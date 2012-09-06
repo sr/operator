@@ -1,0 +1,29 @@
+{
+  "name":        "Parbot",
+  "version":     "1.0.0",
+  "author":      "Pardot LLC",
+  "keywords":    "parbot hubot irc bot",
+  "description": "A simple irc bot for Pardot",
+  "licenses":     [{
+    "type":       "MIT",
+    "url":        "http://github.com/github/hubot/raw/master/LICENSE"
+  }],
+
+  "repository" : {
+    "type": "git",
+    "url":  "https://github.com/github/hubot.git"
+  },
+
+  "dependencies": {
+    "hubot": "2.3.2",
+    "hubot-scripts": ">= 2.1.0",
+    "optparse": "1.0.3",
+    "hubot-irc": "0.1.0",
+    "mysql": "0.9.6"
+  },
+
+  "engines": {
+    "node": "0.6.x",
+    "npm": "1.1.x"
+  }
+}
