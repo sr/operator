@@ -20,5 +20,8 @@ export QUOTE_DB_DATABASE="pardot_quotes"
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
 
+# Supportbot settings
+export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
+
 # Finally run:
 ./bin/hubot -a irc
