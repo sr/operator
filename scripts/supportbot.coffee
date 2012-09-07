@@ -23,7 +23,7 @@ module.exports = (robot) ->
         if !supportBotEnabled then return
         info = joinInfo msg.match[1].split " "
 
-        msg.send sendSupportCommand "addTicket #{msg.message.user.name}", info
+        sendSupportCommand "addTicket #{msg.message.user.name}", info, msg
 
     # Add more to a ticket
     robot.hear /^!(\d+)\s+(.*)$/i, (msg) ->
@@ -31,7 +31,7 @@ module.exports = (robot) ->
         ticket = msg.match[1]
         info   = joinInfo msg.match[2].split " "
 
-        msg.send sendSupportCommand "addMoreToTicket #{ticket}", info + " #{msg.message.user.name}"
+        sendSupportCommand "addMoreToTicket #{ticket}", info + " #{msg.message.user.name}", msg
 
     # Close a ticket
     robot.hear /^!close\s+(\d+)\s*(.*)$/i, (msg) ->
@@ -39,52 +39,52 @@ module.exports = (robot) ->
         ticket = msg.match[1]
         info   = joinInfo msg.match[2].split " "
 
-        msg.send sendSupportCommand "closeTicket #{ticket}", "#{msg.message.user.name} #{info}"
+        sendSupportCommand "closeTicket #{ticket}", "#{msg.message.user.name} #{info}", msg
 
     # Open a ticket
     robot.hear /^!open\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        msg.send sendSupportCommand "openTicket #{ticket}", "#{msg.message.user.name}"
+        sendSupportCommand "openTicket #{ticket}", "#{msg.message.user.name}", msg
 
     # WOC a ticket
     robot.hear /^!woc\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        msg.send sendSupportCommand "wocTicket #{ticket}", "#{msg.message.user.name}"
+        sendSupportCommand "wocTicket #{ticket}", "#{msg.message.user.name}", msg
 
     # Watch a ticket
     robot.hear /^!watch\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} watch #{ticket}"
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} watch #{ticket}", msg
 
     # Ignore a ticket
     robot.hear /^!ignore\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        msg.send sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} ignore #{ticket}"
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} ignore #{ticket}", msg
 
     # What tickets am I watching
     robot.hear /^!watching$/i, (msg) ->
         if !supportBotEnabled then return
-        msg.send sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} info"
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} info", msg
 
     # Overall ticket status
     robot.hear /^!status$/i, (msg) ->
         if !supportBotEnabled then return
-        msg.send sendSupportCommand "status", "#{msg.message.user.name}"
+        sendSupportCommand "status", "#{msg.message.user.name}", msg
 
     # Specific ticket status
     robot.hear /^!status\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        msg.send sendSupportCommand "status", "#{msg.message.user.name} #{ticket}"
+        sendSupportCommand "status", ticket, msg
         
     # Give a ticket
     robot.hear /^!give\s+(\d+)\s+(.*)$/i, (msg) ->
@@ -97,25 +97,23 @@ module.exports = (robot) ->
         if users.indexOf user is -1
             msg.send "#{user} does not exist!"
         else
-            msg.send sendSupportCommand "assignTicket", "#{ticket} #{user}"
+            sendSupportCommand "assignTicket", "#{ticket} #{user}", msg
 
     # Take a ticket
     robot.hear /^!take\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        msg.send sendSupportCommand "assignTicket", "#{ticket} #{msg.message.user.name}"
+        sendSupportCommand "assignTicket", "#{ticket} #{msg.message.user.name}", msg
 
         
 # Execute a supportbot task on the terminal
-sendSupportCommand = (command, arg) ->
-    child = exec "#{process.env.SUPPORTBOT_EXECUTABLE} #{command} #{arg}", (error, stdout, stderr) ->
-            sys.print('stdout: ' + stdout);
-            sys.print('stderr: ' + stderr);
-            
-            console.log 'exec error: ' + error
+sendSupportCommand = (command, arg, msg) ->
 
-            stdout
+    console.log "Running: #{process.env.SUPPORTBOT_EXECUTABLE} #{command} #{arg}"
+
+    child = exec "#{process.env.SUPPORTBOT_EXECUTABLE} #{command} #{arg}", (error, stdout, stderr) ->
+            msg.send stdout
 
 # Join the info with <SPACE>
 joinInfo = (info) ->
@@ -123,15 +121,17 @@ joinInfo = (info) ->
     trimmed = (item for item in trimmed when item.length > 0)
 
     if trimmed.length > 0
-        trimmed.join "<SPACE>"
+        whole = trimmed.join "<SPACE>"
+        "'#{whole}'"    
     else 
         trimmed.join ""
-
+    
 # Is supportbot enabled for this bot?
 supportBotEnabled = () ->
     unless process.env.SUPPORTBOT_ENABLED == 'true'
         false
     true
+
 
 
 
