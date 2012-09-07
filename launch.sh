@@ -9,12 +9,12 @@ export HUBOT_IRC_NICK="Parbot"
 export HUBOT_IRC_SERVER_FAKE_SSL="true"
 
 # Ports to listen on
-export HUBOT_CAT_PORT="7890"
+export HUBOT_CAT_PORT="7892"
 export PORT="7891"
 
 # Quote database settings
-export QUOTE_DB_USER="pardot"
-export QUOTE_DB_PASSWORD="pardot"
+export QUOTE_DB_USER="root"
+export QUOTE_DB_PASSWORD="poop"
 export QUOTE_DB_DATABASE="pardot_quotes"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
