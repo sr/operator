@@ -48,11 +48,13 @@ module.exports = (robot) ->
     robot.hear /^!opme\s+(.*)/i, (msg) ->
         target = msg.match[1]
 
-        console.log msg.robot.adapter.bot
+        
 
-        robot.fooey '112'
-        robot.command "mode", "+o #{target}"
+        console.log getAllNicks()
 
+        #console.log msg.robot.adapter.bot
 
+        #robot.fooey '112'
+        #robot.command "mode", "+o #{target}"
 
 
