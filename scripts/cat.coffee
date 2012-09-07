@@ -11,7 +11,7 @@
 #   None
 #
 # Notes:
-#    echo "hello everyone" | nc -u -w1 localhost 7890
+#    echo "hello everyone" | nc -u -w1 127.0.0.1 7890
 #    
 # Author:
 #   simon

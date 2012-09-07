@@ -11,6 +11,8 @@
 #   None
 #
 
+util = require "../lib/util"
+
 Array::shuffle = -> @sort -> 0.5 - Math.random()
 
 module.exports = (robot) ->
@@ -57,4 +59,50 @@ module.exports = (robot) ->
         #robot.fooey '112'
         #robot.command "mode", "+o #{target}"
 
+     # Chikins runnin wild
+    robot.hear /^!chikin$/i, (msg) ->
+        chikins = [
+            'bucka bucka bucka BUCKA BUACKA baaaaaaAAAA'
+            'cuh-KA cuh-KA cuh-KA KA',
+            'AH-coodle-doodle-doo AH-coodle-doodle-doo',
+            'chee CHAH chee CHAH chee CHAH',
+            'cookoo KATCHA cookoo KATCHA'
+        ].shuffle()
+        
+        msg.send chikins[0]
+        
+    # A cow got loose
+    robot.hear /^!moo$/i, (msg) ->
+        msg.send 'Mooooooo000000000ooooooo000000000ooooooo!!'
+
+    # Hate on someone
+    robot.hear /^!hate$/i, (msg) ->
+        msg.send 'hate hate hate'
+        
+    # Quit hatin
+    robot.hear /^!hater$/i, (msg) ->
+        msg.send 'haters gonna hate'
+        
+    # Poop on someone
+    robot.hear /^!poop$/i, (msg) ->
+        poops = [
+            'plop plop blaaaaaart',
+            'plooop',
+            'pffffft'
+            'ploppity plop ploooooooop',
+            'toot'
+        ].shuffle()
+
+        allNicks = util.getAllNicks robot
+        allNicks.shuffle()
+
+        msg.send "I choose #{allNicks[0]}"
+        robot.send allNicks[0], poops[0]
+    
+    # Get some random nickname
+    robot.hear /^!random$/i, (msg) ->
+        allNicks = util.getAllNicks robot
+        allNicks.shuffle()
+
+        msg.send "#{allNicks[0]}, I choo choo choose you!"
 
