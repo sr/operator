@@ -2,7 +2,7 @@
 
 # Irc connection settings
 export HUBOT_IRC_SERVER="supportbot.pardot.com"
-export HUBOT_IRC_ROOMS="#testSupport"
+export HUBOT_IRC_ROOMS="#testsupport"
 export HUBOT_IRC_PORT="7000"
 export HUBOT_IRC_USESSL="true"
 export HUBOT_IRC_NICK="SupportBot"

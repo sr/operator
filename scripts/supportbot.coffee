@@ -17,12 +17,14 @@ exec = require('child_process').exec;
 module.exports = (robot) ->
     # Add new ticket
     robot.hear /^!add\s+(.*)/i, (msg) ->
+        if !supportBotEnabled then return
         info = joinInfo msg.match[1].split " "
 
         sendSupportCommand "addTicket #{msg.message.user.name}", info
 
     # Add more to a ticket
     robot.hear /^!(\d+)\s+(.*)$/i, (msg) ->
+        if !supportBotEnabled then return
         ticket = msg.match[1].split " "
         info = joinInfo msg.match[2].split " "
 
@@ -30,6 +32,7 @@ module.exports = (robot) ->
 
     # Close a ticket
     robot.hear /^!close\s+(\d+)\s*(.*)$/i, (msg) ->
+        if !supportBotEnabled then return
         ticket = msg.match[1].split " "
         info = joinInfo msg.match[2].split " "
 
@@ -52,6 +55,11 @@ joinInfo = (info) ->
         trimmed.join "<SPACE>"
     else 
         trimmed.join ""
+
+supportBotEnabled = () ->
+    unless process.env.SUPPORTBOT_ENABLED == 'true'
+        false
+    true
 
 
 
