@@ -32,13 +32,11 @@ module.exports = (robot) ->
     robot.hear /^!addquote\s+(.*)$/i, (msg) ->
         key = msg.match[1]
         mysqlClient.query 'INSERT INTO quote (quote) VALUES(?)', [key], (err,r,f) ->
-            console.log err if err
-
-        robot.send msg.message.user.name, 'Quote added!'
+            return console.log err if err
+            robot.send msg.message.user.name, 'Quote added!'
 
     robot.hear /^!delquote\s+(.*)$/i, (msg) ->
         key = msg.match[1]
         mysqlClient.query 'DELETE FROM quote WHERE quote = ?', [key], (err,r,f) ->
-            console.log err if err
-
-        robot.send msg.message.user.name, 'Quote deleted!'
+            return console.log err if err
+            robot.send msg.message.user.name, 'Quote deleted!'
