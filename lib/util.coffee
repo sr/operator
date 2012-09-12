@@ -19,7 +19,7 @@ module.exports.findEngineer = (nickname) ->
 
     for engineer in engineers
         for nick in engineer.list
-             if nickname is nick
-                 engineer.name
+             if nickname.match(/^nick/) is not null
+                return engineer.name
 
     false

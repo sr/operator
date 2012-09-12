@@ -14,8 +14,8 @@ export PORT="7897"
 
 # Quote database settings
 export QUOTE_DB_USER="root"
-export QUOTE_DB_PASSWORD="poop"
-export QUOTE_DB_DATABASE="support_quotes"
+export QUOTE_DB_PASSWORD="pardot07"
+export QUOTE_DB_DATABASE="pardot_quotes"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"

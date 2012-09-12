@@ -26,9 +26,8 @@ module.exports = (robot) ->
             "#{target} caused the current problem",
             "#{target} did it!"
         ]
-        
-        blames.shuffle()
-        msg.send blames[0]
+
+        msg.send msg.random blames
 
     robot.hear /^!praise\s+(.*)/i, (msg) ->
         target = msg.match[1]
@@ -44,20 +43,11 @@ module.exports = (robot) ->
             "#{target} makes it WERK"
         ]
         
-        compliments.shuffle()
-        msg.send compliments[0]
+        msg.send msg.random compliments
 
     robot.hear /^!opme\s+(.*)/i, (msg) ->
         target = msg.match[1]
-
-        
-
         console.log getAllNicks()
-
-        #console.log msg.robot.adapter.bot
-
-        #robot.fooey '112'
-        #robot.command "mode", "+o #{target}"
 
      # Chikins runnin wild
     robot.hear /^!chikin$/i, (msg) ->
@@ -67,9 +57,9 @@ module.exports = (robot) ->
             'AH-coodle-doodle-doo AH-coodle-doodle-doo',
             'chee CHAH chee CHAH chee CHAH',
             'cookoo KATCHA cookoo KATCHA'
-        ].shuffle()
+        ]
         
-        msg.send chikins[0]
+        msg.send msg.random chikins
         
     # A cow got loose
     robot.hear /^!moo$/i, (msg) ->
@@ -82,27 +72,37 @@ module.exports = (robot) ->
     # Quit hatin
     robot.hear /^!hater$/i, (msg) ->
         msg.send 'haters gonna hate'
+
+    # Panic
+    robot.hear /^!panic$/i, (msg) ->
+        msg.send 'oh shit oh shit oh shit oh shit oh shit'
         
     # Poop on someone
     robot.hear /^!poop$/i, (msg) ->
         poops = [
             'plop plop blaaaaaart',
             'plooop',
-            'pffffft'
+            'pffffft',
             'ploppity plop ploooooooop',
             'toot'
-        ].shuffle()
+        ]
 
         allNicks = util.getAllNicks robot
         allNicks.shuffle()
 
+        while allNicks[0] is process.env.HUBOT_IRC_NICK
+            allNicks.shuffle()
+
         msg.send "I choose #{allNicks[0]}"
-        robot.send allNicks[0], poops[0]
+        robot.send allNicks[0], msg.random poops
     
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
         allNicks = util.getAllNicks robot
         allNicks.shuffle()
+
+        while allNicks[0] is process.env.HUBOT_IRC_NICK
+            allNicks.shuffle()
 
         msg.send "#{allNicks[0]}, I choo choo choose you!"
 
