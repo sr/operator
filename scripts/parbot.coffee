@@ -13,8 +13,6 @@
 
 util = require "../lib/util"
 
-Array::shuffle = -> @sort -> 0.5 - Math.random()
-
 module.exports = (robot) ->
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]
@@ -44,10 +42,6 @@ module.exports = (robot) ->
         ]
         
         msg.send msg.random compliments
-
-    robot.hear /^!opme\s+(.*)/i, (msg) ->
-        target = msg.match[1]
-        console.log getAllNicks()
 
      # Chikins runnin wild
     robot.hear /^!chikin$/i, (msg) ->
