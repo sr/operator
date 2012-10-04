@@ -24,7 +24,7 @@ export HUBOT_IRC_DEBUG="true"
 export SUPPORTBOT_ENABLED="false"
 
 # HoursBot settings
-export HOURSBOT_ENABLED="true"
+export HOURSBOT_ENABLED="false"
 
 # Finally run:
 ./bin/hubot -a irc
