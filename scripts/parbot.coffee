@@ -13,6 +13,8 @@
 
 util = require "../lib/util"
 
+Array::shuffle = -> @sort -> 0.5 - Math.random()
+
 module.exports = (robot) ->
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]

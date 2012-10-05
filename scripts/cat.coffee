@@ -11,17 +11,20 @@
 #   None
 #
 # Notes:
-#    echo "hello everyone" | nc -u -w1 127.0.0.1 7890
+#    echo "hello everyone" | nc -w1 127.0.0.1 7890
 #    
 # Author:
-#   simon
+#   Berg
 
-dgram  = require "dgram"
-server = dgram.createSocket "udp4"
+net = require "net"
 
 module.exports = (robot) ->
-  server.on 'message', (message, rinfo) ->
-    msg  = message.toString().trim()
-    user = { room: process.env.HUBOT_IRC_ROOMS }
-    robot.send user, msg
-  server.bind(parseInt(process.env.HUBOT_CAT_PORT))
+  server = net.createServer((c) ->
+    c.on "data", (data) ->
+      msg  = data.toString().trim()
+      user = { room: process.env.HUBOT_IRC_ROOMS }
+      robot.send user, msg
+  )
+
+  server.listen parseInt(process.env.HUBOT_CAT_PORT), ->
+    console.log "cat listening"
