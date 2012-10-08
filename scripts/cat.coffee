@@ -19,12 +19,17 @@
 net = require "net"
 
 module.exports = (robot) ->
-  server = net.createServer((c) ->
-    c.on "data", (data) ->
-      msg  = data.toString().trim()
-      user = { room: process.env.HUBOT_IRC_ROOMS }
-      robot.send user, msg
-  )
+  try
+    server = net.createServer((c) ->
+      c.on "data", (data) ->
+        msg  = data.toString().trim()
+        user = { room: process.env.HUBOT_IRC_ROOMS }
+        robot.send user, msg
+    )
 
-  server.listen parseInt(process.env.HUBOT_CAT_PORT), ->
-    console.log "cat listening"
+    server.listen parseInt(process.env.HUBOT_CAT_PORT), ->
+      console.log "cat listening"
+  catch e
+    console.log e
+    console.log "CAT FAILED!"
+  

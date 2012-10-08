@@ -109,9 +109,7 @@ module.exports = (robot) ->
         
 # Execute a supportbot task on the terminal
 sendSupportCommand = (command, arg, msg) ->
-
     console.log "Running: #{process.env.SUPPORTBOT_EXECUTABLE} #{command} #{arg}"
-
     child = exec "#{process.env.SUPPORTBOT_EXECUTABLE} #{command} #{arg}", (error, stdout, stderr) ->
             msg.send stdout
 
