@@ -40,7 +40,7 @@ module.exports.getQuoteDBConn = () ->
     mysqlClient = mysql.createClient({
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        database: process.env.QUOTE_DB_DATABASE
+        database: process.env.QUOTE_DATABASE
     });
 
     mysqlClient

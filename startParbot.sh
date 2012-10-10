@@ -15,7 +15,7 @@ export PORT="7893"
 # Database settings
 export DB_USER="root"
 export DB_PASSWORD="poop"
-export QUOTE_DB_DATABASE="pardot_quotes"
+export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
