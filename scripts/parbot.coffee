@@ -23,8 +23,8 @@ module.exports = (robot) ->
                 if r and r[0]
                     msg.send r[0].releaser + ' updated prod to revision ' + r[0].revision + ' on ' + r[0].date
         else
-            util.getReleaseDBConn().query 'SELECT * FROM sync ORDER BY ID DESC limit ?', [number], (err,r,f) ->
+            util.getReleaseDBConn().query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for sync in r
-                        msg.send r[0].releaser + ' updated prod to revision ' + r[0].revision + ' on ' + r[0].date
+                        msg.send sync.releaser + ' updated prod to revision ' + sync.revision + ' on ' + sync.date
 
