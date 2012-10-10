@@ -12,10 +12,10 @@ export HUBOT_IRC_SERVER_FAKE_SSL="true"
 export HUBOT_CAT_PORT="7894"
 export PORT="7895"
 
-# Quote database settings
-export QUOTE_DB_USER="root"
-export QUOTE_DB_PASSWORD="poop"
-export QUOTE_DB_DATABASE="support_quotes"
+# Database settings
+export DB_USER="root"
+export DB_PASSWORD="poop"
+export QUOTE_DATABASE="support_quotes"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
@@ -23,6 +23,12 @@ export HUBOT_IRC_DEBUG="true"
 # Supportbot settings
 export SUPPORTBOT_ENABLED="true"
 export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
+
+# HoursBot settings
+export HOURSBOT_ENABLED="false"
+
+# Release tracker
+export RELEASE_TRACKING_ENABLED="false"
 
 # Finally run:
 ./bin/hubot -a irc

@@ -17,6 +17,7 @@
 #   Berg
 
 net = require "net"
+util = require "../lib/util"
 
 module.exports = (robot) ->
   try
@@ -24,6 +25,8 @@ module.exports = (robot) ->
       c.on "data", (data) ->
         msg  = data.toString().trim()
         user = { room: process.env.HUBOT_IRC_ROOMS }
+
+        recordRelease msg
         robot.send user, msg
     )
 
@@ -33,3 +36,11 @@ module.exports = (robot) ->
     console.log e
     console.log "CAT FAILED!"
   
+
+
+recordRelease = (msg) ->
+  match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
+
+  if match isnt null
+    util.getReleaseDBConn().query 'INSERT INTO release (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2], new Date()], (err,r,f) ->
+        return console.log err if err

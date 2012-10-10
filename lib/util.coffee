@@ -1,3 +1,4 @@
+mysql = require "mysql"
 
 # Get all nicknames from the robot
 module.exports.getAllNicks = (robot) ->
@@ -23,3 +24,23 @@ module.exports.findEngineer = (nickname) ->
                 return engineer.name
 
     false
+
+# Get connection to release DB
+module.exports.getReleaseDBConn = () ->
+    mysqlClient = mysql.createClient({
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.RELEASE_DATABASE
+    });
+
+    mysqlClient
+
+# Get connection to quote DB
+module.exports.getQuoteDBConn = () ->
+    mysqlClient = mysql.createClient({
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.QUOTE_DB_DATABASE
+    });
+
+    mysqlClient
