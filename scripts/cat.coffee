@@ -35,9 +35,8 @@ module.exports = (robot) ->
   catch e
     console.log e
     console.log "CAT FAILED!"
-  
 
-
+# Record the relase infos
 recordRelease = (msg) ->
   match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
 

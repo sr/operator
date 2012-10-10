@@ -14,7 +14,7 @@ export PORT="7897"
 
 # Database settings
 export DB_USER="root"
-export DB_PASSWORD="pardot07"
+export DB_PASSWORD="poop"
 export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
 
