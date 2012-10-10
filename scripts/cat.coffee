@@ -41,5 +41,5 @@ recordRelease = (msg) ->
   match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
 
   if match isnt null
-    util.getReleaseDBConn().query 'INSERT INTO release (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2], new Date()], (err,r,f) ->
+    util.getReleaseDBConn().query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2], new Date()], (err,r,f) ->
         return console.log err if err

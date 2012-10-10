@@ -19,10 +19,10 @@ module.exports = (robot) ->
         number = msg.match[1]
 
         if not number
-            util.getReleaseDBConn().query 'SELECT * FROM release ORDER BY ID DESC limit 1', (err,r,f) ->
+            util.getReleaseDBConn().query 'SELECT * FROM sync ORDER BY ID DESC limit 1', (err,r,f) ->
                 msg.send r[0].quote if r and r[0]
         else
             console.log 'fooey'
-            util.getReleaseDBConn().query 'SELECT * FROM release ORDER BY ID DESC limit ?', [number], (err,r,f) ->
+            util.getReleaseDBConn().query 'SELECT * FROM sync ORDER BY ID DESC limit ?', [number], (err,r,f) ->
                 msg.send r[0].quote if r and r[0]
 

@@ -28,8 +28,8 @@ export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
 # HoursBot settings
 export HOURSBOT_ENABLED="true"
 
-# HoursBot settings
-export HOURSBOT_ENABLED="true"
+# Release tracker
+export RELEASE_TRACKING_ENABLED="true"
 
 # Finally run:
 ./bin/hubot -a irc
