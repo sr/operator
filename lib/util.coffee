@@ -44,3 +44,14 @@ module.exports.getQuoteDBConn = () ->
     });
 
     mysqlClient
+
+# Get connection to hours DB
+module.exports.getHoursDBConn = () ->
+    mysqlClient = mysql.createClient({
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.HOURS_DATABASE
+    });
+
+    mysqlClient
+

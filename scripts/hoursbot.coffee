@@ -13,13 +13,6 @@
 
 cronJob = require("cron").CronJob
 utils   = require "../lib/util"
-mysql   = require "mysql"
-
-mysqlClient = mysql.createClient({
-    user: process.env.QUOTE_DB_USER,
-    password: process.env.QUOTE_DB_PASSWORD,
-    database: process.env.QUOTE_DB_DATABASE
-});
 
 module.exports = (robot) ->
     # Record hours

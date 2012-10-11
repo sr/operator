@@ -39,7 +39,12 @@ module.exports = (robot) ->
 # Record the relase infos
 recordRelease = (msg) ->
   match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
+  conn = util.getReleaseDBConn()
 
   if match isnt null
-    util.getReleaseDBConn().query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
-        return console.log err if err
+    conn.query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
+        if err
+          conn.end()
+          return console.log err 
+
+    conn.end()

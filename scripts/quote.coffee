@@ -19,18 +19,35 @@ module.exports = (robot) ->
         conn.query 'SELECT quote FROM quote WHERE quote like ' + conn.escape('%'+key+'%') + ' ORDER BY rand() limit 10', (err,r,f) ->
             msg.send r[0].quote if r and r[0]
 
+        conn.end()
+
     robot.hear /^!quote$/i, (msg) ->
-        util.getQuoteDBConn().query 'SELECT quote FROM quote ORDER BY rand() limit 10', (err,r,f) ->
+        conn = util.getQuoteDBConn()
+        conn.query 'SELECT quote FROM quote ORDER BY rand() limit 10', (err,r,f) ->
             msg.send r[0].quote if r and r[0]
+
+        conn.end()
 
     robot.hear /^!addquote\s+(.*)$/i, (msg) ->
         key = msg.match[1]
-        util.getQuoteDBConn().query 'INSERT INTO quote (quote) VALUES(?)', [key], (err,r,f) ->
-            return console.log err if err
-            robot.send msg.message.user.name, 'Quote added!'
+        conn = util.getQuoteDBConn()
+        conn.query 'INSERT INTO quote (quote) VALUES(?)', [key], (err,r,f) ->
+            if err
+                conn.end()
+                return console.log err
+            else
+                robot.send msg.message.user.name, 'Quote added!'
+
+        conn.end()
 
     robot.hear /^!delquote\s+(.*)$/i, (msg) ->
         key = msg.match[1]
-        util.getQuoteDBConn().query 'DELETE FROM quote WHERE quote = ?', [key], (err,r,f) ->
-            return console.log err if err
-            robot.send msg.message.user.name, 'Quote deleted!'
+        conn = util.getQuoteDBConn()
+        conn.query 'DELETE FROM quote WHERE quote = ?', [key], (err,r,f) ->
+            if err
+                conn.end()
+                return console.log err
+            else
+                robot.send msg.message.user.name, 'Quote deleted!'
+            
+        conn.end()
