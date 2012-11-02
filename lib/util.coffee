@@ -1,5 +1,7 @@
 mysql = require "mysql"
 
+request = require 'request'
+
 # Get all nicknames from the robot
 module.exports.getAllNicks = (robot) ->
     (v.name for k,v of robot.users())
@@ -55,3 +57,22 @@ module.exports.getHoursDBConn = () ->
 
     mysqlClient
 
+# Get account information from internal API
+module.exports.apiGetAccountInfo = (account_id, msg) ->
+    options =
+    url: "https://tools.pardot.com/accounts/#{account_id}"
+    headers:
+        api_key: '1b424ca119675c1c712957531498ac5af4646afb'
+
+    request.get options, (error, response, body) ->
+        if error
+            console.log 'ERROR'
+            console.log error.message
+            msg.send "Sorry, unable to fetch info for account ID: #{account_id}"
+        else
+            console.log body
+            account_info = JSON.parse(body)
+            if account_info.error
+                msg.send "Sorry, unable to fetch info for account ID: #{account_id}"
+            else
+                msg.send 'Company: ' + account_info.company + ' (' + account_info.id + ') | Found on Shard: ' + account_info.shard_id

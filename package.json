@@ -20,7 +20,8 @@
     "optparse": "1.0.3",
     "hubot-irc": "0.1.0",
     "mysql": "0.9.6",
-    "cron": "*"
+    "cron": "*",
+    "request": "*"
   },
 
   "engines": {
