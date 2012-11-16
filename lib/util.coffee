@@ -105,7 +105,7 @@ module.exports.apiGetAccountsLike = (search_text, msg) ->
 
                     account_list = ''
                     for account, idx in info_for_accounts
-                        if idx > 5
+                        if idx >= accounts_to_show
                             break
                         account_list = account_list + "Company: #{account.company} (#{account.id}) | Shard: #{account.shard_id}\n"
 
