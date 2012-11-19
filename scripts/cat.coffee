@@ -27,7 +27,11 @@ module.exports = (robot) ->
         user = { room: process.env.HUBOT_IRC_ROOMS }
 
         recordRelease msg
-        robot.send user, msg
+
+        try
+          robot.send user, msg
+        catch e
+          console.log e
     )
 
     server.listen parseInt(process.env.HUBOT_CAT_PORT), ->
