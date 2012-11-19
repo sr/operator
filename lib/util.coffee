@@ -35,7 +35,6 @@ module.exports.getReleaseDBConn = () ->
             password: process.env.DB_PASSWORD,
             database: process.env.RELEASE_DATABASE,
             socketPath: '/var/run/mysqld/mysqld.sock'
-        });
 
         connection
     catch e
@@ -49,7 +48,6 @@ module.exports.getQuoteDBConn = () ->
             password: process.env.DB_PASSWORD,
             database: process.env.QUOTE_DATABASE,
             socketPath: '/var/run/mysqld/mysqld.sock'
-        });
 
         connection
     catch e
