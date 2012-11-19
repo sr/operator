@@ -29,33 +29,45 @@ module.exports.findEngineer = (nickname) ->
 
 # Get connection to release DB
 module.exports.getReleaseDBConn = () ->
-    mysqlClient = mysql.createClient({
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.RELEASE_DATABASE
-    });
+    try
+        mysqlClient = mysql.createClient({
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.RELEASE_DATABASE,
+            socketPath: "/var/run/mysqld/mysqld.sock"
+        });
 
-    mysqlClient
+        mysqlClient
+    catch e
+        false
 
 # Get connection to quote DB
 module.exports.getQuoteDBConn = () ->
-    mysqlClient = mysql.createClient({
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.QUOTE_DATABASE
-    });
+    try
+        mysqlClient = mysql.createClient({
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.QUOTE_DATABASE,
+            socketPath: "/var/run/mysqld/mysqld.sock"
+        });
 
-    mysqlClient
+        mysqlClient
+    catch e
+        false
 
 # Get connection to hours DB
 module.exports.getHoursDBConn = () ->
-    mysqlClient = mysql.createClient({
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.HOURS_DATABASE
-    });
+    try
+        mysqlClient = mysql.createClient({
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.HOURS_DATABASE,
+            socketPath: "/var/run/mysqld/mysqld.sock"
+        });
 
-    mysqlClient
+        mysqlClient
+    catch e
+        false        
 
 # Get account information from internal API
 module.exports.apiGetAccountInfo = (account_id, msg) ->

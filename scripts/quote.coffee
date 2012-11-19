@@ -16,10 +16,11 @@ module.exports = (robot) ->
     robot.hear /^!quote\s+(.*)$/i, (msg) ->
         key = msg.match[1]
         conn = util.getQuoteDBConn()
-        conn.query 'SELECT quote FROM quote WHERE quote like ' + conn.escape('%'+key+'%') + ' ORDER BY rand() limit 10', (err,r,f) ->
-            msg.send r[0].quote if r and r[0]
+        if conn is not false
+            conn.query 'SELECT quote FROM quote WHERE quote like ' + conn.escape('%'+key+'%') + ' ORDER BY rand() limit 10', (err,r,f) ->
+                msg.send r[0].quote if r and r[0]
 
-        conn.end()
+            conn.end()
 
     robot.hear /^!quote$/i, (msg) ->
         conn = util.getQuoteDBConn()
