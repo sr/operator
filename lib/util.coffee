@@ -34,7 +34,7 @@ module.exports.getReleaseDBConn = () ->
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.RELEASE_DATABASE,
-            socketPath: '/var/run/mysqld/mysqld.sock'
+            host: '127.0.0.1'
 
         connection
     catch e
@@ -47,7 +47,7 @@ module.exports.getQuoteDBConn = () ->
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.QUOTE_DATABASE,
-            socketPath: '/var/run/mysqld/mysqld.sock'
+            host: '127.0.0.1'
 
         connection
     catch e
@@ -59,8 +59,8 @@ module.exports.getHoursDBConn = () ->
         connection = mysql.createConnection
             user: process.env.DB_USER
             password: process.env.DB_PASSWORD
-            database: process.env.HOURS_DATABASE
-            socketPath: '/var/run/mysqld/mysqld.sock'
+            database: process.env.HOURS_DATABASE,
+            host: '127.0.0.1'
 
         connection
     catch e
