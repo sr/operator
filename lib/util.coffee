@@ -30,42 +30,41 @@ module.exports.findEngineer = (nickname) ->
 # Get connection to release DB
 module.exports.getReleaseDBConn = () ->
     try
-        mysqlClient = mysql.createClient({
+        connection = mysql.createConnection
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.RELEASE_DATABASE,
-            socketPath: "/var/run/mysqld/mysqld.sock"
+            socketPath: '/var/run/mysqld/mysqld.sock'
         });
 
-        mysqlClient
+        connection
     catch e
         false
 
 # Get connection to quote DB
 module.exports.getQuoteDBConn = () ->
     try
-        mysqlClient = mysql.createClient({
+        connection = mysql.createConnection
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.QUOTE_DATABASE,
-            socketPath: "/var/run/mysqld/mysqld.sock"
+            socketPath: '/var/run/mysqld/mysqld.sock'
         });
 
-        mysqlClient
+        connection
     catch e
         false
 
 # Get connection to hours DB
 module.exports.getHoursDBConn = () ->
     try
-        mysqlClient = mysql.createClient({
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.HOURS_DATABASE,
-            socketPath: "/var/run/mysqld/mysqld.sock"
-        });
+        connection = mysql.createConnection
+            user: process.env.DB_USER
+            password: process.env.DB_PASSWORD
+            database: process.env.HOURS_DATABASE
+            socketPath: '/var/run/mysqld/mysqld.sock'
 
-        mysqlClient
+        connection
     catch e
         false        
 
