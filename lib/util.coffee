@@ -30,40 +30,43 @@ module.exports.findEngineer = (nickname) ->
 # Get connection to release DB
 module.exports.getReleaseDBConn = () ->
     try
-        connection = mysql.createConnection
+        client = mysql.createClient
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.RELEASE_DATABASE,
             host: '127.0.0.1'
 
-        connection
+        client
     catch e
+        console.log e
         false
 
 # Get connection to quote DB
 module.exports.getQuoteDBConn = () ->
     try
-        connection = mysql.createConnection
+        client = mysql.createClient
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.QUOTE_DATABASE,
             host: '127.0.0.1'
 
-        connection
+        client
     catch e
+        console.log e
         false
 
 # Get connection to hours DB
 module.exports.getHoursDBConn = () ->
     try
-        connection = mysql.createConnection
+        client = mysql.createClient
             user: process.env.DB_USER
             password: process.env.DB_PASSWORD
             database: process.env.HOURS_DATABASE,
             host: '127.0.0.1'
 
-        connection
+        client
     catch e
+        console.log e
         false        
 
 # Get account information from internal API
