@@ -1,5 +1,5 @@
 # Description:
-#   HoursBot commands
+#   KPIBot commands
 #
 # Dependencies:
 #   None
@@ -16,10 +16,10 @@ utils   = require "../lib/util"
 
 module.exports = (robot) ->
     # Record hours
-    robot.hear /^!hours\s+(\d+)$/i, (msg) ->
+    robot.hear /^!kpi\s+(\d+)$/i, (msg) ->
         console.log 'fooey'
 
-        if !hoursBotEnabled then return
+        if !kpiBotEnabled then return
         hours = msg.match[1]
 
         if hours > 24
@@ -39,27 +39,6 @@ updateHours = (engineer, nickHours, date) ->
     
     if nickHours > 24
         nickHours = 8
-    
-    #db.open (err, db)
-    ###
-        if !err
-            db.collection('hours', (err, collection)
-                # Get everyone that sent in hours for this date
-                collection.find({name: engineer, date : hoursDate}).toArray((err, items) {
-                    if items.length == 0
-                        collection.save({name: engineer, date : hoursDate, hours : nickHours});
-                    else
-                        existing = items[0];
-                        existing.hours = nickHours;
-
-                        # Resave
-                        collection.save(existing);
-                    
-                    # Shut it down
-                    db.close()
-    
-    #nickHours
-    ###
 
 # Get whatever 'yesterday' was
 getYesterday = ->
@@ -83,9 +62,24 @@ getYesterday = ->
     #month + '-' + day + '-' + year
 
 
-# Is supportbot enabled for this bot?
-hoursBotEnabled = () ->
-    unless process.env.HOURSBOT_ENABLED == 'true'
+# Is kpibot enabled for this bot?
+kpiBotEnabled = () ->
+    unless process.env.KPIBOT_ENABLED == 'true'
         false
     true
+
+# Setup some crons to prompt us
+new cronJob("00 45 9 * * 2-6", ->
+  askForHours()
+, null, true)
+
+new cronJob("00 */10 10-12 * * 2-6", ->
+  askForHours()
+, null, true)
+
+new cronJob("00 * * * * 2-6", ->
+  client.send "NAMES", ircRoom
+, null, true)
+
+
 

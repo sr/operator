@@ -17,7 +17,7 @@ export DB_USER="root"
 export DB_PASSWORD="poop"
 export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
-export HOURS_DATABASE="pardot_hours"
+export KPI_DATABASE="pardot_kpis"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
@@ -25,8 +25,8 @@ export HUBOT_IRC_DEBUG="true"
 # Supportbot settings
 export SUPPORTBOT_ENABLED="false"
 
-# HoursBot settings
-export HOURSBOT_ENABLED="false"
+# KPIBot settings
+export KPIBOT_ENABLED="false"
 
 # Release tracker
 export RELEASE_TRACKING_ENABLED="true"

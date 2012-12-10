@@ -17,7 +17,7 @@ export DB_USER="root"
 export DB_PASSWORD="poop"
 export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
-export HOURS_DATABASE="pardot_hours"
+export KPI_DATABASE="pardot_kpis"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
@@ -26,8 +26,8 @@ export HUBOT_IRC_DEBUG="true"
 export SUPPORTBOT_ENABLED="true"
 export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
 
-# HoursBot settings
-export HOURSBOT_ENABLED="true"
+# KPIBot settings
+export KPIBOT_ENABLED="true"
 
 # Release tracker
 export RELEASE_TRACKING_ENABLED="true"

@@ -10,7 +10,6 @@ module.exports.getAllNicks = (robot) ->
 module.exports.findEngineer = (nickname) ->
     engineers = [
         { name: "berg", list: ["berg"] },
-        { name: "evinti", list : ["evinti"] },
         { name: "ian", list : ["ian"] },
         { name: "jarrett", list : ["jarrett", "jart"] },
         { name: "meredith", list : ["meredith"] },
@@ -55,13 +54,13 @@ module.exports.getQuoteDBConn = () ->
         console.log e
         false
 
-# Get connection to hours DB
-module.exports.getHoursDBConn = () ->
+# Get connection to kpi DB
+module.exports.getKPIDBConn = () ->
     try
         client = mysql.createClient
             user: process.env.DB_USER
             password: process.env.DB_PASSWORD
-            database: process.env.HOURS_DATABASE,
+            database: process.env.KPI_DATABASE,
             host: '127.0.0.1'
 
         client
