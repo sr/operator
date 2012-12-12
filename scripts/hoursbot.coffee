@@ -69,17 +69,16 @@ kpiBotEnabled = () ->
     true
 
 # Setup some crons to prompt us
-new cronJob("00 45 9 * * 2-6", ->
-  askForHours()
-, null, true)
 
-new cronJob("00 */10 10-12 * * 2-6", ->
-  askForHours()
-, null, true)
+#new cronJob("00 45 9 * * 2-6", ->
+#  askForHours()
+#, null, true)
 
-new cronJob("00 * * * * 2-6", ->
-  client.send "NAMES", ircRoom
-, null, true)
+#new cronJob("00 */10 10-12 * * 2-6", ->
+#  askForHours()
+#, null, true)
 
-
+#new cronJob("00 * * * * 2-6", ->
+#  client.send "NAMES", ircRoom
+#, null, true)
 

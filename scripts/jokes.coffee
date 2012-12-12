@@ -6,8 +6,5 @@ module.exports = (robot) ->
       vote = joke.up_votes - joke.down_votes
       msg.send "#{ joke.question }"
       setTimeout ->
-        msg.send "#{ joke.answer }" 
-        setTimeout ->
-          msg.send "#{ vote } upvotes - #{ joke.bitly_url }"
-        , 1000
+        msg.send "#{ joke.answer }"
        , 4000
