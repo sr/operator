@@ -3,8 +3,10 @@ mysql = require "mysql"
 request = require 'request'
 
 # Get all nicknames from the robot
-module.exports.getAllNicks = (robot) ->
-    (v.name for k,v of robot.users())
+module.exports.getAllNicks = (message) ->
+  channel = message.robot.adapter.bot.chans[message.message.user.room]
+  return [] if not channel
+  Object.keys channel.users
 
 # Find an engineer based on nickname
 module.exports.findEngineer = (nickname) ->

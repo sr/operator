@@ -84,7 +84,7 @@ module.exports = (robot) ->
             'toot'
         ]
 
-        allNicks = util.getAllNicks robot
+        allNicks = util.getAllNicks msg
         allNicks.shuffle()
 
         while allNicks[0] is process.env.HUBOT_IRC_NICK
@@ -98,7 +98,7 @@ module.exports = (robot) ->
     
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
-        allNicks = util.getAllNicks robot
+        allNicks = util.getAllNicks msg
         allNicks.shuffle()
 
         while allNicks[0] is process.env.HUBOT_IRC_NICK

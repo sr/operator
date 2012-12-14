@@ -92,7 +92,7 @@ module.exports = (robot) ->
         ticket = msg.match[1]
         user   = msg.match[2]
 
-        users = util.getAllNicks robot
+        users = util.getAllNicks msg
 
         if users.indexOf user is -1
             msg.send "#{user} does not exist!"
