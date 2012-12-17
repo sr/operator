@@ -13,7 +13,7 @@
 util = require "../lib/util"
 
 module.exports = (robot) ->
-    robot.hear /^!joke\s+(.*)$/i, (msg) ->
+    robot.hear /^!joke$/i, (msg) ->
         key = msg.match[1]
         conn = util.getQuoteDBConn()
         conn.query 'SELECT quote FROM quote WHERE quote like \'%ian%\' ORDER BY rand() limit 10', (err,r,f) ->
