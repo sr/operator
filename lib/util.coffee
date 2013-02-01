@@ -68,7 +68,7 @@ module.exports.getKPIDBConn = () ->
         client
     catch e
         console.log e
-        false        
+        false
 
 # Get account information from internal API
 module.exports.apiGetAccountInfo = (account_id, msg) ->
@@ -91,7 +91,9 @@ module.exports.apiGetAccountInfo = (account_id, msg) ->
                 msg.send "Company: #{account_info.company} (#{account_info.id}) | Shard: #{account_info.shard_id}"
 
 module.exports.apiGetAccountsLike = (search_text, msg) ->
-    escaped_text = escape search_text
+    # escaped_text = escape search_text
+    escaped_text = encodeURIComponent search_text
+    console.log escaped_text
     options =
         url: "https://tools.pardot.com/accounts/like/#{escaped_text}"
         headers:
@@ -104,7 +106,13 @@ module.exports.apiGetAccountsLike = (search_text, msg) ->
             msg.send "Sorry, unable to fetch accounts matching \'#{search_text}\'"
         else
             console.log body
-            info_for_accounts = JSON.parse(body)
+            try
+                info_for_accounts = JSON.parse(body)
+            catch e
+                console.log e
+                msg.send "Sorry, unable to fetch accounts matching \'#{search_text}\'"
+                return
+
             if info_for_accounts.error
                 msg.send "Sorry, unable to fetch accounts matching \'#{search_text}\'"
             else
