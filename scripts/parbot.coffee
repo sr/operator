@@ -8,7 +8,7 @@
 #   None
 #
 # Commands:
-#   fooery - parbot commands
+#   fooey - parbot commands
 #
 
 util = require "../lib/util"
@@ -18,6 +18,9 @@ module.exports = (robot) ->
     robot.hear /^!lastrelease\s*(\d*)/i, (msg) ->
         number = msg.match[1]
         conn = util.getReleaseDBConn()
+
+        if number > 10
+            number = 10
 
         if not number
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit 1', (err,r,f) ->
