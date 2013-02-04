@@ -128,7 +128,8 @@ joinInfo = (info) ->
 
     if trimmed.length > 0
         whole = trimmed.join "<SPACE>"
-        "'#{whole}'"    
+        whole = addslashes whole
+        "\"#{whole}\""
     else 
         trimmed.join ""
     
@@ -138,6 +139,9 @@ supportBotEnabled = () ->
         false
     true
 
+# Not escaping single quotes here!
+addslashes = (string) ->
+  string.replace(/\\/g, "\\\\").replace(/\u0008/g, "\\b").replace(/\t/g, "\\t").replace(/\n/g, "\\n").replace(/\f/g, "\\f").replace(/\r/g, "\\r").replace /"/g, "\\\""
 
 
 
