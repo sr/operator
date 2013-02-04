@@ -26,6 +26,8 @@ module.exports = (robot) ->
         msg  = data.toString().trim()
         user = { room: process.env.HUBOT_IRC_ROOMS }
 
+        console.log msg
+
         if msg is "command:getNicks"
           channel = robot.adapter.bot.chans[process.env.HUBOT_IRC_ROOMS]
           users = Object.keys channel.users
