@@ -62,6 +62,13 @@ module.exports = (robot) ->
 
         sendSupportCommand "ircNotifyTicket", "#{msg.message.user.name} watch #{ticket}", msg
 
+    robot.hear /^!notify\s+(\d+)\s+(.+)$/i, (msg) ->
+        if !supportBotEnabled then return
+        ticket = msg.match[1]
+        notify = msg.match[2]
+
+        sendSupportCommand "ircNotifyTicket", "#{notify} watch #{ticket}", msg
+
     # Ignore a ticket
     robot.hear /^!ignore\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
@@ -93,8 +100,9 @@ module.exports = (robot) ->
         user   = msg.match[2]
 
         users = util.getAllNicks msg
+        index = users.indexOf user
 
-        if users.indexOf user is -1
+        if index is -1
             msg.send "#{user} does not exist!"
         else
             sendSupportCommand "assignTicket", "#{ticket} #{user}", msg

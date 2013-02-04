@@ -26,12 +26,20 @@ module.exports = (robot) ->
         msg  = data.toString().trim()
         user = { room: process.env.HUBOT_IRC_ROOMS }
 
-        recordRelease msg
+        if msg is "command:getNicks"
+          channel = robot.adapter.bot.chans[process.env.HUBOT_IRC_ROOMS]
+          users = Object.keys channel.users
+          c.write users.toString().replace(",", " ")
+          c.pipe c
+        else
+          recordRelease msg
 
-        try
-          robot.send user, msg
-        catch e
-          console.log e
+          try
+            robot.send user, msg
+          catch e
+            console.log e
+
+        c.end()
     )
 
     server.listen parseInt(process.env.HUBOT_CAT_PORT), ->
