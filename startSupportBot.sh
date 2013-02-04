@@ -9,7 +9,7 @@ export HUBOT_IRC_NICK="SupportBot"
 export HUBOT_IRC_SERVER_FAKE_SSL="true"
 
 # Ports to listen on
-export HUBOT_CAT_PORT="7894"
+export HUBOT_CAT_PORT="7891"
 export PORT="7895"
 
 # Database settings
