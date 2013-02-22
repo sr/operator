@@ -105,14 +105,14 @@ module.exports = (robot) ->
         if index is -1
             msg.send "#{user} does not exist!"
         else
-            sendSupportCommand "assignTicket", "#{ticket} #{user}", msg
+            sendSupportCommand "assignTicket", "#{ticket} #{user} #{msg.message.user.name}", msg
 
     # Take a ticket
     robot.hear /^!take\s+(\d+)$/i, (msg) ->
         if !supportBotEnabled then return
         ticket = msg.match[1]
 
-        sendSupportCommand "assignTicket", "#{ticket} #{msg.message.user.name}", msg
+        sendSupportCommand "assignTicket", "#{ticket} #{msg.message.user.name} #{msg.message.user.name}", msg
 
         
 # Execute a supportbot task on the terminal
