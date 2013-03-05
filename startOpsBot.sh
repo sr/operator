@@ -10,7 +10,7 @@ export HUBOT_IRC_SERVER_FAKE_SSL="true"
 
 # Ports to listen on
 export HUBOT_CAT_PORT="7890"
-export PORT="7893"
+export PORT="7894"
 
 # Database settings
 export DB_USER="root"

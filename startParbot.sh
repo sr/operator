@@ -9,7 +9,7 @@ export HUBOT_IRC_NICK="Parbot"
 export HUBOT_IRC_SERVER_FAKE_SSL="true"
 
 # Ports to listen on
-export HUBOT_CAT_PORT="7889"
+export HUBOT_CAT_PORT="7880"
 export PORT="7893"
 
 # Database settings
