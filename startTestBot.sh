@@ -32,5 +32,8 @@ export KPIBOT_ENABLED="true"
 # Release tracker
 export RELEASE_TRACKING_ENABLED="true"
 
+# Fire tracker
+export FIRE_RECORDING_ENABLED="true"
+
 # Finally run:
 ./bin/hubot -a irc

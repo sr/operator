@@ -9,7 +9,7 @@ export HUBOT_IRC_NICK="Parbot"
 export HUBOT_IRC_SERVER_FAKE_SSL="true"
 
 # Ports to listen on
-export HUBOT_CAT_PORT="7890"
+export HUBOT_CAT_PORT="7889"
 export PORT="7893"
 
 # Database settings
@@ -30,6 +30,9 @@ export KPIBOT_ENABLED="false"
 
 # Release tracker
 export RELEASE_TRACKING_ENABLED="true"
+
+# Fire tracker
+export FIRE_RECORDING_ENABLED="false"
 
 # Finally run:
 ./bin/hubot -a irc
