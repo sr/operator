@@ -33,6 +33,7 @@ module.exports = (robot) ->
           c.pipe c
         else
           recordRelease msg
+          recordFires msg
 
           try
             robot.send user, msg
@@ -50,13 +51,49 @@ module.exports = (robot) ->
 
 # Record the relase infos
 recordRelease = (msg) ->
-  match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
-  conn = util.getReleaseDBConn()
+  if process.env.RELEASE_TRACKING_ENABLED == 'true'
+    match = msg.match(/^(\w\w)\sjust\supdated\sPROD\son\semail-d1\.pardot\.com\sfrom\sRevision:\s(\d+)/i)
+    conn = util.getReleaseDBConn()
 
-  if match isnt null
-    conn.query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
-        if err
-          conn.end()
-          return console.log err 
+    if match isnt null
+      conn.query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
+          if err
+            conn.end()
+            return console.log err 
 
-    conn.end()
+      conn.end()
+
+# Record production fires
+recordFires = (msg) ->
+  if process.env.FIRE_RECORDING_ENABLED == 'true'
+    score = 0
+
+    # Solr out of date
+    match = msg.match(/^Solr\sout\sof\sdate\son\sshard\s\d*\.*/i)
+    if match isnt null
+      score += 2
+
+    match = msg.match(/^Solr\d:\sCaught\sRestCurlException/i)
+    if match isnt null
+      score += 2
+
+    match = msg.match((/^Error\s\'Duplicate\sentry/i)
+    if match isnt null
+      score += 10
+
+    match = msg.match((/^Replication\sfailed\son\sdb-/i)
+    if match isnt null
+      score += 10
+
+
+
+
+
+
+
+
+
+
+
+
+
