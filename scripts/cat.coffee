@@ -64,26 +64,26 @@ recordRelease = (msg) ->
       conn.end()
 
 # Record production fires
-recordFires = (msg) ->
-  if process.env.FIRE_RECORDING_ENABLED == 'true'
-    score = 0
+#recordFires = (msg) ->
+#  if process.env.FIRE_RECORDING_ENABLED == 'true'
+#    score = 0
 
     # Solr out of date
-    match = msg.match(/^Solr\sout\sof\sdate\son\sshard\s\d*\.*/i)
-    if match isnt null
-      score += 2
+#    match = msg.match(/^Solr\sout\sof\sdate\son\sshard\s\d*\.*/i)
+#    if match isnt null
+#      score += 2
 
-    match = msg.match(/^Solr\d:\sCaught\sRestCurlException/i)
-    if match isnt null
-      score += 2
+#    match = msg.match(/^Solr\d:\sCaught\sRestCurlException/i)
+#    if match isnt null
+#      score += 2
 
-    match = msg.match((/^Error\s\'Duplicate\sentry/i)
-    if match isnt null
-      score += 10
+#    match = msg.match((/^Error\s\'Duplicate\sentry/i)
+#    if match isnt null
+#      score += 10
 
-    match = msg.match((/^Replication\sfailed\son\sdb-/i)
-    if match isnt null
-      score += 10
+#    match = msg.match((/^Replication\sfailed\son\sdb-/i)
+#    if match isnt null
+#      score += 10
 
 
 
