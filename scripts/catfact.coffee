@@ -14,7 +14,7 @@
 #   scottmeyer
 
 module.exports = (robot) ->
-    robot.listen /catfact/i, (msg) ->
+    robot.hear /catfact/i, (msg) ->
         msg.http('http://catfacts-api.appspot.com/api/facts?number=1')
             .get() (error, response, body) ->
                 # passes back the complete reponse
