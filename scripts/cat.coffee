@@ -33,7 +33,7 @@ module.exports = (robot) ->
           c.pipe c
         else
           recordRelease msg
-          recordFires msg
+          #recordFires msg
 
           try
             robot.send user, msg
