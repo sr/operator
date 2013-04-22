@@ -52,9 +52,6 @@ module.exports = (robot) ->
 # Record the relase infos
 recordRelease = (msg) ->
   if process.env.RELEASE_TRACKING_ENABLED == 'true'
-
-    eb just began syncing r58399 to PROD on
-
     match = msg.match(/^(\w\w)\sjust\began\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
     conn = util.getReleaseDBConn()
 
