@@ -19,6 +19,7 @@
     "hubot-scripts": ">= 2.1.0",
     "optparse": "1.0.3",
     "hubot-irc": "0.1.0",
+    "hubot-hipchat": ">= 2.4.5",
     "mysql": "0.9.6",
     "cron": "*",
     "request": "*"
