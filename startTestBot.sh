@@ -22,18 +22,8 @@ export KPI_DATABASE="pardot_kpis"
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
 
-# Supportbot settings
-export SUPPORTBOT_ENABLED="true"
-export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
-
-# KPIBot settings
-export KPIBOT_ENABLED="true"
-
-# Release tracker
-export RELEASE_TRACKING_ENABLED="true"
-
-# Fire tracker
-export FIRE_RECORDING_ENABLED="true"
+# Set the bot type for permission related items
+export BOT_TYPE="parbot"
 
 # Finally run:
 ./bin/hubot -a irc

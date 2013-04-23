@@ -14,7 +14,7 @@ util = require "../lib/util"
 
 module.exports = (robot) ->
     robot.hear /^!joke$/i, (msg) ->
-        if process.env.HUBOT_IRC_NICK == 'Parbot'
+        if process.env.BOT_TYPE == 'parbot'
             key = msg.match[1]
             conn = util.getQuoteDBConn()
             conn.query 'SELECT quote FROM quote WHERE quote like \'%<ian>%\' ORDER BY rand() limit 10', (err,r,f) ->

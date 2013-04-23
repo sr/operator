@@ -135,7 +135,7 @@ joinInfo = (info) ->
     
 # Is supportbot enabled for this bot?
 supportBotEnabled = () ->
-    unless process.env.SUPPORTBOT_ENABLED == 'true'
+    unless process.env.BOT_TYPE == 'supportbot'
         false
     true
 

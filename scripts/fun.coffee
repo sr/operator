@@ -75,6 +75,10 @@ module.exports = (robot) ->
         
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
+
+        console.log 'logging message: '
+        console.log msg
+
         target = msg.match[1]
         poops = [
             'plop plop blaaaaaart',

@@ -20,18 +20,11 @@ export QUOTE_DATABASE="support_quotes"
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing
 export HUBOT_IRC_DEBUG="true"
 
+# Set the bot type for permission related items
+export BOT_TYPE="supportbot"
+
 # Supportbot settings
-export SUPPORTBOT_ENABLED="true"
 export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
-
-# KPIBot settings
-export KPIBOT_ENABLED="false"
-
-# Release tracker
-export RELEASE_TRACKING_ENABLED="false"
-
-# Fire tracker
-export FIRE_RECORDING_ENABLED="false"
 
 # Finally run:
 ./bin/hubot -a irc
