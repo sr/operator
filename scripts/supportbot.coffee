@@ -9,7 +9,8 @@
 #
 # Commands:
 #   None
-#
+#   
+# WILL NEED THIS robot.adapter.bot.join '45727_ops@conf.hipchat.com'
 
 sys  = require "sys"
 exec = require "child_process"
@@ -99,7 +100,7 @@ module.exports = (robot) ->
         ticket = msg.match[1]
         user   = msg.match[2]
 
-        users = util.getAllNicks msg
+        users = util.getUsersInRoom msg
         index = users.indexOf user
 
         if index is -1

@@ -24,7 +24,7 @@ module.exports = (robot) ->
     server = net.createServer((c) ->
       c.on "data", (data) ->
         msg  = data.toString().trim()
-        user = { room: process.env.HUBOT_IRC_ROOMS }
+        user = { room: util.getCatRoomId() }
 
         if msg is "command:getNicks"
           channel = robot.adapter.bot.chans[process.env.HUBOT_IRC_ROOMS]

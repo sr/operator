@@ -13,8 +13,6 @@
 #
 util = require "../lib/util"
 
-Array::shuffle = -> @sort -> 0.5 - Math.random()
-
 module.exports = (robot) ->
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]
@@ -75,10 +73,6 @@ module.exports = (robot) ->
         
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
-
-        console.log 'logging message: '
-        console.log msg
-
         target = msg.match[1]
         poops = [
             'plop plop blaaaaaart',
@@ -88,24 +82,27 @@ module.exports = (robot) ->
             'toot'
         ]
 
-        allNicks = util.getAllNicks msg
-        allNicks.shuffle()
+        # Shuffle the poops pls
+        poops = util.shuffle poops
 
-        while allNicks[0] is process.env.HUBOT_IRC_NICK
-            allNicks.shuffle()
+        util.getUsersInRoom msg, (users) ->
+            users = util.shuffle users
 
-        if msg.message.user.name is 'berg' and target
-            allNicks[0] = target
+            while users[0].jid is util.getBotUser()
+                users = util.shuffle users
 
-        msg.send "I choose #{allNicks[0]}"
-        robot.send allNicks[0], msg.random poops
+            if msg.message.user.jid is '45727_306025@chat.hipchat.com' and target
+                users[0].mention_name = target
+
+            msg.send "@#{users[0].mention_name} #{poops[0]}"
     
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
-        allNicks = util.getAllNicks msg
-        allNicks.shuffle()
+        util.getUsersInRoom msg, (users) ->
+            users = util.shuffle users
 
-        while allNicks[0] is process.env.HUBOT_IRC_NICK
-            allNicks.shuffle()
+            while users[0].jid is util.getBotUser()
+                users = util.shuffle users
 
-        msg.send "#{allNicks[0]}, I choo choo choose you!"
+
+            msg.send "I choose @#{users[0].mention_name}"

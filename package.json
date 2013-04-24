@@ -22,7 +22,8 @@
     "hubot-hipchat": ">= 2.4.5",
     "mysql": "0.9.6",
     "cron": "*",
-    "request": "*"
+    "request": "*",
+    "underscore": "1.1.7"
   },
 
   "engines": {
