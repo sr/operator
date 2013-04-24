@@ -32,7 +32,9 @@ module.exports = (robot) ->
           c.write users.toString().replace(/,/g, " ")
           c.pipe c
         else
-          if recordRelease msg is true
+          result = recordRelease msg
+
+          if result is true
             # Just return from recording the release
             c.end()
             return
