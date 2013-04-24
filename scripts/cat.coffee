@@ -32,7 +32,10 @@ module.exports = (robot) ->
           c.write users.toString().replace(/,/g, " ")
           c.pipe c
         else
-          recordRelease msg
+          if recordRelease msg is true
+            # Just return from recording the release
+            c.end()
+            return
           #recordFires msg
 
           try
@@ -62,6 +65,7 @@ recordRelease = (msg) ->
             return console.log err 
 
       conn.end()
+      return true
 
 # Record production fires
 #recordFires = (msg) ->
