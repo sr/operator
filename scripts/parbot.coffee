@@ -19,7 +19,7 @@ if process.env.BOT_TYPE != 'parbot'
 module.exports = (robot) ->
     # Find release infos
     robot.hear /^!lastrelease\s*(\d*)/i, (msg) ->
-        if process.env.RELEASE_TRACKING_ENABLED == 'true'
+        if process.env.BOT_TYPE == 'parbot'
             number = msg.match[1]
             conn = util.getReleaseDBConn()
 
