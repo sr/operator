@@ -58,7 +58,7 @@ module.exports = (robot) ->
 recordRelease = (msg) ->
   if process.env.BOT_TYPE == 'parbot'
     # Dont record this one
-    match = msg.match(/^(\w\w)\sjust began syncing r/i)
+    match = msg.match(/^(\w\w)\sjust\scompleted\ssyncing/i)
     if match isnt null
       return true
 
