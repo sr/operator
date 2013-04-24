@@ -7,8 +7,8 @@ export HUBOT_HIPCHAT_API_KEY='33965558fc3c09972af5a4e3edf510'
 #export HUBOT_HIPCHAT_DEBUG="true"
 
 # Ports to listen on
-export HUBOT_CAT_PORT="7778"
-export PORT="7777"
+export HUBOT_CAT_PORT="7880"
+export PORT="7893"
 
 # Database settings
 export DB_USER="root"
