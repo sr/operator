@@ -57,6 +57,12 @@ module.exports = (robot) ->
 # Record the relase infos
 recordRelease = (msg) ->
   if process.env.BOT_TYPE == 'parbot'
+    # Dont record this one
+    match = msg.match(/^(\w\w)\sjust began syncing r/i)
+    if match isnt null
+      return true
+
+    # Record this one!
     match = msg.match(/^(\w\w)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
     conn = util.getReleaseDBConn()
 
