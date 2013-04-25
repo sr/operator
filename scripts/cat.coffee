@@ -60,6 +60,8 @@ recordRelease = (msg) ->
     # Dont record this one
     match = msg.match(/^(\w\w)\sjust\scompleted\ssyncing/i)
     if match isnt null
+      console.log 'matched completed syncing: '
+      console.log msg
       return true
 
     # Record this one!
@@ -67,6 +69,8 @@ recordRelease = (msg) ->
     conn = util.getReleaseDBConn()
 
     if match isnt null
+      console.log 'matched just began syncing syncing: '
+      console.log msg
       conn.query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
           if err
             conn.end()
