@@ -13,10 +13,10 @@
 
 util = require "../lib/util"
 
-if process.env.BOT_TYPE != 'parbot'
-    return
-
 module.exports = (robot) ->
+    if process.env.BOT_TYPE != 'parbot'
+        return
+        
     # Find release infos
     robot.hear /^!lastrelease\s*(\d*)/i, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
