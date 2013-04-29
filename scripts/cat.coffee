@@ -58,14 +58,14 @@ module.exports = (robot) ->
 recordRelease = (msg) ->
   if process.env.BOT_TYPE == 'parbot'
     # Dont record this one
-    match = msg.match(/^(\w\w)\sjust\scompleted\ssyncing/i)
+    match = msg.match(/^(\w+)\sjust\scompleted\ssyncing/i)
     if match isnt null
       console.log 'matched completed syncing: '
       console.log msg
       return true
 
     # Record this one!
-    match = msg.match(/^(\w\w)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
+    match = msg.match(/^(\w+)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
     conn = util.getReleaseDBConn()
 
     if match isnt null
