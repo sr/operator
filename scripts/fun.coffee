@@ -88,7 +88,7 @@ module.exports = (robot) ->
         util.getUsersInRoom msg, (users) ->
             users = util.shuffle users
 
-            while users[0].jid is util.getBotUser()
+            while users.length > 0 and users[0].jid is util.getBotUser()
                 users = util.shuffle users
 
             if msg.message.user.jid is '45727_306025@chat.hipchat.com' and target
