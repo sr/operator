@@ -2,7 +2,8 @@
 export HUBOT_HIPCHAT_JID="45727_308741@chat.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Support Bot"
 export HUBOT_HIPCHAT_PASSWORD="!Parbot.2013!"
-export HUBOT_HIPCHAT_ROOMS="45727_support@conf.hipchat.com"
+#export HUBOT_HIPCHAT_ROOMS="45727_support@conf.hipchat.com"
+export HUBOT_HIPCHAT_ROOMS="45727_supporttest@conf.hipchat.com"
 export HUBOT_HIPCHAT_API_KEY='7019554b399f58a4e7fb8892a1f444'
 #export HUBOT_HIPCHAT_DEBUG="true"
 
