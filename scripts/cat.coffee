@@ -66,7 +66,7 @@ recordRelease = (msg) ->
 
     # Record this one!
     # match = msg.match(/^(\w+)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
-    match = msg.match(/(\w+) just began syncing .*?(build\d+).*? to PROD on email-d1\.pardot\.com/i)
+    match = msg.match(/(\w+) just began syncing build(\d+) to PROD on email-d1\.pardot\.com/i)
     conn = util.getReleaseDBConn()
 
     if match isnt null

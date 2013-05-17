@@ -16,7 +16,7 @@ util = require "../lib/util"
 module.exports = (robot) ->
     if process.env.BOT_TYPE != 'parbot'
         return
-        
+
     # Find release infos
     robot.hear /^!lastrelease\s*(\d*)/i, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
@@ -29,11 +29,11 @@ module.exports = (robot) ->
             if not number
                 conn.query 'SELECT * FROM sync ORDER BY ID DESC limit 1', (err,r,f) ->
                     if r and r[0]
-                        msg.send r[0].releaser + ' synced revision ' + r[0].revision + ' to production on ' + r[0].date
+                        msg.send r[0].releaser + ' synced tag "build' + r[0].revision + '" to production on ' + r[0].date
             else
                 conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                     if r and r[0]
                         for sync in r
-                            msg.send sync.releaser + ' synced revision ' + sync.revision + ' to production on ' + sync.date
+                            msg.send sync.releaser + ' synced tag "build' + sync.revision + '" to production on ' + sync.date
 
             conn.end()
