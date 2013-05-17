@@ -12,7 +12,7 @@
 #
 # Notes:
 #    echo "hello everyone" | nc -w1 127.0.0.1 7890
-#    
+#
 # Author:
 #   Berg
 
@@ -65,7 +65,9 @@ recordRelease = (msg) ->
       return true
 
     # Record this one!
-    match = msg.match(/^(\w+)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
+    # match = msg.match(/^(\w+)\sjust\sbegan\ssyncing\sr(\d+)\sto\sPROD\son\semail-d1\.pardot\.com/i)
+    match = msg.match(/(\w+) just began syncing build(\d+) (.+?) to PROD on email-d1\.pardot\.com/i)
+    # http://rubular.com/r/eJ0bIVk0FV <-- testing for above regex
     conn = util.getReleaseDBConn()
 
     if match isnt null
@@ -74,7 +76,7 @@ recordRelease = (msg) ->
       conn.query 'INSERT INTO sync (releaser, revision, date) VALUES(?, ?, NOW())', [match[1], match[2]], (err,r,f) ->
           if err
             conn.end()
-            return console.log err 
+            return console.log err
 
       conn.end()
       return true
