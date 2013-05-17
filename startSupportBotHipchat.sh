@@ -23,7 +23,7 @@ export HUBOT_IRC_DEBUG="true"
 export BOT_TYPE="supportbot"
 
 # Supportbot settings
-export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
+export SUPPORTBOT_EXECUTABLE="php /var/www/supportq-stage/symfony"
 
 # Finally run:
 ./bin/hubot -a hipchat
