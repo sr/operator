@@ -81,7 +81,7 @@ module.exports = (robot) ->
 
         console.log msg.message.user
         
-        sendSupportCommand "status", "#{msg.message.user.jid}", msg
+        sendSupportCommand "status", "", msg
 
     # Specific ticket status
     robot.hear /^!status\s+(\d+)$/i, (msg) ->
