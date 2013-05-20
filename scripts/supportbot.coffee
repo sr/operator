@@ -58,7 +58,7 @@ module.exports = (robot) ->
     robot.hear /^!watch\s+(\d+)$/i, (msg) ->
         ticket = msg.match[1]
 
-        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.mention_name} watch #{ticket}", msg
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.jid} watch #{ticket}", msg
 
     robot.hear /^!notify\s+(\d+)\s+(.+)$/i, (msg) ->
         ticket = msg.match[1]
@@ -70,11 +70,11 @@ module.exports = (robot) ->
     robot.hear /^!ignore\s+(\d+)$/i, (msg) ->
         ticket = msg.match[1]
 
-        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.mention_name} ignore #{ticket}", msg
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.jid} ignore #{ticket}", msg
 
     # What tickets am I watching
     robot.hear /^!watching$/i, (msg) ->
-        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.mention_name} info", msg
+        sendSupportCommand "ircNotifyTicket", "#{msg.message.user.jid} info", msg
 
     # Overall ticket status
     robot.hear /^!status$/i, (msg) ->
