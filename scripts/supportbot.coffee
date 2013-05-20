@@ -33,6 +33,9 @@ module.exports = (robot) ->
         ticket = msg.match[1]
         info   = joinInfo msg.match[2].split " "
 
+        console.log 'user object: '
+        console.log msg.message.user
+
         sendSupportCommand "addMoreToTicket #{ticket}", info + " #{msg.message.user.jid}", msg
 
     # Close a ticket
