@@ -88,6 +88,8 @@ module.exports = (robot) ->
         util.getUsersInRoom msg, (users) ->
             users = util.shuffle users
 
+            console.log users
+
             while users.length > 0 and users[0].jid is util.getBotUser()
                 users = util.shuffle users
 
