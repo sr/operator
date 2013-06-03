@@ -45,14 +45,14 @@ module.exports = (robot) ->
             build_number = msg.match[1]
             github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
 
-            msg.send 'Sounds like build' + build_number + ' (' + github_link + ') just passed [TEST IGNORE]'
+            msg.send 'Sounds like build' + build_number + ' (' + github_link + ') just passed [TEST IGNORE] << @veader'
 
 
     # PROD: is just finished syncing Pardot to build537 on email-d1.pardot.com
-    # testable link for regex : http://rubular.com/r/SUd2nNaHKM
-    robot.hear /^PROD\: (\w+) just finished syncing Pardot to .*?build(\d+).*? on ([\w\.\-]*)/, (msg) ->
+    # testable link for regex : http://rubular.com/r/kqYwQ7ztFS
+    robot.hear /^PROD\: (\w+) just began syncing Pardot to .*?build(\d+).*? on ([\w\.\-]*)/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             syncmaster = msg.match[1]
             build_number = msg.match[2]
 
-            msg.send 'Sounds like ' + syncmaster + ' just finished a pooosh of build' + build_number + '  [TEST IGNORE]'
+            msg.send 'Sounds like ' + syncmaster + ' just began a pooosh of build' + build_number + '  [TEST IGNORE] << @veader'
