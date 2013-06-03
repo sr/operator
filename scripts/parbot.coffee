@@ -39,8 +39,8 @@ module.exports = (robot) ->
             conn.end()
 
     # [image] Pardot › Application Pipeline › #541 passed. 1580 passed. Changes by Joe Winegarden
-    # testable link for regex : http://rubular.com/r/RlwJ9Oo6Dx
-    robot.hear /Pardot . Application Pipeline . \#(\d*).*?passed\./, (msg) ->
+    # testable link for regex : http://rubular.com/r/OQw3IvAFda
+    robot.hear /Pardot . Application Pipeline . \#(\d*)[^\d]*? passed\./, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             build_number = msg.match[1]
             github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
