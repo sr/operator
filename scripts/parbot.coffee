@@ -12,6 +12,7 @@
 #
 
 util = require "../lib/util"
+HipChatClient = require('../lib/hipchat')
 
 module.exports = (robot) ->
     if process.env.BOT_TYPE != 'parbot'
@@ -29,12 +30,23 @@ module.exports = (robot) ->
             if number < 1
                 number = 1
 
+            body = {}
+            body.room = msg.envelope.room
+            hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
+
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for sync in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + sync.revision
-                        msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
+                        # msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
+                        body.message = sync.releaser + ' synced <a href="' +  github_link + '">build' + sync.revision + '</a> to production on ' + sync.date
+                        hipchat_client.postMessage body, (data, err) ->
+                            if err
+                                console.log 'Error sending message via the API: ' + err
+                            if data and data.error
+                                console.log 'Error sending message via the API: ' + JSON.stringify(data)
+
                 else
                     msg.send 'Unable to find previous releases at the moment...'
 
@@ -51,12 +63,22 @@ module.exports = (robot) ->
             if number < 1
                 number = 1
 
+            body = {}
+            body.room = msg.envelope.room
+            hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
+
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM builds ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
-                        msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
+                        # msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
+                        body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + build.datebuild
+                        hipchat_client.postMessage body, (data, err) ->
+                            if err
+                                console.log 'Error sending message via the API: ' + err
+                            if data and data.error
+                                console.log 'Error sending message via the API: ' + JSON.stringify(data)
                 else
                     msg.send 'Unable to find previous builds at the moment...'
 
