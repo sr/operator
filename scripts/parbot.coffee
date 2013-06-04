@@ -75,7 +75,7 @@ module.exports = (robot) ->
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
                         # msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
-                        body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + build.datebuild
+                        body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + build.date
                         hipchat_client.postMessage body, (data, err) ->
                             if err
                                 console.log 'Error sending message via the API: ' + err
