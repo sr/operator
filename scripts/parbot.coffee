@@ -35,6 +35,8 @@ module.exports = (robot) ->
                     for sync in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + sync.revision
                         msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
+                else
+                    msg.send 'Unable to find previous releases at the moment...'
 
             conn.end()
 
@@ -55,6 +57,9 @@ module.exports = (robot) ->
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
                         msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
+                else
+                    msg.send 'Unable to find previous builds at the moment...'
+
             conn.end()
 
 
