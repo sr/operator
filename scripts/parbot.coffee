@@ -73,7 +73,7 @@ module.exports = (robot) ->
             # github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
 
             conn = util.getReleaseDBConn()
-            conn.query 'INSERT INTO builds (build_number, date) VALUES(?, ?, NOW())', [build_number], (err,r,f) ->
+            conn.query 'INSERT INTO builds (build_number, date) VALUES(?, NOW())', [build_number], (err,r,f) ->
                 if err
                     console.log err
 
