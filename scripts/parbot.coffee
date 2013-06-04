@@ -88,6 +88,9 @@ module.exports = (robot) ->
 
     robot.hear /^!ondeck/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
+            last_build = null
+            last_sync = null
+
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM builds ORDER BY ID DESC LIMIT 1', (err, r, f) ->
                 if r and r[0]
@@ -103,7 +106,7 @@ module.exports = (robot) ->
                 body = {}
                 body.room = 'engineering' # msg.envelope.room
                 body.from = 'Parbot'
-                body.message = 'Changes on deck: <a href="' + github_link + '">' + last_sync + '...' + last_build '</a>'
+                body.message = 'Changes on deck: <a href="' + github_link + '">' + last_sync + '...' + last_build + '</a>'
 
                 hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
                 hipchat_client.postMessage body, (data, err) ->
