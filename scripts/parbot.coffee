@@ -33,7 +33,7 @@ module.exports = (robot) ->
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for sync in r
-                        github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
+                        github_link = 'https://github.com/pardot/pardot/tree/build' + sync.revision
                         msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
 
             conn.end()
