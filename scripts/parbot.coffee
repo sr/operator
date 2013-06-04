@@ -32,9 +32,8 @@ module.exports = (robot) ->
 
             body = {}
             body.room = 'engineering' # msg.envelope.room
+            body.from = 'Parbot'
             hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
-            if msg.room
-                console.log 'ROOM: ' + msg.room
 
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
@@ -67,9 +66,8 @@ module.exports = (robot) ->
 
             body = {}
             body.room = 'engineering' # msg.envelope.room
+            body.from = 'Parbot'
             hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
-            if msg.room
-                console.log 'ROOM: ' + msg.room
 
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM builds ORDER BY ID DESC limit ' + number, (err,r,f) ->
