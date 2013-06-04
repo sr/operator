@@ -33,7 +33,8 @@ module.exports = (robot) ->
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for sync in r
-                        msg.send sync.releaser + ' synced tag "build' + sync.revision + '" to production on ' + sync.date
+                        github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
+                        msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
 
             conn.end()
 
@@ -53,12 +54,9 @@ module.exports = (robot) ->
                 if r and r[0]
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
-                        msg.send 'build' + build.build_number + ' (' + + ') on ' + build.date
+                        msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
             conn.end()
 
-    robot.hear /^!testprint/, (msg) ->
-        if process.env.BOT_TYPE == 'parbot'
-            msg.send 'Github: <a href="http://github.com/pardot/pardot">pardot</a>'
 
     # [image] Pardot › Application Pipeline › #541 passed. 1580 passed. Changes by Joe Winegarden
     # testable link for regex : http://rubular.com/r/OQw3IvAFda
