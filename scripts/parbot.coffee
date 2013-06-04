@@ -87,7 +87,7 @@ module.exports = (robot) ->
             conn.end()
 
     robot.hear /^!ondeck/, (msg) ->
-        if process.env.BOT_TYPE == 'pardot'
+        if process.env.BOT_TYPE == 'parbot'
             conn = util.getReleaseDBConn()
             conn.query 'SELECT * FROM builds ORDER BY ID DESC LIMIT 1', (err, r, f) ->
                 if r and r[0]
