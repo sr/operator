@@ -21,25 +21,24 @@ module.exports = (robot) ->
     robot.hear /^!lastrelease\s*(\d*)/i, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             number = msg.match[1]
-            conn = util.getReleaseDBConn()
-
-            if number > 10
-                number = 10
 
             if not number
-                conn.query 'SELECT * FROM sync ORDER BY ID DESC limit 1', (err,r,f) ->
-                    if r and r[0]
-                        msg.send r[0].releaser + ' synced tag "build' + r[0].revision + '" to production on ' + r[0].date
-            else
-                conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
-                    if r and r[0]
-                        for sync in r
-                            msg.send sync.releaser + ' synced tag "build' + sync.revision + '" to production on ' + sync.date
+                number = 1
+            if number > 10
+                number = 10
+            if number < 1
+                number = 1
+
+            conn = util.getReleaseDBConn()
+            conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
+                if r and r[0]
+                    for sync in r
+                        msg.send sync.releaser + ' synced tag "build' + sync.revision + '" to production on ' + sync.date
 
             conn.end()
 
     robot.hear /^!lastbuild\s*(\d*)/i, (msg) ->
-        if process.env.BOT_TYPE == 'pardot'
+        if process.env.BOT_TYPE == 'parbot'
             number = msg.match[1]
 
             if not number
@@ -57,6 +56,9 @@ module.exports = (robot) ->
                         msg.send 'build' + build.build_number + ' (' + + ') on ' + build.date
             conn.end()
 
+    robot.hear /^!testprint/, (msg) ->
+        if process.env.BOT_TYPE == 'parbot'
+            msg.send 'Github: <a href="http://github.com/pardot/pardot">pardot</a>'
 
     # [image] Pardot › Application Pipeline › #541 passed. 1580 passed. Changes by Joe Winegarden
     # testable link for regex : http://rubular.com/r/OQw3IvAFda
