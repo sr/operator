@@ -31,7 +31,7 @@ module.exports = (robot) ->
                 number = 1
 
             body = {}
-            body.room = msg.envelope.room
+            body.room = process.env.HUBOT_HIPCHAT_ROOMS # msg.envelope.room
             hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
 
             conn = util.getReleaseDBConn()
@@ -64,7 +64,7 @@ module.exports = (robot) ->
                 number = 1
 
             body = {}
-            body.room = msg.envelope.room
+            body.room = process.env.HUBOT_HIPCHAT_ROOMS # msg.envelope.room
             hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
 
             conn = util.getReleaseDBConn()
