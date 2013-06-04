@@ -103,7 +103,7 @@ module.exports = (robot) ->
                 body = {}
                 body.room = 'engineering' # msg.envelope.room
                 body.from = 'Parbot'
-                body.message = 'Changes on deck: <a href="' + github_link'">' + last_sync + '...' + last_build '</a>'
+                body.message = 'Changes on deck: <a href="' + github_link + '">' + last_sync + '...' + last_build '</a>'
 
                 hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
                 hipchat_client.postMessage body, (data, err) ->
