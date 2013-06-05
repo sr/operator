@@ -89,32 +89,30 @@ module.exports = (robot) ->
     robot.hear /^!ondeck/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             conn = util.getReleaseDBConn()
-            conn.query 'SELECT * FROM builds ORDER BY ID DESC LIMIT 1', (err,r,f) ->
-                if r and r[0]
+            conn.query 'SELECT * FROM builds ORDER BY ID DESC LIMIT 1', [], (err,r,f) ->
+                if r and r[0] and r[0].build_number
                     last_build = r[0].build_number
 
-                    if last_build
-                        conn2 = util.getReleaseDBConn()
-                        conn2.query 'SELECT * FROM sync ORDER BY ID DESC LIMIT 1', (err,r,f) ->
-                            if r and r[0]
-                                last_sync = r[0].revision
+                    conn2 = util.getReleaseDBConn()
+                    conn2.query 'SELECT * FROM sync ORDER BY ID DESC LIMIT 1', [], (err,r,f) ->
+                        if r and r[0] and r[0].revision
+                            last_sync = r[0].revision
 
-                                if last_sync
-                                    github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
+                            github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
 
-                                    body = {}
-                                    body.room = 'engineering' # msg.envelope.room
-                                    body.from = 'Parbot'
-                                    body.message = 'Changes on deck: <a href="' + github_link + '">' + last_sync + '...' + last_build + '</a>'
+                            body = {}
+                            body.room = 'engineering' # msg.envelope.room
+                            body.from = 'Parbot'
+                            body.message = 'Changes on deck: <a href="' + github_link + '">build' + last_sync + ' ... build' + last_build + '</a>'
 
-                                    hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
-                                    hipchat_client.postMessage body, (data, err) ->
-                                        if err
-                                            console.log 'Error sending message via the API: ' + err
-                                        if data and data.error
-                                            console.log 'Error sending message via the API: ' + JSON.stringify(data)
+                            hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
+                            hipchat_client.postMessage body, (data, err) ->
+                                if err
+                                    console.log 'Error sending message via the API: ' + err
+                                if data and data.error
+                                    console.log 'Error sending message via the API: ' + JSON.stringify(data)
 
-                        conn2.end()
+                    conn2.end()
 
             conn.end()
 
