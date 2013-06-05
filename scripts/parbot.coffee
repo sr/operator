@@ -98,19 +98,22 @@ module.exports = (robot) ->
                         if r and r[0] and r[0].revision
                             last_sync = r[0].revision
 
-                            github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
+                            if last_sync == last_build
+                                msg.send 'Looks like we are up-to-date. (thumbsup)'
+                            else
+                                github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
 
-                            body = {}
-                            body.room = 'engineering' # msg.envelope.room
-                            body.from = 'Parbot'
-                            body.message = 'Changes on deck: <a href="' + github_link + '">build' + last_sync + ' ... build' + last_build + '</a>'
+                                body = {}
+                                body.room = 'engineering' # msg.envelope.room
+                                body.from = 'Parbot'
+                                body.message = 'Changes on deck: <a href="' + github_link + '">build' + last_sync + ' ... build' + last_build + '</a>'
 
-                            hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
-                            hipchat_client.postMessage body, (data, err) ->
-                                if err
-                                    console.log 'Error sending message via the API: ' + err
-                                if data and data.error
-                                    console.log 'Error sending message via the API: ' + JSON.stringify(data)
+                                hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
+                                hipchat_client.postMessage body, (data, err) ->
+                                    if err
+                                        console.log 'Error sending message via the API: ' + err
+                                    if data and data.error
+                                        console.log 'Error sending message via the API: ' + JSON.stringify(data)
 
                     conn2.end()
 
