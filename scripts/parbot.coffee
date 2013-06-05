@@ -99,7 +99,7 @@ module.exports = (robot) ->
                             last_sync = r[0].revision
 
                             if last_sync == last_build
-                                msg.send 'Looks like we are up-to-date. (thumbsup)'
+                                msg.send 'Looks like we are up-to-date. (buttrock)'
                             else
                                 github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
 
