@@ -14,6 +14,9 @@
 util = require "../lib/util"
 
 module.exports = (robot) ->
+    if process.env.BOT_TYPE == 'internbot'
+      return
+
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]
 
@@ -40,7 +43,7 @@ module.exports = (robot) ->
             "Today, #{target} suddenly and deliberately kicked some ass",
             "#{target} makes it WERK"
         ]
-        
+
         msg.send msg.random compliments
 
      # Chikins runnin wild
@@ -52,9 +55,9 @@ module.exports = (robot) ->
             'chee CHAH chee CHAH chee CHAH',
             'cookoo KATCHA cookoo KATCHA'
         ]
-        
+
         msg.send msg.random chikins
-        
+
     # A cow got loose
     robot.hear /^!moo$/i, (msg) ->
         msg.send 'Mooooooo000000000ooooooo000000000ooooooo!!'
@@ -62,7 +65,7 @@ module.exports = (robot) ->
     # Hate on someone
     robot.hear /^!hate$/i, (msg) ->
         msg.send 'hate hate hate'
-        
+
     # Quit hatin
     robot.hear /^!hater$/i, (msg) ->
         msg.send 'haters gonna hate'
@@ -70,7 +73,7 @@ module.exports = (robot) ->
     # Panic
     robot.hear /^!panic$/i, (msg) ->
         msg.send 'oh shit oh shit oh shit oh shit oh shit'
-        
+
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
         target = msg.match[1]
@@ -95,7 +98,7 @@ module.exports = (robot) ->
                 users[0].mention_name = target
 
             msg.send "@#{users[0].mention_name} #{poops[0]}"
-    
+
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
         util.getUsersInRoom msg, (users) ->
