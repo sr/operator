@@ -21,5 +21,12 @@ export TWITTER_ACCESS_TOKEN_SECRET='lVP2KugUCTEfxpYlzNqw3dKlD5j00OGCHMpUXF0hY'
 export MEMEGENERATOR_USERNAME='asuahInternbot'
 export MEMEGENERATOR_PASSWORD='internbot'
 
+# Database settings
+export DB_USER="root"
+export DB_PASSWORD="poop"
+export QUOTE_DATABASE="pardot_quotes"
+export RELEASE_DATABASE="pardot_releases"
+export KPI_DATABASE="pardot_kpis"
+
 # Finally run:
 ./bin/hubot -a hipchat
