@@ -21,7 +21,7 @@ module.exports = (robot) ->
     robot.hear /!commit\s+([a-z0-9\-]+)\s+([a-f0-9]+)$/i, (msg) ->
         project = msg.match[1]
         sha = msg.match[2]
-        msg.send "https://github.com/Pardot/" + project + "/" + sha
+        msg.send "https://github.com/Pardot/" + project + "/commit/" + sha
 
     robot.hear /!diff\s+(.+)$/i, (msg) ->
         branch = msg.match[1]
