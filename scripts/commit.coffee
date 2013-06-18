@@ -22,3 +22,7 @@ module.exports = (robot) ->
         project = msg.match[1]
         sha = msg.match[2]
         msg.send "https://github.com/Pardot/" + project + "/" + sha
+
+    robot.hear /!diff\s+(.+)$/i, (msg) ->
+        branch = msg.match[1]
+        msg.send "https://github.com/Pardot/pardot/compare/" + branch.replace('/', ';')
