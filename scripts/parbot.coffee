@@ -123,7 +123,7 @@ module.exports = (robot) ->
 
 
     # [image] Pardot › Application Pipeline › #541 passed. 1580 passed. Changes by Joe Winegarden
-    # testable link for regex : http://rubular.com/r/OQw3IvAFda
+    # testable link for regex : http://rubular.com/r/pBdvKraIwz
 
     # CREATE TABLE IF NOT EXISTS `builds` (
     #   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -131,7 +131,7 @@ module.exports = (robot) ->
     #   `date` datetime DEFAULT NULL,
     #   PRIMARY KEY (`id`)
     # ) ENGINE=InnoDB AUTO_INCREMENT=1019 DEFAULT CHARSET=utf8;
-    robot.hear /Pardot . Application Pipeline . \#(\d*)[^\d]*? passed\./, (msg) ->
+    robot.hear /Pardot . Application Pipeline . \#(\d*)[^\d]*? passed/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             build_number = msg.match[1]
             # github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
