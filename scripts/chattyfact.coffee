@@ -20,6 +20,6 @@ module.exports = (robot) ->
                 # passes back the complete reponse
                 response = JSON.parse(body)
                 if response.type == "success"
-                    msg.send response.value.joke.replace /Chuck Norris/, "Chatty"
+                    msg.send response.value.joke.replace /Chuck Norris/g, "Chatty"
                 else
                     msg.send "Unable to get chatty facts right now."
