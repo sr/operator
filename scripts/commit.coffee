@@ -25,10 +25,10 @@ module.exports = (robot) ->
 
     robot.hear /!diff\s+([^\s]+)$/i, (msg) ->
         branch = msg.match[1]
-        msg.send "https://github.com/Pardot/pardot/compare/" + branch.replace('/', ';')
+        msg.send "https://github.com/Pardot/pardot/compare/" + branch.replace('/', ';') + "?w=1"
 
     robot.hear /!diff\s+([^\s]+)\s+([^\s]+)$/i, (msg) ->
         branch1 = msg.match[1]
         branch2 = msg.match[2]
         diff = branch1.replace('/', ';') + "..." + branch2.replace('/', ';')
-        msg.send "https://github.com/Pardot/pardot/compare/" + diff
+        msg.send "https://github.com/Pardot/pardot/compare/" + diff + "?w=1"
