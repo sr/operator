@@ -45,7 +45,8 @@ module.exports = (robot) ->
                 conn.end()
                 return console.log err
             else
-                robot.send msg.message.user.name, 'Quote added!'
+                msg.send 'OK, added. (buttrock)'
+                # robot.send msg.message.user.name, 'Quote added!'
 
         conn.end()
 
@@ -57,6 +58,7 @@ module.exports = (robot) ->
                 conn.end()
                 return console.log err
             else
-                robot.send msg.message.user.name, 'Quote deleted!'
-            
+                msg.send 'OK, deleted. (sadpanda)'
+                # robot.send msg.message.user.name, 'Quote deleted!'
+
         conn.end()
