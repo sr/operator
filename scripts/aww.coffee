@@ -17,4 +17,4 @@ module.exports = (robot) ->
         urls.push(child.data.url)
 
       rnd = Math.floor(Math.random()*urls.length)
-      msg.send urls[rnd]
+      #msg.send urls[rnd]
