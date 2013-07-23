@@ -4,7 +4,7 @@ module.exports = (robot) ->
   if process.env.BOT_TYPE == 'internbot'
     return
 
-  robot.hear /aww/i, (msg) ->
+  robot.hear /^!aww/i, (msg) ->
     Request.get 'http://www.reddit.com/r/aww.json', (err, res, body) ->
       result = JSON.parse(body) if typeof body is 'string'
 
@@ -17,4 +17,4 @@ module.exports = (robot) ->
         urls.push(child.data.url)
 
       rnd = Math.floor(Math.random()*urls.length)
-      #msg.send urls[rnd]
+      msg.send urls[rnd]
