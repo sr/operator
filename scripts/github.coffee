@@ -36,16 +36,22 @@ status = (msg) ->
       now = new Date()
       date = new Date(json['last_updated'])
       secondsAgo = Math.round((now.getTime() - date.getTime()) / 1000)
-      msg.send "Status: #{json['status']} (#{secondsAgo} seconds ago)"
+      txtmsg = "Status: #{json['status']} (#{secondsAgo} seconds ago)"
+      txtmsg = txtmsg.replace /good/, "(successful)(nyan)(chatty)(chatty)(chatty)"
+      txtmsg = txtmsg.replace /(major|minor)/, "(failed)(failed)(failed)"
+      msg.send txtmsg
 
 lastMessage = (msg) ->
   msg.http('https://status.github.com/api/last-message.json')
     .get() (err, res, body) ->
       json = JSON.parse(body)
       date = new Date(json['created_on'])
-      msg.send "Status: #{json['status']}\n" +
+      txtmsg = "Status: #{json['status']}\n" +
                "Message: #{formatString(json['body'])}\n" +
                "Date: #{date.toLocaleString()}"
+      txtmsg = txtmsg.replace /good/, "(successful)(nyan)(chatty)(chatty)(chatty)"
+      txtmsg = txtmsg.replace /(major|minor)/, "(failed)(failed)(failed)"
+      msg.send txtmsg
 
 statusMessages = (msg) ->
   msg.http('https://status.github.com/api/messages.json')
