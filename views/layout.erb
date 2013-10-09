@@ -2,14 +2,102 @@
 <html lang='en'>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%# stylesheet_link_tag :application, :media => :all %>
-    <%# javascript_include_tag '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %>
-    <%# javascript_include_tag '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js' %>
-    <%# javascript_include_tag '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js' %>
-    <%# javascript_include_tag :application %>
     <title>Pardot/Canoe</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/main.min.css">
+    <link rel="stylesheet" href="./css/app.css">
   </head>
   <body>
-    <%= yield %>
+    <header class="navbar navbar-default navbar-fixed-top" role="banner">
+      <div class="navbar-header">
+          <button class="navbar-toggle" type="button" data-toggle="collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+          </button>
+          <a href="/" class="navbar-brand"><img src="img/logo.png" alt="Pardot" class="img-responsive"/></a>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"><i class="icon-question-sign"></i></a></li>
+            <li><a href="#"><i class="icon-search"></i></a></li>
+            <li><a href="#"><i class="icon-user"></i></a></li>
+          </ul>
+      </div>
+    </header>
+
+    <% if current_user %>
+      <aside role="navigation">
+        <nav role="navigation">
+            <ul class="nav nav-stacked">
+              <li>
+                <a href="#"><i class="icon-file"></i>Things</a>
+              </li>
+              <!--
+              <li>{{#link-to 'docs'}}<span class="badge pull-right">2</span><i class="icon-file"></i> Docs{{/link-to}}</li>
+              <li>{{#link-to 'guidelines'}}<i class="icon-book"></i> Guidelines{{/link-to}}</li>
+              <li>{{#link-to 'patterns'}}<i class="icon-th"></i> Patterns{{/link-to}}</li>
+              <li>
+                  {{#link-to 'views'}}<span class="badge pull-right">6</span><i class="icon-sitemap"></i> Views{{/link-to}}
+                  <ul class="nav nav-stacked nav-submenu">
+                      <li><a href="#">Datatables</a></li>
+                      <li><a href="#">Forms</a></li>
+                      <li><a href="#">App Wide</a></li>
+                      <li><a href="#">Charts &amp; Graphs</a></li>
+                      <li><a href="#">Interactive Modules</a></li>
+                      <li><a href="#">Wizards</a></li>
+                  </ul>
+              </li>
+              <li>{{#link-to 'sandbox'}}<i class="icon-terminal"></i> Sandbox{{/link-to}}</li>
+              -->
+            </ul>
+        </nav>
+
+        <nav role="navigation-bottom">
+            <ul class="nav nav-stacked">
+              <li><a href="#"><i class="icon-gear"></i> Settings</a></li>
+            </ul>
+        </nav>
+      </aside>
+
+      <main id="content" role="main">
+          <% if flash[:notice] %>
+            <%= flash[:notice] %>
+          <% elsif flash[:error] %>
+            <%= flash[:error] %>
+          <% end %>
+
+          <div class="container">
+            <%= yield %>
+          </div>
+      </main>
+
+      <div class="modal fade" id="js-thumbnail-modal">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title">Modal title</h4>
+                  </div>
+                  <div class="modal-body text-center">
+                  </div>
+              </div>
+          </div>
+      </div>
+    <% else %>
+      <style type="text/css">
+      body { padding-left:0; }
+      </style>
+      <% if flash[:notice] %>
+        <%= flash[:notice] %>
+      <% elsif flash[:error] %>
+        <%= flash[:error] %>
+      <% end %>
+
+      <%= yield %>
+    <% end %>
+
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
   </body>
 </html>

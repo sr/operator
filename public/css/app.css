@@ -1,0 +1,12 @@
+.login-prompt {
+   text-align:center;
+   background:#FFC;
+   padding:30px 20px;
+}
+.login-prompt h3 {
+  padding-bottom:2px;
+  margin:0;
+}
+.login-prompt p {
+  margin-top:20px;
+}

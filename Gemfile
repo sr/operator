@@ -5,7 +5,11 @@ gem "rake"
 # web ----
 gem "rack"
 gem "sinatra"
+gem "rack-flash3"
 # gem "json", "~> 1.8.0"
+
+# dev/debugging ----
+gem "tux"
 
 # database ----
 gem "sinatra-activerecord"
