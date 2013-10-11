@@ -11,8 +11,8 @@ require "github"
 
 # models ----
 require "auth_user"
-require "models/deploy"
-require "models/deploy_target"
+require "deploy"
+require "deploy_target"
 
 set :database, ENV["DATABASE_URL"]
 

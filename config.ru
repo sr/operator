@@ -5,6 +5,7 @@ ENV["RACK_ENV"]="development"
 # add our root and lib dirs to the load path
 $:.unshift CANOE_DIR
 $:.unshift "#{CANOE_DIR}/lib/"
+$:.unshift "#{CANOE_DIR}/lib/models/"
 
 require "app"
 

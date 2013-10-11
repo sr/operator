@@ -7,6 +7,7 @@ ENV["CANOE_DIR"]=CANOE_DIR
 
 $:.unshift CANOE_DIR
 $:.unshift "#{CANOE_DIR}/lib/"
+$:.unshift "#{CANOE_DIR}/lib/models/"
 
 require "app"
 require "sinatra/activerecord/rake"
