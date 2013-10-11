@@ -1,0 +1,14 @@
+<ul class="list-unstyled deploy-list">
+  <% @tags.each do |tag| %>
+    <li>
+      <h4>
+        <a href="<%= deploy_path(tag: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button"><i class="icon-rocket"></i> Deploy!</a>
+        &nbsp;
+        TAG: <%= tag.name %>
+        <a href="<%= github_tag_url(tag) %>"><i class="icon-tag"></i></a>
+      </h4>
+      <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>"><%= tag.commit.sha %></a></small>
+      <hr>
+    </li>
+  <% end %>
+</ul>

@@ -11,6 +11,9 @@ gem "rack-flash3"
 # dev/debugging ----
 gem "tux"
 
+# other ----
+gem "octokit"
+
 # database ----
 gem "sinatra-activerecord"
 gem "sqlite3" # technically only needed for dev

@@ -1,0 +1,14 @@
+<ul class="list-unstyled deploy-list">
+  <% @branches.each do |branch| %>
+    <li>
+      <h4>
+        <a href="<%= deploy_path(branch: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button"><i class="icon-rocket"></i> Deploy!</a>
+        &nbsp;
+        BRANCH: <%= branch.name %>
+        <a href="<%= github_branch_url(branch) %>"><i class="icon-code-fork"></i></a>
+      </h4>
+      <small class="muted">commit: <a href="<%= github_commit_url(branch.commit) %>"><%= branch.commit.sha %></a></small>
+      <hr>
+    </li>
+  <% end %>
+</ul>

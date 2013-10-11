@@ -10,3 +10,26 @@
 .login-prompt p {
   margin-top:20px;
 }
+.no-bottom {
+  margin-bottom:0;
+  padding-bottom:0;
+}
+.muted { color:#AAA; }
+.deploy-list {
+  padding-left:10px;
+}
+.deploy-button {
+}
+.deploy-target {
+  border-left: 2px solid #CCC;
+  padding-left:20px;
+}
+.deploy-target h2 {
+  margin-bottom:0px;
+}
+.last-deploy {
+  margin:10px 0;
+}
+.first-target {
+  border-top:3px solid #BBB;
+}

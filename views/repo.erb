@@ -1,0 +1,34 @@
+<h1>REPO</h1>
+<p class="lead no-bottom">
+  <i class="icon-github"></i>&nbsp;
+  <a href="https://github.com/pardot/<%= current_repo.name %>"><%= current_repo.full_name %></a>
+</p>
+<small class="muted"><%= current_repo.description %></small>
+<br><br>
+
+<div>
+  <ul class="nav nav-tabs">
+    <li <%= 'class="active"' if @tags %>>
+      <a href="<%= repo_path %>/tags"><i class="icon-tags"></i> Tags</a>
+    </li>
+    <li <%= 'class="active"' if @branches %>>
+      <a href="<%= repo_path %>/branches"><i class="icon-code-fork"></i> Branches</a>
+    </li>
+    <li <%= 'class="active"' if @commits %>>
+      <a href="<%= repo_path %>/commits"><i class="icon-tasks"></i> Commits</a>
+    </li>
+  </ul>
+  <br>
+
+  <% if @tags %>
+    <%= erb :'partials/tags', locals: { tags: @tags } %>
+  <% elsif @branches %>
+    <%= erb :'partials/branches', locals: { branches: @branches } %>
+  <% elsif @commits %>
+    <%= erb :'partials/commits', locals: { commits: @commits } %>
+  <% else %>
+    <div class="container">
+      <h3 class="muted"><i class="icon-circle-arrow-up"></i> What would you like to deploy?</h3>
+    </div>
+  <% end %>
+</div>

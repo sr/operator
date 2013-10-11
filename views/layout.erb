@@ -5,8 +5,8 @@
     <title>Pardot/Canoe</title>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css">
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./css/main.min.css">
-    <link rel="stylesheet" href="./css/app.css">
+    <link rel="stylesheet" href="/css/main.min.css">
+    <link rel="stylesheet" href="/css/app.css">
   </head>
   <body>
     <header class="navbar navbar-default navbar-fixed-top" role="banner">
@@ -17,12 +17,16 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
           </button>
-          <a href="/" class="navbar-brand"><img src="img/logo.png" alt="Pardot" class="img-responsive"/></a>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><i class="icon-question-sign"></i></a></li>
-            <li><a href="#"><i class="icon-search"></i></a></li>
-            <li><a href="#"><i class="icon-user"></i></a></li>
-          </ul>
+          <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Pardot" class="img-responsive"/></a>
+          <% if current_user %>
+            <ul class="nav navbar-nav navbar-right">
+              <!--
+              <li><a href="#"><i class="icon-question-sign"></i></a></li>
+              <li><a href="#"><i class="icon-search"></i></a></li>
+              -->
+              <li><a href="#"><i class="icon-user"></i></a></li>
+            </ul>
+          <% end %>
       </div>
     </header>
 
@@ -31,7 +35,16 @@
         <nav role="navigation">
             <ul class="nav nav-stacked">
               <li>
-                <a href="#"><i class="icon-file"></i>Things</a>
+                <a href="/repo/pardot"  <%= active_repo 'pardot'  %>><i class="icon-book"></i>Pardot </a>
+              </li>
+              <li>
+                <a href="/repo/symfony" <%= active_repo 'symfony' %>><i class="icon-book"></i>Symfony</a>
+              </li>
+              <% all_targets.each do |target| %>
+                <li <%= 'class="first-target"' if all_targets.first == target %>>
+                  <a href="/target/<%= target.name %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
+                </li>
+              <% end %>
               </li>
               <!--
               <li>{{#link-to 'docs'}}<span class="badge pull-right">2</span><i class="icon-file"></i> Docs{{/link-to}}</li>
@@ -53,11 +66,13 @@
             </ul>
         </nav>
 
+        <!--
         <nav role="navigation-bottom">
             <ul class="nav nav-stacked">
               <li><a href="#"><i class="icon-gear"></i> Settings</a></li>
             </ul>
         </nav>
+        -->
       </aside>
 
       <main id="content" role="main">

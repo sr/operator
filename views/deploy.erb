@@ -1,0 +1,51 @@
+<h1>DEPLOY</h1>
+<h3 class="muted">
+  <%= current_repo.name.capitalize %>:
+  <%= deploy_type_icon(@deploy_type.name) %>
+  <%= @deploy_type.details %>
+</h3>
+<br>
+<div class="alert alert-info">
+  <p class="lead">
+    Select <i class="icon-bullseye"></i> for deployment.
+  </p>
+</div>
+
+<!-- TODO: also check for ongoing pushes? -->
+<% @targets.each do |target| %>
+  <div class="deploy-target">
+    <h2>
+      <% if target.locked? %>
+        <i class="icon-lock text-danger"></i>
+      <% else %>
+        <i class="icon-unlock text-success"></i>
+      <% end %>
+      <%= target.name.upcase %>
+    </h2>
+    <div class="last-deploy">
+      <small class="muted">
+        <strong>LAST DEPLOY:</strong>
+        shawn.veader@salesforce.com deployed <a href="#"><i class="icon-tag"></i> build2561</a> on 10/10/2013 @ 3:59 PM
+      </small>
+    </div>
+    <% if target.locked? %>
+      <div class="alert alert-warning">Currently locked by <%= target.locking_user.email %></div>
+    <% else %>
+      <form role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
+        <button type="submit" class="btn btn-warning"><i class="icon-rocket"></i> DEPLOY!</button>
+        <!-- TODO: checkbox for locking -->
+      </form>
+    <% end %>
+  </div>
+    <%= "<hr>" unless @targets.last == target %>
+<% end %>
+<!--
+      <small class="muted">
+      <strong>LAST DEPLOY:</strong>
+      shawn.veader@salesforce.com deployed <a href="#"><i class="icon-tag"></i> build2561</a> on 10/10/2013 @ 3:59 PM
+    </small>
+    <small class="muted">
+      <strong>LAST DEPLOY:</strong>
+      shawn.veader@salesforce.com deployed <a href="#"><i class="icon-code-fork"></i> sv/PDT-1234</a> on 10/10/2013 @ 10:16 AM
+    </small>
+-->
