@@ -36,10 +36,14 @@ class CanoeApplication < Sinatra::Base
 
   use Rack::Flash, :sweep => true
 
-  use OmniAuth::Strategies::Developer
-  # use OmniAuth::Builder do
-  #   provider :developer
-  # end
+  if ENV["RACK_ENV"] == "development"
+    use OmniAuth::Strategies::Developer
+  else
+    use OmniAuth::Builder do
+      provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_SECRET"],
+               { name: "google", access_type: "online" }
+    end
+  end
 
   # ---------------------------------------------------------------
   before do
