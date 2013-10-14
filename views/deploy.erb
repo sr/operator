@@ -28,8 +28,8 @@
         shawn.veader@salesforce.com deployed <a href="#"><i class="icon-tag"></i> build2561</a> on 10/10/2013 @ 3:59 PM
       </small>
     </div>
-    <% if target.locked? %>
-      <div class="alert alert-warning">Currently locked by <%= target.locking_user.email %></div>
+    <% if target.locked? && target.locking_user != current_user %>
+      <%= partial :'partials/locked_target_warning', locals: { target: target } %>
     <% else %>
       <form role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
         <button type="submit" class="btn btn-warning"><i class="icon-rocket"></i> DEPLOY!</button>

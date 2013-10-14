@@ -3,9 +3,11 @@
 require "load_envvars"
 require "sinatra"
 require "sinatra/activerecord"
+require "sinatra/partial"
 require 'rack-flash'
 require "omniauth"
 require "ostruct"
+require "pp"
 
 require "github"
 
@@ -19,8 +21,10 @@ set :database, ENV["DATABASE_URL"]
 class CanoeApplication < Sinatra::Base
 
   register Sinatra::ActiveRecordExtension
+  register Sinatra::Partial
 
-  set :root, File.join(File.dirname(__FILE__), "..")
+  set :root, ENV["CANOE_DIR"] # File.join(File.dirname(__FILE__), "..")
+  set :partial_template_engine, :erb
 
   # enable :sessions # use explicit so we can set session secret
   use Rack::Session::Cookie, {  key: "rack.session",
@@ -144,35 +148,74 @@ class CanoeApplication < Sinatra::Base
       redirect back
     end
 
+    # check for locked target, allow user who has it locked to deploy again
+    if current_target.locked? && current_target.locking_user != current_user
+      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
+      redirect_ back
+    end
+
+    deploy_type = ''
     cmd_pieces = []
     cmd_pieces << current_target.script_path + "/ship-it.rb"
     cmd_pieces << current_repo.name
     %w[tag branch commit].each do |type|
       if params[type]
-        the_type = type
+        the_type = deploy_type = type
         the_type = "hash" if type == "commit" # commit is called hash in the options
         cmd_pieces << "#{the_type}=#{params[type]}"
       end
     end
-    # TODO: check for user wanting to lock
-    flash[:notice] = "Command that would be run: #{cmd_pieces.join(' ')}"
-    puts cmd_pieces.join(' ')
 
-    # TODO: create a deploy and forward to watching it..
-    redirect "/deploy/watch"
+    deploy = Deploy.create( deploy_target: current_target,
+                            auth_user: current_user,
+                            repo_name: current_repo.name,
+                            what: deploy_type,
+                            what_details: params[deploy_type],
+                            completed: false,
+                            )
+
+    cmd_pieces << "--deploy-id=#{deploy.id}"
+    cmd_pieces << "--no-confirmations"
+    cmd_pieces << "&> #{deploy.log_path}"
+    # TODO: check for user wanting to lock
+    flash[:notice] = "Command that would be run: #{cmd_pieces.join(" ")}"
+    puts cmd_pieces.join(" ")
+
+    # TODO: permissions, etc
+    # fork off process to run this...
+    shipit = fork { exec cmd_pieces.join(" ") }
+    Process.detach(shipit)
+
+    redirect "/deploy/#{deploy.id}/watch"
   end
 
-  get "/deploy/watch" do
+  get "/deploy/:deploy_id" do
+    erb :deploy_show
+  end
+
+  get "/deploy/:deploy_id/watch" do
     erb :watch
+  end
+
+  post "/deploy/:deploy_id/complete" do
+    # does not require auth but requires "secret" params #trust
+    redirect "/login" unless params[:super_secret] == 'chatty'
+
+    if current_deploy
+      current_deploy.completed = true
+      current_deploy.save!
+    end
+    '' # no real need to return since the script can't do anything with it...
   end
 
   # ---------------------------------------------------------------
   def page_requires_authentication?
-    # pages that do not require authentication are login and /auth/... paths
+    # pages that do not require authentication are login, /auth/ and the complete paths
     paths_without_auth = ["/login"]
 
     ( !paths_without_auth.include?(request.path_info) && \
-      !request.path_info.match(%r{^/auth/}) )
+      !request.path_info.match(%r{^/auth/}) && \
+      !request.path_info.match(/deploy\/.*\/complete/) )
   end
 
   def authentication_required!
@@ -209,6 +252,10 @@ class CanoeApplication < Sinatra::Base
 
     def current_target
       @_current_target ||= DeployTarget.where(name: params[:target_name]).first
+    end
+
+    def current_deploy
+      @_current_deploy ||= Deploy.where(id: params[:deploy_id].to_i).first
     end
 
     def all_targets
@@ -268,6 +315,10 @@ class CanoeApplication < Sinatra::Base
       else
         ''
       end
+    end
+
+    def print_time(time)
+      time.strftime("%m/%d/%y @ %l:%M %p")
     end
   end
 

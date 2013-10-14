@@ -5,4 +5,17 @@ class Deploy < ActiveRecord::Base
   belongs_to :auth_user
 
   # TODO: log location, etd
+
+  def log_path
+    @_log_path ||= \
+      begin
+        filename = "#{self.deploy_target.name}_#{self.repo_name}_#{self.id}.log"
+        File.join(ENV["CANOE_DIR"], 'log', filename)
+      end
+  end
+
+  def log_contents
+    File.read(log_path)
+  end
+
 end

@@ -1,2 +1,4 @@
 .envvars_*
 tmp/*.txt
+log/*.log
+

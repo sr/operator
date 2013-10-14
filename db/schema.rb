@@ -38,8 +38,9 @@ ActiveRecord::Schema.define(version: 20131010212003) do
   create_table "deploys", force: true do |t|
     t.integer  "deploy_target_id"
     t.integer  "auth_user_id"
-    t.string   "type"
-    t.string   "type_details"
+    t.string   "repo_name"
+    t.string   "what"
+    t.string   "what_details"
     t.boolean  "completed"
     t.datetime "created_at"
     t.datetime "updated_at"

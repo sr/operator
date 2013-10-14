@@ -1,0 +1,9 @@
+<div class="alert alert-warning">
+  Currently locked by
+  <% if target.locking_user == current_user %>
+    <strong>you</strong>.
+  <% else %>
+    <%= target.locking_user.email %>.
+  <% end %>
+</div>
+

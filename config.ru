@@ -1,4 +1,4 @@
-CANOE_DIR=File.dirname(__FILE__)
+CANOE_DIR=File.expand_path(File.dirname(__FILE__))
 ENV["CANOE_DIR"]=CANOE_DIR
 ENV["RACK_ENV"]="development"
 

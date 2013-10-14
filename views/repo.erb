@@ -21,11 +21,11 @@
   <br>
 
   <% if @tags %>
-    <%= erb :'partials/tags', locals: { tags: @tags } %>
+    <%= partial :'partials/tags', locals: { tags: @tags } %>
   <% elsif @branches %>
-    <%= erb :'partials/branches', locals: { branches: @branches } %>
+    <%= partial :'partials/branches', locals: { branches: @branches } %>
   <% elsif @commits %>
-    <%= erb :'partials/commits', locals: { commits: @commits } %>
+    <%= partial :'partials/commits', locals: { commits: @commits } %>
   <% else %>
     <div class="container">
       <h3 class="muted"><i class="icon-circle-arrow-up"></i> What would you like to deploy?</h3>

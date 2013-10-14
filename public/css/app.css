@@ -31,5 +31,9 @@
   margin:10px 0;
 }
 .first-target {
-  border-top:3px solid #BBB;
+  border-top:3px solid #009ddc;
+}
+.deploy-log {
+  background:#444;
+  color:#EEE;
 }

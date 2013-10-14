@@ -6,6 +6,7 @@ gem "rake"
 gem "rack"
 gem "sinatra"
 gem "rack-flash3"
+gem "sinatra-partial"
 # gem "json", "~> 1.8.0"
 
 # dev/debugging ----

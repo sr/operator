@@ -3,8 +3,9 @@ class CreateDeploys < ActiveRecord::Migration
     create_table :deploys do |t|
       t.integer :deploy_target_id
       t.integer :auth_user_id
-      t.string :type
-      t.string :type_details
+      t.string :repo_name
+      t.string :what
+      t.string :what_details
       t.boolean :completed
       t.timestamps
     end

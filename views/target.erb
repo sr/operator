@@ -1,1 +1,45 @@
 <h1>TARGET</h1>
+<p class="lead no-bottom">
+  <i class="icon-bullseye"></i>&nbsp;
+  <%= current_target.name.capitalize %>
+</p>
+<br>
+
+<% if current_target.locked? %>
+  <%= partial :'partials/locked_target_warning', locals: { target: current_target } %>
+<% end %>
+
+<!-- TODO: look for any running deploys - provide watch link -->
+<% if current_target.active_deploy %>
+  <div class="alert alert-info">
+    <strong>Active</strong>:
+    There is a deploy currently going out to <%= current_target.name %>.
+    <a href="/deploy/<%= current_target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+  </div>
+<% end %>
+<!-- TODO: list of past deploys -->
+
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Repo</th>
+      <th>Type</th>
+      <th>What</th>
+      <th>Who</th>
+      <th>When</th>
+      <th>Complete</th>
+    </tr>
+  </thead>
+  <% current_target.deploys.each do |deploy| %>
+    <tr>
+      <td><a href="/deploy/<%= deploy.id %>">view</a></td>
+      <td><%= deploy.repo_name %></td>
+      <td><%= deploy_type_icon deploy.what %></td>
+      <td><%= deploy.what_details %></td>
+      <td><%= deploy.auth_user.email %></td>
+      <td><%= print_time deploy.created_at %></td>
+      <td><%= deploy.completed? ? "Yes" : "" %></td>
+    </tr>
+  <% end %>
+</table>

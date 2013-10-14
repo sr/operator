@@ -1,7 +1,6 @@
 <h1>DEPLOY</h1>
 <p class="lead no-bottom">
-  <i class="icon-eye-open"></i> Watching deploy
-  of <%= current_deploy.repo_name.capitalize %> :
+  <%= current_deploy.repo_name.capitalize %> :
   <%= deploy_type_icon(current_deploy.what) %> <%= current_deploy.what_details %>
   to <%= current_deploy.deploy_target.name %>
 </p>
