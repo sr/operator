@@ -1,6 +1,6 @@
 CANOE_DIR=File.expand_path(File.dirname(__FILE__))
 ENV["CANOE_DIR"]=CANOE_DIR
-ENV["RACK_ENV"]="development"
+ENV["RACK_ENV"]="production"
 
 # add our root and lib dirs to the load path
 $:.unshift CANOE_DIR
