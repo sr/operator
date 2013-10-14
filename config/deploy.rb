@@ -22,7 +22,7 @@ set :default_environment, {
 set :bundle_flags, '--deployment --quiet --binstubs --shebang ruby-local-exec'
 
 after 'deploy:restart', 'deploy:cleanup'
-# after 'deploy:create_symlink', 'mesh:link_envvars'
+after 'deploy:create_symlink', 'canoe:link_envvars'
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
@@ -33,5 +33,11 @@ namespace :deploy do
   task :stop  do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
+  end
+end
+
+namespace :canoe do
+  task :link_envvars do
+    run "ln -nfs ~/.envvars_production_#{application} #{current_path}/.envvars_production"
   end
 end
