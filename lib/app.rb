@@ -19,10 +19,20 @@ require "deploy_target"
 
 set :database, ENV["DATABASE_URL"]
 
+module Sinatra
+  module GetOrPost
+    def get_or_post(path, options = {}, &block)
+      get(path, options, &block)
+      post(path, options, &block)
+    end
+  end
+end
+
 class CanoeApplication < Sinatra::Base
 
   register Sinatra::ActiveRecordExtension
   register Sinatra::Partial
+  register Sinatra::GetOrPost
 
   set :root, ENV["CANOE_DIR"] # File.join(File.dirname(__FILE__), "..")
   set :partial_template_engine, :erb
@@ -48,6 +58,11 @@ class CanoeApplication < Sinatra::Base
     end
   end
 
+  def get_or_post(path, opts={}, &block)
+    get(path, opts, &block)
+    post(path, opts, &block)
+  end
+
   # ---------------------------------------------------------------
   before do
     authentication_required!
@@ -59,7 +74,7 @@ class CanoeApplication < Sinatra::Base
   end
 
   get "/login" do
-    @oauth_path = "/auth/developer"
+    @oauth_path = ENV["RACK_ENV"] == "development" ? "/auth/developer" : "/auth/google"
     erb :login
   end
 
@@ -68,7 +83,7 @@ class CanoeApplication < Sinatra::Base
     redirect "/"
   end
 
-  post "/auth/:name/callback" do
+  get_or_post "/auth/:name/callback" do
     session.clear
     auth_hash = request.env["omniauth.auth"]
 
