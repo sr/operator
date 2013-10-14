@@ -200,7 +200,7 @@ class CanoeApplication < Sinatra::Base
     cmd_pieces << "--no-confirmations"
     cmd_pieces << "&> #{deploy.log_path}"
     # TODO: check for user wanting to lock
-    flash[:notice] = "Command that would be run: #{cmd_pieces.join(" ")}"
+    # flash[:notice] = "Command that would be run: #{cmd_pieces.join(" ")}"
     puts cmd_pieces.join(" ")
 
     # TODO: permissions, etc
