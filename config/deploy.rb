@@ -10,9 +10,9 @@ set :deploy_to,   "/var/#{application}"
 # set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 
-role :web, "canoe.test.pardot.com"
-role :app, "canoe.test.pardot.com"
-role :db,  "canoe.test.pardot.com", :primary => true
+role :web, "127.0.0.1"
+role :app, "127.0.0.1"
+role :db,  "127.0.0.1", :primary => true
 
 # fun rbenv setup
 set :default_environment, {
