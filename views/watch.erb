@@ -22,6 +22,10 @@
 <% else %>
   <div class="alert alert-warning">
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-rocket"></i> to land.
+    <script type="text/javascript">
+      // automatically refresh the page
+      setTimeout(function () { location.reload(); }, 2000);
+    </script>
   </div>
 <% end %>
 
