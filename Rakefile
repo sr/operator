@@ -37,4 +37,23 @@ namespace :canoe do
     ) if !test
   end
 
+  desc 'Create deploy targets for test/staging envs'
+  task :create_staging_targets do
+    testing_env = DeployTarget.where(name: 'test').first
+    DeployTarget.create(
+      name: 'test',
+      script_path: '/opt/sync/test',
+      lock_path: '/var/lock/test',
+      locked: false,
+    ) if !testing_env
+
+    staging_env = DeployTarget.where(name: 'staging').first
+    DeployTarget.create(
+      name: 'staging',
+      script_path: '/opt/sync/staging',
+      lock_path: '/var/lock/staging',
+      locked: false,
+    ) if !staging_env
+  end
+
 end
