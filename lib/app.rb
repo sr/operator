@@ -6,6 +6,7 @@ require "sinatra/activerecord"
 require "sinatra/partial"
 require 'rack-flash'
 require "omniauth"
+require "omniauth-google-oauth2"
 require "ostruct"
 require "pp"
 
@@ -39,6 +40,8 @@ class CanoeApplication < Sinatra::Base
   if ENV["RACK_ENV"] == "development"
     use OmniAuth::Strategies::Developer
   else
+    # keys found here: https://cloud.google.com/console
+    # under veader@gmail.com account ... :(
     use OmniAuth::Builder do
       provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_SECRET"],
                { name: "google", access_type: "online" }
