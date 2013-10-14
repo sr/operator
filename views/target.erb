@@ -31,7 +31,7 @@
       <th>Complete</th>
     </tr>
   </thead>
-  <% current_target.deploys.each do |deploy| %>
+  <% @deploys.each do |deploy| %>
     <tr>
       <td><a href="/deploy/<%= deploy.id %>">view</a></td>
       <td><%= deploy.repo_name %></td>

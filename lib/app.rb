@@ -160,6 +160,7 @@ class CanoeApplication < Sinatra::Base
   # TARGET --------
   get "/target/:target_name" do
     guard_against_unknown_targets!
+    @deploys = current_target.deploys.order('created_at DESC')
     erb :target
   end
 
