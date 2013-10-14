@@ -38,6 +38,6 @@ end
 
 namespace :canoe do
   task :link_envvars do
-    run "ln -nfs ~/.envvars_production_#{application} #{current_path}/.envvars_production"
+    run "ln -nfs ~/.envvars_production_#{application} #{current_path}/.envvars_production.rb"
   end
 end
