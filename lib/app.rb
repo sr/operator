@@ -335,11 +335,11 @@ class CanoeApplication < Sinatra::Base
     def deploy_type_icon(type)
       case type
       when 'tag'
-        "<i class='icon-tag'></i>"
+        "<i class='icon-tag' title='tag'></i>"
       when 'branch'
-        "<i class='icon-code-fork'></i>"
+        "<i class='icon-code-fork' title='branch'></i>"
       when 'commit'
-        "<i class='icon-tasks'></i>"
+        "<i class='icon-tasks' title='commit'></i>"
       else
         ''
       end
