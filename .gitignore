@@ -1,3 +1,4 @@
+**/**/.DS_Store
 .envvars_*
 tmp/*.txt
 log/*.log
