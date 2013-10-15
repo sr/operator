@@ -37,7 +37,7 @@
         <% end %>
       </small>
     </div>
-    <% if target.is_locked? && target.locking_user != current_user %>
+    <% if target.is_locked? && target.locking_user != current_user && target.file_lock_user != current_user.email %>
       <%= partial :'partials/locked_target_warning', locals: { target: target } %>
     <% else %>
       <form role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">

@@ -1,6 +1,7 @@
 <div class="alert alert-warning">
   Currently locked by
-  <% if target.locking_user == current_user %>
+  <% if target.locking_user == current_user ||
+        target.has_file_lock? && target.file_lock_user == current_user.email %>
     <strong>you</strong>.
   <% else %>
     <% if target.locked? %>

@@ -177,9 +177,11 @@ class CanoeApplication < Sinatra::Base
     end
 
     # check for locked target, allow user who has it locked to deploy again
-    if current_target.is_locked? && current_target.locking_user != current_user
+    if current_target.is_locked? && \
+       current_target.locking_user != current_user && \
+       current_target.file_lock_user != current_user.email
       flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-      redirect_ back
+      redirect back
     end
 
     deploy_type = ''
@@ -202,6 +204,7 @@ class CanoeApplication < Sinatra::Base
                             completed: false,
                             )
 
+    cmd_pieces << "--user=#{current_user.email}"
     cmd_pieces << "--deploy-id=#{deploy.id}"
     cmd_pieces << "--no-confirmations"
     cmd_pieces << "&> #{deploy.log_path}"
