@@ -1,6 +1,7 @@
 class DeployTarget < ActiveRecord::Base
   # validations, uniqueness, etc
   has_many :deploys
+  has_many :locks
   belongs_to :locking_user, class_name: AuthUser
 
 

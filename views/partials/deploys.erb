@@ -1,0 +1,31 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Repo</th>
+      <th>What</th>
+      <th>Who</th>
+      <th>When</th>
+      <th>Complete</th>
+    </tr>
+  </thead>
+  <% @deploys.each do |deploy| %>
+    <tr>
+      <td><a href="/deploy/<%= deploy.id %>">view</a></td>
+      <td><%= deploy.repo_name %></td>
+      <td>
+        <%= deploy_type_icon deploy.what %>
+        <%= deploy.what_details %>
+      </td>
+      <td><%= deploy.auth_user.email %></td>
+      <td><%= print_time deploy.created_at %></td>
+      <td>
+        <% if deploy.completed? %>
+          <span class="text-success"><i class="icon-check"></i></span>
+        <% else %>
+          <span class="text-muted"><i class="icon-check-empty"></i></span>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

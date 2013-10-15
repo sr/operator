@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131010212003) do
+ActiveRecord::Schema.define(version: 20131015203252) do
 
   create_table "auth_users", force: true do |t|
     t.string   "email"
@@ -47,5 +47,17 @@ ActiveRecord::Schema.define(version: 20131010212003) do
   end
 
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
+
+  create_table "locks", force: true do |t|
+    t.integer  "deploy_target_id"
+    t.integer  "auth_user_id"
+    t.boolean  "locking",          default: false
+    t.boolean  "forced",           default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
+  add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
 
 end

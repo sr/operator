@@ -16,6 +16,7 @@ require "github"
 require "auth_user"
 require "deploy"
 require "deploy_target"
+require "lock"
 
 set :database, ENV["DATABASE_URL"]
 
@@ -160,26 +161,32 @@ class CanoeApplication < Sinatra::Base
   # TARGET --------
   get "/target/:target_name" do
     guard_against_unknown_targets!
-    @last_repo_deploys = {}
-    %w[pardot symfony].each do |repo|
-      @last_repo_deploys[repo] = \
-        current_target.deploys.where(repo_name: repo).order('created_at DESC').first
-    end
+    get_recent_deploys_for_repos
     @deploys = current_target.deploys.order('created_at DESC')
     erb :target
   end
 
+  get "/target/:target_name/locks" do
+    guard_against_unknown_targets!
+    get_recent_deploys_for_repos
+    @locks = current_target.locks.order('created_at DESC')
+    erb :target
+  end
+
   post "/target/:target_name/lock" do
+    guard_against_unknown_targets!
     lock_target!
     redirect "/target/#{current_target.name}"
   end
 
   post "/target/:target_name/unlock" do
+    guard_against_unknown_targets!
     unlock_target!
     redirect "/target/#{current_target.name}"
   end
 
   post "/target/:target_name/unlock/force" do
+    guard_against_unknown_targets!
     unlock_target!(true)
     redirect "/target/#{current_target.name}"
   end
@@ -234,6 +241,8 @@ class CanoeApplication < Sinatra::Base
     shipit = fork { exec cmd_pieces.join(" ") }
     Process.detach(shipit)
 
+    create_lock_history! if params[:lock] == "on"
+
     redirect "/deploy/#{deploy.id}/watch"
   end
 
@@ -282,23 +291,46 @@ class CanoeApplication < Sinatra::Base
 
   # ---------------------------------------------------------------
   def lock_target!
+    current_target.locked = true
+    current_target.locking_user = current_user
+    current_target.save
+
     cmd_pieces = []
     cmd_pieces << current_target.script_path + "/ship-it.rb"
     cmd_pieces << "--only-lock"
     cmd_pieces << "--user=#{current_user.email}"
+
+    create_lock_history!
 
     output = `#{cmd_pieces.join(" ")}`
     flash[:notice] = output
   end
 
   def unlock_target!(with_force=false)
+    current_target.locked = false
+    current_target.locking_user = nil
+    current_target.save
+
     cmd_pieces = []
     cmd_pieces << current_target.script_path + "/ship-it.rb"
     cmd_pieces << (with_force ? "--force-unlock" : "--unlock")
     cmd_pieces << "--user=#{current_user.email}"
 
+    Lock.create(deploy_target: current_target,
+                auth_user: current_user,
+                locking: false,
+                forced: with_force,
+                )
+
     output = `#{cmd_pieces.join(" ")}`
     flash[:notice] = output
+  end
+
+  def create_lock_history!
+    Lock.create(deploy_target: current_target,
+                auth_user: current_user,
+                locking: true,
+                )
   end
 
   # ---------------------------------------------------------------
@@ -313,6 +345,15 @@ class CanoeApplication < Sinatra::Base
     if !current_target
       flash[:notice] = "Requested target is unknown."
       redirect back
+    end
+  end
+
+  # ---------------------------------------------------------------
+  def get_recent_deploys_for_repos
+    @last_repo_deploys = {}
+    %w[pardot symfony].each do |repo|
+      @last_repo_deploys[repo] = \
+        current_target.deploys.where(repo_name: repo).order('created_at DESC').first
     end
   end
 
