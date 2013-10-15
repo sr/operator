@@ -77,16 +77,7 @@
       </aside>
 
       <main id="content" role="main">
-          <% if flash[:notice] %>
-            <div class="alert alert-info">
-              <%= flash[:notice] %>
-            </div>
-          <% elsif flash[:error] %>
-            <div class="alert alert-warning">
-              <%= flash[:error] %>
-            </div>
-          <% end %>
-
+          <%= partial :'/partials/flash_messages' %>
           <div class="container">
             <%= yield %>
           </div>
@@ -105,16 +96,13 @@
           </div>
       </div>
     <% else %>
-      <style type="text/css">
-      body { padding-left:0; }
-      </style>
-      <% if flash[:notice] %>
-        <%= flash[:notice] %>
-      <% elsif flash[:error] %>
-        <%= flash[:error] %>
-      <% end %>
-
-      <%= yield %>
+      <div class="container">
+        <style type="text/css">
+        body { padding-left:0; }
+        </style>
+        <%= partial :'/partials/flash_messages' %>
+        <%= yield %>
+      </div>
     <% end %>
 
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
