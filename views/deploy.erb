@@ -25,7 +25,16 @@
     <div class="last-deploy">
       <small class="muted">
         <strong>LAST DEPLOY:</strong>
-        shawn.veader@salesforce.com deployed <a href="#"><i class="icon-tag"></i> build2561</a> on 10/10/2013 @ 3:59 PM
+        <% deploy = target.last_deploy_for(current_repo.name) %>
+        <% if deploy %>
+          <%= deploy.auth_user.email %> deployed
+          <span class="text-info">
+            <%= deploy_type_icon deploy.what %> <%= deploy.what_details %>
+          </span>
+          on <%= print_time deploy.created_at %>
+        <% else %>
+          <em>No record of being deployed on this target.</em>
+        <% end %>
       </small>
     </div>
     <% if target.is_locked? && target.locking_user != current_user %>

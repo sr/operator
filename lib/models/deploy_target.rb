@@ -3,13 +3,18 @@ class DeployTarget < ActiveRecord::Base
   has_many :deploys
   belongs_to :locking_user, class_name: AuthUser
 
+
+  def last_deploy_for(repo_name)
+    self.deploys.where(repo_name: repo_name).order("created_at DESC").first
+  end
+
   def active_deploy
     # see if the most recent deploy is not completed
     @_active_deploy ||= most_recent_deploy.try(:completed) ? nil : most_recent_deploy
   end
 
   def most_recent_deploy
-    @_most_recent_deploy ||= self.deploys.order(:created_at).first
+    @_most_recent_deploy ||= self.deploys.order("created_at DESC").first
   end
 
   def is_locked?
