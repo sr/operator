@@ -169,6 +169,21 @@ class CanoeApplication < Sinatra::Base
     erb :target
   end
 
+  post "/target/:target_name/lock" do
+    lock_target!
+    redirect "/target/#{current_target.name}"
+  end
+
+  post "/target/:target_name/unlock" do
+    unlock_target!
+    redirect "/target/#{current_target.name}"
+  end
+
+  post "/target/:target_name/unlock/force" do
+    unlock_target!(true)
+    redirect "/target/#{current_target.name}"
+  end
+
   # DEPLOY --------
   post "/deploy/target/:target_name" do
     unless current_repo && current_target
@@ -261,6 +276,27 @@ class CanoeApplication < Sinatra::Base
   def authentication_required!
     return unless page_requires_authentication?
     redirect "/login" unless current_user
+  end
+
+  # ---------------------------------------------------------------
+  def lock_target!
+    cmd_pieces = []
+    cmd_pieces << current_target.script_path + "/ship-it.rb"
+    cmd_pieces << "--only-lock"
+    cmd_pieces << "--user=#{current_user.email}"
+
+    output = `#{cmd_pieces.join(" ")}`
+    flash[:notice] = output
+  end
+
+  def unlock_target!(with_force=false)
+    cmd_pieces = []
+    cmd_pieces << current_target.script_path + "/ship-it.rb"
+    cmd_pieces << (with_force ? "--force-unlock" : "--unlock")
+    cmd_pieces << "--user=#{current_user.email}"
+
+    output = `#{cmd_pieces.join(" ")}`
+    flash[:notice] = output
   end
 
   # ---------------------------------------------------------------
