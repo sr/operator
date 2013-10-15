@@ -12,4 +12,16 @@ class DeployTarget < ActiveRecord::Base
     @_most_recent_deploy ||= self.deploys.order(:created_at).first
   end
 
+  def is_locked?
+    self.locked? || has_file_lock?
+  end
+
+  def has_file_lock?
+    File.exists?(self.lock_path)
+  end
+
+  def file_lock_user
+    File.read(self.lock_path)
+  end
+
 end

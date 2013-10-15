@@ -177,7 +177,7 @@ class CanoeApplication < Sinatra::Base
     end
 
     # check for locked target, allow user who has it locked to deploy again
-    if current_target.locked? && current_target.locking_user != current_user
+    if current_target.is_locked? && current_target.locking_user != current_user
       flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
       redirect_ back
     end

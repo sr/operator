@@ -5,7 +5,7 @@
 </p>
 <br>
 
-<% if current_target.locked? %>
+<% if current_target.is_locked? %>
   <%= partial :'partials/locked_target_warning', locals: { target: current_target } %>
 <% end %>
 
