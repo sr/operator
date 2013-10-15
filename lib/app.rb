@@ -160,6 +160,11 @@ class CanoeApplication < Sinatra::Base
   # TARGET --------
   get "/target/:target_name" do
     guard_against_unknown_targets!
+    @last_repo_deploys = {}
+    %w[pardot symfony].each do |repo|
+      @last_repo_deploys[repo] = \
+        current_target.deploys.where(repo_name: repo).order('created_at DESC').first
+    end
     @deploys = current_target.deploys.order('created_at DESC')
     erb :target
   end
