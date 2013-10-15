@@ -239,6 +239,15 @@ class CanoeApplication < Sinatra::Base
     '' # no real need to return since the script can't do anything with it...
   end
 
+  post "/deploy/:deploy_id/mark/complete" do
+    if current_deploy
+      current_deploy.completed = true
+      current_deploy.save!
+    end
+
+    redirect "/deploy/#{current_deploy.id}"
+  end
+
   # ---------------------------------------------------------------
   def page_requires_authentication?
     # pages that do not require authentication are login, /auth/ and the complete paths

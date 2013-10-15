@@ -26,3 +26,12 @@
 
 <h4>Log</h4>
 <%= partial :'partials/deploy_log' %>
+
+<% if !current_deploy.completed %>
+  <br>
+  <div>
+    <form role="form" action="/deploy/<%= current_deploy.id %>/mark/complete" method="post" onsubmit="return confirm('Are you sure you want to mark this complete?');">
+      <button type="submit" class="btn btn-danger">Mark as Complete</button>
+    </form>
+  </div>
+<% end %>
