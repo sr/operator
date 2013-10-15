@@ -40,8 +40,14 @@
     <% if target.is_locked? && target.locking_user != current_user && target.file_lock_user != current_user.email %>
       <%= partial :'partials/locked_target_warning', locals: { target: target } %>
     <% else %>
-      <form role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
+      <form class="form-inline" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
         <button type="submit" class="btn btn-warning"><i class="icon-rocket"></i> DEPLOY!</button>
+        &nbsp;
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="lock"> Lock
+          </label>
+        </div>
         <!-- TODO: checkbox for locking -->
       </form>
     <% end %>

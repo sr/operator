@@ -219,6 +219,8 @@ class CanoeApplication < Sinatra::Base
                             completed: false,
                             )
 
+
+    cmd_pieces << "--lock" if params[:lock] == "on"
     cmd_pieces << "--user=#{current_user.email}"
     cmd_pieces << "--deploy-id=#{deploy.id}"
     cmd_pieces << "--no-confirmations"
