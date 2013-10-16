@@ -18,6 +18,9 @@ require "deploy"
 require "deploy_target"
 require "lock"
 
+Time.zone = "UTC"
+ActiveRecord::Base.default_timezone = :utc
+
 set :database, ENV["DATABASE_URL"]
 
 module Sinatra
@@ -437,7 +440,7 @@ class CanoeApplication < Sinatra::Base
     end
 
     def print_time(time)
-      time.strftime("%m/%d/%y @ %l:%M %p")
+      time.localtime.strftime("%m/%d/%y @ %l:%M %p")
     end
   end
 
