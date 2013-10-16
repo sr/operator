@@ -139,7 +139,7 @@ class CanoeApplication < Sinatra::Base
     @branches = @branches.sort_by(&:name) # may not really be needed...
 
     if params[:search]
-      @branches = @branches.find_all { |b| b.name =~ /#{params[:search]}/ }
+      @branches = @branches.find_all { |b| b.name =~ /#{params[:search]}/i }
     end
 
     erb :repo
