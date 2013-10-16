@@ -137,6 +137,11 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_repos!
     @branches = Octokit.branches(current_repo.full_name)
     @branches = @branches.sort_by(&:name) # may not really be needed...
+
+    if params[:search]
+      @branches = @branches.find_all { |b| b.name =~ /#{params[:search]}/ }
+    end
+
     erb :repo
   end
 
@@ -157,7 +162,7 @@ class CanoeApplication < Sinatra::Base
       end
     end
 
-    @targets = DeployTarget.order(:name).all
+    @targets = DeployTarget.order(:name)
     erb :deploy
   end
 
@@ -381,7 +386,7 @@ class CanoeApplication < Sinatra::Base
     end
 
     def all_targets
-      @_all_targets ||= DeployTarget.order(:name).all
+      @_all_targets ||= DeployTarget.order(:name)
     end
 
     def active_repo(repo_name)

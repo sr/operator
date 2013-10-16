@@ -7,6 +7,15 @@
 <br><br>
 
 <div>
+  <% if @branches %>
+    <form class="form-inline pull-right" role="form" action="<%= repo_path %>/branches" method="get">
+      <div class="form-group">
+        <label class="sr-only" for="search">Search</label>
+        <input type="text" class="form-control" id="search" name="search" placeholder="Enter branch name" value="<%= params[:search] %>">
+      </div>
+      <button type="submit" class="btn btn-default">Search</button>
+    </form>
+  <% end %>
   <ul class="nav nav-tabs">
     <li <%= 'class="active"' if @tags %>>
       <a href="<%= repo_path %>/tags"><i class="icon-tags"></i> Tags</a>
