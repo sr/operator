@@ -20,11 +20,6 @@
           <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Pardot" class="img-responsive"/></a>
           <% if current_user %>
             <ul class="nav navbar-nav navbar-right">
-              <!--
-              <li><a href="#"><i class="icon-question-sign"></i></a></li>
-              <li><a href="#"><i class="icon-search"></i></a></li>
-              -->
-              <li><a href="#"><i class="icon-user" title="<%= current_user.email %>"></i></a></li>
               <li><a href="/logout"><i class="icon-signout" title="logout"></i></a></li>
             </ul>
           <% end %>
@@ -36,44 +31,20 @@
         <nav role="navigation">
             <ul class="nav nav-stacked">
               <li>
-                <a href="/repo/pardot"  <%= active_repo 'pardot'  %>><i class="icon-book"></i>Pardot </a>
+                <a href="/repo/pardot"  <%= active_repo 'pardot'  %>><i class="icon-cloud"></i>Pardot </a>
               </li>
               <li>
-                <a href="/repo/symfony" <%= active_repo 'symfony' %>><i class="icon-book"></i>Symfony</a>
+                <a href="/repo/symfony" <%= active_repo 'symfony' %>><i class="icon-code"></i>Symfony</a>
               </li>
+							<li>&nbsp;</li>
               <% all_targets.each do |target| %>
-                <li <%= 'class="first-target"' if all_targets.first == target %>>
+                <li>
                   <a href="/target/<%= target.name %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
                 </li>
               <% end %>
               </li>
-              <!--
-              <li>{{#link-to 'docs'}}<span class="badge pull-right">2</span><i class="icon-file"></i> Docs{{/link-to}}</li>
-              <li>{{#link-to 'guidelines'}}<i class="icon-book"></i> Guidelines{{/link-to}}</li>
-              <li>{{#link-to 'patterns'}}<i class="icon-th"></i> Patterns{{/link-to}}</li>
-              <li>
-                  {{#link-to 'views'}}<span class="badge pull-right">6</span><i class="icon-sitemap"></i> Views{{/link-to}}
-                  <ul class="nav nav-stacked nav-submenu">
-                      <li><a href="#">Datatables</a></li>
-                      <li><a href="#">Forms</a></li>
-                      <li><a href="#">App Wide</a></li>
-                      <li><a href="#">Charts &amp; Graphs</a></li>
-                      <li><a href="#">Interactive Modules</a></li>
-                      <li><a href="#">Wizards</a></li>
-                  </ul>
-              </li>
-              <li>{{#link-to 'sandbox'}}<i class="icon-terminal"></i> Sandbox{{/link-to}}</li>
-              -->
             </ul>
         </nav>
-
-        <!--
-        <nav role="navigation-bottom">
-            <ul class="nav nav-stacked">
-              <li><a href="#"><i class="icon-gear"></i> Settings</a></li>
-            </ul>
-        </nav>
-        -->
       </aside>
 
       <main id="content" role="main">
@@ -107,5 +78,6 @@
 
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="/js/app.js"></script>
   </body>
 </html>
