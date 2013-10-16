@@ -226,6 +226,7 @@ class CanoeApplication < Sinatra::Base
       end
     end
 
+    # need to go ahead and create this since we need the ID to pass to ship-it
     deploy = Deploy.create( deploy_target: current_target,
                             auth_user: current_user,
                             repo_name: current_repo.name,
@@ -234,22 +235,17 @@ class CanoeApplication < Sinatra::Base
                             completed: false,
                             )
 
-
     cmd_pieces << "--lock" if params[:lock] == "on"
     cmd_pieces << "--user=#{current_user.email}"
     cmd_pieces << "--deploy-id=#{deploy.id}"
     cmd_pieces << "--no-confirmations"
     cmd_pieces << "&> #{deploy.log_path}"
-    # TODO: check for user wanting to lock
-    # flash[:notice] = "Command that would be run: #{cmd_pieces.join(" ")}"
-    puts cmd_pieces.join(" ")
 
-    # TODO: permissions, etc
+    create_lock_history! if params[:lock] == "on"
+
     # fork off process to run this...
     shipit = fork { exec cmd_pieces.join(" ") }
     Process.detach(shipit)
-
-    create_lock_history! if params[:lock] == "on"
 
     redirect "/deploy/#{deploy.id}/watch"
   end
