@@ -2,7 +2,11 @@
 <h3 class="muted">
   <%= current_repo.name.capitalize %>:
   <%= deploy_type_icon(@deploy_type.name) %>
-  <%= @deploy_type.details %>
+  <% if @deploy_type.name == "commit" %>
+    <%= sha_span(@deploy_type.details) %>
+  <% else %>
+    <%= @deploy_type.details %>
+  <% end %>
 </h3>
 <br>
 <div class="alert alert-info">

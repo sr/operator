@@ -11,22 +11,27 @@ $(function(){
   $nav = $('aside[role="navigation"]');
   $('[role="banner"] .navbar-toggle').click(toggleMenu);
 
-	$('.js-unlock-toggle').click(function(event){
+	$('.js-unlock-toggle').click(function(event) {
 		event.preventDefault();
 		$('#unlock-forms').show();
 		$('#unlock-hider').hide();
 	});
 
-	$('.js-locking-toggle').click(function(event){
+	$('.js-locking-toggle').click(function(event) {
 		event.preventDefault();
 		$('#lock-forms').show();
 		$('#lock-hider').hide();
 	});
 
-	$('.js-confirm').submit(function(){
+	$('.js-confirm').submit(function() {
 		var $this = $(this);
 		return confirm($this.attr('data-confirm'));
 	});
+
+  $('.js-sha-expand').click(function(event) {
+    var $this = $(this);
+    $this.html($this.attr('data-sha'));
+  })
 
 
 });

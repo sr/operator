@@ -440,11 +440,15 @@ class CanoeApplication < Sinatra::Base
       end
     end
 
+    def sha_span(sha)
+      "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,12]}...</span>"
+    end
+
     def print_deploy_what(deploy)
       output = deploy_type_icon(deploy.what)
       output += " "
       if deploy.what == "commit"
-        output += "<span title='#{deploy.what_details}'>#{deploy.what_details[0,12]}...</span>"
+        output += sha_span(deploy.what_details)
       else
         output += deploy.what_details
       end
