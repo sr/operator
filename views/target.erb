@@ -43,9 +43,7 @@
       <div>
         <strong><%= deploy.repo_name.upcase %>:</strong>
         <%= deploy.auth_user.email %> deployed
-        <span class="text-info">
-          <%= deploy_type_icon deploy.what %> <%= deploy.what_details %>
-        </span>
+        <span class="text-info"><%= print_deploy_what(deploy) %></span>
         on <%= print_time deploy.created_at %>
       </div>
     <% else %>

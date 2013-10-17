@@ -28,9 +28,7 @@
         <% deploy = target.last_deploy_for(current_repo.name) %>
         <% if deploy %>
           <%= deploy.auth_user.email %> deployed
-          <span class="text-info">
-            <%= deploy_type_icon deploy.what %> <%= deploy.what_details %>
-          </span>
+          <span class="text-info"><%= print_deploy_what(deploy) %></span>
           on <%= print_time deploy.created_at %>
         <% else %>
           <em>No record of being deployed on this target.</em>
@@ -48,19 +46,9 @@
             <input type="checkbox" name="lock"> Lock
           </label>
         </div>
-        <!-- TODO: checkbox for locking -->
       </form>
     <% end %>
   </div>
     <%= "<hr>" unless @targets.last == target %>
 <% end %>
-<!--
-      <small class="muted">
-      <strong>LAST DEPLOY:</strong>
-      shawn.veader@salesforce.com deployed <a href="#"><i class="icon-tag"></i> build2561</a> on 10/10/2013 @ 3:59 PM
-    </small>
-    <small class="muted">
-      <strong>LAST DEPLOY:</strong>
-      shawn.veader@salesforce.com deployed <a href="#"><i class="icon-code-fork"></i> sv/PDT-1234</a> on 10/10/2013 @ 10:16 AM
-    </small>
--->
+

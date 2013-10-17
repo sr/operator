@@ -2,7 +2,7 @@
 <p class="lead no-bottom">
   <i class="icon-eye-open"></i> Watching deploy
   of <%= current_deploy.repo_name.capitalize %> :
-  <%= deploy_type_icon(current_deploy.what) %> <%= current_deploy.what_details %>
+  <%= print_deploy_what(current_deploy) %>
   to <%= current_deploy.deploy_target.name %>
 </p>
 <small class="muted">

@@ -13,10 +13,7 @@
     <tr>
       <td><a href="/deploy/<%= deploy.id %>">view</a></td>
       <td><%= deploy.repo_name %></td>
-      <td>
-        <%= deploy_type_icon deploy.what %>
-        <%= deploy.what_details %>
-      </td>
+      <td><%= print_deploy_what(deploy) %></td>
       <td><%= deploy.auth_user.email %></td>
       <td><%= print_time deploy.created_at %></td>
       <td>

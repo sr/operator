@@ -4,10 +4,11 @@
       <h4>
         <a href="<%= deploy_path(tag: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button"><i class="icon-rocket"></i> Deploy!</a>
         &nbsp;
-        TAG: <%= tag.name %>
-        <a href="<%= github_tag_url(tag) %>"><i class="icon-tag"></i></a>
+        <i class="icon-tag"></i> <%= tag.name %>
+        &nbsp;
+        <a href="<%= github_tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
       </h4>
-      <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>"><%= tag.commit.sha %></a></small>
+      <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= tag.commit.sha[0,12] %>...</a></small>
       <hr>
     </li>
   <% end %>

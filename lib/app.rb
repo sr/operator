@@ -440,6 +440,17 @@ class CanoeApplication < Sinatra::Base
       end
     end
 
+    def print_deploy_what(deploy)
+      output = deploy_type_icon(deploy.what)
+      output += " "
+      if deploy.what == "commit"
+        output += "<span title='#{deploy.what_details}'>#{deploy.what_details[0,12]}...</span>"
+      else
+        output += deploy.what_details
+      end
+      output
+    end
+
     def print_time(time)
       time.localtime.strftime("%m/%d/%y @ %l:%M %p")
     end

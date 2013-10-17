@@ -4,8 +4,9 @@
       <h4>
         <a href="<%= deploy_path(commit: commit.sha) %>" class="btn btn-primary btn-xs btn-success deploy-button"><i class="icon-rocket"></i> Deploy!</a>
         &nbsp;
-        COMMIT: <%= commit.sha %>
-        <a href="<%= github_commit_url(commit) %>"><i class="icon-code"></i></a>
+        <i class="icon-tasks"></i> <span title="<%= commit.sha %>"><%= commit.sha[0,12] %>...</span>
+        &nbsp;
+        <a href="<%= github_commit_url(commit) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
       </h4>
       <small class="muted">author: <%= (commit.author || commit.commit.author).try(:login) %></small>
       <p><%= commit.commit.message %></p>

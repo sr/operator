@@ -4,10 +4,11 @@
       <h4>
         <a href="<%= deploy_path(branch: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button"><i class="icon-rocket"></i> Deploy!</a>
         &nbsp;
-        BRANCH: <%= branch.name %>
-        <a href="<%= github_branch_url(branch) %>"><i class="icon-code-fork"></i></a>
+        <i class="icon-code-fork"></i> <%= branch.name %>
+        &nbsp;
+        <a href="<%= github_branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
       </h4>
-      <small class="muted">commit: <a href="<%= github_commit_url(branch.commit) %>"><%= branch.commit.sha %></a></small>
+      <small class="muted">commit: <a href="<%= github_commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= branch.commit.sha[0,12] %>...</a></small>
       <hr>
     </li>
   <% end %>
