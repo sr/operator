@@ -41,6 +41,11 @@ module Canoe
                   auth_user: current_user,
                   locking: true,
                   )
+
+      # also flag it on the target
+      current_target.locked = true
+      current_target.locking_user = current_user
+      current_target.save
     end
   end
 end
