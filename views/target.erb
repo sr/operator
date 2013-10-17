@@ -1,36 +1,35 @@
-<h1>TARGET</h1>
-<p class="lead no-bottom">
+<h1>
   <i class="icon-bullseye"></i>&nbsp;
   <%= current_target.name.capitalize %>
-</p>
+</h1>
 <br>
 
 <% if current_target.is_locked? %>
   <%= partial :'partials/locked_target_warning', locals: { target: current_target } %>
   <div id="unlock-hider">
-    <a type="button" class="btn btn-default btn-xs" href="#" onclick="$('#unlock-forms').show();$('#unlock-hider').hide();">
+    <a type="button" class="btn btn-default btn js-unlock-toggle" href="#">
       <i class="icon-unlock"></i> Unlocking Options
     </a>
   </div>
   <div id="unlock-forms" style="display:none;">
     <% if current_target.locking_user == current_user || current_target.file_lock_user == current_user.email %>
-      <form role="form" action="/target/<%= current_target.name %>/unlock" method="post" onsubmit="return confirm('Are you sure you want to unlock this target?');">
+      <form class="js-confirm" role="form" action="/target/<%= current_target.name %>/unlock" method="post" data-confirm="Are you sure you want to unlock this target?">
         <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
       </form>
     <% else %>
-      <form role="form" action="/target/<%= current_target.name %>/unlock/force" method="post" onsubmit="return confirm('Are you sure you want to forcefully unlock this?\nIt\'s kinda not nice...');">
+      <form role="form" class="js-confirm" action="/target/<%= current_target.name %>/unlock/force" method="post" data-confirm="Are you sure you want to forcefully unlock this?\nIt\'s kinda not nice...">
         <button type="submit" class="btn btn-danger"><i class="icon-unlock"></i> Forcefully Unlock!</button>
       </form>
     <% end %>
   </div>
 <% else %>
   <div id="lock-hider">
-    <a type="button" class="btn btn-default btn-xs" href="#" onclick="$('#lock-forms').show();$('#lock-hider').hide();">
+    <a type="button" class="btn btn-default btn js-locking-toggle" href="#">
       <i class="icon-lock"></i> Locking Options
     </a>
   </div>
   <div id="lock-forms" style="display:none;">
-    <form role="form" action="/target/<%= current_target.name %>/lock" method="post" onsubmit="return confirm('Are you sure you want to lock this target?');">
+    <form class="js-confirm" role="form" action="/target/<%= current_target.name %>/lock" method="post" data-confirm="Are you sure you want to lock this target?">
       <button type="submit" class="btn btn-warning"><i class="icon-lock"></i> Lock!</button>
     </form>
   </div>
