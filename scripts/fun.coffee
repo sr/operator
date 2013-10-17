@@ -17,7 +17,7 @@ module.exports = (robot) ->
     if process.env.BOT_TYPE == 'internbot'
       return
 
-    robot.hear /^!toiletnuggets\s+(.*)/i, (msg) ->
+    robot.hear /^!toiletnuggets$/i, (msg) ->
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
 
     robot.hear /^!blame\s+(.*)/i, (msg) ->
