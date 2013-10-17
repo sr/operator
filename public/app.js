@@ -10,7 +10,7 @@ function toggleMenu() {
 $(function(){
   $nav = $('aside[role="navigation"]');
   $('[role="banner"] .navbar-toggle').click(toggleMenu);
-	
+
 	$('.js-unlock-toggle').click(function(event){
 		event.preventDefault();
 		$('#unlock-forms').show();
@@ -22,14 +22,11 @@ $(function(){
 		$('#lock-forms').show();
 		$('#lock-hider').hide();
 	});
-	
+
 	$('.js-confirm').submit(function(){
 		var $this = $(this);
-		if(confirm($this.attr('data-confirm'))) {
-			return true;
-		}
-		return false;
+		return confirm($this.attr('data-confirm'));
 	});
-	
-	
+
+
 });
