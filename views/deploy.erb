@@ -15,7 +15,6 @@
   </p>
 </div>
 
-<!-- TODO: also check for ongoing pushes? -->
 <% @targets.each do |target| %>
   <div class="deploy-target">
     <h2>
@@ -41,6 +40,12 @@
     </div>
     <% if target.is_locked? && target.locking_user != current_user && target.file_lock_user != current_user.email %>
       <%= partial :'partials/locked_target_warning', locals: { target: target } %>
+    <% elsif target.active_deploy %>
+      <div class="alert alert-info">
+        <strong>Active</strong>:
+        There is a deploy currently going out to <%= target.name %>.
+        <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+      </div>
     <% else %>
       <form class="form-inline" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
         <button type="submit" class="btn btn-warning"><i class="icon-rocket"></i> DEPLOY!</button>

@@ -48,7 +48,6 @@ class CanoeApplication < Sinatra::Base
                                 expire_after: 2592000,
                                 secret: ENV["SESSION_SECRET"],
                               }
-                              # domain: 'foo.com',
 
   use Rack::Flash, :sweep => true
 
@@ -149,7 +148,6 @@ class CanoeApplication < Sinatra::Base
   get "/repo/:repo_name/commits" do
     guard_against_unknown_repos!
     @commits = Octokit.commits(current_repo.full_name)
-    # TODO: sort commits by time?
     erb :repo
   end
 
