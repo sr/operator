@@ -18,21 +18,22 @@ require "deploy"
 require "deploy_target"
 require "lock"
 
+# helpers ----
+require "canoe_authentication"
+require "canoe_sinatra_tweaks"
+require "canoe_locking"
+require "canoe_helpers"
+require "canoe_guards"
+
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
 
 set :database, ENV["DATABASE_URL"]
 
-module Sinatra
-  module GetOrPost
-    def get_or_post(path, options = {}, &block)
-      get(path, options, &block)
-      post(path, options, &block)
-    end
-  end
-end
-
 class CanoeApplication < Sinatra::Base
+  include Canoe::Authentication
+  include Canoe::Locking
+  include Canoe::Guards
 
   register Sinatra::ActiveRecordExtension
   register Sinatra::Partial
@@ -62,9 +63,9 @@ class CanoeApplication < Sinatra::Base
     end
   end
 
-  def get_or_post(path, opts={}, &block)
-    get(path, opts, &block)
-    post(path, opts, &block)
+  # ---------------------------------------------------------------
+  helpers do
+    include Canoe::Helpers
   end
 
   # ---------------------------------------------------------------
@@ -277,188 +278,5 @@ class CanoeApplication < Sinatra::Base
 
     redirect "/deploy/#{current_deploy.id}"
   end
-
-  # ---------------------------------------------------------------
-  def page_requires_authentication?
-    # pages that do not require authentication are login, /auth/ and the complete paths
-    paths_without_auth = ["/login"]
-
-    ( !paths_without_auth.include?(request.path_info) && \
-      !request.path_info.match(%r{^/auth/}) && \
-      !request.path_info.match(/deploy\/.*\/complete/) )
-  end
-
-  def authentication_required!
-    return unless page_requires_authentication?
-    redirect "/login" unless current_user
-  end
-
-  # ---------------------------------------------------------------
-  def lock_target!
-    current_target.locked = true
-    current_target.locking_user = current_user
-    current_target.save
-
-    cmd_pieces = []
-    cmd_pieces << current_target.script_path + "/ship-it.rb"
-    cmd_pieces << "--only-lock"
-    cmd_pieces << "--user=#{current_user.email}"
-
-    create_lock_history!
-
-    output = `#{cmd_pieces.join(" ")}`
-    flash[:notice] = output
-  end
-
-  def unlock_target!(with_force=false)
-    current_target.locked = false
-    current_target.locking_user = nil
-    current_target.save
-
-    cmd_pieces = []
-    cmd_pieces << current_target.script_path + "/ship-it.rb"
-    cmd_pieces << (with_force ? "--force-unlock" : "--unlock")
-    cmd_pieces << "--user=#{current_user.email}"
-
-    Lock.create(deploy_target: current_target,
-                auth_user: current_user,
-                locking: false,
-                forced: with_force,
-                )
-
-    output = `#{cmd_pieces.join(" ")}`
-    flash[:notice] = output
-  end
-
-  def create_lock_history!
-    Lock.create(deploy_target: current_target,
-                auth_user: current_user,
-                locking: true,
-                )
-  end
-
-  # ---------------------------------------------------------------
-  def guard_against_unknown_repos!
-    if !current_repo
-      flash[:notice] = "Requested repo is unknown."
-      redirect back
-    end
-  end
-
-  def guard_against_unknown_targets!
-    if !current_target
-      flash[:notice] = "Requested target is unknown."
-      redirect back
-    end
-  end
-
-  # ---------------------------------------------------------------
-  def get_recent_deploys_for_repos
-    @last_repo_deploys = {}
-    %w[pardot symfony].each do |repo|
-      @last_repo_deploys[repo] = \
-        current_target.deploys.where(repo_name: repo).order('created_at DESC').first
-    end
-  end
-
-  # ---------------------------------------------------------------
-  helpers do
-    def current_user
-      @_current_user ||= \
-        session[:user_id] ? AuthUser.where(id: session[:user_id].to_i).first : nil
-    end
-
-    def current_repo
-      return nil unless %w[pardot symfony].include?((params[:repo_name] || '').downcase)
-      @_current_repo ||= Octokit.repo("pardot/#{params[:repo_name]}")
-    end
-
-    def current_target
-      @_current_target ||= DeployTarget.where(name: params[:target_name]).first
-    end
-
-    def current_deploy
-      @_current_deploy ||= Deploy.where(id: params[:deploy_id].to_i).first
-    end
-
-    def all_targets
-      @_all_targets ||= DeployTarget.order(:name)
-    end
-
-    def active_repo(repo_name)
-      current_repo && current_repo.name.downcase == repo_name.downcase ? 'class="active"' : ""
-    end
-
-    def active_target(target_name)
-      current_target && current_target.name.downcase == target_name.downcase ? 'class="active"' : ""
-    end
-
-    def repo_path
-      "/repo/#{current_repo.name}"
-    end
-
-    def deploy_path(options)
-      path = "#{repo_path}/deploy?"
-      options.each { |key,value| path += "#{key}=#{CGI.escape(value)}&" }
-      path.gsub!(/\&$/,'') # remove any trailing &'s
-      path
-    end
-
-    def deploy_target_path(target, deploy_type)
-      path = "/deploy/target/#{target.name}?"
-      path += "repo_name=#{current_repo.name}&"
-      path += "#{deploy_type.name}=#{deploy_type.details}"
-      path
-    end
-
-    def github_url
-      "https://github.com"
-    end
-
-    def github_tag_url(tag)
-      "#{github_url}/#{current_repo.full_name}/releases/tag/#{tag.name}"
-    end
-
-    def github_branch_url(branch)
-      "#{github_url}/#{current_repo.full_name}/tree/#{branch.name}"
-    end
-
-    def github_commit_url(commit)
-      "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
-    end
-
-    def deploy_type_icon(type)
-      case type
-      when 'tag'
-        "<i class='icon-tag' title='tag'></i>"
-      when 'branch'
-        "<i class='icon-code-fork' title='branch'></i>"
-      when 'commit'
-        "<i class='icon-tasks' title='commit'></i>"
-      else
-        ''
-      end
-    end
-
-    def sha_span(sha)
-      "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,12]}...</span>"
-    end
-
-    def print_deploy_what(deploy)
-      output = deploy_type_icon(deploy.what)
-      output += " "
-      if deploy.what == "commit"
-        output += sha_span(deploy.what_details)
-      else
-        output += deploy.what_details
-      end
-      output
-    end
-
-    def print_time(time)
-      time.localtime.strftime("%m/%d/%y @ %l:%M %p")
-    end
-  end
-
 
 end

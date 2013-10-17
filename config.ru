@@ -6,6 +6,7 @@ ENV["RACK_ENV"]="production"
 $:.unshift CANOE_DIR
 $:.unshift "#{CANOE_DIR}/lib/"
 $:.unshift "#{CANOE_DIR}/lib/models/"
+$:.unshift "#{CANOE_DIR}/lib/helpers/"
 
 require "app"
 
