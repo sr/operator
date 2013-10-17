@@ -240,7 +240,7 @@ class CanoeApplication < Sinatra::Base
     cmd_pieces << "--no-confirmations"
     cmd_pieces << "&> #{deploy.log_path}"
 
-    create_lock_history! if params[:lock] == "on"
+    current_target.lock!(current_user) if params[:lock] == "on"
 
     # fork off process to run this...
     shipit = fork { exec cmd_pieces.join(" ") }

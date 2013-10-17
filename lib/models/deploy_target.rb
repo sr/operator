@@ -18,6 +18,22 @@ class DeployTarget < ActiveRecord::Base
     @_most_recent_deploy ||= self.deploys.order("created_at DESC").first
   end
 
+  def lock!(user)
+    self.locked = true
+    self.locking_user = user
+    self.save
+
+    self.locks.create(auth_user: user, locking: true)
+  end
+
+  def unlock!(user, forced=false)
+    self.locked = false
+    self.locking_user = nil
+    self.save
+
+    self.locks.create(auth_user: user, locking: false, forced: forced)
+  end
+
   def is_locked?
     self.locked? || has_file_lock?
   end
