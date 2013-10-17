@@ -30,7 +30,11 @@ $(function(){
 
   $('.js-sha-expand').click(function(event) {
     var $this = $(this);
-    $this.html($this.attr('data-sha'));
+    if ($this.html() == $this.attr('data-sha')) {
+      $this.html($this.attr('data-sha').substring(0,12) + '...');
+    } else {
+      $this.html($this.attr('data-sha'));
+    }
   })
 
 
