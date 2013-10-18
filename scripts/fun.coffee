@@ -18,7 +18,7 @@ module.exports = (robot) ->
       return
 
     robot.hear /^!reversenuggets$/i, (msg) ->
-        msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306030/e3Xgb1wrgi4vDVF/26871.gif"
 
     robot.hear /^!toiletnuggets$/i, (msg) ->
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
