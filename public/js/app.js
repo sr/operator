@@ -33,8 +33,8 @@ $(function(){
 	});
 
 	$('.js-confirm').submit(function() {
-		var $this = $(this);
-		return confirm($this.attr('data-confirm'));
+    var confirmText = $(this).attr('data-confirm');
+    return confirm(confirmText.replace(/<br\s*\/?>/mg,"\n"));
 	});
 
   $('.js-sha-expand').click(function(event) {
