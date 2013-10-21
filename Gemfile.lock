@@ -25,6 +25,7 @@ GEM
     hashie (2.0.5)
     httpauth (0.2.0)
     i18n (0.6.5)
+    json (1.8.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
     minitest (4.7.5)
@@ -92,6 +93,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  json
   mysql2
   octokit
   omniauth

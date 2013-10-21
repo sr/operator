@@ -277,4 +277,19 @@ class CanoeApplication < Sinatra::Base
     redirect "/deploy/#{current_deploy.id}"
   end
 
+  # API --------
+  get "/api/lock/status" do
+    content_type :json
+    output = {}
+    all_targets.each do |target|
+      locking_user = target.locking_user.try(:email)
+      locking_user = target.file_lock_user if target.has_file_lock?
+      output[target.name] = { locked: target.is_locked?,
+                              locked_by: locking_user,
+                              locked_at: target.created_at,
+                            }
+    end
+    output.to_json
+  end
+
 end

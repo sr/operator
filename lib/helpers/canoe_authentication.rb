@@ -6,7 +6,9 @@ module Canoe
 
       ( !paths_without_auth.include?(request.path_info) && \
         !request.path_info.match(%r{^/auth/}) && \
-        !request.path_info.match(/deploy\/.*\/complete/) )
+        !request.path_info.match(/deploy\/.*\/complete/) && \
+        !request.path_info.match(%r{^/api})
+       )
     end
 
     def authentication_required!

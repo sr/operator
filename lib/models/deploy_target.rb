@@ -44,7 +44,7 @@ class DeployTarget < ActiveRecord::Base
 
   def file_lock_user
     return nil unless File.exists?(self.lock_path)
-    File.read(self.lock_path)
+    File.read(self.lock_path).chomp
   end
 
 end
