@@ -17,7 +17,7 @@
         <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
       </form>
     <% else %>
-      <form role="form" class="js-confirm" action="/target/<%= current_target.name %>/unlock/force" method="post" data-confirm="Are you sure you want to forcefully unlock this? It's kinda not nice...">
+      <form role="form" class="js-confirm" action="/target/<%= current_target.name %>/unlock/force" method="post" data-confirm="Are you sure you want to forcefully unlock this?<br>It's kinda not nice...">
         <button type="submit" class="btn btn-danger"><i class="icon-unlock"></i> Forcefully Unlock!</button>
       </form>
     <% end %>
