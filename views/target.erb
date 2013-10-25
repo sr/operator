@@ -42,7 +42,7 @@
     <% if deploy %>
       <div>
         <strong><%= deploy.repo_name.upcase %>:</strong>
-        <%= deploy.auth_user.email %> deployed
+        <%= print_email deploy.auth_user.email %> deployed
         <span class="text-info"><%= print_deploy_what(deploy) %></span>
         on <%= print_time deploy.created_at %>
       </div>
@@ -66,7 +66,7 @@
 <div>
   <ul class="nav nav-tabs">
     <li <%= 'class="active"' if @deploys %>>
-      <a href="/target/<%= current_target.name %>"><i class="icon-rocket"></i> Deploys</a>
+      <a href="/target/<%= current_target.name %>"><i class="icon-train2"></i> Deploys</a>
     </li>
     <li <%= 'class="active"' if @locks %>>
       <a href="/target/<%= current_target.name %>/locks"><i class="icon-lock"></i> Locks</a>

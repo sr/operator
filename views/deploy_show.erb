@@ -1,4 +1,4 @@
-<h1>DEPLOY</h1>
+<h1><i class="icon-train2"></i> DEPLOY</h1>
 <p class="lead no-bottom">
   <%= current_deploy.repo_name.capitalize %> :
   <%= print_deploy_what(current_deploy) %>
@@ -9,7 +9,7 @@
   <% if current_deploy.auth_user == current_user %>
     <strong>you</strong>.
   <% else %>
-    <%= current_deploy.auth_user.email %>.
+    <%= print_email current_deploy.auth_user.email %>.
   <% end %>
 </small>
 <br><br>
@@ -20,7 +20,7 @@
   </div>
 <% else %>
   <div class="alert alert-warning">
-    <strong>Not Complete</strong>: we're waiting on this <i class="icon-rocket"></i> to land.
+    <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
   </div>
 <% end %>
 

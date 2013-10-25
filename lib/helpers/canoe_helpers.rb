@@ -116,5 +116,12 @@ module Canoe
       time.localtime.strftime("%m/%d/%y @ %l:%M %p")
     end
 
+    def print_email(email)
+      pieces = email.split("@")
+      output = pieces[0]
+      output += "<span class='muted'>@#{pieces[1]}</span>" if pieces[1]
+      output
+    end
+
   end
 end
