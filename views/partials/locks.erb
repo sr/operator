@@ -12,9 +12,9 @@
       <td><%= lock.auth_user.email %></td>
       <td>
         <% if lock.locking? %>
-          <i class="icon-lock text-danger"></i>
+          <i class="icon-lock text-danger"></i> <strong>Lock</strong>
         <% else %>
-          <i class="icon-unlock text-success"></i>
+          <i class="icon-unlock text-success"></i> Unlock
         <% end %>
       </td>
       <td><%= "<i class='icon-warning-sign text-warning'></i>" if lock.forced? %></td>
