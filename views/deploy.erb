@@ -38,7 +38,7 @@
         <% end %>
       </small>
     </div>
-    <% if target.is_locked? && target.locking_user != current_user && target.file_lock_user != current_user.email %>
+    <% if !target.user_can_deploy?(current_user) %>
       <%= partial :'partials/locked_target_warning', locals: { target: target } %>
     <% elsif target.active_deploy %>
       <div class="alert alert-info">
