@@ -158,6 +158,7 @@ class CanoeApplication < Sinatra::Base
       if params[type]
         @deploy_type.name = type
         @deploy_type.details = params[type]
+        break
       end
     end
 
@@ -206,46 +207,26 @@ class CanoeApplication < Sinatra::Base
     end
 
     # check for locked target, allow user who has it locked to deploy again
-    if current_target.is_locked? && \
-       current_target.locking_user != current_user && \
-       current_target.file_lock_user != current_user.email
+    unless current_target.user_can_deploy?(current_user)
       flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
       redirect back
     end
 
-    deploy_type = ''
-    cmd_pieces = []
-    cmd_pieces << current_target.script_path + "/ship-it.rb"
-    cmd_pieces << current_repo.name
+    deploy_options = { user: current_user,
+                       repo: current_repo,
+                       lock: (params[:lock] == "on"),
+                     }
+
+    # lets determine what we're deploying...
     %w[tag branch commit].each do |type|
       if params[type]
-        the_type = deploy_type = type
-        the_type = "hash" if type == "commit" # commit is called hash in the options
-        cmd_pieces << "#{the_type}=#{params[type]}"
+        deploy_options[:what] = type
+        deploy_options[:what_details] = params[type]
+        break
       end
     end
 
-    # need to go ahead and create this since we need the ID to pass to ship-it
-    deploy = Deploy.create( deploy_target: current_target,
-                            auth_user: current_user,
-                            repo_name: current_repo.name,
-                            what: deploy_type,
-                            what_details: params[deploy_type],
-                            completed: false,
-                            )
-
-    cmd_pieces << "--lock" if params[:lock] == "on"
-    cmd_pieces << "--user=#{current_user.email}"
-    cmd_pieces << "--deploy-id=#{deploy.id}"
-    cmd_pieces << "--no-confirmations"
-    cmd_pieces << "&> #{deploy.log_path}"
-
-    current_target.lock!(current_user) if params[:lock] == "on"
-
-    # fork off process to run this...
-    shipit = fork { exec cmd_pieces.join(" ") }
-    Process.detach(shipit)
-
+    deploy = current_target.deploy!(deploy_options)
     redirect "/deploy/#{deploy.id}/watch"
   end
 

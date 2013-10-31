@@ -13,6 +13,7 @@ class Deploy < ActiveRecord::Base
   end
 
   def log_contents
+    return "" unless File.exists?(log_path)
     File.read(log_path)
   end
 

@@ -47,4 +47,47 @@ class DeployTarget < ActiveRecord::Base
     File.read(self.lock_path).chomp
   end
 
+  # user can deploy if the target isn't locked or they are the ones with the current lock
+  def user_can_deploy?(user)
+    ! is_locked? || \
+    self.locking_user == user || \
+    self.file_lock_user == user.email
+  end
+
+  def deploy!(options = {})
+    [:user, :repo, :what, :what_details].each do |arg|
+      unless options.keys.include?(arg)
+        raise "Required option, #{arg.to_s}, is missing from deploy options."
+      end
+    end
+
+    cmd_pieces = []
+    cmd_pieces << self.script_path + "/ship-it.rb"
+    cmd_pieces << options[:repo].name
+    cmd_pieces << "#{options[:what]}=#{options[:what_details]}"
+
+    # need to go ahead and create this since we need the ID to pass to ship-it
+    deploy = self.deploys.create( auth_user: options[:user],
+                                  repo_name: options[:repo].name,
+                                  what: options[:what],
+                                  what_details: options[:what_details],
+                                  completed: false,
+                                  )
+
+    cmd_pieces << "--lock" if options[:lock]
+    cmd_pieces << "--user=#{options[:user].email}"
+    cmd_pieces << "--deploy-id=#{deploy.id}"
+    cmd_pieces << "--no-confirmations"
+    cmd_pieces << "&> #{deploy.log_path}"
+
+    self.lock!(options[:user]) if options[:lock]
+
+    # fork off process to run this...
+    shipit = fork { exec cmd_pieces.join(" ") }
+    Process.detach(shipit)
+
+    # return the deploy for good measure
+    deploy
+  end
+
 end

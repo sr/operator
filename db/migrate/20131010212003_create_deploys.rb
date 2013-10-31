@@ -6,7 +6,7 @@ class CreateDeploys < ActiveRecord::Migration
       t.string :repo_name
       t.string :what
       t.string :what_details
-      t.boolean :completed
+      t.boolean :completed, :default => false
       t.timestamps
     end
     add_index :deploys, :deploy_target_id
