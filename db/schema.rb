@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131015203252) do
+ActiveRecord::Schema.define(version: 20131031141158) do
 
   create_table "auth_users", force: true do |t|
     t.string   "email"
@@ -59,5 +59,19 @@ ActiveRecord::Schema.define(version: 20131015203252) do
 
   add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
+
+  create_table "target_jobs", force: true do |t|
+    t.integer  "deploy_target_id"
+    t.integer  "auth_user_id"
+    t.string   "job_name"
+    t.string   "command"
+    t.string   "process_id"
+    t.boolean  "completed",        default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "target_jobs", ["auth_user_id"], name: "index_target_jobs_on_auth_user_id", using: :btree
+  add_index "target_jobs", ["deploy_target_id"], name: "index_target_jobs_on_deploy_target_id", using: :btree
 
 end

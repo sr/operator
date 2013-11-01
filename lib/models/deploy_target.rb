@@ -2,6 +2,7 @@ class DeployTarget < ActiveRecord::Base
   # validations, uniqueness, etc
   has_many :deploys
   has_many :locks
+  has_many :jobs, class_name: TargetJob
   belongs_to :locking_user, class_name: AuthUser
 
 
@@ -16,6 +17,14 @@ class DeployTarget < ActiveRecord::Base
 
   def most_recent_deploy
     @_most_recent_deploy ||= self.deploys.order("created_at DESC").first
+  end
+
+  def active_job
+    @_active_job ||= most_recent_job.try(:completed) ? nil : most_recent_job
+  end
+
+  def most_recent_job
+    @_most_recent_job ||= self.jobs.order("created_at DESC").first
   end
 
   def lock!(user)
@@ -83,11 +92,44 @@ class DeployTarget < ActiveRecord::Base
     self.lock!(options[:user]) if options[:lock]
 
     # fork off process to run this...
-    shipit = fork { exec cmd_pieces.join(" ") }
-    Process.detach(shipit)
+    shipit_pid = fork { exec cmd_pieces.join(" ") }
+    Process.detach(shipit_pid)
 
     # return the deploy for good measure
     deploy
+  end
+
+  def reset_database!(options = {})
+    # gather the location of the pardot deploy
+    directory = `#{self.script_path}/ship-it.rb --remote-pardot-path`.chomp
+    cmd_pieces = []
+    cmd_pieces << "cd #{directory};"
+    if self.name == "dev"
+      cmd_pieces << "sh batch/devResetAll.sh"
+    elsif self.name == "test"
+      cmd_pieces << "cd ../;" # back up a dir...
+      cmd_pieces << "sh update-test-reset"
+    else
+      return
+    end
+
+    job = self.jobs.create( auth_user: options[:user],
+                            command: "",
+                            job_name: "Database Reset",
+                            )
+
+    # we need job to be created so we can get the proper log path...
+    cmd_pieces << "&> #{job.log_path}"
+
+    job.command = cmd_pieces.join(" ")
+    job.save!
+
+    rake_cmd = "bundle exec rake canoe:run_job JOB_ID=#{job.id}"
+    rake_pid = fork { exec rake_cmd }
+    Process.detach(rake_pid)
+
+    # return job for good measure
+    job
   end
 
 end

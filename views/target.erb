@@ -64,12 +64,21 @@
 <% end %>
 
 <div>
+  <% if %w[dev test].include? current_target.name %>
+    <form class="js-confirm" role="form" action="/target/<%= current_target.name %>/reset_database" method="post" data-confirm="Are you sure you want to reset the database?">
+      <button type="submit" class="btn btn-danger pull-right">Reset DB</button>
+    </form>
+  <% end %>
+
   <ul class="nav nav-tabs">
     <li <%= 'class="active"' if @deploys %>>
       <a href="/target/<%= current_target.name %>"><i class="icon-train2"></i> Deploys</a>
     </li>
     <li <%= 'class="active"' if @locks %>>
       <a href="/target/<%= current_target.name %>/locks"><i class="icon-lock"></i> Locks</a>
+    </li>
+    <li <%= 'class="active"' if @jobs %>>
+      <a href="/target/<%= current_target.name %>/jobs"><i class="icon-wrench"></i> Jobs</a>
     </li>
   </ul>
   <br>
@@ -78,5 +87,7 @@
     <%= partial :"/partials/deploys", locals: { deploys: @deploys } %>
   <% elsif @locks %>
     <%= partial :"/partials/locks", locals: { locks: @locks } %>
+  <% elsif @jobs %>
+    <%= partial :"/partials/jobs", locals: { jobs: @jobs } %>
   <% end %>
 </div>

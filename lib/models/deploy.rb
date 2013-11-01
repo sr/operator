@@ -17,4 +17,9 @@ class Deploy < ActiveRecord::Base
     File.read(log_path)
   end
 
+  def complete!
+    self.completed = true
+    save!
+  end
+
 end

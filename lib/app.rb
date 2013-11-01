@@ -15,6 +15,7 @@ require "github"
 # models ----
 require "auth_user"
 require "deploy"
+require "target_job"
 require "deploy_target"
 require "lock"
 
@@ -199,6 +200,24 @@ class CanoeApplication < Sinatra::Base
     redirect "/target/#{current_target.name}"
   end
 
+  get "/target/:target_name/jobs" do
+    guard_against_unknown_targets!
+    get_recent_deploys_for_repos
+    @jobs = current_target.jobs.order('created_at DESC')
+    erb :target
+  end
+
+  post "/target/:target_name/reset_database" do
+    guard_against_unknown_targets!
+    job = current_target.reset_database!(user: current_user)
+    if job
+      redirect "/job/#{job.id}/watch"
+    else
+      flash[:notice] = "Sorry, we were unable to start database reset job at this time."
+      redirect back
+    end
+  end
+
   # DEPLOY --------
   post "/deploy/target/:target_name" do
     unless current_repo && current_target
@@ -242,11 +261,8 @@ class CanoeApplication < Sinatra::Base
     # does not require auth but requires "secret" params #trust
     redirect "/login" unless params[:super_secret] == 'chatty'
 
-    if current_deploy
-      current_deploy.completed = true
-      current_deploy.save!
-    end
-    '' # no real need to return since the script can't do anything with it...
+    current_deploy.try(:complete!)
+    "" # no real need to return since the script can't do anything with it...
   end
 
   post "/deploy/:deploy_id/mark/complete" do
@@ -256,6 +272,18 @@ class CanoeApplication < Sinatra::Base
     end
 
     redirect "/deploy/#{current_deploy.id}"
+  end
+
+  # JOB --------
+  get "/job/:job_id" do
+    current_job.check_completed_status!
+    erb :job
+  end
+
+  get "/job/:job_id/watch" do
+    current_job.check_completed_status!
+    @watching = true
+    erb :job
   end
 
   # API --------
