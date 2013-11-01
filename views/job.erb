@@ -16,7 +16,7 @@
   <% if current_job.auth_user == current_user %>
     <strong>you</strong>.
   <% else %>
-    <%= current_job.auth_user.email %>.
+    <%= print_email current_job.auth_user.email %>.
   <% end %>
   <br>
   <strong>Command:</strong> <%= current_job.command %>
