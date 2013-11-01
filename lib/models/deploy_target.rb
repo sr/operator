@@ -91,9 +91,8 @@ class DeployTarget < ActiveRecord::Base
 
     self.lock!(options[:user]) if options[:lock]
 
-    # fork off process to run this...
-    shipit_pid = fork { exec cmd_pieces.join(" ") }
-    Process.detach(shipit_pid)
+    # spawn process to run this...
+    shipit_pid = spawn(cmd_pieces.join(" "))
 
     # return the deploy for good measure
     deploy
@@ -124,9 +123,10 @@ class DeployTarget < ActiveRecord::Base
     job.command = cmd_pieces.join(" ")
     job.save!
 
-    rake_cmd = "bundle exec rake canoe:run_job JOB_ID=#{job.id}"
-    rake_pid = fork { exec rake_cmd }
-    Process.detach(rake_pid)
+    rake_env = { "JOB_ID" => job.id.to_s }
+    rake_cmd = "bundle exec rake canoe:run_job"
+    # spawn process to run the rake command...
+    rake_pid = spawn(rake_env, rake_cmd)
 
     # return job for good measure
     job

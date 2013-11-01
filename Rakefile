@@ -23,7 +23,7 @@ namespace :canoe do
     return unless job
 
     # fork off our job to run...
-    job_pid = fork { exec job.command }
+    job_pid = spawn(job.command)
     job.process_id = job_pid
     job.save
 
