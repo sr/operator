@@ -107,7 +107,7 @@ class DeployTarget < ActiveRecord::Base
       cmd_pieces << "sh batch/devResetAll.sh"
     elsif self.name == "test"
       cmd_pieces << "cd ../;" # back up a dir...
-      cmd_pieces << "sh update-test-reset"
+      cmd_pieces << "sudo sh update-test-reset"
     else
       return
     end
