@@ -25,7 +25,7 @@
   <div class="alert alert-warning">
     <img src="/img/busy.gif" style="width:25px;">
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
-    <% if @watching %>
+    <% if @watching && !current_deploy.completed? %>
       <script type="text/javascript">
         // automatically refresh the page
         setTimeout(function () { location.reload(); }, 2000);
@@ -37,7 +37,7 @@
 <h4>Log</h4>
 <%= partial :'partials/deploy_log' %>
 
-<% if !@watching && !current_deploy.completed %>
+<% if !@watching && !current_deploy.completed? %>
   <br>
   <div>
     <form class="js-confirm" role="form" action="/deploy/<%= current_deploy.id %>/mark/complete" method="post" data-confirm="Are you sure you want to mark this complete?">

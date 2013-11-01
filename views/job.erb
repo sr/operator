@@ -33,7 +33,7 @@
   <div class="alert alert-warning">
     <img src="/img/busy.gif" style="width:25px;">
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-wrench"></i> to stop.
-    <% if @watching %>
+    <% if @watching && !current_job.completed? %>
       <script type="text/javascript">
         // automatically refresh the page
         setTimeout(function () { location.reload(); }, 2000);
