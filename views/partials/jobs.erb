@@ -3,7 +3,7 @@
     <tr>
       <th></th>
       <th>Who</th>
-      <th>Command</th>
+      <th>What</th>
       <th>When</th>
       <th>Complete</th>
     </tr>
@@ -12,7 +12,7 @@
     <tr>
       <td><a href="/job/<%= job.id %>">view</a></td>
       <td><%= job.auth_user.email %></td>
-      <td><%= job.command[0,40] %>...</td>
+      <td><%= job.job_name %></td>
       <td><%= print_time job.created_at %></td>
       <td>
         <% if job.completed? %>
