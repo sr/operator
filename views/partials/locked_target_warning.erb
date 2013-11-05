@@ -10,5 +10,10 @@
       <%= target.file_lock_user %> (<strong>file lock</strong>).
     <% end %>
   <% end %>
+  <br>
+  <strong>
+    The lock was set about <%= print_relative_time target.file_lock_time %> ago.
+  </strong>
+  (<%= print_time target.file_lock_time %>)
 </div>
 

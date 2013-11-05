@@ -120,6 +120,20 @@ module Canoe
       time.localtime.strftime("%m/%d/%y @ %l:%M %p")
     end
 
+    def print_relative_time(time)
+      time_delta = Time.now - time
+      minutes = (time_delta / 60).round
+      if minutes < 1
+        seconds = time_delta.round
+        "#{seconds} second#{seconds == 1 ? '' : 's'}"
+      elsif minutes < 60
+        "#{minutes} minute#{minutes == 1 ? '' : 's'}"
+      else
+        hours = minutes / 60.0
+        "#{"%0.1f" % hours} hour#{hours == 1 ? '' : 's'}"
+      end
+    end
+
     def print_email(email)
       pieces = email.split("@")
       output = pieces[0]

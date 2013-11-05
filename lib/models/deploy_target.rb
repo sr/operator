@@ -56,6 +56,11 @@ class DeployTarget < ActiveRecord::Base
     File.read(self.lock_path).chomp
   end
 
+  def file_lock_time
+    return Time.now unless has_file_lock?
+    File.ctime(self.lock_path)
+  end
+
   # user can deploy if the target isn't locked or they are the ones with the current lock
   def user_can_deploy?(user)
     ! is_locked? || \
