@@ -74,4 +74,15 @@ namespace :canoe do
     ) if !staging_env
   end
 
+  desc 'Create deploy targets for new-staging env'
+  task :create_new_staging_targets do
+    staging_env = DeployTarget.where(name: 'staging').first
+    DeployTarget.create(
+      name: 'staging',
+      script_path: '/opt/sync/staging',
+      lock_path: '/var/lock/staging',
+      locked: false,
+    ) if !staging_env
+  end
+
 end
