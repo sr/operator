@@ -13,80 +13,47 @@ What follows is the *hard* way to do it (ie: by hand).
 
 
 1. __Install rbenv__ *(v0.4.0 @ time of writing - substitute as appropriate below)*
-
     - Clone the git repo in /usr/local :
-
         - `sudo git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv-0.4.0`
-
     - Create a symlink for /usr/local/rbenv :
-
         - `sudo ln -s /usr/local/rbenv-0.4.0 /usr/local/rbenv`
-
     - Check out the v0.4.0 tag
-
         - `cd /usr/local/rbenv; sudo checkout tags/v0.4.0 -b v0.4.0`
-
     - Add rbenv to your ENV in your .bash_profile
 
             export RBENV_ROOT=/usr/local/rbenv
             export PATH=$RBENV_ROOT/bin:$PATH:$HOME/bin
             eval "$(rbenv init -)"
-
     - Add group for rbenv and add appropriate users to it.
-
         - `sudo groupadd rbenv`
-
         - Add these people (`pi,sv,sp,wheel,apache,root,deploy`) to it (and others, as needed):
-
             - `sudo vim /etc/group`
-
     - Use this group for the rbenv directory
-
         - `sudo chown -R root:rbenv /usr/local/rbenv-0.4.0/`
-
     - Make sure the group can write to the folder
-
         - `sudo chmod -R g+w /usr/local/rbenv-v0.4.0`
-
     - Log out and back in to pick up group and have profile changes fire off...
-
         - Double check that the `rbenv init` worked by checking /usr/local/rbenv for shim and versions directories.
 
 2. __Install ruby-build__
-
     - Create plugins directory for rbenv
-
-        `cd /usr/local/rbenv; sudo mkdir plugins`
-
+        - `cd /usr/local/rbenv; sudo mkdir plugins`
         - Fix permissions and what-not
-
-            `sudo chown root:rbenv plugins; sudo chmod 775 plugins`
-
+            - `sudo chown root:rbenv plugins; sudo chmod 775 plugins`
     - Clone git repo into plugins
-
-        `cd plugins; git clone https://github.com/sstephenson/ruby-build.git`
-
+        - `cd plugins; git clone https://github.com/sstephenson/ruby-build.git`
     - Confirm all is well
-
-        `rbenv install -l`
-
-        *(Should display long list of ruby versions)*
+        - `rbenv install -l`
+        - *(Should display long list of ruby versions)*
 
 3. __Install Ruby 2.0__ *(2.0.0-p247 @ time of writing)*
-
-    `rbenv install 2.0.0-p247`
-
+    - `rbenv install 2.0.0-p247`
     - Grab a coffee... wait... wait more...
-
     - */me drums fingers on the table*
-
     - When it completes, set the global version to this:
-
-        `rbenv global 2.0.0-p247`
-
+        - `rbenv global 2.0.0-p247`
     - Confirm
-
-        `ruby -v`
+        - `ruby -v`
 
 4. __Install Necessary Gems__
 
@@ -163,31 +130,23 @@ Apache
 We need to setup the Ruby gem `passenger` and a virtual host.
 
 1. __Install Passenger__
-
     - Install gem
 
             gem install passenger
             rbenv rehash
-
     - Build and install the passenger Apache mod
-
-        `sudo passenger-install-apache2-module`
-
+        - `sudo passenger-install-apache2-module`
         - Add module load instructions to passenger.conf
-
-            `sudo vim /etc/httpd/conf.d/passenger.conf`
-
-            It should look something like:
+            - `sudo vim /etc/httpd/conf.d/passenger.conf`
+            - It should look something like:
 
                   LoadModule passenger_module /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23/buildout/apache2/mod_passenger.so
                   PassengerRoot /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23
                   PassengerDefaultRuby /usr/local/rbenv/versions/2.0.0-p247/bin/ruby
 
 2. __Define VirtualHost Entry__
-
     - Edit /etc/httpd/conf.d/canoe.conf to add virtual host entry
-
-        `sudo vim /etc/httpd/conf.d/canoe.conf`
+        - `sudo vim /etc/httpd/conf.d/canoe.conf`
 
             <VirtualHost *:80>
               ServerName shipit.staging.pardot.com
@@ -201,5 +160,4 @@ We need to setup the Ruby gem `passenger` and a virtual host.
             </VirtualHost>
 
 3. __Kick Apache__
-
-    `sudo service httpd restart`
+    - `sudo service httpd restart`
