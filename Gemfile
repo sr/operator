@@ -17,7 +17,7 @@ gem "octokit"
 
 # database ----
 gem "sinatra-activerecord"
-gem "sqlite3" # technically only needed for dev
+# gem "sqlite3" # technically only needed for dev
 gem "mysql2"
 
 # authentication ----
