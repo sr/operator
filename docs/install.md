@@ -140,24 +140,24 @@ We need to setup the Ruby gem `passenger` and a virtual host.
             - `sudo vim /etc/httpd/conf.d/passenger.conf`
             - It should look something like:
 
-                  LoadModule passenger_module /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23/buildout/apache2/mod_passenger.so
-                  PassengerRoot /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23
-                  PassengerDefaultRuby /usr/local/rbenv/versions/2.0.0-p247/bin/ruby
+                    LoadModule passenger_module /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23/buildout/apache2/mod_passenger.so
+                    PassengerRoot /usr/local/rbenv/versions/2.0.0-p247/lib/ruby/gems/2.0.0/gems/passenger-4.0.23
+                    PassengerDefaultRuby /usr/local/rbenv/versions/2.0.0-p247/bin/ruby
 
 2. __Define VirtualHost Entry__
     - Edit /etc/httpd/conf.d/canoe.conf to add virtual host entry
         - `sudo vim /etc/httpd/conf.d/canoe.conf`
 
-            <VirtualHost *:80>
-              ServerName shipit.staging.pardot.com
-              DocumentRoot /var/canoe/current/public
-              <Directory /var/canoe/current/public>
-                # This relaxes Apache security settings.
-                AllowOverride all
-                # MultiViews must be turned off.
-                Options -MultiViews
-              </Directory>
-            </VirtualHost>
+                <VirtualHost *:80>
+                  ServerName shipit.staging.pardot.com
+                  DocumentRoot /var/canoe/current/public
+                  <Directory /var/canoe/current/public>
+                    # This relaxes Apache security settings.
+                    AllowOverride all
+                    # MultiViews must be turned off.
+                    Options -MultiViews
+                  </Directory>
+                </VirtualHost>
 
 3. __Kick Apache__
     - `sudo service httpd restart`
