@@ -14,43 +14,43 @@ What follows is the *hard* way to do it (ie: by hand).
 
 1. __Install rbenv__ *(v0.4.0 @ time of writing - substitute as appropriate below)*
 
-    - Clone the git repo in /usr/local :
+- Clone the git repo in /usr/local :
 
-        `sudo git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv-0.4.0`
+    `sudo git clone https://github.com/sstephenson/rbenv.git /usr/local/rbenv-0.4.0`
 
-    - Create a symlink for /usr/local/rbenv :
+- Create a symlink for /usr/local/rbenv :
 
-        `sudo ln -s /usr/local/rbenv-0.4.0 /usr/local/rbenv`
+    `sudo ln -s /usr/local/rbenv-0.4.0 /usr/local/rbenv`
 
-    - Check out the v0.4.0 tag
+- Check out the v0.4.0 tag
 
-        `cd /usr/local/rbenv; sudo checkout tags/v0.4.0 -b v0.4.0`
+    `cd /usr/local/rbenv; sudo checkout tags/v0.4.0 -b v0.4.0`
 
-    - Add rbenv to your ENV in your .bash_profile
+- Add rbenv to your ENV in your .bash_profile
 
-            export RBENV_ROOT=/usr/local/rbenv
-            export PATH=$RBENV_ROOT/bin:$PATH:$HOME/bin
-            eval "$(rbenv init -)"
+        export RBENV_ROOT=/usr/local/rbenv
+        export PATH=$RBENV_ROOT/bin:$PATH:$HOME/bin
+        eval "$(rbenv init -)"
 
-    - Add group for rbenv and add appropriate users to it.
+- Add group for rbenv and add appropriate users to it.
 
-        `sudo groupadd rbenv`
+    `sudo groupadd rbenv`
 
-        - Add these people (`pi,sv,sp,wheel,apache,root,deploy`) to it (and others, as needed):
+    - Add these people (`pi,sv,sp,wheel,apache,root,deploy`) to it (and others, as needed):
 
-            `sudo vim /etc/group`
+        `sudo vim /etc/group`
 
-    - Use this group for the rbenv directory
+- Use this group for the rbenv directory
 
-        `sudo chown -R root:rbenv /usr/local/rbenv-0.4.0/`
+    `sudo chown -R root:rbenv /usr/local/rbenv-0.4.0/`
 
-    - Make sure the group can write to the folder
+- Make sure the group can write to the folder
 
-        `sudo chmod -R g+w /usr/local/rbenv-v0.4.0`
+    `sudo chmod -R g+w /usr/local/rbenv-v0.4.0`
 
-    - Log out and back in to pick up group and have profile changes fire off...
+- Log out and back in to pick up group and have profile changes fire off...
 
-        - Double check that the `rbenv init` worked by checking /usr/local/rbenv for shim and versions directories.
+    - Double check that the `rbenv init` worked by checking /usr/local/rbenv for shim and versions directories.
 
 2. __Install ruby-build__
 
