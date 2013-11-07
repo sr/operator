@@ -24,6 +24,10 @@ module.exports = (robot) ->
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
 
     robot.hear /^!puppies/i, (msg) ->
+        if msg.message.user.jid is '45727_470666@chat.hipchat.com'
+          msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+          return
+          
         msg.send "http://i.imgur.com/lSwAPqr.gif"
 
     robot.hear /^!blame\s+(.*)/i, (msg) ->
