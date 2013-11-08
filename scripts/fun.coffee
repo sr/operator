@@ -18,18 +18,26 @@ module.exports = (robot) ->
       return
 
     robot.hear /^!reversenuggets$/i, (msg) ->
+        if msg.message.user.jid in ('45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com')
+            msg.send "http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif"
+            return
+
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306030/e3Xgb1wrgi4vDVF/26871.gif"
 
     robot.hear /^!toiletnuggets$/i, (msg) ->
+        if msg.message.user.jid in ('45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com')
+            msg.send "http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg"
+            return
+
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
 
     robot.hear /^!beyonce/i, (msg) ->
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
 
     robot.hear /^!puppies/i, (msg) ->
-        if msg.message.user.jid is '45727_470666@chat.hipchat.com'
-          msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
-          return
+        # if msg.message.user.jid is '45727_470666@chat.hipchat.com'
+        #   msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+        #   return
 
         msg.send "http://i.imgur.com/lSwAPqr.gif"
 

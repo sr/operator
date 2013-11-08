@@ -5,9 +5,9 @@ module.exports = (robot) ->
     return
 
   robot.hear /^!aww/i, (msg) ->
-    if msg.message.user.jid is '45727_470666@chat.hipchat.com'
-      msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
-      return
+    # if msg.message.user.jid is '45727_470666@chat.hipchat.com'
+    #   msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+    #   return
 
     Request.get 'http://www.reddit.com/r/aww.json', (err, res, body) ->
       result = JSON.parse(body) if typeof body is 'string'
