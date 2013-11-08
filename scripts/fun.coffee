@@ -18,14 +18,14 @@ module.exports = (robot) ->
       return
 
     robot.hear /^!reversenuggets$/i, (msg) ->
-        if msg.message.user.jid in ('45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com')
+        if msg.message.user.jid in ['45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com']
             msg.send "http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif"
             return
 
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306030/e3Xgb1wrgi4vDVF/26871.gif"
 
     robot.hear /^!toiletnuggets$/i, (msg) ->
-        if msg.message.user.jid in ('45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com')
+        if msg.message.user.jid in ['45727_306025@chat.hipchat.com', '45727_306061@chat.hipchat.com', '45727_306403@chat.hipchat.com']
             msg.send "http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg"
             return
 
