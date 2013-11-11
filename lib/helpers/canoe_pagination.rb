@@ -13,7 +13,7 @@ module Canoe
     end
 
     def pagination_page_size
-      10
+      2
     end
 
     def page_button(page_number, link)
@@ -91,11 +91,19 @@ module Canoe
         output = "<div class='pagination'>"
         output << previous_page_button(current_link)
         output << page_button(first_page, current_link)
-        output << page_gap if range_start_page > first_page + 1
+        if range_start_page > first_page + 2
+          output << page_gap
+        elsif range_start_page > first_page + 1
+          output << page_button(first_page + 1, current_link)
+        end
         range.each do |this_page|
           output << page_button(this_page, current_link)
         end
-        output << page_gap if range_end_page < last_page - 1
+        if range_end_page < last_page - 2
+          output << page_gap
+        elsif range_end_page < last_page - 1
+          output << page_button(last_page - 1, current_link)
+        end
         output << page_button(last_page, current_link)
         output << next_page_button(last_page, current_link)
         output << "</div>"
