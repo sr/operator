@@ -86,9 +86,11 @@
     <li <%= 'class="active"' if @locks %>>
       <a href="/target/<%= current_target.name %>/locks"><i class="icon-lock"></i> Locks</a>
     </li>
-    <li <%= 'class="active"' if @jobs %>>
-      <a href="/target/<%= current_target.name %>/jobs"><i class="icon-wrench"></i> Jobs</a>
-    </li>
+    <% if %w[dev test].include?(current_target.name) %>
+      <li <%= 'class="active"' if @jobs %>>
+        <a href="/target/<%= current_target.name %>/jobs"><i class="icon-wrench"></i> Jobs</a>
+      </li>
+    <% end %>
   </ul>
   <br>
 
