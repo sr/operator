@@ -22,4 +22,15 @@ class Deploy < ActiveRecord::Base
     save!
   end
 
+  def check_completed_status!
+    # bail out if we are complete or we're still running...
+    return if self.completed? || process_still_running?
+    complete! # otherwise, mark as complete
+  end
+
+  def process_still_running?
+    check = `ps cax | grep -e "^\s*#{self.process_id}"`
+    !check.blank?
+  end
+
 end

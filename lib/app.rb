@@ -261,10 +261,12 @@ class CanoeApplication < Sinatra::Base
   end
 
   get "/deploy/:deploy_id" do
+    current_deploy.check_completed_status!
     erb :deploy_show
   end
 
   get "/deploy/:deploy_id/watch" do
+    current_deploy.check_completed_status!
     @watching = true
     erb :deploy_show
   end

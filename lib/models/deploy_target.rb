@@ -98,6 +98,7 @@ class DeployTarget < ActiveRecord::Base
 
     # spawn process to run this...
     shipit_pid = spawn(cmd_pieces.join(" "))
+    deploy.update_attribute(:process_id, shipit_pid)
 
     # return the deploy for good measure
     deploy

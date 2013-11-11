@@ -24,8 +24,7 @@ namespace :canoe do
 
     # fork off our job to run...
     job_pid = spawn(job.command)
-    job.process_id = job_pid
-    job.save
+    job.update_attribute(:process_id, job_pid)
 
     # wait for the child process to complete...
     waitpid(job_pid, Process::WNOHANG)
