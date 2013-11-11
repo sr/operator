@@ -96,11 +96,11 @@ module.exports = (robot) ->
 
     # Panic
     robot.hear /^!panic$/i, (msg) ->
-        msg.send 'oh shit oh shit oh shit oh shit oh shit'
-
-    # Dreamforce
-    robot.hear /^!dreamforce$/i, (msg) ->
-        msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png'
+        random = Math.floor(Math.random() * 100)
+        if random > 70
+            msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png'
+        else
+            msg.send 'oh shit oh shit oh shit oh shit oh shit'
 
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
