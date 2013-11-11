@@ -45,3 +45,12 @@
     </form>
   </div>
 <% end %>
+
+<% if current_deploy.completed? %>
+  <hr>
+  <div>
+    <form class="form-inline" role="form" action="<%= deploy_target_path(current_deploy.deploy_target, nil) %>" method="post">
+      <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> REDEPLOY THIS!</button>
+    </form>
+  </div>
+<% end %>

@@ -61,10 +61,17 @@ module Canoe
       path
     end
 
-    def deploy_target_path(target, deploy_type)
+    def deploy_target_path(target, deploy_type=nil)
       path = "/deploy/target/#{target.name}?"
-      path += "repo_name=#{current_repo.name}&"
-      path += "#{deploy_type.name}=#{deploy_type.details}"
+      if deploy_type
+        path += "repo_name=#{current_repo.name}&"
+        path += "#{deploy_type.name}=#{deploy_type.details}"
+      elsif
+        path += "repo_name=#{current_deploy.repo_name}&"
+        path += "#{current_deploy.what}=#{current_deploy.what_details}"
+      else
+        raise 'Unknown path details...'
+      end
       path
     end
 
