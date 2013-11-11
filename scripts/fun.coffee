@@ -98,6 +98,10 @@ module.exports = (robot) ->
     robot.hear /^!panic$/i, (msg) ->
         msg.send 'oh shit oh shit oh shit oh shit oh shit'
 
+    # Dreamforce
+    robot.hear /^!dreamforce$/i, (msg) ->
+        msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png'
+
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
         target = msg.match[1]
