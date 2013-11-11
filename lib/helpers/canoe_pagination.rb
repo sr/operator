@@ -13,7 +13,7 @@ module Canoe
     end
 
     def pagination_page_size
-      2
+      10
     end
 
     def page_button(page_number, link)
