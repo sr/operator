@@ -25,6 +25,7 @@ require "canoe_sinatra_tweaks"
 require "canoe_locking"
 require "canoe_helpers"
 require "canoe_guards"
+require "canoe_pagination"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -66,6 +67,7 @@ class CanoeApplication < Sinatra::Base
   # ---------------------------------------------------------------
   helpers do
     include Canoe::Helpers
+    include Canoe::Pagination
   end
 
   # ---------------------------------------------------------------
@@ -171,14 +173,20 @@ class CanoeApplication < Sinatra::Base
   get "/target/:target_name" do
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
-    @deploys = current_target.deploys.order('created_at DESC')
+    @total_deploys = current_target.deploys.count
+    @deploys = current_target.deploys.order('created_at DESC')    \
+                                     .limit(pagination_page_size) \
+                                     .offset(pagination_page_size * (current_page - 1))
     erb :target
   end
 
   get "/target/:target_name/locks" do
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
-    @locks = current_target.locks.order('created_at DESC')
+    @total_locks = current_target.locks.count
+    @locks = current_target.locks.order('created_at DESC')    \
+                                 .limit(pagination_page_size) \
+                                 .offset(pagination_page_size * (current_page - 1))
     erb :target
   end
 
@@ -203,7 +211,10 @@ class CanoeApplication < Sinatra::Base
   get "/target/:target_name/jobs" do
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
-    @jobs = current_target.jobs.order('created_at DESC')
+    @total_jobs = current_target.jobs.count
+    @jobs = current_target.jobs.order('created_at DESC')    \
+                               .limit(pagination_page_size) \
+                               .offset(pagination_page_size * (current_page - 1))
     erb :target
   end
 
