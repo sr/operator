@@ -44,7 +44,10 @@ $(function(){
     } else {
       $this.html($this.attr('data-sha'));
     }
-  })
+  });
 
+  if ($("#deploy_log_output")) {
+    $("#deploy_log_output").scrollTop($("#deploy_log_output")[0].scrollHeight);
+  };
 
 });
