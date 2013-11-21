@@ -24,7 +24,15 @@ module.exports = (robot) ->
         msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
 
     robot.hear /^!beyonce/i, (msg) ->
-        msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+        charisma = [
+            "http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif",
+            "http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg",
+            "http://cdn.volcom.com/wordpress/wp-content/uploads/2013/09/Unknown1.jpeg",
+            "http://fashiongrunge.files.wordpress.com/2012/05/tumblr_m0kuc045mq1qb67y3.jpeg",
+            "http://thetangential.com/wp-content/uploads/2011/03/lisafrank1.jpg",
+            "http://i208.photobucket.com/albums/bb213/pairsofreckles/polar_bear.jpg"
+        ]
+        msg.send msg.random charisma
 
     robot.hear /^!puppies/i, (msg) ->
         msg.send "http://i.imgur.com/lSwAPqr.gif"
