@@ -123,6 +123,10 @@ module.exports = (robot) ->
 
             msg.send "@#{users[0].mention_name} #{poops[0]}"
 
+    # poop
+    robot.hear /^!greyskull$/i, (msg) ->
+        msg.send "http://www.andymangels.com/HeMan_DVD_Web/SheRa-S1V1-l.jpg"
+        
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
         util.getUsersInRoom msg, (users) ->
