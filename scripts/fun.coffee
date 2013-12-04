@@ -137,3 +137,7 @@ module.exports = (robot) ->
 
 
             msg.send "I choose @#{users[0].mention_name}"
+
+	robot.hear /^!yourmom$/i, (msg) ->
+	  	msg.send "http://dl.dropboxusercontent.com/u/45215568/internbot/yourmom4.jpeg"
+
