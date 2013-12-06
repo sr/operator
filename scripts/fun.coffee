@@ -126,7 +126,7 @@ module.exports = (robot) ->
     # poop
     robot.hear /^!greyskull$/i, (msg) ->
         msg.send "http://www.andymangels.com/HeMan_DVD_Web/SheRa-S1V1-l.jpg"
-        
+
     # Get some random nickname
     robot.hear /^!random$/i, (msg) ->
         util.getUsersInRoom msg, (users) ->
@@ -138,6 +138,7 @@ module.exports = (robot) ->
 
             msg.send "I choose @#{users[0].mention_name}"
 
-	robot.hear /^!yourmom$/i, (msg) ->
-	  	msg.send "http://dl.dropboxusercontent.com/u/45215568/internbot/yourmom4.jpeg"
+    # your mom, hahahaha
+    robot.hear /^!yourmom$/i, (msg) ->
+        msg.send "http://dl.dropboxusercontent.com/u/45215568/internbot/yourmom4.jpeg"
 
