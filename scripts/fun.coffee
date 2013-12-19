@@ -49,9 +49,6 @@ module.exports = (robot) ->
     robot.hear /!stokes$/i, (msg) ->
         msg.send msg.random [milkshake, funnelcake, beerfest]
 
-    robot.hear /^!funnelcake$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KD555k7E3dcSOXn/output.gif"
-
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]
 
