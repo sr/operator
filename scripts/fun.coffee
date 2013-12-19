@@ -29,6 +29,12 @@ module.exports = (robot) ->
     robot.hear /^!puppies/i, (msg) ->
         msg.send "http://i.imgur.com/lSwAPqr.gif"
 
+    robot.hear /^!stokes$/i, (msg) ->
+        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KD555k7E3dcSOXn/output.gif"
+
+    robot.hear /^!funnelcake$/i, (msg) ->
+        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KD555k7E3dcSOXn/output.gif"
+
     robot.hear /^!blame\s+(.*)/i, (msg) ->
         target = msg.match[1]
 
