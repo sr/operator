@@ -144,8 +144,8 @@ module.exports = (robot) ->
             conn.end()
 
 
-    # PROD: is just finished syncing Pardot to build537 on email-d1.pardot.com
-    # testable link for regex : http://rubular.com/r/kqYwQ7ztFS
+    # PROD: dan.vankley just began syncing Pardot to build537 on email-d1.pardot.com
+    # testable link for regex : http://rubular.com/r/4fNIw2zFuZ
 
     # CREATE TABLE IF NOT EXISTS `sync` (
     #   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -154,7 +154,7 @@ module.exports = (robot) ->
     #   `date` datetime DEFAULT NULL,
     #   PRIMARY KEY (`id`)
     # ) ENGINE=InnoDB AUTO_INCREMENT=1019 DEFAULT CHARSET=utf8;
-    robot.hear /^PROD\: (\w+) just began syncing Pardot to .*?build(\d+).*? on ([\w\.\-]*)/, (msg) ->
+    robot.hear /^PROD\: (\S+) just began syncing Pardot to .*?build(\d+).*? on ([\w\.\-]*)/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             syncmaster = msg.match[1]
             build_number = msg.match[2]
