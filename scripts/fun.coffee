@@ -37,8 +37,17 @@ module.exports = (robot) ->
     robot.hear /^!puppies/i, (msg) ->
         msg.send "http://i.imgur.com/lSwAPqr.gif"
 
-    robot.hear /^!stokes$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KD555k7E3dcSOXn/output.gif"
+    milkshake  = "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/0ExRFQY3vttdRGE/output.gif"
+    funnelcake = "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/QByVSFk2ZCG7upz/output.gif"
+    beerfest   = "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KSFuqD31hX27b0J/output.gif"
+    robot.hear /!funnelcake/i, (msg) ->
+        msg.send funnelcake
+    robot.hear /!milkshake/i, (msg) ->
+        msg.send milkshake
+    robot.hear /!stokesbeer/i, (msg) ->
+        msg.send beerfest
+    robot.hear /!stokes$/i, (msg) ->
+        msg.send msg.random [milkshake, funnelcake, beerfest]
 
     robot.hear /^!funnelcake$/i, (msg) ->
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/KD555k7E3dcSOXn/output.gif"
