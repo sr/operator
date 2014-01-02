@@ -113,7 +113,7 @@ class DeployTarget < ActiveRecord::Base
       cmd_pieces << "sh batch/devResetAll.sh"
     elsif self.name == "test"
       cmd_pieces << "cd ../;" # back up a dir...
-      cmd_pieces << "sudo sh CANOE_USER=#{options[:user].email} update-test-reset"
+      cmd_pieces << "sudo CANOE_USER=#{options[:user].email} sh update-test-reset"
     else
       return
     end
