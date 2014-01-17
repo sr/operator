@@ -44,17 +44,11 @@ class CanoeApplication < Sinatra::Base
   set :root, ENV["CANOE_DIR"] # File.join(File.dirname(__FILE__), "..")
   set :partial_template_engine, :erb
 
-  # enable some logging....
-  configure do
-    set :logging, true
-
-    log_path = "#{root}/log"
-    Dir.mkdir(log_path) unless File.exist?(log_path)
-    log_file = File.new("#{log_path}/canoe.log", "a+")
-    log_file.sync = true
-    $stdout.reopen(log_file)
-    $stderr.reopen(log_file)
-  end
+  # useful for debugging....
+  # set :logging, true
+  # set :dump_errors, true
+  # set :raise_errors, true
+  # set :show_exceptions, true
 
   # enable :sessions # use explicit so we can set session secret
   use Rack::Session::Cookie, {  key: "rack.session",
