@@ -5,6 +5,24 @@
 <small class="muted"><%= current_repo.description %></small>
 <br><br>
 
+<p class="lead">
+  Select the
+  <% if @tags %>
+    <i class="icon-tags"></i> <strong>tag</strong>
+  <% elsif @branches %>
+    <i class="icon-code-fork"></i> <strong>branch</strong>
+  <% elsif @commits %>
+    <i class="icon-tasks"></i> <strong>commit</strong>
+  <% end %>
+  that you wish to ship.
+</p>
+
+<div class="alert alert-warning">
+  <p>
+    On the next step you will choose the target where selected item will be deployed.
+  </p>
+</div>
+
 <div>
   <% if @branches %>
     <form class="form-inline pull-right" role="form" action="<%= repo_path %>/branches" method="get">
