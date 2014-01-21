@@ -1,27 +1,31 @@
-<h1>
+<h1>What do you want to deploy?</h1>
+<h3>
   <i class="icon-github"></i>&nbsp;
   <a href="https://github.com/pardot/<%= current_repo.name %>"><%= current_repo.full_name %></a>
-</h1>
+</h3>
 <small class="muted"><%= current_repo.description %></small>
 <br><br>
 
-<p class="lead">
-  Select the
-  <% if @tags %>
-    <i class="icon-tags"></i> <strong>tag</strong>
-  <% elsif @branches %>
-    <i class="icon-code-fork"></i> <strong>branch</strong>
-  <% elsif @commits %>
-    <i class="icon-tasks"></i> <strong>commit</strong>
-  <% end %>
-  that you wish to ship.
-</p>
-
-<div class="alert alert-warning">
-  <p>
-    On the next step you will choose the target where selected item will be deployed.
+<% if @tags || @branches || @commits %>
+  <p class="lead">
+    Select the
+    <% if @tags %>
+      <i class="icon-tags"></i> <strong>tag</strong>
+    <% elsif @branches %>
+      <i class="icon-code-fork"></i> <strong>branch</strong>
+    <% elsif @commits %>
+      <i class="icon-tasks"></i> <strong>commit</strong>
+    <% end %>
+    that you wish to ship.
   </p>
-</div>
+
+  <div class="alert alert-warning">
+    <p>
+      <strong>Note:</strong>
+      On the next step you will choose where this will be deployed.
+    </p>
+  </div>
+<% end %>
 
 <div>
   <% if @branches %>
@@ -54,7 +58,9 @@
     <%= partial :'partials/commits', locals: { commits: @commits } %>
   <% else %>
     <div class="container">
-      <h3 class="muted"><i class="icon-circle-arrow-up"></i> What would you like to deploy?</h3>
+      <h3 class="muted"><i class="icon-circle-arrow-up"></i>
+        Select where to grab the code.
+      </h3>
     </div>
   <% end %>
 </div>
