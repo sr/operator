@@ -28,5 +28,7 @@ export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
 export KPI_DATABASE="pardot_kpis"
 
+export BOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Finally run:
-./bin/hubot -a hipchat
+$BOT_PATH/bin/hubot -a hipchat

@@ -25,6 +25,8 @@ export HUBOT_IRC_DEBUG="true"
 # Set the bot type for permission related items
 export BOT_TYPE="parbot"
 
+export BOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Finally run:
-./bin/hubot -a hipchat
+$BOT_PATH/bin/hubot -a hipchat
 
