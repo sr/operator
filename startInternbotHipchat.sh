@@ -30,5 +30,8 @@ export KPI_DATABASE="pardot_kpis"
 
 export BOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# TODO: should we avoid starting if PID file exists?
+echo $$ > /var/run/$BOT_TYPE.pid
+
 # Finally run:
 $BOT_PATH/bin/hubot -a hipchat
