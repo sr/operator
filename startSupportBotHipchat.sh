@@ -25,5 +25,7 @@ export BOT_TYPE="supportbot"
 # Supportbot settings
 export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
 
+export BOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Finally run:
-./bin/hubot -a hipchat
+$BOT_PATH/bin/hubot -a hipchat
