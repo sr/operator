@@ -106,8 +106,10 @@ module.exports = (robot) ->
     # Panic
     robot.hear /^!panic$/i, (msg) ->
         random = Math.floor(Math.random() * 100)
-        if random > 70
+        if random > 0 and random < 33
             msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png'
+        else if random >= 33 and random < 66
+            msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/341003/mjQmdzG1n3jd77P/Saasy%20Atlanta%20Takeover.jpg'
         else
             msg.send 'oh shit oh shit oh shit oh shit oh shit'
 
