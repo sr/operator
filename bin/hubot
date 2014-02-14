@@ -1,7 +1,8 @@
 #!/bin/sh
 
 npm install
-export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
+# BOT_PATH is exported in start scripts
+export PATH="$BOT_PATH/node_modules/.bin:$BOT_PATH/node_modules/hubot/node_modules/.bin:$PATH"
 
-exec node_modules/.bin/hubot "$@"
+exec $BOT_PATH/node_modules/.bin/hubot "$@"
 

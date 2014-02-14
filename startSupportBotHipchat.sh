@@ -25,5 +25,10 @@ export BOT_TYPE="supportbot"
 # Supportbot settings
 export SUPPORTBOT_EXECUTABLE="php /var/www/supportq/symfony"
 
+export BOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# TODO: should we avoid starting if PID file exists?
+echo $$ > /var/run/$BOT_TYPE.pid
+
 # Finally run:
-./bin/hubot -a hipchat
+$BOT_PATH/bin/hubot -a hipchat
