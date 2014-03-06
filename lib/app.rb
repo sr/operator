@@ -4,7 +4,7 @@ require "load_envvars"
 require "sinatra"
 require "sinatra/activerecord"
 require "sinatra/partial"
-require 'rack-flash'
+require "rack-flash"
 require "omniauth"
 require "omniauth-google-oauth2"
 require "ostruct"
@@ -26,6 +26,7 @@ require "canoe_locking"
 require "canoe_helpers"
 require "canoe_guards"
 require "canoe_pagination"
+require "canoe_deploy"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -74,6 +75,7 @@ class CanoeApplication < Sinatra::Base
   helpers do
     include Canoe::Helpers
     include Canoe::Pagination
+    include Canoe::Deploy
   end
 
   # ---------------------------------------------------------------
@@ -118,7 +120,7 @@ class CanoeApplication < Sinatra::Base
     else
       puts "We did NOT find or create a user!!"
       session[:user_id] = nil
-      error_str = 'Unable to authenticate.'
+      error_str = "Unable to authenticate."
 
       user.errors.full_messages.each do |msg|
         error_str += "\n#{msg}"
@@ -137,7 +139,7 @@ class CanoeApplication < Sinatra::Base
   get "/repo/:repo_name/tags" do
     guard_against_unknown_repos!
     @tags = Octokit.tags(current_repo.full_name)
-    @tags = @tags.sort_by { |t| t.name.gsub(/^build/,'').to_i }.reverse
+    @tags = @tags.sort_by { |t| t.name.gsub(/^build/,"").to_i }.reverse
     @tags = @tags[0,50] # we only really care about the most recent 50?
     erb :repo
   end
@@ -162,7 +164,7 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/deploy" do
     guard_against_unknown_repos!
-    @deploy_type = OpenStruct.new(name: '', details: '')
+    @deploy_type = OpenStruct.new(name: "", details: "")
     %w[tag branch commit].each do |type|
       if params[type]
         @deploy_type.name = type
@@ -180,7 +182,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_deploys = current_target.deploys.count
-    @deploys = current_target.deploys.order('created_at DESC')    \
+    @deploys = current_target.deploys.order("created_at DESC")    \
                                      .limit(pagination_page_size) \
                                      .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -190,7 +192,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_locks = current_target.locks.count
-    @locks = current_target.locks.order('created_at DESC')    \
+    @locks = current_target.locks.order("created_at DESC")    \
                                  .limit(pagination_page_size) \
                                  .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -218,7 +220,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_jobs = current_target.jobs.count
-    @jobs = current_target.jobs.order('created_at DESC')    \
+    @jobs = current_target.jobs.order("created_at DESC")    \
                                .limit(pagination_page_size) \
                                .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -237,33 +239,22 @@ class CanoeApplication < Sinatra::Base
 
   # DEPLOY --------
   post "/deploy/target/:target_name" do
-    unless current_repo && current_target
-      flash[:notice] = "We did not have everything needed to deploy. Try again."
-      redirect back
-    end
+    deploy = deploy!
 
-    # check for locked target, allow user who has it locked to deploy again
-    unless current_target.user_can_deploy?(current_user)
-      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-      redirect back
-    end
+    if deploy
+      redirect "/deploy/#{deploy.id}/watch"
+    else
+      unless current_repo && current_target
+        flash[:notice] = "We did not have everything needed to deploy. Try again."
+        redirect back
+      end
 
-    deploy_options = { user: current_user,
-                       repo: current_repo,
-                       lock: (params[:lock] == "on"),
-                     }
-
-    # lets determine what we're deploying...
-    %w[tag branch commit].each do |type|
-      if params[type]
-        deploy_options[:what] = type
-        deploy_options[:what_details] = params[type]
-        break
+      # check for locked target, allow user who has it locked to deploy again
+      unless current_target.user_can_deploy?(current_user)
+        flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
+        redirect back
       end
     end
-
-    deploy = current_target.deploy!(deploy_options)
-    redirect "/deploy/#{deploy.id}/watch"
   end
 
   get "/deploy/:deploy_id" do
@@ -306,6 +297,7 @@ class CanoeApplication < Sinatra::Base
     erb :job
   end
 
+  # ========================================================================
   # API --------
   get "/api/lock/status" do
     content_type :json
@@ -319,6 +311,26 @@ class CanoeApplication < Sinatra::Base
                             }
     end
     output.to_json
+  end
+
+  get "/api/status/target/:target_name" do
+    # is the target available for deploy?
+  end
+
+  post "/api/lock/target/:target_name" do
+    # lock the given target
+  end
+
+  post "/api/unlock/target/:target_name" do
+    # unlock the given target
+  end
+
+  post "/api/deploy/target/:target_name" do
+    # start deploy on target
+  end
+
+  get "/api/status/deploy/:deploy_id" do
+    # get the status of the given deploy
   end
 
 end
