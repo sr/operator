@@ -133,7 +133,8 @@ class DeployTarget < ActiveRecord::Base
     rake_env = { "JOB_ID" => job.id.to_s }
     rake_cmd = "bundle exec rake canoe:run_job"
     # spawn process to run the rake command...
-    rake_pid = spawn(rake_env, rake_cmd)
+    # rake_pid = \
+    spawn(rake_env, rake_cmd)
 
     # return job for good measure
     job
