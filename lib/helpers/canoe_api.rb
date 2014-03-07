@@ -16,5 +16,11 @@ module Canoe
       end
     end
 
+    def require_api_repo!
+      unless current_repo
+        halt 200, {}, { error: true, message: "Invalid repo specified." }.to_json
+      end
+    end
+
   end
 end

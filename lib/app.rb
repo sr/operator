@@ -349,8 +349,7 @@ class CanoeApplication < Sinatra::Base
     output = lock_target!
     current_target.reload!
 
-    {
-      locked: current_target.is_locked?,
+    { locked: current_target.is_locked?,
       output: output,
     }.to_json
   end
@@ -366,8 +365,7 @@ class CanoeApplication < Sinatra::Base
     output = unlock_target!
     current_target.reload!
 
-    {
-      locked: current_target.is_locked?,
+    { locked: current_target.is_locked?,
       output: output,
     }.to_json
   end
@@ -376,7 +374,29 @@ class CanoeApplication < Sinatra::Base
     content_type :json
 
     require_api_authentication!
+    require_api_target!
+    require_api_user!
+    require_api_repo!
+
     # start deploy on target
+    deploy = deploy!
+
+    if deploy
+      { deployed: true,
+        status_callback: "/api/status/deploy/#{deploy.id}",
+      }.to_json
+    else
+      # check for locked target, allow user who has it locked to deploy again
+      if !current_target.user_can_deploy?(current_user)
+        { deployed: false,
+          message: "#{current_target.name} is currently locked.",
+        }.to_json
+      else
+        { deployed: false,
+          message: "Unable to deploy."
+        }.to_json
+      end
+    end
   end
 
   get "/api/status/deploy/:deploy_id" do

@@ -209,5 +209,69 @@ describe Canoe do
     end
   end # /api/unlock/target
 
+  # --------------------------------------------------------------------------
+  describe "/api/deploy/target/:target_name" do
+    describe "without authentication" do
+      it "should error" do
+        post "/api/deploy/target/test"
+        assert_json_error_response("auth token")
+      end
+
+      it "should not respond to GET" do
+        get "/api/deploy/target/test"
+        assert last_response.not_found?
+      end
+    end
+
+    describe "with authentication" do
+      it "should require target" do
+        define_target_missing_mock("foo")
+        api_post "/api/deploy/target/foo"
+        assert_json_error_response("Invalid target")
+      end
+
+      it "should require user" do
+        define_api_user_missing_mock
+        define_target_mock
+        api_post "/api/deploy/target/test"
+        assert_json_error_response("Invalid user")
+      end
+
+      it "should require repo" do
+        define_api_user_mock
+        define_target_mock
+        api_post "/api/deploy/target/test"
+        assert_json_error_response("Invalid repo")
+      end
+
+      it "should indicate when user is unable to deploy (locking error)" do
+        define_api_user_mock
+        define_repo_mock
+        define_target_mock do |target_mock|
+          target_mock.stubs(:user_can_deploy?).returns(false)
+        end
+
+        api_post "/api/deploy/target/test?repo_name=pardot"
+        assert last_response.ok?
+        assert !json_response["deployed"]
+        assert_match "locked", json_response["message"]
+      end
+
+      it "should indicate deploy and give callback URL" do
+        define_api_user_mock
+        define_repo_mock
+        define_target_mock do |target_mock|
+          target_mock.stubs(:user_can_deploy?).returns(true)
+          target_mock.expects(:deploy!).returns(Deploy.new(id: 1234))
+        end
+
+        api_post "/api/deploy/target/test?repo_name=pardot&tag=1234"
+        assert last_response.ok?
+        assert json_response["deployed"]
+        assert_equal "/api/status/deploy/1234", json_response["status_callback"]
+      end
+    end
+  end # /api/deploy/target
+
 
 end
