@@ -359,7 +359,17 @@ class CanoeApplication < Sinatra::Base
     content_type :json
 
     require_api_authentication!
+    require_api_target!
+    require_api_user!
+
     # unlock the given target
+    output = unlock_target!
+    current_target.reload!
+
+    {
+      locked: current_target.is_locked?,
+      output: output,
+    }.to_json
   end
 
   post "/api/deploy/target/:target_name" do
