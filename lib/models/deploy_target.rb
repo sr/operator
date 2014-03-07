@@ -47,6 +47,14 @@ class DeployTarget < ActiveRecord::Base
     self.locked? || has_file_lock?
   end
 
+  def name_of_locking_user
+    if has_file_lock?
+      file_lock_user
+    else
+      self.locking_user.try(:email)
+    end
+  end
+
   def has_file_lock?
     File.exists?(self.lock_path)
   end

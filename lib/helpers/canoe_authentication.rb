@@ -15,5 +15,13 @@ module Canoe
       return unless page_requires_authentication?
       redirect "/login" unless current_user
     end
+
+    def require_api_authentication!
+      # check for proper api_auth param
+      if params[:api_token] != ENV["API_AUTH_TOKEN"]
+        halt 200, { error: true, message: "Invalid auth token" }.to_json
+      end
+    end
+
   end
 end

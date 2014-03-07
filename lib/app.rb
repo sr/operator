@@ -8,8 +8,6 @@ require "rack-flash"
 require "omniauth"
 require "omniauth-google-oauth2"
 require "ostruct"
-require "pp"
-
 require "github"
 
 # models ----
@@ -27,6 +25,7 @@ require "canoe_helpers"
 require "canoe_guards"
 require "canoe_pagination"
 require "canoe_deploy"
+require "canoe_api"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -76,6 +75,7 @@ class CanoeApplication < Sinatra::Base
     include Canoe::Helpers
     include Canoe::Pagination
     include Canoe::Deploy
+    include Canoe::API
   end
 
   # ---------------------------------------------------------------
@@ -301,12 +301,13 @@ class CanoeApplication < Sinatra::Base
   # API --------
   get "/api/lock/status" do
     content_type :json
+
+    require_api_authentication!
+
     output = {}
     all_targets.each do |target|
-      locking_user = target.locking_user.try(:email)
-      locking_user = target.file_lock_user if target.has_file_lock?
       output[target.name] = { locked: target.is_locked?,
-                              locked_by: locking_user,
+                              locked_by: target.name_of_locking_user,
                               locked_at: target.created_at,
                             }
     end
@@ -314,22 +315,46 @@ class CanoeApplication < Sinatra::Base
   end
 
   get "/api/status/target/:target_name" do
+    content_type :json
+
+    require_api_authentication!
+    require_api_target!
+    require_api_user!
+
     # is the target available for deploy?
+    if !current_target.user_can_deploy?(current_user)
+      user_name = current_target.name_of_locking_user
+      { available: false,
+        reason: "#{current_target.name} is currently locked by #{user_name}",
+      }.to_json
+    elsif current_target.active_deploy
+      deploy = current_target.active_deploy
+      deploy_name = "#{deploy.repo_name} #{deploy.what} #{deploy.what_details}"
+      { available: false,
+        reason: "#{current_target.name} is currently running deploy of #{deploy_name}.",
+      }.to_json
+    else
+      { available: true }.to_json
+    end
   end
 
   post "/api/lock/target/:target_name" do
+    require_api_authentication!
     # lock the given target
   end
 
   post "/api/unlock/target/:target_name" do
+    require_api_authentication!
     # unlock the given target
   end
 
   post "/api/deploy/target/:target_name" do
+    require_api_authentication!
     # start deploy on target
   end
 
   get "/api/status/deploy/:deploy_id" do
+    require_api_authentication!
     # get the status of the given deploy
   end
 

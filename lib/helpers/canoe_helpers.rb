@@ -4,7 +4,11 @@ module Canoe
     # CURRENT X
     def current_user
       @_current_user ||= \
-        session[:user_id] ? AuthUser.where(id: session[:user_id].to_i).first : nil
+        if is_api?
+          params[:user_email] ? AuthUser.where(email: params[:user_email]).first : nil
+        else
+          session[:user_id] ? AuthUser.where(id: session[:user_id].to_i).first : nil
+        end
     end
 
     def current_repo

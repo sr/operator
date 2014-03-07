@@ -7,19 +7,6 @@ describe Deploy do
     CanoeApplication
   end
 
-  def define_target_mock(&block)
-    target_mock = DeployTarget.new(name: "test")
-    assoc_mock = mock
-    assoc_mock.stubs(:first).returns(target_mock)
-    DeployTarget.stubs(:where).with(name: "test").returns(assoc_mock)
-
-    yield(target_mock) if block_given?
-  end
-
-  def define_repo_mock(repo_name="pardot", &block)
-    Octokit.expects(:repo).with("pardot/#{repo_name}").returns(OpenStruct.new)
-  end
-
   describe "accessing /deploy/target/:target_name" do
     describe "without authentication" do
       it "GET: should redirect to login" do
@@ -49,8 +36,9 @@ describe Deploy do
         end
 
         it "should require target passed" do
-          define_target_mock
-          post_request_with_auth "/deploy/target/foo"
+          define_repo_mock
+          define_target_missing_mock("foo")
+          post_request_with_auth "/deploy/target/foo?repo_name=pardot"
           # TODO: how do we check for the flash message?
           assert last_response.redirect?
         end
