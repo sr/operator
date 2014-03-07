@@ -273,5 +273,45 @@ describe Canoe do
     end
   end # /api/deploy/target
 
+  # --------------------------------------------------------------------------
+  describe "/api/status/deploy/:deploy_id" do
+    describe "without authentication" do
+      it "should error" do
+        get "/api/status/deploy/1"
+        assert_json_error_response("auth token")
+      end
+
+      it "should not respond to POST" do
+        post "/api/status/deploy/1"
+        assert last_response.not_found?
+      end
+    end
+
+    describe "with authentication" do
+      it "should require target" do
+        assoc_mock = mock
+        assoc_mock.expects(:first).returns(nil)
+        Deploy.expects(:where).with(id: 1).returns(assoc_mock)
+
+        api_get "/api/status/deploy/1"
+        assert_json_error_response("Unable to find")
+      end
+
+      it "should give info on status of deploy" do
+        deploy = Deploy.new(id: 1, what: "tag", what_details: "1234", completed: true)
+        deploy.expects(:target).returns(OpenStruct.new(name: "test"))
+        deploy.expects(:auth_user).returns(OpenStruct.new(email: "sveader@salesforce.com"))
+        deploy.expects(:repo).returns(OpenStruct.new(name: "pardot"))
+
+        assoc_mock = mock
+        assoc_mock.expects(:first).returns(deploy)
+        Deploy.expects(:where).with(id: 1).returns(assoc_mock)
+
+        api_get "/api/status/deploy/1"
+        assert last_response.ok?
+        assert json_response["completed"]
+      end
+    end
+  end # /api/status/deploy
 
 end

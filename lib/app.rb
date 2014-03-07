@@ -403,7 +403,22 @@ class CanoeApplication < Sinatra::Base
     content_type :json
 
     require_api_authentication!
+
     # get the status of the given deploy
+    deploy = Deploy.where(id: params[:deploy_id].to_i).first unless params[:deploy_id].blank?
+    if deploy
+      { target: deploy.target.name,
+        user: deploy.auth_user.email,
+        repo: deploy.repo.name,
+        what: deploy.what,
+        what_details: deploy.what_details,
+        completed: deploy.completed,
+      }.to_json
+    else
+      { error: true,
+        message: "Unable to find requested deploy.",
+      }.to_json
+    end
   end
 
 end
