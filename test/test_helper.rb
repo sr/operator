@@ -55,7 +55,7 @@ def api_get(url)
 end
 
 def api_post(url)
-  get url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }, {}
+  post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }, {}
 end
 
 def define_api_user_mock(email="sveader@salesforce.com")

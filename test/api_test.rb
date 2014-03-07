@@ -47,7 +47,7 @@ describe Canoe do
         assert_equal username, json_response["test"]["locked_by"]
       end
     end
-  end
+  end # /api/lock/status
 
   # --------------------------------------------------------------------------
   describe "/api/status/target/:target_name" do
@@ -113,6 +113,54 @@ describe Canoe do
         assert_nil json_response["reason"]
       end
     end
-  end
+  end # /api/status/target
+
+  # --------------------------------------------------------------------------
+  describe "/api/lock/target/:target_name" do
+    describe "without authentication" do
+      it "should error" do
+        post "/api/lock/target/test"
+        assert_json_error_response("auth token")
+      end
+
+      it "should not respond to GET" do
+        get "/api/lock/target/test"
+        assert last_response.not_found?
+      end
+    end
+
+    describe "with authentication" do
+      it "should require target" do
+        define_target_missing_mock("foo")
+        api_post "/api/lock/target/foo"
+        assert_json_error_response("Invalid target")
+      end
+
+      it "should require user" do
+        define_api_user_missing_mock
+        define_target_mock
+        api_post "/api/lock/target/test"
+        assert_json_error_response("Invalid user")
+      end
+
+      it "should give locking output" do
+        define_api_user_mock
+        define_target_mock do |target_mock|
+          # make sure shell command just echos and exits
+          target_mock.expects(:script_path).returns("echo 'test'; exit 0;")
+          target_mock.expects(:lock!)
+          target_mock.expects(:reload!)
+          target_mock.expects(:is_locked?).returns(true)
+        end
+
+        api_post "/api/lock/target/test"
+        assert last_response.ok?
+        assert json_response["locked"]
+        # make sure output is pushed into json response
+        assert_match "test", json_response["output"]
+      end
+    end
+  end # /api/lock/target
+
 
 end
