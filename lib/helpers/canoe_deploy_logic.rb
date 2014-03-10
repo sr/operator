@@ -1,5 +1,5 @@
 module Canoe
-  module Deploy
+  module DeployLogic
     # ----------------------------------------------------------------------
     def deploy!
       # require a repo and target

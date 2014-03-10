@@ -24,7 +24,7 @@ require "canoe_locking"
 require "canoe_helpers"
 require "canoe_guards"
 require "canoe_pagination"
-require "canoe_deploy"
+require "canoe_deploy_logic"
 require "canoe_api"
 
 Time.zone = "UTC"
@@ -74,7 +74,7 @@ class CanoeApplication < Sinatra::Base
   helpers do
     include Canoe::Helpers
     include Canoe::Pagination
-    include Canoe::Deploy
+    include Canoe::DeployLogic
     include Canoe::API
   end
 
