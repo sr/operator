@@ -20,6 +20,11 @@ GEM
     atomic (1.1.14)
     bond (0.4.3)
     builder (3.1.4)
+    configatron (2.13.0)
+      yamler (>= 0.1.0)
+    cover_me (1.2.0)
+      configatron
+      hashie
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     hashie (2.0.5)
@@ -28,7 +33,10 @@ GEM
     json (1.8.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
+    metaclass (0.0.1)
     minitest (4.7.5)
+    mocha (0.14.0)
+      metaclass (~> 0.0.1)
     multi_json (1.8.0)
     multipart-post (1.2.0)
     mysql2 (0.3.13)
@@ -87,18 +95,22 @@ GEM
       sinatra (>= 1.2.1)
     tzinfo (0.3.37)
     uri_template (0.5.3)
+    yamler (0.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  cover_me (>= 1.2.0)
   json
+  mocha
   mysql2
   octokit
   omniauth
   omniauth-google-oauth2
   rack
   rack-flash3
+  rack-test
   rake
   sinatra
   sinatra-activerecord

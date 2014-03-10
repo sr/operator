@@ -47,6 +47,14 @@ class DeployTarget < ActiveRecord::Base
     self.locked? || has_file_lock?
   end
 
+  def name_of_locking_user
+    if has_file_lock?
+      file_lock_user
+    else
+      self.locking_user.try(:email)
+    end
+  end
+
   def has_file_lock?
     File.exists?(self.lock_path)
   end
@@ -133,7 +141,8 @@ class DeployTarget < ActiveRecord::Base
     rake_env = { "JOB_ID" => job.id.to_s }
     rake_cmd = "bundle exec rake canoe:run_job"
     # spawn process to run the rake command...
-    rake_pid = spawn(rake_env, rake_cmd)
+    # rake_pid = \
+    spawn(rake_env, rake_cmd)
 
     # return job for good measure
     job

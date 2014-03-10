@@ -23,3 +23,9 @@ gem "mysql2"
 # authentication ----
 gem "omniauth"
 gem "omniauth-google-oauth2"
+
+group :test do
+  gem 'mocha'
+  gem 'cover_me', '>= 1.2.0'
+  gem "rack-test"
+end

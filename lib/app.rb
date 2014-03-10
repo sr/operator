@@ -4,12 +4,10 @@ require "load_envvars"
 require "sinatra"
 require "sinatra/activerecord"
 require "sinatra/partial"
-require 'rack-flash'
+require "rack-flash"
 require "omniauth"
 require "omniauth-google-oauth2"
 require "ostruct"
-require "pp"
-
 require "github"
 
 # models ----
@@ -26,6 +24,8 @@ require "canoe_locking"
 require "canoe_helpers"
 require "canoe_guards"
 require "canoe_pagination"
+require "canoe_deploy"
+require "canoe_api"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -74,6 +74,8 @@ class CanoeApplication < Sinatra::Base
   helpers do
     include Canoe::Helpers
     include Canoe::Pagination
+    include Canoe::Deploy
+    include Canoe::API
   end
 
   # ---------------------------------------------------------------
@@ -118,7 +120,7 @@ class CanoeApplication < Sinatra::Base
     else
       puts "We did NOT find or create a user!!"
       session[:user_id] = nil
-      error_str = 'Unable to authenticate.'
+      error_str = "Unable to authenticate."
 
       user.errors.full_messages.each do |msg|
         error_str += "\n#{msg}"
@@ -137,7 +139,7 @@ class CanoeApplication < Sinatra::Base
   get "/repo/:repo_name/tags" do
     guard_against_unknown_repos!
     @tags = Octokit.tags(current_repo.full_name)
-    @tags = @tags.sort_by { |t| t.name.gsub(/^build/,'').to_i }.reverse
+    @tags = @tags.sort_by { |t| t.name.gsub(/^build/,"").to_i }.reverse
     @tags = @tags[0,50] # we only really care about the most recent 50?
     erb :repo
   end
@@ -162,7 +164,7 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/deploy" do
     guard_against_unknown_repos!
-    @deploy_type = OpenStruct.new(name: '', details: '')
+    @deploy_type = OpenStruct.new(name: "", details: "")
     %w[tag branch commit].each do |type|
       if params[type]
         @deploy_type.name = type
@@ -180,7 +182,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_deploys = current_target.deploys.count
-    @deploys = current_target.deploys.order('created_at DESC')    \
+    @deploys = current_target.deploys.order("created_at DESC")    \
                                      .limit(pagination_page_size) \
                                      .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -190,7 +192,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_locks = current_target.locks.count
-    @locks = current_target.locks.order('created_at DESC')    \
+    @locks = current_target.locks.order("created_at DESC")    \
                                  .limit(pagination_page_size) \
                                  .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -218,7 +220,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_unknown_targets!
     get_recent_deploys_for_repos
     @total_jobs = current_target.jobs.count
-    @jobs = current_target.jobs.order('created_at DESC')    \
+    @jobs = current_target.jobs.order("created_at DESC")    \
                                .limit(pagination_page_size) \
                                .offset(pagination_page_size * (current_page - 1))
     erb :target
@@ -237,33 +239,22 @@ class CanoeApplication < Sinatra::Base
 
   # DEPLOY --------
   post "/deploy/target/:target_name" do
-    unless current_repo && current_target
-      flash[:notice] = "We did not have everything needed to deploy. Try again."
-      redirect back
-    end
+    deploy = deploy!
 
-    # check for locked target, allow user who has it locked to deploy again
-    unless current_target.user_can_deploy?(current_user)
-      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-      redirect back
-    end
+    if deploy
+      redirect "/deploy/#{deploy.id}/watch"
+    else
+      unless current_repo && current_target
+        flash[:notice] = "We did not have everything needed to deploy. Try again."
+        redirect back
+      end
 
-    deploy_options = { user: current_user,
-                       repo: current_repo,
-                       lock: (params[:lock] == "on"),
-                     }
-
-    # lets determine what we're deploying...
-    %w[tag branch commit].each do |type|
-      if params[type]
-        deploy_options[:what] = type
-        deploy_options[:what_details] = params[type]
-        break
+      # check for locked target, allow user who has it locked to deploy again
+      unless current_target.user_can_deploy?(current_user)
+        flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
+        redirect back
       end
     end
-
-    deploy = current_target.deploy!(deploy_options)
-    redirect "/deploy/#{deploy.id}/watch"
   end
 
   get "/deploy/:deploy_id" do
@@ -306,19 +297,128 @@ class CanoeApplication < Sinatra::Base
     erb :job
   end
 
+  # ========================================================================
   # API --------
   get "/api/lock/status" do
     content_type :json
+
+    require_api_authentication!
+
     output = {}
     all_targets.each do |target|
-      locking_user = target.locking_user.try(:email)
-      locking_user = target.file_lock_user if target.has_file_lock?
       output[target.name] = { locked: target.is_locked?,
-                              locked_by: locking_user,
+                              locked_by: target.name_of_locking_user,
                               locked_at: target.created_at,
                             }
     end
     output.to_json
+  end
+
+  get "/api/status/target/:target_name" do
+    content_type :json
+
+    require_api_authentication!
+    require_api_target!
+    require_api_user!
+
+    # is the target available for deploy?
+    if !current_target.user_can_deploy?(current_user)
+      user_name = current_target.name_of_locking_user
+      { available: false,
+        reason: "#{current_target.name} is currently locked by #{user_name}",
+      }.to_json
+    elsif current_target.active_deploy
+      deploy = current_target.active_deploy
+      deploy_name = "#{deploy.repo_name} #{deploy.what} #{deploy.what_details}"
+      { available: false,
+        reason: "#{current_target.name} is currently running deploy of #{deploy_name}.",
+      }.to_json
+    else
+      { available: true }.to_json
+    end
+  end
+
+  post "/api/lock/target/:target_name" do
+    content_type :json
+
+    require_api_authentication!
+    require_api_target!
+    require_api_user!
+
+    # lock the given target
+    output = lock_target!
+    current_target.reload!
+
+    { locked: current_target.is_locked?,
+      output: output,
+    }.to_json
+  end
+
+  post "/api/unlock/target/:target_name" do
+    content_type :json
+
+    require_api_authentication!
+    require_api_target!
+    require_api_user!
+
+    # unlock the given target
+    output = unlock_target!
+    current_target.reload!
+
+    { locked: current_target.is_locked?,
+      output: output,
+    }.to_json
+  end
+
+  post "/api/deploy/target/:target_name" do
+    content_type :json
+
+    require_api_authentication!
+    require_api_target!
+    require_api_user!
+    require_api_repo!
+
+    # start deploy on target
+    deploy = deploy!
+
+    if deploy
+      { deployed: true,
+        status_callback: "/api/status/deploy/#{deploy.id}",
+      }.to_json
+    else
+      # check for locked target, allow user who has it locked to deploy again
+      if !current_target.user_can_deploy?(current_user)
+        { deployed: false,
+          message: "#{current_target.name} is currently locked.",
+        }.to_json
+      else
+        { deployed: false,
+          message: "Unable to deploy."
+        }.to_json
+      end
+    end
+  end
+
+  get "/api/status/deploy/:deploy_id" do
+    content_type :json
+
+    require_api_authentication!
+
+    # get the status of the given deploy
+    deploy = Deploy.where(id: params[:deploy_id].to_i).first unless params[:deploy_id].blank?
+    if deploy
+      { target: deploy.target.name,
+        user: deploy.auth_user.email,
+        repo: deploy.repo.name,
+        what: deploy.what,
+        what_details: deploy.what_details,
+        completed: deploy.completed,
+      }.to_json
+    else
+      { error: true,
+        message: "Unable to find requested deploy.",
+      }.to_json
+    end
   end
 
 end
