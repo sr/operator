@@ -239,18 +239,22 @@ class CanoeApplication < Sinatra::Base
 
   # DEPLOY --------
   post "/deploy/target/:target_name" do
-    deploy = deploy!
+    deploy_response = deploy!
 
-    if deploy
-      redirect "/deploy/#{deploy.id}/watch"
-    else
-      unless current_repo && current_target
+    if !deploy_response[:error] && deploy_response[:deploy]
+      the_deploy = deploy_response[:deploy]
+      redirect "/deploy/#{the_deploy.id}/watch"
+    else # error
+      # missing pieces
+      missing_error_codes = \
+        [DEPLOYLOGIC_ERROR_NO_REPO, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
+      if missing_error_codes.include?(deploy_response[:reason])
         flash[:notice] = "We did not have everything needed to deploy. Try again."
         redirect back
       end
 
       # check for locked target, allow user who has it locked to deploy again
-      unless current_target.user_can_deploy?(current_user)
+      if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
         flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
         redirect back
       end
@@ -379,22 +383,35 @@ class CanoeApplication < Sinatra::Base
     require_api_repo!
 
     # start deploy on target
-    deploy = deploy!
+    deploy_response = deploy!
 
-    if deploy
+    if !deploy_response[:error] && deploy_response[:deploy]
+      the_deploy = deploy_response[:deploy]
       { deployed: true,
-        status_callback: "/api/status/deploy/#{deploy.id}",
+        status_callback: "/api/status/deploy/#{the_deploy.id}",
       }.to_json
-    else
-      # check for locked target, allow user who has it locked to deploy again
-      if !current_target.user_can_deploy?(current_user)
-        { deployed: false,
-          message: "#{current_target.name} is currently locked.",
-        }.to_json
-      else
-        { deployed: false,
-          message: "Unable to deploy."
-        }.to_json
+    else # error
+      case deploy_response[:reason]
+        when DEPLOYLOGIC_ERROR_NO_REPO
+          { deployed: false,
+            message: "Unable to deploy. No repo given."
+          }.to_json
+        when DEPLOYLOGIC_ERROR_NO_TARGET
+          { deployed: false,
+            message: "Unable to deploy. No target given."
+          }.to_json
+        when DEPLOYLOGIC_ERROR_NO_WHAT
+          { deployed: false,
+            message: "Unable to deploy. No branch, tag or commit given."
+          }.to_json
+        when DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
+          { deployed: false,
+            message: "#{current_target.name} is currently locked.",
+          }.to_json
+        else
+          { deployed: false,
+            message: "Unable to deploy. Unknown error."
+          }.to_json
       end
     end
   end

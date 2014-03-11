@@ -267,6 +267,19 @@ describe Canoe do
         assert_match "locked", json_response["message"]
       end
 
+      it "should require a branch, tag or commit" do
+        define_api_user_mock
+        define_repo_mock
+        define_target_mock do |target_mock|
+          target_mock.stubs(:user_can_deploy?).returns(true)
+        end
+
+        api_post "/api/deploy/target/test?repo_name=pardot"
+        assert last_response.ok?
+        assert !json_response["deployed"]
+        assert_match "No branch", json_response["message"]
+      end
+
       it "should indicate deploy and give callback URL" do
         define_api_user_mock
         define_repo_mock
