@@ -432,14 +432,13 @@ class CanoeApplication < Sinatra::Base
     require_api_authentication!
 
     # get the status of the given deploy
-    deploy = Deploy.where(id: params[:deploy_id].to_i).first unless params[:deploy_id].blank?
-    if deploy
-      { target: deploy.target.name,
-        user: deploy.auth_user.email,
-        repo: deploy.repo.name,
-        what: deploy.what,
-        what_details: deploy.what_details,
-        completed: deploy.completed,
+    if current_deploy
+      { target: current_deploy.deploy_target.name,
+        user: current_deploy.auth_user.email,
+        repo: current_deploy.repo_name,
+        what: current_deploy.what,
+        what_details: current_deploy.what_details,
+        completed: current_deploy.completed,
       }.to_json
     else
       { error: true,
