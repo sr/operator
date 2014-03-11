@@ -262,9 +262,7 @@ describe Canoe do
         end
 
         api_post "/api/deploy/target/test?repo_name=pardot"
-        assert last_response.ok?
-        assert !json_response["deployed"]
-        assert_match "locked", json_response["message"]
+        assert_json_error_response("locked")
       end
 
       it "should require a branch, tag or commit" do
@@ -275,9 +273,33 @@ describe Canoe do
         end
 
         api_post "/api/deploy/target/test?repo_name=pardot"
+        assert_json_error_response("No branch")
+      end
+
+      it "should indicate unknown branch" do
+        define_api_user_mock
+        define_repo_mock
+        define_target_mock do |target_mock|
+          target_mock.stubs(:user_can_deploy?).returns(true)
+        end
+        Octokit.expects(:branches).returns([])
+
+        api_post "/api/deploy/target/test?repo_name=pardot&branch=build1234"
+        assert_json_error_response("Invalid branch")
+      end
+
+      it "should indicate unknown tag" do
+        define_api_user_mock
+        define_repo_mock
+        define_target_mock do |target_mock|
+          target_mock.stubs(:user_can_deploy?).returns(true)
+        end
+        Octokit.expects(:tags).returns([])
+
+        api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         assert last_response.ok?
         assert !json_response["deployed"]
-        assert_match "No branch", json_response["message"]
+        assert_match "Invalid tag", json_response["message"]
       end
 
       it "should indicate deploy and give callback URL" do
@@ -287,8 +309,9 @@ describe Canoe do
           target_mock.stubs(:user_can_deploy?).returns(true)
           target_mock.expects(:deploy!).returns(Deploy.new(id: 1234))
         end
+        Octokit.expects(:tags).returns([OpenStruct.new(name: 'build1234')])
 
-        api_post "/api/deploy/target/test?repo_name=pardot&tag=1234"
+        api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         assert last_response.ok?
         assert json_response["deployed"]
         assert_equal "/api/status/deploy/1234", json_response["status_callback"]

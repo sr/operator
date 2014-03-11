@@ -252,11 +252,18 @@ class CanoeApplication < Sinatra::Base
         redirect back
       end
 
+      # check for invalid
+      if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_WHAT
+        flash[:notice] = "Sorry, it appears you specified an unknown #{deploy_response[:what]}."
+        redirect back
+      end
+
       # check for locked target, allow user who has it locked to deploy again
       if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
         flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
         redirect back
       end
+
     end
   end
 
@@ -391,24 +398,28 @@ class CanoeApplication < Sinatra::Base
       }.to_json
     else # error
       case deploy_response[:reason]
-        when DEPLOYLOGIC_ERROR_NO_REPO
-          { deployed: false,
+      when DEPLOYLOGIC_ERROR_NO_REPO # should be handled by guard above
+          { error: true,
             message: "Unable to deploy. No repo given."
           }.to_json
-        when DEPLOYLOGIC_ERROR_NO_TARGET
-          { deployed: false,
+        when DEPLOYLOGIC_ERROR_NO_TARGET # should be handled by guard above
+          { error: true,
             message: "Unable to deploy. No target given."
           }.to_json
         when DEPLOYLOGIC_ERROR_NO_WHAT
-          { deployed: false,
+          { error: true,
             message: "Unable to deploy. No branch, tag or commit given."
           }.to_json
         when DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
-          { deployed: false,
+          { error: true,
             message: "#{current_target.name} is currently locked.",
           }.to_json
+        when DEPLOYLOGIC_ERROR_INVALID_WHAT
+          { error: true,
+            message: "Invalid #{deploy_response[:what]} given."
+          }.to_json
         else
-          { deployed: false,
+          { error: true,
             message: "Unable to deploy. Unknown error."
           }.to_json
       end
