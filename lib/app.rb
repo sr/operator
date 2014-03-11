@@ -26,6 +26,7 @@ require "canoe_guards"
 require "canoe_pagination"
 require "canoe_deploy_logic"
 require "canoe_api"
+require "canoe_git_helpers.rb"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -76,6 +77,7 @@ class CanoeApplication < Sinatra::Base
     include Canoe::Pagination
     include Canoe::DeployLogic
     include Canoe::API
+    include Canoe::GitHelpers
   end
 
   # ---------------------------------------------------------------
@@ -138,16 +140,13 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/tags" do
     guard_against_unknown_repos!
-    @tags = Octokit.tags(current_repo.full_name)
-    @tags = @tags.sort_by { |t| t.name.gsub(/^build/,"").to_i }.reverse
-    @tags = @tags[0,50] # we only really care about the most recent 50?
+    @tags = tags_for_current_repo
     erb :repo
   end
 
   get "/repo/:repo_name/branches" do
     guard_against_unknown_repos!
-    @branches = Octokit.branches(current_repo.full_name)
-    @branches = @branches.sort_by(&:name) # may not really be needed...
+    @branches = branches_for_current_repo
 
     if params[:search]
       @branches = @branches.find_all { |b| b.name =~ /#{params[:search]}/i }
@@ -158,7 +157,7 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/commits" do
     guard_against_unknown_repos!
-    @commits = Octokit.commits(current_repo.full_name)
+    @commits = commits_for_current_repo
     erb :repo
   end
 
