@@ -46,6 +46,16 @@ describe Canoe do
         assert json_response["test"]["locked"]
         assert_equal username, json_response["test"]["locked_by"]
       end
+
+      it "should error if ENV setting is not defined for auth token" do
+        # one test to make sure we are confirming API token isn't nil
+        #     (ie: new or unchanged config on server)
+        before_token = ENV["API_AUTH_TOKEN"]
+        ENV["API_AUTH_TOKEN"] = nil
+        api_get "/api/lock/status"
+        assert_json_error_response("auth token")
+        ENV["API_AUTH_TOKEN"] = before_token # put it back
+      end
     end
   end # /api/lock/status
 
