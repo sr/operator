@@ -157,7 +157,7 @@ module.exports = (robot) ->
     robot.hear /^!yourmom$/i, (msg) ->
         msg.send "http://dl.dropboxusercontent.com/u/45215568/internbot/yourmom4.jpeg"
 
-    robot.hear /its\shappening/i, (msg) ->
+    robot.hear /it\'?s\shappening/i, (msg) ->
         msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
 
     robot.hear /top\smen/i, (msg) ->
