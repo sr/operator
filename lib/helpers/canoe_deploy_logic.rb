@@ -48,7 +48,7 @@ module Canoe
         tags.collect(&:name).include?(what_details)
       when "branch"
         branches = branches_for_current_repo
-        branches.include?(what_details)
+        branches.collect(&:name).include?(what_details)
       when "commit"
         commits = commits_for_current_repo
         found_commits = commits.select do |commit|
