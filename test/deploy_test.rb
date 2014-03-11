@@ -53,6 +53,39 @@ describe Deploy do
           assert last_response.redirect?
         end
 
+        it "should check for existance of branch" do
+          define_repo_mock
+          define_target_mock do |target_mock|
+            target_mock.expects(:user_can_deploy?).returns(true)
+          end
+          Octokit.expects(:branches).returns([])
+
+          post_request_with_auth "/deploy/target/test?repo_name=pardot&branch=foo"
+          assert last_response.redirect?
+        end
+
+        it "should check for existance of tag" do
+          define_repo_mock
+          define_target_mock do |target_mock|
+            target_mock.expects(:user_can_deploy?).returns(true)
+          end
+          Octokit.expects(:tags).returns([])
+
+          post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=foo"
+          assert last_response.redirect?
+        end
+
+        it "should check for existance of commit" do
+          define_repo_mock
+          define_target_mock do |target_mock|
+            target_mock.expects(:user_can_deploy?).returns(true)
+          end
+          Octokit.expects(:commits).returns([])
+
+          post_request_with_auth "/deploy/target/test?repo_name=pardot&commit=foo"
+          assert last_response.redirect?
+        end
+
         it "should deploy if everything is passed" do
           define_repo_mock
           define_target_mock do |target_mock|
@@ -61,8 +94,9 @@ describe Deploy do
             deploy_mock = mock(id: 1234)
             target_mock.expects(:deploy!).returns(deploy_mock)
           end
+          Octokit.expects(:tags).returns([OpenStruct.new(name: 'build5678')])
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=5678"
+          post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=build5678"
           assert last_response.redirect?
           assert_match "/deploy/1234/watch", last_response.location
         end
