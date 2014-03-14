@@ -164,7 +164,7 @@ module.exports = (robot) ->
         msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
 
     robot.hear /top\smen/i, (msg) ->
-        msg.send "http://static3.wikia.nocookie.net/__cb20070924225034/indianajones/images/1/1a/Eaton.jpg"
+        msg.send "http://www.mememaker.net/static/images/memes/3247839.jpg"
 
     robot.hear /^!kyle$/i, (msg) ->
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif"
