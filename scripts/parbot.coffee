@@ -132,6 +132,7 @@ module.exports = (robot) ->
     #   PRIMARY KEY (`id`)
     # ) ENGINE=InnoDB AUTO_INCREMENT=1019 DEFAULT CHARSET=utf8;
     robot.hear /Pardot . Pardot PHP [^#]+ \#(\d*)[^\d]*? passed/, (msg) ->
+        return if msg.message.text.match(/›/g).length isnt 2
         if process.env.BOT_TYPE == 'parbot'
             build_number = msg.match[1]
             # github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
