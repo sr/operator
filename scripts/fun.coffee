@@ -172,6 +172,6 @@ module.exports = (robot) ->
     robot.hear /^!dartz$/i, (msg) ->
         heathers = [
             "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif",
-            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/NK0JncG2mmunLrM/OGxQMW8.gif"
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/AgWDWwpIg1fawXU/dartz_key.gif"
         ]
         msg.send msg.random heathers
