@@ -170,4 +170,8 @@ module.exports = (robot) ->
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif"
 
     robot.hear /^!dartz$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif"
+        heathers = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/NK0JncG2mmunLrM/OGxQMW8.gif"
+        ]
+        msg.send msg.random heathers
