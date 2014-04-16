@@ -171,3 +171,6 @@ module.exports = (robot) ->
 
     robot.hear /^!dartz$/i, (msg) ->
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif"
+
+    robot.hear /^!berg$/i, (msg) ->
+        msg.send "http://i.imgur.com/OGxQMW8.gif"
