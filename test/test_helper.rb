@@ -1,5 +1,6 @@
 # test_helper.rb
-require "cover_me"
+require "simplecov"
+SimpleCov.start
 
 CANOE_TEST_LOADED = true
 

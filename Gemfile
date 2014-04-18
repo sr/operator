@@ -26,6 +26,6 @@ gem "omniauth-google-oauth2"
 
 group :test do
   gem 'mocha'
-  gem 'cover_me', '>= 1.2.0'
+  gem "simplecov", "~> 0.7.1"
   gem "rack-test"
 end

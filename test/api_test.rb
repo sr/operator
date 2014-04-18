@@ -345,9 +345,9 @@ describe Canoe do
 
       it "should give info on status of deploy" do
         deploy = Deploy.new(id: 1, what: "tag", what_details: "1234", completed: true)
-        deploy.expects(:target).returns(OpenStruct.new(name: "test"))
+        deploy.expects(:deploy_target).returns(OpenStruct.new(name: "test"))
         deploy.expects(:auth_user).returns(OpenStruct.new(email: "sveader@salesforce.com"))
-        deploy.expects(:repo).returns(OpenStruct.new(name: "pardot"))
+        # deploy.expects(:repo).returns(OpenStruct.new(name: "pardot"))
 
         assoc_mock = mock
         assoc_mock.expects(:first).returns(deploy)
