@@ -8,6 +8,7 @@ module Canoe
     end
 
     def branches_for_current_repo
+      Octokit.auto_paginate = true
       branches = Octokit.branches(current_repo.full_name)
       branches.sort_by(&:name) # may not really be needed...
     end
