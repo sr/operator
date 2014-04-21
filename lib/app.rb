@@ -67,7 +67,7 @@ class CanoeApplication < Sinatra::Base
     # under veader@gmail.com account ... :(
     use OmniAuth::Builder do
       provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_SECRET"],
-               { name: "google", access_type: "online" }
+               { name: "google", access_type: "online", prompt: "consent" }
     end
   end
 
