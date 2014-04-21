@@ -132,6 +132,13 @@ class CanoeApplication < Sinatra::Base
     end
   end
 
+  get_or_post "/auth/failure" do
+    session.clear
+    @auth_hash = request.env["omniauth.auth"]
+    @failure_message = params[:message]
+    erb :auth_failure
+  end
+
   # REPO --------
   get "/repo/:repo_name" do
     guard_against_unknown_repos!
