@@ -67,8 +67,10 @@ class CanoeApplication < Sinatra::Base
     # under veader@gmail.com account ... :(
     use OmniAuth::Builder do
       provider :google_oauth2, ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_SECRET"],
-               { name: "google", access_type: "online", prompt: "consent" }
+               { name: "google", access_type: "online" }
+      # prompt: "consent" # <-- add to hash to "force" reset
     end
+    OmniAuth.config.logger = Logger.new("log/canoe.log")
   end
 
   # ---------------------------------------------------------------
@@ -106,7 +108,6 @@ class CanoeApplication < Sinatra::Base
 
     user = AuthUser.find_or_create_by_omniauth(auth_hash)
     if user && user.valid?
-      puts "We have user #{user.id}"
       session[:user_id] = user.id
 
       # redirect to the requested URL if we have one stashed
@@ -120,7 +121,6 @@ class CanoeApplication < Sinatra::Base
 
       redirect "/"
     else
-      puts "We did NOT find or create a user!!"
       session[:user_id] = nil
       error_str = "Unable to authenticate."
 
