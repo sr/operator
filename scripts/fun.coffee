@@ -167,7 +167,11 @@ module.exports = (robot) ->
         msg.send "http://www.mememaker.net/static/images/memes/3247839.jpg"
 
     robot.hear /^!kyle$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif"
+        kyles = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/ogs5mDtO3vkv885/output.gif",
+        ]
+        msg.send msg.random kyles
 
     robot.hear /^!dartz$/i, (msg) ->
         heathers = [
