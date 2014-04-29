@@ -169,7 +169,7 @@ module.exports = (robot) ->
     robot.hear /^!kyle$/i, (msg) ->
         kyles = [
             "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif",
-            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/ogs5mDtO3vkv885/output.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/312472/pwM5kPVFC0LDZLi/KyleTreadmill-copy4.gif",
         ]
         msg.send msg.random kyles
 
