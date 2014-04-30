@@ -12,7 +12,7 @@ module Canoe
     end
 
     def current_repo
-      return nil unless %w[pardot symfony].include?((params[:repo_name] || '').downcase)
+      return nil unless %w[pardot symfony pithumbs].include?((params[:repo_name] || '').downcase)
       @_current_repo ||= Octokit.repo("pardot/#{params[:repo_name]}")
     end
 
