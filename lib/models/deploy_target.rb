@@ -86,6 +86,7 @@ class DeployTarget < ActiveRecord::Base
     cmd_pieces = []
     cmd_pieces << "PATH=$PATH:/usr/local/bin"
     cmd_pieces << self.script_path + "/ship-it.rb"
+    cmd_pieces << self.name.downcase
     cmd_pieces << options[:repo].name
     cmd_pieces << "#{options[:what]}=#{options[:what_details]}"
 
