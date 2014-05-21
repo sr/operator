@@ -31,7 +31,7 @@ class Deploy < ActiveRecord::Base
   def process_still_running?
     # look in the process list for our process ID.
     #     - remove any zombie process listings
-    check = `ps cax | grep -v "\sZ[+]\\?\s" | grep -e "^\s*#{self.process_id}\s"`
+    check = `ps cax | grep -v "\sZ[+]*\s" | grep -e "^\s*#{self.process_id}\s"`
     !check.blank?
   end
 
