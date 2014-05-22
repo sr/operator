@@ -116,7 +116,7 @@ class DeployTarget < ActiveRecord::Base
 
   def reset_database!(options = {})
     # gather the location of the pardot deploy
-    directory = `#{self.script_path}/ship-it.rb --remote-pardot-path`.chomp
+    directory = `#{self.script_path}/ship-it.rb #{self.name.downcase} --remote-pardot-path`.chomp
     cmd_pieces = []
     cmd_pieces << "cd #{directory};"
     if self.name == "dev"

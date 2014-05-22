@@ -3,6 +3,7 @@ module Canoe
     def lock_target!
       cmd_pieces = []
       cmd_pieces << current_target.script_path + "/ship-it.rb"
+      cmd_pieces << current_target.name.downcase
       cmd_pieces << "--only-lock"
       cmd_pieces << "--user=#{current_user.email}"
 
@@ -15,6 +16,7 @@ module Canoe
     def unlock_target!(with_force=false)
       cmd_pieces = []
       cmd_pieces << current_target.script_path + "/ship-it.rb"
+      cmd_pieces << current_target.name.downcase
       cmd_pieces << (with_force ? "--force-unlock" : "--unlock")
       cmd_pieces << "--user=#{current_user.email}"
 
