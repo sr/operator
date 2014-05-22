@@ -76,6 +76,17 @@ class DeployTarget < ActiveRecord::Base
     self.file_lock_user == user.email
   end
 
+  def shipit_command(cmd_options=[])
+    cmd_pieces = []
+    cmd_pieces << "PATH=$PATH:/usr/local/bin"
+    cmd_pieces << self.script_path + "/ship-it.rb"
+    cmd_pieces << self.name.downcase # always pass env
+    cmd_pieces << "--no-color" # we don't need color here
+
+    cmd_pieces += cmd_options
+    cmd_pieces.join(" ")
+  end
+
   def deploy!(options = {})
     [:user, :repo, :what, :what_details].each do |arg|
       unless options.keys.include?(arg)
@@ -83,12 +94,10 @@ class DeployTarget < ActiveRecord::Base
       end
     end
 
-    cmd_pieces = []
-    cmd_pieces << "PATH=$PATH:/usr/local/bin"
-    cmd_pieces << self.script_path + "/ship-it.rb"
-    cmd_pieces << self.name.downcase
-    cmd_pieces << options[:repo].name
-    cmd_pieces << "#{options[:what]}=#{options[:what_details]}"
+    # build options ot pass to ship-it
+    cmd_options = []
+    cmd_options << options[:repo].name
+    cmd_options << "#{options[:what]}=#{options[:what_details]}"
 
     # need to go ahead and create this since we need the ID to pass to ship-it
     deploy = self.deploys.create( auth_user: options[:user],
@@ -98,16 +107,16 @@ class DeployTarget < ActiveRecord::Base
                                   completed: false,
                                   )
 
-    cmd_pieces << "--lock" if options[:lock]
-    cmd_pieces << "--user=#{options[:user].email}"
-    cmd_pieces << "--deploy-id=#{deploy.id}"
-    cmd_pieces << "--no-confirmations"
-    cmd_pieces << "&> #{deploy.log_path}"
+    cmd_options << "--lock" if options[:lock]
+    cmd_options << "--user=#{options[:user].email}"
+    cmd_options << "--deploy-id=#{deploy.id}"
+    cmd_options << "--no-confirmations"
+    cmd_options << "&> #{deploy.log_path}"
 
     self.lock!(options[:user]) if options[:lock]
 
     # spawn process to run this...
-    shipit_pid = spawn(cmd_pieces.join(" "))
+    shipit_pid = spawn(shipit_command(cmd_options))
     deploy.update_attribute(:process_id, shipit_pid)
 
     # return the deploy for good measure
@@ -116,7 +125,8 @@ class DeployTarget < ActiveRecord::Base
 
   def reset_database!(options = {})
     # gather the location of the pardot deploy
-    directory = `#{self.script_path}/ship-it.rb #{self.name.downcase} --remote-pardot-path`.chomp
+    cmd = shipit_command(["--remote-pardot-path"])
+    directory = `#{cmd}`.chomp
     cmd_pieces = []
     cmd_pieces << "cd #{directory};"
     if self.name == "dev"
