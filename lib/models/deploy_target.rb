@@ -81,9 +81,9 @@ class DeployTarget < ActiveRecord::Base
     cmd_pieces << "PATH=$PATH:/usr/local/bin"
     cmd_pieces << self.script_path + "/ship-it.rb"
     cmd_pieces << self.name.downcase # always pass env
+    cmd_pieces += cmd_options
     cmd_pieces << "--no-color" # we don't need color here
 
-    cmd_pieces += cmd_options
     cmd_pieces.join(" ")
   end
 
