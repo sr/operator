@@ -21,7 +21,7 @@ module.exports = (robot) ->
         msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306030/e3Xgb1wrgi4vDVF/26871.gif"
 
     robot.hear /^!toiletnuggets$/i, (msg) ->
-        msg.send "http://1-ps.googleusercontent.com/x/www.dailydawdle.com/images.dailydawdle.com/how-to-flush-56-nuggets.gif.pagespeed.ce.xFOeLk3OWO.gif"
+        msg.send "http://i.imgur.com/LUi0ncH.gif"
 
     robot.hear /^!beyonce/i, (msg) ->
         charisma = [
@@ -167,7 +167,15 @@ module.exports = (robot) ->
         msg.send "http://www.mememaker.net/static/images/memes/3247839.jpg"
 
     robot.hear /^!kyle$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif"
+        kyles = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/306033/D6SQIZKD7rsl5ut/output1.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/312472/pwM5kPVFC0LDZLi/KyleTreadmill-copy4.gif",
+        ]
+        msg.send msg.random kyles
 
     robot.hear /^!dartz$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif"
+        heathers = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/k6BTryyIKTIBTd8/dartz.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/AgWDWwpIg1fawXU/dartz_key.gif"
+        ]
+        msg.send msg.random heathers
