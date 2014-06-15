@@ -16,7 +16,7 @@
 module.exports = (robot) ->
   robot.respond /beer me (.*)/i, (msg) ->
     unless process.env.BREWERYDB_API_KEY?
-      msg.send "Please sepcify your BreweyDB API key in BREWERYDB_API_KEY"
+      msg.send "Please specify your BreweyDB API key in BREWERYDB_API_KEY"
       return
     msg.http("http://api.brewerydb.com/v2/search")
       .query
@@ -41,4 +41,8 @@ module.exports = (robot) ->
             response += "\nABV:  #{beer['abv']}%"
           if beer['ibu']?
             response += "\nIBU:  #{beer['ibu']}"
+          if beer['description']?
+            response += "\nDescription:   #{beer['description']}"
+          if beer['foodPairings']?
+            response += "\nFood Pairings:   #{beer['foodPairings']}"
           msg.send response

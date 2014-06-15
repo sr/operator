@@ -3,7 +3,7 @@
 #
 # Dependencies:
 #   "htmlparser": "1.7.6"
-#   "soupselect: "0.2.0"
+#   "soupselect": "0.2.0"
 #   "jsdom": "0.2.14"
 #   "underscore": "1.3.3"
 #
@@ -32,7 +32,7 @@ module.exports = (robot) ->
 
 get_quote = (msg, quotes) ->
 
-  nodeChildren = _.flatten childern_of_type(quotes[Math.floor(Math.random() * quotes.length)])
+  nodeChildren = _.flatten children_of_type(quotes[Math.floor(Math.random() * quotes.length)])
   quote = (textNode.data for textNode in nodeChildren).join(' ').replace(/^\s+|\s+$/g, '')
 
   msg.send quote
@@ -45,11 +45,11 @@ parse_html = (html, selector) ->
   parser.parseComplete html
   Select handler.dom, selector
 
-childern_of_type = (root) ->
+children_of_type = (root) ->
   return [root] if root?.type is "text"
 
   if root?.children?.length > 0
-    return (childern_of_type(child) for child in root.children)
+    return (children_of_type(child) for child in root.children)
 
 get_dom = (xml) ->
   body = JsDom.jsdom(xml)

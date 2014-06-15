@@ -2,10 +2,20 @@
 #   Set your availability status so people know whether they're able to come
 #   over and chat with you or ping you over IM.
 #
+# Dependencies:
+#   None
+#
+# Configuration:
+#   None
+#
 # Commands:
 #   hubot is <user> available - Find out if the specified user is available or not
 #   hubot i am <available|free|not busy|at hand> - Set that you are available
 #   hubot i am <unavailable|dnd|do not disturb|busy|in the zone> - Setthat you are not available
+#
+# Author:
+#   tombell
+
 module.exports = (robot) ->
 
   # Find the user by user name from hubot's brain.
@@ -15,7 +25,7 @@ module.exports = (robot) ->
   # Returns a user object if a single user is found, an array of users if more
   # than one user matched the name or false if no user is found.
   findUser = (name) ->
-    users = robot.usersForFuzzyName name
+    users = robot.brain.usersForFuzzyName name
     if users.length is 1
       users[0]
     else if users.length > 1

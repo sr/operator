@@ -7,6 +7,10 @@ class Response
   # message - A Message instance.
   # match   - A Match object from the successful Regex match.
   constructor: (@robot, @message, @match) ->
+    @envelope =
+      room: @message.room
+      user: @message.user
+      message: @message
 
   # Public: Posts a message back to the chat source
   #
@@ -15,16 +19,16 @@ class Response
   #
   # Returns nothing.
   send: (strings...) ->
-    @robot.adapter.send @message.user, strings...
+    @robot.adapter.send @envelope, strings...
 
-  # Public: Posts a topic changing message
+  # Public: Posts an emote back to the chat source
   #
-  # strings - One or more strings to set as the topic of the
-  #           room the bot is in.
+  # strings - One or more strings to be posted. The order of these strings
+  #           should be kept intact.
   #
   # Returns nothing.
-  topic: (strings...) ->
-    @robot.adapter.topic @message.user, strings...
+  emote: (strings...) ->
+    @robot.adapter.emote @envelope, strings...
 
   # Public: Posts a message mentioning the current user.
   #
@@ -33,7 +37,34 @@ class Response
   #
   # Returns nothing.
   reply: (strings...) ->
-    @robot.adapter.reply @message.user, strings...
+    @robot.adapter.reply @envelope, strings...
+
+  # Public: Posts a topic changing message
+  #
+  # strings - One or more strings to set as the topic of the
+  #           room the bot is in.
+  #
+  # Returns nothing.
+  topic: (strings...) ->
+    @robot.adapter.topic @envelope, strings...
+
+  # Public: Play a sound in the chat source
+  #
+  # strings - One or more strings to be posted as sounds to play. The order of
+  #           these strings should be kept intact.
+  #
+  # Returns nothing
+  play: (strings...) ->
+    @robot.adapter.play @envelope, strings...
+
+  # Public: Posts a message in an unlogged room
+  #
+  # strings - One or more strings to be posted. The order of these strings
+  #           should be kept intact.
+  #
+  # Returns nothing
+  locked: (strings...) ->
+    @robot.adapter.locked @envelope, strings...
 
   # Public: Picks a random item from the given items.
   #

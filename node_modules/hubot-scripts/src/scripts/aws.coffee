@@ -24,7 +24,7 @@
 #   cloudwatch:GetMetricStatistics, cloudwatch:Describe*, autoscaling:Describe*
 #
 # Author:
-#   Ethan J. Brown
+#   Iristyle
 
 key = process.env.HUBOT_AWS_ACCESS_KEY_ID
 secret = process.env.HUBOT_AWS_SECRET_ACCESS_KEY
@@ -98,8 +98,8 @@ getRegionInstances = (region, msg) ->
           arch = instance.architecture
           devType = instance.rootDeviceType
 
-          tags = _.flatten [instance.tagSet.item]
-          name = (_.find tags, (t) -> t.key == 'Name').value
+          tags = _.flatten [instance.tagSet?.item ? []]
+          name = (_.find tags, (t) -> t.key == 'Name')?.value ? 'missing'
 
           msg.send "#{prefix} [#{state}] - #{name} / #{type} [#{devType} #{arch}] / #{dnsName} / #{region} / #{id} - started #{launchTime} #{suffix}"
 

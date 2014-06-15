@@ -41,16 +41,25 @@ module.exports = (robot) ->
       return
 
     #get <user>'s phone number as listed in the brain
-    if user = robot.userForName(to)
+    if user = robot.brain.userForName(to)
       if user.phone == ""
         msg.send user.name + ' has no phone! set it with <user> has phone <phone>'
         return
       else
         to = user.phone
         to = to.toString().replace(/\d/, '+46')
-    else
-      msg.send 'Me cant find ' + to + ', are you sure that person is born?'
-      return    
+    else 
+      users = robot.brain.usersForFuzzyName(to)
+      if users.length is 1
+        user = users[0]
+        to = user.phone
+        to = to.toString().replace(/\d/, '+46')
+      else if users.length > 1
+        msg.send getAmbiguousUserText users
+        return
+      else
+        msg.send 'Me cant find ' + to + ', are you sure that person is born?'
+        return    
 
     data  = QS.stringify from: from, to: to, message: bahdy
 
@@ -69,7 +78,7 @@ module.exports = (robot) ->
     phone = msg.match[2].trim()
 
   
-    users = robot.usersForFuzzyName(name)
+    users = robot.brain.usersForFuzzyName(name)
     if users.length is 1
       user = users[0]
       if user.phone == phone
@@ -86,7 +95,7 @@ module.exports = (robot) ->
 
   robot.respond /@?give me the phone number to ([\w .-_]+)*/i, (msg) ->
     name  = msg.match[1]
-    users = robot.usersForFuzzyName(name)
+    users = robot.brain.usersForFuzzyName(name)
     if users.length is 1
       user = users[0]
       if user.phone.length < 1
