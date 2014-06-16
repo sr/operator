@@ -28,7 +28,8 @@
     "jquery": "1.7.x",
     "scraper": "0.0.9",
     "cheerio": "0.9.x",
-    "sprintf": "~0.1.1"
+    "sprintf": "~0.1.1",
+    "twit" : "1.1.15"
   },
 
   "engines": {
