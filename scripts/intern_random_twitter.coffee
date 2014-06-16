@@ -1,28 +1,28 @@
-Twit  =  require 'twit'
-_     =  require 'underscore'
-
-T = new Twit
-  consumer_key:         process.env.TWITTER_CONSUMER_KEY
-  consumer_secret:      process.env.TWITTER_CONSUMER_SECRET
-  access_token:         process.env.TWITTER_ACCESS_TOKEN
-  access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET
-
-Commands = [
-  { command: /^!antijoke/, user: 'antijokecat' }
-  { command: /^!uberfact/, user: 'uberfacts' }
-  { command: /^!borat/,    user: 'devops_borat' }
-  { command: /^!grimlock/, user: 'fakegrimlock' }
-  { command: /^!nph/,      user: 'ActuallyNPH' }
-  { command: /^!drunkhulk/, user: 'DrunkHulk' }
-  { command: /^!deathstar/, user: 'DeathStarPR' }
-  { command: /^!yoda/, user: 'yoda' }
-  { command: /^!couragewolf/, user: 'courage_wolf' }
-  { command: /^!compscifact/, user: 'compscifact' }
-]
-
 module.exports = (robot) ->
   if process.env.BOT_TYPE != 'internbot'
     return
+
+  Twit  =  require 'twit'
+  _     =  require 'underscore'
+
+  T = new Twit
+    consumer_key:         process.env.TWITTER_CONSUMER_KEY
+    consumer_secret:      process.env.TWITTER_CONSUMER_SECRET
+    access_token:         process.env.TWITTER_ACCESS_TOKEN
+    access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET
+
+  Commands = [
+    { command: /^!antijoke/, user: 'antijokecat' }
+    { command: /^!uberfact/, user: 'uberfacts' }
+    { command: /^!borat/,    user: 'devops_borat' }
+    { command: /^!grimlock/, user: 'fakegrimlock' }
+    { command: /^!nph/,      user: 'ActuallyNPH' }
+    { command: /^!drunkhulk/, user: 'DrunkHulk' }
+    { command: /^!deathstar/, user: 'DeathStarPR' }
+    { command: /^!yoda/, user: 'yoda' }
+    { command: /^!couragewolf/, user: 'courage_wolf' }
+    { command: /^!compscifact/, user: 'compscifact' }
+  ]
 
   for command in Commands
     do (command) ->
