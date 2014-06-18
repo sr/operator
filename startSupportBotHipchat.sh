@@ -12,8 +12,8 @@ export HUBOT_CAT_PORT="7891"
 export PORT="7895"
 
 # Database settings
-export DB_USER="root"
-export DB_PASSWORD="poop"
+export DB_USER="bot"
+export DB_PASSWORD="BotSnack.2014"
 export QUOTE_DATABASE="support_quotes"
 
 export HUBOT_LOG_LEVEL="debug"  # This helps to see what Hubot is doing

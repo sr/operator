@@ -12,8 +12,8 @@ export HUBOT_CAT_PORT="7896"
 export PORT="7897"
 
 # Database settings
-export DB_USER="root"
-export DB_PASSWORD="poop"
+export DB_USER="bot"
+export DB_PASSWORD="BotSnack.2014"
 export QUOTE_DATABASE="pardot_quotes"
 export RELEASE_DATABASE="pardot_releases"
 export KPI_DATABASE="pardot_kpis"
