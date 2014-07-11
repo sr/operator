@@ -1,26 +1,23 @@
 module Canoe
   module Locking
     def lock_target!
-      cmd_pieces = []
-      cmd_pieces << current_target.script_path + "/ship-it.rb"
-      cmd_pieces << "--only-lock"
-      cmd_pieces << "--user=#{current_user.email}"
+      cmd_options = ["--only-lock", "--user=#{current_user.email}"]
+      cmd = current_target.shipit_command(cmd_options)
 
       current_target.lock!(current_user)
 
-      output = `#{cmd_pieces.join(" ")}`
+      output = `#{cmd}`
       flash[:notice] = output
     end
 
     def unlock_target!(with_force=false)
-      cmd_pieces = []
-      cmd_pieces << current_target.script_path + "/ship-it.rb"
-      cmd_pieces << (with_force ? "--force-unlock" : "--unlock")
-      cmd_pieces << "--user=#{current_user.email}"
+      cmd_options = ["--user=#{current_user.email}"]
+      cmd_options << (with_force ? "--force-unlock" : "--unlock")
+      cmd = current_target.shipit_command(cmd_options)
 
       current_target.unlock!(current_user, with_force)
 
-      output = `#{cmd_pieces.join(" ")}`
+      output = `#{cmd}`
       flash[:notice] = output
     end
   end
