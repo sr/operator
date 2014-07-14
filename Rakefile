@@ -89,6 +89,17 @@ namespace :canoe do
     ) if !staging_env
   end
 
+  desc "Create deploy target for production env"
+  task :create_prod_targets do
+    prod_env = DeployTarget.where(name: "prod").first
+    DeployTarget.create(
+      name: "Prod",
+      script_path: "/opt/sync/production",
+      lock_path: "/var/lock/production",
+      locked: false,
+    ) unless prod_env
+  end
+
 end
 
 # ----------------------------------------------------------------------------
