@@ -91,9 +91,9 @@ namespace :canoe do
 
   desc "Create deploy target for production env"
   task :create_prod_targets do
-    prod_env = DeployTarget.where(name: "prod").first
+    prod_env = DeployTarget.where(name: "production").first
     DeployTarget.create(
-      name: "Prod",
+      name: "production",
       script_path: "/opt/sync/production",
       lock_path: "/var/lock/production",
       locked: false,
