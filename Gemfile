@@ -14,6 +14,7 @@ gem "tux"
 
 # other ----
 gem "octokit"
+gem "capistrano", "2.15.5"
 
 # database ----
 gem "sinatra-activerecord"
