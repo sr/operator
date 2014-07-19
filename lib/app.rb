@@ -63,6 +63,12 @@ class CanoeApplication < Sinatra::Base
   if ENV["RACK_ENV"] == "development"
     use OmniAuth::Strategies::Developer
   else
+    if ENV["RACK_ENV"] == "production"
+      OmniAuth.config.full_host = "https://canoe.pardot.com"
+    elsif ENV["RACK_ENV"] == "app.dev"
+      OmniAuth.config.full_host = "http://canoe.dev.pardot.com"
+    end
+
     # keys found here: https://cloud.google.com/console
     # under veader@gmail.com account ... :(
     use OmniAuth::Builder do
