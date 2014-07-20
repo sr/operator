@@ -1,15 +1,21 @@
 module Canoe
   module EnvTests
-    def self.is_development?
-      ENV["RACK_ENV"] == "development"
+    def self.included(base)
+      base.extend(ClassMethods)
     end
 
-    def self.is_app_dev?
-      ENV["RACK_ENV"] == "app.dev"
-    end
+    module ClassMethods
+      def is_development?
+        ENV["RACK_ENV"] == "development"
+      end
 
-    def self.is_production?
-      ENV["RACK_ENV"] == "production"
+      def is_app_dev?
+        ENV["RACK_ENV"] == "app.dev"
+      end
+
+      def is_production?
+        ENV["RACK_ENV"] == "production"
+      end
     end
 
   end
