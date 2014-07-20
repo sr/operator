@@ -60,12 +60,12 @@ class CanoeApplication < Sinatra::Base
 
   use Rack::Flash, :sweep => true
 
-  if ENV["RACK_ENV"] == "development"
+  if is_development?
     use OmniAuth::Strategies::Developer
   else
-    if ENV["RACK_ENV"] == "production"
+    if is_production?
       OmniAuth.config.full_host = "https://canoe.pardot.com"
-    elsif ENV["RACK_ENV"] == "app.dev"
+    elsif is_app_dev?
       OmniAuth.config.full_host = "http://canoe.dev.pardot.com"
     end
 
