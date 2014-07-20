@@ -51,6 +51,16 @@ class CanoeApplication < Sinatra::Base
   # set :raise_errors, true
   # set :show_exceptions, true
 
+  # ---------------------------------------------------------------
+  helpers do
+    include Canoe::Helpers
+    include Canoe::Pagination
+    include Canoe::DeployLogic
+    include Canoe::API
+    include Canoe::GitHelpers
+  end
+
+  # ---------------------------------------------------------------
   # enable :sessions # use explicit so we can set session secret
   use Rack::Session::Cookie, {  key: "rack.session",
                                 path: "/",
@@ -77,15 +87,6 @@ class CanoeApplication < Sinatra::Base
       # prompt: "consent" # <-- add to hash to "force" reset
     end
     OmniAuth.config.logger = Logger.new("log/canoe.log")
-  end
-
-  # ---------------------------------------------------------------
-  helpers do
-    include Canoe::Helpers
-    include Canoe::Pagination
-    include Canoe::DeployLogic
-    include Canoe::API
-    include Canoe::GitHelpers
   end
 
   # ---------------------------------------------------------------
