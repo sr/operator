@@ -26,7 +26,8 @@ require "canoe_guards"
 require "canoe_pagination"
 require "canoe_deploy_logic"
 require "canoe_api"
-require "canoe_git_helpers.rb"
+require "canoe_git_helpers"
+require "canoe_env"
 
 Time.zone = "UTC"
 ActiveRecord::Base.default_timezone = :utc
@@ -37,6 +38,7 @@ class CanoeApplication < Sinatra::Base
   include Canoe::Authentication
   include Canoe::Locking
   include Canoe::Guards
+  include Canoe::EnvTests
 
   register Sinatra::ActiveRecordExtension
   register Sinatra::Partial
@@ -51,16 +53,6 @@ class CanoeApplication < Sinatra::Base
   # set :raise_errors, true
   # set :show_exceptions, true
 
-  # ---------------------------------------------------------------
-  helpers do
-    include Canoe::Helpers
-    include Canoe::Pagination
-    include Canoe::DeployLogic
-    include Canoe::API
-    include Canoe::GitHelpers
-  end
-
-  # ---------------------------------------------------------------
   # enable :sessions # use explicit so we can set session secret
   use Rack::Session::Cookie, {  key: "rack.session",
                                 path: "/",
@@ -87,6 +79,15 @@ class CanoeApplication < Sinatra::Base
       # prompt: "consent" # <-- add to hash to "force" reset
     end
     OmniAuth.config.logger = Logger.new("log/canoe.log")
+  end
+
+  # ---------------------------------------------------------------
+  helpers do
+    include Canoe::Helpers
+    include Canoe::Pagination
+    include Canoe::DeployLogic
+    include Canoe::API
+    include Canoe::GitHelpers
   end
 
   # ---------------------------------------------------------------
