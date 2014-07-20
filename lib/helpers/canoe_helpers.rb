@@ -5,7 +5,7 @@ module Canoe
     end
 
     def protocol_for_includes
-      use_https? ? "https" : "https"
+      use_https? ? "https" : "http"
     end
 
     # ----------------------------------------------------------------------
