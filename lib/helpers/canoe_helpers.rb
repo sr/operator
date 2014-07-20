@@ -1,8 +1,7 @@
 module Canoe
   module Helpers
-
     def use_https?
-      is_production?
+      self.class.is_production?
     end
 
     def protocol_for_includes

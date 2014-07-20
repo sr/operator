@@ -1,14 +1,14 @@
 module Canoe
   module EnvTests
-    def is_development?
+    def self.is_development?
       ENV["RACK_ENV"] == "development"
     end
 
-    def is_app_dev?
+    def self.is_app_dev?
       ENV["RACK_ENV"] == "app.dev"
     end
 
-    def is_production?
+    def self.is_production?
       ENV["RACK_ENV"] == "production"
     end
 
