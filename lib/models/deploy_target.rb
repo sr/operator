@@ -78,8 +78,8 @@ class DeployTarget < ActiveRecord::Base
 
   def shipit_command(cmd_options=[])
     cmd_pieces = []
-    cmd_pieces << "PATH=$PATH:/usr/local/bin"
-    cmd_pieces << self.script_path + "/ship-it.rb"
+    cmd_pieces << "cd #{self.script_path} &>/dev/null;"
+    cmd_pieces << "PATH=$PATH:/usr/local/bin bundle exec ./ship-it.rb"
     cmd_pieces << self.name.downcase # always pass env
     cmd_pieces += cmd_options
     cmd_pieces << "--no-color" # we don't need color here

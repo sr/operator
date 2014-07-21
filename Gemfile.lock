@@ -121,7 +121,7 @@ DEPENDENCIES
   rack
   rack-flash3
   rack-test
-  rake (= 10.1.0)
+  rake
   simplecov (~> 0.7.1)
   sinatra
   sinatra-activerecord
