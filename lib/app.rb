@@ -159,6 +159,14 @@ class CanoeApplication < Sinatra::Base
     erb :repo
   end
 
+  get "/repo/:repo_name/tags/latest" do
+    guard_against_unknown_repos!
+    tags = tags_for_current_repo
+    @tag = tags.first
+    @full_tag = full_tag_info(@tag)
+    erb :repo
+  end
+
   get "/repo/:repo_name/branches" do
     guard_against_unknown_repos!
     @branches = branches_for_current_repo

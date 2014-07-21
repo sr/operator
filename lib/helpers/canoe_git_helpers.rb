@@ -17,5 +17,14 @@ module Canoe
       Octokit.commits(current_repo.full_name)
     end
 
+    def full_tag_info(tag)
+      ref = Octokit.ref(current_repo.full_name, "tags/#{tag.name}")
+      if ref
+        Octokit.tag(current_repo.full_name, ref.object.sha)
+      else
+        nil
+      end
+    end
+
   end
 end

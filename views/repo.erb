@@ -56,11 +56,18 @@
     <%= partial :'partials/branches', locals: { branches: @branches } %>
   <% elsif @commits %>
     <%= partial :'partials/commits', locals: { commits: @commits } %>
+  <% elsif @tag %>
+    <%= partial :'partials/latest_tag', locals: { tag: @tag, full_tag: @full_tag } %>
   <% else %>
     <div class="container">
       <h3 class="muted"><i class="icon-circle-arrow-up"></i>
         Select where to grab the code.
       </h3>
+      <br>
+      <h4>
+        Or deploy the
+        <a href="<%= repo_path %>/tags/latest"><i class="icon-tags"></i> latest tag</a>
+      </h4>
     </div>
   <% end %>
 </div>
