@@ -70,7 +70,7 @@ module.exports = (robot) ->
             hipchat_client = new HipChatClient process.env.HUBOT_HIPCHAT_API_KEY
 
             conn = util.getReleaseDBConn()
-            conn.query 'SELECT * FROM builds ORDER BY ID DESC limit ' + number, (err,r,f) ->
+            conn.query 'SELECT * FROM builds ORDER BY build_number DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
@@ -89,7 +89,7 @@ module.exports = (robot) ->
     robot.hear /^!ondeck/, (msg) ->
         if process.env.BOT_TYPE == 'parbot'
             conn = util.getReleaseDBConn()
-            conn.query 'SELECT * FROM builds ORDER BY ID DESC LIMIT 1', [], (err,r,f) ->
+            conn.query 'SELECT * FROM builds ORDER BY build_number DESC LIMIT 1', [], (err,r,f) ->
                 if r and r[0] and r[0].build_number
                     last_build = r[0].build_number
 
