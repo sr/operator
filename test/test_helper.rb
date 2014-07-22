@@ -22,7 +22,7 @@ require "mocha/setup"
 require "rack/test"
 require "app"
 
-ActiveRecord::Base.logger.level = 1
+# ActiveRecord::Base.logger.level = 1
 # I18n.enforce_available_locales = false
 
 def json_response

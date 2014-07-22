@@ -157,7 +157,7 @@ describe Canoe do
         define_api_user_mock
         define_target_mock do |target_mock|
           # make sure shell command just echos and exits
-          target_mock.expects(:script_path).returns("echo 'test'; exit 0;")
+          target_mock.expects(:script_path).returns("~; echo 'test'; exit 0;")
           target_mock.expects(:lock!)
           target_mock.expects(:reload!)
           target_mock.expects(:is_locked?).returns(true)
@@ -204,7 +204,7 @@ describe Canoe do
         define_api_user_mock
         define_target_mock do |target_mock|
           # make sure shell command just echos and exits
-          target_mock.expects(:script_path).returns("echo 'test'; exit 0;")
+          target_mock.expects(:script_path).returns("~; echo 'test'; exit 0;")
           target_mock.expects(:unlock!)
           target_mock.expects(:reload!)
           target_mock.expects(:is_locked?).returns(false)
