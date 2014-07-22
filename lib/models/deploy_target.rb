@@ -81,8 +81,8 @@ class DeployTarget < ActiveRecord::Base
     cmd_pieces << "cd #{self.script_path} &>/dev/null;"
     cmd_pieces << "PATH=$PATH:/usr/local/bin bundle exec ./ship-it.rb"
     cmd_pieces << self.name.downcase # always pass env
-    cmd_pieces += cmd_options
     cmd_pieces << "--no-color" # we don't need color here
+    cmd_pieces += cmd_options
 
     cmd_pieces.join(" ")
   end
@@ -110,6 +110,7 @@ class DeployTarget < ActiveRecord::Base
     cmd_options << "--lock" if options[:lock]
     cmd_options << "--user=#{options[:user].email}"
     cmd_options << "--deploy-id=#{deploy.id}"
+    cmd_options << "--servers=#{options[:servers]}" if options[:servers]
     cmd_options << "--no-confirmations"
     cmd_options << "&> #{deploy.log_path}"
 
