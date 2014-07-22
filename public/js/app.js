@@ -32,6 +32,11 @@ $(function(){
 		$('#lock-hider').hide();
 	});
 
+  $('.js-servers-toggle').click(function(event) {
+    var serverDiv = $(this).attr('data-divname');
+    $('#'+serverDiv).toggle();
+  });
+
 	$('.js-confirm').submit(function() {
     var confirmText = $(this).attr('data-confirm');
     return confirm(confirmText.replace(/<br\s*\/?>/mg,"\n"));

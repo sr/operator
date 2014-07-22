@@ -43,6 +43,15 @@
 
 .half-well {
   width: 50%;
+  padding:5px 20px;
+}
+
+.under {
+  border-bottom: 1px solid #CCC;
+}
+
+.form-wide {
+  width:100%;
 }
 
 @font-face {

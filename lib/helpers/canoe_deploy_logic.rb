@@ -30,6 +30,11 @@ module Canoe
         end
       end
 
+      # gather any servers that might be specified
+      if params[:servers] == "on" && !params[:server_names].blank?
+        deploy_options[:servers] = params[:server_names]
+      end
+
       # validate that what we are deploying was included and is a real thing
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT } if deploy_options[:what].nil?
       if !valid_what?(deploy_options[:what], deploy_options[:what_details])

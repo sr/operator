@@ -1,0 +1,65 @@
+<div class="well half-well">
+  <h2 class="under"><%= target.name.upcase %></h2>
+  <h5>
+    <% if target.is_locked? %>
+      <i class="icon-lock text-danger"></i>
+      <span class="text-danger">
+        LOCKED by <%= target.name_of_locking_user %>
+      </span>
+    <% else %>
+      <i class="icon-unlock text-success"></i>
+      <span class="text-success">Unlocked</span>
+    <% end %>
+  </h5>
+  <div class="last-deploy">
+    <small class="muted">
+      <strong>LAST DEPLOY:</strong>
+      <% deploy = target.last_deploy_for(current_repo.name) %>
+      <% if deploy %>
+        <%= deploy.auth_user.email %> deployed
+        <span class="text-info"><%= print_deploy_what(deploy) %></span>
+        on <%= print_time deploy.created_at %>
+      <% else %>
+        <em>No record of being deployed on this target.</em>
+      <% end %>
+    </small>
+  </div>
+  <% if !target.user_can_deploy?(current_user) %>
+    <%= partial :'partials/locked_target_warning', locals: { target: target } %>
+  <% elsif target.active_deploy %>
+    <div class="alert alert-info">
+      <strong>Active</strong>:
+      There is a deploy currently going out to <%= target.name %>.
+      <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+    </div>
+  <% else %>
+    <form class="form-inline" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
+      <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> DEPLOY HERE!</button>
+      <div class="checkbox">
+        &nbsp;&nbsp;
+        <label>
+          <input type="checkbox" name="lock"> Lock
+        </label>
+      </div>
+      <% if self.class.is_production? %>
+        <div class="checkbox">
+          &nbsp;&nbsp;
+          <label>
+            <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="servers-<%= target.name %>"> Specify Server(s)
+          </label>
+        </div>
+        <div id="servers-<%= target.name %>" style="display:none;">
+          <br>
+          <div class="form-group form-wide">
+            <label for="server_names">Servers</label>
+            <input type="text" class="form-control" name="server_names" placeholder="Enter server(s)">
+          </div>
+          <span class="help-block">
+            Specify a single server or a list of servers separated by commas.
+          </span>
+        </div>
+      <% end %>
+    </form>
+  <% end %>
+  <br>
+</div>
