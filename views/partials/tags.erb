@@ -8,7 +8,9 @@
         &nbsp;
         <a href="<%= github_tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
       </h4>
-      <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= tag.commit.sha[0,12] %>...</a></small>
+      <p>
+        <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= tag.commit.sha[0,12] %>...</a></small>
+      </p>
       <hr>
     </li>
   <% end %>
