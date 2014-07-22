@@ -63,11 +63,13 @@
       <h3 class="muted"><i class="icon-circle-arrow-up"></i>
         Select where to grab the code.
       </h3>
-      <br>
-      <h4>
-        Or deploy the
-        <a href="<%= repo_path %>/tags/latest"><i class="icon-tags"></i> latest tag</a>
-      </h4>
+      <% if %[pardot symfony].include?(current_repo.name) %>
+        <br>
+        <h4>
+          Or deploy the
+          <a href="<%= repo_path %>/tags/latest"><i class="icon-tags"></i> latest tag</a>
+        </h4>
+      <% end %>
     </div>
   <% end %>
 </div>
