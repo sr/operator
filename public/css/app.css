@@ -41,6 +41,10 @@
   background:#EEE;
 }
 
+.half-well {
+  width: 50%;
+}
+
 @font-face {
   font-family: 'icomoon';
   src:url('/fonts/icomoon.eot');
