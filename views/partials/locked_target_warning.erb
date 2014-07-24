@@ -5,7 +5,7 @@
     <strong>you</strong>.
   <% else %>
     <% if target.locked? %>
-      <%= target.locking_user.email %>.
+      <%= target.name_of_locking_user %>.
     <% elsif target.has_file_lock? %>
       <%= target.file_lock_user %> (<strong>file lock</strong>).
     <% end %>
@@ -16,4 +16,3 @@
   </strong>
   (<%= print_time target.file_lock_time %>)
 </div>
-

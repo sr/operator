@@ -1,0 +1,16 @@
+.navbar-header { background-color:#FF8C00; } /* darkorange */
+
+a,
+aside[role="navigation"] .nav.nav-stacked>li a,
+aside[role="navigation"] .nav.nav-stacked>li a i
+  { color:#FF8C00; } /* darkorange */
+
+aside[role="navigation"] .nav.nav-stacked>li a:hover,
+aside[role="navigation"] .nav.nav-stacked>li a:hover i,
+aside[role="navigation"] .nav.nav-stacked>li a.active,
+aside[role="navigation"] .nav.nav-stacked>li a.active i,
+aside[role="navigation"] .nav.nav-stacked>li a.active:hover,
+aside[role="navigation"] .nav.nav-stacked>li a.active:hover i,
+.nav-tabs>li>a:hover,
+a:hover
+  { color:#009DDC; } /* blue */
