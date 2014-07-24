@@ -5,7 +5,7 @@
   <% end %>
   <%= current_deploy.repo_name.capitalize %> :
   <%= print_deploy_what(current_deploy) %>
-  to <%= current_deploy.deploy_target.name %>
+  to <%= current_deploy.deploy_target.name.capitalize %>
 </p>
 <small class="muted">
   Started on <%= print_time current_deploy.created_at %> by
