@@ -1,10 +1,16 @@
-/* blue = #009ddc */
-/* .navbar-header { background-color:#FF7F50; } /* coral */
-/* .navbar-header { background-color:#FF4500; } /* orangered */
 .navbar-header { background-color:#FF8C00; } /* darkorange */
-a { color:#FF8C00; }
-a:hover { color:#009DDC; }
-.nav.nav-stacked>li a, .nav.nav-stacked>li a i { color:#FF8C00; }
-.nav.nav-stacked>li a.active, .nav.nav-stacked>li a:hover, .nav.nav-stacked>li a:hover i { color:#009DDC; }
-aside[role="navigation"] .nav.nav-stacked>li a.active, aside[role="navigation"] .nav.nav-stacked>li a.active i, aside[role="navigation"] .nav.nav-stacked>li a.active:hover, aside[role="navigation"] .nav.nav-stacked>li a.active:hover i { color:#009DDC; }
-.nav-tabs>li>a:hover { color:#009DDC; }
+
+a,
+aside[role="navigation"] .nav.nav-stacked>li a,
+aside[role="navigation"] .nav.nav-stacked>li a i
+  { color:#FF8C00; }
+
+aside[role="navigation"] .nav.nav-stacked>li a:hover,
+aside[role="navigation"] .nav.nav-stacked>li a:hover i,
+aside[role="navigation"] .nav.nav-stacked>li a.active,
+aside[role="navigation"] .nav.nav-stacked>li a.active i,
+aside[role="navigation"] .nav.nav-stacked>li a.active:hover,
+aside[role="navigation"] .nav.nav-stacked>li a.active:hover i,
+.nav-tabs>li>a:hover,
+a:hover
+  { color:#009DDC; }
