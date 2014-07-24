@@ -16,6 +16,10 @@ module Canoe
       def is_production?
         ENV["RACK_ENV"] == "production"
       end
+
+      def env_name
+        ENV["RACK_ENV"]
+      end
     end
 
   end
