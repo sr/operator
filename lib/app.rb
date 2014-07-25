@@ -318,6 +318,12 @@ class CanoeApplication < Sinatra::Base
     redirect "/deploy/#{current_deploy.id}"
   end
 
+  post "/deploy/:deploy_id/cancel" do
+    current_deploy.cancel! if current_deploy
+
+    redirect "/deploy/#{current_deploy.id}"
+  end
+
   # JOB --------
   get "/job/:job_id" do
     current_job.check_completed_status!
