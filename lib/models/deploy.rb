@@ -22,6 +22,12 @@ class Deploy < ActiveRecord::Base
     save!
   end
 
+  def cancel!
+    self.canceled = true
+    save!
+    kill_process!
+  end
+
   def check_completed_status!
     # bail out if we are complete or we're still running...
     return if self.completed? || process_still_running?
@@ -33,6 +39,19 @@ class Deploy < ActiveRecord::Base
     #     - remove any zombie process listings
     check = `ps cax | grep -v "\sZ[+]*\s" | grep -e "^\s*#{self.process_id}\s"`
     !check.blank?
+  end
+
+  def child_process_id
+    # the process we spawn off is the sh process which yields another process
+    `pgrep -P #{self.process_id}`
+  end
+
+  def kill_process!(forcefully=false)
+    return true unless process_still_running?
+    # -2 is INT which the ship-it script traps to report to hipchat
+    `kill #{forcefully ? "-9" : "-2"} #{child_process_id}`
+    sleep(1)
+    check_completed_status!
   end
 
 end
