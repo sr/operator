@@ -35,8 +35,8 @@
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
     <% if @watching && !current_deploy.completed? %>
       <script type="text/javascript">
-        // automatically refresh the page
-        setTimeout(function () { location.reload(); }, 2000);
+        // automatically refresh the page every 10 secs
+        setTimeout(function () { location.reload(); }, 10000);
       </script>
     <% end %>
     <p class="muted"><strong>Process ID:</strong> <%= current_deploy.process_id %></p>
