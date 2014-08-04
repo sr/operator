@@ -109,7 +109,10 @@ class DeployTarget < ActiveRecord::Base
     cmd_options << "--lock" if options[:lock]
     cmd_options << "--user=#{options[:user].email}"
     cmd_options << "--deploy-id=#{deploy.id}"
-    cmd_options << "--servers=#{options[:servers]}" if options[:servers]
+    if options[:servers]
+      # remove whitespace and quote the list to make sure we don't blow up in bash-land
+      cmd_options << "--servers=\"#{options[:servers].gsub(/\s/,"")}\""
+    end
     cmd_options << "--no-confirmations"
     cmd_options << "--no-color" # we don't need color here
     cmd_options << "&> #{deploy.log_path}"
