@@ -7,40 +7,31 @@ function toggleMenu() {
   }
 }
 
-$.extend($.easing, {
-    easeInOutExpo: function (x, t, b, c, d) {
-        if (t==0) return b;
-        if (t==d) return b+c;
-        if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-        return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-    }
-});
-
 $(function(){
   $nav = $('aside[role="navigation"]');
   $('[role="banner"] .navbar-toggle').click(toggleMenu);
 
-	$('.js-unlock-toggle').click(function(event) {
-		event.preventDefault();
-		$('#unlock-forms').show();
-		$('#unlock-hider').hide();
-	});
+  $('.js-unlock-toggle').click(function(event) {
+    event.preventDefault();
+    $('#unlock-forms').show();
+    $('#unlock-hider').hide();
+  });
 
-	$('.js-locking-toggle').click(function(event) {
-		event.preventDefault();
-		$('#lock-forms').show();
-		$('#lock-hider').hide();
-	});
+  $('.js-locking-toggle').click(function(event) {
+    event.preventDefault();
+    $('#lock-forms').show();
+    $('#lock-hider').hide();
+  });
 
   $('.js-servers-toggle').click(function(event) {
     var serverDiv = $(this).attr('data-divname');
     $('#'+serverDiv).toggle();
   });
 
-	$('.js-confirm').submit(function() {
+  $('.js-confirm').submit(function() {
     var confirmText = $(this).attr('data-confirm');
     return confirm(confirmText.replace(/<br\s*\/?>/mg,"\n"));
-	});
+  });
 
   $('.js-sha-expand').click(function(event) {
     var $this = $(this);
@@ -51,8 +42,22 @@ $(function(){
     }
   });
 
-  if ($("#deploy_log_output")) {
-    $("#deploy_log_output").scrollTop($("#deploy_log_output")[0].scrollHeight);
-  };
+  $('.form-disable-on-submit').submit(function() {
+    $(this).find('button').prop('disabled', true);
+    return true;
+  });
 
+  if ($('#deploy_log_output')) {
+    $('#deploy_log_output').scrollTop($('#deploy_log_output')[0].scrollHeight);
+  }
+
+});
+
+$.extend($.easing, {
+  easeInOutExpo: function (x, t, b, c, d) {
+    if (t===0) return b;
+    if (t==d) return b+c;
+    if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+    return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+  }
 });

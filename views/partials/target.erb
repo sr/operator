@@ -35,7 +35,7 @@
       <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
     </div>
   <% else %>
-    <form class="form-inline" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
+    <form class="form-inline form-disable-on-submit" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
       <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> DEPLOY HERE!</button>
       <% if target.lockable? %>
         <div class="checkbox">
