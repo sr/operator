@@ -82,8 +82,26 @@ class DeployTarget < ActiveRecord::Base
     cmd_pieces << "PATH=$PATH:/usr/local/bin bundle exec ./ship-it.rb"
     cmd_pieces << self.name.downcase # always pass env
     cmd_pieces += cmd_options
+    cmd_pieces.compact!
 
     cmd_pieces.join(" ")
+  end
+
+  # returns "tuple" with count and comma separated list of servers (string)
+  def gather_complete_server_list(options)
+    # call the ship-it script to get a full list of servers
+    cmd_options = ["--list-servers"]
+    cmd_options << shipit_server_flag(options)
+    server_list = `#{shipit_command(cmd_options)}`.strip
+    [server_list.split(",").size, server_list]
+  end
+
+  def shipit_server_flag(options)
+    if options[:servers]
+      "--servers=\"#{options[:servers].gsub(/\s/,"")}\""
+    else
+      nil
+    end
   end
 
   def deploy!(options = {})
@@ -92,6 +110,8 @@ class DeployTarget < ActiveRecord::Base
         raise "Required option, #{arg.to_s}, is missing from deploy options."
       end
     end
+
+    server_count, server_list = gather_complete_server_list(options)
 
     # build options ot pass to ship-it
     cmd_options = []
@@ -104,15 +124,15 @@ class DeployTarget < ActiveRecord::Base
                                   what: options[:what],
                                   what_details: options[:what_details],
                                   completed: false,
+                                  specified_servers: options[:servers],
+                                  server_count: server_count,
+                                  servers_used: server_list,
                                   )
 
     cmd_options << "--lock" if options[:lock]
     cmd_options << "--user=#{options[:user].email}"
     cmd_options << "--deploy-id=#{deploy.id}"
-    if options[:servers]
-      # remove whitespace and quote the list to make sure we don't blow up in bash-land
-      cmd_options << "--servers=\"#{options[:servers].gsub(/\s/,"")}\""
-    end
+    cmd_options << shipit_server_flag(options)
     cmd_options << "--no-confirmations"
     cmd_options << "--no-color" # we don't need color here
     cmd_options << "&> #{deploy.log_path}"

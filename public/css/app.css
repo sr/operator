@@ -88,3 +88,7 @@
 .icon-train2:before {
   content: "\e602";
 }
+
+.deploy-progress, .deploy-progress-percentage { position:relative; height:20px; }
+.deploy-progress { width:100%; background-color:#EEE; }
+.deploy-progress-percentage { bottom:0; left:0; background-color:#999; text-align:right; }
