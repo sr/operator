@@ -338,6 +338,20 @@ class CanoeApplication < Sinatra::Base
 
   # ========================================================================
   # API --------
+  post "/api/deploy/:deploy_id/completed_server" do
+    content_type :json
+
+    require_api_authentication!
+
+    if current_deploy
+      servers = current_deploy.finished_servers
+      servers << params[:server]
+      servers.compact!
+      current_deploy.update_attribute(:completed_servers, servers.join(","))
+    end
+    { success: true }.to_json # dummy output...
+  end
+
   get "/api/lock/status" do
     content_type :json
 
