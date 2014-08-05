@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20140805170641) do
     t.boolean  "canceled",          default: false
     t.integer  "server_count",      default: 0
     t.text     "servers_used"
+    t.text     "specified_servers"
     t.text     "completed_servers"
   end
 
