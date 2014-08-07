@@ -41,11 +41,34 @@
     <% end %>
     <p class="muted"><strong>Process ID:</strong> <%= current_deploy.process_id %></p>
   </div>
+
+  <div class="deploy-progress">
+    <div class="deploy-progress-percentage" style="width:<%= current_deploy.percentage_complete %>%">
+      <%= current_deploy.percentage_complete %>%&nbsp;
+    </div>
+  </div>
 <% end %>
 
 <h4>Log</h4>
 <%= partial :'partials/deploy_log' %>
 
+
+<% # ======================== SERVERS ======================== %>
+<%= partial :'partials/deploy_servers' %>
+<div class="alert alert-info" role="alert">
+  <% if current_deploy.used_all_servers? %>
+    <p class="muted">
+      <em>All servers used for sync.</em>
+    </p>
+  <% else %>
+    <p>
+      <strong>Specified Servers:</strong>
+      <%= current_deploy.specified_servers %>
+    </p>
+  <% end %>
+</div>
+
+<% # ======================== ACTION BUTTONS ======================== %>
 <% if !@watching && !current_deploy.completed? %>
   <br>
   <div>

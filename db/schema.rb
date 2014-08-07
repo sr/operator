@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140725190755) do
+ActiveRecord::Schema.define(version: 20140805170641) do
 
   create_table "auth_users", force: true do |t|
     t.string   "email"
@@ -43,11 +43,15 @@ ActiveRecord::Schema.define(version: 20140725190755) do
     t.string   "repo_name"
     t.string   "what"
     t.string   "what_details"
-    t.boolean  "completed",        default: false
+    t.boolean  "completed"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "process_id"
-    t.boolean  "canceled",         default: false
+    t.boolean  "canceled",          default: false
+    t.integer  "server_count",      default: 0
+    t.text     "servers_used"
+    t.text     "specified_servers"
+    t.text     "completed_servers"
   end
 
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree

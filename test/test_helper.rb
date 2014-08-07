@@ -55,8 +55,8 @@ def api_get(url)
   get url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }, {}
 end
 
-def api_post(url)
-  post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }, {}
+def api_post(url, params={})
+  post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), {}
 end
 
 def define_api_user_mock(email="sveader@salesforce.com")
@@ -101,6 +101,15 @@ def define_target_missing_mock(name)
   assoc_mock = mock
   assoc_mock.stubs(:first).returns(nil)
   DeployTarget.stubs(:where).with(name: name).returns(assoc_mock)
+end
+
+def define_deploy_mock(id, &block)
+  deploy_mock = Deploy.new(id: id)
+  assoc_mock = mock
+  assoc_mock.stubs(:first).returns(deploy_mock)
+  Deploy.stubs(:where).with(id: id).returns(assoc_mock)
+
+  yield(deploy_mock) if block_given?
 end
 
 def define_repo_mock(repo_name="pardot", &block)

@@ -17,6 +17,22 @@ class Deploy < ActiveRecord::Base
     File.read(log_path)
   end
 
+  def used_all_servers?
+    self.specified_servers.blank?
+  end
+
+  def all_servers
+    @_all_servers = self.servers_used.to_s.split(",").map(&:strip)
+  end
+
+  def finished_servers
+    @_finished_servers = self.completed_servers.to_s.split(",").map(&:strip)
+  end
+
+  def percentage_complete
+    ((finished_servers.size / all_servers.size.to_f) * 100).to_i
+  end
+
   def complete!
     self.completed = true
     save!

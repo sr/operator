@@ -301,19 +301,9 @@ class CanoeApplication < Sinatra::Base
     erb :deploy_show
   end
 
-  post "/deploy/:deploy_id/complete" do
-    # does not require auth but requires "secret" params #trust
-    redirect "/login" unless params[:super_secret] == 'chatty'
-
-    current_deploy.try(:complete!)
-    "" # no real need to return since the script can't do anything with it...
-  end
-
+  # post "/deploy/:deploy_id/complete" do
   post "/deploy/:deploy_id/mark/complete" do
-    if current_deploy
-      current_deploy.completed = true
-      current_deploy.save!
-    end
+    current_deploy.complete! if current_deploy
 
     redirect "/deploy/#{current_deploy.id}"
   end
@@ -338,6 +328,31 @@ class CanoeApplication < Sinatra::Base
 
   # ========================================================================
   # API --------
+  post "/api/deploy/:deploy_id/complete" do
+    content_type :json
+
+    require_api_authentication!
+
+    current_deploy.complete! if current_deploy
+
+    { success: true }.to_json # dummy output...
+  end
+
+  post "/api/deploy/:deploy_id/completed_server" do
+    content_type :json
+
+    require_api_authentication!
+
+    if current_deploy
+      servers = current_deploy.finished_servers
+      servers << params[:server]
+      servers.compact!
+      current_deploy.update_attribute(:completed_servers, servers.join(","))
+    end
+    
+    { success: true }.to_json # dummy output...
+  end
+
   get "/api/lock/status" do
     content_type :json
 
