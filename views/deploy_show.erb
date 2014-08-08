@@ -42,8 +42,8 @@
     <p class="muted"><strong>Process ID:</strong> <%= current_deploy.process_id %></p>
   </div>
 
-  <div class="deploy-progress">
-    <div class="deploy-progress-percentage" style="width:<%= current_deploy.percentage_complete %>%">
+  <div class="progress">
+    <div class="bar" style="width:<%= current_deploy.percentage_complete %>%">
       <%= current_deploy.percentage_complete %>%&nbsp;
     </div>
   </div>
