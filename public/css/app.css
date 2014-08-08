@@ -88,3 +88,5 @@
 .icon-train2:before {
   content: "\e602";
 }
+
+.deploy-server-status { width: 10%; float:left; }
