@@ -43,8 +43,9 @@
   </div>
 
   <div class="progress">
-    <div class="bar" style="width:<%= current_deploy.percentage_complete %>%">
-      <%= current_deploy.percentage_complete %>%&nbsp;
+    <%- precent_complete = current_deploy.percentage_complete -%>
+    <div class="progress-bar" role="progressbar" aria-valuenow="<%= precent_complete %>" aria-valuemin="0" aria-valuemax="100" style="width:<%= precent_complete %>%;">
+      <%= precent_complete %>%&nbsp;
     </div>
   </div>
 <% end %>
