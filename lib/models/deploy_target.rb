@@ -134,7 +134,7 @@ class DeployTarget < ActiveRecord::Base
     cmd_options << "--deploy-id=#{deploy.id}"
     cmd_options << shipit_server_flag(options)
     cmd_options << "--no-confirmations"
-    cmd_options << "--no-color" # we don't need color here
+    cmd_options << "--html-color"
     cmd_options << "&> #{deploy.log_path}"
 
     self.lock!(options[:user]) if options[:lock]

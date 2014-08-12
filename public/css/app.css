@@ -33,7 +33,7 @@
 .first-target {
   border-top:3px solid #009ddc;
 }
-.deploy-log {
+#deploy_log_output, .deploy-log {
   background:#444;
   color:#EEE;
 }

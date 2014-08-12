@@ -17,6 +17,11 @@ class Deploy < ActiveRecord::Base
     File.read(log_path)
   end
 
+  def log_contents_htmlized
+    contents = log_contents
+    contents.gsub(/\n/,"<br>")
+  end
+
   def used_all_servers?
     self.specified_servers.blank?
   end
