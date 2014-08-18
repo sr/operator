@@ -35,15 +35,13 @@
       <aside role="navigation">
         <nav role="navigation">
             <ul class="nav nav-stacked">
-              <li>
-                <a href="/repo/pardot"  <%= active_repo 'pardot'  %>><i class="icon-cloud"></i>Pardot </a>
-              </li>
-              <li>
-                <a href="/repo/symfony" <%= active_repo 'symfony' %>><i class="icon-code"></i>Symfony</a>
-              </li>
-              <li>
-                <a href="/repo/pithumbs" <%= active_repo "pithumbs" %>><i class="icon-thumbs-up"></i>Thumbs</a>
-              </li>
+              <% all_repos.each do |repo| %>
+                <li>
+                  <a href="/repo/<%= repo %>" <%= active_repo repo %>>
+                    <i class="icon-<%= repo_icon_map[repo] %>"></i><%= repo.capitalize %>
+                  </a>
+                </li>
+              <% end %>
 							<li>&nbsp;</li>
               <% all_targets.each do |target| %>
                 <li>

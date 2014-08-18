@@ -20,8 +20,18 @@ module Canoe
     end
 
     def current_repo
-      return nil unless %w[pardot symfony pithumbs].include?((params[:repo_name] || '').downcase)
+      return nil unless all_repos.include?((params[:repo_name] || '').downcase)
       @_current_repo ||= Octokit.repo("pardot/#{params[:repo_name]}")
+    end
+
+    def all_repos
+      %w[pardot pithumbs]
+    end
+
+    def repo_icon_map
+      { "pardot"   => "cloud",
+        "pithumbs" => "thumbs-up",
+      }
     end
 
     def current_target
