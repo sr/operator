@@ -25,12 +25,11 @@ module Canoe
     end
 
     def all_repos
-      %w[pardot symfony pithumbs]
+      %w[pardot pithumbs]
     end
 
     def repo_icon_map
       { "pardot"   => "cloud",
-        "symfony"  => "code",
         "pithumbs" => "thumbs-up",
       }
     end
