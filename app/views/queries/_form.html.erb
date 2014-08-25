@@ -1,0 +1,5 @@
+Please enter your SQL Query
+<%= form_for @query do |f| %>
+  <%= f.text_area(:sql, size: "60x6") %>
+  <%= f.submit %>
+<% end %>

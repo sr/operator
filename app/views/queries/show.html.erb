@@ -1,8 +1,4 @@
-Please enter your SQL Query
-<%= form_tag("/search") do %>
-  <%= text_area_tag(:sql, @sql, size: "60x6") %>
-  <%= submit_tag %>
-<% end %>
+<%= render partial: 'form' %>
 Parsed Query: <%= @ast.try(:to_sql) %>
 <div>
   <p>Global Tables</p>

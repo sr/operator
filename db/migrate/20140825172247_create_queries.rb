@@ -1,6 +1,6 @@
 class CreateQueries < ActiveRecord::Migration
   def change
-    create_table :queries do |t|
+    create_table :pardotexplorer_queries do |t|
       t.integer :user_id
       t.string :database
       t.string :datacenter
