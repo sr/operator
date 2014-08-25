@@ -1,3 +1,28 @@
+<aside role="navigation">
+  <nav role="navigation">
+    <p class="label">Database</p>
+    <ul class="nav nav-stacked">
+      <li>
+        <a href="/repo/pardot"><i class="fa fa-cloud"></i>Global</a>
+      </li>
+      <li>
+        <a href="/repo/symfony"><i class="fa fa-code"></i>Shard</a>
+      </li>
+      <li>
+        <a href="/repo/pithumbs"><i class="fa fa-thumbs-up"></i>Dallas</a>
+      </li>
+      <li>
+        <a href="/repo/pithumbs"><i class="fa fa-thumbs-up"></i>Seattle</a>
+      </li>
+      <% [].each do |target| %>
+        <li>
+          <a href="/target/<%= target.name %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
+        </li>
+      <% end %>
+      </li>
+    </ul>
+  </nav>
+</aside>
 Please enter your SQL Query
 <%= form_for @query do |f| %>
   <%= f.text_area(:sql, size: "60x6") %>

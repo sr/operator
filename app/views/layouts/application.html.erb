@@ -4,9 +4,28 @@
   <title>Dbquery</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag '//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css', media: 'all' %>
+  <%= stylesheet_link_tag '//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css' %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  <header class="navbar navbar-default navbar-fixed-top" role="banner">
+    <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class: "img-responsive" %></a>
+        <% if true#current_user %>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/logout"><i class="fa fa-sign-out" title="logout"></i></a></li>
+          </ul>
+        <% end %>
+        <span>Pardot Explorer</span>
+    </div>
+  </header>
 
 <%= yield %>
 
