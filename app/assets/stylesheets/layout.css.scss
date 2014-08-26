@@ -1,0 +1,29 @@
+header[role="banner"] {
+  background: none repeat scroll 0 0 #009ddc;
+  border-bottom: 0 none;
+
+  .navbar-brand {
+    margin-left: -12px;
+    margin-top: -12px;
+    padding: 0;
+    img {
+      height: 58px;
+    }
+  }
+  
+  .navbar-nav > li a {
+      color: #fff;
+  }
+  .navbar-header {
+    float: none;
+  }
+}
+$sidebar-width: 140px;
+aside[role="navigation"] {
+  width: $sidebar-width;
+  float: left;
+}
+
+.main {
+  margin-left: $sidebar-width;
+}

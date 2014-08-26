@@ -1,10 +1,12 @@
 <%= render partial: 'form' %>
-Parsed Query: <%= @ast.try(:to_sql) %>
-<div>
-  <p>Global Tables</p>
-  <%= @global_tables %>
-</div>
-<div>
-  <p>Shard Tables</p>
-  <%= @shard_tables %>
+<div class="main">
+  Parsed Query: <%= @ast.try(:to_sql) %>
+  <div>
+    <p>Global Tables</p>
+    <%= @global_tables %>
+  </div>
+  <div>
+    <p>Shard Tables</p>
+    <%= @shard_tables %>
+  </div>
 </div>

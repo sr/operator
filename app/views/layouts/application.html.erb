@@ -9,14 +9,8 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <header class="navbar navbar-default navbar-fixed-top" role="banner">
+  <header role="banner">
     <div class="navbar-header">
-        <button class="navbar-toggle" type="button" data-toggle="collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
         <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class: "img-responsive" %></a>
         <% if true#current_user %>
           <ul class="nav navbar-nav navbar-right">
@@ -26,8 +20,9 @@
         <span>Pardot Explorer</span>
     </div>
   </header>
-
-<%= yield %>
+  <div class="container-fluid">
+    <%= yield %>
+  </div>
 
 </body>
 </html>

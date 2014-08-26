@@ -1,6 +1,6 @@
 <aside role="navigation">
-  <nav role="navigation">
-    <p class="label">Database</p>
+  <div>
+    <p>Database</p>
     <ul class="nav nav-stacked">
       <li>
         <a href="/repo/pardot"><i class="fa fa-cloud"></i>Global</a>
@@ -8,6 +8,11 @@
       <li>
         <a href="/repo/symfony"><i class="fa fa-code"></i>Shard</a>
       </li>
+    </ul>
+  </div>
+  <div>
+    <p>Datacenter</p>
+    <ul class="nav nav-stacked">
       <li>
         <a href="/repo/pithumbs"><i class="fa fa-thumbs-up"></i>Dallas</a>
       </li>
@@ -23,8 +28,10 @@
     </ul>
   </nav>
 </aside>
-Please enter your SQL Query
-<%= form_for @query do |f| %>
-  <%= f.text_area(:sql, size: "60x6") %>
-  <%= f.submit %>
-<% end %>
+<div class="main">
+  Please enter your SQL Query
+  <%= form_for @query do |f| %>
+    <%= f.text_area(:sql, size: "60x6") %>
+    <%= f.submit %>
+  <% end %>
+</div>
