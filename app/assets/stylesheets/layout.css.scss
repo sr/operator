@@ -56,3 +56,16 @@ header .title {
   margin: 20px;
   line-height: 48px;
 }
+#account_id {
+  span {
+    font-size: 2em;
+    margin-right: 10px;
+  }
+  select {
+    font-size: 1.3em;
+    vertical-align: text-bottom;
+  }
+}
+.view {
+  margin: 10px 0;
+}
