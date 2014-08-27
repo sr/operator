@@ -2,11 +2,23 @@
 <div class="main">
   Parsed Query: <%= @ast.try(:to_sql) %>
   <div>
-    <p>Global Tables</p>
-    <%= @global_tables %>
-  </div>
-  <div>
-    <p>Shard Tables</p>
-    <%= @shard_tables %>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+      <% @result.fields.each do |field| %>
+        <th><%= field %></th>
+      <% end %>
+      </tr>
+      </thead>
+      <tbody>
+      <% @result.each do |fields| %>
+        <tr>
+          <% fields.each do |field| %>
+          <td class="filterable-cell"><%= field %></td>
+          <% end %>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
   </div>
 </div>

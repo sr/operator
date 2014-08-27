@@ -7,7 +7,7 @@ class QueriesController < ApplicationController
     command = @query.sql.slice(0, @query.sql.index(';') || @query.sql.size) # Only 1 command
     
     @ast = parser.scan_str(command)
-    tables
+    @result = ActiveRecord::Base.connection.execute(@ast.try(:to_sql)) 
   end
 
   def create
@@ -22,7 +22,7 @@ class QueriesController < ApplicationController
   end
 
   def new
-    @query = Query.new(sql: "SELECT * FROM accounts")
+    @query = Query.new(sql: "SELECT * FROM accounts", database: "Shard", datacenter: "Dallas")
   end
 
   private
@@ -33,6 +33,6 @@ class QueriesController < ApplicationController
   end
 
   def query_params
-    params.require(:query).permit(:sql)
+    params.require(:query).permit(:sql, :database, :datacenter)
   end
 end

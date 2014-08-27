@@ -3,12 +3,12 @@
     <p>Database</p>
     <ul class="nav nav-stacked database">
       <li>
-        <span style="display: none;"><i class="fa fa-code"></i>Global</span>
-        <a href="#"><i class="fa fa-cloud"></i>Global</a>
+        <span <%= show_tag?(:database, "Global", :span) %>><i class="fa fa-code"></i>Global</span>
+        <a href="#" <%= show_tag?(:database, "Global", :href) %>><i class="fa fa-cloud"></i>Global</a>
       </li>
       <li>
-        <span id="shard_selected"><i class="fa fa-code"></i>Shard</span>
-        <a href="#" style="display: none;"><i class="fa fa-cloud"></i>Shard</a>
+        <span id="shard_selected" <%= show_tag?(:database, "Shard", :span) %>><i class="fa fa-code"></i>Shard</span>
+        <a href="#" <%= show_tag?(:database, "Shard", :href) %>><i class="fa fa-cloud"></i>Shard</a>
       </li>
     </ul>
   </div>
@@ -16,18 +16,20 @@
     <p>Datacenter</p>
     <ul class="nav nav-stacked">
       <li>
-        <span style="display: none;"><i class="fa fa-thumbs-up"></i>Dallas</span>
-        <a href="#"><i class="fa fa-thumbs-up"></i>Dallas</a>
+        <span <%= show_tag?(:datacenter, "Dallas", :span) %>><i class="fa fa-thumbs-up"></i>Dallas</span>
+        <a href="#" <%= show_tag?(:datacenter, "Dallas", :href) %>><i class="fa fa-thumbs-up"></i>Dallas</a>
       </li>
       <li>
-        <span><i class="fa fa-thumbs-up"></i>Seattle</span>
-        <a href="#" style="display: none;"><i class="fa fa-thumbs-up"></i>Seattle</a>
+        <span <%= show_tag?(:datacenter, "Seattle", :span) %>><i class="fa fa-thumbs-up"></i>Seattle</span>
+        <a href="#" <%= show_tag?(:datacenter, "Seattle", :href) %>><i class="fa fa-thumbs-up"></i>Seattle</a>
       </li>
     </ul>
   </nav>
 </aside>
 <div class="main">
   <%= form_for @query do |f| %>
+    <%= f.hidden_field :database %>
+    <%= f.hidden_field :datacenter %>
     <div id="account_id">
       <span>Account:</span>
       <%= f.select :account_id, options_for_select(%w[Pardot1/1 Solaris2/2])  %>
@@ -41,8 +43,8 @@
       <%= f.submit %>
     </div>
     <div class="viewoption">
-      <table class="table table-striped">
-        <% Shard.tables.each do |table| %>
+      <table class="table table-striped scrollable">
+        <% ActiveRecord::Base.connection.tables.each do |table| %>
           <tr>
             <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
           </tr>

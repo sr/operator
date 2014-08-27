@@ -69,9 +69,11 @@ header .title {
 .view {
   margin: 10px 0;
 }
-tbody {
+.scrollable {
+  tbody {
     height: 200px;
     overflow-y: auto;
     width: 500px;
+  }
+  thead, tbody, tr, td, th { display: block; }
 }
-thead, tbody, tr, td, th { display: block; }
