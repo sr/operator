@@ -22,7 +22,7 @@ class QueriesController < ApplicationController
   end
 
   def new
-    @query = Query.new
+    @query = Query.new(sql: "SELECT * FROM accounts")
   end
 
   private

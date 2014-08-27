@@ -8,4 +8,12 @@ $ ->
     if $(this).parent().parent().hasClass("database")
       $("#account_id").css('display', $("#shard_selected").css('display'))
     
-    
+  $(".view > button").on "click", ->
+    return if $(this).hasClass("active")
+    $(this).addClass("active").siblings().removeClass("active")
+    $(".viewoption").toggle()
+
+  $(".account_helper").on "click", (e) ->
+    e.preventDefault()
+    $("#query_sql").val("SELECT * FROM `"+$(this).html()+"`")
+    $('form').submit()

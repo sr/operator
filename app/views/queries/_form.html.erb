@@ -29,16 +29,25 @@
 <div class="main">
   <%= form_for @query do |f| %>
     <div id="account_id">
-      <span>Account</span>
+      <span>Account:</span>
       <%= f.select :account_id, options_for_select(%w[Pardot1/1 Solaris2/2])  %>
     </div>
     <div class="btn-group view">
-      <button type="button" class="btn btn-default">Tables</button>
-      <button type="button" class="btn btn-default active">I like my SQL</button>
+      <button type="button" class="btn btn-default active">Tables</button>
+      <button type="button" class="btn btn-default">I like my SQL</button>
     </div>
-    <div>
+    <div class="viewoption" style="display:none;">
       <%= f.text_area(:sql, size: "60x6") %>
       <%= f.submit %>
+    </div>
+    <div class="viewoption">
+      <table class="table table-striped">
+        <% Shard.tables.each do |table| %>
+          <tr>
+            <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
+          </tr>
+        <% end %>
+      </table>
     </div>
   <% end %>
 </div>

@@ -58,7 +58,7 @@ header .title {
 }
 #account_id {
   span {
-    font-size: 2em;
+    font-size: 1.8em;
     margin-right: 10px;
   }
   select {
@@ -69,3 +69,9 @@ header .title {
 .view {
   margin: 10px 0;
 }
+tbody {
+    height: 200px;
+    overflow-y: auto;
+    width: 500px;
+}
+thead, tbody, tr, td, th { display: block; }
