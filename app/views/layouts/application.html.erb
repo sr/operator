@@ -20,8 +20,21 @@
         <span class="title">Pardot Explorer</span>
     </div>
   </header>
+  <aside role="navigation">
+    <nav>
+      <ul class="nav nav-stacked">
+        <li>
+          <a href="<%= new_global_query_path %>"><i class="fa fa-cloud"></i>Global</a>
+        </li>
+        <li>
+          <a href="<%= accounts_path %>"><i class="fa fa-cloud"></i>Account</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
 
-  <%= yield %>
-
+  <div class="main">
+    <%= yield %>
+  </div>
 </body>
 </html>

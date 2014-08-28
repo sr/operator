@@ -1,46 +1,42 @@
-<aside role="navigation">
-  <div class="sideoption">
-    <p>Database</p>
-    <ul class="nav nav-stacked database">
-      <li>
-        <span <%= show_tag?(:database, "Global", :span) %>><i class="fa fa-code"></i>Global</span>
-        <a href="#" <%= show_tag?(:database, "Global", :href) %>><i class="fa fa-cloud"></i>Global</a>
-      </li>
-      <li>
-        <span id="shard_selected" <%= show_tag?(:database, "Account", :span) %>><i class="fa fa-code"></i>Account</span>
-        <a href="#" <%= show_tag?(:database, "Account", :href) %>><i class="fa fa-cloud"></i>Account</a>
-      </li>
+<% if @query.account? %>
+<div id="account_id">
+    <span>Account: <%= @query.account.descriptive_name %></span>
+</div>
+<% end %>
+<%= form_for @query, url: query_form_path do |f| %>
+  <%= f.hidden_field :database %>
+  <%= f.hidden_field :datacenter %>
+  <div class="btn-group view">
+    <button type="button" class="btn btn-default active">I like my SQL</button>
+    <button type="button" class="btn btn-default">Pretty UI View</button>
+  </div>
+  <div class="btn-group datacenter">
+    <button type="button" class="btn btn-default active">Dallas</button>
+    <button type="button" class="btn btn-default">Seattle</button>
+  </div>
+  <div class="viewoption">
+    <%= f.text_area(:sql, size: "60x6") %>
+    <%= f.submit %>
+  </div>
+  <div class="viewoption" style="display:none;">
+    <table class="table table-striped scrollable">
+      <% ActiveRecord::Base.connection.tables.each do |table| %>
+        <tr>
+          <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
+<% if @query.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@query.errors.count, "error") %> prohibited this query from being entered:</h2>
+
+    <ul>
+    <% @query.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
     </ul>
   </div>
-</aside>
-<div class="main">
-  <%= form_for @query do |f| %>
-    <%= f.hidden_field :database %>
-    <%= f.hidden_field :datacenter %>
-    <div id="account_id">
-      <span>Account:</span>
-      <%= f.select :account_id, options_for_select(%w[Pardot1/1 Solaris2/2])  %>
-    </div>
-    <div class="btn-group view">
-      <button type="button" class="btn btn-default active">I like my SQL</button>
-      <button type="button" class="btn btn-default">Pretty UI View</button>
-    </div>
-    <div class="btn-group datacenter">
-      <button type="button" class="btn btn-default active">Dallas</button>
-      <button type="button" class="btn btn-default">Seattle</button>
-    </div>
-    <div class="viewoption">
-      <%= f.text_area(:sql, size: "60x6") %>
-      <%= f.submit %>
-    </div>
-    <div class="viewoption" style="display:none;">
-      <table class="table table-striped scrollable">
-        <% ActiveRecord::Base.connection.tables.each do |table| %>
-          <tr>
-            <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
-          </tr>
-        <% end %>
-      </table>
-    </div>
-  <% end %>
-</div>
+<% end %>

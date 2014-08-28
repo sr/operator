@@ -1,24 +1,22 @@
 <%= render partial: 'form' %>
-<div class="main">
-  Parsed Query: <%= @ast.try(:to_sql) %>
-  <div>
-    <table class="table table-striped">
-      <thead>
+Parsed Query: <%= @ast.try(:to_sql) %>
+<div>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+    <% @result.fields.each do |field| %>
+      <th><%= field %></th>
+    <% end %>
+    </tr>
+    </thead>
+    <tbody>
+    <% @result.each do |fields| %>
       <tr>
-      <% @result.fields.each do |field| %>
-        <th><%= field %></th>
-      <% end %>
+        <% fields.each do |field| %>
+        <td class="filterable-cell"><%= field %></td>
+        <% end %>
       </tr>
-      </thead>
-      <tbody>
-      <% @result.each do |fields| %>
-        <tr>
-          <% fields.each do |field| %>
-          <td class="filterable-cell"><%= field %></td>
-          <% end %>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  </div>
+    <% end %>
+    </tbody>
+  </table>
 </div>
