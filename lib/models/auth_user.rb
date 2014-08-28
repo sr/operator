@@ -12,7 +12,7 @@ class AuthUser < ActiveRecord::Base
     create(email: auth_hash['info']['email'],
            name:  auth_hash['info']['name'],
            uid:   auth_hash['uid'],
-           token: auth_hash['credentials'['token']])
+           token: auth_hash['credentials']['token'])
   end
 
   def self.find_or_create_by_omniauth(auth_hash)
