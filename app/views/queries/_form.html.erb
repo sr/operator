@@ -7,24 +7,11 @@
         <a href="#" <%= show_tag?(:database, "Global", :href) %>><i class="fa fa-cloud"></i>Global</a>
       </li>
       <li>
-        <span id="shard_selected" <%= show_tag?(:database, "Shard", :span) %>><i class="fa fa-code"></i>Shard</span>
-        <a href="#" <%= show_tag?(:database, "Shard", :href) %>><i class="fa fa-cloud"></i>Shard</a>
+        <span id="shard_selected" <%= show_tag?(:database, "Account", :span) %>><i class="fa fa-code"></i>Account</span>
+        <a href="#" <%= show_tag?(:database, "Account", :href) %>><i class="fa fa-cloud"></i>Account</a>
       </li>
     </ul>
   </div>
-  <div class="sideoption">
-    <p>Datacenter</p>
-    <ul class="nav nav-stacked">
-      <li>
-        <span <%= show_tag?(:datacenter, "Dallas", :span) %>><i class="fa fa-thumbs-up"></i>Dallas</span>
-        <a href="#" <%= show_tag?(:datacenter, "Dallas", :href) %>><i class="fa fa-thumbs-up"></i>Dallas</a>
-      </li>
-      <li>
-        <span <%= show_tag?(:datacenter, "Seattle", :span) %>><i class="fa fa-thumbs-up"></i>Seattle</span>
-        <a href="#" <%= show_tag?(:datacenter, "Seattle", :href) %>><i class="fa fa-thumbs-up"></i>Seattle</a>
-      </li>
-    </ul>
-  </nav>
 </aside>
 <div class="main">
   <%= form_for @query do |f| %>
@@ -35,14 +22,18 @@
       <%= f.select :account_id, options_for_select(%w[Pardot1/1 Solaris2/2])  %>
     </div>
     <div class="btn-group view">
-      <button type="button" class="btn btn-default active">Tables</button>
-      <button type="button" class="btn btn-default">I like my SQL</button>
+      <button type="button" class="btn btn-default active">I like my SQL</button>
+      <button type="button" class="btn btn-default">Pretty UI View</button>
     </div>
-    <div class="viewoption" style="display:none;">
+    <div class="btn-group datacenter">
+      <button type="button" class="btn btn-default active">Dallas</button>
+      <button type="button" class="btn btn-default">Seattle</button>
+    </div>
+    <div class="viewoption">
       <%= f.text_area(:sql, size: "60x6") %>
       <%= f.submit %>
     </div>
-    <div class="viewoption">
+    <div class="viewoption" style="display:none;">
       <table class="table table-striped scrollable">
         <% ActiveRecord::Base.connection.tables.each do |table| %>
           <tr>
