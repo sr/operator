@@ -5,25 +5,23 @@
 #   gem 'sqlite3'
 #
 default: &default
-  adapter: mysql2
-  username: pardot
-  password: pardot
+  adapter: sqlite3
 
 development:
   <<: *default
-  database: pardot_global
+  database: db/pardot_global.sqlite3
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: pardot_test
+  database: db/pardot_test.sqlite3
 
 production:
   <<: *default
-  database: pardot_prod
+  database: db/pardot_prod.sqlite3
 
 shard1:
   <<: *default
-  database: pardot_shard1
+  database: db/pardot_shard1.sqlite3

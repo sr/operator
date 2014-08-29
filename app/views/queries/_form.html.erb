@@ -16,11 +16,11 @@
   </div>
   <div class="viewoption">
     <%= f.text_area(:sql, size: "60x6") %>
-    <%= f.submit %>
+    <%= f.submit "Run Query" %>
   </div>
   <div class="viewoption" style="display:none;">
     <table class="table table-striped scrollable">
-      <% ActiveRecord::Base.connection.tables.each do |table| %>
+      <% @query.tables.each do |table| %>
         <tr>
           <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
         </tr>

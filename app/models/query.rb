@@ -7,4 +7,22 @@ class Query < ActiveRecord::Base
   def account?
     database == "Account"
   end
+
+  def tables
+    case database
+    when "Account"
+      account.shard.tables
+    when "Global"
+      PardotGlobalExternal.connection.tables
+    end
+  end
+
+  def execute(cmd)
+    case database
+    when "Account"
+      account.shard.class.connection.execute(cmd)
+    when "Global"
+      PardotGlobalExternal.connection.execute(cmd)
+    end
+  end
 end

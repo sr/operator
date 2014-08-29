@@ -1,10 +1,11 @@
-class Shard < ActiveRecord::Base
-  self.abstract_class = true
-  establish_connection :shard1
-  #self.table_name = "account"
-  #self.inheritance_column = :_type_disabled
+class Shard < PardotShardExternal
+  self.table_name = "account"
 
-  def self.tables
+  def initialize(shard_id)
+    Shard.establish_connection_on_shard(shard_id)
+  end
+  
+  def tables
     Shard.connection.tables
   end
 end

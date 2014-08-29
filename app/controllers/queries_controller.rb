@@ -7,7 +7,7 @@ class QueriesController < ApplicationController
     command = @query.sql.slice(0, @query.sql.index(';') || @query.sql.size) # Only 1 command
     
     @ast = parser.scan_str(command)
-    @result = ActiveRecord::Base.connection.execute(@ast.try(:to_sql)) 
+    @result = @query.execute(@ast.try(:to_sql)) 
   end
 
   def create
@@ -38,11 +38,6 @@ class QueriesController < ApplicationController
   end
 
   private
-
-  def tables
-    @global_tables = ActiveRecord::Base.connection.tables
-    @shard_tables = Shard.tables
-  end
 
   def query_params
     params.require(:query).permit(:sql, :database, :datacenter, :account_id)
