@@ -5,20 +5,21 @@
 <% end %>
 <%= form_for @query, url: query_form_path do |f| %>
   <%= f.hidden_field :database %>
-  <%= f.hidden_field :datacenter %>
+  <%= f.hidden_field :view %>
   <div class="btn-group view">
-    <button type="button" class="btn btn-default active">I like my SQL</button>
-    <button type="button" class="btn btn-default">Pretty UI View</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
+  <%= f.hidden_field :datacenter %>
   <div class="btn-group datacenter">
-    <button type="button" class="btn btn-default active">Dallas</button>
-    <button type="button" class="btn btn-default">Seattle</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, Query::Dallas) %>" data-val="<%= Query::Dallas %>">Dallas</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, Query::Seattle) %>" data-val="<%= Query::Seattle %>">Seattle</button>
   </div>
-  <div class="viewoption">
+  <div class="viewoption" <%= is_active?(:view, Query::UI, 'style="display:none;"') %>>
     <%= f.text_area(:sql, size: "60x6") %>
     <%= f.submit "Run Query" %>
   </div>
-  <div class="viewoption" style="display:none;">
+  <div class="viewoption" <%= is_active?(:view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
       <% @query.tables.each do |table| %>
         <tr>

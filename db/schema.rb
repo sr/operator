@@ -13,12 +13,13 @@
 
 ActiveRecord::Schema.define(version: 20140825172247) do
 
-  create_table "pardotexplorer_queries", force: true do |t|
+  create_table "queries", force: true do |t|
     t.integer  "user_id"
     t.string   "database"
     t.string   "datacenter"
     t.integer  "account_id"
     t.text     "sql"
+    t.string   "view"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

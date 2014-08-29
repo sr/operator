@@ -1,27 +1,38 @@
 class Query < ActiveRecord::Base
-  self.table_name = 'pardotexplorer_queries'
   belongs_to :account
   belongs_to :user
   validates :account_id, presence: true, if: :account?
 
+  # Database
+  Account = "Account"
+  Global = "Global"
+
+  # View
+  SQL = "SQL"
+  UI = "UI"
+
+  # Datacenter
+  Dallas = "Dallas"
+  Seattle = "Seattle"
+
   def account?
-    database == "Account"
+    database == Account
   end
 
   def tables
     case database
-    when "Account"
+    when Account
       account.shard.tables
-    when "Global"
+    when Global
       PardotGlobalExternal.connection.tables
     end
   end
 
   def execute(cmd)
     case database
-    when "Account"
+    when Account
       account.shard.class.connection.execute(cmd)
-    when "Global"
+    when Global
       PardotGlobalExternal.connection.execute(cmd)
     end
   end
