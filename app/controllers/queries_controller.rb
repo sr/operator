@@ -3,10 +3,7 @@ require 'sql-parser'
 class QueriesController < ApplicationController
   def show
     @query = Query.find(params[:id])
-    parser = SQLParser::Parser.new
-    command = @query.sql.slice(0, @query.sql.index(';') || @query.sql.size) # Only 1 command
-    
-    @ast = parser.scan_str(command)
+    @ast = @query.parse(@query.sql)
     @result = @query.execute(@ast.try(:to_sql)) 
   end
 
