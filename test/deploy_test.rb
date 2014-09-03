@@ -36,7 +36,6 @@ describe Deploy do
         end
 
         it "should require target passed" do
-          define_repo_mock
           define_target_missing_mock("foo")
           post_request_with_auth "/deploy/target/foo?repo_name=pardot"
           # TODO: how do we check for the flash message?
