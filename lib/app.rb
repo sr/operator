@@ -13,7 +13,6 @@ require "github"
 # models ----
 require "auth_user"
 require "deploy"
-require "target_job"
 require "deploy_target"
 require "lock"
 
@@ -238,27 +237,6 @@ class CanoeApplication < Sinatra::Base
     redirect "/target/#{current_target.name}"
   end
 
-  get "/target/:target_name/jobs" do
-    guard_against_unknown_targets!
-    get_recent_deploys_for_repos
-    @total_jobs = current_target.jobs.count
-    @jobs = current_target.jobs.order("created_at DESC")    \
-                               .limit(pagination_page_size) \
-                               .offset(pagination_page_size * (current_page - 1))
-    erb :target
-  end
-
-  post "/target/:target_name/reset_database" do
-    guard_against_unknown_targets!
-    job = current_target.reset_database!(user: current_user)
-    if job
-      redirect "/job/#{job.id}/watch"
-    else
-      flash[:notice] = "Sorry, we were unable to start database reset job at this time."
-      redirect back
-    end
-  end
-
   # DEPLOY --------
   post "/deploy/target/:target_name" do
     deploy_response = deploy!
@@ -314,18 +292,6 @@ class CanoeApplication < Sinatra::Base
     redirect "/deploy/#{current_deploy.id}"
   end
 
-  # JOB --------
-  get "/job/:job_id" do
-    current_job.check_completed_status!
-    erb :job
-  end
-
-  get "/job/:job_id/watch" do
-    current_job.check_completed_status!
-    @watching = true
-    erb :job
-  end
-
   # ========================================================================
   # API --------
   post "/api/deploy/:deploy_id/complete" do
@@ -349,7 +315,7 @@ class CanoeApplication < Sinatra::Base
       servers.compact!
       current_deploy.update_attribute(:completed_servers, servers.join(","))
     end
-    
+
     { success: true }.to_json # dummy output...
   end
 

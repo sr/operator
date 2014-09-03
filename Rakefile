@@ -21,22 +21,6 @@ task :default => [:test]
 # ----------------------------------------------------------------------------
 namespace :canoe do
 
-  desc 'Run the given command as a job'
-  task :run_job do
-    job = TargetJob.where(id: ENV["JOB_ID"].to_i).first
-
-    return unless job
-
-    # fork off our job to run...
-    job_pid = spawn(job.command)
-    job.update_attribute(:process_id, job_pid)
-
-    # wait for the child process to complete...
-    waitpid(job_pid, Process::WNOHANG)
-
-    job.complete!
-  end
-
   desc 'Create deploy targets for dev env'
   task :create_dev_targets do
     user = AuthUser.first
