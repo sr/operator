@@ -5,6 +5,7 @@ module Canoe
     DEPLOYLOGIC_ERROR_NO_WHAT   = 3
     DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY = 4
     DEPLOYLOGIC_ERROR_INVALID_WHAT = 5
+    DEPLOYLOGIC_ERROR_DUPLICATE = 6
 
     # ----------------------------------------------------------------------
     def deploy!
@@ -14,6 +15,10 @@ module Canoe
       # confirm user can deploy
       if !current_target.user_can_deploy?(current_user)
         return { error: true, reason: DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY }
+      end
+      # confirm again there is no active deploy
+      if !current_target.active_deploy.nil?
+        return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
       deploy_options = { user: current_user,
@@ -42,7 +47,12 @@ module Canoe
       end
 
       the_deploy = current_target.deploy!(deploy_options)
-      { error: false, deploy: the_deploy }
+      if the_deploy
+        { error: false, deploy: the_deploy }
+      else
+        # likely cause of nil response is a duplicate deploy (another guard)
+        { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
+      end
     end
 
     # silly generic naming... heh

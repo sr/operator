@@ -42,10 +42,6 @@ module Canoe
       @_current_deploy ||= Deploy.where(id: params[:deploy_id].to_i).first
     end
 
-    def current_job
-      @_current_job ||= TargetJob.where(id: params[:job_id].to_i).first
-    end
-
     # ----------------------------------------------------------------------
     # DATA
     def all_targets

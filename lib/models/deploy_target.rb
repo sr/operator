@@ -2,7 +2,6 @@ class DeployTarget < ActiveRecord::Base
   # validations, uniqueness, etc
   has_many :deploys
   has_many :locks
-  has_many :jobs, class_name: TargetJob
   belongs_to :locking_user, class_name: AuthUser
 
 
@@ -12,19 +11,11 @@ class DeployTarget < ActiveRecord::Base
 
   def active_deploy
     # see if the most recent deploy is not completed
-    @_active_deploy ||= most_recent_deploy.try(:completed) ? nil : most_recent_deploy
+    most_recent_deploy.try(:completed) ? nil : most_recent_deploy
   end
 
   def most_recent_deploy
-    @_most_recent_deploy ||= self.deploys.order("created_at DESC").first
-  end
-
-  def active_job
-    @_active_job ||= most_recent_job.try(:completed) ? nil : most_recent_job
-  end
-
-  def most_recent_job
-    @_most_recent_job ||= self.jobs.order("created_at DESC").first
+    self.deploys.order("created_at DESC").first
   end
 
   def lock!(user)
@@ -118,6 +109,9 @@ class DeployTarget < ActiveRecord::Base
     cmd_options << options[:repo].name
     cmd_options << "#{options[:what]}=#{options[:what_details]}"
 
+    # yet *another* duplicate deploy guard
+    return nil unless self.active_deploy.nil?
+
     # need to go ahead and create this since we need the ID to pass to ship-it
     deploy = self.deploys.create( auth_user: options[:user],
                                   repo_name: options[:repo].name,
@@ -145,42 +139,6 @@ class DeployTarget < ActiveRecord::Base
 
     # return the deploy for good measure
     deploy
-  end
-
-  def reset_database!(options = {})
-    # gather the location of the pardot deploy
-    cmd = shipit_command(["--remote-pardot-path"])
-    directory = `#{cmd}`.chomp
-    cmd_pieces = []
-    cmd_pieces << "cd #{directory};"
-    if self.name == "dev"
-      cmd_pieces << "sh batch/devResetAll.sh"
-    elsif self.name == "test"
-      cmd_pieces << "cd ../;" # back up a dir...
-      cmd_pieces << "sudo CANOE_USER=#{options[:user].email} sh update-test-reset"
-    else
-      return
-    end
-
-    job = self.jobs.create( auth_user: options[:user],
-                            command: "",
-                            job_name: "Database Reset",
-                            )
-
-    # we need job to be created so we can get the proper log path...
-    cmd_pieces << "&> #{job.log_path}"
-
-    job.command = cmd_pieces.join(" ")
-    job.save!
-
-    rake_env = { "JOB_ID" => job.id.to_s }
-    rake_cmd = "bundle exec rake canoe:run_job"
-    # spawn process to run the rake command...
-    # rake_pid = \
-    spawn(rake_env, rake_cmd)
-
-    # return job for good measure
-    job
   end
 
 end
