@@ -39,7 +39,15 @@ module Canoe
     end
 
     def current_deploy
-      @_current_deploy ||= Deploy.where(id: params[:deploy_id].to_i).first
+      @_current_deploy ||= \
+        begin
+          deploy = Deploy.where(id: params[:deploy_id].to_i).first
+          if deploy && params[:repo_name].blank?
+            # set the repo name if it's not in the params hash already
+            params[:repo_name] = deploy.repo_name
+          end
+          deploy
+        end
     end
 
     # ----------------------------------------------------------------------
@@ -74,8 +82,8 @@ module Canoe
 
     def deploy_path(options)
       path = "#{repo_path}/deploy?"
-      options.each { |key,value| path += "#{key}=#{CGI.escape(value)}&" }
-      path.gsub!(/\&$/,'') # remove any trailing &'s
+      path += \
+        options.collect { |key,value| "#{key}=#{CGI.escape(value)}" }.join("&")
       path
     end
 
