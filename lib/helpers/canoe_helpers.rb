@@ -54,7 +54,7 @@ module Canoe
 
     def get_recent_deploys_for_repos
       @last_repo_deploys = {}
-      %w[pardot symfony].each do |repo|
+      %w[pardot].each do |repo|
         @last_repo_deploys[repo] = \
           current_target.deploys.where(repo_name: repo).order('created_at DESC').first
       end
