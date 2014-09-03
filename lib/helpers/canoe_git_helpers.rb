@@ -3,7 +3,7 @@ module Canoe
     # ----------------------------------------------------------------------
     def tags_for_current_repo(count=30)
       tags = Octokit.tags(current_repo.full_name, per_page: count)
-      # tags = tags.sort_by { |t| t.name.gsub(/^build/,"").to_i }.reverse
+      tags = tags.sort_by { |t| t.name.gsub(/^build/,"").to_i }.reverse
       tags
     end
 
