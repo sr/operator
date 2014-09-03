@@ -239,6 +239,9 @@ class CanoeApplication < Sinatra::Base
 
   # DEPLOY --------
   post "/deploy/target/:target_name" do
+    guard_against_unknown_targets!
+    guard_against_duplicate_deploys!
+
     deploy_response = deploy!
 
     if !deploy_response[:error] && deploy_response[:deploy]

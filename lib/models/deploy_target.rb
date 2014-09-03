@@ -11,11 +11,11 @@ class DeployTarget < ActiveRecord::Base
 
   def active_deploy
     # see if the most recent deploy is not completed
-    @_active_deploy ||= most_recent_deploy.try(:completed) ? nil : most_recent_deploy
+    most_recent_deploy.try(:completed) ? nil : most_recent_deploy
   end
 
   def most_recent_deploy
-    @_most_recent_deploy ||= self.deploys.order("created_at DESC").first
+    self.deploys.order("created_at DESC").first
   end
 
   def lock!(user)
@@ -108,6 +108,9 @@ class DeployTarget < ActiveRecord::Base
     cmd_options = []
     cmd_options << options[:repo].name
     cmd_options << "#{options[:what]}=#{options[:what_details]}"
+
+    # yet *another* duplicate deploy guard
+    return nil unless self.active_deploy.nil?
 
     # need to go ahead and create this since we need the ID to pass to ship-it
     deploy = self.deploys.create( auth_user: options[:user],
