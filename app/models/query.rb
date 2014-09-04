@@ -41,12 +41,24 @@ class Query < ActiveRecord::Base
     command = input.slice(0, input.index(';') || input.size) # Only 1 command
     
     ast = parser.scan_str(command)
-    my_columns = connection.columns(ast.query_expression.table_expression.from_clause.tables.first.name)
-    ast.query_expression.table_expression.where_clause = restrict_to_account(ast.query_expression.table_expression.where_clause) if account? && my_columns.map(&:name).include?("account_id")
+    if account? && account_specific_table(table_name(ast))
+      ast.query_expression.table_expression.where_clause = restrict_to_account(ast.query_expression.table_expression.where_clause)
+    end
     ast
   end
 
+  def table_name(ast)
+    # TODO - this doesn't handle joins yet
+    ast.try(:query_expression).try(:table_expression).try(:from_clause).try(:tables).try(:first).try(:name)
+  end
+
+  def account_specific_table(tablename)
+    return true if tablename.nil?
+    connection.columns(tablename).map(&:name).include?("account_id")
+  end
+
   def restrict_to_account(original_where)
+    #TODO - this will repeat the account_id query if it's already added
     account_id_constant = SQLParser::Statement::Integer.new(account_id)
     column_reference = SQLParser::Statement::Column.new('account_id')
     account_condition = SQLParser::Statement::Equals.new(column_reference, account_id_constant)
