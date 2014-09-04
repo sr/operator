@@ -1,12 +1,7 @@
 <h1>Where should we deploy this?</h1>
 <h3 class="muted">
   <%= current_repo.name.capitalize %>:
-  <%= deploy_type_icon(@deploy_type.name) %>
-  <% if @deploy_type.name == "commit" %>
-    <%= sha_span(@deploy_type.details) %>
-  <% else %>
-    <%= @deploy_type.details %>
-  <% end %>
+  <%= print_deploy_what @deploy_type %>
 </h3>
 <br>
 <div class="alert alert-info">

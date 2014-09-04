@@ -9,6 +9,20 @@ class DeployTarget < ActiveRecord::Base
     self.deploys.where(repo_name: repo_name).order("created_at DESC").first
   end
 
+  def last_successful_deploy_for(repo_name)
+    self.deploys.where(repo_name: repo_name,
+                       completed: true,
+                       canceled:  false).order("created_at DESC").first
+  end
+
+  def previous_successful_deploy(deploy)
+    self.deploys.where(repo_name: deploy.repo_name,
+                       completed: true,
+                       canceled:  false). \
+                       where("created_at < ?", deploy.created_at). \
+                       order("created_at DESC").first
+  end
+
   def active_deploy
     # see if the most recent deploy is not completed
     most_recent_deploy.try(:completed) ? nil : most_recent_deploy

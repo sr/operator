@@ -15,6 +15,7 @@ require "auth_user"
 require "deploy"
 require "deploy_target"
 require "lock"
+require "mock_deploy"
 
 # helpers ----
 require "canoe_authentication"
@@ -185,11 +186,11 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/deploy" do
     guard_against_unknown_repos!
-    @deploy_type = OpenStruct.new(name: "", details: "")
+
+    @deploy_type = nil
     %w[tag branch commit].each do |type|
       if params[type]
-        @deploy_type.name = type
-        @deploy_type.details = params[type]
+        @deploy_type = MockDeploy.new(type, params[type])
         break
       end
     end
