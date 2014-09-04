@@ -20,8 +20,22 @@ module Canoe
     end
 
     def current_repo
-      return nil unless all_repos.include?((params[:repo_name] || '').downcase)
-      @_current_repo ||= Octokit.repo("pardot/#{params[:repo_name]}")
+      @_current_repo ||= \
+        begin
+          repo_name = ""
+          if params[:repo_name].blank? && current_deploy.nil?
+            return nil # if we don't have anything, bail
+          elsif !params[:repo_name].blank? && !all_repos.include?(params[:repo_name])
+            return nil # make sure it's valid
+          elsif !params[:repo_name].blank?
+            repo_name = params[:repo_name] # use valid repo name
+          elsif !current_deploy.nil?
+            repo_name = current_deploy.repo_nume # fall back to current deploy's repo
+          else
+            return nil # default fail
+          end
+          Octokit.repo("pardot/#{repo_name.downcase}")
+        end
     end
 
     def all_repos
@@ -35,7 +49,16 @@ module Canoe
     end
 
     def current_target
-      @_current_target ||= DeployTarget.where(name: params[:target_name]).first
+      @_current_target ||= \
+        begin
+          if !params[:target_name].blank?
+            DeployTarget.where(name: params[:target_name]).first
+          elsif !current_deploy.nil?
+            current_deploy.deploy_target
+          else
+            nil
+          end
+        end
     end
 
     def current_deploy
@@ -89,12 +112,10 @@ module Canoe
 
     def deploy_target_path(target, deploy_type=nil)
       path = "/deploy/target/#{target.name}?"
+      deploy_type ||= current_deploy
       if deploy_type
         path += "repo_name=#{current_repo.name}&"
-        path += "#{deploy_type.name}=#{deploy_type.details}"
-      elsif
-        path += "repo_name=#{current_deploy.repo_name}&"
-        path += "#{current_deploy.what}=#{current_deploy.what_details}"
+        path += "#{deploy_type.what}=#{deploy_type.what_details}"
       else
         raise 'Unknown path details...'
       end
@@ -115,6 +136,10 @@ module Canoe
 
     def github_commit_url(commit)
       "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
+    end
+
+    def github_diff_url(item1, item2)
+      "#{github_url}/#{current_repo.full_name}/compare/#{item1}...#{item2}"
     end
 
     # ----------------------------------------------------------------------

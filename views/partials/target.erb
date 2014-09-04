@@ -14,17 +14,31 @@
     </h5>
   <% end %>
   <div class="last-deploy">
+    <% deploy = target.last_successful_deploy_for(current_repo.name) %>
     <small class="muted">
       <strong>LAST DEPLOY:</strong>
-      <% deploy = target.last_deploy_for(current_repo.name) %>
       <% if deploy %>
-        <%= deploy.auth_user.email %> deployed
+        <%= print_email deploy.auth_user.email %> deployed
         <span class="text-info"><%= print_deploy_what(deploy) %></span>
         on <%= print_time deploy.created_at %>
       <% else %>
-        <em>No record of being deployed on this target.</em>
+        <em>Nothing has been deployed on this target.</em>
       <% end %>
     </small>
+    <% if deploy && deploy.what != "branch" && @deploy_type.what != "branch" %>
+      <br>
+      <a href="<%= github_diff_url(deploy.what_details, @deploy_type.what_details) %>">
+        <strong>What will Change?</strong>
+        <span style="color:#000;">
+          &nbsp;&nbsp;
+          <%= print_deploy_what deploy %>
+          &nbsp;
+          &#x021D2;
+          &nbsp;
+          <%= print_deploy_what @deploy_type %>
+        </span>
+      </a>
+    <% end %>
   </div>
   <% if !target.user_can_deploy?(current_user) %>
     <%= partial :'partials/locked_target_warning', locals: { target: target } %>
@@ -35,7 +49,7 @@
       <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
     </div>
   <% else %>
-    <form class="form-inline form-disable-on-submit" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post">
+    <form class="form-inline form-disable-on-submit js-confirm" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post" data-confirm="Are you sure you want to deploy <%= @deploy_type.details %> to <%= target.name %>?">
       <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> DEPLOY HERE!</button>
       <% if target.lockable? %>
         <div class="checkbox">
