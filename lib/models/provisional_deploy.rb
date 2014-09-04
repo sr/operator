@@ -1,4 +1,4 @@
-class MockDeploy
+class ProvisionalDeploy
   attr_accessor :what, :what_details
 
   def initialize(what, what_details)
