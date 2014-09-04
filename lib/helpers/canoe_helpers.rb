@@ -49,7 +49,16 @@ module Canoe
     end
 
     def current_target
-      @_current_target ||= DeployTarget.where(name: params[:target_name]).first
+      @_current_target ||= \
+        begin
+          if !params[:target_name].blank?
+            DeployTarget.where(name: params[:target_name]).first
+          elsif !current_deploy.nil?
+            current_deploy.deploy_target
+          else
+            nil
+          end
+        end
     end
 
     def current_deploy
