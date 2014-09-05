@@ -113,5 +113,6 @@ def define_deploy_mock(id, &block)
 end
 
 def define_repo_mock(repo_name="pardot", &block)
-  Octokit.expects(:repo).with("pardot/#{repo_name}").returns(OpenStruct.new)
+  repo = OpenStruct.new(full_name: "pardot/#{repo_name}", name: repo_name)
+  Octokit.expects(:repo).with("pardot/#{repo_name}").returns(repo)
 end

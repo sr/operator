@@ -4,6 +4,7 @@
       <th></th>
       <th>Repo</th>
       <th>What</th>
+      <th>SHA</th>
       <th>Who</th>
       <th>When</th>
       <th>Complete</th>
@@ -15,6 +16,7 @@
       <td><a href="/deploy/<%= deploy.id %>">view</a></td>
       <td><%= deploy.repo_name %></td>
       <td><%= print_deploy_what(deploy) %></td>
+      <td><%= sha_span(deploy.sha) unless deploy.sha.blank? %></td>
       <td><%= print_email deploy.auth_user.email %></td>
       <td><%= print_time deploy.created_at %></td>
       <td>

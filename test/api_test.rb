@@ -335,7 +335,7 @@ describe Canoe do
         define_target_mock do |target_mock|
           target_mock.stubs(:user_can_deploy?).returns(true)
         end
-        Octokit.expects(:branches).returns([])
+        Octokit.expects(:ref).with("pardot/pardot", "heads/build1234").returns({object:{}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&branch=build1234"
         assert_json_error_response("Invalid branch")
@@ -347,7 +347,7 @@ describe Canoe do
         define_target_mock do |target_mock|
           target_mock.stubs(:user_can_deploy?).returns(true)
         end
-        Octokit.expects(:tags).returns([])
+        Octokit.expects(:ref).with("pardot/pardot", "tags/build1234").returns({object:{}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         assert last_response.ok?
@@ -362,7 +362,7 @@ describe Canoe do
           target_mock.stubs(:user_can_deploy?).returns(true)
           target_mock.expects(:deploy!).returns(Deploy.new(id: 1234))
         end
-        Octokit.expects(:tags).returns([OpenStruct.new(name: 'build1234')])
+        Octokit.expects(:ref).with("pardot/pardot", "tags/build1234").returns({object:{sha:"123455"}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         assert last_response.ok?

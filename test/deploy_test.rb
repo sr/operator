@@ -57,7 +57,7 @@ describe Deploy do
           define_target_mock do |target_mock|
             target_mock.expects(:user_can_deploy?).returns(true)
           end
-          Octokit.expects(:branches).returns([])
+          Octokit.expects(:ref).with("pardot/pardot", "heads/foo").returns({object:{}})
 
           post_request_with_auth "/deploy/target/test?repo_name=pardot&branch=foo"
           assert last_response.redirect?
@@ -68,7 +68,7 @@ describe Deploy do
           define_target_mock do |target_mock|
             target_mock.expects(:user_can_deploy?).returns(true)
           end
-          Octokit.expects(:tags).returns([])
+          Octokit.expects(:ref).with("pardot/pardot", "tags/foo").returns({object:{}})
 
           post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=foo"
           assert last_response.redirect?
@@ -79,7 +79,7 @@ describe Deploy do
           define_target_mock do |target_mock|
             target_mock.expects(:user_can_deploy?).returns(true)
           end
-          Octokit.expects(:commits).returns([])
+          Octokit.expects(:commit).with("pardot/pardot", "foo").returns({})
 
           post_request_with_auth "/deploy/target/test?repo_name=pardot&commit=foo"
           assert last_response.redirect?
@@ -93,7 +93,7 @@ describe Deploy do
             deploy_mock = mock(id: 1234)
             target_mock.expects(:deploy!).returns(deploy_mock)
           end
-          Octokit.expects(:tags).returns([OpenStruct.new(name: 'build5678')])
+          Octokit.expects(:ref).with("pardot/pardot", "tags/build5678").returns({object:{sha:"123455"}})
 
           post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=build5678"
           assert last_response.redirect?

@@ -64,12 +64,16 @@ module Canoe
     def current_deploy
       @_current_deploy ||= \
         begin
-          deploy = Deploy.where(id: params[:deploy_id].to_i).first
-          if deploy && params[:repo_name].blank?
-            # set the repo name if it's not in the params hash already
-            params[:repo_name] = deploy.repo_name
+          if !params[:deploy_id].blank?
+            deploy = Deploy.where(id: params[:deploy_id].to_i).first
+            if deploy && params[:repo_name].blank?
+              # set the repo name if it's not in the params hash already
+              params[:repo_name] = deploy.repo_name
+            end
+            deploy
+          else
+            nil
           end
-          deploy
         end
     end
 
@@ -110,12 +114,12 @@ module Canoe
       path
     end
 
-    def deploy_target_path(target, deploy_type=nil)
+    def deploy_target_path(target, deploy=nil)
       path = "/deploy/target/#{target.name}?"
-      deploy_type ||= current_deploy
-      if deploy_type
+      deploy ||= current_deploy
+      if deploy
         path += "repo_name=#{current_repo.name}&"
-        path += "#{deploy_type.what}=#{deploy_type.what_details}"
+        path += "#{deploy.what}=#{deploy.what_details}"
       else
         raise 'Unknown path details...'
       end
@@ -138,7 +142,9 @@ module Canoe
       "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
     end
 
-    def github_diff_url(item1, item2)
+    def github_diff_url(deploy1, deploy2)
+      item1 = deploy1.branch? ? deploy1.sha : deploy1.what_details
+      item2 = deploy2.branch? ? deploy2.sha : deploy2.what_details
       "#{github_url}/#{current_repo.full_name}/compare/#{item1}...#{item2}"
     end
 
@@ -158,7 +164,7 @@ module Canoe
     end
 
     def sha_span(sha)
-      "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,12]}...</span>"
+      "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,8]}...</span>"
     end
 
     # ----------------------------------------------------------------------
@@ -166,7 +172,7 @@ module Canoe
     def print_deploy_what(deploy)
       output = deploy_type_icon(deploy.what)
       output += " "
-      if deploy.what == "commit"
+      if deploy.commit?
         output += sha_span(deploy.what_details)
       else
         output += deploy.what_details

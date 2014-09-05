@@ -20,7 +20,7 @@
   <strong>
     What <%= current_deploy.completed? ? 'changed' : 'is changing' %>?
   </strong>
-  <a href="<%= github_diff_url(@previous_deploy.what_details, current_deploy.what_details) %>">
+  <a href="<%= github_diff_url(@previous_deploy, current_deploy) %>">
     &nbsp;&nbsp;
     <%= print_deploy_what @previous_deploy %>
     &nbsp;

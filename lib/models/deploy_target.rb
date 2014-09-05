@@ -110,7 +110,7 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def deploy!(options = {})
-    [:user, :repo, :what, :what_details].each do |arg|
+    %i[user repo what what_details].each do |arg|
       unless options.keys.include?(arg)
         raise "Required option, #{arg.to_s}, is missing from deploy options."
       end
@@ -135,6 +135,7 @@ class DeployTarget < ActiveRecord::Base
                                   specified_servers: options[:servers],
                                   server_count: server_count,
                                   servers_used: server_list,
+                                  sha: options[:sha],
                                   )
 
     cmd_options << "--lock" if options[:lock]

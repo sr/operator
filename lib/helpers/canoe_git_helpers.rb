@@ -13,8 +13,9 @@ module Canoe
       branches.sort_by(&:name) # may not really be needed...
     end
 
-    def commits_for_current_repo
-      Octokit.commits(current_repo.full_name)
+    def commits_for_current_repo(count=50)
+      Octokit.auto_paginate = false
+      Octokit.commits(current_repo.full_name, per_page: count)
     end
 
     def full_tag_info(tag)

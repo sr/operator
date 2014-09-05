@@ -1,7 +1,7 @@
 <div class="well gray-well half-well">
   <h2>
     <span class="muted">Latest Tag:</span> &nbsp;
-    <i class="icon-tag"></i> <%= tag.name %>
+    <%= deploy_type_icon("tag") %> <%= tag.name %>
     &nbsp;
     <a href="<%= github_tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
   </h2>
@@ -9,7 +9,7 @@
     <small class="muted">
       <strong>tagged on</strong>: <%= full_tag.tagger.date.strftime("%-m/%-d/%Y %l:%M %p") %>
       &nbsp;|&nbsp;
-      <strong>commit</strong>: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= tag.commit.sha[0,12] %>...</a>
+      <strong>commit</strong>: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= sha_span(tag.commit.sha) %></a>
     </small>
   </p>
   <p>

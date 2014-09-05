@@ -186,15 +186,7 @@ class CanoeApplication < Sinatra::Base
 
   get "/repo/:repo_name/deploy" do
     guard_against_unknown_repos!
-
-    @deploy_type = nil
-    %w[tag branch commit].each do |type|
-      if params[type]
-        @deploy_type = ProvisionalDeploy.new(type, params[type])
-        break
-      end
-    end
-
+    @prov_deploy = provisional_deploy
     @targets = DeployTarget.order(:name)
     erb :deploy
   end

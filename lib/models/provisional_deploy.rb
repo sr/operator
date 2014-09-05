@@ -1,21 +1,22 @@
-class ProvisionalDeploy
-  attr_accessor :what, :what_details
+require "deployable"
 
-  def initialize(what, what_details)
+class ProvisionalDeploy
+  include Deployable
+
+  attr_accessor :what, :what_details, :repo_name
+
+  def initialize(what, what_details, repo_name)
     self.what = what
     self.what_details = what_details
+    self.repo_name = repo_name
   end
 
-  def name
-    self.what
+  def sha
+    @_sha ||= get_sha # defined in Deployable
   end
 
-  def details
-    self.what_details
-  end
-
-  def commit?
-    self.what == "commit"
+  def sha=(new_sha)
+    @_sha = new_sha
   end
 
 end
