@@ -7,6 +7,15 @@ module Canoe
     DEPLOYLOGIC_ERROR_INVALID_WHAT = 5
     DEPLOYLOGIC_ERROR_DUPLICATE = 6
 
+    def provisional_deploy
+      %w[tag branch commit].each do |type|
+        if params[type]
+          return ProvisionalDeploy.new(type, params[type], current_repo.full_name)
+        end
+      end
+      nil # fall through
+    end
+
     # ----------------------------------------------------------------------
     def deploy!
       # require a repo and target
@@ -26,13 +35,10 @@ module Canoe
                          lock: (params[:lock] == "on"),
                        }
 
-      # let's determine what we're deploying...
-      %w[tag branch commit].each do |type|
-        if params[type]
-          deploy_options[:what] = type
-          deploy_options[:what_details] = params[type]
-          break
-        end
+      prov_deploy = provisional_deploy
+      if prov_deploy
+        deploy_options[:what] = prov_deploy.what
+        deploy_options[:what_details] = prov_deploy.what_details
       end
 
       # gather any servers that might be specified
@@ -41,10 +47,15 @@ module Canoe
       end
 
       # validate that what we are deploying was included and is a real thing
-      return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT } if deploy_options[:what].nil?
-      if !valid_what?(deploy_options[:what], deploy_options[:what_details])
-        return { error: true, reason: DEPLOYLOGIC_ERROR_INVALID_WHAT, what: deploy_options[:what] }
+      if prov_deploy.nil?
+        return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT }
+      elsif !prov_deploy.is_valid?
+        return { error: true,
+                 reason: DEPLOYLOGIC_ERROR_INVALID_WHAT,
+                 what: prov_deploy.what }
       end
+
+      deploy_options[:sha] = prov_deploy.sha # gathered during is_valid?
 
       the_deploy = current_target.deploy!(deploy_options)
       if the_deploy
@@ -52,26 +63,6 @@ module Canoe
       else
         # likely cause of nil response is a duplicate deploy (another guard)
         { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
-      end
-    end
-
-    # silly generic naming... heh
-    def valid_what?(what, what_details)
-      case what
-      when "tag"
-        tags = tags_for_current_repo
-        tags.collect(&:name).include?(what_details)
-      when "branch"
-        branches = branches_for_current_repo
-        branches.collect(&:name).include?(what_details)
-      when "commit"
-        commits = commits_for_current_repo
-        found_commits = commits.select do |commit|
-          commit.sha.match(%r{^#{what_details}})
-        end
-        !found_commits.empty?
-      else
-        false
       end
     end
 

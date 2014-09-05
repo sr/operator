@@ -25,9 +25,9 @@
         <em>Nothing has been deployed on this target.</em>
       <% end %>
     </small>
-    <% if deploy && deploy.what != "branch" && @deploy_type.what != "branch" %>
+    <% if deploy %>
       <br>
-      <a href="<%= github_diff_url(deploy.what_details, @deploy_type.what_details) %>">
+      <a href="<%= github_diff_url(deploy, @prov_deploy) %>">
         <strong>What will Change?</strong>
         <span style="color:#000;">
           &nbsp;&nbsp;
@@ -35,7 +35,7 @@
           &nbsp;
           &#x021D2;
           &nbsp;
-          <%= print_deploy_what @deploy_type %>
+          <%= print_deploy_what @prov_deploy %>
         </span>
       </a>
     <% end %>
@@ -49,7 +49,7 @@
       <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
     </div>
   <% else %>
-    <form class="form-inline form-disable-on-submit js-confirm" role="form" action="<%= deploy_target_path(target, @deploy_type) %>" method="post" data-confirm="Are you sure you want to deploy <%= @deploy_type.details %> to <%= target.name %>?">
+    <form class="form-inline form-disable-on-submit js-confirm" role="form" action="<%= deploy_target_path(target, @prov_deploy) %>" method="post" data-confirm="Are you sure you want to deploy <%= @prov_deploy.what_details %> to <%= target.name %>?">
       <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> DEPLOY HERE!</button>
       <% if target.lockable? %>
         <div class="checkbox">

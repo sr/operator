@@ -4,11 +4,16 @@
       <h4>
         <a href="<%= deploy_path(commit: commit.sha) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This!</a>
         &nbsp;
-        <i class="icon-tasks"></i> <%= sha_span(commit.sha) %>
+        <%= deploy_type_icon("commit") %> <%= sha_span(commit.sha) %>
         &nbsp;
         <a href="<%= github_commit_url(commit) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
       </h4>
-      <small class="muted">author: <%= (commit.author || commit.commit.author).try(:login) %></small>
+      <small class="muted">
+        <% author = (commit.author || commit.commit.author) %>
+        author: <%= author.try(:login) || author.try(:name) %>
+        &nbsp; | &nbsp;
+        date: <%= print_time commit.commit.committer.date %>
+      </small>
       <p><%= commit.commit.message %></p>
       <hr>
     </li>

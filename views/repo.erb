@@ -10,11 +10,11 @@
   <p class="lead">
     Select the
     <% if @tags %>
-      <i class="icon-tags"></i> <strong>tag</strong>
+      <%= deploy_type_icon("tag") %> <strong>tag</strong>
     <% elsif @branches %>
-      <i class="icon-code-fork"></i> <strong>branch</strong>
+      <%= deploy_type_icon("branch") %> <strong>branch</strong>
     <% elsif @commits %>
-      <i class="icon-tasks"></i> <strong>commit</strong>
+      <%= deploy_type_icon("commit") %> <strong>commit</strong>
     <% end %>
     that you wish to ship.
   </p>
@@ -39,13 +39,13 @@
   <% end %>
   <ul class="nav nav-tabs">
     <li <%= 'class="active"' if @tags %>>
-      <a href="<%= repo_path %>/tags"><i class="icon-tags"></i> Tags</a>
+      <a href="<%= repo_path %>/tags"><%= deploy_type_icon("tag") %> Tags</a>
     </li>
     <li <%= 'class="active"' if @branches %>>
-      <a href="<%= repo_path %>/branches"><i class="icon-code-fork"></i> Branches</a>
+      <a href="<%= repo_path %>/branches"><%= deploy_type_icon("branch") %> Branches</a>
     </li>
     <li <%= 'class="active"' if @commits %>>
-      <a href="<%= repo_path %>/commits"><i class="icon-tasks"></i> Commits</a>
+      <a href="<%= repo_path %>/commits"><%= deploy_type_icon("commit") %> Commits</a>
     </li>
   </ul>
   <br>
@@ -63,7 +63,7 @@
       <h3 class="muted"><i class="icon-circle-arrow-up"></i>
         Select where to grab the code.
       </h3>
-      <% if %[pardot symfony].include?(current_repo.name) %>
+      <% if current_repo.name == "pardot" %>
         <br>
         <h4>
           Or deploy the
