@@ -1,3 +1,9 @@
+PATH
+  remote: lib/sql-parser
+  specs:
+    sql-parser (0.0.3)
+      racc
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -101,8 +107,6 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
-    sql-parser (0.0.2)
-      racc
     sqlite3 (1.3.9)
     thor (0.19.1)
     thread_safe (0.3.4)
@@ -131,7 +135,7 @@ DEPENDENCIES
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
   spring
-  sql-parser
+  sql-parser!
   sqlite3
   turbolinks
   uglifier (>= 1.3.0)

@@ -20,3 +20,4 @@ Parsed Query: <%= @ast.try(:to_sql) %>
     </tbody>
   </table>
 </div>
+<%= link_to("Show All Rows", "#", class: "all_rows") if @query.is_limited %>

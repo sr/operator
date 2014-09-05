@@ -37,7 +37,7 @@ class QueriesController < ApplicationController
   private
 
   def query_params
-    params.require(:query).permit(:sql, :database, :datacenter, :view, :account_id)
+    params.require(:query).permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
   end
 
   def account_params

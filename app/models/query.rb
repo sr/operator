@@ -42,10 +42,13 @@ class Query < ActiveRecord::Base
     
     ast = parser.scan_str(command)
     if account? && account_specific_table(table_name(ast))
-      ast.query_expression.table_expression.where_clause = restrict_to_account(ast.query_expression.table_expression.where_clause)
+      restrict_to_account(ast)
     end
+    append_limit(ast) if is_limited
     ast
   end
+
+  private
 
   def table_name(ast)
     # TODO - this doesn't handle joins yet
@@ -57,16 +60,28 @@ class Query < ActiveRecord::Base
     connection.columns(tablename).map(&:name).include?("account_id")
   end
 
-  def restrict_to_account(original_where)
+  def restrict_to_account(ast)
+    original_where = ast.query_expression.table_expression.where_clause
     #TODO - this will repeat the account_id query if it's already added
     account_id_constant = SQLParser::Statement::Integer.new(account_id)
     column_reference = SQLParser::Statement::Column.new('account_id')
     account_condition = SQLParser::Statement::Equals.new(column_reference, account_id_constant)
-    if (original_where.nil?)
+    if original_where.nil?
       where_clause = SQLParser::Statement::WhereClause.new(account_condition)
     else
       and_condition = SQLParser::Statement::And.new(original_where.search_condition, account_condition)
       where_clause = SQLParser::Statement::WhereClause.new(and_condition)
     end
+    ast.query_expression.table_expression.where_clause = where_clause
+    ast
+  end
+
+  def append_limit(ast, row_count = 10)
+    if ast.limit.nil?
+      ast.limit = SQLParser::Statement::Limit.new(row_count)
+    else
+      self.is_limited = false
+    end
+    ast
   end
 end

@@ -7,6 +7,7 @@ class CreateQueries < ActiveRecord::Migration
       t.integer :account_id
       t.text :sql
       t.string :view
+      t.boolean :is_limited, default: true
 
       t.timestamps
     end

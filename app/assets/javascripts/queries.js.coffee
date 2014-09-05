@@ -18,6 +18,12 @@ ready = ->
   $(".account_helper").on "click", (e) ->
     e.preventDefault()
     $("#query_sql").val("SELECT * FROM `"+$(this).html()+"`")
+    $("#query_is_limited").val("true")
+    $('form').submit()
+
+  $(".all_rows").on "click", (e) ->
+    e.preventDefault()
+    $("#query_is_limited").val("false")
     $('form').submit()
 
 $(document).ready(ready)

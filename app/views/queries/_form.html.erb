@@ -5,6 +5,7 @@
 <% end %>
 <%= form_for @query, url: query_form_path do |f| %>
   <%= f.hidden_field :database %>
+  <%= f.hidden_field :is_limited %>
   <%= f.hidden_field :view %>
   <div class="btn-group view">
     <button type="button" class="btn btn-default<%= is_active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>

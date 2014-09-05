@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20140825172247) do
     t.integer  "account_id"
     t.text     "sql"
     t.string   "view"
+    t.boolean  "is_limited", default: true
     t.datetime "created_at"
     t.datetime "updated_at"
   end
