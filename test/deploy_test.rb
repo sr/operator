@@ -7,15 +7,15 @@ describe Deploy do
     CanoeApplication
   end
 
-  describe "accessing /deploy/target/:target_name" do
+  describe "accessing /deploy/repo/:repo_name/to/target/:target_name" do
     describe "without authentication" do
       it "GET: should redirect to login" do
-        get "/deploy/target/foo"
+        get "/deploy/repo/foo/target/bar"
         assert_redirect_to_login
       end
 
       it "POST: should redirect to login" do
-        post "/deploy/target/foo"
+        get "/deploy/repo/foo/target/bar"
         assert_redirect_to_login
       end
     end
@@ -23,21 +23,21 @@ describe Deploy do
     describe "with authentication" do
       it "GET: should 404" do
         define_target_mock
-        get_request_with_auth "/deploy/target/test"
+        get_request_with_auth "/deploy/repo/pardot/to/target/test"
         assert last_response.not_found?
       end
 
       describe "with POST" do
         it "should require repo passed" do
           define_target_mock
-          post_request_with_auth "/deploy/target/test"
-          # TODO: how do we check for the flash message?
+          post_request_with_auth "/deploy/repo/foo/to/target/test"
+           # TODO: how do we check for the flash message?
           assert last_response.redirect?
         end
 
         it "should require target passed" do
           define_target_missing_mock("foo")
-          post_request_with_auth "/deploy/target/foo?repo_name=pardot"
+          post_request_with_auth "/deploy/repo/pardot/to/target/foo"
           # TODO: how do we check for the flash message?
           assert last_response.redirect?
         end
@@ -48,7 +48,7 @@ describe Deploy do
             target_mock.stubs(:user_can_deploy?).returns(false)
           end
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot"
+          post_request_with_auth "/deploy/repo/pardot/to/target/test"
           assert last_response.redirect?
         end
 
@@ -59,7 +59,7 @@ describe Deploy do
           end
           Octokit.expects(:ref).with("pardot/pardot", "heads/foo").returns({object:{}})
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot&branch=foo"
+          post_request_with_auth "/deploy/repo/pardot/to/target/test?branch=foo"
           assert last_response.redirect?
         end
 
@@ -70,7 +70,7 @@ describe Deploy do
           end
           Octokit.expects(:ref).with("pardot/pardot", "tags/foo").returns({object:{}})
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=foo"
+          post_request_with_auth "/deploy/repo/pardot/to/target/test?tag=foo"
           assert last_response.redirect?
         end
 
@@ -81,7 +81,7 @@ describe Deploy do
           end
           Octokit.expects(:commit).with("pardot/pardot", "foo").returns({})
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot&commit=foo"
+          post_request_with_auth "/deploy/repo/pardot/to/target/test?commit=foo"
           assert last_response.redirect?
         end
 
@@ -95,7 +95,7 @@ describe Deploy do
           end
           Octokit.expects(:ref).with("pardot/pardot", "tags/build5678").returns({object:{sha:"123455"}})
 
-          post_request_with_auth "/deploy/target/test?repo_name=pardot&tag=build5678"
+          post_request_with_auth "/deploy/repo/pardot/to/target/test?tag=build5678"
           assert last_response.redirect?
           assert_match "/deploy/1234/watch", last_response.location
         end

@@ -1,13 +1,9 @@
-<h1>What do you want to deploy?</h1>
-<h3>
-  <i class="icon-github"></i>&nbsp;
-  <a href="https://github.com/pardot/<%= current_repo.name %>"><%= current_repo.full_name %></a>
-</h3>
-<small class="muted"><%= current_repo.description %></small>
-<br><br>
+<h1 class="steps-count">Step 1 of 3</h1>
+<h2>What do you want to deploy?</h2>
+<br>
 
 <% if @tags || @branches || @commits %>
-  <p class="lead">
+  <p class="lead muted">
     Select the
     <% if @tags %>
       <%= deploy_type_icon("tag") %> <strong>tag</strong>
@@ -18,13 +14,6 @@
     <% end %>
     that you wish to ship.
   </p>
-
-  <div class="alert alert-warning">
-    <p>
-      <strong>Note:</strong>
-      On the next step you will choose where this will be deployed.
-    </p>
-  </div>
 <% end %>
 
 <div>

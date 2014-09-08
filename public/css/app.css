@@ -15,6 +15,7 @@
   padding-bottom:0;
 }
 .muted { color:#AAA; }
+.steps-count { font-weight:100;color:#AAA;border-bottom:1px solid #CCC; padding-bottom:5px; }
 .deploy-list {
   padding-left:10px;
 }
@@ -45,6 +46,8 @@
   width: 60%;
   padding:5px 20px;
 }
+
+.confirm-deploy { padding:20px; }
 
 .under {
   border-bottom: 1px solid #CCC;

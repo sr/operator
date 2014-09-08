@@ -148,26 +148,26 @@ class CanoeApplication < Sinatra::Base
   end
 
   # REPO --------
-  get "/repo/:repo_name" do
+  get "/deploy/repo/:repo_name" do
     guard_against_unknown_repos!
-    erb :repo
+    erb :deploy_select_what
   end
 
-  get "/repo/:repo_name/tags" do
+  get "/deploy/repo/:repo_name/tags" do
     guard_against_unknown_repos!
     @tags = tags_for_current_repo
-    erb :repo
+    erb :deploy_select_what
   end
 
-  get "/repo/:repo_name/tags/latest" do
+  get "/deploy/repo/:repo_name/tags/latest" do
     guard_against_unknown_repos!
     tags = tags_for_current_repo
     @tag = tags.first
     @full_tag = full_tag_info(@tag)
-    erb :repo
+    erb :deploy_select_what
   end
 
-  get "/repo/:repo_name/branches" do
+  get "/deploy/repo/:repo_name/branches" do
     guard_against_unknown_repos!
     @branches = branches_for_current_repo
 
@@ -175,20 +175,20 @@ class CanoeApplication < Sinatra::Base
       @branches = @branches.find_all { |b| b.name =~ /#{params[:search]}/i }
     end
 
-    erb :repo
+    erb :deploy_select_what
   end
 
-  get "/repo/:repo_name/commits" do
+  get "/deploy/repo/:repo_name/commits" do
     guard_against_unknown_repos!
     @commits = commits_for_current_repo
-    erb :repo
+    erb :deploy_select_what
   end
 
-  get "/repo/:repo_name/deploy" do
+  get "/deploy/repo/:repo_name/select_target" do
     guard_against_unknown_repos!
     @prov_deploy = provisional_deploy
     @targets = DeployTarget.order(:name)
-    erb :deploy
+    erb :deploy_select_target
   end
 
   # TARGET --------
@@ -231,7 +231,15 @@ class CanoeApplication < Sinatra::Base
   end
 
   # DEPLOY --------
-  post "/deploy/target/:target_name" do
+  get "/deploy/repo/:repo_name/to/target/:target_name/confirm" do
+    guard_against_unknown_targets!
+    guard_against_duplicate_deploys!
+    @prov_deploy = provisional_deploy
+    @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
+    erb :deploy_confirm
+  end
+
+  post "/deploy/repo/:repo_name/to/target/:target_name" do
     guard_against_unknown_targets!
     guard_against_duplicate_deploys!
 

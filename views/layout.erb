@@ -37,7 +37,7 @@
             <ul class="nav nav-stacked">
               <% all_repos.each do |repo| %>
                 <li>
-                  <a href="/repo/<%= repo %>" <%= active_repo repo %>>
+                  <a href="<%= repo_path(repo) %>" <%= active_repo repo %>>
                     <i class="icon-<%= repo_icon_map[repo] %>"></i><%= repo.capitalize %>
                   </a>
                 </li>
@@ -45,7 +45,7 @@
 							<li>&nbsp;</li>
               <% all_targets.each do |target| %>
                 <li>
-                  <a href="/target/<%= target.name %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
+                  <a href="<%= target_path(target.name) %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
                 </li>
               <% end %>
               </li>

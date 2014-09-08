@@ -98,27 +98,39 @@ module Canoe
     end
 
     def active_target(target_name)
-      current_target && current_target.name.downcase == target_name.downcase ? 'class="active"' : ""
+      if !current_repo && current_target && \
+         current_target.name.downcase == target_name.downcase
+        'class="active"'
+      else
+        ""
+      end
     end
 
     # ----------------------------------------------------------------------
     # PATHS
-    def repo_path
-      "/repo/#{current_repo.name}"
+    def repo_path(repo_name=current_repo.name)
+      "/deploy/repo/#{repo_name}"
     end
 
-    def deploy_path(options)
-      path = "#{repo_path}/deploy?"
+    def target_path(target_name=current_target.name)
+      "/target/#{target_name}"
+    end
+
+    def deploy_select_target_path(options)
+      path = repo_path+"/select_target?"
       path += \
         options.collect { |key,value| "#{key}=#{CGI.escape(value)}" }.join("&")
       path
     end
 
-    def deploy_target_path(target, deploy=nil)
-      path = "/deploy/target/#{target.name}?"
+    def deploy_confirm_path(target=current_target, deploy=nil)
+      execute_deploy_path(deploy, target, true)
+    end
+
+    def execute_deploy_path(deploy=nil, target=current_target, show_confirm=false)
+      path = repo_path+"/to/target/#{target.name}#{show_confirm ? "/confirm" : ""}?"
       deploy ||= current_deploy
       if deploy
-        path += "repo_name=#{current_repo.name}&"
         path += "#{deploy.what}=#{deploy.what_details}"
       else
         raise 'Unknown path details...'
