@@ -61,11 +61,11 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def has_file_lock?
-    File.exists?(self.lock_path)
+    File.exist?(self.lock_path)
   end
 
   def file_lock_user
-    return nil unless File.exists?(self.lock_path)
+    return nil unless File.exist?(self.lock_path)
     File.read(self.lock_path).chomp
   end
 
