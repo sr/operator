@@ -236,6 +236,7 @@ class CanoeApplication < Sinatra::Base
     guard_against_duplicate_deploys!
     @prov_deploy = provisional_deploy
     @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
+    @committers = committers_for_compare(@previous_deploy, @prov_deploy)
     erb :deploy_confirm
   end
 
