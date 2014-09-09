@@ -21,8 +21,13 @@ class Deploy < ActiveRecord::Base
     File.read(log_path)
   end
 
-  def log_contents_htmlized
-    contents = log_contents
+  # only grab the last X lines of the log output
+  def some_log_contents(lines=50)
+    `tail -n #{lines} #{log_path}`
+  end
+
+  def log_contents_htmlized(show_all=false)
+    contents = show_all ? log_contents : some_log_contents
     contents.gsub(/\n/,"<br>")
   end
 

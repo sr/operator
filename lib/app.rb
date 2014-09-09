@@ -276,6 +276,7 @@ class CanoeApplication < Sinatra::Base
   get "/deploy/:deploy_id" do
     current_deploy.check_completed_status!
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)
+    @show_full_logs  = (params[:show_full] == "1")
     erb :deploy_show
   end
 
@@ -283,6 +284,7 @@ class CanoeApplication < Sinatra::Base
     current_deploy.check_completed_status!
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)
     @watching = true
+    @show_full_logs = (params[:show_full] == "1")
     erb :deploy_show
   end
 
