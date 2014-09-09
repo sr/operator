@@ -1,0 +1,18 @@
+<h1 class="steps-count">Step 2 of 3</h1>
+<h2>
+  Where should we deploy this?
+  <span class="muted">
+    &nbsp;
+    <%= print_deploy_what @prov_deploy %>
+  </span>
+</h2>
+<br>
+
+<p class="lead muted">
+  Select the <i class="icon-bullseye"></i> for deployment.
+</p>
+
+<% @targets.each do |target| %>
+  <%= partial :"partials/target", locals: { target: target } %>
+  <%# "<hr>" unless @targets.last == target %>
+<% end %>

@@ -20,8 +20,8 @@
   <strong>
     What <%= current_deploy.completed? ? 'changed' : 'is changing' %>?
   </strong>
+  &nbsp;&nbsp;
   <a href="<%= github_diff_url(@previous_deploy, current_deploy) %>">
-    &nbsp;&nbsp;
     <%= print_deploy_what @previous_deploy %>
     &nbsp;
     &#x021D2;
@@ -96,7 +96,7 @@
 <hr>
 <% if current_deploy.completed? %>
   <div>
-    <a href="<%= deploy_path(current_deploy.what => current_deploy.what_details) %>" class="btn btn-primary btn-warning deploy-button">
+    <a href="<%= deploy_select_target_path(current_deploy.what => current_deploy.what_details) %>" class="btn btn-primary btn-warning deploy-button">
       <i class="icon-train2"></i>
       REDEPLOY THIS!
     </a>

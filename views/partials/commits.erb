@@ -2,7 +2,7 @@
   <% commits.each do |commit| %>
     <li>
       <h4>
-        <a href="<%= deploy_path(commit: commit.sha) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This!</a>
+        <a href="<%= deploy_select_target_path(commit: commit.sha) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
         &nbsp;
         <%= deploy_type_icon("commit") %> <%= sha_span(commit.sha) %>
         &nbsp;

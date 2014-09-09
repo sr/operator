@@ -2,7 +2,7 @@
   <% tags.each do |tag| %>
     <li>
       <h4>
-        <a href="<%= deploy_path(tag: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This!</a>
+        <a href="<%= deploy_select_target_path(tag: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
         &nbsp;
         <%= deploy_type_icon("tag") %> <%= tag.name %>
         &nbsp;

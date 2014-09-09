@@ -29,8 +29,8 @@
       <br>
       <a href="<%= github_diff_url(deploy, @prov_deploy) %>">
         <strong>What will Change?</strong>
+        &nbsp;&nbsp;
         <span style="color:#000;">
-          &nbsp;&nbsp;
           <%= print_deploy_what deploy %>
           &nbsp;
           &#x021D2;
@@ -49,35 +49,7 @@
       <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
     </div>
   <% else %>
-    <form class="form-inline form-disable-on-submit js-confirm" role="form" action="<%= deploy_target_path(target, @prov_deploy) %>" method="post" data-confirm="Are you sure you want to deploy <%= @prov_deploy.what_details %> to <%= target.name %>?">
-      <button type="submit" class="btn btn-warning"><i class="icon-train2"></i> DEPLOY HERE!</button>
-      <% if target.lockable? %>
-        <div class="checkbox">
-          &nbsp;&nbsp;
-          <label>
-            <input type="checkbox" name="lock"> Lock
-          </label>
-        </div>
-      <% end %>
-      <% if self.class.is_production? %>
-        <div class="checkbox">
-          &nbsp;&nbsp;
-          <label>
-            <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="servers-<%= target.name %>"> Specify Server(s)
-          </label>
-        </div>
-        <div id="servers-<%= target.name %>" style="display:none;">
-          <br>
-          <div class="form-group form-wide">
-            <label for="server_names">Servers</label>
-            <input type="text" class="form-control" name="server_names" placeholder="Enter server(s)">
-          </div>
-          <span class="help-block">
-            Specify a single server or a list of servers separated by commas.
-          </span>
-        </div>
-      <% end %>
-    </form>
+    <a href="<%= deploy_confirm_path(target, @prov_deploy) %>" class="btn btn-primary btn-success deploy-button">Ship it Here</a>
+    <br><br>
   <% end %>
-  <br>
 </div>

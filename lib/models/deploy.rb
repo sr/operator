@@ -2,7 +2,7 @@ require "deployable"
 
 class Deploy < ActiveRecord::Base
   include Deployable
-  
+
   # validations, uniqueness, etc
   # validate type = %w[tag branch commit]
   belongs_to :deploy_target
@@ -17,7 +17,7 @@ class Deploy < ActiveRecord::Base
   end
 
   def log_contents
-    return "" unless File.exists?(log_path)
+    return "" unless File.exist?(log_path)
     File.read(log_path)
   end
 
