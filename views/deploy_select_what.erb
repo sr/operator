@@ -2,10 +2,12 @@
 <h2>What do you want to deploy?</h2>
 <br>
 
-<% if @tags || @branches || @commits %>
+<% if @tag || @tags || @branches || @commits %>
   <p class="lead muted">
     Select the
-    <% if @tags %>
+    <% if @tag %>
+      <%= deploy_type_icon("tag") %> <strong>latest tag</strong>
+    <% elsif @tags %>
       <%= deploy_type_icon("tag") %> <strong>tag</strong>
     <% elsif @branches %>
       <%= deploy_type_icon("branch") %> <strong>branch</strong>
@@ -27,6 +29,9 @@
     </form>
   <% end %>
   <ul class="nav nav-tabs">
+    <li <%= 'class="active"' if @tag %>>
+      <a href="<%= repo_path %>/tags/latest"><%= deploy_type_icon("tag") %> Latest Tag</a>
+    </li>
     <li <%= 'class="active"' if @tags %>>
       <a href="<%= repo_path %>/tags"><%= deploy_type_icon("tag") %> Tags</a>
     </li>
