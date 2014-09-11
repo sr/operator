@@ -26,5 +26,28 @@ ready = ->
     $("#query_is_limited").val("false")
     $('form').submit()
 
+  $(".select_column").on "click", (e) ->
+    e.preventDefault()
+    column_name = $(this).html()
+    query = $("#query_sql").val()
+    query = query.replace /SELECT .* FROM/i, ->
+      "SELECT " + column_name + " FROM"
+    $("#query_sql").val(query)
+    $('form').submit()
+
+  $("#add_column").on "change", ->
+    column = $(this).val()
+    return if column == "Add column"
+    
+    query = $("#query_sql").val()
+    query = query.replace /SELECT (.*) FROM/i, ($0, $1) ->
+      if column == "Show all"
+        "SELECT * FROM"
+      else
+        "SELECT " + $1 + ", " + column + " FROM"
+    $("#query_sql").val(query)
+    $('form').submit()
+
+
 $(document).ready(ready)
 $(document).on('page:load', ready)

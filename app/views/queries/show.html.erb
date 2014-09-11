@@ -4,8 +4,13 @@ Parsed Query: <%= @ast.try(:to_sql) %>
   <table class="table table-striped">
     <thead>
     <tr>
-    <% @result.fields.each do |field| %>
-      <th><%= field %></th>
+    <% @result.fields.each_with_index do |field, i| %>
+      <th>
+        <%= link_to field, "#", class: 'select_column' %>
+        <% if !@query.select_all? && (i == @result.fields.length-1) %>
+          <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
+        <% end %>
+      </th>
     <% end %>
     </tr>
     </thead>

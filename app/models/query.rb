@@ -19,6 +19,10 @@ class Query < ActiveRecord::Base
     database == Account
   end
 
+  def select_all?
+    sql.match(/SELECT \*/i)
+  end
+
   def tables
     connection.tables
   end
@@ -41,19 +45,19 @@ class Query < ActiveRecord::Base
     command = input.slice(0, input.index(';') || input.size) # Only 1 command
     
     ast = parser.scan_str(command)
-    if account? && account_specific_table(table_name(ast))
+    if account? && account_specific_table(extract_table_name(ast))
       restrict_to_account(ast)
     end
     append_limit(ast) if is_limited
     ast
   end
 
-  private
-
-  def table_name(ast)
+  def extract_table_name(ast)
     # TODO - this doesn't handle joins yet
     ast.try(:query_expression).try(:table_expression).try(:from_clause).try(:tables).try(:first).try(:name)
   end
+
+  private
 
   def account_specific_table(tablename)
     return true if tablename.nil?
