@@ -26,3 +26,4 @@ Parsed Query: <%= @ast.try(:to_sql) %>
   </table>
 </div>
 <%= link_to("Show All Rows", "#", class: "all_rows") if @query.is_limited %>
+<%= link_to "Export to CSV", "#", class: "export_csv" %>

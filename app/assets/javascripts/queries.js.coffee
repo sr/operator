@@ -48,6 +48,10 @@ ready = ->
     $("#query_sql").val(query)
     $('form').submit()
 
+  $(".export_csv").on "click", (e) ->
+    e.preventDefault()
+    alert "TODO: Implement this."
+
 
 $(document).ready(ready)
 $(document).on('page:load', ready)
