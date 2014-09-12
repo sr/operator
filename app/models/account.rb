@@ -1,4 +1,4 @@
-class Account < PardotGlobalExternal
+class Account < GlobalD
   self.table_name = 'global_account'
   self.inheritance_column = :_type_disabled
   has_many :queries
