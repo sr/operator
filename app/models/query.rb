@@ -3,20 +3,8 @@ class Query < ActiveRecord::Base
   belongs_to :user
   validates :account_id, presence: true, if: :account?
 
-  # Database
-  Account = "Account"
-  Global = "Global"
-
-  # View
-  SQL = "SQL"
-  UI = "UI"
-
-  # Datacenter
-  Dallas = "Dallas"
-  Seattle = "Seattle"
-
   def account?
-    database == Account
+    database == DB::Account
   end
 
   def select_all?
@@ -33,10 +21,15 @@ class Query < ActiveRecord::Base
 
   def connection
     case database
-    when Account
-      account.shard.class.connection
-    when Global
-      PardotGlobalExternal.connection
+    when DB::Account
+      account.shard(datacenter).class.connection
+    when DB::Global
+      case datacenter
+      when Dallas
+        GlobalD.connection
+      when Seattle
+        GlobalS.connection
+      end
     end
   end
 

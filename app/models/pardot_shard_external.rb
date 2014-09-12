@@ -1,50 +1,39 @@
 class PardotShardExternal < ActiveRecord::Base
   self.abstract_class = true
 
-  after_initialize :ensure_shard_connection_on_associations
-
   # add a class variable to stash our current shard number in
   class << self
-    attr_accessor :shard_number, :shard_proxy, :sharded_associations
 
-    def establish_connection_on_shard(shard_number)
+    def establish_connection_on_shard(shard_number, datacenter)
       if shard_number.nil?
         raise 'Internal::API - DB_CONNECTION: shard can not be nil'
       end
+      if datacenter.nil?
+        raise 'Internal::API - DB_CONNECTION: datacenter can not be nil'
+      end
 
-      @shard_number = shard_number
-
-      connection_name = shard_connection_name(shard_number)
+      connection_name = shard_connection_name(shard_number, datacenter)
 
       if ENV.include?(connection_name)
         # logger.info("SHARD: Using #{connection_name}")
         establish_connection(ENV[connection_name])
       else
-        shard_connection = create_shard_connection_url(shard_number)
+        shard_connection = create_shard_connection_url(shard_number, datacenter)
         # logger.info("SHARD: Using #{shard_connection} *")
         establish_connection(shard_connection) if shard_connection
       end
     end
 
-    def shard_known?
-      !@shard_number.blank?
-    end
-
-    def reset_shard_info!
-      @shard_number = nil
-    end
-
-    def shard_connection_name(shard_number)
+    def shard_connection_name(shard_number, datacenter)
       # shard database configurations must follow this convention
-      # "#{Rails.env}_pardot_shard#{shard_number}"
-      "DB_CONN_SHARD#{shard_number}"
+      "DB_#{datacenter[0].upcase}_SHARD#{shard_number}"
     end
 
     def default_shard_connection_name
-      shard_connection_name(1)
+      shard_connection_name(1, Dallas)
     end
 
-    def create_shard_connection_url(shard_number)
+    def create_shard_connection_url(shard_number, datacenter)
       # grab our default shard config and bend it to use this shard
       default_shard_url = ENV[default_shard_connection_name]
       shard_conn_url = nil
@@ -74,24 +63,11 @@ class PardotShardExternal < ActiveRecord::Base
       end
 
       # store for later...
-      ENV[shard_connection_name(shard_number)] = shard_conn_url
+      ENV[shard_connection_name(shard_number, datacenter)] = shard_conn_url
 
       shard_conn_url
     end
   end # << self
-
-
-  def ensure_shard_connection_on_associations
-    # setup the shard connection on associations so magic can happen
-    associations = self.class.sharded_associations || []
-    associations = associations.is_a?(Array) ? associations : [associations]
-
-    if self.class.shard_known?
-      associations.each do |assoc|
-        assoc.try(:establish_connection_on_shard, self.class.shard_number)
-      end
-    end
-  end
 
 private
   def after_initialize

@@ -13,7 +13,11 @@ class Account < PardotGlobalExternal
     account.shard_id
   end
 
-  def shard
-    @_shard ||= Shard.new(shard_id)
+  def shard(datacenter = Dallas)
+    @_shard ||= {
+        Dallas => Shard.new(shard_id, Dallas),
+        Seattle => Shard.new(shard_id, Seattle)
+      }
+    @_shard[datacenter]
   end
 end

@@ -24,13 +24,13 @@ class QueriesController < ApplicationController
   end
 
   def new
-    defaults = {datacenter: Query::Dallas, view: Query::SQL}
+    defaults = {datacenter: Dallas, view: SQL}
     if account_params[:account_id]
       # Accounts query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: Query::Account, account_id: account_params[:account_id]))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: DB::Account, account_id: account_params[:account_id]))
     else
       # Global query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: Query::Global))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: DB::Global))
     end
   end
 
