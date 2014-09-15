@@ -5,6 +5,7 @@ class QueriesController < ApplicationController
     @query = Query.find(params[:id])
     @ast = @query.parse(@query.sql)
     @result = @query.execute(@ast.try(:to_sql)) 
+    @query.audits.create(user: "")
   end
 
   def create
