@@ -14,6 +14,7 @@ end
 # View
 SQL = "SQL"
 UI = "UI"
+CSV = "CSV" #for CSV output
 
 # Datacenter
 Dallas = "Dallas"

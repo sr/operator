@@ -8,12 +8,7 @@ module QueriesHelper
   end
 
   def is_active?(type, value, output = " active")
-    case type
-    when :view
-      result = @query.view == value
-    when :datacenter
-      result = @query.datacenter == value
-    end
+    result = @query.send(type) == value
     result ? output.html_safe : ""
   end
 
