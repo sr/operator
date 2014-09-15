@@ -30,7 +30,7 @@ class PardotShardExternal < ActiveRecord::Base
     end
 
     def default_shard_connection_name
-      shard_connection_name(1, Dallas)
+      shard_connection_name(1, DC::Dallas)
     end
 
     def create_shard_connection_url(shard_number, datacenter)

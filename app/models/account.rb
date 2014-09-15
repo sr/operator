@@ -13,10 +13,10 @@ class Account < GlobalD
     account.shard_id
   end
 
-  def shard(datacenter = Dallas)
+  def shard(datacenter = DC::Dallas)
     @_shard ||= {
-        Dallas => Shard.new(shard_id, Dallas),
-        Seattle => Shard.new(shard_id, Seattle)
+        DC::Dallas => Shard.new(shard_id, DC::Dallas),
+        DC::Seattle => Shard.new(shard_id, DC::Seattle)
       }
     @_shard[datacenter]
   end

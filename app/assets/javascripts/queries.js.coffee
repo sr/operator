@@ -50,7 +50,8 @@ ready = ->
 
   $(".export_csv").on "click", (e) ->
     e.preventDefault()
-    alert "TODO: Implement this."
+    $("#query_view").val('CSV')
+    $('form').submit()
 
 
 $(document).ready(ready)

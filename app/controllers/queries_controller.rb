@@ -6,6 +6,10 @@ class QueriesController < ApplicationController
     @ast = @query.parse(@query.sql)
     @result = @query.execute(@ast.try(:to_sql)) 
     @query.audits.create(user: "")
+
+    if @query.view == VW::CSV
+      render 'show.csv.erb'
+    end
   end
 
   def create
@@ -25,7 +29,7 @@ class QueriesController < ApplicationController
   end
 
   def new
-    defaults = {datacenter: Dallas, view: SQL}
+    defaults = {datacenter: DC::Dallas, view: VW::SQL}
     if account_params[:account_id]
       # Accounts query
       @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: DB::Account, account_id: account_params[:account_id]))
