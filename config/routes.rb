@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resource :global, only: [] do
     resources :queries, except: [:destroy, :edit]
   end
+  resources :access_logs, only: :index
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

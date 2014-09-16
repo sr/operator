@@ -5,7 +5,7 @@ class QueriesController < ApplicationController
     @query = Query.find(params[:id])
     @ast = @query.parse(@query.sql)
     @result = @query.execute(@ast.try(:to_sql)) 
-    @query.audits.create(user: "")
+    @query.access_logs.create(user: "")
 
     if @query.view == VW::CSV
       render 'show.csv.erb'

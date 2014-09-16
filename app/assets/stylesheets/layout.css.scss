@@ -22,6 +22,20 @@ $sidebar-width: 140px;
 aside[role="navigation"] {
   width: $sidebar-width;
   float: left;
+
+  a > i {
+    margin-right: 5px;
+  }
+  .newsection {
+    margin-top: 20px;
+  }
+  .li-label {
+    margin-top: 10px;
+  }
+  .li-label span {
+    margin-left: 15px;
+    color: #888;
+  }
 }
 
 .main {

@@ -1,6 +1,6 @@
-class CreateAudits < ActiveRecord::Migration
+class CreateAccessLogs < ActiveRecord::Migration
   def change
-    create_table :audits do |t|
+    create_table :access_logs do |t|
       t.string :user
       t.integer :query_id
 

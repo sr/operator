@@ -1,6 +1,6 @@
 class Query < ActiveRecord::Base
   belongs_to :account
-  has_many :audits
+  has_many :access_logs
   validates :account_id, presence: true, if: :account?
 
   def account?

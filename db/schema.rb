@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140915151939) do
 
-  create_table "audits", force: true do |t|
+  create_table "access_logs", force: true do |t|
     t.string   "user"
     t.integer  "query_id"
     t.datetime "created_at"
