@@ -35,7 +35,8 @@ class PardotShardExternal < ActiveRecord::Base
 
     def create_shard_connection_url(shard_number, datacenter)
       # grab our default shard config and bend it to use this shard
-      default_shard_url = ENV[default_shard_connection_name]
+      dbconf = YAML.load(File.open('config/database.yml'))["test"]
+      default_shard_url = ENV[default_shard_connection_name] || "#{dbconf["adapter"]}://#{dbconf["database"]}.#{dbconf["adapter"]}"
       shard_conn_url = nil
 
       db_url_regex = /^(.*?)\:\/\/(.*?)\:(.*?)\@(.*?)\:(.*?)\/(.*?)$/

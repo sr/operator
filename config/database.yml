@@ -21,3 +21,15 @@ test:
 production:
   <<: *default
   database: db/production.sqlite3
+
+global_test:
+  <<: *default
+  database: db/pardot_global.sqlite3
+
+shard1_test:
+  <<: *default
+  database: db/pardot_shard1.sqlite3
+
+shard2_test:
+  <<: *default
+  database: db/pardot_shard2.sqlite3
