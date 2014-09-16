@@ -4,7 +4,12 @@ class QueriesController < ApplicationController
   def show
     @query = Query.find(params[:id])
     @ast = @query.parse(@query.sql)
-    @result = @query.execute(@ast.try(:to_sql)) 
+    begin
+      @result = @query.execute(@ast.try(:to_sql))
+    rescue ActiveRecord::StatementInvalid
+      @query.errors.add :sqlerror, @ast.try(:to_sql)
+      render :new
+    end
     @query.access_logs.create(user: "")
 
     if @query.view == VW::CSV
