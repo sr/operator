@@ -7,7 +7,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   test "join" do
-    extract_table_name_test("account", "SELECT * FROM `account` JOIN `account_access` ON `account`.`id` = `account_access`.`account_id`")
+    extract_table_name_test("account", "SELECT * FROM `account` INNER JOIN `account_access` ON `account`.`id` = `account_access`.`account_id`")
   end
 
   test "left join" do

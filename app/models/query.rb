@@ -40,7 +40,7 @@ class Query < ActiveRecord::Base
     ast = parser.scan_str(command)
     if account?
       restrict_to_account(ast) if account_specific_table(extract_table_name(ast))
-      restrict_to_account(ast, "id") if extract_table_name(ast) == "account"
+      restrict_to_account(ast, ["account","id"]) if extract_table_name(ast) == "account"
     end
     append_limit(ast) if is_limited
     ast
@@ -48,7 +48,8 @@ class Query < ActiveRecord::Base
 
   def extract_table_name(ast)
     # TODO - this doesn't handle joins yet
-    ast.try(:query_expression).try(:table_expression).try(:from_clause).try(:tables).try(:first).try(:name)
+    tables = ast.try(:query_expression).try(:table_expression).try(:from_clause).try(:tables).try(:first)
+    tables.try(:name) || tables.try(:left).try(:name)
   end
 
   private
@@ -62,7 +63,13 @@ class Query < ActiveRecord::Base
     original_where = ast.query_expression.table_expression.where_clause
     #TODO - this will repeat the account_id query if it's already added
     account_id_constant = SQLParser::Statement::Integer.new(account_id)
-    column_reference = SQLParser::Statement::Column.new(column_name)
+    if column_name.is_a?(Array)
+      column_table = SQLParser::Statement::Table.new(column_name[0])
+      column_column = SQLParser::Statement::Column.new(column_name[1])
+      column_reference = SQLParser::Statement::QualifiedColumn.new(column_table, column_column)
+    else
+      column_reference = SQLParser::Statement::Column.new(column_name)
+    end
     account_condition = SQLParser::Statement::Equals.new(column_reference, account_id_constant)
     if original_where.nil?
       where_clause = SQLParser::Statement::WhereClause.new(account_condition)

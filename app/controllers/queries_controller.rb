@@ -6,8 +6,8 @@ class QueriesController < ApplicationController
     @ast = @query.parse(@query.sql)
     begin
       @result = @query.execute(@ast.try(:to_sql))
-    rescue ActiveRecord::StatementInvalid
-      @query.errors.add :sqlerror, @ast.try(:to_sql)
+    rescue ActiveRecord::StatementInvalid => e
+      @query.errors.add :sqlerror, e
       render :new
     end
     @query.access_logs.create(user: "")
