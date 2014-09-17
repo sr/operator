@@ -31,7 +31,7 @@ ready = ->
     column_name = $(this).html()
     query = $("#query_sql").val()
     query = query.replace /SELECT .* FROM/i, ->
-      "SELECT " + column_name + " FROM"
+      "SELECT `" + column_name + "` FROM"
     $("#query_sql").val(query)
     $('form').submit()
 
@@ -44,7 +44,7 @@ ready = ->
       if column == "Show all"
         "SELECT * FROM"
       else
-        "SELECT " + $1 + ", " + column + " FROM"
+        "SELECT " + $1 + ", `" + column + "` FROM"
     $("#query_sql").val(query)
     $('form').submit()
 
