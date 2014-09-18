@@ -95,7 +95,7 @@ class DeployTarget < ActiveRecord::Base
   # returns "tuple" with count and comma separated list of servers (string)
   def gather_complete_server_list(options)
     # call the ship-it script to get a full list of servers
-    cmd_options = Array(current_repo.name)
+    cmd_options = Array(options[:repo].name)
     cmd_options << "--list-servers"
     cmd_options << shipit_server_flag(options)
     server_list = `#{shipit_command(cmd_options)}`.strip
@@ -120,8 +120,7 @@ class DeployTarget < ActiveRecord::Base
     server_count, server_list = gather_complete_server_list(options)
 
     # build options ot pass to ship-it
-    cmd_options = []
-    cmd_options << options[:repo].name
+    cmd_options = Array(options[:repo].name)
     cmd_options << "#{options[:what]}=#{options[:what_details]}"
 
     # yet *another* duplicate deploy guard
