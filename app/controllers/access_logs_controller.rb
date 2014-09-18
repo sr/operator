@@ -1,5 +1,5 @@
 class AccessLogsController < ApplicationController
   def index
-    @logs = AccessLog.all
+    @logs = AccessLog.page(params[:page]).order('id DESC')
   end
 end
