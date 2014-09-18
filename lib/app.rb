@@ -48,7 +48,7 @@ class CanoeApplication < Sinatra::Base
   set :partial_template_engine, :erb
 
   # useful for debugging....
-  set :logging, true
+  # set :logging, true
   # set :dump_errors, true
   # set :raise_errors, true
   # set :show_exceptions, true
