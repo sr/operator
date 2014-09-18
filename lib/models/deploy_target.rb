@@ -95,7 +95,8 @@ class DeployTarget < ActiveRecord::Base
   # returns "tuple" with count and comma separated list of servers (string)
   def gather_complete_server_list(options)
     # call the ship-it script to get a full list of servers
-    cmd_options = ["--list-servers"]
+    cmd_options = Array(current_repo.name)
+    cmd_options << "--list-servers"
     cmd_options << shipit_server_flag(options)
     server_list = `#{shipit_command(cmd_options)}`.strip
     [server_list.split(",").size, server_list]
