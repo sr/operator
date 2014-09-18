@@ -20,4 +20,9 @@ class Account < GlobalD
       }
     @_shard[datacenter]
   end
+
+  def access?
+    # Role 7 is engineering
+    !account_accesses.where(role: 7).where("expires_at > ?", Time.now).empty?
+  end
 end
