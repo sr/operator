@@ -19,6 +19,7 @@ module Canoe
     end
 
     def commits_for_compare(item1, item2)
+      return unless item1 && item2
       sha1 = item1.branch? ? item1.sha : item1.what_details
       sha2 = item2.branch? ? item2.sha : item2.what_details
       Octokit.compare(current_repo.full_name, sha1, sha2)
@@ -26,6 +27,7 @@ module Canoe
 
     def committers_for_compare(item1, item2)
       output = commits_for_compare(item1, item2)
+      return [] if output.nil?
 
       # we have to work around stevie's busted git setup (facepalm)
       # gather some sort of author from each commit
