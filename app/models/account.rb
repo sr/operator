@@ -15,8 +15,8 @@ class Account < GlobalD
 
   def shard(datacenter = DC::Dallas)
     @_shard ||= {
-        DC::Dallas => Shard.new(shard_id, DC::Dallas),
-        DC::Seattle => Shard.new(shard_id, DC::Seattle)
+        DC::Dallas => Account.create_shard(shard_id, DC::Dallas),
+        DC::Seattle => Account.create_shard(shard_id, DC::Seattle)
       }
     @_shard[datacenter]
   end
@@ -25,4 +25,21 @@ class Account < GlobalD
     # Role 7 is engineering
     !account_accesses.where(role: 7).where("expires_at > ?", Time.now).empty?
   end
+
+  def self.create_shard(shard_id, datacenter = DC::Dallas)
+    # Dynamically creates Shard Classes which hold the db connection for us
+    shard_name = "Shard#{shard_id}#{datacenter}"
+    begin
+      shard_name.constantize
+    rescue NameError
+      klass = Class.new(PardotShardExternal) do
+        self.table_name = "account"
+      end
+      Object.const_set shard_name, klass
+      shard_name.constantize.class_eval do
+        establish_connection_on_shard(shard_id, datacenter)
+      end
+    end
+  end
+
 end

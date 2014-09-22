@@ -22,7 +22,7 @@ class Query < ActiveRecord::Base
   def connection
     case database
     when DB::Account
-      account.shard(datacenter).class.connection
+      account.shard(datacenter).connection
     when DB::Global
       case datacenter
       when DC::Dallas
