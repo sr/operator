@@ -17,7 +17,7 @@
     <button type="button" class="btn btn-default<%= is_active?(:datacenter, DC::Seattle) %>" data-val="<%= DC::Seattle %>">Seattle</button>
   </div>
   <div class="viewoption" <%= is_active?(:view, VW::UI, 'style="display:none;"') %>>
-    <%= f.text_area(:sql, size: "60x6") %>
+    <%= f.text_area(:sql, rows: "6") %>
     <%= f.submit "Run Query" %>
   </div>
   <div class="viewoption" <%= is_active?(:view, VW::SQL, 'style="display:none;"') %>>
