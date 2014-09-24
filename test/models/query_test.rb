@@ -81,10 +81,14 @@ class QueryTest < ActiveSupport::TestCase
     assert_equal "#{sql} #{@limit}", @aquery.parse(sql).to_sql
   end
 
+  test "Lazy text - no quotes" do
+    sql = "select * from fromtable"
+    assert SQLParser::Parser.new.scan_str(sql)
+  end
+
   # Advanced tests
   test "Date test" do
     sql = 'select email_id from visitor_activity where type=12 and created_at<DATE "2014-07-23"'
-    puts SQLParser::Parser.new.scan_str(sql).to_sql
     assert SQLParser::Parser.new.scan_str(sql)
   end
 
@@ -97,4 +101,5 @@ class QueryTest < ActiveSupport::TestCase
     sql = 'select prospect_id from piListxProspect where (listx_id=1 or listx_id=2) and account_id=1 and is_mailable=1 order by rand() limit 10'
     assert SQLParser::Parser.new.scan_str(sql)
   end
+
 end
