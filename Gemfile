@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-
+gem 'dotenv'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.5'
 # Use sqlite3 as the database for Active Record
@@ -30,7 +30,6 @@ gem 'spring',        group: :development
 
 gem 'sql-parser', github: "janSF/sql-parser"# , path: "lib/sql-parser"
 gem 'will_paginate'
-gem 'dotenv'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
