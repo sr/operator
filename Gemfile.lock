@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/janSF/sql-parser.git
+  revision: 90f0c36ca4ff3f98a95f9fc74f47ebc619192ca1
+  specs:
+    sql-parser (0.0.3)
+      racc
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -41,6 +48,7 @@ GEM
     coffee-script-source (1.7.1)
     columnize (0.8.9)
     debugger-linecache (1.2.0)
+    dotenv (1.0.1)
     erubis (2.7.0)
     execjs (2.2.1)
     hike (1.2.3)
@@ -103,8 +111,6 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
-    sql-parser (0.0.2)
-      racc
     sqlite3 (1.3.9)
     therubyracer (0.12.1)
       libv8 (~> 3.16.14.0)
@@ -130,6 +136,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   coffee-rails (~> 4.0.0)
+  dotenv
   jbuilder (~> 2.0)
   jquery-rails
   mysql2
@@ -137,7 +144,7 @@ DEPENDENCIES
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
   spring
-  sql-parser
+  sql-parser!
   sqlite3
   therubyracer
   turbolinks
