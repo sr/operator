@@ -44,7 +44,9 @@ class Deploy < ActiveRecord::Base
   end
 
   def percentage_complete
-    ((finished_servers.size / all_servers.size.to_f) * 100).to_i
+    percentage = ((finished_servers.size / all_servers.size.to_f) * 100).to_i
+    percentage = 100 if percentage > 100 # make sure we don't go over 100 (happens on retries)
+    percentage
   end
 
   def complete!
