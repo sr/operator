@@ -1,7 +1,7 @@
 module Canoe
   module Locking
     def lock_target!
-      cmd_options = ["--only-lock", "--user=#{current_user.email}"]
+      cmd_options = ["--only-lock", "--no-color", "--user=#{current_user.email}"]
       cmd = current_target.shipit_command(cmd_options)
 
       current_target.lock!(current_user)
@@ -11,7 +11,7 @@ module Canoe
     end
 
     def unlock_target!(with_force=false)
-      cmd_options = ["--user=#{current_user.email}"]
+      cmd_options = ["--user=#{current_user.email}", "--no-color"]
       cmd_options << (with_force ? "--force-unlock" : "--unlock")
       cmd = current_target.shipit_command(cmd_options)
 
