@@ -105,17 +105,22 @@ module.exports = (robot) ->
 
     # Quit hatin
     robot.hear /^!hater$/i, (msg) ->
-        msg.send 'haters gonna hate'
+        haters = [
+          'https://s3.amazonaws.com/uploads.hipchat.com/45727/1005454/oScK0hmRTdRc3Gp/Haters-gonna-Hate.jpg',
+          'haters gonna hate'
+        ]
+        msg.send msg.random haters
 
     # Panic
     robot.hear /^!panic$/i, (msg) ->
-        random = Math.floor(Math.random() * 100)
-        if random > 0 and random < 33
-            msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png'
-        else if random >= 33 and random < 66
-            msg.send 'https://s3.amazonaws.com/uploads.hipchat.com/45727/341003/mjQmdzG1n3jd77P/Saasy%20Atlanta%20Takeover.jpg'
-        else
-            msg.send 'oh shit oh shit oh shit oh shit oh shit'
+        panics = [
+          'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png',
+          'https://s3.amazonaws.com/uploads.hipchat.com/45727/341003/mjQmdzG1n3jd77P/Saasy%20Atlanta%20Takeover.jpg',
+          'oh shit oh shit oh shit oh shit oh shit',
+          'Egads, I just pooped myself!'
+        ]
+
+        msg.send msg.random panics
 
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
