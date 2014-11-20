@@ -111,6 +111,10 @@ module.exports = (robot) ->
         ]
         msg.send msg.random haters
 
+    # head desking like a bo$$
+    robot.hear /^!headdesk$/i, (msg) ->
+        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/meCjyf1ox8fDqYN/head_desk.gif"
+
     # Panic
     robot.hear /^!panic$/i, (msg) ->
         panics = [
