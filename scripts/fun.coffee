@@ -61,7 +61,8 @@ module.exports = (robot) ->
             "#{target} makes questionable decisions",
             "#{target} breaks most things around here",
             "#{target} caused the current problem",
-            "#{target} did it!"
+            "#{target} did it!",
+            "#{target} has no idea what they are doing, but we still like 'em :)"
         ]
 
         msg.send msg.random blames
