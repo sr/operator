@@ -124,7 +124,8 @@ module.exports = (robot) ->
           'https://s3.amazonaws.com/uploads.hipchat.com/45727/306061/fo3AfbSS5Mvv3kP/sassy.png',
           'https://s3.amazonaws.com/uploads.hipchat.com/45727/341003/mjQmdzG1n3jd77P/Saasy%20Atlanta%20Takeover.jpg',
           'oh shit oh shit oh shit oh shit oh shit',
-          'Egads, I just pooped myself!'
+          'Egads, I just pooped myself!',
+          'https://s3.amazonaws.com/uploads.hipchat.com/45727/341003/MrXsBZvzXlbwH4u/Harry%20on%20fire.gif'
         ]
 
         msg.send msg.random panics
