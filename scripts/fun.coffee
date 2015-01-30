@@ -136,7 +136,7 @@ module.exports = (robot) ->
             'https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/7ZhhnBbw0mcAle6/kyleTyping.gif'
             'https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/lOMAYjK3Y1zDqk1/fln9x.gif'
         ]
-	   
+
         msg.send msg.random kylets
 
     # !jarsh
@@ -206,3 +206,11 @@ module.exports = (robot) ->
             "https://s3.amazonaws.com/uploads.hipchat.com/45727/575304/AgWDWwpIg1fawXU/dartz_key.gif"
         ]
         msg.send msg.random heathers
+
+    robot.hear /^!casey$/i, (msg) ->
+        caseys = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/1005454/Ar4bLTKjXwSI6pX/Im%20a%20lion.gif",
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/312472/MQoxbi1zWVP4x6I/Untitled-11.gif"
+        ]
+
+        msg.send msg.random caseys
