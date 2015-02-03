@@ -1,7 +1,7 @@
 #!/bin/bash
 export HUBOT_HIPCHAT_JID="45727_306047@chat.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Par Bot"
-export HUBOT_HIPCHAT_PASSWORD="!Parbot.2013!"
+export HUBOT_HIPCHAT_PASSWORD="!Parbot@2015!"
 export HUBOT_HIPCHAT_ROOMS="45727_engineering@conf.hipchat.com, 45727_campaign-overhaul@conf.hipchat.com"
 export HUBOT_HIPCHAT_API_KEY='33965558fc3c09972af5a4e3edf510'
 export HUBOT_HIPCHAT_TOKEN='33965558fc3c09972af5a4e3edf510'

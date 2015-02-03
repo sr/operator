@@ -1,7 +1,7 @@
 #!/bin/bash
-export HUBOT_HIPCHAT_JID="45727_306047@chat.hipchat.com"
-export HUBOT_HIPCHAT_NAME="Par Bot"
-export HUBOT_HIPCHAT_PASSWORD="!Parbot.2013!"
+export HUBOT_HIPCHAT_JID="45727_1289028@chat.hipchat.com"
+export HUBOT_HIPCHAT_NAME="Test Bot"
+export HUBOT_HIPCHAT_PASSWORD="Robit.07"
 export HUBOT_HIPCHAT_ROOMS="45727_bottest@conf.hipchat.com"
 export HUBOT_HIPCHAT_API_KEY='33965558fc3c09972af5a4e3edf510'
 export HUBOT_HIPCHAT_TOKEN='33965558fc3c09972af5a4e3edf510'
@@ -10,6 +10,10 @@ export HUBOT_HIPCHAT_DEBUG="true"
 # Ports to listen on
 export HUBOT_CAT_PORT="7896"
 export PORT="7897"
+
+# Kafka settings
+export ZOOKEEPER_HOST="zookeeperhost"
+export ZOOKEEPER_PORT="2181"
 
 # Database settings
 export DB_USER="bot"
