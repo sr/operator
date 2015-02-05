@@ -1,4 +1,14 @@
 #!/bin/bash
+
+echo "You have moved into a dark place."
+echo "It is pitch black. You are likely to be eaten by a grue."
+echo
+echo ">what is a grue?"
+echo "A grue is a sinister, lurking presence that requires you to"
+echo "update the configuration variables in this file so this test"
+echo "bot can connect to the new Hipchat instance."
+exit 1
+
 export HUBOT_HIPCHAT_JID="45727_1289028@chat.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Test Bot"
 export HUBOT_HIPCHAT_PASSWORD="Robit.07"

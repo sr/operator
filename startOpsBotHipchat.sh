@@ -1,4 +1,8 @@
 #!/bin/bash
+
+echo "OpsBot is dead. Long live OpsBot."
+exit 1
+
 export HUBOT_HIPCHAT_JID="45727_307793@chat.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Ops Bot"
 export HUBOT_HIPCHAT_PASSWORD="!Parbot@2015!"
