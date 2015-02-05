@@ -1,8 +1,8 @@
 #!/bin/bash
 export HUBOT_HIPCHAT_JID="1_113@chat.btf.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Par Bot"
-export HUBOT_HIPCHAT_PASSWORD="#### Waiting is the hardest part ####"
-export HUBOT_HIPCHAT_ROOMS="1_engineering@conf.btf.hipchat.com, 1_#craprag4life@conf.btf.hipchat.com"
+export HUBOT_HIPCHAT_PASSWORD="@Robit2015"
+export HUBOT_HIPCHAT_ROOMS="1_engineering@conf.btf.hipchat.com, 1_#craprag4life@conf.btf.hipchat.com, 1_team_assland@conf.btf.hipchat.com"
 export HUBOT_HIPCHAT_API_KEY='f9e237a292b8c3e6fbfa30bf0b687a'
 export HUBOT_HIPCHAT_TOKEN='f9e237a292b8c3e6fbfa30bf0b687a'
 export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
