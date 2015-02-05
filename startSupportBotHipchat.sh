@@ -1,7 +1,7 @@
 #!/bin/bash
 export HUBOT_HIPCHAT_JID="1_180@chat.btf.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Support Bot"
-export HUBOT_HIPCHAT_PASSWORD="STILL WAITING ON THE PASSWORD RESET EMAIL"
+export HUBOT_HIPCHAT_PASSWORD="MyRobitHasAFirstName5upport"
 export HUBOT_HIPCHAT_ROOMS="1_support@conf.btf.hipchat.com"
 export HUBOT_HIPCHAT_API_KEY='f9e237a292b8c3e6fbfa30bf0b687a'
 export HUBOT_HIPCHAT_TOKEN='f9e237a292b8c3e6fbfa30bf0b687a'
