@@ -1,10 +1,12 @@
 #!/bin/bash
-export HUBOT_HIPCHAT_JID="45727_306047@chat.hipchat.com"
+export HUBOT_HIPCHAT_JID="1_113@chat.btf.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Par Bot"
-export HUBOT_HIPCHAT_PASSWORD="!Parbot@2015!"
-export HUBOT_HIPCHAT_ROOMS="45727_engineering@conf.hipchat.com, 45727_campaign-overhaul@conf.hipchat.com"
-export HUBOT_HIPCHAT_API_KEY='33965558fc3c09972af5a4e3edf510'
-export HUBOT_HIPCHAT_TOKEN='33965558fc3c09972af5a4e3edf510'
+export HUBOT_HIPCHAT_PASSWORD="#### Waiting is the hardest part ####"
+export HUBOT_HIPCHAT_ROOMS="1_engineering@conf.btf.hipchat.com, 1_#craprag4life@conf.btf.hipchat.com"
+export HUBOT_HIPCHAT_API_KEY='f9e237a292b8c3e6fbfa30bf0b687a'
+export HUBOT_HIPCHAT_TOKEN='f9e237a292b8c3e6fbfa30bf0b687a'
+export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
+export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
 #export HUBOT_HIPCHAT_DEBUG="true"
 
 # Ports to listen on
