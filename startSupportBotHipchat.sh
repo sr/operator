@@ -1,10 +1,13 @@
 #!/bin/bash
-export HUBOT_HIPCHAT_JID="45727_308741@chat.hipchat.com"
+export HUBOT_HIPCHAT_JID="1_180@chat.btf.hipchat.com"
 export HUBOT_HIPCHAT_NAME="Support Bot"
-export HUBOT_HIPCHAT_PASSWORD="!Parbot@2015!"
-#export HUBOT_HIPCHAT_ROOMS="45727_support@conf.hipchat.com"
-export HUBOT_HIPCHAT_ROOMS="45727_support@conf.hipchat.com"
-export HUBOT_HIPCHAT_API_KEY='7019554b399f58a4e7fb8892a1f444'
+export HUBOT_HIPCHAT_PASSWORD="STILL WAITING ON THE PASSWORD RESET EMAIL"
+export HUBOT_HIPCHAT_ROOMS="1_support@conf.btf.hipchat.com"
+export HUBOT_HIPCHAT_API_KEY='f9e237a292b8c3e6fbfa30bf0b687a'
+export HUBOT_HIPCHAT_TOKEN='f9e237a292b8c3e6fbfa30bf0b687a'
+export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
+export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
+
 #export HUBOT_HIPCHAT_DEBUG="true"
 
 # Ports to listen on

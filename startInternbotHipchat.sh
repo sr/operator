@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "GOTO THECLOUD # internbot is a separate project these days"
+exit 1
+
 export HUBOT_HIPCHAT_JID="45727_306060@chat.hipchat.com"
 export HUBOT_HIPCHAT_PASSWORD="P4RD07"
 export HUBOT_HIPCHAT_NAME="Intern Bot"
