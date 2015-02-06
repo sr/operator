@@ -3,9 +3,9 @@ querystring = require 'querystring'
 _           = require 'underscore'
 
 class HipChatClient
-    
-    host:    'api.hipchat.com'
-    
+
+    host:    'hipchat.dev.pardot.com'
+
     constructor: (@apikey) ->
     
     listUsers: (callback) ->
