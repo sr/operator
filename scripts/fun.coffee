@@ -133,7 +133,7 @@ module.exports = (robot) ->
     # !kyle
     robot.hear /^!kylet$/i, (msg) ->
         kylets = [
-            'https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/7ZhhnBbw0mcAle6/kyleTyping.gif'
+            'https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/7ZhhnBbw0mcAle6/kyleTyping.gif',
             'https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/lOMAYjK3Y1zDqk1/fln9x.gif'
         ]
 
@@ -141,7 +141,20 @@ module.exports = (robot) ->
 
     # !jarsh
     robot.hear /^!jarsh$/i, (msg) ->
-    	       msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/DenznkieYNoO8oC/airswim.gif"
+        jarshs = [
+            "https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/DenznkieYNoO8oC/airswim.gif",
+            "https://hipchat.dev.pardot.com/files/1/168/QH3hjSnULEeFsyc/JarshUpsideDown.jpeg"
+        ]
+
+        msg.send msg.random jarshs
+
+    # !tinny
+    robot.hear /^!tinny$/i, (msg) ->
+        tinnys = [
+            "https://hipchat.dev.pardot.com/files/1/168/bsimEJhT7jZCY9w/Tinny.jpg"
+        ]
+
+        msg.send msg.random tinnys
 
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
