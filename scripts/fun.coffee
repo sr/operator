@@ -141,20 +141,20 @@ module.exports = (robot) ->
 
     # !jarsh
     robot.hear /^!jarsh$/i, (msg) ->
-        jarshs = [
+        jarshes = [
             "https://s3.amazonaws.com/uploads.hipchat.com/45727/1079249/DenznkieYNoO8oC/airswim.gif",
             "https://hipchat.dev.pardot.com/files/1/168/QH3hjSnULEeFsyc/JarshUpsideDown.jpeg"
         ]
 
-        msg.send msg.random jarshs
+        msg.send msg.random jarshes
 
-    # !tinny
-    robot.hear /^!tinny$/i, (msg) ->
-        tinnys = [
+    # !miniTinny
+    robot.hear /^!miniTinny$/i, (msg) ->
+        miniTinnies = [
             "https://hipchat.dev.pardot.com/files/1/168/bsimEJhT7jZCY9w/Tinny.jpg"
         ]
 
-        msg.send msg.random tinnys
+        msg.send msg.random miniTinnies
 
     # Poop on someone
     robot.hear /^!poop\s?(.*)/i, (msg) ->
