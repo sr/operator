@@ -13,6 +13,12 @@
 
 util = require "../lib/util"
 HipChatClient = require('../lib/hipchat')
+moment = require 'moment-timezone'
+
+formatDate = (dateString) ->
+    return moment(new Date(dateString))
+      .tz("America/New_York")
+      .format('llll z')
 
 module.exports = (robot) ->
     if process.env.BOT_TYPE != 'parbot'
@@ -41,7 +47,7 @@ module.exports = (robot) ->
                     for sync in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + sync.revision
                         # msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
-                        body.message = sync.releaser + ' synced <a href="' +  github_link + '">build' + sync.revision + '</a> to production on ' + sync.date
+                        body.message = sync.releaser + ' synced <a href="' +  github_link + '">build' + sync.revision + '</a> to production on ' + formatDate(sync.date)
                         hipchat_client.postMessage body, (data, err) ->
                             if err
                                 console.log 'Error sending message via the API: ' + err
@@ -75,7 +81,7 @@ module.exports = (robot) ->
                     for build in r
                         github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
                         # msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
-                        body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + build.date
+                        body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + formatDate(build.date)
                         hipchat_client.postMessage body, (data, err) ->
                             if err
                                 console.log 'Error sending message via the API: ' + err
