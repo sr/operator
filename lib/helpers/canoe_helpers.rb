@@ -50,7 +50,7 @@ module Canoe
     def repo_icon_map
       { "pardot"   => "cloud",
         "pithumbs" => "thumbs-up",
-        "realtime-frontend" => "money",
+        "realtime-frontend" => "bullhorn",
       }
     end
 
