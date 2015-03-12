@@ -20,7 +20,11 @@ module Canoe
     end
 
     def current_repo
-      @_current_repo ||= \
+      @_current_repo ||= Octokit.repo("pardot/#{current_repo_name}")
+    end
+
+    def current_repo_name
+      @_current_repo_name ||= \
         begin
           repo_name = ""
           if params[:repo_name].blank? && current_deploy.nil?
@@ -30,22 +34,32 @@ module Canoe
           elsif !params[:repo_name].blank?
             repo_name = params[:repo_name] # use valid repo name
           elsif !current_deploy.nil?
-            repo_name = current_deploy.repo_nume # fall back to current deploy's repo
+            repo_name = current_deploy.repo_name # fall back to current deploy's repo
           else
             return nil # default fail
           end
-          Octokit.repo("pardot/#{repo_name.downcase}")
+
+          repo_name
         end
     end
 
     def all_repos
-      %w[pardot pithumbs]
+      %w[pardot pithumbs realtime-frontend]
     end
 
     def repo_icon_map
       { "pardot"   => "cloud",
         "pithumbs" => "thumbs-up",
+        "realtime-frontend" => "money",
       }
+    end
+
+    def supported?(what)
+      # these methods of deploying are NOT supported by the given repos
+      @_exclusions ||= {
+        "realtime-frontend" => %w[branch commit],
+      }
+      !(@_exclusions[current_repo_name] || []).include?(what.to_s)
     end
 
     def current_target
@@ -94,7 +108,7 @@ module Canoe
     # ----------------------------------------------------------------------
     # ACTIVE X
     def active_repo(repo_name)
-      current_repo && current_repo.name.downcase == repo_name.downcase ? 'class="active"' : ""
+      current_repo_name.downcase == repo_name.downcase ? 'class="active"' : ""
     end
 
     def active_target(target_name)
@@ -108,7 +122,7 @@ module Canoe
 
     # ----------------------------------------------------------------------
     # PATHS
-    def repo_path(repo_name=current_repo.name)
+    def repo_path(repo_name=current_repo_name)
       "/deploy/repo/#{repo_name}"
     end
 

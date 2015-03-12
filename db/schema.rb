@@ -43,7 +43,7 @@ ActiveRecord::Schema.define(version: 20140904164525) do
     t.string   "repo_name"
     t.string   "what"
     t.string   "what_details"
-    t.boolean  "completed"
+    t.boolean  "completed",         default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "process_id"

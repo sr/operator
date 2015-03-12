@@ -29,18 +29,24 @@
     </form>
   <% end %>
   <ul class="nav nav-tabs">
+    <% if supported?("tag") %>
     <li <%= 'class="active"' if @tag %>>
       <a href="<%= repo_path %>/tags/latest"><%= deploy_type_icon("tag") %> Latest Tag</a>
     </li>
     <li <%= 'class="active"' if @tags %>>
       <a href="<%= repo_path %>/tags"><%= deploy_type_icon("tag") %> Tags</a>
     </li>
+    <% end %>
+    <% if supported?("branch") %>
     <li <%= 'class="active"' if @branches %>>
       <a href="<%= repo_path %>/branches"><%= deploy_type_icon("branch") %> Branches</a>
     </li>
+    <% end %>
+    <% if supported?("commit") %>
     <li <%= 'class="active"' if @commits %>>
       <a href="<%= repo_path %>/commits"><%= deploy_type_icon("commit") %> Commits</a>
     </li>
+    <% end %>
   </ul>
   <br>
 
