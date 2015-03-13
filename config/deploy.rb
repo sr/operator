@@ -1,6 +1,6 @@
 require 'bundler/capistrano'
 
-default_run_options[:pty] = true  # Must be set for the password prompt from git to work
+# default_run_options[:pty] = true  # Must be set for the password prompt from git to work
 ssh_options[:forward_agent] = true
 
 set :application, "canoe"
@@ -8,9 +8,7 @@ set :repository,  "git@github.com:Pardot/#{application}.git"
 set :deploy_to,   "/var/#{application}"
 set :branch,      ENV["BRANCH"] || "master"
 set :user,        "deploy"
-
-# set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
-# Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
+set :scm,         :git
 
 role :web, "127.0.0.1"
 role :app, "127.0.0.1"
