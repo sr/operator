@@ -17,7 +17,7 @@ module.exports = (robot) ->
         if process.env.BOT_TYPE == 'parbot'
             key = msg.match[1]
             conn = util.getQuoteDBConn()
-            conn.query 'SELECT quote FROM quote WHERE quote like \'%<ian>%\' ORDER BY rand() limit 10', (err,r,f) ->
+            conn.query 'SELECT quote FROM quote WHERE quote like \'%<robrighter>%\' OR quote like \'%<ian>%\' ORDER BY rand() limit 10', (err,r,f) ->
                 msg.send r[0].quote if r and r[0]
 
             conn.end()
