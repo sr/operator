@@ -107,11 +107,11 @@ module Canoe
 
     # ----------------------------------------------------------------------
     # ACTIVE X
-    def active_repo(repo_name)
-      current_repo_name.downcase == repo_name.downcase ? 'class="active"' : ""
+    def active_repo(repo_name="")
+      (current_repo_name || "").downcase == repo_name.downcase ? 'class="active"' : ""
     end
 
-    def active_target(target_name)
+    def active_target(target_name="")
       if !current_repo && current_target && \
          current_target.name.downcase == target_name.downcase
         'class="active"'
