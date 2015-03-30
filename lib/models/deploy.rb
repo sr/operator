@@ -18,7 +18,7 @@ class Deploy < ActiveRecord::Base
 
   def log_contents
     return "" unless File.exist?(log_path)
-    File.read(log_path)
+    File.read(log_path, :encoding => "UTF-8")
   end
 
   # only grab the last X lines of the log output
