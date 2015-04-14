@@ -84,6 +84,15 @@ namespace :canoe do
     ) unless prod_env
   end
 
+  # added for ease of chef'ing
+  task :create_development_targets do
+    Rake::Task["canoe:create_dev_targets"].invoke
+  end
+
+  task :create_production_targets do
+    Rake::Task["canoe:create_prod_targets"].invoke
+  end
+
 end
 
 # ----------------------------------------------------------------------------
