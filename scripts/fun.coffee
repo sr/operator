@@ -227,3 +227,6 @@ module.exports = (robot) ->
         ]
 
         msg.send msg.random caseys
+
+    robot.hear /^!engage$/i, (msg) ->
+        msg.send "http://i.imgur.com/MX458aQ.jpg"
