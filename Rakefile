@@ -68,6 +68,14 @@ namespace :canoe do
       lock_path: '/var/lock/staging',
       locked: false,
     ) if !staging_env
+
+    engage_env = DeployTarget.where(name: 'engagement').first
+    DeployTarget.create(
+      name: 'engagement',
+      script_path: '/opt/sync/staging',
+      lock_path: '/var/lock/engagement',
+      locked: false,
+    ) if !engage_env
   end
 
   desc "Create deploy target for production env"
