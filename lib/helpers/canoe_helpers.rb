@@ -1,13 +1,5 @@
 module Canoe
   module Helpers
-    def use_https?
-      self.class.is_production?
-    end
-
-    def protocol_for_includes
-      use_https? ? "https" : "http"
-    end
-
     # ----------------------------------------------------------------------
     # CURRENT X
     def current_user
