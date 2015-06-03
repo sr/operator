@@ -4,7 +4,7 @@ require 'bundler/capistrano'
 ssh_options[:forward_agent] = true
 
 set :application, "canoe"
-set :repository,  "git@github.com:Pardot/#{application}.git"
+set :repository,  "git@git.dev.pardot.com:Pardot/#{application}.git"
 set :deploy_to,   "/var/#{application}"
 set :branch,      ENV["BRANCH"] || "master"
 set :user,        "deploy"

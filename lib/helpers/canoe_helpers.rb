@@ -153,7 +153,7 @@ module Canoe
     end
 
     def github_url
-      "https://github.com"
+      "https://git.dev.pardot.com"
     end
 
     def github_tag_url(tag)

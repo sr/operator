@@ -102,7 +102,7 @@ To avoid some github/ssh mess, I also symlink id_rsa to canoe_id_rsa and id_rsa.
 
         mkdir -p ~/repo
         cd ~/repo
-        git clone git@github.com:Pardot/canoe.git
+        git clone git@git.dev.pardot.com:Pardot/canoe.git
 
 3. Create our deploy destination
 

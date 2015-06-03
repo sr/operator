@@ -1,7 +1,7 @@
 Canoe
 =====
 
-Easy deployment front-end to [ship-it.rb](https://github.com/pardot/sync_scripts).
+Easy deployment front-end to [ship-it.rb](https://git.dev.pardot.com/pardot/sync_scripts).
 
 ------------------------------------------------------------------------------
 
