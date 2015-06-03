@@ -45,7 +45,7 @@ module.exports = (robot) ->
             conn.query 'SELECT * FROM sync ORDER BY ID DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for sync in r
-                        github_link = 'https://github.com/pardot/pardot/tree/build' + sync.revision
+                        github_link = 'https://git.dev.pardot.com/pardot/pardot/tree/build' + sync.revision
                         # msg.send sync.releaser + ' synced tag "build' + sync.revision + '" (' + github_link + ') to production on ' + sync.date
                         body.message = sync.releaser + ' synced <a href="' +  github_link + '">build' + sync.revision + '</a> to production on ' + formatDate(sync.date)
                         hipchat_client.postMessage body, (data, err) ->
@@ -79,7 +79,7 @@ module.exports = (robot) ->
             conn.query 'SELECT * FROM builds ORDER BY build_number DESC limit ' + number, (err,r,f) ->
                 if r and r[0]
                     for build in r
-                        github_link = 'https://github.com/pardot/pardot/tree/build' + build.build_number
+                        github_link = 'https://git.dev.pardot.com/pardot/pardot/tree/build' + build.build_number
                         # msg.send 'build' + build.build_number + ' (' + github_link + ') passed on ' + build.date
                         body.message = '<a href="' + github_link + '">build' + build.build_number + '</a> passed on ' + formatDate(build.date)
                         hipchat_client.postMessage body, (data, err) ->
@@ -107,7 +107,7 @@ module.exports = (robot) ->
                             if last_sync == last_build
                                 msg.send 'Looks like we are up-to-date. (buttrock)'
                             else
-                                github_link = 'https://github.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
+                                github_link = 'https://git.dev.pardot.com/pardot/pardot/compare/build' + last_sync + '...' + 'build' + last_build
 
                                 body = {}
                                 body.room = 'engineering' # msg.envelope.room
@@ -141,7 +141,7 @@ module.exports = (robot) ->
         return if msg.message.text.match(/›/g).length isnt 2
         if process.env.BOT_TYPE == 'parbot'
             build_number = msg.match[1]
-            # github_link = 'https://github.com/pardot/pardot/tree/build' + build_number
+            # github_link = 'https://git.dev.pardot.com/pardot/pardot/tree/build' + build_number
 
             conn = util.getReleaseDBConn()
             conn.query 'INSERT INTO builds (build_number, date) VALUES(?, NOW())', [build_number], (err,r,f) ->

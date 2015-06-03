@@ -36,7 +36,7 @@ module.exports = (robot) ->
     msg.send "http://i957.photobucket.com/albums/ae55/mttrek360/the_more_you_know2.jpg"
 
   robot.hear /^!source/i, (msg) ->
-    msg.send "https://github.com/pardot/parbot"
+    msg.send "https://git.dev.pardot.com/pardot/parbot"
 
   robot.hear /knowing is half the battle/i, (msg) ->
     msg.send msg.random thebattle
