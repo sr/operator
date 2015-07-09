@@ -44,13 +44,14 @@ module Canoe
     end
 
     def all_repos
-      %w[pardot pithumbs realtime-frontend]
+      %w[pardot pithumbs realtime-frontend workflow]
     end
 
     def repo_icon_map
       { "pardot"   => "cloud",
         "pithumbs" => "thumbs-up",
         "realtime-frontend" => "bullhorn",
+        "workflow" => "fighter-jet",
       }
     end
 
@@ -58,6 +59,7 @@ module Canoe
       # these methods of deploying are NOT supported by the given repos
       @_exclusions ||= {
         "realtime-frontend" => %w[branch commit],
+        "workflow" => %w[branch commit],
       }
       !(@_exclusions[current_repo_name] || []).include?(what.to_s)
     end
