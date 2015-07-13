@@ -27,6 +27,7 @@ module Canoe
       @_current_repo_name ||= \
         begin
           repo_name = ""
+
           if params[:repo_name].blank? && current_deploy.nil?
             return nil # if we don't have anything, bail
           elsif !params[:repo_name].blank? && !all_repos.include?(params[:repo_name])
@@ -44,14 +45,14 @@ module Canoe
     end
 
     def all_repos
-      %w[pardot pithumbs realtime-frontend workflow]
+      %w[pardot pithumbs realtime-frontend workflow-stats]
     end
 
     def repo_icon_map
       { "pardot"   => "cloud",
         "pithumbs" => "thumbs-up",
         "realtime-frontend" => "bullhorn",
-        "workflow" => "fighter-jet",
+        "workflow-stats" => "fighter-jet",
       }
     end
 
@@ -59,7 +60,7 @@ module Canoe
       # these methods of deploying are NOT supported by the given repos
       @_exclusions ||= {
         "realtime-frontend" => %w[branch commit],
-        "workflow" => %w[branch commit],
+        "workflow-stats" => %w[branch commit],
       }
       !(@_exclusions[current_repo_name] || []).include?(what.to_s)
     end
