@@ -1,0 +1,5 @@
+.DS_Store
+.dev_settings.yml
+coverage
+test_destinations/*
+test_sources/*

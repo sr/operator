@@ -1,0 +1,49 @@
+#    _____          _   
+#   /__   \___  ___| |_ 
+#     / /\/ _ \/ __| __|
+#    / / |  __/\__ \ |_ 
+#    \/   \___||___/\__|
+                    
+
+# This is using the :key: yml syntax to get symbol keys instead of string keys
+---
+<% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
+
+:sudo: ""
+:rsync_user: ""
+
+:use_locking: true
+:lock_location: <%= sync_dir %>/dev_lock
+
+:canoe_url: http://canoe.dev
+
+<% sources_path = "#{sync_dir}/test_sources" %>
+<% destinations_path = "#{sync_dir}/test_destinations" %>
+
+:repos:
+  :pardot:
+    :key: ''
+    :local_path: <%= sources_path %>/pi
+    :remote_path: <%= destinations_path %>/test-pi/
+    :remote_current_link: <%= destinations_path %>/current-pi
+    :remote_path_choices: 
+      - <%= destinations_path %>/test-piA/
+      - <%= destinations_path %>/test-piB/
+    :remote_html_path: <%= destinations_path %>/test-html/
+  :node_modules:
+    :key: ''
+    :local_path: <%= sources_path %>/node_modules
+    :remote_path: <%= destinations_path %>/test-node_modules
+  :pithumbs:
+    :key: ''
+    :local_path: <%= sources_path %>/thumbs
+    :remote_path: <%= destinations_path %>/test-thumbs
+
+:servers:
+  :pardot: 
+    - localhost
+  :pithumbs: 
+    - localhost
+
+:redis_hosts: []
+:redis_ports: []

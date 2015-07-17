@@ -1,0 +1,62 @@
+#   8888888b.
+#   888  "Y88b
+#   888    888
+#   888    888  .d88b.  888  888
+#   888    888 d8P  Y8b 888  888
+#   888    888 88888888 Y88  88P
+#   888  .d88P Y8b.      Y8bd8P
+#   8888888P"   "Y8888    Y88P
+
+# This is using the :key: yml syntax to get symbol keys instead of string keys
+---
+<% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
+
+:canoe_url: https://canoe.dev.pardot.com
+:canoe_target: staging
+
+<% sources_path = "#{sync_dir}/test_sources" %>
+<% destinations_path = "#{sync_dir}/test_destinations" %>
+<% pardot_dir = "#{destinations_path}/pardot" %>
+
+:repos:
+  :pardot:
+    :key: ''
+    :local_path: <%= sources_path %>/pi
+    # Directory layout:
+    #  <local_path>/artifacts # S3 artifact cache
+    #  <local_path>/github # Local git directory
+    #  <local_path>/build # Where artifacts get expanded and built
+    :remote_path: /var/www/pi/
+    :remote_current_link: <%= pardot_dir %>/current
+    :remote_path_choices:
+      - <%= pardot_dir %>/releases/A
+      - <%= pardot_dir %>/releases/B
+    :artifact_prefix: pi-
+    :s3_bucket: pi
+  :node_modules:
+    :key: ''
+    :local_path: <%= sources_path %>/node_modules
+    :remote_path: <%= destinations_path %>/node_modules
+  :pithumbs:
+    :key: ''
+    :local_path: <%= sources_path %>/thumbs
+    :remote_path: <%= destinations_path %>/thumbs
+  :realtime-frontend:
+    :key: ''
+    :local_path: <%= sources_path %>/realtime_frontend
+    :remote_path: <%= destinations_path %>/realtime_frontend
+    :remote_current_link: <%= destinations_path %>/current-salesedge
+    # :remote_path_choices:
+    #   - <%= destinations_path %>/test-salesedge/releases/A/
+    #   - <%= destinations_path %>/test-salesedge/releases/B/
+  :workflow:
+    :key: ''
+    :local_path: <%= sources_path %>/workflow
+    :remote_path: <%= destinations_path %>/workflow
+    :remote_current_link: <%= destinations_path %>/workflow/current
+    :remote_path_choices:
+      - <%= destinations_path %>/workflow/releases/A/
+      - <%= destinations_path %>/workflow/releases/B/
+
+:redis_hosts: []
+:redis_ports: []
