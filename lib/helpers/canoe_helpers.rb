@@ -1,11 +1,7 @@
 module Canoe
   module Helpers
     def protocol_for_includes
-      if self.class.is_production?
-        "https" # SSL connection is terminated at proxy
-      else
-        request.scheme
-      end
+      request.scheme
     end
 
     # ----------------------------------------------------------------------
