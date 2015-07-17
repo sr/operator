@@ -466,4 +466,26 @@ class CanoeApplication < Sinatra::Base
     end
   end
 
+  get "/api/status/deploy/pardot" do
+    content_type :json
+    require_api_authentication!
+
+    get_recent_deploys_for_repos
+    current_deploy = @last_repo_deploys['pardot']
+    # get the status of the given deploy
+    if current_deploy
+      { target: current_deploy.deploy_target.name,
+        user: current_deploy.auth_user.email,
+        repo: current_deploy.repo_name,
+        what: current_deploy.what,
+        what_details: current_deploy.what_details,
+        completed: current_deploy.completed,
+      }.to_json
+    else
+      { error: true,
+        message: "Unable to find requested deploy.",
+      }.to_json
+    end
+  end
+
 end
