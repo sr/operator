@@ -466,7 +466,7 @@ class CanoeApplication < Sinatra::Base
     end
   end
 
-  get "/api/status/deploy/pardot" do
+  get "/api/status/deploy/:target_name/pardot" do
     content_type :json
     require_api_authentication!
 
