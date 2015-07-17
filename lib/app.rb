@@ -470,8 +470,7 @@ class CanoeApplication < Sinatra::Base
     content_type :json
     require_api_authentication!
 
-    get_recent_deploys_for_repos
-    current_deploy = @last_repo_deploys['pardot']
+    current_deploy = get_recent_deploys_for_repos['pardot']
     # get the status of the given deploy
     if current_deploy
       { target: current_deploy.deploy_target.name,
