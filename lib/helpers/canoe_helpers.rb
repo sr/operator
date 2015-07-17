@@ -103,6 +103,7 @@ module Canoe
         @last_repo_deploys[repo] = \
           current_target.deploys.where(repo_name: repo).order('created_at DESC').first
       end
+      @last_repo_deploys
     end
 
     # ----------------------------------------------------------------------
