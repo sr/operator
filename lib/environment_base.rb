@@ -36,7 +36,7 @@ class EnvironmentBase
     begin
       tmp_hooks = Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
       #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
-      #tmp_hooks[:pardot][:after][:fetch]  = [:run_composer, :tag_build]
+      tmp_hooks[:pardot][:after][:deploy] = [:custom_hooks]
       tmp_hooks
     end
   end
@@ -126,6 +126,17 @@ class EnvironmentBase
   end
 
   # =========================================================================
+  # common hooks
+
+  # These are per machine custom hooks that are managed by chef
+  def custom_hooks
+    unless (custom_hooks_path.empty?)
+      output = ShellHelper.execute_shell(custom_hooks_path)
+      Console.log(output)
+    end
+  end
+
+  # =========================================================================
   def name
     self.class.to_s.gsub(/^Environment/,"")
   end
@@ -185,6 +196,10 @@ class EnvironmentBase
 
   def canoe_target
     @config.fetch(:canoe_target, "")
+  end
+
+  def custom_hooks_path
+    @config.fetch(:custom_hooks, "")
   end
 
   private

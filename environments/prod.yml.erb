@@ -19,6 +19,8 @@
 :lock_location: ''
 
 :canoe_url: http://internal.canoe.pardot.com
+:canoe_target: production
+:custom_hooks: /opt/pardot/server_hooks.sh
 
 :repos:
   :pardot:
@@ -29,7 +31,6 @@
     #  <local_path>/github # Local git directory
     #  <local_path>/build # Where artifacts get expanded and built
     :remote_path: /var/www/pi/
-    :remote_html_path: /var/www/html/
     :remote_current_link: <%= pardot_dir %>/current
     :remote_path_choices:
       - <%= pardot_dir %>/releases/A
