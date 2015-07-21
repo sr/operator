@@ -153,6 +153,18 @@ class EnvironmentBase
     ShellHelper.real_user(@user)
   end
 
+  def dev?
+    name.downcase == "dev"
+  end
+
+  def test_env?
+    name.downcase == "test"
+  end
+
+  def production?
+    name.downcase == "production"
+  end
+
   def valid_payload?(payload_name = nil)
     if payload_name
       repos.keys.include?(payload_name.to_sym)

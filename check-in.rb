@@ -2,6 +2,7 @@
 
 require 'pathname'
 
+LOCKFILE='/tmp/pull-lock'
 SYNC_SCRIPTS_DIR=File.realpath(File.dirname(__FILE__))
 # add our root and lib dirs to the load path
 $:.unshift SYNC_SCRIPTS_DIR
@@ -15,6 +16,15 @@ require 'canoe'
 
 cli = CLI.new
 cli.setup
+
+# Wait a random number of seconds, since cron can't be set by second
+sleep(rand*30) unless cli.environment.dev?
+
+# Only one-concurrent process using file lock
+exit if File.exist?(LOCKFILE)
+lockfile = File.new(LOCKFILE, 'w')
+lockfile.close
+
 currently_deployed = cli.check_version
 requested = Canoe.get_current_build(cli.environment)
 
@@ -25,3 +35,5 @@ if currently_deployed != requested
 else
   Console.log("We're up to date: #{requested}", :green)
 end
+
+File.delete(LOCKFILE)
