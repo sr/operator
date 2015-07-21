@@ -19,7 +19,7 @@ currently_deployed = cli.check_version
 requested = Canoe.get_current_build(cli.environment)
 
 if currently_deployed != requested
-  Console.log("Current: #{currently_deployed} -> Requested: #{requested}")
+  Console.log("Current: #{currently_deployed || "<None>"} -> Requested: #{requested}")
   cli.options[:requested_value] = requested
   cli.start!
 else

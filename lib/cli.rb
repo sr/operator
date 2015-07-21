@@ -124,9 +124,11 @@ class CLI
 
   def check_version
     version = nil
-    File.open(environment.payload.tag_file).each do |line|
-      if (line =~ /build\d+/)
-        version = Regexp.last_match[0]
+    if (File.exist?(environment.payload.tag_file))
+      File.open(environment.payload.tag_file).each do |line|
+        if (line =~ /build\d+/)
+          version = Regexp.last_match[0]
+        end
       end
     end
     version
