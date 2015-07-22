@@ -21,12 +21,11 @@
 :repos:
   :pardot:
     :key: ''
-    :local_path: <%= sources_path %>/pi
+    :local_path: <%= pardot_dir %>
     # Directory layout:
     #  <local_path>/artifacts # S3 artifact cache
     #  <local_path>/github # Local git directory
     #  <local_path>/build # Where artifacts get expanded and built
-    :remote_path: /var/www/pi/
     :remote_current_link: <%= pardot_dir %>/current
     :remote_path_choices:
       - <%= pardot_dir %>/releases/A
