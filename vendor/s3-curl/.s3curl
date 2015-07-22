@@ -1,7 +1,0 @@
-%awsSecretAccessKeys = (
-   # Pardot account
-   bamboo => {
-        id => 'AKIAI45UFYSB3UQOS6SA',
-        key => 'YlsLM6UGzuLKiU3gKODa7d0k8giYLntAd/czoMIY',
-    },
-);
