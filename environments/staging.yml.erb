@@ -1,0 +1,63 @@
+#    .d8888b.  888                      d8b
+#   d88P  Y88b 888                      Y8P
+#   Y88b.      888
+#    "Y888b.   888888  8888b.   .d88b.  888 88888b.   .d88b.
+#       "Y88b. 888        "88b d88P"88b 888 888 "88b d88P"88b
+#         "888 888    .d888888 888  888 888 888  888 888  888
+#   Y88b  d88P Y88b.  888  888 Y88b 888 888 888  888 Y88b 888
+#    "Y8888P"   "Y888 "Y888888  "Y88888 888 888  888  "Y88888
+#                                   888                   888
+#                              Y8b d88P              Y8b d88P
+#                               "Y88P"                "Y88P"
+
+---
+<% sync_dir = "/opt/sync" %>
+<% pardot_dir = "/var/www/pardot" %>
+<% realtime_dir = "/opt/realtime_frontend" %>
+<% workflow_dir = "/opt/workflow" %>
+:sudo: sudo -u pi
+
+:use_locking: true
+:lock_location: /var/lock/staging
+
+:canoe_url: http://internal.canoe.dev.pardot.com
+:canoe_target: staging
+:custom_hooks: /opt/pardot/server_hooks.sh
+
+:repos:
+  :pardot:
+    :key: ""
+    :local_path: <%= sync_dir %>/pi
+    :remote_path: /var/www/pi/
+    :remote_current_link: <%= pardot_dir %>/current
+    :remote_path_choices:
+      - <%= pardot_dir %>/releases/A
+      - <%= pardot_dir %>/releases/B
+  :node_modules:
+    :key: ""
+    :local_path: <%= sync_dir %>/node_modules
+    :remote_path: /var/www/node_modules/
+  :pithumbs:
+    :key: ""
+    :local_path: <%= sync_dir %>/thumbs
+    :remote_path: /var/www/pithumbs/
+  :realtime-frontend:
+    :key: ""
+    :local_path: <%= sync_dir %>/realtime_frontend
+    :remote_path: <%= realtime_dir %>
+    :remote_current_link: <%= realtime_dir %>/realtime-frontend
+    :artifact_prefix: realtime-
+    :s3_bucket: realtime-frontend
+  :workflow:
+    :key: ''
+    :local_path: <%= sync_dir %>/workflow
+    :remote_path: <%= workflow_dir %>
+    :remote_current_link: <%= workflow_dir %>/current
+    :artifact_prefix: realtime-
+    :s3_bucket: realtime-frontend
+
+:composer_cache_path: <%= sync_dir %>/composer_cache
+
+:redis_hosts:
+  - redis-s1.dev
+:redis_ports: [1234]
