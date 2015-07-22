@@ -25,15 +25,19 @@ exit if File.exist?(LOCKFILE)
 lockfile = File.new(LOCKFILE, 'w')
 lockfile.close
 
-currently_deployed = cli.check_version
-requested = Canoe.get_current_build(cli.environment)
+begin
+  currently_deployed = cli.check_version
+  requested = Canoe.get_current_build(cli.environment)
 
-if currently_deployed != requested
-  Console.log("Current: #{currently_deployed || "<None>"} -> Requested: #{requested}")
-  cli.options[:requested_value] = requested
-  cli.start!
-else
-  Console.log("We're up to date: #{requested}", :green)
+  if (requested =~ /build\d+/).nil?
+    Console.log("We will only deploy Bamboo tags - Requested: #{requested}")
+  elsif currently_deployed != requested
+    Console.log("Current: #{currently_deployed || "<None>"} -> Requested: #{requested}")
+    cli.options[:requested_value] = requested
+    cli.start!
+  else
+    Console.log("We're up to date: #{requested}", :green)
+  end
+ensure
+  File.delete(LOCKFILE)
 end
-
-File.delete(LOCKFILE)
