@@ -16,8 +16,8 @@ class EnvironmentBase
   end
 
   def load_secrets
-    if File.exist?(".#{name}_settings.yml")
-      load_yaml(".#{name}_settings.yml")
+    if File.exist?(".#{name.downcase}_settings.yml")
+      load_yaml(".#{name.downcase}_settings.yml")
     elsif File.exist?(".default_settings.yml")
       load_yaml(".default_settings.yml")
     end
