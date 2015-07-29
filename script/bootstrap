@@ -8,6 +8,6 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "==> Installing gem dependencies…"
-bundle check --path vendor/gems 2>&1 > /dev/null || {
+bundle check &> /dev/null || {
   bundle install --quiet --without production
 }
