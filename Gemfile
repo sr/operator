@@ -12,11 +12,14 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
+gem 'octokit', '~> 3.8'
+
 group :development do
   # Use Capistrano for deployment
   gem 'capistrano-rails', '~> 1.1', '>= 1.1.3'
 
   gem 'foreman', '0.78.0'
+  gem 'dotenv-rails', '~> 2.0', '>= 2.0.2', require: 'dotenv/rails-now'
 end
 
 group :development, :test do
