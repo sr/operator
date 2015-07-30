@@ -13,6 +13,8 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'octokit', '~> 3.8'
+gem 'omniauth', '~> 1.2', '>= 1.2.2'
+gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
 group :development do
   # Use Capistrano for deployment
