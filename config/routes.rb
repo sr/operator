@@ -5,8 +5,9 @@ Rails.application.routes.draw do
   namespace :api do
     # TODO: In an ideal world, deploy should be deploys (plural). Do we need to
     # keep the API routes stable for any reason?
-    resources :deploy do
+    resources :deploy, only: [] do
       post :complete, on: :member
+      post :completed_server, on: :member
     end
   end
 
