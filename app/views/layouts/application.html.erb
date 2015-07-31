@@ -1,14 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Canoe</title>
-  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Pardot/Canoe [<%= Rails.env %>]</title>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%- if Rails.env.production? %>
+    <%= stylesheet_link_tag 'prod', media: 'all' %>
+  <%- end %>
+
   <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
+  <header class="navbar navbar-default navbar-fixed-top" role="banner">
+  <div class="navbar-header">
+    <button class="navbar-toggle" type="button" data-toggle="collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Pardot" class="img-responsive"/></a>
+    <% if current_user %>
+      <ul class="nav navbar-nav navbar-right">
+      <li><a href="/logout"><i class="icon-signout" title="logout"></i></a></li>
+      </ul>
+    <% end %>
+  </div>
+  </header>
 
-<%= yield %>
+  <% if current_user %>
+  <aside role="navigation">
+    <nav role="navigation">
+      <ul class="nav nav-stacked">
+      <% all_repos.each do |repo| %>
+        <li>
+        <a href="<%= repo_path(repo) %>" <%= active_repo repo %>>
+          <i class="icon-<%= repo_icon_map[repo] %>"></i><%= repo.capitalize %>
+        </a>
+        </li>
+      <% end %>
+      <li>&nbsp;</li>
+      <% all_targets.each do |target| %>
+        <li>
+        <a href="<%= target_path(target.name) %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
+        </li>
+      <% end %>
+      </li>
+      </ul>
+    </nav>
+  </aside>
 
+  <main id="content" role="main">
+    <div class="container">
+      <%= render partial: 'flash_messages' %>
+      <%= yield %>
+    </div>
+  </main>
+
+  <div class="modal fade" id="js-thumbnail-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Modal title</h4>
+        </div>
+        <div class="modal-body text-center">
+        </div>
+      </div>
+    </div>
+  </div>
+  <% else %>
+    <div class="container">
+      <style type="text/css">
+      body { padding-left:0; }
+      </style>
+      <%= render partial: 'flash_messages' %>
+      <%= yield %>
+    </div>
+  <% end %>
 </body>
 </html>
