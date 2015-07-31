@@ -25,4 +25,20 @@ class ApplicationController < ActionController::Base
     else "/auth/google"
     end
   end
+
+  def current_deploy
+    @_current_deploy ||= \
+      begin
+        if !params[:id].blank?
+          deploy = Deploy.where(id: params[:id].to_i).first
+          if deploy && params[:repo_name].blank?
+            # set the repo name if it's not in the params hash already
+            params[:repo_name] = deploy.repo_name
+          end
+          deploy
+        else
+          nil
+        end
+      end
+  end
 end

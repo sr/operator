@@ -62,22 +62,6 @@ module CanoeHelper
       end
   end
 
-  def current_deploy
-    @_current_deploy ||= \
-      begin
-        if !params[:deploy_id].blank?
-          deploy = Deploy.where(id: params[:deploy_id].to_i).first
-          if deploy && params[:repo_name].blank?
-            # set the repo name if it's not in the params hash already
-            params[:repo_name] = deploy.repo_name
-          end
-          deploy
-        else
-          nil
-        end
-      end
-  end
-
   # ----------------------------------------------------------------------
   # DATA
   def all_targets
