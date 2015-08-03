@@ -63,7 +63,7 @@ class ApplicationController < ActionController::Base
     @_current_target ||= \
       begin
         if !params[:target_name].blank?
-          DeployTarget.where(name: params[:target_name]).first
+          DeployTarget.find_by_name(params[:target_name].to_s)
         elsif !current_deploy.nil?
           current_deploy.deploy_target
         else

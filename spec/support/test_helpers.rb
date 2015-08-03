@@ -60,17 +60,13 @@ module TestHelpers
   # ---------------------------------------------------------------------
   def define_target_mock(&block)
     target_mock = DeployTarget.new(name: "test")
-    assoc_mock = double
-    allow(assoc_mock).to receive(:first).and_return(target_mock)
-    allow(DeployTarget).to receive(:where).with(name: "test").and_return(assoc_mock)
+    allow(DeployTarget).to receive(:find_by_name).with("test").and_return(target_mock)
 
     yield(target_mock) if block_given?
   end
 
   def define_target_missing_mock(name)
-    assoc_mock = double
-    allow(assoc_mock).to receive(:first).and_return(nil)
-    allow(DeployTarget).to receive(:where).with(name: name).and_return(assoc_mock)
+    allow(DeployTarget).to receive(:find_by_name).with(name).and_return(nil)
   end
 
   def define_deploy_mock(id, &block)
