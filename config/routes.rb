@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     get "status/target/:target_name" => "target#status"
     post "lock/target/:target_name" => "target#lock"
     post "unlock/target/:target_name" => "target#unlock"
+    post "deploy/target/:target_name" => "target#deploy"
   end
 
   get "home/index"

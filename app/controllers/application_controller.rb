@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Canoe::DeployLogic
+
   protect_from_forgery with: :null_session
 
   before_filter :require_oauth_authentication
@@ -44,28 +46,18 @@ class ApplicationController < ActionController::Base
   helper_method :current_deploy
 
   def current_repo
-    @_current_repo ||= Octokit.repo("pardot/#{current_repo_name}")
+    return @current_repo if defined?(@current_repo)
+    @current_repo = current_repo_name && Octokit.repo("pardot/#{current_repo_name}")
   end
   helper_method :current_repo
 
   def current_repo_name
-    @_current_repo_name ||= \
-      begin
-        repo_name = ""
-
-        if params[:repo_name].blank? && current_deploy.nil?
-          return nil # if we don't have anything, bail
-        elsif !params[:repo_name].blank? && !all_repos.include?(params[:repo_name])
-          return nil # make sure it's valid
-        elsif !params[:repo_name].blank?
-          repo_name = params[:repo_name] # use valid repo name
-        elsif !current_deploy.nil?
-          repo_name = current_deploy.repo_name # fall back to current deploy's repo
-        else
-          return nil # default fail
-        end
-
-        repo_name
+    return @current_repo_name if defined?(@current_repo_name)
+    @current_repo_name =
+      if params[:repo_name].present? && all_repos.include?(params[:repo_name])
+        params[:repo_name]
+      elsif current_deploy
+        current_deploy.repo_name
       end
   end
   helper_method :current_repo_name
@@ -86,5 +78,9 @@ class ApplicationController < ActionController::Base
 
   def all_targets
     @_all_targets ||= DeployTarget.order(:name)
+  end
+
+  def all_repos
+    %w[pardot pithumbs realtime-frontend workflow-stats]
   end
 end

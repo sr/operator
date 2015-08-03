@@ -1,6 +1,7 @@
 class Api::TargetController < Api::Controller
   before_filter :require_api_target
   before_filter :require_api_user
+  before_filter :require_api_repo, only: [:deploy]
 
   def status
     if !current_target.user_can_deploy?(current_user)
@@ -41,5 +42,34 @@ class Api::TargetController < Api::Controller
       locked: current_target.is_locked?,
       output: output,
     }
+  end
+
+  def deploy
+    # start deploy on target
+    deploy_response = deploy!
+
+    response =
+      if !deploy_response[:error] && deploy_response[:deploy]
+        the_deploy = deploy_response[:deploy]
+        { deployed: true,
+            status_callback: "/api/status/deploy/#{the_deploy.id}",
+        }
+      else
+        case deploy_response[:reason]
+        when DEPLOYLOGIC_ERROR_NO_REPO # should be handled by guard above
+          {error: true, message: "Unable to deploy. No repo given."}
+        when DEPLOYLOGIC_ERROR_NO_TARGET # should be handled by guard above
+          {error: true, message: "Unable to deploy. No target given."}
+        when DEPLOYLOGIC_ERROR_NO_WHAT
+          {error: true, message: "Unable to deploy. No branch, tag or commit given."}
+        when DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
+          {error: true, message: "#{current_target.name} is currently locked."}
+        when DEPLOYLOGIC_ERROR_INVALID_WHAT
+          {error: true, message: "Invalid #{deploy_response[:what]} given."}
+        else
+          {error: true, message: "Unable to deploy. Unknown error."}
+        end
+      end
+    render json: response
   end
 end

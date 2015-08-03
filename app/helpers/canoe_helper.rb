@@ -3,10 +3,6 @@ module CanoeHelper
     request.scheme
   end
 
-  def all_repos
-    %w[pardot pithumbs realtime-frontend workflow-stats]
-  end
-
   def repo_icon_map
     { "pardot"   => "cloud",
       "pithumbs" => "thumbs-up",
