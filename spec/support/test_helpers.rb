@@ -34,15 +34,11 @@ module TestHelpers
   end
 
   def define_api_user_mock(email="sveader@salesforce.com")
-    assoc_mock = double
-    expect(assoc_mock).to receive(:first).and_return(AuthUser.new(id: 2, email: email))
-    expect(AuthUser).to receive(:where).with(email: email).and_return(assoc_mock)
+    expect(AuthUser).to receive(:find_by_email).with(email).and_return(AuthUser.new(id: 2, email: email))
   end
 
   def define_api_user_missing_mock(email="sveader@salesforce.com")
-    assoc_mock = double
-    expect(assoc_mock).to receive(:first).and_return(nil)
-    expect(AuthUser).to receive(:where).with(email: email).and_return(assoc_mock)
+    expect(AuthUser).to receive(:find_by_email).with(email).and_return(nil)
   end
 
   # ---------------------------------------------------------------------
