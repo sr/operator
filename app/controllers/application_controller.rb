@@ -29,18 +29,15 @@ class ApplicationController < ActionController::Base
   end
 
   def current_deploy
-    @_current_deploy ||= \
-      begin
-        if !params[:id].blank?
-          deploy = Deploy.where(id: params[:id].to_i).first
-          if deploy && params[:repo_name].blank?
-            # set the repo name if it's not in the params hash already
-            params[:repo_name] = deploy.repo_name
-          end
-          deploy
-        else
-          nil
+    return @current_deploy if defined?(@current_deploy)
+    @current_deploy =
+      if params[:id].present?
+        deploy = Deploy.find_by_id(params[:id].to_i)
+        if deploy && params[:repo_name].blank?
+          # set the repo name if it's not in the params hash already
+          params[:repo_name] = deploy.repo_name
         end
+        deploy
       end
   end
   helper_method :current_deploy

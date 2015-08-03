@@ -10,8 +10,11 @@ Rails.application.routes.draw do
       post :completed_server, on: :member
     end
 
+    # TODO: These path components are a bit out of order, IMO. Can we change
+    # these around to be more conventional? -@alindeman
     get "lock/status" => "lock#status"
     get "status/target/:target_name" => "target#status"
+    get "status/deploy/:id" => "deploy#status"
     post "lock/target/:target_name" => "target#lock"
     post "unlock/target/:target_name" => "target#unlock"
     post "deploy/target/:target_name" => "target#deploy"

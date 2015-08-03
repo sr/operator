@@ -75,9 +75,7 @@ module TestHelpers
 
   def define_deploy_mock(id, &block)
     deploy_mock = Deploy.new(id: id)
-    assoc_mock = double
-    allow(assoc_mock).to receive(:first).and_return(deploy_mock)
-    allow(Deploy).to receive(:where).with(id: id).and_return(assoc_mock)
+    allow(Deploy).to receive(:find_by_id).with(id).and_return(deploy_mock)
 
     yield(deploy_mock) if block_given?
   end

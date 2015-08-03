@@ -16,4 +16,12 @@ class Api::DeployController < Api::Controller
 
     render json: {success: true}
   end
+
+  def status
+    if @deploy = current_deploy
+      render
+    else
+      render json: {error: true, message: "Unable to find requested deploy."}
+    end
+  end
 end
