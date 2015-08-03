@@ -41,4 +41,5 @@ class ApplicationController < ActionController::Base
         end
       end
   end
+  helper_method :current_deploy
 end
