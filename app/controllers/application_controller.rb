@@ -42,4 +42,8 @@ class ApplicationController < ActionController::Base
       end
   end
   helper_method :current_deploy
+
+  def all_targets
+    @_all_targets ||= DeployTarget.order(:name)
+  end
 end

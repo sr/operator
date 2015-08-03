@@ -64,9 +64,6 @@ module CanoeHelper
 
   # ----------------------------------------------------------------------
   # DATA
-  def all_targets
-    @_all_targets ||= DeployTarget.order(:name)
-  end
 
   def get_recent_deploys_for_repos
     @last_repo_deploys = {}
