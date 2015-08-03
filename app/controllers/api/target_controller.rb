@@ -32,4 +32,14 @@ class Api::TargetController < Api::Controller
       output: output,
     }
   end
+
+  def unlock
+    output = Canoe::Locker.new.unlock!(current_target, current_user)
+    current_target.reload
+
+    render json: {
+      locked: current_target.is_locked?,
+      output: output,
+    }
+  end
 end
