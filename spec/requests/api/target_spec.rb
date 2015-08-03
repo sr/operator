@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "/api/status/target" do
+RSpec.describe "/api/*/target" do
   describe "/api/status/target/:target_name" do
     describe "without authentication" do
       it "should error" do
@@ -62,6 +62,53 @@ RSpec.describe "/api/status/target" do
         expect(response).to be_ok
         expect(json_response["available"]).to be_truthy
         assert_nil json_response["reason"]
+      end
+    end
+  end
+
+  describe "/api/lock/target/:target_name" do
+    describe "without authentication" do
+      it "should error" do
+        post "/api/lock/target/test"
+        assert_json_error_response("auth token")
+      end
+
+      it "should not respond to GET" do
+        expect {
+          get "/api/lock/target/test"
+        }.to raise_error(ActionController::RoutingError)
+      end
+    end
+
+    describe "with authentication" do
+      it "should require target" do
+        define_target_missing_mock("foo")
+        api_post "/api/lock/target/foo"
+        assert_json_error_response("Invalid target")
+      end
+
+      it "should require user" do
+        define_api_user_missing_mock
+        define_target_mock
+        api_post "/api/lock/target/test"
+        assert_json_error_response("Invalid user")
+      end
+
+      it "should give locking output" do
+        define_api_user_mock
+        define_target_mock do |target_mock|
+          # make sure shell command just echos and exits
+          expect(target_mock).to receive(:script_path).and_return("~; echo 'test'; exit 0;")
+          expect(target_mock).to receive(:lock!)
+          expect(target_mock).to receive(:reload)
+          expect(target_mock).to receive(:is_locked?).and_return(true)
+        end
+
+        api_post "/api/lock/target/test"
+        assert response.ok?
+        assert json_response["locked"]
+        # make sure output is pushed into json response
+        assert_match "test", json_response["output"]
       end
     end
   end

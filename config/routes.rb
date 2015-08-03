@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
     get "lock/status" => "lock#status"
     get "status/target/:target_name" => "target#status"
+    post "lock/target/:target_name" => "target#lock"
   end
 
   get "home/index"
