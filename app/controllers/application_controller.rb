@@ -60,21 +60,18 @@ class ApplicationController < ActionController::Base
   helper_method :current_repo_name
 
   def current_target
-    @_current_target ||= \
-      begin
-        if !params[:target_name].blank?
-          DeployTarget.find_by_name(params[:target_name].to_s)
-        elsif !current_deploy.nil?
-          current_deploy.deploy_target
-        else
-          nil
-        end
+    return @current_target if defined?(@current_target)
+    @current_target =
+      if params[:target_name].present?
+        DeployTarget.find_by_name(params[:target_name].to_s)
+      elsif current_deploy
+        current_deploy.deploy_target
       end
   end
   helper_method :current_target
 
   def all_targets
-    @_all_targets ||= DeployTarget.order(:name)
+    @all_targets ||= DeployTarget.order(:name)
   end
 
   def all_repos
