@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     delete :destroy, on: :collection
   end
   post "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/failure", to: "sessions#failure"
 
   namespace :api, defaults: {format: "json"} do
     # TODO: In an ideal world, deploy should be deploys (plural). Do we need to

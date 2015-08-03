@@ -24,4 +24,10 @@ class SessionsController < ApplicationController
     session.destroy
     redirect_to root_url
   end
+
+  def failure
+    session.destroy
+    @auth_hash = request.env["omniauth.auth"]
+    @failure_message = params[:message]
+  end
 end
