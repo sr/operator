@@ -27,7 +27,11 @@
     <a href="/" class="navbar-brand"><img src="/img/logo.png" alt="Pardot" class="img-responsive"/></a>
     <% if current_user %>
       <ul class="nav navbar-nav navbar-right">
-      <li><a href="/logout"><i class="icon-signout" title="logout"></i></a></li>
+        <li>
+          <%= link_to sessions_path, data: {method: "delete"} do %>
+            <i class="icon-signout" title="logout"></i>
+          <%- end %>
+        </li>
       </ul>
     <% end %>
   </div>

@@ -19,4 +19,9 @@ class SessionsController < ApplicationController
       render action: "new"
     end
   end
+
+  def destroy
+    session.destroy
+    redirect_to root_url
+  end
 end

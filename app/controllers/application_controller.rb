@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
 
   private
   def require_oauth_authentication
-    redirect_to oauth_url unless current_user.present?
+    redirect_to oauth_path unless current_user.present?
   end
 
   def current_user
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
     session[:user_id] = user.id
   end
 
-  def oauth_url
+  def oauth_path
     case Rails.env
     when "development" then "/auth/developer"
     else "/auth/google"
@@ -73,8 +73,10 @@ class ApplicationController < ActionController::Base
   def all_targets
     @all_targets ||= DeployTarget.order(:name)
   end
+  helper_method :all_targets
 
   def all_repos
     %w[pardot pithumbs realtime-frontend workflow-stats]
   end
+  helper_method :all_repos
 end

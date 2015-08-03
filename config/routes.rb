@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  resources :sessions, only: [:new]
+  resources :sessions, only: [:new] do
+    delete :destroy, on: :collection
+  end
   post "/auth/:provider/callback", to: "sessions#create"
 
   namespace :api, defaults: {format: "json"} do
