@@ -1,0 +1,82 @@
+<h1 class="steps-count">Step 3 of 3</h1>
+<h2>This is what you want to deploy, right?</h2>
+<div class="alert alert-warning">
+  <p class="lead">
+    <strong>Deploy:</strong>
+    <%= current_repo.name.capitalize %>
+    <%= print_deploy_what @prov_deploy %>
+    to
+    <i class="icon-bullseye"></i> <%= current_target.name.upcase %>
+  </p>
+</div>
+
+<blockquote>
+  <p class="lead muted">
+    <strong>
+      What will change?
+    </strong>
+    &nbsp;&nbsp;
+    <a href="<%= github_diff_url(@previous_deploy, @prov_deploy) %>">
+      <% if @previous_deploy %>
+        <%= print_deploy_what @previous_deploy %>
+      <% else %>
+        First Deploy
+      <% end %>
+      &nbsp;
+      &#x021D2;
+      &nbsp;
+      <%= print_deploy_what @prov_deploy %>
+    </a>
+    <br><br>
+    <small>
+      <strong>Committers: </strong>
+      <% if @committers.size > 0 %>
+        <%= @committers.join(", ") %>
+      <% else %>
+        <span class="muted">No committers found...</span>
+      <% end %>
+    </small>
+
+  </p>
+</blockquote>
+
+<div class="confirm-deploy">
+  <%= form_tag repo_deploys_path(current_repo.name),
+      class: "form-inline form-disable-on-submit",
+      role: "form",
+      data: {confirm: "Are you sure? Like *really* sure?"} do %>
+
+    <%= hidden_field_tag @prov_deploy.what, @prov_deploy.what_details %>
+    <%= hidden_field_tag "target_name", current_target.name %>
+
+    <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
+
+    <% if current_target.lockable? %>
+      <div class="checkbox">
+        &nbsp;&nbsp;
+        <label>
+          <input type="checkbox" name="lock"> Lock
+        </label>
+      </div>
+    <% end %>
+    <% if Rails.env.production? %>
+      <div class="checkbox">
+        &nbsp;&nbsp;
+        <label>
+          <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="servers-<%= current_target.name %>"> Specify Server(s)
+        </label>
+      </div>
+      <div id="servers-<%= current_target.name %>" style="display:none;">
+        <br>
+        <div class="form-group form-wide">
+          <label for="server_names">Servers</label>
+          <input type="text" class="form-control" name="server_names" placeholder="Enter server(s)">
+        </div>
+        <span class="help-block">
+          Specify a single server or a list of servers separated by commas.
+        </span>
+      </div>
+    <% end %>
+  <%- end %>
+</div>
+

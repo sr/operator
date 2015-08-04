@@ -53,21 +53,6 @@ module CanoeHelper
     "/target/#{target_name}"
   end
 
-  def deploy_confirm_path(target=current_target, deploy=nil)
-    execute_deploy_path(deploy, target, true)
-  end
-
-  def execute_deploy_path(deploy=nil, target=current_target, show_confirm=false)
-    path = repo_path+"/to/target/#{target.name}#{show_confirm ? "/confirm" : ""}?"
-    deploy ||= current_deploy
-    if deploy
-      path += "#{deploy.what}=#{deploy.what_details}"
-    else
-      raise 'Unknown path details...'
-    end
-    path
-  end
-
   def github_url
     "https://git.dev.pardot.com"
   end

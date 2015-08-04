@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     resources :branches, param: :name, only: [:index]
     resources :commits, param: :sha, only: [:index]
 
-    resources :deploys, only: [:new] do
+    resources :deploys, only: [:new, :create] do
       get :select_target, on: :collection
     end
   end
