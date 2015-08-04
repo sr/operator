@@ -107,18 +107,18 @@ module CanoeHelper
   def deploy_type_icon(type)
     case type
     when 'tag'
-      "<i class='icon-tag' title='tag'></i>"
+      "<i class='icon-tag' title='tag'></i>".html_safe
     when 'branch'
-      "<i class='icon-code-fork' title='branch'></i>"
+      "<i class='icon-code-fork' title='branch'></i>".html_safe
     when 'commit'
-      "<i class='icon-tasks' title='commit'></i>"
+      "<i class='icon-tasks' title='commit'></i>".html_safe
     else
       ''
     end
   end
 
   def sha_span(sha)
-    "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,8]}...</span>"
+    "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,8]}...</span>".html_safe
   end
 
   # ----------------------------------------------------------------------
