@@ -5,16 +5,16 @@ namespace :canoe do
     dev = DeployTarget.where(name: 'dev').first
     DeployTarget.create(
       name: 'dev',
-      script_path: '#{Rails.root}/../sync_scripts',
-      lock_path: '#{Rails.root}/../sync_scripts/dev_lock',
+      script_path: "#{Rails.root}/../sync_scripts",
+      lock_path: "#{Rails.root}/../sync_scripts/dev_lock",
       locked: false,
     ) if !dev
 
     test = DeployTarget.where(name: 'test').first
     DeployTarget.create(
       name: 'test',
-      script_path: '#{Rails.root}/../sync_scripts',
-      lock_path: '#{Rails.root}/../sync_scripts/dev_lock',
+      script_path: "#{Rails.root}/../sync_scripts",
+      lock_path: "#{Rails.root}/../sync_scripts/dev_lock",
       locked: true,
     ) if !test
   end
