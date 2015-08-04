@@ -79,4 +79,10 @@ class ApplicationController < ActionController::Base
     %w[pardot pithumbs realtime-frontend workflow-stats]
   end
   helper_method :all_repos
+
+  def require_repo
+    return if current_repo
+    # TODO: Remove the need for this
+    raise ActiveRecord::RecordNotFound.new("no repository with name '#{current_repo_name}'")
+  end
 end

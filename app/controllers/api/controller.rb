@@ -16,17 +16,17 @@ class Api::Controller < ApplicationController
     @current_user = params[:user_email] && AuthUser.find_by_email(params[:user_email].to_s)
   end
 
-  def require_api_target
+  def require_target
     return if current_target
     render json: {error: true, message: "Invalid target specified."}
   end
 
-  def require_api_user
+  def require_user
     return if current_user
     render json: {error: true, message: "Invalid user specified."}
   end
 
-  def require_api_repo
+  def require_repo
     return if current_repo
     render json: {error: true, message: "Invalid repo specified."}
   end

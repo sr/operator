@@ -1,7 +1,7 @@
 class Api::TargetController < Api::Controller
-  before_filter :require_api_target
-  before_filter :require_api_user
-  before_filter :require_api_repo, only: [:deploy]
+  before_filter :require_target
+  before_filter :require_user
+  before_filter :require_repo, only: [:deploy]
 
   def status
     if !current_target.user_can_deploy?(current_user)
