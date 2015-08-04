@@ -46,7 +46,9 @@
     <div class="alert alert-info">
       <strong>Active</strong>:
       There is a deploy currently going out to <%= target.name %>.
-      <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+      <%= link_to repo_deploy_path(current_repo.name, target.active_deploy.id, watching: "1") do %>
+        <i class="icon-eye-open"></i> Watch it here
+      <%- end %>
     </div>
   <% else %>
     <%= link_to "Ship it Here", new_repo_deploy_path(current_repo.name, :target_name => target.name, @prov_deploy.what => @prov_deploy.what_details), class: "btn btn-primary btn-success deploy-button" %>
