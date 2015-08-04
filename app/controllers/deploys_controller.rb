@@ -10,7 +10,7 @@ class DeploysController < ApplicationController
 
   def new
     @prov_deploy = provisional_deploy
-    @previous_deploy = current_deploy.deploy_target.last_successful_deploy_for(current_repo.name)
+    @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
     @committers = committers_for_compare(@previous_deploy, @prov_deploy)
   end
 
@@ -27,7 +27,7 @@ class DeploysController < ApplicationController
 
     if !deploy_response[:error] && deploy_response[:deploy]
       the_deploy = deploy_response[:deploy]
-      redirect_to repo_deploy_path(current_repo.name, the_deploy.id)
+      redirect_to repo_deploy_path(current_repo.name, the_deploy.id, watching: "1")
     else # error
       # missing pieces
       missing_error_codes = \

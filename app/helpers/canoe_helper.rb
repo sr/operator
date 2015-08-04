@@ -41,7 +41,7 @@ module CanoeHelper
   def active_target(target_name="")
     if !current_repo && current_target && \
         current_target.name.downcase == target_name.downcase
-      'class="active"'
+      'class="active"'.html_safe
     else
       ""
     end
@@ -105,7 +105,7 @@ module CanoeHelper
     else
       output += deploy.what_details
     end
-    output
+    output.html_safe
   end
 
   def print_time(time)
@@ -130,6 +130,6 @@ module CanoeHelper
     pieces = email.split("@")
     output = pieces[0]
     output += "<span class='muted'>@#{pieces[1]}</span>" if pieces[1]
-    output
+    output.html_safe
   end
 end
