@@ -49,10 +49,6 @@ module CanoeHelper
 
   # ----------------------------------------------------------------------
   # PATHS
-  def repo_path(repo_name=current_repo_name)
-    "/deploy/repo/#{repo_name}"
-  end
-
   def target_path(target_name=current_target.name)
     "/target/#{target_name}"
   end

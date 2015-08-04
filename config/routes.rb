@@ -5,9 +5,16 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
+  resources :repos, param: :name, only: [:show] do
+    resources :tags, param: :name, only: [:show, :index]
+    resources :branches, param: :name, only: [:index]
+    resources :commits, param: :sha, only: [:index]
+  end
+
   namespace :api, defaults: {format: "json"} do
-    # TODO: In an ideal world, deploy should be deploys (plural). Do we need to
-    # keep the API routes stable for any reason?
+    # TODO: In an ideal world, deploy should be deploys (plural). What
+    # dependencies does the API have that would break if we changed things to be
+    # more conventional? -@alindeman
     resources :deploy, only: [] do
       post :complete, on: :member
       post :completed_server, on: :member
