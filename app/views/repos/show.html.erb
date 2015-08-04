@@ -2,10 +2,10 @@
 <h2>What do you want to deploy?</h2>
 <br>
 
-<% if @tag || @tags || @branches || @commits %>
+<% if @latest_tag || @tags || @branches || @commits %>
   <p class="lead muted">
     Select the
-    <% if @tag %>
+    <% if @latest_tag %>
       <%= deploy_type_icon("tag") %> <strong>latest tag</strong>
     <% elsif @tags %>
       <%= deploy_type_icon("tag") %> <strong>tag</strong>
@@ -30,27 +30,27 @@
   <% end %>
   <ul class="nav nav-tabs">
     <% if supported?("tag") %>
-    <li <%= 'class="active"' if @tag %>>
-      <%= link_to repo_tag_path(@repo.name, "latest") do %>
+    <li <%= 'class="active"'.html_safe if @latest_tag %>>
+      <%= link_to latest_repo_tags_path(current_repo.name) do %>
         <%= deploy_type_icon("tag") %> Latest Tag
       <%- end %>
     </li>
-    <li <%= 'class="active"' if @tags %>>
-      <%= link_to repo_tags_path(@repo.name) do %>
+    <li <%= 'class="active"'.html_safe if @tags %>>
+      <%= link_to repo_tags_path(current_repo.name) do %>
         <%= deploy_type_icon("tag") %> Tags
       <%- end %>
     </li>
     <% end %>
     <% if supported?("branch") %>
-    <li <%= 'class="active"' if @branches %>>
-      <%= link_to repo_branches_path(@repo.name) do %>
+    <li <%= 'class="active"'.html_safe if @branches %>>
+      <%= link_to repo_branches_path(current_repo.name) do %>
         <%= deploy_type_icon("branch") %> Branches
       <%- end %>
     </li>
     <% end %>
     <% if supported?("commit") %>
-    <li <%= 'class="active"' if @commits %>>
-      <%= link_to repo_commits_path(@repo.name) do %>
+    <li <%= 'class="active"'.html_safe if @commits %>>
+      <%= link_to repo_commits_path(current_repo.name) do %>
         <%= deploy_type_icon("commit") %> Commits
       <%- end %>
     </li>
@@ -59,23 +59,25 @@
   <br>
 
   <% if @tags %>
-    <%= partial :'partials/tags', locals: { tags: @tags } %>
+    <%= render partial: 'repos/tags', locals: { tags: @tags } %>
   <% elsif @branches %>
-    <%= partial :'partials/branches', locals: { branches: @branches } %>
+    <%= render partial: 'repos/branches', locals: { branches: @branches } %>
   <% elsif @commits %>
-    <%= partial :'partials/commits', locals: { commits: @commits } %>
-  <% elsif @tag %>
-    <%= partial :'partials/latest_tag', locals: { tag: @tag, full_tag: @full_tag } %>
+    <%= render partial: 'repos/commits', locals: { commits: @commits } %>
+  <% elsif @latest_tag %>
+    <%= render partial: 'repos/latest_tag', locals: { foo: "bar", latest_tag: @latest_tag } %>
   <% else %>
     <div class="container">
       <h3 class="muted"><i class="icon-circle-arrow-up"></i>
         Select where to grab the code.
       </h3>
-      <% if @repo.name == "pardot" %>
+      <% if current_repo.name == "pardot" %>
         <br>
         <h4>
           Or deploy the
-          <a href="<%= repo_path %>/tags/latest"><i class="icon-tags"></i> latest tag</a>
+          <%= link_to latest_repo_tags_path(current_repo.name) do %>
+            <i class="icon-tags"></i> latest tag
+          <%- end %>
         </h4>
       <% end %>
     </div>

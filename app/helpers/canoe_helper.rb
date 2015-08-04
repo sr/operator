@@ -53,13 +53,6 @@ module CanoeHelper
     "/target/#{target_name}"
   end
 
-  def deploy_select_target_path(options)
-    path = repo_path+"/select_target?"
-    path += \
-      options.collect { |key,value| "#{key}=#{CGI.escape(value)}" }.join("&")
-    path
-  end
-
   def deploy_confirm_path(target=current_target, deploy=nil)
     execute_deploy_path(deploy, target, true)
   end

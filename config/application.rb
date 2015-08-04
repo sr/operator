@@ -34,5 +34,11 @@ module Canoe
 
     # Autoload files from lib/
     config.autoload_paths << Rails.root.join("lib")
+
+    # Similar to how ActiveRecord rescues ActiveRecord::NotFound to render 404,
+    # do the same for Octokit::NotFound.
+    config.action_dispatch.rescue_responses.merge!(
+      'Octokit::NotFound' => :not_found,
+    )
   end
 end

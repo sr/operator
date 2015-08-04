@@ -6,9 +6,15 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "sessions#failure"
 
   resources :repos, param: :name, only: [:show] do
-    resources :tags, param: :name, only: [:show, :index]
+    resources :tags, param: :name, only: [:index] do
+      get :latest, on: :collection
+    end
     resources :branches, param: :name, only: [:index]
     resources :commits, param: :sha, only: [:index]
+
+    resources :deploys, only: [] do
+      get :select_target, on: :collection
+    end
   end
 
   namespace :api, defaults: {format: "json"} do

@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
 
   def current_repo
     return @current_repo if defined?(@current_repo)
-    @current_repo = current_repo_name && Octokit.repo("pardot/#{current_repo_name}")
+    @current_repo = current_repo_name && Repo.new(current_repo_name)
   end
   helper_method :current_repo
 
