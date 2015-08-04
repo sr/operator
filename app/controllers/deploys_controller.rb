@@ -15,6 +15,8 @@ class DeploysController < ApplicationController
   end
 
   def show
+    current_deploy.check_completed_status!
+
     @watching = params[:watching].present?
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)
     @show_full_logs = (params[:show_full] == "1")
