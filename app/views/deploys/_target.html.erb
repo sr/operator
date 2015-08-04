@@ -1,0 +1,55 @@
+<div class="well half-well">
+  <h2 class="under"><%= target.name.upcase %></h2>
+  <% if target.lockable? %>
+    <h5>
+      <% if target.is_locked? %>
+        <i class="icon-lock text-danger"></i>
+        <span class="text-danger">
+          LOCKED by <%= target.name_of_locking_user %>
+        </span>
+      <% else %>
+        <i class="icon-unlock text-success"></i>
+        <span class="text-success">Unlocked</span>
+      <% end %>
+    </h5>
+  <% end %>
+  <div class="last-deploy">
+    <% deploy = target.last_successful_deploy_for(current_repo.name) %>
+    <small class="muted">
+      <strong>LAST DEPLOY:</strong>
+      <% if deploy %>
+        <%= print_email deploy.auth_user.email %> deployed
+        <span class="text-info"><%= print_deploy_what(deploy) %></span>
+        on <%= print_time deploy.created_at %>
+      <% else %>
+        <em>Nothing has been deployed on this target.</em>
+      <% end %>
+    </small>
+    <% if deploy %>
+      <br>
+      <a href="<%= github_diff_url(deploy, @prov_deploy) %>">
+        <strong>What will Change?</strong>
+        &nbsp;&nbsp;
+        <span style="color:#000;">
+          <%= print_deploy_what deploy %>
+          &nbsp;
+          &#x021D2;
+          &nbsp;
+          <%= print_deploy_what @prov_deploy %>
+        </span>
+      </a>
+    <% end %>
+  </div>
+  <% if !target.user_can_deploy?(current_user) %>
+    <%= render partial: 'deploys/locked_target_warning', locals: { target: target } %>
+  <% elsif target.active_deploy %>
+    <div class="alert alert-info">
+      <strong>Active</strong>:
+      There is a deploy currently going out to <%= target.name %>.
+      <a href="/deploy/<%= target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+    </div>
+  <% else %>
+    <%= link_to "Ship it Here", new_repo_deploy_path(current_repo.name, :target_name => target.name, @prov_deploy.what => @prov_deploy.what_details), class: "btn btn-primary btn-success deploy-button" %>
+    <br><br>
+  <% end %>
+</div>
