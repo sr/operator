@@ -28,7 +28,7 @@ class Deploy < ActiveRecord::Base
 
   def log_contents_htmlized(show_all=false)
     contents = show_all ? log_contents : some_log_contents
-    contents.gsub(/\n/,"<br>")
+    contents.gsub(/\n/,"<br>").html_safe
   end
 
   def used_all_servers?

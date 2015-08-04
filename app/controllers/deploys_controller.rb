@@ -1,7 +1,7 @@
 class DeploysController < ApplicationController
   before_filter :require_repo
-  before_filter :require_target, except: [:select_target]
-  before_filter :require_no_active_deploy, except: [:select_target]
+  before_filter :require_target, only: [:new, :create]
+  before_filter :require_no_active_deploy, only: [:new, :create]
 
   def select_target
     @prov_deploy = provisional_deploy
@@ -10,8 +10,14 @@ class DeploysController < ApplicationController
 
   def new
     @prov_deploy = provisional_deploy
-    @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
+    @previous_deploy = current_deploy.deploy_target.last_successful_deploy_for(current_repo.name)
     @committers = committers_for_compare(@previous_deploy, @prov_deploy)
+  end
+
+  def show
+    @watching = params[:watching].present?
+    @previous_deploy = current_target.previous_successful_deploy(current_deploy)
+    @show_full_logs = (params[:show_full] == "1")
   end
 
   def create
@@ -19,7 +25,7 @@ class DeploysController < ApplicationController
 
     if !deploy_response[:error] && deploy_response[:deploy]
       the_deploy = deploy_response[:deploy]
-      redirect_to "/deploy/#{the_deploy.id}/watch"
+      redirect_to repo_deploy_path(current_repo.name, the_deploy.id)
     else # error
       # missing pieces
       missing_error_codes = \
