@@ -51,6 +51,16 @@ class DeploysController < ApplicationController
     end
   end
 
+  def complete
+    current_deploy.complete! if current_deploy
+    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+  end
+
+  def cancel
+    current_deploy.cancel! if current_deploy
+    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+  end
+
   private
   def require_no_active_deploy
     unless current_target.active_deploy.nil?

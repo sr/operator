@@ -14,6 +14,8 @@ Rails.application.routes.draw do
 
     resources :deploys, only: [:new, :create, :show] do
       get :select_target, on: :collection
+      post :complete, on: :member
+      post :cancel, on: :member
     end
   end
 
