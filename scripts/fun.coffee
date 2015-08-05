@@ -18,7 +18,7 @@ module.exports = (robot) ->
       return
 
     robot.hear /^!reversenuggets$/i, (msg) ->
-        msg.send "https://s3.amazonaws.com/uploads.hipchat.com/45727/306030/e3Xgb1wrgi4vDVF/26871.gif"
+        msg.send "http://i.imgur.com/7Ljw6Gg.gif"
 
     robot.hear /^!toiletnuggets$/i, (msg) ->
         msg.send "http://i.imgur.com/LUi0ncH.gif"
