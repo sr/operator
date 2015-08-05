@@ -197,7 +197,6 @@ RSpec.describe "/api/*/target" do
 
       it "should indicate when user is unable to deploy (locking error)" do
         define_api_user_mock
-        define_repo_mock
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(false)
         end
@@ -208,7 +207,6 @@ RSpec.describe "/api/*/target" do
 
       it "should require a branch, tag or commit" do
         define_api_user_mock
-        define_repo_mock
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
@@ -219,11 +217,10 @@ RSpec.describe "/api/*/target" do
 
       it "should indicate unknown branch" do
         define_api_user_mock
-        define_repo_mock
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
-        expect(Octokit).to receive(:ref).with("pardot/pardot", "heads/build1234").and_return({object:{}})
+        expect(Octokit).to receive(:ref).with("Pardot/pardot", "heads/build1234").and_return({object:{}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&branch=build1234"
         assert_json_error_response("Invalid branch")
@@ -231,11 +228,10 @@ RSpec.describe "/api/*/target" do
 
       it "should indicate unknown tag" do
         define_api_user_mock
-        define_repo_mock
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
-        expect(Octokit).to receive(:ref).with("pardot/pardot", "tags/build1234").and_return({object:{}})
+        expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         expect(response).to be_ok
@@ -245,17 +241,22 @@ RSpec.describe "/api/*/target" do
 
       it "should indicate deploy and give callback URL" do
         define_api_user_mock
-        define_repo_mock
         define_target_mock do |target_mock|
+          # REFACTOR: We don't really need to use mocks here. Let's just put a
+          # fixture in the database. -@alindeman
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
-          expect(target_mock).to receive(:deploy!).and_return(Deploy.new(id: 1234))
+          allow(target_mock).to receive(:active_deploy).and_return(nil)
+
+          deploy_assoc = double
+          allow(target_mock).to receive(:deploys).and_return(deploy_assoc)
+          expect(deploy_assoc).to receive(:create!).and_return(Deploy.new(id: 1234))
         end
-        expect(Octokit).to receive(:ref).with("pardot/pardot", "tags/build1234").and_return({object:{sha:"123455"}})
+        expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{sha:"123455"}})
 
         api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
         expect(response).to be_ok
         expect(json_response["deployed"]).to be_truthy
-        assert_equal "/api/status/deploy/1234", json_response["status_callback"]
+        expect(json_response["status_callback"]).to eq("/api/status/deploy/1234")
       end
     end
   end

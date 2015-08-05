@@ -75,9 +75,4 @@ module TestHelpers
 
     yield(deploy_mock) if block_given?
   end
-
-  def define_repo_mock(repo_name="pardot", &block)
-    repo = OpenStruct.new(full_name: "pardot/#{repo_name}", name: repo_name)
-    expect(Octokit).to receive(:repo).with("pardot/#{repo_name}").and_return(repo)
-  end
 end

@@ -2,8 +2,6 @@ require "rails_helper"
 
 RSpec.feature "user deploys pardot repo" do
   before do
-    Rails.application.config.deployment.strategy.clear
-
     DeployTarget.create! \
       name: "test",
       script_path: "/tmp/sync_scripts",

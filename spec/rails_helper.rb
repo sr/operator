@@ -24,4 +24,9 @@ RSpec.configure do |config|
   config.include TestHelpers
 
   config.include FeatureHelpers, type: :feature
+
+  config.before do
+    # Cleanup list of test deploys
+    Rails.application.config.deployment.strategy.clear
+  end
 end
