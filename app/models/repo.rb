@@ -3,7 +3,6 @@ class Repo
 
   def initialize(name)
     @name = name
-    @octokit_repo = Octokit.repo(full_name)
   end
 
   def full_name

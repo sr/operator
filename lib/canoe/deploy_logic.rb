@@ -60,7 +60,18 @@ module Canoe
 
       deploy_options[:sha] = prov_deploy.sha # gathered during is_valid?
 
-      the_deploy = current_target.deploy!(deploy_options)
+      deployer = Canoe::Deployer.new(strategy: Rails.application.config.deployment.strategy)
+      the_deploy = deployer.deploy(
+        target: current_target,
+        user: current_user,
+        repo: current_repo,
+        what: prov_deploy.what,
+        what_details: prov_deploy.what_details,
+        sha: prov_deploy.sha,
+        lock: (params[:lock] == "on"),
+        servers: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
+      )
+
       if the_deploy
         { error: false, deploy: the_deploy }
       else

@@ -24,6 +24,7 @@ class ApplicationController < ActionController::Base
   def oauth_path
     case Rails.env
     when "development" then "/auth/developer"
+    when "test" then "/auth/developer"
     else "/auth/google"
     end
   end

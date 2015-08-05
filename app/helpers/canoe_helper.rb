@@ -35,7 +35,7 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # ACTIVE X
   def active_repo(repo_name="")
-    (current_repo_name || "").downcase == repo_name.downcase ? 'class="active"' : ""
+    (current_repo_name || "").downcase == repo_name.downcase ? 'class="active"'.html_safe : ""
   end
 
   def active_target(target_name="")

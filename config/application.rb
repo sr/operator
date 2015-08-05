@@ -40,5 +40,9 @@ module Canoe
     config.action_dispatch.rescue_responses.merge!(
       'Octokit::NotFound' => :not_found,
     )
+
+    require "canoe/deployment/strategies/sync_scripts"
+    config.deployment = ActiveSupport::OrderedOptions.new
+    config.deployment.strategy = Canoe::Deployment::Strategies::SyncScripts.new
   end
 end

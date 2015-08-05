@@ -40,7 +40,7 @@
   <% if current_user %>
   <aside role="navigation">
     <nav role="navigation">
-      <ul class="nav nav-stacked">
+      <ul class="nav nav-stacked repos">
       <% all_repos.each do |repo| %>
         <li>
         <a href="<%= repo_path(repo) %>" <%= active_repo repo %>>
@@ -48,7 +48,9 @@
         </a>
         </li>
       <% end %>
-      <li>&nbsp;</li>
+      </ul>
+
+      <ul class="nav nav-stacked targets">
       <% all_targets.each do |target| %>
         <li>
         <a href="<%= target_path(target.name) %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>

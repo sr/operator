@@ -28,7 +28,7 @@
       <button type="submit" class="btn btn-default">Search</button>
     </form>
   <% end %>
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-tabs deploy-targets">
     <% if supported?("tag") %>
     <li <%= 'class="active"'.html_safe if @latest_tag %>>
       <%= link_to latest_repo_tags_path(current_repo.name) do %>

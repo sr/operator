@@ -22,4 +22,6 @@ RSpec.configure do |config|
 
   # TODO: Extract TestHelpers into more cohesive modules
   config.include TestHelpers
+
+  config.include FeatureHelpers, type: :feature
 end

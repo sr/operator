@@ -1,5 +1,5 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
-  if Rails.env.development?
+  if Rails.env.development? || Rails.env.test?
     provider :developer
   else
     provider :google_oauth2,
