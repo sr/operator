@@ -1,0 +1,17 @@
+<ul class="list-unstyled deploy-list">
+  <% tags.each do |tag| %>
+    <li>
+      <h4>
+        <a href="<%= select_target_repo_deploys_path(current_repo.name, tag: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
+        &nbsp;
+        <%= deploy_type_icon("tag") %> <%= tag.name %>
+        &nbsp;
+        <a href="<%= github_tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
+      </h4>
+      <p>
+        <small class="muted">commit: <a href="<%= github_commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= sha_span(tag.commit.sha) %></a></small>
+      </p>
+      <hr>
+    </li>
+  <% end %>
+</ul>
