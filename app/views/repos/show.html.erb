@@ -20,13 +20,13 @@
 
 <div>
   <% if @branches %>
-    <form class="form-inline pull-right" role="form" action="<%= repo_path %>/branches" method="get">
+    <%= form_tag repo_branches_path(current_repo.name), method: "get", class: "form-inline pull-right" do %>
       <div class="form-group">
         <label class="sr-only" for="search">Search</label>
-        <input type="text" class="form-control" id="search" name="search" placeholder="Enter branch name" value="<%= params[:search] %>">
+        <%= text_field_tag "search", params[:search], class: "form-control", id: "search", placeholder: "Enter branch name" %>
       </div>
       <button type="submit" class="btn btn-default">Search</button>
-    </form>
+    <%- end %>
   <% end %>
   <ul class="nav nav-tabs deploy-targets">
     <% if supported?("tag") %>

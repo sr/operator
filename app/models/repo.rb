@@ -26,4 +26,12 @@ class Repo
   def latest_tag
     tags.first
   end
+
+  def branches
+    Octokit.auto_paginate = true
+    branches = Octokit.branches(full_name)
+    branches.sort_by(&:name) # may not really be needed...
+  ensure
+    Octokit.auto_paginate = false
+  end
 end
