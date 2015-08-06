@@ -34,4 +34,8 @@ class Repo
   ensure
     Octokit.auto_paginate = false
   end
+
+  def commits(count = 50)
+    Octokit.commits(full_name, per_page: count)
+  end
 end
