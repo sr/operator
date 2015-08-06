@@ -11,9 +11,11 @@ class TargetsController < ApplicationController
 
   def lock
     lock_target!
+    redirect_to target_path(current_target)
   end
 
   def unlock
     unlock_target!
+    redirect_to target_path(current_target)
   end
 end
