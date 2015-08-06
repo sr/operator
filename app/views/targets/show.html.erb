@@ -60,7 +60,9 @@
   <div class="alert alert-info">
     <strong>Active</strong>:
     There is a deploy currently going out to <%= current_target.name %>.
-    <a href="/deploy/<%= current_target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+    <%= link_to repo_deploy_path(current_target.active_deploy.repo_name, current_target.active_deploy, watching: "1") do %>
+      <i class="icon-eye-open"></i> Watch it here
+    <%- end %>
   </div>
 <% end %>
 
