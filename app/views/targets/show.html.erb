@@ -14,13 +14,13 @@
     </div>
     <div id="unlock-forms" style="display:none;">
       <% if current_target.locking_user == current_user || current_target.file_lock_user == current_user.email %>
-        <form role="form" action="<%= unlock_target_path(current_target) %>/unlock" method="post" data-confirm="Are you sure you want to unlock this target?">
+        <%= form_tag unlock_target_path(current_target), method: "post", data: {confirm: "Are you sure you want to unlock this target?"} do %>
           <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
-        </form>
+        <%- end %>
       <% else %>
-        <form role="form" class="js-confirm" action="<%= unlock_target_path(current_target, force: "1") %>" method="post" data-confirm="Are you sure you want to forcefully unlock this?<br>It's kinda not nice...">
+        <%= form_tag unlock_target_path(current_target, force: "1"), method: "post", data: {confirm: "Are you sure you want to forcefully unlock this target?"} do %>
           <button type="submit" class="btn btn-danger"><i class="icon-unlock"></i> Forcefully Unlock!</button>
-        </form>
+        <%- end %>
       <% end %>
     </div>
   <% else %>
@@ -30,9 +30,9 @@
       </a>
     </div>
     <div id="lock-forms" style="display:none;">
-      <form class="js-confirm" role="form" action="<%= lock_target_path(current_target) %>" method="post" data-confirm="Are you sure you want to lock this target?">
+      <%= form_tag lock_target_path(current_target), method: "post", data: {confirm: "Are you sure you want to lock this target?"} do %>
         <button type="submit" class="btn btn-warning"><i class="icon-lock"></i> Lock!</button>
-      </form>
+      <%- end %>
     </div>
   <% end %>
   <br>
