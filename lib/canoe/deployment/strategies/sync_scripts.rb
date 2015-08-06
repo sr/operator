@@ -8,7 +8,7 @@ module Canoe
         end
 
         def perform(deploy, lock: false)
-          client = build_client(deploy.target)
+          client = build_client(deploy.deploy_target)
           client.deploy(
             what: deploy.what,
             what_details: deploy.what_details,
@@ -33,7 +33,7 @@ module Canoe
 
         private
         def build_client(target)
-          SyncScripts::Client.new(deploy.target.script_path, target.name)
+          Canoe::SyncScripts::Client.new(target.script_path, target.name)
         end
       end
     end

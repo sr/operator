@@ -32,7 +32,7 @@ module Canoe
 
       def unlock(user:, force:)
         run_shipit([
-          force ? "--force-unlock" : "--unlock"
+          force ? "--force-unlock" : "--unlock",
           "--no-color",
           "--user=#{user.email}",
         ]).read
