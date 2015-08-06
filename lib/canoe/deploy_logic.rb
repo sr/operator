@@ -60,7 +60,6 @@ module Canoe
 
       deploy_options[:sha] = prov_deploy.sha # gathered during is_valid?
 
-      deployer = Canoe::Deployer.new(strategy: Rails.application.config.deployment.strategy)
       the_deploy = deployer.deploy(
         target: current_target,
         user: current_user,
@@ -80,5 +79,17 @@ module Canoe
       end
     end
 
+    def lock_target!
+      deployer.lock(target: current_target, user: current_user)
+    end
+
+    def unlock_target!(force: false)
+      deployer.unlock(target: current_target, user: current_user, force: force)
+    end
+
+    private
+    def deployer
+      @deployer ||= Canoe::Deployer.new(strategy: Rails.application.config.deployment.strategy)
+    end
   end
 end

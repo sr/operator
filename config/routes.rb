@@ -19,6 +19,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :targets, param: :name, only: [:show] do
+    resources :locks, only: [:index]
+    post :lock, on: :member
+    post :unlock, on: :member
+  end
+
   namespace :api, defaults: {format: "json"} do
     # TODO: In an ideal world, deploy should be deploys (plural). What
     # dependencies does the API have that would break if we changed things to be

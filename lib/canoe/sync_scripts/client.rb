@@ -22,6 +22,22 @@ module Canoe
         io.pid
       end
 
+      def lock(user:)
+        run_shipit([
+          "--only-lock",
+          "--no-color",
+          "--user=#{user.email}",
+        ]).read
+      end
+
+      def unlock(user:, force:)
+        run_shipit([
+          force ? "--force-unlock" : "--unlock"
+          "--no-color",
+          "--user=#{user.email}",
+        ]).read
+      end
+
       def list_servers
         run_shipit(["--list-servers"])
           .read

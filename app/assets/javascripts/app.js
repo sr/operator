@@ -28,11 +28,6 @@ $(function(){
     $('#'+serverDiv).toggle();
   });
 
-  $('.js-confirm').submit(function() {
-    var confirmText = $(this).attr('data-confirm');
-    return confirm(confirmText.replace(/<br\s*\/?>/mg,"\n"));
-  });
-
   $('.js-sha-expand').click(function(event) {
     var $this = $(this);
     if ($this.html() == $this.attr('data-sha')) {

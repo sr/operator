@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Canoe::DeployLogic
+  include PaginationHelper
 
   protect_from_forgery with: :null_session
 
@@ -68,6 +69,8 @@ class ApplicationController < ActionController::Base
     @current_target =
       if params[:target_name].present?
         DeployTarget.find_by_name(params[:target_name].to_s)
+      elsif params[:name].present?
+        DeployTarget.find_by_name(params[:name].to_s)
       elsif current_deploy
         # TODO: Remove this branch
         current_deploy.deploy_target

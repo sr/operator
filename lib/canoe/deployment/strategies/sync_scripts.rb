@@ -21,6 +21,16 @@ module Canoe
           )
         end
 
+        def lock(target:, user:)
+          client = build_client(target)
+          client.lock(user: user)
+        end
+
+        def unlock(target:, user:, force:)
+          client = build_client(target)
+          client.unlock(user: user, force: force)
+        end
+
         private
         def build_client(target)
           SyncScripts::Client.new(deploy.target.script_path, target.name)

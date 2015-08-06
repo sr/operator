@@ -19,6 +19,14 @@ module Canoe
           nil
         end
 
+        def lock(target:, user:)
+          # TODO
+        end
+
+        def unlock(target:, user:, force:)
+          # TODO
+        end
+
         def clear
           @deploys.clear
         end

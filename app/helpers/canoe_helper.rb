@@ -23,15 +23,6 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # DATA
 
-  def get_recent_deploys_for_repos
-    @last_repo_deploys = {}
-    %w[pardot].each do |repo|
-      @last_repo_deploys[repo] = \
-        current_target.deploys.where(repo_name: repo).order('created_at DESC').first
-    end
-    @last_repo_deploys
-  end
-
   # ----------------------------------------------------------------------
   # ACTIVE X
   def active_repo(repo_name="")
@@ -49,10 +40,6 @@ module CanoeHelper
 
   # ----------------------------------------------------------------------
   # PATHS
-  def target_path(target_name=current_target.name)
-    "/target/#{target_name}"
-  end
-
   def github_url
     "https://git.dev.pardot.com"
   end

@@ -1,0 +1,85 @@
+<h1>
+  <i class="icon-bullseye"></i>&nbsp;
+  <%= current_target.name.capitalize %>
+</h1>
+<br>
+
+<% if current_target.lockable? %>
+  <% if current_target.is_locked? %>
+    <%= render partial: 'deploys/locked_target_warning', locals: { target: current_target } %>
+    <div id="unlock-hider">
+      <a type="button" class="btn btn-default btn js-unlock-toggle" href="#">
+        <i class="icon-unlock"></i> Unlocking Options
+      </a>
+    </div>
+    <div id="unlock-forms" style="display:none;">
+      <% if current_target.locking_user == current_user || current_target.file_lock_user == current_user.email %>
+        <form role="form" action="<%= unlock_target_path(current_target) %>/unlock" method="post" data-confirm="Are you sure you want to unlock this target?">
+          <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
+        </form>
+      <% else %>
+        <form role="form" class="js-confirm" action="<%= unlock_target_path(current_target, force: "1") %>" method="post" data-confirm="Are you sure you want to forcefully unlock this?<br>It's kinda not nice...">
+          <button type="submit" class="btn btn-danger"><i class="icon-unlock"></i> Forcefully Unlock!</button>
+        </form>
+      <% end %>
+    </div>
+  <% else %>
+    <div id="lock-hider">
+      <a type="button" class="btn btn-default btn js-locking-toggle" href="#">
+        <i class="icon-lock"></i> Locking Options
+      </a>
+    </div>
+    <div id="lock-forms" style="display:none;">
+      <form class="js-confirm" role="form" action="<%= lock_target_path(current_target) %>" method="post" data-confirm="Are you sure you want to lock this target?">
+        <button type="submit" class="btn btn-warning"><i class="icon-lock"></i> Lock!</button>
+      </form>
+    </div>
+  <% end %>
+  <br>
+<% end %>
+
+<div class="well gray-well">
+  <% %w[pardot].each do |repo| %>
+    <% if deploy = last_repo_deploys(repo) %>
+      <div>
+        <strong><%= deploy.repo_name.upcase %>:</strong>
+        <%= print_email deploy.auth_user.email %> deployed
+        <span class="text-info"><%= print_deploy_what(deploy) %></span>
+        on <%= print_time deploy.created_at %>
+      </div>
+    <% else %>
+      <div>
+        <strong><%= repo.upcase %>:</strong>
+        <em>No record of this being deployed to this target.</em>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<% if current_target.active_deploy %>
+  <div class="alert alert-info">
+    <strong>Active</strong>:
+    There is a deploy currently going out to <%= current_target.name %>.
+    <a href="/deploy/<%= current_target.active_deploy.id %>/watch"><i class="icon-eye-open"></i> Watch it here</a>
+  </div>
+<% end %>
+
+<div>
+  <ul class="nav nav-tabs">
+    <li <%= 'class="active"'.html_safe if @deploys %>>
+      <a href="<%= target_path(current_target) %>"><i class="icon-train2"></i> Deploys</a>
+    </li>
+    <% if current_target.lockable? %>
+      <li <%= 'class="active"'.html_safe if @locks %>>
+        <a href="<%= target_locks_path(current_target) %>"><i class="icon-lock"></i> Locks</a>
+      </li>
+    <% end %>
+  </ul>
+  <br>
+
+  <% if @deploys %>
+    <%= render partial: "targets/deploys", locals: { deploys: @deploys } %>
+  <% elsif @locks %>
+    <%= render partial: "targets/locks", locals: { locks: @locks } %>
+  <% end %>
+</div>

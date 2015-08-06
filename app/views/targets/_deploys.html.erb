@@ -1,0 +1,42 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Repo</th>
+      <th>What</th>
+      <th>SHA</th>
+      <th>Who</th>
+      <th>When</th>
+      <th>Complete</th>
+      <th>Servers</th>
+    </tr>
+  </thead>
+  <% @deploys.each do |deploy| %>
+    <tr>
+      <td><a href="/deploy/<%= deploy.id %>">view</a></td>
+      <td><%= deploy.repo_name %></td>
+      <td><%= print_deploy_what(deploy) %></td>
+      <td><%= sha_span(deploy.sha) unless deploy.sha.blank? %></td>
+      <td><%= print_email deploy.auth_user.email %></td>
+      <td><%= print_time deploy.created_at %></td>
+      <td>
+        <% if deploy.canceled? %>
+          <span class="text-danger" title="Canceled"><i class="icon-remove-sign"></i></span>
+        <% elsif deploy.completed? %>
+          <span class="text-success" title="Complete"><i class="icon-check"></i></span>
+        <% else %>
+          <span class="text-muted" title="Not Complete"><i class="icon-check-empty"></i></span>
+        <% end %>
+      </td>
+      <td>
+        <% if deploy.used_all_servers? %>
+          <span class="muted" title="All Servers"><i class="icon-circle"></i></span>
+        <% else %>
+          <span class="muted" title="Partial List"><i class="icon-adjust"></i></span>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<%= pagination_links(@deploys.size, @total_deploys) %>
