@@ -47,7 +47,10 @@ module Canoe
 
       private
       def run_shipit(args, options = {})
-        IO.popen([shipit_command_path, @environment] + args, options.merge(chdir: @path))
+        full_cmd = [shipit_command_path, @environment] + args
+
+        Rails.logger.debug "Executing: #{full_cmd.inspect}"
+        IO.popen(full_cmd, options.merge(chdir: @path))
       end
 
       def shipit_command_path
