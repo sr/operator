@@ -13,7 +13,7 @@
   </thead>
   <% @deploys.each do |deploy| %>
     <tr>
-      <td><a href="/deploy/<%= deploy.id %>">view</a></td>
+      <td><%= link_to "view", repo_deploy_path(deploy.repo_name, deploy) %></td>
       <td><%= deploy.repo_name %></td>
       <td><%= print_deploy_what(deploy) %></td>
       <td><%= sha_span(deploy.sha) unless deploy.sha.blank? %></td>
