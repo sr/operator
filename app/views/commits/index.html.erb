@@ -1,5 +1,15 @@
+<h1 class="steps-count">Step 1 of 3</h1>
+<h2>What do you want to deploy?</h2>
+<br>
+
+<p class="lead muted">
+  Select the <%= deploy_type_icon("commit") %> <strong>commit</strong> that you wish to ship.
+</p>
+
 <ul class="list-unstyled deploy-list">
-  <% commits.each do |commit| %>
+  <%= render partial: "application/deploy_what_tabs" %>
+
+  <% @commits.each do |commit| %>
     <li>
       <h4>
         <a href="<%= select_target_repo_deploys_path(current_repo.name, commit: commit.sha) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>

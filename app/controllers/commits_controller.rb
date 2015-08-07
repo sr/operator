@@ -3,6 +3,5 @@ class CommitsController < ApplicationController
 
   def index
     @commits = current_repo.commits
-    render "repos/show"
   end
 end

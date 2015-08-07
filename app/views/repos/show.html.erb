@@ -2,36 +2,21 @@
 <h2>What do you want to deploy?</h2>
 <br>
 
-<% if @latest_tag || @tags || @branches || @commits %>
-  <p class="lead muted">
-    Select the
-    <% if @commits %>
-      <%= deploy_type_icon("commit") %> <strong>commit</strong>
-    <% end %>
-    that you wish to ship.
-  </p>
-<% end %>
-
-
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
 
-  <% if @commits %>
-    <%= render partial: 'repos/commits', locals: { commits: @commits } %>
-  <% else %>
-    <div class="container">
-      <h3 class="muted"><i class="icon-circle-arrow-up"></i>
-        Select where to grab the code.
-      </h3>
-      <% if current_repo.name == "pardot" %>
-        <br>
-        <h4>
-          Or deploy the
-          <%= link_to latest_repo_tags_path(current_repo.name) do %>
-            <i class="icon-tags"></i> latest tag
-          <%- end %>
-        </h4>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="container">
+    <h3 class="muted"><i class="icon-circle-arrow-up"></i>
+      Select where to grab the code.
+    </h3>
+    <% if current_repo.name == "pardot" %>
+      <br>
+      <h4>
+        Or deploy the
+        <%= link_to latest_repo_tags_path(current_repo.name) do %>
+          <i class="icon-tags"></i> latest tag
+        <%- end %>
+      </h4>
+    <% end %>
+  </div>
 </div>
