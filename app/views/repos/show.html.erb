@@ -5,9 +5,7 @@
 <% if @latest_tag || @tags || @branches || @commits %>
   <p class="lead muted">
     Select the
-    <% if @latest_tag %>
-      <%= deploy_type_icon("tag") %> <strong>latest tag</strong>
-    <% elsif @branches %>
+    <% if @branches %>
       <%= deploy_type_icon("branch") %> <strong>branch</strong>
     <% elsif @commits %>
       <%= deploy_type_icon("commit") %> <strong>commit</strong>
@@ -24,8 +22,6 @@
     <%= render partial: 'repos/branches', locals: { branches: @branches } %>
   <% elsif @commits %>
     <%= render partial: 'repos/commits', locals: { commits: @commits } %>
-  <% elsif @latest_tag %>
-    <%= render partial: 'repos/latest_tag', locals: { foo: "bar", latest_tag: @latest_tag } %>
   <% else %>
     <div class="container">
       <h3 class="muted"><i class="icon-circle-arrow-up"></i>
