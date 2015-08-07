@@ -1,0 +1,39 @@
+<% if @branches %>
+  <%= form_tag repo_branches_path(current_repo.name), method: "get", class: "form-inline pull-right" do %>
+    <div class="form-group">
+      <label class="sr-only" for="search">Search</label>
+      <%= text_field_tag "search", params[:search], class: "form-control", id: "search", placeholder: "Enter branch name" %>
+    </div>
+    <button type="submit" class="btn btn-default">Search</button>
+  <%- end %>
+<% end %>
+
+<ul class="nav nav-tabs deploy-targets">
+  <% if supported?("tag") %>
+  <li <%= 'class="active"'.html_safe if @latest_tag %>>
+    <%= link_to latest_repo_tags_path(current_repo.name) do %>
+      <%= deploy_type_icon("tag") %> Latest Tag
+    <%- end %>
+  </li>
+  <li <%= 'class="active"'.html_safe if @tags %>>
+    <%= link_to repo_tags_path(current_repo.name) do %>
+      <%= deploy_type_icon("tag") %> Tags
+    <%- end %>
+  </li>
+  <% end %>
+  <% if supported?("branch") %>
+  <li <%= 'class="active"'.html_safe if @branches %>>
+    <%= link_to repo_branches_path(current_repo.name) do %>
+      <%= deploy_type_icon("branch") %> Branches
+    <%- end %>
+  </li>
+  <% end %>
+  <% if supported?("commit") %>
+  <li <%= 'class="active"'.html_safe if @commits %>>
+    <%= link_to repo_commits_path(current_repo.name) do %>
+      <%= deploy_type_icon("commit") %> Commits
+    <%- end %>
+  </li>
+  <% end %>
+</ul>
+<br>

@@ -66,15 +66,15 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # HTML Helpers
   def deploy_type_icon(type)
+    content_tag :i, "", class: deploy_icon_class(type)
+  end
+
+  def deploy_icon_class(type)
     case type
-    when 'tag'
-      "<i class='icon-tag' title='tag'></i>".html_safe
-    when 'branch'
-      "<i class='icon-code-fork' title='branch'></i>".html_safe
-    when 'commit'
-      "<i class='icon-tasks' title='commit'></i>".html_safe
-    else
-      ''
+    when "tag" then "icon-tag"
+    when "branch" then "icon-code-fork"
+    when "commit" then "icon-tasks"
+    else ""
     end
   end
 
