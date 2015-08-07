@@ -67,21 +67,17 @@ class Deploy < ActiveRecord::Base
   end
 
   def process_still_running?
-    # look in the process list for our process ID.
-    #     - remove any zombie process listings
-    check = `ps cax | grep -v "\sZ[+]*\s" | grep -e "^\s*#{self.process_id}\s"`
-    !check.blank?
-  end
-
-  def child_process_id
-    # the process we spawn off is the sh process which yields another process
-    `pgrep -P #{self.process_id}`
+    # kill -0 checks if the process is running and owned by us, but doesn't send
+    # a signal
+    !!Process.kill(0, process_id)
+  rescue
+    # process isn't running or isn't owned by us
+    false
   end
 
   def kill_process!(forcefully=false)
     return true unless process_still_running?
-    # -2 is INT which the ship-it script traps to report to hipchat
-    `kill #{forcefully ? "-9" : "-2"} #{child_process_id}`
+    Process.kill(forcefully ? "KILL" : "INT", process_id)
     sleep(1)
     check_completed_status!
   end
