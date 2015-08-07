@@ -23,7 +23,7 @@ class Deploy < ActiveRecord::Base
 
   # only grab the last X lines of the log output
   def some_log_contents(lines=50)
-    system("tail", "-n", lines, log_path)
+    IO.popen(["tail", "-n", lines.to_s, log_path]) { |io| io.read }
   end
 
   def log_contents_htmlized(show_all=false)
@@ -67,19 +67,30 @@ class Deploy < ActiveRecord::Base
   end
 
   def process_still_running?
+    return false if process_id.nil?
+    try_to_clean_up_process_status
+
     # kill -0 checks if the process is running and owned by us, but doesn't send
     # a signal
-    !!Process.kill(0, process_id)
+    !!Process.kill(0, process_id.to_i)
   rescue
     # process isn't running or isn't owned by us
     false
   end
 
   def kill_process!(forcefully=false)
-    return true unless process_still_running?
-    Process.kill(forcefully ? "KILL" : "INT", process_id)
+    return unless process_still_running?
+    Process.kill(forcefully ? "KILL" : "INT", process_id.to_i)
     sleep(1)
     check_completed_status!
   end
 
+  # Clean up after ourselves, if we are the owner. Otherwise the OS builds up
+  # zombie processes
+  def try_to_clean_up_process_status
+    Process.waitpid(process_id.to_i, Process::WNOHANG)
+  rescue
+    # Process isn't dead or isn't owned by us
+    nil
+  end
 end
