@@ -18,7 +18,7 @@ module Canoe
         args << "--no-confirmations"
         args << "--html-color"
 
-        background_shipit(args, out: log_path, err: :out)
+        background_shipit(args, [:out, :err] => [log_path, "w"])
       end
 
       def lock(user:)
