@@ -7,8 +7,6 @@
     Select the
     <% if @latest_tag %>
       <%= deploy_type_icon("tag") %> <strong>latest tag</strong>
-    <% elsif @tags %>
-      <%= deploy_type_icon("tag") %> <strong>tag</strong>
     <% elsif @branches %>
       <%= deploy_type_icon("branch") %> <strong>branch</strong>
     <% elsif @commits %>
@@ -22,9 +20,7 @@
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
 
-  <% if @tags %>
-    <%= render partial: 'repos/tags', locals: { tags: @tags } %>
-  <% elsif @branches %>
+  <% if @branches %>
     <%= render partial: 'repos/branches', locals: { branches: @branches } %>
   <% elsif @commits %>
     <%= render partial: 'repos/commits', locals: { commits: @commits } %>

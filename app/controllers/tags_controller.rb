@@ -3,7 +3,6 @@ class TagsController < ApplicationController
 
   def index
     @tags = current_repo.tags
-    render template: "repos/show"
   end
 
   def latest
