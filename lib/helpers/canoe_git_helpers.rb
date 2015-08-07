@@ -11,10 +11,11 @@ module Canoe
       Octokit.auto_paginate = true
       branches = Octokit.branches(current_repo.full_name)
       branches.sort_by(&:name) # may not really be needed...
+    ensure
+      Octokit.auto_paginate = false
     end
 
     def commits_for_current_repo(count=50)
-      Octokit.auto_paginate = false
       Octokit.commits(current_repo.full_name, per_page: count)
     end
 
