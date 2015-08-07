@@ -21,9 +21,8 @@ cli.setup
 sleep(rand*30) unless cli.environment.dev?
 
 # Only one-concurrent process using file lock
-exit if File.exist?(LOCKFILE)
 lockfile = File.new(LOCKFILE, 'w')
-lockfile.close
+lockfile.flock(File::LOCK_NB|File::LOCK_EX) or abort("#{LOCKFILE} is locked. Is another process already running?")
 
 begin
   currently_deployed = cli.check_version
@@ -39,5 +38,5 @@ begin
     Console.log("We're up to date: #{requested}", :green)
   end
 ensure
-  File.delete(LOCKFILE)
+  lockfile.close
 end
