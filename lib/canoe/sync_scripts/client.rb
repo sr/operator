@@ -18,8 +18,7 @@ module Canoe
         args << "--no-confirmations"
         args << "--html-color"
 
-        io = run_shipit(args, out: log_path, err: log_path)
-        io.pid
+        background_shipit(args, out: log_path, err: :out)
       end
 
       def lock(user:)
@@ -27,7 +26,7 @@ module Canoe
           "--only-lock",
           "--no-color",
           "--user=#{user.email}",
-        ]).read
+        ])
       end
 
       def unlock(user:, force:)
@@ -35,22 +34,33 @@ module Canoe
           force ? "--force-unlock" : "--unlock",
           "--no-color",
           "--user=#{user.email}",
-        ]).read
+        ])
       end
 
       def list_servers
         run_shipit(["--list-servers"])
-          .read
           .strip
           .split(/\s*,\s*/)
       end
 
       private
-      def run_shipit(args, options = {})
-        full_cmd = [shipit_command_path, @environment] + args
+
+      def run_shipit(args)
+        full_cmd = shipit_full_cmd(args)
 
         Rails.logger.debug "Executing: #{full_cmd.inspect}"
-        IO.popen(full_cmd, options.merge(chdir: @path))
+        IO.popen(full_cmd, chdir: @path) { |io| io.read }
+      end
+
+      def background_shipit(args, options = {})
+        full_cmd = shipit_full_cmd(args)
+
+        Rails.logger.debug "Executing: #{full_cmd.inspect}"
+        spawn(*full_cmd, options.merge(chdir: @path))
+      end
+
+      def shipit_full_cmd(args)
+        [shipit_command_path, @environment] + args
       end
 
       def shipit_command_path

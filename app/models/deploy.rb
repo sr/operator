@@ -12,7 +12,7 @@ class Deploy < ActiveRecord::Base
     @_log_path ||= \
       begin
         filename = "#{self.deploy_target.name}_#{self.repo_name}_#{self.id}.log"
-        Rails.root.join('log', filename)
+        Rails.root.join('log', filename).to_s
       end
   end
 
