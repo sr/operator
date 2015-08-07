@@ -5,9 +5,7 @@
 <% if @latest_tag || @tags || @branches || @commits %>
   <p class="lead muted">
     Select the
-    <% if @branches %>
-      <%= deploy_type_icon("branch") %> <strong>branch</strong>
-    <% elsif @commits %>
+    <% if @commits %>
       <%= deploy_type_icon("commit") %> <strong>commit</strong>
     <% end %>
     that you wish to ship.
@@ -18,9 +16,7 @@
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
 
-  <% if @branches %>
-    <%= render partial: 'repos/branches', locals: { branches: @branches } %>
-  <% elsif @commits %>
+  <% if @commits %>
     <%= render partial: 'repos/commits', locals: { commits: @commits } %>
   <% else %>
     <div class="container">

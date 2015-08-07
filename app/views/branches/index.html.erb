@@ -1,0 +1,27 @@
+<h1 class="steps-count">Step 1 of 3</h1>
+<h2>What do you want to deploy?</h2>
+<br>
+
+<p class="lead muted">
+  Select the <%= deploy_type_icon("branch") %> <strong>branch</strong> that you wish to ship.
+</p>
+
+<div>
+  <%= render partial: "application/deploy_what_tabs" %>
+
+  <ul class="list-unstyled deploy-list">
+    <% @branches.each do |branch| %>
+      <li>
+        <h4>
+          <a href="<%= select_target_repo_deploys_path(current_repo.name, branch: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
+          &nbsp;
+          <%= deploy_type_icon("branch") %> <%= branch.name %>
+          &nbsp;
+          <a href="<%= github_branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
+        </h4>
+        <small class="muted">commit: <a href="<%= github_commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
+        <hr>
+      </li>
+    <% end %>
+  </ul>
+</div>
