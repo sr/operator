@@ -23,7 +23,7 @@ class Deploy < ActiveRecord::Base
 
   # only grab the last X lines of the log output
   def some_log_contents(lines=50)
-    `tail -n #{lines} #{log_path}`
+    system("tail", "-n", lines, log_path)
   end
 
   def log_contents_htmlized(show_all=false)
