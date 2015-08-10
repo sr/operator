@@ -83,16 +83,4 @@ class DeployTarget < ActiveRecord::Base
     self.locking_user == user || \
     self.file_lock_user == user.email
   end
-
-  # TODO: Kill this method
-  def shipit_command(cmd_options=[])
-    cmd_pieces = []
-    cmd_pieces << "cd #{self.script_path} &>/dev/null;"
-    cmd_pieces << "PATH=$PATH:/usr/local/bin bundle exec ./ship-it.rb"
-    cmd_pieces << self.name.downcase # always pass env
-    cmd_pieces += cmd_options
-    cmd_pieces.compact!
-
-    cmd_pieces.join(" ")
-  end
 end
