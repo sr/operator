@@ -68,7 +68,6 @@ class Deploy < ActiveRecord::Base
 
   def process_still_running?
     return false if process_id.nil?
-    try_to_clean_up_process_status
 
     # kill -0 checks if the process is running and owned by us, but doesn't send
     # a signal
@@ -83,14 +82,5 @@ class Deploy < ActiveRecord::Base
     Process.kill(forcefully ? "KILL" : "INT", process_id.to_i)
     sleep(1)
     check_completed_status!
-  end
-
-  # Clean up after ourselves, if we are the owner. Otherwise the OS builds up
-  # zombie processes
-  def try_to_clean_up_process_status
-    Process.waitpid(process_id.to_i, Process::WNOHANG)
-  rescue
-    # Process isn't dead or isn't owned by us
-    nil
   end
 end

@@ -28,6 +28,7 @@ module Canoe
       target.lock!(user) if lock
 
       if pid = @strategy.perform(deploy, lock: lock)
+        Process.detach(pid)
         deploy.update_attribute(:process_id, pid)
       end
 
