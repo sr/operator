@@ -20,9 +20,6 @@ gem 'omniauth', '~> 1.2', '>= 1.2.2'
 gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
 group :development do
-  # Use Capistrano for deployment
-  gem 'capistrano-rails', '~> 1.1', '>= 1.1.3'
-
   gem 'foreman', '0.78.0'
   gem 'dotenv-rails', '~> 2.0', '>= 2.0.2', require: 'dotenv/rails-now'
 end
