@@ -98,7 +98,6 @@ RSpec.describe "/api/*/target" do
         define_api_user_mock
         define_target_mock do |target_mock|
           # make sure shell command just echos and exits
-          expect(target_mock).to receive(:script_path).and_return("~; echo 'test'; exit 0;")
           expect(target_mock).to receive(:lock!)
           expect(target_mock).to receive(:reload)
           expect(target_mock).to receive(:is_locked?).and_return(true)
@@ -107,8 +106,8 @@ RSpec.describe "/api/*/target" do
         api_post "/api/lock/target/test"
         expect(response).to be_ok
         expect(json_response["locked"]).to be_truthy
-        # make sure output is pushed into json response
-        expect(json_response["output"]).to include("test")
+        # See Canoe::Deployment::Strategies::Test
+        expect(json_response["output"]).to include("test lock successful")
       end
     end
   end
@@ -145,7 +144,6 @@ RSpec.describe "/api/*/target" do
         define_api_user_mock
         define_target_mock do |target_mock|
           # make sure shell command just echos and exits
-          expect(target_mock).to receive(:script_path).and_return("~; echo 'test'; exit 0;")
           expect(target_mock).to receive(:unlock!)
           expect(target_mock).to receive(:reload)
           expect(target_mock).to receive(:is_locked?).and_return(false)
@@ -154,8 +152,8 @@ RSpec.describe "/api/*/target" do
         api_post "/api/unlock/target/test"
         expect(response).to be_ok
         expect(json_response["locked"]).to be_falsey
-        # make sure output is pushed into json response
-        expect(json_response["output"]).to include("test")
+        # See Canoe::Deployment::Strategies::Test
+        expect(json_response["output"]).to include("test unlock successful")
       end
     end
   end

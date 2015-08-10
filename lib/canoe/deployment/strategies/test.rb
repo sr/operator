@@ -20,11 +20,11 @@ module Canoe
         end
 
         def lock(target:, user:)
-          # TODO
+          "test lock successful"
         end
 
         def unlock(target:, user:, force:)
-          # TODO
+          "test unlock successful"
         end
 
         def clear
