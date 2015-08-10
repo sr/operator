@@ -4,7 +4,7 @@ module PaginationHelper
   end
 
   def pagination_page_size
-    3
+    10
   end
 
   def page_button(page_number, link)
