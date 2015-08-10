@@ -88,13 +88,11 @@ class ApplicationController < ActionController::Base
 
   def require_repo
     return if current_repo
-    # TODO: Remove the need for this
     raise ActiveRecord::RecordNotFound.new("no repository with name '#{current_repo_name}'")
   end
 
   def require_target
     return if current_target
-    # TODO: Remove the need for this
     raise ActiveRecord::RecordNotFound.new("no target found")
   end
 end
