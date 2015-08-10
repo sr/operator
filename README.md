@@ -3,7 +3,7 @@
 :ship: Canoe is the frontend that ships our code to production.
 
 * Canoe Production: <https://canoe.pardot.com>
-* Canoe Staging: <https://canoe.pardot.com>
+* Canoe Staging: <https://canoe.dev.pardot.com>
 
 ## Development Setup
 
