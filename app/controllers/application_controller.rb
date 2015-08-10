@@ -58,7 +58,6 @@ class ApplicationController < ActionController::Base
       elsif params[:name].present? && all_repos.include?(params[:name])
         params[:name]
       elsif current_deploy
-        # TODO: Remove this branch
         current_deploy.repo_name
       end
   end
@@ -72,7 +71,6 @@ class ApplicationController < ActionController::Base
       elsif params[:name].present?
         DeployTarget.find_by_name(params[:name].to_s)
       elsif current_deploy
-        # TODO: Remove this branch
         current_deploy.deploy_target
       end
   end
