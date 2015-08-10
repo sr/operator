@@ -1,12 +1,21 @@
 # Canoe
 
-:ship:
+:ship: Canoe is the frontend that ships our code to production.
+
+* Canoe Production: <https://canoe.pardot.com>
+* Canoe Staging: <https://canoe.pardot.com>
 
 ## Development Setup
 
+Canoe uses GitHub style [scripts-to-rule-them-all](https://github.com/github/scripts-to-rule-them-all).
+
+To install required gems and to setup the database:
+
 ```
-script/bootstrap
+script/setup
 ```
+
+`script/setup` should only need to be run once. Use `script/update` in future after adding new gems or pulling new code.
 
 ### Secrets
 
@@ -24,4 +33,18 @@ cp .env.sample .env
 # .env
 GITHUB_USER=my_ldap_username
 GITHUB_PASSWORD=my_personal_access_token
+```
+
+### Tests
+
+Run all the tests:
+
+```
+script/test
+```
+
+Run specific tests:
+
+```
+script/test spec/path/to/whatever_spec.rb
 ```
