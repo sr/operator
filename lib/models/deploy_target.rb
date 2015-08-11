@@ -98,8 +98,11 @@ class DeployTarget < ActiveRecord::Base
     cmd_options = Array(options[:repo].name)
     cmd_options << "--list-servers"
     cmd_options << shipit_server_flag(options)
-    server_list = `#{shipit_command(cmd_options)}`.strip
-    [server_list.split(",").size, server_list]
+
+    Bundler.with_clean_env do
+      server_list = `#{shipit_command(cmd_options)}`.strip
+      [server_list.split(",").size, server_list]
+    end
   end
 
   def shipit_server_flag(options)
@@ -149,8 +152,10 @@ class DeployTarget < ActiveRecord::Base
     self.lock!(options[:user]) if options[:lock]
 
     # spawn process to run this...
-    shipit_pid = spawn(shipit_command(cmd_options))
-    deploy.update_attribute(:process_id, shipit_pid)
+    Bundler.with_clean_env do
+      shipit_pid = spawn(shipit_command(cmd_options))
+      deploy.update_attribute(:process_id, shipit_pid)
+    end
 
     # return the deploy for good measure
     deploy
