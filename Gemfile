@@ -21,7 +21,6 @@ gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
 group :development do
   gem 'foreman', '0.78.0'
-  gem 'dotenv-rails', '~> 2.0', '>= 2.0.2', require: 'dotenv/rails-now'
 end
 
 group :development, :test do

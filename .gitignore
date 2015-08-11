@@ -13,7 +13,8 @@
 /tmp
 
 # Local secrets
-/.env
+/.envvars_*.rb
+!/.envvars_sample.rb
 
 # Failed tests
 /spec/examples.txt

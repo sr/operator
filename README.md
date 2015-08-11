@@ -21,18 +21,18 @@ script/setup
 
 Canoe uses the GitHub API to get information about branches, tags, etc. For local development, you can use your own user to authenticate against that API.
 
-First, copy the `.env.sample` file to `.env`:
+First, copy the `.envvars_sample.rb` file to `.envvars_development.rb`:
 
 ```
-cp .env.sample .env
+cp .envvars_sample.rb .envvars_development.rb
 ```
 
-[Create a Personal Access Token](https://git.dev.pardot.com/settings/applications) and provide it as `GITHUB_PASSWORD` in `.env`:
+[Create a Personal Access Token](https://git.dev.pardot.com/settings/applications) and provide it as `GITHUB_PASSWORD` in `.envvars_development.rb`:
 
 ```
-# .env
-GITHUB_USER=my_ldap_username
-GITHUB_PASSWORD=my_personal_access_token
+# .envvars_development.rb
+ENV["GITHUB_USER"] = "my_ldap_username"
+ENV["GITHUB_PASSWORD"] = "my_personal_access_token"
 ```
 
 ### Tests
