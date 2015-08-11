@@ -64,11 +64,23 @@ module Canoe
       end
 
       def shipit_full_cmd(args)
-        [shipit_command_path, @environment] + args
+        full_cmd = []
+        if File.executable?(rbenv_shim_path)
+          full_cmd << rbenv_shim_path
+        end
+
+        full_cmd << shipit_command_path
+        full_cmd << @environment
+        full_cmd.append(args)
+        full_cmd
       end
 
       def shipit_command_path
         Pathname.new(@path).join("ship-it.rb").to_s
+      end
+
+      def rbenv_shim_path
+        "/opt/rbenv/shims/ruby".freeze
       end
     end
   end
