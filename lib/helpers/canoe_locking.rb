@@ -6,8 +6,10 @@ module Canoe
 
       current_target.lock!(current_user)
 
-      output = `#{cmd}`
-      flash[:notice] = output
+      Bundler.with_clean_env do
+        output = `#{cmd}`
+        flash[:notice] = output
+      end
     end
 
     def unlock_target!(with_force=false)
@@ -17,8 +19,10 @@ module Canoe
 
       current_target.unlock!(current_user, with_force)
 
-      output = `#{cmd}`
-      flash[:notice] = output
+      Bundler.with_clean_env do
+        output = `#{cmd}`
+        flash[:notice] = output
+      end
     end
   end
 end
