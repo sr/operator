@@ -49,14 +49,18 @@ module Canoe
         full_cmd = shipit_full_cmd(args)
 
         Rails.logger.debug "Executing: #{full_cmd.inspect}"
-        IO.popen(full_cmd, chdir: @path) { |io| io.read }
+        Bundler.with_clean_env do
+          IO.popen(full_cmd, chdir: @path) { |io| io.read }
+        end
       end
 
       def background_shipit(args, options = {})
         full_cmd = shipit_full_cmd(args)
 
         Rails.logger.debug "Executing: #{full_cmd.inspect}"
-        spawn(*full_cmd, options.merge(chdir: @path))
+        Bundler.with_clean_env do
+          spawn(*full_cmd, options.merge(chdir: @path))
+        end
       end
 
       def shipit_full_cmd(args)
