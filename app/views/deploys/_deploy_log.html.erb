@@ -10,7 +10,7 @@
 
 <div id="deploy_log_output" class=" <%= "pre-scrollable" unless @show_full_logs %>">
   <code class="deploy-log">
-  <%= "---- OUTPUT TRUNCATED ----<br>" unless @show_full_logs  %>
+  <%= "---- OUTPUT TRUNCATED ----<br>".html_safe unless @show_full_logs  %>
   <%= current_deploy.log_contents_htmlized(@show_full_logs) %>
   </code>
 </div>
