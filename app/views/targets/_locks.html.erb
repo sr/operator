@@ -17,7 +17,7 @@
           <i class="icon-unlock text-success"></i> Unlock
         <% end %>
       </td>
-      <td><%= "<i class='icon-warning-sign text-warning'></i>" if lock.forced? %></td>
+      <td><%= content_tag :i, "", class: "icon-warning-sign text-warning" if lock.forced? %></td>
       <td><%= print_time lock.created_at %></td>
     </tr>
   <% end %>
