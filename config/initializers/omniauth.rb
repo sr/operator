@@ -1,4 +1,11 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
+  case Rails.env
+  when "production"
+    OmniAuth.config.full_host = "https://canoe.pardot.com"
+  when "app.dev"
+    OmniAuth.config.full_host = "http://canoe.dev.pardot.com"
+  end
+
   if Rails.env.development? || Rails.env.test?
     provider :developer
   else
@@ -7,12 +14,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       ENV["GOOGLE_SECRET"],
       name: "google",
       access_type: "online"
-  end
-
-  case Rails.env
-  when "production"
-    OmniAuth.config.full_host = "https://canoe.pardot.com"
-  when "app.dev"
-    OmniAuth.config.full_host = "http://canoe.dev.pardot.com"
   end
 end
