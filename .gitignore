@@ -16,5 +16,8 @@
 /.envvars_*.rb
 !/.envvars_sample.rb
 
+# Compiled assets
+/public/assets
+
 # Failed tests
 /spec/examples.txt
