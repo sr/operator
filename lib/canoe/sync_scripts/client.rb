@@ -71,7 +71,7 @@ module Canoe
 
         full_cmd << shipit_command_path
         full_cmd << @environment
-        full_cmd.append(args)
+        full_cmd.concat(args)
         full_cmd
       end
 
