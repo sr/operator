@@ -8,4 +8,11 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       name: "google",
       access_type: "online"
   end
+
+  case Rails.env
+  when "production"
+    OmniAuth.config.full_host = "https://canoe.pardot.com"
+  when "app.dev"
+    OmniAuth.config.full_host = "http://canoe.dev.pardot.com"
+  end
 end
