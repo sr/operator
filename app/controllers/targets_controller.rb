@@ -15,7 +15,7 @@ class TargetsController < ApplicationController
   end
 
   def unlock
-    unlock_target!
+    unlock_target!(force: (params[:force] == "1"))
     redirect_to target_path(current_target)
   end
 end
