@@ -1,0 +1,115 @@
+<h1><i class="icon-train2"></i> DEPLOY</h1>
+<p class="lead no-bottom">
+  <% if @watching %>
+    <i class="icon-eye-open"></i> Watching deploy of
+  <% end %>
+  <%= current_deploy.repo_name.capitalize %> :
+  <%= print_deploy_what(current_deploy) %>
+  to <%= current_deploy.deploy_target.name.capitalize %>
+</p>
+<small class="muted">
+  Started on <%= print_time current_deploy.created_at %> by
+  <% if current_deploy.auth_user == current_user %>
+    <strong>you</strong>.
+  <% else %>
+    <%= print_email current_deploy.auth_user.email %>.
+  <% end %>
+</small>
+<br>
+<h4>
+  <strong>
+    What <%= current_deploy.completed? ? 'changed' : 'is changing' %>?
+  </strong>
+  &nbsp;&nbsp;
+  <a href="<%= github_diff_url(@previous_deploy, current_deploy) %>">
+    <% if @previous_deploy %>
+      <%= print_deploy_what @previous_deploy %>
+    <% else %>
+      First Deploy
+    <% end %>
+    &nbsp;
+    &#x021D2;
+    &nbsp;
+    <%= print_deploy_what current_deploy %>
+  </a>
+</h4>
+<br>
+
+<% if current_deploy.canceled? %>
+  <div class="alert alert-danger">
+    <i class="icon-remove-sign"></i>
+    <strong>Canceled</strong>:
+    this deploy was canceled and marked completed on <%= print_time current_deploy.updated_at %>
+  </div>
+<% elsif current_deploy.completed? %>
+  <div class="alert alert-success">
+    <i class="icon-check"></i>
+    <strong>Complete</strong>:
+    marked as completed on <%= print_time current_deploy.updated_at %>
+  </div>
+<% else %>
+  <div class="alert alert-warning">
+    <img src="/img/busy.gif" style="width:25px;">
+    <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
+    <% if @watching && !current_deploy.completed? %>
+      <script type="text/javascript">
+        // automatically refresh the page every 15 secs
+        setTimeout(function () { location.reload(); }, 15000);
+      </script>
+    <% end %>
+    <p class="muted"><strong>Process ID:</strong> <%= current_deploy.process_id %></p>
+  </div>
+
+  <div class="progress">
+    <% precent_complete = current_deploy.percentage_complete %>
+    <div class="progress-bar" role="progressbar" aria-valuenow="<%= precent_complete %>" aria-valuemin="0" aria-valuemax="100" style="width:<%= precent_complete %>%;">
+      <%= precent_complete %>%&nbsp;
+    </div>
+  </div>
+<% end %>
+
+<%= render partial: "deploys/deploy_log" %>
+
+<% unless @show_full_logs %> <%# don't show server info on full log %>
+  <%# ======================== SERVERS ======================== %>
+  <%= render partial: "deploys/deploy_servers" %>
+  <div class="alert alert-info" role="alert">
+    <% if current_deploy.used_all_servers? %>
+      <p class="muted">
+        <em>All servers used for sync.</em>
+      </p>
+    <% else %>
+      <p>
+        <strong>Specified Servers:</strong>
+        <%= current_deploy.specified_servers %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+
+<%# ======================== ACTION BUTTONS ======================== %>
+<% if !@watching && !current_deploy.completed? %>
+  <br>
+  <div>
+    <%= form_tag complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to mark this complete?"} do %>
+      <button type="submit" class="btn btn-danger">Mark as Complete</button>
+    <%- end %>
+  </div>
+<% end %>
+
+<hr>
+<% if current_deploy.completed? %>
+  <div>
+    <%= link_to select_target_repo_deploys_path(current_repo.name, current_deploy.what => current_deploy.what_details), class: "btn btn-primary btn-warning deploy-button" do %>
+      <i class="icon-train2"></i> REDEPLOY THIS!
+    <%- end %>
+  </div>
+<% else %>
+  <div>
+    <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
+      <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> CANCEL</button>
+    <%- end %>
+  </div>
+<% end %>
+
+<br>

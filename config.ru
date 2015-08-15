@@ -1,13 +1,4 @@
-CANOE_DIR=File.expand_path(File.dirname(__FILE__))
-ENV["CANOE_DIR"]=CANOE_DIR
-ENV["RACK_ENV"]="production"
+# This file is used by Rack-based servers to start the application.
 
-# add our root and lib dirs to the load path
-$:.unshift CANOE_DIR
-$:.unshift "#{CANOE_DIR}/lib/"
-$:.unshift "#{CANOE_DIR}/lib/models/"
-$:.unshift "#{CANOE_DIR}/lib/helpers/"
-
-require "app"
-
-run CanoeApplication
+require ::File.expand_path('../config/environment', __FILE__)
+run Rails.application

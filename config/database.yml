@@ -1,0 +1,19 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: root
+  password:
+  socket: /tmp/mysql.sock
+
+development:
+  <<: *default
+  database: canoe_development
+
+test:
+  <<: *default
+  database: canoe_test
+
+production: &production
+  url: <%= ENV['DATABASE_URL'] %>
+app.dev: *production

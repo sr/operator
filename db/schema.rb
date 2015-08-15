@@ -13,55 +13,55 @@
 
 ActiveRecord::Schema.define(version: 20140904164525) do
 
-  create_table "auth_users", force: true do |t|
-    t.string   "email"
-    t.string   "name"
-    t.string   "uid"
-    t.string   "token"
+  create_table "auth_users", force: :cascade do |t|
+    t.string   "email",      limit: 255
+    t.string   "name",       limit: 255
+    t.string   "uid",        limit: 255
+    t.string   "token",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "auth_users", ["email"], name: "index_auth_users_on_email", using: :btree
 
-  create_table "deploy_targets", force: true do |t|
-    t.string   "name"
-    t.string   "script_path"
-    t.string   "lock_path"
+  create_table "deploy_targets", force: :cascade do |t|
+    t.string   "name",            limit: 255
+    t.string   "script_path",     limit: 255
+    t.string   "lock_path",       limit: 255
     t.boolean  "locked"
-    t.integer  "locking_user_id"
+    t.integer  "locking_user_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "lockable",        default: false
+    t.boolean  "lockable",                    default: false
   end
 
   add_index "deploy_targets", ["name"], name: "index_deploy_targets_on_name", using: :btree
 
-  create_table "deploys", force: true do |t|
-    t.integer  "deploy_target_id"
-    t.integer  "auth_user_id"
-    t.string   "repo_name"
-    t.string   "what"
-    t.string   "what_details"
-    t.boolean  "completed",         default: false
+  create_table "deploys", force: :cascade do |t|
+    t.integer  "deploy_target_id",  limit: 4
+    t.integer  "auth_user_id",      limit: 4
+    t.string   "repo_name",         limit: 255
+    t.string   "what",              limit: 255
+    t.string   "what_details",      limit: 255
+    t.boolean  "completed",                       default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "process_id"
-    t.boolean  "canceled",          default: false
-    t.integer  "server_count",      default: 0
-    t.text     "servers_used"
-    t.text     "specified_servers"
-    t.text     "completed_servers"
-    t.text     "sha"
+    t.string   "process_id",        limit: 255
+    t.boolean  "canceled",                        default: false
+    t.integer  "server_count",      limit: 4,     default: 0
+    t.text     "servers_used",      limit: 65535
+    t.text     "specified_servers", limit: 65535
+    t.text     "completed_servers", limit: 65535
+    t.text     "sha",               limit: 65535
   end
 
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
 
-  create_table "locks", force: true do |t|
-    t.integer  "deploy_target_id"
-    t.integer  "auth_user_id"
-    t.boolean  "locking",          default: false
-    t.boolean  "forced",           default: false
+  create_table "locks", force: :cascade do |t|
+    t.integer  "deploy_target_id", limit: 4
+    t.integer  "auth_user_id",     limit: 4
+    t.boolean  "locking",                    default: false
+    t.boolean  "forced",                     default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -69,13 +69,13 @@ ActiveRecord::Schema.define(version: 20140904164525) do
   add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
 
-  create_table "target_jobs", force: true do |t|
-    t.integer  "deploy_target_id"
-    t.integer  "auth_user_id"
-    t.string   "job_name"
-    t.string   "command"
-    t.string   "process_id"
-    t.boolean  "completed",        default: false
+  create_table "target_jobs", force: :cascade do |t|
+    t.integer  "deploy_target_id", limit: 4
+    t.integer  "auth_user_id",     limit: 4
+    t.string   "job_name",         limit: 255
+    t.string   "command",          limit: 255
+    t.string   "process_id",       limit: 255
+    t.boolean  "completed",                    default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

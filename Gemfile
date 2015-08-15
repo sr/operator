@@ -1,32 +1,40 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "rake"
+gem 'rails', '4.2.3'
+gem 'mysql2', '~> 0.3', '>= 0.3.18'
 
-# web ----
-gem "rack"
-gem "sinatra"
-gem "rack-flash3"
-gem "sinatra-partial"
-gem "json"
+gem 'sass-rails', '~> 5.0'
+gem 'uglifier', '>= 1.3.0'
+gem 'coffee-rails', '~> 4.1.0'
 
-# dev/debugging ----
-gem "tux"
+gem 'jquery-rails', '~> 4.0', '>= 4.0.4'
+gem 'bootstrap-sass', '~> 3.3', '>= 3.3.5.1'
+gem 'font-awesome-rails', '3.2.1.3'
 
-# other ----
-gem "octokit"
-gem "capistrano", "2.15.5"
+gem 'jbuilder', '~> 2.0'
+# bundle exec rake doc:rails generates the API under doc/api.
+gem 'sdoc', '~> 0.4.0', group: :doc
 
-# database ----
-gem "sinatra-activerecord"
-# gem "sqlite3" # technically only needed for dev
-gem "mysql2"
+gem 'octokit', '~> 3.8'
+gem 'omniauth', '~> 1.2', '>= 1.2.2'
+gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
-# authentication ----
-gem "omniauth"
-gem "omniauth-google-oauth2"
+group :development do
+  gem 'foreman', '0.78.0'
+end
+
+group :development, :test do
+  gem 'byebug'
+  gem 'web-console', '~> 2.0'
+  gem 'spring'
+  gem 'rspec-rails', '~> 3.3', '>= 3.3.3'
+  gem 'capybara', '~> 2.4', '>= 2.4.4'
+end
 
 group :test do
-  gem 'mocha'
-  gem "simplecov", "~> 0.7.1"
-  gem "rack-test"
+  gem 'webmock', '~> 1.21', '>= 1.21.0'
+end
+
+group :production, :"app.dev" do
+  gem 'therubyracer', '~> 0.12', '>= 0.12.2'
 end
