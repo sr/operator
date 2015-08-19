@@ -2,14 +2,15 @@ module Canoe
   module Deployment
     module Strategies
       class SyncScripts
-        def list_servers(target)
+        def list_servers(target, repo_name)
           client = build_client(target)
-          client.list_servers
+          client.list_servers(repo_name: repo_name)
         end
 
         def perform(deploy, lock: false)
           client = build_client(deploy.deploy_target)
           client.deploy(
+            repo_name: deploy.repo_name,
             what: deploy.what,
             what_details: deploy.what_details,
             user: deploy.auth_user,
