@@ -10,7 +10,7 @@ module Canoe
           @deploys = []
         end
 
-        def list_servers(target)
+        def list_servers(target, repo_name)
           ["localhost"]
         end
 

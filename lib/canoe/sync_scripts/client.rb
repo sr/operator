@@ -9,8 +9,9 @@ module Canoe
         @environment = environment
       end
 
-      def deploy(what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, lock: false)
-        args  = ["#{what}=#{what_details}"]
+      def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, lock: false)
+        args  = [repo_name]
+        args << "#{what}=#{what_details}"
         args << "--lock" if lock
         args << "--user=#{user.email}"
         args << "--deploy-id=#{deploy_id}"
@@ -37,8 +38,8 @@ module Canoe
         ])
       end
 
-      def list_servers
-        run_shipit(["--list-servers"])
+      def list_servers(repo_name:)
+        run_shipit([repo_name, "--list-servers"])
           .strip
           .split(/\s*,\s*/)
       end

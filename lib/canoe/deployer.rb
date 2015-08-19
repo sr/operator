@@ -7,7 +7,7 @@ module Canoe
     end
 
     def deploy(target:, user:, repo:, what:, what_details:, sha:, lock: false, servers: nil)
-      servers_used = servers || @strategy.list_servers(target)
+      servers_used = servers || @strategy.list_servers(target, repo.name)
 
       # REFACTOR: An exception might be more appropriate -@alindeman
       # Last guard against a duplicate deploy
