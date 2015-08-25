@@ -70,9 +70,10 @@ ActiveRecord::Schema.define(version: 20150824191000) do
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
 
   create_table "repos", force: :cascade do |t|
-    t.string "name",                limit: 255, null: false
-    t.string "icon",                limit: 255, null: false
-    t.string "artifactory_project", limit: 255
+    t.string  "name",                   limit: 255,                 null: false
+    t.string  "icon",                   limit: 255,                 null: false
+    t.string  "artifactory_project",    limit: 255
+    t.boolean "supports_branch_deploy",             default: false, null: false
   end
 
   add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree

@@ -3,30 +3,16 @@ module CanoeHelper
     request.scheme
   end
 
-  def repo_icon_map
-    { "pardot"   => "cloud",
-      "pithumbs" => "thumbs-up",
-      "realtime-frontend" => "bullhorn",
-      "workflow-stats" => "fighter-jet",
-    }
-  end
-
-  def supported?(what)
-    # these methods of deploying are NOT supported by the given repos
-    @_exclusions ||= {
-      "realtime-frontend" => %w[branch commit],
-      "workflow-stats" => %w[branch commit],
-    }
-    !(@_exclusions[current_repo_name] || []).include?(what.to_s)
-  end
-
   # ----------------------------------------------------------------------
   # DATA
 
   # ----------------------------------------------------------------------
   # ACTIVE X
-  def active_repo(repo_name="")
-    (current_repo_name || "").downcase == repo_name.downcase ? 'class="active"'.html_safe : ""
+  def active_repo(repo = nil)
+    current_repo_name = current_repo && current_repo.name
+    repo_name = repo && repo.name
+
+    current_repo_name == repo_name ? 'class="active"'.html_safe : ''
   end
 
   def active_target(target_name="")

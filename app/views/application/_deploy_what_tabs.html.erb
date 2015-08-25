@@ -9,26 +9,24 @@
 <% end %>
 
 <ul class="nav nav-tabs deploy-targets">
-  <% if supported?("tag") %>
-    <%= content_tag :li, class: (@latest_tag ? "active" : "") do %>
-      <%= link_to latest_repo_tags_path(current_repo.name) do %>
-        <%= deploy_type_icon("tag") %> Latest Tag
-      <%- end %>
+  <%= content_tag :li, class: (@latest_tag ? "active" : "") do %>
+    <%= link_to latest_repo_tags_path(current_repo.name) do %>
+      <%= deploy_type_icon("tag") %> Latest Tag
     <%- end %>
-    <%= content_tag :li, class: (@tags ? "active" : "") do %>
-      <%= link_to repo_tags_path(current_repo.name) do %>
-        <%= deploy_type_icon("tag") %> Tags
-      <%- end %>
+  <%- end %>
+  <%= content_tag :li, class: (@tags ? "active" : "") do %>
+    <%= link_to repo_tags_path(current_repo.name) do %>
+      <%= deploy_type_icon("tag") %> Tags
     <%- end %>
-  <% end %>
-  <% if supported?("branch") %>
+  <%- end %>
+  <% if current_repo.supports_branch_deploy? %>
     <%= content_tag :li, class: (@branches ? "active" : "") do %>
       <%= link_to repo_branches_path(current_repo.name) do %>
         <%= deploy_type_icon("branch") %> Branches
       <%- end %>
     <%- end %>
   <% end %>
-  <% if supported?("commit") %>
+  <% if false %>
     <%= content_tag :li, class: (@commits ? "active" : "") do %>
       <%= link_to repo_commits_path(current_repo.name) do %>
         <%= deploy_type_icon("commit") %> Commits

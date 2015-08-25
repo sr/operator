@@ -1,12 +1,10 @@
-class Repo
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
+class Repo < ActiveRecord::Base
+  def full_name
+    "Pardot/#{name}"
   end
 
-  def full_name
-    "Pardot/#{@name}"
+  def to_param
+    name
   end
 
   def tags(count = 30)

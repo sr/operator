@@ -46,22 +46,16 @@ class ApplicationController < ActionController::Base
 
   def current_repo
     return @current_repo if defined?(@current_repo)
-    @current_repo = current_repo_name && Repo.new(current_repo_name)
-  end
-  helper_method :current_repo
-
-  def current_repo_name
-    return @current_repo_name if defined?(@current_repo_name)
-    @current_repo_name =
-      if params[:repo_name].present? && all_repos.include?(params[:repo_name])
-        params[:repo_name]
-      elsif params[:name].present? && all_repos.include?(params[:name])
-        params[:name]
+    @current_repo =
+      if params[:repo_name].present?
+        Repo.find_by_name(params[:repo_name].to_s)
+      elsif params[:name].present?
+        Repo.find_by_name(params[:name].to_s)
       elsif current_deploy
-        current_deploy.repo_name
+        Repo.find_by_name(current_deploy.repo_name)
       end
   end
-  helper_method :current_repo_name
+  helper_method :current_repo
 
   def current_target
     return @current_target if defined?(@current_target)
@@ -82,13 +76,13 @@ class ApplicationController < ActionController::Base
   helper_method :all_targets
 
   def all_repos
-    %w[pardot pithumbs realtime-frontend workflow-stats]
+    @all_repos ||= Repo.order(:name)
   end
   helper_method :all_repos
 
   def require_repo
     return if current_repo
-    raise ActiveRecord::RecordNotFound.new("no repository with name '#{current_repo_name}'")
+    raise ActiveRecord::RecordNotFound.new("no repository found")
   end
 
   def require_target

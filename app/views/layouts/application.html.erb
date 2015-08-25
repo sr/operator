@@ -43,8 +43,8 @@
       <ul class="nav nav-stacked repos">
       <% all_repos.each do |repo| %>
         <li>
-        <a href="<%= repo_path(repo) %>" <%= active_repo repo %>>
-          <i class="icon-<%= repo_icon_map[repo] %>"></i><%= repo.capitalize %>
+        <a href="<%= repo_path(repo) %>" <%= active_repo(repo) %>>
+          <i class="icon-<%= repo.icon %>"></i><%= repo.name.capitalize %>
         </a>
         </li>
       <% end %>

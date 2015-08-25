@@ -16,4 +16,6 @@ if [ -z "$RAILS_ENV" ] && [ -z "$RACK_ENV" ]; then
   # Only run in development environments
   echo "===> Adding development targets"
   bin/rake canoe:create_dev_targets
+  echo "===> Adding repos"
+  bin/rake canoe:create_repos
 fi
