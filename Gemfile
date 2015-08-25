@@ -3,6 +3,7 @@ source "https://rubygems.org"
 
 # gem "rails"
 gem "rake"
+gem "artifactory"
 
 # these for tests ----
 # gem 'minitest' # for 1.8

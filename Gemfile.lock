@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    artifactory (2.3.0)
     byebug (5.0.0)
       columnize (= 0.9.0)
     columnize (0.9.0)
@@ -27,6 +28,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  artifactory
   byebug
   debugger (>= 1.6.6)
   minitest
