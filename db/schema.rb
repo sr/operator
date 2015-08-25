@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140904164525) do
+ActiveRecord::Schema.define(version: 20150824191000) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -68,6 +68,14 @@ ActiveRecord::Schema.define(version: 20140904164525) do
 
   add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
+
+  create_table "repos", force: :cascade do |t|
+    t.string "name",                limit: 255, null: false
+    t.string "icon",                limit: 255, null: false
+    t.string "artifactory_project", limit: 255
+  end
+
+  add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree
 
   create_table "target_jobs", force: :cascade do |t|
     t.integer  "deploy_target_id", limit: 4
