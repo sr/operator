@@ -13,6 +13,12 @@ class Conductor
 
   def deploy!(label)
     fetch_strategy = environment.current_fetch_strategy
+    deploy_strategy = environment.current_deploy_strategy
+
+    if deploy_strategy.rollback?(label)
+      return rollback!(deploy_strategy, label)
+    end
+
     unless fetch_strategy.valid?(label)
       invalid_fetch_warning(label)
       return false
@@ -23,9 +29,16 @@ class Conductor
     exit_for_invalid_fetch_path if payload_path.empty?
     environment.execute_post_fetch_hooks(label)
 
-    deploy_strategy = environment.current_deploy_strategy
     environment.execute_pre_deploy_hooks(label)
     success = deploy_strategy.deploy(payload_path, label)
+    environment.execute_post_deploy_hooks(label)
+
+    success
+  end
+
+  def rollback!(deploy_strategy, label)
+    environment.execute_pre_deploy_hooks(label)
+    success = deploy_strategy.rollback
     environment.execute_post_deploy_hooks(label)
 
     success
