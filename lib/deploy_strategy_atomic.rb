@@ -8,7 +8,6 @@ class DeployStrategyAtomic < DeployStrategyBase
       response = DEPLOY_FAILED
     else
       response = extract_artifact(dpath, artifact_path)
-      change_index_php_symfony_path!(dpath)
       move_symlinks(:forward, dpath)
     end
     response
@@ -99,18 +98,6 @@ class DeployStrategyAtomic < DeployStrategyBase
     # symlinks to dirs shouldn't end in /
     return nil if path.nil?
     path.to_s.strip.gsub(/\/$/,"")
-  end
-
-  def change_index_php_symfony_path!(deploy_path)
-    # TODO: HACK - REMOVE THIS!!!
-    Console.log("HACK: Changing index.php to point to /var/www/pardot/current...", :yellow)
-    # this should only grab this line:
-    # define('SF_ROOT_DIR',    realpath(dirname(__FILE__).'/../pi/'));
-    # and do the replace to get this:
-    # define('SF_ROOT_DIR',    realpath(dirname(__FILE__).'/..'));
-    sed_cmd = "sed -i tmp 's/\\/pi\\///' #{deploy_path}/web/index.php"
-    output = ShellHelper.execute_shell(sed_cmd)
-    Console.log(output) unless output.strip.empty?
   end
 
   def extract_artifact(deploy_path, artifact)
