@@ -14,17 +14,18 @@ class DeployStrategyAtomic < DeployStrategyBase
     response
   end
 
+  def rollback?(label)
+    tag_file = "#{deploy_path(:reverse)}/build.version"
+    if File.exist?(tag_file)
+      tag, _hash = IO.readlines(tag_file)
+      return tag.chomp == label
+    end
+    false
+  end
+
   def rollback
     move_symlinks(:reverse)
   end
-
-  #def get_tag_and_hash(server_ip)
-  #  label_file = "#{environment.payload.remote_current_link}/TAG-build*"
-  #  label_file_name = ShellHelper.remote(server_ip, "ls #{label_file}", @environment)
-  #  m = label_file_name.match(/TAG-(?<tag>\w+)/)
-  #  hash = ShellHelper.remote(server_ip, "cat #{label_file}", @environment)
-  #  [m[:tag], hash]
-  #end
 
   private
 
