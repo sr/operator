@@ -34,7 +34,6 @@ describe DeployStrategyAtomic do
       env = EnvironmentTest.new
       env.stubs(:payload).returns(@payload_mock)
       @strat = DeployStrategyAtomic.new(env)
-      @strat.stubs(:change_index_php_symfony_path!).returns(nil)  # TODO: HACK REMOVE!
       @strat.stubs(:rsync).returns(@rsync_mock)
     end
 
