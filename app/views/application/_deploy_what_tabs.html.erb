@@ -12,7 +12,7 @@
   <%- if current_repo.deploys_via_artifacts? -%>
     <%= content_tag :li, class: (current_page?(controller: "builds", action: "index", repo_name: current_repo.name, branch_name: "master") ? "active" : "") do %>
       <%= link_to repo_branch_builds_path(current_repo, "master") do %>
-        <%= deploy_type_icon("branch") %> master
+        <%= deploy_type_icon("branch-master") %> master
       <%- end %>
     <%- end %>
     <%= content_tag :li, class: (current_page?(controller: "branches", action: "index", repo_name: current_repo.name) ? "active" : "") do %>

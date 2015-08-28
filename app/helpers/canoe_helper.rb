@@ -63,6 +63,7 @@ module CanoeHelper
     case type
     when "build" then "icon-archive"
     when "tag" then "icon-tag"
+    when "branch-master" then "icon-code"
     when "branch" then "icon-code-fork"
     when "commit" then "icon-tasks"
     else ""
