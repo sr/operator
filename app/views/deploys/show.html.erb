@@ -100,7 +100,7 @@
 <hr>
 <% if current_deploy.completed? %>
   <div>
-    <%= link_to select_target_repo_deploys_path(current_repo.name, current_deploy.what => current_deploy.what_details), class: "btn btn-primary btn-warning deploy-button" do %>
+    <%= link_to select_target_repo_deploys_path(current_repo.name, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-warning deploy-button" do %>
       <i class="icon-train2"></i> REDEPLOY THIS!
     <%- end %>
   </div>

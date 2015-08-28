@@ -220,7 +220,7 @@ RSpec.describe "/api/*/target" do
         end
         expect(Octokit).to receive(:ref).with("Pardot/pardot", "heads/build1234").and_return({object:{}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&branch=build1234"
+        api_post "/api/deploy/target/test?repo_name=pardot&what=branch&what_details=build1234"
         assert_json_error_response("Invalid branch")
       end
 
@@ -231,7 +231,7 @@ RSpec.describe "/api/*/target" do
         end
         expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
+        api_post "/api/deploy/target/test?repo_name=pardot&what=tag&what_details=build1234"
         expect(response).to be_ok
         expect(json_response["deployed"]).to be_falsey
         expect(json_response["message"]).to include("Invalid tag")
@@ -251,7 +251,7 @@ RSpec.describe "/api/*/target" do
         end
         expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{sha:"123455"}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&tag=build1234"
+        api_post "/api/deploy/target/test?repo_name=pardot&what=tag&what_details=build1234"
         expect(response).to be_ok
         expect(json_response["deployed"]).to be_truthy
         expect(json_response["status_callback"]).to eq("/api/status/deploy/1234")

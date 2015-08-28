@@ -13,7 +13,7 @@
     <% @branches.each do |branch| %>
       <li>
         <h4>
-          <a href="<%= select_target_repo_deploys_path(current_repo.name, branch: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
+          <a href="<%= select_target_repo_deploys_path(current_repo.name, what: "branch", what_details: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
           &nbsp;
           <%= deploy_type_icon("branch") %> <%= branch.name %>
           &nbsp;

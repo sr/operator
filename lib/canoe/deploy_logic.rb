@@ -10,17 +10,8 @@ module Canoe
     DEPLOYLOGIC_ERROR_INVALID_WHAT = 5
     DEPLOYLOGIC_ERROR_DUPLICATE = 6
 
-    def provisional_deploy
-      %w[tag branch commit].each do |type|
-        if params[type]
-          return ProvisionalDeploy.new(type, params[type], current_repo.full_name)
-        end
-      end
-      nil # fall through
-    end
-
     # ----------------------------------------------------------------------
-    def deploy!
+    def deploy!(prov_deploy)
       # require a repo and target
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_REPO   } if !current_repo
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
@@ -38,11 +29,9 @@ module Canoe
                          lock: (params[:lock] == "on"),
                        }
 
-      prov_deploy = provisional_deploy
-      if prov_deploy
-        deploy_options[:what] = prov_deploy.what
-        deploy_options[:what_details] = prov_deploy.what_details
-      end
+      # TODO: deploy_options[:artifact_url] = prov_deploy.artifact_url
+      deploy_options[:what] = prov_deploy.what
+      deploy_options[:what_details] = prov_deploy.what_details
 
       # gather any servers that might be specified
       if params[:servers] == "on" && !params[:server_names].blank?

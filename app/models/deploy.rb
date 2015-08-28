@@ -43,26 +43,6 @@ class Deploy < ActiveRecord::Base
     @_finished_servers = self.completed_servers.to_s.split(",").map(&:strip)
   end
 
-  # Legacy
-  def what
-    if tag.present?
-      "tag"
-    elsif branch.present?
-      "branch"
-    else
-      "commit"
-    end
-  end
-
-  # Legacy
-  def what_details
-   case what
-   when "tag" then tag
-   when "branch" then branch
-   when "commit" then sha
-   end
-  end
-
   def percentage_complete
     percentage = ((finished_servers.size / all_servers.size.to_f) * 100).to_i
     percentage = 100 if percentage > 100 # make sure we don't go over 100 (happens on retries)
