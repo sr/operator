@@ -1,10 +1,15 @@
 require "rails_helper"
 
 RSpec.describe "/api/*/target" do
+  before do
+    @deploy_target = FactoryGirl.create(:deploy_target)
+    @repo = FactoryGirl.create(:repo)
+  end
+
   describe "/api/status/target/:target_name" do
     describe "without authentication" do
       it "should error" do
-        get "/api/status/target/test"
+        get "/api/status/target/#{@deploy_target.name}"
         assert_json_error_response("auth token")
       end
     end
@@ -19,7 +24,7 @@ RSpec.describe "/api/*/target" do
       it "should require user" do
         define_api_user_missing_mock
         define_target_mock
-        api_get "/api/status/target/test"
+        api_get "/api/status/target/#{@deploy_target.name}"
         assert_json_error_response("Invalid user")
       end
 
@@ -30,7 +35,7 @@ RSpec.describe "/api/*/target" do
           expect(target_mock).to receive(:name_of_locking_user).and_return("sveader@salesforce.com")
         end
 
-        api_get "/api/status/target/test"
+        api_get "/api/status/target/#{@deploy_target.name}"
         expect(response).to be_ok
         expect(json_response["available"]).to be_falsey
         expect(json_response["reason"]).to include("currently locked")
@@ -45,7 +50,7 @@ RSpec.describe "/api/*/target" do
           allow(target_mock).to receive(:active_deploy).and_return(deploy_mock)
         end
 
-        api_get "/api/status/target/test"
+        api_get "/api/status/target/#{@deploy_target.name}"
         expect(response).to be_ok
         expect(json_response["available"]).to be_falsey
         expect(json_response["reason"]).to include("running deploy")
@@ -58,7 +63,7 @@ RSpec.describe "/api/*/target" do
           allow(target_mock).to receive(:active_deploy).and_return(nil)
         end
 
-        api_get "/api/status/target/test"
+        api_get "/api/status/target/#{@deploy_target.name}"
         expect(response).to be_ok
         expect(json_response["available"]).to be_truthy
         assert_nil json_response["reason"]
@@ -69,13 +74,13 @@ RSpec.describe "/api/*/target" do
   describe "/api/lock/target/:target_name" do
     describe "without authentication" do
       it "should error" do
-        post "/api/lock/target/test"
+        post "/api/lock/target/#{@deploy_target.name}"
         assert_json_error_response("auth token")
       end
 
       it "should not respond to GET" do
         expect {
-          get "/api/lock/target/test"
+          get "/api/lock/target/#{@deploy_target.name}"
         }.to raise_error(ActionController::RoutingError)
       end
     end
@@ -90,7 +95,7 @@ RSpec.describe "/api/*/target" do
       it "should require user" do
         define_api_user_missing_mock
         define_target_mock
-        api_post "/api/lock/target/test"
+        api_post "/api/lock/target/#{@deploy_target.name}"
         assert_json_error_response("Invalid user")
       end
 
@@ -103,7 +108,7 @@ RSpec.describe "/api/*/target" do
           expect(target_mock).to receive(:is_locked?).and_return(true)
         end
 
-        api_post "/api/lock/target/test"
+        api_post "/api/lock/target/#{@deploy_target.name}"
         expect(response).to be_ok
         expect(json_response["locked"]).to be_truthy
         # See Canoe::Deployment::Strategies::Test
@@ -115,13 +120,13 @@ RSpec.describe "/api/*/target" do
   describe "/api/unlock/target/:target_name" do
     describe "without authentication" do
       it "should error" do
-        post "/api/unlock/target/test"
+        post "/api/unlock/target/#{@deploy_target.name}"
         assert_json_error_response("auth token")
       end
 
       it "should not respond to GET" do
         expect {
-          get "/api/lock/untarget/test"
+          get "/api/lock/untarget/#{@deploy_target.name}"
         }.to raise_error(ActionController::RoutingError)
       end
     end
@@ -136,7 +141,7 @@ RSpec.describe "/api/*/target" do
       it "should require user" do
         define_api_user_missing_mock
         define_target_mock
-        api_post "/api/unlock/target/test"
+        api_post "/api/unlock/target/#{@deploy_target.name}"
         assert_json_error_response("Invalid user")
       end
 
@@ -149,10 +154,10 @@ RSpec.describe "/api/*/target" do
           expect(target_mock).to receive(:is_locked?).and_return(false)
         end
 
-        api_post "/api/unlock/target/test"
+        api_post "/api/unlock/target/#{@deploy_target.name}"
         expect(response).to be_ok
         expect(json_response["locked"]).to be_falsey
-        # See Canoe::Deployment::Strategies::Test
+        # See Canoe::Deployment::Strategies::#{@Deploy_Target.Name}
         expect(json_response["output"]).to include("test unlock successful")
       end
     end
@@ -161,13 +166,13 @@ RSpec.describe "/api/*/target" do
   describe "/api/deploy/target/:target_name" do
     describe "without authentication" do
       it "should error" do
-        post "/api/deploy/target/test"
+        post "/api/deploy/target/#{@deploy_target.name}"
         assert_json_error_response("auth token")
       end
 
       it "should not respond to GET" do
         expect {
-          get "/api/deploy/target/test"
+          get "/api/deploy/target/#{@deploy_target.name}"
         }.to raise_error(ActionController::RoutingError)
       end
     end
@@ -182,14 +187,14 @@ RSpec.describe "/api/*/target" do
       it "should require user" do
         define_api_user_missing_mock
         define_target_mock
-        api_post "/api/deploy/target/test"
+        api_post "/api/deploy/target/#{@deploy_target.name}"
         assert_json_error_response("Invalid user")
       end
 
       it "should require repo" do
         define_api_user_mock
         define_target_mock
-        api_post "/api/deploy/target/test"
+        api_post "/api/deploy/target/#{@deploy_target.name}"
         assert_json_error_response("Invalid repo")
       end
 
@@ -198,8 +203,9 @@ RSpec.describe "/api/*/target" do
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(false)
         end
+        expect(Octokit).to receive(:ref).with("Pardot/#{@repo.name}", "tags/build1234").and_return({object:{}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot"
+        api_post "/api/deploy/target/#{@deploy_target.name}?repo_name=#{@repo.name}&what=tag&what_details=build1234"
         assert_json_error_response("locked")
       end
 
@@ -209,8 +215,8 @@ RSpec.describe "/api/*/target" do
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
 
-        api_post "/api/deploy/target/test?repo_name=pardot"
-        assert_json_error_response("No branch")
+        api_post "/api/deploy/target/#{@deploy_target.name}?repo_name=#{@repo.name}"
+        assert_json_error_response("Unknown deploy type")
       end
 
       it "should indicate unknown branch" do
@@ -218,9 +224,9 @@ RSpec.describe "/api/*/target" do
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
-        expect(Octokit).to receive(:ref).with("Pardot/pardot", "heads/build1234").and_return({object:{}})
+        expect(Octokit).to receive(:ref).with("Pardot/#{@repo.name}", "heads/build1234").and_return({object:{}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&what=branch&what_details=build1234"
+        api_post "/api/deploy/target/#{@deploy_target.name}?repo_name=#{@repo.name}&what=branch&what_details=build1234"
         assert_json_error_response("Invalid branch")
       end
 
@@ -229,9 +235,9 @@ RSpec.describe "/api/*/target" do
         define_target_mock do |target_mock|
           allow(target_mock).to receive(:user_can_deploy?).and_return(true)
         end
-        expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{}})
+        expect(Octokit).to receive(:ref).with("Pardot/#{@repo.name}", "tags/build1234").and_return({object:{}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&what=tag&what_details=build1234"
+        api_post "/api/deploy/target/#{@deploy_target.name}?repo_name=#{@repo.name}&what=tag&what_details=build1234"
         expect(response).to be_ok
         expect(json_response["deployed"]).to be_falsey
         expect(json_response["message"]).to include("Invalid tag")
@@ -249,9 +255,9 @@ RSpec.describe "/api/*/target" do
           allow(target_mock).to receive(:deploys).and_return(deploy_assoc)
           expect(deploy_assoc).to receive(:create!).and_return(Deploy.new(id: 1234))
         end
-        expect(Octokit).to receive(:ref).with("Pardot/pardot", "tags/build1234").and_return({object:{sha:"123455"}})
+        expect(Octokit).to receive(:ref).with("Pardot/#{@repo.name}", "tags/build1234").and_return({object:{sha:"123455"}})
 
-        api_post "/api/deploy/target/test?repo_name=pardot&what=tag&what_details=build1234"
+        api_post "/api/deploy/target/#{@deploy_target.name}?repo_name=#{@repo.name}&what=tag&what_details=build1234"
         expect(response).to be_ok
         expect(json_response["deployed"]).to be_truthy
         expect(json_response["status_callback"]).to eq("/api/status/deploy/1234")

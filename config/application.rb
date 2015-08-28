@@ -32,6 +32,11 @@ module Canoe
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
 
+    # Disable automatic factory generation
+    config.generators do |g|
+      g.factory_girl false
+    end
+
     # Autoload files from lib/
     config.autoload_paths << Rails.root.join("lib")
 

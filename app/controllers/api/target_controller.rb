@@ -73,7 +73,7 @@ class Api::TargetController < Api::Controller
         end
       render json: response
     else
-      render status: :unprocessable_entity, json: {error: true, message: "Unknown deploy type: #{params[:what]}"}
+      render json: {error: true, message: "Unknown deploy type: #{params[:what]}"}
     end
   end
 end

@@ -103,15 +103,6 @@ class DeploysController < ApplicationController
     Octokit.compare(current_repo.full_name, sha1, sha2)
   end
 
-  def build_provisional_deploy
-    case params[:what]
-    when "tag"
-      ProvisionalDeploy.from_tag(current_repo, params[:what_details])
-    when "branch"
-      ProvisionalDeploy.from_branch(current_repo, params[:what_details])
-    end
-  end
-
   def render_invalid_provisional_deploy
     render status: :unprocessable_entity, text: "Unknown deploy type: #{params[:what]}"
   end

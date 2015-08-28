@@ -89,4 +89,13 @@ class ApplicationController < ActionController::Base
     return if current_target
     raise ActiveRecord::RecordNotFound.new("no target found")
   end
+
+  def build_provisional_deploy
+    case params[:what]
+    when "tag"
+      ProvisionalDeploy.from_tag(current_repo, params[:what_details])
+    when "branch"
+      ProvisionalDeploy.from_branch(current_repo, params[:what_details])
+    end
+  end
 end
