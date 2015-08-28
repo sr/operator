@@ -1,0 +1,35 @@
+<h1 class="steps-count">Step 2 of 3</h1>
+<h2>What do you want to deploy?</h2>
+<br>
+
+<p class="lead muted">
+  Select the <%= deploy_type_icon("build") %> <strong>build</strong> for the <strong><%= @branch.name %></strong> branch.
+</p>
+
+<div>
+  <%= render partial: "application/deploy_what_tabs" %>
+
+  <%- if @builds.empty? %>
+    Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
+  <%- else %>
+    <ul class="list-unstyled deploy-list">
+
+      <% @builds.each do |build| %>
+        <li>
+          <h4>
+            <%= link_to "Ship This", select_target_repo_deploys_path(current_repo, artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success deploy-button" %>
+            &nbsp;
+            <%= deploy_type_icon("build") %> build<%= build.build_number %>
+          </h4>
+          <small class="muted">
+            commit:
+            <%= link_to github_sha_url(build.sha), title: build.sha do %>
+              <%= sha_span(build.sha)  %>
+            <%- end %>
+          </small>
+          <hr>
+        </li>
+      <% end %>
+    </ul>
+  <%- end %>
+</div>

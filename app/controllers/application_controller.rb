@@ -91,10 +91,11 @@ class ApplicationController < ActionController::Base
   end
 
   def build_provisional_deploy
-    case params[:what]
-    when "tag"
+    if params[:artifact_url]
+      ProvisionalDeploy.from_artifact_url(current_repo, params[:artifact_url])
+    elsif params[:what] == "tag"
       ProvisionalDeploy.from_tag(current_repo, params[:what_details])
-    when "branch"
+    elsif params[:what] == "branch"
       ProvisionalDeploy.from_branch(current_repo, params[:what_details])
     end
   end

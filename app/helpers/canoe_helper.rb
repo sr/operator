@@ -42,6 +42,10 @@ module CanoeHelper
     "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
   end
 
+  def github_sha_url(sha)
+    "#{github_url}/#{current_repo.full_name}/commits/#{sha}"
+  end
+
   def github_diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
     item1 = deploy1.branch? ? deploy1.sha : deploy1.what_details
@@ -57,6 +61,7 @@ module CanoeHelper
 
   def deploy_icon_class(type)
     case type
+    when "build" then "icon-archive"
     when "tag" then "icon-tag"
     when "branch" then "icon-code-fork"
     when "commit" then "icon-tasks"
@@ -78,6 +83,14 @@ module CanoeHelper
     else
       output += deploy.what_details
     end
+
+    if deploy.build_number
+      output += " "
+      output += deploy_type_icon("build")
+      output += " "
+      output += "build#{deploy.build_number}"
+    end
+
     output.html_safe
   end
 

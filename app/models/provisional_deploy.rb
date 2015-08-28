@@ -3,13 +3,18 @@ require "deployable"
 class ProvisionalDeploy
   include Deployable
 
-  include Artifactory::Resource
-
-  attr_reader :artifact_url, :repo_name, :what, :what_details, :sha
+  attr_reader :artifact_url, :repo_name, :what, :what_details, :build_number, :sha
 
   def self.from_artifact_url(repo, artifact_url)
-    # TODO: Artifactory
-    raise "Not implemented"
+    artifact = Artifactory::Resource::Artifact.from_url(artifact_url)
+    new(
+      repo: repo,
+      artifact_url: artifact_url,
+      what: "branch",
+      what_details: artifact.properties["branch"].first,
+      build_number: Integer(artifact.properties["build"].first),
+      sha: artifact.properties["sha"].first,
+    )
   end
 
   def self.from_tag(repo, tag)
@@ -19,6 +24,7 @@ class ProvisionalDeploy
       artifact_url: nil,
       what: "tag",
       what_details: tag,
+      build_number: Integer(tag.sub(/\Abuild/, "")),
       sha: ref[:object][:sha],
     )
   end
@@ -30,15 +36,17 @@ class ProvisionalDeploy
       artifact_url: nil,
       what: "branch",
       what_details: branch,
+      build_number: nil,
       sha: ref[:object][:sha],
     )
   end
 
-  def initialize(repo:, artifact_url:, what:, what_details:, sha:)
+  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:)
     @repo = repo
     @artifact_url = artifact_url
     @what = what
     @what_details = what_details
+    @build_number = build_number
     @sha = sha
   end
 

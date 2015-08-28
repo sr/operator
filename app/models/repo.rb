@@ -1,10 +1,29 @@
 class Repo < ActiveRecord::Base
+  ARTIFACTORY_REPO = "pardot-production".freeze
+
   def full_name
     "Pardot/#{name}"
   end
 
   def to_param
     name
+  end
+
+  def deploys_via_artifacts?
+    artifactory_project.present?
+  end
+
+  def builds(branch:)
+    raise "no artifactory project configured" if artifactory_project.empty?
+
+    artifacts = Artifactory::Resource::Artifact.property_search(
+      project: artifactory_project,
+      branch:  branch,
+      repos:   ARTIFACTORY_REPO,
+    )
+
+    artifacts.map { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
+      .sort_by { |deploy| -deploy.build_number }
   end
 
   def tags(count = 30)
@@ -27,10 +46,13 @@ class Repo < ActiveRecord::Base
 
   def branches
     Octokit.auto_paginate = true
-    branches = Octokit.branches(full_name)
-    branches.sort_by(&:name) # may not really be needed...
+    Octokit.branches(full_name)
   ensure
     Octokit.auto_paginate = false
+  end
+
+  def branch(branch)
+    Octokit.branch(full_name, branch)
   end
 
   def commits(count = 50)

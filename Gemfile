@@ -16,6 +16,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'octokit', '~> 3.8'
+gem 'artifactory', '~> 2.3'
 gem 'omniauth', '~> 1.2', '>= 1.2.2'
 gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
@@ -29,6 +30,7 @@ group :development, :test do
   gem 'spring'
   gem 'rspec-rails', '~> 3.3', '>= 3.3.3'
   gem 'capybara', '~> 2.4', '>= 2.4.4'
+  gem 'factory_girl_rails', '~> 4.5'
 end
 
 group :test do

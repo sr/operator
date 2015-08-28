@@ -1,24 +1,25 @@
 namespace :canoe do
   desc 'Create repos for deployment'
   task :create_repos => :environment do
-    Repo.find_or_initialize_by(name: 'pardot') { |repo|
+    Repo.find_or_initialize_by(name: 'pardot').tap { |repo|
       repo.icon = 'cloud'
       repo.supports_branch_deploy = true
     }.save
 
-    Repo.find_or_initialize_by(name: 'pithumbs') { |repo|
+    Repo.find_or_initialize_by(name: 'pithumbs').tap { |repo|
       repo.icon = 'thumbs-up'
       repo.supports_branch_deploy = true
     }.save
 
-    Repo.find_or_initialize_by(name: 'realtime-frontend') { |repo|
+    Repo.find_or_initialize_by(name: 'realtime-frontend').tap { |repo|
       repo.icon = 'bullhorn'
       repo.supports_branch_deploy = false
     }.save
 
-    Repo.find_or_initialize_by(name: 'workflow-stats') { |repo|
+    Repo.find_or_initialize_by(name: 'workflow-stats').tap { |repo|
       repo.icon = 'fighter-jet'
-      repo.supports_branch_deploy = false
+      repo.artifactory_project = 'workflow-stats'
+      repo.supports_branch_deploy = true
     }.save
   end
 
