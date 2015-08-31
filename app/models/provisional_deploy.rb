@@ -12,7 +12,7 @@ class ProvisionalDeploy
       artifact_url: artifact_url,
       what: "branch",
       what_details: artifact.properties["branch"].first,
-      build_number: Integer(artifact.properties["build"].first),
+      build_number: artifact.properties["build"].first.to_i,
       sha: artifact.properties["sha"].first,
     )
   end
@@ -24,7 +24,7 @@ class ProvisionalDeploy
       artifact_url: nil,
       what: "tag",
       what_details: tag,
-      build_number: Integer(tag.sub(/\Abuild/, "")),
+      build_number: tag.sub(/\Abuild/, "").to_i,
       sha: ref[:object][:sha],
     )
   end
