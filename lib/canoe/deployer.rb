@@ -6,7 +6,7 @@ module Canoe
       @strategy = strategy
     end
 
-    def deploy(target:, user:, repo:, what:, what_details:, sha:, build_number: nil, lock: false, servers: nil)
+    def deploy(target:, user:, repo:, what:, what_details:, sha:, build_number: nil, artifact_url: nil, lock: false, servers: nil)
       servers_used = servers || @strategy.list_servers(target, repo.name)
 
       # REFACTOR: An exception might be more appropriate -@alindeman
@@ -24,13 +24,17 @@ module Canoe
         servers_used: servers_used.join(","),
         sha: sha,
         build_number: build_number,
+        artifact_url: artifact_url,
       )
 
       target.lock!(user) if lock
 
-      if pid = @strategy.perform(deploy, lock: lock)
-        Process.detach(pid)
-        deploy.update_attribute(:process_id, pid)
+      # TODO: Remove when artifactory is the only method of deployment.
+      unless repo.deploys_via_artifacts?
+        if pid = @strategy.perform(deploy, lock: lock)
+          Process.detach(pid)
+          deploy.update_attribute(:process_id, pid)
+        end
       end
 
       deploy

@@ -24,20 +24,6 @@ module Canoe
         return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
-      deploy_options = { user: current_user,
-                         repo: current_repo,
-                         lock: (params[:lock] == "on"),
-                       }
-
-      # TODO: deploy_options[:artifact_url] = prov_deploy.artifact_url
-      deploy_options[:what] = prov_deploy.what
-      deploy_options[:what_details] = prov_deploy.what_details
-
-      # gather any servers that might be specified
-      if params[:servers] == "on" && !params[:server_names].blank?
-        deploy_options[:servers] = params[:server_names]
-      end
-
       # validate that what we are deploying was included and is a real thing
       if prov_deploy.nil?
         return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT }
@@ -47,8 +33,6 @@ module Canoe
                  what: prov_deploy.what }
       end
 
-      deploy_options[:sha] = prov_deploy.sha # gathered during is_valid?
-
       the_deploy = deployer.deploy(
         target: current_target,
         user: current_user,
@@ -57,6 +41,7 @@ module Canoe
         what_details: prov_deploy.what_details,
         sha: prov_deploy.sha,
         build_number: prov_deploy.build_number,
+        artifact_url: prov_deploy.artifact_url,
         lock: (params[:lock] == "on"),
         servers: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
       )

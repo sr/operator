@@ -33,16 +33,17 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
     click_button "SHIP IT!"
     expect(page).to have_text("Watching deploy of #{@repo.name.capitalize}")
 
-    test_deploy_strategy = Rails.application.config.deployment.strategy
-    expect(test_deploy_strategy.deploys.length).to eq(1)
-    expect(test_deploy_strategy.deploys[0].auth_user.email).to eq("joe.syncmaster@salesforce.com")
-    expect(test_deploy_strategy.deploys[0].repo_name).to eq(@repo.name)
-    expect(test_deploy_strategy.deploys[0].what).to eq("branch")
-    expect(test_deploy_strategy.deploys[0].what_details).to eq("master")
-    expect(test_deploy_strategy.deploys[0].build_number).to eq(1234)
-    expect(test_deploy_strategy.deploys[0].server_count).to eq(1)
-    expect(test_deploy_strategy.deploys[0].servers_used).to eq("localhost")
-    expect(test_deploy_strategy.deploys[0].specified_servers).to eq(nil)
-    expect(test_deploy_strategy.deploys[0].sha).to eq("abc123")
+    deploys = Deploy.all
+    expect(deploys.length).to eq(1)
+    expect(deploys[0].auth_user.email).to eq("joe.syncmaster@salesforce.com")
+    expect(deploys[0].repo_name).to eq(@repo.name)
+    expect(deploys[0].what).to eq("branch")
+    expect(deploys[0].what_details).to eq("master")
+    expect(deploys[0].build_number).to eq(1234)
+    expect(deploys[0].server_count).to eq(1)
+    expect(deploys[0].servers_used).to eq("localhost")
+    expect(deploys[0].specified_servers).to eq(nil)
+    expect(deploys[0].sha).to eq("abc123")
+    expect(deploys[0].artifact_url).to eq("https://artifactory.example/pardot/build1234.tar.gz")
   end
 end
