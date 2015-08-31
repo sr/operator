@@ -27,9 +27,14 @@ Rails.application.routes.draw do
   end
 
   namespace :api, defaults: {format: "json"} do
-    # TODO: In an ideal world, deploy should be deploys (plural). What
-    # dependencies does the API have that would break if we changed things to be
-    # more conventional? -@alindeman
+    # TODO: This is the new format for the api that we should switch the ones below to.
+    # We'll have to find a good time to do that like when we switch to pull_agent.
+    resources :targets, param: :name, only: [] do
+      resources :deploys, only: [:index] do
+        post :latest, on: :collection
+      end
+    end
+
     resources :deploy, only: [] do
       post :complete, on: :member
       post :completed_server, on: :member
