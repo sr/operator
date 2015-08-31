@@ -48,9 +48,7 @@ module CanoeHelper
 
   def github_diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
-    item1 = deploy1.branch? ? deploy1.sha : deploy1.what_details
-    item2 = deploy2.branch? ? deploy2.sha : deploy2.what_details
-    "#{github_url}/#{current_repo.full_name}/compare/#{item1}...#{item2}"
+    "#{github_url}/#{current_repo.full_name}/compare/#{deploy1.sha}...#{deploy2.sha}"
   end
 
   # ----------------------------------------------------------------------

@@ -98,9 +98,7 @@ class DeploysController < ApplicationController
 
   def commits_for_compare(item1, item2)
     return unless item1 && item2
-    sha1 = item1.branch? ? item1.sha : item1.what_details
-    sha2 = item2.branch? ? item2.sha : item2.what_details
-    Octokit.compare(current_repo.full_name, sha1, sha2)
+    Octokit.compare(current_repo.full_name, item1.sha, item2.sha)
   end
 
   def render_invalid_provisional_deploy
