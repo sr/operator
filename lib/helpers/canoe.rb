@@ -14,7 +14,7 @@ class Canoe
 
   def self.get_current_build(environment)
     return if !environment.use_canoe?
-    result = self.call_api(environment, "api/status/deploy/#{environment.canoe_target}/pardot", method: "GET")
+    result = self.call_api(environment, "api/targets/#{environment.canoe_target}/deploys/latest", repo_name: environment.payload.id)
     parsed = JSON.parse(result)
     parsed["what_details"]
   end
