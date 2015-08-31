@@ -38,13 +38,6 @@
         <%- end %>
       <%- end %>
     <% end %>
-    <% if false %>
-      <%= content_tag :li, class: (@commits ? "active" : "") do %>
-        <%= link_to repo_commits_path(current_repo.name) do %>
-          <%= deploy_type_icon("commit") %> commits
-        <%- end %>
-      <%- end %>
-    <% end %>
   <%- end %>
 </ul>
 <br>

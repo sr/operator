@@ -6,8 +6,4 @@ module Deployable
   def branch?
     what == "branch"
   end
-
-  def commit?
-    what == "commit"
-  end
 end

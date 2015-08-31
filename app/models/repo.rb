@@ -54,8 +54,4 @@ class Repo < ActiveRecord::Base
   def branch(branch)
     Octokit.branch(full_name, branch)
   end
-
-  def commits(count = 50)
-    Octokit.commits(full_name, per_page: count)
-  end
 end
