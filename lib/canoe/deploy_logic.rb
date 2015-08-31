@@ -56,6 +56,7 @@ module Canoe
         what: prov_deploy.what,
         what_details: prov_deploy.what_details,
         sha: prov_deploy.sha,
+        build_number: prov_deploy.build_number,
         lock: (params[:lock] == "on"),
         servers: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
       )

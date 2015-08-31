@@ -6,7 +6,7 @@ module Canoe
       @strategy = strategy
     end
 
-    def deploy(target:, user:, repo:, what:, what_details:, sha:, lock: false, servers: nil)
+    def deploy(target:, user:, repo:, what:, what_details:, sha:, build_number: nil, lock: false, servers: nil)
       servers_used = servers || @strategy.list_servers(target, repo.name)
 
       # REFACTOR: An exception might be more appropriate -@alindeman
@@ -23,6 +23,7 @@ module Canoe
         server_count: servers_used.length,
         servers_used: servers_used.join(","),
         sha: sha,
+        build_number: build_number,
       )
 
       target.lock!(user) if lock

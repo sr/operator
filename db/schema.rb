@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150824191000) do
+ActiveRecord::Schema.define(version: 20150831174733) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 20150824191000) do
     t.text     "specified_servers", limit: 65535
     t.text     "completed_servers", limit: 65535
     t.text     "sha",               limit: 65535
+    t.integer  "build_number",      limit: 4
   end
 
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
