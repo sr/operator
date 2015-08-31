@@ -33,14 +33,6 @@ module TestHelpers
     post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), {}
   end
 
-  def define_api_user_mock(email="sveader@salesforce.com")
-    expect(AuthUser).to receive(:find_by_email).with(email).and_return(AuthUser.new(id: 2, email: email))
-  end
-
-  def define_api_user_missing_mock(email="sveader@salesforce.com")
-    expect(AuthUser).to receive(:find_by_email).with(email).and_return(nil)
-  end
-
   # ---------------------------------------------------------------------
   def get_request_with_auth(url)
     get url, {}, "rack.session" => auth_session
@@ -55,18 +47,6 @@ module TestHelpers
     expect(assoc_mock).to receive(:first).and_return(AuthUser.new(id: 2))
     expect(AuthUser).to recieve(:where).with(id: 2).and_return(assoc_mock)
     { user_id: 2 } # returned
-  end
-
-  # ---------------------------------------------------------------------
-  def define_target_mock(&block)
-    target_mock = DeployTarget.new(name: "test")
-    allow(DeployTarget).to receive(:find_by_name).with("test").and_return(target_mock)
-
-    yield(target_mock) if block_given?
-  end
-
-  def define_target_missing_mock(name)
-    allow(DeployTarget).to receive(:find_by_name).with(name).and_return(nil)
   end
 
   def define_deploy_mock(id, &block)

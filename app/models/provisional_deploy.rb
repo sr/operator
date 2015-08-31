@@ -18,26 +18,41 @@ class ProvisionalDeploy
   end
 
   def self.from_tag(repo, tag)
-    ref = Octokit.ref(repo.full_name, "tags/#{tag}")
+    sha = nil
+    begin
+      ref = Octokit.ref(repo.full_name, "tags/#{tag}")
+      tag_ref = Octokit.tag(repo.full_name, ref[:object][:sha])
+      sha = tag_ref[:object][:sha]
+    rescue Octokit::NotFound
+      sha = nil
+    end
+
     new(
       repo: repo,
       artifact_url: nil,
       what: "tag",
       what_details: tag,
       build_number: tag.sub(/\Abuild/, "").to_i,
-      sha: ref[:object][:sha],
+      sha: sha,
     )
   end
 
   def self.from_branch(repo, branch)
-    ref = Octokit.ref(repo.full_name, "heads/#{branch}")
+    sha = nil
+    begin
+      ref = Octokit.ref(repo.full_name, "heads/#{branch}")
+      sha = ref[:object][:sha]
+    rescue Octokit::NotFound
+      sha = nil
+    end
+
     new(
       repo: repo,
       artifact_url: nil,
       what: "branch",
       what_details: branch,
       build_number: nil,
-      sha: ref[:object][:sha],
+      sha: sha,
     )
   end
 
