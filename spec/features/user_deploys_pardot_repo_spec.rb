@@ -23,7 +23,7 @@ RSpec.feature "user deploys pardot repo" do
     login_as "Joe Syncmaster", "joe.syncmaster@salesforce.com"
 
     find(".repos a", text: @repo.name.capitalize).click
-    find(".deploy-targets a", text: "Latest Tag").click
+    find(".deploy-targets a", text: "latest tag").click
     click_link "Ship This"
     find("a[data-target='test']", text: "Ship it Here").click
     click_button "SHIP IT!"
