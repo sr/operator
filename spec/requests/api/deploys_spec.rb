@@ -29,7 +29,6 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           deploy = Deploy.new(id: 1, what: "tag", what_details: "1234", completed: true)
           expect(deploy).to receive(:deploy_target).and_return(OpenStruct.new(name: "test"))
           expect(deploy).to receive(:auth_user).and_return(OpenStruct.new(email: "sveader@salesforce.com"))
-        # expect(deploy).to receive(:repo).and_return(OpenStruct.new(name: "pardot"))
           define_target_mock do |target_mock|
             expect(target_mock).to receive(:last_deploy_for).and_return(deploy)
           end

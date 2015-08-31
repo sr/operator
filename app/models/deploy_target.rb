@@ -3,20 +3,19 @@ class DeployTarget < ActiveRecord::Base
   has_many :deploys
   has_many :locks
   belongs_to :locking_user, class_name: AuthUser
-  default_scope -> { order('created_at DESC') }
 
   def to_param
     name
   end
 
   def last_deploy_for(repo_name)
-    self.deploys.where(repo_name: repo_name).first
+    self.deploys.where(repo_name: repo_name).order("created_at DESC").first
   end
 
   def last_successful_deploy_for(repo_name)
     self.deploys.where(repo_name: repo_name,
                        completed: true,
-                       canceled:  false).first
+                       canceled:  false).order("created_at DESC").first
   end
 
   def previous_successful_deploy(deploy)
@@ -24,7 +23,7 @@ class DeployTarget < ActiveRecord::Base
                        completed: true,
                        canceled:  false). \
                        where("created_at < ?", deploy.created_at). \
-                       first
+                       order("created_at DESC").first
   end
 
   def active_deploy
@@ -33,7 +32,7 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def most_recent_deploy
-    self.deploys.first
+    self.deploys.order("created_at DESC").first
   end
 
   def lock!(user)
