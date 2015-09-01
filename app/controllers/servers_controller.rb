@@ -40,6 +40,6 @@ class ServersController < ApplicationController
 
   private
   def server_params
-    params.require(:server).permit(:hostname, :deploy_target_id, :repo_ids => [])
+    params.require(:server).permit(:hostname, :enabled, :deploy_target_id, :repo_ids => [])
   end
 end
