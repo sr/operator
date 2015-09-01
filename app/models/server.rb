@@ -10,4 +10,6 @@ class Server < ActiveRecord::Base
   scope :enabled, -> { where(enabled: true) }
 
   belongs_to :deploy_target
+  has_many :repo_server
+  has_many :repos, through: :repo_server
 end

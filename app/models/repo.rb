@@ -1,6 +1,9 @@
 class Repo < ActiveRecord::Base
   ARTIFACTORY_REPO = "pardot-production".freeze
 
+  has_many :repo_servers
+  has_many :servers, through: :repo_servers
+
   def full_name
     "Pardot/#{name}"
   end
