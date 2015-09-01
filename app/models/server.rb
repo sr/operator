@@ -8,4 +8,6 @@ class Server < ActiveRecord::Base
   validates :hostname, uniqueness: true
 
   scope :enabled, -> { where(enabled: true) }
+
+  belongs_to :deploy_target
 end

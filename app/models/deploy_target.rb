@@ -4,6 +4,8 @@ class DeployTarget < ActiveRecord::Base
   has_many :locks
   belongs_to :locking_user, class_name: AuthUser
 
+  has_many :servers
+
   def to_param
     name
   end
