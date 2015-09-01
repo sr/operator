@@ -36,6 +36,8 @@ class EnvironmentBase
     begin
       tmp_hooks = Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
       #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
+      tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
+      tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana]
       tmp_hooks[:pardot][:after][:deploy] = [:custom_hooks]
       tmp_hooks
     end
@@ -134,6 +136,14 @@ class EnvironmentBase
       output = ShellHelper.execute_shell(custom_hooks_path)
       Console.log(output)
     end
+  end
+
+  def notify_begin_kibana(label)
+    Console.syslog("Started fetch of #{payload.name}:#{label}")
+  end
+
+  def notify_complete_kibana(label)
+    Console.syslog("Finished deploy of #{payload.name}:#{label}")
   end
 
   # =========================================================================
