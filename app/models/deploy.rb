@@ -63,9 +63,11 @@ class Deploy < ActiveRecord::Base
   end
 
   def check_completed_status!
-    # bail out if we are complete or we're still running...
-    return if self.completed? || process_still_running?
-    complete! # otherwise, mark as complete
+    return if completed?
+
+    if !process_still_running? && !pending_results_present?
+      complete!
+    end
   end
 
   def process_still_running?
@@ -77,6 +79,10 @@ class Deploy < ActiveRecord::Base
   rescue
     # process isn't running or isn't owned by us
     false
+  end
+
+  def pending_results_present?
+    results.pending.any?
   end
 
   def kill_process!(forcefully=false)
