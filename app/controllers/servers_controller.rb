@@ -25,7 +25,7 @@ class ServersController < ApplicationController
     if @server.update(server_params)
       redirect_to servers_path, notice: "Server #{@server.hostname} updated"
     else
-      render action: "new"
+      render action: "edit"
     end
   end
 
