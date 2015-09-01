@@ -9,6 +9,10 @@ class Server < ActiveRecord::Base
 
   scope :enabled, -> { where(enabled: true) }
 
+  def self.for_repo(repo)
+    joins(:repos).where(repos: {id: repo.id})
+  end
+
   belongs_to :deploy_target
   has_many :repo_server
   has_many :repos, through: :repo_server

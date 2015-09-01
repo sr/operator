@@ -8,6 +8,8 @@ class Deploy < ActiveRecord::Base
   belongs_to :deploy_target
   belongs_to :auth_user
 
+  has_many :results, class_name: DeployResult
+
   def log_path
     @_log_path ||= \
       begin

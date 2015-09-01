@@ -2,8 +2,9 @@ require "rails_helper"
 
 RSpec.feature "user deploys pardot repo from artifactory artifact" do
   before do
-    FactoryGirl.create(:deploy_target, name: "test")
+    @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
     @repo = FactoryGirl.create(:repo, name: "pardot", artifactory_project: "pardot")
+    @server = FactoryGirl.create(:server, hostname: "app-s1.example", deploy_target: @deploy_target, repos: [@repo])
 
     allow(Octokit).to receive(:branch)
       .with("Pardot/#{@repo.name}", "master")
@@ -45,5 +46,11 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
     expect(deploys[0].specified_servers).to eq(nil)
     expect(deploys[0].sha).to eq("abc123")
     expect(deploys[0].artifact_url).to eq("https://artifactory.example/pardot/build1234.tar.gz")
+
+    # DeployResult instances are created for pull servers only. Eventually all
+    # servers will be pull servers.
+    expect(deploys[0].results.length).to eq(1)
+    expect(deploys[0].results[0].server.hostname).to eq(@server.hostname)
+    expect(deploys[0].results[0].status).to eq("pending")
   end
 end
