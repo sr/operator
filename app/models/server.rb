@@ -5,7 +5,7 @@
 # As `sync_scripts` becomes deprecated, eventually all servers where code is
 # deployed will be a `Server` instance.
 class Server < ActiveRecord::Base
-  validates :hostname, uniqueness: true
+  validates :hostname, presence: true, uniqueness: true
 
   scope :enabled, -> { where(enabled: true) }
 

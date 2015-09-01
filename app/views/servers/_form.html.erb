@@ -1,0 +1,8 @@
+<%= simple_form_for @server, html: {class: 'form-horizontal'}, wrapper: :horizontal_form do |f| %>
+  <%= f.input :hostname, label: 'Hostname', placeholder: 'app-s1' %>
+  <%= f.input :enabled, label: 'Enabled?', wrapper: :horizontal_radio_and_checkboxes %>
+  <%= f.association :deploy_target, label: 'Target', include_blank: false %>
+  <%= f.association :repos, label: 'Repos', as: :check_boxes, wrapper: :horizontal_radio_and_checkboxes %>
+  <%= f.button :submit, class: "btn btn-success" %>
+  <%= link_to "Cancel", servers_path, class: "btn btn-default" %>
+<%- end %>
