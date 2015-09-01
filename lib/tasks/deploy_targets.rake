@@ -18,7 +18,7 @@ namespace :canoe do
 
     Repo.find_or_initialize_by(name: 'workflow-stats').tap { |repo|
       repo.icon = 'fighter-jet'
-      repo.artifactory_project = 'workflow-stats'
+      repo.artifactory_project = 'WFST-WFS-WFSRLS'
       repo.supports_branch_deploy = true
     }.save
   end
