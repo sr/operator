@@ -27,6 +27,8 @@ Rails.application.routes.draw do
     post :unlock, on: :member
   end
 
+  resources :servers
+
   namespace :api, defaults: {format: "json"} do
     # TODO: This is the new format for the api that we should switch the ones below to.
     # We'll have to find a good time to do that like when we switch to pull_agent.
