@@ -50,6 +50,15 @@
       <% end %>
       </ul>
 
+      <ul class="nav nav-stacked servers">
+        <%= content_tag :li, class: current_page?(controller: "servers", action: "index") ? "active" : "" do %>
+          <%= link_to servers_path do %>
+            <%= content_tag :i, "", class: "icon-tasks" %>
+            Servers
+          <%- end %>
+        <%- end %>
+      </ul>
+
       <ul class="nav nav-stacked targets">
       <% all_targets.each do |target| %>
         <li>
