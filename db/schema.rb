@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150831185400) do
+ActiveRecord::Schema.define(version: 20150901175917) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -79,6 +79,13 @@ ActiveRecord::Schema.define(version: 20150831185400) do
   end
 
   add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree
+
+  create_table "servers", force: :cascade do |t|
+    t.string  "hostname", limit: 255,                null: false
+    t.boolean "enabled",              default: true, null: false
+  end
+
+  add_index "servers", ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
 
   create_table "target_jobs", force: :cascade do |t|
     t.integer  "deploy_target_id", limit: 4
