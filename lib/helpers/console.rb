@@ -1,4 +1,5 @@
 require "color_string"
+require "syslog"
 
 class Console
   class << self
@@ -31,6 +32,18 @@ class Console
     # ===========================================================================
     def print_line(color=:none)
       log("+"+("-"*80), color)
+    end
+
+    def syslog(message, our_priority = :info)
+      priority = case our_priority
+      when :info
+        Syslog::LOG_INFO
+      when :warn
+        Syslog::LOG_WARNING
+      when :alert
+        Syslog::LOG_ALERT
+      end
+      Syslog.log(priority, message)
     end
 
     def log(message, color=:none)

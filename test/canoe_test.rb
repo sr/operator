@@ -6,6 +6,7 @@ describe Canoe do
   before {
     Console.silence!
     @env = EnvironmentTest.new
+    @env.payload = 'pardot'
     #@env.deploy_id = 0
   }
 
@@ -32,8 +33,8 @@ describe Canoe do
   end
 
   describe "#get_current_build" do
-    it "should" do
-      ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/status/deploy}) }.returns('{"target":"staging","user":"ccornutt@salesforce.com","repo":"pardot","what":"branch","what_details":"ccornutt/PDT-14553","completed":true}')
+    it "should get latest deployed build in canoe" do
+      ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/targets/staging/deploys/latest}) }.returns('{"target":"staging","user":"ccornutt@salesforce.com","repo":"pardot","what":"branch","what_details":"ccornutt/PDT-14553","completed":true}')
       assert_equal(Canoe.get_current_build(@env), "ccornutt/PDT-14553")
     end
   end

@@ -37,6 +37,9 @@ begin
   else
     Console.log("We're up to date: #{requested}", :green)
   end
+rescue => e
+  Console.syslog(e, :alert)
+  raise e
 ensure
   lockfile.close
 end

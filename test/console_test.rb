@@ -79,6 +79,20 @@ describe Console do
     end
   end
 
+  describe "#syslog" do
+    it "should send an info message to syslog" do
+      msg = "Going onshore"
+      Syslog.expects(:log).with(Syslog::LOG_INFO, msg)
+      Console.syslog(msg)
+    end
+
+    it "should allow you to send an alert" do
+      msg = "This ship is on fire"
+      Syslog.expects(:log).with(Syslog::LOG_ALERT, msg)
+      Console.syslog(msg, :alert)
+    end
+  end
+
   describe "#ask" do
     it "should print out question for user" do
       question = "Do you test?"
