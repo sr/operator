@@ -29,12 +29,9 @@ module Canoe
 
       target.lock!(user) if lock
 
-      # TODO: Remove when artifactory is the only method of deployment.
-      unless repo.deploys_via_artifacts?
-        if pid = @strategy.perform(deploy, lock: lock)
-          Process.detach(pid)
-          deploy.update_attribute(:process_id, pid)
-        end
+      if pid = @strategy.perform(deploy, lock: lock)
+        Process.detach(pid)
+        deploy.update_attribute(:process_id, pid)
       end
 
       deploy
