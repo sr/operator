@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150901210446) do
+ActiveRecord::Schema.define(version: 20150902005713) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -58,7 +58,6 @@ ActiveRecord::Schema.define(version: 20150901210446) do
     t.datetime "updated_at"
     t.string   "process_id",        limit: 255
     t.boolean  "canceled",                        default: false
-    t.integer  "server_count",      limit: 4,     default: 0
     t.text     "servers_used",      limit: 65535
     t.text     "specified_servers", limit: 65535
     t.text     "completed_servers", limit: 65535

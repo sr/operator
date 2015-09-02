@@ -31,7 +31,6 @@ module Canoe
           what_details: what_details,
           completed: false,
           specified_servers: (server_hostnames && server_hostnames.join(",")).presence,
-          server_count: sync_servers.length,
           servers_used: sync_servers.join(","),
           sha: sha,
           build_number: build_number,

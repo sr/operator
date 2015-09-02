@@ -35,7 +35,6 @@ RSpec.feature "user deploys pardot repo" do
     expect(test_deploy_strategy.deploys[0].repo_name).to eq(@repo.name)
     expect(test_deploy_strategy.deploys[0].what).to eq("tag")
     expect(test_deploy_strategy.deploys[0].what_details).to eq("build1234")
-    expect(test_deploy_strategy.deploys[0].server_count).to eq(1)
     expect(test_deploy_strategy.deploys[0].servers_used).to eq("localhost")
     expect(test_deploy_strategy.deploys[0].specified_servers).to eq(nil)
     expect(test_deploy_strategy.deploys[0].sha).to eq("abc123")
