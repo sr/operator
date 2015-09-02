@@ -1,6 +1,6 @@
 class ServersController < ApplicationController
   def index
-    @servers = Server.order(hostname: :asc).includes(:deploy_target, :repos)
+    @servers = Server.order(hostname: :asc)
   end
 
   def new
@@ -40,6 +40,9 @@ class ServersController < ApplicationController
 
   private
   def server_params
-    params.require(:server).permit(:hostname, :enabled, :deploy_target_id, :repo_ids => [])
+    params.require(:server).permit(
+      :hostname, :enabled,
+      :deploy_scenarios_attributes => [:id, :deploy_target_id, :repo_id, :_destroy]
+    )
   end
 end

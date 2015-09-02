@@ -4,8 +4,6 @@ class DeployTarget < ActiveRecord::Base
   has_many :locks
   belongs_to :locking_user, class_name: AuthUser
 
-  has_many :servers
-
   def to_param
     name
   end
@@ -84,5 +82,11 @@ class DeployTarget < ActiveRecord::Base
     ! is_locked? || \
     self.locking_user == user || \
     self.file_lock_user == user.email
+  end
+
+  def servers(repo:)
+    Server
+      .joins(:deploy_scenarios)
+      .where(deploy_scenarios: {deploy_target_id: id, repo_id: repo.id})
   end
 end

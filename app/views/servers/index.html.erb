@@ -5,7 +5,6 @@
 <table class="table" style="margin-top: 10px">
   <tr>
     <th>Hostname</th>
-    <th>Target</th>
     <th>Repos</th>
     <th>Actions</th>
   </tr>
@@ -13,7 +12,6 @@
   <%- @servers.each do |server| %>
     <tr class="<%= server.enabled? ? "success" : "warning" %>">
       <td><%= server.hostname %></td>
-      <td><%= server.deploy_target.name %></td>
       <td><%= server.repos.map(&:name).sort.join(", ") %></td>
       <td>
         <%= link_to "Edit", edit_server_path(server), class: "btn btn-xs btn-success" %>

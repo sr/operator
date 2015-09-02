@@ -14,7 +14,7 @@ module Canoe
         sync_servers = sync_servers & server_hostnames
       end
 
-      pull_servers = target.servers.enabled.for_repo(repo)
+      pull_servers = target.servers(repo: repo).enabled
       if server_hostnames
         pull_servers = pull_servers.where(hostname: server_hostnames)
       end

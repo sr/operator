@@ -4,5 +4,5 @@
 class DeployScenario < ActiveRecord::Base
   belongs_to :repo
   belongs_to :server
-  belongs_to :target
+  belongs_to :deploy_target
 end

@@ -4,7 +4,8 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
     @repo = FactoryGirl.create(:repo, name: "pardot", artifactory_project: "pardot")
-    @server = FactoryGirl.create(:server, hostname: "app-s1.example", deploy_target: @deploy_target, repos: [@repo])
+    @server = FactoryGirl.create(:server, hostname: "app-s1.example")
+    @server.deploy_scenarios.create!(deploy_target: @deploy_target, repo: @repo)
 
     allow(Octokit).to receive(:branch)
       .with("Pardot/#{@repo.name}", "master")

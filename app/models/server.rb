@@ -9,7 +9,14 @@ class Server < ActiveRecord::Base
 
   scope :enabled, -> { where(enabled: true) }
 
+  has_many :deploy_scenarios
+  accepts_nested_attributes_for :deploy_scenarios, allow_destroy: true
+
   def self.for_repo(repo)
     joins(:repos).where(repos: {id: repo.id})
+  end
+
+  def repos
+    deploy_scenarios.includes(:repo).map(&:repo).uniq
   end
 end
