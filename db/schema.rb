@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902005713) do
+ActiveRecord::Schema.define(version: 20150902170212) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -33,6 +33,14 @@ ActiveRecord::Schema.define(version: 20150902005713) do
 
   add_index "deploy_results", ["deploy_id", "status"], name: "index_deploy_results_on_deploy_id_and_status", using: :btree
   add_index "deploy_results", ["server_id", "deploy_id"], name: "index_deploy_results_on_server_id_and_deploy_id", unique: true, using: :btree
+
+  create_table "deploy_scenarios", force: :cascade do |t|
+    t.integer "repo_id",          limit: 4, null: false
+    t.integer "server_id",        limit: 4, null: false
+    t.integer "deploy_target_id", limit: 4, null: false
+  end
+
+  add_index "deploy_scenarios", ["repo_id", "deploy_target_id", "server_id"], name: "index_deploy_scenarios_on_repo_deploy_server_ids", unique: true, using: :btree
 
   create_table "deploy_targets", force: :cascade do |t|
     t.string   "name",            limit: 255
@@ -79,13 +87,6 @@ ActiveRecord::Schema.define(version: 20150902005713) do
 
   add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
-
-  create_table "repo_servers", force: :cascade do |t|
-    t.integer "repo_id",   limit: 4, null: false
-    t.integer "server_id", limit: 4, null: false
-  end
-
-  add_index "repo_servers", ["repo_id", "server_id"], name: "index_repo_servers_on_repo_id_and_server_id", unique: true, using: :btree
 
   create_table "repos", force: :cascade do |t|
     t.string  "name",                   limit: 255,                 null: false
