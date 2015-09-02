@@ -10,14 +10,14 @@ class Repo < ActiveRecord::Base
   end
 
   def deploys_via_artifacts?
-    artifactory_project.present?
+    bamboo_project.present?
   end
 
   def builds(branch:)
-    raise "no artifactory project configured" if artifactory_project.empty?
+    raise "no artifactory project configured" if bamboo_project.empty?
 
     artifacts = Artifactory::Resource::Artifact.property_search(
-      bambooProject: artifactory_project,
+      bambooProject: bamboo_project,
       gitBranch:     branch,
       repos:         ARTIFACTORY_REPO,
     )

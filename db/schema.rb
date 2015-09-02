@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150902192728) do
+ActiveRecord::Schema.define(version: 20150902204747) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -91,7 +91,7 @@ ActiveRecord::Schema.define(version: 20150902192728) do
   create_table "repos", force: :cascade do |t|
     t.string  "name",                   limit: 255,                 null: false
     t.string  "icon",                   limit: 255,                 null: false
-    t.string  "artifactory_project",    limit: 255
+    t.string  "bamboo_project",         limit: 255
     t.boolean "supports_branch_deploy",             default: false, null: false
   end
 

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.feature "user deploys pardot repo from artifactory artifact" do
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
-    @repo = FactoryGirl.create(:repo, name: "pardot", artifactory_project: "pardot")
+    @repo = FactoryGirl.create(:repo, name: "pardot", bamboo_project: "pardot")
     @server = FactoryGirl.create(:server, hostname: "app-s1.example")
     @server.deploy_scenarios.create!(deploy_target: @deploy_target, repo: @repo)
 
@@ -12,13 +12,13 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
       .and_return(OpenStruct.new(name: "master", object: OpenStruct.new(sha: "abc123")))
 
     allow(Artifactory::Resource::Artifact).to receive(:property_search)
-      .with(project: @repo.artifactory_project, branch: "master", repos: Repo::ARTIFACTORY_REPO)
+      .with(bambooProject: @repo.bamboo_project, gitBranch: "master", repos: Repo::ARTIFACTORY_REPO)
       .and_return([OpenStruct.new(uri: "https://artifactory.example/pardot/build1234.tar.gz")])
 
     properties = {
-      "branch" => ["master"],
-      "build"  => ["1234"],
-      "sha"    => ["abc123"],
+      "gitBranch"   => ["master"],
+      "buildNumber" => ["1234"],
+      "gitSha"      => ["abc123"],
     }
     allow(Artifactory::Resource::Artifact).to receive(:from_url)
       .with("https://artifactory.example/pardot/build1234.tar.gz")
