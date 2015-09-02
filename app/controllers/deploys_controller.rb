@@ -22,6 +22,7 @@ class DeploysController < ApplicationController
 
   def show
     @deploy = Deploy.includes(results: [:server]).find(params[:id])
+    @deploy.check_completed_status!
 
     @watching = params[:watching].present?
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)

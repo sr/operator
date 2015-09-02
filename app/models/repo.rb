@@ -17,9 +17,9 @@ class Repo < ActiveRecord::Base
     raise "no artifactory project configured" if artifactory_project.empty?
 
     artifacts = Artifactory::Resource::Artifact.property_search(
-      project: artifactory_project,
-      branch:  branch,
-      repos:   ARTIFACTORY_REPO,
+      bambooProject: artifactory_project,
+      gitBranch:     branch,
+      repos:         ARTIFACTORY_REPO,
     )
 
     artifacts.map { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }

@@ -11,9 +11,9 @@ class ProvisionalDeploy
       repo: repo,
       artifact_url: artifact_url,
       what: "branch",
-      what_details: artifact.properties["branch"].first,
-      build_number: artifact.properties["build"].first.to_i,
-      sha: artifact.properties["sha"].first,
+      what_details: artifact.properties["gitBranch"].first,
+      build_number: artifact.properties["buildNumber"].first.to_i,
+      sha: artifact.properties["gitSha"].first,
     )
   end
 
