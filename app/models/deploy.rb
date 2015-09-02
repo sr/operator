@@ -52,13 +52,11 @@ class Deploy < ActiveRecord::Base
   end
 
   def complete!
-    self.completed = true
-    save!
+    update!(completed: true)
   end
 
   def cancel!
-    self.canceled = true
-    save!
+    update!(canceled: true, completed: true)
     kill_process!
   end
 

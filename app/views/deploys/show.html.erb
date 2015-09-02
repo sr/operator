@@ -72,7 +72,7 @@
 
 <% unless @show_full_logs %> <%# don't show server info on full log %>
   <%# ======================== SERVERS ======================== %>
-  <%= render partial: "deploys/deploy_servers" %>
+  <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy} %>
   <div class="alert alert-info" role="alert">
     <% if current_deploy.used_all_servers? %>
       <p class="muted">

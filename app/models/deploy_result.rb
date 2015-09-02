@@ -8,4 +8,16 @@ class DeployResult < ActiveRecord::Base
     inclusion: {in: STATUSES}
 
   scope :pending, -> { where(status: "pending") }
+
+  def pending?
+    status == "pending"
+  end
+
+  def completed?
+    status == "completed"
+  end
+
+  def failed?
+    status == "failed"
+  end
 end
