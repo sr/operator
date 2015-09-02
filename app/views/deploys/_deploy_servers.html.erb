@@ -17,12 +17,11 @@
   <%- deploy.results.each do |result| %>
     <div class="deploy-server-status">
       <%- if result.pending? %>
-        <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
+        <span class="text-muted muted" title="Pending"><i class="icon-check-empty"></i></span>
       <%- elsif result.completed? %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
       <% elsif result.failed? %>
-        <span class="text-success" title="Complete"><i class="icon-check"></i></span>
-
+        <span class="text-danger" title="Failed"><i class="icon-exclamation-sign"></i></span>
       <% end %>
       <%= result.server.hostname %>
     </div>
