@@ -23,6 +23,7 @@ class Repo < ActiveRecord::Base
     )
 
     artifacts.map { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
+      .compact
       .sort_by { |deploy| -deploy.build_number }
   end
 

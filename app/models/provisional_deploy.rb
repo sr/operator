@@ -7,6 +7,8 @@ class ProvisionalDeploy
 
   def self.from_artifact_url(repo, artifact_url)
     artifact = Artifactory::Resource::Artifact.from_url(artifact_url)
+    return nil unless artifact.properties["gitBranch"] && artifact.properties["buildNumber"] && artifact.properties["gitSha"]
+
     new(
       repo: repo,
       artifact_url: artifact_url,
