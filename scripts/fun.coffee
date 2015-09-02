@@ -230,3 +230,9 @@ module.exports = (robot) ->
 
     robot.hear /^!engage$/i, (msg) ->
         msg.send "http://i.imgur.com/MX458aQ.jpg"
+
+    robot.hear /^!oncall$/i, (msg) ->
+        msg.send "https://i.imgur.com/mWxLrwF.gif"
+
+    robot.hear /^!nope$/i, (msg) ->
+        msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
