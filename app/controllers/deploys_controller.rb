@@ -95,6 +95,8 @@ class DeploysController < ApplicationController
     authors.collect do |author|
       author.try(:login) || author.try(:name)
     end.uniq.sort
+  rescue Octokit::NotFound
+    []
   end
 
   def commits_for_compare(item1, item2)
