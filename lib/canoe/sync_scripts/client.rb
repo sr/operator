@@ -9,9 +9,10 @@ module Canoe
         @environment = environment
       end
 
-      def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, lock: false)
+      def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, artifact_url: nil, lock: false)
         args  = [repo_name]
         args << "#{what}=#{what_details}"
+        args << "--artifact-url=#{artifact_url}" unless artifact_url.nil?
         args << "--lock" if lock
         args << "--user=#{user.email}"
         args << "--deploy-id=#{deploy_id}"
