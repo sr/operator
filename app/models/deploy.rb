@@ -8,6 +8,8 @@ class Deploy < ActiveRecord::Base
   belongs_to :deploy_target
   belongs_to :auth_user
 
+  has_many :results, class_name: DeployResult
+
   def log_path
     @_log_path ||= \
       begin
@@ -50,20 +52,20 @@ class Deploy < ActiveRecord::Base
   end
 
   def complete!
-    self.completed = true
-    save!
+    update!(completed: true)
   end
 
   def cancel!
-    self.canceled = true
-    save!
+    update!(canceled: true, completed: true)
     kill_process!
   end
 
   def check_completed_status!
-    # bail out if we are complete or we're still running...
-    return if self.completed? || process_still_running?
-    complete! # otherwise, mark as complete
+    return if completed?
+
+    if !process_still_running? && !pending_results_present?
+      complete!
+    end
   end
 
   def process_still_running?
@@ -75,6 +77,10 @@ class Deploy < ActiveRecord::Base
   rescue
     # process isn't running or isn't owned by us
     false
+  end
+
+  def pending_results_present?
+    results.pending.any?
   end
 
   def kill_process!(forcefully=false)

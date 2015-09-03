@@ -3,30 +3,16 @@ module CanoeHelper
     request.scheme
   end
 
-  def repo_icon_map
-    { "pardot"   => "cloud",
-      "pithumbs" => "thumbs-up",
-      "realtime-frontend" => "bullhorn",
-      "workflow-stats" => "fighter-jet",
-    }
-  end
-
-  def supported?(what)
-    # these methods of deploying are NOT supported by the given repos
-    @_exclusions ||= {
-      "realtime-frontend" => %w[branch commit],
-      "workflow-stats" => %w[branch commit],
-    }
-    !(@_exclusions[current_repo_name] || []).include?(what.to_s)
-  end
-
   # ----------------------------------------------------------------------
   # DATA
 
   # ----------------------------------------------------------------------
   # ACTIVE X
-  def active_repo(repo_name="")
-    (current_repo_name || "").downcase == repo_name.downcase ? 'class="active"'.html_safe : ""
+  def active_repo(repo = nil)
+    current_repo_name = current_repo && current_repo.name
+    repo_name = repo && repo.name
+
+    current_repo_name == repo_name ? 'class="active"'.html_safe : ''
   end
 
   def active_target(target_name="")
@@ -56,11 +42,13 @@ module CanoeHelper
     "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
   end
 
+  def github_sha_url(sha)
+    "#{github_url}/#{current_repo.full_name}/commits/#{sha}"
+  end
+
   def github_diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
-    item1 = deploy1.branch? ? deploy1.sha : deploy1.what_details
-    item2 = deploy2.branch? ? deploy2.sha : deploy2.what_details
-    "#{github_url}/#{current_repo.full_name}/compare/#{item1}...#{item2}"
+    "#{github_url}/#{current_repo.full_name}/compare/#{deploy1.sha}...#{deploy2.sha}"
   end
 
   # ----------------------------------------------------------------------
@@ -71,9 +59,10 @@ module CanoeHelper
 
   def deploy_icon_class(type)
     case type
+    when "build" then "icon-archive"
     when "tag" then "icon-tag"
+    when "branch-master" then "icon-code"
     when "branch" then "icon-code-fork"
-    when "commit" then "icon-tasks"
     else ""
     end
   end
@@ -92,6 +81,14 @@ module CanoeHelper
     else
       output += deploy.what_details
     end
+
+    if deploy.build_number
+      output += " "
+      output += deploy_type_icon("build")
+      output += " "
+      output += "build#{deploy.build_number}"
+    end
+
     output.html_safe
   end
 

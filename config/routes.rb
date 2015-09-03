@@ -10,8 +10,9 @@ Rails.application.routes.draw do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
-    resources :branches, param: :name, only: [:index]
-    resources :commits, param: :sha, only: [:index]
+    resources :branches, param: :name, only: [:index] do
+      resources :builds, only: [:index]
+    end
 
     resources :deploys, only: [:new, :create, :show] do
       get :select_target, on: :collection
@@ -25,6 +26,8 @@ Rails.application.routes.draw do
     post :lock, on: :member
     post :unlock, on: :member
   end
+
+  resources :servers
 
   namespace :api, defaults: {format: "json"} do
     # TODO: This is the new format for the api that we should switch the ones below to.

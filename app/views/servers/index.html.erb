@@ -1,0 +1,22 @@
+<h1>Servers</h1>
+
+<%= link_to "New Server", new_server_path, class: "btn btn-default" %>
+
+<table class="table" style="margin-top: 10px">
+  <tr>
+    <th>Hostname</th>
+    <th>Repos</th>
+    <th>Actions</th>
+  </tr>
+
+  <%- @servers.each do |server| %>
+    <tr class="<%= server.enabled? ? "success" : "warning" %>">
+      <td><%= server.hostname %></td>
+      <td><%= server.repos.map(&:name).sort.join(", ") %></td>
+      <td>
+        <%= link_to "Edit", edit_server_path(server), class: "btn btn-xs btn-success" %>
+        <%= link_to "Delete", server, method: "delete", data: {confirm: "Are you sure you want to delete this server?"}, class: "btn btn-xs btn-danger" %>
+      </td>
+    </tr>
+  <%- end %>
+</table>

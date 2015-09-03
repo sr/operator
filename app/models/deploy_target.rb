@@ -83,4 +83,10 @@ class DeployTarget < ActiveRecord::Base
     self.locking_user == user || \
     self.file_lock_user == user.email
   end
+
+  def servers(repo:)
+    Server
+      .joins(:deploy_scenarios)
+      .where(deploy_scenarios: {deploy_target_id: id, repo_id: repo.id})
+  end
 end

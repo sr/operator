@@ -1,8 +1,8 @@
 <div class="container">
   <h4>Servers</h4>
-  <% current_deploy.all_servers.each do |server| %>
+  <% deploy.all_servers.each do |server| %>
     <div class="deploy-server-status">
-      <% if current_deploy.finished_servers.include?(server) %>
+      <% if deploy.finished_servers.include?(server) %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
       <% else %>
         <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
@@ -10,6 +10,22 @@
       <%= server %>
     </div>
   <% end %>
+</div>
+
+<div class="container">
+  <h4>Pull-Based Servers</h4>
+  <%- deploy.results.each do |result| %>
+    <div class="deploy-server-status">
+      <%- if result.pending? %>
+        <span class="text-muted muted" title="Pending"><i class="icon-check-empty"></i></span>
+      <%- elsif result.completed? %>
+        <span class="text-success" title="Complete"><i class="icon-check"></i></span>
+      <% elsif result.failed? %>
+        <span class="text-danger" title="Failed"><i class="icon-exclamation-sign"></i></span>
+      <% end %>
+      <%= result.server.hostname %>
+    </div>
+  <%- end %>
 </div>
 
 <div class="clearfix">

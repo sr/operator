@@ -10,17 +10,8 @@ module Canoe
     DEPLOYLOGIC_ERROR_INVALID_WHAT = 5
     DEPLOYLOGIC_ERROR_DUPLICATE = 6
 
-    def provisional_deploy
-      %w[tag branch commit].each do |type|
-        if params[type]
-          return ProvisionalDeploy.new(type, params[type], current_repo.full_name)
-        end
-      end
-      nil # fall through
-    end
-
     # ----------------------------------------------------------------------
-    def deploy!
+    def deploy!(prov_deploy)
       # require a repo and target
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_REPO   } if !current_repo
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
@@ -33,22 +24,6 @@ module Canoe
         return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
-      deploy_options = { user: current_user,
-                         repo: current_repo,
-                         lock: (params[:lock] == "on"),
-                       }
-
-      prov_deploy = provisional_deploy
-      if prov_deploy
-        deploy_options[:what] = prov_deploy.what
-        deploy_options[:what_details] = prov_deploy.what_details
-      end
-
-      # gather any servers that might be specified
-      if params[:servers] == "on" && !params[:server_names].blank?
-        deploy_options[:servers] = params[:server_names]
-      end
-
       # validate that what we are deploying was included and is a real thing
       if prov_deploy.nil?
         return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT }
@@ -58,8 +33,6 @@ module Canoe
                  what: prov_deploy.what }
       end
 
-      deploy_options[:sha] = prov_deploy.sha # gathered during is_valid?
-
       the_deploy = deployer.deploy(
         target: current_target,
         user: current_user,
@@ -67,8 +40,10 @@ module Canoe
         what: prov_deploy.what,
         what_details: prov_deploy.what_details,
         sha: prov_deploy.sha,
+        build_number: prov_deploy.build_number,
+        artifact_url: prov_deploy.artifact_url,
         lock: (params[:lock] == "on"),
-        servers: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
+        server_hostnames: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
       )
 
       if the_deploy

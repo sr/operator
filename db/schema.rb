@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140904164525) do
+ActiveRecord::Schema.define(version: 20150902204747) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -23,6 +23,24 @@ ActiveRecord::Schema.define(version: 20140904164525) do
   end
 
   add_index "auth_users", ["email"], name: "index_auth_users_on_email", using: :btree
+
+  create_table "deploy_results", force: :cascade do |t|
+    t.integer "server_id", limit: 4,                         null: false
+    t.integer "deploy_id", limit: 4,                         null: false
+    t.string  "status",    limit: 255,   default: "pending", null: false
+    t.text    "logs",      limit: 65535
+  end
+
+  add_index "deploy_results", ["deploy_id", "status"], name: "index_deploy_results_on_deploy_id_and_status", using: :btree
+  add_index "deploy_results", ["server_id", "deploy_id"], name: "index_deploy_results_on_server_id_and_deploy_id", unique: true, using: :btree
+
+  create_table "deploy_scenarios", force: :cascade do |t|
+    t.integer "repo_id",          limit: 4, null: false
+    t.integer "server_id",        limit: 4, null: false
+    t.integer "deploy_target_id", limit: 4, null: false
+  end
+
+  add_index "deploy_scenarios", ["repo_id", "deploy_target_id", "server_id"], name: "index_deploy_scenarios_on_repo_deploy_server_ids", unique: true, using: :btree
 
   create_table "deploy_targets", force: :cascade do |t|
     t.string   "name",            limit: 255
@@ -48,11 +66,12 @@ ActiveRecord::Schema.define(version: 20140904164525) do
     t.datetime "updated_at"
     t.string   "process_id",        limit: 255
     t.boolean  "canceled",                        default: false
-    t.integer  "server_count",      limit: 4,     default: 0
     t.text     "servers_used",      limit: 65535
     t.text     "specified_servers", limit: 65535
     t.text     "completed_servers", limit: 65535
     t.text     "sha",               limit: 65535
+    t.integer  "build_number",      limit: 4
+    t.string   "artifact_url",      limit: 255
   end
 
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
@@ -68,6 +87,22 @@ ActiveRecord::Schema.define(version: 20140904164525) do
 
   add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
   add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
+
+  create_table "repos", force: :cascade do |t|
+    t.string  "name",                   limit: 255,                 null: false
+    t.string  "icon",                   limit: 255,                 null: false
+    t.string  "bamboo_project",         limit: 255
+    t.boolean "supports_branch_deploy",             default: false, null: false
+  end
+
+  add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree
+
+  create_table "servers", force: :cascade do |t|
+    t.string  "hostname", limit: 255,                null: false
+    t.boolean "enabled",              default: true, null: false
+  end
+
+  add_index "servers", ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
 
   create_table "target_jobs", force: :cascade do |t|
     t.integer  "deploy_target_id", limit: 4

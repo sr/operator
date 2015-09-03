@@ -1,12 +1,30 @@
-class Repo
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
-  end
+class Repo < ActiveRecord::Base
+  ARTIFACTORY_REPO = "pd-canoe".freeze
 
   def full_name
-    "Pardot/#{@name}"
+    "Pardot/#{name}"
+  end
+
+  def to_param
+    name
+  end
+
+  def deploys_via_artifacts?
+    bamboo_project.present?
+  end
+
+  def builds(branch:)
+    raise "no artifactory project configured" if bamboo_project.empty?
+
+    artifacts = Artifactory::Resource::Artifact.property_search(
+      bambooProject: bamboo_project,
+      gitBranch:     branch,
+      repos:         ARTIFACTORY_REPO,
+    )
+
+    artifacts.map { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
+      .compact
+      .sort_by { |deploy| -deploy.build_number }
   end
 
   def tags(count = 30)
@@ -29,13 +47,12 @@ class Repo
 
   def branches
     Octokit.auto_paginate = true
-    branches = Octokit.branches(full_name)
-    branches.sort_by(&:name) # may not really be needed...
+    Octokit.branches(full_name)
   ensure
     Octokit.auto_paginate = false
   end
 
-  def commits(count = 50)
-    Octokit.commits(full_name, per_page: count)
+  def branch(branch)
+    Octokit.branch(full_name, branch)
   end
 end

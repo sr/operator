@@ -27,12 +27,17 @@ First, copy the `.envvars_sample.rb` file to `.envvars_development.rb`:
 cp .envvars_sample.rb .envvars_development.rb
 ```
 
-[Create a Personal Access Token](https://git.dev.pardot.com/settings/applications) and provide it as `GITHUB_PASSWORD` in `.envvars_development.rb`:
+Generate some secrets:
+* [Create a Personal Access Token](https://git.dev.pardot.com/settings/applications) and provide it as `GITHUB_PASSWORD`.
+* [Create an Artifactory API Token](https://artifactory.dev.pardot.com/artifactory/webapp/#/profile) and provide it as `ARTIFACTORY_API_KEY`.
 
 ```
 # .envvars_development.rb
 ENV["GITHUB_USER"] = "my_ldap_username"
 ENV["GITHUB_PASSWORD"] = "my_personal_access_token"
+
+ENV["ARTIFACTORY_USERNAME"] = "my_ldap_username"
+ENV["ARTIFACTORY_API_KEY"] = "my_api_key"
 ```
 
 ### Tests

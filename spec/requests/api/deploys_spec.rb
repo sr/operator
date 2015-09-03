@@ -1,10 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "/api/targets/:target_name/deploys" do
+  before do
+    @target = FactoryGirl.create(:deploy_target, name: "test")
+  end
+
   describe "/api/targets/:target_name/deploys/latest" do
     describe "without authentication" do
       it "should error" do
-        post "/api/targets/dev/deploys/latest"
+        post "/api/targets/#{@target.name}/deploys/latest"
         assert_json_error_response("auth token")
       end
     end
@@ -12,27 +16,27 @@ RSpec.describe "/api/targets/:target_name/deploys" do
     describe "with authentication" do
       describe "without repo_name" do
         it "should error" do
-          api_post "/api/targets/dev/deploys/latest", { }
+          api_post "/api/targets/#{@target.name}/deploys/latest", { }
           assert_json_error_response("Invalid repo")
         end
       end
 
       describe "with a bogus repo name" do
         it "should error" do
-          api_post "/api/targets/dev/deploys/latest", { repo_name: "foobar" }
+          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: "foobar" }
           assert_json_error_response("Invalid repo")
         end
       end
 
       describe "with a good repo name" do
+        before do
+          @repo = FactoryGirl.create(:repo)
+        end
+
         it "should list the latest deploy info" do
-          deploy = Deploy.new(id: 1, what: "tag", what_details: "1234", completed: true)
-          expect(deploy).to receive(:deploy_target).and_return(OpenStruct.new(name: "test"))
-          expect(deploy).to receive(:auth_user).and_return(OpenStruct.new(email: "sveader@salesforce.com"))
-          define_target_mock do |target_mock|
-            expect(target_mock).to receive(:last_deploy_for).and_return(deploy)
-          end
-          api_post "/api/targets/test/deploys/latest", { repo_name: "pardot" }
+          deploy = FactoryGirl.create(:deploy, repo_name: @repo.name, deploy_target: @target)
+
+          api_post "/api/targets/test/deploys/latest", { repo_name: @repo.name }
           assert_nonerror_response
         end
       end

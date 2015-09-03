@@ -9,31 +9,35 @@
 <% end %>
 
 <ul class="nav nav-tabs deploy-targets">
-  <% if supported?("tag") %>
+  <%- if current_repo.deploys_via_artifacts? -%>
+    <%= content_tag :li, class: (current_page?(controller: "builds", action: "index", repo_name: current_repo.name, branch_name: "master") ? "active" : "") do %>
+      <%= link_to repo_branch_builds_path(current_repo, "master") do %>
+        <%= deploy_type_icon("branch-master") %> master
+      <%- end %>
+    <%- end %>
+    <%= content_tag :li, class: (current_page?(controller: "branches", action: "index", repo_name: current_repo.name) ? "active" : "") do %>
+      <%= link_to repo_branches_path(current_repo) do %>
+        <%= deploy_type_icon("branch") %> branches
+      <%- end %>
+    <%- end %>
+  <%- else %>
     <%= content_tag :li, class: (@latest_tag ? "active" : "") do %>
       <%= link_to latest_repo_tags_path(current_repo.name) do %>
-        <%= deploy_type_icon("tag") %> Latest Tag
+        <%= deploy_type_icon("tag") %> latest tag
       <%- end %>
     <%- end %>
     <%= content_tag :li, class: (@tags ? "active" : "") do %>
       <%= link_to repo_tags_path(current_repo.name) do %>
-        <%= deploy_type_icon("tag") %> Tags
+        <%= deploy_type_icon("tag") %> tags
       <%- end %>
     <%- end %>
-  <% end %>
-  <% if supported?("branch") %>
-    <%= content_tag :li, class: (@branches ? "active" : "") do %>
-      <%= link_to repo_branches_path(current_repo.name) do %>
-        <%= deploy_type_icon("branch") %> Branches
+    <% if current_repo.supports_branch_deploy? %>
+      <%= content_tag :li, class: (@branches ? "active" : "") do %>
+        <%= link_to repo_branches_path(current_repo.name) do %>
+          <%= deploy_type_icon("branch") %> branches
+        <%- end %>
       <%- end %>
-    <%- end %>
-  <% end %>
-  <% if supported?("commit") %>
-    <%= content_tag :li, class: (@commits ? "active" : "") do %>
-      <%= link_to repo_commits_path(current_repo.name) do %>
-        <%= deploy_type_icon("commit") %> Commits
-      <%- end %>
-    <%- end %>
-  <% end %>
+    <% end %>
+  <%- end %>
 </ul>
 <br>

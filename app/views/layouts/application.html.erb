@@ -43,11 +43,20 @@
       <ul class="nav nav-stacked repos">
       <% all_repos.each do |repo| %>
         <li>
-        <a href="<%= repo_path(repo) %>" <%= active_repo repo %>>
-          <i class="icon-<%= repo_icon_map[repo] %>"></i><%= repo.capitalize %>
+        <a href="<%= repo_path(repo) %>" <%= active_repo(repo) %>>
+          <i class="icon-<%= repo.icon %>"></i><%= repo.name.capitalize %>
         </a>
         </li>
       <% end %>
+      </ul>
+
+      <ul class="nav nav-stacked servers">
+        <%= content_tag :li, class: current_page?(controller: "servers", action: "index") ? "active" : "" do %>
+          <%= link_to servers_path do %>
+            <%= content_tag :i, "", class: "icon-tasks" %>
+            Servers
+          <%- end %>
+        <%- end %>
       </ul>
 
       <ul class="nav nav-stacked targets">

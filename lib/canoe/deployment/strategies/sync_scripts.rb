@@ -13,6 +13,7 @@ module Canoe
             repo_name: deploy.repo_name,
             what: deploy.what,
             what_details: deploy.what_details,
+            artifact_url: deploy.artifact_url,
             user: deploy.auth_user,
             deploy_id: deploy.id,
             servers: deploy.all_servers,
