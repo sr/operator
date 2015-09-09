@@ -32,30 +32,11 @@ class DeploysController < ApplicationController
   def create
     if prov_deploy = build_provisional_deploy
       deploy_response = deploy!(prov_deploy)
-
       if !deploy_response[:error] && deploy_response[:deploy]
         the_deploy = deploy_response[:deploy]
         redirect_to repo_deploy_path(current_repo.name, the_deploy.id, watching: "1")
-      else # error
-        # missing pieces
-        missing_error_codes = \
-          [DEPLOYLOGIC_ERROR_NO_REPO, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
-        if missing_error_codes.include?(deploy_response[:reason])
-          flash[:notice] = "We did not have everything needed to deploy. Try again."
-          redirect_to :back
-        end
-
-        # check for invalid
-        if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_WHAT
-          flash[:notice] = "Sorry, it appears you specified an unknown #{deploy_response[:what]}."
-          redirect_to :back
-        end
-
-        # check for locked target, allow user who has it locked to deploy again
-        if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
-          flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-          redirect_to :back
-        end
+      else
+        render_deploy_error(deploy_response)
       end
     else
       render_invalid_provisional_deploy
@@ -70,6 +51,43 @@ class DeploysController < ApplicationController
   def cancel
     current_deploy.cancel! if current_deploy
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+  end
+
+  def rollback
+    unless current_deploy == current_target.last_deploy_for(current_repo.name)
+      redirect_to repo_deploy_path(current_repo.name, current_deploy),
+        alert: "Only the latest deploy can be rolled back"
+      return
+    end
+
+    previous_deploy = current_target.previous_deploy(current_deploy)
+    if previous_deploy.present?
+      # HACK: DeployLogic depends on params[:servers] until it is refactored to
+      # do otherwise
+      if current_deploy.specified_servers.present?
+        params[:servers] = "on"
+
+        server_names = current_deploy.all_servers + current_deploy.all_pull_servers
+        params[:server_names] = server_names.join(",")
+      end
+
+      prov_deploy = ProvisionalDeploy.from_previous_deploy(current_repo, previous_deploy)
+
+      current_deploy.check_completed_status!
+      current_deploy.cancel! unless current_deploy.completed?
+
+      deploy_response = deploy!(prov_deploy)
+      if !deploy_response[:error] && deploy_response[:deploy]
+        the_deploy = deploy_response[:deploy]
+        redirect_to repo_deploy_path(current_repo.name, the_deploy.id, watching: "1"),
+          notice: "Previous deploy canceled. Rollback deploy initiated."
+      else
+        render_deploy_error(deploy_response)
+      end
+    else
+      redirect_to repo_deploy_path(current_repo.name, current_deploy),
+        alert: "There is no previous deploy, so a rollback is unavailable"
+    end
   end
 
   private
@@ -106,5 +124,27 @@ class DeploysController < ApplicationController
 
   def render_invalid_provisional_deploy
     render status: :unprocessable_entity, text: "Unknown deploy type: #{params[:what]}"
+  end
+
+  def render_deploy_error(deploy_response)
+    # missing pieces
+    missing_error_codes = \
+      [DEPLOYLOGIC_ERROR_NO_REPO, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
+    if missing_error_codes.include?(deploy_response[:reason])
+      flash[:notice] = "We did not have everything needed to deploy. Try again."
+      redirect_to :back
+    end
+
+    # check for invalid
+    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_WHAT
+      flash[:notice] = "Sorry, it appears you specified an unknown #{deploy_response[:what]}."
+      redirect_to :back
+    end
+
+    # check for locked target, allow user who has it locked to deploy again
+    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
+      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
+      redirect_to :back
+    end
   end
 end

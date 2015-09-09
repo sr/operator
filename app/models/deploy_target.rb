@@ -9,21 +9,39 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def last_deploy_for(repo_name)
-    self.deploys.where(repo_name: repo_name).order("created_at DESC").first
+    self.deploys
+      .where(repo_name: repo_name)
+      .order(id: :desc)
+      .first
   end
 
   def last_successful_deploy_for(repo_name)
-    self.deploys.where(repo_name: repo_name,
-                       completed: true,
-                       canceled:  false).order("created_at DESC").first
+    self.deploys
+      .where(
+        repo_name: repo_name,
+        completed: true,
+        canceled:  false)
+      .order(id: :desc)
+      .first
+  end
+
+  def previous_deploy(deploy)
+    self.deploys
+      .where(repo_name: deploy.repo_name)
+      .where("id < ?", deploy.id)
+      .order(id: :desc)
+      .first
   end
 
   def previous_successful_deploy(deploy)
-    self.deploys.where(repo_name: deploy.repo_name,
-                       completed: true,
-                       canceled:  false). \
-                       where("created_at < ?", deploy.created_at). \
-                       order("created_at DESC").first
+    self.deploys
+      .where(
+        repo_name: deploy.repo_name,
+        completed: true,
+        canceled:  false)
+      .where("id < ?", deploy.id)
+      .order(id: :desc)
+      .first
   end
 
   def active_deploy
@@ -32,7 +50,9 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def most_recent_deploy
-    self.deploys.order("created_at DESC").first
+    self.deploys
+      .order(id: :desc)
+      .first
   end
 
   def lock!(user)

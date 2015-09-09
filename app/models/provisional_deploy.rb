@@ -58,6 +58,17 @@ class ProvisionalDeploy
     )
   end
 
+  def self.from_previous_deploy(repo, deploy)
+    new(
+      repo: repo,
+      artifact_url: deploy.artifact_url,
+      what: deploy.what,
+      what_details: deploy.what_details,
+      build_number: deploy.build_number,
+      sha: deploy.sha,
+    )
+  end
+
   def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:)
     @repo = repo
     @artifact_url = artifact_url
