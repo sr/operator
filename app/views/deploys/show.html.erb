@@ -73,16 +73,12 @@
 <% unless @show_full_logs %> <%# don't show server info on full log %>
   <%# ======================== SERVERS ======================== %>
   <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy} %>
-  <div class="alert alert-info" role="alert">
+  <div class="well well-sm">
     <% if current_deploy.used_all_servers? %>
-      <p class="muted">
-        <em>All servers used for sync.</em>
-      </p>
+      <em>All servers used for sync.</em>
     <% else %>
-      <p>
-        <strong>Specified Servers:</strong>
-        <%= current_deploy.specified_servers %>
-      </p>
+      <strong>Specified Servers:</strong>
+      <%= current_deploy.specified_servers %>
     <% end %>
   </div>
 <% end %>
@@ -98,18 +94,33 @@
 <% end %>
 
 <hr>
-<% if current_deploy.completed? %>
-  <div>
-    <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-warning deploy-button" do %>
-      <i class="icon-train2"></i> REDEPLOY THIS!
+
+<div class="horizontal-button-array">
+  <%- if current_deploy.completed? %>
+    <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
+      <i class="icon-train2"></i> REDEPLOY
     <%- end %>
-  </div>
-<% else %>
-  <div>
+  <%- end %>
+
+  <%# If this deploy is the latest deploy, offer an option to roll it back %>
+  <%- if current_target.last_deploy_for(current_deploy.repo_name) == current_deploy %>
+    <%= form_tag rollback_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy and rollback to the previous deploy?"} do %>
+      <%= button_tag type: "submit", class: "btn btn-warning" do %>
+        <%= content_tag :i, "", class: "icon-rotate-left" %>
+        <%- if current_deploy.completed? %>
+          ROLLBACK
+        <%- else %>
+          CANCEL &amp; ROLLBACK
+        <%- end %>
+      <%- end %>
+    <%- end %>
+  <%- end %>
+
+  <%- unless current_deploy.completed? %>
     <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
       <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> CANCEL</button>
     <%- end %>
-  </div>
-<% end %>
+  <% end %>
+</div>
 
 <br>

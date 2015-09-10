@@ -41,6 +41,10 @@ class Deploy < ActiveRecord::Base
     @_all_servers = self.servers_used.to_s.split(",").map(&:strip)
   end
 
+  def all_pull_servers
+    results.includes(:server).map { |result| result.server.hostname }
+  end
+
   def finished_servers
     @_finished_servers = self.completed_servers.to_s.split(",").map(&:strip)
   end
