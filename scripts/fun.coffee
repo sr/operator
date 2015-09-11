@@ -226,12 +226,14 @@ module.exports = (robot) ->
             "https://s3.amazonaws.com/uploads.hipchat.com/45727/312472/MQoxbi1zWVP4x6I/Untitled-11.gif"
         ]
 
+        msg.send msg.random caseys
+
     robot.hear /^!tbone$/i, (msg) ->
         tbones = [
             "https://hipchat.dev.pardot.com/files/1/42/ttSs2Ol0zENJGq0/TBone.jpeg"
         ]
 
-        msg.send msg.random caseys
+        msg.send msg.random tbones
 
     robot.hear /^!engage$/i, (msg) ->
         msg.send "http://i.imgur.com/MX458aQ.jpg"
