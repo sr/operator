@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
+cd "$dir"
+
+script/bootstrap
+
+if [ -z "$NODE_ENV" ] || [ "$NODE_ENV" = "development" ]; then
+  echo "==> Creating the database"
+  echo "
+    CREATE DATABASE IF NOT EXISTS parbot_development;
+    GRANT ALL ON parbot_development.* TO parbot@127.0.0.1 IDENTIFIED BY 'parbot';
+  " | mysql -u root
+fi
+
+script/migrate

@@ -1,0 +1,25 @@
+{
+  "name": "parbot",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Stan Lemon <slemon@salesforce.com>",
+  "description": "Pardot's useful, but not production-critical chatbot",
+  "dependencies": {
+    "db-migrate": "^0.9.21",
+    "dotenv": "^1.2.0",
+    "hubot": "^2.16.0",
+    "hubot-diagnostics": "0.0.1",
+    "hubot-help": "^0.1.1",
+    "hubot-hipchat": "^2.12.0",
+    "hubot-redis-brain": "0.0.3",
+    "hubot-schedule": "^0.2.1",
+    "hubot-scripts": "^2.16.2",
+    "moment": "^2.10.6",
+    "moment-timezone": "^0.4.0",
+    "mysql": "^2.9.0",
+    "parse-database-url": "^0.2.2"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
