@@ -35,9 +35,13 @@ module.exports = (robot) ->
         msg.reply "Something went wrong: #{err}"
       else
         return unless r and r[0]
+
+        msgs = []
         for deploy in r
           githubLink = "https://git.dev.pardot.com/pardot/pardot/tree/build#{deploy.build_number}"
-          msg.send "#{deploy.sync_master} synced build#{deploy.build_number} synced on #{formatDateString(deploy.started_at)}: #{githubLink}"
+          msgs.push "#{deploy.sync_master} synced build#{deploy.build_number} synced on #{formatDateString(deploy.started_at)}: #{githubLink}"
+
+        msg.send msgs.join("\n")
 
   robot.respond /ondeck/i, (msg) ->
     buildClient.latest 1, (err, r) ->

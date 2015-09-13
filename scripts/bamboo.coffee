@@ -32,6 +32,10 @@ module.exports = (robot) ->
         msg.reply "Something went wrong: #{err}"
       else
         return unless r and r[0]
+
+        msgs = []
         for build in r
           githubLink = "https://git.dev.pardot.com/pardot/pardot/tree/build#{build.build_number}"
-          msg.send "build#{build.build_number} passed on #{formatDateString(build.completed_at)}: #{githubLink}"
+          msgs.push "build#{build.build_number} passed on #{formatDateString(build.completed_at)}: #{githubLink}"
+
+        msg.send msgs.join("\n")
