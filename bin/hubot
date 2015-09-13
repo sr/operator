@@ -1,8 +1,0 @@
-#!/bin/sh
-
-npm install
-# BOT_PATH is exported in start scripts
-export PATH="$BOT_PATH/node_modules/.bin:$BOT_PATH/node_modules/hubot/node_modules/.bin:$PATH"
-
-exec $BOT_PATH/node_modules/.bin/hubot "$@"
-
