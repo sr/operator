@@ -34,5 +34,4 @@ module.exports = (robot) ->
         return unless r and r[0]
         for build in r
           githubLink = "https://git.dev.pardot.com/pardot/pardot/tree/build#{build.build_number}"
-          msgText = "<a href=\"#{githubLink}\">build#{build.build_number}</a> passed on #{formatDateString(build.completed_at)}"
-          msg.send msgText
+          msg.send "build#{build.build_number} passed on #{formatDateString(build.completed_at)}: #{githubLink}"

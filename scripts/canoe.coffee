@@ -37,8 +37,7 @@ module.exports = (robot) ->
         return unless r and r[0]
         for deploy in r
           githubLink = "https://git.dev.pardot.com/pardot/pardot/tree/build#{deploy.build_number}"
-          msgText = "#{deploy.sync_master} synced <a href=\"#{githubLink}\">build#{deploy.build_number}</a> synced on #{formatDateString(deploy.started_at)}"
-          msg.send msgText
+          msg.send "#{deploy.sync_master} synced build#{deploy.build_number} synced on #{formatDateString(deploy.started_at)}: #{githubLink}"
 
   robot.respond /ondeck/i, (msg) ->
     buildClient.latest 1, (err, r) ->
@@ -52,4 +51,4 @@ module.exports = (robot) ->
           msg.reply "Looks like we are up to date. (buttrock)"
         else
           githubLink = "https://git.dev.pardot.com/pardot/pardot/compare/build#{latestDeployedBuildNumber}...build#{latestBuiltBuildNumber}"
-          msg.reply "Changes on deck: <a href=\"#{githubLink}\">build#{latestDeployedBuildNumber}...build#{latestBuiltBuildNumber}</a>"
+          msg.reply "Changes on deck: build#{latestDeployedBuildNumber}...build#{latestBuiltBuildNumber}: #{githubLink}"
