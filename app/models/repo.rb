@@ -9,15 +9,12 @@ class Repo < ActiveRecord::Base
     name
   end
 
-  def deploys_via_artifacts?
-    bamboo_project.present?
-  end
-
   def builds(branch:)
-    raise "no artifactory project configured" if bamboo_project.empty?
+    # should never happen, but a sanity check in case this code path is encountered
+    raise "repo does not deploy via artifacts" unless deploys_via_artifacts?
 
     artifacts = Artifactory::Resource::Artifact.property_search(
-      bambooProject: bamboo_project,
+      gitRepo:       "*/#{full_name}.git",
       gitBranch:     branch,
       repos:         ARTIFACTORY_REPO,
     )
