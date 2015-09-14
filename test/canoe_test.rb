@@ -35,7 +35,8 @@ describe Canoe do
   describe "#get_current_build" do
     it "should get latest deployed build in canoe" do
       ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/targets/staging/deploys/latest}) }.returns('{"target":"staging","user":"ccornutt@salesforce.com","repo":"pardot","what":"branch","what_details":"ccornutt/PDT-14553","completed":true}')
-      assert_equal(Canoe.get_current_build(@env), "ccornutt/PDT-14553")
+      branch, _artifact_url = Canoe.get_current_build(@env)
+      assert_equal(branch, "ccornutt/PDT-14553")
     end
   end
 

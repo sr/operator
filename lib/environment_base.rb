@@ -7,10 +7,11 @@ require "erb"
 class EnvironmentBase
   # =========================================================================
   attr_writer :user
-  attr_reader :payload
+  attr_reader :payload, :deploy_options
 
   def initialize
     @user = nil
+    @deploy_options = {}
     load_yaml("environments/#{short_name.downcase}.yml.erb")
     load_secrets
   end
@@ -84,7 +85,7 @@ class EnvironmentBase
   def self.default_strategies
     {
       deploy: :atomic,
-      fetch: :tarball
+      fetch: :artifactory
     }
   end
 
@@ -108,12 +109,7 @@ class EnvironmentBase
         callback_hooks = Array(general_hooks) | Array(payload_hooks)
 
         callback_hooks.each do |method|
-          # hooks can take no args or all 1
-          if self.class.instance_method(method).arity == 1
-            self.send(method, label)
-          else
-            self.send(method)
-          end
+          self.send(method)
         end
       end
     end
@@ -138,12 +134,12 @@ class EnvironmentBase
     end
   end
 
-  def notify_begin_kibana(label)
-    Console.syslog("Started fetch of #{payload.name}:#{label}")
+  def notify_begin_kibana
+    Console.syslog("Started fetch of #{payload.name}:#{deploy_options[:buildnum]}")
   end
 
-  def notify_complete_kibana(label)
-    Console.syslog("Finished deploy of #{payload.name}:#{label}")
+  def notify_complete_kibana
+    Console.syslog("Finished deploy of #{payload.name}:#{deploy_options[:buildnum]}")
   end
 
   # =========================================================================
