@@ -1,64 +1,48 @@
 # Description:
-#   Handle quoting
+#   Maintains a list of quotable quotes
 #
 # Dependencies:
-#   None
+#   mysql
 #
 # Configuration:
-#   None
+#   DATABASE_URL
 #
 # Commands:
-#   None
-#
-util = require "../lib/util"
+#   hubot joke - Returns a quote by ian
+#   hubot quote - Returns a random quote
+#   hubot quote <quote> - Returns a random quote containing <quote>
+#   hubot addquote <nick> <quote> - Adds a quote to the database
+#   hubot delquote <quote> - Removes a quote from the database
+
+quotes = require "../lib/quotes"
 
 module.exports = (robot) ->
-    robot.hear /^!joke$/i, (msg) ->
-        if process.env.BOT_TYPE == 'parbot'
-            key = msg.match[1]
-            conn = util.getQuoteDBConn()
-            conn.query 'SELECT quote FROM quote WHERE quote like \'%<robrighter>%\' OR quote like \'%<ian>%\' ORDER BY rand() limit 10', (err,r,f) ->
-                msg.send r[0].quote if r and r[0]
+  client = quotes.createClient()
 
-            conn.end()
+  robot.respond /joke$/i, (msg) ->
+    client.random 1, "<ian>", (err, r) ->
+      msg.send r[0].quote if r and r[0]
 
-    robot.hear /^!quote\s+(.*)$/i, (msg) ->
-        key = msg.match[1]
-        conn = util.getQuoteDBConn()
-        conn.query 'SELECT quote FROM quote WHERE quote like ' + conn.escape('%'+key+'%') + ' ORDER BY rand() limit 10', (err,r,f) ->
-            msg.send r[0].quote if r and r[0]
+  robot.respond /quote\s+(.*)$/i, (msg) ->
+    client.random 1, msg.match[1], (err, r) ->
+      msg.send r[0].quote if r and r[0]
 
-        conn.end()
+  robot.respond /quote$/i, (msg) ->
+    client.random 1, null, (err, r) ->
+      msg.send r[0].quote if r and r[0]
 
-    robot.hear /^!quote$/i, (msg) ->
-        conn = util.getQuoteDBConn()
-        conn.query 'SELECT quote FROM quote ORDER BY rand() limit 10', (err,r,f) ->
-            msg.send r[0].quote if r and r[0]
+  robot.respond /addquote\s+(.*)$/i, (msg) ->
+    client.add msg.match[1], (err, r, f) ->
+      if err
+        console.log err
+        msg.send 'Something went wrong. (sadpanda)'
+      else
+        msg.send 'OK, added. (buttrock)'
 
-        conn.end()
-
-    robot.hear /^!addquote\s+(.*)$/i, (msg) ->
-        key = msg.match[1]
-        conn = util.getQuoteDBConn()
-        conn.query 'INSERT INTO quote (quote) VALUES(?)', [key], (err,r,f) ->
-            if err
-                conn.end()
-                return console.log err
-            else
-                msg.send 'OK, added. (buttrock)'
-                # robot.send msg.message.user.name, 'Quote added!'
-
-        conn.end()
-
-    robot.hear /^!delquote\s+(.*)$/i, (msg) ->
-        key = msg.match[1]
-        conn = util.getQuoteDBConn()
-        conn.query 'DELETE FROM quote WHERE quote = ?', [key], (err,r,f) ->
-            if err
-                conn.end()
-                return console.log err
-            else
-                msg.send 'OK, deleted. (sadpanda)'
-                # robot.send msg.message.user.name, 'Quote deleted!'
-
-        conn.end()
+  robot.respond /delquote\s+(.*)$/i, (msg) ->
+    client.delete msg.match[1], (err, r, f) ->
+      if err
+        console.log err
+        msg.send 'Something went wrong. (sadpanda)'
+      else
+        msg.send 'OK, deleted. (sadpanda)'

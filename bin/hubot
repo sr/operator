@@ -1,8 +1,8 @@
 #!/bin/sh
 
+set -e
+
 npm install
-# BOT_PATH is exported in start scripts
-export PATH="$BOT_PATH/node_modules/.bin:$BOT_PATH/node_modules/hubot/node_modules/.bin:$PATH"
+export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
 
-exec $BOT_PATH/node_modules/.bin/hubot "$@"
-
+exec node_modules/.bin/hubot --name "Parbot" "$@"
