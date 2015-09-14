@@ -1,23 +1,29 @@
 db = require "./db"
 
 class Quotes
-  constructor: (@conn) ->
-
   add: (quote, cb) ->
-    @conn.query 'INSERT INTO quotes (quote) VALUES (?)', [quote], cb
+    conn = db.createClient()
+    conn.query 'INSERT INTO quotes (quote) VALUES (?)', [quote], (err, r, f) ->
+      conn.end()
+      cb(err, r, f) if cb
 
   random: (n, substring, cb) ->
+    conn = db.createClient()
     if substring
-      @conn.query 'SELECT quote FROM quotes WHERE quote LIKE ? ORDER BY rand() LIMIT ?', ["%" + substring + "%", n], (err, r, f) ->
-        cb(err, r)
+      conn.query 'SELECT quote FROM quotes WHERE quote LIKE ? ORDER BY rand() LIMIT ?', ["%" + substring + "%", n], (err, r, f) ->
+        conn.end()
+        cb(err, r, f) if cb
     else
-      @conn.query 'SELECT quote FROM quotes ORDER BY rand() LIMIT ?', [n], (err, r, f) ->
-        cb(err, r)
+      conn.query 'SELECT quote FROM quotes ORDER BY rand() LIMIT ?', [n], (err, r, f) ->
+        conn.end()
+        cb(err, r, f) if cb
 
   delete: (quote, cb) ->
-    @conn.query 'DELETE FROM quotes WHERE quote = ?', [quote], cb
+    conn = db.createClient()
+    conn.query 'DELETE FROM quotes WHERE quote = ?', [quote], (err, r, f) ->
+      conn.end()
+      cb(err, r, f) if cb
 
 module.exports =
   createClient: ->
-    conn = db.createClient()
-    return new Quotes(conn)
+    return new Quotes()
