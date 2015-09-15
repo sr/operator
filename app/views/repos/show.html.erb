@@ -9,14 +9,5 @@
     <h3 class="muted"><i class="icon-circle-arrow-up"></i>
       Select where to grab the code.
     </h3>
-    <% if current_repo.name == "pardot" %>
-      <br>
-      <h4>
-        Or deploy the
-        <%= link_to latest_repo_tags_path(current_repo.name) do %>
-          <i class="icon-tags"></i> latest tag
-        <%- end %>
-      </h4>
-    <% end %>
   </div>
 </div>
