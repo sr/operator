@@ -16,23 +16,32 @@
 
 quotes = require "../lib/quotes"
 
+roomSpecificContexts =
+  "support": "support"
+
+contextForRoom = (room) ->
+  if context = roomSpecificContexts[room]
+    context
+  else
+    "engineering"
+
 module.exports = (robot) ->
   client = quotes.createClient()
 
   robot.respond /joke$/i, (msg) ->
-    client.random 1, "<ian>", (err, r) ->
+    client.random contextForRoom(msg.message.room), 1, "<ian>", (err, r) ->
       msg.send r[0].quote if r and r[0]
 
   robot.respond /quote\s+(.*)$/i, (msg) ->
-    client.random 1, msg.match[1], (err, r) ->
+    client.random contextForRoom(msg.message.room), 1, msg.match[1], (err, r) ->
       msg.send r[0].quote if r and r[0]
 
   robot.respond /quote$/i, (msg) ->
-    client.random 1, null, (err, r) ->
+    client.random contextForRoom(msg.message.room), 1, null, (err, r) ->
       msg.send r[0].quote if r and r[0]
 
   robot.respond /addquote\s+(.*)$/i, (msg) ->
-    client.add msg.match[1], (err, r, f) ->
+    client.add contextForRoom(msg.message.room), msg.match[1], (err, r, f) ->
       if err
         console.log err
         msg.send 'Something went wrong. (sadpanda)'
@@ -40,7 +49,7 @@ module.exports = (robot) ->
         msg.send 'OK, added. (buttrock)'
 
   robot.respond /delquote\s+(.*)$/i, (msg) ->
-    client.delete msg.match[1], (err, r, f) ->
+    client.delete contextForRoom(msg.message.room), msg.match[1], (err, r, f) ->
       if err
         console.log err
         msg.send 'Something went wrong. (sadpanda)'

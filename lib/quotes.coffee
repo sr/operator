@@ -1,26 +1,26 @@
 db = require "./db"
 
 class Quotes
-  add: (quote, cb) ->
+  add: (context, quote, cb) ->
     db.createClient (conn) ->
-      conn.query 'INSERT INTO quotes (quote) VALUES (?)', [quote], (err, r, f) ->
+      conn.query 'INSERT INTO quotes (context, quote) VALUES (?, ?)', [context, quote], (err, r, f) ->
         conn.end()
         cb(err, r, f) if cb
 
-  random: (n, substring, cb) ->
+  random: (context, n, substring, cb) ->
     db.createClient (conn) ->
       if substring
-        conn.query 'SELECT quote FROM quotes WHERE quote LIKE ? ORDER BY rand() LIMIT ?', ["%" + substring + "%", n], (err, r, f) ->
+        conn.query 'SELECT quote FROM quotes WHERE context = ? AND quote LIKE ? ORDER BY rand() LIMIT ?', [context, "%" + substring + "%", n], (err, r, f) ->
           conn.end()
           cb(err, r, f) if cb
       else
-        conn.query 'SELECT quote FROM quotes ORDER BY rand() LIMIT ?', [n], (err, r, f) ->
+        conn.query 'SELECT quote FROM quotes WHERE context = ? ORDER BY rand() LIMIT ?', [context, n], (err, r, f) ->
           conn.end()
           cb(err, r, f) if cb
 
-  delete: (quote, cb) ->
+  delete: (context, quote, cb) ->
     db.createClient (conn) ->
-      conn.query 'DELETE FROM quotes WHERE quote = ?', [quote], (err, r, f) ->
+      conn.query 'DELETE FROM quotes WHERE context = ? AND quote = ?', [context, quote], (err, r, f) ->
         conn.end()
         cb(err, r, f) if cb
 
