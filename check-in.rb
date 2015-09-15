@@ -28,9 +28,7 @@ begin
   currently_deployed = cli.check_version
   requested, artifact_url = Canoe.get_current_build(cli.environment)
 
-  if (requested =~ /build\d+/).nil?
-    Console.log("We will only deploy Bamboo tags - Requested: #{requested}")
-  elsif currently_deployed != requested
+  if currently_deployed != requested
     Console.log("Current: #{currently_deployed || "<None>"} -> Requested: #{requested}")
     cli.options[:requested_value] = requested
     cli.options[:artifact_url] = artifact_url
@@ -39,7 +37,7 @@ begin
     Console.log("We're up to date: #{requested}", :green)
   end
 rescue => e
-  Console.syslog(e, :alert)
+  Console.syslog(e.to_s, :alert)
   raise e
 ensure
   lockfile.close

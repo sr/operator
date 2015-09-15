@@ -102,7 +102,7 @@ class EnvironmentBase
   # execute_pre_deploy_hooks, execute_post_deploy_hooks, etc
   [:before, :after].each do |callback|
     [:fetch, :deploy].each do |action|
-      define_method("execute_#{latinize(callback)}_#{action}_hooks") do |label|
+      define_method("execute_#{latinize(callback)}_#{action}_hooks") do
         general_hooks = self.class.hooks[:all][callback][action] || self.class.common_hooks[:all][callback][action]
         payload_name = payload.nil? ? :all : payload.id
         payload_hooks = self.class.hooks[payload_name][callback][action] || self.class.common_hooks[payload_name][callback][action]
