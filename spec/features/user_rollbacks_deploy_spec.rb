@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.feature "user rollbacks deploy" do
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
-    @repo = FactoryGirl.create(:repo, name: "pardot", bamboo_project: "pardot")
+    @repo = FactoryGirl.create(:repo, name: "pardot", deploys_via_artifacts: true)
     @server = FactoryGirl.create(:server, hostname: "app-s1.example")
     @server.deploy_scenarios.create!(deploy_target: @deploy_target, repo: @repo)
 
@@ -15,7 +15,7 @@ RSpec.feature "user rollbacks deploy" do
       .and_return(nil)
 
     allow(Artifactory::Resource::Artifact).to receive(:property_search)
-      .with(bambooProject: @repo.bamboo_project, gitBranch: "master", repos: Repo::ARTIFACTORY_REPO)
+      .with(gitRepo: "*/Pardot/#{@repo.name}.git", gitBranch: "master", repos: Repo::ARTIFACTORY_REPO)
       .and_return([OpenStruct.new(uri: "https://artifactory.example/pardot/build1234.tar.gz")])
 
     properties = {
