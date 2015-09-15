@@ -16,7 +16,7 @@ class Canoe
     return if !environment.use_canoe?
     result = self.call_api(environment, "api/targets/#{environment.canoe_target}/deploys/latest", repo_name: environment.payload.id)
     parsed = JSON.parse(result)
-    parsed["what_details"]
+    [parsed["what_details"], parsed["artifact_url"]]
   end
 
   def self.call_api(environment, path, params={})

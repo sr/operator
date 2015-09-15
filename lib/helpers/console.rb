@@ -43,7 +43,9 @@ class Console
       when :alert
         Syslog::LOG_ALERT
       end
-      Syslog.log(priority, message)
+      Syslog.open do
+        Syslog.log(priority, message)
+      end
     end
 
     def log(message, color=:none)

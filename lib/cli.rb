@@ -33,7 +33,9 @@ class CLI
 
     conductor = environment.conductor
     conductor.dont_ask! if @options[:no_confirmations]
-    conductor.deploy!(@options[:requested_value])
+    environment.deploy_options[:buildnum] = @options[:requested_value]
+    environment.deploy_options[:artifact_url] = @options[:artifact_url]
+    conductor.deploy!
   end
 
   def parse_arguments
@@ -66,6 +68,8 @@ class CLI
         @options[:requested_value] = arg.split("=").last
       elsif arg.match(%r{--no-confirmations}i)
         @options[:no_confirmations] = true
+      elsif arg.match(%r{--artifact-url}i)
+        @options[:artifact_url] = arg.split("=", 2).last
       elsif arg.match(%r{--user}i)
         @options[:user_name] = arg.split("=").last
       # --------------------------------------

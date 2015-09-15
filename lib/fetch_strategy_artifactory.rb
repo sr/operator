@@ -17,44 +17,23 @@ class FetchStrategyArtifactory < FetchStrategyBase
     end
   end
 
-  def valid?(type, value)
-    artifact = Artifact.search(name: name_for(type, value)).first
-    !artifact.nil?
+  def valid?(value)
+    artifact_url = environment.deploy_options[:artifact_url]
+    return false unless artifact_url
+    artifact = Artifact.from_url(artifact_url)
+    artifact && artifact.properties["gitSha"]
+  rescue Artifactory::Error::HTTPError
+    false
   end
 
-  def fetch(type, value)
+  def fetch(value)
     # returns path to fetched asset (file or directory)
-    artifact = Artifact.search(name: name_for(type, value)).first
-    unless artifact.nil?
-      # Check if the file exists locally first, and skip download?
-      artifact.download(environment.payload.local_artifacts_path)
-    else
-      ""
-    end
+    artifact = Artifact.from_url(environment.deploy_options[:artifact_url])
+    artifact.download(environment.payload.local_artifacts_path)
   end
 
-  def get_tag_and_hash(type, value)
-    #case type
-    #when :tag
-      artifact = Artifact.search(name: name_for(type, value)).first
-      hash = /(?<hash>\w+).jar/.match(artifact.uri)[:hash]
-      [value, hash]
-    #when :commit
-    #  artifacts = Artifact.search(name: name_for(type,value))
-
-  end
-
-  private
-
-  def name_for(type, value)
-    #case type
-    #when :tag
-      buildnumber = /build(?<num>\d+)/.match(value)[:num]
-      "#{environment.payload.artifact_prefix}-#{buildnumber}-"
-    #when :commit
-    #  value
-    #when :artifact
-    #  value
-    #end
+  def get_tag_and_hash(value)
+    artifact = Artifact.from_url(environment.deploy_options[:artifact_url])
+    [value, artifact.properties["gitSha"].first]
   end
 end

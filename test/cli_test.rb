@@ -59,7 +59,7 @@ describe CLI do
     it "parses tag and value" do
       cli = CLI.new(%w[test tag=build1234])
       mock_conductor(cli) do |conductor|
-        conductor.expects(:deploy!).with("build1234")
+        conductor.expects(:deploy!)
       end
       cli.setup
       cli.start! # calls parse_arguments
@@ -108,6 +108,7 @@ describe CLI do
     env_mock = mock
     env_mock.stubs(:payload=)
     env_mock.stubs(:user=)
+    env_mock.stubs(:deploy_options).returns({})
     conductor = Conductor.new(env_mock)
     yield(conductor) if block_given?
     env_mock.stubs(:conductor).returns(conductor)
