@@ -66,9 +66,7 @@ class DeploysController < ApplicationController
       # do otherwise
       if current_deploy.specified_servers.present?
         params[:servers] = "on"
-
-        server_names = current_deploy.all_servers + current_deploy.all_pull_servers
-        params[:server_names] = server_names.join(",")
+        params[:server_names] = current_deploy.all_servers.join(",")
       end
 
       prov_deploy = ProvisionalDeploy.from_previous_deploy(current_repo, previous_deploy)
