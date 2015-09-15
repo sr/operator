@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
-    resources :branches, param: :name, only: [:index] do
+    resources :branches, param: :name, constraints: {name: /.*/}, only: [:index] do
       resources :builds, only: [:index]
     end
 
