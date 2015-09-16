@@ -1,8 +1,9 @@
 require 'socket'
 
-Deploy = Struct.new(:what, :what_details, :build_number, :artifact_url, :servers) do
+Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :servers) do
   def self.from_hash(hash)
     new(
+      hash["id"],
       hash["what"],
       hash["what_details"],
       hash["build_number"],
@@ -11,12 +12,11 @@ Deploy = Struct.new(:what, :what_details, :build_number, :artifact_url, :servers
     )
   end
 
-  def applies_to_this_server?
-    servers && servers.include?(short_hostname)
+  def this_server_hostname
+    Socket.gethostname.sub(/\.pardot\.com$/, "")
   end
 
-  private
-  def short_hostname
-    Socket.gethostname.sub(/\.pardot\.com$/, "")
+  def applies_to_this_server?
+    servers && servers.include?(this_server_hostname)
   end
 end

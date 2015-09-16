@@ -37,7 +37,7 @@ class EnvironmentBase
       tmp_hooks = Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
       #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
       tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
-      tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana]
+      tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana, :notify_complete_canoe]
       tmp_hooks[:pardot][:after][:deploy] = [:custom_hooks]
       tmp_hooks
     end
@@ -144,6 +144,10 @@ class EnvironmentBase
 
   def notify_complete_kibana(deploy)
     Console.syslog("Finished deploy of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
+  end
+
+  def notify_complete_canoe(deploy)
+    Canoe.notify_completed_server(self, deploy, deploy.this_server_hostname)
   end
 
   # =========================================================================

@@ -5,6 +5,7 @@ describe Deploy do
   describe ".from_hash" do
     it "constructs a deploy object from its hash representation" do
       json = {
+        "id"           => 445,
         "what"         => "branch",
         "what_details" => "master",
         "artifact_url" => "https://artifact.example/build1234.tar.gz",
@@ -12,6 +13,7 @@ describe Deploy do
       }
 
       deploy = Deploy.from_hash(json)
+      deploy.id.must_equal json["id"]
       deploy.what.must_equal json["what"]
       deploy.what_details.must_equal json["what_details"]
       deploy.artifact_url.must_equal json["artifact_url"]
