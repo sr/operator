@@ -16,7 +16,7 @@ module Canoe
             artifact_url: deploy.artifact_url,
             user: deploy.auth_user,
             deploy_id: deploy.id,
-            servers: deploy.all_servers,
+            servers: deploy.all_sync_servers,
             log_path: deploy.log_path,
             sha: deploy.sha,
             lock: lock,

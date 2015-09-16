@@ -39,6 +39,21 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           api_post "/api/targets/test/deploys/latest", { repo_name: @repo.name }
           assert_nonerror_response
         end
+
+        it "lists the servers used for deployment" do
+          server = FactoryGirl.create(:server)
+
+          deploy = FactoryGirl.create(:deploy,
+            repo_name: @repo.name,
+            deploy_target: @target,
+            specified_servers: "localhost,#{server.hostname}",
+            servers_used: "localhost"
+          )
+          deploy.results.create!(server: server, status: "pending")
+
+          api_post "/api/targets/test/deploys/latest", { repo_name: @repo.name }
+          expect(json_response["servers"]).to match_array(["localhost", server.hostname])
+        end
       end
     end
   end

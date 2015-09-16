@@ -38,7 +38,11 @@ class Deploy < ActiveRecord::Base
   end
 
   def all_servers
-    @_all_servers = self.servers_used.to_s.split(",").map(&:strip)
+    all_sync_servers + all_pull_servers
+  end
+
+  def all_sync_servers
+    self.servers_used.to_s.split(",").map(&:strip)
   end
 
   def all_pull_servers
@@ -50,7 +54,7 @@ class Deploy < ActiveRecord::Base
   end
 
   def percentage_complete
-    percentage = ((finished_servers.size / all_servers.size.to_f) * 100).to_i
+    percentage = ((finished_servers.size / all_sync_servers.size.to_f) * 100).to_i
     percentage = 100 if percentage > 100 # make sure we don't go over 100 (happens on retries)
     percentage
   end

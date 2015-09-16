@@ -1,6 +1,6 @@
 <div class="container">
   <h4>Servers</h4>
-  <% deploy.all_servers.each do |server| %>
+  <% deploy.all_sync_servers.each do |server| %>
     <div class="deploy-server-status">
       <% if deploy.finished_servers.include?(server) %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
