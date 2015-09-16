@@ -16,7 +16,7 @@ BuildVersion = Struct.new(:build_number, :sha, :artifact_url) do
   def self.load(filename)
     File.open(filename, "r") do |f|
       lines = f.readlines.map { |line| line.strip != "" && line.strip }
-      new(lines[0], lines[1], lines[2])
+      new(lines[0].sub(/^build/, "").to_i, lines[1], lines[2])
     end
   rescue => e
     Console.syslog("Couldn't load sync state from #{filename}: #{e}", :warn)
