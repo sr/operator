@@ -1,30 +1,17 @@
 class FetchStrategyBase
-  attr_accessor :environment
+  attr_reader :environment
 
   def initialize(environment)
-    self.environment = environment
+    @environment = environment
   end
 
-  # type should be one of: [:tag, :commit, :branch]
-  # value should be the specified type to fetch
-  def valid?(value)
+  def valid?(deploy)
     # returns boolean value indicating the combination is valid
     raise "Must be defined by sub-classes"
   end
 
-  # type should be one of: [:tag, :commit, :branch]
-  # value should be the specified type to fetch
-  def fetch(value)
+  def fetch(deploy)
     # returns path to fetched asset (file or directory)
-    raise "Must be defined by sub-classes"
-  end
-
-  # can be overriden by sub-classes (no-op otherwise)
-  def full_label(label)
-    label
-  end
-
-  def get_tag_and_hash(label)
     raise "Must be defined by sub-classes"
   end
 

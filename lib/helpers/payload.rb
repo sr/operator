@@ -70,7 +70,7 @@ class Payload
     @options[:s3_bucket] || "pi"
   end
 
-  def tag_file
+  def build_version_file
     "#{remote_current_link}/build.version"
   end
 

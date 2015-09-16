@@ -14,3 +14,6 @@ require "minitest/pride"
 require "mocha/setup"
 require "ostruct"
 require "pp"
+require "webmock/minitest"
+
+WebMock.disable_net_connect!

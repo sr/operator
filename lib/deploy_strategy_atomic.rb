@@ -1,7 +1,9 @@
 require 'deploy_strategy_base'
+require 'shell_helper'
+require 'build_version'
 
 class DeployStrategyAtomic < DeployStrategyBase
-  def deploy(artifact_path, label)
+  def deploy(artifact_path, deploy)
     dpath = deploy_path
     if dpath.nil?
       Console.log("Error: Deploy path not found: #{dpath}", :red)
@@ -13,13 +15,12 @@ class DeployStrategyAtomic < DeployStrategyBase
     response
   end
 
-  def rollback?(label)
-    tag_file = "#{deploy_path(:reverse)}/build.version"
-    if File.exist?(tag_file)
-      tag, _hash = IO.readlines(tag_file)
-      return tag.chomp == label
+  def rollback?(deploy)
+    if current_build_version = BuildVersion.load("#{deploy_path(:reverse)}/build.version")
+      current_build_version.instance_of_deploy?(deploy)
+    else
+      false
     end
-    false
   end
 
   def rollback

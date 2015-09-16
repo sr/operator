@@ -1,17 +1,18 @@
 require 'socket'
 
-Deploy = Struct.new(:what, :what_details, :artifact_url, :servers) do
-  def self.from_json(json)
+Deploy = Struct.new(:what, :what_details, :build_number, :artifact_url, :servers) do
+  def self.from_hash(hash)
     new(
-      json["what"],
-      json["what_details"],
-      json["artifact_url"],
-      json["servers"],
+      hash["what"],
+      hash["what_details"],
+      hash["build_number"],
+      hash["artifact_url"],
+      hash["servers"]
     )
   end
 
   def applies_to_this_server?
-    servers.include?(short_hostname)
+    servers && servers.include?(short_hostname)
   end
 
   private

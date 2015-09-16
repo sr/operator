@@ -11,29 +11,27 @@ class Conductor
     @no_questions = false
   end
 
-  def deploy!
+  def deploy!(deploy)
     fetch_strategy = environment.current_fetch_strategy
     deploy_strategy = environment.current_deploy_strategy
-    buildnum = environment.deploy_options[:buildnum]
-    exit_for_missing_buildnum unless buildnum
 
-    if deploy_strategy.rollback?(buildnum)
+    if deploy_strategy.rollback?(deploy)
       return rollback!(deploy_strategy)
     end
 
-    unless fetch_strategy.valid?(buildnum)
-      invalid_fetch_warning(buildnum)
+    unless fetch_strategy.valid?(deploy)
+      invalid_fetch_warning(deploy)
       return false
     end
 
-    environment.execute_pre_fetch_hooks
-    payload_path = fetch_strategy.fetch(buildnum)
+    environment.execute_pre_fetch_hooks(deploy)
+    payload_path = fetch_strategy.fetch(deploy)
     exit_for_invalid_fetch_path if payload_path.empty?
-    environment.execute_post_fetch_hooks
+    environment.execute_post_fetch_hooks(deploy)
 
-    environment.execute_pre_deploy_hooks
-    success = deploy_strategy.deploy(payload_path, buildnum)
-    environment.execute_post_deploy_hooks
+    environment.execute_pre_deploy_hooks(deploy)
+    success = deploy_strategy.deploy(payload_path, deploy)
+    environment.execute_post_deploy_hooks(deploy)
 
     success
   end
@@ -54,21 +52,15 @@ class Conductor
     @no_questions
   end
 
-  def invalid_fetch_warning(value)
+  def invalid_fetch_warning(deploy)
     Console.log("!"*80, :red)
-    Console.log("ERROR: Requested \"#{value}\" was not found.\n" + \
-                  "Please confirm it was entered correctly and actually exists.", :red)
+    Console.log("ERROR: Requested deploy #{deploy.inspect} was not found.\n" +
+      "Please confirm it was entered correctly and actually exists.", :red)
   end
 
   def exit_for_invalid_fetch_path
     Console.log("!"*80, :red)
     Console.log("ERROR: No local path available. Maybe check the environment definitions.")
-    exit 1 # TODO: should we have different exit codes for different conditions?
-  end
-
-  def exit_for_missing_buildnum
-    Console.log("!"*80, :red)
-    Console.log("ERROR: No build number selected for deploy")
     exit 1 # TODO: should we have different exit codes for different conditions?
   end
 end

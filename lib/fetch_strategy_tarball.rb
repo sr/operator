@@ -14,23 +14,24 @@ class FetchStrategyTarball < FetchStrategyBase
   end
 
   # returns boolean indicating the requested build is available
-  def valid?(label)
-    artifact_metadata = s3curl.getHeader(remote_artifact_file(label))
+  def valid?(deploy)
+    return false unless deploy.what == "tag"
+
+    artifact_metadata = s3curl.getHeader(remote_artifact_file(deploy.what_details))
     !!artifact_metadata[/HTTP.*200.*/]
   end
 
   # returns path to dir where payload was fetched
-  def fetch(label)
-
+  def fetch(deploy)
     local_artifacts_path = environment.payload.local_artifacts_path
     FileUtils.mkpath(local_artifacts_path) unless File.directory?(local_artifacts_path)
-    local_file = File.join(local_artifacts_path, "#{environment.payload.artifact_prefix}#{label}.tar.gz")
+    local_file = File.join(local_artifacts_path, "#{environment.payload.artifact_prefix}#{deploy.what_details}.tar.gz")
 
     if File.exist?(local_file)
       Console.log("Artifact is already downloaded. Continuing...", :green)
     else
-      Console.log("Pulling #{label} from S3....", :green)
-      s3curl.getFile(remote_artifact_file(label), local_artifacts_path)
+      Console.log("Pulling #{deploy.what_details} from S3....", :green)
+      s3curl.getFile(remote_artifact_file(deploy.what_details), local_artifacts_path)
     end
 
     # tarball strategy returns the path to the tarball
