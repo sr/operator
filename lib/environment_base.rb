@@ -208,6 +208,18 @@ class EnvironmentBase
     end
   end
 
+  def artifactory_proxy
+    @config[:artifactory_proxy]
+  end
+
+  def artifactory_user
+    @config[:artifactory_user]
+  end
+
+  def artifactory_token
+    @config[:artifactory_token]
+  end
+
   def canoe_url
     @config.fetch(:canoe_url, "")
   end
