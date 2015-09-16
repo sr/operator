@@ -18,6 +18,7 @@ quotes = require "../lib/quotes"
 
 roomSpecificContexts =
   "support": "support"
+  "not_solutions_for_work": "support"
 
 contextForRoom = (room) ->
   if context = roomSpecificContexts[room]
