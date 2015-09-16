@@ -21,23 +21,17 @@ class FetchStrategyArtifactory < FetchStrategyBase
     end
   end
 
-  def valid?(value)
-    artifact_url = environment.deploy_options[:artifact_url]
-    return false unless artifact_url
-    artifact = Artifact.from_url(artifact_url)
+  def valid?(deploy)
+    return false unless deploy.artifact_url
+    artifact = Artifact.from_url(deploy.artifact_url)
     artifact && artifact.properties["gitSha"]
   rescue Artifactory::Error::HTTPError
     false
   end
 
-  def fetch(value)
+  def fetch(deploy)
     # returns path to fetched asset (file or directory)
-    artifact = Artifact.from_url(environment.deploy_options[:artifact_url])
+    artifact = Artifact.from_url(deploy.artifact_url)
     artifact.download(environment.payload.local_artifacts_path)
-  end
-
-  def get_tag_and_hash(value)
-    artifact = Artifact.from_url(environment.deploy_options[:artifact_url])
-    [value, artifact.properties["gitSha"].first]
   end
 end

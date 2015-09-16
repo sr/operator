@@ -11,8 +11,9 @@
 ---
 <% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
 
-:canoe_url: https://canoe.dev.pardot.com
-:canoe_target: staging
+:canoe_url: "http://localhost:4000"
+:canoe_target: "dev"
+:canoe_api_token: "canoe123"
 
 <% sources_path = "#{sync_dir}/test_sources" %>
 <% destinations_path = "#{sync_dir}/test_destinations" %>

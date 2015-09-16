@@ -1,15 +1,15 @@
 class DeployStrategyBase
-  attr_accessor :environment, :label
+  attr_reader :environment
 
   def initialize(environment)
-    self.environment = environment
+    @environment = environment
   end
 
-  def deploy(path, label='')
+  def deploy(path, deploy)
     raise "Must be defined by sub-classes"
   end
 
-  def rollback?(label)
+  def rollback?(deploy)
     false
   end
 end

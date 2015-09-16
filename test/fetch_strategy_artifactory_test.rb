@@ -14,11 +14,11 @@ describe FetchStrategyArtifactory do
 
     Artifactory::Resource::Artifact
       .expects(:from_url)
-      .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+      .with("https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
       .returns(artifact)
 
-    @env.deploy_options[:artifact_url] = "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar"
-    assert @strat.valid?("build123")
+    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+    assert @strat.valid?(deploy)
   end
 
   it "is not valid if gitSha property is not present" do
@@ -27,11 +27,11 @@ describe FetchStrategyArtifactory do
 
     Artifactory::Resource::Artifact
       .stubs(:from_url)
-      .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+      .with("https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
       .returns(artifact)
 
-    @env.deploy_options[:artifact_url] = "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar"
-    refute @strat.valid?("build123")
+    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+    refute @strat.valid?(deploy)
   end
 
   it "should use Artifactory to pull build" do
@@ -42,11 +42,11 @@ describe FetchStrategyArtifactory do
 
     Artifactory::Resource::Artifact
       .stubs(:from_url)
-      .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+      .with("https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
       .returns(artifact)
 
-    @env.deploy_options[:artifact_url] = "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar"
-    assert_equal local_artifact, @strat.fetch("build123")
+    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.example/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.jar")
+    assert_equal local_artifact, @strat.fetch(deploy)
   end
 
   it "should be type artifactory" do

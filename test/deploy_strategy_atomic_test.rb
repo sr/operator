@@ -63,7 +63,7 @@ describe DeployStrategyAtomic do
     end
 
     it "should not roll back because there hasn't been a deploy" do
-      refute @strat.rollback?("build0")
+      refute @strat.rollback?("http://artifactory.example/build1234.tar.gz")
     end
 
     it "should roll back because the version matches" do

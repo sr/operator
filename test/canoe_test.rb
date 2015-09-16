@@ -1,57 +1,27 @@
 require_relative "test_helper.rb"
 require "canoe"
 require "environment_test"
+require "console"
 
 describe Canoe do
   before {
     Console.silence!
     @env = EnvironmentTest.new
-    @env.payload = 'pardot'
-    #@env.deploy_id = 0
+    @env.payload = "pardot"
   }
 
-  describe "#call_api" do
-    it "should generate appropriate curl command, given path" do
-      ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/foo/bar.* -d api_token=}) }
-      Canoe.call_api(@env, "api/foo/bar")
-    end
+  describe ".latest_deploy" do
+    it "fetches the latest deploy from the Canoe API" do
+      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+        .with(body: {api_token: @env.canoe_api_token, repo_name: @env.payload.id.to_s})
+        .to_return(body: %({"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"servers":["localhost"]}))
 
-    it "should append further params given" do
-      ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/foo/bar.* -d chatty=\"saasy}) }
-      Canoe.call_api(@env, "api/foo/bar", chatty: "saasy")
-    end
-
-    it "should pick out the method from the params" do
-      ShellHelper.expects(:execute_shell).with { |arg| arg.match(/FOOBAR/)}
-      Canoe.call_api(@env, "api/foo/bar", method: "FOOBAR")
-    end
-
-    it "should take the method call out of the regular params" do
-      ShellHelper.expects(:execute_shell).with { |arg| !arg.match(/method/)}
-      Canoe.call_api(@env, "api/foo/bar", method: "GET")
+      deploy = Canoe.latest_deploy(@env)
+      deploy.what.must_equal "branch"
+      deploy.what_details.must_equal "master"
+      deploy.artifact_url.must_equal "http://artifactory.example/build1234.tar.gz"
+      deploy.build_number.must_equal 1234
+      deploy.servers.must_equal ["localhost"]
     end
   end
-
-  describe "#get_current_build" do
-    it "should get latest deployed build in canoe" do
-      ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/targets/staging/deploys/latest}) }.returns('{"target":"staging","user":"ccornutt@salesforce.com","repo":"pardot","what":"branch","what_details":"ccornutt/PDT-14553","completed":true}')
-      branch, _artifact_url = Canoe.get_current_build(@env)
-      assert_equal(branch, "ccornutt/PDT-14553")
-    end
-  end
-
-  #describe "#notify" do
-  #  it "should ping deploy complete API end-point" do
-  #    ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/deploy/0/complete.* -d api_token=}) }
-  #    Canoe.notify(@env)
-  #  end
-  #end
-#
-  #describe "#notify_completed_server" do
-  #  it "should ping completed server API end-point" do
-  #    ShellHelper.expects(:execute_shell).with { |arg| arg.match(%r{api/deploy/0/completed_server.* -d server=\"chatty}) }
-  #    Canoe.notify_completed_server(@env, "chatty")
-  #  end
-  #end
-
 end

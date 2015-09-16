@@ -7,11 +7,10 @@ require "erb"
 class EnvironmentBase
   # =========================================================================
   attr_writer :user
-  attr_reader :payload, :deploy_options
+  attr_reader :payload
 
   def initialize
     @user = nil
-    @deploy_options = {}
     load_yaml("environments/#{short_name.downcase}.yml.erb")
     load_secrets
   end
@@ -102,14 +101,19 @@ class EnvironmentBase
   # execute_pre_deploy_hooks, execute_post_deploy_hooks, etc
   [:before, :after].each do |callback|
     [:fetch, :deploy].each do |action|
-      define_method("execute_#{latinize(callback)}_#{action}_hooks") do
+      define_method("execute_#{latinize(callback)}_#{action}_hooks") do |deploy|
         general_hooks = self.class.hooks[:all][callback][action] || self.class.common_hooks[:all][callback][action]
         payload_name = payload.nil? ? :all : payload.id
         payload_hooks = self.class.hooks[payload_name][callback][action] || self.class.common_hooks[payload_name][callback][action]
         callback_hooks = Array(general_hooks) | Array(payload_hooks)
 
-        callback_hooks.each do |method|
-          self.send(method)
+        callback_hooks.each do |method_name|
+          method = method(method_name)
+          if method.arity == 0
+            __send__(method_name)
+          elsif method.arity == 1 || method.arity == -1
+            __send__(method_name, deploy)
+          end
         end
       end
     end
@@ -134,12 +138,12 @@ class EnvironmentBase
     end
   end
 
-  def notify_begin_kibana
-    Console.syslog("Started fetch of #{payload.name}:#{deploy_options[:buildnum]}")
+  def notify_begin_kibana(deploy)
+    Console.syslog("Started fetch of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
   end
 
-  def notify_complete_kibana
-    Console.syslog("Finished deploy of #{payload.name}:#{deploy_options[:buildnum]}")
+  def notify_complete_kibana(deploy)
+    Console.syslog("Finished deploy of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
   end
 
   # =========================================================================
