@@ -14,7 +14,7 @@ describe Canoe do
     it "fetches the latest deploy from the Canoe API" do
       stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .with(body: {api_token: @env.canoe_api_token, repo_name: @env.payload.id.to_s})
-        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"servers":["localhost"]}))
+        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"completed":true,"servers":["localhost"]}))
 
       deploy = Canoe.latest_deploy(@env)
       deploy.id.must_equal 445
@@ -22,6 +22,7 @@ describe Canoe do
       deploy.what_details.must_equal "master"
       deploy.artifact_url.must_equal "http://artifactory.example/build1234.tar.gz"
       deploy.build_number.must_equal 1234
+      deploy.completed.must_equal true
       deploy.servers.must_equal ["localhost"]
     end
   end
