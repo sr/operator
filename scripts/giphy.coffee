@@ -8,11 +8,11 @@
 #   gif me <query> - Returns an animated gif matching the requested search term.
 
 giphy =
-  api_key: process.env.HUBOT_GIPHY_API_KEY
+  api_key: dc6zaTOxFJmzC #api_key: process.env.HUBOT_GIPHY_API_KEY
   base_url: 'http://api.giphy.com/v1'
 
 module.exports = (robot) ->
-  robot.hear /(gif|giphy)( me)? (.*)/i, (msg) ->
+  robot.hear /(!gif|giphy)( me)? (.*)/i, (msg) ->
     giphyMe msg, msg.match[3], (url) ->
       msg.send url
 
