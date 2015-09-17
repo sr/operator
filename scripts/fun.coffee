@@ -132,3 +132,18 @@ module.exports = (robot) ->
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
+
+  robot.hear /(tldr|tl;dr|!tldr|!tl;dr)/i, (msg) ->
+    TLDRS=[
+      'http://media4.giphy.com/media/EeIzKI0uDz916/giphy.gif',
+      'http://media2.giphy.com/media/YOvJuai8jPGpO/giphy.gif',
+      'http://media4.giphy.com/media/ToMjGpqWojvqz7ts2li/giphy.gif',
+      'http://media3.giphy.com/media/lcmYVxHTvkOLC/giphy.gif'
+    ]
+    msg.send msg.random TLDRS
+
+  robot.hear /(over 9000|over 9,000)/i, (msg) ->
+    msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
+
+  robot.hear /knowing is half the battle/i, (msg) ->
+    msg.send 'http://i.imgur.com/0HMzzBB.png'
