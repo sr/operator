@@ -19,7 +19,12 @@ class Repo < ActiveRecord::Base
       repos:         ARTIFACTORY_REPO,
     )
 
-    artifacts.map { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
+    # Rails development environment is not thread-safe, but in production we can
+    # run multiple requests to Artifactory concurrently and achieve a
+    # significant speedup in wall clock time.
+    threads = Rails.env.development? ? 1 : 10
+
+    Parallel.map(artifacts, in_threads: threads) { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
       .compact
       .sort_by { |deploy| -deploy.build_number }
   end
