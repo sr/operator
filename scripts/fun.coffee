@@ -118,6 +118,15 @@ module.exports = (robot) ->
 
     msg.send msg.random tbones
 
+
+  robot.hear /^!bestfriends$/i, (msg) ->
+    bestfriendss = [
+      "https://hipchat.dev.pardot.com/files/1/22/MO21rCEkbDsiomt/phoobs.gif"
+    ]
+
+    msg.send msg.random bestfriendss
+
+
   robot.hear /it\'?s\shappening/i, (msg) ->
     msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
 
