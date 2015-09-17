@@ -14,7 +14,7 @@
 #   parkermcgee
 
 module.exports = (robot) ->
-  robot.hear /chattyfact/i, (msg) ->
+  robot.respond /chattyfact/i, (msg) ->
     msg.http('http://api.icndb.com/jokes/random')
       .get() (error, response, body) ->
         # passes back the complete reponse

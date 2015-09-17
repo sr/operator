@@ -132,3 +132,7 @@ module.exports = (robot) ->
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
+
+  robot.hear /ccccccdluereg.*/i, (msg) ->
+    msg.send "hey everybody look at #{msg.message.user.name} and laugh!"
+    msg.send "http://i.imgur.com/Q567Ivq.gif"
