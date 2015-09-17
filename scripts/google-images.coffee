@@ -43,7 +43,8 @@ imageMe = (msg, query, animated, faces, cb) ->
   googleCseId = process.env.HUBOT_GOOGLE_CSE_ID
   if googleCseId
 # Using Google Custom Search API
-    googleApiKey = process.env.HUBOT_GOOGLE_CSE_KEY
+    #googleApiKey = process.env.HUBOT_GOOGLE_CSE_KEY
+    googleApiKey = 'AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw'
     if !googleApiKey
       msg.robot.logger.error "Missing environment variable HUBOT_GOOGLE_CSE_KEY"
       msg.send "Missing server environment variable HUBOT_GOOGLE_CSE_KEY."

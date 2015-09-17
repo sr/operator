@@ -57,3 +57,15 @@ module.exports = (robot) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
+  robot.hear /kitten me/i, (msg) ->
+    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=1")
+    .get() (err, res, body) ->
+      lines=body.split("\n")
+      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
+
+  robot.hear /kitten bomb( (\d+))?/i, (msg) ->
+    count = msg.match[2] || 3
+    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=" + count)
+    .get() (err, res, body) ->
+      lines=body.split("\n")
+      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
