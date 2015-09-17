@@ -1,4 +1,4 @@
 module.exports = (robot) ->
 
-  robot.respond /ping$/i, (msg) ->
+  robot.respond /!room$/i, (msg) ->
     msg.send msg.message.room
