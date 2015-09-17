@@ -8,8 +8,8 @@
 #   None
 #
 # Commands:
-#   dickbutt me - Receive a pug
-#   dickbutt bomb N - get N pugs
+#   !dickbutt me - Receive a pug
+#   !dickbutt bomb N - get N pugs
 #
 # Author:
 #   @keefkeef
