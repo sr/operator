@@ -18,54 +18,59 @@
 
 module.exports = (robot) ->
 
-  robot.hear /cat me/i, (msg) ->
+  robot.respond /cat me/i, (msg) ->
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&results_per_page=1")
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /cat bomb( (\d+))?/i, (msg) ->
+  robot.respond /cat bomb( (\d+))?/i, (msg) ->
     count = msg.match[2] || 3
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&results_per_page=" + count)
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /cat gif me/i, (msg) ->
+  robot.respond /cat gif me/i, (msg) ->
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=gif&results_per_page=1")
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /cat gif bomb( (\d+))?/i, (msg) ->
+  robot.respond /cat gif bomb( (\d+))?/i, (msg) ->
     count = msg.match[2] || 3
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=gif&results_per_page=" + count)
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /cat hat me/i, (msg) ->
+  robot.respond /cat hat me/i, (msg) ->
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=hats&results_per_page=1")
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /cat hat bomb( (\d+))?/i, (msg) ->
+  robot.respond /cat hat bomb( (\d+))?/i, (msg) ->
     count = msg.match[2] || 3
     msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=hats&results_per_page=" + count)
     .get() (err, res, body) ->
       lines=body.split("\n")
       msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
 
-  robot.hear /kitten me/i, (msg) ->
-    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=1")
-    .get() (err, res, body) ->
-      lines=body.split("\n")
-      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
-
-  robot.hear /kitten bomb( (\d+))?/i, (msg) ->
-    count = msg.match[2] || 3
-    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=" + count)
-    .get() (err, res, body) ->
-      lines=body.split("\n")
-      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
+##
+## this works but the API is broken
+##
+## see:
+##
+#  robot.respond /kitten me/i, (msg) ->
+#    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=1")
+#    .get() (err, res, body) ->
+#      lines=body.split("\n")
+#      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
+#
+#  robot.respond /kitten bomb( (\d+))?/i, (msg) ->
+#    count = msg.match[2] || 3
+#    msg.http("http://thecatapi.com/api/images/get?api_key=MzY3NTA&format=xml&type=jpg,png&category=kittens&results_per_page=" + count)
+#    .get() (err, res, body) ->
+#      lines=body.split("\n")
+#      msg.send line.split(">")[1].split("<")[0] for line in lines when line.match("<url>")
