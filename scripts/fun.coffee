@@ -111,7 +111,7 @@ module.exports = (robot) ->
 
     msg.send msg.random miniTinnies
 
-  robot.hear /^!tbone$/i, (msg) ->
+  robot.respond /tbone$/i, (msg) ->
     tbones = [
       "https://hipchat.dev.pardot.com/files/1/42/ttSs2Ol0zENJGq0/TBone.jpeg"
     ]
@@ -119,7 +119,7 @@ module.exports = (robot) ->
     msg.send msg.random tbones
 
 
-  robot.hear /^!bestfriends$/i, (msg) ->
+  robot.respond /bestfriends$/i, (msg) ->
     bestfriendss = [
       "https://hipchat.dev.pardot.com/files/1/22/MO21rCEkbDsiomt/phoobs.gif"
     ]
