@@ -127,11 +127,8 @@ module.exports = (robot) ->
     msg.send msg.random bestfriendss
 
 
-  robot.hear /it\'?s\shappening/i, (msg) ->
+  robot.respond /it\'?s\shappening$/i, (msg) ->
     msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
-
-  robot.hear /top\smen/i, (msg) ->
-    msg.send "http://www.mememaker.net/static/images/memes/3247839.jpg"
 
   robot.respond /engage$/i, (msg) ->
     msg.send "http://i.imgur.com/MX458aQ.jpg"
