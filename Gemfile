@@ -22,6 +22,8 @@ gem 'artifactory', '~> 2.3'
 gem 'omniauth', '~> 1.2', '>= 1.2.2'
 gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
+gem 'parallel', '~> 1.6', '>= 1.6.1'
+
 group :development do
   gem 'foreman', '0.78.0'
 end
