@@ -9,7 +9,7 @@
 #
 # Commands:
 #   !dickbutt me - Receive a pug
-#   !dickbutt bomb N - get N pugs
+#   [disabled] !dickbutt bomb N - get N pugs
 #
 # Author:
 #   @keefkeef
@@ -19,11 +19,12 @@ module.exports = (robot) ->
     imageMe msg, "dickbutt", (url) ->
       msg.send "#{url}"
 
-  robot.respond /dickbutt bomb( (\d+))?/i, (msg) ->
-    count = msg.match[2] || 3
-    i for i in [1..count]
-      imageMe msg, "dickbutt", (url) ->
-        msg.send "#{url}"
+## disabled
+#  robot.respond /dickbutt bomb( (\d+))?/i, (msg) ->
+#    count = msg.match[2] || 3
+#    i for i in [1..count]
+#      imageMe msg, "dickbutt", (url) ->
+#        msg.send "#{url}"
 
 imageMe = (msg, query, cb) ->
   msg.http('http://ajax.googleapis.com/ajax/services/search/images')
