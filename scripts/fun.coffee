@@ -153,7 +153,3 @@ module.exports = (robot) ->
 
   robot.hear /knowing is half the battle/i, (msg) ->
     msg.send 'http://i.imgur.com/0HMzzBB.png'
-
-  robot.hear /ccccccdluereg.*/i, (msg) ->
-    msg.send "hey everybody look at #{msg.message.user.name} and laugh!"
-    msg.send 'http://i.imgur.com/Q567Ivq.gif'

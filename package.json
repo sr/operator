@@ -14,6 +14,7 @@
     "hubot-redis-brain": "0.0.3",
     "hubot-schedule": "^0.2.1",
     "hubot-scripts": "^2.16.2",
+    "hubot-yubikey-invalidation": "0.0.2",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.0",
     "mysql": "^2.9.0",

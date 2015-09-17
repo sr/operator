@@ -4,4 +4,8 @@ set -e
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 cd "$dir"
 
+# No secrets here, please.
+# Secrets go here: <https://git.dev.pardot.com/Pardot/chef/blob/master/cookbooks/pardot_halbot/recipes/configure.rb>
+export HUBOT_YUBIKEY_API_ID=24689
+
 exec bin/hubot --alias '!' --disable-httpd "$@"
