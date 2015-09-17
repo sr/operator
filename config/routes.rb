@@ -40,7 +40,6 @@ Rails.application.routes.draw do
     end
 
     resources :deploy, only: [] do
-      post :complete, on: :member
       post :completed_server, on: :member
     end
 
