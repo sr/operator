@@ -20,7 +20,7 @@ module.exports = (robot) ->
       msg.send "#{url}"
 
   robot.respond /dickbutt bomb( (\d+))?/i, (msg) ->
-    count = msg.match[2] || 5
+    count = msg.match[2] || 3
     i for i in [0..count]
       imageMe msg, "dickbutt", (url) ->
         msg.send "#{url}"
