@@ -1,3 +1,4 @@
+json.id @deploy.id
 json.target @deploy.deploy_target.name
 json.user @deploy.auth_user.email
 json.repo @deploy.repo_name

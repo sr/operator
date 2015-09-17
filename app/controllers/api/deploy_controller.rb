@@ -1,9 +1,4 @@
 class Api::DeployController < Api::Controller
-  def complete
-    current_deploy.complete! if current_deploy
-    render json: {success: true}
-  end
-
   def completed_server
     if current_deploy
       server = Server.find_by_hostname(params[:server])
@@ -17,6 +12,8 @@ class Api::DeployController < Api::Controller
         current_deploy.update_attribute(:completed_servers, servers.join(","))
       end
     end
+
+    current_deploy.check_completed_status!
 
     render json: {success: true}
   end
