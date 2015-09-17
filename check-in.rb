@@ -30,14 +30,16 @@ begin
   requested_deploy = Canoe.latest_deploy(environment)
 
   if requested_deploy.applies_to_this_server?
-    if current_build_version.nil? || !current_build_version.instance_of_deploy?(requested_deploy)
+    if requested_deploy.completed
+      Console.log("Latest deploy is marked as completed: #{requested_deploy}")
+    elsif current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
+      Console.log("We are up to date: #{requested_deploy}")
+    else
       Console.log("Current build: #{current_build_version || "<< None >>"}")
       Console.log("Requested deploy: #{requested_deploy}")
 
       conductor = environment.conductor
       conductor.deploy!(requested_deploy)
-    else
-      Console.log("We are up to date: #{requested_deploy}")
     end
   else
     Console.log("The latest deploy does not apply to this server: #{requested_deploy}", :green)
