@@ -133,7 +133,7 @@ module.exports = (robot) ->
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
 
-  robot.hear /(tldr|tl;dr|!tldr|!tl;dr)/i, (msg) ->
+  robot.respond /(tldr|tl;dr)/i, (msg) ->
     TLDRS=[
       'http://media4.giphy.com/media/EeIzKI0uDz916/giphy.gif',
       'http://media2.giphy.com/media/YOvJuai8jPGpO/giphy.gif',
@@ -147,7 +147,7 @@ module.exports = (robot) ->
 
   robot.hear /knowing is half the battle/i, (msg) ->
     msg.send 'http://i.imgur.com/0HMzzBB.png'
-  
+
   robot.hear /ccccccdluereg.*/i, (msg) ->
     msg.send "hey everybody look at #{msg.message.user.name} and laugh!"
     msg.send 'http://i.imgur.com/Q567Ivq.gif'
