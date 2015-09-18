@@ -216,7 +216,7 @@ module.exports = (robot) ->
       imageMe msg, "Nicolas Cage", (url) ->
         msg.send "#{url}"
 
-  robot.respond /totally\snot\snic\scage/i, (msg) ->
+  robot.respond /totally\s+not\s+nic\s+cage/i, (msg) ->
     imageMe msg, "Nicolas Cage as everyone", (url) ->
       msg.send "#{url}"
 
