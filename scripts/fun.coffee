@@ -32,7 +32,9 @@
 #   hubot dickbutt (me) - Get what you think you're gonna get
 #   hubot chatty (me) - Got chatty?
 #   hubot doge (me) - Such wow
-#   hubot doge bomb <count> - Many awesome
+#   hubot doge bomb <count> - Many awesome#
+#   hubot corgi (me) - It's dangerous to go alone. Take this.
+#   hubot corgi bomb <count> - It's dangerous to go alone. Take these.
 #   hubot knightrider (me) - Only the best
 #   hubot knightrider bomb <count> - Lots of the best
 #   hubot hasselhoff (me) - Cant get enough of that chest hair
