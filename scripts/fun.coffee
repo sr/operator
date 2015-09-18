@@ -142,7 +142,7 @@ module.exports = (robot) ->
     ]
     msg.send msg.random TLDRS
 
-  robot.respond /(it\'+s\s+over\s+9,+000.*)/i, (msg) ->
+  robot.hear /over 9000/i, (msg) ->
     msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
 
   robot.hear /knowing is half the battle/i, (msg) ->
