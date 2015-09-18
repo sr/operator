@@ -279,6 +279,16 @@ module.exports = (robot) ->
       imageMe msg, "kawaii", (url) ->
         msg.send "#{url}"
 
+  robot.respond /corgi(\sme)?/i, (msg) ->
+    imageMe msg, "corgi", (url) ->
+      msg.send "#{url}"
+
+  robot.respond /corgi bomb( (\d+))?/i, (msg) ->
+    count = msg.match[2] || 3
+    for i in [1..count]
+      imageMe msg, "corgi", (url) ->
+        msg.send "#{url}"
+
   robot.respond /meme(\sme)?/i, (msg) ->
     imageMe msg, "meme", (url) ->
       msg.send "#{url}"
