@@ -33,6 +33,8 @@
 #   hubot chatty (me) - Got chatty?
 #   hubot doge (me) - Such wow
 #   hubot doge bomb <count> - Many awesome
+#   hubot corgi (me) - It's dangerous to go alone. Take this.
+#   hubot corgi bomb <count> - It's dangerous to go alone. Take these.
 #   hubot knightrider (me) - Only the best
 #   hubot knightrider bomb <count> - Lots of the best
 #   hubot hasselhoff (me) - Cant get enough of that chest hair
@@ -298,6 +300,16 @@ module.exports = (robot) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "kawaii", (url) ->
+        msg.send "#{url}"
+
+  robot.respond /corgi(\sme)?/i, (msg) ->
+    imageMe msg, "corgi", (url) ->
+      msg.send "#{url}"
+
+  robot.respond /corgi bomb( (\d+))?/i, (msg) ->
+    count = msg.match[2] || 3
+    for i in [1..count]
+      imageMe msg, "corgi", (url) ->
         msg.send "#{url}"
 
   robot.respond /meme(\sme)?/i, (msg) ->
