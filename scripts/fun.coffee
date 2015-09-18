@@ -8,9 +8,48 @@
 #   None
 #
 # Commands:
-#   None
-#
-#
+#   hubot toiletnuggets - Get rid of some nuggets
+#   hubot reversenuggets - Get nuggets
+#   hubot puppies - Get puppies
+#   hubot beyonce - Get charisma
+#   hubot waffles - Get waffles
+#   hubot chikin - Get chicken noises
+#   hubot headdesk - Get headdesk.gif
+#   hubot hater - They gonna hate
+#   hubot panic - Get panic
+#   hubot jarsh - Get jarsh
+#   hubot blame <person> - Objectively make it THEIR fault
+#   hubot praise <person> - Objectively make it THEIR win!
+#   hubot miniTinny - Get Tiny Tinny
+#   hubot tbone - Get Tuberculosis. Once.
+#   hubot bestfriends - Get Friends
+#   hubot its happening - Get Ron Paul
+#   hubot engage - ?
+#   hubot oncall - Who is on call?
+#   hubot nope - Got nope?
+#   hubot tldr - Totally didn't read it
+#   hubot tl;dr - Totally didn't read it
+#   hubot dickbutt (me) - Get what you think you're gonna get
+#   hubot chatty (me) - Got chatty?
+#   hubot doge (me) - Such wow
+#   hubot doge bomb <count> - Many awesome
+#   hubot knightrider (me) - Only the best
+#   hubot knightrider bomb <count> - Lots of the best
+#   hubot hasselhoff (me) - Cant get enough of that chest hair
+#   hubot hasselhoff bomb <count> - ..Okay, I think we've got enough chest hair now...
+#   hubot macgyver (me) - MULLET ME
+#   hubot macgyver bomb <count> - MULLET ME GOOOOOD
+#   hubot busey (me) - Winners do what losers dont want to do
+#   hubot busey bomb <count> - If you take shortcuts you get cut short
+#   hubot niccage (me) - I know what it's like to meet someone you admire and have them be a complete jerk.
+#   hubot niccage bomb <count> - I do enjoy animated movies. I really love anime and movies like 'Spirited Away' and 'Howl's Moving Castle.'
+#   hubot totally not nic cage - ...Or is it?
+#   hubot kawaii (me) - so cute it hurts
+#   hubot kawaii bomb <count> - OMFG THIS IS SO KAWAII DESU
+#   hubot meme (me) - You want it? You got it
+#   hubot dankmeme (me) - Synonymous with dank: sick, ill, boss, dope, fly
+#   hubot winning - You're just jelly.
+
 
 module.exports = (robot) ->
   robot.respond /reversenuggets$/i, (msg) ->
@@ -21,12 +60,12 @@ module.exports = (robot) ->
 
   robot.respond /beyonce/i, (msg) ->
     charisma = [
-      "http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif",
-      "http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg",
-      "http://cdn.volcom.com/wordpress/wp-content/uploads/2013/09/Unknown1.jpeg",
-      "http://fashiongrunge.files.wordpress.com/2012/05/tumblr_m0kuc045mq1qb67y3.jpeg",
-      "http://thetangential.com/wp-content/uploads/2011/03/lisafrank1.jpg",
-      "http://i208.photobucket.com/albums/bb213/pairsofreckles/polar_bear.jpg"
+      'http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif',
+      'http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg',
+      'http://cdn.volcom.com/wordpress/wp-content/uploads/2013/09/Unknown1.jpeg',
+      'http://fashiongrunge.files.wordpress.com/2012/05/tumblr_m0kuc045mq1qb67y3.jpeg',
+      'http://thetangential.com/wp-content/uploads/2011/03/lisafrank1.jpg',
+      'http://i208.photobucket.com/albums/bb213/pairsofreckles/polar_bear.jpg'
     ]
     msg.send msg.random charisma
 
@@ -48,7 +87,8 @@ module.exports = (robot) ->
       "#{target} breaks most things around here",
       "#{target} caused the current problem",
       "#{target} did it!",
-      "#{target} has no idea what they are doing, but we still like 'em :)"
+      "#{target} has no idea what they are doing, but we still like 'em :)",
+      "(scumbag) #{target} *so* did that :-/"
     ]
 
     msg.send msg.random blames
@@ -64,7 +104,8 @@ module.exports = (robot) ->
       "All good work done shall bear #{target}'s name. So let it be written, so it shall be done.",
       "Today, #{target} brought forth in this room a feat of great success, conceived in magnificence, and dedicated to awesomeness.",
       "Today, #{target} suddenly and deliberately kicked some ass",
-      "#{target} makes it WERK"
+      "#{target} makes it WERK",
+      "#{target} is on FIRE! Oh my!"
     ]
 
     msg.send msg.random compliments
@@ -82,7 +123,8 @@ module.exports = (robot) ->
 
   robot.respond /hater$/i, (msg) ->
     haters = [
-      'haters gonna hate'
+      'haters gonna hate',
+      '(haters)'
     ]
     msg.send msg.random haters
 
@@ -99,7 +141,8 @@ module.exports = (robot) ->
 
   robot.respond /jarsh$/i, (msg) ->
     jarshes = [
-      "https://hipchat.dev.pardot.com/files/1/168/QH3hjSnULEeFsyc/JarshUpsideDown.jpeg"
+      'https://hipchat.dev.pardot.com/files/1/168/QH3hjSnULEeFsyc/JarshUpsideDown.jpeg',
+      'http://i.imgur.com/1k3GyNf.jpg'
     ]
 
     msg.send msg.random jarshes
