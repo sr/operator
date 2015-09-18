@@ -9,15 +9,18 @@ class Repo < ActiveRecord::Base
     name
   end
 
-  def builds(branch:)
+  def builds(branch:, include_failed_builds: false)
     # should never happen, but a sanity check in case this code path is encountered
     raise "repo does not deploy via artifacts" unless deploys_via_artifacts?
 
-    artifacts = Artifactory::Resource::Artifact.property_search(
-      gitRepo:       "*/#{full_name}.git",
-      gitBranch:     branch,
-      repos:         ARTIFACTORY_REPO,
-    )
+    properties = {
+      gitRepo:   "*/#{full_name}.git",
+      gitBranch: branch,
+      repos:     ARTIFACTORY_REPO,
+    }
+    properties[:passedCI] = "true" unless include_failed_builds
+
+    artifacts = Artifactory::Resource::Artifact.property_search(properties)
 
     # Rails development environment is not thread-safe, but in production we can
     # run multiple requests to Artifactory concurrently and achieve a

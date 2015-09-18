@@ -15,7 +15,7 @@ RSpec.feature "user rollbacks deploy" do
       .and_return(nil)
 
     allow(Artifactory::Resource::Artifact).to receive(:property_search)
-      .with(gitRepo: "*/Pardot/#{@repo.name}.git", gitBranch: "master", repos: Repo::ARTIFACTORY_REPO)
+      .with(gitRepo: "*/Pardot/#{@repo.name}.git", gitBranch: "master", repos: Repo::ARTIFACTORY_REPO, passedCI: "true")
       .and_return([OpenStruct.new(uri: "https://artifactory.example/pardot/build1234.tar.gz")])
 
     properties = {

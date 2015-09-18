@@ -3,7 +3,7 @@ require "deployable"
 class ProvisionalDeploy
   include Deployable
 
-  attr_reader :artifact_url, :repo_name, :what, :what_details, :build_number, :sha
+  attr_reader :artifact_url, :repo_name, :what, :what_details, :build_number, :sha, :passed_ci
 
   def self.from_artifact_url(repo, artifact_url)
     artifact = Artifactory::Resource::Artifact.from_url(artifact_url)
@@ -16,6 +16,7 @@ class ProvisionalDeploy
       what_details: artifact.properties["gitBranch"].first,
       build_number: artifact.properties["buildNumber"].first.to_i,
       sha: artifact.properties["gitSha"].first,
+      passed_ci: !!(artifact.properties["passedCI"] && artifact.properties["passedCI"].first == "true"),
     )
   end
 
@@ -36,6 +37,7 @@ class ProvisionalDeploy
       what_details: tag,
       build_number: tag.sub(/\Abuild/, "").to_i,
       sha: sha,
+      passed_ci: true,
     )
   end
 
@@ -55,6 +57,7 @@ class ProvisionalDeploy
       what_details: branch,
       build_number: nil,
       sha: sha,
+      passed_ci: true,
     )
   end
 
@@ -66,16 +69,18 @@ class ProvisionalDeploy
       what_details: deploy.what_details,
       build_number: deploy.build_number,
       sha: deploy.sha,
+      passed_ci: deploy.passed_ci,
     )
   end
 
-  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:)
+  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:)
     @repo = repo
     @artifact_url = artifact_url
     @what = what
     @what_details = what_details
     @build_number = build_number
     @sha = sha
+    @passed_ci = passed_ci
   end
 
   def repo_name
@@ -83,6 +88,10 @@ class ProvisionalDeploy
   end
 
   def is_valid?
-    sha.present?
+    @sha.present?
+  end
+
+  def passed_ci?
+    @passed_ci
   end
 end

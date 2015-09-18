@@ -42,10 +42,9 @@ $(function(){
     return true;
   });
 
-  if ($('#deploy_log_output')) {
+  if ($('#deploy_log_output').length > 0) {
     $('#deploy_log_output').scrollTop($('#deploy_log_output')[0].scrollHeight);
   }
-
 });
 
 $.extend($.easing, {

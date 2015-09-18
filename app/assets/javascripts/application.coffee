@@ -15,3 +15,18 @@
 #= require jquery_nested_form
 #= require bootstrap-sprockets
 #= require_tree .
+
+$ ->
+  $("#include-failed-build-form input").on "change", (e) ->
+    checkbox = $(this)
+    form = $(this).closest("form")
+
+    if checkbox.prop("checked")
+      if confirm("Failed builds should only be deployed in emergency situations. Are you sure?")
+        form.submit()
+        form.find("input").prop("disabled", true)
+      else
+        checkbox.prop("checked", false)
+    else
+      form.submit()
+      form.find("input").prop("disabled", true)
