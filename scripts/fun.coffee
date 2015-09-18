@@ -151,25 +151,6 @@ module.exports = (robot) ->
     msg.send msg.random jarshes
 
 
-  robot.respond /phoebe(\sbomb(?:\s(\d+))?)?/i, (msg) ->
-    phoebes = [
-      'https://hipchat.dev.pardot.com/files/1/271/MoX6kLdBxNxkSmL/windy.jpg',
-      'https://hipchat.dev.pardot.com/files/1/271/VrED5Svq56NlMDt/snowy.jpg',
-      'https://hipchat.dev.pardot.com/files/1/271/uEdXDMt5p4R3dHO/tower.jpg',
-      'https://hipchat.dev.pardot.com/files/1/271/OBbZnyW5iyEYTqC/football.jpg',
-      'https://hipchat.dev.pardot.com/files/1/271/WfJ4pvOKvTdc2jV/rock.jpg',
-    ]
-
-    count = \
-      if msg.match[1] && msg.match[2]
-        _.min([parseInt(msg.match[2]), phoebes.length])
-      else if msg.match[1]
-        phoebes.length
-      else
-        1
-
-    msg.send _.sample(phoebes, count)...
-
   robot.respond /miniTinny$/i, (msg) ->
     miniTinnies = [
       "https://hipchat.dev.pardot.com/files/1/168/bsimEJhT7jZCY9w/Tinny.jpg"
