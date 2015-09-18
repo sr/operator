@@ -8,12 +8,12 @@
 #   None
 #
 # Commands:
-#   cat me - Receive a cat
-#   cat bomb N - get (N|3) cats
-#   cat gif me - Receive a cat gif
-#   cat gif bomb N - get (N|3) cat gifs
-#   cat hat me - Receive a cat in a hat
-#   cat hat bomb N - get (N|3) cats in a hat
+#   hubot cat me - Receive a cat
+#   hubot cat bomb N - get (N|3) cats
+#   hubot cat gif me - Receive a cat gif
+#   hubot cat gif bomb N - get (N|3) cat gifs
+#   hubot cat hat me - Receive a cat in a hat
+#   hubot cat hat bomb N - get (N|3) cats in a hat
 
 
 module.exports = (robot) ->

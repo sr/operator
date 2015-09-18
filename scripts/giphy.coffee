@@ -5,7 +5,7 @@
 #   HUBOT_GIPHY_API_KEY
 #
 # Commands:
-#   gif me <query> - Returns an animated gif matching the requested search term.
+#  hubot gif <query> - Returns an animated gif matching the requested search term from GIPHY
 
 giphy =
   api_key: 'dc6zaTOxFJmzC'
