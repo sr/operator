@@ -6,5 +6,7 @@
   "lmgtfy.coffee",
   "corgime.coffee",
   "commandlinefu.coffee",
-  "meme_generator.coffee"
+  "meme_generator.coffee",
+  "giphy.coffee",
+  "google-images.coffee"
 ]
