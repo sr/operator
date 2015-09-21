@@ -6,7 +6,7 @@ module Canoe
       @strategy = strategy
     end
 
-    def deploy(target:, user:, repo:, what:, what_details:, sha:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil)
+    def deploy(target:, user:, repo:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil)
       # Differentiate between servers which use sync_scripts and those that use
       # pull_agent
       sync_servers = @strategy.list_servers(target, repo.name)
@@ -33,6 +33,7 @@ module Canoe
           specified_servers: (server_hostnames && server_hostnames.join(",")).presence,
           servers_used: sync_servers.join(","),
           sha: sha,
+          passed_ci: passed_ci,
           build_number: build_number,
           artifact_url: artifact_url,
         ).tap { |deploy|

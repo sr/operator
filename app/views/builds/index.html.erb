@@ -12,14 +12,23 @@
   <%- if @builds.empty? %>
     Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
   <%- else %>
-    <ul class="list-unstyled deploy-list">
+    <div class="well well-sm">
+      <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
+        <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
+        <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
+      <%- end %>
+    </div>
 
+    <ul class="list-unstyled deploy-list">
       <% @builds.each do |build| %>
         <li>
           <h4>
             <%= link_to "Ship This", select_target_repo_deploys_path(current_repo, artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success deploy-button" %>
             &nbsp;
             <%= deploy_type_icon("build") %> build<%= build.build_number %>
+            <%- if !build.passed_ci? %>
+              <span class="label label-danger">Untested</span>
+            <%- end %>
           </h4>
           <small class="muted">
             commit:

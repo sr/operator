@@ -9,22 +9,21 @@ class Repo < ActiveRecord::Base
     name
   end
 
-  def builds(branch:)
+  def builds(branch:, include_untested_builds: false)
     # should never happen, but a sanity check in case this code path is encountered
     raise "repo does not deploy via artifacts" unless deploys_via_artifacts?
 
-    artifacts = Artifactory::Resource::Artifact.property_search(
-      gitRepo:       "*/#{full_name}.git",
-      gitBranch:     branch,
-      repos:         ARTIFACTORY_REPO,
-    )
+    aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds)
+    artifact_urls = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
+      .fetch("results")
+      .map { |hash| build_artifact_url_from_hash(hash) }
 
     # Rails development environment is not thread-safe, but in production we can
     # run multiple requests to Artifactory concurrently and achieve a
     # significant speedup in wall clock time.
     threads = Rails.env.development? ? 1 : 10
 
-    Parallel.map(artifacts, in_threads: threads) { |artifact| ProvisionalDeploy.from_artifact_url(self, artifact.uri) }
+    Parallel.map(artifact_urls, in_threads: threads) { |url| ProvisionalDeploy.from_artifact_url(self, url) }
       .compact
       .sort_by { |deploy| -deploy.build_number }
   end
@@ -56,5 +55,35 @@ class Repo < ActiveRecord::Base
 
   def branch(branch)
     Octokit.branch(full_name, branch)
+  end
+
+  private
+  def build_aql_query(branch:, include_untested_builds:)
+    conditions = [
+      {"repo"       => {"$eq"    => ARTIFACTORY_REPO}},
+      {"@gitRepo"   => {"$match" => "*/#{full_name}.git"}},
+      {"@gitBranch" => {"$eq"    => branch}},
+    ]
+
+    if include_untested_builds
+      # We can't know the difference between a failed build and a build that
+      # hasn't yet completed CI. Since the intention is to be able to deploy
+      # untested (but not failed) builds, our compromise is to display builds
+      # only that have been created in the past hour.
+      conditions << {
+        "$or" => [
+          {"@passedCI" => {"$eq" => "true"}},
+          {"created"   => {"$gt" => 1.hour.ago.iso8601}},
+        ]
+      }
+    else
+      conditions << {"@passedCI" => {"$eq" => "true"}}
+    end
+
+    %(items.find(#{JSON.dump("$and" => conditions)}))
+  end
+
+  def build_artifact_url_from_hash(hash)
+    Artifactory.client.build_uri(:get, "/" + ["api", "storage", hash["repo"], hash["path"], hash["name"]].join("/")).to_s
   end
 end
