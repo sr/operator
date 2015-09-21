@@ -65,6 +65,11 @@ class Repo < ActiveRecord::Base
       {"@gitBranch" => {"$eq"    => branch}},
     ]
 
+    if bamboo_project
+      conditions << {"@bambooProject" => {"$eq" => bamboo_project}}
+      conditions << {"@bambooPlan"    => {"$eq" => bamboo_plan}} if bamboo_plan.present?
+    end
+
     if include_untested_builds
       # We can't know the difference between a failed build and a build that
       # hasn't yet completed CI. Since the intention is to be able to deploy

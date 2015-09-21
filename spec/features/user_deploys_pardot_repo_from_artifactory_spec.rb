@@ -3,7 +3,12 @@ require "rails_helper"
 RSpec.feature "user deploys pardot repo from artifactory artifact" do
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
-    @repo = FactoryGirl.create(:repo, name: "pardot", deploys_via_artifacts: true)
+    @repo = FactoryGirl.create(:repo,
+      name: "pardot",
+      deploys_via_artifacts: true,
+      bamboo_project: "PDT",
+      bamboo_plan: "PPANT",
+    )
     @server = FactoryGirl.create(:server, hostname: "app-s1.example")
     @server.deploy_scenarios.create!(deploy_target: @deploy_target, repo: @repo)
 
