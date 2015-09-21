@@ -6,7 +6,8 @@ class ProvisionalDeploy
   attr_reader :artifact_url, :repo_name, :what, :what_details, :build_number, :sha, :passed_ci
 
   def self.from_artifact_url(repo, artifact_url)
-    artifact = Artifactory::Resource::Artifact.from_url(artifact_url)
+    hash = Artifactory.client.get(artifact_url, properties: nil)
+    artifact = Artifactory::Resource::Artifact.from_hash(hash)
     return nil unless artifact.properties["gitBranch"] && artifact.properties["buildNumber"] && artifact.properties["gitSha"]
 
     new(

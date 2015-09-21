@@ -16,13 +16,16 @@
 #= require bootstrap-sprockets
 #= require_tree .
 
+window.isProduction = ->
+  window.location.host == "canoe.pardot.com"
+
 $ ->
-  $("#include-failed-build-form input").on "change", (e) ->
+  $("#include-untested-build-form input").on "change", (e) ->
     checkbox = $(this)
     form = $(this).closest("form")
 
     if checkbox.prop("checked")
-      if confirm("Failed builds should only be deployed in emergency situations. Are you sure?")
+      if !window.isProduction() or confirm("Untested builds should only be deployed in emergency situations. Are you sure?")
         form.submit()
         form.find("input").prop("disabled", true)
       else

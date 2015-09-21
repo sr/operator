@@ -11,18 +11,22 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
       .with("Pardot/#{@repo.name}", "master")
       .and_return(OpenStruct.new(name: "master", object: OpenStruct.new(sha: "abc123")))
 
-    allow(Artifactory::Resource::Artifact).to receive(:property_search)
-      .with(gitRepo: "*/Pardot/#{@repo.name}.git", gitBranch: "master", repos: Repo::ARTIFACTORY_REPO, passedCI: "true")
-      .and_return([OpenStruct.new(uri: "https://artifactory.example/pardot/build1234.tar.gz")])
+    allow(Artifactory.client).to receive(:post)
+      .and_return("results" => [
+        {"repo" => "pd-canoe", "path" => "PDT/PPANT", "name" => "build1234.tar.gz"},
+      ])
 
-    properties = {
-      "gitBranch"   => ["master"],
-      "buildNumber" => ["1234"],
-      "gitSha"      => ["abc123"],
-    }
-    allow(Artifactory::Resource::Artifact).to receive(:from_url)
-      .with("https://artifactory.example/pardot/build1234.tar.gz")
-      .and_return(OpenStruct.new(properties: properties))
+    allow(Artifactory.client).to receive(:get)
+      .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, properties: nil)
+      .and_return(
+        "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        "properties" => {
+          "gitBranch"   => ["master"],
+          "buildNumber" => ["1234"],
+          "gitSha"      => ["abc123"],
+        },
+      )
   end
 
   scenario "happy path deployment" do
@@ -45,7 +49,7 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
     expect(deploys[0].servers_used).to eq("localhost")
     expect(deploys[0].specified_servers).to eq(nil)
     expect(deploys[0].sha).to eq("abc123")
-    expect(deploys[0].artifact_url).to eq("https://artifactory.example/pardot/build1234.tar.gz")
+    expect(deploys[0].artifact_url).to be_present
 
     # DeployResult instances are created for pull servers only. Eventually all
     # servers will be pull servers.

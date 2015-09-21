@@ -13,9 +13,9 @@
     Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
   <%- else %>
     <div class="well well-sm">
-      <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-failed-build-form" do |f| %>
-        <%= check_box_tag :include_failed_builds, "1", @include_failed_builds %>
-        <%= label_tag :include_failed_builds, "Include Failed Builds?" %>
+      <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
+        <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
+        <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
       <%- end %>
     </div>
 
@@ -27,7 +27,7 @@
             &nbsp;
             <%= deploy_type_icon("build") %> build<%= build.build_number %>
             <%- if !build.passed_ci? %>
-              <span class="label label-danger">Failed CI</span>
+              <span class="label label-danger">Untested</span>
             <%- end %>
           </h4>
           <small class="muted">

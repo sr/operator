@@ -14,18 +14,22 @@ RSpec.feature "user rollbacks deploy" do
     allow(Octokit).to receive(:compare)
       .and_return(nil)
 
-    allow(Artifactory::Resource::Artifact).to receive(:property_search)
-      .with(gitRepo: "*/Pardot/#{@repo.name}.git", gitBranch: "master", repos: Repo::ARTIFACTORY_REPO, passedCI: "true")
-      .and_return([OpenStruct.new(uri: "https://artifactory.example/pardot/build1234.tar.gz")])
+    allow(Artifactory.client).to receive(:post)
+      .and_return("results" => [
+        {"repo" => "pd-canoe", "path" => "PDT/PPANT", "name" => "build1234.tar.gz"},
+      ])
 
-    properties = {
-      "gitBranch"   => ["master"],
-      "buildNumber" => ["1234"],
-      "gitSha"      => ["bcd234"],
-    }
-    allow(Artifactory::Resource::Artifact).to receive(:from_url)
-      .with("https://artifactory.example/pardot/build1234.tar.gz")
-      .and_return(OpenStruct.new(properties: properties))
+    allow(Artifactory.client).to receive(:get)
+      .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, properties: nil)
+      .and_return(
+        "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        "properties" => {
+          "gitBranch"   => ["master"],
+          "buildNumber" => ["1234"],
+          "gitSha"      => ["bcd234"],
+        },
+      )
   end
 
   scenario "happy path rollback" do
