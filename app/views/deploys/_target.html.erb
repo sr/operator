@@ -27,7 +27,7 @@
     </small>
     <% if deploy %>
       <br>
-      <a href="<%= github_diff_url(deploy, @prov_deploy) %>">
+      <a href="<%= current_repo.diff_url(deploy, @prov_deploy) %>">
         <strong>What will Change?</strong>
         &nbsp;&nbsp;
         <span style="color:#000;">

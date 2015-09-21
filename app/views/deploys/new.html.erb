@@ -16,7 +16,7 @@
       What will change?
     </strong>
     &nbsp;&nbsp;
-    <a href="<%= github_diff_url(@previous_deploy, @prov_deploy) %>">
+    <a href="<%= current_repo.diff_url(@previous_deploy, @prov_deploy) %>">
       <% if @previous_deploy %>
         <%= print_deploy_what @previous_deploy %>
       <% else %>

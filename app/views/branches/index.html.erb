@@ -22,9 +22,9 @@
           &nbsp;
           <%= deploy_type_icon("branch") %> <%= branch.name %>
           &nbsp;
-          <a href="<%= github_branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
+          <a href="<%= current_repo.branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
         </h4>
-        <small class="muted">commit: <a href="<%= github_commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
+        <small class="muted">commit: <a href="<%= current_repo.commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
         <hr>
       </li>
     <% end %>

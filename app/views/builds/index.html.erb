@@ -23,7 +23,7 @@
           </h4>
           <small class="muted">
             commit:
-            <%= link_to github_sha_url(build.sha), title: build.sha do %>
+            <%= link_to current_repo.sha_url(build.sha), title: build.sha do %>
               <%= sha_span(build.sha)  %>
             <%- end %>
           </small>
