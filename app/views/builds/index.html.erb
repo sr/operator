@@ -9,16 +9,16 @@
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
 
+  <div class="well well-sm">
+    <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
+      <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
+      <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
+    <%- end %>
+  </div>
+
   <%- if @builds.empty? %>
     Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
   <%- else %>
-    <div class="well well-sm">
-      <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
-        <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
-        <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
-      <%- end %>
-    </div>
-
     <ul class="list-unstyled deploy-list">
       <% @builds.each do |build| %>
         <li>
