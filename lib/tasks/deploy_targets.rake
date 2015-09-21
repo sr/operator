@@ -4,6 +4,11 @@ namespace :canoe do
     Repo.find_or_initialize_by(name: 'pardot').tap { |repo|
       repo.icon = 'cloud'
       repo.supports_branch_deploy = true
+      # TODO: Is being toggled manually in app.dev; not quite ready for
+      # production rollout yet
+      # repo.deploys_via_artifacts = true
+      repo.bamboo_project = 'PDT'
+      repo.bamboo_plan = 'PPANT'
     }.save
 
     Repo.find_or_initialize_by(name: 'pithumbs').tap { |repo|
@@ -20,6 +25,8 @@ namespace :canoe do
       repo.icon = 'fighter-jet'
       repo.deploys_via_artifacts = true
       repo.supports_branch_deploy = true
+      repo.bamboo_project = 'WFST'
+      repo.bamboo_plan = 'WFS'
     }.save
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150918212113) do
+ActiveRecord::Schema.define(version: 20150921140013) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -94,6 +94,8 @@ ActiveRecord::Schema.define(version: 20150918212113) do
     t.string  "icon",                   limit: 255,                 null: false
     t.boolean "supports_branch_deploy",             default: false, null: false
     t.boolean "deploys_via_artifacts",              default: false, null: false
+    t.string  "bamboo_project",         limit: 255
+    t.string  "bamboo_plan",            limit: 255
   end
 
   add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree
