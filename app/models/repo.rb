@@ -66,8 +66,8 @@ class Repo < ActiveRecord::Base
     ]
 
     if bamboo_project
-      conditions << {"@bambooProject" => {"$eq" => bamboo_project}}
-      conditions << {"@bambooPlan"    => {"$eq" => bamboo_plan}} if bamboo_plan.present?
+      conditions << {"@bambooProject" => {"$eq"    => bamboo_project}}
+      conditions << {"@bambooPlan"    => {"$match" => "#{bamboo_plan}*"}} if bamboo_plan.present?
     end
 
     if include_untested_builds

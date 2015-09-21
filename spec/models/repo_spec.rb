@@ -13,7 +13,7 @@ RSpec.describe Repo do
 
       it "searches for artifacts restricted to the specified bamboo project and bamboo plan" do
         allow(Artifactory.client).to receive(:post)
-          .with("/api/search/aql", %r({"@bambooProject":{"\$eq":"PDT"}},{"@bambooPlan":{"\$eq":"PPANT"}}), anything)
+          .with("/api/search/aql", %r({"@bambooProject":{"\$eq":"PDT"}},{"@bambooPlan":{"\$match":"PPANT\*"}}), anything)
           .and_return("results" => [
             {"repo" => "pd-canoe", "path" => "PDT/PPANT", "name" => "build1234.tar.gz"},
           ])
