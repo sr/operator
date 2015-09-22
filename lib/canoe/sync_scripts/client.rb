@@ -13,7 +13,6 @@ module Canoe
         args  = [repo_name]
         args << "#{what}=#{what_details}"
         args << "--artifact-url=#{artifact_url}" unless artifact_url.nil?
-        args << "--lock" if lock
         args << "--user=#{user.email}"
         args << "--deploy-id=#{deploy_id}"
         args << "--servers=#{servers.join(",")}"
