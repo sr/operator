@@ -9,7 +9,7 @@ class Deploy < ActiveRecord::Base
   belongs_to :auth_user
 
   has_many :results, class_name: DeployResult
-  after_create 'Hipchat.notify_deploy_start(self)'
+  after_create { |deploy| Hipchat.notify_deploy_start(deploy) }
 
   def log_path
     @_log_path ||= \
