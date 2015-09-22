@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150921140013) do
+ActiveRecord::Schema.define(version: 20150922180608) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -45,7 +45,6 @@ ActiveRecord::Schema.define(version: 20150921140013) do
   create_table "deploy_targets", force: :cascade do |t|
     t.string   "name",            limit: 255
     t.string   "script_path",     limit: 255
-    t.string   "lock_path",       limit: 255
     t.boolean  "locked"
     t.integer  "locking_user_id", limit: 4
     t.datetime "created_at"

@@ -5,7 +5,7 @@
 <br>
 
 <% if current_target.lockable? %>
-  <% if current_target.is_locked? %>
+  <% if current_target.locked? %>
     <%= render partial: 'deploys/locked_target_warning', locals: { target: current_target } %>
     <div id="unlock-hider">
       <a type="button" class="btn btn-default btn js-unlock-toggle" href="#">
@@ -13,7 +13,7 @@
       </a>
     </div>
     <div id="unlock-forms" style="display:none;">
-      <% if current_target.locking_user == current_user || current_target.file_lock_user == current_user.email %>
+      <% if current_target.locking_user == current_user %>
         <%= form_tag unlock_target_path(current_target), method: "post", data: {confirm: "Are you sure you want to unlock this target?"} do %>
           <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
         <%- end %>

@@ -29,7 +29,7 @@ class Api::TargetController < Api::Controller
     current_target.reload
 
     render json: {
-      locked: current_target.is_locked?,
+      locked: current_target.locked?,
       output: output,
     }
   end
@@ -39,7 +39,7 @@ class Api::TargetController < Api::Controller
     current_target.reload
 
     render json: {
-      locked: current_target.is_locked?,
+      locked: current_target.locked?,
       output: output,
     }
   end

@@ -71,37 +71,13 @@ class DeployTarget < ActiveRecord::Base
     self.locks.create(auth_user: user, locking: false, forced: forced)
   end
 
-  def is_locked?
-    self.locked? || has_file_lock?
-  end
-
   def name_of_locking_user
-    if has_file_lock?
-      file_lock_user
-    else
-      self.locking_user.try(:email)
-    end
-  end
-
-  def has_file_lock?
-    File.exist?(self.lock_path)
-  end
-
-  def file_lock_user
-    return nil unless File.exist?(self.lock_path)
-    File.read(self.lock_path, :encoding => "UTF-8").chomp
-  end
-
-  def file_lock_time
-    return Time.now unless has_file_lock?
-    File.ctime(self.lock_path)
+    self.locking_user.try(:email)
   end
 
   # user can deploy if the target isn't locked or they are the ones with the current lock
   def user_can_deploy?(user)
-    ! is_locked? || \
-    self.locking_user == user || \
-    self.file_lock_user == user.email
+    !locked? || self.locking_user == user
   end
 
   def servers(repo:)

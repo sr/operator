@@ -2,7 +2,7 @@
   <h2 class="under"><%= target.name.upcase %></h2>
   <% if target.lockable? %>
     <h5>
-      <% if target.is_locked? %>
+      <% if target.locked? %>
         <i class="icon-lock text-danger"></i>
         <span class="text-danger">
           LOCKED by <%= target.name_of_locking_user %>

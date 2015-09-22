@@ -14,8 +14,7 @@ RSpec.describe "/api/lock" do
         email = "sveader@salesforce.com"
         target_mock = DeployTarget.new(name: "test")
         expect(target_mock).to receive(:locking_user).and_return(OpenStruct.new(email: email))
-        expect(target_mock).to receive(:is_locked?).and_return(true)
-        expect(target_mock).to receive(:has_file_lock?).and_return(false)
+        expect(target_mock).to receive(:locked?).and_return(true)
         expect(DeployTarget).to receive(:order).with(:name).and_return([target_mock])
 
         api_get "/api/lock/status"
@@ -23,21 +22,6 @@ RSpec.describe "/api/lock" do
         assert json_response["test"]
         assert json_response["test"]["locked"]
         assert_equal email, json_response["test"]["locked_by"]
-      end
-
-      it "should return status of lock on filesystem" do
-        username = "sv"
-        target_mock = DeployTarget.new(name: "test")
-        expect(target_mock).to receive(:is_locked?).and_return(true)
-        expect(target_mock).to receive(:has_file_lock?).and_return(true)
-        expect(target_mock).to receive(:file_lock_user).and_return(username)
-        expect(DeployTarget).to receive(:order).with(:name).and_return([target_mock])
-
-        api_get "/api/lock/status"
-        assert_nonerror_response
-        assert json_response["test"]
-        assert json_response["test"]["locked"]
-        assert_equal username, json_response["test"]["locked_by"]
       end
 
       it "should error if ENV setting is not defined for auth token" do
