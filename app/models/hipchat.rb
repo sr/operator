@@ -7,7 +7,7 @@ class Hipchat
 
   class << self
     def notify_deploy_start(deploy)
-      previous_deploy = deploy.deploy_target.previous_deploy(deploy)  
+      previous_deploy = deploy.deploy_target.previous_deploy(deploy)
       server_count = deploy.all_sync_servers.size
       if server_count > 3
         server_msg = "#{server_count} servers"
@@ -17,40 +17,42 @@ class Hipchat
   
       # tell support
       msg = "#{deploy.auth_user.email} just began syncing #{build_link(deploy, false)}" + \
-            " to #{deploy.deploy_target.name}"
+            " to #{deploy.deploy_target.name.capitalize}"
       notify_room(SUPPORT_ROOM, msg)
   
       # tell engineering
       # NOTE: parbot currently listens for this format to work with !lastrelease, etc
-      msg = "#{deploy.deploy_target.name}: #{deploy.auth_user.email} just began " + \
-            "syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)} " + \
-            "[#{server_msg}]"
-      msg += "<br>GitHub Diff: #{deploy.repo.diff_url(deploy, previous_deploy)}" if previous_deploy
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
+            "just began syncing #{deploy.repo_name.capitalize} to " + \
+            "#{build_link(deploy)} [#{server_msg}]"
+      msg += "<br>GitHub Diff: <a href='#{deploy.repo.diff_url(deploy, previous_deploy)}'>" + \
+            "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" + \
+            "</a>" if previous_deploy
       notify_room(ENG_ROOM, msg)
     end
   
     def notify_deploy_complete(deploy)
       # tell support
       msg = "#{deploy.auth_user.email} just finished syncing #{build_link(deploy, false)} to " + \
-            "#{deploy.deploy_target.name}"
+            "#{deploy.deploy_target.name.capitalize}"
       notify_room(SUPPORT_ROOM, msg) if Rails.env.production?
   
       # tell engineering
-      msg = "#{deploy.deploy_target.name}: #{deploy.auth_user.email} just finished " + \
-            "syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
+            "just finished syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
       notify_room(ENG_ROOM, msg)
     end
   
     def notify_deploy_cancelled(deploy)
-      msg = "#{deploy.deploy_target.name}: #{deploy.auth_user.email} just CANCELLED " + \
-            "syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " + \
+            "CANCELLED syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
       notify_room(SUPPORT_ROOM, msg) if Rails.env.production?
       notify_room(ENG_ROOM, msg)
     end
   
     def notify_deploy_failed_servers(failed_hosts)
-      msg = "#{deploy.deploy_target.name}: Unable to fully sync to the following hosts: " + \
-            failed_hosts.sort.join(", ")
+      msg = "#{deploy.deploy_target.name.capitalize}: Unable to fully sync to the " + \
+            "following hosts: " + failed_hosts.sort.join(", ")
       notify_room(ENG_ROOM, msg, "red")
     end
   
