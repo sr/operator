@@ -7,6 +7,7 @@ class Hipchat
 
   class << self
     def notify_deploy_start(deploy)
+      return unless Rails.env.production? || Rails.env.test?
       previous_deploy = deploy.deploy_target.previous_deploy(deploy)
       server_count = deploy.all_sync_servers.size
       if server_count > 3
