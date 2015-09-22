@@ -30,4 +30,9 @@ class Api::Controller < ApplicationController
     return if current_repo
     render json: {error: true, message: "Invalid repo specified."}
   end
+
+  def require_deploy
+    return if current_deploy
+    render json: {error: true, message: "Invalid deploy specified."}
+  end
 end

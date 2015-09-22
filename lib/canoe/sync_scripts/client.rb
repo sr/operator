@@ -9,7 +9,7 @@ module Canoe
         @environment = environment
       end
 
-      def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, artifact_url: nil, lock: false)
+      def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, artifact_url: nil)
         args  = [repo_name]
         args << "#{what}=#{what_details}"
         args << "--artifact-url=#{artifact_url}" unless artifact_url.nil?
@@ -21,22 +21,6 @@ module Canoe
         args << "--html-color"
 
         background_shipit(args, [:out, :err] => [log_path, "w"])
-      end
-
-      def lock(user:)
-        run_shipit([
-          "--only-lock",
-          "--no-color",
-          "--user=#{user.email}",
-        ])
-      end
-
-      def unlock(user:, force:)
-        run_shipit([
-          force ? "--force-unlock" : "--unlock",
-          "--no-color",
-          "--user=#{user.email}",
-        ])
       end
 
       def list_servers(repo_name:)

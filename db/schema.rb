@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150922180608) do
+ActiveRecord::Schema.define(version: 20150922180908) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -77,16 +77,14 @@ ActiveRecord::Schema.define(version: 20150922180608) do
   add_index "deploys", ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
 
   create_table "locks", force: :cascade do |t|
-    t.integer  "deploy_target_id", limit: 4
-    t.integer  "auth_user_id",     limit: 4
-    t.boolean  "locking",                    default: false
-    t.boolean  "forced",                     default: false
+    t.integer  "deploy_target_id", limit: 4, null: false
+    t.integer  "auth_user_id",     limit: 4, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "repo_id",          limit: 4, null: false
   end
 
-  add_index "locks", ["auth_user_id"], name: "index_locks_on_auth_user_id", using: :btree
-  add_index "locks", ["deploy_target_id"], name: "index_locks_on_deploy_target_id", using: :btree
+  add_index "locks", ["deploy_target_id", "repo_id"], name: "index_locks_on_deploy_target_id_and_repo_id", unique: true, using: :btree
 
   create_table "repos", force: :cascade do |t|
     t.string  "name",                   limit: 255,                 null: false

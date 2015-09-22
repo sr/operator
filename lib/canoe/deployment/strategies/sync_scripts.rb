@@ -7,7 +7,7 @@ module Canoe
           client.list_servers(repo_name: repo_name)
         end
 
-        def perform(deploy, lock: false)
+        def perform(deploy)
           client = build_client(deploy.deploy_target)
           client.deploy(
             repo_name: deploy.repo_name,
@@ -19,18 +19,7 @@ module Canoe
             servers: deploy.all_sync_servers,
             log_path: deploy.log_path,
             sha: deploy.sha,
-            lock: lock,
           )
-        end
-
-        def lock(target:, user:)
-          client = build_client(target)
-          client.lock(user: user)
-        end
-
-        def unlock(target:, user:, force:)
-          client = build_client(target)
-          client.unlock(user: user, force: force)
         end
 
         private

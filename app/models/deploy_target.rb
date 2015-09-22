@@ -55,29 +55,26 @@ class DeployTarget < ActiveRecord::Base
       .first
   end
 
-  def lock!(user)
-    self.locked = true
-    self.locking_user = user
-    self.save
-
-    self.locks.create(auth_user: user, locking: true)
+  def lock!(repo, user)
+    locks.create!(repo: repo, auth_user: user)
   end
 
-  def unlock!(user, forced=false)
-    self.locked = false
-    self.locking_user = nil
-    self.save
+  def unlock!(repo, user, force: false)
+    criteria = {}
+    criteria[:repo] = repo
+    criteria[:auth_user] = user unless force
 
-    self.locks.create(auth_user: user, locking: false, forced: forced)
+    locks.where(criteria).destroy_all
   end
 
-  def name_of_locking_user
-    self.locking_user.try(:email)
+  # Finds an existing lock on the target and repo
+  def existing_lock(repo)
+    locks.where(repo: repo).first
   end
 
-  # user can deploy if the target isn't locked or they are the ones with the current lock
-  def user_can_deploy?(user)
-    !locked? || self.locking_user == user
+  def user_can_deploy?(repo, user)
+    lock = existing_lock(repo)
+    lock.nil? || lock.auth_user == user
   end
 
   def servers(repo:)

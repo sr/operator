@@ -36,7 +36,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
         it "should list the latest deploy info" do
           deploy = FactoryGirl.create(:deploy, repo_name: @repo.name, deploy_target: @target)
 
-          api_post "/api/targets/test/deploys/latest", { repo_name: @repo.name }
+          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
           assert_nonerror_response
         end
 
@@ -51,7 +51,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           )
           deploy.results.create!(server: server, status: "pending")
 
-          api_post "/api/targets/test/deploys/latest", { repo_name: @repo.name }
+          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
           expect(json_response["servers"]).to match_array(["localhost", server.hostname])
         end
       end

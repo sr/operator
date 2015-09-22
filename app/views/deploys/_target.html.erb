@@ -40,8 +40,8 @@
       </a>
     <% end %>
   </div>
-  <% if !target.user_can_deploy?(current_user) %>
-    <%= render partial: 'deploys/locked_target_warning', locals: { target: target } %>
+  <% if !target.user_can_deploy?(current_repo, current_user) %>
+    <%= render partial: 'deploys/lock', locals: { target: target, lock: target.existing_lock(current_repo) } %>
   <% elsif target.active_deploy %>
     <div class="alert alert-info">
       <strong>Active</strong>:

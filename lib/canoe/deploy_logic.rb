@@ -16,7 +16,7 @@ module Canoe
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_REPO   } if !current_repo
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
       # confirm user can deploy
-      if !current_target.user_can_deploy?(current_user)
+      if !current_target.user_can_deploy?(current_repo, current_user)
         return { error: true, reason: DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY }
       end
       # confirm again there is no active deploy

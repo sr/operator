@@ -47,41 +47,4 @@ RSpec.describe "/api/deploy" do
       end
     end
   end
-
-  describe "/api/status/deploy/:deploy_id" do
-    describe "without authentication" do
-      it "should error" do
-        get "/api/status/deploy/1"
-        assert_json_error_response("auth token")
-      end
-
-      it "should not respond to POST" do
-        expect {
-          post "/api/status/deploy/1"
-        }.to raise_error(ActionController::RoutingError)
-      end
-    end
-
-    describe "with authentication" do
-      it "should require target" do
-        expect(Deploy).to receive(:find_by_id).with(1).and_return(nil)
-
-        api_get "/api/status/deploy/1"
-        assert_json_error_response("Unable to find")
-      end
-
-      it "should give info on status of deploy" do
-        deploy = Deploy.new(id: 1, what: "tag", what_details: "1234", completed: true)
-        expect(deploy).to receive(:deploy_target).and_return(OpenStruct.new(name: "test"))
-        expect(deploy).to receive(:auth_user).and_return(OpenStruct.new(email: "sveader@salesforce.com"))
-        # expect(deploy).to receive(:repo).and_return(OpenStruct.new(name: "pardot"))
-
-        expect(Deploy).to receive(:find_by_id).with(1).and_return(deploy)
-
-        api_get "/api/status/deploy/1"
-        expect(response).to be_ok
-        expect(json_response["completed"]).to be_truthy
-      end
-    end
-  end # /api/status/deploy
 end

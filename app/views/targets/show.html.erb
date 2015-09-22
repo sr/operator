@@ -4,40 +4,6 @@
 </h1>
 <br>
 
-<% if current_target.lockable? %>
-  <% if current_target.locked? %>
-    <%= render partial: 'deploys/locked_target_warning', locals: { target: current_target } %>
-    <div id="unlock-hider">
-      <a type="button" class="btn btn-default btn js-unlock-toggle" href="#">
-        <i class="icon-unlock"></i> Unlocking Options
-      </a>
-    </div>
-    <div id="unlock-forms" style="display:none;">
-      <% if current_target.locking_user == current_user %>
-        <%= form_tag unlock_target_path(current_target), method: "post", data: {confirm: "Are you sure you want to unlock this target?"} do %>
-          <button type="submit" class="btn btn-warning"><i class="icon-unlock"></i> Unlock!</button>
-        <%- end %>
-      <% else %>
-        <%= form_tag unlock_target_path(current_target, force: "1"), method: "post", data: {confirm: "Are you sure you want to forcefully unlock this target?"} do %>
-          <button type="submit" class="btn btn-danger"><i class="icon-unlock"></i> Forcefully Unlock!</button>
-        <%- end %>
-      <% end %>
-    </div>
-  <% else %>
-    <div id="lock-hider">
-      <a type="button" class="btn btn-default btn js-locking-toggle" href="#">
-        <i class="icon-lock"></i> Locking Options
-      </a>
-    </div>
-    <div id="lock-forms" style="display:none;">
-      <%= form_tag lock_target_path(current_target), method: "post", data: {confirm: "Are you sure you want to lock this target?"} do %>
-        <button type="submit" class="btn btn-warning"><i class="icon-lock"></i> Lock!</button>
-      <%- end %>
-    </div>
-  <% end %>
-  <br>
-<% end %>
-
 <div class="well gray-well">
   <% %w[pardot].each do |repo| %>
     <% if deploy = last_repo_deploys(repo) %>
@@ -71,17 +37,8 @@
     <li <%= 'class="active"'.html_safe if @deploys %>>
       <a href="<%= target_path(current_target) %>"><i class="icon-train2"></i> Deploys</a>
     </li>
-    <% if current_target.lockable? %>
-      <li <%= 'class="active"'.html_safe if @locks %>>
-        <a href="<%= target_locks_path(current_target) %>"><i class="icon-lock"></i> Locks</a>
-      </li>
-    <% end %>
   </ul>
   <br>
 
-  <% if @deploys %>
-    <%= render partial: "targets/deploys", locals: { deploys: @deploys } %>
-  <% elsif @locks %>
-    <%= render partial: "targets/locks", locals: { locks: @locks } %>
-  <% end %>
+  <%= render partial: "targets/deploys", locals: { deploys: @deploys } %>
 </div>

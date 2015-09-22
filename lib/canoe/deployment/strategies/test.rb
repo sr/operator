@@ -14,17 +14,9 @@ module Canoe
           ["localhost"]
         end
 
-        def perform(deploy, lock: false)
+        def perform(deploy)
           @deploys << deploy
           nil
-        end
-
-        def lock(target:, user:)
-          "test lock successful"
-        end
-
-        def unlock(target:, user:, force:)
-          "test unlock successful"
         end
 
         def clear
