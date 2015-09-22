@@ -42,6 +42,7 @@ module Canoe
         sha: prov_deploy.sha,
         build_number: prov_deploy.build_number,
         artifact_url: prov_deploy.artifact_url,
+        passed_ci: prov_deploy.passed_ci,
         lock: (params[:lock] == "on"),
         server_hostnames: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
       )
