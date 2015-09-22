@@ -45,7 +45,7 @@ class Hipchat
   
     def notify_deploy_cancelled(deploy)
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " + \
-            "CANCELLED syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
+            "CANCELLED syncing #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
       notify_room(SUPPORT_ROOM, msg) if Rails.env.production?
       notify_room(ENG_ROOM, msg)
     end
