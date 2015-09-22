@@ -16,7 +16,7 @@ class Hipchat
       end
   
       # tell support
-      msg = "#{deploy.auth_user.email} just began syncing #{build_txt}" + \
+      msg = "#{deploy.auth_user.email} just began syncing #{build_link(deploy, false)}" + \
             " to #{deploy.deploy_target.name}"
       notify_room(SUPPORT_ROOM, msg)
   
@@ -31,7 +31,7 @@ class Hipchat
   
     def notify_deploy_complete(deploy)
       # tell support
-      msg = "#{deploy.auth_user.email} just finished syncing #{build_txt} to " + \
+      msg = "#{deploy.auth_user.email} just finished syncing #{build_link(deploy, false)} to " + \
             "#{deploy.deploy_target.name}"
       notify_room(SUPPORT_ROOM, msg) if Rails.env.production?
   
@@ -66,7 +66,7 @@ class Hipchat
         :format         => "json",
         :auth_token     => "62b38be68d7593e4da865dcff0c2db",
         :room_id        => room,
-        :from           => "#{deploy.deploy_target.name} Update",
+        :from           => "Canoe",
         :color          => color,
         :message_format => "html",
         :message        => msg,
@@ -79,18 +79,18 @@ class Hipchat
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_form_data(body)
   
-      http.request(request)
-      Console.log("HIPCHAT: [#{room}] #{msg}")
+      http.request(request) if Rails.env.production? || Rails.env == "app.dev"
+      Rails.logger.info("HIPCHAT: [#{room}] #{msg}")
     end
   
-    def build_link(deploy)
+    def build_link(deploy, link = true)
       if deploy.what_details == "master"
         build_txt = "build#{deploy.build_number}"
       else
         build_txt = "#{deploy.what_details} build#{deploy.build_number}"
       end
-      commit_link = deploy.repo.commit_url(deploy.sha)
-      "<a href='#{commit_link}'>#{build_txt}</a>"
+      commit_link = deploy.repo.commit_url(deploy)
+      link ? "<a href='#{commit_link}'>#{build_txt}</a>" : build_txt
     end
   end
 end
