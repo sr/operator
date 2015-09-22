@@ -1,18 +1,6 @@
 <div class="well half-well">
   <h2 class="under"><%= target.name.upcase %></h2>
-  <% if target.lockable? %>
-    <h5>
-      <% if target.locked? %>
-        <i class="icon-lock text-danger"></i>
-        <span class="text-danger">
-          LOCKED by <%= target.name_of_locking_user %>
-        </span>
-      <% else %>
-        <i class="icon-unlock text-success"></i>
-        <span class="text-success">Unlocked</span>
-      <% end %>
-    </h5>
-  <% end %>
+
   <div class="last-deploy">
     <% deploy = target.last_successful_deploy_for(current_repo.name) %>
     <small class="muted">

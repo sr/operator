@@ -56,14 +56,13 @@
 
     <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
 
-    <% if current_target.lockable? %>
-      <div class="checkbox">
-        &nbsp;&nbsp;
-        <label>
-          <input type="checkbox" name="lock"> Lock
-        </label>
-      </div>
-    <% end %>
+    <div class="checkbox">
+      &nbsp;&nbsp;
+      <label>
+        <input type="checkbox" name="lock"> Lock
+      </label>
+    </div>
+
     <% if Rails.env.production? %>
       <div class="checkbox">
         &nbsp;&nbsp;
