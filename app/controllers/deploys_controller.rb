@@ -101,7 +101,7 @@ class DeploysController < ApplicationController
 
   private
   def require_no_active_deploy
-    unless current_target.active_deploy.nil?
+    unless current_target.active_deploy(current_repo).nil?
       flash[:notice] = "There is currently a deploy in progress."
       redirect_to :back
     end

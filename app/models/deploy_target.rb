@@ -44,13 +44,15 @@ class DeployTarget < ActiveRecord::Base
       .first
   end
 
-  def active_deploy
-    # see if the most recent deploy is not completed
-    most_recent_deploy.try(:completed) ? nil : most_recent_deploy
+  def active_deploy(repo)
+    if latest_deploy = most_recent_deploy(repo)
+      latest_deploy unless latest_deploy.completed?
+    end
   end
 
-  def most_recent_deploy
+  def most_recent_deploy(repo)
     self.deploys
+      .where(repo_name: repo.name)
       .order(id: :desc)
       .first
   end

@@ -57,7 +57,7 @@ RSpec.describe "/deploys" do
       expect(rollback_deploy.what_details).to eq(@first_deploy.what_details)
       expect(rollback_deploy.sha).to eq(@first_deploy.sha)
 
-      expect(@deploy_target.most_recent_deploy).to eq(rollback_deploy)
+      expect(@deploy_target.most_recent_deploy(@repo)).to eq(rollback_deploy)
     end
 
     it "rolls back only to the specified servers from the current deploy" do

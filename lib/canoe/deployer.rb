@@ -21,7 +21,7 @@ module Canoe
 
       # REFACTOR: An exception might be more appropriate -@alindeman
       # Last guard against a duplicate deploy
-      return nil if target.active_deploy.present?
+      return nil if target.active_deploy(repo).present?
 
       deploy = target.transaction do
         target.deploys.create!(

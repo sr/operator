@@ -30,11 +30,11 @@
   </div>
   <% if !target.user_can_deploy?(current_repo, current_user) %>
     <%= render partial: 'deploys/lock', locals: { target: target, lock: target.existing_lock(current_repo) } %>
-  <% elsif target.active_deploy %>
+  <% elsif active_deploy = target.active_deploy(current_repo) %>
     <div class="alert alert-info">
       <strong>Active</strong>:
-      There is a deploy currently going out to <%= target.name %>.
-      <%= link_to repo_deploy_path(current_repo.name, target.active_deploy.id, watching: "1") do %>
+      There is a deploy currently going out.
+      <%= link_to repo_deploy_path(current_repo.name, active_deploy.id, watching: "1") do %>
         <i class="icon-eye-open"></i> Watch it here
       <%- end %>
     </div>

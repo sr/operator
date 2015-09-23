@@ -20,7 +20,7 @@ module Canoe
         return { error: true, reason: DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY }
       end
       # confirm again there is no active deploy
-      if !current_target.active_deploy.nil?
+      if !current_target.active_deploy(current_repo).nil?
         return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
