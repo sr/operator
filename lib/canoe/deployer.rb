@@ -21,7 +21,7 @@ module Canoe
 
       # REFACTOR: An exception might be more appropriate -@alindeman
       # Last guard against a duplicate deploy
-      return nil if target.active_deploy.present?
+      return nil if target.active_deploy(repo).present?
 
       deploy = target.transaction do
         target.deploys.create!(
@@ -43,24 +43,14 @@ module Canoe
         }
       end
 
-      target.lock!(user) if lock
+      target.lock!(repo, user) if lock
 
-      if pid = @strategy.perform(deploy, lock: lock)
+      if pid = @strategy.perform(deploy)
         Process.detach(pid)
         deploy.update_attribute(:process_id, pid)
       end
 
       deploy
-    end
-
-    def lock(target:, user:)
-      target.lock!(user)
-      @strategy.lock(target: target, user: user)
-    end
-
-    def unlock(target:, user:, force: false)
-      target.unlock!(user, force)
-      @strategy.unlock(target: target, user: user, force: force)
     end
   end
 end

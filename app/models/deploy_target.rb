@@ -44,64 +44,35 @@ class DeployTarget < ActiveRecord::Base
       .first
   end
 
-  def active_deploy
-    # see if the most recent deploy is not completed
-    most_recent_deploy.try(:completed) ? nil : most_recent_deploy
+  def active_deploy(repo)
+    if latest_deploy = most_recent_deploy(repo)
+      latest_deploy unless latest_deploy.completed?
+    end
   end
 
-  def most_recent_deploy
+  def most_recent_deploy(repo)
     self.deploys
+      .where(repo_name: repo.name)
       .order(id: :desc)
       .first
   end
 
-  def lock!(user)
-    self.locked = true
-    self.locking_user = user
-    self.save
-
-    self.locks.create(auth_user: user, locking: true)
+  def lock!(repo, user)
+    locks.create!(repo: repo, auth_user: user)
   end
 
-  def unlock!(user, forced=false)
-    self.locked = false
-    self.locking_user = nil
-    self.save
-
-    self.locks.create(auth_user: user, locking: false, forced: forced)
+  def unlock!(repo, user)
+    locks.where(repo: repo).destroy_all
   end
 
-  def is_locked?
-    self.locked? || has_file_lock?
+  # Finds an existing lock on the target and repo
+  def existing_lock(repo)
+    locks.where(repo: repo).first
   end
 
-  def name_of_locking_user
-    if has_file_lock?
-      file_lock_user
-    else
-      self.locking_user.try(:email)
-    end
-  end
-
-  def has_file_lock?
-    File.exist?(self.lock_path)
-  end
-
-  def file_lock_user
-    return nil unless File.exist?(self.lock_path)
-    File.read(self.lock_path, :encoding => "UTF-8").chomp
-  end
-
-  def file_lock_time
-    return Time.now unless has_file_lock?
-    File.ctime(self.lock_path)
-  end
-
-  # user can deploy if the target isn't locked or they are the ones with the current lock
-  def user_can_deploy?(user)
-    ! is_locked? || \
-    self.locking_user == user || \
-    self.file_lock_user == user.email
+  def user_can_deploy?(repo, user)
+    lock = existing_lock(repo)
+    lock.nil? || lock.auth_user == user
   end
 
   def servers(repo:)

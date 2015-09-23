@@ -1,7 +1,19 @@
 class DeploysController < ApplicationController
   before_filter :require_repo
-  before_filter :require_target, only: [:new, :create]
+  before_filter :require_target, only: [:new, :create, :index]
   before_filter :require_no_active_deploy, only: [:new, :create]
+  before_filter :require_no_active_lock, only: [:new, :create]
+
+  def index
+    all_deploys = current_target.deploys
+      .where(repo_name: current_repo.name)
+      .reverse_chronological
+
+    @total_deploys = all_deploys.count
+    @deploys = all_deploys
+      .offset(pagination_page_size * (current_page - 1))
+      .limit(pagination_page_size)
+  end
 
   def select_target
     if @prov_deploy = build_provisional_deploy
@@ -90,9 +102,16 @@ class DeploysController < ApplicationController
 
   private
   def require_no_active_deploy
-    unless current_target.active_deploy.nil?
+    unless current_target.active_deploy(current_repo).nil?
       flash[:notice] = "There is currently a deploy in progress."
       redirect_to :back
+    end
+  end
+
+  def require_no_active_lock
+    unless current_target.user_can_deploy?(current_repo, current_user)
+      flash[:alert] = "The current target and repository are locked by another user."
+      redirect_to repo_url(current_repo)
     end
   end
 

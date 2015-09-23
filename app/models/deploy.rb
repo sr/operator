@@ -10,6 +10,8 @@ class Deploy < ActiveRecord::Base
 
   has_many :results, class_name: DeployResult
 
+  scope :reverse_chronological, -> { order(created_at: :desc) }
+
   def log_path
     @_log_path ||= \
       begin

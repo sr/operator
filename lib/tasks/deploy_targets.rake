@@ -36,16 +36,12 @@ namespace :canoe do
     DeployTarget.create(
       name: 'dev',
       script_path: "#{Rails.root}/../sync_scripts",
-      lock_path: "#{Rails.root}/../sync_scripts/dev_lock",
-      locked: false,
     ) if !dev
 
     test = DeployTarget.where(name: 'test').first
     DeployTarget.create(
       name: 'test',
       script_path: "#{Rails.root}/../sync_scripts",
-      lock_path: "#{Rails.root}/../sync_scripts/dev_lock",
-      locked: true,
     ) if !test
   end
 
@@ -55,16 +51,12 @@ namespace :canoe do
     DeployTarget.create(
       name: 'test',
       script_path: '/opt/sync/test',
-      lock_path: '/var/lock/test',
-      locked: false,
     ) if !testing_env
 
     staging_env = DeployTarget.where(name: 'staging').first
     DeployTarget.create(
       name: 'staging',
       script_path: '/opt/sync/staging',
-      lock_path: '/var/lock/staging',
-      locked: false,
     ) if !staging_env
   end
 
@@ -74,16 +66,12 @@ namespace :canoe do
     DeployTarget.create(
       name: 'staging',
       script_path: '/opt/sync/staging',
-      lock_path: '/var/lock/staging',
-      locked: false,
     ) if !staging_env
 
     engage_env = DeployTarget.where(name: 'engagement').first
     DeployTarget.create(
       name: 'engagement',
       script_path: '/opt/sync/staging',
-      lock_path: '/var/lock/engagement',
-      locked: false,
     ) if !engage_env
   end
 
@@ -93,8 +81,6 @@ namespace :canoe do
     DeployTarget.create(
       name: "production",
       script_path: "/opt/sync/production",
-      lock_path: "/var/lock/production",
-      locked: false,
     ) unless prod_env
   end
 

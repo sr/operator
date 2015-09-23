@@ -23,34 +23,25 @@ Rails.application.routes.draw do
   end
 
   resources :targets, param: :name, only: [:show] do
-    resources :locks, only: [:index]
-    post :lock, on: :member
-    post :unlock, on: :member
-  end
+    resources :repos, param: :name, only: [] do
+      resources :deploys, only: [:index]
 
+      post :lock, on: :member
+      post :unlock, on: :member
+    end
+  end
   resources :servers
 
   namespace :api, defaults: {format: "json"} do
-    # TODO: This is the new format for the api that we should switch the ones below to.
-    # We'll have to find a good time to do that like when we switch to pull_agent.
+    # legacy
+    post "deploy/:id/completed_server" => "deploys#completed_server"
+
     resources :targets, param: :name, only: [] do
-      resources :deploys, only: [:index] do
+      resources :deploys, only: [:show] do
         post :latest, on: :collection
+        post :completed_server, on: :member
       end
     end
-
-    resources :deploy, only: [] do
-      post :completed_server, on: :member
-    end
-
-    # TODO: These path components are a bit out of order, IMO. Can we change
-    # these around to be more conventional? -@alindeman
-    get "lock/status" => "lock#status"
-    get "status/target/:target_name" => "target#status"
-    get "status/deploy/:id" => "deploy#status"
-    post "lock/target/:target_name" => "target#lock"
-    post "unlock/target/:target_name" => "target#unlock"
-    post "deploy/target/:target_name" => "target#deploy"
   end
 
   get "home/index"
