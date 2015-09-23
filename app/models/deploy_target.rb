@@ -59,12 +59,8 @@ class DeployTarget < ActiveRecord::Base
     locks.create!(repo: repo, auth_user: user)
   end
 
-  def unlock!(repo, user, force: false)
-    criteria = {}
-    criteria[:repo] = repo
-    criteria[:auth_user] = user unless force
-
-    locks.where(criteria).destroy_all
+  def unlock!(repo, user)
+    locks.where(repo: repo).destroy_all
   end
 
   # Finds an existing lock on the target and repo

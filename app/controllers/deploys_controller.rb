@@ -1,7 +1,18 @@
 class DeploysController < ApplicationController
   before_filter :require_repo
-  before_filter :require_target, only: [:new, :create]
+  before_filter :require_target, only: [:new, :create, :index]
   before_filter :require_no_active_deploy, only: [:new, :create]
+
+  def index
+    all_deploys = current_target.deploys
+      .where(repo_name: current_repo.name)
+      .reverse_chronological
+
+    @total_deploys = all_deploys.count
+    @deploys = all_deploys
+      .offset(pagination_page_size * (current_page - 1))
+      .limit(pagination_page_size)
+  end
 
   def select_target
     if @prov_deploy = build_provisional_deploy

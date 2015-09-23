@@ -23,10 +23,13 @@ Rails.application.routes.draw do
   end
 
   resources :targets, param: :name, only: [:show] do
-    post :lock, on: :member
-    post :unlock, on: :member
-  end
+    resources :repos, param: :name, only: [] do
+      resources :deploys, only: [:index]
 
+      post :lock, on: :member
+      post :unlock, on: :member
+    end
+  end
   resources :servers
 
   namespace :api, defaults: {format: "json"} do

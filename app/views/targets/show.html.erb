@@ -1,44 +1,64 @@
 <h1>
-  <i class="icon-bullseye"></i>&nbsp;
+  <i class="icon-bullseye"></i>
   <%= current_target.name.capitalize %>
 </h1>
-<br>
 
-<div class="well gray-well">
-  <% %w[pardot].each do |repo| %>
-    <% if deploy = last_repo_deploys(repo) %>
-      <div>
-        <strong><%= deploy.repo_name.upcase %>:</strong>
-        <%= print_email deploy.auth_user.email %> deployed
-        <span class="text-info"><%= print_deploy_what(deploy) %></span>
-        on <%= print_time deploy.created_at %>
-      </div>
-    <% else %>
-      <div>
-        <strong><%= repo.upcase %>:</strong>
-        <em>No record of this being deployed to this target.</em>
-      </div>
-    <% end %>
-  <% end %>
-</div>
+<table class="table table-hover table-condensed">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Repo</th>
+      <th>Latest Deploy</th>
+      <th>Lock Status</th>
+    </tr>
+  </thead>
 
-<% if current_target.active_deploy %>
-  <div class="alert alert-info">
-    <strong>Active</strong>:
-    There is a deploy currently going out to <%= current_target.name %>.
-    <%= link_to repo_deploy_path(current_target.active_deploy.repo_name, current_target.active_deploy, watching: "1") do %>
-      <i class="icon-eye-open"></i> Watch it here
+  <tbody>
+    <%- all_repos.each do |repo| %>
+      <%-
+        lock = current_target.existing_lock(repo)
+        deploy = current_target.last_deploy_for(repo.name)
+      %>
+
+      <%= content_tag :tr, class: repo_row_class(lock, deploy) do %>
+        <td style="width: 1px; white-space: nowrap">
+          <%- if lock %>
+            <%= link_to unlock_target_repo_path(current_target, repo), method: "post", class: "btn btn-xs btn-warning", data: {confirm: lock.auth_user == current_user ? nil : "Are you sure you want to force unlock this repo?"} do %>
+              <i class="icon-unlock"></i> Unlock
+            <%- end %>
+          <%- else %>
+            <%= link_to lock_target_repo_path(current_target, repo), method: "post", class: "btn btn-xs btn-danger" do %>
+              <i class="icon-lock"></i> Lock
+            <%- end %>
+          <%- end %>
+
+          <%= link_to "All Deploys", target_repo_deploys_path(current_target, repo), class: "btn btn-xs btn-primary" %>
+        </td>
+
+        <td><%= link_to repo.name, repo %></td>
+
+        <td>
+          <%- if deploy = current_target.last_deploy_for(repo.name) %>
+            <%- if deploy.completed? %>
+              <i class="icon-check"></i>
+            <%- else %>
+              <i class="icon-spinner"></i>
+            <%- end %>
+
+            <%= print_deploy_what(deploy) %>
+            <%= link_to "View", repo_deploy_path(repo, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
+          <%- end %>
+        </td>
+
+        <td>
+          <%- if lock %>
+            <i class="icon-lock"></i>
+            <strong><%= lock.auth_user.name %></strong> since <%= time_ago_in_words lock.created_at %> ago
+          <%- else %>
+            <i class="icon-unlock"></i>
+          <%- end %>
+        </td>
+      <%- end %>
     <%- end %>
-  </div>
-<% end %>
-
-<div>
-  <ul class="nav nav-tabs">
-    <li <%= 'class="active"'.html_safe if @deploys %>>
-      <a href="<%= target_path(current_target) %>"><i class="icon-train2"></i> Deploys</a>
-    </li>
-  </ul>
-  <br>
-
-  <%= render partial: "targets/deploys", locals: { deploys: @deploys } %>
-</div>
+  </tbody>
+</table>
