@@ -3,7 +3,7 @@
   <%= current_target.name.capitalize %>
 </h1>
 
-<table class="table table-hover table-condensed">
+<table class="table table-hover table-condensed repos">
   <thead>
     <tr>
       <th></th>
@@ -20,7 +20,7 @@
         deploy = current_target.last_deploy_for(repo.name)
       %>
 
-      <%= content_tag :tr, class: repo_row_class(lock, deploy) do %>
+      <%= content_tag :tr, class: repo_row_class(lock, deploy), data: {repo: repo.name} do %>
         <td style="width: 1px; white-space: nowrap">
           <%- if lock %>
             <%= link_to unlock_target_repo_path(current_target, repo), method: "post", class: "btn btn-xs btn-warning", data: {confirm: lock.auth_user == current_user ? nil : "Are you sure you want to force unlock this repo?"} do %>
