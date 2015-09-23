@@ -2,6 +2,7 @@ class DeploysController < ApplicationController
   before_filter :require_repo
   before_filter :require_target, only: [:new, :create, :index]
   before_filter :require_no_active_deploy, only: [:new, :create]
+  before_filter :require_no_active_lock, only: [:new, :create]
 
   def index
     all_deploys = current_target.deploys
@@ -104,6 +105,13 @@ class DeploysController < ApplicationController
     unless current_target.active_deploy(current_repo).nil?
       flash[:notice] = "There is currently a deploy in progress."
       redirect_to :back
+    end
+  end
+
+  def require_no_active_lock
+    unless current_target.user_can_deploy?(current_repo, current_user)
+      flash[:alert] = "The current target and repository are locked by another user."
+      redirect_to repo_url(current_repo)
     end
   end
 
