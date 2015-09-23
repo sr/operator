@@ -28,7 +28,12 @@
       <td>
         <%= link_to "View", repo_deploy_path(current_repo, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
       </td>
-      <td><%= print_deploy_what(deploy) %></td>
+      <td>
+        <%= print_deploy_what(deploy) %>
+        <%- if !deploy.passed_ci? %>
+          <span class="label label-danger">Untested</span>
+        <%- end %>
+      </td>
       <td><%= sha_span(deploy.sha) unless deploy.sha.blank? %></td>
       <td><%= print_email deploy.auth_user.email %></td>
       <td><%= print_time deploy.created_at %></td>
