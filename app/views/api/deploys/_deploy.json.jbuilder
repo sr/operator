@@ -1,0 +1,11 @@
+json.id deploy.id
+json.target deploy.deploy_target.name
+json.user deploy.auth_user.email
+json.repo deploy.repo_name
+json.what deploy.what
+json.what_details deploy.what_details
+json.build_number deploy.build_number
+json.servers deploy.all_servers
+json.artifact_url deploy.artifact_url
+json.completed deploy.completed
+json.created_at deploy.created_at

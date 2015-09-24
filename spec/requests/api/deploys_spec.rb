@@ -2,7 +2,27 @@ require "rails_helper"
 
 RSpec.describe "/api/targets/:target_name/deploys" do
   before do
+    @repo = FactoryGirl.create(:repo)
     @target = FactoryGirl.create(:deploy_target, name: "test")
+  end
+
+  describe "/api/targets/:target_name/repos/:repo_name/deploys" do
+    describe "without authentication" do
+      it "should error" do
+        get "/api/targets/#{@target.name}/repos/#{@repo.name}/deploys"
+        assert_json_error_response("auth token")
+      end
+    end
+
+    describe "with authentication" do
+      it "returns the latest deploys" do
+        deploys = FactoryGirl.create_list(:deploy, 3, deploy_target: @target, repo_name: @repo.name)
+
+        api_get "/api/targets/#{@target.name}/repos/#{@repo.name}/deploys"
+        p json_response
+        expect(json_response.length).to eq(3)
+      end
+    end
   end
 
   describe "/api/targets/:target_name/deploys/latest" do
@@ -29,10 +49,6 @@ RSpec.describe "/api/targets/:target_name/deploys" do
       end
 
       describe "with a good repo name" do
-        before do
-          @repo = FactoryGirl.create(:repo)
-        end
-
         it "should list the latest deploy info" do
           deploy = FactoryGirl.create(:deploy, repo_name: @repo.name, deploy_target: @target)
 

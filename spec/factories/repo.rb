@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :repo do
-    name "pardot"
+    sequence(:name) { |n| "pardot#{n}" }
     icon "cloud"
     supports_branch_deploy true
   end
