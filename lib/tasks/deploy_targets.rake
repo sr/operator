@@ -33,67 +33,31 @@ namespace :canoe do
     }.save
   end
 
-  desc 'Create deploy targets for dev env'
-  task :create_dev_targets => :environment do
-    dev = DeployTarget.where(name: 'dev').first
-    DeployTarget.create(
-      name: 'dev',
-      script_path: "#{Rails.root}/../sync_scripts",
-    ) if !dev
+  desc 'Create targets for deployment'
+  task :create_targets => :environment do
+    case Rails.env
+    when 'development'
+      DeployTarget.find_or_initialize_by(name: 'dev').tap { |target|
+        target.script_path = "#{Rails.root}/../sync_scripts"
+      }.save
 
-    test = DeployTarget.where(name: 'test').first
-    DeployTarget.create(
-      name: 'test',
-      script_path: "#{Rails.root}/../sync_scripts",
-    ) if !test
+      DeployTarget.find_or_initialize_by(name: 'test').tap { |target|
+        target.script_path = "#{Rails.root}/../sync_scripts"
+      }.save
+    when 'test'
+      # tests create their own targets via FactoryGirl
+    when 'app.dev'
+      DeployTarget.find_or_initialize_by(name: 'staging').tap { |target|
+        target.script_path = '/opt/sync/staging'
+      }.save
+
+      DeployTarget.find_or_initialize_by(name: 'engagement').tap { |target|
+        target.script_path = '/opt/sync/staging'
+      }.save
+    when 'production'
+      DeployTarget.find_or_initialize_by(name: "production").tap { |target|
+        target.script_path = "/opt/sync/production"
+      }.save
+    end
   end
-
-  desc 'Create deploy targets for test/staging envs'
-  task :create_staging_targets => :environment do
-    testing_env = DeployTarget.where(name: 'test').first
-    DeployTarget.create(
-      name: 'test',
-      script_path: '/opt/sync/test',
-    ) if !testing_env
-
-    staging_env = DeployTarget.where(name: 'staging').first
-    DeployTarget.create(
-      name: 'staging',
-      script_path: '/opt/sync/staging',
-    ) if !staging_env
-  end
-
-  desc 'Create deploy targets for new-staging env'
-  task :create_new_staging_targets => :environment do
-    staging_env = DeployTarget.where(name: 'staging').first
-    DeployTarget.create(
-      name: 'staging',
-      script_path: '/opt/sync/staging',
-    ) if !staging_env
-
-    engage_env = DeployTarget.where(name: 'engagement').first
-    DeployTarget.create(
-      name: 'engagement',
-      script_path: '/opt/sync/staging',
-    ) if !engage_env
-  end
-
-  desc "Create deploy target for production env"
-  task :create_prod_targets => :environment do
-    prod_env = DeployTarget.where(name: "production").first
-    DeployTarget.create(
-      name: "production",
-      script_path: "/opt/sync/production",
-    ) unless prod_env
-  end
-
-  # added for ease of chef'ing
-  task :create_development_targets => :environment do
-    Rake::Task["canoe:create_dev_targets"].invoke
-  end
-
-  task :create_production_targets => :environment do
-    Rake::Task["canoe:create_prod_targets"].invoke
-  end
-
 end
