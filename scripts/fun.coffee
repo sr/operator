@@ -61,7 +61,7 @@ module.exports = (robot) ->
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.imgur.com/LUi0ncH.gif"
 
-  robot.respond /beyonce/i, (msg) ->
+  robot.respond /beyonce$/i, (msg) ->
     charisma = [
       'http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif',
       'http://static.rookiemag.com/2012/08/1346168144lisafrankfolder.jpg',
@@ -72,16 +72,16 @@ module.exports = (robot) ->
     ]
     msg.send msg.random charisma
 
-  robot.respond /puppies/i, (msg) ->
+  robot.respond /puppies$/i, (msg) ->
     msg.send "http://i.imgur.com/lSwAPqr.gif"
 
-  robot.respond /shades/i, (msg) ->
+  robot.respond /shades$/i, (msg) ->
     msg.send "http://i.imgur.com/yXAJ3Uw.gif"
 
-  robot.respond /waffles/i, (msg) ->
+  robot.respond /waffles$/i, (msg) ->
     msg.send "http://i.imgur.com/8TkPJcP.gif"
 
-  robot.respond /blame\s+(.*)/i, (msg) ->
+  robot.respond /blame\s+(.*)$/i, (msg) ->
     target = msg.match[1]
 
     blames = [
@@ -96,7 +96,7 @@ module.exports = (robot) ->
 
     msg.send msg.random blames
 
-  robot.respond /praise\s+(.*)/i, (msg) ->
+  robot.respond /praise\s+(.*)$/i, (msg) ->
     target = msg.match[1]
 
     compliments = [
@@ -186,7 +186,7 @@ module.exports = (robot) ->
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
 
-  robot.respond /(tldr|tl;dr)/i, (msg) ->
+  robot.respond /(tldr|tl;dr)$/i, (msg) ->
     TLDRS=[
       'http://media4.giphy.com/media/EeIzKI0uDz916/giphy.gif',
       'http://media2.giphy.com/media/YOvJuai8jPGpO/giphy.gif',
@@ -195,113 +195,113 @@ module.exports = (robot) ->
     ]
     msg.send msg.random TLDRS
 
-  robot.hear /over 9000/i, (msg) ->
+  robot.hear /over 9000$/i, (msg) ->
     msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
 
-  robot.hear /knowing is half the battle/i, (msg) ->
+  robot.hear /knowing is half the battle$/i, (msg) ->
     msg.send 'http://i.imgur.com/0HMzzBB.png'
 
-  robot.respond /dickbutt(\sme)?/i, (msg) ->
+  robot.respond /dickbutt(\sme)?$/i, (msg) ->
     imageMe msg, "dickbutt", (url) ->
       msg.send "#{url}"
 
-  robot.respond /chatty(\sme)?/i, (msg) ->
+  robot.respond /chatty(\sme)?$/i, (msg) ->
     imageMe msg, "chatty salesforce", (url) ->
       msg.send "#{url}"
 
-  robot.respond /doge(\sme)?/i, (msg) ->
+  robot.respond /doge(\sme)?$/i, (msg) ->
     imageMe msg, "doge", (url) ->
       msg.send "#{url}"
 
-  robot.respond /doge bomb( (\d+))?/i, (msg) ->
+  robot.respond /doge bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "doge", (url) ->
         msg.send "#{url}"
 
-  robot.respond /knightrider(\sme)?/i, (msg) ->
+  robot.respond /knightrider(\sme)?$/i, (msg) ->
     imageMe msg, "knight rider", (url) ->
       msg.send "#{url}"
 
-  robot.respond /knightrider bomb( (\d+))?/i, (msg) ->
+  robot.respond /knightrider bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "knight rider", (url) ->
         msg.send "#{url}"
 
-  robot.respond /hasselhoff(\sme)?/i, (msg) ->
+  robot.respond /hasselhoff(\sme)?$/i, (msg) ->
     imageMe msg, "knight rider", (url) ->
       msg.send "#{url}"
 
-  robot.respond /hasselhoff bomb( (\d+))?/i, (msg) ->
+  robot.respond /hasselhoff bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "hasselhoff", (url) ->
         msg.send "#{url}"
 
-  robot.respond /macgyver(\sme)?/i, (msg) ->
+  robot.respond /macgyver(\sme)?$/i, (msg) ->
     imageMe msg, "MacGyver", (url) ->
       msg.send "#{url}"
 
-  robot.respond /macgyver bomb( (\d+))?/i, (msg) ->
+  robot.respond /macgyver bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "MacGyver", (url) ->
         msg.send "#{url}"
 
-  robot.respond /busey(\sme)?/i, (msg) ->
+  robot.respond /busey(\sme)?$/i, (msg) ->
     imageMe msg, "Gary Busey", (url) ->
       msg.send "#{url}"
 
-  robot.respond /busey bomb( (\d+))?/i, (msg) ->
+  robot.respond /busey bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "Gary Busey", (url) ->
         msg.send "#{url}"
 
-  robot.respond /niccage(\sme)?/i, (msg) ->
+  robot.respond /niccage(\sme)?$/i, (msg) ->
     imageMe msg, "Nicolas Cage", (url) ->
       msg.send "#{url}"
 
-  robot.respond /niccage bomb( (\d+))?/i, (msg) ->
+  robot.respond /niccage bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "Nicolas Cage", (url) ->
         msg.send "#{url}"
 
-  robot.respond /totally\s+not\s+nic\s+cage/i, (msg) ->
+  robot.respond /totally\s+not\s+nic\s+cage$/i, (msg) ->
     imageMe msg, "Nicolas Cage as everyone", (url) ->
       msg.send "#{url}"
 
-  robot.respond /kawaii(\sme)?/i, (msg) ->
+  robot.respond /kawaii(\sme)?$/i, (msg) ->
     imageMe msg, "kawaii", (url) ->
       msg.send "#{url}"
 
-  robot.respond /kawaii bomb( (\d+))?/i, (msg) ->
+  robot.respond /kawaii bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "kawaii", (url) ->
         msg.send "#{url}"
 
-  robot.respond /corgi(\sme)?/i, (msg) ->
+  robot.respond /corgi(\sme)?$/i, (msg) ->
     imageMe msg, "corgi", (url) ->
       msg.send "#{url}"
 
-  robot.respond /corgi bomb( (\d+))?/i, (msg) ->
+  robot.respond /corgi bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
       imageMe msg, "corgi", (url) ->
         msg.send "#{url}"
 
-  robot.respond /meme(\sme)?/i, (msg) ->
+  robot.respond /meme(\sme)?$/i, (msg) ->
     imageMe msg, "meme", (url) ->
       msg.send "#{url}"
 
-  robot.respond /dankmeme(\sme)?/i, (msg) ->
+  robot.respond /dankmeme(\sme)?$/i, (msg) ->
     imageMe msg, "dank meme", (url) ->
       msg.send "#{url}"
 
-  robot.respond /winning/i, (msg) ->
+  robot.respond /winning$/i, (msg) ->
     imageMe msg, "Charlie Sheen winning", (url) ->
       msg.send "#{url}"
 
