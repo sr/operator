@@ -18,6 +18,9 @@
 
   <%- if @builds.empty? %>
     Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
+    <p>
+      You can read about creating plan branches here: <%= link_to 'Bamboo Plan Branches', 'https://confluence.dev.pardot.com/display/PE/Testing+Branches+with+Bamboo' %>
+    </p>
   <%- else %>
     <ul class="list-unstyled deploy-list">
       <% @builds.each do |build| %>
