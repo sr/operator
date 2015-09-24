@@ -19,6 +19,9 @@ namespace :canoe do
     Repo.find_or_initialize_by(name: 'realtime-frontend').tap { |repo|
       repo.icon = 'bullhorn'
       repo.supports_branch_deploy = false
+      repo.deploys_via_artifacts = true
+      repo.bamboo_project = 'PDT'
+      repo.bamboo_plan = 'RTF'
     }.save
 
     Repo.find_or_initialize_by(name: 'workflow-stats').tap { |repo|
