@@ -8,4 +8,5 @@ json.build_number deploy.build_number
 json.servers deploy.all_servers
 json.artifact_url deploy.artifact_url
 json.completed deploy.completed
+json.sha deploy.sha
 json.created_at deploy.created_at
