@@ -10,9 +10,6 @@ class Repo < ActiveRecord::Base
   end
 
   def builds(branch:, include_untested_builds: false)
-    # should never happen, but a sanity check in case this code path is encountered
-    raise "repo does not deploy via artifacts" unless deploys_via_artifacts?
-
     aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds)
     artifact_urls = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")

@@ -37,9 +37,19 @@ Rails.application.routes.draw do
     post "deploy/:id/completed_server" => "deploys#completed_server"
 
     resources :targets, param: :name, only: [] do
+      resources :repos, param: :name, only: [] do
+        resources :deploys, only: [:index]
+      end
+
       resources :deploys, only: [:show] do
         post :latest, on: :collection
         post :completed_server, on: :member
+      end
+    end
+
+    resources :repos, param: :name, only: [] do
+      resources :branches, param: :name, constraints: {name: /.*/}, only: [] do
+        resources :builds, only: [:index]
       end
     end
   end

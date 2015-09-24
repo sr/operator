@@ -27,9 +27,10 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
         "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
         "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
         "properties" => {
-          "gitBranch"   => ["master"],
-          "buildNumber" => ["1234"],
-          "gitSha"      => ["abc123"],
+          "gitBranch"      => ["master"],
+          "buildNumber"    => ["1234"],
+          "gitSha"         => ["abc123"],
+          "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"],
         },
       )
   end

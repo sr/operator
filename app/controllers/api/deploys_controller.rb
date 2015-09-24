@@ -1,7 +1,14 @@
 class Api::DeploysController < Api::Controller
-  before_filter :require_repo, only: [:latest]
-  before_filter :require_target, only: [:latest]
+  before_filter :require_repo, only: [:index, :latest]
+  before_filter :require_target, only: [:index, :latest]
   before_filter :require_deploy, only: [:show, :completed_server]
+
+  def index
+    @deploys = current_target.deploys
+      .where(repo_name: current_repo.name)
+      .order(id: :desc)
+      .limit(10)
+  end
 
   def latest
     if @deploy = current_target.last_deploy_for(current_repo.name)
