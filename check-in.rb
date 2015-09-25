@@ -46,7 +46,7 @@ begin
     Console.log("The latest deploy does not apply to this server: #{requested_deploy}", :green)
   end
 rescue => e
-  Console.syslog(e.to_s, :alert)
+  Console.syslog(e.to_s + "\n" + e.backtrace.join("\n"), :alert)
   raise e
 ensure
   lockfile.close
