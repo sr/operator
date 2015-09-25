@@ -1,5 +1,5 @@
 <%= simple_nested_form_for @server, html: {class: 'form-horizontal'}, wrapper: :horizontal_form do |f| %>
-  <%= f.input :hostname, label: 'Hostname', placeholder: 'app-s1' %>
+  <%= f.input :hostname, label: 'Hostname', placeholder: 'app-s1', disabled: @server.persisted? %>
   <%= f.input :enabled, label: 'Enabled?', wrapper: :horizontal_radio_and_checkboxes %>
 
   <div class="form-group">

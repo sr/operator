@@ -6,6 +6,7 @@
 # deployed will be a `Server` instance.
 class Server < ActiveRecord::Base
   validates :hostname, presence: true, uniqueness: true
+  attr_readonly :hostname
 
   scope :enabled, -> { where(enabled: true) }
 
