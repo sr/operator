@@ -11,7 +11,7 @@ module Canoe
 
       def deploy(repo_name:, what:, what_details:, user:, deploy_id:, servers:, log_path:, sha:, artifact_url: nil)
         args  = [repo_name]
-        args << "#{what}=#{what_details}"
+        args << "commit=#{sha}"
         args << "--artifact-url=#{artifact_url}" unless artifact_url.nil?
         args << "--user=#{user.email}"
         args << "--deploy-id=#{deploy_id}"
