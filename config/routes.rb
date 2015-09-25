@@ -30,7 +30,7 @@ Rails.application.routes.draw do
       post :unlock, on: :member
     end
   end
-  resources :servers
+  resources :servers, only: [:index, :new, :create, :edit, :update]
 
   namespace :api, defaults: {format: "json"} do
     # legacy

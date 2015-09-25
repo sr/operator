@@ -29,15 +29,6 @@ class ServersController < ApplicationController
     end
   end
 
-  def destroy
-    @server = Server.find(params[:id])
-    if @server.destroy
-      redirect_to servers_path, notice: "Server #{@server.hostname} deleted"
-    else
-      redirect_to servers_path, alert: "Server #{@server.hostname} not deleted"
-    end
-  end
-
   private
   def server_params
     params.require(:server).permit(
