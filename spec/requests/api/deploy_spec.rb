@@ -12,7 +12,7 @@ RSpec.describe "/api/deploy" do
     describe "with authentication" do
       it "should set empty list to a single server" do
         repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
-        deploy = FactoryGirl.create(:deploy)
+        deploy = FactoryGirl.create(:deploy, repo_name: repo.name)
 
         api_post "/api/deploy/#{deploy.id}/completed_server", { server: "test-server" }
 
@@ -23,7 +23,7 @@ RSpec.describe "/api/deploy" do
       context "sync_script servers" do
         it "should add to existing list of servers" do
           repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
-          deploy = FactoryGirl.create(:deploy, completed_servers: "foo,bar")
+          deploy = FactoryGirl.create(:deploy, repo_name: repo.name, completed_servers: "foo,bar")
           
           api_post "/api/deploy/#{deploy.id}/completed_server", { server: "test-server" }
           expect(Deploy.find(deploy.id).completed_servers).to eq("foo,bar,test-server")
@@ -36,7 +36,7 @@ RSpec.describe "/api/deploy" do
         it "updates the deploy result record for the server" do
           repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
           server = FactoryGirl.create(:server)
-          deploy = FactoryGirl.create(:deploy)
+          deploy = FactoryGirl.create(:deploy, repo_name: repo.name)
           result = deploy.results.create!(server: server)
 
           api_post "/api/deploy/#{deploy.id}/completed_server", { server: server.hostname }
