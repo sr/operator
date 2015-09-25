@@ -25,33 +25,6 @@ module CanoeHelper
   end
 
   # ----------------------------------------------------------------------
-  # PATHS
-  def github_url
-    "https://git.dev.pardot.com"
-  end
-
-  def github_tag_url(tag)
-    "#{github_url}/#{current_repo.full_name}/releases/tag/#{tag.name}"
-  end
-
-  def github_branch_url(branch)
-    "#{github_url}/#{current_repo.full_name}/tree/#{branch.name}"
-  end
-
-  def github_commit_url(commit)
-    "#{github_url}/#{current_repo.full_name}/commits/#{commit.sha}"
-  end
-
-  def github_sha_url(sha)
-    "#{github_url}/#{current_repo.full_name}/commits/#{sha}"
-  end
-
-  def github_diff_url(deploy1, deploy2)
-    return "#" unless deploy1 && deploy2
-    "#{github_url}/#{current_repo.full_name}/compare/#{deploy1.sha}...#{deploy2.sha}"
-  end
-
-  # ----------------------------------------------------------------------
   # HTML Helpers
   def deploy_type_icon(type)
     content_tag :i, "", class: deploy_icon_class(type)

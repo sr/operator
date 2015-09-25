@@ -9,6 +9,7 @@ class Deploy < ActiveRecord::Base
   belongs_to :auth_user
 
   has_many :results, class_name: DeployResult
+  after_create { |deploy| Hipchat.notify_deploy_start(deploy) }
 
   scope :reverse_chronological, -> { order(created_at: :desc) }
 
@@ -63,11 +64,18 @@ class Deploy < ActiveRecord::Base
 
   def complete!
     update!(completed: true)
+    Hipchat.notify_deploy_complete(self)
   end
 
   def cancel!
     update!(canceled: true, completed: true)
     kill_process!
+    Hipchat.notify_deploy_cancelled(self)
+  end
+
+  # TODO Replace the repo_name column with repo_id
+  def repo
+    Repo.find_by_name(repo_name)
   end
 
   def check_completed_status!

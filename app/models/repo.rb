@@ -1,5 +1,6 @@
 class Repo < ActiveRecord::Base
   ARTIFACTORY_REPO = "pd-canoe".freeze
+  GITHUB_URL = "https://git.dev.pardot.com".freeze
 
   def full_name
     "Pardot/#{name}"
@@ -52,6 +53,29 @@ class Repo < ActiveRecord::Base
 
   def branch(branch)
     Octokit.branch(full_name, branch)
+  end
+
+  # ----- PATHS ----
+
+  def tag_url(tag)
+    "#{GITHUB_URL}/#{full_name}/releases/tag/#{tag.name}"
+  end
+  
+  def branch_url(branch)
+    "#{GITHUB_URL}/#{full_name}/tree/#{branch.name}"
+  end
+  
+  def commit_url(commit)
+    "#{GITHUB_URL}/#{full_name}/commits/#{commit.sha}"
+  end
+  
+  def sha_url(sha)
+    "#{GITHUB_URL}/#{full_name}/commits/#{sha}"
+  end
+  
+  def diff_url(deploy1, deploy2)
+    return "#" unless deploy1 && deploy2
+    "#{GITHUB_URL}/#{full_name}/compare/#{deploy1.sha}...#{deploy2.sha}"
   end
 
   private
