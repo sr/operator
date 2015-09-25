@@ -16,7 +16,7 @@ class Conductor
     deploy_strategy = environment.current_deploy_strategy
 
     if deploy_strategy.rollback?(deploy)
-      return rollback!(deploy_strategy)
+      return rollback!(deploy, deploy_strategy)
     end
 
     unless fetch_strategy.valid?(deploy)
@@ -36,10 +36,10 @@ class Conductor
     success
   end
 
-  def rollback!(deploy_strategy)
-    environment.execute_pre_deploy_hooks
+  def rollback!(deploy, deploy_strategy)
+    environment.execute_pre_deploy_hooks(deploy)
     success = deploy_strategy.rollback
-    environment.execute_post_deploy_hooks
+    environment.execute_post_deploy_hooks(deploy)
 
     success
   end
