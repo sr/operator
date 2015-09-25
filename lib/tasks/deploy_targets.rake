@@ -29,7 +29,7 @@ namespace :canoe do
       repo.deploys_via_artifacts = true
       repo.supports_branch_deploy = true
       repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'WFS'
+      repo.bamboo_plan = 'WFST'
     }.save
   end
 
