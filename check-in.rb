@@ -34,6 +34,7 @@ begin
       Console.log("Latest deploy is marked as completed: #{requested_deploy}")
     elsif current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
       Console.log("We are up to date: #{requested_deploy}")
+      Canoe.notify_completed_server(environment, requested_deploy, requested_deploy.this_server_hostname)
     else
       Console.log("Current build: #{current_build_version || "<< None >>"}")
       Console.log("Requested deploy: #{requested_deploy}")
@@ -45,7 +46,7 @@ begin
     Console.log("The latest deploy does not apply to this server: #{requested_deploy}", :green)
   end
 rescue => e
-  Console.syslog(e.to_s, :alert)
+  Console.syslog(e.to_s + "\n" + e.backtrace.join("\n"), :alert)
   raise e
 ensure
   lockfile.close
