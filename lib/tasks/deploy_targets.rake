@@ -28,7 +28,7 @@ namespace :canoe do
       repo.icon = 'fighter-jet'
       repo.deploys_via_artifacts = true
       repo.supports_branch_deploy = true
-      repo.bamboo_project = 'WFST'
+      repo.bamboo_project = 'PDT'
       repo.bamboo_plan = 'WFS'
     }.save
   end
