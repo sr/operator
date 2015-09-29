@@ -4,9 +4,7 @@ namespace :canoe do
     Repo.find_or_initialize_by(name: 'pardot').tap { |repo|
       repo.icon = 'cloud'
       repo.supports_branch_deploy = true
-      # TODO: Is being toggled manually in app.dev; not quite ready for
-      # production rollout yet
-      # repo.deploys_via_artifacts = true
+      repo.deploys_via_artifacts = true
       repo.bamboo_project = 'PDT'
       repo.bamboo_plan = 'PPANT'
     }.save
