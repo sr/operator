@@ -12,7 +12,7 @@
     "hubot-diagnostics": "0.0.1",
     "hubot-google-images": "^0.2.1",
     "hubot-help": "^0.1.1",
-    "hubot-hipchat": "2.12.0-5",
+    "hubot-hipchat": "git+https://github.com/alindeman/hubot-hipchat#reconnect",
     "hubot-meme": "^1.2.0",
     "hubot-redis-brain": "0.0.3",
     "hubot-schedule": "^0.2.1",
