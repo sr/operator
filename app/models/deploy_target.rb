@@ -58,7 +58,7 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def lock!(repo, user)
-    locks.create!(repo: repo, auth_user: user)
+    locks.find_or_create_by!(repo: repo, auth_user: user)
   end
 
   def unlock!(repo, user)
