@@ -9,7 +9,10 @@ class Deploy < ActiveRecord::Base
   belongs_to :auth_user
 
   has_many :results, class_name: DeployResult
-  after_create { |deploy| Hipchat.notify_deploy_start(deploy) }
+  after_create do |deploy|
+    Hipchat.notify_deploy_start(deploy)
+    Hipchat.notify_untested_deploy(deploy) if Rails.env.production? && !deploy.passed_ci
+  end
 
   scope :reverse_chronological, -> { order(created_at: :desc) }
 

@@ -62,4 +62,19 @@ RSpec.describe Hipchat do
     expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg)
     Hipchat.notify_deploy_cancelled(deploy)
   end
+
+  it "should not notify_untested_deploy because we're in test" do
+    repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
+    deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214, passed_ci: false)
+    msg = "Test: #{deploy.auth_user.email} just started an UNTESTED deploy of #{deploy.repo_name.capitalize} to build214"
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, "red").never
+  end
+
+  it "should notify_untested_deploy" do
+    repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
+    deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214, passed_ci: false)
+    msg = "Test: #{deploy.auth_user.email} just started an UNTESTED deploy of #{deploy.repo_name.capitalize} to build214"
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, "red")
+    Hipchat.notify_untested_deploy(deploy)
+  end
 end
