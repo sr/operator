@@ -56,6 +56,12 @@ class Hipchat
             "following hosts: " + failed_hosts.sort.join(", ")
       notify_room(ENG_ROOM, msg, "red")
     end
+
+    def notify_untested_deploy(deploy)
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " + \
+            "an UNTESTED deploy of #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
+      notify_room(ENG_ROOM, msg, "red")
+    end
   
     def notify_room(room, msg, color=nil)
       hipchat_host = "hipchat.dev.pardot.com"
