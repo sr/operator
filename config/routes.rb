@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       get :latest, on: :collection
     end
     resources :branches, param: :name, constraints: {name: /.*/}, only: [:index] do
-      resources :builds, only: [:index]
+      resources :builds, only: [:index, :create]
     end
 
     resources :deploys, only: [:new, :create, :show] do
