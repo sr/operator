@@ -3,7 +3,7 @@
 <br>
 
 <p class="lead muted">
-  Select the <%= deploy_type_icon("build") %> <strong>build</strong> for the <%= deploy_type_icon("branch") %> <strong><%= @branch.name %></strong> branch.
+  Select the <%= deploy_type_icon("build") %> <strong>build</strong> for the <%= deploy_type_icon("branch") %> <strong><%= current_branch.name %></strong> branch.
 </p>
 
 <div>
@@ -17,9 +17,13 @@
   </div>
 
   <%- if @builds.empty? %>
-    Sorry, there are no recent builds for this branch. Kick one off in <%= link_to "Bamboo", "https://bamboo.dev.pardot.com/" %>?
     <p>
-      You can read about creating plan branches here: <%= link_to 'Bamboo Plan Branches', 'https://confluence.dev.pardot.com/display/PE/Testing+Branches+with+Bamboo' %>
+      <strong>Sorry, there are no recent builds for this branch.</strong>
+    </p>
+    <p>
+      <%= link_to repo_branch_builds_path(current_repo, current_branch.name), class: "btn btn-primary", id: "start-build-in-bamboo-button" do %>
+        <i class="icon-cogs"></i> Enqueue Build in Bamboo
+      <%- end %>
     </p>
   <%- else %>
     <ul class="list-unstyled deploy-list">
