@@ -26,7 +26,7 @@ class Hipchat
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
             "just began syncing #{deploy.repo_name.capitalize} to " + \
             "#{build_link(deploy)} [#{server_msg}]"
-      msg += "<br>GitHub Diff: <a href='#{deploy.repo.diff_url(deploy, previous_deploy)}'>" + \
+      msg += "<br>GitHub Diff: <a href='#{deploy.repo.diff_url(previous_deploy, deploy)}'>" + \
             "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" + \
             "</a>" if previous_deploy
       notify_room(ENG_ROOM, msg)
