@@ -151,7 +151,7 @@ class EnvironmentBase
   end
 
   def bounce_redis_workers
-    return if skip_redis_bounce?
+    return unless perform_redis_bounce?
 
     # restart automation workers
     Redis.bounce_workers("automationWorkers", redis_hosts, redis_ports)
@@ -166,8 +166,8 @@ class EnvironmentBase
     Redis.bounce_workers("previewWorkers", redis_hosts, redis_ports)
   end
 
-  def skip_redis_bounce?
-    true
+  def perform_redis_bounce?
+    false
   end
 
   # =========================================================================

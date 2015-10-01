@@ -8,7 +8,7 @@ class EnvironmentProduction < EnvironmentBase
     "prod"
   end
 
-  def skip_redis_bounce?
-    ShellHelper.hostname != "autojob-s47"
+  def perform_redis_bounce?
+    ShellHelper.hostname == "autojob-s47"
   end
 end
