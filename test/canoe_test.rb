@@ -2,6 +2,7 @@ require_relative "test_helper.rb"
 require "canoe"
 require "environment_test"
 require "console"
+require "shell_helper"
 
 describe Canoe do
   before {
@@ -31,10 +32,10 @@ describe Canoe do
     it "reports that the server has completed its deployment" do
       deploy = Deploy.from_hash("id" => 445)
       stub_request(:post, "#{@env.canoe_url}/api/deploy/#{deploy.id}/completed_server")
-        .with(body: {api_token: @env.canoe_api_token, server: deploy.this_server_hostname})
+        .with(body: {api_token: @env.canoe_api_token, server: ShellHelper.hostname})
         .to_return(body: %({"success": true}))
 
-      Canoe.notify_completed_server(@env, deploy, deploy.this_server_hostname)
+      Canoe.notify_completed_server(@env, deploy, ShellHelper.hostname)
     end
   end
 end

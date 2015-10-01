@@ -1,3 +1,5 @@
+require 'socket'
+
 class ShellHelper
   def self.shell_user
     execute_shell("whoami")
@@ -16,7 +18,7 @@ class ShellHelper
   end
 
   def self.hostname
-    execute_shell("hostname")
+    Socket.gethostname.sub(/\.pardot\.com$/, "")
   end
 
   # this should make it easier to test, etc...

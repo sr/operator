@@ -14,6 +14,7 @@ $:.unshift "#{SYNC_SCRIPTS_DIR}/lib/core_ext/"
 require 'canoe'
 require 'cli'
 require 'build_version'
+require 'shell_helper'
 
 cli = CLI.new
 cli.parse_arguments!
@@ -34,7 +35,7 @@ begin
       Console.log("Latest deploy is marked as completed: #{requested_deploy}")
     elsif current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
       Console.log("We are up to date: #{requested_deploy}")
-      Canoe.notify_completed_server(environment, requested_deploy, requested_deploy.this_server_hostname)
+      Canoe.notify_completed_server(environment, requested_deploy, ShellHelper.hostname)
     else
       Console.log("Current build: #{current_build_version || "<< None >>"}")
       Console.log("Requested deploy: #{requested_deploy}")

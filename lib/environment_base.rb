@@ -147,7 +147,27 @@ class EnvironmentBase
   end
 
   def notify_complete_canoe(deploy)
-    Canoe.notify_completed_server(self, deploy, deploy.this_server_hostname)
+    Canoe.notify_completed_server(self, deploy, ShellHelper.hostname)
+  end
+
+  def bounce_redis_workers
+    return if skip_redis_bounce?
+
+    # restart automation workers
+    Redis.bounce_workers("automationWorkers", redis_hosts, redis_ports)
+
+    # restart per account automation workers
+    Redis.bounce_workers("PerAccountAutomationWorker", redis_hosts, redis_ports)
+
+    # restart related object workers
+    Redis.bounce_workers("automationRelatedObjectWorkers", redis_hosts, redis_ports)
+
+    # restart automation preview workers
+    Redis.bounce_workers("previewWorkers", redis_hosts, redis_ports)
+  end
+
+  def skip_redis_bounce?
+    true
   end
 
   # =========================================================================

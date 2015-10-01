@@ -18,7 +18,7 @@ class Canoe
 
   def self.call_api(environment, method, path, params={})
     canoe_url = URI(environment.canoe_url)
-    response = Net::HTTP.start(canoe_url.host, canoe_url.port, use_ssl: (canoe_url.scheme == "https")) do |http|
+    Net::HTTP.start(canoe_url.host, canoe_url.port, use_ssl: (canoe_url.scheme == "https")) do |http|
       req = case method
             when "POST" then Net::HTTP::Post.new(path)
             when "GET" then Net::HTTP::Get.new(path)
