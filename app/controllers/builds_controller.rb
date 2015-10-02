@@ -8,9 +8,17 @@ class BuildsController < ApplicationController
       begin
         client = Bamboo::Client.new
 
-        plan_branch = \
-          client.plan_branch(project_key: current_repo.bamboo_project, build_key: current_repo.bamboo_plan, branch: params[:branch_name]) || \
-          client.create_plan_branch(project_key: current_repo.bamboo_project, build_key: current_repo.bamboo_plan, branch: params[:branch_name])
+        plan_branch = client.plan_branch(project_key: current_repo.bamboo_project, build_key: current_repo.bamboo_plan, branch: params[:branch_name])
+        if plan_branch.nil?
+          plan_branch = client.create_plan_branch(project_key: current_repo.bamboo_project, build_key: current_repo.bamboo_plan, branch: params[:branch_name])
+
+          client.update_plan_branch(
+            plan_key: plan_branch[:plan_key],
+            branch: params[:branch_name],
+            enabled: true,
+            clean_up_plan_automatically: true,
+          )
+        end
 
         latest_result = client.latest_result(plan_key: plan_branch[:plan_key])
         if latest_result && latest_result[:life_cycle_state] == "inprogress"

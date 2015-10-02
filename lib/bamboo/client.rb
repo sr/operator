@@ -60,6 +60,28 @@ module Bamboo
       end
     end
 
+    def update_plan_branch(plan_key:, branch:, enabled: true, clean_up_plan_automatically: true)
+      resp = with_client do |http|
+        req = Net::HTTP::Post.new("/branch/admin/config/saveChainBranchDetails.action")
+        req["x-atlassian-token"] = "no-check"
+        req.form_data = {
+          buildKey: plan_key,
+          planKey: plan_key,
+          branchName: branch_name_key(branch),
+          enabled: enabled.to_s,
+          planBranchCleanUpEnabled: clean_up_plan_automatically.to_s,
+        }
+        req.basic_auth(@username, @password)
+        http.request(req)
+      end
+
+      if Net::HTTPSuccess === resp || Net::HTTPRedirection === resp
+        true
+      else
+        raise Error, "Unable to update plan branch: #{resp.body}"
+      end
+    end
+
     def latest_result(plan_key:, include_all_states: true)
       resp = with_client do |http|
         req = Net::HTTP::Get.new("/rest/api/latest/result/#{plan_key}/latest?includeAllStates=#{include_all_states}")
