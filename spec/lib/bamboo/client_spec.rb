@@ -70,6 +70,28 @@ RSpec.describe Bamboo::Client do
     end
   end
 
+  describe "#update_plan_branch" do
+    it "updates a plan branch with the given attributes" do
+      request = stub_request(:post, "http://username:password@bamboo.example/branch/admin/config/saveChainBranchDetails.action")
+        .with(body: {
+          buildKey: "PDT-PPANT333",
+          planKey: "PDT-PPANT333",
+          branchName: "alindeman-testing-bamboo-builds",
+          enabled: "true",
+          planBranchCleanUpEnabled: "true",
+        }).to_return(status: 200)
+
+      client.update_plan_branch(
+        plan_key: "PDT-PPANT333",
+        branch: "alindeman/testing-bamboo-builds",
+        enabled: true,
+        clean_up_plan_automatically: true,
+      )
+
+      expect(request).to have_been_made.once
+    end
+  end
+
   describe "#latest_result" do
     it "returns the latest result for the given plan key" do
       stub_request(:get, "http://username:password@bamboo.example/rest/api/latest/result/PDT-PPANT372/latest?includeAllStates=true")
