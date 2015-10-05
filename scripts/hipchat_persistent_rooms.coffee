@@ -22,7 +22,7 @@ class HipchatPersistentRoomList
     _.keys(@brain.get(BRAIN_KEY))
 
   add: (jid) ->
-    return unless jid?
+    return unless jid? && jid.match(/@/)
 
     @_ensureBrainInitialized()
     @brain.get(BRAIN_KEY)[jid] = 1
@@ -41,10 +41,7 @@ module.exports = (robot) ->
     robot.brain.on "loaded", -> persistentRoomList.joinAll()
 
     robot.receiveMiddleware (context, next, done) ->
-      jid = context.response?.envelope?.user?.reply_to
-      if jid? and jid.match(/@/)
-        persistentRoomList.add(context.response?.envelope?.room)
-
+      persistentRoomList.add(context.response?.envelope?.room)
       next(done)
 
     robot.enter (res) ->
