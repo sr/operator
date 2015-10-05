@@ -11,7 +11,7 @@ class EnvironmentBase
 
   def initialize
     @user = nil
-    load_yaml("environments/#{short_name.downcase}.yml.erb")
+    load_yaml("environments/#{short_name}.yml.erb")
     load_secrets
   end
 
@@ -150,33 +150,13 @@ class EnvironmentBase
     Canoe.notify_completed_server(self, deploy, ShellHelper.hostname)
   end
 
-  def bounce_redis_workers
-    return unless perform_redis_bounce?
-
-    # restart automation workers
-    Redis.bounce_workers("automationWorkers", redis_hosts, redis_ports)
-
-    # restart per account automation workers
-    Redis.bounce_workers("PerAccountAutomationWorker", redis_hosts, redis_ports)
-
-    # restart related object workers
-    Redis.bounce_workers("automationRelatedObjectWorkers", redis_hosts, redis_ports)
-
-    # restart automation preview workers
-    Redis.bounce_workers("previewWorkers", redis_hosts, redis_ports)
-  end
-
-  def perform_redis_bounce?
-    false
-  end
-
   # =========================================================================
   def name
     self.class.to_s.gsub(/^Environment/,"")
   end
 
   def short_name
-    name # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
+    name.downcase # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
   end
 
   def conductor
@@ -258,6 +238,18 @@ class EnvironmentBase
 
   def custom_hooks_path
     @config.fetch(:custom_hooks, "")
+  end
+
+  def redis_hosts
+    @config.fetch(:redis_hosts, [])
+  end
+
+  def redis_ports
+    @config.fetch(:redis_ports, [])
+  end
+
+  def symfony_path
+    @config[:symfony_path]
   end
 
   private

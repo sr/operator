@@ -24,7 +24,7 @@ class ShellHelper
   # this should make it easier to test, etc...
   def self.execute_shell(command)
     # Console.log(command, :purple)
-    `#{command}`.chomp
+    IO.popen(command){ |io| io.read.strip }
   end
 
 end

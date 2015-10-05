@@ -80,8 +80,7 @@ class DeployStrategyAtomic < DeployStrategyBase
       else
         # trying an alternative approach: create "current_new" symlink and then move it to "current"
         "ln -sf #{new_path} #{environment.payload.remote_current_link}_new;" + \
-        "mv -T #{environment.payload.remote_current_link}_new #{environment.payload.remote_current_link};" + \
-        "/opt/pardot/server_hooks.sh;" # Restart job hook for now
+        "mv -T #{environment.payload.remote_current_link}_new #{environment.payload.remote_current_link};"
       end
 
     Console.log("LINK: [MOVE] current -> '#{new_path}'", :yellow)

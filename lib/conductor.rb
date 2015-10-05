@@ -1,3 +1,4 @@
+require 'redis'
 # make sure encoding works properly on the servers...
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
@@ -42,6 +43,23 @@ class Conductor
     environment.execute_post_deploy_hooks(deploy)
 
     success
+  end
+
+  def restart_jobs!(deploy)
+    # Restart automation workers
+    Redis.bounce_workers("automationWorkers", @environment.redis_hosts, @environment.redis_ports)
+    # Restart per account automation workers
+    Redis.bounce_workers("PerAccountAutomationWorker", @environment.redis_hosts, @environment.redis_ports)
+    # Restart related object workers
+    Redis.bounce_workers("automationRelatedObjectWorkers", @environment.redis_hosts, @environment.redis_ports)
+    # Restart automation preview workers
+    Redis.bounce_workers("previewWorkers", @environment.redis_hosts, @environment.redis_ports)
+
+    # Restart old style jobs
+    ShellHelper.execute_shell("#{@environment.symfony_path}/symfony-#{@environment.short_name} restart-old-jobs")
+
+    # Restart new style jobs
+    Redis.bounce_redis_jobs
   end
 
   def dont_ask!
