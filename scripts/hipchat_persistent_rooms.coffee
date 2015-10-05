@@ -13,24 +13,26 @@
 _ = require "underscore"
 
 class HipchatPersistentRoomList
-  BRAIN_KEY = "hipchat-persistent-room-list"
+  BRAIN_KEY = "hipchat-persistent-room-list2"
 
   constructor: (@adapter, @brain) ->
 
   all: ->
     @_ensureBrainInitialized()
-    @brain.get(BRAIN_KEY)
+    _.keys(@brain.get(BRAIN_KEY))
 
   add: (jid) ->
+    return unless jid?
+
     @_ensureBrainInitialized()
-    @all().push(jid) unless _.contains(@all(), jid)
+    @brain.get(BRAIN_KEY)[jid] = 1
 
   joinAll: ->
     for jid in @all()
       @adapter.connector.join(jid)
 
   _ensureBrainInitialized: ->
-    @brain.set(BRAIN_KEY, []) unless @brain.get(BRAIN_KEY)?
+    @brain.set(BRAIN_KEY, {}) unless @brain.get(BRAIN_KEY)?
 
 module.exports = (robot) ->
   # only relevant when the hipchat adapter is being used
@@ -38,7 +40,12 @@ module.exports = (robot) ->
     persistentRoomList = new HipchatPersistentRoomList(robot.adapter, robot.brain)
     robot.brain.on "loaded", -> persistentRoomList.joinAll()
 
+    robot.receiveMiddleware (context, next, done) ->
+      jid = context.response?.envelope?.user?.reply_to
+      if jid? and jid.match(/@/)
+        persistentRoomList.add(context.response?.envelope?.room)
+
+      next(done)
+
     robot.enter (res) ->
-      myJid = robot.adapter?.options?.jid
-      if myJid? and myJid == res.message.user.jid
-        persistentRoomList.add(res.message.user.room)
+      persistentRoomList.add(res.message.user.room)
