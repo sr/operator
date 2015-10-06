@@ -15,7 +15,7 @@
     "hubot-hipchat": "git+https://github.com/alindeman/hubot-hipchat#reconnect",
     "hubot-meme": "^1.2.0",
     "hubot-redis-brain": "0.0.3",
-    "hubot-schedule": "^0.2.1",
+    "hubot-schedule": "git+https://github.com/alindeman/hubot-schedule#schedule-list-prefix",
     "hubot-scripts": "^2.16.2",
     "hubot-yubikey-invalidation": "0.0.3",
     "moment": "^2.10.6",
