@@ -67,17 +67,14 @@ class CLI
     if requested_deploy.applies_to_this_server?
       if requested_deploy.stage == "completed"
         Console.log("Latest deploy is marked as completed: #{requested_deploy.build_number}")
-      elsif requested_deploy.stage == "restarting"
-        if requested_deploy.servers.include?(ShellHelper.hostname)
-          conductor = environment.conductor
-          conductor.restart_jobs!(requested_deploy)
-          Console.log("Restarted job servers")
-        else
-          Console.log("Waiting on restart")
-        end
+      elsif requested_deploy.stage == "pending_restart"
+        conductor = environment.conductor
+        conductor.restart_jobs!(requested_deploy)
+        Console.log("Restarted job servers")
+        Canoe.notify_server(environment, requested_deploy, :restarting)
       elsif current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
         Console.log("We are up to date: #{requested_deploy.build_number}")
-        Canoe.notify_completed_server(environment, requested_deploy, ShellHelper.hostname)
+        Canoe.notify_server(environment, requested_deploy, :completed)
       else
         Console.log("Current build: #{current_build_version || "<< None >>"}")
         Console.log("Requested deploy: #{requested_deploy.build_number}")

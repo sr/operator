@@ -28,14 +28,14 @@ describe Canoe do
     end
   end
 
-  describe ".notify_completed_server" do
+  describe ".notify_server" do
     it "reports that the server has completed its deployment" do
       deploy = Deploy.from_hash("id" => 445)
-      stub_request(:post, "#{@env.canoe_url}/api/deploy/#{deploy.id}/completed_server")
-        .with(body: {api_token: @env.canoe_api_token, server: ShellHelper.hostname})
+      stub_request(:post, "#{@env.canoe_url}/api/deploy/#{deploy.id}/update_stage")
+        .with(body: {api_token: @env.canoe_api_token, server: ShellHelper.hostname, stage: "completed"})
         .to_return(body: %({"success": true}))
 
-      Canoe.notify_completed_server(@env, deploy, ShellHelper.hostname)
+      Canoe.notify_server(@env, deploy, :completed)
     end
   end
 end

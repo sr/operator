@@ -94,8 +94,9 @@ describe CLI do
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
       @env.conductor.stubs(:restart_jobs!)
+      Canoe.stubs(:notify_server)
       stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
-        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"stage":"restarting","servers":["#{ShellHelper.hostname}"]}))
+        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"stage":"pending_restart","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("Restarted job servers")
       @cli.checkin
@@ -105,7 +106,7 @@ describe CLI do
       build_number = 1234
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
-      Canoe.stubs(:notify_completed_server)
+      Canoe.stubs(:notify_server)
       stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"stage":"deploying","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
@@ -117,7 +118,7 @@ describe CLI do
       build_number = 1234
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
-      Canoe.stubs(:notify_completed_server)
+      Canoe.stubs(:notify_server)
       stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"stage":"deploying","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
