@@ -10,8 +10,8 @@ class Repo < ActiveRecord::Base
     name
   end
 
-  def builds(branch:, include_untested_builds: false)
-    aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds)
+  def builds(branch:, include_untested_builds: false, limit: nil)
+    aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds, limit: limit)
     artifact_urls = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
       .map { |hash| build_artifact_url_from_hash(hash) }
@@ -79,7 +79,7 @@ class Repo < ActiveRecord::Base
   end
 
   private
-  def build_aql_query(branch:, include_untested_builds:)
+  def build_aql_query(branch:, include_untested_builds:, limit:)
     conditions = [
       {"repo"       => {"$eq"    => ARTIFACTORY_REPO}},
       {"@gitRepo"   => {"$match" => "*/#{full_name}.git"}},
@@ -106,7 +106,10 @@ class Repo < ActiveRecord::Base
       conditions << {"@passedCI" => {"$eq" => "true"}}
     end
 
-    %(items.find(#{JSON.dump("$and" => conditions)}))
+    aql = %(items.find(#{JSON.dump("$and" => conditions)}))
+    aql << %(.sort({"$desc": ["created"]}))
+    aql << %(.limit(#{limit.to_i})) if limit
+    aql
   end
 
   def build_artifact_url_from_hash(hash)
