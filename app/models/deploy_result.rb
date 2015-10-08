@@ -11,6 +11,7 @@ class DeployResult < ActiveRecord::Base
   scope :for_server, -> (server) { where(server: server).first }
 
   STAGES.each do |stage|
+    scope stage, -> { where(stage: stage) }
     define_method("#{stage}?") { self.stage == stage }
   end
 end
