@@ -3,9 +3,9 @@ require "json"
 require "deploy"
 
 class Canoe
-  def self.notify_server(environment, deploy, stage)
+  def self.notify_server(environment, deploy)
     return if !environment.use_canoe?
-    call_api(environment, "POST", "/api/deploy/#{deploy.id}/update_stage", server: ShellHelper.hostname, stage: stage)
+    call_api(environment, "POST", "/api/deploy/#{deploy.id}", server: ShellHelper.hostname, action: deploy.action, success: true)
   end
 
   def self.latest_deploy(environment)

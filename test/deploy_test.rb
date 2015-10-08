@@ -9,7 +9,7 @@ describe Deploy do
         "what"         => "branch",
         "what_details" => "master",
         "artifact_url" => "https://artifact.example/build1234.tar.gz",
-        "stage"        => "completed",
+        "action"        => "deploy",
         "servers"      => ["server1.example", "server2.example"],
       }
 
@@ -18,7 +18,7 @@ describe Deploy do
       deploy.what.must_equal json["what"]
       deploy.what_details.must_equal json["what_details"]
       deploy.artifact_url.must_equal json["artifact_url"]
-      deploy.stage.must_equal json["stage"]
+      deploy.action.must_equal json["action"]
       deploy.servers.must_equal json["servers"]
     end
   end
