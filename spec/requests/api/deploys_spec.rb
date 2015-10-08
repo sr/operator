@@ -19,7 +19,6 @@ RSpec.describe "/api/targets/:target_name/deploys" do
         deploys = FactoryGirl.create_list(:deploy, 3, deploy_target: @target, repo_name: @repo.name)
 
         api_get "/api/targets/#{@target.name}/repos/#{@repo.name}/deploys"
-        p json_response
         expect(json_response.length).to eq(3)
       end
     end
@@ -55,21 +54,30 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
           assert_nonerror_response
         end
+      end
+    end
+  end
 
-        it "lists the servers used for deployment" do
-          server = FactoryGirl.create(:server)
+  describe "/api/repos/:repo_name/deploys/:id" do
+    describe "with a valid deploy id" do
+      it "lists the servers used for deployment" do
+        server = FactoryGirl.create(:server)
 
-          deploy = FactoryGirl.create(:deploy,
-            repo_name: @repo.name,
-            deploy_target: @target,
-            specified_servers: "localhost,#{server.hostname}",
-            servers_used: "localhost"
-          )
-          deploy.results.create!(server: server, stage: "initiated")
+        deploy = FactoryGirl.create(:deploy,
+          repo_name: @repo.name,
+          deploy_target: @target,
+          specified_servers: "localhost,#{server.hostname}",
+          servers_used: "localhost",
+          completed: false,
+        )
+        deploy.results.create!(server: server, stage: "initiated")
 
-          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
-          expect(json_response["servers"]).to match_array(["localhost", server.hostname])
-        end
+        api_get "/api/targets/#{@target.name}/deploys/#{deploy.id}"
+        expect(json_response["servers"].keys).to match_array([server.hostname])
+        expect(json_response["servers"][server.hostname]).to eq({
+          "stage"  => "initiated",
+          "action" => "deploy",
+        })
       end
     end
   end

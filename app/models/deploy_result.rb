@@ -9,6 +9,7 @@ class DeployResult < ActiveRecord::Base
 
   scope :incomplete, -> { where("stage NOT IN (?)", ["completed", "failed"]) }
   scope :for_server, -> (server) { where(server: server).first }
+  scope :for_server_hostnames, -> (hostnames) { joins(:server).where(servers: {hostname: hostnames}) }
 
   STAGES.each do |stage|
     scope stage, -> { where(stage: stage) }

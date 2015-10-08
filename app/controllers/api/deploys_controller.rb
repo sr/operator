@@ -20,6 +20,7 @@ class Api::DeploysController < Api::Controller
 
   def show
     if @deploy = current_deploy
+      @results = params[:server].present? ? @deploy.results.for_server_hostnames(params[:server]) : @deploy.results
       render
     else
       render json: {error: true, message: "Unable to find requested deploy."}
@@ -44,4 +45,11 @@ class Api::DeploysController < Api::Controller
 
     render json: {success: true}
   end
+
+  private
+  def workflow_for(deploy:)
+    @workflows ||= {}
+    @workflows[deploy] ||= DeployWorkflow.new(deploy: deploy)
+  end
+  helper_method :workflow_for
 end

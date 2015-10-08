@@ -25,10 +25,10 @@ class DeployWorkflow
     end
   end
 
-  def next_action_for(server:)
+  def next_action_for(server:, result: nil)
     return nil if @deploy.completed?
 
-    result = require_result_for(server: server)
+    result ||= require_result_for(server: server)
     if result.initiated?
       "deploy"
     elsif @deploy.restart_server == server && @deploy.results.initiated.empty?
