@@ -47,13 +47,13 @@ class Conductor
 
   def restart_jobs!(deploy)
     # Restart automation workers
-    Redis.bounce_workers("automationWorkers", @environment.redis_hosts, @environment.redis_ports)
+    Redis.bounce_workers("automationWorkers", @environment.autojob_hosts)
     # Restart per account automation workers
-    Redis.bounce_workers("PerAccountAutomationWorker", @environment.redis_hosts, @environment.redis_ports)
+    Redis.bounce_workers("PerAccountAutomationWorker", @environment.autojob_hosts)
     # Restart related object workers
-    Redis.bounce_workers("automationRelatedObjectWorkers", @environment.redis_hosts, @environment.redis_ports)
+    Redis.bounce_workers("automationRelatedObjectWorkers", @environment.autojob_hosts)
     # Restart automation preview workers
-    Redis.bounce_workers("previewWorkers", @environment.redis_hosts, @environment.redis_ports)
+    Redis.bounce_workers("previewWorkers", @environment.autojob_hosts)
 
     # Restart old style jobs
     ShellHelper.execute_shell("#{@environment.symfony_path}/symfony-#{@environment.short_name} restart-old-jobs")

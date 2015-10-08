@@ -240,12 +240,8 @@ class EnvironmentBase
     @config.fetch(:custom_hooks, "")
   end
 
-  def redis_hosts
-    @config.fetch(:redis_hosts, [])
-  end
-
-  def redis_ports
-    @config.fetch(:redis_ports, [])
+  def autojob_hosts
+    @config.fetch(:autojob_hosts, [])
   end
 
   def symfony_path

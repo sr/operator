@@ -61,6 +61,9 @@
 
 :composer_cache_path: <%= sync_dir %>/composer_cache
 
-:redis_hosts:
-  - redis-rules-s1
-:redis_ports: <%= (1234..1237).to_a %>
+:autojob_hosts:
+  - redis-rules-s1:1234..1237
+  - redis-cache-d1
+  - redis-cache-d2
+  - redis-cache-d3
+  - redis-cache-d4

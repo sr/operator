@@ -3,7 +3,7 @@ require "shell_helper"
 
 class Redis
   class Host
-    attr_accessor :host, :port
+    attr_accessor :host, :port, :db
 
     def initialize(host, port, db = nil)
       self.host = host
@@ -33,7 +33,7 @@ class Redis
   end # Host
 
   class << self
-    def bounce_workers(type, redis_hosts=[], redis_ports=[])
+    def bounce_workers(type, redis_hosts=[])
       if ! redis_installed?
         Console.log("WARNING: Redis is NOT installed!", :yellow)
         return
@@ -51,11 +51,14 @@ class Redis
       key = "#{type}-manager-config"
       entry = "restart"
       value = Time.now.to_i
-
-      # Find which port has the key
-      redis_ports.each do |port|
-        redis_hosts.each do |host_name|
-          host = Redis::Host.new(host_name, port)
+      Array(redis_hosts).each do |host_and_port|
+        hostname, port_string = host_and_port.split(':')
+        port_string ||= "6379" # Default Redis port
+        ports = port_string.split('..').map{|d| Integer(d)}
+        port_range = ports.length > 1 ? ports[0]..ports[1] : ports
+        # Find which port has the key
+        port_range.each do |port|
+          host = Redis::Host.new(hostname, port)
           if host.has_key?(key)
             Console.log("Found key #{key} on port #{port}, restarting workers using timestamp value #{value}", :yellow)
             host.hset(key, entry, value)
@@ -63,7 +66,6 @@ class Redis
           end
         end
       end
-
       false
     end
 
