@@ -82,7 +82,7 @@ describe CLI do
       build_number = 1234
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":null,"servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("Nothing to do for this deploy: #{build_number}")
@@ -95,7 +95,7 @@ describe CLI do
       artifact_url = "http://artifactory.example/build1234.tar.gz"
       @env.conductor.stubs(:restart_jobs!)
       Canoe.stubs(:notify_server)
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":"restart","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("Restarted job servers")
@@ -107,7 +107,7 @@ describe CLI do
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
       Canoe.stubs(:notify_server)
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":"deploy","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("We are up to date: #{build_number}")
@@ -119,7 +119,7 @@ describe CLI do
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
       Canoe.stubs(:notify_server)
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":"deploy","servers":["#{ShellHelper.hostname}"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("We are up to date: #{build_number}")
@@ -131,7 +131,7 @@ describe CLI do
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
       @env.conductor.stubs(:deploy!)
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":"deploy","servers":["#{ShellHelper.hostname}"]}))
       current_build_version = BuildVersion.new(build_number-1,sha,"http://example/build123.tar")
       BuildVersion.stubs(:load).returns(current_build_version)
@@ -144,7 +144,7 @@ describe CLI do
       build_number = 1234
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"action":null,"servers":["localhost"]}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
       Console.expects(:log).with("The latest deploy does not apply to this server: #{build_number}", :green)

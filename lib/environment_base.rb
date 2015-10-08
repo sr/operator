@@ -147,7 +147,7 @@ class EnvironmentBase
   end
 
   def notify_complete_canoe(deploy)
-    Canoe.notify_server(self, deploy, :completed)
+    Canoe.notify_server(self, deploy)
   end
 
   # =========================================================================
