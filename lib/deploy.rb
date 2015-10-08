@@ -8,7 +8,7 @@ Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :se
       hash["what_details"],
       hash["build_number"],
       hash["artifact_url"],
-      hash["server_actions"]
+      hash["servers"]
     )
   end
 
@@ -17,8 +17,8 @@ Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :se
   end
 
   def action
-    if server_actions
-      server_actions[ShellHelper.hostname]
+    if server_actions && server_actions[ShellHelper.hostname]
+      server_actions[ShellHelper.hostname]["action"]
     else
       nil
     end
