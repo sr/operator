@@ -7,17 +7,12 @@ class Quotes
         conn.end()
         cb(err, r, f) if cb
 
-  random: (context, n, substring, cb) ->
+  random: (context, n, regexp, cb) ->
     db.createClient (conn) ->
-      if substring
-        if ((substring.split " ")[0] is "regex")
-          conn.query 'SELECT quote FROM quotes WHERE context = ? AND quote RLIKE ? ORDER BY rand() LIMIT ?', [context, substring.substr(substring.indexOf(" ") + 1), n], (err, r, f) ->
-            conn.end()
-            cb(err, r, f) if cb
-        else 
-          conn.query 'SELECT quote FROM quotes WHERE context = ? AND quote LIKE ? ORDER BY rand() LIMIT ?', [context, "%" + substring + "%", n], (err, r, f) ->
-            conn.end()
-            cb(err, r, f) if cb
+      if regexp
+        conn.query 'SELECT quote FROM quotes WHERE context = ? AND quote RLIKE ? ORDER BY rand() LIMIT ?', [context, ".*" + regexp + ".*", n], (err, r, f) ->
+          conn.end()
+          cb(err, r, f) if cb
       else
         conn.query 'SELECT quote FROM quotes WHERE context = ? ORDER BY rand() LIMIT ?', [context, n], (err, r, f) ->
           conn.end()
