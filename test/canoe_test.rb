@@ -15,7 +15,7 @@ describe Canoe do
     it "fetches the latest deploy from the Canoe API" do
       stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
         .with(body: {repo_name: @env.payload.id.to_s, server: ShellHelper.hostname})
-        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"action":null,"servers":["localhost"]}))
+        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"server_actions":{"localhost":null}}))
 
       deploy = Canoe.latest_deploy(@env)
       deploy.id.must_equal 445
@@ -23,14 +23,13 @@ describe Canoe do
       deploy.what_details.must_equal "master"
       deploy.artifact_url.must_equal "http://artifactory.example/build1234.tar.gz"
       deploy.build_number.must_equal 1234
-      deploy.action.must_equal nil
-      deploy.servers.must_equal ["localhost"]
+      deploy.server_actions.must_be_instance_of Hash
     end
   end
 
   describe ".notify_server" do
     it "reports that the server has completed its deployment" do
-      deploy = Deploy.from_hash("id" => 445, "action" => "deploy")
+      deploy = Deploy.from_hash("id" => 445, "server_actions" => { ShellHelper.hostname => "deploy" })
       stub_request(:put, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/#{deploy.id}")
         .with(body: {server: ShellHelper.hostname, action: "deploy", success: "true"})
         .to_return(body: %({"success": true}))

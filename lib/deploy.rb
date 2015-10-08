@@ -1,6 +1,6 @@
 require 'shell_helper'
 
-Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :action, :servers) do
+Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions) do
   def self.from_hash(hash)
     new(
       hash["id"],
@@ -8,12 +8,23 @@ Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :ac
       hash["what_details"],
       hash["build_number"],
       hash["artifact_url"],
-      hash["action"],
-      hash["servers"]
+      hash["server_actions"]
     )
   end
 
   def applies_to_this_server?
-    servers && servers.include?(ShellHelper.hostname)
+    server_actions && server_actions.key?(ShellHelper.hostname)
+  end
+
+  def action
+    if server_actions
+      server_actions[ShellHelper.hostname]
+    else
+      nil
+    end
+  end
+
+  def servers
+    server_actions.keys
   end
 end
