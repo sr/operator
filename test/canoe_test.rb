@@ -13,8 +13,7 @@ describe Canoe do
 
   describe ".latest_deploy" do
     it "fetches the latest deploy from the Canoe API" do
-      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
-        .with(body: {repo_name: @env.payload.id.to_s, server: ShellHelper.hostname})
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest?repo_name=pardot&server=juhlrich-ltm2.internal.salesforce.com")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"server_actions":{"localhost":null}}))
 
       deploy = Canoe.latest_deploy(@env)
