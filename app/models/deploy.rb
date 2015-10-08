@@ -84,7 +84,7 @@ class Deploy < ActiveRecord::Base
   def check_completed_status!
     return if completed?
 
-    if !process_still_running? && !pending_results_present?
+    if !process_still_running? && !incomplete_results_present?
       complete!
     end
   end
@@ -100,8 +100,8 @@ class Deploy < ActiveRecord::Base
     false
   end
 
-  def pending_results_present?
-    results.pending.any?
+  def incomplete_results_present?
+    results.incomplete.any?
   end
 
   def kill_process!(forcefully=false)

@@ -30,7 +30,7 @@ class Api::DeploysController < Api::Controller
     if current_deploy
       server = Server.find_by_hostname(params[:server])
       if server && result = current_deploy.results.where(server: server).first
-        result.update(status: "completed")
+        result.update(stage: "completed")
       else
         # TODO: Remove this section of code when sync_scripts are no longer used
         servers = current_deploy.finished_servers

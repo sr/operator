@@ -38,7 +38,7 @@ module Canoe
           artifact_url: artifact_url,
         ).tap { |deploy|
           pull_servers.each do |server|
-            deploy.results.create!(server: server, status: "pending")
+            deploy.results.create!(server: server, stage: "initiated")
           end
         }
       end

@@ -15,9 +15,9 @@
 <div class="container">
   <h4>Pull-Based Servers</h4>
   <%- deploy.results.each do |result| %>
-    <div class="deploy-server-status">
-      <%- if result.pending? %>
-        <span class="text-muted muted" title="Pending"><i class="icon-check-empty"></i></span>
+    <div class="deploy-server-stage">
+      <%- if result.initiated? %>
+        <span class="text-muted muted" title="Initiated"><i class="icon-check-empty"></i></span>
       <%- elsif result.completed? %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
       <% elsif result.failed? %>

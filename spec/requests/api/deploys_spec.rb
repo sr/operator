@@ -65,7 +65,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             specified_servers: "localhost,#{server.hostname}",
             servers_used: "localhost"
           )
-          deploy.results.create!(server: server, status: "pending")
+          deploy.results.create!(server: server, stage: "initiated")
 
           api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
           expect(json_response["servers"]).to match_array(["localhost", server.hostname])
