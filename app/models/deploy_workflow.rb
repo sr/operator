@@ -1,4 +1,6 @@
 class DeployWorkflow
+  TransitionError = Class.new(StandardError)
+
   def self.initiate(deploy:, servers:)
     servers.each do |server|
       deploy.results.create!(server: server, stage: "initiated")
@@ -15,13 +17,32 @@ class DeployWorkflow
     result = @deploy.results.for_server(server)
     raise ArgumentError, "No deploy result found for #{server} in #{deploy}" unless result
 
+    case [result.stage, action]
+    when ["initiated", "deploy"]
+      notify_action_deploy_successful(result: result)
+    when ["deployed", "restart"]
+      notify_action_restart_successful(result: result)
+    else
+      raise TransitionError, "No transition from #{result.stage} via action #{action} for server #{server.hostname}"
+    end
+  end
+
+  private
+  def notify_action_deploy_successful(result:)
     # This update_all line is atomic. It can't race with another restart server
     # being assigned. As far as I know, this is the only way to achieve this
     # kind of thing in Rails :/
-    if Deploy.where(id: @deploy.id, restart_server_id: nil).update_all(restart_server_id: server.id) > 0
+    if Deploy.where(id: @deploy.id, restart_server_id: nil).update_all(restart_server_id: result.server_id) > 0
       result.update(stage: "deployed")
     else
       result.update(stage: "completed")
     end
+
+    @deploy.check_completed_status!
+  end
+
+  def notify_action_restart_successful(result:)
+    result.update(stage: "completed")
+    @deploy.check_completed_status!
   end
 end

@@ -28,20 +28,56 @@ RSpec.describe DeployWorkflow do
   end
 
   context "initiated -> completed" do
-    it "moves servers other than the restart server to the completed state" do
+    it "moves servers other than the restart server to the completed stage" do
       servers = FactoryGirl.create_list(:server, 3)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
 
       restart_server = servers.first
       workflow.notify_action_successful(server: restart_server, action: "deploy")
 
-      second_server = servers[1]
-      workflow.notify_action_successful(server: second_server, action: "deploy")
-      expect(deploy.results.for_server(second_server).stage).to eq("completed")
+      server2 = servers[1]
+      workflow.notify_action_successful(server: server2, action: "deploy")
+      expect(deploy.results.for_server(server2).stage).to eq("completed")
 
-      third_server = servers[2]
-      workflow.notify_action_successful(server: third_server, action: "deploy")
-      expect(deploy.results.for_server(third_server).stage).to eq("completed")
+      server3 = servers[2]
+      workflow.notify_action_successful(server: server3, action: "deploy")
+      expect(deploy.results.for_server(server3).stage).to eq("completed")
+    end
+  end
+
+  context "deployed -> completed" do
+    it "moves the restart server to the completed stage after it reports a successful restart" do
+      servers = FactoryGirl.create_list(:server, 3)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
+
+      restart_server = servers.first
+      workflow.notify_action_successful(server: restart_server, action: "deploy")
+      workflow.notify_action_successful(server: restart_server, action: "restart")
+
+      expect(deploy.results.for_server(restart_server).stage).to eq("completed")
+    end
+
+    it "moves the entire deploy to be completed when all results are completed" do
+      restart_server, other_server = FactoryGirl.create_list(:server, 2)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
+
+      workflow.notify_action_successful(server: restart_server, action: "deploy")
+      workflow.notify_action_successful(server: other_server, action: "deploy")
+      workflow.notify_action_successful(server: restart_server, action: "restart")
+
+      deploy.reload
+      expect(deploy.completed).to be_truthy
+    end
+  end
+
+  context "invalid transition" do
+    it "raises a TransitionError" do
+      server = FactoryGirl.create(:server)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
+
+      expect {
+        workflow.notify_action_successful(server: server, action: "restart")
+      }.to raise_error(DeployWorkflow::TransitionError)
     end
   end
 end
