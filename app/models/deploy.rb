@@ -7,8 +7,10 @@ class Deploy < ActiveRecord::Base
   # validate type = %w[tag branch commit]
   belongs_to :deploy_target
   belongs_to :auth_user
+  belongs_to :restart_server, class_name: Server
 
   has_many :results, class_name: DeployResult
+
   after_create do |deploy|
     Hipchat.notify_deploy_start(deploy)
     Hipchat.notify_untested_deploy(deploy) if Rails.env.production? && !deploy.passed_ci
