@@ -66,8 +66,7 @@ class CLI
     requested_deploy = Canoe.latest_deploy(environment)
     if requested_deploy.applies_to_this_server?
       if requested_deploy.action == "restart"
-        conductor = environment.conductor
-        conductor.restart_jobs!(requested_deploy)
+        environment.conductor.restart_jobs!(requested_deploy) unless Rails.env.production?
         Console.log("Restarted job servers")
         Canoe.notify_server(environment, requested_deploy)
       elsif requested_deploy.action == "deploy"
