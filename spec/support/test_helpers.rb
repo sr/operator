@@ -14,7 +14,7 @@ module TestHelpers
   end
 
   def assert_json_error_response(message_match=//)
-    expect(response).to be_ok
+    expect(response).not_to be_ok
     expect(json_response["error"]).to be_truthy
     expect(json_response["message"]).to match(message_match)
   end

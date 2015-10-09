@@ -6,7 +6,7 @@ class Api::Controller < ApplicationController
   def require_api_authentication
     provided_api_token = request.headers["X-Api-Token"].presence || params[:api_token].presence
     if ENV["API_AUTH_TOKEN"].nil? || provided_api_token.nil? || !Rack::Utils.secure_compare(ENV["API_AUTH_TOKEN"], provided_api_token)
-      render json: { error: true, message: "Invalid auth token" }
+      render status: 401, json: { error: true, message: "Invalid auth token" }
       false
     end
   end
