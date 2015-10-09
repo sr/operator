@@ -11,7 +11,7 @@ class EnvironmentBase
 
   def initialize
     @user = nil
-    load_yaml("environments/#{short_name.downcase}.yml.erb")
+    load_yaml("environments/#{short_name}.yml.erb")
     load_secrets
   end
 
@@ -147,7 +147,7 @@ class EnvironmentBase
   end
 
   def notify_complete_canoe(deploy)
-    Canoe.notify_completed_server(self, deploy, deploy.this_server_hostname)
+    Canoe.notify_server(self, deploy)
   end
 
   # =========================================================================
@@ -156,7 +156,7 @@ class EnvironmentBase
   end
 
   def short_name
-    name # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
+    name.downcase # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
   end
 
   def conductor
@@ -238,6 +238,14 @@ class EnvironmentBase
 
   def custom_hooks_path
     @config.fetch(:custom_hooks, "")
+  end
+
+  def autojob_hosts
+    @config.fetch(:autojob_hosts, [])
+  end
+
+  def symfony_path
+    @config[:symfony_path]
   end
 
   private

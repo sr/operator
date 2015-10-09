@@ -2,6 +2,7 @@ require_relative "test_helper.rb"
 require "canoe"
 require "environment_test"
 require "console"
+require "shell_helper"
 
 describe Canoe do
   before {
@@ -12,9 +13,8 @@ describe Canoe do
 
   describe ".latest_deploy" do
     it "fetches the latest deploy from the Canoe API" do
-      stub_request(:post, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest")
-        .with(body: {api_token: @env.canoe_api_token, repo_name: @env.payload.id.to_s})
-        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"completed":true,"servers":["localhost"]}))
+      stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest?repo_name=pardot&server=juhlrich-ltm2.internal.salesforce.com")
+        .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"http://artifactory.example/build1234.tar.gz","build_number":1234,"servers":{"localhost":{"stage":"completed","action":null}}}))
 
       deploy = Canoe.latest_deploy(@env)
       deploy.id.must_equal 445
@@ -22,19 +22,18 @@ describe Canoe do
       deploy.what_details.must_equal "master"
       deploy.artifact_url.must_equal "http://artifactory.example/build1234.tar.gz"
       deploy.build_number.must_equal 1234
-      deploy.completed.must_equal true
-      deploy.servers.must_equal ["localhost"]
+      deploy.server_actions.must_be_instance_of Hash
     end
   end
 
-  describe ".notify_completed_server" do
+  describe ".notify_server" do
     it "reports that the server has completed its deployment" do
-      deploy = Deploy.from_hash("id" => 445)
-      stub_request(:post, "#{@env.canoe_url}/api/deploy/#{deploy.id}/completed_server")
-        .with(body: {api_token: @env.canoe_api_token, server: deploy.this_server_hostname})
+      deploy = Deploy.from_hash("id" => 445, "servers" => {ShellHelper.hostname => {"action" => "deploy" }})
+      stub_request(:put, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/#{deploy.id}/results/#{ShellHelper.hostname}")
+        .with(body: {action: "deploy", success: "true"})
         .to_return(body: %({"success": true}))
 
-      Canoe.notify_completed_server(@env, deploy, deploy.this_server_hostname)
+      Canoe.notify_server(@env, deploy)
     end
   end
 end

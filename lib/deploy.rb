@@ -1,6 +1,6 @@
-require 'socket'
+require 'shell_helper'
 
-Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :completed, :servers) do
+Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions) do
   def self.from_hash(hash)
     new(
       hash["id"],
@@ -8,16 +8,23 @@ Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :co
       hash["what_details"],
       hash["build_number"],
       hash["artifact_url"],
-      hash["completed"],
       hash["servers"]
     )
   end
 
-  def this_server_hostname
-    Socket.gethostname.sub(/\.pardot\.com$/, "")
+  def applies_to_this_server?
+    server_actions && server_actions.key?(ShellHelper.hostname)
   end
 
-  def applies_to_this_server?
-    servers && servers.include?(this_server_hostname)
+  def action
+    if server_actions && server_actions[ShellHelper.hostname]
+      server_actions[ShellHelper.hostname]["action"]
+    else
+      nil
+    end
+  end
+
+  def servers
+    server_actions.keys
   end
 end

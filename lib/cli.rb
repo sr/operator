@@ -61,6 +61,31 @@ class CLI
       end
   end
 
+  def checkin
+    current_build_version = BuildVersion.load(environment.payload.build_version_file)
+    requested_deploy = Canoe.latest_deploy(environment)
+    if requested_deploy.applies_to_this_server?
+      if requested_deploy.action == "restart"
+        environment.conductor.restart_jobs!(requested_deploy) unless Rails.env.production?
+        Console.log("Restarted job servers")
+        Canoe.notify_server(environment, requested_deploy)
+      elsif requested_deploy.action == "deploy"
+        if current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
+          Console.log("We are up to date: #{requested_deploy.build_number}")
+          Canoe.notify_server(environment, requested_deploy)
+        else
+          Console.log("Current build: #{current_build_version || "<< None >>"}")
+          Console.log("Requested deploy: #{requested_deploy.build_number}")
+          environment.conductor.deploy!(requested_deploy)
+        end
+      else
+        Console.log("Nothing to do for this deploy: #{requested_deploy.build_number}")
+      end
+    else
+      Console.log("The latest deploy does not apply to this server: #{requested_deploy.build_number}", :green)
+    end
+  end
+
   private
   def default_options
     {
