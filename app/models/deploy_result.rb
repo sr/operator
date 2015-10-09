@@ -15,4 +15,8 @@ class DeployResult < ActiveRecord::Base
     scope stage, -> { where(stage: stage) }
     define_method("#{stage}?") { self.stage == stage }
   end
+
+  def self.for_server_hostname(hostname)
+    joins(:server).where(servers: {hostname: hostname}).first
+  end
 end

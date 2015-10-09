@@ -42,6 +42,7 @@ Rails.application.routes.draw do
       end
 
       resources :deploys, only: [:show] do
+        resources :results, param: :hostname, constraints: {hostname: /.*/}, only: [:update]
         get :latest, on: :collection
         post :completed_server, on: :member
       end

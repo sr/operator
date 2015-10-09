@@ -19,21 +19,26 @@ class Api::Controller < ApplicationController
 
   def require_target
     return if current_target
-    render json: {error: true, message: "Invalid target specified."}
+    render status: 404, json: {error: true, message: "Invalid target specified."}
   end
 
   def require_user
     return if current_user
-    render json: {error: true, message: "Invalid user specified."}
+    render status: 400, json: {error: true, message: "Invalid user specified."}
   end
 
   def require_repo
     return if current_repo
-    render json: {error: true, message: "Invalid repo specified."}
+    render status: 404, json: {error: true, message: "Invalid repo specified."}
   end
 
   def require_deploy
     return if current_deploy
-    render json: {error: true, message: "Invalid deploy specified."}
+    render status: 404, json: {error: true, message: "Invalid deploy specified."}
+  end
+
+  def require_result
+    return if current_result
+    render status: 404, json: {error: true, message: "Invalid result specified."}
   end
 end

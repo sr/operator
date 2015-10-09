@@ -1,6 +1,7 @@
 module TestHelpers
   def json_response
-    JSON.parse(response.body)
+    return @json_response if defined?(@json_response)
+    @json_response = JSON.parse(response.body)
   end
 
   def assert_nonerror_response
@@ -31,6 +32,10 @@ module TestHelpers
 
   def api_post(url, params={})
     post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), {}
+  end
+
+  def api_put(url, params={})
+    put url, { user_email: "sveader@salesforce.com" }.merge(params), { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
   end
 
   # ---------------------------------------------------------------------
