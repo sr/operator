@@ -29,8 +29,8 @@ describe Canoe do
   describe ".notify_server" do
     it "reports that the server has completed its deployment" do
       deploy = Deploy.from_hash("id" => 445, "servers" => {ShellHelper.hostname => {"action" => "deploy" }})
-      stub_request(:put, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/#{deploy.id}")
-        .with(body: {server: ShellHelper.hostname, action: "deploy", success: "true"})
+      stub_request(:put, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/#{deploy.id}/results/#{ShellHelper.hostname}")
+        .with(body: {action: "deploy", success: "true"})
         .to_return(body: %({"success": true}))
 
       Canoe.notify_server(@env, deploy)

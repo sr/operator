@@ -1,11 +1,12 @@
 require "net/http"
+require "cgi"
 require "json"
 require "deploy"
 
 class Canoe
   def self.notify_server(environment, deploy)
     return if !environment.use_canoe?
-    call_api(environment, "PUT", "/api/targets/#{environment.canoe_target}/deploys/#{deploy.id}", server: ShellHelper.hostname, action: deploy.action, success: true)
+    call_api(environment, "PUT", "/api/targets/#{environment.canoe_target}/deploys/#{deploy.id}/results/#{ShellHelper.hostname}", action: deploy.action, success: true)
   end
 
   def self.latest_deploy(environment)
