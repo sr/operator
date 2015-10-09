@@ -27,7 +27,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
   describe "/api/targets/:target_name/deploys/latest" do
     describe "without authentication" do
       it "should error" do
-        post "/api/targets/#{@target.name}/deploys/latest"
+        get "/api/targets/#{@target.name}/deploys/latest"
         assert_json_error_response("auth token")
       end
     end
@@ -35,14 +35,14 @@ RSpec.describe "/api/targets/:target_name/deploys" do
     describe "with authentication" do
       describe "without repo_name" do
         it "should error" do
-          api_post "/api/targets/#{@target.name}/deploys/latest", { }
+          api_get "/api/targets/#{@target.name}/deploys/latest"
           assert_json_error_response("Invalid repo")
         end
       end
 
       describe "with a bogus repo name" do
         it "should error" do
-          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: "foobar" }
+          api_get "/api/targets/#{@target.name}/deploys/latest?repo_name=foobar"
           assert_json_error_response("Invalid repo")
         end
       end
@@ -51,7 +51,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
         it "should list the latest deploy info" do
           deploy = FactoryGirl.create(:deploy, repo_name: @repo.name, deploy_target: @target)
 
-          api_post "/api/targets/#{@target.name}/deploys/latest", { repo_name: @repo.name }
+          api_get "/api/targets/#{@target.name}/deploys/latest?repo_name=#{CGI.escape(@repo.name)}"
           assert_nonerror_response
         end
       end

@@ -42,7 +42,7 @@ Rails.application.routes.draw do
       end
 
       resources :deploys, only: [:show] do
-        post :latest, on: :collection
+        get :latest, on: :collection
         post :completed_server, on: :member
       end
     end
