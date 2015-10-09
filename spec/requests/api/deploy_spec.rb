@@ -43,7 +43,7 @@ RSpec.describe "/api/deploy" do
           assert_nonerror_response
 
           result.reload
-          expect(result.status).to eq("completed")
+          expect(result.stage).to eq("completed")
         end
       end
     end

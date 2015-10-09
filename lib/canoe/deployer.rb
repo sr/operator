@@ -37,9 +37,7 @@ module Canoe
           build_number: build_number,
           artifact_url: artifact_url,
         ).tap { |deploy|
-          pull_servers.each do |server|
-            deploy.results.create!(server: server, status: "pending")
-          end
+          DeployWorkflow.initiate(deploy: deploy, servers: pull_servers)
         }
       end
 

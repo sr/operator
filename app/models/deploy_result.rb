@@ -2,22 +2,21 @@ class DeployResult < ActiveRecord::Base
   belongs_to :deploy
   belongs_to :server
 
-  STATUSES = %w(pending completed failed)
-  validates :status,
+  STAGES = %w(initiated deployed completed failed)
+  validates :stage,
     presence: true,
-    inclusion: {in: STATUSES}
+    inclusion: {in: STAGES}
 
-  scope :pending, -> { where(status: "pending") }
+  scope :incomplete, -> { where("stage NOT IN (?)", ["completed", "failed"]) }
+  scope :for_server, -> (server) { where(server: server).first }
+  scope :for_server_hostnames, -> (hostnames) { joins(:server).where(servers: {hostname: hostnames}) }
 
-  def pending?
-    status == "pending"
+  STAGES.each do |stage|
+    scope stage, -> { where(stage: stage) }
+    define_method("#{stage}?") { self.stage == stage }
   end
 
-  def completed?
-    status == "completed"
-  end
-
-  def failed?
-    status == "failed"
+  def self.for_server_hostname(hostname)
+    joins(:server).where(servers: {hostname: hostname}).first
   end
 end

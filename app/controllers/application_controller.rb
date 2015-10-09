@@ -30,11 +30,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def current_result
+    return @current_result if defined?(@current_result)
+    @current_result = current_deploy.results.for_server_hostname(params[:hostname] || params[:server_hostname])
+  end
+  helper_method :current_result
+
   def current_deploy
     return @current_deploy if defined?(@current_deploy)
     @current_deploy =
-      if params[:id].present?
-        deploy = Deploy.find_by_id(params[:id].to_i)
+      if id = params[:deploy_id] || params[:id]
+        deploy = Deploy.find_by_id(id.to_i)
         if deploy && params[:repo_name].blank?
           # set the repo name if it's not in the params hash already
           params[:repo_name] = deploy.repo_name
@@ -88,6 +94,16 @@ class ApplicationController < ActionController::Base
   def require_target
     return if current_target
     raise ActiveRecord::RecordNotFound.new("no target found")
+  end
+
+  def require_deploy
+    return if current_deploy
+    raise ActiveRecord::RecordNotFound.new("no deploy found")
+  end
+
+  def require_result
+    return if current_result
+    raise ActiveRecord::RecordNotFound.new("no result found")
   end
 
   def build_provisional_deploy

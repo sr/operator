@@ -20,6 +20,7 @@ class Api::DeploysController < Api::Controller
 
   def show
     if @deploy = current_deploy
+      @results = params[:server].present? ? @deploy.results.for_server_hostnames(params[:server]) : @deploy.results
       render
     else
       render json: {error: true, message: "Unable to find requested deploy."}
@@ -30,7 +31,7 @@ class Api::DeploysController < Api::Controller
     if current_deploy
       server = Server.find_by_hostname(params[:server])
       if server && result = current_deploy.results.where(server: server).first
-        result.update(status: "completed")
+        result.update(stage: "completed")
       else
         # TODO: Remove this section of code when sync_scripts are no longer used
         servers = current_deploy.finished_servers
@@ -44,4 +45,11 @@ class Api::DeploysController < Api::Controller
 
     render json: {success: true}
   end
+
+  private
+  def workflow_for(deploy:)
+    @workflows ||= {}
+    @workflows[deploy] ||= DeployWorkflow.new(deploy: deploy)
+  end
+  helper_method :workflow_for
 end

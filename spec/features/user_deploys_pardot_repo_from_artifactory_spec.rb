@@ -61,6 +61,6 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
     # servers will be pull servers.
     expect(deploys[0].results.length).to eq(1)
     expect(deploys[0].results[0].server.hostname).to eq(@server.hostname)
-    expect(deploys[0].results[0].status).to eq("pending")
+    expect(deploys[0].results[0].stage).to eq("initiated")
   end
 end

@@ -15,7 +15,7 @@ RSpec.describe Deploy do
       repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
       deploy = FactoryGirl.create(:deploy, repo_name: repo.name, completed: false)
       server = FactoryGirl.create(:server)
-      deploy.results.create!(server: server, status: "pending")
+      deploy.results.create!(server: server, stage: "initiated")
 
       deploy.check_completed_status!
       expect(deploy.completed?).to be_falsey
@@ -27,7 +27,7 @@ RSpec.describe Deploy do
       allow(Process).to receive(:kill).with(0, 12345).and_raise(Errno::ESRCH)
 
       server = FactoryGirl.create(:server)
-      deploy.results.create!(server: server, status: "completed")
+      deploy.results.create!(server: server, stage: "completed")
 
       deploy.check_completed_status!
       expect(deploy.completed?).to be_truthy

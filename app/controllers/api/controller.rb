@@ -4,8 +4,9 @@ class Api::Controller < ApplicationController
 
   private
   def require_api_authentication
-    if ENV["API_AUTH_TOKEN"].nil? || params[:api_token] != ENV["API_AUTH_TOKEN"]
-      render json: { error: true, message: "Invalid auth token" }
+    provided_api_token = request.headers["X-Api-Token"].presence || params[:api_token].presence
+    if ENV["API_AUTH_TOKEN"].nil? || provided_api_token.nil? || !Rack::Utils.secure_compare(ENV["API_AUTH_TOKEN"], provided_api_token)
+      render status: 401, json: { error: true, message: "Invalid auth token" }
       false
     end
   end
@@ -18,21 +19,26 @@ class Api::Controller < ApplicationController
 
   def require_target
     return if current_target
-    render json: {error: true, message: "Invalid target specified."}
+    render status: 404, json: {error: true, message: "Invalid target specified."}
   end
 
   def require_user
     return if current_user
-    render json: {error: true, message: "Invalid user specified."}
+    render status: 400, json: {error: true, message: "Invalid user specified."}
   end
 
   def require_repo
     return if current_repo
-    render json: {error: true, message: "Invalid repo specified."}
+    render status: 404, json: {error: true, message: "Invalid repo specified."}
   end
 
   def require_deploy
     return if current_deploy
-    render json: {error: true, message: "Invalid deploy specified."}
+    render status: 404, json: {error: true, message: "Invalid deploy specified."}
+  end
+
+  def require_result
+    return if current_result
+    render status: 404, json: {error: true, message: "Invalid result specified."}
   end
 end
