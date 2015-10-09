@@ -26,7 +26,7 @@ module TestHelpers
 
   # ---------------------------------------------------------------------
   def api_get(url)
-    get url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }, {}
+    get url, { user_email: "sveader@salesforce.com" }, { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
   end
 
   def api_post(url, params={})
