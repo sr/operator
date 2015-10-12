@@ -50,6 +50,7 @@ namespace :canoe do
       }.save
 
       DeployTarget.find_or_initialize_by(name: 'engagement').tap { |target|
+        target.enabled = false
         target.script_path = '/opt/sync/staging'
       }.save
     when 'production'

@@ -18,7 +18,7 @@ class DeploysController < ApplicationController
 
   def select_target
     if @prov_deploy = build_provisional_deploy
-      @targets = DeployTarget.order(:name)
+      @targets = DeployTarget.enabled.order(:name)
     else
       render_invalid_provisional_deploy
     end
