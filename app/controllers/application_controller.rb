@@ -67,9 +67,9 @@ class ApplicationController < ActionController::Base
     return @current_target if defined?(@current_target)
     @current_target =
       if params[:target_name].present?
-        DeployTarget.find_by_name(params[:target_name].to_s)
+        DeployTarget.enabled.where(name: params[:target_name].to_s).first
       elsif params[:name].present?
-        DeployTarget.find_by_name(params[:name].to_s)
+        DeployTarget.enabled.where(name: params[:name].to_s).first
       elsif current_deploy
         current_deploy.deploy_target
       end
@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_target
 
   def all_targets
-    @all_targets ||= DeployTarget.order(:name)
+    @all_targets ||= DeployTarget.enabled.order(:name)
   end
   helper_method :all_targets
 

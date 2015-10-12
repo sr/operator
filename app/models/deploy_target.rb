@@ -4,6 +4,8 @@ class DeployTarget < ActiveRecord::Base
   has_many :locks
   belongs_to :locking_user, class_name: AuthUser
 
+  scope :enabled, -> { where(enabled: true) }
+
   def to_param
     name
   end
