@@ -18,14 +18,17 @@ class BuildsController < ApplicationController
             enabled: true,
             clean_up_plan_automatically: true,
           )
-        end
 
-        latest_result = client.latest_result(plan_key: plan_branch[:plan_key])
-        if latest_result && latest_result[:life_cycle_state] == "inprogress"
-          render status: 200, json: latest_result
+          # a build will be automatically started by Bamboo in a few seconds
+          render status: 201, json: plan_branch
         else
-          queued_build = client.queue_build(plan_key: plan_branch[:plan_key])
-          render status: 201, json: queued_build
+          latest_result = client.latest_result(plan_key: plan_branch[:plan_key])
+          if latest_result && latest_result[:life_cycle_state] == "inprogress"
+            render status: 200, json: plan_branch
+          else
+            queued_build = client.queue_build(plan_key: plan_branch[:plan_key])
+            render status: 201, json: plan_branch
+          end
         end
       rescue => e
         render status: 500, json: {error: e.message}
