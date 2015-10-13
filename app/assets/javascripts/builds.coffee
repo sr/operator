@@ -12,7 +12,7 @@ $ ->
     req.done (resp) ->
       console.log resp
 
-      bambooBuildUrl = "https://bamboo.dev.pardot.com/browse/#{resp.build_result_key}"
+      bambooBuildUrl = "https://bamboo.dev.pardot.com/browse/#{resp.plan_key}"
       bambooLink = $("<a>")
         .prop("href", bambooBuildUrl)
         .text(bambooBuildUrl)
