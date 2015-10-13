@@ -5,7 +5,6 @@ require "environment_test"
 describe DeployStrategyAtomic do
   before do
     Console.silence!
-    #Syslog.stubs(:open)
   end
 
   describe "#deploy_to_server" do
