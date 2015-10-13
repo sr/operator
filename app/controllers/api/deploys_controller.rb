@@ -12,6 +12,7 @@ class Api::DeploysController < Api::Controller
 
   def latest
     if @deploy = current_target.last_deploy_for(current_repo.name)
+      @results = params[:server].present? ? @deploy.results.for_server_hostnames(params[:server]) : @deploy.results
       render action: "show"
     else
       render json: {error: true, message: "Repo #{current_repo.name} hasn't been deployed to #{current_target.name}."}

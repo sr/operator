@@ -54,6 +54,22 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           api_get "/api/targets/#{@target.name}/deploys/latest?repo_name=#{CGI.escape(@repo.name)}"
           assert_nonerror_response
         end
+
+        it "lists the servers used for deployment" do
+          server = FactoryGirl.create(:server)
+
+          deploy = FactoryGirl.create(:deploy,
+            repo_name: @repo.name,
+            deploy_target: @target,
+            specified_servers: "localhost,#{server.hostname}",
+            servers_used: "localhost",
+            completed: false,
+          )
+          deploy.results.create!(server: server, stage: "initiated")
+
+          api_get "/api/targets/#{@target.name}/deploys/latest?repo_name=#{CGI.escape(@repo.name)}"
+          expect(json_response["servers"].keys).to match_array([server.hostname])
+        end
       end
     end
   end
