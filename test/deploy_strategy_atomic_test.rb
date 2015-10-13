@@ -29,7 +29,7 @@ describe DeployStrategyAtomic do
       # ShellHelper.stubs(:remote)
       #   .with(){ | server_ip, cmd | cmd.match(/ln -sfn +(?<path>\S+) #{@payload_mock.remote_current_link}_new\;mv -T/) && @symlinks[server_ip] = Regexp.last_match[:path] }.returns("")
       ShellHelper.stubs(:execute_shell)
-        .with(){ | cmd | cmd.match(/ln -sfn +(?<path>\S+) #{@payload_mock.remote_current_link}/) && @symlink = Regexp.last_match[:path] }.returns("")
+        .with(){ | cmd | cmd.match(/ln -sfn? +(?<path>\S+) #{@payload_mock.remote_current_link}/) && @symlink = Regexp.last_match[:path] }.returns("")
       env = EnvironmentTest.new
       env.stubs(:payload).returns(@payload_mock)
       @strat = DeployStrategyAtomic.new(env)
