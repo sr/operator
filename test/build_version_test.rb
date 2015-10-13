@@ -4,7 +4,7 @@ require "tempfile"
 
 describe BuildVersion do
   it "loads a build version file from disk" do
-    Tempfile.create("build.version") do |tmpfile|
+    Tempfile.open("build.version") do |tmpfile|
       tmpfile.write("build1234\nbfa9aac\nhttps://artifactory.example/build1234.tar.gz\n")
       tmpfile.flush
 
