@@ -77,8 +77,8 @@ class Redis
       @_redis_cmd ||= ShellHelper.execute_shell("which redis-cli")
     end
 
-    def bounce_redis_jobs
-      yaml = File.open("#{@environment.symfony_path}/config/services/#{@environment.short_name}/nosql/redis/client.yml").readlines.join()
+    def bounce_redis_jobs(config_file)
+      yaml = File.open(config_file).readlines.join()
       redis_servers = []
       (1..9).each do |i|
         # We have to regex the yml because symfony 1.0 doesn't use proper yaml format
