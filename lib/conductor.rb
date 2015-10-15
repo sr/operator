@@ -59,7 +59,7 @@ class Conductor
     ShellHelper.execute_shell("#{@environment.symfony_path}/symfony-#{@environment.short_name} restart-old-jobs")
 
     # Restart new style jobs
-    Redis.bounce_redis_jobs
+    Redis.bounce_redis_jobs("#{@environment.symfony_path}/config/services/#{@environment.short_name}/nosql/redis/client.yml")
   end
 
   def dont_ask!
