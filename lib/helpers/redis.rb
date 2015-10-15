@@ -1,5 +1,5 @@
 require "console"
-require "shell_helper"
+require "socket"
 
 class Redis
   class Host
@@ -12,32 +12,28 @@ class Redis
     end
 
     def has_key?(key)
-      cmd = "#{redis_cmd} -h #{self.host} -p #{self.port} #{"-n #{db} " if db}EXISTS #{key}"
-      output = ShellHelper.execute_shell(cmd)
+      output = execute("EXISTS #{key}")
       output.to_i == 1
     end
 
     def hset(key, entry, value)
-      cmd = "#{redis_cmd} -h #{self.host} -p #{self.port} #{"-n #{db} " if db}HSET #{key} #{entry} #{value}"
-      ShellHelper.execute_shell(cmd)
+      execute("HSET #{key} #{entry} #{value}")
     end
 
     def set(key, value)
-      cmd = "#{redis_cmd} -h #{self.host} -p #{self.port} #{"-n #{db} " if db}SET #{key} #{value}"
-      ShellHelper.execute_shell(cmd)
+      execute("SET #{key} #{value}")
     end
 
-    def redis_cmd
-      Redis.redis_cmd
+    def execute(cmd)
+      TCPSocket.open(@host, @port) do |socket|
+        socket.puts("#{"SELECT #{@db}\r\n" if @db}#{cmd}\r\nQUIT\r\n")
+        socket.readline
+      end
     end
   end # Host
 
   class << self
     def bounce_workers(type, redis_hosts=[])
-      if ! redis_installed?
-        Console.log("WARNING: Redis is NOT installed!", :yellow)
-        return
-      end
 
       valid_types = \
         %w[ automationWorkers
@@ -60,21 +56,13 @@ class Redis
         port_range.each do |port|
           host = Redis::Host.new(hostname, port)
           if host.has_key?(key)
-            Console.log("Found key #{key} on port #{port}, restarting workers using timestamp value #{value}", :yellow)
+            Console.syslog("Found key #{key} on port #{port}, restarting workers using timestamp value #{value}")
             host.hset(key, entry, value)
             return true # found and set
           end
         end
       end
       false
-    end
-
-    def redis_installed?
-      File.exist?(redis_cmd)
-    end
-
-    def redis_cmd
-      @_redis_cmd ||= ShellHelper.execute_shell("which redis-cli")
     end
 
     def bounce_redis_jobs(config_file)
@@ -91,7 +79,7 @@ class Redis
         redis = Redis::Host.new(host, 6379, 10)
         redis.set("node_reset", Time.now.to_i)
         redis.set("monitor_reset", Time.now.to_i)
-        Console.log("Reset job nodes and monitors for host #{host}")
+        Console.syslog("Reset job nodes and monitors for host #{host}")
       end
     end
   end # << self
