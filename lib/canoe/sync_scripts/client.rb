@@ -15,7 +15,7 @@ module Canoe
         args << "--artifact-url=#{artifact_url}" unless artifact_url.nil?
         args << "--user=#{user.email}"
         args << "--deploy-id=#{deploy_id}"
-        args << "--servers=#{servers.join(",")}"
+        args << "--servers=#{servers.join(",")}" unless servers.empty?
         args << "--no-confirmations"
         args << "--html-color"
 
