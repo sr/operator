@@ -16,8 +16,9 @@
 #   hubot chikin - Get chicken noises
 #   hubot headdesk - Get headdesk.gif
 #   hubot hater - They gonna hate
-#   hubot panic - Get panic
-#   hubot jarsh - Get jarsh
+#   hubot panic - PANIC!1!1!!!
+#   hubot jarsh - jarsh
+#   hubot kyle - kyle
 #   hubot blame <person> - Objectively make it THEIR fault
 #   hubot praise <person> - Objectively make it THEIR win!
 #   hubot miniTinny - Get Tiny Tinny
@@ -150,6 +151,10 @@ module.exports = (robot) ->
 
     msg.send msg.random jarshes
 
+  robot.respond /kyle$/i, (msg) ->
+    msg.send msg.random [
+      "https://hipchat.dev.pardot.com/files/1/282/eYuVJnFMlUJAqnw/2015-10-15%2016_37_09.gif"
+    ]
 
   robot.respond /miniTinny$/i, (msg) ->
     miniTinnies = [
