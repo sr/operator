@@ -102,7 +102,9 @@ class DeployStrategyAtomic < DeployStrategyBase
   end
 
   def extract_artifact(deploy_path, artifact)
-    ShellHelper.execute_shell("mkdir -p #{deploy_path} &&
-    tar xzf #{artifact} -C #{deploy_path}")
+    ShellHelper.execute_shell("
+      rm -rf #{deploy_path}
+      mkdir -p #{deploy_path} &&
+      tar xzf #{artifact} -C #{deploy_path}")
   end
 end
