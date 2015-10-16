@@ -27,7 +27,7 @@ class Redis
     def execute(cmd)
       TCPSocket.open(@host, @port) do |socket|
         socket.puts("#{"SELECT #{@db}\r\n" if @db}#{cmd}\r\nQUIT\r\n")
-        socket.readline
+        socket.read
       end
     end
   end # Host

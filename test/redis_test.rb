@@ -9,7 +9,7 @@ describe Redis do
 
   it ".hset" do
     socket = mock()
-    socket.stubs(:readline)
+    socket.stubs(:read)
     socket.expects(:puts).with("HSET foo bar baz\r\nQUIT\r\n")
     TCPSocket.stubs(:open).yields(socket)
     @r.hset("foo", "bar", "baz")
@@ -17,7 +17,7 @@ describe Redis do
 
   it ".set" do
     socket = mock()
-    socket.stubs(:readline)
+    socket.stubs(:read)
     socket.expects(:puts).with("SET foo bar\r\nQUIT\r\n")
     TCPSocket.stubs(:open).yields(socket)
     @r.set("foo", "bar")
@@ -25,7 +25,7 @@ describe Redis do
 
   it ".has_key?" do
     socket = mock()
-    socket.stubs(:readline)
+    socket.stubs(:read)
     socket.expects(:puts).with("EXISTS mykey\r\nQUIT\r\n")
     TCPSocket.stubs(:open).yields(socket)
     @r.has_key?("mykey")
@@ -33,7 +33,7 @@ describe Redis do
 
   it ".set with db" do
     socket = mock()
-    socket.stubs(:readline)
+    socket.stubs(:read)
     socket.expects(:puts).with("SELECT 10\r\nSET foo bar\r\nQUIT\r\n")
     TCPSocket.stubs(:open).yields(socket)
     r = Redis::Host.new('localhost', 6379, 10)
