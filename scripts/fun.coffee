@@ -26,7 +26,6 @@
 #   hubot bestfriends - Get Friends
 #   hubot its happening - Get Ron Paul
 #   hubot engage - ?
-#   hubot oncall - Who is on call?
 #   hubot nope - Got nope?
 #   hubot tldr - Totally didn't read it
 #   hubot tl;dr - Totally didn't read it
@@ -184,9 +183,6 @@ module.exports = (robot) ->
 
   robot.respond /engage$/i, (msg) ->
     msg.send "http://i.imgur.com/MX458aQ.jpg"
-
-  robot.respond /oncall$/i, (msg) ->
-    msg.send "https://i.imgur.com/mWxLrwF.gif"
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
