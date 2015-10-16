@@ -35,6 +35,7 @@ class Console
     end
 
     def syslog(message, our_priority = :info)
+      return if silent
       priority = case our_priority
       when :info
         Syslog::LOG_INFO
