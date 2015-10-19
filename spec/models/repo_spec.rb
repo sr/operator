@@ -15,21 +15,18 @@ RSpec.describe Repo do
         allow(Artifactory.client).to receive(:post)
           .with("/api/search/aql", %r({"@bambooProject":{"\$eq":"PDT"}},{"@bambooPlan":{"\$match":"PPANT\*"}}), anything)
           .and_return("results" => [
-            {"repo" => "pd-canoe", "path" => "PDT/PPANT", "name" => "build1234.tar.gz"},
+            {
+              "repo" => "pd-canoe",
+              "path" => "PDT/PPANT",
+              "name" => "build1234.tar.gz",
+              "properties" => [
+                {"key" => "gitBranch", "value" => "master"},
+                {"key" => "buildNumber", "value" => "1234"},
+                {"key" => "gitSha", "value" => "abc123"},
+                {"key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00"},
+              ]
+            }
           ])
-
-        allow(Artifactory.client).to receive(:get)
-          .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, anything)
-          .and_return(
-            "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
-            "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
-            "properties" => {
-              "gitBranch"      => ["master"],
-              "buildNumber"    => ["1234"],
-              "gitSha"         => ["abc123"],
-              "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"],
-            },
-          )
 
         builds = repo.builds(branch: "master")
         expect(builds.length).to eq(1)

@@ -24,8 +24,6 @@ gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
 gem 'nokogiri', '~> 1.6', '>= 1.6.6.2'
 
-gem 'parallel', '~> 1.6', '>= 1.6.1'
-
 group :development do
   gem 'foreman', '0.78.0'
 end

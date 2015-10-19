@@ -8,22 +8,34 @@ class ProvisionalDeploy
   def self.from_artifact_url(repo, artifact_url)
     hash = Artifactory.client.get(artifact_url, properties: nil)
     artifact = Artifactory::Resource::Artifact.from_hash(hash)
+    properties = artifact.properties.each_with_object({}) { |(k, v), h| h[k] = v.first }
 
+    from_artifact_url_and_properties(repo, artifact_url, properties)
+  end
+
+  def self.from_artifact_hash(hash)
+    artifact_url = Artifactory.client.build_uri(:get, "/" + ["api", "storage", hash["repo"], hash["path"], hash["name"]].join("/")).to_s
+    properties = hash["properties"].each_with_object({}) { |p, h| h[p["key"]] = p["value"] }
+
+    from_artifact_url_and_properties(hash["repo"], artifact_url, properties)
+  end
+
+  def self.from_artifact_url_and_properties(repo, artifact_url, properties)
     return nil unless
-      artifact.properties["gitBranch"] && \
-      artifact.properties["buildNumber"] && \
-      artifact.properties["gitSha"] && \
-      artifact.properties["buildTimeStamp"]
+      properties["gitBranch"] && \
+      properties["buildNumber"] && \
+      properties["gitSha"] && \
+      properties["buildTimeStamp"]
 
     new(
       repo: repo,
       artifact_url: artifact_url,
       what: "branch",
-      what_details: artifact.properties["gitBranch"].first,
-      build_number: artifact.properties["buildNumber"].first.to_i,
-      sha: artifact.properties["gitSha"].first,
-      passed_ci: !!(artifact.properties["passedCI"] && artifact.properties["passedCI"].first == "true"),
-      created_at: Time.parse(artifact.properties["buildTimeStamp"].first),
+      what_details: properties["gitBranch"],
+      build_number: properties["buildNumber"].to_i,
+      sha: properties["gitSha"],
+      passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
+      created_at: Time.parse(properties["buildTimeStamp"]),
     )
   end
 
