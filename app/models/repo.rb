@@ -12,16 +12,10 @@ class Repo < ActiveRecord::Base
 
   def builds(branch:, include_untested_builds: false, limit: nil)
     aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds, limit: limit)
-    artifact_urls = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
+    artifact_hashes = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
-      .map { |hash| build_artifact_url_from_hash(hash) }
 
-    # Rails development environment is not thread-safe, but in production we can
-    # run multiple requests to Artifactory concurrently and achieve a
-    # significant speedup in wall clock time.
-    threads = Rails.env.development? ? 1 : 10
-
-    Parallel.map(artifact_urls, in_threads: threads) { |url| ProvisionalDeploy.from_artifact_url(self, url) }
+    artifact_hashes.map { |hash| ProvisionalDeploy.from_artifact_hash(hash) }
       .compact
       .sort_by { |deploy| -deploy.build_number }
   end
@@ -107,6 +101,7 @@ class Repo < ActiveRecord::Base
     end
 
     aql = %(items.find(#{JSON.dump("$and" => conditions)}))
+    aql << %(.include("property.*"))
     aql << %(.sort({"$desc": ["created"]}))
     aql << %(.limit(#{limit.to_i})) if limit
     aql
