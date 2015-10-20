@@ -35,7 +35,7 @@ class Api::DeploysController < Api::Controller
         result.update(stage: "completed")
       else
         # TODO: Remove this section of code when sync_scripts are no longer used
-        servers = current_deploy.finished_servers
+        servers = current_deploy.sync_finished_servers
         servers << params[:server]
         servers.compact!
         current_deploy.update_attribute(:completed_servers, servers.join(","))
