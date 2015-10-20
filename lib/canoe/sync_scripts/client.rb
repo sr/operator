@@ -45,7 +45,12 @@ module Canoe
         Rails.logger.debug "Executing: #{full_cmd.inspect}"
         Bundler.with_clean_env do
           fork do
-            Process.setsid
+            begin
+              Process.setsid
+            rescue Errno::EPERM
+              # already the group leader
+            end
+
             exec(*full_cmd, options.merge(chdir: @path))
           end
         end
