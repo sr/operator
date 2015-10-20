@@ -44,7 +44,10 @@ module Canoe
 
         Rails.logger.debug "Executing: #{full_cmd.inspect}"
         Bundler.with_clean_env do
-          spawn(*full_cmd, options.merge(chdir: @path))
+          fork do
+            Process.setsid
+            exec(*full_cmd, options.merge(chdir: @path))
+          end
         end
       end
 
