@@ -2,7 +2,7 @@
   <h4>Servers</h4>
   <% deploy.all_sync_servers.each do |server| %>
     <div class="deploy-server-status">
-      <% if deploy.finished_servers.include?(server) %>
+      <% if deploy.sync_finished_servers.include?(server) %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
       <% else %>
         <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
@@ -15,13 +15,15 @@
 <div class="container">
   <h4>Pull-Based Servers</h4>
   <%- deploy.results.each do |result| %>
-    <div class="deploy-server-stage">
+    <div class="deploy-server-status">
       <%- if result.initiated? %>
         <span class="text-muted muted" title="Initiated"><i class="icon-check-empty"></i></span>
       <%- elsif result.completed? %>
         <span class="text-success" title="Complete"><i class="icon-check"></i></span>
       <% elsif result.failed? %>
         <span class="text-danger" title="Failed"><i class="icon-exclamation-sign"></i></span>
+      <% elsif result.deployed? %>
+        <span class="test-success" title="Deployed"><i class="icon-refresh"></i></span>
       <% end %>
       <%= result.server.hostname %>
     </div>
