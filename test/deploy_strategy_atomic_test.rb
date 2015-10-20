@@ -33,6 +33,7 @@ describe DeployStrategyAtomic do
       env = EnvironmentTest.new
       env.stubs(:payload).returns(@payload_mock)
       @strat = DeployStrategyAtomic.new(env)
+      @strat.stubs(:fix_index_php)
       @strat.stubs(:rsync).returns(@rsync_mock)
     end
 
