@@ -10,6 +10,7 @@ class DeployStrategyAtomic < DeployStrategyBase
       response = DEPLOY_FAILED
     else
       response = extract_artifact(dpath, artifact_path)
+      fix_index_php
       move_symlinks(:forward, dpath)
     end
     response
@@ -106,5 +107,12 @@ class DeployStrategyAtomic < DeployStrategyBase
       rm -rf #{deploy_path}
       mkdir -p #{deploy_path} &&
       tar xzf #{artifact} -C #{deploy_path}")
+  end
+
+  # TODO: This is a temporary hack. Let's fix https://jira.dev.pardot.com/browse/BREAD-312
+  def fix_index_php
+    return if environment.production?
+    File.delete("#{deploy_path}/web/index.php")
+    File.symlink("#{deploy_path}/web/index_staging_s.php", "#{deploy_path}/web/index.php")
   end
 end
