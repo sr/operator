@@ -138,6 +138,8 @@ module.exports = (robot) ->
     panics = [
       'oh shit oh shit oh shit oh shit oh shit',
       'Egads, I just pooped myself!',
+      'http://media.giphy.com/media/dbtDDSvWErdf2/giphy.gif',
+      'https://media.giphy.com/media/KqWzEMydtRHX2/giphy.gif'
     ]
 
     msg.send msg.random panics
