@@ -25,6 +25,7 @@
 #   hubot tbone - Get Tuberculosis. Once.
 #   hubot bestfriends - Get Friends
 #   hubot its happening - Get Ron Paul
+#   hubot situation - Belinda Wong Situation
 #   hubot engage - ?
 #   hubot nope - Got nope?
 #   hubot tldr - Totally didn't read it
@@ -180,6 +181,9 @@ module.exports = (robot) ->
 
   robot.respond /it\'?s\shappening$/i, (msg) ->
     msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
+
+  robot.respond /situation$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/39/VW6iFJhRbY0AYVy/belinda_situation.jpg"
 
   robot.respond /engage$/i, (msg) ->
     msg.send "http://i.imgur.com/MX458aQ.jpg"
