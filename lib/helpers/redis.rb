@@ -70,8 +70,8 @@ class Redis
       redis_servers = []
       (1..9).each do |i|
         # We have to regex the yml because symfony 1.0 doesn't use proper yaml format
-        # http://rubular.com/r/iRUNxyL35f
-        yaml[/redis\.jobs\.servers\.#{i}:\s+d\d:\s+host:\s*['"](.*)['"]/]
+        # http://rubular.com/r/4igxCz6E39
+        yaml[/redis\.jobs\.servers#{ "\.#{i}" if i > 1 }:\s+d\d:\s+host:\s*['"](.*)['"]/]
         redis_servers << Regexp.last_match(1) if Regexp.last_match
       end
       
