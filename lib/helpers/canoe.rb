@@ -19,7 +19,7 @@ class Canoe
 
   def self.call_api(environment, method, path, params={})
     canoe_url = URI(environment.canoe_url)
-    Net::HTTP.start(canoe_url.host, canoe_url.port, use_ssl: (canoe_url.scheme == "https")) do |http|
+    Net::HTTP.start(canoe_url.host, canoe_url.port, :ENV, use_ssl: (canoe_url.scheme == "https")) do |http|
       if method == "GET" && !params.empty?
         path += "?" + params.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}" }.join("&")
       end
