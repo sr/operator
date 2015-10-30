@@ -21,3 +21,7 @@
 
 # Failed tests
 /spec/examples.txt
+
+# rubymine
+.idea
+.idea/*

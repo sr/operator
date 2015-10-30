@@ -11,7 +11,11 @@ namespace :canoe do
 
     Repo.find_or_initialize_by(name: 'pithumbs').tap { |repo|
       repo.icon = 'thumbs-up'
+      repo.icon = 'cloud'
       repo.supports_branch_deploy = true
+      repo.deploys_via_artifacts = true
+      repo.bamboo_project = 'PDT'
+      repo.bamboo_plan = 'PTHMBS'
     }.save
 
     Repo.find_or_initialize_by(name: 'realtime-frontend').tap { |repo|
