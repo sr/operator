@@ -1,0 +1,30 @@
+# rpms
+
+A buildroot for building custom RPMs.
+
+## Prerequisites
+
+1. [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+1. [Vagrant](https://www.vagrantup.com/downloads.html)
+
+## Usage
+
+### tl;dr
+
+```
+script/build <package>
+
+# example
+script/build brubeck
+```
+
+### Building a new package
+
+1. Create a `<package>.spec` file in the `SPECS/` directory.
+1. Run `script/build <package>`.
+1. Copy `RPMS/x86_64/package*.rpm` to the RPM server.
+1. Have a cool beverage of your choice.
+
+## Resources
+
+* [Working with Spec Files](https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-specfiles.html) from the Fedora documentation
