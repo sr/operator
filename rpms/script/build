@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 MACHINE="rpms-el6"
-BUILD_DIRECTORY="/root/rpmbuild"
+BUILD_DIRECTORY="/home/vagrant/rpmbuild"
 
 if [ $# -lt 1 ]; then
   echo "$0 <package> <package...>"
@@ -14,10 +14,6 @@ set -e
 
 for package in "$@"; do
   set -x
-  vagrant ssh "$MACHINE" -- "
-    sudo yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-    sudo spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-    sudo rpmbuild -ba ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-  "
+  vagrant ssh "$MACHINE" -- "sudo env BUILD_DIRECTORY=$BUILD_DIRECTORY $BUILD_DIRECTORY/script/local-build ${package}"
   set +x
 done

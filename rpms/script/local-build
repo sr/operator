@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+if [ $# -lt 1 ]; then
+  echo "$0 <package> <package...>"
+  exit 1
+fi
+
+for package in "$@"; do
+  yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  rpmbuild -ba ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+done
