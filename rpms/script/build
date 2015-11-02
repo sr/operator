@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+MACHINE="rpms-el6"
+BUILD_DIRECTORY="/root/rpmbuild"
+
+if [ $# -lt 1 ]; then
+  echo "$0 <package> <package...>"
+  exit 1
+fi
+
+set +e
+vagrant up "$MACHINE"
+set -e
+
+for package in "$@"; do
+  set -x
+  vagrant ssh "$MACHINE" -- "
+    sudo yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+    sudo spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+    sudo rpmbuild -ba ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  "
+  set +x
+done
