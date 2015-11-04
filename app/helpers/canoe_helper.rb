@@ -89,4 +89,11 @@ module CanoeHelper
     output += "<span class='muted'>@#{pieces[1]}</span>" if pieces[1]
     output.html_safe
   end
+
+  def kibana_link(deploy)
+    base_url = "https://logs.#{'dev.' unless Rails.env.production?}pardot.com/#/dashboard/script/logstash.js"
+    query = "#{current_repo.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})"
+    escaped_query = CGI.escape(query.gsub('/','\/')).gsub('+','%20')
+    "#{base_url}?query=#{escaped_query}&fields=@timestamp,host,message"
+  end
 end
