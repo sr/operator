@@ -11,6 +11,8 @@ class DeployResult < ActiveRecord::Base
   scope :for_server, -> (server) { where(server: server).first }
   scope :for_server_hostnames, -> (hostnames) { joins(:server).where(servers: {hostname: hostnames}) }
 
+  scope :sort_by_server_hostname, -> { joins(:server).order("servers.hostname ASC") }
+
   STAGES.each do |stage|
     scope stage, -> { where(stage: stage) }
     define_method("#{stage}?") { self.stage == stage }
