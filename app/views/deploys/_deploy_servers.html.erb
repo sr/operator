@@ -14,7 +14,7 @@
 
 <div class="container">
   <h4>Pull-Based Servers</h4>
-  <%- deploy.results.sort_by_server_hostname.each do |result| %>
+  <%- deploy.results.includes(:server).sort_by_server_hostname.each do |result| %>
     <div class="deploy-server-status">
       <%- if result.initiated? %>
         <span class="text-muted muted" title="Initiated"><i class="icon-check-empty"></i></span>
