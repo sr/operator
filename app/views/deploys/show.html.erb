@@ -96,9 +96,6 @@
 <% if !@watching && !current_deploy.completed? %>
   <br>
   <div>
-    <%= form_tag complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to mark this complete?"} do %>
-      <button type="submit" class="btn btn-danger">Mark as Complete</button>
-    <%- end %>
   </div>
 <% end %>
 
@@ -108,6 +105,15 @@
   <%- if current_deploy.completed? %>
     <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
       <i class="icon-train2"></i> REDEPLOY
+    <%- end %>
+  <%- end %>
+
+  <%- if !current_deploy.completed? %>
+    <%= form_tag cancel_on_incomplete_servers_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
+      <%= button_tag type: "submit", class: "btn btn-warning" do %>
+        <%= content_tag :i, "", class: "icon-fast-forward" %>
+        FORCE TO COMPLETE
+      <%- end %>
     <%- end %>
   <%- end %>
 

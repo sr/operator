@@ -48,9 +48,4 @@ class Api::DeploysController < Api::Controller
   end
 
   private
-  def workflow_for(deploy:)
-    @workflows ||= {}
-    @workflows[deploy] ||= DeployWorkflow.new(deploy: deploy)
-  end
-  helper_method :workflow_for
 end

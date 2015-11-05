@@ -25,6 +25,13 @@ class DeployWorkflow
     end
   end
 
+  # Moves any servers still deploying code to the "failed" stage so the restart
+  # phase can complete immediately.
+  def cancel_deploy_on_incomplete_servers
+    @deploy.results.initiated.update_all(stage: "failed")
+    @deploy.check_completed_status!
+  end
+
   def next_action_for(server:, result: nil)
     return nil if @deploy.completed?
 

@@ -9,7 +9,7 @@ if local_assigns[:results]
   json.set! :servers, results.includes(:server).each_with_object({}) { |result, hsh|
     hsh[result.server.hostname] = {
       stage: result.stage,
-      action: workflow_for(deploy: deploy).next_action_for(server: result.server, result: result)
+      action: deploy_workflow_for(deploy).next_action_for(server: result.server, result: result)
     }
   }
 end

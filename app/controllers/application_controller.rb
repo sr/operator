@@ -115,4 +115,10 @@ class ApplicationController < ActionController::Base
       ProvisionalDeploy.from_branch(current_repo, params[:what_details])
     end
   end
+
+  def deploy_workflow_for(deploy)
+    @deploy_workflows ||= {}
+    @deploy_workflows[deploy] ||= DeployWorkflow.new(deploy: deploy)
+  end
+  helper_method :deploy_workflow_for
 end
