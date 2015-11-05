@@ -56,6 +56,11 @@ class DeploysController < ApplicationController
     end
   end
 
+  def cancel_on_incomplete_servers
+    deploy_workflow_for(current_deploy).cancel_deploy_on_incomplete_servers
+    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+  end
+
   def complete
     current_deploy.complete! if current_deploy
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
