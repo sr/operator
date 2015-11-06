@@ -25,11 +25,26 @@ describe EnvironmentProduction do
     end
   end # ---- self.after_fetch
 
+  describe "self.restart_task" do
+    it "allows setting a single task" do
+      EnvironmentProduction.tasks[:all][:restart].must_equal([])
+      EnvironmentProduction.restart_task :bar
+      EnvironmentProduction.tasks[:all][:restart].must_equal([:bar])
+    end
+
+    it "allows setting multiple tasks" do
+      EnvironmentProduction.tasks[:all][:restart].must_equal([])
+      EnvironmentProduction.restart_task :bar, :baz
+      EnvironmentProduction.tasks[:all][:restart].must_equal([:bar, :baz])
+    end
+  end
+
   # --------------------------------------------------------------------------
   def reset_class_defaults!
     # we need this because we're mucking with class level instance variables
     EnvironmentProduction.instance_variable_set(:@strategies, nil)
     EnvironmentProduction.instance_variable_set(:@hooks, nil)
+    EnvironmentProduction.instance_variable_set(:@tasks, nil)
     EnvironmentProduction.instance_variable_set(:@common_hooks, nil)
   end
 

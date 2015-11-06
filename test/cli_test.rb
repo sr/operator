@@ -89,7 +89,7 @@ describe CLI do
       @cli.checkin
     end
 
-    it "should restart job servers" do
+    it "should execute restart tasks" do
       build_number = 1234
       sha = "abc123"
       artifact_url = "http://artifactory.example/build1234.tar.gz"
@@ -98,7 +98,7 @@ describe CLI do
       stub_request(:get, "#{@env.canoe_url}/api/targets/#{@env.canoe_target}/deploys/latest?repo_name=pardot&server=#{ShellHelper.hostname}")
         .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{ShellHelper.hostname}":{"stage":"deployed","action":"restart"}}}))
       BuildVersion.stubs(:load).returns(BuildVersion.new(build_number,sha,artifact_url))
-      Console.expects(:log).with("Restarted job servers")
+      Console.expects(:log).with("Executing restart tasks")
       @cli.checkin
     end
 
