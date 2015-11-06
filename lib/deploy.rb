@@ -1,6 +1,6 @@
 require 'shell_helper'
 
-Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions) do
+Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions, :created_at) do
   def self.from_hash(hash)
     new(
       hash["id"],
@@ -8,7 +8,8 @@ Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :se
       hash["what_details"],
       hash["build_number"],
       hash["artifact_url"],
-      hash["servers"]
+      hash["servers"],
+      hash["created_at"]
     )
   end
 
