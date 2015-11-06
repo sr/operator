@@ -66,8 +66,8 @@ class CLI
     requested_deploy = Canoe.latest_deploy(environment)
     if requested_deploy.applies_to_this_server?
       if requested_deploy.action == "restart"
-        Console.log("Executing restart tasks")
-        environment.conductor.restart!(requested_deploy)
+        environment.conductor.restart_jobs!(requested_deploy) unless environment.production?
+        Console.log("Restarted job servers")
         Canoe.notify_server(environment, requested_deploy)
       elsif requested_deploy.action == "deploy"
         if current_build_version && current_build_version.instance_of_deploy?(requested_deploy)

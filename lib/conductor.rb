@@ -45,12 +45,6 @@ class Conductor
     success
   end
 
-  # Executes the restart phase of the deploy. Only performed on one server per
-  # deploy.
-  def restart!(deploy)
-    environment.execute_restart_tasks(deploy)
-  end
-
   def restart_jobs!(deploy)
     # Restart automation workers
     Redis.bounce_workers("automationWorkers", @environment.autojob_hosts)
