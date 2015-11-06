@@ -13,7 +13,8 @@ class Redis
 
     def has_key?(key)
       output = execute("EXISTS #{key}")
-      output.to_i == 1
+      # http://redis.io/topics/protocol#resp-protocol-description
+      !!(output =~ /\A:1\r\n/)
     end
 
     def hset(key, entry, value)
