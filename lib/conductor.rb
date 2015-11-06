@@ -45,21 +45,10 @@ class Conductor
     success
   end
 
-  def restart_jobs!(deploy)
-    # Restart automation workers
-    Redis.bounce_workers("automationWorkers", @environment.autojob_hosts)
-    # Restart per account automation workers
-    Redis.bounce_workers("PerAccountAutomationWorker", @environment.autojob_hosts)
-    # Restart related object workers
-    Redis.bounce_workers("automationRelatedObjectWorkers", @environment.autojob_hosts)
-    # Restart automation preview workers
-    Redis.bounce_workers("previewWorkers", @environment.autojob_hosts)
-
-    # Restart old style jobs
-    ShellHelper.execute_shell("#{@environment.symfony_path}/symfony-#{@environment.short_name} restart-old-jobs")
-
-    # Restart new style jobs
-    Redis.bounce_redis_jobs("#{@environment.symfony_path}/config/services/#{@environment.short_name}/nosql/redis/client.yml")
+  # Executes the restart phase of the deploy. Only performed on one server per
+  # deploy.
+  def restart!(deploy)
+    environment.execute_restart_tasks(deploy)
   end
 
   def dont_ask!
