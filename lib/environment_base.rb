@@ -31,10 +31,6 @@ class EnvironmentBase
     @hooks ||= Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
   end
 
-  def self.tasks
-    @tasks ||= Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = [] } }
-  end
-
   def self.common_hooks
     @common_hooks ||= \
     begin
@@ -85,11 +81,6 @@ class EnvironmentBase
     end
   end
 
-  def self.restart_task(*args)
-    options = args.extract_options!
-    tasks[options.fetch(:only, :all)][:restart].concat(args.map(&:to_sym))
-  end
-
   def self.default_strategies
     {
       deploy: :atomic,
@@ -124,23 +115,6 @@ class EnvironmentBase
             __send__(method_name, deploy)
           end
         end
-      end
-    end
-  end
-
-  def execute_restart_tasks(deploy)
-    tasks = self.class.tasks[:all][:restart]
-    unless payload.nil? || payload.id.nil?
-      tasks.concat(self.class.tasks[payload.id][:restart])
-    end
-
-    tasks.uniq.each do |method_name|
-      m = method(method_name)
-      case m.arity.abs
-      when 0
-        __send__(method_name)
-      when 1
-        __send__(method_name, deploy)
       end
     end
   end
