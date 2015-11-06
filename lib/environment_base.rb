@@ -176,7 +176,7 @@ class EnvironmentBase
     Canoe.notify_server(self, deploy)
   end
 
-  def restart_pardot_jobs(deploy)
+  def restart_autojobs
     # Restart automation workers
     Redis.bounce_workers("automationWorkers", autojob_hosts)
     # Restart per account automation workers
@@ -185,11 +185,13 @@ class EnvironmentBase
     Redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
     # Restart automation preview workers
     Redis.bounce_workers("previewWorkers", autojob_hosts)
+  end
 
-    # Restart old style jobs
+  def restart_old_style_jobs
     ShellHelper.execute_shell("#{symfony_path}/symfony-#{short_name} restart-old-jobs")
+  end
 
-    # Restart new style jobs
+  def restart_redis_jobs
     Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{short_name}/nosql/redis/client.yml")
   end
 
