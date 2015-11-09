@@ -62,6 +62,9 @@ module.exports = (robot) ->
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.imgur.com/LUi0ncH.gif"
 
+  robot.respond /bees$/i, (msg) ->
+    msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
+
   robot.respond /beyonce$/i, (msg) ->
     charisma = [
       'http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif',
