@@ -57,10 +57,10 @@ _ = require "underscore"
 
 module.exports = (robot) ->
   robot.respond /reversenuggets$/i, (msg) ->
-    msg.send "http://i.imgur.com/7Ljw6Gg.gif"
+    msg.send "http://i.giphy.com/4y1DzwdJcnAfC.gif"
 
   robot.respond /toiletnuggets$/i, (msg) ->
-    msg.send "http://i.imgur.com/LUi0ncH.gif"
+    msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
 
   robot.respond /bees$/i, (msg) ->
     msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
