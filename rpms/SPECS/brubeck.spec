@@ -1,11 +1,11 @@
 Name: brubeck
 Version: 1.0.0
-Release: 657498c47e0cabc6aaecc6e1b0db8b25e5c0be22
+Release: 3373c817f1ee9c9b37de46d32ac5d53ab6d11413
 Summary: A Statsd-compatible metrics aggregator
 Group: Applications/Internet
 License: MIT
 URL: https://github.com/github/brubeck
-Source0: https://github.com/github/brubeck/archive/%{release}.tar.gz
+Source0: https://git.dev.pardot.com/andy-lindeman/brubeck/archive/%{release}.tar.gz
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: jansson-devel >= 2.5
