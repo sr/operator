@@ -31,6 +31,12 @@ script/build brubeck
 
 `rpmbuild` is not able to download tarballs from GitHub Enterprise. If one of the sources for a package is hosted on `git.dev.pardot.com`, you'll need to download the file yourself and put it in `SOURCES/`.
 
+Then, build the package with the `-n` flag, which signals to the automation that it should not try to download sources:
+
+```
+script/build -n <package>
+```
+
 ## Resources
 
 * [Working with Spec Files](https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-specfiles.html) from the Fedora documentation

@@ -1,12 +1,26 @@
 #!/bin/bash -e
 
 if [ $# -lt 1 ]; then
-  echo "$0 <package> <package...>"
+  echo "$0 -n <package> <package...>"
+  echo
+  echo "-n: Do not run spectool. Sources must be downloaded manually and placed in SOURCES/"
   exit 1
 fi
 
+NOSPECTOOL=0
+while getopts n opt; do
+  case "$opt" in
+    n)
+      NOSPECTOOL=1
+      ;;
+    esac
+done
+shift $((OPTIND-1))
+
+set -x
 for package in "$@"; do
-  yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-  spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  rpmlint ${BUILD_DIRECTORY}/SPECS/${package}.spec || exit 1;
+  sudo yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  [ "$NOSPECTOOL" -eq 1 ] || spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
   rpmbuild -ba ${BUILD_DIRECTORY}/SPECS/${package}.spec;
 done

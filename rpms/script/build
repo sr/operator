@@ -4,7 +4,9 @@ MACHINE="rpms-el6"
 BUILD_DIRECTORY="/home/vagrant/rpmbuild"
 
 if [ $# -lt 1 ]; then
-  echo "$0 <package> <package...>"
+  echo "$0 -n <package> <package...>"
+  echo
+  echo "-n: Do not run spectool. Sources must be downloaded manually and placed in SOURCES/"
   exit 1
 fi
 
@@ -12,8 +14,6 @@ set +e
 vagrant up "$MACHINE"
 set -e
 
-for package in "$@"; do
-  set -x
-  vagrant ssh "$MACHINE" -- "sudo env BUILD_DIRECTORY=$BUILD_DIRECTORY $BUILD_DIRECTORY/script/local-build ${package}"
-  set +x
-done
+set -x
+vagrant ssh "$MACHINE" -- "env BUILD_DIRECTORY=$BUILD_DIRECTORY $BUILD_DIRECTORY/script/local-build $*"
+set +x
