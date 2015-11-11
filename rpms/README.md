@@ -25,6 +25,12 @@ script/build brubeck
 1. Copy `RPMS/x86_64/package*.rpm` to the RPM server.
 1. Have a cool beverage of your choice.
 
+## Caveats
+
+### Tarballs from GitHub Enterprise
+
+`rpmbuild` is not able to download tarballs from GitHub Enterprise. If one of the sources for a package is hosted on `git.dev.pardot.com`, you'll need to download the file yourself and put it in `SOURCES/`.
+
 ## Resources
 
 * [Working with Spec Files](https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-specfiles.html) from the Fedora documentation
