@@ -20,7 +20,7 @@ goget-openflights:
 docker-build-openflightsd: goget-openflights
 	make -C $(GOPATH)/src/go.pedge.io/openflights -f Makefile docker-build-openflightsd
 
-docker-push-openflightsd: # docker-build-openflightsd
+docker-push-openflightsd:
 	docker tag pedge/openflightsd gcr.io/operator-europe-west/openflightsd:$(VERSION)
 	gcloud docker push gcr.io/operator-europe-west/openflightsd
 
