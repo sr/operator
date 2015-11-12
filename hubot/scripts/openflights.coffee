@@ -5,7 +5,7 @@ protobuf = require "protobufjs"
 protodir = path.resolve(__dirname + "/../../proto")
 proto = protobuf.loadProtoFile(root: protodir, file: "openflights.proto")
 openflights = grpc.loadObject(proto.ns).openflights
-client = new openflights.API("0.0.0.0:1747", grpc.Credentials.createInsecure())
+client = new openflights.API("104.155.76.57:1747", grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
   robot.respond /airport (\w+)/i, (msg) ->
