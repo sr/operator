@@ -1,4 +1,6 @@
 VERSION = $(shell git rev-parse --short HEAD)
+GCLOUD_CLUSTER = operator-1
+GCLOUD_ZONE = europe-west1-d
 
 proto-get:
 	go get -u github.com/golang/protobuf/proto/... \
@@ -23,6 +25,17 @@ docker-build-openflightsd: goget-openflights
 docker-push-openflightsd:
 	docker tag pedge/openflightsd gcr.io/operator-europe-west/openflightsd:$(VERSION)
 	gcloud docker push gcr.io/operator-europe-west/openflightsd
+
+gcloud-container-cluster:
+	gcloud container \
+		--project "operator-europe-west" \
+		clusters create "$(GCLOUD_CLUSTER)" \
+			--zone "$(GCLOUD_ZONE)" \
+			--num-nodes 3 \
+			--machine-type "n1-standard-1" \
+			--network "default" \
+			--enable-cloud-logging \
+			--scopes cloud-platform,compute-rw,logging-write,monitoring,storage-full,useraccounts-rw,userinfo-email
 
 .PHONY: \
 	proto \
