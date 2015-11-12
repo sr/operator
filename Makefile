@@ -1,6 +1,9 @@
 .PHONY: \
 	proto \
-	proto-get
+	proto-get \
+	goget-openflights \
+	docker-build-openflightsd \
+	docker-push-openflightsd
 
 proto-get:
 	go get -u github.com/golang/protobuf/proto/... \
@@ -15,3 +18,13 @@ proto-get:
 
 proto:
 	PROTOC_INCLUDE_PATH=src protoc-all github.com/sr/operator
+
+goget-openflights:
+	go get go.pedge.io/openflights
+
+docker-build-openflightsd: goget-openflights
+	make -C $(GOPATH)/src/go.pedge.io/openflights -f Makefile docker-build-openflightsd
+
+docker-push-openflightsd: docker-build-openflightsd
+	docker tag pedge/openflightsd gcr.io/operator-europe-west/openflightsd
+	gcloud docker push gcr.io/operator-europe-west/openflightsd
