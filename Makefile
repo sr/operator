@@ -42,4 +42,5 @@ gcloud-container-cluster:
 	proto-get \
 	goget-openflights \
 	docker-build-openflightsd \
-	docker-push-openflightsd
+	docker-push-openflightsd \
+	gcloud-container-cluster
