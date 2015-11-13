@@ -112,6 +112,7 @@ class DeployStrategyAtomic < DeployStrategyBase
   # TODO: This is a temporary hack. Let's fix https://jira.dev.pardot.com/browse/BREAD-312
   def fix_index_php
     return if environment.production?
+    return if File.read("#{deploy_path}/web/index.php") =~ /PI_ENV/
     File.delete("#{deploy_path}/web/index.php")
     File.symlink("#{deploy_path}/web/index_staging_s.php", "#{deploy_path}/web/index.php")
   end
