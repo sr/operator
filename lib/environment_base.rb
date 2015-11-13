@@ -188,11 +188,11 @@ class EnvironmentBase
   end
 
   def restart_old_style_jobs
-    ShellHelper.execute_shell("#{symfony_path}/symfony-#{short_name} restart-old-jobs")
+    ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
   end
 
   def restart_redis_jobs
-    Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{short_name}/nosql/redis/client.yml")
+    Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{symfony_env}/nosql/redis/client.yml")
   end
 
   # =========================================================================
@@ -202,6 +202,11 @@ class EnvironmentBase
 
   def short_name
     name.downcase # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
+  end
+
+  # By default, symfony_env is the same as short_name, but it can be overridden in subclasses as needed
+  def symfony_env
+    short_name
   end
 
   def conductor
@@ -259,10 +264,6 @@ class EnvironmentBase
       Console.log("CANOE: No API token specified", :red)
       ""
     end
-  end
-
-  def artifactory_proxy
-    @config[:artifactory_proxy]
   end
 
   def artifactory_user

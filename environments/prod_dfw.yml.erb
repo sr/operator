@@ -18,7 +18,7 @@
 :use_locking: false
 :lock_location: ''
 
-:canoe_url: http://internal.canoe.pardot.com
+:canoe_url: https://canoe.pardot.com
 :canoe_target: production
 :custom_hooks: /opt/pardot/server_hooks.sh
 
@@ -60,9 +60,4 @@
 
 :composer_cache_path: <%= sync_dir %>/composer_cache
 
-:autojob_hosts:
-  - redis-rules-s1:1234..1237
-  - redis-cache-d1
-  - redis-cache-d2
-  - redis-cache-d3
-  - redis-cache-d4
+:autojob_hosts: []
