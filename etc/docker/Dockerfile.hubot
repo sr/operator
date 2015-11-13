@@ -1,0 +1,13 @@
+FROM grpc/node:0.11
+MAINTAINER me@simonrozet.com
+RUN \
+  apt-get install -y --no-install-recommends \
+    build-essential \
+    libicu-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /var/cache
+ADD hubot /hubot
+ADD proto /proto
+WORKDIR /hubot
+RUN npm install
+ENTRYPOINT ["bin/hubot"]
