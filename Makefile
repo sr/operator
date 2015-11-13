@@ -22,7 +22,7 @@ goget-openflights:
 docker-build-hubot:
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 
-docker-push-hubot:
+docker-push-hubot: docker-build-hubot
 	docker tag sr/hubot gcr.io/operator-europe-west/hubot:$(VERSION)
 	gcloud docker push gcr.io/operator-europe-west/hubot
 
