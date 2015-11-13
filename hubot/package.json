@@ -1,27 +1,10 @@
 {
   "name": "hosted-hubot",
-  "version": "2.7.1",
+  "version": "1.0.0",
   "private": true,
-  "author": "GitHub Inc.",
-  "keywords": [
-    "github",
-    "hubot",
-    "campfire",
-    "bot"
-  ],
-  "description": "A simple helpful robot for your Company",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/github/hubot/raw/master/LICENSE"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/github/hubot.git"
-  },
+  "author": "Simon Rozet <me@simonrozet.com>",
   "dependencies": {
-    "grpc": "^0.11.1",
+    "grpc": "=0.11.0",
     "hubot": "^2.16.0",
     "hubot-irc-slack": "git://github.com/lstoll/hubot-irc-slack.git",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
