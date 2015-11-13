@@ -266,10 +266,6 @@ class EnvironmentBase
     end
   end
 
-  def artifactory_proxy
-    @config[:artifactory_proxy]
-  end
-
   def artifactory_user
     @config[:artifactory_user]
   end

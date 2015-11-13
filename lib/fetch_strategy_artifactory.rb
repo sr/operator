@@ -1,3 +1,4 @@
+require "uri"
 require "fetch_strategy_base"
 require 'artifactory'
 
@@ -13,10 +14,11 @@ class FetchStrategyArtifactory < FetchStrategyBase
       config.username = environment.artifactory_user
       config.password = environment.artifactory_token
       config.ssl_verify = true
-      if environment.artifactory_proxy
-        p_address, p_port = environment.artifactory_proxy.split(':')
-        config.proxy_address = p_address
-        config.proxy_port = p_port
+
+      proxy = URI(config.endpoint).find_proxy
+      if proxy
+        config.proxy_address = proxy.hostname
+        config.proxy_port = proxy.port
       end
     end
   end
