@@ -1,0 +1,13 @@
+#!/bin/sh
+cd $(dirname "$0")/..
+export HUBOT_ADAPTER="irc-slack"
+export HUBOT_HTTPD="0"
+export HUBOT_NAME="batman"
+export HUBOT_IRC_REALNAME="batman"
+export HUBOT_SLACK_TEAM="bazbat"
+export HUBOT_SLACK_TOKEN="xoxp-14348563207-14516005907-14519168854-ef2849943f"
+export HUBOT_IRC_ROOMS=""
+export HUBOT_IRC_SERVER="bazbat.irc.slack.com"
+export HUBOT_IRC_PASSWORD="bazbat.p6lIyU2mQ10QhEZ9G0FO"
+export HUBOT_IRC_USESSL="1"
+bin/hubot
