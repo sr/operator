@@ -1,6 +1,7 @@
 require "conductor"
 require "payload"
 require "extract_options"
+require "underscore_string"
 require "yaml"
 require "erb"
 
@@ -16,8 +17,8 @@ class EnvironmentBase
   end
 
   def load_secrets
-    if File.exist?(".#{name.downcase}_settings.yml")
-      load_yaml(".#{name.downcase}_settings.yml")
+    if File.exist?(".#{name.underscore}_settings.yml")
+      load_yaml(".#{name.underscore}_settings.yml")
     elsif File.exist?(".default_settings.yml")
       load_yaml(".default_settings.yml")
     end
@@ -201,7 +202,7 @@ class EnvironmentBase
   end
 
   def short_name
-    name.downcase # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
+    name.underscore # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
   end
 
   # By default, symfony_env is the same as short_name, but it can be overridden in subclasses as needed
@@ -218,15 +219,15 @@ class EnvironmentBase
   end
 
   def dev?
-    name.downcase == "dev"
+    name.underscore == "dev"
   end
 
   def test_env?
-    name.downcase == "test"
+    name.underscore == "test"
   end
 
   def production?
-    name.downcase == "production"
+    name.underscore == "production" || name.underscore == "production_dfw"
   end
 
   def valid_payload?(payload_name = nil)
