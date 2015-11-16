@@ -1,5 +1,5 @@
 Name: rmux
-Version: 0.3.1.9
+Version: 0.3.2.0
 Release: 6%{?dist}
 Summary: Redis multiplexer and connection pooling solution
 Group: Applications/Internet
@@ -10,8 +10,6 @@ Source0: https://github.com/SalesforceEng/rmux/archive/%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: golang >= 1.4
 
-#BuildRoot: %{_tmppath}/%name-root
-
 %description
 Redis multiplexer and connection pooling solution
 
@@ -20,20 +18,20 @@ Redis multiplexer and connection pooling solution
 rm -rf vendor
 
 %build
+# special function to work around a bug...
+function gobuild { go build -a -ldflags "-B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \n')" -v -x "$@"; }
 # set up temp gopath and put our directory there
 mkdir -p ./_build/src/github.com/SalesforceEng
 ln -s $(pwd) ./_build/src/github.com/SalesforceEng/rmux
 
 export GOPATH=$(pwd)/_build:%{gopath}
-go build -o rmux.amd64 github.com/SalesforceEng/rmux
+cd ./_build/src/github.com/SalesforceEng/rmux
+gobuild -o build/rmux ./main
 
 %install
 install -d -m 755 %{buildroot}%{_bindir}
-install -p -m 0755 ./rmux.amd64 %{buildroot}%{_bindir}/rmux
+install -p -m 0755 ./build/rmux %{buildroot}%{_bindir}/rmux
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/rmux
-
-%clean
-rm -rf $RPM_BUILD_ROOT
