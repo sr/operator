@@ -18,7 +18,7 @@ class ShellHelper
   end
 
   def self.hostname
-    Socket.gethostname.sub(/\.pardot\.com$/, "")
+    Socket.gethostname.sub(/(\.pardot\.com|\.ops\.sfdc\.net)$/, "")
   end
 
   # this should make it easier to test, etc...
