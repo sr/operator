@@ -61,7 +61,7 @@ namespace :canoe do
         target.script_path = "/opt/sync/production"
       }.save
       DeployTarget.find_or_initialize_by(name: "production_dfw").tap { |target|
-        target.script_path = "/opt/sync/production_dfw"
+        target.script_path = nil
       }.save
     end
   end
