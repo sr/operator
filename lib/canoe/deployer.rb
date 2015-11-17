@@ -10,7 +10,7 @@ module Canoe
       # Differentiate between servers which use sync_scripts and those that use
       # pull_agent
       if target.script_path.nil?
-        sync_scripts = []
+        sync_servers = []
       else
         sync_servers = @strategy.list_servers(target, repo.name)
       end
