@@ -9,7 +9,7 @@ module Canoe
     def deploy(target:, user:, repo:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil)
       # Differentiate between servers which use sync_scripts and those that use
       # pull_agent
-      if current_target.script_path.nil?
+      if target.script_path.nil?
         sync_scripts = []
       else
         sync_servers = @strategy.list_servers(target, repo.name)
@@ -47,7 +47,7 @@ module Canoe
 
       target.lock!(repo, user) if lock
 
-      if !current_target.script_path.nil? && pid = @strategy.perform(deploy)
+      if !target.script_path.nil? && pid = @strategy.perform(deploy)
         Process.detach(pid)
         deploy.update_attribute(:process_id, pid)
       end
