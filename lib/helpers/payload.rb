@@ -23,10 +23,6 @@ class Payload
     end
   end
 
-  def key
-    @_key ||= @options[:key]
-  end
-
   def local_git_path
     @_local_git_path ||= File.expand_path("github", local_path)
   end

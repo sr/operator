@@ -33,7 +33,6 @@
       - <%= pardot_dir %>/releases/A
       - <%= pardot_dir %>/releases/B
     :artifact_prefix: pi-
-    :s3_bucket: pi
   :node_modules:
     :key: ""
     :local_path: <%= sync_dir %>/node_modules
@@ -48,16 +47,12 @@
     :remote_path: <%= realtime_dir %>
     :remote_current_link: <%= realtime_dir %>/realtime-frontend
     :artifact_prefix: realtime-
-    :s3_bucket: realtime-frontend
   :workflow:
     :key: ''
     :local_path: <%= sync_dir %>/workflow
     :remote_path: <%= workflow_dir %>
     :remote_current_link: <%= workflow_dir %>/current
     :artifact_prefix: realtime-
-    :s3_bucket: realtime-frontend
-
-:composer_cache_path: <%= sync_dir %>/composer_cache
 
 :autojob_hosts:
   - redis-s1.dev:1234

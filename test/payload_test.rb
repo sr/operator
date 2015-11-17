@@ -20,12 +20,6 @@ describe Payload do
     payload.name.must_equal("PardotStuff")
   end
 
-  it "should pull key from passed options hash" do
-    key = "~/.ssh/test.pub"
-    payload = Payload.new(key: key)
-    payload.key.must_equal(key)
-  end
-
   it "should pull local_path from passed options hash" do
     path = "/tmp/"
     payload = Payload.new(local_path: path)
