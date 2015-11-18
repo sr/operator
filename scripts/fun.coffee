@@ -83,6 +83,9 @@ module.exports = (robot) ->
   robot.respond /shades$/i, (msg) ->
     msg.send "http://i.imgur.com/yXAJ3Uw.gif"
 
+  robot.respond /visualstudio$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/204/tpEHzIVPqzNKIDM/upload.png"
+
   robot.respond /waffles$/i, (msg) ->
     msg.send "http://i.imgur.com/8TkPJcP.gif"
 
