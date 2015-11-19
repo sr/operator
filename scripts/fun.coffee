@@ -12,6 +12,7 @@
 #   hubot reversenuggets - Get nuggets
 #   hubot puppies - Get puppies
 #   hubot beyonce - Get charisma
+#   hubot visualstudio - Get lawlz
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
 #   hubot headdesk - Get headdesk.gif
@@ -53,6 +54,7 @@
 #   hubot meme (me) - You want it? You got it
 #   hubot dankmeme (me) - Synonymous with dank: sick, ill, boss, dope, fly
 #   hubot winning - You're just jelly.
+#   hubot magicword - Nuh uh uhhh!
 
 _ = require "underscore"
 
@@ -85,6 +87,9 @@ module.exports = (robot) ->
 
   robot.respond /visualstudio$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/204/tpEHzIVPqzNKIDM/upload.png"
+
+  robot.respond /magicword$/i, (msg) ->
+    msg.send "http://i.imgur.com/Ryv8YVP.gif"
 
   robot.respond /waffles$/i, (msg) ->
     msg.send "http://i.imgur.com/8TkPJcP.gif"
