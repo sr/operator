@@ -51,13 +51,13 @@ describe CLI do
       cli = CLI.new(%w[test pithumbs])
 
       cli.parse_arguments!
-      cli.options[:payload].must_equal("pithumbs")
+      cli.environment.payload.id.must_equal(:pithumbs)
     end
   end
 
   describe "environment" do
     it "should return production environment if requested" do
-      cli = CLI.new(%w[prod pardot])
+      cli = CLI.new(%w[production pardot])
 
       cli.parse_arguments!
       cli.environment.class.must_equal(EnvironmentProduction)

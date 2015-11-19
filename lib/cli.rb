@@ -1,10 +1,9 @@
 require 'console'
 
 class CLI
-  attr_reader :options
+  attr_reader :environment
 
   def initialize(args = ARGV)
-    @options = default_options
     @arguments = args
   end
 
@@ -18,8 +17,11 @@ class CLI
       if index == 0
         # our environment MUST be the first argument
         if valid_environment?(arg)
-          @options[:environment] = arg.downcase.to_sym
-          next
+          env_require = "environment_" + arg.downcase
+          env_class = "Environment" + arg.downcase.split("_").map(&:capitalize).join
+          require env_require
+
+          @environment = Object.const_get(env_class).new
         else
           Console.log("ERROR: Invalid environment specified.\n", :red)
 
@@ -28,8 +30,8 @@ class CLI
         end
       elsif index == 1
         # the payload (repository name) MUST be the second argument
-        if environment.valid_payload?(arg.downcase)
-          @options[:payload] = arg.downcase
+        if @environment.valid_payload?(arg)
+          @environment.payload = arg
         else
           Console.log("ERROR: Invalid payload specified.\n", :red)
 
@@ -49,16 +51,6 @@ class CLI
       print_help
       return
     end
-  end
-
-  def environment
-    @_environment ||= \
-      begin
-        env_require = "environment_" + @options[:environment].to_s
-        env_class = "Environment" + @options[:environment].to_s.split("_").map(&:capitalize).join
-        require env_require
-        Object.const_get(env_class).new.tap { |environment| environment.payload = @options[:payload] }
-      end
   end
 
   def checkin
@@ -87,13 +79,6 @@ class CLI
   end
 
   private
-  def default_options
-    {
-      environment: :production,
-      payload: "pardot",
-    }
-  end
-
   def print_help
     readme = File.join(File.dirname(__FILE__), '..', 'README.md')
     if File.exist?(readme)
