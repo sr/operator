@@ -6,6 +6,7 @@ class EnvironmentProduction < EnvironmentBase
   GRAPHITE_PORT = "2003"
 
   restart_task :add_graphite_annotation, only: :pardot
+  after_deploy :restart_pithumbs_service, only: :pithumbs
 
   def short_name
     "prod"

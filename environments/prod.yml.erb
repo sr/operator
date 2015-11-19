@@ -12,6 +12,7 @@
 <% pardot_dir = "/var/www/pardot" %>
 <% realtime_dir = "/opt/realtime_frontend" %>
 <% workflow_dir = "/opt/workflow" %>
+<% pithumbs_dir = "/var/www/pithumbs" %>
 :sudo: sudo -u pi
 
 :use_locking: false
@@ -29,6 +30,13 @@
       - <%= pardot_dir %>/releases/A
       - <%= pardot_dir %>/releases/B
     :artifact_prefix: pi-
+  :pithumbs:
+    :key: ""
+    :local_path: <%= pithumbs_dir %>
+    :remote_current_link: <%= pithumbs_dir %>/current
+    :remote_path_choices:
+      - <%= pithumbs_dir %>/releases/A
+      - <%= pithumbs_dir %>/releases/B
 
 :autojob_hosts:
   - redis-rules-s1:1234..1237

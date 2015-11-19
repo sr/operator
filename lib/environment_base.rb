@@ -196,6 +196,28 @@ class EnvironmentBase
     Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{symfony_env}/nosql/redis/client.yml")
   end
 
+  def restart_pithumbs_service
+    restart_upstart_job("pithumbs")
+  end
+
+  def restart_upstart_job(job)
+    result = ShellHelper.execute_shell("sudo /sbin/restart #{job}")
+    if result.include?("#{job} start/running")
+      Console.syslog("Restarted #{job} service")
+    elsif result.include?("Unknown instance")
+      Console.syslog("#{job} service was not running, attempting start")
+
+      start_result = ShellHelper.execute_shell("sudo /sbin/start #{job}")
+      if start_result.include?("#{job} start/running")
+        Console.syslog("Started #{job} service")
+      else
+        Console.syslog("Unable to start #{job} service: #{start_result}")
+      end
+    else
+      Console.syslog("Unable to restart #{job} service: #{result}")
+    end
+  end
+
   # =========================================================================
   def name
     self.class.to_s.gsub(/^Environment/,"")
