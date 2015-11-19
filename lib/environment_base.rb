@@ -201,13 +201,13 @@ class EnvironmentBase
   end
 
   def restart_upstart_job(job)
-    result = ShellHelper.execute_shell("sudo /sbin/restart #{job}")
+    result = ShellHelper.execute_shell("sudo /sbin/restart #{job} 2>&1")
     if result.include?("#{job} start/running")
       Console.syslog("Restarted #{job} service")
     elsif result.include?("Unknown instance")
       Console.syslog("#{job} service was not running, attempting start")
 
-      start_result = ShellHelper.execute_shell("sudo /sbin/start #{job}")
+      start_result = ShellHelper.execute_shell("sudo /sbin/start #{job} 2>&1")
       if start_result.include?("#{job} start/running")
         Console.syslog("Started #{job} service")
       else
