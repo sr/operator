@@ -253,15 +253,16 @@ class EnvironmentBase
   end
 
   def valid_payload?(payload_name = nil)
+    payload_name = payload_name.downcase.to_sym
     if payload_name
-      repos.keys.include?(payload_name.to_sym)
+      repos.keys.include?(payload_name)
     else
       !payload.nil?
     end
   end
 
   def payload=(payload_name)
-    payload_name = payload_name.to_sym
+    payload_name = payload_name.downcase.to_sym
     if valid_payload?(payload_name)
       @payload = Payload.new({id: payload_name}.merge(repos[payload_name]))
     end
