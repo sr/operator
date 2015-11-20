@@ -23,39 +23,21 @@ class Payload
     end
   end
 
-  def local_git_path
-    @_local_git_path ||= File.expand_path("github", local_path)
-  end
-
-  def local_artifacts_path
-    @_local_artifacts_path ||= \
+  def artifacts_path
+    @_artifacts_path ||= \
       begin
-        artifact_path = File.expand_path("artifacts", local_path)
+        artifact_path = File.expand_path("artifacts", repo_path)
         FileUtils.mkdir_p(artifact_path) unless Dir.exist?(artifact_path)
         artifact_path
       end
   end
 
-  def local_build_path
-    @_local_build_path ||= File.expand_path("build", local_path)
+  def current_link
+    @options[:current_link]
   end
 
-  def remote_current_link
-    @options[:remote_current_link]
-  end
-
-  def remote_path_choices
-    @options[:remote_path_choices]
-  end
-
-  def remote_path
-    # TODO: do we need to look for remote_current_link to be set???
-    @_remote_path ||= safe_path(@options[:remote_path])
-  end
-
-  # TODO: remove this!
-  def remote_html_path
-    @_remote_html_path ||= safe_path(@options[:remote_html_path])
+  def path_choices
+    @options[:path_choices]
   end
 
   def artifact_prefix
@@ -67,7 +49,7 @@ class Payload
   end
 
   def build_version_file
-    "#{remote_current_link}/build.version"
+    "#{current_link}/build.version"
   end
 
   # --------------------------------------------------------------------------
@@ -78,10 +60,10 @@ class Payload
     path
   end
 
-  def local_path
-    @_local_path ||= \
+  def repo_path
+    @_repo_path ||= \
       begin
-        path = @options[:local_path]
+        path = @options[:repo_path]
         if path.to_s.strip.empty?
           nil
         else

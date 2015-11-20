@@ -31,15 +31,15 @@ class DeployStrategyAtomic < DeployStrategyBase
   private
 
   def current_remote_pointed_at
-    output = ShellHelper.execute_shell("ls -l #{environment.payload.remote_current_link}")
+    output = ShellHelper.execute_shell("ls -l #{environment.payload.current_link}")
     # http://rubular.com/r/wRL3vKUhQU
     if m = output.match(/\s(?<current_link>\.?\/.*?)\s->\s(?<real_path>.*)$/)
       # Double check current link
-      Console.log("Remote dir does not match", :red) if m[:current_link] != environment.payload.remote_current_link
+      Console.log("Remote dir does not match", :red) if m[:current_link] != environment.payload.current_link
       # second is either a relative or absolute path
       real_path = m[:real_path]
       unless %w[/ .].include?(real_path[0])
-        real_path = File.join(File.dirname(environment.payload.remote_current_link), real_path)
+        real_path = File.join(File.dirname(environment.payload.current_link), real_path)
       end
       Console.log("LINK: current -> '#{real_path.strip}'", :yellow)
       real_path.strip
@@ -52,9 +52,9 @@ class DeployStrategyAtomic < DeployStrategyBase
     current = current_remote_pointed_at
     if current.nil?
       # First deployment - pick first one
-      environment.payload.remote_path_choices.first
+      environment.payload.path_choices.first
     else
-      pick_next_choice(environment.payload.remote_path_choices, current, direction)
+      pick_next_choice(environment.payload.path_choices, current, direction)
     end
   end
 
@@ -77,11 +77,11 @@ class DeployStrategyAtomic < DeployStrategyBase
 
     symlink_cmd = \
       if RUBY_PLATFORM =~ /darwin/ # "hack" for dev testing where OSX doesn't support the -T flag on mv
-        "ln -sfn #{new_path} #{environment.payload.remote_current_link}"
+        "ln -sfn #{new_path} #{environment.payload.current_link}"
       else
         # trying an alternative approach: create "current_new" symlink and then move it to "current"
-        "ln -sf #{new_path} #{environment.payload.remote_current_link}_new;" + \
-        "mv -T #{environment.payload.remote_current_link}_new #{environment.payload.remote_current_link};"
+        "ln -sf #{new_path} #{environment.payload.current_link}_new;" + \
+        "mv -T #{environment.payload.current_link}_new #{environment.payload.current_link};"
       end
 
     Console.log("LINK: [MOVE] current -> '#{new_path}'", :yellow)

@@ -13,23 +13,23 @@ describe DeployStrategyAtomic do
       @rsync_mock.stubs(:rsync_command).returns("sudo rsync foo")
       @payload_mock = mock
       @payload_mock.stubs(:name).returns("test")
-      @remote_path_choices = %w[/var/www/testA /var/www/testB]
-      @payload_mock.stubs(:remote_path_choices).returns(@remote_path_choices)
-      @payload_mock.stubs(:remote_current_link).returns("/var/www/current-test")
+      @path_choices = %w[/var/www/testA /var/www/testB]
+      @payload_mock.stubs(:path_choices).returns(@path_choices)
+      @payload_mock.stubs(:current_link).returns("/var/www/current-test")
       @symlink = nil
       ShellHelper.stubs(:execute_shell).returns("(success)")
-      @remote_path_choices.each do | remote_path |
+      @path_choices.each do | path_choice |
         ShellHelper.stubs(:execute_shell)
-          .with(){ | cmd | cmd == "ls -l #{@payload_mock.remote_current_link}" && @symlink == remote_path }
-          .returns("lrwxr-xr-x  1 julrich  SFDC\Domain Users  10 Jun 10 07:59 #{@payload_mock.remote_current_link} -> #{remote_path}")
+          .with(){ | cmd | cmd == "ls -l #{@payload_mock.current_link}" && @symlink == path_choice }
+          .returns("lrwxr-xr-x  1 julrich  SFDC\Domain Users  10 Jun 10 07:59 #{@payload_mock.current_link} -> #{path_choice}")
       end
       ShellHelper.stubs(:execute_shell)
-        .with(){ | cmd | cmd == "ls -l #{@payload_mock.remote_current_link}" && @symlink.nil? }
-        .returns("ls: #{@payload_mock.remote_current_link}: No such file or directory")
+        .with(){ | cmd | cmd == "ls -l #{@payload_mock.current_link}" && @symlink.nil? }
+        .returns("ls: #{@payload_mock.current_link}: No such file or directory")
       # ShellHelper.stubs(:remote)
-      #   .with(){ | server_ip, cmd | cmd.match(/ln -sfn +(?<path>\S+) #{@payload_mock.remote_current_link}_new\;mv -T/) && @symlinks[server_ip] = Regexp.last_match[:path] }.returns("")
+      #   .with(){ | server_ip, cmd | cmd.match(/ln -sfn +(?<path>\S+) #{@payload_mock.current_link}_new\;mv -T/) && @symlinks[server_ip] = Regexp.last_match[:path] }.returns("")
       ShellHelper.stubs(:execute_shell)
-        .with(){ | cmd | cmd.match(/ln -sfn? +(?<path>\S+) #{@payload_mock.remote_current_link}/) && @symlink = Regexp.last_match[:path] }.returns("")
+        .with(){ | cmd | cmd.match(/ln -sfn? +(?<path>\S+) #{@payload_mock.current_link}/) && @symlink = Regexp.last_match[:path] }.returns("")
       env = EnvironmentTest.new
       env.stubs(:payload).returns(@payload_mock)
       @strat = DeployStrategyAtomic.new(env)
@@ -37,7 +37,7 @@ describe DeployStrategyAtomic do
       @strat.stubs(:rsync).returns(@rsync_mock)
     end
 
-    it "should deploy and link to the first choice when there is no remote_current_link" do
+    it "should deploy and link to the first choice when there is no current_link" do
       @strat.deploy("/tmp/foo", %w[localhost])
       assert_equal "/var/www/testA", @symlink, "Did not link to A"
     end
@@ -72,7 +72,7 @@ describe DeployStrategyAtomic do
       @strat.deploy("/tmp/foo", "build1001")
       assert_equal "/var/www/testB", @symlink, "Did not link to B"
       ShellHelper.expects(:execute_shell)
-          .with("ls -l #{@payload_mock.remote_current_link}")
+          .with("ls -l #{@payload_mock.current_link}")
           .never
       @strat.deploy("/tmp/foo", "build1000")
       assert_equal "/var/www/testA", @symlink, "Did not link to A"
