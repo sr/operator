@@ -36,3 +36,5 @@ $ ->
 
   if $('.shipithere') && (/derweze/i).test($('h2 > span').text())
     $('.shipithere[data-target="production"]').attr("disabled", true)
+  else
+    $('.shipithere[data-target="production_dfw"]').attr("disabled", true)
