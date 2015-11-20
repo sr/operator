@@ -14,3 +14,8 @@ aside[role="navigation"] .nav.nav-stacked>li a.active:hover i,
 .nav-tabs>li>a:hover,
 a:hover
   { color:#009DDC; } /* blue */
+
+/* Derweze branch protection during Terminus transition */
+a[disabled] {
+    pointer-events: none;
+}
