@@ -3,7 +3,7 @@ require "deployable"
 class ProvisionalDeploy
   include Deployable
 
-  attr_reader :artifact_url, :repo_name, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
+  attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
 
   def self.from_artifact_url(repo, artifact_url)
     hash = Artifactory.client.get(artifact_url, properties: nil)
