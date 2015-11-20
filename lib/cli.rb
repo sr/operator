@@ -97,6 +97,6 @@ class CLI
 
   def valid_environments
     # TODO: should we have long and short names?
-    [:production, :staging, :test, :dev, :engagement, :production_dfw]
+    [:production, :staging, :test, :dev, :production_dfw]
   end
 end

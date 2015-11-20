@@ -24,27 +24,18 @@
 
 :repos:
   :pardot:
-    :key: ''
-    :local_path: <%= sources_path %>/pi
-    :remote_path: <%= destinations_path %>/test-pi/
-    :remote_current_link: <%= destinations_path %>/current-pi
-    :remote_path_choices: 
+    :repo_path: <%= destinations_path %>/test-pi/
+    :current_link: <%= destinations_path %>/current-pi
+    :path_choices: 
       - <%= destinations_path %>/test-piA/
       - <%= destinations_path %>/test-piB/
-    :remote_html_path: <%= destinations_path %>/test-html/
   :node_modules:
-    :key: ''
-    :local_path: <%= sources_path %>/node_modules
-    :remote_path: <%= destinations_path %>/test-node_modules
+    :repo_path: <%= destinations_path %>/test-node_modules
   :pithumbs:
-    :key: ''
-    :local_path: <%= sources_path %>/thumbs
-    :remote_path: <%= destinations_path %>/test-thumbs
+    :repo_path: <%= destinations_path %>/test-thumbs
   :workflow-stats:
-    :key: ''
-    :local_path: <%= sources_path %>/workflow_stats
-    :remote_path: <%= destinations_path %>/workflow_stats
-    :remote_current_link: <%= destinations_path %>/workflow_stats/current
+    :repo_path: <%= destinations_path %>/workflow_stats
+    :current_link: <%= destinations_path %>/workflow_stats/current
     :artifact_prefix: workflowstats-1.0SNAPSHOT
 
 :servers:

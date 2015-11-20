@@ -34,6 +34,6 @@ class FetchStrategyArtifactory < FetchStrategyBase
   def fetch(deploy)
     # returns path to fetched asset (file or directory)
     artifact = Artifact.from_url(deploy.artifact_url)
-    artifact.download(environment.payload.local_artifacts_path)
+    artifact.download(environment.payload.artifacts_path)
   end
 end

@@ -35,10 +35,10 @@ describe FetchStrategyArtifactory do
   end
 
   it "should use Artifactory to pull build" do
-    local_artifact = @env.payload.local_artifacts_path + '/' + "wfs"
+    local_artifact = @env.payload.artifacts_path + '/' + "wfs"
 
     artifact = mock
-    artifact.expects(:download).with(@env.payload.local_artifacts_path).returns(local_artifact)
+    artifact.expects(:download).with(@env.payload.artifacts_path).returns(local_artifact)
 
     Artifactory::Resource::Artifact
       .stubs(:from_url)

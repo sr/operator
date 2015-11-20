@@ -23,15 +23,15 @@ class FetchStrategyTarball < FetchStrategyBase
 
   # returns path to dir where payload was fetched
   def fetch(deploy)
-    local_artifacts_path = environment.payload.local_artifacts_path
-    FileUtils.mkpath(local_artifacts_path) unless File.directory?(local_artifacts_path)
-    local_file = File.join(local_artifacts_path, "#{environment.payload.artifact_prefix}#{deploy.what_details}.tar.gz")
+    artifacts_path = environment.payload.artifacts_path
+    FileUtils.mkpath(artifacts_path) unless File.directory?(artifacts_path)
+    local_file = File.join(artifacts_path, "#{environment.payload.artifact_prefix}#{deploy.what_details}.tar.gz")
 
     if File.exist?(local_file)
       Console.log("Artifact is already downloaded. Continuing...", :green)
     else
       Console.log("Pulling #{deploy.what_details} from S3....", :green)
-      s3curl.getFile(remote_artifact_file(deploy.what_details), local_artifacts_path)
+      s3curl.getFile(remote_artifact_file(deploy.what_details), artifacts_path)
     end
 
     # tarball strategy returns the path to the tarball
