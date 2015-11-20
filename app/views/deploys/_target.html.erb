@@ -39,7 +39,7 @@
       <%- end %>
     </div>
   <% else %>
-    <%= link_to "Ship it Here", new_repo_deploy_path(current_repo.name, target_name: target.name, artifact_url: @prov_deploy.artifact_url, what: @prov_deploy.what, what_details: @prov_deploy.what_details), class: "btn btn-primary btn-success deploy-button", data: {"target" => target.name} %>
+    <%= link_to "Ship it Here", new_repo_deploy_path(current_repo.name, target_name: target.name, artifact_url: @prov_deploy.artifact_url, what: @prov_deploy.what, what_details: @prov_deploy.what_details), class: "btn btn-primary btn-success deploy-button shipithere", data: {"target" => target.name} %>
     <br><br>
   <% end %>
 </div>

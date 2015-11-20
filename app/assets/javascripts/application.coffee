@@ -33,3 +33,6 @@ $ ->
     else
       form.submit()
       form.find("input").prop("disabled", true)
+
+  if $('.shipithere') && (/derweze/i).test($('h2 > span').text())
+    $('.shipithere[data-target="production"]').attr("disabled", true)
