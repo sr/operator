@@ -29,13 +29,18 @@
     :path_choices:
       - <%= pardot_dir %>/releases/A
       - <%= pardot_dir %>/releases/B
-    :artifact_prefix: pi-
   :pithumbs:
     :repo_path: <%= pithumbs_dir %>
     :current_link: <%= pithumbs_dir %>/current
     :path_choices:
       - <%= pithumbs_dir %>/releases/A
       - <%= pithumbs_dir %>/releases/B
+  :realtime-frontend:
+    :repo_path: <%= realtime_dir %>
+    :current_link: <%= realtime_dir %>/realtime-frontend
+    :path_choices:
+      - <%= realtime_dir %>/releases/A
+      - <%= realtime_dir %>/releases/B
 
 :autojob_hosts:
   - redis-rules-s1:1234..1237

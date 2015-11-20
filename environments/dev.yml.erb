@@ -15,7 +15,6 @@
 :canoe_target: "dev"
 :canoe_api_token: "canoe123"
 
-<% sources_path = "#{sync_dir}/test_sources" %>
 <% destinations_path = "#{sync_dir}/test_destinations" %>
 <% pardot_dir = "#{destinations_path}/pardot" %>
 
@@ -26,8 +25,6 @@
     :path_choices:
       - <%= pardot_dir %>/releases/A
       - <%= pardot_dir %>/releases/B
-    :artifact_prefix: pi-
-    :s3_bucket: pi
   :node_modules:
     :repo_path: <%= destinations_path %>/node_modules
   :pithumbs:
