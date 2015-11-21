@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/sr/operator/src/services/ecs"
+	"github.com/sr/operator/src/gcloud"
 	"google.golang.org/grpc"
 )
 
@@ -14,6 +14,6 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	server := grpc.NewServer()
-	service_ecs.RegisterECSServiceServer(server, service_ecs.NewServer())
+	gcloud.RegisterGCloudServiceServer(server, gcloud.NewAPIServer())
 	server.Serve(listener)
 }
