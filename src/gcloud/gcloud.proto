@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package gcloud;
+
+service GCloudService {
+	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
+	rpc ListOperations(ListOperationsRequest) returns (ListOperationsResponse);
+}
+
+message Instance {
+	string id = 1;
+}
+
+message Operation {
+	string id = 1;
+}
+
+message ListInstancesRequest {
+	string project_id = 1;
+}
+
+message ListInstancesResponse {
+	repeated Instance instances = 1;
+}
+
+message ListOperationsRequest {
+	string project_id = 1;
+}
+
+message ListOperationsResponse {
+	repeated Operation operations = 1;
+}
