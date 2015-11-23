@@ -34,7 +34,8 @@ $ ->
       form.submit()
       form.find("input").prop("disabled", true)
 
-  if $('.shipithere') && $('.repo').text().match(/pardot/) && $('h2 > span').text().match(/derweze/i)
-    $('.shipithere[data-target="production"]').attr("disabled", true)
-  else
-    $('.shipithere[data-target="production_dfw"]').attr("disabled", true)
+  if $('.shipithere') && $('.repo').text().match(/pardot/)
+    if $('h2 > span').text().match(/derweze/i)
+      $('.shipithere[data-target="production"]').attr("disabled", true)
+    else
+      $('.shipithere[data-target="production_dfw"]').attr("disabled", true)
