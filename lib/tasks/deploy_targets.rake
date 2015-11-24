@@ -32,6 +32,14 @@ namespace :canoe do
       repo.bamboo_project = 'PDT'
       repo.bamboo_plan = 'WFST'
     }.save
+
+    Repo.find_or_initialize_by(name: 'murdoc').tap { |repo|
+      repo.icon = 'bolt'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = true
+      repo.bamboo_project = 'PDT'
+      repo.bamboo_plan = 'MDOC'
+    }.save
   end
 
   desc 'Create targets for deployment'
