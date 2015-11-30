@@ -33,11 +33,11 @@ class Payload
   end
 
   def current_link
-    @options[:current_link]
+    @options.fetch(:current_link, File.expand_path("current", repo_path))
   end
 
   def path_choices
-    @options[:path_choices]
+    @options.fetch(:path_choices, %w(A B).map {|letter| File.expand_path("releases/#{letter}", repo_path)})
   end
 
   def artifact_prefix

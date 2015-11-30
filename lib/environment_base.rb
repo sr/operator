@@ -200,6 +200,10 @@ class EnvironmentBase
     restart_upstart_job("pithumbs")
   end
 
+  def restart_murdoc
+    restart_upstart_job("murdoc")
+  end
+
   def restart_upstart_job(job)
     result = ShellHelper.execute_shell("sudo /sbin/restart #{job} 2>&1")
     if result.include?("#{job} start/running")

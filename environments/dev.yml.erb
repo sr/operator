@@ -16,15 +16,10 @@
 :canoe_api_token: "canoe123"
 
 <% destinations_path = "#{sync_dir}/test_destinations" %>
-<% pardot_dir = "#{destinations_path}/pardot" %>
 
 :repos:
   :pardot:
-    :repo_path: <%= pardot_dir %>
-    :current_link: <%= pardot_dir %>/current
-    :path_choices:
-      - <%= pardot_dir %>/releases/A
-      - <%= pardot_dir %>/releases/B
+    :repo_path: <%= destinations_path %>/pardot
   :node_modules:
     :repo_path: <%= destinations_path %>/node_modules
   :pithumbs:
@@ -32,14 +27,7 @@
   :realtime-frontend:
     :repo_path: <%= destinations_path %>/realtime_frontend
     :current_link: <%= destinations_path %>/current-salesedge
-    # :path_choices:
-    #   - <%= destinations_path %>/test-salesedge/releases/A/
-    #   - <%= destinations_path %>/test-salesedge/releases/B/
   :workflow:
     :repo_path: <%= destinations_path %>/workflow
-    :current_link: <%= destinations_path %>/workflow/current
-    :path_choices:
-      - <%= destinations_path %>/workflow/releases/A/
-      - <%= destinations_path %>/workflow/releases/B/
 
 :autojob_hosts: []
