@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package papertrail;
+
+service PapertrailService {
+	rpc Search(SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+	string query = 1;
+}
+
+message SearchResponse {
+	repeated LogEvent events = 1;
+}
+
+message LogEvent {
+	string id = 1;
+	string source = 2;
+	string program = 3;
+	string log_message = 4;
+}
