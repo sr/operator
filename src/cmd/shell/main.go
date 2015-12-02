@@ -36,7 +36,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(gcloudListInstancesResponse)
+		for _, instance := range gcloudListInstancesResponse.Instances {
+			fmt.Printf("%s %s %s\n", instance.Name, instance.Status, instance.Zone)
+		}
 
 		gcloudListOperationsResponse, err := gcloudClient.ListOperations(
 			context.Background(),
@@ -47,7 +49,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(gcloudListOperationsResponse)
+		for _, operation := range gcloudListOperationsResponse.Operations {
+			fmt.Printf("%s %s %s\n", operation.Id, operation.Type, operation.Status)
+		}
 	case "logs":
 		papertrailClient := papertrail.NewPapertrailServiceClient(conn)
 		response, err := papertrailClient.Search(
