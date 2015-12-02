@@ -9,10 +9,15 @@ service GCloudService {
 
 message Instance {
 	string id = 1;
+	string name = 2;
+	string status = 3;
+	string zone = 4;
 }
 
 message Operation {
 	string id = 1;
+	string type = 2;
+	string status = 3;
 }
 
 message ListInstancesRequest {

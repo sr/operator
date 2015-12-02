@@ -2,6 +2,7 @@ package gcloud
 
 import (
 	"net/http"
+	"strconv"
 
 	"golang.org/x/net/context"
 	computeapi "google.golang.org/api/compute/v1"
@@ -30,7 +31,12 @@ func (s *apiServer) ListInstances(
 	var instances []*Instance
 	for _, item := range response.Items {
 		for _, instance := range item.Instances {
-			instances = append(instances, &Instance{Id: string(instance.Id)})
+			instances = append(instances, &Instance{
+				Id:     string(instance.Id),
+				Name:   instance.Name,
+				Status: instance.Status,
+				Zone:   instance.Zone,
+			})
 		}
 	}
 	return &ListInstancesResponse{
@@ -53,7 +59,11 @@ func (s *apiServer) ListOperations(
 	var operations []*Operation
 	for _, item := range response.Items {
 		for _, operation := range item.Operations {
-			operations = append(operations, &Operation{Id: string(operation.Id)})
+			operations = append(operations, &Operation{
+				Id:     strconv.FormatUint(operation.Id, 10),
+				Type:   string(operation.OperationType),
+				Status: string(operation.Status),
+			})
 		}
 	}
 	return &ListOperationsResponse{
