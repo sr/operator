@@ -22,7 +22,7 @@ func Listen() error {
 
 	gcloud.RegisterGCloudServiceServer(server, gcloud.NewAPIServer())
 
-	papertrailEnv := &papertrailEnv{}
+	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
 		return err
 	}
