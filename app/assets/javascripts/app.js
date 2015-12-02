@@ -24,8 +24,13 @@ $(function(){
   });
 
   $('.js-servers-toggle').click(function(event) {
-    var serverDiv = $(this).attr('data-divname');
-    $('#'+serverDiv).toggle();
+    var $this = $(this);
+    var $serverDiv = $("#" + $this.attr('data-divname'));
+    if ($this.is(":checked")) {
+      $serverDiv.show();
+    } else {
+      $serverDiv.hide();
+    }
   });
 
   $('.js-sha-expand').click(function(event) {

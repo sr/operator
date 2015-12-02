@@ -63,24 +63,51 @@
       </label>
     </div>
 
-    <% if Rails.env.production? %>
-      <div class="checkbox">
-        &nbsp;&nbsp;
-        <label>
-          <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="servers-<%= current_target.name %>"> Specify Server(s)
-        </label>
-      </div>
-      <div id="servers-<%= current_target.name %>" style="display:none;">
-        <br>
-        <div class="form-group form-wide">
-          <label for="server_names">Servers</label>
-          <input type="text" class="form-control" name="server_names" placeholder="Enter server(s)">
+    <div class="checkbox">
+      &nbsp;&nbsp;
+      <label>
+        <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="deploy-servers"> Specify Server(s)
+      </label>
+    </div>
+
+    <div id="deploy-servers" style="display: none;">
+      <div class="well well-sm">
+        <legend>Tags</legend>
+
+        <div class="container-fluid">
+          <%- @tags.each_slice(6).each do |slice| %>
+            <div class="row">
+              <%- slice.each do |tag| %>
+                <div class="col-xs-2">
+                  <label class="checkbox-inline">
+                    <%= check_box_tag "server_tags[]", tag.id, false, data: {server_hostnames: tag.servers.map(&:hostname)} %> <%= tag.name %>
+                  </label>
+                </div>
+              <%- end %>
+            </div>
+          <%- end %>
         </div>
-        <span class="help-block">
-          Specify a single server or a list of servers separated by commas.
-        </span>
       </div>
-    <% end %>
+
+      <div class="well well-sm">
+        <legend>Servers</legend>
+
+        <div class="container-fluid">
+          <%- @server_hostnames.each_slice(6) do |slice| %>
+            <div class="row">
+              <%- slice.each do |hostname| %>
+                <div class="col-xs-2">
+                  <label class="checkbox-inline">
+                    <%= check_box_tag "server_hostnames[]", hostname %>
+                    <%= hostname %>
+                  </label>
+                </div>
+              <%- end %>
+            </div>
+          <%- end %>
+        </div>
+      </div>
+    </div>
   <%- end %>
 </div>
 
