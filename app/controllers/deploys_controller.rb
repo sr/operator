@@ -33,10 +33,12 @@ class DeploysController < ApplicationController
       #
       # TODO: Use server_ids instead of server hostnames once pull-based
       # deployment is fully rolled out.
-      @server_hostnames = (
-        Rails.application.config.deployment.strategy.list_servers(current_target, current_repo.name) +
-        current_target.servers(repo: current_repo).enabled.pluck(:hostname)
-      ).sort
+      @server_hostnames = current_target.servers(repo: current_repo).enabled.pluck(:hostname)
+      if current_target.script_path.present?
+        @server_hostnames.concat(Rails.application.config.deployment.strategy.list_servers(current_target, current_repo.name))
+      end
+      @server_hostnames.sort!
+
       @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
     else
       render_invalid_provisional_deploy
