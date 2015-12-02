@@ -1,0 +1,57 @@
+{
+	"ImportPath": "github.com/sr/operator",
+	"GoVersion": "go1.5.1",
+	"Packages": [
+		"./src/..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "57346232f21afd1b0138cc10fbdd43c4d17e6c16"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "5627bad10b821d907ac4dc81fb3535ec7dd81c2b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2",
+			"Rev": "5627bad10b821d907ac4dc81fb3535ec7dd81c2b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/timeseries",
+			"Rev": "5627bad10b821d907ac4dc81fb3535ec7dd81c2b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/trace",
+			"Rev": "5627bad10b821d907ac4dc81fb3535ec7dd81c2b"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "3314c49c831be809de14a5e6c7c68f4c83733a69"
+		},
+		{
+			"ImportPath": "google.golang.org/api/compute/v1",
+			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
+		},
+		{
+			"ImportPath": "google.golang.org/api/gensupport",
+			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi",
+			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/compute/metadata",
+			"Rev": "e06e2bd3393c9e08d519da7ac2bb392dbb3c12eb"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/internal",
+			"Rev": "e06e2bd3393c9e08d519da7ac2bb392dbb3c12eb"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc",
+			"Rev": "2011d72ca3b5637b963367c586bacce50ff08bf7"
+		}
+	]
+}
