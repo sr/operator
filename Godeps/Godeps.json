@@ -10,6 +10,10 @@
 			"Rev": "57346232f21afd1b0138cc10fbdd43c4d17e6c16"
 		},
 		{
+			"ImportPath": "go.pedge.io/env",
+			"Rev": "7bb5904005698ff870289d34e93e0fb8f433e2b9"
+		},
+		{
 			"ImportPath": "golang.org/x/net/context",
 			"Rev": "5627bad10b821d907ac4dc81fb3535ec7dd81c2b"
 		},
