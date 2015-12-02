@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/sr/operator/src/gcloud"
 	"github.com/sr/operator/src/papertrail"
@@ -36,9 +38,20 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		instancesW := new(tabwriter.Writer)
+		instancesW.Init(os.Stdout, 0, 8, 0, '\t', 0)
+		fmt.Fprintf(instancesW, "%s\t%s\t%s\n", "NAME", "STATUS", "ZONE")
 		for _, instance := range gcloudListInstancesResponse.Instances {
-			fmt.Printf("%s %s %s\n", instance.Name, instance.Status, instance.Zone)
+			zoneParts := strings.Split(instance.Zone, "/")
+			fmt.Fprintf(
+				instancesW,
+				"%s\t%s\t%s\n",
+				instance.Name,
+				instance.Status,
+				zoneParts[len(zoneParts)-1],
+			)
 		}
+		instancesW.Flush()
 
 		gcloudListOperationsResponse, err := gcloudClient.ListOperations(
 			context.Background(),
@@ -49,9 +62,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		operationsW := new(tabwriter.Writer)
+		operationsW.Init(os.Stdout, 0, 8, 0, '\t', 0)
+		fmt.Fprintf(operationsW, "%s\t%s\t%s\n", "ID", "TYPE", "STATUS")
 		for _, operation := range gcloudListOperationsResponse.Operations {
-			fmt.Printf("%s %s %s\n", operation.Id, operation.Type, operation.Status)
+			fmt.Fprintf(operationsW, "%s\t%s\t%s\n", operation.Id, operation.Type, operation.Status)
 		}
+		operationsW.Flush()
 	case "logs":
 		papertrailClient := papertrail.NewPapertrailServiceClient(conn)
 		response, err := papertrailClient.Search(
