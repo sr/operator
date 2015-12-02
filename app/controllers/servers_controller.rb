@@ -33,7 +33,13 @@ class ServersController < ApplicationController
   def server_params
     params.require(:server).permit(
       :hostname, :enabled,
+      :server_tag_names => [],
       :deploy_scenarios_attributes => [:id, :deploy_target_id, :repo_id, :_destroy]
     )
   end
+
+  def all_server_tag_names
+    @all_server_tag_names ||= ServerTag.pluck(:name)
+  end
+  helper_method :all_server_tag_names
 end

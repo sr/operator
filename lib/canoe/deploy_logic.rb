@@ -44,7 +44,7 @@ module Canoe
         artifact_url: prov_deploy.artifact_url,
         passed_ci: prov_deploy.passed_ci,
         lock: (params[:lock] == "on"),
-        server_hostnames: (params[:servers] == "on" && params[:server_names].strip.split(/\s*,\s*/)).presence,
+        server_hostnames: (params[:servers] == "on" && params.fetch(:server_hostnames, [])).presence,
       )
 
       if the_deploy

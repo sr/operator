@@ -2,6 +2,10 @@
   <%= f.input :hostname, label: 'Hostname', placeholder: 'app-s1', disabled: @server.persisted? %>
   <%= f.input :enabled, label: 'Enabled?', wrapper: :horizontal_radio_and_checkboxes %>
 
+  <%= f.input :server_tag_names, label: 'Tags' do %>
+    <%= f.select :server_tag_names, all_server_tag_names, {include_blank: false}, multiple: true %>
+  <%- end %>
+
   <div class="form-group">
     <label class="col-sm-3 control-label">Deploy Scenarios</label>
     <div class="col-sm-9 deploy-scenarios-fields">

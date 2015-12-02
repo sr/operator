@@ -28,6 +28,16 @@ class DeploysController < ApplicationController
     if @prov_deploy = build_provisional_deploy
       @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
+
+      # TODO: Remove strategy once pull-based deployment is fully rolled out.
+      #
+      # TODO: Use server_ids instead of server hostnames once pull-based
+      # deployment is fully rolled out.
+      @server_hostnames = (
+        Rails.application.config.deployment.strategy.list_servers(current_target, current_repo.name) +
+        current_target.servers(repo: current_repo).enabled.pluck(:hostname)
+      ).sort
+      @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
     else
       render_invalid_provisional_deploy
     end
@@ -84,7 +94,7 @@ class DeploysController < ApplicationController
       # do otherwise
       if current_deploy.specified_servers.present?
         params[:servers] = "on"
-        params[:server_names] = current_deploy.all_servers.join(",")
+        params[:server_hostnames] = current_deploy.all_servers
       end
 
       prov_deploy = ProvisionalDeploy.from_previous_deploy(current_repo, previous_deploy)

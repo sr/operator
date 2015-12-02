@@ -14,6 +14,7 @@
 #= require jquery_ujs
 #= require jquery_nested_form
 #= require bootstrap-sprockets
+#= require selectize
 #= require_tree .
 
 window.isProduction = ->
@@ -33,6 +34,17 @@ $ ->
     else
       form.submit()
       form.find("input").prop("disabled", true)
+
+  $("#server_server_tag_names").selectize
+    create: true
+    hideSelected: true
+
+  $("input[name='server_tags[]']").on "change", (e) ->
+    $checkbox = $(this)
+    checked = $checkbox.is(":checked")
+
+    for hostname in $checkbox.data("server-hostnames")
+      $("input[name='server_hostnames[]'][value='#{hostname}']").prop("checked", checked)
 
   if $('.shipithere') && $('.repo').text().match(/pardot/)
     if $('h2 > span').text().match(/derweze/i)
