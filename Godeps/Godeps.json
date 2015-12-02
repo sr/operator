@@ -10,6 +10,14 @@
 			"Rev": "57346232f21afd1b0138cc10fbdd43c4d17e6c16"
 		},
 		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "2a60fc2ba6c19de80291203597d752e9ba58e4c0"
+		},
+		{
+			"ImportPath": "github.com/sourcegraph/go-papertrail/papertrail",
+			"Rev": "175a8be170fffcc1046d95bbd20fc2ef28eab01c"
+		},
+		{
 			"ImportPath": "go.pedge.io/env",
 			"Rev": "7bb5904005698ff870289d34e93e0fb8f433e2b9"
 		},
