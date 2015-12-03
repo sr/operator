@@ -1,6 +1,7 @@
 Name: kafka
 Version: 0.9.0.0
-Release: 1
+Release: 1%{?dist}
+BuildArch: noarch
 Summary: Kafka is a distributed, partitioned, replicated commit log service
 Group: Applications/Internet
 License: Apache
@@ -19,11 +20,21 @@ Kafka is a distributed, partitioned, replicated commit log service
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d -m 755 $RPM_BUILD_ROOT/usr/local
-cp -rp ../* $RPM_BUILD_ROOT/usr/local/
+install -d -m 755 $RPM_BUILD_ROOT/opt/kafka/kafka-%{version}
+cp -rp * $RPM_BUILD_ROOT/opt/kafka/kafka-%{version}
 
 %files
-/usr/local/kafka_2.11-0.9.0.0/*
+%defattr(-,kafka,kafka,-)
+/opt/kafka/kafka-%{version}
+
+%pre
+# Check if custom group 'kafka' exists. If not, create it.
+getent group kafka >/dev/null || groupadd -r kafka
+
+# Check if custom user 'kafka' exists. If not, create it.
+getent passwd kafka >/dev/null || \
+    useradd -r -M -g kafka -s /bin/false \
+    -c "Kafka service account" kafka
 
 %clean
 rm -rf $RPM_BUILD_ROOT
