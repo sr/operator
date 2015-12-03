@@ -20,12 +20,12 @@ Kafka is a distributed, partitioned, replicated commit log service
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d -m 755 $RPM_BUILD_ROOT/opt/kafka/kafka-%{version}
-cp -rp * $RPM_BUILD_ROOT/opt/kafka/kafka-%{version}
+install -d -m 755 $RPM_BUILD_ROOT/opt/kafka/kafka_%{version}
+cp -rp * $RPM_BUILD_ROOT/opt/kafka/kafka_%{version}
 
 %files
 %defattr(-,kafka,kafka,-)
-/opt/kafka/kafka-%{version}
+/opt/kafka/kafka_%{version}
 
 %pre
 # Check if custom group 'kafka' exists. If not, create it.
