@@ -1,0 +1,3 @@
+images:
+  docker.dev.pardot.com/base/centos:7:
+    build: centos/7

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$(uname)" = "Darwin" ]; then
+  DOCKER="/usr/local/bin/devenv docker"
+else
+  DOCKER="docker"
+fi
+
+exec $DOCKER "$@"
