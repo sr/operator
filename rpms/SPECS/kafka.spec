@@ -6,7 +6,7 @@ Summary: Kafka is a distributed, partitioned, replicated commit log service
 Group: Applications/Internet
 License: Apache
 URL: http://kafka.apache.org/
-Source0: http://www.us.apache.org/dist/kafka/0.9.0.0/kafka_2.11-0.9.0.0.tgz
+Source0: http://www.us.apache.org/dist/kafka/%{version}/kafka_2.11-%{version}.tgz
 Source1: http://chef-repos.pardot.com/pardot/no-arch/kafka-statsd-reporter-1.0.1.jar
 BuildRoot: %{_tmppath}/%name-root
 %define debug_package %{nil}

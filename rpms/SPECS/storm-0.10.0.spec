@@ -6,7 +6,7 @@ Summary: Apache Storm is a free and open source distributed realtime computation
 Group: Applications/Internet
 License: Apache
 URL: http://storm.apache.org/
-Source0: http://mirror.nus.edu.sg/apache/storm/apache-storm-0.10.0/apache-storm-0.10.0.tar.gz
+Source0: http://mirror.nus.edu.sg/apache/storm/apache-storm-%{version}/apache-storm-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%name-root
 %define debug_package %{nil}
 
