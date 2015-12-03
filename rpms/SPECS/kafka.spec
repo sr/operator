@@ -7,6 +7,7 @@ Group: Applications/Internet
 License: Apache
 URL: http://kafka.apache.org/
 Source0: http://www.us.apache.org/dist/kafka/0.9.0.0/kafka_2.11-0.9.0.0.tgz
+Source1: http://chef-repos.pardot.com/pardot/no-arch/kafka-statsd-reporter-1.0.1.jar
 BuildRoot: %{_tmppath}/%name-root
 %define debug_package %{nil}
 
@@ -22,6 +23,7 @@ Kafka is a distributed, partitioned, replicated commit log service
 rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT/opt/kafka/kafka_%{version}
 cp -rp * $RPM_BUILD_ROOT/opt/kafka/kafka_%{version}
+install -m0644 %{SOURCE1} $RPM_BUILD_ROOT/opt/kafka/kafka_%{version}/libs
 
 %files
 %defattr(-,kafka,kafka,-)
