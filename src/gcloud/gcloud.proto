@@ -6,7 +6,6 @@ package gcloud;
 
 service GCloudService {
 	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
-	rpc ListOperations(ListOperationsRequest) returns (ListOperationsResponse);
 }
 
 message Instance {
@@ -16,12 +15,6 @@ message Instance {
 	string zone = 4;
 }
 
-message Operation {
-	string id = 1;
-	string type = 2;
-	string status = 3;
-}
-
 message ListInstancesRequest {
 	string project_id = 1;
 }
@@ -29,12 +22,4 @@ message ListInstancesRequest {
 message ListInstancesResponse {
 	proto.Output output = 1;
 	repeated Instance objects = 2;
-}
-
-message ListOperationsRequest {
-	string project_id = 1;
-}
-
-message ListOperationsResponse {
-	repeated Operation operations = 1;
 }
