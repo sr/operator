@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "proto/operator.proto";
+
 package gcloud;
 
 service GCloudService {
@@ -14,10 +16,6 @@ message Instance {
 	string zone = 4;
 }
 
-message Output {
-	string PlainText = 1;
-}
-
 message Operation {
 	string id = 1;
 	string type = 2;
@@ -29,7 +27,7 @@ message ListInstancesRequest {
 }
 
 message ListInstancesResponse {
-	Output output = 1;
+	proto.Output output = 1;
 	repeated Instance objects = 2;
 }
 
