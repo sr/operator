@@ -84,7 +84,7 @@ func main() {
 			fmt.Println(event.LogMessage)
 		}
 	default:
-		fmt.Fprintf(os.Stderr, "no such service: %s\n", "error")
+		fmt.Fprintf(os.Stderr, "no such service: %s\n", service)
 		os.Exit(1)
 	}
 }
