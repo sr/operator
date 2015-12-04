@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"text/tabwriter"
 
 	"github.com/sr/operator/src/gcloud"
 	"github.com/sr/operator/src/papertrail"
@@ -38,23 +37,6 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Print(gcloudListInstancesResponse.Output.PlainText)
-
-		gcloudListOperationsResponse, err := gcloudClient.ListOperations(
-			context.Background(),
-			&gcloud.ListOperationsRequest{
-				ProjectId: "dev-europe-west1",
-			},
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		operationsW := new(tabwriter.Writer)
-		operationsW.Init(os.Stdout, 0, 8, 0, '\t', 0)
-		fmt.Fprintf(operationsW, "%s\t%s\t%s\n", "ID", "TYPE", "STATUS")
-		for _, operation := range gcloudListOperationsResponse.Operations {
-			fmt.Fprintf(operationsW, "%s\t%s\t%s\n", operation.Id, operation.Type, operation.Status)
-		}
-		operationsW.Flush()
 	case "logs":
 		papertrailClient := papertrail.NewPapertrailServiceClient(conn)
 		response, err := papertrailClient.Search(

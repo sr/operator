@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -66,32 +65,5 @@ func (s *apiServer) ListInstances(
 	return &ListInstancesResponse{
 		Objects: instances,
 		Output:  &proto.Output{PlainText: output.String()},
-	}, nil
-}
-
-func (s *apiServer) ListOperations(
-	ctx context.Context,
-	request *ListOperationsRequest,
-) (*ListOperationsResponse, error) {
-	service, err := computeapi.New(s.client)
-	if err != nil {
-		return nil, err
-	}
-	response, err := service.GlobalOperations.AggregatedList(request.ProjectId).Do()
-	if err != nil {
-		return nil, err
-	}
-	var operations []*Operation
-	for _, item := range response.Items {
-		for _, operation := range item.Operations {
-			operations = append(operations, &Operation{
-				Id:     strconv.FormatUint(operation.Id, 10),
-				Type:   string(operation.OperationType),
-				Status: string(operation.Status),
-			})
-		}
-	}
-	return &ListOperationsResponse{
-		Operations: operations,
 	}, nil
 }
