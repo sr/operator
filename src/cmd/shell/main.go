@@ -80,9 +80,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, event := range response.LogEvents {
-			fmt.Println(event.LogMessage)
-		}
+		fmt.Print(response.Output.PlainText)
 	default:
 		fmt.Fprintf(os.Stderr, "no such service: %s\n", service)
 		os.Exit(1)
