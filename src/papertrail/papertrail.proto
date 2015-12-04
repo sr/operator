@@ -1,13 +1,11 @@
 syntax = "proto3";
 
+import "proto/operator.proto";
+
 package papertrail;
 
 service PapertrailService {
 	rpc Search(SearchRequest) returns (SearchResponse);
-}
-
-message Output {
-	string PlainText = 1;
 }
 
 message SearchRequest {
@@ -15,7 +13,7 @@ message SearchRequest {
 }
 
 message SearchResponse {
-	Output output = 1;
+	proto.Output output = 1;
 	repeated LogEvent objects = 2;
 }
 
