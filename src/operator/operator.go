@@ -9,10 +9,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-type papertrailEnv struct {
-	APIToken string `env:"PAPERTRAIL_API_TOKEN,required"`
-}
-
 func Listen() error {
 	listener, err := net.Listen("tcp", ":3000")
 	if err != nil {
