@@ -14,6 +14,10 @@ message Instance {
 	string zone = 4;
 }
 
+message Output {
+	string PlainText = 1;
+}
+
 message Operation {
 	string id = 1;
 	string type = 2;
@@ -25,7 +29,8 @@ message ListInstancesRequest {
 }
 
 message ListInstancesResponse {
-	repeated Instance instances = 1;
+	Output output = 1;
+	repeated Instance objects = 2;
 }
 
 message ListOperationsRequest {

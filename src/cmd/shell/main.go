@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/sr/operator/src/gcloud"
@@ -38,20 +37,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		instancesW := new(tabwriter.Writer)
-		instancesW.Init(os.Stdout, 0, 8, 0, '\t', 0)
-		fmt.Fprintf(instancesW, "%s\t%s\t%s\n", "NAME", "STATUS", "ZONE")
-		for _, instance := range gcloudListInstancesResponse.Instances {
-			zoneParts := strings.Split(instance.Zone, "/")
-			fmt.Fprintf(
-				instancesW,
-				"%s\t%s\t%s\n",
-				instance.Name,
-				instance.Status,
-				zoneParts[len(zoneParts)-1],
-			)
-		}
-		instancesW.Flush()
+		fmt.Print(gcloudListInstancesResponse.Output.PlainText)
 
 		gcloudListOperationsResponse, err := gcloudClient.ListOperations(
 			context.Background(),
