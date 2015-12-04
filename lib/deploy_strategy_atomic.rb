@@ -11,7 +11,7 @@ class DeployStrategyAtomic < DeployStrategyBase
     else
       response = extract_artifact(dpath, artifact_path)
       fix_index_php
-      move_symlinks(:forward, dpath)
+      move_symlinks(:forward, dpath) if response == DEPLOY_SUCCESS
     end
     response
   end
@@ -107,6 +107,7 @@ class DeployStrategyAtomic < DeployStrategyBase
       rm -rf #{deploy_path}
       mkdir -p #{deploy_path} &&
       tar xzf #{artifact} -C #{deploy_path}")
+    $?.nil? || $?.exitstatus == 0 ? DEPLOY_SUCCESS : DEPLOY_FAILURE
   end
 
   # TODO: This is a temporary hack. Let's fix https://jira.dev.pardot.com/browse/BREAD-312

@@ -32,7 +32,7 @@ class Conductor
 
     environment.execute_pre_deploy_hooks(deploy)
     success = deploy_strategy.deploy(payload_path, deploy)
-    environment.execute_post_deploy_hooks(deploy)
+    environment.execute_post_deploy_hooks(deploy) unless success == deploy_strategy::DEPLOY_FAILED
 
     success
   end

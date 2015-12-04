@@ -48,7 +48,7 @@ describe DeployStrategyAtomic do
       @strat.deploy("/tmp/foo", "build1001")
       assert_equal "/var/www/testB", @symlink, "Did not link to B"
       # Don't expect a rollback
-      @strat.expects(:extract_artifact)
+      @strat.expects(:extract_artifact).returns(DeployStrategyAtomic::DEPLOY_SUCCESS)
       @strat.deploy("/tmp/foo", "build1002")
       assert_equal "/var/www/testA", @symlink, "Did not link to A"
     end
