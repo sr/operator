@@ -1,6 +1,9 @@
 package papertrail
 
 import (
+	"bytes"
+	"fmt"
+
 	gopapertrail "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
 )
@@ -26,16 +29,21 @@ func (s *apiServer) Search(
 	}
 
 	var logEvents []*LogEvent
+	output := bytes.NewBufferString("")
+
 	for _, event := range response.Events {
-		logEvents = append(logEvents, &LogEvent{
+		logEvent := &LogEvent{
 			Id:         event.ID,
 			Source:     event.SourceName,
 			Program:    *event.Program,
 			LogMessage: event.Message,
-		})
+		}
+		logEvents = append(logEvents, logEvent)
+		fmt.Fprintln(output, logEvent.LogMessage)
 	}
 
 	return &SearchResponse{
-		LogEvents: logEvents,
+		Objects: logEvents,
+		Output:  &Output{PlainText: output.String()},
 	}, nil
 }

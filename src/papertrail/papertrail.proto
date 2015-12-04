@@ -6,12 +6,17 @@ service PapertrailService {
 	rpc Search(SearchRequest) returns (SearchResponse);
 }
 
+message Output {
+	string PlainText = 1;
+}
+
 message SearchRequest {
 	string query = 1;
 }
 
 message SearchResponse {
-	repeated LogEvent log_events = 1;
+	Output output = 1;
+	repeated LogEvent objects = 2;
 }
 
 message LogEvent {
