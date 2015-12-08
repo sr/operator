@@ -50,8 +50,10 @@ class FetchStrategyArtifactory < FetchStrategyBase
     FileUtils.mkdir_p(environment.payload.artifacts_path)
     filename = File.join(environment.payload.artifacts_path, File.basename(download_uri.to_s))
 
+    # https://github.com/chef/artifactory-client/blob/0e2fe203608ee3f62fc86c404a590f0cbe6fff30/lib/artifactory/resources/base.rb#L112-L116
+    download_path = download_uri.path.sub(/^#{Regexp.escape(URI(Artifactory.client.endpoint).path)}/, "")
     File.open(filename, "wb") do |f|
-      f.write(Artifactory.client.get(download_uri.path))
+      f.write(Artifactory.client.get(download_path))
     end
 
     filename
