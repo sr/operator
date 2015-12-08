@@ -35,10 +35,14 @@ describe FetchStrategyArtifactory do
   end
 
   it "should use Artifactory to pull build" do
-    local_artifact = @env.payload.artifacts_path + '/' + "wfs"
+    local_artifact = File.join(@env.payload.artifacts_path, "WFS-153.jar")
 
     artifact = mock
-    artifact.expects(:download).with(@env.payload.artifacts_path).returns(local_artifact)
+    artifact.stubs(:download_uri).returns("https://artifactory.example/artifactory/pd-canoe/WFST/WFS/WFS-153.jar")
+    Artifactory.client
+      .expects(:get)
+      .with("/artifactory/pd-canoe/WFST/WFS/WFS-153.jar")
+      .returns("hello world!")
 
     Artifactory::Resource::Artifact
       .stubs(:from_url)

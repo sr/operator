@@ -38,8 +38,16 @@ class FetchStrategyArtifactory < FetchStrategyBase
   end
 
   def fetch(deploy)
-    # returns path to fetched asset (file or directory)
     artifact = Artifact.from_url(deploy.artifact_url)
-    artifact.download(environment.payload.artifacts_path)
+    download_uri = URI.parse(artifact.download_uri)
+
+    FileUtils.mkdir_p(environment.payload.artifacts_path)
+    filename = File.join(environment.payload.artifacts_path, File.basename(download_uri.to_s))
+
+    File.open(filename, "wb") do |f|
+      f.write(Artifactory.client.get(download_uri.path))
+    end
+
+    filename
   end
 end
