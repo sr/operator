@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.8)
-    artifactory (2.3.0)
+    artifactory (2.3.2)
     byebug (5.0.0)
       columnize (= 0.9.0)
     columnize (0.9.0)
@@ -29,10 +29,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  artifactory
+  artifactory (~> 2.3, >= 2.3.2)
   byebug
   minitest
   mocha
   rake
   simplecov (>= 0.9.0)
   webmock (~> 1.21)
+
+BUNDLED WITH
+   1.10.6
