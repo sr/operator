@@ -10,7 +10,7 @@ class FetchStrategyArtifactory < FetchStrategyBase
     self.environment = environment
 
     Artifactory.configure do |config|
-      config.endpoint = 'https://artifactory.dev.pardot.com'
+      config.endpoint = 'https://artifactory.dev.pardot.com/artifactory'
       config.username = environment.artifactory_user
       config.password = environment.artifactory_token
       config.ssl_verify = true
@@ -29,7 +29,7 @@ class FetchStrategyArtifactory < FetchStrategyBase
           # Proxies in app.dev are too old to support vhost-based caching. Since
           # app.dev is dying and only has a small number of hosts, we're not
           # going to worry about it there.
-          config.endpoint = 'http://artifactory.dev.pardot.com'
+          config.endpoint = 'http://artifactory.dev.pardot.com/artifactory'
         end
       end
     end
