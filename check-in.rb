@@ -21,7 +21,7 @@ cli.parse_arguments!
 environment = cli.environment
 
 # Wait a random number of seconds, since cron can't be set by second
-sleep(rand*30) unless environment.dev?
+sleep(rand*90) unless environment.dev?
 
 # Only one-concurrent process using file lock
 lockfile = File.new(LOCKFILE, 'w')
