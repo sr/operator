@@ -41,7 +41,7 @@ describe FetchStrategyArtifactory do
     artifact.stubs(:download_uri).returns("https://artifactory.example/artifactory/pd-canoe/WFST/WFS/WFS-153.jar")
     Artifactory.client
       .expects(:get)
-      .with("/artifactory/pd-canoe/WFST/WFS/WFS-153.jar")
+      .with("/pd-canoe/WFST/WFS/WFS-153.jar")
       .returns("hello world!")
 
     Artifactory::Resource::Artifact
