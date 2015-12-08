@@ -2,7 +2,7 @@
 source "https://rubygems.org"
 
 gem "rake"
-gem "artifactory"
+gem "artifactory", "~> 2.3", ">= 2.3.2"
 
 group :test do
   gem "mocha"
