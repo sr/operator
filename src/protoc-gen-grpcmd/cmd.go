@@ -13,13 +13,14 @@ const operatorPkgPrefix = "github.com/sr/operator/src"
 type cmd struct {
 	*generator.Generator
 	generator.PluginImports
-	gcloudPkg      generator.Single
-	protoPkg       generator.Single
-	contextPkg     generator.Single
-	grpcPkg        generator.Single
-	flagPkg        generator.Single
-	osPkg          generator.Single
-	messagesByName map[string]*google_protobuf.DescriptorProto
+	pkgPkg           generator.Single
+	protoPkg         generator.Single
+	contextPkg       generator.Single
+	grpcPkg          generator.Single
+	flagPkg          generator.Single
+	osPkg            generator.Single
+	protoPackageName string
+	messagesByName   map[string]*google_protobuf.DescriptorProto
 }
 
 func New() *cmd {
@@ -44,25 +45,20 @@ func (p *cmd) Init(g *generator.Generator) {
 
 func (c *cmd) Generate(file *generator.FileDescriptor) {
 	c.PluginImports = generator.NewPluginImports(c.Generator)
-
 	if len(file.FileDescriptorProto.Service) == 0 {
 		return
 	}
 	if len(file.FileDescriptorProto.Service) > 1 {
 		panic("can not generate command for more than one service")
 	}
-
+	c.protoPackageName = *file.FileDescriptorProto.Package
 	c.setupImports()
-
 	c.messagesByName = make(map[string]*google_protobuf.DescriptorProto)
 	for _, message := range file.FileDescriptorProto.MessageType {
 		c.messagesByName[*message.Name] = message
 	}
-
-	for _, service := range file.FileDescriptorProto.Service {
-		c.generateService(file.FileDescriptorProto, service)
-	}
-
+	service := file.FileDescriptorProto.Service[0]
+	c.generateService(file.FileDescriptorProto, service)
 	c.P("")
 	c.generateHandleMethod(file.FileDescriptorProto.Service[0])
 	c.P("")
@@ -72,7 +68,7 @@ func (c *cmd) Generate(file *generator.FileDescriptor) {
 func (c *cmd) setupImports() {
 	c.contextPkg = c.NewImport("golang.org/x/net/context")
 	c.flagPkg = c.NewImport("flag")
-	c.gcloudPkg = c.NewImport(fmt.Sprintf("%s/%s", operatorPkgPrefix, "gcloud"))
+	c.pkgPkg = c.NewImport(fmt.Sprintf("%s/%s", operatorPkgPrefix, c.protoPackageName))
 	c.grpcPkg = c.NewImport("google.golang.org/grpc")
 	c.osPkg = c.NewImport("os")
 	c.protoPkg = c.NewImport("github.com/sr/operator/src/proto")
@@ -87,11 +83,11 @@ func (c *cmd) generateService(
 	c.P("")
 	c.P("type serviceCommand struct {")
 	c.In()
-	c.P("client ", c.gcloudPkg.Use(), ".", service.Name, "Client")
+	c.P("client ", c.pkgPkg.Use(), ".", service.Name, "Client")
 	c.Out()
 	c.P("}")
 	c.P("")
-	c.P("func newServiceCommand(client ", c.gcloudPkg.Use(), ".", service.Name,
+	c.P("func newServiceCommand(client ", c.pkgPkg.Use(), ".", service.Name,
 		"Client) *serviceCommand {")
 	c.In()
 	c.P("return &serviceCommand{client}")
@@ -114,7 +110,8 @@ func (c *cmd) getMessage(name string) *google_protobuf.DescriptorProto {
 }
 
 func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
-	message := c.getMessage(strings.Replace(*method.InputType, ".gcloud.", "", 1))
+	src := fmt.Sprintf(".%s.", c.protoPackageName)
+	message := c.getMessage(strings.Replace(*method.InputType, src, "", 1))
 	c.P("func (s *serviceCommand) ", method.Name, "() (*", c.protoPkg.Use(), ".Output, error) {")
 	c.In()
 	c.P("flags := ", c.flagPkg.Use(), ".NewFlagSet(", "\"", method.Name, "\", flag.ExitOnError)")
@@ -125,7 +122,9 @@ func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
 	c.P("response, err := s.client.", method.Name, "(")
 	c.In()
 	c.P(c.contextPkg.Use(), ".Background(), ")
-	c.P("&", c.gcloudPkg.Use(), strings.Replace(*method.InputType, ".gcloud", "", 1), "{")
+	src = fmt.Sprintf(".%s", c.protoPackageName)
+	structName := strings.Replace(*method.InputType, src, "", 1)
+	c.P("&", c.pkgPkg.Use(), structName, "{")
 	c.In()
 	for _, field := range message.Field {
 		c.P(generator.CamelCase(*field.Name), ": *", field.Name, ",")
@@ -183,7 +182,7 @@ func (c *cmd) generateMain() {
 	c.P("}")
 
 	// TODO
-	c.P("client := ", c.gcloudPkg.Use(), ".NewGCloudServiceClient(conn)")
+	c.P("client := ", c.pkgPkg.Use(), ".NewGCloudServiceClient(conn)")
 
 	c.P("service := newServiceCommand(client)")
 	c.P("method := ", c.osPkg.Use(), ".Args[1]")
