@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-MACHINE="rpms-el6"
+MACHINE="${MACHINE:-el6}"
 BUILD_DIRECTORY="/home/vagrant/rpmbuild"
 
 if [ $# -lt 1 ]; then

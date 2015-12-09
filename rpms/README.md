@@ -16,6 +16,9 @@ script/build <package>
 
 # example
 script/build brubeck
+
+# build for CentOS 5
+MACHINE=el5 script/build brubeck
 ```
 
 ### Building a new package
@@ -29,7 +32,7 @@ script/build brubeck
 
 ### Tarballs from GitHub Enterprise
 
-`rpmbuild` is not able to download tarballs from GitHub Enterprise. If one of the sources for a package is hosted on `git.dev.pardot.com`, you'll need to download the file yourself and put it in `SOURCES/`.
+`rpmbuild` is not able to download tarballs from GitHub Enterprise. If one of the sources for a package is hosted on `git.dev.pardot.com`, you'll need to download the file yourself and put it in `SOURCES/` on the Vagrant VM.
 
 Then, build the package with the `-n` flag, which signals to the automation that it should not try to download sources:
 
