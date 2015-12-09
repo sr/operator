@@ -7,6 +7,5 @@ cd "$dir"
 # No secrets here, please.
 # Secrets go here: <https://git.dev.pardot.com/Pardot/chef/blob/master/cookbooks/pardot_halbot/recipes/configure.rb>
 export HUBOT_YUBIKEY_API_ID=24689
-export HUBOT_SCHEDULE_LIST_PREFIX="/quote "
 
 exec bin/hubot --alias '!' --disable-httpd "$@"

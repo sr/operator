@@ -20,13 +20,17 @@
 #   hubot panic - PANIC!1!1!!!
 #   hubot jarsh - jarsh
 #   hubot kyle - kyle
+#   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
 #   hubot praise <person> - Objectively make it THEIR win!
 #   hubot miniTinny - Get Tiny Tinny
 #   hubot tbone - Get Tuberculosis. Once.
 #   hubot bestfriends - Get Friends
 #   hubot its happening - Get Ron Paul
-#   hubot engage - ?
+#   hubot situation - Belinda Wong Situation
+#   hubot engage - . M A K E . I T . S O .
+#   hubot picard - for when you're feeling frisky!
+#   hubot visualstudio - you_irl (if you were a M$ dev)
 #   hubot nope - Got nope?
 #   hubot tldr - Totally didn't read it
 #   hubot tl;dr - Totally didn't read it
@@ -58,10 +62,13 @@ _ = require "underscore"
 
 module.exports = (robot) ->
   robot.respond /reversenuggets$/i, (msg) ->
-    msg.send "http://i.imgur.com/7Ljw6Gg.gif"
+    msg.send "http://i.giphy.com/4y1DzwdJcnAfC.gif"
 
   robot.respond /toiletnuggets$/i, (msg) ->
-    msg.send "http://i.imgur.com/LUi0ncH.gif"
+    msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
+
+  robot.respond /bees$/i, (msg) ->
+    msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
 
   robot.respond /beyonce$/i, (msg) ->
     charisma = [
@@ -190,8 +197,12 @@ module.exports = (robot) ->
 
   robot.respond /kyle$/i, (msg) ->
     msg.send msg.random [
-      "https://hipchat.dev.pardot.com/files/1/282/eYuVJnFMlUJAqnw/2015-10-15%2016_37_09.gif"
+      "https://hipchat.dev.pardot.com/files/1/282/eYuVJnFMlUJAqnw/2015-10-15%2016_37_09.gif",
+      "https://hipchat.dev.pardot.com/files/1/139/p2nyPWIpuRJsELg/Screen%20Shot%202015-11-13%20at%203.34.37%20PM.png"
     ]
+
+  robot.respond /makeitrain$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/282/M6ckjWgQX2HM4Ne/2015-11-16%2018_10_12.gif"
 
   robot.respond /miniTinny$/i, (msg) ->
     miniTinnies = [
@@ -218,6 +229,11 @@ module.exports = (robot) ->
 
   robot.respond /it\'?s\shappening$/i, (msg) ->
     msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
+
+
+  robot.respond /situation$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/39/VW6iFJhRbY0AYVy/belinda_situation.jpg"
+
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
