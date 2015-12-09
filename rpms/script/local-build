@@ -17,10 +17,29 @@ while getopts n opt; do
 done
 shift $((OPTIND-1))
 
+REDHAT_RELEASE=$(awk '{ print $3 }' /etc/redhat-release | cut -d. -f1)
+
 set -x
+
+if [ "$REDHAT_RELEASE" -le 5 ]; then
+  echo "%_topdir ${BUILD_DIRECTORY}" > ~/.rpmmacros
+fi
+
 for package in "$@"; do
-  rpmlint ${BUILD_DIRECTORY}/SPECS/${package}.spec || exit 1;
-  sudo yum-builddep -y ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-  [ "$NOSPECTOOL" -eq 1 ] || spectool -g -R ${BUILD_DIRECTORY}/SPECS/${package}.spec;
-  rpmbuild -ba ${BUILD_DIRECTORY}/SPECS/${package}.spec;
+  cd ${BUILD_DIRECTORY}
+
+  rpmlint SPECS/${package}.spec || exit 1
+
+  # yum-builddep doesn't support passing a spec file on CentOS 5
+  if [ "$REDHAT_RELEASE" -ge 6 ]; then
+    sudo yum-builddep -y SPECS/${package}.spec;
+  else
+    # Do our best to pull out the dependencies
+    egrep '^BuildRequires:' SPECS/${package}.spec |
+      awk '{ print $2 }' |
+      xargs sudo yum install -y
+  fi
+
+  [ "$NOSPECTOOL" -eq 1 ] || spectool -C SOURCES/ -g SPECS/${package}.spec;
+  rpmbuild -ba SPECS/${package}.spec
 done

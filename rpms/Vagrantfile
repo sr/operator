@@ -2,18 +2,30 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.define "rpms-el6" do |el6|
+  config.vm.define "el6" do |el6|
     el6.vm.box = "bento/centos-6.7"
+  end
+
+  config.vm.define "el5" do |el5|
+    el5.vm.box = "bento/centos-5.11"
   end
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
 
-  config.vm.synced_folder ".", "/home/vagrant/rpmbuild"
+  config.vm.synced_folder "script", "/home/vagrant/rpmbuild/script"
+  config.vm.synced_folder "SPECS", "/home/vagrant/rpmbuild/SPECS"
+  config.vm.synced_folder "RPMS", "/home/vagrant/rpmbuild/RPMS"
+  config.vm.synced_folder "SRPMS", "/home/vagrant/rpmbuild/SRPMS"
 
   config.vm.provision "shell", inline: <<-SHELL
-    sudo yum install -y rpmdevtools rpmlint yum-utils epel-release
-    sudo yum groupinstall -y "Development Tools"
+    yum install -y epel-release
+    yum clean metadata
+    yum install -y rpmdevtools rpmlint yum-utils buildsys-macros
+    yum groupinstall -y "Development Tools"
+
+    mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT,SOURCES}
+    chown -R vagrant: /home/vagrant/rpmbuild
   SHELL
 end
