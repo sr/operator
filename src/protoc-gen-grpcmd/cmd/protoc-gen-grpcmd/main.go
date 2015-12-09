@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/gogo/protobuf/proto"
@@ -33,8 +34,19 @@ func main() {
 	gen.BuildTypeNameMap()
 	gen.GeneratePlugin(cmd.New())
 
+	r := regexp.MustCompile(`package \w+`)
+
 	for i := 0; i < len(gen.Response.File); i++ {
-		gen.Response.File[i].Name = proto.String(strings.Replace(*gen.Response.File[i].Name, ".pb.go", ".letmegrpc.go", -1))
+		defaultPath := *gen.Response.File[i].Name
+		parts := strings.Split(defaultPath, "/")
+		defaultFileName := parts[len(parts)-1]
+		newPath := strings.Replace(defaultPath, defaultFileName, "main-gen.go", 1)
+		gen.Response.File[i].Name = proto.String(newPath)
+
+		origContent := *gen.Response.File[i].Content
+		newPackage := "package main"
+		newContent := r.ReplaceAllLiteralString(origContent, newPackage)
+		gen.Response.File[i].Content = proto.String(newContent)
 	}
 
 	// Send back the results.
