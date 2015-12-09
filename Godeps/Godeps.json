@@ -35,14 +35,6 @@
 			"Rev": "68415e7123da32b07eab49c96d2c4d6158360e9b"
 		},
 		{
-			"ImportPath": "github.com/golang/protobuf/protoc-gen-go/descriptor",
-			"Rev": "68415e7123da32b07eab49c96d2c4d6158360e9b"
-		},
-		{
-			"ImportPath": "github.com/golang/protobuf/protoc-gen-go/plugin",
-			"Rev": "68415e7123da32b07eab49c96d2c4d6158360e9b"
-		},
-		{
 			"ImportPath": "github.com/google/go-querystring/query",
 			"Rev": "2a60fc2ba6c19de80291203597d752e9ba58e4c0"
 		},
