@@ -20,7 +20,7 @@ class FetchStrategyArtifactory < FetchStrategyBase
         config.proxy_address = proxy.hostname
         config.proxy_port = proxy.port
 
-        if environment.name != "staging"
+        if environment.staging?
           # If we connect through a proxy, we use an HTTP (non-SSL) URL. The proxy
           # intercepts this request and still talks to the upstream over SSL, but
           # it allows the response to be cached since it's decrypted by the
