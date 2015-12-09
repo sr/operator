@@ -13,14 +13,15 @@ const operatorPkgPrefix = "github.com/sr/operator/src"
 type cmd struct {
 	*generator.Generator
 	generator.PluginImports
+	contextPkg       generator.Single
+	flagPkg          generator.Single
+	grpcPkg          generator.Single
+	messagesByName   map[string]*google_protobuf.DescriptorProto
+	osPkg            generator.Single
 	pkgPkg           generator.Single
 	protoPkg         generator.Single
-	contextPkg       generator.Single
-	grpcPkg          generator.Single
-	flagPkg          generator.Single
-	osPkg            generator.Single
 	protoPackageName string
-	messagesByName   map[string]*google_protobuf.DescriptorProto
+	protoServiceName string
 }
 
 func New() *cmd {
@@ -58,6 +59,7 @@ func (c *cmd) Generate(file *generator.FileDescriptor) {
 		c.messagesByName[*message.Name] = message
 	}
 	service := file.FileDescriptorProto.Service[0]
+	c.protoServiceName = *service.Name
 	c.generateService(file.FileDescriptorProto, service)
 	c.P("")
 	c.generateHandleMethod(file.FileDescriptorProto.Service[0])
@@ -180,10 +182,7 @@ func (c *cmd) generateMain() {
 	c.P("os.Exit(1)")
 	c.Out()
 	c.P("}")
-
-	// TODO
-	c.P("client := ", c.pkgPkg.Use(), ".NewGCloudServiceClient(conn)")
-
+	c.P("client := ", c.pkgPkg.Use(), ".New", c.protoServiceName, "Client(conn)")
 	c.P("service := newServiceCommand(client)")
 	c.P("method := ", c.osPkg.Use(), ".Args[1]")
 	c.P("output, err := service.handle(method)")
