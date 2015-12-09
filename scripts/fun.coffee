@@ -80,6 +80,9 @@ module.exports = (robot) ->
   robot.respond /shades$/i, (msg) ->
     msg.send "http://i.imgur.com/yXAJ3Uw.gif"
 
+  robot.respond /picard$/i, (msg) ->
+    msg.send "http://i.imgur.com/IgxL0lR.gif"
+
   robot.respond /visualstudio$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/204/tpEHzIVPqzNKIDM/upload.png"
 
@@ -147,10 +150,35 @@ module.exports = (robot) ->
       'oh shit oh shit oh shit oh shit oh shit',
       'Egads, I just pooped myself!',
       'http://media.giphy.com/media/dbtDDSvWErdf2/giphy.gif',
-      'https://media.giphy.com/media/KqWzEMydtRHX2/giphy.gif'
+      'https://media.giphy.com/media/KqWzEMydtRHX2/giphy.gif',
+      'http://i.imgur.com/IJPBxgn.gif'
     ]
 
     msg.send msg.random panics
+
+  robot.respond /engage$/i, (msg) ->
+    engages = [
+      'http://i.imgur.com/kSUHUU7.gif',
+      'http://i.imgur.com/MX458aQ.jpg',
+      'http://i.imgur.com/s4kO6Zj.gif',
+      'http://i.imgur.com/GfzcTu0.gif',
+      'http://i.imgur.com/utFIfjv.gif',
+      'http://i.imgur.com/pjEU3Fo.gif',
+      'http://i.imgur.com/Y6PRvR3.gif',
+      'http://i.imgur.com/KQujX2P.gif',
+      'http://i.imgur.com/JuA0Ts4.gif',
+      'http://i.imgur.com/otOwD1Q.gif',
+      'http://i.imgur.com/O0t44wR.gif',
+      'http://i.imgur.com/bjc4vlo.gif',
+      'http://i.imgur.com/yEyw4FU.gif',
+      'http://i.imgur.com/HgjO87I.gif',
+      'http://i.imgur.com/QJvY45C.gif',
+      'http://i.imgur.com/gGDcx0W.gif',
+      'http://i.imgur.com/R0ZVqSo.gif',
+      'http://i.imgur.com/4LWaG0a.gif',
+      'http://i.imgur.com/e2WJpvI.gif'
+    ]
+    msg.send msg.random engages
 
   robot.respond /jarsh$/i, (msg) ->
     jarshes = [
@@ -190,9 +218,6 @@ module.exports = (robot) ->
 
   robot.respond /it\'?s\shappening$/i, (msg) ->
     msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
-
-  robot.respond /engage$/i, (msg) ->
-    msg.send "http://i.imgur.com/MX458aQ.jpg"
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
@@ -241,7 +266,7 @@ module.exports = (robot) ->
         msg.send "#{url}"
 
   robot.respond /hasselhoff(\sme)?$/i, (msg) ->
-    imageMe msg, "knight rider", (url) ->
+    imageMe msg, "hasselhoff", (url) ->
       msg.send "#{url}"
 
   robot.respond /hasselhoff bomb( (\d+))?$/i, (msg) ->
