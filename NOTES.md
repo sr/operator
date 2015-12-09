@@ -74,7 +74,11 @@ https://cloud.google.com/compute/docs/reference/latest/projects/setUsageExportBu
 /gcloud enable-usage
 /ansible dev dev6-us-central1
 /papertrail program=cbk at=finish
+/buildkite setup {create project on buildkite + creates webhook on github}
+/ci status repo/branch[/commit]
 /ci projects
+/ci {buildkite yayyyy}
+https://github.com/ejholmes/slashdeploy
 ```
 
 # ?
