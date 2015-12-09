@@ -17,6 +17,8 @@ type cmd struct {
 	protoPkg       generator.Single
 	contextPkg     generator.Single
 	grpcPkg        generator.Single
+	flagPkg        generator.Single
+	osPkg          generator.Single
 	messagesByName map[string]*google_protobuf.DescriptorProto
 }
 
@@ -68,9 +70,11 @@ func (c *cmd) Generate(file *generator.FileDescriptor) {
 }
 
 func (c *cmd) setupImports() {
-	c.gcloudPkg = c.NewImport(fmt.Sprintf("%s/%s", operatorPkgPrefix, "gcloud"))
 	c.contextPkg = c.NewImport("golang.org/x/net/context")
+	c.flagPkg = c.NewImport("flag")
+	c.gcloudPkg = c.NewImport(fmt.Sprintf("%s/%s", operatorPkgPrefix, "gcloud"))
 	c.grpcPkg = c.NewImport("google.golang.org/grpc")
+	c.osPkg = c.NewImport("os")
 	c.protoPkg = c.NewImport("github.com/sr/operator/src/proto")
 }
 
@@ -111,21 +115,20 @@ func (c *cmd) getMessage(name string) *google_protobuf.DescriptorProto {
 
 func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
 	message := c.getMessage(strings.Replace(*method.InputType, ".gcloud.", "", 1))
-
 	c.P("func (s *serviceCommand) ", method.Name, "() (*", c.protoPkg.Use(), ".Output, error) {")
 	c.In()
-	c.P("flags := flag.NewFlagSet(", "\"", method.Name, "\", flag.ExitOnError)")
+	c.P("flags := ", c.flagPkg.Use(), ".NewFlagSet(", "\"", method.Name, "\", flag.ExitOnError)")
 	for _, field := range message.Field {
-		c.P(field.Name, " := flags.String(\"", field.Name, "\", \"\", \"\")")
-		c.P("flags.Parse(os.Args[2:])")
+		c.P(field.Name, " := ", `flags.String("`, field.Name, `", "", "")`)
+		c.P("flags.Parse(", c.osPkg.Use(), ".Args[2:])")
 	}
 	c.P("response, err := s.client.", method.Name, "(")
 	c.In()
 	c.P(c.contextPkg.Use(), ".Background(), ")
-	c.P(c.gcloudPkg.Use(), strings.Replace(*method.InputType, ".gcloud", "", 1), "{")
+	c.P("&", c.gcloudPkg.Use(), strings.Replace(*method.InputType, ".gcloud", "", 1), "{")
 	c.In()
 	for _, field := range message.Field {
-		c.P(field.Name, ": ", field.Name, ",")
+		c.P(generator.CamelCase(*field.Name), ": *", field.Name, ",")
 	}
 	c.Out()
 	c.P("},")
@@ -148,13 +151,13 @@ func (c *cmd) generateHandleMethod(
 	c.In()
 	c.P("switch method {")
 	for _, method := range service.Method {
-		c.P("case \"", method.Name, "\":")
+		c.P(`case "`, method.Name, `":`)
 		c.In()
 		c.P("return s.", method.Name, "()")
 		c.Out()
 		c.P("default:")
 		c.In()
-		c.P("return nil, fmt.Errorf(\"unspported method: %%s\", method)")
+		c.P(`return nil, fmt.Errorf("unspported method: %s", method)`)
 		c.Out()
 		c.P("}")
 	}
@@ -163,30 +166,35 @@ func (c *cmd) generateHandleMethod(
 }
 
 func (c *cmd) generateMain() {
-	c.P(`
-func main() {
-	conn, err := grpc.Dial(":3000", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
+	c.P("func main() {")
+	c.In()
+	c.P("conn, err := ", c.grpcPkg.Use(), `.Dial(":3000", `, c.grpcPkg.Use(), ".WithInsecure())")
+	c.P("if err != nil {")
+	c.In()
+	c.P("panic(err)")
+	c.Out()
+	c.P("}")
+	c.P("defer conn.Close()")
+	c.P("if len(", c.osPkg.Use(), ".Args) < 2 {")
+	c.In()
+	c.P("fmt.Fprintf(", c.osPkg.Use(), `.Stderr, "Usage: %s <service> \n", commandName)`)
+	c.P("os.Exit(1)")
+	c.Out()
+	c.P("}")
 
-	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <service> \n", commandName)
-		os.Exit(1)
-	}
+	// TODO
+	c.P("client := ", c.gcloudPkg.Use(), ".NewGCloudServiceClient(conn)")
 
-	client := gcloud.NewGCloudServiceClient(conn)
-	service := newServiceCommand(client)
-	method := os.Args[1]
-
-	output, err := service.handle(method)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v", err)
-		os.Exit(1)
-	}
-
-	fmt.Fprintln(os.Stdout, output.PlainText)
-}
-`)
+	c.P("service := newServiceCommand(client)")
+	c.P("method := ", c.osPkg.Use(), ".Args[1]")
+	c.P("output, err := service.handle(method)")
+	c.P("if err != nil {")
+	c.In()
+	c.P("fmt.Fprintf(", c.osPkg.Use(), `.Stderr, "%v\n", err)`)
+	c.P(c.osPkg.Use(), ".Exit(1)")
+	c.Out()
+	c.P("}")
+	c.P("fmt.Fprintln(os.Stdout, output.PlainText)")
+	c.Out()
+	c.P("}")
 }
