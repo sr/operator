@@ -22,7 +22,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     yum install -y epel-release
     yum clean metadata
-    yum install -y rpmdevtools rpmlint yum-utils buildsys-macros
+    yum install -y rpmdevtools rpmlint yum-utils
     yum groupinstall -y "Development Tools"
 
     mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT,SOURCES}

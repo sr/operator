@@ -23,6 +23,7 @@ set -x
 
 if [ "$REDHAT_RELEASE" -le 5 ]; then
   echo "%_topdir ${BUILD_DIRECTORY}" > ~/.rpmmacros
+  echo "%dist .el${REDHAT_RELEASE}" >> ~/.rpmmacros
 fi
 
 for package in "$@"; do
