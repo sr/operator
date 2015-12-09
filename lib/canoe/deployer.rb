@@ -47,9 +47,11 @@ module Canoe
 
       target.lock!(repo, user) if lock
 
-      if !target.script_path.nil? && pid = @strategy.perform(deploy)
-        Process.detach(pid)
-        deploy.update_attribute(:process_id, pid)
+      if !target.script_path.nil? && !sync_servers.empty?
+        if pid = @strategy.perform(deploy)
+          Process.detach(pid)
+          deploy.update_attribute(:process_id, pid)
+        end
       end
 
       deploy
