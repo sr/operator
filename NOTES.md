@@ -4,15 +4,22 @@
 
 What's left before showing this to Peter
 
-- Finish protoc-gen-grpcmd
 - Generate hubot scripts
 - Deploy and setup hubot on bazbat
 - Sort out openflights deployment
 - Deploy operatord
+- Implement https://github.com/atmos/hubot-ci/blob/master/src/scripts/ci.coffee
+- Finish papertrail
+- Finish up gcloud
 
 After:
 
 - Work in logging/interceptor stuff into GRPC to get going on auditing
+
+## Command generation TODOs
+- sneak-case the methods (i.e. ListInstances becomes list-instances)
+- ditto for arguments (i.e. ProjectId becomes -project-id)
+- --help [command]
 
 ## Audit/Logging
 - Audit of all actions. Log the service, method, user, etc. Has to happen on the
