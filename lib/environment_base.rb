@@ -252,6 +252,10 @@ class EnvironmentBase
     name.underscore == "test"
   end
 
+  def staging?
+    name.underscore == "staging"
+  end
+
   def production?
     name.underscore == "production" || name.underscore == "production_dfw"
   end
