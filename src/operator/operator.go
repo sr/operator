@@ -3,8 +3,8 @@ package operator
 import (
 	"net"
 
-	"github.com/sr/operator/src/gcloud"
-	"github.com/sr/operator/src/papertrail"
+	"github.com/sr/operator/src/services/gcloud"
+	"github.com/sr/operator/src/services/papertrail"
 	"go.pedge.io/env"
 	"google.golang.org/grpc"
 )

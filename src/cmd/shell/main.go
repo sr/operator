@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/sr/operator/src/gcloud"
-	"github.com/sr/operator/src/papertrail"
+	"github.com/sr/operator/src/services/gcloud"
+	"github.com/sr/operator/src/services/papertrail"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

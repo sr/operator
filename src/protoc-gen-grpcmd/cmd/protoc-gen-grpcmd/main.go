@@ -41,6 +41,7 @@ func main() {
 		parts := strings.Split(defaultPath, "/")
 		defaultFileName := parts[len(parts)-1]
 		newPath := strings.Replace(defaultPath, defaultFileName, "main-gen.go", 1)
+		newPath = strings.Replace(newPath, "services/", "", 1)
 		gen.Response.File[i].Name = proto.String(newPath)
 
 		origContent := *gen.Response.File[i].Content
