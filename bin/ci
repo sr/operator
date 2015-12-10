@@ -3,7 +3,8 @@ cd "$(dirname "$0")/.."
 set -eu
 
 GOPATH="$(pwd)/go"
-export GOPATH
+PATH="$GOPATH/bin:$PATH"
+export GOPATH PATH
 mkdir "$GOPATH"
 
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
