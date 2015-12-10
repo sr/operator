@@ -1,6 +1,6 @@
 require "uri"
-require "fetch_strategy_base"
 require 'artifactory'
+require_relative "fetch_strategy_base"
 
 class FetchStrategyArtifactory < FetchStrategyBase
   include Artifactory::Resource

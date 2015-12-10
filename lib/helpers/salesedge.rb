@@ -1,5 +1,5 @@
-require "console"
-require "shell_helper"
+require "helpers/console"
+require_relative "shell_helper"
 
 # module to include in the proper environments for required hooks
 module SalesEdgeEnvModule

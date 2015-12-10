@@ -1,4 +1,4 @@
-require 'shell_helper'
+require_relative 'helpers/shell_helper'
 
 Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions, :created_at) do
   def self.from_hash(hash)
