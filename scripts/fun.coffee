@@ -332,7 +332,7 @@ module.exports = (robot) ->
   robot.respond /kawaii bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
-      imageMe msg, "kawaii", (url) ->
+      Me msg, "kawaii", (url) ->
         msg.send "#{url}"
 
   robot.respond /corgi(\sme)?$/i, (msg) ->
@@ -358,10 +358,83 @@ module.exports = (robot) ->
       msg.send "#{url}"
 
   imageMe = (msg, query, cb) ->
-    msg.http('http://ajax.googleapis.com/ajax/services/search/images')
-    .query(v: "1.0", rsz: '8', q: query)
-    .get() (err, res, body) ->
-      images = JSON.parse(body)
-      images = images.responseData.results
-      image  = msg.random images
-      cb "#{image.unescapedUrl}"
+#    msg.http('http://ajax.googleapis.com/ajax/services/search/images')
+#    .query(v: "1.0", rsz: '8', q: query)
+#    .get() (err, res, body) ->
+#      images = JSON.parse(body)
+#      images = images.responseData.results
+#      image  = msg.random images
+#      cb "#{image.unescapedUrl}"
+# Using deprecated Google image search API
+#imageMe = (msg, query, animated, faces, cb) ->
+#    cb = animated if typeof animated == 'function'
+#    cb = faces if typeof faces == 'function'
+    googleCseId = "006277482686057757140:iilj71y0d0u"
+    if googleCseId
+  # Using Google Custom Search API
+      googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw"
+      if !googleApiKey
+        msg.robot.logger.error "Missing environment variable HUBOT_GOOGLE_CSE_KEY"
+        msg.send "Missing server environment variable HUBOT_GOOGLE_CSE_KEY."
+        return
+      q =
+        q: query,
+        searchType:'image',
+        safe:'high',
+        fields:'items(link)',
+        cx: googleCseId,
+        key: googleApiKey
+#      if animated is true
+#        q.fileType = 'gif'
+#        q.hq = 'animated'
+#      if faces is true
+#        q.imgType = 'face'
+      url = 'https://www.googleapis.com/customsearch/v1'
+      msg.http(url)
+      .query(q)
+      .get() (err, res, body) ->
+        if err
+          msg.send "Encountered an error :( #{err}"
+          return
+        if res.statusCode isnt 200
+          msg.send "Bad HTTP response :( #{res.statusCode}"
+          return
+        response = JSON.parse(body)
+        if response?.items
+          image = msg.random response.items
+          cb ensureImageExtension image.link
+        else
+          msg.send "Oops. I had trouble searching '#{query}'. Try later."
+          ((error) ->
+            msg.robot.logger.error error.message
+            msg.robot.logger
+            .error "(see #{error.extendedHelp})" if error.extendedHelp
+          ) error for error in response.error.errors if response.error?.errors
+    else
+  # Using deprecated Google image search API
+      q = v: '1.0', rsz: '8', q: query, safe: 'active'
+#      q.imgtype = 'animated' if typeof animated is 'boolean' and animated is true
+#      q.imgtype = 'face' if typeof faces is 'boolean' and faces is true
+      msg.http('https://ajax.googleapis.com/ajax/services/search/images')
+      .query(q)
+      .get() (err, res, body) ->
+        if err
+          msg.send "Encountered an error :( #{err}"
+          return
+        if res.statusCode isnt 200
+          msg.send "Bad HTTP response :( #{res.statusCode}"
+          return
+        images = JSON.parse(body)
+        images = images.responseData?.results
+        if images?.length > 0
+          image = msg.random images
+          cb ensureImageExtension image.unescapedUrl
+        else
+          msg.send "Sorry, I found no results for '#{query}'\n\n [Response: #{body}]."
+
+  ensureImageExtension = (url) ->
+    ext = url.split('.').pop()
+    if /(png|jpe?g|gif)/i.test(ext)
+      url
+    else
+      "#{url}#.png"
