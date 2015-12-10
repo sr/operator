@@ -8,7 +8,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 )
 
-const operatorPkgPrefix = "github.com/sr/operator/src"
+const operatorPkgPrefix = "github.com/sr/operator/src/services"
 
 type cmd struct {
 	*generator.Generator
