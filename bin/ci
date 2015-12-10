@@ -9,4 +9,6 @@ test -d "$GOPATH" || mkdir "$GOPATH"
 
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
 
-make vet errcheck build install
+make vet errcheck build install proto
+# check generated files haven't changed
+git diff --exit-code
