@@ -1,6 +1,8 @@
+%global gem_version 2.1.0
+
 Name: ruby-2.1.5
 Version: 2.1.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: An interpreter of object-oriented scripting language
 Group: Development/Languages
 License: BSD-2-Clause
@@ -32,6 +34,13 @@ make
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
+
+# install bundler
+GEM_HOME=$RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/gems/%{gem_version} \
+  $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/bin/ruby \
+  -I $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/%{gem_version} \
+  -I $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/%{gem_version}/%{_arch}-linux \
+  $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/bin/gem install bundler -v 1.10.6
 
 %files
 %defattr(-,root,root,-)
