@@ -1,5 +1,5 @@
-require "environment_production"
-require "salesedge"
+require_relative "environment_production"
+require_relative "helpers/salesedge"
 
 class EnvironmentProductionDfw < EnvironmentProduction
   include SalesEdgeEnvModule
