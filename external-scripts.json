@@ -4,6 +4,5 @@
   "hubot-redis-brain",
   "hubot-schedule",
   "hubot-yubikey-invalidation",
-  "hubot-google-images",
   "hubot-meme"
 ]
