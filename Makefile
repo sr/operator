@@ -55,8 +55,17 @@ proto-get:
 		github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/... \
 		google.golang.org/grpc
 
-proto:
-	PROTOC_INCLUDE_PATH=src protoc-all github.com/sr/operator
+proto: proto-grpcmd proto-hubot
+
+proto-grpc:
+	@ PROTOC_INCLUDE_PATH=src protoc-all github.com/sr/operator
+
+proto-hubot:
+	@ protoc --hubot_out=hubot/scripts/ -Isrc src/services/**/*.proto
+
+proto-grpcmd:
+	@ protoc --grpcmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
+	@ protoc --grpcmd_out=src/cmd/ -Isrc src/services/papertrail/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights
@@ -100,6 +109,8 @@ gcloud-container-cluster:
 	test \
 	clean \
 	proto \
+	proto-hubot \
+	proto-grpcmd \
 	proto-get \
 	goget-openflights \
 	docker-build-hubot \
