@@ -1,6 +1,5 @@
 app:
   build: .
-  privileged: true
   environment:
     - GITHUB_REPO_TOKEN
   volumes:
