@@ -2,6 +2,7 @@ require "net/http"
 require "cgi"
 require "json"
 require "deploy"
+require "logger"
 
 class Canoe
   def self.notify_server(environment, deploy)

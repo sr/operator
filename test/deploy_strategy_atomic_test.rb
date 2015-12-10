@@ -1,12 +1,8 @@
 require_relative "test_helper.rb"
 require "deploy_strategy_atomic"
-require "environment_test"
+require "environments"
 
 describe DeployStrategyAtomic do
-  before do
-    Console.silence!
-  end
-
   describe "#deploy_to_server" do
     before do
       @rsync_mock = mock
@@ -30,7 +26,7 @@ describe DeployStrategyAtomic do
       #   .with(){ | server_ip, cmd | cmd.match(/ln -sfn +(?<path>\S+) #{@payload_mock.current_link}_new\;mv -T/) && @symlinks[server_ip] = Regexp.last_match[:path] }.returns("")
       ShellHelper.stubs(:execute_shell)
         .with(){ | cmd | cmd.match(/ln -sfn? +(?<path>\S+) #{@payload_mock.current_link}/) && @symlink = Regexp.last_match[:path] }.returns("")
-      env = EnvironmentTest.new
+      env = Environments.build(:test)
       env.stubs(:payload).returns(@payload_mock)
       @strat = DeployStrategyAtomic.new(env)
       @strat.stubs(:fix_index_php)

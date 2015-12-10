@@ -44,10 +44,6 @@ class Payload
     @options[:artifact_prefix] || ""
   end
 
-  def s3_bucket
-    @options[:s3_bucket] || "pi"
-  end
-
   def build_version_file
     "#{current_link}/build.version"
   end
