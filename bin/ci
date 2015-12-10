@@ -5,7 +5,7 @@ set -eu
 GOPATH="$(pwd)/go"
 PATH="$GOPATH/bin:$PATH"
 export GOPATH PATH
-mkdir "$GOPATH"
+test -d "$GOPATH" || mkdir "$GOPATH"
 
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
 
