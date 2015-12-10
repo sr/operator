@@ -1,15 +1,16 @@
+
 path = require "path"
 grpc = require "grpc"
 protobuf = require "protobufjs"
 
-protodir = path.resolve(__dirname + "/../../proto")
-proto = protobuf.loadProtoFile(root: protodir, file: "gcloud.proto")
+protodir = path.resolve(__dirname + "/../../src/proto")
+proto = protobuf.loadProtoFile(root: protodir, file: "GCloudService.proto")
 gcloud = grpc.loadObject(proto.ns).gcloud
 client = new gcloud.GCloudService("localhost:3000", grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-  robot.respond /gcloud list/i, (msg) ->
-    request = new gcloud.ListInstancesRequest()
+
+  robot.respond /^gcloud listinstances project_id=(\w+)$/, (msg) ->
+    request = new client.ListInstancesRequest()
     client.ListInstances(request) (err, response) ->
-      for instance in response.instances
-        msg.reply "#{response.id}"
+	  msg.send(response.Output.PlainText)
