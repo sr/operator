@@ -1,9 +1,9 @@
-require "conductor"
-require "payload"
-require "extract_options"
-require "underscore_string"
 require "yaml"
 require "erb"
+require_relative "conductor"
+require_relative "payload"
+require_relative "core_ext/extract_options"
+require_relative "core_ext/underscore_string"
 
 class EnvironmentBase
   # =========================================================================

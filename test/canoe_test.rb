@@ -1,8 +1,5 @@
-require_relative "test_helper.rb"
+require_relative "test_helper"
 require "canoe"
-require "environment_test"
-require "console"
-require "shell_helper"
 
 describe Canoe do
   before {

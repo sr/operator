@@ -1,5 +1,5 @@
-require "color_string"
 require "syslog"
+require "core_ext/color_string"
 
 class Console
   class << self

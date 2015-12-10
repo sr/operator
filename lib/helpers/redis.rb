@@ -1,5 +1,5 @@
-require "console"
 require "socket"
+require "helpers/console"
 
 class Redis
   class Host

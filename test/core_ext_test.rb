@@ -1,5 +1,5 @@
-require_relative "test_helper.rb"
-require "underscore_string"
+require_relative "test_helper"
+require "core_ext/underscore_string"
 
 describe String do
   it "expects snakecase" do

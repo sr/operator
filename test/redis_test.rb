@@ -1,5 +1,5 @@
-require_relative "test_helper.rb"
-require "redis"
+require_relative "test_helper"
+require "helpers/redis"
 
 describe Redis do
   before do

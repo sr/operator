@@ -1,20 +1,15 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
+require 'bundler/setup'
 require 'pathname'
 
 LOCKFILE = '/tmp/pull-lock'
 SYNC_SCRIPTS_DIR = File.realpath(File.dirname(__FILE__))
-# add our root and lib dirs to the load path
-$:.unshift SYNC_SCRIPTS_DIR
-$:.unshift "#{SYNC_SCRIPTS_DIR}/lib/"
-$:.unshift "#{SYNC_SCRIPTS_DIR}/lib/helpers/"
-$:.unshift "#{SYNC_SCRIPTS_DIR}/lib/core_ext/"
+$:.unshift "#{SYNC_SCRIPTS_DIR}/lib"
 
 # ---------------------------------------------------------------------------
-require 'canoe'
 require 'cli'
-require 'build_version'
-require 'shell_helper'
 
 cli = CLI.new
 cli.parse_arguments!

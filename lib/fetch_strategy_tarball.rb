@@ -1,7 +1,7 @@
-require "fetch_strategy_base"
 require "s3curl"
-require "shell_helper"
 require "fileutils"
+require_relative "fetch_strategy_base"
+require_relative "helpers/shell_helper"
 
 class FetchStrategyTarball < FetchStrategyBase
 

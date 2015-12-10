@@ -1,4 +1,7 @@
-require 'console'
+require_relative 'canoe'
+require_relative 'build_version'
+require_relative 'helpers/shell_helper'
+require_relative 'helpers/console'
 
 class CLI
   attr_reader :environment

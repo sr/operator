@@ -1,6 +1,6 @@
-require 'deploy_strategy_base'
-require 'shell_helper'
-require 'build_version'
+require_relative 'deploy_strategy_base'
+require_relative 'helpers/shell_helper'
+require_relative 'build_version'
 
 class DeployStrategyAtomic < DeployStrategyBase
   def deploy(artifact_path, deploy)

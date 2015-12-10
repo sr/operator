@@ -1,5 +1,5 @@
-require_relative "test_helper.rb"
-require "console"
+require_relative "test_helper"
+require "helpers/console"
 
 describe Console do
   before do

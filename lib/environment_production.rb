@@ -1,6 +1,6 @@
-require "environment_base"
 require "time"
-require "salesedge"
+require_relative "environment_base"
+require_relative "helpers/salesedge"
 
 class EnvironmentProduction < EnvironmentBase
   include SalesEdgeEnvModule
