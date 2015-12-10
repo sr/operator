@@ -15,7 +15,6 @@ BuildRequires: libffi-devel
 BuildRequires: openssl-devel
 BuildRequires: libyaml-devel
 BuildRequires: readline-devel
-BuildRequires: tk-devel
 BuildRoot: %{_tmppath}/%name-root
 
 %description
@@ -28,7 +27,10 @@ straight-forward, and extensible.
 %setup -q -n ruby-%{version}
 
 %build
-./configure --prefix=/opt/rubies/ruby-%{version} --exec-prefix=/opt/rubies/ruby-%{version}
+./configure \
+  --with-out-ext=tcl --with-out-ext=tk \
+  --prefix=/opt/rubies/ruby-%{version} \
+  --exec-prefix=/opt/rubies/ruby-%{version}
 make
 
 %install
