@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "operator/operator.proto";
+
+package buildkite;
+
+service BuildkiteService {
+	rpc ProjectsStatus(ProjectsStatusRequest) returns (ProjectsStatusResponse);
+}
+
+message ProjectsStatusRequest {
+}
+
+message ProjectsStatusResponse {
+  operator.Output output = 1;
+}
