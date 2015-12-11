@@ -1,0 +1,5 @@
+FROM scratch
+MAINTAINER me@simonrozet.com
+ADD /tmp/operatord /
+EXPOSE 3000
+ENTRYPOINT ["/operatord"]
