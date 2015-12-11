@@ -50,7 +50,9 @@ describe Redis do
       TCPServer.open("127.0.0.1", 0) do |sock|
         Thread.new do
           s = sock.accept
+          s.readline
           s.write(":1\r\n")
+          s.readline
           s.close
         end
 
@@ -63,7 +65,9 @@ describe Redis do
       TCPServer.open("127.0.0.1", 0) do |sock|
         Thread.new do
           s = sock.accept
+          s.readline
           s.write("0r\n")
+          s.readline
           s.close
         end
 
