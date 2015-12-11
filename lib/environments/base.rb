@@ -16,7 +16,7 @@ module Environments
     def initialize
       @user = nil
       load_yaml(File.join(File.dirname(__FILE__), "..", "..", "environments", "#{short_name}.yml.erb"))
-      load_yaml(File.join(File.dirname(__FILE__), "..", "..", ".#{name.underscore}_settings.yml"))
+      load_yaml(File.join(File.dirname(__FILE__), "..", "..", ".#{name}_settings.yml"))
     end
 
     def self.strategies
@@ -219,11 +219,12 @@ module Environments
 
     # =========================================================================
     def name
-      self.class.to_s.split("::").last
+      self.class.to_s.split("::").last.downcase.underscore
     end
 
+    # By default, the same as name but can be overridden in subclasses if needed
     def short_name
-      name.underscore # NOTE: redefine in sub-classes if this is shortened (eg: production vs prod)
+      name
     end
 
     # By default, symfony_env is the same as short_name, but it can be overridden in subclasses as needed
@@ -240,19 +241,19 @@ module Environments
     end
 
     def dev?
-      name.underscore == "dev"
+      name == "dev"
     end
 
-    def test_env?
-      name.underscore == "test"
+    def test?
+      name == "test"
     end
 
     def staging?
-      name.underscore == "staging"
+      name == "staging"
     end
 
     def production?
-      name.underscore == "production" || name.underscore == "production_dfw"
+      name == "production" || name == "production_dfw"
     end
 
     def valid_payload?(payload_name = nil)
