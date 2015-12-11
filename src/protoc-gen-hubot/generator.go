@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/gogo/protobuf/proto"
 	google_protobuf "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
@@ -62,7 +64,10 @@ func (g *generator) generateFile(
 	service := protoFile.Service[0]
 	var templateMethods []*templateMethod
 	for _, method := range service.Method {
-		templateMethod := g.newTemplateMethod(protoFile.GetPackage(), method)
+		templateMethod, err := g.newTemplateMethod(protoFile.GetPackage(), method)
+		if err != nil {
+			return "", "", err
+		}
 		templateMethods = append(templateMethods, templateMethod)
 	}
 	var buffer bytes.Buffer
@@ -80,17 +85,31 @@ func (g *generator) generateFile(
 func (g *generator) newTemplateMethod(
 	service string,
 	method *google_protobuf.MethodDescriptorProto,
-) *templateMethod {
+) (*templateMethod, error) {
 	inputMessage := g.messagesByName[strings.Split(method.GetInputType(), ".")[2]]
 	arguments := bytes.NewBufferString("")
-	for _, field := range inputMessage.Field {
-		arguments.WriteString(fmt.Sprintf(" %s=(\\w+)", field.GetName()))
+	input := bytes.NewBufferString("{")
+	for i, field := range inputMessage.Field {
+		// TODO: blow up for non string fields, handle optional arguments and defaults
+		_, err := input.WriteString(fmt.Sprintf("%s: msg.match[%d],", field.GetName(), i+1))
+		_, err = arguments.WriteString(fmt.Sprintf(" %s=(\\w+)", field.GetName()))
+		if err != nil {
+			return nil, err
+		}
 	}
+	_, err := input.WriteString("}")
+	if err != nil {
+		return nil, err
+	}
+	inputString := input.String()
+	name := method.GetName()
+	r, n := utf8.DecodeRuneInString(name)
+	name = string(unicode.ToLower(r)) + name[n:]
 	return &templateMethod{
 		Service:   service,
-		Name:      method.GetName(),
+		Name:      name,
 		NameSnake: strings.Replace(snaker.CamelToSnake(method.GetName()), "_", "-", -1),
-		Input:     strings.Split(method.GetInputType(), ".")[2],
+		Input:     inputString,
 		Arguments: arguments.String(),
-	}
+	}, nil
 }
