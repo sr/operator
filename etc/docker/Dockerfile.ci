@@ -28,6 +28,9 @@ RUN \
   git submodule update --init && \
   make && \
   make install
+RUN \
+  curl -sSL https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 > /bin/docker \
+  && chmod +x /bin/docker
 ENV GO15VENDOREXPERIMENT 1
 RUN mkdir -p /go/src/
 ADD . /go/src/github.com/sr/operator/
