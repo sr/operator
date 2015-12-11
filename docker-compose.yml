@@ -1,6 +1,0 @@
-app:
-  build: .
-  environment:
-    - GITHUB_REPO_TOKEN
-  volumes:
-    - ./:/app
