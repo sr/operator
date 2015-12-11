@@ -9,7 +9,8 @@ hubot-dev: docker-build-hubot
 	docker run --rm --name hubot --link operatord -it sr/hubot -a shell -l /
 
 operatord-dev: docker-build-operatord
-	docker run --rm --name operatord -v /etc/ssl/certs:/etc/ssl/certs -e PAPERTRAIL_API_TOKEN=token sr/operatord
+	docker run --rm --name operatord /etc/ssl/certs:/etc/ssl/certs \
+		-e PAPERTRAIL_API_TOKEN=token sr/operatord
 
 clean:
 	go clean -i ./src/...
