@@ -4,4 +4,5 @@
 /src/hubot/proto/*.proto
 /src/hubot/proto/operator
 /src/hubot/scripts/*.coffee
+/etc/k8s/**/secrets.json
 /tmp
