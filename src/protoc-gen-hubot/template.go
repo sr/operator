@@ -22,8 +22,8 @@ path = require "path"
 grpc = require "grpc"
 protobuf = require "protobufjs"
 
-protodir = path.resolve(__dirname + "/../../src/proto")
-proto = protobuf.loadProtoFile(root: protodir, file: "{{.Service}}.proto")
+protodir = path.resolve(__dirname + "/../proto")
+proto = protobuf.loadProtoFile(root: protodir, file: "{{.Package}}.proto")
 {{.Package}} = grpc.loadObject(proto.ns).{{.Package}}
 client = new {{.Package}}.{{.Service}}("localhost:3000", grpc.Credentials.createInsecure())
 

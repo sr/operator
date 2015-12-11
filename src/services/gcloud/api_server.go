@@ -7,8 +7,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/sr/operator/src/proto"
-
 	"golang.org/x/net/context"
 	computeapi "google.golang.org/api/compute/v1"
 )
@@ -64,6 +62,6 @@ func (s *apiServer) ListInstances(
 
 	return &ListInstancesResponse{
 		Objects: instances,
-		Output:  &proto.Output{PlainText: output.String()},
+		Output:  &operator.Output{PlainText: output.String()},
 	}, nil
 }
