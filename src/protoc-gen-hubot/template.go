@@ -28,7 +28,7 @@ client = new {{.Package}}.{{.Service}}("localhost:3000", grpc.Credentials.create
 
 module.exports = (robot) ->
 {{range .Methods}}
-  robot.respond /^{{.Service}} {{.NameLower}}{{.Arguments}}$/, (msg) ->
+  robot.respond /{{.Service}} {{.NameLower}}{{.Arguments}}/, (msg) ->
     request = new client.{{.Input}}()
     client.{{.Name}}(request) (err, response) ->
 	  msg.send(response.Output.PlainText)
