@@ -19,6 +19,8 @@ describe Strategies::Deploy::Atomic do
     it "should deploy and link to the first choice when there is no current_link" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
+        f.flush
+
         strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
       end
@@ -27,6 +29,7 @@ describe Strategies::Deploy::Atomic do
     it "in 3 deploys it should deploy to A/B/A" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
+        f.flush
 
         strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
@@ -40,6 +43,7 @@ describe Strategies::Deploy::Atomic do
     it "should do a rollback" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
+        f.flush
 
         strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
@@ -60,6 +64,7 @@ describe Strategies::Deploy::Atomic do
 
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
+        f.flush
 
         strategy.deploy(f.path, Deploy.from_hash("artifact_url" => build1.artifact_url))
         File.write("#{tempdir}/current/build.version", build1.to_s)
