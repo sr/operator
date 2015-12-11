@@ -13,7 +13,7 @@ message SearchRequest {
 }
 
 message SearchResponse {
-	proto.Output output = 1;
+	operator.Output output = 1;
 	repeated LogEvent objects = 2;
 }
 

@@ -20,6 +20,6 @@ message ListInstancesRequest {
 }
 
 message ListInstancesResponse {
-	proto.Output output = 1;
+	operator.Output output = 1;
 	repeated Instance objects = 2;
 }
