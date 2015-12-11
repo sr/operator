@@ -4,32 +4,61 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
 	"github.com/sr/operator/src/operator"
 
 	"golang.org/x/net/context"
-	computeapi "google.golang.org/api/compute/v1"
+	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/container/v1"
 )
 
 type apiServer struct {
-	client *http.Client
+	client           *http.Client
+	computeService   *compute.Service
+	containerService *container.Service
 }
 
-func newAPIServer(client *http.Client) *apiServer {
-	return &apiServer{client}
+func newAPIServer(
+	client *http.Client,
+	computeService *compute.Service,
+	containerService *container.Service,
+) *apiServer {
+	return &apiServer{
+		client,
+		computeService,
+		containerService,
+	}
+}
+
+func (s *apiServer) CreateContainerCluster(
+	ctx context.Context,
+	request *CreateContainerClusterRequest,
+) (*CreateContainerClusterResponse, error) {
+	// TODO proper type support, stop assuming everything is a string
+	nodeCount, err := strconv.ParseInt(request.NodeCount, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	s.containerService.Projects.Zones.Clusters.Create(
+		request.ProjectId,
+		request.Zone,
+		&container.CreateClusterRequest{
+			Cluster: &container.Cluster{
+				InitialNodeCount: nodeCount,
+			},
+		},
+	)
+	return nil, nil
 }
 
 func (s *apiServer) ListInstances(
 	ctx context.Context,
 	request *ListInstancesRequest,
 ) (*ListInstancesResponse, error) {
-	service, err := computeapi.New(s.client)
-	if err != nil {
-		return nil, err
-	}
-	response, err := service.Instances.AggregatedList(request.ProjectId).Do()
+	response, err := s.computeService.Instances.AggregatedList(request.ProjectId).Do()
 	if err != nil {
 		return nil, err
 	}
