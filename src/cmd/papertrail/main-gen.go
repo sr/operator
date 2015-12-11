@@ -20,12 +20,12 @@ import flag "flag"
 import github_com_sr_operator_src_services_papertrail "github.com/sr/operator/src/services/papertrail"
 import google_golang_org_grpc "google.golang.org/grpc"
 import os "os"
-import github_com_sr_operator_src_proto "github.com/sr/operator/src/proto"
+import github_com_sr_operator_src_operator "github.com/sr/operator/src/operator"
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 
-// discarding unused import proto1 "operator"
+// discarding unused import operator "operator"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -42,7 +42,7 @@ func newServiceCommand(client github_com_sr_operator_src_services_papertrail.Pap
 	return &serviceCommand{client}
 }
 
-func (s *serviceCommand) Search() (*github_com_sr_operator_src_proto.Output, error) {
+func (s *serviceCommand) Search() (*github_com_sr_operator_src_operator.Output, error) {
 	flags := flag.NewFlagSet("Search", flag.ExitOnError)
 	query := flags.String("query", "", "")
 	flags.Parse(os.Args[2:])
@@ -58,7 +58,7 @@ func (s *serviceCommand) Search() (*github_com_sr_operator_src_proto.Output, err
 	return response.Output, nil
 }
 
-func (s *serviceCommand) handle(method string) (*github_com_sr_operator_src_proto.Output, error) {
+func (s *serviceCommand) handle(method string) (*github_com_sr_operator_src_operator.Output, error) {
 	switch method {
 	case "Search":
 		return s.Search()
