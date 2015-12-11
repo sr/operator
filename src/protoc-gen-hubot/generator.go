@@ -9,6 +9,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 	google_protobuf "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
+	"github.com/serenize/snaker"
 )
 
 type generator struct {
@@ -88,7 +89,7 @@ func (g *generator) newTemplateMethod(
 	return &templateMethod{
 		Service:   service,
 		Name:      method.GetName(),
-		NameLower: strings.ToLower(method.GetName()),
+		NameSnake: strings.Replace(snaker.CamelToSnake(method.GetName()), "_", "-", -1),
 		Input:     strings.Split(method.GetInputType(), ".")[2],
 		Arguments: arguments.String(),
 	}

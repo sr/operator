@@ -11,7 +11,7 @@ type templateService struct {
 type templateMethod struct {
 	Service   string
 	Name      string
-	NameLower string
+	NameSnake string
 	Input     string
 	Arguments string
 }
@@ -28,7 +28,7 @@ client = new {{.Package}}.{{.Service}}("localhost:3000", grpc.Credentials.create
 
 module.exports = (robot) ->
 {{range .Methods}}
-  robot.respond /{{.Service}} {{.NameLower}}{{.Arguments}}/, (msg) ->
+  robot.respond /{{.Service}} {{.NameSnake}}{{.Arguments}}/, (msg) ->
     request = new client.{{.Input}}()
     client.{{.Name}}(request) (err, response) ->
 	  msg.send(response.Output.PlainText)
