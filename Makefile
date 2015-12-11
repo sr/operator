@@ -41,6 +41,9 @@ pretest: lint
 test: testdeps pretest
 	go test ./src/...
 
+hubot-shell: docker-build-hubot
+	docker run -it sr/hubot -a shell -l /
+
 clean:
 	go clean -i ./src/...
 	rm -rf src/hubot/proto/{operator,services}
@@ -79,7 +82,7 @@ proto-grpcmd:
 goget-openflights:
 	go get go.pedge.io/openflights
 
-docker-build-hubot:
+docker-build-hubot: proto-hubot
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 
 docker-push-hubot: docker-build-hubot
