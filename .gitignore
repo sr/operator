@@ -1,4 +1,5 @@
 /src/hubot/.hubot_history
+/src/hubot/nodes_modules
 /src/hubot/proto/*.proto
 /src/hubot/proto/operator
 /tmp

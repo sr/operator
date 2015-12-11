@@ -6,13 +6,9 @@ set -eu
 PATH="$GOPATH/bin:$PATH"
 export GOPATH PATH
 test -d "$GOPATH" || mkdir "$GOPATH"
-
 GO15VENDOREXPERIMENT=1
 export GO15VENDOREXPERIMENT
 
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
 
-make proto-get vet errcheck build install proto-get proto
-
-# check generated files haven't changed
-git diff --exit-code
+make build install vet proto-hubot proto-grcmd
