@@ -51,6 +51,12 @@ proto-grpcmd:
 goget-openflights:
 	go get go.pedge.io/openflights
 
+docker-ci: docker-build-ci
+	docker run --rm -e GITHUB_REPO_TOKEN=$(GITHUB_REPO_TOKEN) sr/ci bin/ci
+
+docker-build-ci:
+	docker build -t sr/ci -f etc/docker/Dockerfile.ci .
+
 docker-build-hubot: proto-hubot
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 

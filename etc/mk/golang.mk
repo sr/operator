@@ -36,4 +36,3 @@ pretest: lint
 
 test: testdeps pretest
 	go test ./src/...
-
