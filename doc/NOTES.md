@@ -1,5 +1,7 @@
 # Notes
 
+# Generator
+
 # Roadmap-ish
 
 - Fix grpcmd to accept more than one package name on the command
@@ -8,12 +10,12 @@
 What's left before showing this to Peter
 
 - [x] Generate hubot scripts
-- make dev or equivalent
-- Setup CI
-- Deploy and setup hubot on bazbat
-- Sort out openflights deployment
-- Deploy operatord
-- Implement https://github.com/atmos/hubot-ci/blob/master/src/scripts/ci.coffee
+- [x] make dev or equivalent
+- [x] Setup CI
+- [x] Deploy and setup hubot on bazbat
+- [x] Implement https://github.com/atmos/hubot-ci/blob/master/src/scripts/ci.coffee
+- [ ] Deploy operatord
+- [ ] Sort out openflights deployment and service
 - Finish papertrail
 - Finish up gcloud
 
