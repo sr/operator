@@ -12,14 +12,18 @@ import (
 )
 
 func run() error {
+	// TODO: configure server port via environment variable
 	listener, err := net.Listen("tcp", ":3000")
 	if err != nil {
 		return err
 	}
 	server := grpc.NewServer()
-
-	gcloud.RegisterGCloudServiceServer(server, gcloud.NewAPIServer())
-
+	// TODO: figure out how to autoload services... generate?
+	gcloudServer, err := gcloud.NewAPIServer()
+	if err != nil {
+		return err
+	}
+	gcloud.RegisterGCloudServiceServer(server, gcloudServer)
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
 		return err
@@ -28,7 +32,6 @@ func run() error {
 		server,
 		papertrail.NewAPIServer(papertrailEnv),
 	)
-
 	fmt.Println("listening on port 3000")
 	return server.Serve(listener)
 }

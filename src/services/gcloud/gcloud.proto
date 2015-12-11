@@ -5,7 +5,18 @@ import "operator/operator.proto";
 package gcloud;
 
 service GCloudService {
+	rpc CreateContainerCluster(CreateContainerClusterRequest) returns (CreateContainerClusterResponse);
 	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
+}
+
+message CreateContainerClusterRequest {
+  string project_id = 1;
+  string name = 2;
+  string node_count = 3;
+  string zone = 4;
+}
+
+message CreateContainerClusterResponse {
 }
 
 message Instance {

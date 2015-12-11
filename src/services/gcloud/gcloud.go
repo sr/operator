@@ -3,12 +3,22 @@ package gcloud
 import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/container/v1"
 )
 
-func NewAPIServer() GCloudServiceServer {
+func NewAPIServer() (GCloudServiceServer, error) {
 	client, err := google.DefaultClient(context.Background())
 	if err != nil {
-		return nil
+		return nil, nil
 	}
-	return newAPIServer(client)
+	computeService, err := compute.New(client)
+	if err != nil {
+		return nil, nil
+	}
+	containerService, err := container.New(client)
+	if err != nil {
+		return nil, nil
+	}
+	return newAPIServer(client, computeService, containerService), nil
 }
