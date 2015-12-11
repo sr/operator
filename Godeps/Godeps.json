@@ -75,6 +75,10 @@
 			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
 		},
 		{
+			"ImportPath": "google.golang.org/api/container/v1",
+			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
+		},
+		{
 			"ImportPath": "google.golang.org/api/gensupport",
 			"Rev": "e4bb4e4880a5cabeec41cbff1095e86059f2f908"
 		},
