@@ -2,9 +2,14 @@
 
 # Roadmap-ish
 
+- Fix grpcmd to accept more than one package name on the command
+- Rewrite it to use templating technique
+
 What's left before showing this to Peter
 
-- Generate hubot scripts
+- [x] Generate hubot scripts
+- make dev or equivalent
+- Setup CI
 - Deploy and setup hubot on bazbat
 - Sort out openflights deployment
 - Deploy operatord
@@ -15,6 +20,9 @@ What's left before showing this to Peter
 After:
 
 - Work in logging/interceptor stuff into GRPC to get going on auditing
+
+[Fri Dec 11 2015 12:10:08 GMT+0000 (UTC)] INFO /hubot/scripts/gcloud.coffee is
+using deprecated documentation syntax
 
 ## Command generation TODOs
 - sneak-case the methods (i.e. ListInstances becomes list-instances)
