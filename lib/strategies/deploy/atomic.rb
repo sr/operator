@@ -11,12 +11,16 @@ module Strategies
         dpath = deploy_path
         if dpath.nil?
           Logger.log(:err, "Deploy path not found: #{dpath}")
-          response = DEPLOY_FAILED
+          false
         else
-          response = extract_artifact(dpath, artifact_path)
-          move_symlinks(:forward, dpath)
+          if extract_artifact(dpath, artifact_path)
+            move_symlinks(:forward, dpath)
+            true
+          else
+            Logger.log(:err, "Failed to extract artifact")
+            false
+          end
         end
-        response
       end
 
       def rollback?(deploy)
@@ -94,6 +98,7 @@ module Strategies
         FileUtils.rm_rf(deploy_path)
         FileUtils.mkdir_p(deploy_path)
         ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", deploy_path])
+        $?.success?
       end
     end
   end

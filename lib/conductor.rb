@@ -29,8 +29,9 @@ class Conductor
     environment.execute_post_fetch_hooks(deploy)
 
     environment.execute_pre_deploy_hooks(deploy)
-    success = deploy_strategy.deploy(payload_path, deploy)
-    environment.execute_post_deploy_hooks(deploy)
+    if success = deploy_strategy.deploy(payload_path, deploy)
+      environment.execute_post_deploy_hooks(deploy)
+    end
 
     success
   end
