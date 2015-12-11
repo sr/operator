@@ -156,12 +156,12 @@ func (c *cmd) generateHandleMethod(
 		c.In()
 		c.P("return s.", method.Name, "()")
 		c.Out()
-		c.P("default:")
-		c.In()
-		c.P(`return nil, fmt.Errorf("unspported method: %s", method)`)
-		c.Out()
-		c.P("}")
 	}
+	c.P("default:")
+	c.In()
+	c.P(`return nil, fmt.Errorf("unspported method: %s", method)`)
+	c.Out()
+	c.P("}")
 	c.Out()
 	c.P("}")
 }
