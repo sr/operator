@@ -1,6 +1,6 @@
 VERSION = $(shell git rev-parse --short HEAD)
 GCLOUD_PROJECT_ID = dev-europe-west1
-GCLOUD_CLUSTER = operator-1
+GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
 
 -include etc/mk/golang.mk
@@ -81,8 +81,8 @@ docker-push-operatord: docker-build-operatord
 	gcloud docker push gcr.io/$(GCLOUD_PROJECT_ID)/operatord
 
 docker-push-hubot: docker-build-hubot
-	docker tag sr/hubot gcr.io/operator-europe-west/hubot:$(VERSION)
-	gcloud docker push gcr.io/operator-europe-west/hubot
+	docker tag sr/hubot gcr.io/$(GCLOUD_PROJECT_ID)/hubot:$(VERSION)
+	gcloud docker push gcr.io/$(GCLOUD_PROJECT_ID)/hubot
 
 docker-build-openflightsd: goget-openflights
 	make -C $(GOPATH)/src/go.pedge.io/openflights -f Makefile docker-build-openflightsd
@@ -93,7 +93,7 @@ docker-push-openflightsd:
 
 gcloud-container-cluster:
 	gcloud container \
-		--project "operator-europe-west" \
+		--project "$(GCLOUD_PROJECT_ID)" \
 		clusters create "$(GCLOUD_CLUSTER)" \
 			--zone "$(GCLOUD_ZONE)" \
 			--num-nodes 3 \
