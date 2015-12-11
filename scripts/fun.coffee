@@ -57,6 +57,8 @@
 #   hubot dankmeme (me) - Synonymous with dank: sick, ill, boss, dope, fly
 #   hubot winning - You're just jelly.
 #   hubot magicword - Nuh uh uhhh!
+#   hubot capitalidea - great idea!
+#   hubot thebestgifever - just ask FOWLER
 
 _ = require "underscore"
 
@@ -66,6 +68,12 @@ module.exports = (robot) ->
 
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
+
+  robot.respond /capital(\s)?idea$/i, (msg) ->
+    msg.send "http://i.imgur.com/8aVB7x0.png"
+
+  robot.respond /the(\s)?best(\s)?gif(\s)?ever$/i, (msg) ->
+    msg.send "http://media4.giphy.com/media/V9qc3Adm2wWyY/giphy.gif"
 
   robot.respond /bees$/i, (msg) ->
     msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
@@ -158,7 +166,20 @@ module.exports = (robot) ->
       'Egads, I just pooped myself!',
       'http://media.giphy.com/media/dbtDDSvWErdf2/giphy.gif',
       'https://media.giphy.com/media/KqWzEMydtRHX2/giphy.gif',
-      'http://i.imgur.com/IJPBxgn.gif'
+      'http://i.imgur.com/IJPBxgn.gif',
+      'http://media4.giphy.com/media/ZRdoRaKVvfGHm/giphy.gif',
+      'https://www.youtube.com/watch?v=8ZCysBT5Kec',
+      'https://media.giphy.com/media/EGyW8qwza7ByE/giphy.gif',
+      'https://media.giphy.com/media/vBxc7PxxWAv9S/giphy.gif',
+      'https://media.giphy.com/media/sEVisqKC04Wek/giphy.gif',
+      'https://media.giphy.com/media/snEeOh54kCFxe/giphy.gif',
+      'https://media.giphy.com/media/KmTnUKop0AfFm/giphy.gif',
+      'https://media.giphy.com/media/lNMyVfxjfzIJO/giphy.gif',
+      'https://media.giphy.com/media/fJXB7Qjzu9pQc/giphy.gif',
+      'https://media.giphy.com/media/qxqXS7PhBWgWk/giphy.gif',
+      'https://www.youtube.com/watch?v=QCniMXdbO6c',
+      'https://www.youtube.com/watch?v=JYc05gZFly0',
+      'https://www.youtube.com/watch?v=NsICCjOQ3Dg'
     ]
 
     msg.send msg.random panics
@@ -369,10 +390,10 @@ module.exports = (robot) ->
 #imageMe = (msg, query, animated, faces, cb) ->
 #    cb = animated if typeof animated == 'function'
 #    cb = faces if typeof faces == 'function'
-    googleCseId = "006277482686057757140:iilj71y0d0u"
+    googleCseId = "006277482686057757140:iilj71y0d0u" #<-- free, 100searches a day
     if googleCseId
   # Using Google Custom Search API
-      googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw"
+      googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw" #<-- free, 100searches a day
       if !googleApiKey
         msg.robot.logger.error "Missing environment variable HUBOT_GOOGLE_CSE_KEY"
         msg.send "Missing server environment variable HUBOT_GOOGLE_CSE_KEY."
