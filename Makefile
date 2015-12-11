@@ -30,22 +30,22 @@ proto-get:
 proto: proto-grpcmd proto-hubot
 
 proto-grpc:
-	@ PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
+	PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
 		find src/hubot -name '*.pb.go' | xargs rm -f
 
 src/hubot/proto/operator/:
-	@ mkdir $@
+	mkdir $@
 
 proto-hubot: build install src/hubot/proto/operator/
-	@ for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
-	    cp $$file src/hubot/proto; \
-	  done
-	@ cp src/operator/operator.proto src/hubot/proto/operator
-	@ protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
+	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
+		cp $$file src/hubot/proto; \
+	done
+	cp src/operator/operator.proto src/hubot/proto/operator
+	protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-grpcmd:
-	@ protoc --grpcmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
-	@ protoc --grpcmd_out=src/cmd/ -Isrc src/services/papertrail/*.proto
+	protoc --grpcmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
+	protoc --grpcmd_out=src/cmd/ -Isrc src/services/papertrail/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights
