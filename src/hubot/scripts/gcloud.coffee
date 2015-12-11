@@ -6,11 +6,17 @@ protobuf = require "protobufjs"
 protodir = path.resolve(__dirname + "/../proto")
 proto = protobuf.loadProtoFile(root: protodir, file: "gcloud.proto")
 gcloud = grpc.loadObject(proto.ns).gcloud
-client = new gcloud.GCloudService("localhost:3000", grpc.Credentials.createInsecure())
+host = process.env.OPERATORD_PORT_3000_TCP_ADDR
+port = process.env.OPERATORD_PORT_3000_TCP_PORT
+address = "#{host}:#{port}"
+client = new gcloud.GCloudService(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
 
-  robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
-    request = new client.ListInstancesRequest()
-    client.ListInstances(request) (err, response) ->
-	  msg.send(response.Output.PlainText)
+	robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
+		client.listInstances {project_id: msg.match[1],}, (err, response) ->
+			if err
+				msg.send("gcloud error: #{err.message}")
+			else
+				msg.send(response.Output.PlainText)
+

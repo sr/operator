@@ -24,13 +24,18 @@ protobuf = require "protobufjs"
 protodir = path.resolve(__dirname + "/../proto")
 proto = protobuf.loadProtoFile(root: protodir, file: "{{.Package}}.proto")
 {{.Package}} = grpc.loadObject(proto.ns).{{.Package}}
-client = new {{.Package}}.{{.Service}}("localhost:3000", grpc.Credentials.createInsecure())
+host = process.env.OPERATORD_PORT_3000_TCP_ADDR
+port = process.env.OPERATORD_PORT_3000_TCP_PORT
+address = "#{host}:#{port}"
+client = new {{.Package}}.{{.Service}}(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
 {{range .Methods}}
-  robot.respond /{{.Service}} {{.NameSnake}}{{.Arguments}}/, (msg) ->
-    request = new client.{{.Input}}()
-    client.{{.Name}}(request) (err, response) ->
-	  msg.send(response.Output.PlainText)
+	robot.respond /{{.Service}} {{.NameSnake}}{{.Arguments}}/, (msg) ->
+		client.{{.Name}} {{.Input}}, (err, response) ->
+			if err
+				msg.send("{{.Service}} error: #{err.message}")
+			else
+				msg.send(response.Output.PlainText)
 {{end}}
 `))

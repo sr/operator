@@ -6,11 +6,17 @@ protobuf = require "protobufjs"
 protodir = path.resolve(__dirname + "/../proto")
 proto = protobuf.loadProtoFile(root: protodir, file: "papertrail.proto")
 papertrail = grpc.loadObject(proto.ns).papertrail
-client = new papertrail.PapertrailService("localhost:3000", grpc.Credentials.createInsecure())
+host = process.env.OPERATORD_PORT_3000_TCP_ADDR
+port = process.env.OPERATORD_PORT_3000_TCP_PORT
+address = "#{host}:#{port}"
+client = new papertrail.PapertrailService(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
 
-  robot.respond /papertrail search query=(\w+)/, (msg) ->
-    request = new client.SearchRequest()
-    client.Search(request) (err, response) ->
-	  msg.send(response.Output.PlainText)
+	robot.respond /papertrail search query=(\w+)/, (msg) ->
+		client.search {query: msg.match[1],}, (err, response) ->
+			if err
+				msg.send("papertrail error: #{err.message}")
+			else
+				msg.send(response.Output.PlainText)
+
