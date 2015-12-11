@@ -19,7 +19,7 @@ type cmd struct {
 	messagesByName   map[string]*google_protobuf.DescriptorProto
 	osPkg            generator.Single
 	pkgPkg           generator.Single
-	protoPkg         generator.Single
+	operatorPkg      generator.Single
 	protoPackageName string
 	protoServiceName string
 }
@@ -73,7 +73,7 @@ func (c *cmd) setupImports() {
 	c.pkgPkg = c.NewImport(fmt.Sprintf("%s/%s", operatorPkgPrefix, c.protoPackageName))
 	c.grpcPkg = c.NewImport("google.golang.org/grpc")
 	c.osPkg = c.NewImport("os")
-	c.protoPkg = c.NewImport("github.com/sr/operator/src/proto")
+	c.operatorPkg = c.NewImport("github.com/sr/operator/src/operator")
 }
 
 func (c *cmd) generateService(
@@ -114,7 +114,7 @@ func (c *cmd) getMessage(name string) *google_protobuf.DescriptorProto {
 func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
 	src := fmt.Sprintf(".%s.", c.protoPackageName)
 	message := c.getMessage(strings.Replace(*method.InputType, src, "", 1))
-	c.P("func (s *serviceCommand) ", method.Name, "() (*", c.protoPkg.Use(), ".Output, error) {")
+	c.P("func (s *serviceCommand) ", method.Name, "() (*", c.operatorPkg.Use(), ".Output, error) {")
 	c.In()
 	c.P("flags := ", c.flagPkg.Use(), ".NewFlagSet(", "\"", method.Name, "\", flag.ExitOnError)")
 	for _, field := range message.Field {
@@ -148,7 +148,7 @@ func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
 func (c *cmd) generateHandleMethod(
 	service *google_protobuf.ServiceDescriptorProto,
 ) {
-	c.P("func (s *serviceCommand) handle(method string) (*", c.protoPkg.Use(), ".Output, error) {")
+	c.P("func (s *serviceCommand) handle(method string) (*", c.operatorPkg.Use(), ".Output, error) {")
 	c.In()
 	c.P("switch method {")
 	for _, method := range service.Method {
