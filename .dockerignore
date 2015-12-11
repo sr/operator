@@ -1,4 +1,3 @@
 .git
 .gitingore
-tmp
 src/hubot/node_modules
