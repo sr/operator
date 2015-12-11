@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: hubot
-        image: gcr.io/dev-europe-west1/hubot:5c132d0
+        image: gcr.io/dev-europe-west1/hubot:3e952a0
         command: ["/hubot/bin/hubot-k8s"]
       volumes:
       - name: secrets
