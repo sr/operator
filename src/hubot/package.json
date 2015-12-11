@@ -6,6 +6,7 @@
   "dependencies": {
     "grpc": "=0.11.0",
     "hubot": "^2.16.0",
+    "hubot-devops-reactions": "^1.0.2",
     "hubot-diagnostics": "0.0.1",
     "hubot-help": "^0.1.2",
     "hubot-http-status": "^0.2.1",
