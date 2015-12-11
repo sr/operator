@@ -16,3 +16,7 @@ spec:
       - name: hubot
         image: gcr.io/dev-europe-west1/hubot:5c132d0
         command: ["/hubot/bin/hubot-k8s"]
+      volumes:
+      - name: secrets
+        secret:
+          secretName: hubot
