@@ -43,6 +43,7 @@ test: testdeps pretest
 
 clean:
 	go clean -i ./src/...
+	rm -rf src/hubot/proto/{operator,services}
 
 proto-get:
 	go get -u github.com/golang/protobuf/proto/... \
@@ -58,15 +59,21 @@ proto-get:
 proto: proto-grpcmd proto-hubot
 
 proto-grpc:
-	@ PROTOC_INCLUDE_PATH=src protoc-all github.com/sr/operator
+	@ PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
+		find src/hubot -name '*.pb.go' | xargs rm -f
 
-proto-hubot:
-	@	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
-			cp $$file src/hubot/proto; \
-		done; \
-		mkdir src/hubot/proto/operator; \
-		cp src/operator/operator.proto src/hubot/proto/operator; \
-		protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
+src/hubot/proto/services/:
+	@ mkdir $@
+
+src/hubot/proto/operator/:
+	@ mkdir $@
+
+proto-hubot: src/hubot/proto/services/ src/hubot/proto/operator/
+	@ for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
+	    cp $$file src/hubot/proto/services; \
+	  done
+	@ cp src/operator/operator.proto src/hubot/proto/operator
+	@ protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-grpcmd:
 	@ protoc --grpcmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
