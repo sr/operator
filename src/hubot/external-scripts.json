@@ -1,4 +1,5 @@
 [
+  "hubot-devops-reactions",
   "hubot-diagnostics",
   "hubot-help",
   "hubot-http-status"
