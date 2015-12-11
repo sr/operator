@@ -39,6 +39,10 @@
 			"Rev": "2a60fc2ba6c19de80291203597d752e9ba58e4c0"
 		},
 		{
+			"ImportPath": "github.com/serenize/snaker",
+			"Rev": "d88cc11617e4f179fa2c821a60908d5fabd7bdad"
+		},
+		{
 			"ImportPath": "github.com/sourcegraph/go-papertrail/papertrail",
 			"Rev": "175a8be170fffcc1046d95bbd20fc2ef28eab01c"
 		},
