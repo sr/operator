@@ -17,6 +17,7 @@ message CreateContainerClusterRequest {
 }
 
 message CreateContainerClusterResponse {
+  operator.Output output = 1;
 }
 
 message Instance {

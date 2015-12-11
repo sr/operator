@@ -42,16 +42,22 @@ func (s *apiServer) CreateContainerCluster(
 	if err != nil {
 		return nil, err
 	}
-	s.containerService.Projects.Zones.Clusters.Create(
+	operation, err := s.containerService.Projects.Zones.Clusters.Create(
 		request.ProjectId,
 		request.Zone,
 		&container.CreateClusterRequest{
 			Cluster: &container.Cluster{
+				Name:             request.Name,
 				InitialNodeCount: nodeCount,
 			},
 		},
-	)
-	return nil, nil
+	).Do()
+	if err != nil {
+		return nil, err
+	}
+	return &CreateContainerClusterResponse{
+		Output: &operator.Output{PlainText: operation.SelfLink},
+	}, nil
 }
 
 func (s *apiServer) ListInstances(
