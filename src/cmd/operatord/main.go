@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/sr/operator/src/services/buildkite"
 	"github.com/sr/operator/src/services/gcloud"
 	"github.com/sr/operator/src/services/papertrail"
 	"go.pedge.io/env"
@@ -19,11 +20,11 @@ func run() error {
 	}
 	server := grpc.NewServer()
 	// TODO: figure out how to autoload services... generate?
-	gcloudServer, err := gcloud.NewAPIServer()
-	if err != nil {
+	if gcloudServer, err := gcloud.NewAPIServer(); err != nil {
 		return err
+	} else {
+		gcloud.RegisterGCloudServiceServer(server, gcloudServer)
 	}
-	gcloud.RegisterGCloudServiceServer(server, gcloudServer)
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
 		return err
@@ -32,6 +33,15 @@ func run() error {
 		server,
 		papertrail.NewAPIServer(papertrailEnv),
 	)
+	buildkiteEnv := &buildkite.Env{}
+	if err := env.Populate(buildkiteEnv); err != nil {
+		return err
+	}
+	if buildkiteServer, err := buildkite.NewServer(buildkiteEnv); err != nil {
+		return err
+	} else {
+		buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
+	}
 	fmt.Println("listening on port 3000")
 	return server.Serve(listener)
 }
