@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: operatord
+  labels:
+    app: operatord
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: operatord
+    spec:
+      containers:
+      - name: operatord
+        image: gcr.io/dev-europe-west1/operatord:bca288d
