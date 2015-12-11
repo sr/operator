@@ -1,0 +1,7 @@
+app:
+  build: ../..
+  dockerfile: etc/docker/Dockerfile.ci
+  environment:
+    - GITHUB_REPO_TOKEN
+  volumes:
+    - ../../:/app
