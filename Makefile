@@ -9,7 +9,8 @@ hubot-dev: docker-build-hubot
 	docker run --rm --name hubot --link operatord -it sr/hubot -a shell -l /
 
 operatord-dev: docker-build-operatord
-	docker run --rm --name operatord /etc/ssl/certs:/etc/ssl/certs \
+	docker run --rm -p 3000:3000 --name operatord \
+		-v /etc/ssl/certs:/etc/ssl/certs \
 		-e PAPERTRAIL_API_TOKEN=token sr/operatord
 
 clean:
@@ -28,7 +29,7 @@ proto-get:
 		github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/... \
 		google.golang.org/grpc
 
-proto: proto-grpcmd proto-hubot
+proto: build install proto-grpc proto-grpcmd proto-hubot
 
 proto-grpc:
 	PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
@@ -37,7 +38,10 @@ proto-grpc:
 src/hubot/proto/operator/:
 	mkdir $@
 
-proto-hubot: build install src/hubot/proto/operator/
+src/hubot/scripts/:
+	mkdir $@
+
+proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
 		cp $$file src/hubot/proto; \
 	done
