@@ -15,16 +15,8 @@ module Environments
 
     def initialize
       @user = nil
-      load_yaml("environments/#{short_name}.yml.erb")
-      load_secrets
-    end
-
-    def load_secrets
-      if File.exist?(".#{name.underscore}_settings.yml")
-        load_yaml(".#{name.underscore}_settings.yml")
-      elsif File.exist?(".default_settings.yml")
-        load_yaml(".default_settings.yml")
-      end
+      load_yaml(File.join(File.dirname(__FILE__), "..", "..", "environments", "#{short_name}.yml.erb"))
+      load_yaml(File.join(File.dirname(__FILE__), "..", "..", ".#{name.underscore}_settings.yml"))
     end
 
     def self.strategies
@@ -346,10 +338,9 @@ module Environments
 
     def load_yaml(filename)
       @config ||= {}
-      if filename.nil? || !File.exist?(filename)
-        return
+      if File.file?(filename)
+        @config.merge!(YAML.load(ERB.new(File.read(filename)).result))
       end
-      @config.merge!(YAML.load(ERB.new(File.read(filename)).result))
     end
   end
 end

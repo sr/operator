@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift File.realpath(File.join(File.dirname(__FILE__), "..", "lib"))
 require_relative "helpers/stdout"
+require_relative "helpers/fixtures"
 
 require "webmock/rspec"
 WebMock.disable_net_connect!
@@ -9,6 +10,7 @@ SimpleCov.start
 
 RSpec.configure do |config|
   config.include TestHelpers::Stdout
+  config.include TestHelpers::Fixtures
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

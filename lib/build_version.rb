@@ -26,4 +26,8 @@ BuildVersion = Struct.new(:build_number, :sha, :artifact_url) do
   def instance_of_deploy?(deploy)
     artifact_url && deploy.artifact_url == artifact_url
   end
+
+  def to_s
+    ["build#{build_number}", sha, artifact_url].join("\n")
+  end
 end
