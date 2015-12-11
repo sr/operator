@@ -7,6 +7,7 @@
     "grpc": "=0.11.0",
     "hubot": "^2.16.0",
     "hubot-diagnostics": "0.0.1",
+    "hubot-google-translate": "^0.2.0",
     "hubot-help": "^0.1.2",
     "hubot-http-status": "^0.2.1",
     "hubot-irc-slack": "git://github.com/lstoll/hubot-irc-slack.git",
