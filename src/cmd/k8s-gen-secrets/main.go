@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
@@ -37,17 +36,17 @@ func run() error {
 	if err := decoder.Decode(secret); err != nil {
 		return err
 	}
+	newData := make(map[string][]byte)
 	for name, _ := range secret.Data {
 		value, ok := os.LookupEnv(name)
 		if !ok {
 			return fmt.Errorf("environment variable %s must be set", name)
 		}
-		newValue := bytes.NewBufferString("")
-		encoder := base64.NewEncoder(base64.StdEncoding, newValue)
-		encoder.Write([]byte(value))
-		encoder.Close()
-		secret.Data[name] = newValue.Bytes()
+		encoded := base64.StdEncoding.EncodeToString([]byte(value))
+		newKey := strings.Replace(strings.ToLower(name), "_", ".", -1)
+		newData[newKey] = []byte(encoded)
 	}
+	secret.Data = newData
 	secretFile, err := os.Create(strings.Replace(*templateFile, templateFileName, secretsFileName, 1))
 	if err != nil {
 		return err
