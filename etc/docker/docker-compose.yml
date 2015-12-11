@@ -5,3 +5,4 @@ app:
     - GITHUB_REPO_TOKEN
   volumes:
     - ../../:/app
+    - /var/run/docker:/var/run/docker
