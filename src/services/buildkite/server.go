@@ -42,7 +42,7 @@ func (s *server) ProjectsStatus(
 				fmt.Sprintf("%s/%s", *organization.Slug, *project.Slug),
 				*project.FeaturedBuild.State,
 				*project.FeaturedBuild.Branch,
-				fmt.Sprintf("https://buildkite.com/%s/%s", *organization.Slug, *project.Slug), // TODO use WebURL
+				*project.WebURL,
 			)
 		}
 	}
