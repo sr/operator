@@ -1,4 +1,5 @@
 $LOAD_PATH.unshift File.realpath(File.join(File.dirname(__FILE__), "..", "lib"))
+require "tmpdir"
 require_relative "helpers/stdout"
 require_relative "helpers/fixtures"
 
@@ -7,6 +8,8 @@ WebMock.disable_net_connect!
 
 require "simplecov"
 SimpleCov.start
+
+require "byebug"
 
 RSpec.configure do |config|
   config.include TestHelpers::Stdout

@@ -7,7 +7,7 @@ describe Environments::Production do
 
   it "should give name as production" do
     env = Environments.build(:production)
-    expect(env.name).to eq("Production")
+    expect(env.name).to eq("production")
     expect(env.short_name).to eq("prod")
   end
 

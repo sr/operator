@@ -11,7 +11,7 @@ describe Strategies::Fetch::Artifactory do
     }
   }
 
-  let(:strategy) { Strategies.build(:fetch, :artifactory, environment) }
+  let!(:strategy) { Strategies.build(:fetch, :artifactory, environment) }
 
   after { FileUtils.rm_rf(tempdir) }
 
