@@ -1,1 +1,5 @@
-[]
+[
+  "hubot-diagnostics",
+  "hubot-help",
+  "hubot-http-status"
+]
