@@ -62,15 +62,12 @@ proto-grpc:
 	@ PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
 		find src/hubot -name '*.pb.go' | xargs rm -f
 
-src/hubot/proto/services/:
-	@ mkdir $@
-
 src/hubot/proto/operator/:
 	@ mkdir $@
 
-proto-hubot: src/hubot/proto/services/ src/hubot/proto/operator/
+proto-hubot: src/hubot/proto/operator/
 	@ for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
-	    cp $$file src/hubot/proto/services; \
+	    cp $$file src/hubot/proto; \
 	  done
 	@ cp src/operator/operator.proto src/hubot/proto/operator
 	@ protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
