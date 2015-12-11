@@ -119,8 +119,8 @@ func (c *cmd) generateMethod(method *google_protobuf.MethodDescriptorProto) {
 	c.P("flags := ", c.flagPkg.Use(), ".NewFlagSet(", "\"", method.Name, "\", flag.ExitOnError)")
 	for _, field := range message.Field {
 		c.P(field.Name, " := ", `flags.String("`, field.Name, `", "", "")`)
-		c.P("flags.Parse(", c.osPkg.Use(), ".Args[2:])")
 	}
+	c.P("flags.Parse(", c.osPkg.Use(), ".Args[2:])")
 	c.P("response, err := s.client.", method.Name, "(")
 	c.In()
 	c.P(c.contextPkg.Use(), ".Background(), ")
