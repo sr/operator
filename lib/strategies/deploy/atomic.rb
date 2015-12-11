@@ -13,13 +13,10 @@ module Strategies
           Logger.log(:err, "Deploy path not found: #{dpath}")
           false
         else
-          if extract_artifact(dpath, artifact_path)
+          if success = extract_artifact(dpath, artifact_path)
             move_symlinks(:forward, dpath)
-            true
-          else
-            Logger.log(:err, "Failed to extract artifact")
-            false
           end
+          success
         end
       end
 
@@ -97,8 +94,14 @@ module Strategies
       def extract_artifact(deploy_path, artifact)
         FileUtils.rm_rf(deploy_path)
         FileUtils.mkdir_p(deploy_path)
-        ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", deploy_path])
-        $?.success?
+
+        output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", deploy_path])
+        success = $?.success?
+        if !success
+          Logger.log(:err, "Unable to extract artifact: #{output}")
+        end
+
+        success
       end
     end
   end
