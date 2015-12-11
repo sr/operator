@@ -1,13 +1,13 @@
-%global api_version 2.1.0
+%global api_version 2.2.0
 
-Name: ruby-2.1.5
-Version: 2.1.5
-Release: 2%{?dist}
+Name: ruby-2.2.3
+Version: 2.2.3
+Release: 1%{?dist}
 Summary: An interpreter of object-oriented scripting language
 Group: Development/Languages
 License: BSD-2-Clause
 URL: https://www.ruby-lang.org/
-Source0: http://cache.ruby-lang.org/pub/ruby/2.1/ruby-%{version}.tar.gz
+Source0: http://cache.ruby-lang.org/pub/ruby/2.2/ruby-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: gdbm-devel
 BuildRequires: ncurses-devel
