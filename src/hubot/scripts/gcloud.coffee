@@ -10,7 +10,7 @@ client = new gcloud.GCloudService("localhost:3000", grpc.Credentials.createInsec
 
 module.exports = (robot) ->
 
-  robot.respond /^gcloud listinstances project_id=(\w+)$/, (msg) ->
+  robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
     request = new client.ListInstancesRequest()
     client.ListInstances(request) (err, response) ->
 	  msg.send(response.Output.PlainText)

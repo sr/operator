@@ -10,7 +10,7 @@ client = new papertrail.PapertrailService("localhost:3000", grpc.Credentials.cre
 
 module.exports = (robot) ->
 
-  robot.respond /^papertrail search query=(\w+)$/, (msg) ->
+  robot.respond /papertrail search query=(\w+)/, (msg) ->
     request = new client.SearchRequest()
     client.Search(request) (err, response) ->
 	  msg.send(response.Output.PlainText)
