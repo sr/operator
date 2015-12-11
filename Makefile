@@ -42,11 +42,11 @@ pretest: lint
 test: testdeps pretest
 	go test ./src/...
 
-hubot-shell: docker-build-hubot
-	docker run -it sr/hubot -a shell -l /
+hubot-dev: docker-build-hubot
+	docker run --rm --name hubot --link operatord -it sr/hubot -a shell -l /
 
 operatord-dev: docker-build-operatord
-	docker run --rm --name operatord -e PAPERTRAIL_API_TOKEN=token sr/operatord
+	docker run --rm --name operatord -v /etc/ssl/certs:/etc/ssl/certs -e PAPERTRAIL_API_TOKEN=token sr/operatord
 
 clean:
 	go clean -i ./src/...
@@ -73,7 +73,7 @@ proto-grpc:
 src/hubot/proto/operator/:
 	@ mkdir $@
 
-proto-hubot: src/hubot/proto/operator/
+proto-hubot: build install src/hubot/proto/operator/
 	@ for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
 	    cp $$file src/hubot/proto; \
 	  done
@@ -87,28 +87,28 @@ proto-grpcmd:
 goget-openflights:
 	go get go.pedge.io/openflights
 
-docker-build-hubot: # proto-hubot
-	@ docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
+docker-build-hubot: proto-hubot
+	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 
-docker-build-operatord:
-	@ rm -rf tmp
-	@ mkdir -p tmp
-	@ go build \
-			-a \
-			-installsuffix netgo \
-			-tags netgo \
-			-ldflags '-w -linkmode external -extldflags "-static"' \
-			-o tmp/operatord \
-			src/cmd/operatord/main.go
-	@ docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
+docker-build-operatord: proto-grpc
+	rm -rf tmp
+	mkdir -p tmp
+	go build \
+		-a \
+		-installsuffix netgo \
+		-tags netgo \
+		-ldflags '-w -linkmode external -extldflags "-static"' \
+		-o tmp/operatord \
+		src/cmd/operatord/main.go
+	docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
 
 docker-push-operatord: docker-build-operatord
-	@ docker tag sr/operatord gcr.io/$(GCLOUD_PROJECT_ID)/operatord:$(VERSION)
-	@ gcloud docker push gcr.io/$(GCLOUD_PROJECT_ID)/operatord
+	docker tag sr/operatord gcr.io/$(GCLOUD_PROJECT_ID)/operatord:$(VERSION)
+	gcloud docker push gcr.io/$(GCLOUD_PROJECT_ID)/operatord
 
 docker-push-hubot: docker-build-hubot
-	@ docker tag sr/hubot gcr.io/operator-europe-west/hubot:$(VERSION)
-	@ gcloud docker push gcr.io/operator-europe-west/hubot
+	docker tag sr/hubot gcr.io/operator-europe-west/hubot:$(VERSION)
+	gcloud docker push gcr.io/operator-europe-west/hubot
 
 docker-build-openflightsd: goget-openflights
 	make -C $(GOPATH)/src/go.pedge.io/openflights -f Makefile docker-build-openflightsd
