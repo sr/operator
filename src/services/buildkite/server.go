@@ -28,8 +28,8 @@ func (s *server) ProjectsStatus(
 	}
 	output := bytes.NewBufferString("")
 	w := new(tabwriter.Writer)
-	w.Init(output, 0, 8, 2, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "NAME", "STATUS", "RUNNING", "WAITING")
+	w.Init(output, 0, 8, 1, '\t', 0)
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "NAME", "STATUS", "BRANCH", "URL")
 	for _, organization := range organizations {
 		projects, err := s.fetchAllOrganizationProjects(organization)
 		if err != nil {
@@ -38,11 +38,11 @@ func (s *server) ProjectsStatus(
 		for _, project := range projects {
 			fmt.Fprintf(
 				w,
-				"%s\t%s\t%d\t%d\n",
+				"%s\t%s\t%s\t%s\n",
 				fmt.Sprintf("%s/%s", *organization.Slug, *project.Slug),
 				*project.FeaturedBuild.State,
-				0, // TODO
-				0, // TODO
+				*project.FeaturedBuild.Branch,
+				fmt.Sprintf("https://buildkite.com/%s/%s", *organization.Slug, *project.Slug), // TODO use WebURL
 			)
 		}
 	}
