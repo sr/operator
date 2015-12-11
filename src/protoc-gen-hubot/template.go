@@ -3,7 +3,6 @@ package hubot
 import "text/template"
 
 type templateService struct {
-	Debug   string
 	Package string
 	Service string
 	Methods []*templateMethod
