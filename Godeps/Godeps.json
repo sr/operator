@@ -47,6 +47,10 @@
 			"Rev": "175a8be170fffcc1046d95bbd20fc2ef28eab01c"
 		},
 		{
+			"ImportPath": "github.com/wolfeidau/go-buildkite/buildkite",
+			"Rev": "6952bec4f6b679a6aad3a51eecf57215e9687997"
+		},
+		{
 			"ImportPath": "go.pedge.io/env",
 			"Rev": "7bb5904005698ff870289d34e93e0fb8f433e2b9"
 		},
