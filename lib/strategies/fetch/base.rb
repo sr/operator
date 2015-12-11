@@ -18,7 +18,7 @@ module Strategies
       end
 
       def type
-        self.class.to_s.split("::").last.downcase
+        self.class.to_s.split("::").last.downcase.to_sym
       end
     end
   end
