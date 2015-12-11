@@ -6,8 +6,11 @@
   "dependencies": {
     "grpc": "=0.11.0",
     "hubot": "^2.16.0",
+    "hubot-diagnostics": "0.0.1",
+    "hubot-help": "^0.1.2",
+    "hubot-http-status": "^0.2.1",
     "hubot-irc-slack": "git://github.com/lstoll/hubot-irc-slack.git",
-    "hubot-scripts": ">= 2.5.0 < 3.0.0",
+    "hubot-scripts": "git://github.com/github/hubot-scripts",
     "protobufjs": ">=4.1.2",
     "underscore": "~> 1.4.2"
   },
