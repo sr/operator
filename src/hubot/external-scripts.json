@@ -1,5 +1,6 @@
 [
   "hubot-diagnostics",
+  "hubot-google-translate",
   "hubot-help",
   "hubot-http-status"
 ]
