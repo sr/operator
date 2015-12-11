@@ -33,9 +33,9 @@ describe "deploying a new build" do
         body: JSON.dump(
           uri: artifact_url,
           downloadUri: artifact_download_url,
-          properties: {"gitSha": [sha]},
+          properties: {"gitSha" => [sha]},
         ),
-        headers: {"Content-Type": "application/json"}
+        headers: {"Content-Type" => "application/json"}
       )
 
     # Download request for the Artifact
@@ -43,7 +43,7 @@ describe "deploying a new build" do
       .to_return(
         status: 200,
         body: empty_tar_gz_contents,
-        headers: {"Content-Type": "application/x-gzip"}
+        headers: {"Content-Type" => "application/x-gzip"}
       )
 
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{ShellHelper.hostname}")
