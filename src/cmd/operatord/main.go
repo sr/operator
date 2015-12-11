@@ -29,12 +29,13 @@ func run() error {
 		papertrail.NewAPIServer(papertrailEnv),
 	)
 
+	fmt.Println("listening on port 3000")
 	return server.Serve(listener)
 }
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "operatord error: %v", err)
+		fmt.Fprintf(os.Stderr, "operatord error: %v\n", err)
 		os.Exit(1)
 	}
 }
