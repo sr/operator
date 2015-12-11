@@ -4,7 +4,7 @@
   "private": true,
   "author": "Simon Rozet <me@simonrozet.com>",
   "dependencies": {
-    "grpc": "=0.11.1",
+    "grpc": "=0.11.0",
     "hubot": "^2.16.0",
     "hubot-irc-slack": "git://github.com/lstoll/hubot-irc-slack.git",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",

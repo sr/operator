@@ -6,8 +6,7 @@ RUN \
     libicu-dev \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache
-ADD proto /proto
-ADD hubot /hubot
+ADD /src/hubot /hubot
 WORKDIR /hubot
 RUN npm install
 ENTRYPOINT ["bin/hubot"]
