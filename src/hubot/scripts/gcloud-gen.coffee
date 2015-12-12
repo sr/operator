@@ -21,11 +21,12 @@ module.exports = (robot) ->
 			if err
 				msg.send("gcloud error: #{err.message}")
 			else
-				msg.send(response.Output.PlainText)
+				msg.send(response.output.PlainText)
 
 	robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
 		client.listInstances {project_id: msg.match[1],}, (err, response) ->
 			if err
 				msg.send("gcloud error: #{err.message}")
 			else
-				msg.send(response.Output.PlainText)
+				msg.send(response.output.PlainText)
+
