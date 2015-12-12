@@ -82,27 +82,33 @@ func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	}
 }
 
-func main() {
+func run() error {
 	mainEnv := &mainEnv{}
 	if err := env.Populate(mainEnv); err != nil {
-		panic(err)
+		return err
 	}
 	conn, err := grpc.Dial(mainEnv.Address, grpc.WithInsecure())
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer conn.Close()
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <method> \n", commandName)
-		os.Exit(1)
+		return fmt.Errorf("Usage: %s <method>", commandName)
 	}
 	client := service.New{{.ServiceClient}}(conn)
 	service := newServiceCommand(client)
 	method := os.Args[1]
 	output, err := service.handle(method)
 	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(os.Stdout, output.PlainText)
+	return err
+}
+
+func main() {
+	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
-	fmt.Fprintln(os.Stdout, output.PlainText)
 }`))
