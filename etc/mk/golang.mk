@@ -20,14 +20,14 @@ install: deps
 
 lint: testdeps
 	go get -v github.com/golang/lint/golint
-	for file in $$(find src -name '*.go'); do \
+	@ for file in $$(find src -name '*.go'); do \
 		bin/golint $${file}; \
 		failure=false; \
 		test -n "$$(bin/golint $${file})" && failure=true; \
-	done; \
-	if $$failure; \
-	then exit 1; \
-	fi
+	  done; \
+	  if $$failure; \
+	  then exit 1; \
+	  fi
 
 vet: testdeps
 	go vet ./src/...
