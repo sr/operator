@@ -6,10 +6,10 @@ type Env struct {
 	BuildkiteAPIToken string `env:"BUILDKITE_API_TOKEN,required"`
 }
 
-func NewServer(env *Env) (BuildkiteServiceServer, error) {
+func NewAPIServer(env *Env) (BuildkiteServiceServer, error) {
 	config, err := buildkite.NewTokenConfig(env.BuildkiteAPIToken, false)
 	if err != nil {
 		return nil, err
 	}
-	return newServer(buildkite.NewClient(config.Client())), nil
+	return newAPIServer(buildkite.NewClient(config.Client())), nil
 }
