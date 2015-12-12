@@ -7,6 +7,7 @@ RUN \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache
 ADD /src/hubot /hubot
+ADD /bin/k8s-hubot /hubot/bin/k8s-hubot
 WORKDIR /hubot
 RUN npm install
 ENTRYPOINT ["bin/hubot"]
