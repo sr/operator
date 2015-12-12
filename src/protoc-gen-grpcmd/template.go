@@ -2,19 +2,38 @@ package cmd
 
 import "text/template"
 
-var commandTemplate = template.Must(template.New("main-gen.go").Parse(`
-package main
+type serviceCommandDescriptor struct {
+	ServiceImportPath string
+	CommandName       string
+	ServiceClient     string
+	Methods           []*methodDescriptor
+}
+
+type methodDescriptor struct {
+	Name           string
+	SnakeCasedName string
+	DasherizedName string
+	Input          string
+	Arguments      []*argumentDescriptor
+}
+
+type argumentDescriptor struct {
+	SnakeCaseName  string
+	CamelCaseName  string
+	DasherizedName string
+}
+
+var commandTemplate = template.Must(template.New("main-gen.go").Parse(
+	`package main
 
 import (
 	context "golang.org/x/net/context"
 	flag "flag"
-	math "math"
 	fmt "fmt"
 	grpc "google.golang.org/grpc"
 	operator "github.com/sr/operator/src/operator"
 	os "os"
-	service "github.com/sr/operator/src/services/papertrail"
-	proto "github.com/gogo/protobuf/proto"
+	service "{{.ServiceImportPath}}"
 )
 
 const commandName = "{{.CommandName}}"
@@ -28,16 +47,16 @@ func newServiceCommand(client service.{{.ServiceClient}}) *serviceCommand {
 }
 {{range .Methods}}
 func (s *serviceCommand) {{.Name}}() (*operator.Output, error) {
-	flags := flag.NewFlagSet("{{.SneakCasedName}}", flag.ExitOnError)
+	flags := flag.NewFlagSet("{{.DasherizedName}}", flag.ExitOnError)
 {{range .Arguments}}
-	{{.Name}} := flags.String("{{.DasherizedName}}", "", "")
+	{{.SnakeCaseName}} := flags.String("{{.DasherizedName}}", "", "")
 {{end}}
 	flags.Parse(os.Args[2:])
 	response, err := s.client.Search(
 		context.Background(),
-		&papertrail.SearchRequest{
+		&service.{{.Input}}{
 		{{range .Arguments}}
-			{{.Name}}: *{{.LowerCaseName}},
+			{{.CamelCaseName}}: *{{.SnakeCaseName}},
 		{{end}}
 		},
 	)
@@ -50,7 +69,7 @@ func (s *serviceCommand) {{.Name}}() (*operator.Output, error) {
 func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	switch method {
 {{range .Methods}}
-	case "{{.SneakCasedName}}":
+	case "{{.SnakeCasedName}}":
 		return s.{{.Name}}()
 {{end}}
 	default:
@@ -68,7 +87,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage: %s <method> \n", commandName)
 		os.Exit(1)
 	}
-	client := service.{{.ServiceClient}}(conn)
+	client := service.New{{.ServiceClient}}(conn)
 	service := newServiceCommand(client)
 	method := os.Args[1]
 	output, err := service.handle(method)
@@ -77,5 +96,4 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Fprintln(os.Stdout, output.PlainText)
-}
-`))
+}`))
