@@ -1,10 +1,14 @@
 {
 	"ImportPath": "github.com/sr/operator",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.2",
 	"Packages": [
 		"./src/..."
 	],
 	"Deps": [
+		{
+			"ImportPath": "github.com/acsellers/inflections",
+			"Rev": "cb98bfe9e3ee28e8649778f5fbb2e95f54f71b39"
+		},
 		{
 			"ImportPath": "github.com/beorn7/perks/quantile",
 			"Rev": "b965b613227fddccbfffe13eae360ed3fa822f8d"
@@ -43,22 +47,12 @@
 			"Rev": "73d445a93680fa1a78ae23a5839bad48f32ba1ee"
 		},
 		{
-			"ImportPath": "github.com/gogo/protobuf/gogoproto",
-			"Comment": "v0.1-55-g2093b57",
-			"Rev": "2093b57e5ca2ccbee4626814100bc1aada691b18"
-		},
-		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
 			"Comment": "v0.1-55-g2093b57",
 			"Rev": "2093b57e5ca2ccbee4626814100bc1aada691b18"
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
-			"Comment": "v0.1-55-g2093b57",
-			"Rev": "2093b57e5ca2ccbee4626814100bc1aada691b18"
-		},
-		{
-			"ImportPath": "github.com/gogo/protobuf/protoc-gen-gogo/generator",
 			"Comment": "v0.1-55-g2093b57",
 			"Rev": "2093b57e5ca2ccbee4626814100bc1aada691b18"
 		},
