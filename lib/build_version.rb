@@ -19,11 +19,15 @@ BuildVersion = Struct.new(:build_number, :sha, :artifact_url) do
       new(lines[0].sub(/^build/, "").to_i, lines[1], lines[2])
     end
   rescue => e
-    Console.syslog("Couldn't load sync state from #{filename}: #{e}", :warn)
+    Logger.log(:warn, "Couldn't load sync state from #{filename}: #{e}")
     nil
   end
 
   def instance_of_deploy?(deploy)
     artifact_url && deploy.artifact_url == artifact_url
+  end
+
+  def to_s
+    ["build#{build_number}", sha, artifact_url].join("\n")
   end
 end
