@@ -5,3 +5,13 @@ package operator;
 message Output {
 	string PlainText = 1;
 }
+
+message ServerStartupNotice {
+	string Address = 1;
+	string Protocol = 2;
+	repeated Service services = 3;
+}
+
+message Service {
+	string name = 1;
+}

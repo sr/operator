@@ -2,6 +2,9 @@ package operator
 
 import (
 	"net"
+	"os"
+
+	"go.pedge.io/protolog"
 
 	"google.golang.org/grpc"
 )
@@ -12,6 +15,7 @@ type server struct {
 	protocol  string
 	address   string
 	rpcServer *grpc.Server
+	logger    protolog.Logger
 }
 
 func newServer(address string) *server {
@@ -19,6 +23,12 @@ func newServer(address string) *server {
 		defaultProtocol,
 		address,
 		grpc.NewServer(),
+		protolog.NewLogger(
+			protolog.NewDefaultTextWritePusher(
+				protolog.NewFileFlusher(os.Stderr),
+			),
+			protolog.LoggerOptions{},
+		),
 	}
 }
 
@@ -27,6 +37,7 @@ func (s *server) Serve() error {
 	if err != nil {
 		return err
 	}
+	s.logger.Info(&ServerStartupNotice{Address: s.address, Protocol: s.protocol})
 	return s.rpcServer.Serve(listener)
 }
 
