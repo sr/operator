@@ -39,6 +39,6 @@ module.exports = (robot) ->
 			if err
 				msg.send("{{.Service}} error: #{err.message}")
 			else
-				msg.send(response.Output.PlainText)
+				msg.send(response.output.PlainText)
 {{end}}
 `))
