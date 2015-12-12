@@ -6,6 +6,7 @@ generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
 - [ ] Fix grpcmd to accept more than one package name on the command line
+- [ ] Update binaries to connect to OPERATORD_ADDRESS or something
 - [ ] Generate the operatord main.go responsible for registering the different
   services on the GRPC server
 - [ ] Rewrite `protoc-gen-grpcmd` to use same templating technique that
@@ -38,7 +39,7 @@ _Note about Google Cloud Logging:_ we get for free real time logs, log metrics,
 powerful querying (via Big Query), and log term archival (to Cloud Storage/S3)
 
 ## Deployment
-- [ ] Deploy Hubot and operatord manually Kubernetes.
+- [x] Deploy Hubot and operatord manually to Kubernetes.
 - [ ] Write an operatord service to automate away deployment of an Operator
   instance. i.e. given a Kubernetes/Google Cloud Container cluster set
   everything up, deploy new versions, etc.
