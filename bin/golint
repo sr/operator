@@ -1,0 +1,3 @@
+#!/bin/sh
+golint "$1" |
+grep -v 'should have comment'
