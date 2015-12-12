@@ -3,7 +3,6 @@ package papertrail
 import (
 	"bytes"
 	"fmt"
-	"log"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"github.com/sr/operator/src/operator"
@@ -22,7 +21,6 @@ func (s *apiServer) Search(
 	ctx context.Context,
 	request *SearchRequest,
 ) (*SearchResponse, error) {
-	log.Println(request.Query)
 	options := papertrailapi.SearchOptions{
 		Query: request.Query,
 	}
