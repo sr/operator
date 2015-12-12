@@ -20,7 +20,7 @@ install: deps
 
 lint: testdeps
 	go get -v github.com/golang/lint/golint
-	for file in $$(find src -name '*.go' | grep -v '\.pb\.go' | grep -v '\.pb\.gw\.go'); do \
+	for file in $$(find src -name '*.go'); do \
 		bin/golint $${file}; \
 		failure=false; \
 		test -n "$$(bin/golint $${file})" && failure=true; \
