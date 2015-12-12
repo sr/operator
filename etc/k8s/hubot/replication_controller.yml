@@ -15,7 +15,7 @@ spec:
       containers:
       - name: hubot
         image: gcr.io/dev-europe-west1/hubot:987aec5
-        command: ["/hubot/bin/hubot-k8s"]
+        command: ["/hubot/bin/k8s-hubot"]
         volumeMounts:
         - name: secrets
           mountPath: "/secrets"
