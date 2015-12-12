@@ -12,6 +12,11 @@ message ServerStartupNotice {
 	repeated Service services = 3;
 }
 
+message ServiceStartupError {
+	Service service = 1;
+	string message = 2;
+}
+
 message Service {
 	string name = 1;
 }
