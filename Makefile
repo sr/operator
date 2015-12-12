@@ -31,7 +31,7 @@ proto-get:
 		github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/... \
 		google.golang.org/grpc
 
-proto: build install proto-grpc proto-grpcmd proto-hubot
+proto: build install proto-grpc proto-grpcmd proto-hubot proto-operatord
 
 proto-grpc:
 	PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
@@ -54,6 +54,9 @@ proto-grpcmd:
 	protoc --grpcmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
 	protoc --grpcmd_out=src/cmd/ -Isrc src/services/papertrail/*.proto
 	protoc --grpcmd_out=src/cmd/ -Isrc src/services/buildkite/*.proto
+
+proto-operatord:
+	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights
