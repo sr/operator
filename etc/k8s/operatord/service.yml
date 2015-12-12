@@ -7,6 +7,9 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 3000
+  - name: grpc
+    port: 3000
+    targetPort: operatord
+    protocol: TCP
   selector:
     app: operatord
