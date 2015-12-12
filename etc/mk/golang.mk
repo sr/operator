@@ -1,3 +1,5 @@
+GO15VENDOREXPERIMENT = 1
+
 deps:
 	go get -d -v ./src/...
 
