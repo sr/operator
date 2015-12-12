@@ -36,7 +36,7 @@ func run() error {
 		return err
 	}
 	newData := make(map[string][]byte)
-	for name, _ := range secret.Data {
+	for name := range secret.Data {
 		value, ok := os.LookupEnv(name)
 		if !ok {
 			return fmt.Errorf("environment variable %s must be set", name)
