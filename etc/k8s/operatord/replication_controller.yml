@@ -20,6 +20,9 @@ spec:
         - name: secrets
           mountPath: "/secrets"
           readOnly: true
+        ports:
+        - name: operatord
+          containerPort: 3000
       volumes:
       - name: secrets
         secret:
