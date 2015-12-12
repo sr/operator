@@ -6,10 +6,10 @@ HUBOT_HTTPD="0"
 HUBOT_NAME="batman"
 HUBOT_IRC_REALNAME="batman"
 HUBOT_SLACK_TEAM="bazbat"
-HUBOT_SLACK_TOKEN="$(cat /etc/hubot-secrets/hubot.slack.token)"
+HUBOT_SLACK_TOKEN="$(cat /secrets/hubot.slack.token)"
 HUBOT_IRC_ROOMS="#chatoops"
 HUBOT_IRC_SERVER="bazbat.irc.slack.com"
-HUBOT_IRC_PASSWORD="$(cat /etc/hubot-secrets/hubot.irc.password)"
+HUBOT_IRC_PASSWORD="$(cat /secrets/hubot.irc.password)"
 HUBOT_IRC_USESSL="1"
 export \
     HUBOT_ADAPTER \
