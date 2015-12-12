@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	templateFileName = "secrets.tmpl.yml"
+	templateFileName = "secrets.template.yml"
 	secretsFileName  = "secrets.json"
 )
 
