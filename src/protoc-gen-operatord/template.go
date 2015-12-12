@@ -20,42 +20,32 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"os"
 {{range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
 {{end}}
 	"go.pedge.io/env"
-	"google.golang.org/grpc"
+	"github.com/sr/operator/src/operator"
 )
 
-type mainEnv struct {
-	Port string ` + "`env:\"PORT,required,default=3000\"`" + `
-}
-
 func run() error {
-	mainEnv := &mainEnv{}
-	if err := env.Populate(mainEnv); err != nil {
+	config := &operator.Config{}
+	if err := env.Populate(config); err != nil {
 		return err
 	}
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", mainEnv.Port))
-	if err != nil {
-		return err
-	}
-	server := grpc.NewServer()
+	server := operator.NewServer(config.Address)
 {{range .Services}}
 	{{.Name}}Env := &{{.Name}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
-		return fmt.Errorf("service={{.Name}} %s", err)
+		return operator.ConfigurationError("{{.Name}}", err)
 	}
 	if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
-		return fmt.Errorf("{{.Name}}: error loading server. %s", err)
+		return operator.InitializationError("{{.Name}}", err)
 	} else {
-		{{.Name}}.Register{{.CamelCaseName}}Server(server, {{.Name}}Server)
+		{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), {{.Name}}Server)
 	}
 {{end}}
-	fmt.Println(fmt.Sprintf("listening on %s", mainEnv.Port))
-	return server.Serve(listener)
+	return server.Serve()
 }
 
 func main() {

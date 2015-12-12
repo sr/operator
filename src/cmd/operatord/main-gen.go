@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"os"
 
 	buildkite "github.com/sr/operator/src/services/buildkite"
@@ -13,56 +12,47 @@ import (
 	papertrail "github.com/sr/operator/src/services/papertrail"
 
 	"go.pedge.io/env"
-	"google.golang.org/grpc"
+	"github.com/sr/operator/src/operator"
 )
 
-type mainEnv struct {
-	Port string `env:"PORT,required,default=3000"`
-}
-
 func run() error {
-	mainEnv := &mainEnv{}
-	if err := env.Populate(mainEnv); err != nil {
+	config := &operator.Config{}
+	if err := env.Populate(config); err != nil {
 		return err
 	}
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", mainEnv.Port))
-	if err != nil {
-		return err
-	}
-	server := grpc.NewServer()
+	server := operator.NewServer(config.Address)
 
 	buildkiteEnv := &buildkite.Env{}
 	if err := env.Populate(buildkiteEnv); err != nil {
-		return fmt.Errorf("service=buildkite %s", err)
+		return operator.ConfigurationError("buildkite", err)
 	}
 	if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
-		return fmt.Errorf("buildkite: error loading server. %s", err)
+		return operator.InitializationError("buildkite", err)
 	} else {
-		buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
+		buildkite.RegisterBuildkiteServiceServer(server.Server(), buildkiteServer)
 	}
 
 	gcloudEnv := &gcloud.Env{}
 	if err := env.Populate(gcloudEnv); err != nil {
-		return fmt.Errorf("service=gcloud %s", err)
+		return operator.ConfigurationError("gcloud", err)
 	}
 	if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
-		return fmt.Errorf("gcloud: error loading server. %s", err)
+		return operator.InitializationError("gcloud", err)
 	} else {
-		gcloud.RegisterGCloudServiceServer(server, gcloudServer)
+		gcloud.RegisterGCloudServiceServer(server.Server(), gcloudServer)
 	}
 
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
-		return fmt.Errorf("service=papertrail %s", err)
+		return operator.ConfigurationError("papertrail", err)
 	}
 	if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
-		return fmt.Errorf("papertrail: error loading server. %s", err)
+		return operator.InitializationError("papertrail", err)
 	} else {
-		papertrail.RegisterPapertrailServiceServer(server, papertrailServer)
+		papertrail.RegisterPapertrailServiceServer(server.Server(), papertrailServer)
 	}
 
-	fmt.Println(fmt.Sprintf("listening on %s", mainEnv.Port))
-	return server.Serve(listener)
+	return server.Serve()
 }
 
 func main() {
