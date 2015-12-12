@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -42,9 +41,8 @@ func run() error {
 		if !ok {
 			return fmt.Errorf("environment variable %s must be set", name)
 		}
-		encoded := base64.StdEncoding.EncodeToString([]byte(value))
 		newKey := strings.Replace(strings.ToLower(name), "_", ".", -1)
-		newData[newKey] = []byte(encoded)
+		newData[newKey] = []byte(value)
 	}
 	secret.Data = newData
 	secretFile, err := os.Create(strings.Replace(*templateFile, templateFileName, secretsFileName, 1))
