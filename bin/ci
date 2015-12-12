@@ -12,5 +12,5 @@ export GO15VENDOREXPERIMENT
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
 
 make build install vet errcheck lint \
-    proto-hubot proto-grpcmd proto-operatord \
+    proto-hubot proto-cmd proto-operatord \
     docker-build-hubot docker-build-operatord
