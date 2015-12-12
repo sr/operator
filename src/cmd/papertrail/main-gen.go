@@ -2,6 +2,7 @@ package main
 
 import (
 	context "golang.org/x/net/context"
+	env "go.pedge.io/env"
 	flag "flag"
 	fmt "fmt"
 	grpc "google.golang.org/grpc"
@@ -11,6 +12,10 @@ import (
 )
 
 const commandName = "papertrail"
+
+type mainEnv struct {
+	Address string `env:"OPERATORD_ADDRESS,default=localhost:3000"`
+}
 
 type serviceCommand struct {
 	client service.PapertrailServiceClient
@@ -52,7 +57,11 @@ func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 }
 
 func main() {
-	conn, err := grpc.Dial(":3000", grpc.WithInsecure())
+	mainEnv := &mainEnv{}
+	if err := env.Populate(mainEnv); err != nil {
+		panic(err)
+	}
+	conn, err := grpc.Dial(mainEnv.Address, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
