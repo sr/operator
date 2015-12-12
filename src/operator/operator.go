@@ -1,9 +1,18 @@
 package operator
 
 import (
-	"fmt"
+	"os"
+
+	"go.pedge.io/protolog"
 
 	"google.golang.org/grpc"
+)
+
+var Logger = protolog.NewLogger(
+	protolog.NewDefaultTextWritePusher(
+		protolog.NewFileFlusher(os.Stderr),
+	),
+	protolog.LoggerOptions{},
 )
 
 type Server interface {
@@ -16,13 +25,14 @@ type Config struct {
 }
 
 func NewServer(address string) Server {
-	return newServer(address)
+	return newServer(address, Logger)
 }
 
-func ConfigurationError(serviceName string, err error) error {
-	return fmt.Errorf("service=%s %s", serviceName, err)
-}
-
-func InitializationError(serviceName string, err error) error {
-	return fmt.Errorf("%s error loading server. %s", serviceName, err)
+func LogServiceStartupError(serviceName string, err error) {
+	Logger.Error(&ServiceStartupError{
+		Service: &Service{
+			Name: serviceName,
+		},
+		Message: err.Error(),
+	})
 }

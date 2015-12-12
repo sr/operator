@@ -2,7 +2,6 @@ package operator
 
 import (
 	"net"
-	"os"
 
 	"go.pedge.io/protolog"
 
@@ -18,17 +17,12 @@ type server struct {
 	logger    protolog.Logger
 }
 
-func newServer(address string) *server {
+func newServer(address string, logger protolog.Logger) *server {
 	return &server{
 		defaultProtocol,
 		address,
 		grpc.NewServer(),
-		protolog.NewLogger(
-			protolog.NewDefaultTextWritePusher(
-				protolog.NewFileFlusher(os.Stderr),
-			),
-			protolog.LoggerOptions{},
-		),
+		logger,
 	}
 }
 

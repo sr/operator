@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	buildkite "github.com/sr/operator/src/services/buildkite"
@@ -24,32 +23,35 @@ func run() error {
 
 	buildkiteEnv := &buildkite.Env{}
 	if err := env.Populate(buildkiteEnv); err != nil {
-		return operator.ConfigurationError("buildkite", err)
-	}
-	if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
-		return operator.InitializationError("buildkite", err)
+		operator.LogServiceStartupError("buildkite", err)
 	} else {
-		buildkite.RegisterBuildkiteServiceServer(server.Server(), buildkiteServer)
+		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
+			operator.LogServiceStartupError("buildkite", err)
+		} else {
+			buildkite.RegisterBuildkiteServiceServer(server.Server(), buildkiteServer)
+		}
 	}
 
 	gcloudEnv := &gcloud.Env{}
 	if err := env.Populate(gcloudEnv); err != nil {
-		return operator.ConfigurationError("gcloud", err)
-	}
-	if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
-		return operator.InitializationError("gcloud", err)
+		operator.LogServiceStartupError("gcloud", err)
 	} else {
-		gcloud.RegisterGCloudServiceServer(server.Server(), gcloudServer)
+		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
+			operator.LogServiceStartupError("gcloud", err)
+		} else {
+			gcloud.RegisterGCloudServiceServer(server.Server(), gcloudServer)
+		}
 	}
 
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
-		return operator.ConfigurationError("papertrail", err)
-	}
-	if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
-		return operator.InitializationError("papertrail", err)
+		operator.LogServiceStartupError("papertrail", err)
 	} else {
-		papertrail.RegisterPapertrailServiceServer(server.Server(), papertrailServer)
+		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
+			operator.LogServiceStartupError("papertrail", err)
+		} else {
+			papertrail.RegisterPapertrailServiceServer(server.Server(), papertrailServer)
+		}
 	}
 
 	return server.Serve()

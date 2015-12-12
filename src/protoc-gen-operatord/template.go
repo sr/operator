@@ -19,7 +19,6 @@ var mainTemplate = template.Must(template.New("main-gen.go").Parse(
 package main
 
 import (
-	"fmt"
 	"os"
 {{range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
@@ -37,12 +36,13 @@ func run() error {
 {{range .Services}}
 	{{.Name}}Env := &{{.Name}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
-		return operator.ConfigurationError("{{.Name}}", err)
-	}
-	if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
-		return operator.InitializationError("{{.Name}}", err)
+		operator.LogServiceStartupError("{{.Name}}", err)
 	} else {
-		{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), {{.Name}}Server)
+		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
+			operator.LogServiceStartupError("{{.Name}}", err)
+		} else {
+			{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), {{.Name}}Server)
+		}
 	}
 {{end}}
 	return server.Serve()
