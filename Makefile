@@ -10,7 +10,6 @@ hubot-dev: docker-build-hubot
 
 operatord-dev: docker-build-operatord
 	docker run --rm -p 3000:3000 --name operatord \
-		-v /etc/ssl/certs:/etc/ssl/certs \
 		-e PAPERTRAIL_API_TOKEN=$(PAPERTRAIL_API_TOKEN) \
 		-e BUILDKITE_API_TOKEN=$(BUILDKITE_API_TOKEN) \
 		sr/operatord
