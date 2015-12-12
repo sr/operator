@@ -51,7 +51,7 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-cmd:
-	protoc --cmd_out=src/cmd/ -Isrc src/services/gcloud/*.proto
+	protoc --cmd_out=src/cmd/ -Isrc src/services/**/*.proto
 
 proto-operatord:
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
