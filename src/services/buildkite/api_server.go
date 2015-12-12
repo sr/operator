@@ -10,15 +10,15 @@ import (
 	"golang.org/x/net/context"
 )
 
-type server struct {
+type apiServer struct {
 	client *buildkiteapi.Client
 }
 
-func newServer(client *buildkiteapi.Client) *server {
-	return &server{client}
+func newAPIServer(client *buildkiteapi.Client) *apiServer {
+	return &apiServer{client}
 }
 
-func (s *server) ProjectsStatus(
+func (s *apiServer) ProjectsStatus(
 	ctx context.Context,
 	request *ProjectsStatusRequest,
 ) (*ProjectsStatusResponse, error) {
@@ -54,7 +54,7 @@ func (s *server) ProjectsStatus(
 	}, nil
 }
 
-func (s *server) fetchAllOrganizations() ([]buildkiteapi.Organization, error) {
+func (s *apiServer) fetchAllOrganizations() ([]buildkiteapi.Organization, error) {
 	var organizations []buildkiteapi.Organization
 	pageNumber := 1
 	for {
@@ -80,7 +80,7 @@ func (s *server) fetchAllOrganizations() ([]buildkiteapi.Organization, error) {
 	return organizations, nil
 }
 
-func (s *server) fetchAllOrganizationProjects(
+func (s *apiServer) fetchAllOrganizationProjects(
 	organization buildkiteapi.Organization,
 ) ([]buildkiteapi.Project, error) {
 	var projects []buildkiteapi.Project
