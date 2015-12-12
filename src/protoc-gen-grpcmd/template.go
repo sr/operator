@@ -78,4 +78,4 @@ func main() {
 	}
 	fmt.Fprintln(os.Stdout, output.PlainText)
 }
-`)
+`))
