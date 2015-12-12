@@ -70,7 +70,7 @@ docker-build-ci:
 docker-build-hubot: proto-hubot
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 
-docker-build-operatord: proto-grpc
+docker-build-operatord: proto-grpc proto-operatord
 	rm -rf tmp
 	mkdir -p tmp
 	go build \
@@ -79,7 +79,7 @@ docker-build-operatord: proto-grpc
 		-tags netgo \
 		-ldflags '-w -linkmode external -extldflags "-static"' \
 		-o tmp/operatord \
-		src/cmd/operatord/main.go
+		src/cmd/operatord/main-gen.go
 	docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
 
 docker-push-operatord: docker-build-operatord
