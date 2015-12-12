@@ -1,5 +1,3 @@
-/src/cmd/**/main-gen.go
-!/src/cmd/operatord/main-gen.go
 /src/hubot/.hubot_history
 /src/hubot/nodes_modules
 /src/hubot/proto/*.proto
