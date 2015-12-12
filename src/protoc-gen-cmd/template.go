@@ -74,7 +74,7 @@ func (s *serviceCommand) {{.Name}}() (*operator.Output, error) {
 func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	switch method {
 {{range .Methods}}
-	case "{{.SnakeCasedName}}":
+	case "{{.DasherizedName}}":
 		return s.{{.Name}}()
 {{end}}
 	default:

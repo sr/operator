@@ -80,10 +80,10 @@ func (s *serviceCommand) ListInstances() (*operator.Output, error) {
 func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	switch method {
 
-	case "create_container_cluster":
+	case "create-container-cluster":
 		return s.CreateContainerCluster()
 
-	case "list_instances":
+	case "list-instances":
 		return s.ListInstances()
 
 	default:

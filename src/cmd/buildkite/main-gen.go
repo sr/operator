@@ -44,7 +44,7 @@ func (s *serviceCommand) ProjectsStatus() (*operator.Output, error) {
 func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	switch method {
 
-	case "projects_status":
+	case "projects-status":
 		return s.ProjectsStatus()
 
 	default:
