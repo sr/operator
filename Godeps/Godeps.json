@@ -116,6 +116,10 @@
 			"Rev": "406e5b7bfd8201a36e2bb5f7bdae0b03380c2ce8"
 		},
 		{
+			"ImportPath": "github.com/satori/go.uuid",
+			"Rev": "d41af8bb6a7704f00bc3b7cba9355ae6a5a80048"
+		},
+		{
 			"ImportPath": "github.com/serenize/snaker",
 			"Rev": "d88cc11617e4f179fa2c821a60908d5fabd7bdad"
 		},
@@ -138,6 +142,18 @@
 		{
 			"ImportPath": "go.pedge.io/env",
 			"Rev": "7bb5904005698ff870289d34e93e0fb8f433e2b9"
+		},
+		{
+			"ImportPath": "go.pedge.io/google-protobuf",
+			"Rev": "e65351045a010f78e5a00b21d2e5ce0b38f3c546"
+		},
+		{
+			"ImportPath": "go.pedge.io/proto/time",
+			"Rev": "15fc26eb8d5d6ce10e2131569185723fb7356f40"
+		},
+		{
+			"ImportPath": "go.pedge.io/protolog",
+			"Rev": "54ec15cf514299f5252a6dfdf2e73513bad66524"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/curve25519",
