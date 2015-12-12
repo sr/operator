@@ -93,7 +93,7 @@ func (g *generator) newMethodDescriptor(
 	for i, field := range inputMessage.Field {
 		arguments[i] = &argumentDescriptor{
 			// TODO(sr) use same snake casing algo as grpc (i.e. don't repect accronyms)
-			CamelCaseName:  snaker.SnakeToCamel(field.GetName()),
+			CamelCaseName:  strings.Replace(snaker.SnakeToCamel(field.GetName()), "ID", "Id", 1),
 			SnakeCaseName:  lowerFirst(snaker.SnakeToCamel(field.GetName())),
 			DasherizedName: inflections.Dasherize(field.GetName()),
 		}

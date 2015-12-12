@@ -52,7 +52,7 @@ func (s *serviceCommand) {{.Name}}() (*operator.Output, error) {
 	{{.SnakeCaseName}} := flags.String("{{.DasherizedName}}", "", "")
 {{end}}
 	flags.Parse(os.Args[2:])
-	response, err := s.client.Search(
+	response, err := s.client.{{.Name}}(
 		context.Background(),
 		&service.{{.Input}}{
 		{{range .Arguments}}
