@@ -47,6 +47,18 @@ powerful querying (via Big Query), and log term archival (to Cloud Storage/S3)
 - [ ] Setup rsyslog container ingesting logs from Protolog via syslog protocol
 and forwarding them to Google Cloud Logging via rsyslog prog. See
 <http://www.rsyslog.com/doc/v8-stable/configuration/modules/omprog.html>.
+- Clean-up K8s secrets stuff. Only ever write one secret, a shell file that
+  exports all secrets and can be sourced in by all controllers
+  ```
+  export TOKEN="boomtown"
+  ENTRYPOINT ["/k8s-exec /operatord"]
+  ```
+  Or perhaps even better, do this in Go so bash isn't required in the container
+  (i.e. works with FROM scratch), nor is mounting the actual secret volume (or
+  is it?) read data using the API (see
+  <http://kubernetes.io/v1.1/docs/api-reference/v1/definitions.html#_v1_secret>)
+  and sets os.Setenv(k,v). Perhaps something like... k8secrets.Setenv().
+  Requires figuring out how to connect to the agent from within a pod.
 
 # Miscelleanous long term/vague stuff
 - Generator/Command line utility that generates services skeleton. This is key.
