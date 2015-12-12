@@ -23,7 +23,7 @@ var (
 
 func run() error {
 	if path.Base(*templateFile) != templateFileName {
-		fmt.Errorf("%s is not a secret template", *templateFile)
+		return fmt.Errorf("%s is not a secret template", *templateFile)
 	}
 	file, err := os.Open(*templateFile)
 	defer file.Close()
