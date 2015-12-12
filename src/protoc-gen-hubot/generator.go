@@ -43,7 +43,7 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 			return nil, err
 		}
 		response.File[i] = &plugin.CodeGeneratorResponse_File{
-			Name:    proto.String(fmt.Sprintf("%s.%s", name, "coffee")),
+			Name:    proto.String(fmt.Sprintf("%s-gen.%s", name, "coffee")),
 			Content: proto.String(content),
 		}
 	}
