@@ -19,7 +19,7 @@ module.exports = (robot) ->
 	robot.respond /buildkite projects-status/, (msg) ->
 		client.projectsStatus {}, (err, response) ->
 			if err
-				msg.send("buildkite error: #{err.message}")
+				msg.send("```\nbuildkite error: #{err.message}\n```")
 			else
-				msg.send(response.output.PlainText)
+				msg.send("```\n#{response.output.PlainText}\n```")
 

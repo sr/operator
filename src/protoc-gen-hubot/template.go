@@ -37,8 +37,8 @@ module.exports = (robot) ->
 	robot.respond /{{.Service}} {{.NameSnake}}{{.Arguments}}/, (msg) ->
 		client.{{.Name}} {{.Input}}, (err, response) ->
 			if err
-				msg.send("{{.Service}} error: #{err.message}")
+				msg.send("` + "```" + `\n{{.Service}} error: #{err.message}\n` + "```" + `")
 			else
-				msg.send(response.output.PlainText)
+				msg.send("` + "```" + `\n#{response.output.PlainText}\n` + "```" + `")
 {{end}}
 `))

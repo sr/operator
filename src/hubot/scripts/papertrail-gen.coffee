@@ -19,7 +19,7 @@ module.exports = (robot) ->
 	robot.respond /papertrail search query=(\w+)/, (msg) ->
 		client.search {query: msg.match[1],}, (err, response) ->
 			if err
-				msg.send("papertrail error: #{err.message}")
+				msg.send("```\npapertrail error: #{err.message}\n```")
 			else
-				msg.send(response.output.PlainText)
+				msg.send("```\n#{response.output.PlainText}\n```")
 
