@@ -1,3 +1,5 @@
 #!/bin/sh
 golint "$1" |
+grep -v '.pb.go:' |
+grep -v '.pb.gw.go:' |
 grep -v 'should have comment'
