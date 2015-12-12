@@ -5,6 +5,7 @@ This encompasses both `protoc-gen-hubot` and `protoc-gen-grpcmd` used to
 generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
+- [ ] Switch to go.pedge.io/protoeasy for generating code with protoc
 - [x] Fix grpcmd to accept more than one package name on the command line
 - [ ] Update binaries to connect to OPERATORD_ADDRESS or something
 - [x] Generate the operatord main.go responsible for registering the different
@@ -67,8 +68,9 @@ and forwarding them to Google Cloud Logging via rsyslog prog. See
 - Come up with a service that can execute arbitrary shell commands to integrate
   with shops that already have tons of these shell scripts scripts all over the
   place or for e.g. executing things like ansible-playbook(1) or puppet(1).
-  Probably create a container then run the command. Allow people to create and
-  sepcify a kitchen-sink Docker image with the runtime these existing need
-  (typically a whole ubuntu/debian with extra packages and whatnot -- something
-  matching their production environment)
-- Investigate HTML output for chat.
+  Probably create a container or pod using either the Docker or Kubernetes API
+  then run the command in it. Allow people to create and specify a kitchen-sink
+  like Docker image with the runtime these existing need (typically a whole
+  ubuntu/debian with extra packages and whatnot -- something matching their
+  production environment)
+- Investigate rich formatting/HTML output for chat.
