@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+export BUILDKITE_API_TOKEN="$(cat "/secrets/buildkite.api.token")"
+export PAPERTRAIL_API_TOKEN="$(cat "/secrets/papertrail.api.token")"
+/operatord

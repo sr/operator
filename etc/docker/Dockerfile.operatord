@@ -1,5 +1,6 @@
-FROM scratch
+FROM ubuntu:14.04
 MAINTAINER me@simonrozet.com
+ADD /bin/k8s-operatord /k8s-operatord
 ADD /tmp/operatord /
 EXPOSE 3000
 ENTRYPOINT ["/operatord"]

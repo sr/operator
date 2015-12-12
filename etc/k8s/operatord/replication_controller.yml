@@ -14,4 +14,13 @@ spec:
     spec:
       containers:
       - name: operatord
-        image: gcr.io/dev-europe-west1/operatord:bca288d
+        image: gcr.io/dev-europe-west1/operatord:e5ff2b7
+        command: ["/k8s-operatord"]
+        volumeMounts:
+        - name: secrets
+          mountPath: "/secrets"
+          readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: operatord
