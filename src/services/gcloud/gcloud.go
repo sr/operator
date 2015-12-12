@@ -7,7 +7,9 @@ import (
 	"google.golang.org/api/container/v1"
 )
 
-func NewAPIServer() (GCloudServiceServer, error) {
+type Env struct{}
+
+func NewAPIServer(env *Env) (GCloudServiceServer, error) {
 	client, err := google.DefaultClient(context.Background())
 	if err != nil {
 		return nil, nil
