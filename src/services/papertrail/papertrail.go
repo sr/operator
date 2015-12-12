@@ -6,8 +6,8 @@ type Env struct {
 	APIToken string `env:"PAPERTRAIL_API_TOKEN,required"`
 }
 
-func NewAPIServer(env *Env) PapertrailServiceServer {
+func NewAPIServer(env *Env) (PapertrailServiceServer, error) {
 	token := &gopapertrail.TokenTransport{Token: env.APIToken}
 	client := gopapertrail.NewClient(token.Client())
-	return newAPIServer(client)
+	return newAPIServer(client), nil
 }
