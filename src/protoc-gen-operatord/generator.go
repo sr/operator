@@ -22,7 +22,7 @@ type generator struct {
 	request *plugin.CodeGeneratorRequest
 }
 
-func NewGenerator(request *plugin.CodeGeneratorRequest) *generator {
+func newGenerator(request *plugin.CodeGeneratorRequest) *generator {
 	return &generator{request}
 }
 
