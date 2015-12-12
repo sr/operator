@@ -49,7 +49,7 @@ powerful querying (via Big Query), and log term archival (to Cloud Storage/S3)
 - [ ] Setup rsyslog container ingesting logs from Protolog via syslog protocol
 and forwarding them to Google Cloud Logging via rsyslog prog. See
 <http://www.rsyslog.com/doc/v8-stable/configuration/modules/omprog.html>.
-- Clean-up K8s secrets stuff. Only ever write one secret, a shell file that
+- [ ] Clean-up K8s secrets stuff. Only ever write one secret, a shell file that
   exports all secrets and can be sourced in by all controllers
   ```
   export TOKEN="boomtown"
