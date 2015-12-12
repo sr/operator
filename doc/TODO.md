@@ -5,21 +5,22 @@ This encompasses both `protoc-gen-hubot` and `protoc-gen-grpcmd` used to
 generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
-- [ ] Fix grpcmd to accept more than one package name on the command line
+- [x] Fix grpcmd to accept more than one package name on the command line
 - [ ] Update binaries to connect to OPERATORD_ADDRESS or something
-- [ ] Generate the operatord main.go responsible for registering the different
+- [x] Generate the operatord main.go responsible for registering the different
   services on the GRPC server
-- [ ] Rewrite `protoc-gen-grpcmd` to use same templating technique that
+- [x] Rewrite `protoc-gen-grpcmd` to use same templating technique that
   `protoc-gen-hubot` is using. It's a lot more maintainable this way.
-- [ ] Sneak sneak case the methods (i.e. `GCloudService.ListInstances` becomes `gcloud list-instances`)
-- [ ] Sneak case the arguments. `ProjectId` becomes `-project-id`.
+- [x] Sneak sneak case the methods (i.e. `GCloudService.ListInstances` becomes `gcloud list-instances`)
+- [x] Sneak case the arguments. `ProjectId` becomes `-project-id`.
 - [ ] Handle optional and required fields.
 - [ ] Add support for int types and move away from considering everything as a
   string as much as practicaly possible.
 - [ ] Generate proper help syntax for Hubot scripts to integrate with
   `/hubot help`
 - [ ] Allow choosing a prefix for generated binaries, e.g. `ops-papertrail`,
-  `ops-gcloud`, etc. This should be set as a protobuf option.
+  `ops-gcloud`, etc. This should be set as a protobuf option. Perhaps generate a
+  whole command line suite with proper sub commands instead...
 - [ ] Process code comments annotating the service definition, methods, and
   messages and use those to generate help messages all three levels: the
   service, its methods, and their arguments. See `gh-help` example here:
