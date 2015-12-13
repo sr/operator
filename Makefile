@@ -52,11 +52,11 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 proto-cmd:
 	protoc --cmd_out=src/cmd/ -Isrc src/services/**/*.proto
 
-proto-operatord: proto-logger
+proto-operatord: proto-instrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
-proto-logger:
-	protoc --grpclog_out=src/ -Isrc src/services/**/*.proto
+proto-instrument:
+	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights

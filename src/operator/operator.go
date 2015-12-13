@@ -5,7 +5,7 @@ import (
 
 	"go.pedge.io/protolog"
 
-	"github.com/sr/operator/src/grpclog"
+	"github.com/sr/operator/src/grpcinstrument"
 	"google.golang.org/grpc"
 )
 
@@ -36,7 +36,7 @@ func NewLogger() protolog.Logger {
 	)
 }
 
-func NewGRPCLogger() grpclog.Logger {
+func NewGRPCLogger() grpcinstrument.Logger {
 	return newGRPCLogger(Logger)
 }
 

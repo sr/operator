@@ -1,33 +1,32 @@
 package papertrail
 
 import (
-	"time"
-
 	"github.com/rcrowley/go-metrics"
-	"github.com/sr/operator/src/grpclog"
+	"github.com/sr/operator/src/grpcinstrument"
 	"golang.org/x/net/context"
+	"time"
 )
 
-type logAPIServer struct {
-	logger   grpclog.Logger
+type instrumentedAPIServer struct {
+	logger   grpcinstrument.Logger
 	metrics  metrics.Registry
 	delegate PapertrailServiceServer
 }
 
-func NewLogAPIServer(
-	logger grpclog.Logger,
+func NewInstrumentedAPIServer(
+	logger grpcinstrument.Logger,
 	metrics metrics.Registry,
 	delegate PapertrailServiceServer,
-) *logAPIServer {
-	return &logAPIServer{logger, metrics, delegate}
+) *instrumentedAPIServer {
+	return &instrumentedAPIServer{logger, metrics, delegate}
 }
 
-func (a *logAPIServer) Search(
+func (a *instrumentedAPIServer) Search(
 	ctx context.Context,
 	request *SearchRequest,
 ) (response *SearchResponse, err error) {
 	defer func(start time.Time) {
-		grpclog.Instrument(
+		grpcinstrument.Instrument(
 			a.logger,
 			a.metrics,
 			"papertrail",
