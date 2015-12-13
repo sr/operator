@@ -32,7 +32,7 @@ definitions, respectively.
 The operator server that's running the various services. There is nothing there
 at the moment. In the future this will be responsible for logging all actions,
 managing ACL, etc.
-- [ ] Setup protolog with startup notice log entry.
+- [x] Setup protolog with startup notice log entry.
 - [ ] Figure out how to log all GRPC requests for all services. See Peter's
   interceptor stuff. Perhaps will have to write a gogo plugin if we can't
   convince GRPC core that this is a good idea.
@@ -74,3 +74,19 @@ and forwarding them to Google Cloud Logging via rsyslog prog. See
   ubuntu/debian with extra packages and whatnot -- something matching their
   production environment)
 - Investigate rich formatting/HTML output for chat.
+- Utimately Operator should become a library and a command that people install
+  and then use to boot their own server/bootstrap their own services etc. not
+  have to clone/fork this repository and know what make targets to call to
+  recompile their main (!!), build docker images etc. Probably provide commands
+  such as `operator build` to build Docker image(s) (server daemon + hubot) form
+  the set of services present in the repo. Advice against checking in generated
+  files... Maybe? What about Hubot scripts? These have to live a separate
+  repo...
+  Maybe something like:
+    # generate hubot scripts into existing company's hubot repository
+    $ operator build ~/src/{ops,dev}/services/*.proto --hubot ~src/hubot
+    # build single "operator" binary for all services listed then upload to s3
+    $ operator build ~/src/{ops,dev}/services/*.proto --cmd ~/tmp/operator --upload s3://my-bucket/
+    # build operatord (server) binary inside docker then create a docker image setup to run it
+      that can be pushed to whatever registry (and then deployed to ecs/gcloud/kubernetes/...)
+    $ operator build ~/src/{ops,dev}/services/*.proto
