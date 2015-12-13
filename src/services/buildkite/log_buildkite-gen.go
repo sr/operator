@@ -1,10 +1,11 @@
 package buildkite
 
 import (
+	"time"
+
 	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/grpclog"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type logAPIServer struct {
