@@ -1,6 +1,7 @@
 package buildkite
 
 import (
+	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/grpclog"
 	"golang.org/x/net/context"
 	"time"
@@ -8,17 +9,26 @@ import (
 
 type logAPIServer struct {
 	logger   grpclog.Logger
+	metrics  metrics.Registry
 	delegate BuildkiteServiceServer
 }
 
-func NewLogAPIServer(logger grpclog.Logger, delegate BuildkiteServiceServer) *logAPIServer {
-	return &logAPIServer{logger, delegate}
+func NewLogAPIServer(
+	logger grpclog.Logger,
+	metrics metrics.Registry,
+	delegate BuildkiteServiceServer,
+) *logAPIServer {
+	return &logAPIServer{logger, metrics, delegate}
 }
 
-func (a *logAPIServer) ProjectsStatus(ctx context.Context, request *ProjectsStatusRequest) (response *ProjectsStatusResponse, err error) {
+func (a *logAPIServer) ProjectsStatus(
+	ctx context.Context,
+	request *ProjectsStatusRequest,
+) (response *ProjectsStatusResponse, err error) {
 	defer func(start time.Time) {
-		grpclog.Log(
+		grpclog.Instrument(
 			a.logger,
+			a.metrics,
 			"buildkite",
 			"ProjectsStatus",
 			"ProjectsStatusRequest",

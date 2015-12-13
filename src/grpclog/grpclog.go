@@ -1,8 +1,10 @@
 package grpclog
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/rcrowley/go-metrics"
 	"go.pedge.io/proto/time"
 )
 
@@ -10,8 +12,9 @@ type Logger interface {
 	Log(*Call)
 }
 
-func Log(
+func Instrument(
 	logger Logger,
+	registry metrics.Registry,
 	serviceName string,
 	methodName string,
 	inputType string,
@@ -21,6 +24,7 @@ func Log(
 ) {
 	call := &Call{
 		Service:  serviceName,
+		Method:   methodName,
 		Input:    &Input{Type: inputType},
 		Output:   &Output{Type: outputType},
 		Duration: prototime.DurationToProto(time.Since(start)),
@@ -29,4 +33,5 @@ func Log(
 		call.Error = &Error{Message: err.Error()}
 	}
 	logger.Log(call)
+	metrics.GetOrRegisterCounter(fmt.Sprintf("%s.methods.%s.calls", call.Service, call.Method), registry).Inc(1)
 }
