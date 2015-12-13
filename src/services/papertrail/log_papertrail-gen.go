@@ -1,21 +1,19 @@
-
 package papertrail
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/operator/src/grpclog"
+	"golang.org/x/net/context"
+	"time"
 )
 
 type logAPIServer struct {
-	logger grpclog.Logger
+	logger   grpclog.Logger
 	delegate PapertrailServiceServer
 }
 
 func NewLogAPIServer(logger grpclog.Logger, delegate PapertrailServiceServer) *logAPIServer {
 	return &logAPIServer{logger, delegate}
 }
-
 
 func (a *logAPIServer) Search(ctx context.Context, request *SearchRequest) (response *SearchResponse, err error) {
 	defer func(start time.Time) {

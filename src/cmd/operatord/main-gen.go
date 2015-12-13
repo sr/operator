@@ -10,8 +10,8 @@ import (
 
 	papertrail "github.com/sr/operator/src/services/papertrail"
 
-	"go.pedge.io/env"
 	"github.com/sr/operator/src/operator"
+	"go.pedge.io/env"
 )
 
 func run() error {
