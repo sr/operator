@@ -23,22 +23,32 @@ import (
 	"time"
 	"golang.org/x/net/context"
 	"github.com/sr/operator/src/grpclog"
+	"github.com/rcrowley/go-metrics"
 )
 
 type logAPIServer struct {
 	logger grpclog.Logger
+	metrics metrics.Registry
 	delegate {{.ServerInterface}}
 }
 
-func NewLogAPIServer(logger grpclog.Logger, delegate {{.ServerInterface}}) *logAPIServer {
-	return &logAPIServer{logger, delegate}
+func NewLogAPIServer(
+	logger grpclog.Logger,
+	metrics metrics.Registry,
+	delegate {{.ServerInterface}},
+) *logAPIServer {
+	return &logAPIServer{logger, metrics, delegate}
 }
 
 {{range .Methods}}
-func (a *logAPIServer) {{.Name}}(ctx context.Context, request *{{.InputType}}) (response *{{.OutputType}}, err error) {
+func (a *logAPIServer) {{.Name}}(
+	ctx context.Context,
+	request *{{.InputType}},
+) (response *{{.OutputType}}, err error) {
 	defer func(start time.Time) {
-		grpclog.Log(
+		grpclog.Instrument(
 			a.logger,
+			a.metrics,
 			"{{.Service}}",
 			"{{.Name}}",
 			"{{.InputType}}",
