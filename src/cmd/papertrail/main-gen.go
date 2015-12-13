@@ -3,12 +3,13 @@ package main
 import (
 	flag "flag"
 	fmt "fmt"
+	os "os"
+
 	operator "github.com/sr/operator/src/operator"
 	service "github.com/sr/operator/src/services/papertrail"
 	env "go.pedge.io/env"
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
-	os "os"
 )
 
 const commandName = "papertrail"

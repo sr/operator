@@ -4,9 +4,10 @@ package main
 import (
 	"os"
 
-	buildkite "github.com/sr/operator/src/services/buildkite"
 	"log"
 	"time"
+
+	buildkite "github.com/sr/operator/src/services/buildkite"
 
 	gcloud "github.com/sr/operator/src/services/gcloud"
 

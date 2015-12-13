@@ -14,7 +14,7 @@ It has these top-level messages:
 	Output
 	Error
 */
-package grpclog
+package grpcinstrument
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
