@@ -1,4 +1,4 @@
-package logger
+package generator
 
 import (
 	"bytes"
@@ -11,6 +11,14 @@ import (
 	google_protobuf "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 )
+
+type Generator interface {
+	Generate() (*plugin.CodeGeneratorResponse, error)
+}
+
+func NewGenerator(request *plugin.CodeGeneratorRequest) Generator {
+	return newGenerator(request)
+}
 
 type generator struct {
 	request        *plugin.CodeGeneratorRequest
@@ -51,19 +59,20 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 }
 
 func (g *generator) generateFile(
-	protoFile *google_protobuf.FileDescriptorProto,
+	file *google_protobuf.FileDescriptorProto,
 ) (content string, err error) {
-	if len(protoFile.Service) != 1 {
+	if len(file.Service) != 1 {
 		return "", errors.New("can only generate script for exactly one service")
 	}
-	service := protoFile.Service[0]
+	service := file.Service[0]
 	descriptor := &fileDescriptor{
-		Package:         protoFile.GetPackage(),
+		Service:         file.GetPackage(),
+		Package:         file.GetPackage(),
 		ServerInterface: fmt.Sprintf("%sServer", service.GetName()),
 		Methods:         make([]*methodDescriptor, len(service.Method)),
 	}
 	for i, method := range service.Method {
-		descriptor.Methods[i] = newMethodDescriptor(method)
+		descriptor.Methods[i] = newMethodDescriptor(file.GetPackage(), method)
 	}
 	var buffer bytes.Buffer
 	if err := loggerTemplate.Execute(&buffer, descriptor); err != nil {
@@ -73,11 +82,13 @@ func (g *generator) generateFile(
 }
 
 func newMethodDescriptor(
+	service string,
 	method *google_protobuf.MethodDescriptorProto,
 ) *methodDescriptor {
 	return &methodDescriptor{
-		Name:     method.GetName(),
-		Request:  strings.Split(method.GetInputType(), ".")[2],
-		Response: strings.Split(method.GetOutputType(), ".")[2],
+		Service:    service,
+		Name:       method.GetName(),
+		InputType:  strings.Split(method.GetInputType(), ".")[2],
+		OutputType: strings.Split(method.GetOutputType(), ".")[2],
 	}
 }

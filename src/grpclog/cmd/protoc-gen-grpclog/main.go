@@ -8,12 +8,12 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	plugin "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
-	"github.com/sr/operator/src/protoc-gen-logger"
+	"github.com/sr/operator/src/grpclog/generator"
 )
 
 func fatal(err error, msgs ...string) {
 	s := strings.Join(msgs, " ") + ":" + err.Error()
-	log.Print("protoc-gen-logger: error:", s)
+	log.Print("protoc-gen-grpclog error:", s)
 	os.Exit(1)
 }
 
@@ -26,7 +26,7 @@ func main() {
 	if err := proto.Unmarshal(data, request); err != nil {
 		fatal(err, "parsing input proto")
 	}
-	gen := logger.NewGenerator(request)
+	gen := generator.NewGenerator(request)
 	response, err := gen.Generate()
 	if err != nil {
 		fatal(err, "generating response")
