@@ -56,7 +56,7 @@ proto-operatord: proto-logger
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
 proto-logger:
-	protoc --logger_out=src/ -Isrc src/services/**/*.proto
+	protoc --grpclog_out=src/ -Isrc src/services/**/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights

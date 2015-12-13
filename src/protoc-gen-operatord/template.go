@@ -41,7 +41,7 @@ func run() error {
 		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
 			operator.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), {{.Name}}.NewLogAPIServer({{.Name}}Server))
+			{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), {{.Name}}.NewLogAPIServer(operator.GRPCLogger, {{.Name}}Server))
 		}
 	}
 {{end}}

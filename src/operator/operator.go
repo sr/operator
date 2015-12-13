@@ -5,14 +5,13 @@ import (
 
 	"go.pedge.io/protolog"
 
+	"github.com/sr/operator/src/grpclog"
 	"google.golang.org/grpc"
 )
 
-var Logger = protolog.NewLogger(
-	protolog.NewDefaultTextWritePusher(
-		protolog.NewFileFlusher(os.Stderr),
-	),
-	protolog.LoggerOptions{},
+var (
+	Logger     = NewLogger()
+	GRPCLogger = newGRPCLogger(Logger)
 )
 
 type Server interface {
@@ -26,6 +25,19 @@ type Config struct {
 
 func NewServer(address string) Server {
 	return newServer(address, Logger)
+}
+
+func NewLogger() protolog.Logger {
+	return protolog.NewLogger(
+		protolog.NewDefaultTextWritePusher(
+			protolog.NewFileFlusher(os.Stderr),
+		),
+		protolog.LoggerOptions{},
+	)
+}
+
+func NewGRPCLogger() grpclog.Logger {
+	return newGRPCLogger(Logger)
 }
 
 func LogServerStartupError(err error) {

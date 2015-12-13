@@ -28,7 +28,7 @@ func run() error {
 		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
 			operator.LogServiceStartupError("buildkite", err)
 		} else {
-			buildkite.RegisterBuildkiteServiceServer(server.Server(), buildkite.NewLogAPIServer(buildkiteServer))
+			buildkite.RegisterBuildkiteServiceServer(server.Server(), buildkite.NewLogAPIServer(operator.GRPCLogger, buildkiteServer))
 		}
 	}
 
@@ -39,7 +39,7 @@ func run() error {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
 			operator.LogServiceStartupError("gcloud", err)
 		} else {
-			gcloud.RegisterGCloudServiceServer(server.Server(), gcloud.NewLogAPIServer(gcloudServer))
+			gcloud.RegisterGCloudServiceServer(server.Server(), gcloud.NewLogAPIServer(operator.GRPCLogger, gcloudServer))
 		}
 	}
 
@@ -50,7 +50,7 @@ func run() error {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
 			operator.LogServiceStartupError("papertrail", err)
 		} else {
-			papertrail.RegisterPapertrailServiceServer(server.Server(), papertrail.NewLogAPIServer(papertrailServer))
+			papertrail.RegisterPapertrailServiceServer(server.Server(), papertrail.NewLogAPIServer(operator.GRPCLogger, papertrailServer))
 		}
 	}
 
