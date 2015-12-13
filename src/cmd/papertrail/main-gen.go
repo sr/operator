@@ -1,14 +1,14 @@
 package main
 
 import (
-	context "golang.org/x/net/context"
-	env "go.pedge.io/env"
 	flag "flag"
 	fmt "fmt"
-	grpc "google.golang.org/grpc"
 	operator "github.com/sr/operator/src/operator"
-	os "os"
 	service "github.com/sr/operator/src/services/papertrail"
+	env "go.pedge.io/env"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	os "os"
 )
 
 const commandName = "papertrail"
@@ -36,7 +36,6 @@ func (s *serviceCommand) Search() (*operator.Output, error) {
 		&service.SearchRequest{
 
 			Query: *query,
-
 		},
 	)
 	if err != nil {

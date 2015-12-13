@@ -1,21 +1,19 @@
-
 package buildkite
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/operator/src/grpclog"
+	"golang.org/x/net/context"
+	"time"
 )
 
 type logAPIServer struct {
-	logger grpclog.Logger
+	logger   grpclog.Logger
 	delegate BuildkiteServiceServer
 }
 
 func NewLogAPIServer(logger grpclog.Logger, delegate BuildkiteServiceServer) *logAPIServer {
 	return &logAPIServer{logger, delegate}
 }
-
 
 func (a *logAPIServer) ProjectsStatus(ctx context.Context, request *ProjectsStatusRequest) (response *ProjectsStatusResponse, err error) {
 	defer func(start time.Time) {

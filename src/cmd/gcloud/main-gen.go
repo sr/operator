@@ -1,14 +1,14 @@
 package main
 
 import (
-	context "golang.org/x/net/context"
-	env "go.pedge.io/env"
 	flag "flag"
 	fmt "fmt"
-	grpc "google.golang.org/grpc"
 	operator "github.com/sr/operator/src/operator"
-	os "os"
 	service "github.com/sr/operator/src/services/gcloud"
+	env "go.pedge.io/env"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	os "os"
 )
 
 const commandName = "gcloud"
@@ -48,7 +48,6 @@ func (s *serviceCommand) CreateContainerCluster() (*operator.Output, error) {
 			NodeCount: *nodeCount,
 
 			Zone: *zone,
-
 		},
 	)
 	if err != nil {
@@ -68,7 +67,6 @@ func (s *serviceCommand) ListInstances() (*operator.Output, error) {
 		&service.ListInstancesRequest{
 
 			ProjectId: *projectID,
-
 		},
 	)
 	if err != nil {

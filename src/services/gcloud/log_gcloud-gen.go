@@ -1,21 +1,19 @@
-
 package gcloud
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/operator/src/grpclog"
+	"golang.org/x/net/context"
+	"time"
 )
 
 type logAPIServer struct {
-	logger grpclog.Logger
+	logger   grpclog.Logger
 	delegate GCloudServiceServer
 }
 
 func NewLogAPIServer(logger grpclog.Logger, delegate GCloudServiceServer) *logAPIServer {
 	return &logAPIServer{logger, delegate}
 }
-
 
 func (a *logAPIServer) CreateContainerCluster(ctx context.Context, request *CreateContainerClusterRequest) (response *CreateContainerClusterResponse, err error) {
 	defer func(start time.Time) {

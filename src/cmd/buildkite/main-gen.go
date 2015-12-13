@@ -1,14 +1,14 @@
 package main
 
 import (
-	context "golang.org/x/net/context"
-	env "go.pedge.io/env"
 	flag "flag"
 	fmt "fmt"
-	grpc "google.golang.org/grpc"
 	operator "github.com/sr/operator/src/operator"
-	os "os"
 	service "github.com/sr/operator/src/services/buildkite"
+	env "go.pedge.io/env"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	os "os"
 )
 
 const commandName = "buildkite"
@@ -31,9 +31,7 @@ func (s *serviceCommand) ProjectsStatus() (*operator.Output, error) {
 	flags.Parse(os.Args[2:])
 	response, err := s.client.ProjectsStatus(
 		context.Background(),
-		&service.ProjectsStatusRequest{
-
-		},
+		&service.ProjectsStatusRequest{},
 	)
 	if err != nil {
 		return nil, err
