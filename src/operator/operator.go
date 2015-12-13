@@ -28,6 +28,10 @@ func NewServer(address string) Server {
 	return newServer(address, Logger)
 }
 
+func LogServerStartupError(err error) {
+	Logger.Fatal(&ServerStartupError{err.Error()})
+}
+
 func LogServiceStartupError(serviceName string, err error) {
 	Logger.Error(&ServiceStartupError{
 		Service: &Service{
