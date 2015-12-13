@@ -5,6 +5,8 @@ This encompasses both `protoc-gen-hubot` and `protoc-gen-grpcmd` used to
 generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
+- [ ] protoc --cmd_out=~/tmp/openflights $GOPATH/src/go.pedge.io/openflights/openflights.proto
+	should work (it currently segfaults)
 - [ ] Switch to go.pedge.io/protoeasy for generating code with protoc
 - [x] Fix grpcmd to accept more than one package name on the command line
 - [ ] Update binaries to connect to OPERATORD_ADDRESS or something
