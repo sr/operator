@@ -59,7 +59,7 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "operatord error: %v\n", err)
+		operator.LogServerStartupError(err)
 		os.Exit(1)
 	}
 }
