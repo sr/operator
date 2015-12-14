@@ -6,22 +6,22 @@ import (
 	"time"
 )
 
-type instrumentedAPIServer struct {
+type instrumentedGCloudServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	delegate       GCloudServiceServer
 }
 
-func NewInstrumentedAPIServer(
+func NewInstrumentedGCloudServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	delegate GCloudServiceServer,
-) *instrumentedAPIServer {
-	return &instrumentedAPIServer{
+) *instrumentedGCloudServiceServer {
+	return &instrumentedGCloudServiceServer{
 		instrumentator,
 		delegate,
 	}
 }
 
-func (a *instrumentedAPIServer) CreateContainerCluster(
+func (a *instrumentedGCloudServiceServer) CreateContainerCluster(
 	ctx context.Context,
 	request *CreateContainerClusterRequest,
 ) (response *CreateContainerClusterResponse, err error) {
@@ -39,7 +39,7 @@ func (a *instrumentedAPIServer) CreateContainerCluster(
 	return a.delegate.CreateContainerCluster(ctx, request)
 }
 
-func (a *instrumentedAPIServer) ListInstances(
+func (a *instrumentedGCloudServiceServer) ListInstances(
 	ctx context.Context,
 	request *ListInstancesRequest,
 ) (response *ListInstancesResponse, err error) {

@@ -6,22 +6,22 @@ import (
 	"time"
 )
 
-type instrumentedAPIServer struct {
+type instrumentedPapertrailServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	delegate       PapertrailServiceServer
 }
 
-func NewInstrumentedAPIServer(
+func NewInstrumentedPapertrailServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	delegate PapertrailServiceServer,
-) *instrumentedAPIServer {
-	return &instrumentedAPIServer{
+) *instrumentedPapertrailServiceServer {
+	return &instrumentedPapertrailServiceServer{
 		instrumentator,
 		delegate,
 	}
 }
 
-func (a *instrumentedAPIServer) Search(
+func (a *instrumentedPapertrailServiceServer) Search(
 	ctx context.Context,
 	request *SearchRequest,
 ) (response *SearchResponse, err error) {

@@ -6,22 +6,22 @@ import (
 	"time"
 )
 
-type instrumentedAPIServer struct {
+type instrumentedBuildkiteServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	delegate       BuildkiteServiceServer
 }
 
-func NewInstrumentedAPIServer(
+func NewInstrumentedBuildkiteServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	delegate BuildkiteServiceServer,
-) *instrumentedAPIServer {
-	return &instrumentedAPIServer{
+) *instrumentedBuildkiteServiceServer {
+	return &instrumentedBuildkiteServiceServer{
 		instrumentator,
 		delegate,
 	}
 }
 
-func (a *instrumentedAPIServer) ProjectsStatus(
+func (a *instrumentedBuildkiteServiceServer) ProjectsStatus(
 	ctx context.Context,
 	request *ProjectsStatusRequest,
 ) (response *ProjectsStatusResponse, err error) {
