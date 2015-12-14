@@ -19,22 +19,10 @@ clean:
 	rm -rf src/hubot/proto/{operator,services}
 	rm -rf tmp/
 
-proto-get:
-	go get -u github.com/golang/protobuf/proto/... \
-		github.com/golang/protobuf/protoc-gen-go/... \
-		go.pedge.io/google-protobuf/... \
-		go.pedge.io/googleapis/... \
-		go.pedge.io/protolog/cmd/protoc-gen-protolog/... \
-		go.pedge.io/protolog/cmd/protoc-gen-protolog \
-		go.pedge.io/tools/protoc-all \
-		github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/... \
-		google.golang.org/grpc
-
 proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
 
 proto-grpc:
-	PROTOC_INCLUDE_PATH=src/ protoc-all github.com/sr/operator && \
-		find src/hubot -name '*.pb.go' | xargs rm -f
+	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
 
 src/hubot/proto/operator/:
 	mkdir $@
