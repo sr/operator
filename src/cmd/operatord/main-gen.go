@@ -4,19 +4,15 @@ package main
 import (
 	"os"
 
-	"log"
-	"time"
-
 	buildkite "github.com/sr/operator/src/services/buildkite"
 
 	gcloud "github.com/sr/operator/src/services/gcloud"
 
-	"github.com/rcrowley/go-metrics"
-
 	papertrail "github.com/sr/operator/src/services/papertrail"
 
-	"github.com/sr/operator/src/operator"
+	"github.com/rcrowley/go-metrics"
 	"go.pedge.io/env"
+	"github.com/sr/operator/src/operator"
 )
 
 func run() error {
@@ -33,7 +29,7 @@ func run() error {
 		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
 			operator.LogServiceStartupError("buildkite", err)
 		} else {
-			instrumented := buildkite.NewLogAPIServer(
+			instrumented := buildkite.NewInstrumentedAPIServer(
 				operator.GRPCLogger,
 				metrics.DefaultRegistry,
 				buildkiteServer,
@@ -49,7 +45,7 @@ func run() error {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
 			operator.LogServiceStartupError("gcloud", err)
 		} else {
-			instrumented := gcloud.NewLogAPIServer(
+			instrumented := gcloud.NewInstrumentedAPIServer(
 				operator.GRPCLogger,
 				metrics.DefaultRegistry,
 				gcloudServer,
@@ -65,7 +61,7 @@ func run() error {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
 			operator.LogServiceStartupError("papertrail", err)
 		} else {
-			instrumented := papertrail.NewLogAPIServer(
+			instrumented := papertrail.NewInstrumentedAPIServer(
 				operator.GRPCLogger,
 				metrics.DefaultRegistry,
 				papertrailServer,
@@ -73,8 +69,6 @@ func run() error {
 			papertrail.RegisterPapertrailServiceServer(server.Server(), instrumented)
 		}
 	}
-
-	go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 
 	return server.Serve()
 }

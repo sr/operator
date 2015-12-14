@@ -23,6 +23,7 @@ import (
 {{range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
 {{end}}
+	"github.com/rcrowley/go-metrics"
 	"go.pedge.io/env"
 	"github.com/sr/operator/src/operator"
 )
@@ -41,7 +42,7 @@ func run() error {
 		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
 			operator.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := {{.Name}}.NewLogAPIServer(
+			instrumented := {{.Name}}.NewInstrumentedAPIServer(
 				operator.GRPCLogger,
 				metrics.DefaultRegistry,
 				{{.Name}}Server,
