@@ -20,34 +20,35 @@ package main
 
 import (
 	"os"
+	"fmt"
 {{range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
 {{end}}
-	"github.com/rcrowley/go-metrics"
-	"go.pedge.io/env"
+	"google.golang.org/grpc"
 	"github.com/sr/operator/src/operator"
+	"go.pedge.io/env"
 )
 
 func run() error {
-	config := &operator.Config{}
-	if err := env.Populate(config); err != nil {
+	config, err := operator.NewConfigFromEnv()
+	if err != nil {
 		return err
 	}
-	server := operator.NewServer(config.Address)
+	rpcServer := grpc.NewServer()
+	logger := operator.NewLogger()
+	registry := operator.NewMetricsRegistry()
+	instrumentator := operator.NewInstrumentator(logger, registry)
+	server := operator.NewServer(rpcServer, config, logger, instrumentator)
 {{range .Services}}
 	{{.Name}}Env := &{{.Name}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
-		operator.LogServiceStartupError("{{.Name}}", err)
+		server.LogServiceStartupError("{{.Name}}", err)
 	} else {
 		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
-			operator.LogServiceStartupError("{{.Name}}", err)
+			server.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := {{.Name}}.NewInstrumentedAPIServer(
-				operator.GRPCLogger,
-				metrics.DefaultRegistry,
-				{{.Name}}Server,
-			)
-			{{.Name}}.Register{{.CamelCaseName}}Server(server.Server(), instrumented)
+			instrumented := {{.Name}}.NewInstrumentedAPIServer(instrumentator, {{.Name}}Server)
+			{{.Name}}.Register{{.CamelCaseName}}Server(rpcServer, instrumented)
 		}
 	}
 {{end}}
@@ -56,7 +57,7 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		operator.LogServerStartupError(err)
+		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
 }
