@@ -1,24 +1,24 @@
 package buildkite
 
 import (
-	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/grpcinstrument"
 	"golang.org/x/net/context"
 	"time"
 )
 
 type instrumentedAPIServer struct {
-	logger   grpcinstrument.Logger
-	metrics  metrics.Registry
-	delegate BuildkiteServiceServer
+	instrumentator grpcinstrument.Instrumentator
+	delegate       BuildkiteServiceServer
 }
 
 func NewInstrumentedAPIServer(
-	logger grpcinstrument.Logger,
-	metrics metrics.Registry,
+	instrumentator grpcinstrument.Instrumentator,
 	delegate BuildkiteServiceServer,
 ) *instrumentedAPIServer {
-	return &instrumentedAPIServer{logger, metrics, delegate}
+	return &instrumentedAPIServer{
+		instrumentator,
+		delegate,
+	}
 }
 
 func (a *instrumentedAPIServer) ProjectsStatus(
@@ -27,8 +27,7 @@ func (a *instrumentedAPIServer) ProjectsStatus(
 ) (response *ProjectsStatusResponse, err error) {
 	defer func(start time.Time) {
 		grpcinstrument.Instrument(
-			a.logger,
-			a.metrics,
+			a.instrumentator,
 			"buildkite",
 			"ProjectsStatus",
 			"ProjectsStatusRequest",

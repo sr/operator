@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	buildkite "github.com/sr/operator/src/services/buildkite"
@@ -10,72 +11,63 @@ import (
 
 	papertrail "github.com/sr/operator/src/services/papertrail"
 
-	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/operator"
 	"go.pedge.io/env"
+	"google.golang.org/grpc"
 )
 
 func run() error {
-	config := &operator.Config{}
-	if err := env.Populate(config); err != nil {
+	config, err := operator.NewConfigFromEnv()
+	if err != nil {
 		return err
 	}
-	server := operator.NewServer(config.Address)
+	rpcServer := grpc.NewServer()
+	logger := operator.NewLogger()
+	registry := operator.NewMetricsRegistry()
+	instrumentator := operator.NewInstrumentator(logger, registry)
+	server := operator.NewServer(rpcServer, config, logger, instrumentator)
 
 	buildkiteEnv := &buildkite.Env{}
 	if err := env.Populate(buildkiteEnv); err != nil {
-		operator.LogServiceStartupError("buildkite", err)
+		server.LogServiceStartupError("buildkite", err)
 	} else {
 		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
-			operator.LogServiceStartupError("buildkite", err)
+			server.LogServiceStartupError("buildkite", err)
 		} else {
-			instrumented := buildkite.NewInstrumentedAPIServer(
-				operator.GRPCLogger,
-				metrics.DefaultRegistry,
-				buildkiteServer,
-			)
-			buildkite.RegisterBuildkiteServiceServer(server.Server(), instrumented)
+			instrumented := buildkite.NewInstrumentedAPIServer(instrumentator, buildkiteServer)
+			buildkite.RegisterBuildkiteServiceServer(rpcServer, instrumented)
 		}
 	}
 
 	gcloudEnv := &gcloud.Env{}
 	if err := env.Populate(gcloudEnv); err != nil {
-		operator.LogServiceStartupError("gcloud", err)
+		server.LogServiceStartupError("gcloud", err)
 	} else {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
-			operator.LogServiceStartupError("gcloud", err)
+			server.LogServiceStartupError("gcloud", err)
 		} else {
-			instrumented := gcloud.NewInstrumentedAPIServer(
-				operator.GRPCLogger,
-				metrics.DefaultRegistry,
-				gcloudServer,
-			)
-			gcloud.RegisterGCloudServiceServer(server.Server(), instrumented)
+			instrumented := gcloud.NewInstrumentedAPIServer(instrumentator, gcloudServer)
+			gcloud.RegisterGCloudServiceServer(rpcServer, instrumented)
 		}
 	}
 
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
-		operator.LogServiceStartupError("papertrail", err)
+		server.LogServiceStartupError("papertrail", err)
 	} else {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
-			operator.LogServiceStartupError("papertrail", err)
+			server.LogServiceStartupError("papertrail", err)
 		} else {
-			instrumented := papertrail.NewInstrumentedAPIServer(
-				operator.GRPCLogger,
-				metrics.DefaultRegistry,
-				papertrailServer,
-			)
-			papertrail.RegisterPapertrailServiceServer(server.Server(), instrumented)
+			instrumented := papertrail.NewInstrumentedAPIServer(instrumentator, papertrailServer)
+			papertrail.RegisterPapertrailServiceServer(rpcServer, instrumented)
 		}
 	}
-
 	return server.Serve()
 }
 
 func main() {
 	if err := run(); err != nil {
-		operator.LogServerStartupError(err)
+		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
 }
