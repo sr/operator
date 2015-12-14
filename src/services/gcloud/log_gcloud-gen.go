@@ -1,16 +1,15 @@
-
 package gcloud
 
 import (
-	"time"
-	"golang.org/x/net/context"
-	"github.com/sr/operator/src/grpcinstrument"
 	"github.com/rcrowley/go-metrics"
+	"github.com/sr/operator/src/grpcinstrument"
+	"golang.org/x/net/context"
+	"time"
 )
 
 type instrumentedAPIServer struct {
-	logger grpcinstrument.Logger
-	metrics metrics.Registry
+	logger   grpcinstrument.Logger
+	metrics  metrics.Registry
 	delegate GCloudServiceServer
 }
 
@@ -21,7 +20,6 @@ func NewInstrumentedAPIServer(
 ) *instrumentedAPIServer {
 	return &instrumentedAPIServer{logger, metrics, delegate}
 }
-
 
 func (a *instrumentedAPIServer) CreateContainerCluster(
 	ctx context.Context,

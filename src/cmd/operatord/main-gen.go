@@ -11,8 +11,8 @@ import (
 	papertrail "github.com/sr/operator/src/services/papertrail"
 
 	"github.com/rcrowley/go-metrics"
-	"go.pedge.io/env"
 	"github.com/sr/operator/src/operator"
+	"go.pedge.io/env"
 )
 
 func run() error {
