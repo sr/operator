@@ -3,38 +3,54 @@ package operator
 import (
 	"net"
 
-	"go.pedge.io/protolog"
+	"github.com/sr/operator/src/grpcinstrument"
 
 	"google.golang.org/grpc"
 )
 
-const defaultProtocol = "tcp"
+const protocol = "tcp"
 
 type server struct {
-	protocol  string
-	address   string
-	rpcServer *grpc.Server
-	logger    protolog.Logger
+	server         *grpc.Server
+	config         *Config
+	logger         Logger
+	instrumentator grpcinstrument.Instrumentator
 }
 
-func newServer(address string, logger protolog.Logger) *server {
+func newServer(
+	grpcServer *grpc.Server,
+	config *Config,
+	logger Logger,
+	instrumentator grpcinstrument.Instrumentator,
+) *server {
 	return &server{
-		defaultProtocol,
-		address,
-		grpc.NewServer(),
+		grpcServer,
+		config,
 		logger,
+		instrumentator,
 	}
 }
 
 func (s *server) Serve() error {
-	listener, err := net.Listen(s.protocol, s.address)
+	listener, err := net.Listen(protocol, s.config.Address)
 	if err != nil {
+		s.logger.Error(&ServerStartupError{err.Error()})
 		return err
 	}
-	s.logger.Info(&ServerStartupNotice{Address: s.address, Protocol: s.protocol})
-	return s.rpcServer.Serve(listener)
+	s.logger.Info(&ServerStartupNotice{Address: s.config.Address, Protocol: protocol})
+	err = s.server.Serve(listener)
+	if err != nil {
+		s.logger.Error(&ServerStartupError{err.Error()})
+		return err
+	}
+	return nil
 }
 
-func (s *server) Server() *grpc.Server {
-	return s.rpcServer
+func (s *server) LogServiceStartupError(serviceName string, err error) {
+	s.logger.Error(&ServiceStartupError{
+		Service: &Service{
+			Name: serviceName,
+		},
+		Message: err.Error(),
+	})
 }

@@ -1,54 +1,60 @@
 package operator
 
 import (
-	"os"
-
-	"go.pedge.io/protolog"
-
+	"github.com/golang/protobuf/proto"
+	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/grpcinstrument"
+	"go.pedge.io/env"
 	"google.golang.org/grpc"
 )
 
-var (
-	Logger     = NewLogger()
-	GRPCLogger = newGRPCLogger(Logger)
-)
-
 type Server interface {
+	LogServiceStartupError(service string, err error)
 	Serve() error
-	Server() *grpc.Server
+}
+
+type Logger interface {
+	Info(proto.Message)
+	Error(proto.Message)
 }
 
 type Config struct {
 	Address string `env:"PORT,default=:3000"`
 }
 
-func NewServer(address string) Server {
-	return newServer(address, Logger)
+func NewConfigFromEnv() (*Config, error) {
+	config := &Config{}
+	if err := env.Populate(config); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
-func NewLogger() protolog.Logger {
-	return protolog.NewLogger(
-		protolog.NewDefaultTextWritePusher(
-			protolog.NewFileFlusher(os.Stderr),
-		),
-		protolog.LoggerOptions{},
+func NewServer(
+	server *grpc.Server,
+	config *Config,
+	logger Logger,
+	instrumentator grpcinstrument.Instrumentator,
+) Server {
+	return newServer(
+		server,
+		config,
+		logger,
+		instrumentator,
 	)
 }
 
-func NewGRPCLogger() grpcinstrument.Logger {
-	return newGRPCLogger(Logger)
+func NewLogger() Logger {
+	return newLogger()
 }
 
-func LogServerStartupError(err error) {
-	Logger.Fatal(&ServerStartupError{err.Error()})
+func NewInstrumentator(
+	logger Logger,
+	registry metrics.Registry,
+) grpcinstrument.Instrumentator {
+	return newInstrumentator(logger, registry)
 }
 
-func LogServiceStartupError(serviceName string, err error) {
-	Logger.Error(&ServiceStartupError{
-		Service: &Service{
-			Name: serviceName,
-		},
-		Message: err.Error(),
-	})
+func NewMetricsRegistry() metrics.Registry {
+	return metrics.NewRegistry()
 }
