@@ -1,24 +1,24 @@
 package gcloud
 
 import (
-	"github.com/rcrowley/go-metrics"
 	"github.com/sr/operator/src/grpcinstrument"
 	"golang.org/x/net/context"
 	"time"
 )
 
 type instrumentedAPIServer struct {
-	logger   grpcinstrument.Logger
-	metrics  metrics.Registry
-	delegate GCloudServiceServer
+	instrumentator grpcinstrument.Instrumentator
+	delegate       GCloudServiceServer
 }
 
 func NewInstrumentedAPIServer(
-	logger grpcinstrument.Logger,
-	metrics metrics.Registry,
+	instrumentator grpcinstrument.Instrumentator,
 	delegate GCloudServiceServer,
 ) *instrumentedAPIServer {
-	return &instrumentedAPIServer{logger, metrics, delegate}
+	return &instrumentedAPIServer{
+		instrumentator,
+		delegate,
+	}
 }
 
 func (a *instrumentedAPIServer) CreateContainerCluster(
@@ -27,8 +27,7 @@ func (a *instrumentedAPIServer) CreateContainerCluster(
 ) (response *CreateContainerClusterResponse, err error) {
 	defer func(start time.Time) {
 		grpcinstrument.Instrument(
-			a.logger,
-			a.metrics,
+			a.instrumentator,
 			"gcloud",
 			"CreateContainerCluster",
 			"CreateContainerClusterRequest",
@@ -46,8 +45,7 @@ func (a *instrumentedAPIServer) ListInstances(
 ) (response *ListInstancesResponse, err error) {
 	defer func(start time.Time) {
 		grpcinstrument.Instrument(
-			a.logger,
-			a.metrics,
+			a.instrumentator,
 			"gcloud",
 			"ListInstances",
 			"ListInstancesRequest",
