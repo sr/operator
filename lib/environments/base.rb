@@ -219,7 +219,7 @@ module Environments
 
     # =========================================================================
     def name
-      self.class.to_s.split("::").last.downcase.underscore
+      self.class.to_s.split("::").last.underscore
     end
 
     # By default, the same as name but can be overridden in subclasses if needed
