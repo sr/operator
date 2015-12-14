@@ -92,16 +92,32 @@ module Strategies
       end
 
       def extract_artifact(deploy_path, artifact)
-        FileUtils.rm_rf(deploy_path)
-        FileUtils.mkdir_p(deploy_path)
+        # We deploy to a temporary deploy path to minimize the time when the
+        # release directory is not present at all.
+        new_deploy_path = "#{path_without_trailing_slash(deploy_path)}.new.#{$$}"
+        begin
+          FileUtils.rm_rf(new_deploy_path)
+          FileUtils.mkdir_p(new_deploy_path)
 
-        output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", deploy_path])
-        success = $?.success?
-        if !success
-          Logger.log(:err, "Unable to extract artifact: #{output}")
+          output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", new_deploy_path])
+          success = $?.success?
+          if success
+            old_deploy_path = "#{path_without_trailing_slash(deploy_path)}.old.#{$$}"
+            begin
+              FileUtils.rm_rf(old_deploy_path)
+              File.rename(deploy_path, old_deploy_path) if File.exists?(deploy_path)
+              File.rename(new_deploy_path, deploy_path)
+            ensure
+              FileUtils.rm_rf(old_deploy_path)
+            end
+          else
+            Logger.log(:err, "Unable to extract artifact: #{output}")
+          end
+
+          success
+        ensure
+          FileUtils.rm_rf(new_deploy_path)
         end
-
-        success
       end
     end
   end
