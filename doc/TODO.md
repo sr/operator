@@ -1,15 +1,31 @@
 # Tasks
 
+## Demo
+
+Focus on a small subset of services that would speak to the audience... Probably
+just **CI and deploy** at first.
+
+- [ ] lstoll
+- [ ] holman
+- [ ] jfryman
+- [ ] imbriaco
+
+**FOCUS: Build and deploy operator using operator**
+
 ## Code generation
 This encompasses both `protoc-gen-hubot` and `protoc-gen-grpcmd` used to
 generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
+Allow choosing a prefix for generated binaries, e.g. `ops-papertrail`,
+  `ops-gcloud`, etc. This should be set as a protobuf option. Perhaps generate a
+  whole command line suite with proper sub commands instead...
 - [ ] protoc --cmd_out=~/tmp/openflights $GOPATH/src/go.pedge.io/openflights/openflights.proto
 	should work (it currently segfaults)
-- [ ] Switch to go.pedge.io/protoeasy for generating code with protoc
+- [x] Switch to go.pedge.io/protoeasy for generating code with protoc
+- [ ] Contribute grpcinstrument plugin to protoeasy
 - [x] Fix grpcmd to accept more than one package name on the command line
-- [ ] Update binaries to connect to OPERATORD_ADDRESS or something
+- [x] Update binaries to connect to OPERATORD_ADDRESS or something
 - [x] Generate the operatord main.go responsible for registering the different
   services on the GRPC server
 - [x] Rewrite `protoc-gen-grpcmd` to use same templating technique that
@@ -21,9 +37,6 @@ definitions, respectively.
   string as much as practicaly possible.
 - [ ] Generate proper help syntax for Hubot scripts to integrate with
   `/hubot help`
-- [ ] Allow choosing a prefix for generated binaries, e.g. `ops-papertrail`,
-  `ops-gcloud`, etc. This should be set as a protobuf option. Perhaps generate a
-  whole command line suite with proper sub commands instead...
 - [ ] Process code comments annotating the service definition, methods, and
   messages and use those to generate help messages all three levels: the
   service, its methods, and their arguments. See `gh-help` example here:
@@ -35,7 +48,7 @@ The operator server that's running the various services. There is nothing there
 at the moment. In the future this will be responsible for logging all actions,
 managing ACL, etc.
 - [x] Setup protolog with startup notice log entry.
-- [ ] Figure out how to log all GRPC requests for all services. See Peter's
+- [x] Figure out how to log all GRPC requests for all services. See Peter's
   interceptor stuff. Perhaps will have to write a gogo plugin if we can't
   convince GRPC core that this is a good idea.
 
@@ -44,11 +57,11 @@ powerful querying (via Big Query), and log term archival (to Cloud Storage/S3)
 
 ## Deployment
 - [x] Deploy Hubot and operatord manually to Kubernetes.
+- [ ] Setup prometheus / metrics
 - [ ] Write an operatord service to automate away deployment of an Operator
   instance. i.e. given a Kubernetes/Google Cloud Container cluster set
   everything up, deploy new versions, etc.
 - [ ] Stop using insecure connection between client and server.
-- [ ] Metrics.
 - [ ] Setup rsyslog container ingesting logs from Protolog via syslog protocol
 and forwarding them to Google Cloud Logging via rsyslog prog. See
 <http://www.rsyslog.com/doc/v8-stable/configuration/modules/omprog.html>.
