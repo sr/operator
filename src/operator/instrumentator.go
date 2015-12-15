@@ -37,10 +37,16 @@ func newInstrumentator(logger Logger) grpcinstrument.Instrumentator {
 	}
 }
 
-func (i *instrumentator) Init() {
-	prometheus.MustRegister(i.registry.total)
-	prometheus.MustRegister(i.registry.errors)
-	prometheus.MustRegister(i.registry.duration)
+func (i *instrumentator) Init() error {
+	if err := prometheus.Register(i.registry.total); err != nil {
+		return err
+	}
+	if err := prometheus.Register(i.registry.errors); err != nil {
+		return err
+	}
+	if err := prometheus.Register(i.registry.duration); err != nil {
+		return err
+	}
 }
 
 func (i *instrumentator) CollectMetrics(call *grpcinstrument.Call) {
