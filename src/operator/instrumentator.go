@@ -30,11 +30,17 @@ func newInstrumentator(logger Logger) grpcinstrument.Instrumentator {
 				Help: "Number of GRPC calls that returned an error.",
 			}, []string{"service", "method"}),
 			duration: prometheus.NewHistogramVec(prometheus.HistogramOpts{
-				Name: "grpc_calls_total",
+				Name: "grpc_calls_durations",
 				Help: "Duration of GRPC calls.",
 			}, []string{"service", "method"}),
 		},
 	}
+}
+
+func (i *instrumentator) Init() {
+	prometheus.MustRegister(i.registry.total)
+	prometheus.MustRegister(i.registry.errors)
+	prometheus.MustRegister(i.registry.duration)
 }
 
 func (i *instrumentator) CollectMetrics(call *grpcinstrument.Call) {
