@@ -7,6 +7,7 @@ just **CI and deploy** at first.
 
 - [ ] lstoll
 - [ ] holman
+- [ ] wfarr
 - [ ] jfryman
 - [ ] imbriaco
 
