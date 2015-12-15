@@ -5,20 +5,22 @@ This is a golang package that helps instrumenting [gRPC][] servers. It includes
 a [Protocol Buffer][pb] compiler plugin for generating code that wraps and
 instruments gRPC servers and an implementation of the `Instrumentator` interface
 that logs requests to any of the backends supported by [protolog][] and exposes
-metrics about requests using [Prometheus][].
+metrics about RPC calls via [Prometheus][].
+
+[gRPC]: http://www.grpc.io
+[pb]: https://developers.google.com/protocol-buffers/?hl=en
+[protolog]: https://github.com/peter-edge/go-protolog
+[Prometheus]: http://prometheus.io
 
 [Checkout the godoc][godoc] online or download this package and view them
 locally:
 
     $ go get github.com/sr/grpcinstrument/...
-    $ godoc github.com/sr/grpcinstrument
 
-To generate instrumentation stubs first install the compiler plugin:
+[godoc]: https://godoc.org/github.com/sr/grpcinstrument
 
-    $ go install github.com/sr/grpcinstrument/...
-
-Then, assuming your proto files are located under `src/`, invoke the `protoc`
-command like so:
+Assuming your proto files are located under `src/`, invoke the `protoc` command
+like so:
 
     $ protoc --grpcinstrument_out=src/ src/*.proto
     $ ls src/*-gen.go

@@ -132,6 +132,10 @@
 			"Rev": "08b1a584251b5b62f458943640fc8ebd4d50aaa5"
 		},
 		{
+			"ImportPath": "github.com/sr/grpcinstrument",
+			"Rev": "63a053ecec756adcd4e6ea20273c54e06b275321"
+		},
+		{
 			"ImportPath": "github.com/ugorji/go/codec",
 			"Rev": "74d8be59e086d89e61bbb984d73428b96f78d44c"
 		},

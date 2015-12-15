@@ -1,7 +1,7 @@
 package buildkite
 
 import (
-	"github.com/sr/operator/src/grpcinstrument"
+	"github.com/sr/grpcinstrument"
 	"golang.org/x/net/context"
 	"time"
 )

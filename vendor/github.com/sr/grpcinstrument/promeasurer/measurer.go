@@ -2,7 +2,7 @@ package promeasurer
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sr/operator/src/grpcinstrument"
+	"github.com/sr/grpcinstrument"
 	"go.pedge.io/proto/time"
 )
 
@@ -16,7 +16,7 @@ type registry struct {
 	duration *prometheus.HistogramVec
 }
 
-func New() grpcinstrument.Measurer {
+func newMeasurer() grpcinstrument.Measurer {
 	return &measurer{
 		registry: &registry{
 			total: prometheus.NewCounterVec(prometheus.CounterOpts{
