@@ -8,7 +8,7 @@ require 'pathname'
 require 'cli'
 require 'logger'
 
-LOCKFILE = '/tmp/pull-lock'.freeze
+LOCKFILE = '/var/lock/pull-agent/deploy.lock'.freeze
 
 cli = CLI.new
 cli.parse_arguments!
