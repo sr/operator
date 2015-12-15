@@ -23,8 +23,7 @@ func run() error {
 	}
 	rpcServer := grpc.NewServer()
 	logger := operator.NewLogger()
-	registry := operator.NewMetricsRegistry()
-	instrumentator := operator.NewInstrumentator(logger, registry)
+	instrumentator := operator.NewInstrumentator(logger)
 	server := operator.NewServer(rpcServer, config, logger, instrumentator)
 
 	buildkiteEnv := &buildkite.Env{}
@@ -34,7 +33,7 @@ func run() error {
 		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
 			server.LogServiceStartupError("buildkite", err)
 		} else {
-			instrumented := buildkite.NewInstrumentedAPIServer(instrumentator, buildkiteServer)
+			instrumented := buildkite.NewInstrumentedBuildkiteServiceServer(instrumentator, buildkiteServer)
 			buildkite.RegisterBuildkiteServiceServer(rpcServer, instrumented)
 		}
 	}
@@ -46,7 +45,7 @@ func run() error {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
 			server.LogServiceStartupError("gcloud", err)
 		} else {
-			instrumented := gcloud.NewInstrumentedAPIServer(instrumentator, gcloudServer)
+			instrumented := gcloud.NewInstrumentedGCloudServiceServer(instrumentator, gcloudServer)
 			gcloud.RegisterGCloudServiceServer(rpcServer, instrumented)
 		}
 	}
@@ -58,10 +57,11 @@ func run() error {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
 			server.LogServiceStartupError("papertrail", err)
 		} else {
-			instrumented := papertrail.NewInstrumentedAPIServer(instrumentator, papertrailServer)
+			instrumented := papertrail.NewInstrumentedPapertrailServiceServer(instrumentator, papertrailServer)
 			papertrail.RegisterPapertrailServiceServer(rpcServer, instrumented)
 		}
 	}
+
 	return server.Serve()
 }
 

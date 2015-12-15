@@ -8,16 +8,16 @@ import (
 
 type instrumentedPapertrailServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	delegate       PapertrailServiceServer
+	server         PapertrailServiceServer
 }
 
 func NewInstrumentedPapertrailServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
-	delegate PapertrailServiceServer,
+	server PapertrailServiceServer,
 ) *instrumentedPapertrailServiceServer {
 	return &instrumentedPapertrailServiceServer{
 		instrumentator,
-		delegate,
+		server,
 	}
 }
 
@@ -36,5 +36,5 @@ func (a *instrumentedPapertrailServiceServer) Search(
 			start,
 		)
 	}(time.Now())
-	return a.delegate.Search(ctx, request)
+	return a.server.Search(ctx, request)
 }

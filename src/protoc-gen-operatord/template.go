@@ -36,8 +36,7 @@ func run() error {
 	}
 	rpcServer := grpc.NewServer()
 	logger := operator.NewLogger()
-	registry := operator.NewMetricsRegistry()
-	instrumentator := operator.NewInstrumentator(logger, registry)
+	instrumentator := operator.NewInstrumentator(logger)
 	server := operator.NewServer(rpcServer, config, logger, instrumentator)
 {{range .Services}}
 	{{.Name}}Env := &{{.Name}}.Env{}
@@ -47,7 +46,7 @@ func run() error {
 		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
 			server.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := {{.Name}}.NewInstrumentedAPIServer(instrumentator, {{.Name}}Server)
+			instrumented := {{.Name}}.NewInstrumented{{.CamelCaseName}}Server(instrumentator, {{.Name}}Server)
 			{{.Name}}.Register{{.CamelCaseName}}Server(rpcServer, instrumented)
 		}
 	}

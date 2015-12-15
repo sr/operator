@@ -8,16 +8,16 @@ import (
 
 type instrumentedBuildkiteServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	delegate       BuildkiteServiceServer
+	server         BuildkiteServiceServer
 }
 
 func NewInstrumentedBuildkiteServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
-	delegate BuildkiteServiceServer,
+	server BuildkiteServiceServer,
 ) *instrumentedBuildkiteServiceServer {
 	return &instrumentedBuildkiteServiceServer{
 		instrumentator,
-		delegate,
+		server,
 	}
 }
 
@@ -36,5 +36,5 @@ func (a *instrumentedBuildkiteServiceServer) ProjectsStatus(
 			start,
 		)
 	}(time.Now())
-	return a.delegate.ProjectsStatus(ctx, request)
+	return a.server.ProjectsStatus(ctx, request)
 }

@@ -8,16 +8,16 @@ import (
 
 type instrumentedGCloudServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	delegate       GCloudServiceServer
+	server         GCloudServiceServer
 }
 
 func NewInstrumentedGCloudServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
-	delegate GCloudServiceServer,
+	server GCloudServiceServer,
 ) *instrumentedGCloudServiceServer {
 	return &instrumentedGCloudServiceServer{
 		instrumentator,
-		delegate,
+		server,
 	}
 }
 
@@ -36,7 +36,7 @@ func (a *instrumentedGCloudServiceServer) CreateContainerCluster(
 			start,
 		)
 	}(time.Now())
-	return a.delegate.CreateContainerCluster(ctx, request)
+	return a.server.CreateContainerCluster(ctx, request)
 }
 
 func (a *instrumentedGCloudServiceServer) ListInstances(
@@ -54,5 +54,5 @@ func (a *instrumentedGCloudServiceServer) ListInstances(
 			start,
 		)
 	}(time.Now())
-	return a.delegate.ListInstances(ctx, request)
+	return a.server.ListInstances(ctx, request)
 }
