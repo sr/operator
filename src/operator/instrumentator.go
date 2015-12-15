@@ -1,17 +1,49 @@
 package operator
 
 import (
-	"github.com/rcrowley/go-metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sr/operator/src/grpcinstrument"
+	"go.pedge.io/proto/time"
 )
 
 type instrumentator struct {
 	logger   Logger
-	registry metrics.Registry
+	registry *registry
 }
 
-func newInstrumentator(logger Logger, registry metrics.Registry) grpcinstrument.Instrumentator {
-	return &instrumentator{logger, registry}
+type registry struct {
+	total    *prometheus.CounterVec
+	errors   *prometheus.CounterVec
+	duration *prometheus.HistogramVec
+}
+
+func newInstrumentator(logger Logger) grpcinstrument.Instrumentator {
+	return &instrumentator{
+		logger,
+		&registry{
+			total: prometheus.NewCounterVec(prometheus.CounterOpts{
+				Name: "grpc_calls_total",
+				Help: "Number of GRPC calls received by the server being instrumented.",
+			}, []string{"service", "method"}),
+			errors: prometheus.NewCounterVec(prometheus.CounterOpts{
+				Name: "grpc_calls_errors",
+				Help: "Number of GRPC calls that returned an error.",
+			}, []string{"service", "method"}),
+			duration: prometheus.NewHistogramVec(prometheus.HistogramOpts{
+				Name: "grpc_calls_total",
+				Help: "Duration of GRPC calls.",
+			}, []string{"service", "method"}),
+		},
+	}
+}
+
+func (i *instrumentator) CollectMetrics(call *grpcinstrument.Call) {
+	labels := prometheus.Labels{"service": call.Service, "method": call.Method}
+	i.registry.total.With(labels).Inc()
+	i.registry.errors.With(labels).Inc()
+	i.registry.duration.With(labels).Observe(
+		float64(prototime.DurationFromProto(call.Duration).Nanoseconds()),
+	)
 }
 
 func (i *instrumentator) Log(call *grpcinstrument.Call) {
@@ -20,8 +52,4 @@ func (i *instrumentator) Log(call *grpcinstrument.Call) {
 	} else {
 		i.logger.Info(call)
 	}
-}
-
-func (i *instrumentator) Increment(metric string) {
-	metrics.GetOrRegisterCounter(metric, i.registry).Inc(1)
 }

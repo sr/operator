@@ -48,11 +48,8 @@ func NewLogger() Logger {
 	return newLogger()
 }
 
-func NewInstrumentator(
-	logger Logger,
-	registry metrics.Registry,
-) grpcinstrument.Instrumentator {
-	return newInstrumentator(logger, registry)
+func NewInstrumentator(logger Logger) grpcinstrument.Instrumentator {
+	return newInstrumentator(logger)
 }
 
 func NewMetricsRegistry() metrics.Registry {
