@@ -40,10 +40,11 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 proto-cmd:
 	protoc --cmd_out=src/cmd/ -Isrc src/services/**/*.proto
 
-proto-operatord: proto-instrument
+proto-operatord: proto-grpcinstrument
+	go get github.com/sr/grpcinstrument/...
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
-proto-instrument:
+proto-grpcinstrument:
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
 
 goget-openflights:
