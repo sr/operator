@@ -1,5 +1,6 @@
 require "yaml"
 require "erb"
+require "fileutils"
 require "conductor"
 require "payload"
 require "logger"
@@ -214,6 +215,16 @@ module Environments
         end
       else
         Logger.log(:err, "Unable to restart #{job} service: #{result}")
+      end
+    end
+
+    def link_blue_mesh_env_file
+      payload.path_choices.each do |release_dir|
+        begin
+          FileUtils.ln_s(File.join(payload.repo_path, ".env"), File.join(release_dir, ".env"))
+        rescue Errno::EEXIST
+          # already exists
+        end
       end
     end
 
