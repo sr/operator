@@ -1,4 +1,6 @@
-VERSION = $(shell git rev-parse --short HEAD)
+ifndef VERSION
+	VERSION = $(shell git rev-parse --short HEAD)
+endif
 GCLOUD_PROJECT_ID = dev-europe-west1
 GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
