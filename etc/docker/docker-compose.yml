@@ -3,6 +3,7 @@ app:
   dockerfile: etc/docker/Dockerfile.ci
   environment:
     - GITHUB_REPO_TOKEN
+    - BUILDKITE_BUILD_NUMBER
   volumes:
     - ../../:/app
     - /var/run/docker.sock:/var/run/docker.sock
