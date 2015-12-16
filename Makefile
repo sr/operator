@@ -21,14 +21,8 @@ clean:
 
 proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
 
-proto-grpc:
+proto-grpc: get-protoeasy
 	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
-
-src/hubot/proto/operator/:
-	mkdir $@
-
-src/hubot/scripts/:
-	mkdir $@
 
 proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
@@ -38,14 +32,27 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-cmd:
-	protoc --cmd_out=src/cmd/ -Isrc src/services/**/*.proto
+	protoc --cmd_out=src/cmd/ -Isrc -I/usr/local/include src/services/buildkite/*.proto
 
 proto-operatord: proto-grpcinstrument
 	go get github.com/sr/grpcinstrument/...
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
-proto-grpcinstrument:
+proto-grpcinstrument: get-grpcinstrument
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
+
+get-protoeasy:
+	go get go.pedge.io/protoeasy/cmd/protoeasy
+	go get github.com/golang/protobuf/protoc-gen-go/...
+
+get-grpcinstrument:
+	go get github.com/sr/grpcinstrument/...
+
+src/hubot/proto/operator/:
+	mkdir $@
+
+src/hubot/scripts/:
+	mkdir $@
 
 goget-openflights:
 	go get go.pedge.io/openflights
