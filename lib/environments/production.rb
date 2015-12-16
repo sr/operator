@@ -11,6 +11,7 @@ module Environments
     restart_task :add_graphite_annotation, only: :pardot
     after_deploy :restart_pithumbs_service, only: :pithumbs
     after_deploy :restart_salesedge, only: :'realtime-frontend'
+    after_deploy :link_blue_mesh_env_file, only: :'blue-mesh'
 
     def short_name
       "prod"
