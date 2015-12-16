@@ -13,6 +13,8 @@ test -d "$(pwd)/google-cloud-sdk" &&
 PATH="$(pwd)/google-cloud-sdk/bin:$PATH"
 export PATH
 
+env
+
 git config --global url."https://sr:$GITHUB_REPO_TOKEN@github.com/".insteadOf "https://github.com/"
 
 make build install vet lint \
