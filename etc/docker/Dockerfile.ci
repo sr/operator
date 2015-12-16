@@ -31,6 +31,9 @@ RUN \
 RUN \
   curl -sSL https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 > /bin/docker \
   && chmod +x /bin/docker
+RUN \
+  wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-90.0.0-linux-x86_64.tar.gz \
+  && tar -xzvf google-cloud-sdk-90.0.0-linux-x86_64.tar.gz
 ENV GO15VENDOREXPERIMENT 1
 RUN mkdir -p /go/src/
 ADD . /go/src/github.com/sr/operator/
