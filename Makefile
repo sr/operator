@@ -34,7 +34,7 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-cmd:
-	protoc --cmd_out=src/cmd/ -Isrc -I/usr/local/include src/services/buildkite/*.proto
+	protoc --cmd_out=src/cmd/ -Isrc -I/usr/local/include src/services/**/*.proto
 
 proto-operatord: proto-grpcinstrument
 	go get github.com/sr/grpcinstrument/...
