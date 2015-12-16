@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
     yum install -y rpmdevtools rpmlint yum-utils
     yum groupinstall -y "Development Tools"
 
-    mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT,SOURCES}
+    mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT}
     chown -R vagrant: /home/vagrant/rpmbuild
   SHELL
 end
