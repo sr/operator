@@ -23,7 +23,7 @@ lockfile.flock(File::LOCK_NB|File::LOCK_EX) or abort("#{LOCKFILE} is locked. Is 
 begin
   cli.checkin
 rescue => e
-  Logger.log(:alert, e.to_s + "\n", e.backtrace.join("\n"))
+  Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
   raise e
 ensure
   lockfile.close
