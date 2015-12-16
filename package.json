@@ -13,6 +13,7 @@
     "hubot-google-images": "^0.2.1",
     "hubot-help": "^0.1.2",
     "hubot-hipchat": "git+https://github.com/alindeman/hubot-hipchat#reconnect",
+    "hubot-itunes-search": "^0.1.0",
     "hubot-meme": "^1.2.0",
     "hubot-redis-brain": "0.0.3",
     "hubot-schedule": "^0.4.0",
