@@ -16,7 +16,7 @@ module Logger
   }.freeze
 
   def log(our_priority, message)
-    puts "[%s] %s" % [our_priority, message]
+    puts "[%s] %s" % [our_priority, message] unless ENV['CRON']
 
     Syslog.open do
       Syslog.log(PRIORITIES.fetch(our_priority), message)
