@@ -18,9 +18,7 @@ This encompasses both `protoc-gen-hubot` and `protoc-gen-grpcmd` used to
 generate command line binaries and hubot scripts from the protobuf service
 definitions, respectively.
 
-Allow choosing a prefix for generated binaries, e.g. `ops-papertrail`,
-  `ops-gcloud`, etc. This should be set as a protobuf option. Perhaps generate a
-  whole command line suite with proper sub commands instead...
+- [ ] If the input has only one field then just do `/service method (.*?)` in Hubot
 - [ ] protoc --cmd_out=~/tmp/openflights $GOPATH/src/go.pedge.io/openflights/openflights.proto
 	should work (it currently segfaults)
 - [x] Switch to go.pedge.io/protoeasy for generating code with protoc
@@ -106,3 +104,8 @@ and forwarding them to Google Cloud Logging via rsyslog prog. See
     # build operatord (server) binary inside docker then create a docker image setup to run it
       that can be pushed to whatever registry (and then deployed to ecs/gcloud/kubernetes/...)
     $ operator build ~/src/{ops,dev}/services/*.proto
+
+## Services
+
+- [ ] Spin up/spin down Operator kubernetes cluster
+- [ ] /gcloud enable-http dev1-europe-west1b

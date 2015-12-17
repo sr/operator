@@ -1,5 +1,7 @@
 ## Binary `operator(1)`
 
+See for alias ff58b4d41ccb6c79c1b9af4d499a7a8418a288d8
+
 Generate a single binary that includes ALL services and methods defined in
 services. `operator --help` should list a summary of all commands grouped by
 services with a short synopsys. Example:
