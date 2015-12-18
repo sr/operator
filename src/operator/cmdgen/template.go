@@ -1,6 +1,6 @@
 package cmdgen
 
-import "html/template"
+import "text/template"
 
 var mainTemplate = template.Must(template.New("main-gen.go").Parse(
 	`package main
