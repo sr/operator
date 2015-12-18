@@ -3,7 +3,6 @@ package cmdgen
 import (
 	"bytes"
 	"errors"
-	"html"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -116,7 +115,7 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 	response.File = make([]*plugin.CodeGeneratorResponse_File, 1)
 	response.File[0] = &plugin.CodeGeneratorResponse_File{
 		Name:    proto.String("main-gen.go"),
-		Content: proto.String(html.UnescapeString(buffer.String())),
+		Content: proto.String(buffer.String()),
 	}
 	return response, nil
 }
