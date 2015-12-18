@@ -249,7 +249,8 @@ module.exports = (robot) ->
       'https://media.giphy.com/media/qxqXS7PhBWgWk/giphy.gif',
       'https://www.youtube.com/watch?v=QCniMXdbO6c',
       'https://www.youtube.com/watch?v=JYc05gZFly0',
-      'https://www.youtube.com/watch?v=NsICCjOQ3Dg'
+      'https://www.youtube.com/watch?v=NsICCjOQ3Dg',
+      'https://i.imgur.com/KZf5kWZ.png'
     ]
 
     msg.send msg.random panics
