@@ -9,8 +9,10 @@ It is generated from these files:
 	services/buildkite/buildkite.proto
 
 It has these top-level messages:
-	ProjectsStatusRequest
-	ProjectsStatusResponse
+	StatusRequest
+	StatusResponse
+	ListBuildsRequest
+	ListBuildsResponse
 */
 package buildkite
 
@@ -29,24 +31,54 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type ProjectsStatusRequest struct {
+type StatusRequest struct {
+	// Optional project slug.
+	Slug string `protobuf:"bytes,1,opt,name=slug" json:"slug,omitempty"`
 }
 
-func (m *ProjectsStatusRequest) Reset()                    { *m = ProjectsStatusRequest{} }
-func (m *ProjectsStatusRequest) String() string            { return proto.CompactTextString(m) }
-func (*ProjectsStatusRequest) ProtoMessage()               {}
-func (*ProjectsStatusRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *StatusRequest) Reset()                    { *m = StatusRequest{} }
+func (m *StatusRequest) String() string            { return proto.CompactTextString(m) }
+func (*StatusRequest) ProtoMessage()               {}
+func (*StatusRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-type ProjectsStatusResponse struct {
+type StatusResponse struct {
 	Output *operator.Output `protobuf:"bytes,1,opt,name=output" json:"output,omitempty"`
 }
 
-func (m *ProjectsStatusResponse) Reset()                    { *m = ProjectsStatusResponse{} }
-func (m *ProjectsStatusResponse) String() string            { return proto.CompactTextString(m) }
-func (*ProjectsStatusResponse) ProtoMessage()               {}
-func (*ProjectsStatusResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *StatusResponse) Reset()                    { *m = StatusResponse{} }
+func (m *StatusResponse) String() string            { return proto.CompactTextString(m) }
+func (*StatusResponse) ProtoMessage()               {}
+func (*StatusResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *ProjectsStatusResponse) GetOutput() *operator.Output {
+func (m *StatusResponse) GetOutput() *operator.Output {
+	if m != nil {
+		return m.Output
+	}
+	return nil
+}
+
+type ListBuildsRequest struct {
+	// Optional project slug.
+	Slug string `protobuf:"bytes,1,opt,name=slug" json:"slug,omitempty"`
+	// Optional branch name.
+	Branch string `protobuf:"bytes,2,opt,name=branch" json:"branch,omitempty"`
+}
+
+func (m *ListBuildsRequest) Reset()                    { *m = ListBuildsRequest{} }
+func (m *ListBuildsRequest) String() string            { return proto.CompactTextString(m) }
+func (*ListBuildsRequest) ProtoMessage()               {}
+func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+type ListBuildsResponse struct {
+	Output *operator.Output `protobuf:"bytes,1,opt,name=output" json:"output,omitempty"`
+}
+
+func (m *ListBuildsResponse) Reset()                    { *m = ListBuildsResponse{} }
+func (m *ListBuildsResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListBuildsResponse) ProtoMessage()               {}
+func (*ListBuildsResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *ListBuildsResponse) GetOutput() *operator.Output {
 	if m != nil {
 		return m.Output
 	}
@@ -54,8 +86,10 @@ func (m *ProjectsStatusResponse) GetOutput() *operator.Output {
 }
 
 func init() {
-	proto.RegisterType((*ProjectsStatusRequest)(nil), "buildkite.ProjectsStatusRequest")
-	proto.RegisterType((*ProjectsStatusResponse)(nil), "buildkite.ProjectsStatusResponse")
+	proto.RegisterType((*StatusRequest)(nil), "buildkite.StatusRequest")
+	proto.RegisterType((*StatusResponse)(nil), "buildkite.StatusResponse")
+	proto.RegisterType((*ListBuildsRequest)(nil), "buildkite.ListBuildsRequest")
+	proto.RegisterType((*ListBuildsResponse)(nil), "buildkite.ListBuildsResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -65,7 +99,12 @@ var _ grpc.ClientConn
 // Client API for BuildkiteService service
 
 type BuildkiteServiceClient interface {
-	ProjectsStatus(ctx context.Context, in *ProjectsStatusRequest, opts ...grpc.CallOption) (*ProjectsStatusResponse, error)
+	// List the status of all (i.e. the status of the last build) of one or
+	// all projects.
+	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	// List the last builds of one or all projects, optionally limited to a
+	// branch.
+	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*ListBuildsResponse, error)
 }
 
 type buildkiteServiceClient struct {
@@ -76,9 +115,18 @@ func NewBuildkiteServiceClient(cc *grpc.ClientConn) BuildkiteServiceClient {
 	return &buildkiteServiceClient{cc}
 }
 
-func (c *buildkiteServiceClient) ProjectsStatus(ctx context.Context, in *ProjectsStatusRequest, opts ...grpc.CallOption) (*ProjectsStatusResponse, error) {
-	out := new(ProjectsStatusResponse)
-	err := grpc.Invoke(ctx, "/buildkite.BuildkiteService/ProjectsStatus", in, out, c.cc, opts...)
+func (c *buildkiteServiceClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := grpc.Invoke(ctx, "/buildkite.BuildkiteService/Status", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildkiteServiceClient) ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*ListBuildsResponse, error) {
+	out := new(ListBuildsResponse)
+	err := grpc.Invoke(ctx, "/buildkite.BuildkiteService/ListBuilds", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,19 +136,36 @@ func (c *buildkiteServiceClient) ProjectsStatus(ctx context.Context, in *Project
 // Server API for BuildkiteService service
 
 type BuildkiteServiceServer interface {
-	ProjectsStatus(context.Context, *ProjectsStatusRequest) (*ProjectsStatusResponse, error)
+	// List the status of all (i.e. the status of the last build) of one or
+	// all projects.
+	Status(context.Context, *StatusRequest) (*StatusResponse, error)
+	// List the last builds of one or all projects, optionally limited to a
+	// branch.
+	ListBuilds(context.Context, *ListBuildsRequest) (*ListBuildsResponse, error)
 }
 
 func RegisterBuildkiteServiceServer(s *grpc.Server, srv BuildkiteServiceServer) {
 	s.RegisterService(&_BuildkiteService_serviceDesc, srv)
 }
 
-func _BuildkiteService_ProjectsStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(ProjectsStatusRequest)
+func _BuildkiteService_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(StatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(BuildkiteServiceServer).ProjectsStatus(ctx, in)
+	out, err := srv.(BuildkiteServiceServer).Status(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _BuildkiteService_ListBuilds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(ListBuildsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(BuildkiteServiceServer).ListBuilds(ctx, in)
 	if err != nil {
 		return nil, err
 	}
@@ -112,24 +177,32 @@ var _BuildkiteService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*BuildkiteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ProjectsStatus",
-			Handler:    _BuildkiteService_ProjectsStatus_Handler,
+			MethodName: "Status",
+			Handler:    _BuildkiteService_Status_Handler,
+		},
+		{
+			MethodName: "ListBuilds",
+			Handler:    _BuildkiteService_ListBuilds_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},
 }
 
 var fileDescriptor0 = []byte{
-	// 168 bytes of a gzipped FileDescriptorProto
+	// 232 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x52, 0x2a, 0x4e, 0x2d, 0x2a,
 	0xcb, 0x4c, 0x4e, 0x2d, 0xd6, 0x4f, 0x2a, 0xcd, 0xcc, 0x49, 0xc9, 0xce, 0x2c, 0x49, 0x45, 0xb0,
 	0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x38, 0xe1, 0x02, 0x52, 0xe2, 0xf9, 0x05, 0xa9, 0x45,
-	0x89, 0x25, 0xf9, 0x45, 0xfa, 0x30, 0x06, 0x44, 0x8d, 0x92, 0x38, 0x97, 0x68, 0x40, 0x51, 0x7e,
-	0x56, 0x6a, 0x72, 0x49, 0x71, 0x70, 0x49, 0x62, 0x49, 0x69, 0x71, 0x50, 0x6a, 0x61, 0x69, 0x6a,
-	0x71, 0x89, 0x92, 0x15, 0x97, 0x18, 0xba, 0x44, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x02,
-	0x17, 0x5b, 0x7e, 0x69, 0x49, 0x41, 0x69, 0x89, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0xb7, 0x91, 0x80,
-	0x1e, 0xdc, 0x4c, 0x7f, 0xb0, 0xb8, 0x51, 0x26, 0x97, 0x80, 0x13, 0xcc, 0xea, 0x60, 0x88, 0x3b,
-	0x85, 0x42, 0xb9, 0xf8, 0x50, 0xcd, 0x13, 0x52, 0xd0, 0x43, 0x38, 0x18, 0xab, 0x1b, 0xa4, 0x14,
-	0xf1, 0xa8, 0x80, 0x38, 0x26, 0x89, 0x0d, 0xec, 0x0d, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x1b, 0x40, 0xa1, 0x70, 0x10, 0x01, 0x00, 0x00,
+	0x89, 0x25, 0xf9, 0x45, 0xfa, 0x30, 0x06, 0x44, 0x8d, 0x92, 0x2c, 0x17, 0x6f, 0x70, 0x49, 0x62,
+	0x49, 0x69, 0x71, 0x50, 0x6a, 0x61, 0x69, 0x6a, 0x71, 0x89, 0x10, 0x0f, 0x17, 0x4b, 0x71, 0x4e,
+	0x69, 0xba, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0xa7, 0x92, 0x11, 0x17, 0x1f, 0x4c, 0xba, 0xb8, 0x20,
+	0x3f, 0xaf, 0x38, 0x55, 0x48, 0x81, 0x8b, 0x2d, 0xbf, 0xb4, 0xa4, 0xa0, 0xb4, 0x04, 0xac, 0x82,
+	0xdb, 0x48, 0x40, 0x0f, 0x6e, 0xa2, 0x3f, 0x58, 0x5c, 0xc9, 0x90, 0x4b, 0xd0, 0x27, 0xb3, 0xb8,
+	0xc4, 0x09, 0x64, 0x39, 0x76, 0x63, 0x85, 0xf8, 0xb8, 0xd8, 0x92, 0x8a, 0x12, 0xf3, 0x92, 0x33,
+	0x24, 0x98, 0xc0, 0xd6, 0x98, 0x71, 0x09, 0x21, 0x6b, 0x21, 0xd6, 0x2a, 0xa3, 0xd5, 0x8c, 0x5c,
+	0x02, 0x4e, 0x30, 0x4f, 0x06, 0x43, 0x42, 0x44, 0xc8, 0x96, 0x8b, 0x0d, 0xe2, 0x66, 0x21, 0x09,
+	0x3d, 0x44, 0x90, 0xa0, 0xf8, 0x52, 0x4a, 0x12, 0x8b, 0x0c, 0xd4, 0x56, 0x4f, 0x2e, 0x2e, 0x84,
+	0x5b, 0x84, 0x64, 0x90, 0x14, 0x62, 0xf8, 0x4a, 0x4a, 0x16, 0x87, 0x2c, 0xc4, 0x28, 0x29, 0xde,
+	0x49, 0x4d, 0x92, 0x88, 0x48, 0x48, 0x62, 0x03, 0x07, 0xb9, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff,
+	0x0e, 0xd7, 0xd0, 0x52, 0xbc, 0x01, 0x00, 0x00,
 }
