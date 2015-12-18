@@ -42,12 +42,12 @@ class Redis
             automationRelatedObjectWorkers
             previewWorkers
             PerAccountAutomationWorker ]
-      return if ! valid_types.include?(type)
+      return false if ! valid_types.include?(type)
 
-      # Define stuff
       key = "#{type}-manager-config"
       entry = "restart"
       value = Time.now.to_i
+      found = false
       Array(redis_hosts).each do |host_and_port|
         hostname, port_string = host_and_port.split(':')
         port_string ||= "6379" # Default Redis port
@@ -57,10 +57,10 @@ class Redis
         if host.has_key?(key)
           Logger.log(:info, "Found key #{key} on port #{port}, restarting workers using timestamp value #{value}")
           host.hset(key, entry, value)
-          return true # found and set
+          found = true
         end
       end
-      false
+      found
     end
 
     def bounce_redis_jobs(config_file)
