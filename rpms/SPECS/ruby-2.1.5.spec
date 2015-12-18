@@ -41,7 +41,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 GEM_HOME=$RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/gems/%{api_version} \
   $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/bin/ruby \
   -I $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/%{api_version} \
-  -I $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/%{api_version}/%{_arch}-linux \
+  -I $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/lib/ruby/%{api_version}/%{_build_cpu}-linux \
   $RPM_BUILD_ROOT/opt/rubies/ruby-%{version}/bin/gem install bundler -v 1.10.6
 
 %files
