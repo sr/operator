@@ -10,6 +10,10 @@ Vagrant.configure(2) do |config|
     el5.vm.box = "bento/centos-5.11"
   end
 
+  config.vm.define "el5-i386" do |el5|
+    el5.vm.box = "bento/centos-5.11-i386"
+  end
+
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
