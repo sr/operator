@@ -18,10 +18,10 @@ func newAPIServer(client *buildkiteapi.Client) *apiServer {
 	return &apiServer{client}
 }
 
-func (s *apiServer) ProjectsStatus(
+func (s *apiServer) Status(
 	ctx context.Context,
-	request *ProjectsStatusRequest,
-) (*ProjectsStatusResponse, error) {
+	request *StatusRequest,
+) (*StatusResponse, error) {
 	organizations, err := s.fetchAllOrganizations()
 	if err != nil {
 		return nil, err
@@ -47,11 +47,18 @@ func (s *apiServer) ProjectsStatus(
 		}
 	}
 	w.Flush()
-	return &ProjectsStatusResponse{
+	return &StatusResponse{
 		Output: &operator.Output{
 			PlainText: output.String(),
 		},
 	}, nil
+}
+
+func (s *apiServer) ListBuilds(
+	ctx context.Context,
+	request *ListBuildsRequest,
+) (*ListBuildsResponse, error) {
+	return nil, nil
 }
 
 func (s *apiServer) fetchAllOrganizations() ([]buildkiteapi.Organization, error) {
