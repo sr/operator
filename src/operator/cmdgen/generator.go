@@ -101,7 +101,8 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				main.Services[loc.Path[1]].Description = strings.Split(strings.Replace(*loc.LeadingComments, `\'`, "'", -1), "\n")
+				desc := strings.Split(strings.Replace(*loc.LeadingComments, `\'`, "'", -1), "\n")
+				main.Services[loc.Path[1]].Description = desc
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
 				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = *loc.LeadingComments
 			}
