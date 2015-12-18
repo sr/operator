@@ -82,11 +82,11 @@ module.exports = (robot) ->
 
   robot.respond /tomcat(\s)?waits$/i, (msg) ->
     tomcatwaits = [
-      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/15988_10202156409094143_1084865467_n.jpg',
-      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/936546_10202770777892979_1367543095_n.jpg'
-      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10390415_10204528724000533_4769635084884811952_n.jpg',
-      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xtf1/v/t1.0-9/12274471_10208136125543317_7049117977820372103_n.jpg',
-      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xft1/v/t1.0-9/11988353_10207788216285803_2987774891366340392_n.jpg'
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/15988_10202156409094143_1084865467_n.jpg?oh=f5cf9ab2a12c295b37b765ec29e73234&oe=56DC051E',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/936546_10202770777892979_1367543095_n.jpg?oh=f5cf9ab2a12c295b37b765ec29e73234&oe=56DC051E'
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10390415_10204528724000533_4769635084884811952_n.jpg?oh=f5cf9ab2a12c295b37b765ec29e73234&oe=56DC051E',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xtf1/v/t1.0-9/12274471_10208136125543317_7049117977820372103_n.jpg?oh=f5cf9ab2a12c295b37b765ec29e73234&oe=56DC051E',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xft1/v/t1.0-9/11988353_10207788216285803_2987774891366340392_n.jpg?oh=f5cf9ab2a12c295b37b765ec29e73234&oe=56DC051E'
     ]
     msg.send msg.random tomcatwaits
 
