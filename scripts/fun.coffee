@@ -59,6 +59,8 @@
 #   hubot magicword - Nuh uh uhhh!
 #   hubot capitalidea - great idea!
 #   hubot thebestgifever - just ask FOWLER
+#   hubot bishop - Diffs cat
+#   hubot tomcatwaits - Caseys cat
 
 _ = require "underscore"
 
@@ -77,6 +79,27 @@ module.exports = (robot) ->
 
   robot.respond /bees$/i, (msg) ->
     msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
+
+  robot.respond /tomcat(\s)?waits$/i, (msg) ->
+    tomcatwaits = [
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/15988_10202156409094143_1084865467_n.jpg',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/936546_10202770777892979_1367543095_n.jpg'
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/10390415_10204528724000533_4769635084884811952_n.jpg',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xtf1/v/t1.0-9/12274471_10208136125543317_7049117977820372103_n.jpg',
+      'https://scontent-iad3-1.xx.fbcdn.net/hphotos-xft1/v/t1.0-9/11988353_10207788216285803_2987774891366340392_n.jpg'
+    ]
+    msg.send msg.random tomcatwaits
+
+  robot.respond /bishop$/i, (msg) ->
+    tehbishop = [
+      'https://www.dropbox.com/s/uxy0wxomh49wqmy/2015-10-27%2016.13.43.jpg',
+      'https://www.dropbox.com/s/rh79uce5ijtrwpk/2015-10-21%2015.01.08.jpg',
+      'https://dl.dropboxusercontent.com/u/2103751/gifs/hamper.gif',
+      'https://www.dropbox.com/s/08dqb3aiov0vdon/2015-09-29%2022.02.43.jpg',
+      'https://www.dropbox.com/s/09sxpi86gf8pbb6/2015-09-07%2016.45.33.jpg',
+      'https://www.dropbox.com/s/sbuty386e22eh85/2015-06-07%2018.13.08-1.jpg'
+    ]
+    msg.send msg.random tehbishop
 
   robot.respond /beyonce$/i, (msg) ->
     charisma = [
@@ -134,7 +157,12 @@ module.exports = (robot) ->
       "Today, #{target} brought forth in this room a feat of great success, conceived in magnificence, and dedicated to awesomeness.",
       "Today, #{target} suddenly and deliberately kicked some ass",
       "#{target} makes it WERK",
-      "#{target} is on FIRE! Oh my!"
+      "#{target} is on FIRE! Oh my!",
+      "Watch #{target} whip! Now watch #{target} nae nae!",
+      "Go #{target}! It's your birthday!",
+      "#{target} is on fleek",
+      "#{target} is streets ahead!",
+      "#{target} is bonafide"
     ]
 
     msg.send msg.random compliments
