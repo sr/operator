@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package operator;
 
+import "google/protobuf/descriptor.proto";
+
 message Output {
 	string PlainText = 1;
 }
@@ -23,4 +25,8 @@ message ServiceStartupError {
 
 message Service {
 	string name = 1;
+}
+
+extend google.protobuf.ServiceOptions {
+	string name = 51234;
 }

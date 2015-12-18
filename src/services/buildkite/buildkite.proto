@@ -4,13 +4,34 @@ import "operator/operator.proto";
 
 package buildkite;
 
+// Interact with the Buildkite.com Continuous Integration server. Let's you
+// retrieve the status of projects, setup new ones, and trigger builds.
 service BuildkiteService {
-	rpc ProjectsStatus(ProjectsStatusRequest) returns (ProjectsStatusResponse);
+	option (operator.name) = "buildkite";
+	// List the status of all (i.e. the status of the last build) of one or
+	// all projects.
+	rpc Status(StatusRequest) returns (StatusResponse);
+	// List the last builds of one or all projects, optionally limited to a
+	// branch.
+	rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
 }
 
-message ProjectsStatusRequest {
+message StatusRequest {
+	// Optional project slug.
+	string slug = 1;
 }
 
-message ProjectsStatusResponse {
+message StatusResponse {
+  operator.Output output = 1;
+}
+
+message ListBuildsRequest {
+	// Optional project slug.
+	string slug = 1;
+	// Optional branch name.
+	string branch = 2;
+}
+
+message ListBuildsResponse {
   operator.Output output = 1;
 }
