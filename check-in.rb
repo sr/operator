@@ -19,9 +19,12 @@ sleep(rand*60) unless environment.dev?
 
 # Only one-concurrent process using file lock
 lockfile = File.new(LOCKFILE, 'w')
-lockfile.flock(File::LOCK_NB|File::LOCK_EX) or abort("#{LOCKFILE} is locked. Is another process already running?")
 begin
-  cli.checkin
+  if lockfile.flock(File::LOCK_NB|File::LOCK_EX)
+    cli.checkin
+  else
+    Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
+  end
 rescue => e
   Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
   raise e
