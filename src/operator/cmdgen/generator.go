@@ -5,9 +5,11 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/acsellers/inflections"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/serenize/snaker"
 	"github.com/sr/operator/src/operator"
 )
 
@@ -28,18 +30,27 @@ type mainDescriptor struct {
 type serviceDescriptor struct {
 	Name        string
 	Description []string
+	BinaryName  string
 	Methods     []*methodDescriptor
 }
 
 type methodDescriptor struct {
-	Name        string
-	Description string
-	Arguments   []*argumentDescriptor
+	Name           string
+	NameDasherized string
+	ServiceName    string
+	Description    string
+	ServiceClient  string
+	ServicePkg     string
+	Input          string
+	Arguments      []*argumentDescriptor
 }
 
 type argumentDescriptor struct {
-	Name        string
-	Description string
+	Name           string
+	NameCamelCase  string
+	NameSnakeCase  string
+	NameDasherized string
+	Description    string
 }
 
 func newGenerator(request *plugin.CodeGeneratorRequest) *generator {
@@ -77,20 +88,27 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 			}
 			main.Services[i] = &serviceDescriptor{
 				Name:        *name.(*string),
+				BinaryName:  binaryName,
 				Description: []string{undocumentedPlaceholder},
 				Methods:     make([]*methodDescriptor, len(service.Method)),
 			}
 			for j, method := range service.Method {
 				input := messagesByName[strings.Split(method.GetInputType(), ".")[2]]
 				main.Services[i].Methods[j] = &methodDescriptor{
-					Name:        method.GetName(),
-					Description: undocumentedPlaceholder,
-					Arguments:   make([]*argumentDescriptor, len(input.Field)),
+					Name:           method.GetName(),
+					Input:          input.GetName(),
+					ServicePkg:     "buildkite",
+					ServiceClient:  "BuildkiteServiceClient",
+					NameDasherized: inflections.Dasherize(snaker.CamelToSnake(method.GetName())),
+					Description:    undocumentedPlaceholder,
+					Arguments:      make([]*argumentDescriptor, len(input.Field)),
 				}
 				for k, field := range input.Field {
 					main.Services[i].Methods[j].Arguments[k] = &argumentDescriptor{
-						Name:        field.GetName(),
-						Description: undocumentedPlaceholder,
+						Name:           snaker.SnakeToCamel(field.GetName()),
+						NameDasherized: inflections.Dasherize(snaker.CamelToSnake(field.GetName())),
+						NameSnakeCase:  snaker.CamelToSnake(field.GetName()),
+						Description:    undocumentedPlaceholder,
 					}
 				}
 			}
@@ -103,7 +121,7 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 				desc := strings.Split(strings.Replace(*loc.LeadingComments, `\'`, "'", -1), "\n")
 				main.Services[loc.Path[1]].Description = desc
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
-				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = *loc.LeadingComments
+				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = strings.Replace(*loc.LeadingComments, "\n", " ", -1)
 			}
 		}
 	}
