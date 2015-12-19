@@ -3,6 +3,7 @@ package cmdgen
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/acsellers/inflections"
@@ -82,6 +83,9 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 		}
 		main.Services = make([]*serviceDescriptor, len(file.Service))
 		for i, service := range file.Service {
+			if service.Options == nil {
+				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
+			}
 			name, err := proto.GetExtension(service.Options, operator.E_Name)
 			if err != nil {
 				return nil, err
