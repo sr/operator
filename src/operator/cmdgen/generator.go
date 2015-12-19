@@ -98,7 +98,6 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 			messagesByName[message.GetName()] = message
 		}
 		for _, service := range file.Service {
-			//fmt.Println(service.GetName())
 			if service.Options == nil {
 				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
 			}
@@ -141,7 +140,7 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				desc := strings.Split(strings.Replace(*loc.LeadingComments, `\'`, "'", -1), "\n")
+				desc := strings.Split(*loc.LeadingComments, "\n")
 				main.Services[loc.Path[1]].Description = desc
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
 				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = strings.Replace(*loc.LeadingComments, "\n", " ", -1)
