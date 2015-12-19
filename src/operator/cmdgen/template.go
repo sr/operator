@@ -12,7 +12,9 @@ import (
 	"fmt"
 	"os"
 	"go.pedge.io/env"
-	buildkite "github.com/sr/operator/src/services/buildkite"
+	{{range .Imports}}
+	"{{.}}"
+	{{end}}
 )
 
 const usage = ` + "`" + `Usage: {{.BinaryName}} <service> <command>

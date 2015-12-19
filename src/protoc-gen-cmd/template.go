@@ -3,10 +3,9 @@ package cmd
 import "text/template"
 
 type serviceCommandDescriptor struct {
-	ServiceImportPath string
-	CommandName       string
-	ServiceClient     string
-	Methods           []*methodDescriptor
+	CommandName   string
+	ServiceClient string
+	Methods       []*methodDescriptor
 }
 
 type methodDescriptor struct {
@@ -34,7 +33,9 @@ import (
 	grpc "google.golang.org/grpc"
 	operator "github.com/sr/operator/src/operator"
 	os "os"
-	service "{{.ServiceImportPath}}"
+	{{range .Imports}}
+	import "{{.}}"
+	{{end}}
 )
 
 const commandName = "{{.CommandName}}"
@@ -74,7 +75,7 @@ func (s *serviceCommand) {{.Name}}() (*operator.Output, error) {
 func (s *serviceCommand) handle(method string) (*operator.Output, error) {
 	switch method {
 {{range .Methods}}
-	case "{{.DasherizedName}}":
+	case "{{.SnakeCasedName}}":
 		return s.{{.Name}}()
 {{end}}
 	default:
