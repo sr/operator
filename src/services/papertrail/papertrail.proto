@@ -5,6 +5,7 @@ import "operator/operator.proto";
 package papertrail;
 
 service PapertrailService {
+	option (operator.name) = "papertrail";
 	rpc Search(SearchRequest) returns (SearchResponse);
 }
 
