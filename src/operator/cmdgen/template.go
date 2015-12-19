@@ -14,7 +14,7 @@ import (
 	"go.pedge.io/env"
 	{{range .Imports}}
 	"{{.}}"
-	{{end}}
+	{{- end}}
 )
 
 const usage = ` + "`" + `Usage: {{.BinaryName}} <service> <command>
@@ -25,7 +25,7 @@ Available services:
 {{range .Services}}
   {{.Name}}{{range .Description}}
     {{.}}{{end}}
-{{end}}` + "`" + `
+{{- end}}` + "`" + `
 
 type mainEnv struct {
 	Address string ` + "`" + `env:"OPERATORD_ADDRESS,default=localhost:3000"` + "`" + `
@@ -53,7 +53,7 @@ func main() {
 	if len(os.Args) >= 2 {
 		service := os.Args[1]
 		switch service {
-		{{range .Services}}
+		{{- range .Services}}
 		case "{{.Name}}":
 			if (len(os.Args) == 2 || (os.Args[2] == "-h" ||
 				os.Args[2] == "--help" || os.Args[2] == "help")) {
@@ -65,12 +65,12 @@ Available Commands:{{range .Methods}}
 			} else {
 				command := os.Args[2]
 				switch command {
-				{{range .Methods}}
+				{{- range .Methods}}
 				case "{{.NameDasherized}}":
 					flags := flag.NewFlagSet("{{.NameDasherized}}", flag.ExitOnError)
-					{{range .Arguments}}
+					{{- range .Arguments}}
 					{{.NameSnakeCase}} := flags.String("{{.NameDasherized}}", "", "")
-					{{end}}
+					{{- end}}
 					flags.Parse(os.Args[2:])
 					conn, err := grpc.Dial(mainEnv.Address, grpc.WithInsecure())
 					if err != nil {
@@ -81,9 +81,9 @@ Available Commands:{{range .Methods}}
 					response, err := client.{{.Name}}(
 						context.Background(),
 						&{{.ServicePkg}}.{{.Input}}{
-						{{range .Arguments}}
+						{{- range .Arguments}}
 							{{.Name}}: *{{.NameSnakeCase}},
-						{{end}}
+						{{- end}}
 						},
 					)
 					if err != nil {
@@ -91,13 +91,12 @@ Available Commands:{{range .Methods}}
 					}
 					fmt.Fprintf(os.Stdout, "%s\n", response.Output.PlainText)
 					os.Exit(0)
-				{{end}}
+				{{- end}}
 				default:
 					fatal(fmt.Sprintf("no such command: %s", command))
 				}
 			}
-
-{{end}}
+{{- end}}
 		default:
 			fatal(fmt.Sprintf("no such service: %s", service))
 		}
