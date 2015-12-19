@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/acsellers/inflections"
@@ -26,6 +27,7 @@ type generator struct {
 type mainDescriptor struct {
 	BinaryName string
 	Services   []*serviceDescriptor
+	Imports    []string
 }
 
 type serviceDescriptor struct {
@@ -75,14 +77,28 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 	if val, ok := params["binary"]; ok {
 		binaryName = val
 	}
-	main := &mainDescriptor{BinaryName: binaryName}
+	numServices := 0
+	for _, file := range g.request.ProtoFile {
+		numServices = numServices + len(file.Service)
+	}
+	main := &mainDescriptor{
+		BinaryName: binaryName,
+		Imports:    make([]string, numFiles),
+		Services:   make([]*serviceDescriptor, numServices),
+	}
+	for i, file := range g.request.FileToGenerate {
+		// TODO(sr) substitute path.Ext() or whatever
+		b := fmt.Sprintf("/%s", path.Base(file))
+		main.Imports[i] = fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file, b, "", 1))
+	}
+	i := 0
 	for _, file := range g.request.ProtoFile {
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
 		for _, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
 		}
-		main.Services = make([]*serviceDescriptor, len(file.Service))
-		for i, service := range file.Service {
+		for _, service := range file.Service {
+			//fmt.Println(service.GetName())
 			if service.Options == nil {
 				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
 			}
@@ -103,20 +119,22 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 					Name:           method.GetName(),
 					Input:          input.GetName(),
 					ServicePkg:     nameStr,
-					ServiceClient:  fmt.Sprintf("%sServiceCLient", service.GetName()),
+					ServiceClient:  fmt.Sprintf("%sClient", service.GetName()),
 					NameDasherized: inflections.Dasherize(snaker.CamelToSnake(method.GetName())),
 					Description:    undocumentedPlaceholder,
 					Arguments:      make([]*argumentDescriptor, len(input.Field)),
 				}
 				for k, field := range input.Field {
 					main.Services[i].Methods[j].Arguments[k] = &argumentDescriptor{
-						Name:           snaker.SnakeToCamel(field.GetName()),
+						// TODO(sr) deal with ID => Id etc better
+						Name:           strings.Replace(snaker.SnakeToCamel(field.GetName()), "ID", "Id", 1),
 						NameDasherized: inflections.Dasherize(snaker.CamelToSnake(field.GetName())),
 						NameSnakeCase:  snaker.CamelToSnake(field.GetName()),
 						Description:    undocumentedPlaceholder,
 					}
 				}
 			}
+			i = i + 1
 		}
 		for _, loc := range file.GetSourceCodeInfo().GetLocation() {
 			if loc.LeadingComments == nil {
