@@ -5,6 +5,7 @@ import "operator/operator.proto";
 package gcloud;
 
 service GCloudService {
+	option (operator.name) = "gcloud";
 	rpc CreateContainerCluster(CreateContainerClusterRequest) returns (CreateContainerClusterResponse);
 	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
 }
