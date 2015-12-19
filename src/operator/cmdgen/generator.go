@@ -90,8 +90,9 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 			if err != nil {
 				return nil, err
 			}
+			nameStr := *name.(*string)
 			main.Services[i] = &serviceDescriptor{
-				Name:        *name.(*string),
+				Name:        nameStr,
 				BinaryName:  binaryName,
 				Description: []string{undocumentedPlaceholder},
 				Methods:     make([]*methodDescriptor, len(service.Method)),
@@ -101,8 +102,8 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 				main.Services[i].Methods[j] = &methodDescriptor{
 					Name:           method.GetName(),
 					Input:          input.GetName(),
-					ServicePkg:     "buildkite",
-					ServiceClient:  "BuildkiteServiceClient",
+					ServicePkg:     nameStr,
+					ServiceClient:  fmt.Sprintf("%sServiceCLient", service.GetName()),
 					NameDasherized: inflections.Dasherize(snaker.CamelToSnake(method.GetName())),
 					Description:    undocumentedPlaceholder,
 					Arguments:      make([]*argumentDescriptor, len(input.Field)),
