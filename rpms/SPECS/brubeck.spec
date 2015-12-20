@@ -1,11 +1,15 @@
+%global brubeck_git_revision 013b8e479c31310046ba28c3b3049be4fad9652e
+
 Name: brubeck
 Version: 1.0.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A Statsd-compatible metrics aggregator
 Group: Applications/Internet
 License: MIT
 URL: https://github.com/github/brubeck
-Source0: https://git.dev.pardot.com/Pardot/brubeck/archive/3bd41eda71a0988f3ab58f2af4a4fb56f6d95e47.tar.gz
+Source0: https://github.com/github/brubeck/archive/%{brubeck_git_revision}.tar.gz
+Patch0: https://patch-diff.githubusercontent.com/raw/github/brubeck/pull/30.patch
+Patch1: https://patch-diff.githubusercontent.com/raw/github/brubeck/pull/31.patch
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: jansson-devel >= 2.5
@@ -20,8 +24,14 @@ BuildRoot: %{_tmppath}/%name-root
 A Statsd-compatible metrics aggregator developed by GitHub.
 
 %prep
-%setup -q -n brubeck-3bd41eda71a0988f3ab58f2af4a4fb56f6d95e47
-git clone -b 1a84d49c3ca794356f015a3391e6d10be98f6a6a https://github.com/concurrencykit/ck vendor/ck
+%setup -q -n brubeck-%{brubeck_git_revision}
+%patch0 -p1
+%patch1 -p1
+
+git clone https://github.com/concurrencykit/ck vendor/ck
+pushd vendor/ck
+git checkout 1a84d49c3ca794356f015a3391e6d10be98f6a6a
+popd
 
 %build
 make brubeck
