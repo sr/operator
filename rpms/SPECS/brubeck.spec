@@ -15,9 +15,6 @@ BuildRequires: git
 BuildRequires: jansson-devel >= 2.5
 BuildRequires: libmicrohttpd-devel
 BuildRequires: openssl-devel
-Requires: jansson >= 2.5
-Requires: libmicrohttpd
-Requires: openssl
 BuildRoot: %{_tmppath}/%name-root
 
 %description
