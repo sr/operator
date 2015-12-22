@@ -104,7 +104,7 @@ module Strategies
           output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", temp_deploy_path])
           success = $?.success?
           if success
-            output = ShellHelper.execute_shell(["rsync", "--recursive", "--checksum", "--links", "--verbose", "--delete", temp_deploy_path + "/", deploy_path])
+            output = ShellHelper.execute_shell(["rsync", "--recursive", "--checksum", "--links", "--perms", "--verbose", "--delete", temp_deploy_path + "/", deploy_path])
             success = $?.success?
             unless success
               Logger.log(:err, "Unable to sync changes to new deploy path: #{output}")
