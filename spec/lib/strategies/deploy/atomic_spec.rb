@@ -26,6 +26,16 @@ describe Strategies::Deploy::Atomic do
       end
     end
 
+    it "copies files to the destination deploy directory" do
+      Tempfile.create("hello.tar.gz") do |f|
+        f.write(hello_tar_gz_contents)
+        f.flush
+
+        strategy.deploy(f.path, Deploy.new)
+        expect(File.read(File.join(tempdir, "current", "hello.txt"))).to eq("hello world\n")
+      end
+    end
+
     it "in 3 deploys it should deploy to A/B/A" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
