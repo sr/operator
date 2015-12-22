@@ -18,7 +18,6 @@ Rails.application.routes.draw do
       get :select_target, on: :collection
       post :cancel_on_incomplete_servers, on: :member
       post :cancel, on: :member
-      post :rollback, on: :member
     end
   end
 
