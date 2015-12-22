@@ -1,7 +1,7 @@
 class DeploysController < ApplicationController
   before_filter :require_repo
   before_filter :require_target, only: [:new, :create, :index]
-  before_filter :require_deploy, only: [:show, :complete, :cancel, :rollback]
+  before_filter :require_deploy, only: [:show, :complete, :cancel]
   before_filter :require_no_active_deploy, only: [:new, :create]
   before_filter :require_no_active_lock, only: [:new, :create]
 
@@ -81,41 +81,6 @@ class DeploysController < ApplicationController
   def cancel
     current_deploy.cancel! if current_deploy
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
-  end
-
-  def rollback
-    unless current_deploy == current_target.last_deploy_for(current_repo.name)
-      redirect_to repo_deploy_path(current_repo.name, current_deploy),
-        alert: "Only the latest deploy can be rolled back"
-      return
-    end
-
-    previous_deploy = current_target.previous_deploy(current_deploy)
-    if previous_deploy.present?
-      # HACK: DeployLogic depends on params[:servers] until it is refactored to
-      # do otherwise
-      if current_deploy.specified_servers.present?
-        params[:servers] = "on"
-        params[:server_hostnames] = current_deploy.all_servers
-      end
-
-      prov_deploy = ProvisionalDeploy.from_previous_deploy(current_repo, previous_deploy)
-
-      current_deploy.check_completed_status!
-      current_deploy.cancel! unless current_deploy.completed?
-
-      deploy_response = deploy!(prov_deploy)
-      if !deploy_response[:error] && deploy_response[:deploy]
-        the_deploy = deploy_response[:deploy]
-        redirect_to repo_deploy_path(current_repo.name, the_deploy.id, watching: "1"),
-          notice: "Previous deploy canceled. Rollback deploy initiated."
-      else
-        render_deploy_error(deploy_response)
-      end
-    else
-      redirect_to repo_deploy_path(current_repo.name, current_deploy),
-        alert: "There is no previous deploy, so a rollback is unavailable"
-    end
   end
 
   private

@@ -94,41 +94,59 @@
 
 <hr>
 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%- if current_deploy.completed? %>
+      <tr>
+        <td>
+          <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
+
+            <i class="icon-train2"></i> REDEPLOY
+          <%- end %>
+        </td>
+        <td>
+          Prepares to redeploy this build.
+        </td>
+      </tr>
+    <%- end %>
+    <%- unless current_deploy.completed? %>
+      <tr>
+        <td>
+          <%= form_tag cancel_on_incomplete_servers_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
+            <%= button_tag type: "submit", class: "btn btn-warning" do %>
+              <%= content_tag :i, "", class: "icon-fast-forward" %>
+              FORCE TO COMPLETE
+            <%- end %>
+          <%- end %>
+        </td>
+        <td>
+          Forces the deploy to move toward completion, failing the deploy on any outstanding servers. This is appropriate to use if a few servers aren't completing, because they are down or unresponsive. Restart tasks (e.g., restarting jobs) <strong>are</strong> performed, so it's expected that the deploy will run for a few minutes after pushing this button.
+        </td>
+      </tr>
+    <%- end %>
+    <%- unless current_deploy.completed? %>
+      <tr>
+        <td>
+          <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
+            <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> CANCEL</button>
+          <%- end %>
+        </td>
+        <td>
+          Immediately cancels the deploy. This is appropriate only when a rollback is going to be performed immediately. Restart tasks (e.g., restarting jobs) <strong>are not</strong> performed, so the deploy will exit immediately.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
 <div class="horizontal-button-array">
-  <%- if current_deploy.completed? %>
-    <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
-      <i class="icon-train2"></i> REDEPLOY
-    <%- end %>
-  <%- end %>
 
-  <%- if !current_deploy.completed? %>
-    <%= form_tag cancel_on_incomplete_servers_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
-      <%= button_tag type: "submit", class: "btn btn-warning" do %>
-        <%= content_tag :i, "", class: "icon-fast-forward" %>
-        FORCE TO COMPLETE
-      <%- end %>
-    <%- end %>
-  <%- end %>
-
-  <%# If this deploy is the latest deploy, offer an option to roll it back %>
-  <%- if current_target.last_deploy_for(current_deploy.repo_name) == current_deploy %>
-    <%= form_tag rollback_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy and rollback to the previous deploy?"} do %>
-      <%= button_tag type: "submit", class: "btn btn-warning" do %>
-        <%= content_tag :i, "", class: "icon-rotate-left" %>
-        <%- if current_deploy.completed? %>
-          ROLLBACK
-        <%- else %>
-          CANCEL &amp; ROLLBACK
-        <%- end %>
-      <%- end %>
-    <%- end %>
-  <%- end %>
-
-  <%- unless current_deploy.completed? %>
-    <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
-      <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> CANCEL</button>
-    <%- end %>
-  <% end %>
 </div>
 
 <br>
