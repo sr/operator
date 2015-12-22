@@ -25,7 +25,12 @@ class Payload
   end
 
   def artifacts_path
-    @_artifacts_path ||= Dir.tmpdir
+    @_artifacts_path ||= \
+      begin
+        path = File.join(Dir.tmpdir, "pull-agent")
+        FileUtils.mkdir_p(path, mode: 00700)
+        path
+      end
   end
 
   def current_link
