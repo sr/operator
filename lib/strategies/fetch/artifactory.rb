@@ -54,7 +54,7 @@ module Strategies
 
         # https://github.com/chef/artifactory-client/blob/0e2fe203608ee3f62fc86c404a590f0cbe6fff30/lib/artifactory/resources/base.rb#L112-L116
         download_path = download_uri.path.sub(/^#{Regexp.escape(URI(::Artifactory.client.endpoint).path)}/, "")
-        File.open(filename, "wb") do |f|
+        File.open(filename, "wb", 00600) do |f|
           f.write(::Artifactory.client.get(download_path))
         end
 

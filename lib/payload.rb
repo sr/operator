@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'tmpdir'
 
 class Payload
   attr_accessor :options
@@ -26,9 +27,9 @@ class Payload
   def artifacts_path
     @_artifacts_path ||= \
       begin
-        artifact_path = File.expand_path("artifacts", repo_path)
-        FileUtils.mkdir_p(artifact_path) unless Dir.exist?(artifact_path)
-        artifact_path
+        path = File.join(Dir.tmpdir, "pull-agent")
+        FileUtils.mkdir_p(path, mode: 00700)
+        path
       end
   end
 
