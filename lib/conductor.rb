@@ -38,8 +38,9 @@ class Conductor
 
   def rollback!(deploy, deploy_strategy)
     environment.execute_pre_deploy_hooks(deploy)
-    success = deploy_strategy.rollback
-    environment.execute_post_deploy_hooks(deploy)
+    if success = deploy_strategy.rollback(deploy)
+      environment.execute_post_deploy_hooks(deploy)
+    end
 
     success
   end
