@@ -1,10 +1,14 @@
 require "uri"
+require "net/http"
+require "net/https"
 require "artifactory"
 require_relative "base"
 
 module Strategies
   module Fetch
     class Artifactory < Base
+      DownloadFailure = Class.new(StandardError)
+
       include ::Artifactory::Resource
       attr_accessor :environment
 
@@ -47,15 +51,41 @@ module Strategies
 
       def fetch(deploy)
         artifact = Artifact.from_url(deploy.artifact_url)
-        download_uri = URI.parse(artifact.download_uri)
+
+        # Construct the download URI from the Artifactory endpoint + the path
+        # from download_uri
+        #
+        # We do this partially so that the download_uri can't convince us to
+        # make an arbitrary request with our credentials, but also so that we
+        # can take advantage of the Squid proxying (described above)
+        download_uri = URI.parse(::Artifactory.client.endpoint)
+        download_uri.path = URI.parse(artifact.download_uri).path
 
         FileUtils.mkdir_p(environment.payload.artifacts_path)
         filename = File.join(environment.payload.artifacts_path, File.basename(download_uri.to_s))
 
-        # https://github.com/chef/artifactory-client/blob/0e2fe203608ee3f62fc86c404a590f0cbe6fff30/lib/artifactory/resources/base.rb#L112-L116
-        download_path = download_uri.path.sub(/^#{Regexp.escape(URI(::Artifactory.client.endpoint).path)}/, "")
-        File.open(filename, "wb", 00600) do |f|
-          f.write(::Artifactory.client.get(download_path))
+        # We deliberately do not use Artifactory.client.get because it loads the
+        # entire download into memory.
+        proxy = download_uri.find_proxy
+        Net::HTTP.start(download_uri.host, download_uri.port, proxy && proxy.hostname, proxy && proxy.port, use_ssl: (download_uri.scheme == 'https')) do |http|
+          http.read_timeout = 300
+
+          request = Net::HTTP::Get.new(download_uri.path)
+          if ::Artifactory.client.username && ::Artifactory.client.password
+            request.basic_auth(::Artifactory.client.username, ::Artifactory.client.password)
+          end
+
+          File.open(filename, "wb", 00600) do |f|
+            http.request(request) do |response|
+              if Net::HTTPSuccess === response
+                response.read_body do |fragment|
+                  f.write(fragment)
+                end
+              else
+                raise DownloadError.new("Unable to download artifact: #{response}")
+              end
+            end
+          end
         end
 
         filename
