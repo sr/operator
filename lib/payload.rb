@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'tmpdir'
 
 class Payload
   attr_accessor :options
@@ -24,12 +25,7 @@ class Payload
   end
 
   def artifacts_path
-    @_artifacts_path ||= \
-      begin
-        artifact_path = File.expand_path("artifacts", repo_path)
-        FileUtils.mkdir_p(artifact_path) unless Dir.exist?(artifact_path)
-        artifact_path
-      end
+    @_artifacts_path ||= Dir.tmpdir
   end
 
   def current_link
