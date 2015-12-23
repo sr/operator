@@ -7,6 +7,7 @@ module Environments
 
     after_deploy :restart_pithumbs_service, only: :pithumbs
     after_deploy :restart_salesedge, only: :'realtime-frontend'
+    after_deploy :restart_workflowstats_service, only: :'workflow-stats'
 
     def short_name
       "prod_dfw"
