@@ -30,7 +30,7 @@
           <span class="text-success" title="Complete"><i class="icon-check"></i></span>
         <%- end %>
       <%- end %>
-      <%= result.server.hostname %>
+      <%= link_to result.server.hostname, kibana_link(deploy: current_deploy, host: result.server.hostname) %>
     </div>
   <%- end %>
 </div>

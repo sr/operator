@@ -1,3 +1,5 @@
+require 'cgi'
+
 module CanoeHelper
   def protocol_for_includes
     request.scheme
@@ -90,10 +92,18 @@ module CanoeHelper
     output.html_safe
   end
 
-  def kibana_link(deploy)
-    base_url = "https://logs.#{'dev.' unless Rails.env.production?}pardot.com/#/dashboard/script/logstash.js"
-    query = "#{current_repo.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})"
-    escaped_query = CGI.escape(query.gsub('/','\/')).gsub('+','%20')
-    "#{base_url}?query=#{escaped_query}&fields=@timestamp,host,message"
+  def kibana_link(deploy:, host: nil)
+    query = [
+      %(program:pull-agent),
+      %(message:"deploy_id=#{deploy.id}")
+    ]
+    query << %(host:#{host}) if host
+
+    qs = {
+      query: query.join(" AND "),
+      fields: "@timestamp,host,message"
+    }.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v).gsub('+', '%20')}" }.join("&")
+
+    "https://logs.#{'dev.' unless Rails.env.production?}pardot.com/#/dashboard/script/logstash.js?#{qs}"
   end
 end
