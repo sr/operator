@@ -109,3 +109,5 @@ and forwarding them to Google Cloud Logging via rsyslog prog. See
 
 - [ ] Spin up/spin down Operator kubernetes cluster
 - [ ] /gcloud enable-http dev1-europe-west1b
+- [ ] /gcloud list-instances shows tag
+- [ ] /gcloud (un)tag instance=instance-id tags=tag1,tag2
