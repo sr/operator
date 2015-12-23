@@ -200,6 +200,10 @@ module Environments
       restart_upstart_job("murdoc")
     end
 
+    def restart_workflowstats_service
+      restart_upstart_job("workflowstats")
+    end
+
     def restart_upstart_job(job)
       result = ShellHelper.execute_shell("sudo /sbin/restart #{job} 2>&1")
       if result.include?("#{job} start/running")
