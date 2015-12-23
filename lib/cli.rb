@@ -31,6 +31,7 @@ class CLI
         # the payload (repository name) MUST be the second argument
         if @environment.valid_payload?(arg)
           @environment.payload = arg
+          Logger.context[:payload] = arg
         else
           Logger.log(:crit, "Invalid payload specified: #{arg}")
 
@@ -54,7 +55,10 @@ class CLI
 
   def checkin
     current_build_version = BuildVersion.load(environment.payload.build_version_file)
+
     requested_deploy = Canoe.latest_deploy(environment)
+    Logger.context[:deploy_id] = requested_deploy.id
+
     if requested_deploy.applies_to_this_server?
       if requested_deploy.action == "restart"
         Logger.log(:info, "Executing restart tasks")
@@ -62,18 +66,18 @@ class CLI
         Canoe.notify_server(environment, requested_deploy)
       elsif requested_deploy.action == "deploy"
         if current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
-          Logger.log(:info, "We are up to date: #{requested_deploy.build_number}")
+          Logger.log(:info, "We are up to date")
           Canoe.notify_server(environment, requested_deploy)
         else
-          Logger.log(:info, "Current build: #{current_build_version || "<< None >>"}")
-          Logger.log(:info, "Requested deploy: #{requested_deploy.build_number}")
+          Logger.log(:info, "Currently deploy: #{current_build_version.artifact_url || "<< None >>"}")
+          Logger.log(:info, "Requested deploy: #{requested_deploy.artifact_url}")
           environment.conductor.deploy!(requested_deploy)
         end
       else
-        Logger.log(:info, "Nothing to do for this deploy: #{requested_deploy.build_number}")
+        Logger.log(:info, "Nothing to do for this deploy")
       end
     else
-      Logger.log(:info, "The latest deploy does not apply to this server: #{requested_deploy.build_number}")
+      Logger.log(:info, "The deploy does not apply to this server")
     end
   end
 

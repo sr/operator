@@ -46,7 +46,7 @@ module Strategies
       end
 
       def move_current_link(deploy_path)
-        Logger.log(:info, "LINK: [MOVE] current -> '#{deploy_path}'")
+        Logger.log(:info, "Setting current symlink to '#{deploy_path}'")
         # Atomic switch of the symlink requires creating it in a temporary
         # location, then `rename`ing it to the current_link. `ln -sf` _is not
         # atomic_ on its own.
