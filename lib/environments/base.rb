@@ -162,11 +162,11 @@ module Environments
     end
 
     def notify_begin_kibana(deploy)
-      Logger.log(:info, "Started fetch of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
+      Logger.log(:info, "Started fetch of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
     end
 
     def notify_complete_kibana(deploy)
-      Logger.log(:info, "Finished deploy of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
+      Logger.log(:info, "Finished deploy of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
     end
 
     def notify_complete_canoe(deploy)
