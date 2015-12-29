@@ -11,13 +11,14 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/kr/text"
 	"github.com/serenize/snaker"
 	"github.com/sr/operator/src/operator"
 )
 
 const (
 	defaultBinaryName       = "operator"
-	undocumentedPlaceholder = "Undocumented."
+	undocumentedPlaceholder = "  Undocumented."
 )
 
 type generator struct {
@@ -32,7 +33,7 @@ type mainDescriptor struct {
 
 type serviceDescriptor struct {
 	Name        string
-	Description []string
+	Description string
 	BinaryName  string
 	Methods     []*methodDescriptor
 }
@@ -109,7 +110,7 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 			main.Services[i] = &serviceDescriptor{
 				Name:        nameStr,
 				BinaryName:  binaryName,
-				Description: []string{undocumentedPlaceholder},
+				Description: undocumentedPlaceholder,
 				Methods:     make([]*methodDescriptor, len(service.Method)),
 			}
 			for j, method := range service.Method {
@@ -140,10 +141,9 @@ func (g *generator) Generate() (*plugin.CodeGeneratorResponse, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				desc := strings.Split(*loc.LeadingComments, "\n")
-				main.Services[loc.Path[1]].Description = desc
+				main.Services[loc.Path[1]].Description = text.Indent(text.Wrap(*loc.LeadingComments, 80), "  ")
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
-				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = strings.Replace(*loc.LeadingComments, "\n", " ", -1)
+				main.Services[loc.Path[1]].Methods[loc.Path[3]].Description = text.Indent(text.Wrap(*loc.LeadingComments, 80), "  ")
 			}
 		}
 	}

@@ -19,13 +19,13 @@ import (
 
 const usage = ` + "`" + `Usage: {{.BinaryName}} <service> <command>
 
-Use  '{{.BinaryName}} help <service>' for help with a particular service.
+Use  "{{.BinaryName}} help <service>" for help with a particular service.
 
 Available services:
 {{range .Services}}
-  {{.Name}}{{range .Description}}
-    {{.}}{{end}}
-{{- end}}` + "`" + `
+{{.Name}}
+{{.Description}}
+{{end}}` + "`" + `
 
 type mainEnv struct {
 	Address string ` + "`" + `env:"OPERATORD_ADDRESS,default=localhost:3000"` + "`" + `
@@ -58,10 +58,13 @@ func main() {
 			if (len(os.Args) == 2 || (os.Args[2] == "-h" ||
 				os.Args[2] == "--help" || os.Args[2] == "help")) {
 				showUsage(` + "`" + `Usage: {{.BinaryName}} {{.Name}} [command]
-{{range .Description}}
-{{.}}{{end}}
-Available Commands:{{range .Methods}}
-  {{.NameDasherized}} {{.Description}}{{end}}` + "`" + `)
+
+{{.Description}}
+
+Available Commands:
+{{range .Methods}}
+  {{.NameDasherized}}{{.Description}}
+{{end}}` + "`" + `)
 			} else {
 				command := os.Args[2]
 				switch command {
