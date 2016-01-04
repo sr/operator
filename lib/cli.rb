@@ -74,7 +74,7 @@ class CLI
           environment.conductor.deploy!(requested_deploy)
         end
       else
-        Logger.log(:info, "Nothing to do for this deploy")
+        Logger.log(:debug, "Nothing to do for this deploy")
       end
     else
       Logger.log(:info, "The deploy does not apply to this server")
