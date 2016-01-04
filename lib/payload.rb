@@ -49,6 +49,10 @@ class Payload
     "#{current_link}/build.version"
   end
 
+  def services_env
+    @options.fetch(:services_env, "prod")
+  end
+
   # --------------------------------------------------------------------------
   def safe_path(path)
     return nil if path.to_s.strip.empty?
