@@ -176,11 +176,12 @@ module Environments
     end
 
     def restart_old_style_jobs
-      ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
+      output = ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
+      Logger.log(:info, "Restarted old style jobs: #{output}")
     end
 
     def restart_redis_jobs
-      Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{symfony_env}/nosql/redis/client.yml")
+      Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{payload.services_env}/nosql/redis/client.yml")
     end
 
     def restart_pithumbs_service
