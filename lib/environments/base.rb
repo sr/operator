@@ -39,7 +39,6 @@ module Environments
         #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
         tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
         tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana, :notify_complete_canoe]
-        tmp_hooks[:pardot][:after][:deploy] = [:custom_hooks]
         tmp_hooks
       end
     end
@@ -152,14 +151,6 @@ module Environments
 
     # =========================================================================
     # common hooks
-
-    # These are per machine custom hooks that are managed by chef
-    def custom_hooks
-      unless (custom_hooks_path.empty?)
-        output = ShellHelper.execute_shell(custom_hooks_path)
-        Logger.log(:debug, output)
-      end
-    end
 
     def notify_begin_kibana(deploy)
       Logger.log(:info, "Started fetch of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
@@ -323,10 +314,6 @@ module Environments
 
     def canoe_target
       @config.fetch(:canoe_target, "")
-    end
-
-    def custom_hooks_path
-      @config.fetch(:custom_hooks, "")
     end
 
     def autojob_hosts
