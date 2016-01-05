@@ -27,8 +27,15 @@ class DeployWorkflow
 
   # Moves any servers still deploying code to the "failed" stage so the restart
   # phase can complete immediately.
-  def cancel_deploy_on_incomplete_servers
+  def fail_deploy_on_initiated_servers
     @deploy.results.initiated.update_all(stage: "failed")
+    @deploy.check_completed_status!
+  end
+
+  # Moves any incomplete server to the "failed" stage. The restart phase, if it
+  # hasn't run already, will be skipped.
+  def fail_deploy_on_incomplete_servers
+    @deploy.results.incomplete.update_all(stage: "failed")
     @deploy.check_completed_status!
   end
 

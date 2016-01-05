@@ -1,40 +1,35 @@
-<div class="container">
-  <h4>Servers</h4>
-  <% deploy.all_sync_servers.each do |server| %>
-    <div class="deploy-server-status">
-      <% if deploy.sync_finished_servers.include?(server) %>
-        <span class="text-success" title="Complete"><i class="icon-check"></i></span>
-      <% else %>
-        <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
-      <% end %>
-      <%= server %>
-    </div>
-  <% end %>
-</div>
-
-<div class="container">
-  <h4>Pull-Based Servers</h4>
-  <%- deploy.results.includes(:server).sort_by_server_hostname.each do |result| %>
-    <div class="deploy-server-status">
-      <%- if result.initiated? %>
-        <span class="text-muted muted" title="Initiated"><i class="icon-check-empty"></i></span>
-      <%- elsif result.completed? %>
-        <span class="text-success" title="Complete"><i class="icon-check"></i></span>
-      <% elsif result.failed? %>
-        <span class="text-danger" title="Failed"><i class="icon-exclamation-sign"></i></span>
-      <% elsif result.deployed? %>
-        <%- next_action = deploy_workflow_for(deploy).next_action_for(server: result.server, result: result) %>
-        <%- if next_action == "restart" %>
-          <span class="test-success" title="Deployed"><i class="icon-refresh"></i></span>
-        <%- else %>
+<%- if deploy.all_sync_servers.any? %>
+  <div class="container">
+    <h4>Push-Based Servers</h4>
+    <% deploy.all_sync_servers.each do |server| %>
+      <div class="deploy-server-status">
+        <% if deploy.sync_finished_servers.include?(server) %>
           <span class="text-success" title="Complete"><i class="icon-check"></i></span>
-        <%- end %>
-      <%- end %>
-      <%= link_to result.server.hostname, kibana_link(deploy: current_deploy, host: result.server.hostname) %>
-    </div>
-  <%- end %>
-</div>
+        <% else %>
+          <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
+        <% end %>
+        <%= server %>
+      </div>
+    <% end %>
+  </div>
+<%- end %>
 
-<div class="clearfix">
-</div>
-<br>
+<%- pending_servers = deploy_results.reject(&:at_terminal_state?) %>
+<%- if pending_servers.any? %>
+  <div class="container">
+    <h4>Pending Servers</h4>
+    <%- pending_servers.each do |result| %>
+      <%= render "deploy_result", deploy: deploy, result: result %>
+    <%- end %>
+  </div>
+<%- end %>
+
+<%- completed_servers = deploy_results.select(&:at_terminal_state?) %>
+<%- if completed_servers.any? %>
+  <div class="container">
+    <h4>Completed Servers</h4>
+    <%- completed_servers.each do |result| %>
+      <%= render "deploy_result", deploy: deploy, result: result %>
+    <%- end %>
+  </div>
+<%- end %>

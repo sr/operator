@@ -120,12 +120,12 @@ RSpec.describe DeployWorkflow do
     end
   end
 
-  describe "#cancel_deploy_on_incomplete_servers" do
+  describe "#fail_deploy_on_initiated_servers" do
     it "moves any servers in the initiated stage to the failed stage" do
       server = FactoryGirl.create(:server)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
 
-      workflow.cancel_deploy_on_incomplete_servers
+      workflow.fail_deploy_on_initiated_servers
       expect(deploy.results.for_server(server).stage).to eq("failed")
       expect(deploy.completed?).to be_truthy
     end
@@ -135,13 +135,35 @@ RSpec.describe DeployWorkflow do
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
 
       workflow.notify_action_successful(server: restart_server, action: "deploy")
-      workflow.cancel_deploy_on_incomplete_servers
+      workflow.fail_deploy_on_initiated_servers
 
       expect(deploy.completed?).to be_falsey
       expect(workflow.next_action_for(server: restart_server)).to eq("restart")
 
       workflow.notify_action_successful(server: restart_server, action: "restart")
 
+      expect(deploy.completed?).to be_truthy
+    end
+  end
+
+  describe "#fail_deploy_on_incomplete_servers" do
+    it "moves any servers in the incomplete stage to the failed stage" do
+      server = FactoryGirl.create(:server)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
+
+      workflow.fail_deploy_on_incomplete_servers
+      expect(deploy.results.for_server(server).stage).to eq("failed")
+      expect(deploy.completed?).to be_truthy
+    end
+
+    it "skips the restart phase" do
+      restart_server, other_server = FactoryGirl.create_list(:server, 2)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
+
+      workflow.notify_action_successful(server: restart_server, action: "deploy")
+      workflow.fail_deploy_on_incomplete_servers
+
+      expect(workflow.next_action_for(server: restart_server)).to eq(nil)
       expect(deploy.completed?).to be_truthy
     end
   end

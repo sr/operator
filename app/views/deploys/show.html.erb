@@ -40,26 +40,17 @@
     <i class="icon-remove-sign"></i>
     <strong>Canceled</strong>:
     this deploy was canceled and marked completed on <%= print_time current_deploy.updated_at %>
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
   </div>
 <% elsif current_deploy.completed? %>
   <div class="alert alert-success">
     <i class="icon-check"></i>
     <strong>Complete</strong>:
     marked as completed on <%= print_time current_deploy.updated_at %>
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
   </div>
 <% else %>
   <div class="alert alert-warning">
     <img src="/img/busy.gif" style="width:25px;">
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
     <% if @watching && !current_deploy.completed? %>
       <script type="text/javascript">
         // automatically refresh the page every 15 secs
@@ -77,19 +68,18 @@
   </div>
 <% end %>
 
-<%= render partial: "deploys/deploy_log" %>
-
-<% unless @show_full_logs %> <%# don't show server info on full log %>
-  <%# ======================== SERVERS ======================== %>
-  <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy} %>
+<%- if @deploy.all_sync_servers.any? %>
+  <%= render partial: "deploys/deploy_log" %>
+<%- else %>
   <div class="well well-sm">
-    <% if current_deploy.used_all_servers? %>
-      <em>All servers used for sync.</em>
-    <% else %>
-      <strong>Specified Servers:</strong>
-      <%= current_deploy.specified_servers %>
-    <% end %>
+    <%= link_to kibana_link(deploy: current_deploy), class: "btn btn-info", target: "_blank" do %>
+      Logs <i class="icon-external-link"></i>
+    <%- end %>
   </div>
+<%- end %>
+
+<% unless @show_full_logs %>
+  <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy, deploy_results: @deploy_results} %>
 <% end %>
 
 <hr>
@@ -118,7 +108,7 @@
     <%- unless current_deploy.completed? %>
       <tr>
         <td>
-          <%= form_tag cancel_on_incomplete_servers_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
+          <%= form_tag force_to_complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
             <%= button_tag type: "submit", class: "btn btn-warning" do %>
               <%= content_tag :i, "", class: "icon-fast-forward" %>
               FORCE TO COMPLETE

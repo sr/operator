@@ -1,6 +1,6 @@
 class ServersController < ApplicationController
   def index
-    @servers = Server.order(hostname: :asc)
+    @servers = Server.includes(:repos, :server_tags).order(hostname: :asc)
   end
 
   def new

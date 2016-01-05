@@ -1,7 +1,7 @@
 class DeploysController < ApplicationController
   before_filter :require_repo
   before_filter :require_target, only: [:new, :create, :index]
-  before_filter :require_deploy, only: [:show, :complete, :cancel]
+  before_filter :require_deploy, only: [:show, :complete, :cancel, :force_to_complete]
   before_filter :require_no_active_deploy, only: [:new, :create]
   before_filter :require_no_active_lock, only: [:new, :create]
 
@@ -52,6 +52,8 @@ class DeploysController < ApplicationController
     @watching = params[:watching].present?
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)
     @show_full_logs = (params[:show_full] == "1")
+
+    @deploy_results = @deploy.results.includes(:server).sort_by_server_hostname
   end
 
   def create
@@ -68,8 +70,8 @@ class DeploysController < ApplicationController
     end
   end
 
-  def cancel_on_incomplete_servers
-    deploy_workflow_for(current_deploy).cancel_deploy_on_incomplete_servers
+  def force_to_complete
+    deploy_workflow_for(current_deploy).fail_deploy_on_initiated_servers
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
   end
 
@@ -79,7 +81,8 @@ class DeploysController < ApplicationController
   end
 
   def cancel
-    current_deploy.cancel! if current_deploy
+    deploy_workflow_for(current_deploy).fail_deploy_on_incomplete_servers
+    current_deploy.cancel!
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
   end
 

@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
     resources :deploys, only: [:new, :create, :show] do
       get :select_target, on: :collection
-      post :cancel_on_incomplete_servers, on: :member
+      post :force_to_complete, on: :member
       post :cancel, on: :member
     end
   end
