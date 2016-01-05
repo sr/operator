@@ -40,26 +40,17 @@
     <i class="icon-remove-sign"></i>
     <strong>Canceled</strong>:
     this deploy was canceled and marked completed on <%= print_time current_deploy.updated_at %>
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
   </div>
 <% elsif current_deploy.completed? %>
   <div class="alert alert-success">
     <i class="icon-check"></i>
     <strong>Complete</strong>:
     marked as completed on <%= print_time current_deploy.updated_at %>
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
   </div>
 <% else %>
   <div class="alert alert-warning">
     <img src="/img/busy.gif" style="width:25px;">
     <strong>Not Complete</strong>: we're waiting on this <i class="icon-train2"></i> to stop.
-    <%= link_to kibana_link(deploy: current_deploy) do %>
-      <%= image_tag('mustache-small.png') %> Logs
-    <% end %>
     <% if @watching && !current_deploy.completed? %>
       <script type="text/javascript">
         // automatically refresh the page every 15 secs
@@ -77,9 +68,17 @@
   </div>
 <% end %>
 
-<%= render partial: "deploys/deploy_log" %>
+<%- if @deploy.all_sync_servers.any? %>
+  <%= render partial: "deploys/deploy_log" %>
+<%- else %>
+  <div class="well well-sm">
+    <%= link_to kibana_link(deploy: current_deploy), class: "btn btn-info", target: "_blank" do %>
+      Logs <i class="icon-external-link"></i>
+    <%- end %>
+  </div>
+<%- end %>
 
-<% unless @show_full_logs %> <%# don't show server info on full log %>
+<% unless @show_full_logs %>
   <%# ======================== SERVERS ======================== %>
   <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy, deploy_results: @deploy_results} %>
   <div class="well well-sm">
