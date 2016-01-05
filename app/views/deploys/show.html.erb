@@ -79,16 +79,7 @@
 <%- end %>
 
 <% unless @show_full_logs %>
-  <%# ======================== SERVERS ======================== %>
   <%= render partial: "deploys/deploy_servers", locals: {deploy: @deploy, deploy_results: @deploy_results} %>
-  <div class="well well-sm">
-    <% if current_deploy.used_all_servers? %>
-      <em>All servers used for sync.</em>
-    <% else %>
-      <strong>Specified Servers:</strong>
-      <%= current_deploy.specified_servers %>
-    <% end %>
-  </div>
 <% end %>
 
 <hr>

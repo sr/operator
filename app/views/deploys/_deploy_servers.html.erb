@@ -1,27 +1,35 @@
-<div class="container">
-  <h4>Push-Based Servers</h4>
-  <% deploy.all_sync_servers.each do |server| %>
-    <div class="deploy-server-status">
-      <% if deploy.sync_finished_servers.include?(server) %>
-        <span class="text-success" title="Complete"><i class="icon-check"></i></span>
-      <% else %>
-        <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
-      <% end %>
-      <%= server %>
-    </div>
-  <% end %>
-</div>
+<%- if deploy.all_sync_servers.any? %>
+  <div class="container">
+    <h4>Push-Based Servers</h4>
+    <% deploy.all_sync_servers.each do |server| %>
+      <div class="deploy-server-status">
+        <% if deploy.sync_finished_servers.include?(server) %>
+          <span class="text-success" title="Complete"><i class="icon-check"></i></span>
+        <% else %>
+          <span class="text-muted muted" title=""><i class="icon-check-empty"></i></span>
+        <% end %>
+        <%= server %>
+      </div>
+    <% end %>
+  </div>
+<%- end %>
 
-<div class="container">
-  <h4>Pending Servers</h4>
-  <%- deploy_results.reject(&:at_terminal_state?).each do |result| %>
-    <%= render "deploy_result", deploy: deploy, result: result %>
-  <%- end %>
-</div>
+<%- pending_servers = deploy_results.reject(&:at_terminal_state?) %>
+<%- if pending_servers.any? %>
+  <div class="container">
+    <h4>Pending Servers</h4>
+    <%- pending_servers.each do |result| %>
+      <%= render "deploy_result", deploy: deploy, result: result %>
+    <%- end %>
+  </div>
+<%- end %>
 
-<div class="container">
-  <h4>Completed Servers</h4>
-  <%- deploy_results.select(&:at_terminal_state?).each do |result| %>
-    <%= render "deploy_result", deploy: deploy, result: result %>
-  <%- end %>
-</div>
+<%- completed_servers = deploy_results.select(&:at_terminal_state?) %>
+<%- if completed_servers.any? %>
+  <div class="container">
+    <h4>Completed Servers</h4>
+    <%- completed_servers.each do |result| %>
+      <%= render "deploy_result", deploy: deploy, result: result %>
+    <%- end %>
+  </div>
+<%- end %>
