@@ -13,15 +13,13 @@ class Server < ActiveRecord::Base
   has_many :deploy_scenarios
   accepts_nested_attributes_for :deploy_scenarios, allow_destroy: true
 
+  has_many :repos, -> { uniq }, through: :deploy_scenarios
+
   has_many :server_taggings, dependent: :destroy
   has_many :server_tags, through: :server_taggings
 
   def self.for_repo(repo)
     joins(:repos).where(repos: {id: repo.id})
-  end
-
-  def repos
-    deploy_scenarios.includes(:repo).map(&:repo).uniq
   end
 
   def server_tag_names=(tag_names)

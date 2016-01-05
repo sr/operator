@@ -6,6 +6,7 @@
   <tr>
     <th>Hostname</th>
     <th>Repos</th>
+    <th>Tags</th>
     <th>Actions</th>
   </tr>
 
@@ -13,6 +14,7 @@
     <tr class="<%= server.enabled? ? "success" : "warning" %>">
       <td><%= server.hostname %></td>
       <td><%= server.repos.map(&:name).sort.join(", ") %></td>
+      <td><%= server.server_tags.map(&:name).sort.join(", ") %>
       <td>
         <%= link_to "Edit", edit_server_path(server), class: "btn btn-xs btn-success" %>
       </td>
