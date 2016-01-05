@@ -52,6 +52,8 @@ class DeploysController < ApplicationController
     @watching = params[:watching].present?
     @previous_deploy = current_target.previous_successful_deploy(current_deploy)
     @show_full_logs = (params[:show_full] == "1")
+
+    @deploy_results = @deploy.results.includes(:server).sort_by_server_hostname
   end
 
   def create

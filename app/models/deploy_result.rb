@@ -21,4 +21,8 @@ class DeployResult < ActiveRecord::Base
   def self.for_server_hostname(hostname)
     joins(:server).where(servers: {hostname: hostname}).first
   end
+
+  def at_terminal_state?
+    completed? || failed?
+  end
 end
