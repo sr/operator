@@ -1,10 +1,9 @@
-require "console"
+require "logger"
 require "shell_helper"
 
 # module to include in the proper environments for required hooks
 module SalesEdgeEnvModule
   def restart_salesedge
-    Console.log("Restarting service after SalesEdge deployment...")
     se = SalesEdge.new
     se.debugging = true
     se.restart!
@@ -13,14 +12,6 @@ end
 
 class SalesEdge
   attr_accessor :debugging
-
-  def initialize
-    self.debugging = false
-  end
-
-  def debugging?
-    self.debugging
-  end
 
   def services
     @_services ||= {
@@ -31,31 +22,27 @@ class SalesEdge
   end
 
   def restart!
-    Console.log("Restarting SalesEdge...") if debugging?
-
     services.each do |service, port|
       # TODO: what should we do if the service didn't start?
       restart_service!(service, port)
     end
-
-    Console.log("Done restarting.") if debugging?
   end
 
   def restart_service!(service, port)
-    Console.log("\tRestarting #{service} (#{port})...", :yellow) if debugging?
+    Logger.log(:info, "Restarting #{service} (#{port})...", :yellow)
 
     restart_cmd = "sudo -H /sbin/stop  pardot-push-#{service}; " + \
                   "sudo -H /sbin/start pardot-push-#{service}; "
     output = ShellHelper.execute_shell(restart_cmd)
-    Console.log(output) if debugging?
+    Logger.log(:debug, output)
     pause_and_wait(15)
 
     if port
       if did_service_start?(port) # will loop at least 10 times
-        Console.log("\t #{service} is up!", :green) if debugging?
+        Logger.log(:info, "#{service} is up!")
         return true
       else
-        Console.log("\t #{service} did not start?!?", :red) if debugging?
+        Logger.log(:err, "#{service} did not start?!?")
         return false
       end
     else

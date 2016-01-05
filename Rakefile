@@ -1,12 +1,10 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'rake/testtask'
 
-task :default => [:test]
-
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.test_files = FileList['test/*_test.rb']
-  test.verbose = true
-  test.warning = true
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec)
+  task :default => :spec
+rescue LoadError
+  # no rspec available
 end

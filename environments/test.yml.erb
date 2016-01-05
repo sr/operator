@@ -1,42 +1,17 @@
-#    _____          _   
-#   /__   \___  ___| |_ 
+#    _____          _
+#   /__   \___  ___| |_
 #     / /\/ _ \/ __| __|
-#    / / |  __/\__ \ |_ 
+#    / / |  __/\__ \ |_
 #    \/   \___||___/\__|
-                    
 
 # This is using the :key: yml syntax to get symbol keys instead of string keys
 ---
-<% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
-
-:sudo: ""
-
-:use_locking: true
-:lock_location: <%= sync_dir %>/dev_lock
-
-:canoe_url: http://canoe.dev
-:canoe_target: staging
+:canoe_url: http://canoe.test
+:canoe_target: test
 :canoe_api_token: "secret"
-
-<% destinations_path = "#{sync_dir}/test_destinations" %>
 
 :repos:
   :pardot:
-    :repo_path: <%= destinations_path %>/test-pi/
-    :current_link: <%= destinations_path %>/current-pi
-    :path_choices: 
-      - <%= destinations_path %>/test-piA/
-      - <%= destinations_path %>/test-piB/
-  :node_modules:
-    :repo_path: <%= destinations_path %>/test-node_modules
+    :repo_path: /var/www/pardot
   :pithumbs:
-    :repo_path: <%= destinations_path %>/test-thumbs
-  :workflow-stats:
-    :repo_path: <%= destinations_path %>/workflow_stats
-    :artifact_prefix: workflowstats-1.0SNAPSHOT
-
-:servers:
-  :pardot: 
-    - localhost
-  :pithumbs: 
-    - localhost
+    :repo_path: /var/www/pithumbs

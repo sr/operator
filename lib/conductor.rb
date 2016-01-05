@@ -1,7 +1,5 @@
-require 'redis'
-# make sure encoding works properly on the servers...
-Encoding.default_external = Encoding::UTF_8
-Encoding.default_internal = Encoding::UTF_8
+require "redis"
+require "logger"
 
 class Conductor
   # attributes usually set by environment
@@ -31,8 +29,9 @@ class Conductor
     environment.execute_post_fetch_hooks(deploy)
 
     environment.execute_pre_deploy_hooks(deploy)
-    success = deploy_strategy.deploy(payload_path, deploy)
-    environment.execute_post_deploy_hooks(deploy) unless success == deploy_strategy::DEPLOY_FAILED
+    if success = deploy_strategy.deploy(payload_path, deploy)
+      environment.execute_post_deploy_hooks(deploy)
+    end
 
     success
   end
@@ -60,14 +59,12 @@ class Conductor
   end
 
   def invalid_fetch_warning(deploy)
-    Console.log("!"*80, :red)
-    Console.log("ERROR: Requested deploy #{deploy.inspect} was not found.\n" +
-      "Please confirm it was entered correctly and actually exists.", :red)
+    Logger.log(:err, "Requested deploy #{deploy.inspect} was not found")
   end
 
   def exit_for_invalid_fetch_path
-    Console.log("!"*80, :red)
-    Console.log("ERROR: No local path available. Maybe check the environment definitions.")
-    exit 1 # TODO: should we have different exit codes for different conditions?
+    Logger.log(:err, "No local path available. Maybe check the environment definitions.")
+    # TODO: Exiting from this deep into the system is bad design. Can we do something better?
+    exit 1
   end
 end
