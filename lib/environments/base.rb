@@ -5,6 +5,7 @@ require "conductor"
 require "payload"
 require "logger"
 require "strategies"
+require "discovery_client"
 require "core_ext/extract_options"
 require "core_ext/underscore_string"
 
@@ -181,7 +182,13 @@ module Environments
     end
 
     def restart_redis_jobs
-      Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{payload.services_env}/nosql/redis/client.yml")
+      disco = DiscoveryClient.new
+      (1..9).each do |i|
+        masters = disco.service("redis-job-#{i}").select { |s| s['payload'] && s['payload']['role'] == 'master' }
+        masters.each do |master|
+          Redis.bounce_redis_jobs(master['address'], master['port'])
+        end
+      end
     end
 
     def restart_pithumbs_service

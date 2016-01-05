@@ -63,26 +63,11 @@ class Redis
       found
     end
 
-    def bounce_redis_jobs(config_file)
-      yaml = File.open(config_file).readlines.join()
-      redis_servers = []
-
-      (1..9).each do |i|
-        # We have to regex the yml because symfony 1.0 doesn't use proper yaml format
-        # http://rubular.com/r/4igxCz6E39
-        yaml[/redis\.jobs\.servers\.#{i}:\s+d\d:\s+host:\s*['"](.*)['"]/]
-        redis_servers << Regexp.last_match(1) if Regexp.last_match
-      end
-
-      yaml[/redis\.jobs\.servers:\s+d\d:\s+host:\s*['"](.*)['"]/]
-      redis_servers << Regexp.last_match(1) if Regexp.last_match
-
-      redis_servers.each do |host|
-        redis = Redis::Host.new(host, 6379, 10)
-        redis.set("node_reset", Time.now.to_i)
-        redis.set("monitor_reset", Time.now.to_i)
-        Logger.log(:info, "Reset job nodes and monitors for host #{host}:6379")
-      end
+    def bounce_redis_jobs(hostname, port)
+      host = Redis::Host.new(hostname, port, 10)
+      host.set("node_reset", Time.now.to_i)
+      host.set("monitor_reset", Time.now.to_i)
+      Logger.log(:info, "Reset job nodes and monitors for host #{hostname}:#{port}")
     end
   end # << self
 end
