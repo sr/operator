@@ -8,107 +8,106 @@ module Strategies
   module Deploy
     class Atomic < Base
       def deploy(artifact_path, deploy)
-        dpath = deploy_path
-        if dpath.nil?
-          Logger.log(:err, "Deploy path not found: #{dpath}")
-          false
-        else
-          if success = extract_artifact(dpath, artifact_path)
-            move_symlinks(:forward, dpath)
-          end
-          success
+        deploy_path = determine_next_deploy_path
+        if deploy_path.nil?
+          Logger.log(:error, "Unable to determine deploy path")
+          return false
         end
+
+        extract_artifact(deploy_path, artifact_path).tap { |success|
+          if success
+            move_current_link(deploy_path)
+          end
+        }
       end
 
       def rollback?(deploy)
-        if current_build_version = BuildVersion.load("#{deploy_path(:reverse)}/build.version")
-          current_build_version.instance_of_deploy?(deploy)
-        else
-          false
-        end
+        !!find_existing_deploy_on_disk(deploy)
       end
 
-      def rollback
-        move_symlinks(:reverse)
+      def rollback(deploy)
+        rollback_path = find_existing_deploy_on_disk(deploy)
+        if rollback_path.nil?
+          # We shouldn't get here because `rollback` is only invoked if
+          # `rollback?` returns true, but in the case of a code bug, we
+          # definitely want to bomb out if we can't find the deploy
+          Logger.log(:error, "Unable to find rollback deploy on disk: #{deploy}")
+          return false
+        end
+
+        !!move_current_link(rollback_path)
       end
 
       private
-
-      def current_remote_pointed_at
-        if File.symlink?(environment.payload.current_link) && real_path = File.readlink(environment.payload.current_link)
-          Logger.log(:info, "LINK: current -> '#{real_path}'")
-          real_path
-        else
-          nil # First deployment
+      def current_link_pointed_at
+        if File.symlink?(environment.payload.current_link)
+          File.readlink(environment.payload.current_link)
         end
       end
 
-      def deploy_path(direction = :forward)
-        if current = current_remote_pointed_at
-          pick_next_choice(environment.payload.path_choices, current, direction)
-        else
-          # First deployment - pick first one
-          environment.payload.path_choices.first
-        end
-      end
-
-      def pick_next_choice(array, current, direction)
-        result = nil
-        array = array.reverse unless direction == :forward
-        choices = array.cycle
-        array.length.times do
-          if path_with_trailing_slash(current) == path_with_trailing_slash(choices.next)
-            result = choices.next
-            break
-          end
-        end
-        result
-      end
-
-      def move_symlinks(direction = :forward, dpath = nil)
-        dpath ||= deploy_path(direction)
-        new_path = path_without_trailing_slash(dpath)
-
-        Logger.log(:info, "LINK: [MOVE] current -> '#{new_path}'")
+      def move_current_link(deploy_path)
+        Logger.log(:info, "Setting current symlink to '#{deploy_path}'")
         # Atomic switch of the symlink requires creating it in a temporary
         # location, then `rename`ing it to the current_link. `ln -sf` _is not
         # atomic_ on its own.
         temp_current_link = "#{environment.payload.current_link}_temp"
-        FileUtils.ln_sf(new_path, temp_current_link)
+        FileUtils.ln_sf(deploy_path, temp_current_link)
         File.rename(temp_current_link, environment.payload.current_link)
       end
 
-      def path_with_trailing_slash(path)
-        return nil if path.nil?
-        path = path.to_s
-        path += "/" unless path.strip[-1] == "/"
-        path
+      def find_existing_deploy_on_disk(deploy)
+        environment.payload.path_choices.find { |path|
+          if current_build_version = BuildVersion.load(File.join(path, "build.version"))
+            current_build_version.instance_of_deploy?(deploy)
+          else
+            false
+          end
+        }
       end
 
-      def path_without_trailing_slash(path)
-        # symlinks to dirs shouldn't end in /
-        return nil if path.nil?
-        path.to_s.strip.gsub(/\/$/,"")
+      def determine_next_deploy_path
+        path = if current = current_link_pointed_at
+                 pick_next_choice(environment.payload.path_choices, current)
+               else
+                 # First deployment - pick first one
+                 environment.payload.path_choices.first
+               end
+
+        normalize_path(path)
+      end
+
+      def pick_next_choice(array, current)
+        _, next_choice = array.cycle.each_cons(2).take(array.length).find { |element, next_element|
+          normalize_path(element) == normalize_path(current)
+        }
+
+        next_choice
+      end
+
+      # Removes any trailing slashes from a pathname
+      def normalize_path(path)
+        path && path.sub(/\/+$/, '')
       end
 
       def extract_artifact(deploy_path, artifact)
-        # We deploy to a temporary deploy path to minimize the time when the
-        # release directory is not present at all.
-        new_deploy_path = "#{path_without_trailing_slash(deploy_path)}.new.#{$$}"
+        # We extract the artifact to a temporary deploy path, then `rsync` the
+        # changes over to the `deploy_path`. We do this to make sure that we
+        # don't touch the modification time on files that didn't change, which
+        # would unnecessarily cause Opcache to invalidate them. We don't want to
+        # start new deploys with a completely blown cache, lest we cause a cache
+        # stampede.
+        temp_deploy_path = "#{normalize_path(deploy_path)}.new.#{$$}"
         begin
-          FileUtils.rm_rf(new_deploy_path)
-          FileUtils.mkdir_p(new_deploy_path)
+          FileUtils.rm_rf(temp_deploy_path)
+          FileUtils.mkdir_p(temp_deploy_path)
 
-          output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", new_deploy_path])
+          output = ShellHelper.execute_shell(["tar", "xzf", artifact, "-C", temp_deploy_path])
           success = $?.success?
           if success
-            old_deploy_path = "#{path_without_trailing_slash(deploy_path)}.old.#{$$}"
-            begin
-              FileUtils.rm_rf(old_deploy_path)
-              File.rename(deploy_path, old_deploy_path) if File.exists?(deploy_path)
-              File.rename(new_deploy_path, deploy_path)
-            ensure
-              FileUtils.rm_rf(old_deploy_path)
+            output = ShellHelper.execute_shell(["rsync", "--recursive", "--checksum", "--links", "--perms", "--verbose", "--delete", temp_deploy_path + "/", deploy_path])
+            success = $?.success?
+            unless success
+              Logger.log(:err, "Unable to sync changes to new deploy path: #{output}")
             end
           else
             Logger.log(:err, "Unable to extract artifact: #{output}")
@@ -116,7 +115,7 @@ module Strategies
 
           success
         ensure
-          FileUtils.rm_rf(new_deploy_path)
+          FileUtils.rm_rf(temp_deploy_path)
         end
       end
     end

@@ -1,8 +1,6 @@
 require "syslog"
 
 module Logger
-  extend self
-
   PRIORITIES = {
     debug: Syslog::LOG_DEBUG,
     info: Syslog::LOG_INFO,
@@ -15,8 +13,39 @@ module Logger
     crit: Syslog::LOG_CRIT,
   }.freeze
 
-  def log(our_priority, message)
-    puts "[%s] %s" % [our_priority, message] unless ENV['CRON']
+  class Context
+    include Enumerable
+
+    def initialize
+      @values = {}
+    end
+
+    def [](key)
+      @values[key]
+    end
+
+    def []=(key, value)
+      @values[key] = value
+    end
+
+    def each(&blk)
+      @values.each(&blk)
+    end
+
+    def to_s
+      @values.map { |k, v| "#{k}=#{v}" }.join(" ")
+    end
+  end
+
+  def self.context
+    @context ||= Context.new
+  end
+
+  def self.log(our_priority, message)
+    context_str = context.to_s
+    message = "[#{context_str}] #{message}" unless context_str.empty?
+
+    puts "[%s] %s" % [our_priority, message]
 
     Syslog.open("pull-agent") do
       Syslog.log(PRIORITIES.fetch(our_priority), message)

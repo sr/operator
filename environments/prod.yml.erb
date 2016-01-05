@@ -16,11 +16,11 @@
 
 :canoe_url: https://canoe.pardot.com
 :canoe_target: production
-:custom_hooks: /opt/pardot/server_hooks.sh
 
 :repos:
   :pardot:
     :repo_path: /var/www/pardot
+    :services_env: prod
   :pithumbs:
     :repo_path: /var/www/pithumbs
   :realtime-frontend:
@@ -28,6 +28,8 @@
     :current_link: /opt/realtime_frontend/realtime-frontend
   :blue-mesh:
     :repo_path: /opt/blue-mesh
+  :workflow-stats:
+    :repo_path: /opt/workflow_stats
 
 :autojob_hosts:
   - redis-cache-d1

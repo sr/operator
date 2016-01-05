@@ -39,7 +39,6 @@ module Environments
         #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
         tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
         tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana, :notify_complete_canoe]
-        tmp_hooks[:pardot][:after][:deploy] = [:custom_hooks]
         tmp_hooks
       end
     end
@@ -153,20 +152,12 @@ module Environments
     # =========================================================================
     # common hooks
 
-    # These are per machine custom hooks that are managed by chef
-    def custom_hooks
-      unless (custom_hooks_path.empty?)
-        output = ShellHelper.execute_shell(custom_hooks_path)
-        Logger.log(:debug, output)
-      end
-    end
-
     def notify_begin_kibana(deploy)
-      Logger.log(:info, "Started fetch of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
+      Logger.log(:info, "Started fetch of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
     end
 
     def notify_complete_kibana(deploy)
-      Logger.log(:info, "Finished deploy of #{payload.name}:#{deploy.what}/#{deploy.what_details} (build#{deploy.build_number})")
+      Logger.log(:info, "Finished deploy of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
     end
 
     def notify_complete_canoe(deploy)
@@ -185,11 +176,12 @@ module Environments
     end
 
     def restart_old_style_jobs
-      ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
+      output = ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
+      Logger.log(:info, "Restarted old style jobs: #{output}")
     end
 
     def restart_redis_jobs
-      Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{symfony_env}/nosql/redis/client.yml")
+      Redis.bounce_redis_jobs("#{symfony_path}/config/services/#{payload.services_env}/nosql/redis/client.yml")
     end
 
     def restart_pithumbs_service
@@ -198,6 +190,10 @@ module Environments
 
     def restart_murdoc
       restart_upstart_job("murdoc")
+    end
+
+    def restart_workflowstats_service
+      restart_upstart_job("workflowstats")
     end
 
     def restart_upstart_job(job)
@@ -319,10 +315,6 @@ module Environments
 
     def canoe_target
       @config.fetch(:canoe_target, "")
-    end
-
-    def custom_hooks_path
-      @config.fetch(:custom_hooks, "")
     end
 
     def autojob_hosts
