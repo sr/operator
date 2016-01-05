@@ -182,12 +182,20 @@ module Environments
     end
 
     def restart_redis_jobs
+      Logger.log(:info, "Querying the disco service to find redis job manager masters")
+
       disco = DiscoveryClient.new
+      found = false
       (1..9).each do |i|
         masters = disco.service("redis-job-#{i}").select { |s| s['payload'] && s['payload']['role'] == 'master' }
         masters.each do |master|
+          found = true
           Redis.bounce_redis_jobs(master['address'], master['port'])
         end
+      end
+
+      unless found
+        Logger.log(:warn, "No redis job manager masters were found")
       end
     end
 

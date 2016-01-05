@@ -64,10 +64,11 @@ class Redis
     end
 
     def bounce_redis_jobs(hostname, port)
+      Logger.log(:info, "Resetting job nodes and monitors for host #{hostname}:#{port}")
+
       host = Redis::Host.new(hostname, port, 10)
       host.set("node_reset", Time.now.to_i)
       host.set("monitor_reset", Time.now.to_i)
-      Logger.log(:info, "Reset job nodes and monitors for host #{hostname}:#{port}")
     end
   end # << self
 end
