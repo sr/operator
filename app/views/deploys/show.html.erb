@@ -118,7 +118,7 @@
     <%- unless current_deploy.completed? %>
       <tr>
         <td>
-          <%= form_tag cancel_on_incomplete_servers_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
+          <%= form_tag force_to_complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
             <%= button_tag type: "submit", class: "btn btn-warning" do %>
               <%= content_tag :i, "", class: "icon-fast-forward" %>
               FORCE TO COMPLETE
