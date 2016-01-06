@@ -9,7 +9,7 @@ import (
 
 type Env struct{}
 
-func NewAPIServer(env *Env) (GCloudServiceServer, error) {
+func NewAPIServer(env *Env) (GcloudServiceServer, error) {
 	client, err := google.DefaultClient(context.Background())
 	if err != nil {
 		return nil, nil
