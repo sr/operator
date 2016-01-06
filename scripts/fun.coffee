@@ -78,7 +78,19 @@ module.exports = (robot) ->
     msg.send "http://media4.giphy.com/media/V9qc3Adm2wWyY/giphy.gif"
 
   robot.respond /bees$/i, (msg) ->
-    msg.send "http://i.giphy.com/dcubXtnbck0RG.gif"
+    bees = [
+      'http://i.giphy.com/dcubXtnbck0RG.gif',
+      'https://media2.giphy.com/media/uclzDwprOogmI/200.gif',
+      'https://media0.giphy.com/media/12OQCyR1l6zU76/200.gif',
+      'http://i.giphy.com/dcubXtnbck0RG.gif',
+      'https://media.giphy.com/media/RnAorGjnsUkwg/giphy.gif',
+      'https://media.giphy.com/media/iJxPqw5mNXuAo/giphy.gif',
+      'http://i.giphy.com/dcubXtnbck0RG.gif',
+      'https://media.giphy.com/media/FphE0L24UycIU/giphy.gif',
+      'http://i.giphy.com/dcubXtnbck0RG.gif',
+      'https://media.giphy.com/media/YPjFIgSccMHS0/giphy.gif'
+    ]
+    msg.send msg.random bees
 
   robot.respond /tomcat(\s)?waits$/i, (msg) ->
     tomcatwaits = [
@@ -249,7 +261,8 @@ module.exports = (robot) ->
       'https://media.giphy.com/media/qxqXS7PhBWgWk/giphy.gif',
       'https://www.youtube.com/watch?v=QCniMXdbO6c',
       'https://www.youtube.com/watch?v=JYc05gZFly0',
-      'https://www.youtube.com/watch?v=NsICCjOQ3Dg'
+      'https://www.youtube.com/watch?v=NsICCjOQ3Dg',
+      'https://i.imgur.com/KZf5kWZ.png'
     ]
 
     msg.send msg.random panics
