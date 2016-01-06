@@ -51,6 +51,7 @@ RSpec.describe Hipchat do
     eng_msg = "Test: #{deploy.auth_user.email} just finished " + \
       "syncing #{repo.name.capitalize} to <a href='https://git.dev.pardot.com/" + \
       "Pardot/#{repo.name}/commits/abc123'>build214</a>"
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg)
     expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg)
     Hipchat.notify_deploy_complete(deploy)
   end
@@ -59,6 +60,7 @@ RSpec.describe Hipchat do
     repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
     deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214)
     msg = "Test: #{deploy.auth_user.email} just CANCELLED syncing #{repo.name.capitalize} to build214"
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, msg)
     expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg)
     Hipchat.notify_deploy_cancelled(deploy)
   end
