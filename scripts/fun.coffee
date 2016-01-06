@@ -155,6 +155,12 @@ module.exports = (robot) ->
     ]
     msg.send msg.random tehbishop
 
+  robot.respond /caleb$/i, (msg) ->
+    calebapple = [
+      'https://hipchat.dev.pardot.com/files/1/209/3pfm0Zx6Yt6Nc7c/calebapple.gif'
+    ]
+    msg.send msg.random calebapple
+
   robot.respond /beyonce$/i, (msg) ->
     charisma = [
       'http://lisafrankpoetry.files.wordpress.com/2012/07/kittens.gif',
