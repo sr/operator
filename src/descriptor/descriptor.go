@@ -16,16 +16,20 @@ import (
 	"github.com/sr/operator/src/operator"
 )
 
-const undocumentedPlaceholder = "Undocumented."
+const (
+	defaultBinaryName       = "operator"
+	undocumentedPlaceholder = "Undocumented."
+)
 
-type ServiceSet struct {
-	Options  Options
+type OperatorDesc struct {
+	Options  *Options
 	Services []*Service
 }
 
 type Options struct {
-	BinaryName string
-	Imports    []string
+	BinaryName     string
+	DefaultAddress string
+	Imports        []string
 }
 
 type Service struct {
@@ -45,13 +49,13 @@ type Argument struct {
 	Description string
 }
 
-func Describe(request *plugin.CodeGeneratorRequest) (*ServiceSet, error) {
-	numFiles := len(g.request.FileToGenerate)
+func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
+	numFiles := len(request.FileToGenerate)
 	if numFiles == 0 {
 		return nil, errors.New("no file to generate")
 	}
 	params := make(map[string]string)
-	for _, p := range strings.Split(g.request.GetParameter(), ",") {
+	for _, p := range strings.Split(request.GetParameter(), ",") {
 		if i := strings.Index(p, "="); i < 0 {
 			params[p] = ""
 		} else {
@@ -63,23 +67,23 @@ func Describe(request *plugin.CodeGeneratorRequest) (*ServiceSet, error) {
 		binaryName = val
 	}
 	numServices := 0
-	for _, file := range g.request.ProtoFile {
+	for _, file := range request.ProtoFile {
 		numServices = numServices + len(file.Service)
 	}
-	serviceSet := &ServiceSet{
+	desc := &OperatorDesc{
 		Options: &Options{
 			BinaryName: binaryName,
 			Imports:    make([]string, numFiles),
 		},
 		Services: make([]*Service, numServices),
 	}
-	for i, file := range g.request.FileToGenerate {
+	for i, file := range request.FileToGenerate {
 		// TODO(sr) substitute path.Ext() or whatever
 		b := fmt.Sprintf("/%s", path.Base(file))
-		serviceSet.Imports[i] = fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file, b, "", 1))
+		desc.Options.Imports[i] = fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file, b, "", 1))
 	}
 	i := 0
-	for _, file := range g.request.ProtoFile {
+	for _, file := range request.ProtoFile {
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
 		for _, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
@@ -93,21 +97,20 @@ func Describe(request *plugin.CodeGeneratorRequest) (*ServiceSet, error) {
 				return nil, err
 			}
 			nameStr := *name.(*string)
-			serviceSet.Services[i] = &Service{
+			desc.Services[i] = &Service{
 				Name:        nameStr,
-				BinaryName:  binaryName,
 				Description: undocumentedPlaceholder,
-				Methods:     make([]*methodDescriptor, len(service.Method)),
+				Methods:     make([]*Method, len(service.Method)),
 			}
 			for j, method := range service.Method {
 				input := messagesByName[strings.Split(method.GetInputType(), ".")[2]]
-				serviceSet.Services[i].Methods[j] = &Method{
+				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
 					Arguments:   make([]*Argument, len(input.Field)),
 				}
 				for k, field := range input.Field {
-					serviceSet.Services[i].Methods[j].Arguments[k] = &Argument{
+					desc.Services[i].Methods[j].Arguments[k] = &Argument{
 						// TODO(sr) deal with ID => Id etc better
 						Name:        strings.Replace(field.GetName(), "ID", "Id", 1),
 						Description: undocumentedPlaceholder,
@@ -121,11 +124,11 @@ func Describe(request *plugin.CodeGeneratorRequest) (*ServiceSet, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				serviceSet.Services[loc.Path[1]].Description = loc.LeadingComments
+				desc.Services[loc.Path[1]].Description = *loc.LeadingComments
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
-				serviceSet.Services[loc.Path[1]].Methods[loc.Path[3]].Description = *loc.LeadingComments
+				desc.Services[loc.Path[1]].Methods[loc.Path[3]].Description = *loc.LeadingComments
 			}
 		}
 	}
-	return serviceSet, nil
+	return desc, nil
 }
