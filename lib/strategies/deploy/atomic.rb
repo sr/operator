@@ -67,7 +67,13 @@ module Strategies
 
       def determine_next_deploy_path
         path = if current = current_link_pointed_at
-                 pick_next_choice(environment.payload.path_choices, current)
+                 if next_choice = pick_next_choice(environment.payload.path_choices, current)
+                   next_choice
+                 else
+                   # current isn't pointed at either release directory
+                   # we are safe to choose the first
+                   environment.payload.path_choices.first
+                 end
                else
                  # First deployment - pick first one
                  environment.payload.path_choices.first

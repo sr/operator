@@ -26,6 +26,18 @@ describe Strategies::Deploy::Atomic do
       end
     end
 
+    it "should deploy and link to the first choice when current_link points to neither A nor B" do
+      Tempfile.create("empty.tar.gz") do |f|
+        f.write(empty_tar_gz_contents)
+        f.flush
+
+        FileUtils.ln_s("#{tempdir}/releases/foo123", "#{tempdir}/current")
+
+        strategy.deploy(f.path, Deploy.new)
+        expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
+      end
+    end
+
     it "copies files to the destination deploy directory" do
       Tempfile.create("hello.tar.gz") do |f|
         f.write(hello_tar_gz_contents)
