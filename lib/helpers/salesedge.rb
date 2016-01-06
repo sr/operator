@@ -29,7 +29,7 @@ class SalesEdge
   end
 
   def restart_service!(service, port)
-    Logger.log(:info, "Restarting #{service} (#{port})...", :yellow)
+    Logger.log(:info, "Restarting #{service} (#{port})...")
 
     restart_cmd = "sudo -H /sbin/stop  pardot-push-#{service}; " + \
                   "sudo -H /sbin/start pardot-push-#{service}; "
