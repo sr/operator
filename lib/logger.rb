@@ -45,7 +45,7 @@ module Logger
     context_str = context.to_s
     message = "[#{context_str}] #{message}" unless context_str.empty?
 
-    puts "[%s] %s" % [our_priority, message]
+    puts "[%s] %s" % [our_priority, message] unless ENV['CRON']
 
     Syslog.open("pull-agent") do
       Syslog.log(PRIORITIES.fetch(our_priority), message)
