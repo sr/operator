@@ -177,8 +177,9 @@ module Environments
     end
 
     def restart_old_style_jobs
-      output = ShellHelper.execute_shell("#{payload.current_link}/symfony-#{symfony_env} restart-old-jobs")
-      Logger.log(:info, "Restarted old style jobs: #{output}")
+      cmd = "#{payload.current_link}/symfony-#{symfony_env} restart-old-jobs"
+      output = ShellHelper.execute_shell(cmd)
+      Logger.log(:info, "Restarted old style jobs (#{cmd}): #{output}")
     end
 
     def restart_redis_jobs
