@@ -77,7 +77,7 @@ class CLI
         Logger.log(:debug, "Nothing to do for this deploy")
       end
     else
-      Logger.log(:info, "The deploy does not apply to this server")
+      Logger.log(:debug, "The deploy does not apply to this server")
     end
   end
 
