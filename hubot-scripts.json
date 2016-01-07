@@ -5,5 +5,6 @@
   "tell.coffee",
   "lmgtfy.coffee",
   "commandlinefu.coffee",
-  "giphy.coffee"
+  "giphy.coffee",
+  "dice.coffee"
 ]
