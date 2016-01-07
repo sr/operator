@@ -177,7 +177,7 @@ module Environments
     end
 
     def restart_old_style_jobs
-      output = ShellHelper.execute_shell("#{symfony_path}/symfony-#{symfony_env} restart-old-jobs")
+      output = ShellHelper.execute_shell("#{payload.current_link}/symfony-#{symfony_env} restart-old-jobs")
       Logger.log(:info, "Restarted old style jobs: #{output}")
     end
 
@@ -334,10 +334,6 @@ module Environments
 
     def autojob_hosts
       @config.fetch(:autojob_hosts, [])
-    end
-
-    def symfony_path
-      @config[:symfony_path]
     end
 
     private
