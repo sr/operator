@@ -11,7 +11,7 @@ class Deploy < ActiveRecord::Base
 
   has_many :results, class_name: DeployResult
 
-  after_create do |deploy|
+  after_commit on: :create do |deploy|
     Hipchat.notify_deploy_start(deploy)
     Hipchat.notify_untested_deploy(deploy) if Rails.env.production? && !deploy.passed_ci
   end
