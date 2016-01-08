@@ -1,8 +1,4 @@
-// Package generator normalizes user-defined protobuf files and normalizes RPC
-// service descriptions into data structures suitable for code generation. This
-// is used the protoc-gen-hubot, protoc-gen-cmd, and protoc-gen-operatord
-// protobuf compiler plugins.
-package descriptor
+package generator
 
 import (
 	"errors"
@@ -10,49 +6,14 @@ import (
 	"path"
 	"strings"
 
+	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 	"github.com/sr/operator/src/operator"
 )
 
-const (
-	defaultBinaryName       = "operator"
-	undocumentedPlaceholder = "Undocumented."
-)
-
-type OperatorDesc struct {
-	Options  *Options
-	Services []*Service
-}
-
-type Options struct {
-	BinaryName     string
-	DefaultAddress string
-}
-
-type Service struct {
-	Name        string
-	FullName    string
-	Description string
-	PackageName string
-	ImportPath  string
-	Methods     []*Method
-}
-
-type Method struct {
-	Name        string
-	Description string
-	Input       string
-	Arguments   []*Argument
-}
-
-type Argument struct {
-	Name        string
-	Description string
-}
-
-func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
+func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	numFiles := len(request.FileToGenerate)
 	if numFiles == 0 {
 		return nil, errors.New("no file to generate")
@@ -65,7 +26,7 @@ func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
 			params[p[0:i]] = p[i+1:]
 		}
 	}
-	binaryName := defaultBinaryName
+	binaryName := DefaultBinaryName
 	if val, ok := params["binary"]; ok {
 		binaryName = val
 	}
@@ -73,7 +34,7 @@ func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
 	for _, file := range request.ProtoFile {
 		numServices = numServices + len(file.Service)
 	}
-	desc := &OperatorDesc{
+	desc := &Descriptor{
 		Options: &Options{
 			BinaryName: binaryName,
 		},

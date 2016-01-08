@@ -1,6 +1,5 @@
-// Package generator generates Golang code from the input proto files (first
-// normalized using the "descriptor" package) then compiles the code into
-// protobuf structures for use by the protoc executable.
+// Package generator generates Golang code from the input proto files then
+// compiles the code into protobuf structures for use by the protoc executable.
 package generator
 
 import (
@@ -9,17 +8,53 @@ import (
 	"io/ioutil"
 	"text/template"
 
-	"github.com/golang/protobuf/proto"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/sr/operator/src/descriptor"
+
+	"github.com/golang/protobuf/proto"
 )
+
+const (
+	DefaultBinaryName       = "operator"
+	undocumentedPlaceholder = "Undocumented."
+)
+
+type Descriptor struct {
+	Options  *Options
+	Services []*Service
+}
+
+type Options struct {
+	BinaryName     string
+	DefaultAddress string
+}
+
+type Service struct {
+	Name        string
+	FullName    string
+	Description string
+	PackageName string
+	ImportPath  string
+	Methods     []*Method
+}
+
+type Method struct {
+	Name        string
+	Description string
+	Input       string
+	Arguments   []*Argument
+}
+
+type Argument struct {
+	Name        string
+	Description string
+}
 
 type File struct {
 	Name    string
 	Content string
 }
 
-type Generator func(*descriptor.OperatorDesc) ([]*File, error)
+type Generator func(*Descriptor) ([]*File, error)
 
 func Compile(input io.Reader, output io.Writer, gen Generator) error {
 	data, err := ioutil.ReadAll(input)
@@ -30,7 +65,7 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 	if err := proto.Unmarshal(data, request); err != nil {
 		return fmt.Errorf("failed to parse input proto: %s", err)
 	}
-	desc, err := descriptor.Describe(request)
+	desc, err := describe(request)
 	if err != nil {
 		return fmt.Errorf("failed to normalize proto request: %s", err)
 	}

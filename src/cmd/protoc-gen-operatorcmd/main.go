@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sr/operator/src/descriptor"
 	"github.com/sr/operator/src/generator"
 )
 
@@ -16,16 +15,16 @@ const (
 
 type serviceUsageContext struct {
 	BinaryName string
-	Service    *descriptor.Service
+	Service    *generator.Service
 }
 
 type mainContext struct {
-	*descriptor.OperatorDesc
+	*generator.Descriptor
 	MainUsage    string
 	ServiceUsage map[string]string
 }
 
-func generate(descriptor *descriptor.OperatorDesc) ([]*generator.File, error) {
+func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
 	context := &mainContext{
 		descriptor,
