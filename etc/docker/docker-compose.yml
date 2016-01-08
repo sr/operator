@@ -2,9 +2,10 @@ app:
   build: ../..
   dockerfile: etc/docker/Dockerfile.ci
   environment:
-    - GITHUB_REPO_TOKEN
+    - BUILDKITE_AGENT_ACCESS_TOKEN
     - BUILDKITE_BUILD_NUMBER
     - BUILDKITE_JOB_ID
+    - GITHUB_REPO_TOKEN
   volumes:
     - ../../:/app
     - /var/run/docker.sock:/var/run/docker.sock
