@@ -1,4 +1,4 @@
-package genoperatord
+package main
 
 import "github.com/sr/operator/src/generator"
 
