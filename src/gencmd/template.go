@@ -68,6 +68,10 @@ func (c *client) close() {
 	c.client.Close()
 }
 
+func isHelp(arg string) bool {
+	return arg == "-h" || arg == "--help" || arg == "help"
+}
+
 func showUsage(s string) {
 	fmt.Fprintf(os.Stderr, "%s\n", s)
 	os.Exit(2)
@@ -110,8 +114,7 @@ func main() {
 	if err := env.Populate(mainEnv); err != nil {
 		fatal(err.Error())
 	}
-	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" ||
-		os.Args[1] == "help" {
+	if len(os.Args) == 1 || isHelp(os.Args[1]) {
 		showUsage(usage)
 	}
 	if len(os.Args) >= 2 {
@@ -120,8 +123,7 @@ func main() {
 		{{- range .Services}}
 		{{- $serviceName := .Name }}
 		case "{{.Name}}":
-			if (len(os.Args) == 2 || (os.Args[2] == "-h" ||
-				os.Args[2] == "--help" || os.Args[2] == "help")) {
+			if len(os.Args) == 2 || isHelp(os.Args[2]) {
 				showUsage(usageService{{camelCase $serviceName}})
 			} else {
 				command := os.Args[2]
