@@ -20,14 +20,14 @@ Use  "operator help <service>" for help with a particular service.
 Available services:
 
 buildkite
-Interact with the Buildkite.com Continuous Integration server. Let's you
-retrieve the status of projects, setup new ones, and trigger builds.
+  Interact with the Buildkite.com Continuous Integration server. Let's you
+  retrieve the status of projects, setup new ones, and trigger builds.
 
 gcloud
-Undocumented.
+  Undocumented.
 
 papertrail
-Undocumented.
+  Undocumented.
 `
 	usageServiceBuildkite = `Usage: operator buildkite [command]
 
@@ -36,13 +36,12 @@ retrieve the status of projects, setup new ones, and trigger builds.
 
 Available Commands:
 
-  Status List the status of all (i.e. the status of the last build) of one or
- all projects.
+status
+ List the status of all (i.e. the status of the last build) of one or  all
+ projects.
 
-
-  ListBuilds List the last builds of one or all projects, optionally limited to a
- branch.
-
+list-builds
+ List the last builds of one or all projects, optionally limited to a  branch.
 `
 	usageServiceGcloud = `Usage: operator gcloud [command]
 
@@ -50,9 +49,11 @@ Undocumented.
 
 Available Commands:
 
-  CreateContainerClusterUndocumented.
+create-container-cluster
+ Undocumented.
 
-  ListInstancesUndocumented.
+list-instances
+ Undocumented.
 `
 	usageServicePapertrail = `Usage: operator papertrail [command]
 
@@ -60,7 +61,8 @@ Undocumented.
 
 Available Commands:
 
-  SearchUndocumented.
+search
+ Undocumented.
 `
 )
 
@@ -98,7 +100,7 @@ func fatal(message string) {
 	os.Exit(1)
 }
 func (c *client) doBuildkiteStatus() (string, error) {
-	flags := flag.NewFlagSet("Status", flag.ExitOnError)
+	flags := flag.NewFlagSet("status", flag.ExitOnError)
 	slug := flags.String("slug", "", "")
 	flags.Parse(os.Args[2:])
 	client := buildkite.NewBuildkiteServiceClient(c.client)
@@ -115,7 +117,7 @@ func (c *client) doBuildkiteStatus() (string, error) {
 }
 
 func (c *client) doBuildkiteListBuilds() (string, error) {
-	flags := flag.NewFlagSet("ListBuilds", flag.ExitOnError)
+	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
 	slug := flags.String("slug", "", "")
 	branch := flags.String("branch", "", "")
 	flags.Parse(os.Args[2:])
@@ -134,7 +136,7 @@ func (c *client) doBuildkiteListBuilds() (string, error) {
 }
 
 func (c *client) doGcloudCreateContainerCluster() (string, error) {
-	flags := flag.NewFlagSet("CreateContainerCluster", flag.ExitOnError)
+	flags := flag.NewFlagSet("create-container-cluster", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
 	name := flags.String("name", "", "")
 	node_count := flags.String("node-count", "", "")
@@ -157,7 +159,7 @@ func (c *client) doGcloudCreateContainerCluster() (string, error) {
 }
 
 func (c *client) doGcloudListInstances() (string, error) {
-	flags := flag.NewFlagSet("ListInstances", flag.ExitOnError)
+	flags := flag.NewFlagSet("list-instances", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
 	flags.Parse(os.Args[2:])
 	client := gcloud.NewGcloudServiceClient(c.client)
@@ -174,7 +176,7 @@ func (c *client) doGcloudListInstances() (string, error) {
 }
 
 func (c *client) doPapertrailSearch() (string, error) {
-	flags := flag.NewFlagSet("Search", flag.ExitOnError)
+	flags := flag.NewFlagSet("search", flag.ExitOnError)
 	query := flags.String("query", "", "")
 	flags.Parse(os.Args[2:])
 	client := papertrail.NewPapertrailServiceClient(c.client)
@@ -207,7 +209,7 @@ func main() {
 			} else {
 				command := os.Args[2]
 				switch command {
-				case "Status":
+				case "status":
 					client, err := dial(mainEnv.Address)
 					if err != nil {
 						fatal(err.Error())
@@ -219,7 +221,7 @@ func main() {
 					}
 					fmt.Fprintf(os.Stdout, "%s\n", output)
 					os.Exit(0)
-				case "ListBuilds":
+				case "list-builds":
 					client, err := dial(mainEnv.Address)
 					if err != nil {
 						fatal(err.Error())
@@ -241,7 +243,7 @@ func main() {
 			} else {
 				command := os.Args[2]
 				switch command {
-				case "CreateContainerCluster":
+				case "create-container-cluster":
 					client, err := dial(mainEnv.Address)
 					if err != nil {
 						fatal(err.Error())
@@ -253,7 +255,7 @@ func main() {
 					}
 					fmt.Fprintf(os.Stdout, "%s\n", output)
 					os.Exit(0)
-				case "ListInstances":
+				case "list-instances":
 					client, err := dial(mainEnv.Address)
 					if err != nil {
 						fatal(err.Error())
@@ -275,7 +277,7 @@ func main() {
 			} else {
 				command := os.Args[2]
 				switch command {
-				case "Search":
+				case "search":
 					client, err := dial(mainEnv.Address)
 					if err != nil {
 						fatal(err.Error())
