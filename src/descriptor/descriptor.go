@@ -29,18 +29,21 @@ type OperatorDesc struct {
 type Options struct {
 	BinaryName     string
 	DefaultAddress string
-	Imports        []string
 }
 
 type Service struct {
 	Name        string
+	FullName    string
 	Description string
+	PackageName string
+	ImportPath  string
 	Methods     []*Method
 }
 
 type Method struct {
 	Name        string
 	Description string
+	Input       string
 	Arguments   []*Argument
 }
 
@@ -73,14 +76,8 @@ func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
 	desc := &OperatorDesc{
 		Options: &Options{
 			BinaryName: binaryName,
-			Imports:    make([]string, numFiles),
 		},
 		Services: make([]*Service, numServices),
-	}
-	for i, file := range request.FileToGenerate {
-		// TODO(sr) substitute path.Ext() or whatever
-		b := fmt.Sprintf("/%s", path.Base(file))
-		desc.Options.Imports[i] = fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file, b, "", 1))
 	}
 	i := 0
 	for _, file := range request.ProtoFile {
@@ -97,16 +94,25 @@ func Describe(request *plugin.CodeGeneratorRequest) (*OperatorDesc, error) {
 				return nil, err
 			}
 			nameStr := *name.(*string)
+			// TODO(sr) substitute path.Ext() or whatever
+			b := fmt.Sprintf("/%s", path.Base(file.GetName()))
+			importPath := fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file.GetName(), b, "", 1))
 			desc.Services[i] = &Service{
 				Name:        nameStr,
+				FullName:    service.GetName(),
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
+				// TODO(sr) might have to handle go_package proto option as well
+				PackageName: file.GetPackage(),
+				ImportPath:  importPath,
 			}
 			for j, method := range service.Method {
-				input := messagesByName[strings.Split(method.GetInputType(), ".")[2]]
+				inputName := strings.Split(method.GetInputType(), ".")[2]
+				input := messagesByName[inputName]
 				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
+					Input:       inputName,
 					Arguments:   make([]*Argument, len(input.Field)),
 				}
 				for k, field := range input.Field {
