@@ -31,10 +31,10 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 		cp $$file src/hubot/proto; \
 	done
 	cp src/operator/operator.proto src/hubot/proto/operator
-	protoc --hubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
+	protoc --operatorhubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-cmd:
-	protoc --cmd_out=src/cmd/ -Isrc -I/usr/local/include src/services/**/*.proto
+	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
 
 proto-operatord: proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
