@@ -4,6 +4,7 @@ endif
 GCLOUD_PROJECT_ID = dev-europe-west1
 GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
+PROTOEASY = bin/protoeasy
 
 -include etc/mk/golang.mk
 
@@ -34,13 +35,12 @@ proto-operatord: proto-grpcinstrument
 	@ gofmt -s -w src/cmd/operatord
 
 proto-grpc: get-protoeasy
-	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
+	$(PROTOEASY) --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
 
 proto-grpcinstrument: get-grpcinstrument
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
 
 get-protoeasy:
-	go get go.pedge.io/protoeasy/cmd/protoeasy
 	go get github.com/golang/protobuf/protoc-gen-go/...
 
 get-grpcinstrument:
