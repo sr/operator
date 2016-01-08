@@ -1,2 +1,2 @@
-src/hubot/proto/google/ linguist-vendored
-vendor/ linguist-vendored
+src/hubot/proto/google/* linguist-vendored
+vendor/* linguist-vendored
