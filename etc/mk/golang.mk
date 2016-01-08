@@ -40,3 +40,16 @@ pretest: lint
 
 test: testdeps pretest
 	go test ./src/...
+
+.PHONY: \
+	deps \
+	updatedeps \
+	testdeps \
+	updatetestdeps \
+	build \
+	install \
+	lint \
+	vet \
+	errcheck \
+	pretest \
+	test \
