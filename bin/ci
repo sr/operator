@@ -3,7 +3,7 @@ cd "$(dirname "$0")/.."
 set -eu
 
 : "${GOPATH:="$(pwd)/go"}"
-PATH="$GOPATH/bin:$PATH"
+PATH="$GOPATH/bin:/usr/bin:$PATH"
 export GOPATH PATH
 test -d "$GOPATH" || mkdir "$GOPATH"
 
