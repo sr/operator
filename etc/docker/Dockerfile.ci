@@ -1,4 +1,4 @@
-FROM golang:1.5.1
+FROM buildpack-deps:jessie-scm
 RUN \
   apt-get update -yq && \
   apt-get install -yq --no-install-recommends \
@@ -36,7 +36,17 @@ RUN \
   && tar -xzvf google-cloud-sdk-90.0.0-linux-x86_64.tar.gz \
   && mkdir -p /opt \
   && mv google-cloud-sdk /opt/
-ENV GO15VENDOREXPERIMENT 1
-RUN mkdir -p /go/src/
-ADD . /go/src/github.com/sr/operator/
-WORKDIR /go/src/github.com/sr/operator/
+ENV GOLANG_VERSION 1.6beta1
+ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+ENV GOLANG_DOWNLOAD_SHA1 5c02222a5ab348ae0f9244df95dea71781953749
+RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
+  && echo "$GOLANG_DOWNLOAD_SHA1  golang.tar.gz" | sha1sum -c - \
+  && tar -C /usr/local -xzf golang.tar.gz \
+  && rm golang.tar.gz
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+WORKDIR $GOPATH
+RUN mkdir -p $GOPATH/src/
+ADD . $GOPATH/src/github.com/sr/operator/
+WORKDIR $GOPATH/src/github.com/sr/operator/
