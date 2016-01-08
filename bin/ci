@@ -19,3 +19,5 @@ export PATH
 make build install vet lint \
     docker-build-hubot docker-build-operatord \
     docker-push-operatord docker-push-hubot
+
+buildkite-agent meta-data set "ci:test" "1"
