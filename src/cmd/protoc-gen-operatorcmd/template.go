@@ -93,7 +93,7 @@ func (c *client) do{{ camelCase $serviceName }}{{.Name}}() (string, error) {
 	{{- range .Arguments}}
 	{{.Name}} := flags.String("{{dasherize .Name}}", "", "")
 	{{- end}}
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := {{$serviceName}}.New{{$serviceFullName}}Client(c.client)
 	response, err := client.{{.Name}}(
 		context.Background(),
