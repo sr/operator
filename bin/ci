@@ -16,9 +16,10 @@ test -d "/opt/google-cloud-sdk" &&
 PATH="/opt/google-cloud-sdk/bin:$PATH"
 export PATH
 
-make build install vet lint \
-    docker-build-hubot docker-build-operatord \
-    docker-push-operatord docker-push-hubot
+make build install vet lint
+make -j2 proto-cmd proto-operatord proto-hubot
+make -j2 docker-build-hubot docker-build-operatord
+make -j2 docker-push-operatord docker-push-hubot
 
 buildkite-agent meta-data set "ci:images:hubot" "gcr.io/operator-europe-west1/hubot:$VERSION"
 buildkite-agent meta-data set "ci:images:operatord" "gcr.io/operator-europe-west1/operatord:$VERSION"
