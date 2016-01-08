@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if err := generator.Compile(os.Stdin, os.Stdout, genoperatord.Generate); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
+		fmt.Fprintf(os.Stderr, "protoc-gen-operatord: %s\n", err)
 		os.Exit(1)
 	}
 }
