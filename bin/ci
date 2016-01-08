@@ -20,5 +20,5 @@ export PATH
 
 make build install vet lint \
     proto-hubot proto-cmd proto-operatord \
-    docker-build-hubot docker-build-operatord \
-    docker-push-operatord docker-push-hubot
+    docker-build-operatord \
+    docker-push-operatord
