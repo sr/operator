@@ -11,7 +11,7 @@ import (
 const wrapLimit = 80
 
 func wrappedIndent(s string, indentS string) string {
-	return wrap(text.Indent(s, indentS))
+	return text.Indent(text.Wrap(s, wrapLimit-len(indentS)), indentS)
 }
 
 func wrap(s string) string {
@@ -24,5 +24,5 @@ func camelCase(s string) string {
 }
 
 func dasherize(s string) string {
-	return inflections.Dasherize(s)
+	return inflections.Dasherize(snaker.CamelToSnake(s))
 }

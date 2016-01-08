@@ -21,7 +21,8 @@ Available services:
 
 Available Commands:
 {{range .Service.Methods}}
-  {{dasherize .Name}}{{.Description}}
+{{dasherize .Name}}
+{{wrappedIndent .Description " "}}
 {{end}}`)
 )
 
@@ -107,7 +108,7 @@ func (c *client) do{{ camelCase $serviceName }}{{.Name}}() (string, error) {
 	return response.Output.PlainText, nil
 }
 {{end -}}
-{{end}}
+{{end -}}
 
 func main() {
 	mainEnv := &mainEnv{}
