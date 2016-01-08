@@ -68,7 +68,6 @@ docker-build-operatord:
 	rm -rf tmp
 	mkdir -p tmp
 	go build \
-		-a \
 		-installsuffix netgo \
 		-tags netgo \
 		-ldflags '-w -linkmode external -extldflags "-static"' \
