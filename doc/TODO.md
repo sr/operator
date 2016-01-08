@@ -1,5 +1,9 @@
 # Tasks
 
+- [ ] Smoke test suite. Compile everything, build operatord and operator
+  executable, run the daemon then hit it with the executable to verify that code
+  generation is working etc. Somehow do the same for the hubot code generator
+
 ## Demo
 
 Focus on a small subset of services that would speak to the audience... Probably
