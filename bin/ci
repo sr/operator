@@ -6,8 +6,6 @@ set -eu
 PATH="$GOPATH/bin:$PATH"
 export GOPATH PATH
 test -d "$GOPATH" || mkdir "$GOPATH"
-GO15VENDOREXPERIMENT=1
-export GO15VENDOREXPERIMENT
 
 test -n "$BUILDKITE_BUILD_NUMBER" &&
 export VERSION="$BUILDKITE_BUILD_NUMBER"
@@ -19,6 +17,5 @@ PATH="/opt/google-cloud-sdk/bin:$PATH"
 export PATH
 
 make build install vet lint \
-    proto-hubot proto-cmd proto-operatord \
-    docker-build-operatord \
-    docker-push-operatord
+    docker-build-hubot docker-build-operatord \
+    docker-push-operatord docker-push-hubot

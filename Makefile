@@ -61,10 +61,10 @@ docker-ci: docker-build-ci
 docker-build-ci:
 	docker build -t sr/ci -f etc/docker/Dockerfile.ci .
 
-docker-build-hubot: proto-hubot
+docker-build-hubot:
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
 
-docker-build-operatord: proto-grpc proto-operatord
+docker-build-operatord:
 	rm -rf tmp
 	mkdir -p tmp
 	go build \
@@ -76,7 +76,7 @@ docker-build-operatord: proto-grpc proto-operatord
 		src/cmd/operatord/main-gen.go
 	docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
 
-docker-push-operatord: docker-build-operatord
+docker-push-operatord:
 	docker tag sr/operatord gcr.io/$(GCLOUD_PROJECT_ID)/operatord:$(VERSION)
 	gcloud docker push gcr.io/$(GCLOUD_PROJECT_ID)/operatord
 
