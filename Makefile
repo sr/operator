@@ -20,6 +20,7 @@ proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
 
 proto-cmd:
 	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
+	@ gofmt -s -w src/cmd/operator
 
 proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
@@ -30,6 +31,7 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 
 proto-operatord: proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
+	@ gofmt -s -w src/cmd/operatord
 
 proto-grpc: get-protoeasy
 	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
