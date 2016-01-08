@@ -3,12 +3,15 @@ package buildkite
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/sr/operator/src/operator"
 	buildkiteapi "github.com/wolfeidau/go-buildkite/buildkite"
 	"golang.org/x/net/context"
 )
+
+const buildsLimit = 10
 
 type apiServer struct {
 	client *buildkiteapi.Client
@@ -58,7 +61,44 @@ func (s *apiServer) ListBuilds(
 	ctx context.Context,
 	request *ListBuildsRequest,
 ) (*ListBuildsResponse, error) {
-	return nil, nil
+	options := &buildkiteapi.BuildsListOptions{
+		"",
+		"",
+		buildkiteapi.ListOptions{Page: 1, PerPage: buildsLimit},
+	}
+	var (
+		builds []buildkiteapi.Build
+		err    error
+	)
+	if request.ProjectSlug == "" {
+		builds, _, err = s.client.Builds.List(options)
+	} else {
+		p := strings.SplitN(request.ProjectSlug, "/", 2)
+		builds, _, err = s.client.Builds.ListByProject(p[0], p[1], options)
+	}
+	if err != nil {
+		return nil, err
+	}
+	output := bytes.NewBufferString("")
+	w := new(tabwriter.Writer)
+	w.Init(output, 0, 8, 1, '\t', 0)
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "REPO", "STATUS", "BRANCH", "URL")
+	for _, build := range builds {
+		fmt.Fprintf(
+			w,
+			"%s\t%s\t%s\t%s\n",
+			*build.Project.Slug,
+			*build.State,
+			*build.Branch,
+			*build.URL,
+		)
+	}
+	w.Flush()
+	return &ListBuildsResponse{
+		Output: &operator.Output{
+			PlainText: output.String(),
+		},
+	}, nil
 }
 
 func (s *apiServer) fetchAllOrganizations() ([]buildkiteapi.Organization, error) {
