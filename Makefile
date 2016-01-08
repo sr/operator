@@ -37,7 +37,6 @@ proto-cmd:
 	protoc --cmd_out=src/cmd/ -Isrc -I/usr/local/include src/services/**/*.proto
 
 proto-operatord: proto-grpcinstrument
-	go get github.com/sr/grpcinstrument/...
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 
 proto-grpcinstrument: get-grpcinstrument
