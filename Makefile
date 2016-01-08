@@ -16,15 +16,10 @@ operatord-dev: docker-build-operatord
 		-e BUILDKITE_API_TOKEN=$(BUILDKITE_API_TOKEN) \
 		sr/operatord
 
-clean:
-	go clean -i ./src/...
-	rm -rf src/hubot/proto/{operator,services}
-	rm -rf tmp/
-
 proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
 
-proto-grpc: get-protoeasy
-	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
+proto-cmd:
+	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
 
 proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
@@ -33,11 +28,11 @@ proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
 	cp src/operator/operator.proto src/hubot/proto/operator
 	protoc --operatorhubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
-proto-cmd:
-	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
-
 proto-operatord: proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
+
+proto-grpc: get-protoeasy
+	protoeasy --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
 
 proto-grpcinstrument: get-grpcinstrument
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
@@ -105,26 +100,30 @@ gcloud-container-cluster:
 			--enable-cloud-logging \
 			--scopes cloud-platform,compute-rw,logging-write,monitoring,storage-full,useraccounts-rw,userinfo-email
 
+clean:
+	go clean -i ./src/...
+	rm -rf src/hubot/proto/{operator,services}
+	rm -rf tmp/
+
 .PHONY: \
-	deps \
-	updatedeps \
-	testdeps \
-	updatetestdeps \
-	build \
-	install \
-	lint \
-	vet \
-	errcheck \
-	pretest \
-	test \
-	clean \
+	hubot-dev \
+	operatord-dev \
 	proto \
-	proto-hubot \
 	proto-cmd \
-	proto-get \
+	proto-hubot \
+	proto-operatord \
+	proto-grpc \
+	proto-grpcinstrument \
+	get-protoeasy \
+	get-grpcinstrument \
 	goget-openflights \
+	docker-ci \
+	docker-build-ci \
 	docker-build-hubot \
+	docker-build-operatord \
+	docker-push-operatord \
 	docker-push-hubot \
 	docker-build-openflightsd \
 	docker-push-openflightsd \
-	gcloud-container-cluster
+	gcloud-container-cluster \
+	clean
