@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"text/template"
 
 	"github.com/golang/protobuf/proto"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
@@ -57,4 +58,13 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 		return fmt.Errorf("failed to write marshaled proto response: %s", err)
 	}
 	return nil
+}
+
+func NewTemplate(name string, content string) *template.Template {
+	return template.Must(template.New(name).Funcs(template.FuncMap{
+		"camelCase":     camelCase,
+		"dasherize":     dasherize,
+		"wrap":          wrap,
+		"wrappedIndent": wrappedIndent,
+	}).Parse(content))
 }
