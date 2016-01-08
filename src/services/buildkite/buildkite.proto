@@ -4,8 +4,8 @@ import "operator/operator.proto";
 
 package buildkite;
 
-// Interact with the Buildkite.com Continuous Integration server. Let's you
-// retrieve the status of projects, setup new ones, and trigger builds.
+// Interact with the Buildkite.com Continuous Integration server. Retrieve the
+// status of projects, setup new ones, and trigger builds.
 service BuildkiteService {
 	option (operator.name) = "buildkite";
 	// List the status of all (i.e. the status of the last build) of one or
@@ -26,10 +26,7 @@ message StatusResponse {
 }
 
 message ListBuildsRequest {
-	// Optional project slug.
-	string slug = 1;
-	// Optional branch name.
-	string branch = 2;
+	string project_slug = 1;
 }
 
 message ListBuildsResponse {

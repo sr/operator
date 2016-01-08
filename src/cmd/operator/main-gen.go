@@ -21,8 +21,8 @@ Use  "operator help <service>" for help with a particular service.
 Available services:
 
 buildkite
-  Interact with the Buildkite.com Continuous Integration server. Let's you
-  retrieve the status of projects, setup new ones, and trigger builds.
+  Interact with the Buildkite.com Continuous Integration server. Retrieve the
+  status of projects, setup new ones, and trigger builds.
 
 gcloud
   Undocumented.
@@ -32,8 +32,8 @@ papertrail
 `
 	usageServiceBuildkite = `Usage: operator buildkite [command]
 
-Interact with the Buildkite.com Continuous Integration server. Let's you
-retrieve the status of projects, setup new ones, and trigger builds.
+Interact with the Buildkite.com Continuous Integration server. Retrieve the
+status of projects, setup new ones, and trigger builds.
 
 Available Commands:
 
@@ -119,15 +119,13 @@ func (c *client) doBuildkiteStatus() (string, error) {
 
 func (c *client) doBuildkiteListBuilds() (string, error) {
 	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
-	slug := flags.String("slug", "", "")
-	branch := flags.String("branch", "", "")
+	project_slug := flags.String("project-slug", "", "")
 	flags.Parse(os.Args[2:])
 	client := buildkite.NewBuildkiteServiceClient(c.client)
 	response, err := client.ListBuilds(
 		context.Background(),
 		&buildkite.ListBuildsRequest{
-			Slug:   *slug,
-			Branch: *branch,
+			ProjectSlug: *project_slug,
 		},
 	)
 	if err != nil {
