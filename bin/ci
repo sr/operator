@@ -20,4 +20,5 @@ make build install vet lint \
     docker-build-hubot docker-build-operatord \
     docker-push-operatord docker-push-hubot
 
-buildkite-agent meta-data set "ci:test" "1"
+buildkite-agent meta-data set "ci:images:hubot" "gcr.io/operator-europe-west1/hubot:$VERSION"
+buildkite-agent meta-data set "ci:images:operatord" "gcr.io/operator-europe-west1/operatord:$VERSION"
