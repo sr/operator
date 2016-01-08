@@ -9,8 +9,8 @@ package main
 import (
 	"os"
 	"fmt"
-{{range .Options.Imports}}
-	"{{.}}"
+{{range .Services}}
+	"{{.ImportPath}}"
 {{end}}
 	"google.golang.org/grpc"
 	"github.com/sr/operator/src/operator"
@@ -27,14 +27,14 @@ func run() error {
 	instrumentator := operator.NewInstrumentator(logger)
 	server := operator.NewServer(grpcServer, config, logger, instrumentator)
 {{range .Services}}
-	{{.Name}}Env := &{{.Name}}.Env{}
+	{{.Name}}Env := &{{.PackageName}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
 		server.LogServiceStartupError("{{.Name}}", err)
 	} else {
-		if {{.Name}}Server, err := {{.Name}}.NewAPIServer({{.Name}}Env); err != nil {
+		if {{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Env); err != nil {
 			server.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := {{.Name}}.NewInstrumented{{camelCase .Name}}ServiceServer(instrumentator, {{.Name}}Server)
+			instrumented := {{.PackageName}}.NewInstrumented{{camelCase .Name}}ServiceServer(instrumentator, {{.Name}}Server)
 			{{.Name}}.Register{{camelCase .Name}}ServiceServer(grpcServer, instrumented)
 		}
 	}
