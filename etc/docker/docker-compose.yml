@@ -4,6 +4,7 @@ app:
   environment:
     - GITHUB_REPO_TOKEN
     - BUILDKITE_BUILD_NUMBER
+    - BUILDKITE_JOB_ID
   volumes:
     - ../../:/app
     - /var/run/docker.sock:/var/run/docker.sock
