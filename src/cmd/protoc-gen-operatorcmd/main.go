@@ -52,7 +52,7 @@ func generate(descriptor *descriptor.OperatorDesc) ([]*generator.File, error) {
 		return nil, err
 	}
 	response := []*generator.File{
-		&generator.File{
+		{
 			Name:    fileName,
 			Content: buffer.String(),
 		},
