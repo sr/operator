@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sr/operator/src/descriptor"
 	"github.com/sr/operator/src/generator"
 )
 
 const (
-	fileName = "main-gen.go"
+	executable = "protoc-gen-operatord"
+	fileName   = "main-gen.go"
 )
 
-func generate(descriptor *descriptor.OperatorDesc) ([]*generator.File, error) {
+func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
 	if err := template.Execute(&buffer, descriptor); err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func generate(descriptor *descriptor.OperatorDesc) ([]*generator.File, error) {
 
 func main() {
 	if err := generator.Compile(os.Stdin, os.Stdout, generate); err != nil {
-		fmt.Fprintf(os.Stderr, "protoc-gen-operatord: %s\n", err)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", executable, err)
 		os.Exit(1)
 	}
 }
