@@ -2,6 +2,7 @@ package buildkite
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -74,6 +75,9 @@ func (s *apiServer) ListBuilds(
 		builds, _, err = s.client.Builds.List(options)
 	} else {
 		p := strings.SplitN(request.ProjectSlug, "/", 2)
+		if len(p) != 2 {
+			return nil, errors.New("invalid slug. must be in the form org/repo")
+		}
 		builds, _, err = s.client.Builds.ListByProject(p[0], p[1], options)
 	}
 	if err != nil {
