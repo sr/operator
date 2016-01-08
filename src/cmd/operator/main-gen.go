@@ -103,7 +103,7 @@ func fatal(message string) {
 func (c *client) doBuildkiteStatus() (string, error) {
 	flags := flag.NewFlagSet("status", flag.ExitOnError)
 	slug := flags.String("slug", "", "")
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := buildkite.NewBuildkiteServiceClient(c.client)
 	response, err := client.Status(
 		context.Background(),
@@ -120,7 +120,7 @@ func (c *client) doBuildkiteStatus() (string, error) {
 func (c *client) doBuildkiteListBuilds() (string, error) {
 	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
 	project_slug := flags.String("project-slug", "", "")
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := buildkite.NewBuildkiteServiceClient(c.client)
 	response, err := client.ListBuilds(
 		context.Background(),
@@ -140,7 +140,7 @@ func (c *client) doGcloudCreateContainerCluster() (string, error) {
 	name := flags.String("name", "", "")
 	node_count := flags.String("node-count", "", "")
 	zone := flags.String("zone", "", "")
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := gcloud.NewGcloudServiceClient(c.client)
 	response, err := client.CreateContainerCluster(
 		context.Background(),
@@ -160,7 +160,7 @@ func (c *client) doGcloudCreateContainerCluster() (string, error) {
 func (c *client) doGcloudListInstances() (string, error) {
 	flags := flag.NewFlagSet("list-instances", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := gcloud.NewGcloudServiceClient(c.client)
 	response, err := client.ListInstances(
 		context.Background(),
@@ -177,7 +177,7 @@ func (c *client) doGcloudListInstances() (string, error) {
 func (c *client) doPapertrailSearch() (string, error) {
 	flags := flag.NewFlagSet("search", flag.ExitOnError)
 	query := flags.String("query", "", "")
-	flags.Parse(os.Args[2:])
+	flags.Parse(os.Args[3:])
 	client := papertrail.NewPapertrailServiceClient(c.client)
 	response, err := client.Search(
 		context.Background(),
