@@ -1,6 +1,9 @@
+/bin
+/etc/k8s/**/secrets.json
+/pkg
 /src/hubot/.hubot_history
 /src/hubot/nodes_modules
 /src/hubot/proto/*.proto
 /src/hubot/proto/operator
-/etc/k8s/**/secrets.json
 /tmp
+!/bin/ci
