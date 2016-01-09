@@ -80,15 +80,15 @@ func isHelp(arg string) bool {
 {{- range .Methods}}
 func do{{ camelCase $serviceName }}{{.Name}}(address string) (string, error) {
 	flags := flag.NewFlagSet("{{dasherize .Name}}", flag.ExitOnError)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageService{{camelCase $serviceName}}{{.Name}})
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
 	{{- range .Arguments}}
 	{{.Name}} := flags.String("{{dasherize .Name}}", "", "")
 	{{- end}}
 	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageService{{camelCase $serviceName}}{{.Name}})
-		flags.PrintDefaults()
-		os.Exit(2)
-	}
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
