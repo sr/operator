@@ -44,6 +44,14 @@ status
 list-builds
  List the last builds of one or all projects, optionally limited to a  branch.
 `
+
+	usageServiceBuildkiteStatus = `Usage:  buildkite status [arguments]
+
+List the status of all (i.e. the status of the last build) of one or  all
+projects.`
+	usageServiceBuildkiteListBuilds = `Usage:  buildkite list-builds [arguments]
+
+List the last builds of one or all projects, optionally limited to a  branch.`
 	usageServiceGcloud = `Usage: operator gcloud [command]
 
 Undocumented.
@@ -56,6 +64,13 @@ create-container-cluster
 list-instances
  Undocumented.
 `
+
+	usageServiceGcloudCreateContainerCluster = `Usage:  gcloud create-container-cluster [arguments]
+
+Undocumented.`
+	usageServiceGcloudListInstances = `Usage:  gcloud list-instances [arguments]
+
+Undocumented.`
 	usageServicePapertrail = `Usage: operator papertrail [command]
 
 Undocumented.
@@ -65,46 +80,42 @@ Available Commands:
 search
  Undocumented.
 `
+
+	usageServicePapertrailSearch = `Usage:  papertrail search [arguments]
+
+Undocumented.`
 )
 
 type mainEnv struct {
 	Address string `env:"OPERATORD_ADDRESS,default=localhost:3000"`
 }
 
-type client struct {
-	client *grpc.ClientConn
-}
-
-func dial(address string) (*client, error) {
+func dial(address string) (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	return &client{conn}, nil
-}
-
-func (c *client) close() {
-	c.client.Close()
+	return conn, nil
 }
 
 func isHelp(arg string) bool {
 	return arg == "-h" || arg == "--help" || arg == "help"
 }
-
-func showUsage(s string) {
-	fmt.Fprintf(os.Stderr, "%s\n", s)
-	os.Exit(2)
-}
-
-func fatal(message string) {
-	fmt.Fprintf(os.Stderr, "operator: %s\n", message)
-	os.Exit(1)
-}
-func (c *client) doBuildkiteStatus() (string, error) {
+func doBuildkiteStatus(address string) (string, error) {
 	flags := flag.NewFlagSet("status", flag.ExitOnError)
 	slug := flags.String("slug", "", "")
 	flags.Parse(os.Args[3:])
-	client := buildkite.NewBuildkiteServiceClient(c.client)
+	if isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteStatus)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := buildkite.NewBuildkiteServiceClient(conn)
 	response, err := client.Status(
 		context.Background(),
 		&buildkite.StatusRequest{
@@ -117,11 +128,21 @@ func (c *client) doBuildkiteStatus() (string, error) {
 	return response.Output.PlainText, nil
 }
 
-func (c *client) doBuildkiteListBuilds() (string, error) {
+func doBuildkiteListBuilds(address string) (string, error) {
 	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
 	project_slug := flags.String("project-slug", "", "")
 	flags.Parse(os.Args[3:])
-	client := buildkite.NewBuildkiteServiceClient(c.client)
+	if isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteListBuilds)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := buildkite.NewBuildkiteServiceClient(conn)
 	response, err := client.ListBuilds(
 		context.Background(),
 		&buildkite.ListBuildsRequest{
@@ -134,14 +155,24 @@ func (c *client) doBuildkiteListBuilds() (string, error) {
 	return response.Output.PlainText, nil
 }
 
-func (c *client) doGcloudCreateContainerCluster() (string, error) {
+func doGcloudCreateContainerCluster(address string) (string, error) {
 	flags := flag.NewFlagSet("create-container-cluster", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
 	name := flags.String("name", "", "")
 	node_count := flags.String("node-count", "", "")
 	zone := flags.String("zone", "", "")
 	flags.Parse(os.Args[3:])
-	client := gcloud.NewGcloudServiceClient(c.client)
+	if isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudCreateContainerCluster)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := gcloud.NewGcloudServiceClient(conn)
 	response, err := client.CreateContainerCluster(
 		context.Background(),
 		&gcloud.CreateContainerClusterRequest{
@@ -157,11 +188,21 @@ func (c *client) doGcloudCreateContainerCluster() (string, error) {
 	return response.Output.PlainText, nil
 }
 
-func (c *client) doGcloudListInstances() (string, error) {
+func doGcloudListInstances(address string) (string, error) {
 	flags := flag.NewFlagSet("list-instances", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
 	flags.Parse(os.Args[3:])
-	client := gcloud.NewGcloudServiceClient(c.client)
+	if isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudListInstances)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := gcloud.NewGcloudServiceClient(conn)
 	response, err := client.ListInstances(
 		context.Background(),
 		&gcloud.ListInstancesRequest{
@@ -174,11 +215,21 @@ func (c *client) doGcloudListInstances() (string, error) {
 	return response.Output.PlainText, nil
 }
 
-func (c *client) doPapertrailSearch() (string, error) {
+func doPapertrailSearch(address string) (string, error) {
 	flags := flag.NewFlagSet("search", flag.ExitOnError)
 	query := flags.String("query", "", "")
 	flags.Parse(os.Args[3:])
-	client := papertrail.NewPapertrailServiceClient(c.client)
+	if isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServicePapertrailSearch)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := papertrail.NewPapertrailServiceClient(conn)
 	response, err := client.Search(
 		context.Background(),
 		&papertrail.SearchRequest{
@@ -191,108 +242,92 @@ func (c *client) doPapertrailSearch() (string, error) {
 	return response.Output.PlainText, nil
 }
 func main() {
-	mainEnv := &mainEnv{}
-	if err := env.Populate(mainEnv); err != nil {
-		fatal(err.Error())
+	status, output, err := run()
+	if status != 0 {
+		var errS string
+		if output == "" {
+			errS = err.Error()
+		} else {
+			errS = output
+		}
+		fmt.Fprintf(os.Stderr, "%s\n", errS)
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "%s\n", output)
+	os.Exit(0)
+}
+
+func run() (int, string, error) {
+	config := &mainEnv{}
+	if err := env.Populate(config); err != nil {
+		return 1, "", err
 	}
 	if len(os.Args) == 1 || isHelp(os.Args[1]) {
-		showUsage(usage)
+		return 2, usage, nil
 	}
 	if len(os.Args) >= 2 {
 		service := os.Args[1]
 		switch service {
 		case "buildkite":
 			if len(os.Args) == 2 || isHelp(os.Args[2]) {
-				showUsage(usageServiceBuildkite)
-			} else {
-				command := os.Args[2]
-				switch command {
-				case "status":
-					client, err := dial(mainEnv.Address)
-					if err != nil {
-						fatal(err.Error())
-					}
-					defer client.close()
-					output, err := client.doBuildkiteStatus()
-					if err != nil {
-						fatal(err.Error())
-					}
-					fmt.Fprintf(os.Stdout, "%s\n", output)
-					os.Exit(0)
-				case "list-builds":
-					client, err := dial(mainEnv.Address)
-					if err != nil {
-						fatal(err.Error())
-					}
-					defer client.close()
-					output, err := client.doBuildkiteListBuilds()
-					if err != nil {
-						fatal(err.Error())
-					}
-					fmt.Fprintf(os.Stdout, "%s\n", output)
-					os.Exit(0)
-				default:
-					fatal(fmt.Sprintf("no such command: %s", command))
+				return 2, usageServiceBuildkite, nil
+			}
+			command := os.Args[2]
+			switch command {
+			case "status":
+				output, err := doBuildkiteStatus(config.Address)
+				if err != nil {
+					return 1, "", err
 				}
+				return 0, output, nil
+			case "list-builds":
+				output, err := doBuildkiteListBuilds(config.Address)
+				if err != nil {
+					return 1, "", err
+				}
+				return 0, output, nil
+			default:
+				return 1, "", fmt.Errorf("no such command: %s", command)
 			}
 		case "gcloud":
 			if len(os.Args) == 2 || isHelp(os.Args[2]) {
-				showUsage(usageServiceGcloud)
-			} else {
-				command := os.Args[2]
-				switch command {
-				case "create-container-cluster":
-					client, err := dial(mainEnv.Address)
-					if err != nil {
-						fatal(err.Error())
-					}
-					defer client.close()
-					output, err := client.doGcloudCreateContainerCluster()
-					if err != nil {
-						fatal(err.Error())
-					}
-					fmt.Fprintf(os.Stdout, "%s\n", output)
-					os.Exit(0)
-				case "list-instances":
-					client, err := dial(mainEnv.Address)
-					if err != nil {
-						fatal(err.Error())
-					}
-					defer client.close()
-					output, err := client.doGcloudListInstances()
-					if err != nil {
-						fatal(err.Error())
-					}
-					fmt.Fprintf(os.Stdout, "%s\n", output)
-					os.Exit(0)
-				default:
-					fatal(fmt.Sprintf("no such command: %s", command))
+				return 2, usageServiceGcloud, nil
+			}
+			command := os.Args[2]
+			switch command {
+			case "create-container-cluster":
+				output, err := doGcloudCreateContainerCluster(config.Address)
+				if err != nil {
+					return 1, "", err
 				}
+				return 0, output, nil
+			case "list-instances":
+				output, err := doGcloudListInstances(config.Address)
+				if err != nil {
+					return 1, "", err
+				}
+				return 0, output, nil
+			default:
+				return 1, "", fmt.Errorf("no such command: %s", command)
 			}
 		case "papertrail":
 			if len(os.Args) == 2 || isHelp(os.Args[2]) {
-				showUsage(usageServicePapertrail)
-			} else {
-				command := os.Args[2]
-				switch command {
-				case "search":
-					client, err := dial(mainEnv.Address)
-					if err != nil {
-						fatal(err.Error())
-					}
-					defer client.close()
-					output, err := client.doPapertrailSearch()
-					if err != nil {
-						fatal(err.Error())
-					}
-					fmt.Fprintf(os.Stdout, "%s\n", output)
-					os.Exit(0)
-				default:
-					fatal(fmt.Sprintf("no such command: %s", command))
+				return 2, usageServicePapertrail, nil
+			}
+			command := os.Args[2]
+			switch command {
+			case "search":
+				output, err := doPapertrailSearch(config.Address)
+				if err != nil {
+					return 1, "", err
 				}
+				return 0, output, nil
+			default:
+				return 1, "", fmt.Errorf("no such command: %s", command)
 			}
 		default:
-			fatal(fmt.Sprintf("no such service: %s", service))
+			return 1, "", fmt.Errorf("no such service: %s", service)
 		}
 	}
+	return 1, "", fmt.Errorf("BUG this should never happen")
 }

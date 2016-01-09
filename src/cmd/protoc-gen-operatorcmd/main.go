@@ -18,10 +18,18 @@ type serviceUsageContext struct {
 	Service    *generator.Service
 }
 
+type methodUsageContext struct {
+	BinaryName  string
+	Service     *generator.Service
+	Name        string
+	Description string
+}
+
 type mainContext struct {
 	*generator.Descriptor
 	MainUsage    string
 	ServiceUsage map[string]string
+	MethodUsage  map[string]map[string]string
 }
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
@@ -30,6 +38,7 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 		descriptor,
 		"",
 		make(map[string]string, len(descriptor.Services)),
+		make(map[string]map[string]string),
 	}
 	if err := mainUsageTemplate.Execute(&buffer, descriptor); err != nil {
 		return nil, err
@@ -45,6 +54,19 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 			return nil, err
 		}
 		context.ServiceUsage[service.Name] = buffer.String()
+		context.MethodUsage[service.Name] = make(map[string]string, len(service.Methods))
+		for _, method := range service.Methods {
+			methodContext := &methodUsageContext{
+				Service:     service,
+				Name:        method.Name,
+				Description: method.Description,
+			}
+			buffer.Reset()
+			if err := methodUsageTemplate.Execute(&buffer, methodContext); err != nil {
+				return nil, err
+			}
+			context.MethodUsage[service.Name][method.Name] = buffer.String()
+		}
 	}
 	buffer.Reset()
 	if err := mainTemplate.Execute(&buffer, context); err != nil {
