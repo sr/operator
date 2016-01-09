@@ -11,11 +11,9 @@ PROTOEASY = bin/protoeasy
 hubot-dev: docker-build-hubot
 	docker run --rm --name hubot --link operatord -it sr/hubot -a shell -l /
 
-operatord-dev: docker-build-operatord
-	docker run --rm -p 3000:3000 --name operatord \
-		-e PAPERTRAIL_API_TOKEN=$(PAPERTRAIL_API_TOKEN) \
-		-e BUILDKITE_API_TOKEN=$(BUILDKITE_API_TOKEN) \
-		sr/operatord
+operatord-dev: $(GB)
+	$< build cmd/operatord
+	bin/operatord
 
 proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
 
