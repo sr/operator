@@ -120,13 +120,13 @@ func isHelp(arg string) bool {
 }
 func doBuildkiteStatus(address string) (string, error) {
 	flags := flag.NewFlagSet("status", flag.ExitOnError)
-	slug := flags.String("slug", "", "")
-	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteStatus)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceBuildkiteStatus)
 		flags.PrintDefaults()
 		os.Exit(2)
 	}
+	slug := flags.String("slug", "", "")
+	flags.Parse(os.Args[3:])
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
@@ -147,13 +147,13 @@ func doBuildkiteStatus(address string) (string, error) {
 
 func doBuildkiteListBuilds(address string) (string, error) {
 	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
-	project_slug := flags.String("project-slug", "", "")
-	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteListBuilds)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceBuildkiteListBuilds)
 		flags.PrintDefaults()
 		os.Exit(2)
 	}
+	project_slug := flags.String("project-slug", "", "")
+	flags.Parse(os.Args[3:])
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
@@ -174,12 +174,12 @@ func doBuildkiteListBuilds(address string) (string, error) {
 
 func doControllerCreateCluster(address string) (string, error) {
 	flags := flag.NewFlagSet("create-cluster", flag.ExitOnError)
-	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceControllerCreateCluster)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceControllerCreateCluster)
 		flags.PrintDefaults()
 		os.Exit(2)
 	}
+	flags.Parse(os.Args[3:])
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
@@ -198,16 +198,16 @@ func doControllerCreateCluster(address string) (string, error) {
 
 func doGcloudCreateContainerCluster(address string) (string, error) {
 	flags := flag.NewFlagSet("create-container-cluster", flag.ExitOnError)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceGcloudCreateContainerCluster)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
 	project_id := flags.String("project-id", "", "")
 	name := flags.String("name", "", "")
 	node_count := flags.String("node-count", "", "")
 	zone := flags.String("zone", "", "")
 	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudCreateContainerCluster)
-		flags.PrintDefaults()
-		os.Exit(2)
-	}
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
@@ -231,13 +231,13 @@ func doGcloudCreateContainerCluster(address string) (string, error) {
 
 func doGcloudListInstances(address string) (string, error) {
 	flags := flag.NewFlagSet("list-instances", flag.ExitOnError)
-	project_id := flags.String("project-id", "", "")
-	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudListInstances)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceGcloudListInstances)
 		flags.PrintDefaults()
 		os.Exit(2)
 	}
+	project_id := flags.String("project-id", "", "")
+	flags.Parse(os.Args[3:])
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
@@ -258,13 +258,13 @@ func doGcloudListInstances(address string) (string, error) {
 
 func doPapertrailSearch(address string) (string, error) {
 	flags := flag.NewFlagSet("search", flag.ExitOnError)
-	query := flags.String("query", "", "")
-	flags.Parse(os.Args[3:])
-	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
-		fmt.Fprintf(os.Stderr, "%s\n\n", usageServicePapertrailSearch)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServicePapertrailSearch)
 		flags.PrintDefaults()
 		os.Exit(2)
 	}
+	query := flags.String("query", "", "")
+	flags.Parse(os.Args[3:])
 	conn, err := dial(address)
 	if err != nil {
 		return "", err
