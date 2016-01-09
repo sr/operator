@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"operator"
+
 	buildkiteapi "github.com/wolfeidau/go-buildkite/buildkite"
 	"golang.org/x/net/context"
 )
@@ -86,15 +87,15 @@ func (s *apiServer) ListBuilds(
 	output := bytes.NewBufferString("")
 	w := new(tabwriter.Writer)
 	w.Init(output, 0, 8, 1, '\t', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "REPO", "STATUS", "BRANCH", "URL")
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "ID", "STATUS", "BRANCH", "URL")
 	for _, build := range builds {
 		fmt.Fprintf(
 			w,
-			"%s\t%s\t%s\t%s\n",
-			*build.Project.Slug,
+			"%d\t%s\t%s\t%s\n",
+			*build.Number,
 			*build.State,
 			*build.Branch,
-			*build.URL,
+			*build.WebURL,
 		)
 	}
 	w.Flush()
