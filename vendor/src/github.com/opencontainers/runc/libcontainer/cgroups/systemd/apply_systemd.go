@@ -167,8 +167,8 @@ func (m *Manager) Apply(pid int) error {
 		properties []systemdDbus.Property
 	)
 
-	if c.Parent != "" {
-		slice = c.Parent
+	if c.Slice != "" {
+		slice = c.Slice
 	}
 
 	properties = append(properties,
@@ -189,26 +189,26 @@ func (m *Manager) Apply(pid int) error {
 			newProp("DefaultDependencies", false))
 	}
 
-	if c.Resources.Memory != 0 {
+	if c.Memory != 0 {
 		properties = append(properties,
-			newProp("MemoryLimit", uint64(c.Resources.Memory)))
+			newProp("MemoryLimit", uint64(c.Memory)))
 	}
 
-	if c.Resources.CpuShares != 0 {
+	if c.CpuShares != 0 {
 		properties = append(properties,
-			newProp("CPUShares", uint64(c.Resources.CpuShares)))
+			newProp("CPUShares", uint64(c.CpuShares)))
 	}
 
-	if c.Resources.BlkioWeight != 0 {
+	if c.BlkioWeight != 0 {
 		properties = append(properties,
-			newProp("BlockIOWeight", uint64(c.Resources.BlkioWeight)))
+			newProp("BlockIOWeight", uint64(c.BlkioWeight)))
 	}
 
 	// We need to set kernel memory before processes join cgroup because
 	// kmem.limit_in_bytes can only be set when the cgroup is empty.
 	// And swap memory limit needs to be set after memory limit, only
 	// memory limit is handled by systemd, so it's kind of ugly here.
-	if c.Resources.KernelMemory > 0 {
+	if c.KernelMemory > 0 {
 		if err := setKernelMemory(c); err != nil {
 			return err
 		}
@@ -279,7 +279,7 @@ func (m *Manager) Apply(pid int) error {
 	m.Paths = paths
 
 	if paths["cpu"] != "" {
-		if err := fs.CheckCpushares(paths["cpu"], c.Resources.CpuShares); err != nil {
+		if err := fs.CheckCpushares(paths["cpu"], c.CpuShares); err != nil {
 			return err
 		}
 	}
@@ -334,23 +334,23 @@ func joinCpu(c *configs.Cgroup, pid int) error {
 	if err != nil && !cgroups.IsNotFound(err) {
 		return err
 	}
-	if c.Resources.CpuQuota != 0 {
-		if err = writeFile(path, "cpu.cfs_quota_us", strconv.FormatInt(c.Resources.CpuQuota, 10)); err != nil {
+	if c.CpuQuota != 0 {
+		if err = writeFile(path, "cpu.cfs_quota_us", strconv.FormatInt(c.CpuQuota, 10)); err != nil {
 			return err
 		}
 	}
-	if c.Resources.CpuPeriod != 0 {
-		if err = writeFile(path, "cpu.cfs_period_us", strconv.FormatInt(c.Resources.CpuPeriod, 10)); err != nil {
+	if c.CpuPeriod != 0 {
+		if err = writeFile(path, "cpu.cfs_period_us", strconv.FormatInt(c.CpuPeriod, 10)); err != nil {
 			return err
 		}
 	}
-	if c.Resources.CpuRtPeriod != 0 {
-		if err = writeFile(path, "cpu.rt_period_us", strconv.FormatInt(c.Resources.CpuRtPeriod, 10)); err != nil {
+	if c.CpuRtPeriod != 0 {
+		if err = writeFile(path, "cpu.rt_period_us", strconv.FormatInt(c.CpuRtPeriod, 10)); err != nil {
 			return err
 		}
 	}
-	if c.Resources.CpuRtRuntime != 0 {
-		if err = writeFile(path, "cpu.rt_runtime_us", strconv.FormatInt(c.Resources.CpuRtRuntime, 10)); err != nil {
+	if c.CpuRtRuntime != 0 {
+		if err = writeFile(path, "cpu.rt_runtime_us", strconv.FormatInt(c.CpuRtRuntime, 10)); err != nil {
 			return err
 		}
 	}
@@ -406,8 +406,8 @@ func getSubsystemPath(c *configs.Cgroup, subsystem string) (string, error) {
 	}
 
 	slice := "system.slice"
-	if c.Parent != "" {
-		slice = c.Parent
+	if c.Slice != "" {
+		slice = c.Slice
 	}
 
 	return filepath.Join(mountpoint, initPath, slice, getUnitName(c)), nil
@@ -418,15 +418,15 @@ func (m *Manager) Freeze(state configs.FreezerState) error {
 	if err != nil {
 		return err
 	}
-	prevState := m.Cgroups.Resources.Freezer
-	m.Cgroups.Resources.Freezer = state
+	prevState := m.Cgroups.Freezer
+	m.Cgroups.Freezer = state
 	freezer, err := subsystems.Get("freezer")
 	if err != nil {
 		return err
 	}
 	err = freezer.Set(path, m.Cgroups)
 	if err != nil {
-		m.Cgroups.Resources.Freezer = prevState
+		m.Cgroups.Freezer = prevState
 		return err
 	}
 	return nil
@@ -438,14 +438,6 @@ func (m *Manager) GetPids() ([]int, error) {
 		return nil, err
 	}
 	return cgroups.GetPids(path)
-}
-
-func (m *Manager) GetAllPids() ([]int, error) {
-	path, err := getSubsystemPath(m.Cgroups, "devices")
-	if err != nil {
-		return nil, err
-	}
-	return cgroups.GetAllPids(path)
 }
 
 func (m *Manager) GetStats() (*cgroups.Stats, error) {
@@ -480,7 +472,7 @@ func (m *Manager) Set(container *configs.Config) error {
 }
 
 func getUnitName(c *configs.Cgroup) string {
-	return fmt.Sprintf("%s-%s.scope", c.ScopePrefix, c.Name)
+	return fmt.Sprintf("%s-%s.scope", c.Parent, c.Name)
 }
 
 // Atm we can't use the systemd device support because of two missing things:
@@ -518,8 +510,8 @@ func setKernelMemory(c *configs.Cgroup) error {
 		return err
 	}
 
-	if c.Resources.KernelMemory > 0 {
-		err = writeFile(path, "memory.kmem.limit_in_bytes", strconv.FormatInt(c.Resources.KernelMemory, 10))
+	if c.KernelMemory > 0 {
+		err = writeFile(path, "memory.kmem.limit_in_bytes", strconv.FormatInt(c.KernelMemory, 10))
 		if err != nil {
 			return err
 		}
@@ -535,33 +527,33 @@ func joinMemory(c *configs.Cgroup, pid int) error {
 	}
 
 	// -1 disables memoryswap
-	if c.Resources.MemorySwap > 0 {
-		err = writeFile(path, "memory.memsw.limit_in_bytes", strconv.FormatInt(c.Resources.MemorySwap, 10))
+	if c.MemorySwap > 0 {
+		err = writeFile(path, "memory.memsw.limit_in_bytes", strconv.FormatInt(c.MemorySwap, 10))
 		if err != nil {
 			return err
 		}
 	}
-	if c.Resources.MemoryReservation > 0 {
-		err = writeFile(path, "memory.soft_limit_in_bytes", strconv.FormatInt(c.Resources.MemoryReservation, 10))
+	if c.MemoryReservation > 0 {
+		err = writeFile(path, "memory.soft_limit_in_bytes", strconv.FormatInt(c.MemoryReservation, 10))
 		if err != nil {
 			return err
 		}
 	}
-	if c.Resources.OomKillDisable {
+	if c.OomKillDisable {
 		if err := writeFile(path, "memory.oom_control", "1"); err != nil {
 			return err
 		}
 	}
 
-	if c.Resources.MemorySwappiness >= 0 && c.Resources.MemorySwappiness <= 100 {
-		err = writeFile(path, "memory.swappiness", strconv.FormatInt(c.Resources.MemorySwappiness, 10))
+	if c.MemorySwappiness >= 0 && c.MemorySwappiness <= 100 {
+		err = writeFile(path, "memory.swappiness", strconv.FormatInt(c.MemorySwappiness, 10))
 		if err != nil {
 			return err
 		}
-	} else if c.Resources.MemorySwappiness == -1 {
+	} else if c.MemorySwappiness == -1 {
 		return nil
 	} else {
-		return fmt.Errorf("invalid value:%d. valid memory swappiness range is 0-100", c.Resources.MemorySwappiness)
+		return fmt.Errorf("invalid value:%d. valid memory swappiness range is 0-100", c.MemorySwappiness)
 	}
 
 	return nil
@@ -590,12 +582,12 @@ func joinBlkio(c *configs.Cgroup, pid int) error {
 		return err
 	}
 	// systemd doesn't directly support this in the dbus properties
-	if c.Resources.BlkioLeafWeight != 0 {
-		if err := writeFile(path, "blkio.leaf_weight", strconv.FormatUint(uint64(c.Resources.BlkioLeafWeight), 10)); err != nil {
+	if c.BlkioLeafWeight != 0 {
+		if err := writeFile(path, "blkio.leaf_weight", strconv.FormatUint(uint64(c.BlkioLeafWeight), 10)); err != nil {
 			return err
 		}
 	}
-	for _, wd := range c.Resources.BlkioWeightDevice {
+	for _, wd := range c.BlkioWeightDevice {
 		if err := writeFile(path, "blkio.weight_device", wd.WeightString()); err != nil {
 			return err
 		}
@@ -603,22 +595,22 @@ func joinBlkio(c *configs.Cgroup, pid int) error {
 			return err
 		}
 	}
-	for _, td := range c.Resources.BlkioThrottleReadBpsDevice {
+	for _, td := range c.BlkioThrottleReadBpsDevice {
 		if err := writeFile(path, "blkio.throttle.read_bps_device", td.String()); err != nil {
 			return err
 		}
 	}
-	for _, td := range c.Resources.BlkioThrottleWriteBpsDevice {
+	for _, td := range c.BlkioThrottleWriteBpsDevice {
 		if err := writeFile(path, "blkio.throttle.write_bps_device", td.String()); err != nil {
 			return err
 		}
 	}
-	for _, td := range c.Resources.BlkioThrottleReadIOPSDevice {
+	for _, td := range c.BlkioThrottleReadIOPSDevice {
 		if err := writeFile(path, "blkio.throttle.read_iops_device", td.String()); err != nil {
 			return err
 		}
 	}
-	for _, td := range c.Resources.BlkioThrottleWriteIOPSDevice {
+	for _, td := range c.BlkioThrottleWriteIOPSDevice {
 		if err := writeFile(path, "blkio.throttle.write_iops_device", td.String()); err != nil {
 			return err
 		}

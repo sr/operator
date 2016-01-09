@@ -137,7 +137,7 @@ func (m *Manager) Apply(pid int) (err error) {
 	m.Paths = paths
 
 	if paths["cpu"] != "" {
-		if err := CheckCpushares(paths["cpu"], c.Resources.CpuShares); err != nil {
+		if err := CheckCpushares(paths["cpu"], c.CpuShares); err != nil {
 			return err
 		}
 	}
@@ -202,43 +202,32 @@ func (m *Manager) Freeze(state configs.FreezerState) error {
 	if err != nil {
 		return err
 	}
-	prevState := m.Cgroups.Resources.Freezer
-	m.Cgroups.Resources.Freezer = state
+	prevState := m.Cgroups.Freezer
+	m.Cgroups.Freezer = state
 	freezer, err := subsystems.Get("freezer")
 	if err != nil {
 		return err
 	}
 	err = freezer.Set(dir, m.Cgroups)
 	if err != nil {
-		m.Cgroups.Resources.Freezer = prevState
+		m.Cgroups.Freezer = prevState
 		return err
 	}
 	return nil
 }
 
 func (m *Manager) GetPids() ([]int, error) {
-	dir, err := getCgroupPath(m.Cgroups)
+	d, err := getCgroupData(m.Cgroups, 0)
 	if err != nil {
 		return nil, err
 	}
+
+	dir, err := d.path("devices")
+	if err != nil {
+		return nil, err
+	}
+
 	return cgroups.GetPids(dir)
-}
-
-func (m *Manager) GetAllPids() ([]int, error) {
-	dir, err := getCgroupPath(m.Cgroups)
-	if err != nil {
-		return nil, err
-	}
-	return cgroups.GetAllPids(dir)
-}
-
-func getCgroupPath(c *configs.Cgroup) (string, error) {
-	d, err := getCgroupData(c, 0)
-	if err != nil {
-		return "", err
-	}
-
-	return d.path("devices")
 }
 
 func getCgroupData(c *configs.Cgroup, pid int) (*cgroupData, error) {

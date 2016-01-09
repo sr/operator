@@ -30,12 +30,12 @@ func (s *DevicesGroup) Apply(d *cgroupData) error {
 }
 
 func (s *DevicesGroup) Set(path string, cgroup *configs.Cgroup) error {
-	if !cgroup.Resources.AllowAllDevices {
+	if !cgroup.AllowAllDevices {
 		if err := writeFile(path, "devices.deny", "a"); err != nil {
 			return err
 		}
 
-		for _, dev := range cgroup.Resources.AllowedDevices {
+		for _, dev := range cgroup.AllowedDevices {
 			if err := writeFile(path, "devices.allow", dev.CgroupString()); err != nil {
 				return err
 			}
@@ -47,7 +47,7 @@ func (s *DevicesGroup) Set(path string, cgroup *configs.Cgroup) error {
 		return err
 	}
 
-	for _, dev := range cgroup.Resources.DeniedDevices {
+	for _, dev := range cgroup.DeniedDevices {
 		if err := writeFile(path, "devices.deny", dev.CgroupString()); err != nil {
 			return err
 		}

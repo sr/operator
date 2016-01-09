@@ -1,7 +1,5 @@
 // +build !windows
 
-// Package kernel provides helper function to get, parse and compare kernel
-// versions for different platforms.
 package kernel
 
 import (
@@ -10,21 +8,20 @@ import (
 	"fmt"
 )
 
-// VersionInfo holds information about the kernel.
-type VersionInfo struct {
-	Kernel int    // Version of the kernel (e.g. 4.1.2-generic -> 4)
-	Major  int    // Major part of the kernel version (e.g. 4.1.2-generic -> 1)
-	Minor  int    // Minor part of the kernel version (e.g. 4.1.2-generic -> 2)
-	Flavor string // Flavor of the kernel version (e.g. 4.1.2-generic -> generic)
+type KernelVersionInfo struct {
+	Kernel int
+	Major  int
+	Minor  int
+	Flavor string
 }
 
-func (k *VersionInfo) String() string {
+func (k *KernelVersionInfo) String() string {
 	return fmt.Sprintf("%d.%d.%d%s", k.Kernel, k.Major, k.Minor, k.Flavor)
 }
 
-// CompareKernelVersion compares two kernel.VersionInfo structs.
+// Compare two KernelVersionInfo struct.
 // Returns -1 if a < b, 0 if a == b, 1 it a > b
-func CompareKernelVersion(a, b VersionInfo) int {
+func CompareKernelVersion(a, b *KernelVersionInfo) int {
 	if a.Kernel < b.Kernel {
 		return -1
 	} else if a.Kernel > b.Kernel {
@@ -46,8 +43,7 @@ func CompareKernelVersion(a, b VersionInfo) int {
 	return 0
 }
 
-// GetKernelVersion gets the current kernel version.
-func GetKernelVersion() (*VersionInfo, error) {
+func GetKernelVersion() (*KernelVersionInfo, error) {
 	var (
 		err error
 	)
@@ -71,8 +67,7 @@ func GetKernelVersion() (*VersionInfo, error) {
 	return ParseRelease(string(release))
 }
 
-// ParseRelease parses a string and creates a VersionInfo based on it.
-func ParseRelease(release string) (*VersionInfo, error) {
+func ParseRelease(release string) (*KernelVersionInfo, error) {
 	var (
 		kernel, major, minor, parsed int
 		flavor, partial              string
@@ -91,7 +86,7 @@ func ParseRelease(release string) (*VersionInfo, error) {
 		flavor = partial
 	}
 
-	return &VersionInfo{
+	return &KernelVersionInfo{
 		Kernel: kernel,
 		Major:  major,
 		Minor:  minor,

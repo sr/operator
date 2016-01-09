@@ -6,20 +6,18 @@ import (
 	"unsafe"
 )
 
-// VersionInfo holds information about the kernel.
-type VersionInfo struct {
-	kvi   string // Version of the kernel (e.g. 6.1.7601.17592 -> 6)
-	major int    // Major part of the kernel version (e.g. 6.1.7601.17592 -> 1)
-	minor int    // Minor part of the kernel version (e.g. 6.1.7601.17592 -> 7601)
-	build int    // Build number of the kernel version (e.g. 6.1.7601.17592 -> 17592)
+type KernelVersionInfo struct {
+	kvi   string
+	major int
+	minor int
+	build int
 }
 
-func (k *VersionInfo) String() string {
+func (k *KernelVersionInfo) String() string {
 	return fmt.Sprintf("%d.%d %d (%s)", k.major, k.minor, k.build, k.kvi)
 }
 
-// GetKernelVersion gets the current kernel version.
-func GetKernelVersion() (*VersionInfo, error) {
+func GetKernelVersion() (*KernelVersionInfo, error) {
 
 	var (
 		h         syscall.Handle
@@ -27,7 +25,7 @@ func GetKernelVersion() (*VersionInfo, error) {
 		err       error
 	)
 
-	KVI := &VersionInfo{"Unknown", 0, 0, 0}
+	KVI := &KernelVersionInfo{"Unknown", 0, 0, 0}
 
 	if err = syscall.RegOpenKeyEx(syscall.HKEY_LOCAL_MACHINE,
 		syscall.StringToUTF16Ptr(`SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\`),

@@ -8,7 +8,6 @@ import (
 // See https://code.google.com/p/go/source/browse/src/pkg/mime/type_windows.go?r=d14520ac25bf6940785aabb71f5be453a286f58c
 // for a similar sample
 
-// GetOperatingSystem gets the name of the current operating system.
 func GetOperatingSystem() (string, error) {
 
 	var h syscall.Handle
@@ -42,8 +41,7 @@ func GetOperatingSystem() (string, error) {
 	return ret, nil
 }
 
-// IsContainerized returns true if we are running inside a container.
-// No-op on Windows, always returns false.
+// No-op on Windows
 func IsContainerized() (bool, error) {
 	return false, nil
 }
