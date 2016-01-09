@@ -4,13 +4,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	buildkite "services/buildkite"
-	gcloud "services/gcloud"
-	papertrail "services/papertrail"
 	"go.pedge.io/env"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"os"
+	buildkite "services/buildkite"
+	controller "services/controller"
+	gcloud "services/gcloud"
+	papertrail "services/papertrail"
 )
 
 const (
@@ -23,6 +24,9 @@ Available services:
 buildkite
   Interact with the Buildkite.com Continuous Integration server. Retrieve the
   status of projects, setup new ones, and trigger builds.
+
+controller
+  Undocumented.
 
 gcloud
   Undocumented.
@@ -52,6 +56,19 @@ projects.`
 	usageServiceBuildkiteListBuilds = `Usage:  buildkite list-builds [arguments]
 
 List the last builds of one or all projects, optionally limited to a  branch.`
+	usageServiceController = `Usage: operator controller [command]
+
+Undocumented.
+
+Available Commands:
+
+create-cluster
+ Undocumented.
+`
+
+	usageServiceControllerCreateCluster = `Usage:  controller create-cluster [arguments]
+
+Undocumented.`
 	usageServiceGcloud = `Usage: operator gcloud [command]
 
 Undocumented.
@@ -148,6 +165,30 @@ func doBuildkiteListBuilds(address string) (string, error) {
 		&buildkite.ListBuildsRequest{
 			ProjectSlug: *project_slug,
 		},
+	)
+	if err != nil {
+		return "", err
+	}
+	return response.Output.PlainText, nil
+}
+
+func doControllerCreateCluster(address string) (string, error) {
+	flags := flag.NewFlagSet("create-cluster", flag.ExitOnError)
+	flags.Parse(os.Args[3:])
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
+		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceControllerCreateCluster)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := controller.NewControllerClient(conn)
+	response, err := client.CreateCluster(
+		context.Background(),
+		&controller.CreateClusterRequest{},
 	)
 	if err != nil {
 		return "", err
@@ -282,6 +323,21 @@ func run() (int, string, error) {
 				return 0, output, nil
 			case "list-builds":
 				output, err := doBuildkiteListBuilds(config.Address)
+				if err != nil {
+					return 1, "", err
+				}
+				return 0, output, nil
+			default:
+				return 1, "", fmt.Errorf("no such command: %s", command)
+			}
+		case "controller":
+			if len(os.Args) == 2 || isHelp(os.Args[2]) {
+				return 2, usageServiceController, nil
+			}
+			command := os.Args[2]
+			switch command {
+			case "create-cluster":
+				output, err := doControllerCreateCluster(config.Address)
 				if err != nil {
 					return 1, "", err
 				}
