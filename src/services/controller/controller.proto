@@ -7,7 +7,7 @@ package controller;
 service Controller {
   option (operator.name) = "controller";
 
-  rpc CreateCluster(CreateClusterRequest) returns (CreateClusterRequest);
+  rpc CreateCluster(CreateClusterRequest) returns (CreateClusterResponse);
 }
 
 message CreateClusterRequest {
