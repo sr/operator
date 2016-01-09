@@ -1,55 +1,42 @@
-GO15VENDOREXPERIMENT = 1
+GB = bin/gb
+GBVENDOR = bin/gb-vendor
+GOLINT = bin/golint
+ERRCHECK = bin/errcheck
 
-deps:
-	go get -d ./src/...
+$(GB):
+	gb build github.com/constabulary/gb/cmd/gb
 
-updatedeps:
-	go get -d -u -f ./src/...
+$(GBVENDOR): $(GB)
+	$< build github.com/constabulary/gb/cmd/gb-vendor
 
-testdeps:
-	go get -d -t ./src/...
+$(GOLINT): $(GB)
+	$< build github.com/golang/lint/golint
 
-updatetestdeps:
-	go get -d -t -u -f ./src/...
+$(ERRCHECK): $(GB)
+	$< build github.com/kisielk/errcheck
 
-build: deps
-	go build ./src/...
+build: $(GB)
+	$< build all
 
-install: deps
-	go install ./src/...
-
-lint: testdeps
+lint: $(GOLINT)
 	go get github.com/golang/lint/golint
 	@ for file in $$(find src -name '*.go'); do \
-		bin/golint $${file}; \
+		bin/golint-custom $${file}; \
 		failure=false; \
-		test -n "$$(bin/golint $${file})" && failure=true; \
+		test -n "$$(bin/golint-custom $${file})" && failure=true; \
 	  done; \
 	  if $$failure; \
 	  then exit 1; \
 	  fi
 
-vet: testdeps
+vet:
 	go vet ./src/...
 
-errcheck: testdeps
-	go get github.com/kisielk/errcheck
-	errcheck ./src/...
-
-pretest: lint
-
-test: testdeps pretest
-	go test ./src/...
+errcheck: $(ERRCHECK)
+	$< ./src/...
 
 .PHONY: \
-	deps \
-	updatedeps \
-	testdeps \
-	updatetestdeps \
 	build \
-	install \
 	lint \
 	vet \
 	errcheck \
-	pretest \
-	test \

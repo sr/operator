@@ -15,6 +15,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/constabulary/gb",
+			"repository": "https://github.com/constabulary/gb",
+			"revision": "572f68e6f0e403df7e6b4426bb26e535b988398c",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/davecgh/go-spew/spew",
 			"repository": "https://github.com/davecgh/go-spew",
 			"revision": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d",
@@ -73,6 +79,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/golang/lint",
+			"repository": "https://github.com/golang/lint",
+			"revision": "32a87160691b3c96046c0c678fe57c5bef761456",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"revision": "2402d76f3d41f928c7902a765dfc872356dd3aad",
@@ -102,6 +114,18 @@
 			"importpath": "github.com/juju/ratelimit",
 			"repository": "https://github.com/juju/ratelimit",
 			"revision": "77ed1c8a01217656d2080ad51981f6e99adaa177",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/kisielk/errcheck",
+			"repository": "https://github.com/kisielk/errcheck",
+			"revision": "f8d8bb57449c28f30f38d8f0439865765403bc31",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/kisielk/gotool",
+			"repository": "https://github.com/kisielk/gotool",
+			"revision": "58a7a198f2ec6ea7af221fd216e7f559d663ce02",
 			"branch": "master"
 		},
 		{
@@ -238,6 +262,48 @@
 			"revision": "f1d3149ecb40ffadf4a28d39a30f9a125fe57bdf",
 			"branch": "master",
 			"path": "/http2/hpack"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/ast/astutil",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/ast/astutil"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/buildutil",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/buildutil"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/exact",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/exact"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/gcimporter",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/gcimporter"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/loader",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/loader"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/types",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
+			"branch": "master",
+			"path": "/go/types"
 		},
 		{
 			"importpath": "gopkg.in/yaml.v2",
