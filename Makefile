@@ -33,7 +33,7 @@ proto-operatord: proto-grpcinstrument
 	@ gofmt -s -w src/cmd/operatord
 
 proto-grpc: get-protoeasy
-	$(PROTOEASY) --go --grpc --go-import-path github.com/sr/operator/src --exclude hubot src/
+	$(PROTOEASY) --go --grpc --exclude hubot src/
 
 proto-grpcinstrument: get-grpcinstrument
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto

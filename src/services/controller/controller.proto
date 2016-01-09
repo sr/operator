@@ -14,4 +14,5 @@ message CreateClusterRequest {
 }
 
 message CreateClusterResponse {
+	operator.Output output = 1;
 }
