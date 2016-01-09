@@ -67,10 +67,10 @@ docker-build-hubot:
 docker-build-operatord:
 	rm -rf tmp
 	mkdir -p tmp
+	GOPATH=$(shell pwd)/vendor:$(shell pwd) CGO_ENABLED=0 GOOS=linux \
 	go build \
-		-installsuffix netgo \
-		-tags netgo \
-		-ldflags '-w -linkmode external -extldflags "-static"' \
+		-installsuffix cgo \
+		-ldflags '-w -extld ld -extldflags -static' \
 		-o tmp/operatord \
 		src/cmd/operatord/main-gen.go
 	docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
