@@ -6,11 +6,11 @@ import (
 	"path"
 	"strings"
 
-	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/sr/operator/src/operator"
+	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+
+	"operator"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -57,7 +57,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			nameStr := *name.(*string)
 			// TODO(sr) substitute path.Ext() or whatever
 			b := fmt.Sprintf("/%s", path.Base(file.GetName()))
-			importPath := fmt.Sprintf("github.com/sr/operator/src/%s", strings.Replace(file.GetName(), b, "", 1))
+			importPath := strings.Replace(file.GetName(), b, "", 1)
 			desc.Services[i] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),

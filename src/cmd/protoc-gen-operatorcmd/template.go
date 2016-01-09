@@ -1,6 +1,6 @@
 package main
 
-import "github.com/sr/operator/src/generator"
+import "generator"
 
 var (
 	mainUsageTemplate = generator.NewTemplate("main",
