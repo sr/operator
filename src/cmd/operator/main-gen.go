@@ -105,7 +105,7 @@ func doBuildkiteStatus(address string) (string, error) {
 	flags := flag.NewFlagSet("status", flag.ExitOnError)
 	slug := flags.String("slug", "", "")
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteStatus)
 		flags.PrintDefaults()
 		os.Exit(2)
@@ -132,7 +132,7 @@ func doBuildkiteListBuilds(address string) (string, error) {
 	flags := flag.NewFlagSet("list-builds", flag.ExitOnError)
 	project_slug := flags.String("project-slug", "", "")
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceBuildkiteListBuilds)
 		flags.PrintDefaults()
 		os.Exit(2)
@@ -162,7 +162,7 @@ func doGcloudCreateContainerCluster(address string) (string, error) {
 	node_count := flags.String("node-count", "", "")
 	zone := flags.String("zone", "", "")
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudCreateContainerCluster)
 		flags.PrintDefaults()
 		os.Exit(2)
@@ -192,7 +192,7 @@ func doGcloudListInstances(address string) (string, error) {
 	flags := flag.NewFlagSet("list-instances", flag.ExitOnError)
 	project_id := flags.String("project-id", "", "")
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageServiceGcloudListInstances)
 		flags.PrintDefaults()
 		os.Exit(2)
@@ -219,7 +219,7 @@ func doPapertrailSearch(address string) (string, error) {
 	flags := flag.NewFlagSet("search", flag.ExitOnError)
 	query := flags.String("query", "", "")
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageServicePapertrailSearch)
 		flags.PrintDefaults()
 		os.Exit(2)

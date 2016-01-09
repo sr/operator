@@ -84,7 +84,7 @@ func do{{ camelCase $serviceName }}{{.Name}}(address string) (string, error) {
 	{{.Name}} := flags.String("{{dasherize .Name}}", "", "")
 	{{- end}}
 	flags.Parse(os.Args[3:])
-	if isHelp(os.Args[3]) {
+	if len(os.Args) >= 4 && isHelp(os.Args[3]) {
 		fmt.Fprintf(os.Stderr, "%s\n\n", usageService{{camelCase $serviceName}}{{.Name}})
 		flags.PrintDefaults()
 		os.Exit(2)
