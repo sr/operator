@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "operator/operator.proto";
+
+package controller;
+
+service Controller {
+  option (operator.name) = "controller";
+
+  rpc CreateCluster(CreateClusterRequest) returns (CreateClusterRequest);
+}
+
+message CreateClusterRequest {
+}
+
+message CreateClusterResponse {
+}
