@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
-	"github.com/sr/operator/src/operator"
+	"operator"
 	"golang.org/x/net/context"
 )
 

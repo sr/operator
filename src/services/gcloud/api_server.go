@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/sr/operator/src/operator"
+	"operator"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"

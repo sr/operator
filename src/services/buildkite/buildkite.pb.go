@@ -19,7 +19,7 @@ package buildkite
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import operator "github.com/sr/operator/src/operator"
+import operator "operator"
 
 import (
 	context "golang.org/x/net/context"

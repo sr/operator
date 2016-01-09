@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sr/operator/src/generator"
+	"generator"
 )
 
 const (

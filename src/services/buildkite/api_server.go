@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/sr/operator/src/operator"
+	"operator"
 	buildkiteapi "github.com/wolfeidau/go-buildkite/buildkite"
 	"golang.org/x/net/context"
 )

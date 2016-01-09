@@ -17,7 +17,7 @@ package controller
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import _ "github.com/sr/operator/src/operator"
+import _ "operator"
 
 import (
 	context "golang.org/x/net/context"

@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sr/operator/src/services/buildkite"
+	"services/buildkite"
 
-	"github.com/sr/operator/src/services/gcloud"
+	"services/gcloud"
 
-	"github.com/sr/operator/src/services/papertrail"
+	"services/papertrail"
 
-	"github.com/sr/operator/src/operator"
+	"operator"
 	"go.pedge.io/env"
 	"google.golang.org/grpc"
 )

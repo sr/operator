@@ -4,9 +4,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	buildkite "github.com/sr/operator/src/services/buildkite"
-	gcloud "github.com/sr/operator/src/services/gcloud"
-	papertrail "github.com/sr/operator/src/services/papertrail"
+	buildkite "services/buildkite"
+	gcloud "services/gcloud"
+	papertrail "services/papertrail"
 	"go.pedge.io/env"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
