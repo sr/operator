@@ -1,4 +1,5 @@
 /bin
+/doc/TODO
 /etc/k8s/**/secrets.json
 /pkg
 /src/hubot/.hubot_history
