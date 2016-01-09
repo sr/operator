@@ -1,2 +1,0 @@
-- Fix --help getting sallowed by flag library
-- Show WebURL in list-builds output (as opposed to API url)
