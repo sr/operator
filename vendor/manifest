@@ -2,6 +2,18 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/alecthomas/template",
+			"repository": "https://github.com/alecthomas/template",
+			"revision": "14fd436dd20c3cc65242a9f396b61bfc8a3926fc",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/alecthomas/units",
+			"repository": "https://github.com/alecthomas/units",
+			"revision": "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/beorn7/perks/quantile",
 			"repository": "https://github.com/beorn7/perks",
 			"revision": "b965b613227fddccbfffe13eae360ed3fa822f8d",
@@ -97,6 +109,13 @@
 			"revision": "0800e51cbebbf86d30e83dfc87651257cb8d91c7",
 			"branch": "master",
 			"path": "/info/v1"
+		},
+		{
+			"importpath": "github.com/google/go-querystring/query",
+			"repository": "https://github.com/google/go-querystring",
+			"revision": "2a60fc2ba6c19de80291203597d752e9ba58e4c0",
+			"branch": "master",
+			"path": "/query"
 		},
 		{
 			"importpath": "github.com/google/gofuzz",
@@ -236,6 +255,12 @@
 			"path": "/codec"
 		},
 		{
+			"importpath": "github.com/wolfeidau/go-buildkite",
+			"repository": "https://github.com/wolfeidau/go-buildkite",
+			"revision": "0a58664ff35c071699a5f6a8ab2496b3e4cb9238",
+			"branch": "master"
+		},
+		{
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"revision": "f23ba3a5ee43012fcb4b92e1a2a405a92554f4f2",
@@ -304,6 +329,12 @@
 			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
 			"branch": "master",
 			"path": "/go/types"
+		},
+		{
+			"importpath": "gopkg.in/alecthomas/kingpin.v2",
+			"repository": "https://gopkg.in/alecthomas/kingpin.v2",
+			"revision": "8852570bd3865e9c4d4cb7cf5001c4295b07cad5",
+			"branch": "master"
 		},
 		{
 			"importpath": "gopkg.in/yaml.v2",
