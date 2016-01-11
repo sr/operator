@@ -165,6 +165,12 @@ module.exports = (robot) ->
     ]
     msg.send msg.random tehbishop
 
+  robot.respond /fondont$/i, (msg) ->
+    calebapple = [
+      'https://media.giphy.com/media/3oxRmsdUQ50pclDYOs/giphy.gif'
+    ]
+    msg.send msg.random calebapple
+
   robot.respond /caleb$/i, (msg) ->
     calebapple = [
       'https://hipchat.dev.pardot.com/files/1/209/3pfm0Zx6Yt6Nc7c/calebapple.gif'
