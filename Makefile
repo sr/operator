@@ -23,11 +23,14 @@ proto-cmd:
 	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operator
 
-proto-hubot: src/hubot/proto/operator/ src/hubot/scripts/
-	for file in $$(find src/services -name '*.proto' | grep -v src/hubot); do \
+proto-hubot:
+	rm -rf src/hubot/proto src/hubot/scripts
+	cp -r vendor/proto src/hubot
+	mkdir src/hubot/proto/operator src/hubot/scripts
+	for file in $$(find src/services -name '*.proto'); do \
 		cp $$file src/hubot/proto; \
 	done
-	cp src/operator/operator.proto src/hubot/proto/operator
+	cp src/operator/operator.proto src/hubot/proto/operator/
 	protoc --operatorhubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
 proto-operatord: proto-grpcinstrument
@@ -45,12 +48,6 @@ get-protoeasy:
 
 get-grpcinstrument:
 	go get github.com/sr/grpcinstrument/...
-
-src/hubot/proto/operator/:
-	mkdir $@
-
-src/hubot/scripts/:
-	mkdir $@
 
 goget-openflights:
 	go get go.pedge.io/openflights
