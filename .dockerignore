@@ -2,3 +2,5 @@
 .gitingore
 pkg/
 src/hubot/node_modules
+tmp/
+vendor/
