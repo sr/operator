@@ -165,11 +165,11 @@ module.exports = (robot) ->
     ]
     msg.send msg.random tehbishop
 
-  robot.respond /fondont$/i, (msg) ->
-    calebapple = [
+  robot.respond /fondant$/i, (msg) ->
+    fondant = [
       'https://media.giphy.com/media/3oxRmsdUQ50pclDYOs/giphy.gif'
     ]
-    msg.send msg.random calebapple
+    msg.send msg.random fondant
 
   robot.respond /caleb$/i, (msg) ->
     calebapple = [
