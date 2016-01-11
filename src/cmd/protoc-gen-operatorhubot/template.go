@@ -21,9 +21,9 @@ client = new {{.PackageName}}.{{.Name}}(address, grpc.Credentials.createInsecure
 
 module.exports = (robot) ->
 {{$service := .Name}}
-{{- range .Methods}}
-	robot.respond /{{$service}} {{.Name}}TODO(sr)/, (msg) ->
-		client.{{.Name}} {a: 1, b: 2}, (err, response) ->
+{{- range .Methods -}}
+	robot.respond /{{$service}} {{dasherize .Name}}{{index $.Args .Name}}/, (msg) ->
+		client.{{.Name}} {{index $.Input .Name}}, (err, response) ->
 			if err
 				msg.send("`+"```"+`\n{{.Name}} error: #{err.message}\n`+"```"+`")
 			else
