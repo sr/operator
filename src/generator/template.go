@@ -17,6 +17,7 @@ var funcMap = template.FuncMap{
 	"camelCase":     camelCase,
 	"dasherize":     dasherize,
 	"lowerCase":     lowerCase,
+	"oneLine":       oneLine,
 	"wrap":          wrap,
 	"wrappedIndent": wrappedIndent,
 }
@@ -33,6 +34,10 @@ func dasherize(s string) string {
 func lowerCase(s string) string {
 	r, n := utf8.DecodeRuneInString(s)
 	return string(unicode.ToLower(r)) + s[n:]
+}
+
+func oneLine(s string) string {
+	return strings.Replace(s, "\n", " ", -1)
 }
 
 func wrappedIndent(s string, indentS string) string {

@@ -91,11 +91,15 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				desc.Services[loc.Path[1]].Description = *loc.LeadingComments
+				desc.Services[loc.Path[1]].Description = clean(*loc.LeadingComments)
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
-				desc.Services[loc.Path[1]].Methods[loc.Path[3]].Description = *loc.LeadingComments
+				desc.Services[loc.Path[1]].Methods[loc.Path[3]].Description = clean(*loc.LeadingComments)
 			}
 		}
 	}
 	return desc, nil
+}
+
+func clean(s string) string {
+	return strings.Trim(strings.Trim(s, " "), "\n")
 }
