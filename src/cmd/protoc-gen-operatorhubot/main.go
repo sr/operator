@@ -36,7 +36,7 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 			return nil, err
 		}
 		response[i] = &generator.File{
-			Name:    fmt.Sprintf("%s.%s", service.Name, fileExt),
+			Name:    fmt.Sprintf("%s-gen.%s", service.Name, fileExt),
 			Content: buffer.String(),
 		}
 		buffer.Reset()
