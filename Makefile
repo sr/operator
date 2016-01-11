@@ -9,7 +9,9 @@ PROTOEASY = bin/protoeasy
 -include etc/mk/golang.mk
 
 hubot-dev: docker-build-hubot
-	docker run --rm --name hubot --link operatord -it sr/hubot -a shell -l /
+	docker run --rm --name hubot -it --net=host \
+		-e OPERATORD_ADDRESS=localhost:3000 \
+		sr/hubot -a shell -l /
 
 operatord-dev: $(GB)
 	$< build cmd/operatord
