@@ -15,16 +15,14 @@ if !address
 client = new gcloud.gcloud(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-
-	robot.respond /gcloud CreateContainerClusterTODO(sr)/, (msg) ->
-		client.CreateContainerCluster {a: 1, b: 2}, (err, response) ->
+robot.respond /gcloud create-container-cluster project_id=(\w+) name=(\w+) node_count=(\w+) zone=(\w+)/, (msg) ->
+		client.CreateContainerCluster {project_id: msg.match[1],name: msg.match[2],node_count: msg.match[3],zone: msg.match[4],}, (err, response) ->
 			if err
 				msg.send("```\nCreateContainerCluster error: #{err.message}\n```")
 			else
 				msg.send("```\n#{response.output.PlainText}\n```")
-
-	robot.respond /gcloud ListInstancesTODO(sr)/, (msg) ->
-		client.ListInstances {a: 1, b: 2}, (err, response) ->
+robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
+		client.ListInstances {project_id: msg.match[1],}, (err, response) ->
 			if err
 				msg.send("```\nListInstances error: #{err.message}\n```")
 			else

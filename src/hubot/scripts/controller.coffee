@@ -4,20 +4,20 @@ grpc = require "grpc"
 protobuf = require "protobufjs"
 
 protodir = path.resolve(__dirname + "/../proto")
-proto = protobuf.loadProtoFile(root: protodir, file: "papertrail.proto")
-papertrail = grpc.loadObject(proto.ns).papertrail
+proto = protobuf.loadProtoFile(root: protodir, file: "controller.proto")
+controller = grpc.loadObject(proto.ns).controller
 address = process.env.OPERATORD_ADDRESS
 if !address
   host = process.env.OPERATORD_PORT_3000_TCP_ADDR
   port = process.env.OPERATORD_PORT_3000_TCP_PORT
   address = "#{host}:#{port}"
 
-client = new papertrail.papertrail(address, grpc.Credentials.createInsecure())
+client = new controller.controller(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-robot.respond /papertrail search query=(\w+)/, (msg) ->
-		client.Search {query: msg.match[1],}, (err, response) ->
+robot.respond /controller create-cluster/, (msg) ->
+		client.CreateCluster {}, (err, response) ->
 			if err
-				msg.send("```\nSearch error: #{err.message}\n```")
+				msg.send("```\nCreateCluster error: #{err.message}\n```")
 			else
 				msg.send("```\n#{response.output.PlainText}\n```")

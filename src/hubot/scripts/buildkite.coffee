@@ -15,16 +15,14 @@ if !address
 client = new buildkite.buildkite(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-
-	robot.respond /buildkite StatusTODO(sr)/, (msg) ->
-		client.Status {a: 1, b: 2}, (err, response) ->
+robot.respond /buildkite status slug=(\w+)/, (msg) ->
+		client.Status {slug: msg.match[1],}, (err, response) ->
 			if err
 				msg.send("```\nStatus error: #{err.message}\n```")
 			else
 				msg.send("```\n#{response.output.PlainText}\n```")
-
-	robot.respond /buildkite ListBuildsTODO(sr)/, (msg) ->
-		client.ListBuilds {a: 1, b: 2}, (err, response) ->
+robot.respond /buildkite list-builds project_slug=(\w+)/, (msg) ->
+		client.ListBuilds {project_slug: msg.match[1],}, (err, response) ->
 			if err
 				msg.send("```\nListBuilds error: #{err.message}\n```")
 			else
