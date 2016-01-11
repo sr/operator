@@ -1,6 +1,10 @@
 .git
 .gitingore
+bin/
 pkg/
 src/hubot/node_modules
 tmp/
 vendor/
+!bin/ci
+!bin/k8s-hubot
+!bin/k8s-operatord
