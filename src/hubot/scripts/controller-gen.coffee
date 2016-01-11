@@ -12,12 +12,14 @@ if !address
   port = process.env.OPERATORD_PORT_3000_TCP_PORT
   address = "#{host}:#{port}"
 
-client = new controller.controller(address, grpc.Credentials.createInsecure())
+client = new controller.Controller(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-robot.respond /controller create-cluster/, (msg) ->
-		client.CreateCluster {}, (err, response) ->
-			if err
-				msg.send("```\nCreateCluster error: #{err.message}\n```")
-			else
-				msg.send("```\n#{response.output.PlainText}\n```")
+
+  robot.respond /controller create-cluster/, (msg) ->
+    client.createCluster {}, (err, response) ->
+      if err
+        msg.send("```\nCreateCluster error: #{err.message}\n```")
+      else
+        msg.send("```\n#{response.output.PlainText}\n```")
+

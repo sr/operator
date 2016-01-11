@@ -12,12 +12,14 @@ if !address
   port = process.env.OPERATORD_PORT_3000_TCP_PORT
   address = "#{host}:#{port}"
 
-client = new papertrail.papertrail(address, grpc.Credentials.createInsecure())
+client = new papertrail.PapertrailService(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
-robot.respond /papertrail search query=(\w+)/, (msg) ->
-		client.Search {query: msg.match[1],}, (err, response) ->
-			if err
-				msg.send("```\nSearch error: #{err.message}\n```")
-			else
-				msg.send("```\n#{response.output.PlainText}\n```")
+
+  robot.respond /papertrail search query=(\w+)/, (msg) ->
+    client.search {query: msg.match[1],}, (err, response) ->
+      if err
+        msg.send("```\nSearch error: #{err.message}\n```")
+      else
+        msg.send("```\n#{response.output.PlainText}\n```")
+
