@@ -96,10 +96,5 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 }
 
 func NewTemplate(name string, content string) *template.Template {
-	return template.Must(template.New(name).Funcs(template.FuncMap{
-		"camelCase":     camelCase,
-		"dasherize":     dasherize,
-		"wrap":          wrap,
-		"wrappedIndent": wrappedIndent,
-	}).Parse(content))
+	return template.Must(template.New(name).Funcs(funcMap).Parse(content))
 }

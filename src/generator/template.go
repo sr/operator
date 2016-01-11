@@ -2,6 +2,9 @@ package generator
 
 import (
 	"strings"
+	"text/template"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/acsellers/inflections"
 	"github.com/kr/text"
@@ -10,12 +13,12 @@ import (
 
 const wrapLimit = 80
 
-func wrappedIndent(s string, indentS string) string {
-	return text.Indent(text.Wrap(s, wrapLimit-len(indentS)), indentS)
-}
-
-func wrap(s string) string {
-	return text.Wrap(s, wrapLimit)
+var funcMap = template.FuncMap{
+	"camelCase":     camelCase,
+	"dasherize":     dasherize,
+	"lowerCase":     lowerCase,
+	"wrap":          wrap,
+	"wrappedIndent": wrappedIndent,
 }
 
 func camelCase(s string) string {
@@ -25,4 +28,17 @@ func camelCase(s string) string {
 
 func dasherize(s string) string {
 	return inflections.Dasherize(snaker.CamelToSnake(s))
+}
+
+func lowerCase(s string) string {
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToLower(r)) + s[n:]
+}
+
+func wrappedIndent(s string, indentS string) string {
+	return text.Indent(text.Wrap(s, wrapLimit-len(indentS)), indentS)
+}
+
+func wrap(s string) string {
+	return text.Wrap(s, wrapLimit)
 }
