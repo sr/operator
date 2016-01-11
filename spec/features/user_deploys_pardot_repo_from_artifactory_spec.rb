@@ -62,13 +62,10 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
     expect(deploys[0].what).to eq("branch")
     expect(deploys[0].what_details).to eq("master")
     expect(deploys[0].build_number).to eq(1234)
-    expect(deploys[0].servers_used).to eq("localhost")
     expect(deploys[0].specified_servers).to eq(nil)
     expect(deploys[0].sha).to eq("abc123")
     expect(deploys[0].artifact_url).to be_present
 
-    # DeployResult instances are created for pull servers only. Eventually all
-    # servers will be pull servers.
     expect(deploys[0].results.length).to eq(1)
     expect(deploys[0].results[0].server.hostname).to eq(@server.hostname)
     expect(deploys[0].results[0].stage).to eq("initiated")

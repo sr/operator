@@ -20,7 +20,6 @@
       <th>Who</th>
       <th>When</th>
       <th>Complete</th>
-      <th>Servers</th>
     </tr>
   </thead>
   <% @deploys.each do |deploy| %>
@@ -44,13 +43,6 @@
           <span class="text-success" title="Complete"><i class="icon-check"></i></span>
         <% else %>
           <span class="text-muted" title="Not Complete"><i class="icon-check-empty"></i></span>
-        <% end %>
-      </td>
-      <td>
-        <% if deploy.used_all_servers? %>
-          <span class="muted" title="All Servers"><i class="icon-circle"></i></span>
-        <% else %>
-          <span class="muted" title="Partial List"><i class="icon-adjust"></i></span>
         <% end %>
       </td>
     </tr>

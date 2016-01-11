@@ -28,16 +28,7 @@ class DeploysController < ApplicationController
     if @prov_deploy = build_provisional_deploy
       @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
-
-      # TODO: Remove strategy once pull-based deployment is fully rolled out.
-      #
-      # TODO: Use server_ids instead of server hostnames once pull-based
-      # deployment is fully rolled out.
-      @server_hostnames = current_target.servers(repo: current_repo).enabled.pluck(:hostname)
-      if current_target.script_path.present?
-        @server_hostnames.concat(Rails.application.config.deployment.strategy.list_servers(current_target, current_repo.name))
-      end
-      @server_hostnames.sort!
+      @server_hostnames = current_target.servers(repo: current_repo).enabled.pluck(:hostname).sort
 
       @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
     else
