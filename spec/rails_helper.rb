@@ -26,11 +26,6 @@ RSpec.configure do |config|
   config.include FeatureHelpers, type: :feature
   config.include RequestHelpers, type: :request
 
-  config.before do
-    # Cleanup list of test deploys
-    Rails.application.config.deployment.strategy.clear
-  end
-
   config.around type: :request do |example|
     OmniAuth.config.test_mode = true
     example.run

@@ -56,31 +56,18 @@ namespace :canoe do
   task :create_targets => :environment do
     case Rails.env
     when 'development'
-      DeployTarget.find_or_initialize_by(name: 'dev').tap { |target|
-        target.script_path = "#{Rails.root}/../sync_scripts"
-      }.save
-
-      DeployTarget.find_or_initialize_by(name: 'test').tap { |target|
-        target.script_path = "#{Rails.root}/../sync_scripts"
-      }.save
+      DeployTarget.find_or_initialize_by(name: 'dev').save
+      DeployTarget.find_or_initialize_by(name: 'test').save
     when 'test'
       # tests create their own targets via FactoryGirl
     when 'app.dev'
-      DeployTarget.find_or_initialize_by(name: 'staging').tap { |target|
-        target.script_path = '/opt/sync/staging'
-      }.save
-
+      DeployTarget.find_or_initialize_by(name: 'staging').save
       DeployTarget.find_or_initialize_by(name: 'engagement').tap { |target|
         target.enabled = false
-        target.script_path = '/opt/sync/staging'
       }.save
     when 'production'
-      DeployTarget.find_or_initialize_by(name: "production").tap { |target|
-        target.script_path = "/opt/sync/production"
-      }.save
-      DeployTarget.find_or_initialize_by(name: "production_dfw").tap { |target|
-        target.script_path = nil
-      }.save
+      DeployTarget.find_or_initialize_by(name: "production").save
+      DeployTarget.find_or_initialize_by(name: "production_dfw").save
     end
   end
 end

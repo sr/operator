@@ -65,7 +65,7 @@ module Canoe
 
     private
     def deployer
-      @deployer ||= Canoe::Deployer.new(strategy: Rails.application.config.deployment.strategy)
+      @deployer ||= Canoe::Deployer.new
     end
   end
 end

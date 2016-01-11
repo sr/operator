@@ -41,10 +41,6 @@ class Deploy < ActiveRecord::Base
     contents.gsub(/\n/,"<br>").html_safe
   end
 
-  def used_all_servers?
-    self.specified_servers.blank?
-  end
-
   def all_servers
     all_sync_servers + all_pull_servers
   end
@@ -83,7 +79,6 @@ class Deploy < ActiveRecord::Base
 
   def cancel!
     update!(canceled: true, completed: true)
-    kill_process!
     Hipchat.notify_deploy_cancelled(self)
   end
 
@@ -94,31 +89,10 @@ class Deploy < ActiveRecord::Base
 
   def check_completed_status!
     return if completed?
-
-    if !process_still_running? && !incomplete_results_present?
-      complete!
-    end
-  end
-
-  def process_still_running?
-    return false if process_id.nil?
-
-    # kill -0 checks if the process is running and owned by us, but doesn't send
-    # a signal
-    !!Process.kill(0, process_id.to_i)
-  rescue
-    # process isn't running or isn't owned by us
-    false
+    complete! unless incomplete_results_present?
   end
 
   def incomplete_results_present?
     results.incomplete.any?
-  end
-
-  def kill_process!(forcefully=false)
-    return unless process_still_running?
-    Process.kill(forcefully ? "KILL" : "INT", process_id.to_i)
-    sleep(1)
-    check_completed_status!
   end
 end
