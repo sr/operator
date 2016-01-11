@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
-	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"operator"
+
+	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
 )
 
@@ -21,6 +22,9 @@ func (s *apiServer) Search(
 	ctx context.Context,
 	request *SearchRequest,
 ) (*SearchResponse, error) {
+	if request.Query == "" {
+		return nil, operator.NewArgumentRequiredError("Query")
+	}
 	options := papertrailapi.SearchOptions{
 		Query: request.Query,
 	}

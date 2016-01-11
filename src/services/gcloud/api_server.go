@@ -2,6 +2,7 @@ package gcloud
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +15,8 @@ import (
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
 )
+
+var projectIDMissing = errors.New("required project-id parameter is missing")
 
 type apiServer struct {
 	client           *http.Client
@@ -37,10 +40,9 @@ func (s *apiServer) CreateContainerCluster(
 	ctx context.Context,
 	request *CreateContainerClusterRequest,
 ) (*CreateContainerClusterResponse, error) {
-	// TODO proper type support, stop assuming everything is a string
 	nodeCount, err := strconv.ParseInt(request.NodeCount, 10, 64)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid node count value: %v", request.NodeCount)
 	}
 	operation, err := s.containerService.Projects.Zones.Clusters.Create(
 		request.ProjectId,
@@ -64,6 +66,10 @@ func (s *apiServer) ListInstances(
 	ctx context.Context,
 	request *ListInstancesRequest,
 ) (*ListInstancesResponse, error) {
+	if request.ProjectId == "" {
+		return nil, operator.NewArgumentRequiredError("ProjectId")
+	}
+
 	response, err := s.computeService.Instances.AggregatedList(request.ProjectId).Do()
 	if err != nil {
 		return nil, err
