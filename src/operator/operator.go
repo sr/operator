@@ -57,3 +57,7 @@ func NewInstrumentator(logger protolog.Logger) grpcinstrument.Instrumentator {
 		promeasurer.NewMeasurer(),
 	)
 }
+
+func NewArgumentRequiredError(argument string) error {
+	return newArgumentRequiredError(argument)
+}
