@@ -11,7 +11,7 @@ PROTOEASY = bin/protoeasy
 hubot-dev: docker-build-hubot
 	docker run --rm --name hubot -it --net=host \
 		-e OPERATORD_ADDRESS=localhost:3000 \
-		sr/hubot -a shell -l /
+		sr/hubot -d -a shell -l /
 
 operatord-dev: $(GB)
 	$< build cmd/operatord
