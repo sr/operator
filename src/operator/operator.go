@@ -1,8 +1,6 @@
 package operator
 
 import (
-	"os"
-
 	"github.com/sr/grpcinstrument"
 	"github.com/sr/grpcinstrument/promeasurer"
 	"github.com/sr/grpcinstrument/protologger"
@@ -43,12 +41,7 @@ func NewServer(
 }
 
 func NewLogger() protolog.Logger {
-	return protolog.NewLogger(
-		protolog.NewDefaultTextWritePusher(
-			protolog.NewFileFlusher(os.Stderr),
-		),
-		protolog.LoggerOptions{},
-	)
+	return protolog.DefaultLogger
 }
 
 func NewInstrumentator(logger protolog.Logger) grpcinstrument.Instrumentator {
