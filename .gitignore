@@ -6,4 +6,5 @@
 /src/hubot/nodes_modules
 /src/hubot/proto
 /tmp
+/vendor/pkg
 !/bin/ci
