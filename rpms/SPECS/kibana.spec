@@ -22,9 +22,9 @@ Kibana is an open source (Apache Licensed), browser based analytics and search d
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/var/log/kibana
-mkdir -p $RPM_BUILD_ROOT/var/run/kibana
 install -m 0755 -d $RPM_BUILD_ROOT/opt/kibana
+install -m 0755 -d $RPM_BUILD_ROOT/var/log/kibana
+install -m 0755 -d $RPM_BUILD_ROOT/var/run/kibana
 cp -rp . $RPM_BUILD_ROOT/opt/kibana
 
 %files
