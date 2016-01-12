@@ -30,6 +30,8 @@ cp -rp . $RPM_BUILD_ROOT/opt/kibana
 %files
 %defattr(-,kibana,kibana,-)
 /opt/kibana
+%dir /var/log/kibana
+%dir /var/run/kibana
 
 %clean
 rm -rf $RPM_BUILD_ROOT
