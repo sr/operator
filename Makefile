@@ -105,8 +105,8 @@ gcloud-container-cluster:
 			--scopes cloud-platform,compute-rw,logging-write,monitoring,storage-full,useraccounts-rw,userinfo-email
 
 clean:
-	go clean -i ./src/...
-	rm -rf src/hubot/proto/{operator,services}
+	rm -f src/cmd/**/*-gen.go
+	rm -f src/hubot/scripts/*-gen.coffee
 	rm -rf tmp/
 
 .PHONY: \
