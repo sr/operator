@@ -1,32 +1,30 @@
+
 package papertrail
 
 import (
-	"github.com/sr/grpcinstrument"
-	"golang.org/x/net/context"
 	"time"
+	"golang.org/x/net/context"
+	"github.com/sr/grpcinstrument"
 )
 
-// InstrumentedPapertrailServiceServer implements and instruments PapertrailServiceServer
-// using the grpcinstrument package.
-type InstrumentedPapertrailServiceServer struct {
+
+type instrumentedPapertrailServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	server         PapertrailServiceServer
+	server PapertrailServiceServer
 }
 
-// NewInstrumentedPapertrailServiceServer constructs a instrumentation wrapper for
-// PapertrailServiceServer.
+
 func NewInstrumentedPapertrailServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	server PapertrailServiceServer,
-) *InstrumentedPapertrailServiceServer {
-	return &InstrumentedPapertrailServiceServer{
+) *instrumentedPapertrailServiceServer {
+	return &instrumentedPapertrailServiceServer{
 		instrumentator,
 		server,
 	}
 }
 
-// Search instruments the PapertrailServiceServer.Search method.
-func (a *InstrumentedPapertrailServiceServer) Search(
+func (a *instrumentedPapertrailServiceServer) Search(
 	ctx context.Context,
 	request *SearchRequest,
 ) (response *SearchResponse, err error) {
