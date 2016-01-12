@@ -2,7 +2,6 @@ package gcloud
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -15,8 +14,6 @@ import (
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
 )
-
-var projectIDMissing = errors.New("required project-id parameter is missing")
 
 type apiServer struct {
 	client           *http.Client
