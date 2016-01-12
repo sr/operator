@@ -6,6 +6,8 @@ GCLOUD_PROJECT_ID = dev-europe-west1
 GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
 PROTOEASY = bin/protoeasy
+OPERATORD = bin/operatord
+OPERATOR = bin/operator
 PROTOC_GEN_GO = bin/protoc-gen-go
 PROTOC_GEN_GRPCINSTRUMENT = bin/protoc-gen-grpcinstrument
 PROTOC_GEN_OPERATORHUBOT = bin/protoc-gen-operatorhubot
@@ -19,9 +21,8 @@ hubot-dev: docker-build-hubot
 		-e OPERATORD_ADDRESS=localhost:3000 \
 		sr/hubot -d -a shell -l /
 
-operatord-dev: $(GB)
-	$< build cmd/operatord
-	bin/operatord
+operatord-dev: $(OPERATORD)
+	$<
 
 proto: build proto-grpc proto-cmd proto-hubot proto-operatord
 
@@ -45,24 +46,6 @@ proto-operatord: $(PROTOC_GEN_OPERATORD) proto-grpcinstrument
 
 proto-grpc: $(PROTOEASY)
 	$< --go --grpc --exclude hubot src/
-
-$(PROTOC_GEN_OPERATORCMD): $(GB)
-	$< build cmd/protoc-gen-operatorcmd
-
-$(PROTOC_GEN_OPERATORHUBOT): $(GB)
-	$< build cmd/protoc-gen-operatorhubot
-
-$(PROTOC_GEN_OPERATORD): $(GB)
-	$< build cmd/protoc-gen-operatord
-
-$(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
-	$< build go.pedge.io/protoeasy/cmd/protoeasy
-
-$(PROTOC_GEN_GO): $(GB)
-	$< build github.com/golang/protobuf/protoc-gen-go
-
-$(PROTOC_GEN_GRPCINSTRUMENT): $(GB)
-	$< build github.com/sr/grpcinstrument/cmd/protoc-gen-grpcinstrument
 
 proto-grpcinstrument: $(PROTOC_GEN_GRPCINSTRUMENT)
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
@@ -117,11 +100,41 @@ gcloud-container-cluster:
 			--scopes cloud-platform,compute-rw,logging-write,monitoring,storage-full,useraccounts-rw,userinfo-email
 
 clean:
-	rm -f src/cmd/**/*-gen.go
-	rm -f src/hubot/scripts/*-gen.coffee
-	rm -f $(PROTOC_GEN_OPERATORCMD) $(PROTOC_GEN_OPERATORHUBOT)
-	rm -f $(PROTOC_GEN_OPERATORD)
+	rm -f src/cmd/**/*-gen.go \
+		src/hubot/scripts/*-gen.coffee \
+		$(OPERATOR) \
+		$(OPERATORD) \
+		$(PROTOEASY) \
+		$(PROTOC_GEN_GO) \
+		$(PROTOC_GEN_GRPCINSTRUMENT) \
+		$(PROTOC_GEN_OPERATORCMD) \
+		$(PROTOC_GEN_OPERATORD) \
+		$(PROTOC_GEN_OPERATORHUBOT) \
 	rm -rf tmp/
+
+$(OPERATOR): $(GB) proto-cmd
+	$< build cmd/operator
+
+$(OPERATORD): $(GB) proto-operatord
+	$< build cmd/operatord
+
+$(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
+	$< build go.pedge.io/protoeasy/cmd/protoeasy
+
+$(PROTOC_GEN_GO): $(GB)
+	$< build github.com/golang/protobuf/protoc-gen-go
+
+$(PROTOC_GEN_GRPCINSTRUMENT): $(GB)
+	$< build github.com/sr/grpcinstrument/cmd/protoc-gen-grpcinstrument
+
+$(PROTOC_GEN_OPERATORCMD): $(GB)
+	$< build cmd/protoc-gen-operatorcmd
+
+$(PROTOC_GEN_OPERATORD): $(GB)
+	$< build cmd/protoc-gen-operatord
+
+$(PROTOC_GEN_OPERATORHUBOT): $(GB)
+	$< build cmd/protoc-gen-operatorhubot
 
 .PHONY: \
 	hubot-dev \
