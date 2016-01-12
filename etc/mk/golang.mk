@@ -4,8 +4,8 @@ GOLINT = bin/golint
 ERRCHECK = bin/errcheck
 
 $(GB):
-	GOPATH="$(shell pwd)/vendor" \
-	GOBIN="$(shell pwd)/bin" \
+	export GOPATH="$(shell pwd)/vendor"; \
+	export GOBIN="$(shell pwd)/bin"; \
 	go install github.com/constabulary/gb/...
 
 $(GBVENDOR): $(GB)
