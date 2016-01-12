@@ -7,13 +7,15 @@ import (
 
 	"services/buildkite"
 
+	"services/controller"
+
 	"services/gcloud"
 
 	"services/papertrail"
 
-	"operator"
 	"go.pedge.io/env"
 	"google.golang.org/grpc"
+	"operator"
 )
 
 func run() error {
@@ -35,6 +37,18 @@ func run() error {
 		} else {
 			instrumented := buildkite.NewInstrumentedBuildkiteServiceServer(instrumentator, buildkiteServer)
 			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
+		}
+	}
+
+	controllerEnv := &controller.Env{}
+	if err := env.Populate(controllerEnv); err != nil {
+		server.LogServiceStartupError("controller", err)
+	} else {
+		if controllerServer, err := controller.NewAPIServer(controllerEnv); err != nil {
+			server.LogServiceStartupError("controller", err)
+		} else {
+			instrumented := controller.NewInstrumentedControllerServer(instrumentator, controllerServer)
+			controller.RegisterControllerServer(grpcServer, instrumented)
 		}
 	}
 

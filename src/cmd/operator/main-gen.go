@@ -22,7 +22,7 @@ Use  "operator help <service>" for help with a particular service.
 Available services:
 
 buildkite
-  Interact with the Buildkite.com Continuous Integration server. Retrieve the
+  Interact with the Buildkite.com Continuous Integration server. Retrieve the 
   status of projects, setup new ones, and trigger builds.
 
 controller
@@ -36,7 +36,7 @@ papertrail
 `
 	usageServiceBuildkite = `Usage: operator buildkite [command]
 
-Interact with the Buildkite.com Continuous Integration server. Retrieve the
+Interact with the Buildkite.com Continuous Integration server. Retrieve the 
 status of projects, setup new ones, and trigger builds.
 
 Available Commands:

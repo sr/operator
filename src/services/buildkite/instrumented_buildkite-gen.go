@@ -1,32 +1,30 @@
+
 package buildkite
 
 import (
-	"github.com/sr/grpcinstrument"
-	"golang.org/x/net/context"
 	"time"
+	"golang.org/x/net/context"
+	"github.com/sr/grpcinstrument"
 )
 
-// InstrumentedBuildkiteServiceServer implements and instruments BuildkiteServiceServer
-// using the grpcinstrument package.
-type InstrumentedBuildkiteServiceServer struct {
+
+type instrumentedBuildkiteServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	server         BuildkiteServiceServer
+	server BuildkiteServiceServer
 }
 
-// NewInstrumentedBuildkiteServiceServer constructs a instrumentation wrapper for
-// BuildkiteServiceServer.
+
 func NewInstrumentedBuildkiteServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	server BuildkiteServiceServer,
-) *InstrumentedBuildkiteServiceServer {
-	return &InstrumentedBuildkiteServiceServer{
+) *instrumentedBuildkiteServiceServer {
+	return &instrumentedBuildkiteServiceServer{
 		instrumentator,
 		server,
 	}
 }
 
-// Status instruments the BuildkiteServiceServer.Status method.
-func (a *InstrumentedBuildkiteServiceServer) Status(
+func (a *instrumentedBuildkiteServiceServer) Status(
 	ctx context.Context,
 	request *StatusRequest,
 ) (response *StatusResponse, err error) {
@@ -44,8 +42,7 @@ func (a *InstrumentedBuildkiteServiceServer) Status(
 	return a.server.Status(ctx, request)
 }
 
-// ListBuilds instruments the BuildkiteServiceServer.ListBuilds method.
-func (a *InstrumentedBuildkiteServiceServer) ListBuilds(
+func (a *instrumentedBuildkiteServiceServer) ListBuilds(
 	ctx context.Context,
 	request *ListBuildsRequest,
 ) (response *ListBuildsResponse, err error) {
