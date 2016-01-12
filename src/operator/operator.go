@@ -59,5 +59,5 @@ func NewInstrumentator(logger protolog.Logger) grpcinstrument.Instrumentator {
 }
 
 func NewArgumentRequiredError(argument string) error {
-	return newArgumentRequiredError(argument)
+	return &argumentRequiredError{argument}
 }
