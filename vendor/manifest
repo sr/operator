@@ -97,11 +97,17 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/golang/protobuf/proto",
+			"importpath": "github.com/golang/protobuf",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "2402d76f3d41f928c7902a765dfc872356dd3aad",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/golang/protobuf/proto/testdata",
 			"repository": "https://github.com/golang/protobuf",
 			"revision": "2402d76f3d41f928c7902a765dfc872356dd3aad",
 			"branch": "master",
-			"path": "/proto"
+			"path": "/proto/testdata"
 		},
 		{
 			"importpath": "github.com/google/cadvisor/info/v1",
