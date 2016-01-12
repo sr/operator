@@ -2,6 +2,12 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/Sirupsen/logrus",
+			"repository": "https://github.com/Sirupsen/logrus",
+			"revision": "446d1c146faa8ed3f4218f056fcd165f6bcfda81",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/alecthomas/template",
 			"repository": "https://github.com/alecthomas/template",
 			"revision": "14fd436dd20c3cc65242a9f396b61bfc8a3926fc",
@@ -40,6 +46,34 @@
 			"path": "/spew"
 		},
 		{
+			"importpath": "github.com/docker/docker/pkg/archive",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/archive"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/fileutils",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/fileutils"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/idtools",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/idtools"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/ioutils",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/ioutils"
+		},
+		{
 			"importpath": "github.com/docker/docker/pkg/mount",
 			"repository": "https://github.com/docker/docker",
 			"revision": "c49ccd319249610eb05f0c430b26d7c82383bf76",
@@ -52,6 +86,27 @@
 			"revision": "c49ccd319249610eb05f0c430b26d7c82383bf76",
 			"branch": "master",
 			"path": "/pkg/parsers"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/pools",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/pools"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/promise",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/promise"
+		},
+		{
+			"importpath": "github.com/docker/docker/pkg/system",
+			"repository": "https://github.com/docker/docker",
+			"revision": "3f1b16e236ad4626e02f3da4643023454d7dbb3f",
+			"branch": "master",
+			"path": "/pkg/system"
 		},
 		{
 			"importpath": "github.com/docker/go-units",
@@ -77,6 +132,12 @@
 			"revision": "ce94a9f819d7dd2b5599ff0c017b1124595a64fb",
 			"branch": "master",
 			"path": "/swagger"
+		},
+		{
+			"importpath": "github.com/fatih/color",
+			"repository": "https://github.com/fatih/color",
+			"revision": "9aae6aaa22315390f03959adca2c4d395b02fcef",
+			"branch": "master"
 		},
 		{
 			"importpath": "github.com/ghodss/yaml",
@@ -166,6 +227,18 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/mattn/go-colorable",
+			"repository": "https://github.com/mattn/go-colorable",
+			"revision": "3dac7b4f76f6e17fb39b768b89e3783d16e237fe",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"repository": "https://github.com/matttproud/golang_protobuf_extensions",
 			"revision": "d0c3fe89de86839aecf2e0579c40ba3bb336a453",
@@ -248,6 +321,18 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/satori/go.uuid",
+			"repository": "https://github.com/satori/go.uuid",
+			"revision": "d41af8bb6a7704f00bc3b7cba9355ae6a5a80048",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/spf13/cobra",
+			"repository": "https://github.com/spf13/cobra",
+			"revision": "97f831a4fd01378ad85840fed4f43824bc3dd102",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/spf13/pflag",
 			"repository": "https://github.com/spf13/pflag",
 			"revision": "7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7",
@@ -264,6 +349,65 @@
 			"importpath": "github.com/wolfeidau/go-buildkite",
 			"repository": "https://github.com/wolfeidau/go-buildkite",
 			"revision": "0a58664ff35c071699a5f6a8ab2496b3e4cb9238",
+			"branch": "master"
+		},
+		{
+			"importpath": "go.pedge.io/env",
+			"repository": "https://github.com/peter-edge/env-go",
+			"revision": "6581bc8c61bb86c591ac6201906de6633d1034e9",
+			"branch": "master"
+		},
+		{
+			"importpath": "go.pedge.io/google-protobuf",
+			"repository": "https://github.com/peter-edge/google-protobuf-go",
+			"revision": "45ec8c9930215bdff741a69012ddb4fb08d36b10",
+			"branch": "master"
+		},
+		{
+			"importpath": "go.pedge.io/pkg/cobra",
+			"repository": "https://github.com/peter-edge/pkg-go",
+			"revision": "c4dee7ffefe181dc2012ece65b9bbcd3523f6f8b",
+			"branch": "master",
+			"path": "/cobra"
+		},
+		{
+			"importpath": "go.pedge.io/pkg/exec",
+			"repository": "https://github.com/peter-edge/pkg-go",
+			"revision": "c4dee7ffefe181dc2012ece65b9bbcd3523f6f8b",
+			"branch": "master",
+			"path": "/exec"
+		},
+		{
+			"importpath": "go.pedge.io/proto/rpclog",
+			"repository": "https://github.com/peter-edge/proto-go",
+			"revision": "05a37f9287bd9be19b6add68918b4209f8648c93",
+			"branch": "master",
+			"path": "/rpclog"
+		},
+		{
+			"importpath": "go.pedge.io/proto/time",
+			"repository": "https://github.com/peter-edge/proto-go",
+			"revision": "05a37f9287bd9be19b6add68918b4209f8648c93",
+			"branch": "master",
+			"path": "/time"
+		},
+		{
+			"importpath": "go.pedge.io/protoeasy",
+			"repository": "https://github.com/peter-edge/protoeasy-go",
+			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
+			"branch": "master"
+		},
+		{
+			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
+			"repository": "https://github.com/peter-edge/protoeasy-go",
+			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
+			"branch": "master",
+			"path": "/cmd/protoeasy"
+		},
+		{
+			"importpath": "go.pedge.io/protolog",
+			"repository": "https://github.com/peter-edge/protolog-go",
+			"revision": "feebd59ed6f2b9d0c2e412c3badbaf6584b9c92c",
 			"branch": "master"
 		},
 		{
@@ -288,11 +432,32 @@
 			"path": "/context"
 		},
 		{
+			"importpath": "golang.org/x/net/http2",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4fd4a9fed55e5bdee4a89d6406c2eabe38b60300",
+			"branch": "master",
+			"path": "/http2"
+		},
+		{
 			"importpath": "golang.org/x/net/http2/hpack",
 			"repository": "https://go.googlesource.com/net",
 			"revision": "f1d3149ecb40ffadf4a28d39a30f9a125fe57bdf",
 			"branch": "master",
 			"path": "/http2/hpack"
+		},
+		{
+			"importpath": "golang.org/x/net/internal/timeseries",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4fd4a9fed55e5bdee4a89d6406c2eabe38b60300",
+			"branch": "master",
+			"path": "/internal/timeseries"
+		},
+		{
+			"importpath": "golang.org/x/net/trace",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "4fd4a9fed55e5bdee4a89d6406c2eabe38b60300",
+			"branch": "master",
+			"path": "/trace"
 		},
 		{
 			"importpath": "golang.org/x/tools/go/ast/astutil",
@@ -335,6 +500,33 @@
 			"revision": "4ad533583d0194672e7d3bc6fb8b67c8e905d853",
 			"branch": "master",
 			"path": "/go/types"
+		},
+		{
+			"importpath": "google.golang.org/api/gensupport",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f98effadce73f357b6887f9d357a4371bd0859db",
+			"branch": "master",
+			"path": "/gensupport"
+		},
+		{
+			"importpath": "google.golang.org/api/googleapi",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f98effadce73f357b6887f9d357a4371bd0859db",
+			"branch": "master",
+			"path": "/googleapi"
+		},
+		{
+			"importpath": "google.golang.org/api/logging/v1beta3",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f98effadce73f357b6887f9d357a4371bd0859db",
+			"branch": "master",
+			"path": "/logging/v1beta3"
+		},
+		{
+			"importpath": "google.golang.org/grpc",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "7ed4629849ee2967ae82bff77fbde8c2cc7adac4",
+			"branch": "master"
 		},
 		{
 			"importpath": "gopkg.in/alecthomas/kingpin.v2",

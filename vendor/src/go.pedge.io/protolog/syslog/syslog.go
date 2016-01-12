@@ -1,7 +1,8 @@
 /*
-Package syslog defines functionality for integration with syslog.
+Package protolog_syslog defines functionality for integration with syslog.
 */
-package syslog
+package protolog_syslog // import "go.pedge.io/protolog/syslog"
+
 import (
 	"log/syslog"
 
@@ -11,29 +12,24 @@ import (
 var (
 	// DefaultTextMarshaller is the default text Marshaller for syslog.
 	DefaultTextMarshaller = protolog.NewTextMarshaller(
-		protolog.MarshallerOptions{
-			DisableTime:  true,
-			DisableLevel: true,
-		},
+		protolog.TextMarshallerDisableTime(),
+		protolog.TextMarshallerDisableLevel(),
 	)
 )
 
-// PusherOptions defines options for constructing a new syslog protolog.Pusher.
-type PusherOptions struct {
-	Marshaller protolog.Marshaller
+// PusherOption is an option for constructing a new Pusher.
+type PusherOption func(*pusher)
+
+// PusherWithMarshaller uses the Marshaller for the Pusher.
+//
+// By default, DefaultTextMarshaller is used.
+func PusherWithMarshaller(marshaller protolog.Marshaller) PusherOption {
+	return func(pusher *pusher) {
+		pusher.marshaller = marshaller
+	}
 }
 
 // NewPusher creates a new protolog.Pusher that logs using syslog.
-func NewPusher(writer *syslog.Writer, options PusherOptions) protolog.Pusher {
-	return newPusher(writer, options)
-}
-
-// NewDefaultTextPusher creates a new protolog.Pusher that logs using syslog and the default text Marshaller.
-func NewDefaultTextPusher(writer *syslog.Writer) protolog.Pusher {
-	return newPusher(
-		writer,
-		PusherOptions{
-			Marshaller: DefaultTextMarshaller,
-		},
-	)
+func NewPusher(writer *syslog.Writer, options ...PusherOption) protolog.Pusher {
+	return newPusher(writer, options...)
 }

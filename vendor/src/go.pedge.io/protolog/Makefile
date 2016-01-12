@@ -17,9 +17,9 @@ build: deps
 
 lint: testdeps
 	go get -v github.com/golang/lint/golint
-	for file in $$(find . -name '*.go' | grep -v '\.pb.go$$' | grep -v '\.pb.log.go$$' | grep -v 'testing/' | grep -v 'benchmark/'); do \
-		golint $$file; \
-		if [ -n "$$(golint $$file)" ]; then \
+	for file in $$(find . -name '*.go' | grep -v '\.pb.go$$' | grep -v 'testing/' | grep -v 'benchmark/'); do \
+		golint $$file | grep -v underscore; \
+		if [ -n "$$(golint $$file | grep -v underscore)" ]; then \
 			exit 1; \
 		fi; \
 	done
@@ -50,8 +50,8 @@ clean:
 proto:
 	go get -v go.pedge.io/protoeasy/cmd/protoeasy
 	go get -v go.pedge.io/pkg/cmd/strip-package-comments
-	protoeasy --go --grpc --grpc-gateway --go-import-path go.pedge.io/protolog .
-	find . -name *\.pb\*\.go | xargs strip-package-comments
+	protoeasy
+	strip-package-comments testing/testing.pb.go
 
 docker-build:
 	docker build -t quay.io/pedge/protolog .

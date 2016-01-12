@@ -1,4 +1,4 @@
-package glog
+package protolog_glog
 
 import (
 	"github.com/golang/glog"
@@ -7,13 +7,13 @@ import (
 
 var (
 	levelToLogFunc = map[protolog.Level]func(...interface{}){
-		protolog.Level_LEVEL_NONE:  glog.Infoln,
-		protolog.Level_LEVEL_DEBUG: glog.Infoln,
-		protolog.Level_LEVEL_INFO:  glog.Infoln,
-		protolog.Level_LEVEL_WARN:  glog.Warningln,
-		protolog.Level_LEVEL_ERROR: glog.Errorln,
-		protolog.Level_LEVEL_FATAL: glog.Errorln,
-		protolog.Level_LEVEL_PANIC: glog.Errorln,
+		protolog.LevelNone:  glog.Infoln,
+		protolog.LevelDebug: glog.Infoln,
+		protolog.LevelInfo:  glog.Infoln,
+		protolog.LevelWarn:  glog.Warningln,
+		protolog.LevelError: glog.Errorln,
+		protolog.LevelFatal: glog.Errorln,
+		protolog.LevelPanic: glog.Errorln,
 	}
 )
 
@@ -21,12 +21,12 @@ type pusher struct {
 	marshaller protolog.Marshaller
 }
 
-func newPusher(options PusherOptions) *pusher {
-	marshaller := options.Marshaller
-	if marshaller == nil {
-		marshaller = protolog.DefaultMarshaller
+func newPusher(options ...PusherOption) *pusher {
+	pusher := &pusher{DefaultTextMarshaller}
+	for _, option := range options {
+		option(pusher)
 	}
-	return &pusher{marshaller}
+	return pusher
 }
 
 func (p *pusher) Flush() error {
@@ -34,11 +34,11 @@ func (p *pusher) Flush() error {
 	return nil
 }
 
-func (p *pusher) Push(goEntry *protolog.GoEntry) error {
-	data, err := p.marshaller.Marshal(goEntry)
+func (p *pusher) Push(entry *protolog.Entry) error {
+	data, err := p.marshaller.Marshal(entry)
 	if err != nil {
 		return err
 	}
-	levelToLogFunc[goEntry.Level](string(data))
+	levelToLogFunc[entry.Level](string(data))
 	return nil
 }

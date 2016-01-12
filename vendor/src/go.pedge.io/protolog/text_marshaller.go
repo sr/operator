@@ -3,91 +3,161 @@ package protolog
 import (
 	"bytes"
 	"encoding/json"
-	"strings"
 	"time"
 	"unicode"
 
+	"github.com/fatih/color"
 	"github.com/golang/protobuf/proto"
 )
 
+var (
+	levelToColorString = map[Level]string{
+		LevelNone:  color.BlueString(LevelNone.String()),
+		LevelDebug: color.WhiteString(LevelDebug.String()),
+		LevelInfo:  color.BlueString(LevelInfo.String()),
+		LevelWarn:  color.YellowString(LevelWarn.String()),
+		LevelError: color.RedString(LevelError.String()),
+		LevelFatal: color.RedString(LevelFatal.String()),
+		LevelPanic: color.RedString(LevelPanic.String()),
+	}
+)
+
 type textMarshaller struct {
-	options MarshallerOptions
+	disableTime     bool
+	disableLevel    bool
+	disableContexts bool
+	disableNewlines bool
+	colorize        bool
 }
 
-func newTextMarshaller(options MarshallerOptions) *textMarshaller {
-	return &textMarshaller{options}
+func newTextMarshaller(options ...TextMarshallerOption) *textMarshaller {
+	textMarshaller := &textMarshaller{
+		false,
+		false,
+		false,
+		false,
+		false,
+	}
+	for _, option := range options {
+		option(textMarshaller)
+	}
+	return textMarshaller
 }
 
-func (t *textMarshaller) Marshal(goEntry *GoEntry) ([]byte, error) {
-	return textMarshalGoEntry(goEntry, t.options)
+func (t *textMarshaller) WithColors() TextMarshaller {
+	return &textMarshaller{
+		t.disableTime,
+		t.disableLevel,
+		t.disableContexts,
+		t.disableNewlines,
+		true,
+	}
 }
 
-func textMarshalGoEntry(goEntry *GoEntry, options MarshallerOptions) ([]byte, error) {
+func (t *textMarshaller) WithoutColors() TextMarshaller {
+	return &textMarshaller{
+		t.disableTime,
+		t.disableLevel,
+		t.disableContexts,
+		t.disableNewlines,
+		false,
+	}
+}
+
+func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
+	return textMarshalEntry(
+		entry,
+		t.disableTime,
+		t.disableLevel,
+		t.disableContexts,
+		t.disableNewlines,
+		t.colorize,
+	)
+}
+
+func textMarshalEntry(
+	entry *Entry,
+	disableTime bool,
+	disableLevel bool,
+	disableContexts bool,
+	disableNewlines bool,
+	colorize bool,
+) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
-	if goEntry.ID != "" {
-		_, _ = buffer.WriteString(goEntry.ID)
+	if entry.ID != "" {
+		_, _ = buffer.WriteString(entry.ID)
 		_ = buffer.WriteByte(' ')
 	}
-	if !options.DisableTime {
-		_, _ = buffer.WriteString(goEntry.Time.Format(time.RFC3339))
+	if !disableTime {
+		_, _ = buffer.WriteString(entry.Time.Format(time.RFC3339))
 		_ = buffer.WriteByte(' ')
 	}
-	if !options.DisableLevel {
-		levelString := strings.Replace(goEntry.Level.String(), "LEVEL_", "", -1)
-		_, _ = buffer.WriteString(levelString)
-		if len(levelString) == 4 {
-			_, _ = buffer.WriteString("  ")
+	if !disableLevel {
+		var levelString string
+		if colorize {
+			levelString = levelToColorString[entry.Level]
 		} else {
+			levelString = entry.Level.String()
+		}
+		_, _ = buffer.WriteString(levelString)
+		_ = buffer.WriteByte(' ')
+		if len(levelString) == 4 {
 			_ = buffer.WriteByte(' ')
 		}
 	}
-	if goEntry.Event != nil {
-		switch goEntry.Event.(type) {
-		case *Event:
-			_, _ = buffer.WriteString(goEntry.Event.(*Event).Message)
-		case *WriterOutput:
-			_, _ = buffer.Write(trimRightSpaceBytes(goEntry.Event.(*WriterOutput).Value))
-		default:
-			if err := textMarshalMessage(options.JSONMarshaller, buffer, goEntry.Event); err != nil {
+	// TODO(pedge): verify only one of Event, Message, WriterOutput?
+	if entry.Event != nil {
+		if err := textMarshalMessage(buffer, entry.Event); err != nil {
+			return nil, err
+		}
+	}
+	if entry.Message != "" {
+		_, _ = buffer.WriteString(entry.Message)
+	}
+	if entry.WriterOutput != nil {
+		_, _ = buffer.Write(trimRightSpaceBytes(entry.WriterOutput))
+	}
+	if len(entry.Contexts) > 0 && !disableContexts {
+		_ = buffer.WriteByte(' ')
+		lenContexts := len(entry.Contexts)
+		for i, context := range entry.Contexts {
+			if err := textMarshalMessage(buffer, context); err != nil {
 				return nil, err
 			}
-		}
-	}
-	if len(goEntry.Contexts) > 0 && !options.DisableContexts {
-		_, _ = buffer.WriteString(" contexts=[")
-		lenContexts := len(goEntry.Contexts)
-		for i, context := range goEntry.Contexts {
-			switch context.(type) {
-			case *Fields:
-				data, err := json.Marshal(context.(*Fields).Value)
-				if err != nil {
-					return nil, err
-				}
-				_, _ = buffer.Write(data)
-			default:
-				if err := textMarshalMessage(options.JSONMarshaller, buffer, context); err != nil {
-					return nil, err
-				}
-			}
 			if i != lenContexts-1 {
-				_, _ = buffer.WriteString(", ")
+				_ = buffer.WriteByte(' ')
 			}
 		}
-		_ = buffer.WriteByte(']')
 	}
-	return trimRightSpaceBytes(buffer.Bytes()), nil
+	if len(entry.Fields) > 0 && !disableContexts {
+		_ = buffer.WriteByte(' ')
+		data, err := json.Marshal(entry.Fields)
+		if err != nil {
+			return nil, err
+		}
+		_, _ = buffer.Write(data)
+	}
+	data := trimRightSpaceBytes(buffer.Bytes())
+	if !disableNewlines {
+		buffer = bytes.NewBuffer(data)
+		_ = buffer.WriteByte('\n')
+		return buffer.Bytes(), nil
+	}
+	return data, nil
 }
 
-func textMarshalMessage(jsonMarshaller JSONMarshaller, buffer *bytes.Buffer, message proto.Message) error {
+func textMarshalMessage(buffer *bytes.Buffer, message proto.Message) error {
 	if message == nil {
 		return nil
 	}
-	if jsonMarshaller == nil {
-		jsonMarshaller = DefaultJSONMarshaller
-	}
 	_, _ = buffer.WriteString(messageName(message))
 	_ = buffer.WriteByte(' ')
-	return jsonMarshaller.Marshal(buffer, message)
+	data, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+	_, err = buffer.Write(data)
+	return err
 }
 
 func trimRightSpaceBytes(b []byte) []byte {

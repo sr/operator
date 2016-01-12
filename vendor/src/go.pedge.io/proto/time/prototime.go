@@ -1,4 +1,4 @@
-package prototime
+package prototime // import "go.pedge.io/proto/time"
 
 import (
 	"time"
@@ -27,11 +27,11 @@ func TimestampToTime(timestamp *google_protobuf.Timestamp) time.Time {
 
 // TimestampLess returns true if i is before j.
 func TimestampLess(i *google_protobuf.Timestamp, j *google_protobuf.Timestamp) bool {
-	if i == nil {
-		return true
-	}
 	if j == nil {
 		return false
+	}
+	if i == nil {
+		return true
 	}
 	if i.Seconds < j.Seconds {
 		return true

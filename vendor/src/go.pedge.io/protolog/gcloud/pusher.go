@@ -1,4 +1,4 @@
-package gcloud
+package protolog_gcloud
 
 import (
 	"time"
@@ -12,13 +12,13 @@ const customServiceName = "compute.googleapis.com"
 var (
 	// https://cloud.google.com/logging/docs/api/ref/rest/v1beta3/projects.logs.entries/write#LogSeverity
 	severityName = map[protolog.Level]string{
-		protolog.Level_LEVEL_NONE:  "DEFAULT",
-		protolog.Level_LEVEL_DEBUG: "DEBUG",
-		protolog.Level_LEVEL_INFO:  "INFO",
-		protolog.Level_LEVEL_WARN:  "WARNING",
-		protolog.Level_LEVEL_ERROR: "ERROR",
-		protolog.Level_LEVEL_FATAL: "ERROR",
-		protolog.Level_LEVEL_PANIC: "ALERT",
+		protolog.LevelNone:  "DEFAULT",
+		protolog.LevelDebug: "DEBUG",
+		protolog.LevelInfo:  "INFO",
+		protolog.LevelWarn:  "WARNING",
+		protolog.LevelError: "ERROR",
+		protolog.LevelFatal: "ERROR",
+		protolog.LevelPanic: "ALERT",
 	}
 )
 
@@ -40,8 +40,8 @@ func newPusher(
 	}
 }
 
-func (p *pusher) Push(goEntry *protolog.GoEntry) error {
-	id := goEntry.ID
+func (p *pusher) Push(entry *protolog.Entry) error {
+	id := entry.ID
 	if id == "" {
 		id = protolog.DefaultIDAllocator.Allocate()
 	}
@@ -50,13 +50,13 @@ func (p *pusher) Push(goEntry *protolog.GoEntry) error {
 		p.logName,
 		&logging.WriteLogEntriesRequest{
 			Entries: []*logging.LogEntry{
-				&logging.LogEntry{
+				{
 					InsertId:      id,
-					StructPayload: goEntry,
+					StructPayload: entry,
 					Metadata: &logging.LogEntryMetadata{
 						ServiceName: customServiceName,
-						Severity:    severityName[goEntry.Level],
-						Timestamp:   goEntry.Time.Format(time.RFC3339),
+						Severity:    severityName[entry.Level],
+						Timestamp:   entry.Time.Format(time.RFC3339),
 					},
 				},
 			},

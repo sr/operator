@@ -1,8 +1,11 @@
 package protolog
 
 import (
-	"bytes"
+	"io"
+	"os"
 	"sync"
+
+	"github.com/mattn/go-isatty"
 )
 
 var (
@@ -10,42 +13,57 @@ var (
 )
 
 type writePusher struct {
-	writeFlusher WriteFlusher
-	marshaller   Marshaller
-	newline      bool
-	lock         *sync.Mutex
+	writer     io.Writer
+	marshaller Marshaller
+	newline    bool
+	lock       *sync.Mutex
 }
 
-func newWritePusher(writeFlusher WriteFlusher, options WritePusherOptions) *writePusher {
+func newWritePusher(writer io.Writer, options ...WritePusherOption) *writePusher {
 	writePusher := &writePusher{
-		writeFlusher,
-		options.Marshaller,
-		options.Newline,
+		writer,
+		DelimitedMarshaller,
+		false,
 		&sync.Mutex{},
 	}
-	if writePusher.marshaller == nil {
-		writePusher.marshaller = DefaultMarshaller
+	for _, option := range options {
+		option(writePusher)
+	}
+	if file, ok := writer.(*os.File); ok {
+		if textMarshaller, ok := writePusher.marshaller.(TextMarshaller); ok {
+			if isatty.IsTerminal(file.Fd()) {
+				writePusher.marshaller = textMarshaller.WithColors()
+			}
+		}
 	}
 	return writePusher
 }
 
-func (w *writePusher) Flush() error {
-	return w.writeFlusher.Flush()
+type flusher interface {
+	Flush() error
 }
 
-func (w *writePusher) Push(goEntry *GoEntry) error {
-	data, err := w.marshaller.Marshal(goEntry)
+type syncer interface {
+	Sync() error
+}
+
+func (w *writePusher) Flush() error {
+	if syncer, ok := w.writer.(syncer); ok {
+		return syncer.Sync()
+	} else if flusher, ok := w.writer.(flusher); ok {
+		return flusher.Flush()
+	}
+	return nil
+}
+
+func (w *writePusher) Push(entry *Entry) error {
+	data, err := w.marshaller.Marshal(entry)
 	if err != nil {
 		return err
 	}
-	if w.newline {
-		buffer := bytes.NewBuffer(data)
-		_, _ = buffer.Write(newlineBytes)
-		data = buffer.Bytes()
-	}
 	w.lock.Lock()
 	defer w.lock.Unlock()
-	if _, err := w.writeFlusher.Write(data); err != nil {
+	if _, err := w.writer.Write(data); err != nil {
 		return err
 	}
 	return nil

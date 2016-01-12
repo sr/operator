@@ -1,6 +1,7 @@
-[![CircleCI](https://circleci.com/gh/peter-edge/go-protolog/tree/master.png)](https://circleci.com/gh/peter-edge/go-protolog/tree/master)
+[![CircleCI](https://circleci.com/gh/peter-edge/protolog-go/tree/master.png)](https://circleci.com/gh/peter-edge/protolog-go/tree/master)
+[![Go Report Card](http://goreportcard.com/badge/peter-edge/protolog-go)](http://goreportcard.com/report/peter-edge/protolog-go)
 [![GoDoc](http://img.shields.io/badge/GoDoc-Reference-blue.svg)](https://godoc.org/go.pedge.io/protolog)
-[![MIT License](http://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/peter-edge/go-protolog/blob/master/LICENSE)
+[![MIT License](http://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/peter-edge/protolog-go/blob/master/LICENSE)
 
 ```shell
 go get go.pedge.io/protolog
@@ -9,7 +10,7 @@ go get go.pedge.io/protolog
 Initial beta release coming soon - I need to do one more pass on this and then document all the functionality.
 
 * Structured logging with Protocol buffers
-* Child of https://github.com/peter-edge/go-ledge
+* Child of https://github.com/peter-edge/ledge-go
 * Some compatibility with existing libraries (specifically logrus and glog)
 * Two-way serialization - write logs somewhere, read them back, language independent
 

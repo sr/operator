@@ -1,4 +1,4 @@
-package logrus
+package protolog_logrus
 
 import (
 	"bytes"
@@ -15,13 +15,13 @@ import (
 
 var (
 	levelToLogrusLevel = map[protolog.Level]logrus.Level{
-		protolog.Level_LEVEL_NONE:  logrus.InfoLevel,
-		protolog.Level_LEVEL_DEBUG: logrus.DebugLevel,
-		protolog.Level_LEVEL_INFO:  logrus.InfoLevel,
-		protolog.Level_LEVEL_WARN:  logrus.WarnLevel,
-		protolog.Level_LEVEL_ERROR: logrus.ErrorLevel,
-		protolog.Level_LEVEL_FATAL: logrus.FatalLevel,
-		protolog.Level_LEVEL_PANIC: logrus.PanicLevel,
+		protolog.LevelNone:  logrus.InfoLevel,
+		protolog.LevelDebug: logrus.DebugLevel,
+		protolog.LevelInfo:  logrus.InfoLevel,
+		protolog.LevelWarn:  logrus.WarnLevel,
+		protolog.LevelError: logrus.ErrorLevel,
+		protolog.LevelFatal: logrus.FatalLevel,
+		protolog.LevelPanic: logrus.PanicLevel,
 	}
 )
 
@@ -47,64 +47,68 @@ func newPusher(options PusherOptions) *pusher {
 	return &pusher{logger, &sync.Mutex{}, options}
 }
 
-func (p *pusher) Push(goEntry *protolog.GoEntry) error {
-	logrusEntry, err := p.getLogrusEntry(goEntry)
+func (p *pusher) Push(entry *protolog.Entry) error {
+	logrusEntry, err := p.getLogrusEntry(entry)
 	if err != nil {
 		return err
 	}
 	return p.logLogrusEntry(logrusEntry)
 }
 
+type flusher interface {
+	Flush() error
+}
+
+type syncer interface {
+	Sync() error
+}
+
 func (p *pusher) Flush() error {
 	if p.options.Out != nil {
-		return p.options.Out.Flush()
+		if syncer, ok := p.options.Out.(syncer); ok {
+			return syncer.Sync()
+		} else if flusher, ok := p.options.Out.(flusher); ok {
+			return flusher.Flush()
+		}
 	}
 	return nil
 }
 
-func (p *pusher) getLogrusEntry(goEntry *protolog.GoEntry) (*logrus.Entry, error) {
-	jsonMarshaller := p.options.JSONMarshaller
-	if jsonMarshaller == nil {
-		jsonMarshaller = protolog.DefaultJSONMarshaller
-	}
+func (p *pusher) getLogrusEntry(entry *protolog.Entry) (*logrus.Entry, error) {
 	logrusEntry := logrus.NewEntry(p.logger)
-	logrusEntry.Time = goEntry.Time
-	logrusEntry.Level = levelToLogrusLevel[goEntry.Level]
+	logrusEntry.Time = entry.Time
+	logrusEntry.Level = levelToLogrusLevel[entry.Level]
 
-	if goEntry.ID != "" {
-		logrusEntry.Data["_id"] = goEntry.ID
+	if entry.ID != "" {
+		logrusEntry.Data["_id"] = entry.ID
 	}
 	if !p.options.DisableContexts {
-		for _, context := range goEntry.Contexts {
+		for _, context := range entry.Contexts {
 			if context == nil {
 				continue
 			}
-			switch context.(type) {
-			case *protolog.Fields:
-				for key, value := range context.(*protolog.Fields).Value {
-					if value != "" {
-						logrusEntry.Data[key] = value
-					}
-				}
-			default:
-				if err := addProtoMessage(jsonMarshaller, logrusEntry, context); err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-	if goEntry.Event != nil {
-		switch goEntry.Event.(type) {
-		case *protolog.Event:
-			logrusEntry.Message = trimRightSpace(goEntry.Event.(*protolog.Event).Message)
-		case *protolog.WriterOutput:
-			logrusEntry.Message = trimRightSpace(string(goEntry.Event.(*protolog.WriterOutput).Value))
-		default:
-			logrusEntry.Data["_event"] = proto.MessageName(goEntry.Event)
-			if err := addProtoMessage(jsonMarshaller, logrusEntry, goEntry.Event); err != nil {
+			if err := addProtoMessage(logrusEntry, context); err != nil {
 				return nil, err
 			}
 		}
+		for key, value := range entry.Fields {
+			if value != "" {
+				logrusEntry.Data[key] = value
+			}
+		}
+	}
+	// TODO(pedge): verify only one of Event, Message, WriterOutput?
+	if entry.Event != nil {
+		logrusEntry.Data["_event"] = proto.MessageName(entry.Event)
+		if err := addProtoMessage(logrusEntry, entry.Event); err != nil {
+			return nil, err
+		}
+	}
+	if entry.Message != "" {
+		logrusEntry.Message = trimRightSpace(entry.Message)
+	}
+	if entry.WriterOutput != nil {
+		logrusEntry.Message = trimRightSpace(string(entry.WriterOutput))
 	}
 	return logrusEntry, nil
 }
@@ -123,8 +127,8 @@ func (p *pusher) logLogrusEntry(entry *logrus.Entry) error {
 	return err
 }
 
-func addProtoMessage(jsonMarshaller protolog.JSONMarshaller, logrusEntry *logrus.Entry, message proto.Message) error {
-	m, err := getFieldsForProtoMessage(jsonMarshaller, message)
+func addProtoMessage(logrusEntry *logrus.Entry, message proto.Message) error {
+	m, err := getFieldsForProtoMessage(message)
 	if err != nil {
 		return err
 	}
@@ -134,9 +138,13 @@ func addProtoMessage(jsonMarshaller protolog.JSONMarshaller, logrusEntry *logrus
 	return nil
 }
 
-func getFieldsForProtoMessage(jsonMarshaller protolog.JSONMarshaller, message proto.Message) (map[string]interface{}, error) {
+func getFieldsForProtoMessage(message proto.Message) (map[string]interface{}, error) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return nil, err
+	}
 	buffer := bytes.NewBuffer(nil)
-	if err := jsonMarshaller.Marshal(buffer, message); err != nil {
+	if _, err := buffer.Write(data); err != nil {
 		return nil, err
 	}
 	m := make(map[string]interface{}, 0)

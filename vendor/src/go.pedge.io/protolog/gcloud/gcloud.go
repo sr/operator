@@ -1,7 +1,7 @@
-// Package gcloud integrates protolog with the Google Cloud Logging service.
+// Package protolog_gcloud integrates protolog with the Google Cloud Logging service.
 //
 // See https://cloud.google.com/logging/docs/ for more details.
-package gcloud
+package protolog_gcloud
 
 import (
 	"go.pedge.io/protolog"
