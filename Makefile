@@ -1,3 +1,4 @@
+export PATH := bin/:$(PATH)
 ifndef VERSION
 	VERSION = $(shell git rev-parse --short HEAD)
 endif
@@ -5,6 +6,8 @@ GCLOUD_PROJECT_ID = dev-europe-west1
 GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
 PROTOEASY = bin/protoeasy
+PROTOC_GEN_GO = bin/protoc-gen-go
+PROTOC_GEN_GRPCINSTRUMENT = bin/protoc-gen-grpcinstrument
 
 -include etc/mk/golang.mk
 
@@ -17,7 +20,7 @@ operatord-dev: $(GB)
 	$< build cmd/operatord
 	bin/operatord
 
-proto: build install proto-grpc proto-cmd proto-hubot proto-operatord
+proto: build proto-grpc proto-cmd proto-hubot proto-operatord
 
 proto-cmd:
 	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
@@ -37,17 +40,20 @@ proto-operatord: proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operatord
 
-proto-grpc: get-protoeasy
-	$(PROTOEASY) --go --grpc --exclude hubot src/
+proto-grpc: $(PROTOEASY)
+	$< --go --grpc --exclude hubot src/
 
-proto-grpcinstrument: get-grpcinstrument
+$(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
+	$< build go.pedge.io/protoeasy/cmd/protoeasy
+
+$(PROTOC_GEN_GO): $(GB)
+	$< build github.com/golang/protobuf/protoc-gen-go
+
+$(PROTOC_GEN_GRPCINSTRUMENT): $(GB)
+	$< build github.com/sr/grpcinstrument/cmd/protoc-gen-grpcinstrument
+
+proto-grpcinstrument: $(PROTOC_GEN_GRPCINSTRUMENT)
 	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
-
-get-protoeasy:
-	go get github.com/golang/protobuf/protoc-gen-go/...
-
-get-grpcinstrument:
-	go get github.com/sr/grpcinstrument/...
 
 goget-openflights:
 	go get go.pedge.io/openflights
@@ -112,8 +118,6 @@ clean:
 	proto-operatord \
 	proto-grpc \
 	proto-grpcinstrument \
-	get-protoeasy \
-	get-grpcinstrument \
 	goget-openflights \
 	docker-ci \
 	docker-build-ci \
