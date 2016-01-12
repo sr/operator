@@ -8,6 +8,9 @@ GCLOUD_ZONE = europe-west1-d
 PROTOEASY = bin/protoeasy
 PROTOC_GEN_GO = bin/protoc-gen-go
 PROTOC_GEN_GRPCINSTRUMENT = bin/protoc-gen-grpcinstrument
+PROTOC_GEN_OPERATORHUBOT = bin/protoc-gen-operatorhubot
+PROTOC_GEN_OPERATORCMD = bin/protoc-gen-operatorcmd
+PROTOC_GEN_OPERATORD = bin/protoc-gen-operatord
 
 -include etc/mk/golang.mk
 
@@ -22,11 +25,11 @@ operatord-dev: $(GB)
 
 proto: build proto-grpc proto-cmd proto-hubot proto-operatord
 
-proto-cmd:
+proto-cmd: $(PROTOC_GEN_OPERATORCMD)
 	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operator
 
-proto-hubot:
+proto-hubot: $(PROTOC_GEN_OPERATORHUBOT)
 	rm -rf src/hubot/proto src/hubot/scripts
 	cp -r vendor/proto src/hubot
 	mkdir src/hubot/proto/operator src/hubot/scripts
@@ -36,12 +39,21 @@ proto-hubot:
 	cp src/operator/operator.proto src/hubot/proto/operator/
 	protoc --operatorhubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
 
-proto-operatord: proto-grpcinstrument
+proto-operatord: $(PROTOC_GEN_OPERATORD) proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operatord
 
 proto-grpc: $(PROTOEASY)
 	$< --go --grpc --exclude hubot src/
+
+$(PROTOC_GEN_OPERATORCMD): $(GB)
+	$< build cmd/protoc-gen-operatorcmd
+
+$(PROTOC_GEN_OPERATORHUBOT): $(GB)
+	$< build cmd/protoc-gen-operatorhubot
+
+$(PROTOC_GEN_OPERATORD): $(GB)
+	$< build cmd/protoc-gen-operatord
 
 $(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
 	$< build go.pedge.io/protoeasy/cmd/protoeasy
@@ -107,6 +119,8 @@ gcloud-container-cluster:
 clean:
 	rm -f src/cmd/**/*-gen.go
 	rm -f src/hubot/scripts/*-gen.coffee
+	rm -f $(PROTOC_GEN_OPERATORCMD) $(PROTOC_GEN_OPERATORHUBOT)
+	rm -f $(PROTOC_GEN_OPERATORD)
 	rm -rf tmp/
 
 .PHONY: \
