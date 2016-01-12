@@ -16,7 +16,7 @@ test -d "/opt/google-cloud-sdk" &&
 PATH="/opt/google-cloud-sdk/bin:$PATH"
 export PATH
 
-make build install vet lint
+make build vet lint
 make -j2 proto-cmd proto-operatord proto-hubot
 make -j2 docker-build-hubot docker-build-operatord
 make -j2 docker-push-operatord docker-push-hubot
