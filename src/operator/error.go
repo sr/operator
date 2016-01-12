@@ -1,3 +1,5 @@
+package operator
+
 import (
 	"fmt"
 
@@ -10,8 +12,8 @@ type argumentRequiredError struct {
 }
 
 func (a *argumentRequiredError) Error() string {
-	return fmt.Errorf(
+	return fmt.Sprintf(
 		"required argument is missing: %s",
-		inflections.Dasherize(snaker.CamelToSnake(s)),
+		inflections.Dasherize(snaker.CamelToSnake(a.argument)),
 	)
 }
