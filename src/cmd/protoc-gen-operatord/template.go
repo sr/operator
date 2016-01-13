@@ -36,6 +36,7 @@ func run() error {
 		} else {
 			instrumented := {{.PackageName}}.NewInstrumented{{camelCase .FullName}}Server(instrumentator, {{.Name}}Server)
 			{{.Name}}.Register{{camelCase .FullName}}Server(grpcServer, instrumented)
+			server.LogServiceRegistered("{{.Name}}")
 		}
 	}
 {{end}}

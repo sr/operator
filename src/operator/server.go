@@ -48,6 +48,10 @@ func (s *server) Serve() error {
 	return nil
 }
 
+func (s *server) LogServiceRegistered(serviceName string) {
+	s.logger.Info(&ServiceRegistered{&Service{Name: serviceName}})
+}
+
 func (s *server) LogServiceStartupError(serviceName string, err error) {
 	s.logger.Error(&ServiceStartupError{
 		Service: &Service{

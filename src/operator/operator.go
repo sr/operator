@@ -10,6 +10,7 @@ import (
 )
 
 type Server interface {
+	LogServiceRegistered(service string)
 	LogServiceStartupError(service string, err error)
 	Serve() error
 }

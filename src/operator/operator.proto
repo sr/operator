@@ -18,6 +18,10 @@ message ServerStartupError {
 	string message = 1;
 }
 
+message ServiceRegistered {
+	Service service = 1;
+}
+
 message ServiceStartupError {
 	Service service = 1;
 	string message = 2;
