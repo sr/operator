@@ -197,6 +197,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/jmcvetta/randutil",
+			"repository": "https://github.com/jmcvetta/randutil",
+			"revision": "2bb1b664bcff821e02b2a0644cd29c7e824d54f8",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/juju/ratelimit",
 			"repository": "https://github.com/juju/ratelimit",
 			"revision": "77ed1c8a01217656d2080ad51981f6e99adaa177",
