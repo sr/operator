@@ -37,6 +37,7 @@ func run() error {
 		} else {
 			instrumented := buildkite.NewInstrumentedBuildkiteServiceServer(instrumentator, buildkiteServer)
 			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
+			server.LogServiceRegistered("buildkite")
 		}
 	}
 
@@ -49,6 +50,7 @@ func run() error {
 		} else {
 			instrumented := controller.NewInstrumentedControllerServer(instrumentator, controllerServer)
 			controller.RegisterControllerServer(grpcServer, instrumented)
+			server.LogServiceRegistered("controller")
 		}
 	}
 
@@ -61,6 +63,7 @@ func run() error {
 		} else {
 			instrumented := gcloud.NewInstrumentedGcloudServiceServer(instrumentator, gcloudServer)
 			gcloud.RegisterGcloudServiceServer(grpcServer, instrumented)
+			server.LogServiceRegistered("gcloud")
 		}
 	}
 
@@ -73,6 +76,7 @@ func run() error {
 		} else {
 			instrumented := papertrail.NewInstrumentedPapertrailServiceServer(instrumentator, papertrailServer)
 			papertrail.RegisterPapertrailServiceServer(grpcServer, instrumented)
+			server.LogServiceRegistered("papertrail")
 		}
 	}
 
