@@ -8,7 +8,7 @@ URL: https://github.com/SalesforceEng/rmux
 Source0: https://github.com/SalesforceEng/rmux/archive/%{version}.tar.gz
 
 BuildRequires: gcc
-BuildRequires: golang >= 1.4
+BuildRequires: golang >= 1.5.3
 
 %description
 Redis multiplexer and connection pooling solution
