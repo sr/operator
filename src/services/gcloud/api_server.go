@@ -2,18 +2,37 @@ package gcloud
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 
+	"github.com/jmcvetta/randutil"
+
 	"operator"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
+	"google.golang.org/api/logging/v1beta3"
 )
+
+const (
+	clusterAdminUsername = "admin"
+	loggingService       = "logging.googleapis.com"
+	machineType          = "n1-standard-1"
+)
+
+var oauthScopes = []string{
+	compute.CloudPlatformScope,
+	compute.ComputeScope,
+	compute.DevstorageReadWriteScope,
+	logging.LoggingAdminScope,
+	"https://www.googleapis.com/auth/useraccounts-rw",
+	"https://www.googleapis.com/auth/userinfo-email",
+}
 
 type apiServer struct {
 	client           *http.Client
@@ -41,6 +60,10 @@ func (s *apiServer) CreateContainerCluster(
 	if err != nil {
 		return nil, fmt.Errorf("invalid node count value: %v", request.NodeCount)
 	}
+	password, err := randutil.String(10, randutil.Alphanumeric)
+	if err != nil {
+		return nil, errors.New("failed to generated password")
+	}
 	operation, err := s.containerService.Projects.Zones.Clusters.Create(
 		request.ProjectId,
 		request.Zone,
@@ -48,6 +71,15 @@ func (s *apiServer) CreateContainerCluster(
 			Cluster: &container.Cluster{
 				Name:             request.Name,
 				InitialNodeCount: nodeCount,
+				LoggingService:   loggingService,
+				MasterAuth: &container.MasterAuth{
+					Username: clusterAdminUsername,
+					Password: password,
+				},
+				NodeConfig: &container.NodeConfig{
+					MachineType: machineType,
+					OauthScopes: oauthScopes,
+				},
 			},
 		},
 	).Do()

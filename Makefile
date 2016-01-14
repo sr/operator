@@ -88,17 +88,6 @@ docker-push-openflightsd:
 	docker tag pedge/openflightsd gcr.io/operator-europe-west/openflightsd:$(VERSION)
 	gcloud docker push gcr.io/operator-europe-west/openflightsd
 
-gcloud-container-cluster:
-	gcloud container \
-		--project "$(GCLOUD_PROJECT_ID)" \
-		clusters create "$(GCLOUD_CLUSTER)" \
-			--zone "$(GCLOUD_ZONE)" \
-			--num-nodes 3 \
-			--machine-type "n1-standard-1" \
-			--network "default" \
-			--enable-cloud-logging \
-			--scopes cloud-platform,compute-rw,logging-write,monitoring,storage-full,useraccounts-rw,userinfo-email
-
 clean:
 	rm -f src/cmd/**/*-gen.go \
 		src/hubot/scripts/*-gen.coffee \
@@ -154,5 +143,4 @@ $(PROTOC_GEN_OPERATORHUBOT): $(GB)
 	docker-push-hubot \
 	docker-build-openflightsd \
 	docker-push-openflightsd \
-	gcloud-container-cluster \
 	clean
