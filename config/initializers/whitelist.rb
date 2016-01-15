@@ -1,3 +1,5 @@
+require 'ipaddr'
+
 TRUSTED_NETWORKS = [
   '127.0.0.1/32',
   '204.14.236.0/24', # aloha-east
