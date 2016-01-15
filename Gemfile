@@ -22,6 +22,8 @@ gem 'artifactory', '~> 2.3'
 gem 'omniauth', '~> 1.2', '>= 1.2.2'
 gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
 
+gem 'pinglish', '~> 0.2', '>= 0.2.1'
+
 gem 'nokogiri', '~> 1.6', '>= 1.6.6.2'
 
 gem 'puma', '~> 2.15', '>= 2.15.3'
