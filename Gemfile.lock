@@ -130,6 +130,8 @@ GEM
       rack
     puma (2.15.3)
     rack (1.6.4)
+    rack-attack (4.3.1)
+      rack
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.3)
@@ -244,6 +246,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2, >= 0.2.6)
   pinglish (~> 0.2, >= 0.2.1)
   puma (~> 2.15, >= 2.15.3)
+  rack-attack (~> 4.3, >= 4.3.1)
   rails (= 4.2.3)
   rspec-rails (~> 3.3, >= 3.3.3)
   sass-rails (~> 5.0)

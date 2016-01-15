@@ -50,6 +50,8 @@ module Canoe
 
     config.logger = Logger.new(STDOUT)
 
+    config.middleware.use Rack::Attack
+
     config.middleware.use Pinglish do |ping|
       ping.check :db do
         !!Repo.count
