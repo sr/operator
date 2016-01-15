@@ -20,11 +20,6 @@
     <p>
       <strong>Sorry, there are no recent builds for this branch.</strong>
     </p>
-    <p>
-      <%= link_to repo_branch_builds_path(current_repo, current_branch.name), class: "btn btn-primary", id: "start-build-in-bamboo-button" do %>
-        <i class="icon-cogs"></i> Enqueue Build in Bamboo
-      <%- end %>
-    </p>
   <%- else %>
     <ul class="list-unstyled deploy-list">
       <% @builds.each do |build| %>
