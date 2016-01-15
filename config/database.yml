@@ -2,9 +2,9 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
+  host: <%= ENV.fetch('MYSQL_PORT_3306_TCP_ADDR', 'localhost') %>
   username: root
   password:
-  socket: /tmp/mysql.sock
 
 development:
   <<: *default

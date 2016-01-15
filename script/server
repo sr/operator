@@ -13,5 +13,7 @@ script/update
 test -z "$RACK_ENV" &&
   RACK_ENV='development'
 
+rm -f tmp/pids/server.pid
+
 # boot the app and any other necessary processes.
-bin/foreman start -p 4000
+exec bin/foreman start

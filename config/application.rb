@@ -45,5 +45,7 @@ module Canoe
     config.action_dispatch.rescue_responses.merge!(
       'Octokit::NotFound' => :not_found,
     )
+
+    config.logger = Logger.new(STDOUT)
   end
 end
