@@ -1,9 +1,10 @@
 [
   "hubot-diagnostics",
   "hubot-help",
+  "hubot-itunes-search",
+  "hubot-meme",
   "hubot-redis-brain",
   "hubot-schedule",
-  "hubot-yubikey-invalidation",
-  "hubot-meme",
-  "hubot-itunes-search"
+  "hubot-twitter-stream",
+  "hubot-yubikey-invalidation"
 ]
