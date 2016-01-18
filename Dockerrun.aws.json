@@ -5,7 +5,7 @@
   "containerDefinitions": [
     {
       "name": "app",
-      "image": "364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe:latest",
+      "image": "364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe:%BUILD%",
       "essential": true,
       "memory": 1028,
       "environment": [

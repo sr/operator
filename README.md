@@ -74,4 +74,4 @@ The steps for deployment are:
 
 1. Merge code to master
 1. Wait for Bamboo to build and test Canoe
-1. Run `eb push`
+1. Run `script/deploy`

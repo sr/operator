@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+TAG="$1"
+
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"/..; pwd)"
+
+function cleanup() {
+  cd "$dir"
+  git checkout "Dockerrun.aws.json"
+}
+trap cleanup EXIT
+
+cd "$dir"
+
+if [ -z "$TAG" ]; then
+  read -e -p "Which build should we deploy? (e.g., BREAD-CANOE-1234): " TAG
+fi
+
+git checkout "Dockerrun.aws.json"
+sed -i '' -e "s/%BUILD%/${TAG}/" "Dockerrun.aws.json"
+eb deploy
