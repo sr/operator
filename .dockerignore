@@ -7,3 +7,4 @@ tmp/
 !bin/ci
 !bin/k8s-hubot
 !bin/k8s-operatord
+!tmp/operatord
