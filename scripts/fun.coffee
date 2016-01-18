@@ -334,7 +334,6 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/197/5QzZH6beJLMlDoH/superkyle.gif"
     ]
 
-
   robot.respond /makeitrain$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/282/M6ckjWgQX2HM4Ne/2015-11-16%2018_10_12.gif"
 
