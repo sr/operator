@@ -17,9 +17,6 @@ if [ -z "$TAG" ]; then
   read -e -p "Which build should we deploy? (e.g., BREAD-CANOE-1234): " TAG
 fi
 
-# For whatever reason, AWS doesn't like hyphens
-TAG="$(echo "$TAG" | tr '-' '_')"
-
 git checkout "Dockerrun.aws.json"
 sed -i '' -e "s/%BUILD%/${TAG}/" "Dockerrun.aws.json"
-eb deploy
+eb deploy --staged -l "$TAG"
