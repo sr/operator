@@ -3,12 +3,12 @@ mysql:
   environment:
     MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 app:
-  build: ../src/canoe
+  build: .
   environment:
     PORT: "4000"
     BIND: "0.0.0.0"
   volumes:
-    - ../src/canoe:/app
+    - .:/app
   ports:
     - "4000:4000"
   links:
