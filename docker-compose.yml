@@ -1,0 +1,15 @@
+mysql:
+  image: mysql:5.5
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+app:
+  build: ../src/canoe
+  environment:
+    PORT: "4000"
+    BIND: "0.0.0.0"
+  volumes:
+    - ../src/canoe:/app
+  ports:
+    - "4000:4000"
+  links:
+    - mysql
