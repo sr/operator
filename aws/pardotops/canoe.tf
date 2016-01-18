@@ -38,6 +38,25 @@ resource "aws_iam_role_policy" "canoe_ec2_ecs_role_policy" {
 EOF
 }
 
+resource "aws_iam_role_policy" "canoe_ec2_ecr_role_policy" {
+  name = "canoe_ecr_role_policy"
+  role = "${aws_iam_role.canoe_ec2_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_instance_profile" "canoe_ec2_instance_profile" {
   name = "canoe_ec2_instance_profile"
   roles = ["${aws_iam_role.canoe_ec2_role.name}"]
