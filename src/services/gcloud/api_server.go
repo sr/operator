@@ -23,6 +23,8 @@ const (
 	clusterAdminUsername = "admin"
 	loggingService       = "logging.googleapis.com"
 	machineType          = "n1-standard-1"
+	userAccountScope     = "https://www.googleapis.com/auth/cloud.useraccounts"
+	userInfoEmailScope   = "https://www.googleapis.com/auth/userinfo.email"
 )
 
 var oauthScopes = []string{
@@ -30,8 +32,8 @@ var oauthScopes = []string{
 	compute.ComputeScope,
 	compute.DevstorageReadWriteScope,
 	logging.LoggingAdminScope,
-	"https://www.googleapis.com/auth/useraccounts-rw",
-	"https://www.googleapis.com/auth/userinfo-email",
+	userAccountScope,
+	userInfoEmailScope,
 }
 
 type apiServer struct {
