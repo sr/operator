@@ -20,6 +20,7 @@
 #   hubot panic - PANIC!1!1!!!
 #   hubot jarsh - jarsh
 #   hubot kyle - kyle
+#   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
 #   hubot praise <person> - Objectively make it THEIR win!
@@ -327,6 +328,13 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/139/p2nyPWIpuRJsELg/Screen%20Shot%202015-11-13%20at%203.34.37%20PM.png",
       "https://hipchat.dev.pardot.com/files/1/65/sWAGNmuFsb4TOjt/Kyle%20Gets%20Weird.gif"
     ]
+
+  robot.respond /superkyle$/i, (msg) ->
+    msg.send msg.random [
+      "https://hipchat.dev.pardot.com/files/1/139/p2nyPWIpuRJsELg/Screen%20Shot%202015-11-13%20at%203.34.37%20PM.png",
+      "https://hipchat.dev.pardot.com/files/1/197/5QzZH6beJLMlDoH/superkyle.gif"
+    ]
+
 
   robot.respond /makeitrain$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/282/M6ckjWgQX2HM4Ne/2015-11-16%2018_10_12.gif"
