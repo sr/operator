@@ -65,7 +65,7 @@ resource "aws_iam_user_policy" "sa_bamboo_push_pull_canoe_ecr" {
         "ecr:CompleteLayerUpload",
         "ecr:PutImage"
       ],
-      "Resource": "${aws_ecr_repository.canoe.arn}"
+      "Resource": "*"
     }
   ]
 }
