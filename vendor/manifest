@@ -33,12 +33,6 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/constabulary/gb",
-			"repository": "https://github.com/constabulary/gb",
-			"revision": "572f68e6f0e403df7e6b4426bb26e535b988398c",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/davecgh/go-spew/spew",
 			"repository": "https://github.com/davecgh/go-spew",
 			"revision": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d",
