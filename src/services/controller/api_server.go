@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
 	"strings"
 
 	"operator"
@@ -12,108 +13,130 @@ import (
 	k8client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
-const (
-	operatordName  = "operatord"
-	operatordPort  = 3000
-	operatordCmd   = "/k8s-operatord"
-	operatordImage = "gcr.io/dev-europe-west1/operatord:f743959"
-)
-
 type apiServer struct {
 	client    *k8client.Client
 	namespace string
-	secrets   map[string]string
+	operatord *OperatordConfig
+	hubot     *HubotConfig
 }
 
 func newAPIServer(
 	client *k8client.Client,
 	namespace string,
-	secrets map[string]string,
+	operatord *OperatordConfig,
+	hubot *HubotConfig,
 ) *apiServer {
-	return &apiServer{client, namespace, secrets}
+	return &apiServer{
+		client,
+		namespace,
+		operatord,
+		hubot,
+	}
 }
 
 func (s *apiServer) CreateCluster(
-	context.Context,
-	*CreateClusterRequest,
+	ctx context.Context,
+	request *CreateClusterRequest,
 ) (*CreateClusterResponse, error) {
-	secret, err := s.client.Secrets(s.namespace).Create(&api.Secret{
-		ObjectMeta: api.ObjectMeta{
-			Name: operatordName,
-		},
-		Type: api.SecretTypeOpaque,
-		Data: s.encodedSecrets(),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create secret: %v", err)
+	if err := s.createOperatordResources(); err != nil {
+		return nil, fmt.Errorf("failed to create operatord resources: %v", err)
 	}
-	replicationController, err := s.client.ReplicationControllers(s.namespace).
-		Create(&api.ReplicationController{
-			ObjectMeta: api.ObjectMeta{
-				Name:   operatordName,
-				Labels: map[string]string{"app": operatordName},
-			},
-			Spec: api.ReplicationControllerSpec{
-				Replicas: 1,
-				Template: &api.PodTemplateSpec{
-					ObjectMeta: api.ObjectMeta{
-						Labels: map[string]string{
-							"app": operatordName,
-						},
-					},
-					Spec: api.PodSpec{
-						Volumes: []api.Volume{
-							{
-								Name: "secrets",
-								VolumeSource: api.VolumeSource{
-									Secret: &api.SecretVolumeSource{
-										SecretName: secret.Name,
-									},
-								},
-							},
-						},
-						Containers: []api.Container{
-							{
-								Name:    operatordName,
-								Image:   operatordImage,
-								Command: []string{operatordCmd},
-								VolumeMounts: []api.VolumeMount{
-									{
-										Name:      "secrets",
-										MountPath: "/secrets",
-										ReadOnly:  true,
-									},
-								},
-								Ports: []api.ContainerPort{
-									{
-										Name:          operatordName,
-										HostPort:      operatordPort,
-										ContainerPort: operatordPort,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create operatord replication controller: %v", err)
+	if err := s.createHubotResources(); err != nil {
+		return nil, fmt.Errorf("failed to create hubot resources: %v", err)
 	}
 	return &CreateClusterResponse{
 		Output: &operator.Output{
-			PlainText: fmt.Sprintf("replication controller: %s", replicationController.Name),
+			PlainText: fmt.Sprintf(
+				"replication controllers: operatord=%s hubot=%s",
+				s.operatord.Name,
+				s.hubot.Name,
+			),
 		},
 	}, nil
 }
 
-func (s *apiServer) encodedSecrets() map[string][]byte {
-	secrets := make(map[string][]byte, len(s.secrets))
-	for name, value := range s.secrets {
+func (s *apiServer) createOperatordResources() error {
+	secret, err := s.client.Secrets(s.namespace).Get(s.operatord.Name)
+	if err != nil {
+		secret, err = s.createSecret(s.operatord.Name, s.operatord.Secrets)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = s.client.ReplicationControllers(s.namespace).Get(s.operatord.Name)
+	if err != nil {
+		_, err := s.client.ReplicationControllers(s.namespace).
+			Create(s.getOperatordRC(secret))
+		if err != nil {
+			return err
+		}
+	}
+	_, err = s.client.Services(s.namespace).Get(s.operatord.Name)
+	if err != nil {
+		_, err := s.client.Services(s.namespace).Create(s.getOperatordService())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *apiServer) createHubotResources() error {
+	secret, err := s.client.Secrets(s.namespace).Get(s.hubot.Name)
+	if err != nil {
+		secret, err = s.createSecret(s.hubot.Name, s.hubot.Secrets)
+		if err != nil {
+			return err
+		}
+	}
+	_, err = s.client.ReplicationControllers(s.namespace).Get(s.hubot.Name)
+	if err != nil {
+		_, err := s.client.ReplicationControllers(s.namespace).
+			Create(s.getHubotRC(secret))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *apiServer) createSecret(
+	name string,
+	secrets map[string]string,
+) (*api.Secret, error) {
+	return s.client.Secrets(s.namespace).Create(&api.Secret{
+		ObjectMeta: api.ObjectMeta{Name: name},
+		Type:       api.SecretTypeOpaque,
+		Data:       encodeSecrets(secrets),
+	})
+}
+
+func encodeSecrets(secrets map[string]string) map[string][]byte {
+	encodedSecrets := make(map[string][]byte, len(secrets))
+	for name, value := range secrets {
 		encoded := make([]byte, base64.StdEncoding.EncodedLen(len(value)))
 		base64.StdEncoding.Encode(encoded, []byte(value))
 		newName := strings.Replace(strings.ToLower(name), "_", ".", -1)
-		secrets[newName] = encoded
+		encodedSecrets[newName] = encoded
 	}
-	return secrets
+	return encodedSecrets
+}
+
+func loadSecretsForService(
+	optionName string,
+	optionValue string,
+) (map[string]string, error) {
+	secrets := make(map[string]string)
+	for _, secret := range strings.Split(optionValue, ",") {
+		value, ok := os.LookupEnv(secret)
+		if !ok {
+			return nil, fmt.Errorf(
+				"env key not set when included in %s: %s",
+				optionName,
+				optionValue,
+			)
+		}
+		secrets[secret] = value
+	}
+	return secrets, nil
 }
