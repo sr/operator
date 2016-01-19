@@ -96,3 +96,19 @@ EOF
     create_before_destroy = true
   }
 }
+
+resource "aws_autoscaling_group" "canoe_production" {
+  max_size = 2
+  min_size = 2
+  launch_configuration = "${aws_launch_configuration.canoe_production.id}"
+  vpc_zone_identifier = [
+    "${aws_subnet.internal_apps_us_east_1a.id}",
+    "${aws_subnet.internal_apps_us_east_1c.id}",
+    "${aws_subnet.internal_apps_us_east_1d.id}",
+    "${aws_subnet.internal_apps_us_east_1e.id}"
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
