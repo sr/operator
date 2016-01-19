@@ -12,6 +12,13 @@ import (
 	k8client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
+const (
+	operatordName  = "operatord"
+	operatordPort  = 3000
+	operatordCmd   = "/k8s-operatord"
+	operatordImage = "gcr.io/dev-europe-west1/operatord:f743959"
+)
+
 type apiServer struct {
 	client    *k8client.Client
 	namespace string
@@ -32,7 +39,7 @@ func (s *apiServer) CreateCluster(
 ) (*CreateClusterResponse, error) {
 	secret, err := s.client.Secrets(s.namespace).Create(&api.Secret{
 		ObjectMeta: api.ObjectMeta{
-			Name: "operatord",
+			Name: operatordName,
 		},
 		Type: api.SecretTypeOpaque,
 		Data: s.encodedSecrets(),
@@ -43,15 +50,15 @@ func (s *apiServer) CreateCluster(
 	replicationController, err := s.client.ReplicationControllers(s.namespace).
 		Create(&api.ReplicationController{
 			ObjectMeta: api.ObjectMeta{
-				Name:   "operatord",
-				Labels: map[string]string{"app": "operatord"},
+				Name:   operatordName,
+				Labels: map[string]string{"app": operatordName},
 			},
 			Spec: api.ReplicationControllerSpec{
 				Replicas: 1,
 				Template: &api.PodTemplateSpec{
 					ObjectMeta: api.ObjectMeta{
 						Labels: map[string]string{
-							"app": "operatord",
+							"app": operatordName,
 						},
 					},
 					Spec: api.PodSpec{
@@ -67,9 +74,9 @@ func (s *apiServer) CreateCluster(
 						},
 						Containers: []api.Container{
 							{
-								Name:    "operatord",
-								Image:   "gcr.io/dev-europe-west1/operatord:f743959",
-								Command: []string{"/k8s-operatord"},
+								Name:    operatordName,
+								Image:   operatordImage,
+								Command: []string{operatordCmd},
 								VolumeMounts: []api.VolumeMount{
 									{
 										Name:      "secrets",
@@ -79,9 +86,9 @@ func (s *apiServer) CreateCluster(
 								},
 								Ports: []api.ContainerPort{
 									{
-										Name:          "operatord",
-										HostPort:      3000,
-										ContainerPort: 3000,
+										Name:          operatordName,
+										HostPort:      operatordPort,
+										ContainerPort: operatordPort,
 									},
 								},
 							},
