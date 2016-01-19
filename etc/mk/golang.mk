@@ -4,7 +4,7 @@ GOLINT = bin/golint
 ERRCHECK = bin/errcheck
 
 $(GB):
-	go install github.com/constabulary/gb/...
+	go get github.com/constabulary/gb/...
 
 $(GBVENDOR): $(GB)
 	$< build github.com/constabulary/gb/cmd/gb-vendor
