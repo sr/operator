@@ -5,6 +5,15 @@ resource "aws_vpc" "internal_apps" {
   }
 }
 
+resource "aws_security_group_rule" "internal_apps_allow_internal" {
+  type = "ingress"
+  from_port = 0
+  to_port = 65535
+  protocol = "-1"
+  security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
+  cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+}
+
 resource "aws_subnet" "internal_apps_us_east_1a" {
   vpc_id = "${aws_vpc.internal_apps.id}"
   availability_zone = "us-east-1a"
@@ -149,7 +158,7 @@ resource "aws_security_group" "internal_apps_http_lb" {
 
   egress {
     from_port = 0
-    to_port = 0
+    to_port = 65535
     protocol = "tcp"
     cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
   }
