@@ -1,11 +1,9 @@
-GB = bin/gb
+GB = $(GOBIN)/gb
 GBVENDOR = bin/gb-vendor
 GOLINT = bin/golint
 ERRCHECK = bin/errcheck
 
 $(GB):
-	export GOPATH="$(shell pwd)/vendor"; \
-	export GOBIN="$(shell pwd)/bin"; \
 	go install github.com/constabulary/gb/...
 
 $(GBVENDOR): $(GB)
