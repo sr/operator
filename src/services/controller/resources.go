@@ -5,6 +5,8 @@ import (
 	"k8s.io/kubernetes/pkg/util/intstr"
 )
 
+const latestTag = "latest"
+
 func (s *apiServer) getOperatordRC(secret *api.Secret) *api.ReplicationController {
 	return &api.ReplicationController{
 		ObjectMeta: api.ObjectMeta{
@@ -32,9 +34,10 @@ func (s *apiServer) getOperatordRC(secret *api.Secret) *api.ReplicationControlle
 					},
 					Containers: []api.Container{
 						{
-							Name:    s.operatord.Name,
-							Image:   s.operatord.DefaultImage,
-							Command: []string{s.operatord.Command},
+							Name:            s.operatord.Name,
+							Image:           getImage(s.operatord.Image, latestTag),
+							ImagePullPolicy: api.PullIfNotPresent,
+							Command:         []string{s.operatord.Command},
 							VolumeMounts: []api.VolumeMount{
 								{
 									Name:      "secrets",
@@ -105,9 +108,10 @@ func (s *apiServer) getHubotRC(secret *api.Secret) *api.ReplicationController {
 					},
 					Containers: []api.Container{
 						{
-							Name:    s.hubot.Name,
-							Image:   s.hubot.DefaultImage,
-							Command: []string{s.hubot.Command},
+							Name:            s.hubot.Name,
+							Image:           getImage(s.hubot.Image, latestTag),
+							ImagePullPolicy: api.PullIfNotPresent,
+							Command:         []string{s.hubot.Command},
 							VolumeMounts: []api.VolumeMount{
 								{
 									Name:      "secrets",

@@ -8,11 +8,22 @@ service Controller {
   option (operator.name) = "controller";
 
   rpc CreateCluster(CreateClusterRequest) returns (CreateClusterResponse);
+  rpc Deploy(DeployRequest) returns (DeployResponse);
 }
 
 message CreateClusterRequest {
 }
 
+message DeployRequest {
+  string build_id = 1;
+  string hubot_build_id = 2;
+  string operatord_build_id = 3;
+}
+
 message CreateClusterResponse {
+	operator.Output output = 1;
+}
+
+message DeployResponse {
 	operator.Output output = 1;
 }

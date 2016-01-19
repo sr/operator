@@ -46,3 +46,22 @@ func (a *InstrumentedControllerServer) CreateCluster(
 	}(time.Now())
 	return a.server.CreateCluster(ctx, request)
 }
+
+// Deploy instruments the ControllerServer.Deploy method.
+func (a *InstrumentedControllerServer) Deploy(
+	ctx context.Context,
+	request *DeployRequest,
+) (response *DeployResponse, err error) {
+	defer func(start time.Time) {
+		grpcinstrument.Instrument(
+			a.instrumentator,
+			"controller",
+			"Deploy",
+			"DeployRequest",
+			"DeployResponse",
+			err,
+			start,
+		)
+	}(time.Now())
+	return a.server.Deploy(ctx, request)
+}

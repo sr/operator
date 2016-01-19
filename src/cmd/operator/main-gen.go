@@ -64,9 +64,15 @@ Available Commands:
 
 create-cluster
  Undocumented.
+
+deploy
+ Undocumented.
 `
 
 	usageServiceControllerCreateCluster = `Usage:  controller create-cluster [arguments]
+
+Undocumented.`
+	usageServiceControllerDeploy = `Usage:  controller deploy [arguments]
 
 Undocumented.`
 	usageServiceGcloud = `Usage: operator gcloud [command]
@@ -189,6 +195,37 @@ func doControllerCreateCluster(address string) (string, error) {
 	response, err := client.CreateCluster(
 		context.Background(),
 		&controller.CreateClusterRequest{},
+	)
+	if err != nil {
+		return "", err
+	}
+	return response.Output.PlainText, nil
+}
+
+func doControllerDeploy(address string) (string, error) {
+	flags := flag.NewFlagSet("deploy", flag.ExitOnError)
+	flags.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nArguments:\n", usageServiceControllerDeploy)
+		flags.PrintDefaults()
+		os.Exit(2)
+	}
+	build_id := flags.String("build-id", "", "")
+	hubot_build_id := flags.String("hubot-build-id", "", "")
+	operatord_build_id := flags.String("operatord-build-id", "", "")
+	flags.Parse(os.Args[3:])
+	conn, err := dial(address)
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	client := controller.NewControllerClient(conn)
+	response, err := client.Deploy(
+		context.Background(),
+		&controller.DeployRequest{
+			BuildId:          *build_id,
+			HubotBuildId:     *hubot_build_id,
+			OperatordBuildId: *operatord_build_id,
+		},
 	)
 	if err != nil {
 		return "", err
@@ -338,6 +375,12 @@ func run() (int, string, error) {
 			switch command {
 			case "create-cluster":
 				output, err := doControllerCreateCluster(config.Address)
+				if err != nil {
+					return 1, "", err
+				}
+				return 0, output, nil
+			case "deploy":
+				output, err := doControllerDeploy(config.Address)
 				if err != nil {
 					return 1, "", err
 				}
