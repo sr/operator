@@ -36,6 +36,7 @@ RUN \
   && tar -xzvf google-cloud-sdk-90.0.0-linux-x86_64.tar.gz \
   && mkdir -p /opt \
   && mv google-cloud-sdk /opt/
+ENV GOBIN $GOPATH/bin
 RUN mkdir -p $GOPATH/src/
 ADD . $GOPATH/src/github.com/sr/operator/
 WORKDIR $GOPATH/src/github.com/sr/operator/
