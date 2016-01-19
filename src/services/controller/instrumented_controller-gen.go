@@ -2,29 +2,34 @@
 package controller
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/grpcinstrument"
+	"golang.org/x/net/context"
+	"time"
 )
 
 
-type instrumentedControllerServer struct {
+// InstrumentedControllerServer implements and instruments ControllerServer
+// using the grpcinstrument package.
+type InstrumentedControllerServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	server ControllerServer
+	server         ControllerServer
 }
 
 
+// NewInstrumentedControllerServer constructs a instrumentation wrapper for
+// ControllerServer.
 func NewInstrumentedControllerServer(
 	instrumentator grpcinstrument.Instrumentator,
 	server ControllerServer,
-) *instrumentedControllerServer {
-	return &instrumentedControllerServer{
+) *InstrumentedControllerServer {
+	return &InstrumentedControllerServer{
 		instrumentator,
 		server,
 	}
 }
 
-func (a *instrumentedControllerServer) CreateCluster(
+// CreateCluster instruments the ControllerServer.CreateCluster method.
+func (a *InstrumentedControllerServer) CreateCluster(
 	ctx context.Context,
 	request *CreateClusterRequest,
 ) (response *CreateClusterResponse, err error) {
