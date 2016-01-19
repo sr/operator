@@ -11,6 +11,7 @@ plan: $(PLAN)
 .PHONY: apply
 apply: $(PLAN)/plan.out
 	cd $(PLAN) && $(TERRAFORM) apply $(TERRAFORM_OPTS) plan.out
+	cd $(PLAN) && rm -f plan.out
 
 .PHONY: refresh
 refresh:
