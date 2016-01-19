@@ -127,3 +127,30 @@ resource "aws_route_table_association" "internal_apps_us_east_1e_dmz" {
   subnet_id = "${aws_subnet.internal_apps_us_east_1e_dmz.id}"
   route_table_id = "${aws_route_table.internal_apps_route_dmz.id}"
 }
+
+resource "aws_security_group" "internal_apps_http_lb" {
+  name = "internal_apps_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC VPN only"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "tcp"
+    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+  }
+}
