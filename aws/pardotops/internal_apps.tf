@@ -5,10 +5,10 @@ resource "aws_vpc" "internal_apps" {
   }
 }
 
-resource "aws_security_group_rule" "internal_apps_allow_internal" {
+resource "aws_security_group_rule" "internal_apps_allow_internal_ssh" {
   type = "ingress"
-  from_port = 0
-  to_port = 65535
+  from_port = 22
+  to_port = 22
   protocol = "-1"
   security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
   cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
