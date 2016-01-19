@@ -154,3 +154,14 @@ resource "aws_security_group" "internal_apps_http_lb" {
     cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
   }
 }
+
+resource "aws_db_subnet_group" "internal_apps" {
+  name = "internal_apps"
+  description = "Internal Apps DB Subnet"
+  subnet_ids = [
+    "${aws_subnet.internal_apps_us_east_1a.id}",
+    "${aws_subnet.internal_apps_us_east_1c.id}",
+    "${aws_subnet.internal_apps_us_east_1d.id}",
+    "${aws_subnet.internal_apps_us_east_1e.id}"
+  ]
+}

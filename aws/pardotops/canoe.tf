@@ -72,6 +72,25 @@ resource "aws_elb" "canoe_production" {
   }
 }
 
+resource "aws_db_instance" "canoe_production" {
+  identifier = "canoe-production"
+  allocated_storage = 20
+  engine = "mysql"
+  engine_version = "5.6.23"
+  instance_class = "db.t2.small"
+  storage_type = "gp2"
+  name = "canoe_production"
+  username = "canoe"
+  password = "WeGDb6pjqgayjMSnnm7U"
+  maintenance_window = "Mon:20:00-Mon:23:00"
+  multi_az = true
+  publicly_accessible = false
+  db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
+  storage_encrypted = false
+  backup_retention_period = 5
+  apply_immediately = true
+}
+
 resource "aws_ecs_cluster" "canoe_production" {
   name = "canoe_production"
 }
@@ -80,6 +99,7 @@ resource "aws_launch_configuration" "canoe_production" {
   name_prefix = "canoe_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
+  key_name = "canoe"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   associate_public_ip_address = false
 
