@@ -12,10 +12,11 @@ metrics about RPC calls via [Prometheus][].
 [protolog]: https://github.com/peter-edge/go-protolog
 [Prometheus]: http://prometheus.io
 
-[Checkout the godoc][godoc] online or download this package and view them
+[Read the documentation][godoc] online or install this package and read it
 locally:
 
     $ go get github.com/sr/grpcinstrument/...
+    $ godoc github.com/sr/grpcinstrument
 
 [godoc]: https://godoc.org/github.com/sr/grpcinstrument
 
@@ -39,3 +40,6 @@ Then update your main package to use the generated instrumented code:
 +instrumented := buildkite.NewInstrumentedBuildkiteServiceServer(instrumentator, buildkiteServer)
 +buildkite.RegisterBuildkiteServiceServer(server, instrumented)
 ```
+
+Checkout the [example](/example) directory to see what the generated code looks
+like.

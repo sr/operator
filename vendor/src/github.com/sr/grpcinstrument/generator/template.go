@@ -24,29 +24,34 @@ var loggerTemplate = template.Must(template.New("instrumented_api_server.go").Pa
 package {{.Package}}
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/grpcinstrument"
+	"golang.org/x/net/context"
+	"time"
 )
 
 {{range .Services}}
-type instrumented{{.ServerInterface}} struct {
+// Instrumented{{.ServerInterface}} implements and instruments {{.ServerInterface}}
+// using the grpcinstrument package.
+type Instrumented{{.ServerInterface}} struct {
 	instrumentator grpcinstrument.Instrumentator
-	server {{.ServerInterface}}
+	server         {{.ServerInterface}}
 }
 {{end}}
 {{range .Services}}
+// NewInstrumented{{.ServerInterface}} constructs a instrumentation wrapper for
+// {{.ServerInterface}}.
 func NewInstrumented{{.ServerInterface}}(
 	instrumentator grpcinstrument.Instrumentator,
 	server {{.ServerInterface}},
-) *instrumented{{.ServerInterface}} {
-	return &instrumented{{.ServerInterface}}{
+) *Instrumented{{.ServerInterface}} {
+	return &Instrumented{{.ServerInterface}}{
 		instrumentator,
 		server,
 	}
 }
 {{range .Methods}}
-func (a *instrumented{{.ServerInterface}}) {{.Name}}(
+// {{.Name}} instruments the {{.ServerInterface}}.{{.Name}} method.
+func (a *Instrumented{{.ServerInterface}}) {{.Name}}(
 	ctx context.Context,
 	request *{{.InputType}},
 ) (response *{{.OutputType}}, err error) {

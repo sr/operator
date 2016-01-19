@@ -140,6 +140,13 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/gogo/protobuf/proto",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "c57e439bad574c2e0877ff18d514badcfced004d",
+			"branch": "master",
+			"path": "/proto"
+		},
+		{
 			"importpath": "github.com/golang/glog",
 			"repository": "https://github.com/golang/glog",
 			"revision": "fca8c8854093a154ff1eb580aae10276ad6b1b5f",
@@ -336,6 +343,12 @@
 			"importpath": "github.com/spf13/pflag",
 			"repository": "https://github.com/spf13/pflag",
 			"revision": "7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/sr/grpcinstrument",
+			"repository": "https://github.com/sr/grpcinstrument",
+			"revision": "ca6c0e8964a34f1a60d1b43970616bd9f5eefe2b",
 			"branch": "master"
 		},
 		{
