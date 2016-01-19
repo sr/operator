@@ -9,7 +9,7 @@ resource "aws_security_group_rule" "internal_apps_allow_internal_ssh" {
   type = "ingress"
   from_port = 22
   to_port = 22
-  protocol = "-1"
+  protocol = "tcp"
   security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
   cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
 }
@@ -162,6 +162,15 @@ resource "aws_security_group" "internal_apps_http_lb" {
     protocol = "tcp"
     cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
   }
+}
+
+resource "aws_security_group_rule" "internal_apps_allow_lb" {
+  type = "ingress"
+  from_port = 0
+  to_port = 65535
+  protocol = "-1"
+  security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
+  source_security_group_id = "${aws_security_group.internal_apps_http_lb.id}"
 }
 
 resource "aws_db_subnet_group" "internal_apps" {
