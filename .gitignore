@@ -1,2 +1,3 @@
 *.tfvars
 *.backup
+plan.out
