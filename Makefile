@@ -15,4 +15,4 @@ apply: $(PLAN)/plan.out
 
 .PHONY: refresh
 refresh:
-	cd $(PLAN) && $(TERRAFORM) refresh $(TERRAFORM_OPTS)
+	cd $(PLAN) && $(TERRAFORM) refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
