@@ -49,6 +49,7 @@ module Canoe
     )
 
     config.logger = Logger.new(STDOUT)
+    config.colorize_logging = false
 
     config.middleware.use Rack::Attack
 
