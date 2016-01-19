@@ -48,7 +48,13 @@ resource "aws_iam_role_policy" "canoe_ec2_ecr_role_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "ecr:GetAuthorizationToken"
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:BatchGetImage"
       ],
       "Resource": ["*"]
     }
