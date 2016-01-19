@@ -167,9 +167,9 @@ resource "aws_security_group" "internal_apps_http_lb" {
 
   egress {
     from_port = 0
-    to_port = 65535
-    protocol = "tcp"
-    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 

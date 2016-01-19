@@ -62,9 +62,9 @@ resource "aws_elb" "canoe_production" {
   health_check {
     healthy_threshold = 2
     unhealthy_threshold = 2
-    timeout = 5
+    timeout = 3
     target = "HTTP:80/_ping"
-    interval = 30
+    interval = 5
   }
 
   tags {
