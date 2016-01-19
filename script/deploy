@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
 set -e
 
-TAG="$1"
-
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"/..; pwd)"
+
+TAG="$1"
+if [ -z "$TAG" ]; then
+  read -e -p "Which build should we deploy? (e.g., BREAD-CANOE-1234): " TAG
+fi
 
 function cleanup() {
   cd "$dir"
-  git checkout "Dockerrun.aws.json"
+  sed -i '' -E "s/(\"image\".*)${TAG}/\1%BUILD%/" "Dockerrun.aws.json"
+  git add "Dockerrun.aws.json"
 }
 trap cleanup EXIT
 
 cd "$dir"
 
-if [ -z "$TAG" ]; then
-  read -e -p "Which build should we deploy? (e.g., BREAD-CANOE-1234): " TAG
-fi
-
 git checkout "Dockerrun.aws.json"
-sed -i '' -e "s/%BUILD%/${TAG}/" "Dockerrun.aws.json"
-eb deploy --staged -l "$TAG"
+sed -i '' -E "s/(\"image\".*)%BUILD%/\1${TAG}/" "Dockerrun.aws.json"
+git add "Dockerrun.aws.json"
+
+eb deploy --staged -l "${TAG}-$(date +%Y%m%d%H%M%S)"

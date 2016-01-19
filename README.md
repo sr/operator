@@ -62,7 +62,7 @@ script/test spec/path/to/whatever_spec.rb
 * awscli (`brew install awscli`)
 * awsebcli (`brew install awsebcli`)
 * awscli credentials properly setup: `aws configure --profile pardotops`
-* eb properly setup: `eb init --profile pardotops` (select 1 for `us-east-1` and select the `canoe` application)
+* eb properly setup: `eb init --profile=pardotops --region=us-east-1 canoe`
 
 ### Background
 
