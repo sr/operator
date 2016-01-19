@@ -2,29 +2,34 @@
 package gcloud
 
 import (
-	"time"
-	"golang.org/x/net/context"
 	"github.com/sr/grpcinstrument"
+	"golang.org/x/net/context"
+	"time"
 )
 
 
-type instrumentedGcloudServiceServer struct {
+// InstrumentedGcloudServiceServer implements and instruments GcloudServiceServer
+// using the grpcinstrument package.
+type InstrumentedGcloudServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
-	server GcloudServiceServer
+	server         GcloudServiceServer
 }
 
 
+// NewInstrumentedGcloudServiceServer constructs a instrumentation wrapper for
+// GcloudServiceServer.
 func NewInstrumentedGcloudServiceServer(
 	instrumentator grpcinstrument.Instrumentator,
 	server GcloudServiceServer,
-) *instrumentedGcloudServiceServer {
-	return &instrumentedGcloudServiceServer{
+) *InstrumentedGcloudServiceServer {
+	return &InstrumentedGcloudServiceServer{
 		instrumentator,
 		server,
 	}
 }
 
-func (a *instrumentedGcloudServiceServer) CreateContainerCluster(
+// CreateContainerCluster instruments the GcloudServiceServer.CreateContainerCluster method.
+func (a *InstrumentedGcloudServiceServer) CreateContainerCluster(
 	ctx context.Context,
 	request *CreateContainerClusterRequest,
 ) (response *CreateContainerClusterResponse, err error) {
@@ -42,7 +47,8 @@ func (a *instrumentedGcloudServiceServer) CreateContainerCluster(
 	return a.server.CreateContainerCluster(ctx, request)
 }
 
-func (a *instrumentedGcloudServiceServer) ListInstances(
+// ListInstances instruments the GcloudServiceServer.ListInstances method.
+func (a *InstrumentedGcloudServiceServer) ListInstances(
 	ctx context.Context,
 	request *ListInstancesRequest,
 ) (response *ListInstancesResponse, err error) {
