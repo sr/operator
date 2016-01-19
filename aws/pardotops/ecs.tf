@@ -1,3 +1,8 @@
+variable "ecs_ami_id" {
+  # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html
+  default = "ami-2b3b6041"
+}
+
 resource "aws_iam_role" "ecs_cluster_role" {
   name = "ecs_cluster_role"
   assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"

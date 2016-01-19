@@ -31,10 +31,6 @@ resource "aws_iam_user_policy" "sa_bamboo_push_pull_canoe_ecr" {
 EOF
 }
 
-resource "aws_ecs_cluster" "canoe_production" {
-  name = "canoe_production"
-}
-
 resource "aws_elb" "canoe_production" {
   name = "canoe-production"
   security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
@@ -73,5 +69,30 @@ resource "aws_elb" "canoe_production" {
 
   tags {
     Name = "canoe_production"
+  }
+}
+
+resource "aws_ecs_cluster" "canoe_production" {
+  name = "canoe_production"
+}
+
+resource "aws_launch_configuration" "canoe_production" {
+  name_prefix = "canoe_production"
+  image_id = "${var.ecs_ami_id}"
+  instance_type = "t2.small"
+  iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  associate_public_ip_address = false
+
+  user_data = <<EOF
+#!/bin/bash
+echo ECS_CLUSTER=canoe_production >> /etc/ecs/ecs.config
+EOF
+
+  root_block_device {
+    volume_type = "gp2"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
