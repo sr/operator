@@ -1,27 +1,25 @@
 package controller
 
 import (
-	"encoding/base64"
 	"fmt"
-	"os"
-	"strings"
 
 	"operator"
 
 	"golang.org/x/net/context"
 	"k8s.io/kubernetes/pkg/api"
-	k8client "k8s.io/kubernetes/pkg/client/unversioned"
+	errors "k8s.io/kubernetes/pkg/api/errors"
+	client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 type apiServer struct {
-	client    *k8client.Client
+	client    *client.Client
 	namespace string
 	operatord *OperatordConfig
 	hubot     *HubotConfig
 }
 
 func newAPIServer(
-	client *k8client.Client,
+	client *client.Client,
 	namespace string,
 	operatord *OperatordConfig,
 	hubot *HubotConfig,
@@ -55,24 +53,68 @@ func (s *apiServer) CreateCluster(
 	}, nil
 }
 
+func (s *apiServer) Deploy(
+	ctx context.Context,
+	request *DeployRequest,
+) (*DeployResponse, error) {
+	if request.BuildId == "" {
+		return nil, operator.NewArgumentRequiredError("BuildId")
+	}
+	hubotImage := getImage(s.hubot.Image, request.BuildId)
+	operatordImage := getImage(s.operatord.Image, request.BuildId)
+	hubotRC, err := s.replicationControllers().Get(s.hubot.Name)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch hubot replication controller: %v", err)
+	}
+	operatordRC, err := s.replicationControllers().Get(s.operatord.Name)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch operatord replication controller: %v", err)
+	}
+	hubotRC.Spec.Template.Spec.Containers[0].Image = hubotImage
+	operatordRC.Spec.Template.Spec.Containers[0].Image = operatordImage
+	if _, err := s.replicationControllers().Update(hubotRC); err != nil {
+		return nil, fmt.Errorf("failed to deploy hubot: %v", err)
+	}
+	if _, err := s.replicationControllers().Update(operatordRC); err != nil {
+		return nil, fmt.Errorf("failed to deploy operatord: %v", err)
+	}
+	return &DeployResponse{
+		Output: &operator.Output{
+			PlainText: fmt.Sprintf(
+				"deployed hubot=%s operatord=%s",
+				hubotImage,
+				operatordImage,
+			),
+		},
+	}, nil
+}
+
 func (s *apiServer) createOperatordResources() error {
 	secret, err := s.client.Secrets(s.namespace).Get(s.operatord.Name)
 	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
 		secret, err = s.createSecret(s.operatord.Name, s.operatord.Secrets)
 		if err != nil {
 			return err
 		}
 	}
-	_, err = s.client.ReplicationControllers(s.namespace).Get(s.operatord.Name)
+	_, err = s.replicationControllers().Get(s.operatord.Name)
 	if err != nil {
-		_, err := s.client.ReplicationControllers(s.namespace).
-			Create(s.getOperatordRC(secret))
+		if !errors.IsNotFound(err) {
+			return err
+		}
+		_, err := s.replicationControllers().Create(s.getOperatordRC(secret))
 		if err != nil {
 			return err
 		}
 	}
 	_, err = s.client.Services(s.namespace).Get(s.operatord.Name)
 	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
 		_, err := s.client.Services(s.namespace).Create(s.getOperatordService())
 		if err != nil {
 			return err
@@ -84,15 +126,20 @@ func (s *apiServer) createOperatordResources() error {
 func (s *apiServer) createHubotResources() error {
 	secret, err := s.client.Secrets(s.namespace).Get(s.hubot.Name)
 	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
 		secret, err = s.createSecret(s.hubot.Name, s.hubot.Secrets)
 		if err != nil {
 			return err
 		}
 	}
-	_, err = s.client.ReplicationControllers(s.namespace).Get(s.hubot.Name)
+	_, err = s.replicationControllers().Get(s.hubot.Name)
 	if err != nil {
-		_, err := s.client.ReplicationControllers(s.namespace).
-			Create(s.getHubotRC(secret))
+		if !errors.IsNotFound(err) {
+			return err
+		}
+		_, err := s.replicationControllers().Create(s.getHubotRC(secret))
 		if err != nil {
 			return err
 		}
@@ -111,32 +158,6 @@ func (s *apiServer) createSecret(
 	})
 }
 
-func encodeSecrets(secrets map[string]string) map[string][]byte {
-	encodedSecrets := make(map[string][]byte, len(secrets))
-	for name, value := range secrets {
-		encoded := make([]byte, base64.StdEncoding.EncodedLen(len(value)))
-		base64.StdEncoding.Encode(encoded, []byte(value))
-		newName := strings.Replace(strings.ToLower(name), "_", ".", -1)
-		encodedSecrets[newName] = encoded
-	}
-	return encodedSecrets
-}
-
-func loadSecretsForService(
-	optionName string,
-	optionValue string,
-) (map[string]string, error) {
-	secrets := make(map[string]string)
-	for _, secret := range strings.Split(optionValue, ",") {
-		value, ok := os.LookupEnv(secret)
-		if !ok {
-			return nil, fmt.Errorf(
-				"env key not set when included in %s: %s",
-				optionName,
-				optionValue,
-			)
-		}
-		secrets[secret] = value
-	}
-	return secrets, nil
+func (s *apiServer) replicationControllers() client.ReplicationControllerInterface {
+	return s.client.ReplicationControllers(s.namespace)
 }
