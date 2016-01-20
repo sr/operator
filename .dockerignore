@@ -7,6 +7,5 @@ tmp/
 vendor/pkg
 !bin/ci
 !bin/k8s-hubot
-!bin/k8s-operatord
-!tmp/operatord
 !tmp/k8s-exec
+!tmp/operatord
