@@ -31,8 +31,13 @@ client = new {{.PackageName}}.{{.FullName}}(address, grpc.Credentials.createInse
 module.exports = (robot) ->
 {{$service := .Name}}
 {{- range .Methods}}
-  robot.respond /{{$service}} {{dasherize .Name}}{{index $.Args .Name}}/, (msg) ->
-    client.{{lowerCase .Name}} {{index $.Input .Name}}, (err, response) ->
+  robot.respond /{{$service}} {{dasherize .Name}}(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.{{lowerCase .Name}} input, (err, response) ->
       if err
         msg.send("`+"```"+`\n{{.Name}} error: #{err.message}\n`+"```"+`")
       else
