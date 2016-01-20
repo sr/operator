@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  force_ssl unless Rails.env.development? || Rails.env.test?
+
   include Canoe::DeployLogic
   include PaginationHelper
 

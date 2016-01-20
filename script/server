@@ -13,5 +13,7 @@ script/update
 test -z "$RACK_ENV" &&
   RACK_ENV='development'
 
-# boot the app and any other necessary processes.
-bin/foreman start -p 4000
+rm -f tmp/pids/server.pid
+
+export TERM=
+exec bin/foreman start -p "${PORT-4000}"

@@ -1,1 +1,1 @@
-web: bin/rails server -p $PORT
+web: bin/puma -C config/puma.rb

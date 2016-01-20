@@ -11,6 +11,8 @@ require "action_view/railtie"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
+require "pinglish"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -45,5 +47,16 @@ module Canoe
     config.action_dispatch.rescue_responses.merge!(
       'Octokit::NotFound' => :not_found,
     )
+
+    config.logger = Logger.new(STDOUT)
+    config.colorize_logging = false
+
+    config.middleware.use Rack::Attack
+
+    config.middleware.use Pinglish do |ping|
+      ping.check :db do
+        !!Repo.count
+      end
+    end
   end
 end
