@@ -93,6 +93,7 @@ clean:
 		src/hubot/scripts/*-gen.coffee \
 		$(OPERATOR) \
 		$(OPERATORD) \
+		$(K8S_EXEC) \
 		$(PROTOEASY) \
 		$(PROTOC_GEN_GO) \
 		$(PROTOC_GEN_GRPCINSTRUMENT) \
