@@ -3,9 +3,9 @@ set -eu
 cd $(dirname "$0")/..
 HUBOT_ADAPTER="slack"
 HUBOT_HTTPD="0"
-HUBOT_NAME="batman"
-HUBOT_SLACK_TEAM="lstoll"
-HUBOT_SLACK_TOKEN="$(cat /secrets/hubot.slack.token)"
+: "${HUBOT_NAME:="batman"}"
+: "${HUBOT_SLACK_TEAM:="lstoll"}"
+: "${HUBOT_SLACK_TOKEN:="$(cat /secrets/hubot.slack.token)"}"
 export \
     HUBOT_ADAPTER \
     HUBOT_HTTPD \
