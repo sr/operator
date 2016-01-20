@@ -20,12 +20,12 @@ func run() error {
 		)
 		value, err := ioutil.ReadFile(fileName)
 		if err != nil {
-			return fmt.Errorf("open-file secret=%s file=%s err=%v", secret, fileName, err)
+			return fmt.Errorf("k8s-exec: open-file secret=%s file=%s err=%v", secret, fileName, err)
 		}
 		if err := os.Setenv(secret, string(value)); err != nil {
-			return fmt.Errorf("set-env secret=%s file=%s err=%v", secret, fileName, err)
+			return fmt.Errorf("k8s-exec: set-env secret=%s file=%s err=%v", secret, fileName, err)
 		}
-		fmt.Fprintf(os.Stderr, "set-env secret=%s file=%s", secret, fileName)
+		fmt.Fprintf(os.Stderr, "k8s-exec: set-env secret=%s file=%s\n", secret, fileName)
 	}
 	return syscall.Exec(os.Args[1], []string{os.Args[1]}, []string{})
 }
