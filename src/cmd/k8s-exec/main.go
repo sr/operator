@@ -13,6 +13,7 @@ func run() error {
 	if len(os.Args) < 2 {
 		return errors.New("Usage: k8s-exec <executable> <secret-name>...")
 	}
+	var env []string
 	for _, secret := range os.Args[2:] {
 		fileName := fmt.Sprintf(
 			"/secrets/%s",
@@ -22,12 +23,9 @@ func run() error {
 		if err != nil {
 			return fmt.Errorf("k8s-exec: open-file secret=%s file=%s err=%v", secret, fileName, err)
 		}
-		if err := os.Setenv(secret, string(value)); err != nil {
-			return fmt.Errorf("k8s-exec: set-env secret=%s file=%s err=%v", secret, fileName, err)
-		}
-		fmt.Fprintf(os.Stderr, "k8s-exec: set-env secret=%s file=%s\n", secret, fileName)
+		env = append(env, fmt.Sprintf("%s=%s", secret, string(value)))
 	}
-	return syscall.Exec(os.Args[1], []string{os.Args[1]}, []string{})
+	return syscall.Exec(os.Args[1], []string{os.Args[1]}, env)
 }
 
 func main() {
