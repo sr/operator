@@ -30,7 +30,7 @@ func (s *apiServer) Search(
 	}
 	response, _, err := s.client.Search(options)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to execute search query: %v", err)
 	}
 	var logEvents []*LogEvent
 	output := bytes.NewBufferString("")
