@@ -8,7 +8,7 @@ var template = generator.NewTemplate("script.coffee",
 #
 # Commands:
 {{- range .Methods}}
-#   hubot {{$.Name}} {{dasherize .Name}} - {{oneLine .Description}}
+#   hubot {{$.Name}} {{dasherize .Name}} {{index $.Args .Name}} - {{oneLine .Description}}
 {{- end}}
 #
 # Configuration:
