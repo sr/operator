@@ -3,6 +3,7 @@
 #
 # Commands:
 #   hubot controller create-cluster - Undocumented.
+#   hubot controller deploy - Undocumented.
 #
 # Configuration:
 #   OPERATORD_ADDRESS
@@ -23,10 +24,26 @@ client = new controller.Controller(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
 
-  robot.respond /controller create-cluster/, (msg) ->
-    client.createCluster {}, (err, response) ->
+  robot.respond /controller create-cluster(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.createCluster input, (err, response) ->
       if err
         msg.send("```\nCreateCluster error: #{err.message}\n```")
       else
         msg.send("```\n#{response.output.PlainText}\n```")
 
+  robot.respond /controller deploy(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.deploy input, (err, response) ->
+      if err
+        msg.send("```\nDeploy error: #{err.message}\n```")
+      else
+        msg.send("```\n#{response.output.PlainText}\n```")

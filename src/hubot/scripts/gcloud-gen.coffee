@@ -24,15 +24,25 @@ client = new gcloud.GcloudService(address, grpc.Credentials.createInsecure())
 
 module.exports = (robot) ->
 
-  robot.respond /gcloud create-container-cluster project_id=(\w+) name=(\w+) node_count=(\w+) zone=(\w+)/, (msg) ->
-    client.createContainerCluster {project_id: msg.match[1],name: msg.match[2],node_count: msg.match[3],zone: msg.match[4],}, (err, response) ->
+  robot.respond /gcloud create-container-cluster(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.createContainerCluster input, (err, response) ->
       if err
         msg.send("```\nCreateContainerCluster error: #{err.message}\n```")
       else
         msg.send("```\n#{response.output.PlainText}\n```")
 
-  robot.respond /gcloud list-instances project_id=(\w+)/, (msg) ->
-    client.listInstances {project_id: msg.match[1],}, (err, response) ->
+  robot.respond /gcloud list-instances(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.listInstances input, (err, response) ->
       if err
         msg.send("```\nListInstances error: #{err.message}\n```")
       else

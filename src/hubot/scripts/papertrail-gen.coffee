@@ -23,8 +23,13 @@ client = new papertrail.PapertrailService(address, grpc.Credentials.createInsecu
 
 module.exports = (robot) ->
 
-  robot.respond /papertrail search query=(\w+)/, (msg) ->
-    client.search {query: msg.match[1],}, (err, response) ->
+  robot.respond /papertrail search(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.search input, (err, response) ->
       if err
         msg.send("```\nSearch error: #{err.message}\n```")
       else
