@@ -37,7 +37,7 @@ func (s *apiServer) getOperatordRC(secret *api.Secret) *api.ReplicationControlle
 							Name:            s.operatord.Name,
 							Image:           getImage(s.operatord.Image, latestTag),
 							ImagePullPolicy: api.PullIfNotPresent,
-							Command:         []string{s.operatord.Command},
+							Command:         OperatordCommand,
 							VolumeMounts: []api.VolumeMount{
 								{
 									Name:      "secrets",

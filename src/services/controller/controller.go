@@ -4,7 +4,6 @@ import client "k8s.io/kubernetes/pkg/client/unversioned"
 
 const (
 	OperatordName           = "operatord"
-	OperatordCommand        = "/k8s-exec ./k8s-operatord BUILDKITE_API_TOKEN PAPERTRAIL_API_TOKEN"
 	OperatordPortName       = "grpc"
 	OperatordPort           = 3000
 	OperatordSecretsSetting = "CONTROLLER_OPERATORD_SECRETS"
@@ -13,6 +12,13 @@ const (
 	HubotCommand        = "/hubot/bin/k8s-hubot"
 	HubotSecretsSetting = "CONTROLLER_HUBOT_SECRETS"
 )
+
+var OperatordCommand = []string{
+	"/k8s-exec",
+	"./operatord",
+	"BUILDKITE_API_TOKEN", // TODO(sr) stop hard coding this
+	"PAPERTRAIL_API_TOKEN",
+}
 
 /// TODO(sr) rename all Env structs to Config
 type Env struct {
@@ -29,7 +35,7 @@ type Env struct {
 type OperatordConfig struct {
 	Name     string
 	Image    string
-	Command  string
+	Command  []string
 	Port     int
 	PortName string
 	Secrets  map[string]string
