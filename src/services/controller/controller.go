@@ -4,7 +4,7 @@ import client "k8s.io/kubernetes/pkg/client/unversioned"
 
 const (
 	OperatordName           = "operatord"
-	OperatordCommand        = "/k8s-operatord"
+	OperatordCommand        = "/k8s-exec ./k8s-operatord BUILDKITE_API_TOKEN PAPERTRAIL_API_TOKEN"
 	OperatordPortName       = "grpc"
 	OperatordPort           = 3000
 	OperatordSecretsSetting = "CONTROLLER_OPERATORD_SECRETS"

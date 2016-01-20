@@ -1,6 +1,6 @@
 FROM scratch
 MAINTAINER me@simonrozet.com
-COPY /bin/k8s-operatord /k8s-operatord
+COPY /tmp/k8s-exec /k8s-exec
 COPY /tmp/operatord /operatord
 COPY /etc/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENV PORT :3000
