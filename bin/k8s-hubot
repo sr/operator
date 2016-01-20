@@ -4,6 +4,7 @@ cd $(dirname "$0")/..
 HUBOT_ADAPTER="irc-slack"
 HUBOT_HTTPD="0"
 HUBOT_NAME="batman"
+HUBOT_IRC_NICK="$HUBOT_NAME"
 HUBOT_IRC_REALNAME="batman"
 HUBOT_SLACK_TEAM="lstoll"
 HUBOT_SLACK_TOKEN="$(cat /secrets/hubot.slack.token)"
