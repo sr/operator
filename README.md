@@ -56,22 +56,14 @@ script/test spec/path/to/whatever_spec.rb
 
 ## Production Setup
 
-### Requirements
-
-* An account on the `pardotops` AWS account.
-* awscli (`brew install awscli`)
-* awsebcli (`brew install awsebcli`)
-* awscli credentials properly setup: `aws configure --profile pardotops`
-* eb properly setup: `eb init --profile=pardotops --region=us-east-1 canoe`
-
 ### Background
 
 (This is not quite true yet, but will be soon) Canoe is deployed to Amazon Web Services. We run it outside of our datacenters for now to improve its resiliency in the case of a failover.
 
-Specifically, Canoe is deployed by running a Docker image (built on Bamboo and pushed to AWS Container Registry) via Elastic Beanstalk on the `pardotops` AWS account.
+Specifically, Canoe is deployed by running a Docker image (built on Bamboo and pushed to AWS Container Registry) via Elastic Container Service on the `pardotops` AWS account.
 
 The steps for deployment are:
 
 1. Merge code to master
 1. Wait for Bamboo to build and test Canoe
-1. Run `script/deploy`
+1. Deploy Canoe via the Bamboo user interface
