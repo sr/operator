@@ -9,6 +9,8 @@ import (
 	"syscall"
 )
 
+const volumeMountPoint = "/secrets"
+
 func run() error {
 	if len(os.Args) < 2 {
 		return errors.New("Usage: k8s-exec <executable> <secret-name>...")
@@ -16,7 +18,8 @@ func run() error {
 	var env []string
 	for _, secret := range os.Args[2:] {
 		fileName := fmt.Sprintf(
-			"/secrets/%s",
+			"%s/%s",
+			volumeMountPoint,
 			strings.Replace(strings.ToLower(secret), "_", ".", -1),
 		)
 		value, err := ioutil.ReadFile(fileName)
