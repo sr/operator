@@ -7,6 +7,8 @@ RUN \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache
 ADD /src/hubot /hubot
+ADD /vendor/proto /hubot/proto
+COPY /src/operator/operator.proto /hubot/proto/operator/operator.proto
 ADD /bin/k8s-hubot /hubot/bin/k8s-hubot
 WORKDIR /hubot
 RUN npm install
