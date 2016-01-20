@@ -8,6 +8,7 @@ GCLOUD_ZONE = europe-west1-d
 PROTOEASY = bin/protoeasy
 OPERATORD = bin/operatord
 OPERATOR = bin/operator
+K8S_EXEC = bin/k8s-exec
 PROTOC_GEN_GO = bin/protoc-gen-go
 PROTOC_GEN_GRPCINSTRUMENT = bin/protoc-gen-grpcinstrument
 PROTOC_GEN_OPERATORHUBOT = bin/protoc-gen-operatorhubot
@@ -66,11 +67,10 @@ docker-build-operatord:
 	rm -rf tmp
 	mkdir -p tmp
 	GOPATH=$(shell pwd)/vendor:$(shell pwd) CGO_ENABLED=0 GOOS=linux \
-	go build \
-		-installsuffix cgo \
-		-ldflags '-w -extld ld -extldflags -static' \
-		-o tmp/operatord \
-		src/cmd/operatord/main-gen.go
+	go build -installsuffix cgo -ldflags '-w -extld ld -extldflags -static' \
+		-o tmp/operatord src/cmd/operatord/main-gen.go && \
+	go build -installsuffix cgo -ldflags '-w -extld ld -extldflags -static' \
+		-o tmp/k8s-exec src/cmd/k8s-exec/main.go
 	docker build -t sr/operatord -f etc/docker/Dockerfile.operatord .
 
 docker-push-operatord:
@@ -106,6 +106,9 @@ $(OPERATOR): $(GB) proto-cmd
 
 $(OPERATORD): $(GB) proto-operatord
 	$< build cmd/operatord
+
+$(K8S_EXEC): $(GB)
+	$< build cmd/k8s-exec
 
 $(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
 	$< build go.pedge.io/protoeasy/cmd/protoeasy
