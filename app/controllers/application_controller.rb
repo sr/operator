@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
 
   private
   def no_ssl_ok?
-    Rails.env.development? || Rails.env.test? || request.host =~ /\Ainternal.canoe.pardot.com\z/i
+    Rails.env.development? || Rails.env.test? || request.ip =~ /\A10\./
   end
 
   def require_oauth_authentication
