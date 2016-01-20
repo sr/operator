@@ -70,7 +70,25 @@ func (s *apiServer) Deploy(
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch operatord replication controller: %v", err)
 	}
+	hubotRC.Spec.Replicas = 0
+	operatordRC.Spec.Replicas = 0
+	if _, err := s.replicationControllers().Update(hubotRC); err != nil {
+		return nil, fmt.Errorf("failed to shut down hubot: %v", err)
+	}
+	if _, err := s.replicationControllers().Update(operatordRC); err != nil {
+		return nil, fmt.Errorf("failed to shut down operatord: %v", err)
+	}
+	hubotRC, err = s.replicationControllers().Get(s.hubot.Name)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch updated hubot replication controller: %v", err)
+	}
+	operatordRC, err = s.replicationControllers().Get(s.operatord.Name)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch updated operatord replication controller: %v", err)
+	}
+	hubotRC.Spec.Replicas = 1
 	hubotRC.Spec.Template.Spec.Containers[0].Image = hubotImage
+	operatordRC.Spec.Replicas = 1
 	operatordRC.Spec.Template.Spec.Containers[0].Image = operatordImage
 	if _, err := s.replicationControllers().Update(hubotRC); err != nil {
 		return nil, fmt.Errorf("failed to deploy hubot: %v", err)
