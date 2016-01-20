@@ -1,28 +1,17 @@
 #!/bin/sh
 set -eu
 cd $(dirname "$0")/..
-HUBOT_ADAPTER="irc-slack"
+HUBOT_ADAPTER="slack"
 HUBOT_HTTPD="0"
 HUBOT_NAME="batman"
-HUBOT_IRC_NICK="$HUBOT_NAME"
-HUBOT_IRC_REALNAME="batman"
 HUBOT_SLACK_TEAM="lstoll"
 HUBOT_SLACK_TOKEN="$(cat /secrets/hubot.slack.token)"
-HUBOT_IRC_ROOMS="#chatoops"
-HUBOT_IRC_SERVER="lstoll.irc.slack.com"
-HUBOT_IRC_PASSWORD="$(cat /secrets/hubot.irc.password)"
-HUBOT_IRC_USESSL="1"
 export \
     HUBOT_ADAPTER \
     HUBOT_HTTPD \
     HUBOT_NAME \
-    HUBOT_IRC_REALNAME \
     HUBOT_SLACK_TEAM \
-    HUBOT_SLACK_TOKEN \
-    HUBOT_IRC_ROOMS \
-    HUBOT_IRC_SERVER \
-    HUBOT_IRC_PASSWORD \
-    HUBOT_IRC_USESSL
+    HUBOT_SLACK_TOKEN
 
 OPERATORD_ADDRESS="$OPERATORD_SERVICE_HOST:$OPERATORD_SERVICE_PORT"
 export OPERATORD_ADDRESS

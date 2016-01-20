@@ -10,8 +10,8 @@
     "hubot-google-translate": "^0.2.0",
     "hubot-help": "^0.1.2",
     "hubot-http-status": "^0.2.1",
-    "hubot-irc-slack": "git://github.com/lstoll/hubot-irc-slack.git",
     "hubot-scripts": "git://github.com/github/hubot-scripts",
+    "hubot-slack": "^3.4.2",
     "protobufjs": ">=4.1.2",
     "underscore": "~> 1.4.2"
   },
