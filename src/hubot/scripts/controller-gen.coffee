@@ -2,8 +2,8 @@
 #  Undocumented.
 #
 # Commands:
-#   hubot controller create-cluster - Undocumented.
-#   hubot controller deploy - Undocumented.
+#   hubot controller create-cluster  - Undocumented.
+#   hubot controller deploy  [build_id=value] [hubot_build_id=value] [operatord_build_id=value] - Undocumented.
 #
 # Configuration:
 #   OPERATORD_ADDRESS

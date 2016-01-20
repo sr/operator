@@ -2,7 +2,7 @@
 #  Undocumented.
 #
 # Commands:
-#   hubot papertrail search - Undocumented.
+#   hubot papertrail search  [query=value] - Undocumented.
 #
 # Configuration:
 #   OPERATORD_ADDRESS
