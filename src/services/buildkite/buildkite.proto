@@ -12,7 +12,7 @@ service BuildkiteService {
 	// all projects.
 	rpc Status(StatusRequest) returns (StatusResponse);
 	// List the last builds of one or all projects, optionally limited to a
-	// branch.
+	// project.
 	rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
 }
 
