@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  force_ssl unless Rails.env.development? || Rails.env.test?
+  force_ssl unless: :no_ssl_ok?
 
   include Canoe::DeployLogic
   include PaginationHelper
@@ -9,6 +9,10 @@ class ApplicationController < ActionController::Base
   before_filter :require_oauth_authentication
 
   private
+  def no_ssl_ok?
+    Rails.env.development? || Rails.env.test? || request.ip =~ /\A10\./
+  end
+
   def require_oauth_authentication
     redirect_to oauth_path unless current_user.present?
   end
