@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
 
   private
   def no_ssl_ok?
-    Rails.env.development? || Rails.env.test? || request.ip =~ /\A10\./
+    Rails.env.development? || Rails.env.test? || request.ip =~ /\A(10\.|127\.)/
   end
 
   def require_oauth_authentication
