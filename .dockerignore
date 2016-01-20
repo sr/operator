@@ -4,6 +4,7 @@ bin/
 pkg/
 src/hubot/node_modules
 tmp/
+vendor/pkg
 !bin/ci
 !bin/k8s-hubot
 !bin/k8s-operatord
