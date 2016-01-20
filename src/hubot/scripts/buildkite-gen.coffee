@@ -24,15 +24,25 @@ client = new buildkite.BuildkiteService(address, grpc.Credentials.createInsecure
 
 module.exports = (robot) ->
 
-  robot.respond /buildkite status slug=(\w+)/, (msg) ->
-    client.status {slug: msg.match[1],}, (err, response) ->
+  robot.respond /buildkite status(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.status input, (err, response) ->
       if err
         msg.send("```\nStatus error: #{err.message}\n```")
       else
         msg.send("```\n#{response.output.PlainText}\n```")
 
-  robot.respond /buildkite list-builds project_slug=(\w+)/, (msg) ->
-    client.listBuilds {project_slug: msg.match[1],}, (err, response) ->
+  robot.respond /buildkite list-builds(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.listBuilds input, (err, response) ->
       if err
         msg.send("```\nListBuilds error: #{err.message}\n```")
       else
