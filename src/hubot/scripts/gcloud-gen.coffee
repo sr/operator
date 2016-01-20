@@ -2,8 +2,8 @@
 #  Undocumented.
 #
 # Commands:
-#   hubot gcloud create-container-cluster - Undocumented.
-#   hubot gcloud list-instances - Undocumented.
+#   hubot gcloud create-container-cluster  [project_id=value] [name=value] [node_count=value] [zone=value] - Undocumented.
+#   hubot gcloud list-instances  [project_id=value] - Undocumented.
 #
 # Configuration:
 #   OPERATORD_ADDRESS
