@@ -17,8 +17,11 @@ PROTOC_GEN_OPERATORD = bin/protoc-gen-operatord
 
 -include etc/mk/golang.mk
 
-hubot-dev: docker-build-hubot
+hubot-dev:
+	@ touch $(shell pwd)/tmp/.hubot_history
 	docker run --rm --name hubot -it --net=host \
+		-v $(shell pwd)/src/hubot/scripts:/hubot/scripts \
+		-v $(shell pwd)/tmp/.hubot_history:/hubot/.hubot_history \
 		-e OPERATORD_ADDRESS=localhost:3000 \
 		sr/hubot -d -a shell -l /
 
