@@ -25,6 +25,7 @@ func run() error {
 		if err := os.Setenv(secret, string(value)); err != nil {
 			return fmt.Errorf("set-env secret=%s file=%s err=%v", secret, fileName, err)
 		}
+		fmt.Fprintf(os.Stderr, "set-env secret=%s file=%s", secret, fileName)
 	}
 	return syscall.Exec(os.Args[1], []string{os.Args[1]}, []string{})
 }
