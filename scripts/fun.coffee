@@ -166,6 +166,13 @@ module.exports = (robot) ->
     ]
     msg.send msg.random tehbishop
 
+  robot.respond /rubbs$/i, (msg) ->
+    tehrubbs = [
+      'http://i.imgur.com/4R6F3bZ.png'
+    ]
+    msg.send msg.random tehrubbs
+
+
   robot.respond /fondant$/i, (msg) ->
     fondant = [
       'https://media.giphy.com/media/3oxRmsdUQ50pclDYOs/giphy.gif'
