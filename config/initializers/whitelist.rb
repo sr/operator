@@ -11,7 +11,7 @@ TRUSTED_NETWORKS = [
 
 Rack::Attack.whitelist('ip whitelist') do |req|
   remote_ip = IPAddr.new(req.ip)
-  TRUSTED_NETWORKS.any? { |net| net.include?(remote_ip) }
+  req.path == '/_ping' || TRUSTED_NETWORKS.any? { |net| net.include?(remote_ip) }
 end
 
 Rack::Attack.blacklist('deny from internet') do |req|
