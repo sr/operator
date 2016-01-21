@@ -36,7 +36,11 @@ RUN \
   && tar -xzvf google-cloud-sdk-90.0.0-linux-x86_64.tar.gz \
   && mkdir -p /opt \
   && mv google-cloud-sdk /opt/
-ENV GOBIN $GOPATH/bin
-RUN mkdir -p $GOPATH/src/
+RUN mkdir -p $GOPATH/src/github.com/constabulary
+RUN git clone https://github.com/constabulary/gb \
+		$GOPATH/src/github.com/constabulary/gb \
+	&& cd $GOPATH/src/github.com/constabulary/gb \
+	&& git reset --hard v0.4.0 \
+	&& go install github.com/constabulary/gb/...
 ADD . $GOPATH/src/github.com/sr/operator/
 WORKDIR $GOPATH/src/github.com/sr/operator/
