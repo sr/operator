@@ -17,7 +17,6 @@ PATH="/opt/google-cloud-sdk/bin:$PATH"
 export PATH
 
 go version
-go get -v -u github.com/constabulary/gb/...
 # TODO(sr) make build vet lint
 # TODO(sr) make -j2 proto-cmd proto-operatord proto-hubot
 make -j2 docker-build-hubot docker-build-operatord
