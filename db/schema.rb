@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160121172003) do
+ActiveRecord::Schema.define(version: 20160121195651) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -128,8 +128,10 @@ ActiveRecord::Schema.define(version: 20160121172003) do
   add_index "server_tags", ["name"], name: "index_server_tags_on_name", unique: true, using: :btree
 
   create_table "servers", force: :cascade do |t|
-    t.string  "hostname", limit: 255,                null: false
-    t.boolean "enabled",              default: true, null: false
+    t.string   "hostname",   limit: 255,                                 null: false
+    t.boolean  "enabled",                default: true,                  null: false
+    t.datetime "created_at",             default: '2016-01-21 14:59:58', null: false
+    t.datetime "updated_at",             default: '2016-01-21 14:59:58', null: false
   end
 
   add_index "servers", ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
