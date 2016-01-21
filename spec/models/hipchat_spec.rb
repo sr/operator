@@ -9,8 +9,8 @@ RSpec.describe Hipchat do
       eng_msg = "Test: #{deploy.auth_user.email} just began " + \
         "syncing #{repo.name.capitalize} to <a href='https://git.dev.pardot.com/" + \
         "Pardot/#{repo.name}/commits/abc123'>build214</a> [test-server]"
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg)
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg, false)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg, false)
       Hipchat.notify_deploy_start(deploy)
     end
 
@@ -21,8 +21,8 @@ RSpec.describe Hipchat do
       eng_msg = "Test: #{deploy.auth_user.email} just began " + \
         "syncing #{repo.name.capitalize} to <a href='https://git.dev.pardot.com/" + \
         "Pardot/#{repo.name}/commits/abc123'>ju/BREAD-111 build214</a> [test-server]"
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg)
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg, false)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg, false)
       Hipchat.notify_deploy_start(deploy)
     end
 
@@ -38,8 +38,8 @@ RSpec.describe Hipchat do
         "Pardot/#{repo.name}/commits/abc123'>ju/BREAD-111 build214</a> [test-server]" + \
         "<br>GitHub Diff: <a href='https://git.dev.pardot.com/" + \
         "Pardot/#{repo.name}/compare/abc123...abc123'>build214 ... ju/BREAD-111 build214</a>"
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg)
-      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg, false)
+      expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg, false)
       Hipchat.notify_deploy_start(deploy)
     end
   end
@@ -51,8 +51,8 @@ RSpec.describe Hipchat do
     eng_msg = "Test: #{deploy.auth_user.email} just finished " + \
       "syncing #{repo.name.capitalize} to <a href='https://git.dev.pardot.com/" + \
       "Pardot/#{repo.name}/commits/abc123'>build214</a>"
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg)
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg)
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, support_msg, false)
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, eng_msg, false)
     Hipchat.notify_deploy_complete(deploy)
   end
 
@@ -60,8 +60,8 @@ RSpec.describe Hipchat do
     repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
     deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214)
     msg = "Test: #{deploy.auth_user.email} just CANCELLED syncing #{repo.name.capitalize} to build214"
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, msg)
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg)
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::SUPPORT_ROOM, msg, false)
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, false)
     Hipchat.notify_deploy_cancelled(deploy)
   end
 
@@ -69,14 +69,14 @@ RSpec.describe Hipchat do
     repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
     deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214, passed_ci: false)
     msg = "Test: #{deploy.auth_user.email} just started an UNTESTED deploy of #{deploy.repo_name.capitalize} to build214"
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, "red").never
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, false, "red").never
   end
 
   it "should notify_untested_deploy" do
     repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
     deploy = FactoryGirl.create(:deploy, repo_name: repo.name, build_number: 214, passed_ci: false)
     msg = "Test: #{deploy.auth_user.email} just started an UNTESTED deploy of #{deploy.repo_name.capitalize} to build214"
-    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, "red")
+    expect(Hipchat).to receive(:notify_room).with(Hipchat::ENG_ROOM, msg, false, "red")
     Hipchat.notify_untested_deploy(deploy)
   end
 end

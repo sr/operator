@@ -18,7 +18,7 @@ class Hipchat
 
       msg = "#{deploy.auth_user.email} just began syncing #{build_link(deploy, false)}" + \
             " to #{deploy.deploy_target.name.capitalize}"
-      notify_room(SUPPORT_ROOM, msg) if Rails.env.production? || Rails.env.test?
+      notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
             "just began syncing #{deploy.repo_name.capitalize} to " + \
@@ -28,7 +28,7 @@ class Hipchat
       msg += "<br>GitHub Diff: <a href='#{deploy.repo.diff_url(previous_deploy, deploy)}'>" + \
             "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" + \
             "</a>" if previous_deploy
-      notify_room(ENG_ROOM, msg)
+      notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_complete(deploy)
@@ -36,38 +36,38 @@ class Hipchat
 
       msg = "#{deploy.auth_user.email} just finished syncing #{build_link(deploy, false)} to " + \
             "#{deploy.deploy_target.name.capitalize}"
-      notify_room(SUPPORT_ROOM, msg) if Rails.env.production? || Rails.env.test?
+      notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
             "just finished syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
-      notify_room(ENG_ROOM, msg)
+      notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_cancelled(deploy)
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " + \
             "CANCELLED syncing #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
-      notify_room(SUPPORT_ROOM, msg) if Rails.env.production? || Rails.env.test?
-      notify_room(ENG_ROOM, msg)
+      notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
+      notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_failed_servers(failed_hosts)
       msg = "#{deploy.deploy_target.name.capitalize}: Unable to fully sync to the " + \
             "following hosts: " + failed_hosts.sort.join(", ")
-      notify_room(ENG_ROOM, msg, "red")
+      notify_room(ENG_ROOM, msg, deploy.deploy_target.production?, "red")
     end
 
     def notify_untested_deploy(deploy)
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " + \
             "an UNTESTED deploy of #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
-      notify_room(ENG_ROOM, msg, "red")
+      notify_room(ENG_ROOM, msg, deploy.deploy_target.production?, "red")
     end
 
-    def notify_room(room, msg, color=nil)
+    def notify_room(room, msg, production, color=nil)
       hipchat_host = "hipchat.dev.pardot.com"
       uri = URI.parse("https://#{hipchat_host}/v1/rooms/message")
 
       unless %w[yellow red green purple gray].include?(color)
-        color = (Rails.env.production? ? "purple" : "gray")
+        color = (production ? "purple" : "gray")
       end
 
       body = {
