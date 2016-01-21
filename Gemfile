@@ -19,8 +19,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'octokit', '~> 3.8'
 gem 'artifactory', '~> 2.3'
-gem 'omniauth', '~> 1.2', '>= 1.2.2'
-gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
+gem 'omniauth', '~> 1.3', '>= 1.3.1'
+gem 'omniauth-ldap', '~> 1.0', '>= 1.0.4'
 
 gem 'pinglish', '~> 0.2', '>= 0.2.1'
 

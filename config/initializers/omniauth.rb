@@ -9,10 +9,13 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   if Rails.env.development? || Rails.env.test?
     provider :developer
   else
-    provider :google_oauth2,
-      ENV["GOOGLE_CLIENT_ID"],
-      ENV["GOOGLE_SECRET"],
-      name: "google",
-      access_type: "online"
+    provider :ldap,
+      title: "Pardot LDAP",
+      host: ENV["LDAP_HOST"],
+      port: ENV.fetch("LDAP_PORT", 389),
+      method: :tls,
+      filter: "(&(objectClass=person)(ou:dn:=People))",
+      base: ENV["LDAP_BASE"],
+      uid: "uid"
   end
 end
