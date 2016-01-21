@@ -13,7 +13,7 @@ class Deploy < ActiveRecord::Base
 
   after_commit on: :create do |deploy|
     Hipchat.notify_deploy_start(deploy)
-    Hipchat.notify_untested_deploy(deploy) if Rails.env.production? && !deploy.passed_ci
+    Hipchat.notify_untested_deploy(deploy) if deploy.deploy_target.production? && !deploy.passed_ci
   end
 
   scope :reverse_chronological, -> { order(created_at: :desc) }
