@@ -155,14 +155,26 @@ resource "aws_security_group" "internal_apps_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+    cidr_blocks = [
+      "204.14.236.0/24",   # aloha-east
+      "204.14.239.0/24",   # aloha-west
+      "174.37.191.2/32",   # proxy.dev
+      "169.45.0.88/32",    # squid-d4
+      "136.147.104.20/30"  # pardot-proxyout1-{1,2,3,4}-dfw
+    ]
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = ["204.14.236.0/24", "204.14.239.0/24"]
+    cidr_blocks = [
+      "204.14.236.0/24",   # aloha-east
+      "204.14.239.0/24",   # aloha-west
+      "174.37.191.2/32",   # proxy.dev
+      "169.45.0.88/32",    # squid-d4
+      "136.147.104.20/30"  # pardot-proxyout1-{1,2,3,4}-dfw
+    ]
   }
 
   egress {
