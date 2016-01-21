@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_target
 
   def all_targets
-    @all_targets ||= DeployTarget.enabled.order(:name)
+    @all_targets ||= DeployTarget.enabled.order(:production, :name)
   end
   helper_method :all_targets
 

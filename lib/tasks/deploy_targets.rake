@@ -64,8 +64,12 @@ namespace :canoe do
       DeployTarget.find_or_initialize_by(name: 'test').save!
     when 'production'
       DeployTarget.find_or_initialize_by(name: 'staging').save!
-      DeployTarget.find_or_initialize_by(name: "production").save!
-      DeployTarget.find_or_initialize_by(name: "production_dfw").save!
+      DeployTarget.find_or_initialize_by(name: "production").tap { |target|
+        target.production = true
+      }.save!
+      DeployTarget.find_or_initialize_by(name: "production_dfw").tap { |target|
+        target.production = true
+      }.save!
     end
   end
 
