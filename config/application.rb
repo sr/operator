@@ -48,11 +48,9 @@ module Canoe
       'Octokit::NotFound' => :not_found,
     )
 
-    config.logger = Logger.new(STDOUT)
     config.colorize_logging = false
 
     config.middleware.use Rack::Attack
-
     config.middleware.use Pinglish do |ping|
       ping.check :db do
         !!Repo.count

@@ -30,9 +30,7 @@ gem 'rack-attack', '~> 4.3', '>= 4.3.1'
 
 gem 'puma', '~> 2.15', '>= 2.15.3'
 
-group :development do
-  gem 'foreman', '0.78.0'
-end
+gem 'foreman', '0.78.0'
 
 group :development, :test do
   gem 'byebug'
@@ -48,5 +46,6 @@ group :test do
 end
 
 group :production, :"app.dev" do
+  gem 'rails_12factor', '0.0.3'
   gem 'therubyracer', '~> 0.12', '>= 0.12.2'
 end
