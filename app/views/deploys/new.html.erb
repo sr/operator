@@ -1,6 +1,6 @@
 <h1 class="steps-count">Step 3 of 3</h1>
 <h2>This is what you want to deploy, right?</h2>
-<div class="alert alert-warning">
+<%= content_tag :div, class: ["alert", current_target.production? ? "alert-danger" : "alert-info"].compact do %>
   <p class="lead">
     <strong>Deploy:</strong>
     <%= current_repo.name.capitalize %>
@@ -8,7 +8,7 @@
     to
     <i class="icon-bullseye"></i> <%= current_target.name.upcase %>
   </p>
-</div>
+<%- end %>
 
 <blockquote>
   <p class="lead muted">
