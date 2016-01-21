@@ -5,9 +5,6 @@
 
   <title>Pardot/Canoe [<%= Rails.env %>]</title>
   <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%- if Rails.env.production? %>
-    <%= stylesheet_link_tag 'prod', media: 'all' %>
-  <%- end %>
 
   <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
