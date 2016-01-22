@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+package openflights;
+
+// CSVStore stores information on flights in CSV format.
+message CSVStore {
+  bytes airports = 1;
+  bytes airlines = 2;
+  bytes routes = 3;
+}
+
+// IDStore stores maps from id to object.
+message IDStore {
+  map<string, Airport> id_to_airport = 1;
+  map<string, Airline> id_to_airline = 2;
+  repeated Route route = 3;
+}
+
+// DST represents the DST value for a timezone.
+enum DST {
+  DST_NONE = 0;
+  DST_A = 1;
+  DST_E = 2;
+  DST_N = 3;
+  DST_O = 4;
+  DST_S = 5;
+  DST_U = 6;
+  DST_Z = 7;
+}
+
+// Airport represents an airport.
+message Airport {
+  string id = 1;
+  string name = 2;
+  string city = 3;
+  string country = 4;
+  string iata_faa = 5;
+  string icao = 6;
+  sint32 latitude_micros = 7;
+  sint32 longitude_micros = 8;
+  uint32 altitude_feet = 9;
+  sint32 timezone_offset_minutes = 10;
+  DST dst = 11;
+  string timezone = 12;
+}
+
+// Airline represents an airline.
+message Airline {
+  string id = 1;
+  string name = 2;
+  string alias = 3;
+  string iata = 4;
+  string icao = 5;
+  string callsign = 6;
+  string country = 7;
+  bool active = 8;
+}
+
+// Route represents a route.
+message Route {
+  Airline airline = 1;
+  Airport source_airport = 2;
+  Airport destination_airport = 3;
+  bool codeshare = 4;
+  uint32 stops = 5;
+}
+
+// Airports is the protobuf plural for Airport.
+message Airports {
+  repeated Airport airport = 1;
+}
+
+// Airlines is the protobuf plural for Airline.
+message Airlines {
+  repeated Airline airline = 1;
+}
+
+// Routes is the protobuf plural for Airport.
+message Routes {
+  repeated Route route = 1;
+}
+
+// all ids in requests can also be iata/faa or icao codes
+
+message GetAirportRequest {
+  string id = 1;
+}
+
+message GetAirlineRequest {
+  string id = 1;
+}
+
+message GetRoutesRequest {
+  string airline_id = 1;
+  string source_airport_id = 2;
+  string destination_airport_id = 3;
+}
+
+message GetDistanceRequest {
+  string source_airport_id = 1;
+  string destination_airport_id = 2;
+}
+
+message GetMilesRequest {
+  // vie-ord-mem/jfk-vie
+  string route = 1;
+  uint32 min_miles = 2;
+  // 100 = 100%, default = 100%
+  uint32 percentage = 3;
+}
+
+message GetMilesResponse {
+  message Segment {
+    string source_airport_id = 1;
+    string destination_airport_id = 2;
+    uint32 miles = 3;
+    uint32 actual_miles = 4;
+  }
+  repeated Segment segment = 1;
+  uint32 total_miles = 2;
+  uint32 total_actual_miles = 3;
+}
+
+service API {
+  rpc GetAllAirports(google.protobuf.Empty) returns (stream Airport) {
+    option (google.api.http) = {
+      get: "/airports"
+    };
+  }
+  rpc GetAllAirlines(google.protobuf.Empty) returns (stream Airline) {
+    option (google.api.http) = {
+      get: "/airlines"
+    };
+  }
+  rpc GetAllRoutes(google.protobuf.Empty) returns (stream Route) {
+    option (google.api.http) = {
+      get: "/routes"
+    };
+  }
+  rpc GetAirport(GetAirportRequest) returns (Airport) {
+    option (google.api.http) = {
+      get: "/airports/{id}"
+    };
+  }
+  rpc GetAirline(GetAirlineRequest) returns (Airline) {
+    option (google.api.http) = {
+      get: "/airlines/{id}"
+    };
+  }
+  rpc GetRoutes(GetRoutesRequest) returns (Routes) {
+    option (google.api.http) = {
+      get: "/routes/{airline_id}/{source_airport_id}/{destination_airport_id}"
+    };
+  }
+  rpc GetDistance(GetDistanceRequest) returns (google.protobuf.UInt32Value) {
+    option (google.api.http) = {
+      get: "/distance/{source_airport_id}/{destination_airport_id}"
+    };
+  }
+  rpc GetMiles(GetMilesRequest) returns (GetMilesResponse) {
+    option (google.api.http) = {
+      post: "/miles"      
+      body: "*"
+    };
+  }
+}
