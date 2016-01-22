@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  SESSION_EXPIRATION = 8.hours
+
   force_ssl unless: :no_ssl_ok?
 
   include Canoe::DeployLogic
@@ -19,13 +21,22 @@ class ApplicationController < ActionController::Base
 
   def current_user
     return @current_user if defined?(@current_user)
-    @current_user = session[:user_id] && AuthUser.find_by_id(session[:user_id])
+    @current_user = \
+      if session[:user_id]
+        if session[:created_at] && Time.at(session[:created_at]) >= SESSION_EXPIRATION.ago
+          AuthUser.find_by_id(session[:user_id])
+        else
+          session.destroy
+          nil
+        end
+      end
   end
   helper_method :current_user
 
   def current_user=(user)
     @current_user = user
     session[:user_id] = user.id
+    session[:created_at] = Time.now.to_i
   end
 
   def oauth_path
