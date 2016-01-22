@@ -1,5 +1,5 @@
 # attempt to load env files out of the user dir
-%w[development production app.dev test].each do |env|
+%w[development production test].each do |env|
   found_env = false
 
   env_filename = File.expand_path("~/.envvars_canoe_#{env}")

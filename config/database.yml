@@ -16,4 +16,3 @@ test:
 
 production: &production
   url: <%= ENV['DATABASE_URL'] %>
-app.dev: *production

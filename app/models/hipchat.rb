@@ -87,7 +87,7 @@ class Hipchat
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_form_data(body)
 
-      http.request(request) if Rails.env.production? || Rails.env == "app.dev"
+      http.request(request) if Rails.env.production?
       Rails.logger.info("HIPCHAT: [#{room}] #{msg}")
     end
 

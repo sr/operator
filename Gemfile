@@ -45,7 +45,7 @@ group :test do
   gem 'webmock', '~> 1.21', '>= 1.21.0'
 end
 
-group :production, :"app.dev" do
+group :production do
   gem 'rails_12factor', '0.0.3'
   gem 'therubyracer', '~> 0.12', '>= 0.12.2'
 end
