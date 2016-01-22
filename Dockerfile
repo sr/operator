@@ -15,5 +15,6 @@ ADD Gemfile.lock /app/Gemfile.lock
 RUN bundle install
 
 ADD . /app
+RUN bundle exec rake assets:precompile
 
 CMD ["script/server"]

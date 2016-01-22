@@ -19,24 +19,17 @@
 .deploy-list {
   padding-left:10px;
 }
-.deploy-button {
-}
 .deploy-target {
-  border-left: 2px solid #CCC;
-  padding-left:20px;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 .deploy-target h2 {
   margin-bottom:0px;
 }
 .last-deploy {
   margin:10px 0;
-}
-.first-target {
-  border-top:3px solid #009ddc;
-}
-#deploy_log_output, .deploy-log {
-  background:#444;
-  color:#EEE;
 }
 .gray-well {
   background:#EEE;

@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
     case Rails.env
     when "development" then "/auth/developer"
     when "test" then "/auth/developer"
-    else "/auth/google"
+    else "/auth/ldap"
     end
   end
 
@@ -83,7 +83,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_target
 
   def all_targets
-    @all_targets ||= DeployTarget.enabled.order(:name)
+    @all_targets ||= DeployTarget.enabled.order(:production, :name)
   end
   helper_method :all_targets
 
@@ -110,6 +110,26 @@ class ApplicationController < ActionController::Base
   def require_result
     return if current_result
     raise ActiveRecord::RecordNotFound.new("no result found")
+  end
+
+  def require_deploy_acl_satisfied
+    if current_user.nil?
+      raise "No current user"
+    elsif current_repo.nil?
+      raise "No current repository"
+    elsif current_target.nil?
+      raise "No current target"
+    else
+      acl = DeployACLEntry.for_repo_and_deploy_target(current_repo, current_target)
+      if acl && !acl.authorized?(current_user)
+        Rails.logger.info "#{current_user.uid} is NOT authorized to deploy to #{current_repo.name} in #{current_target.name}"
+        render template: "application/not_authorized_for_deploy", status: :unauthorized
+        false
+      else
+        Rails.logger.info "#{current_user.uid} is authorized to deploy to #{current_repo.name} in #{current_target.name}"
+        true
+      end
+    end
   end
 
   def build_provisional_deploy

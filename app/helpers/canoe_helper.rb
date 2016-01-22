@@ -104,6 +104,6 @@ module CanoeHelper
       fields: "@timestamp,host,message"
     }.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v).gsub('+', '%20')}" }.join("&")
 
-    "https://logs.#{'dev.' unless Rails.env.production?}pardot.com/#/dashboard/script/logstash.js?#{qs}"
+    "https://logs.#{'dev.' unless deploy.deploy_target.production?}pardot.com/#/dashboard/script/logstash.js?#{qs}"
   end
 end

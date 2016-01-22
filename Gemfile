@@ -19,8 +19,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'octokit', '~> 3.8'
 gem 'artifactory', '~> 2.3'
-gem 'omniauth', '~> 1.2', '>= 1.2.2'
-gem 'omniauth-google-oauth2', '~> 0.2', '>= 0.2.6'
+gem 'omniauth', '~> 1.3', '>= 1.3.1'
+gem 'omniauth-ldap', '~> 1.0', '>= 1.0.4'
 
 gem 'pinglish', '~> 0.2', '>= 0.2.1'
 
@@ -30,9 +30,7 @@ gem 'rack-attack', '~> 4.3', '>= 4.3.1'
 
 gem 'puma', '~> 2.15', '>= 2.15.3'
 
-group :development do
-  gem 'foreman', '0.78.0'
-end
+gem 'foreman', '0.78.0'
 
 group :development, :test do
   gem 'byebug'
@@ -47,6 +45,7 @@ group :test do
   gem 'webmock', '~> 1.21', '>= 1.21.0'
 end
 
-group :production, :"app.dev" do
+group :production do
+  gem 'rails_12factor', '0.0.3'
   gem 'therubyracer', '~> 0.12', '>= 0.12.2'
 end

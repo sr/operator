@@ -58,7 +58,7 @@ script/test spec/path/to/whatever_spec.rb
 
 ### Background
 
-(This is not quite true yet, but will be soon) Canoe is deployed to Amazon Web Services. We run it outside of our datacenters for now to improve its resiliency in the case of a failover.
+Canoe is deployed to Amazon Web Services. We run it outside of our datacenters for now to improve its resiliency in the case of a failover.
 
 Specifically, Canoe is deployed by running a Docker image (built on Bamboo and pushed to AWS Container Registry) via Elastic Container Service on the `pardotops` AWS account.
 

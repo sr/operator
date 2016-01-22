@@ -11,18 +11,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160111184440) do
+ActiveRecord::Schema.define(version: 20160121195651) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
     t.string   "name",       limit: 255
-    t.string   "uid",        limit: 255
+    t.string   "uid",        limit: 255, null: false
     t.string   "token",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "auth_users", ["email"], name: "index_auth_users_on_email", using: :btree
+  add_index "auth_users", ["uid"], name: "index_auth_users_on_uid", unique: true, using: :btree
+
+  create_table "deploy_acl_entries", force: :cascade do |t|
+    t.integer  "repo_id",          limit: 4,     null: false
+    t.integer  "deploy_target_id", limit: 4,     null: false
+    t.string   "acl_type",         limit: 255,   null: false
+    t.text     "value",            limit: 65535, null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "deploy_acl_entries", ["deploy_target_id", "repo_id"], name: "index_deploy_acl_entries_on_deploy_target_id_and_repo_id", unique: true, using: :btree
+  add_index "deploy_acl_entries", ["repo_id"], name: "index_deploy_acl_entries_on_repo_id", using: :btree
 
   create_table "deploy_results", force: :cascade do |t|
     t.integer "server_id", limit: 4,                           null: false
@@ -48,6 +60,7 @@ ActiveRecord::Schema.define(version: 20160111184440) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "enabled",                     default: true, null: false
+    t.boolean  "production",                  default: true, null: false
   end
 
   add_index "deploy_targets", ["enabled"], name: "index_deploy_targets_on_enabled", using: :btree
@@ -115,8 +128,10 @@ ActiveRecord::Schema.define(version: 20160111184440) do
   add_index "server_tags", ["name"], name: "index_server_tags_on_name", unique: true, using: :btree
 
   create_table "servers", force: :cascade do |t|
-    t.string  "hostname", limit: 255,                null: false
-    t.boolean "enabled",              default: true, null: false
+    t.string   "hostname",   limit: 255,                                 null: false
+    t.boolean  "enabled",                default: true,                  null: false
+    t.datetime "created_at",             default: '2016-01-21 14:59:58', null: false
+    t.datetime "updated_at",             default: '2016-01-21 14:59:58', null: false
   end
 
   add_index "servers", ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
