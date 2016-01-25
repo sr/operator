@@ -22,6 +22,8 @@ gem 'artifactory', '~> 2.3'
 gem 'omniauth', '~> 1.3', '>= 1.3.1'
 gem 'omniauth-ldap', '~> 1.0', '>= 1.0.4'
 
+gem 'json_schema', '~> 0.12', '>= 0.12.1'
+
 gem 'pinglish', '~> 0.2', '>= 0.2.1'
 
 gem 'nokogiri', '~> 1.6', '>= 1.6.6.2'

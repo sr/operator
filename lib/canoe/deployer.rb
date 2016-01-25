@@ -1,6 +1,6 @@
 module Canoe
   class Deployer
-    def deploy(target:, user:, repo:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil)
+    def deploy(target:, user:, repo:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
       servers = target.servers(repo: repo).enabled
       if server_hostnames
         servers = servers.where(hostname: server_hostnames)
@@ -21,6 +21,8 @@ module Canoe
           passed_ci: passed_ci,
           build_number: build_number,
           artifact_url: artifact_url,
+          options_validator: options_validator,
+          options: options,
         ).tap { |deploy|
           DeployWorkflow.initiate(deploy: deploy, servers: servers)
         }

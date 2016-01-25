@@ -85,6 +85,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           specified_servers: "localhost,#{server.hostname}",
           servers_used: "localhost",
           completed: false,
+          options: {"foo" => "bar"}
         )
         deploy.results.create!(server: server, stage: "initiated")
 
@@ -94,6 +95,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           "stage"  => "initiated",
           "action" => "deploy",
         })
+        expect(json_response["options"]).to eq({"foo" => "bar"})
       end
     end
   end

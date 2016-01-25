@@ -42,7 +42,7 @@
 
 <div class="confirm-deploy">
   <%= form_tag repo_deploys_path(current_repo.name),
-      class: "form-inline form-disable-on-submit",
+      class: "form-horizontal form-disable-on-submit",
       role: "form",
       data: {confirm: "Are you sure? Like *really* sure?"} do %>
 
@@ -54,17 +54,21 @@
     <%- end %>
     <%= hidden_field_tag "target_name", current_target.name %>
 
-    <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
+    <%- if @options_form %>
+      <div class="panel panel-default">
+        <div class="panel-heading">Options</div>
+        <div class="panel-body">
+          <%= @options_form.render %>
+        </div>
+      </div>
+    <%- end %>
+
 
     <div class="checkbox">
-      &nbsp;&nbsp;
+      <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
       <label>
         <input type="checkbox" name="lock"> Lock
       </label>
-    </div>
-
-    <div class="checkbox">
-      &nbsp;&nbsp;
       <label>
         <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="deploy-servers"> Specify Server(s)
       </label>

@@ -45,6 +45,8 @@ module Canoe
         passed_ci: prov_deploy.passed_ci,
         lock: (params[:lock] == "on"),
         server_hostnames: (params[:servers] == "on" && params.fetch(:server_hostnames, [])),
+        options_validator: prov_deploy.options_validator,
+        options: params[:options],
       )
 
       if the_deploy

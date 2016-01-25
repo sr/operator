@@ -4,6 +4,7 @@ json.user deploy.auth_user.email
 json.repo deploy.repo_name
 json.what deploy.what
 json.what_details deploy.what_details
+json.options deploy.options || {}
 json.build_number deploy.build_number
 if local_assigns[:results]
   json.set! :servers, results.includes(:server).each_with_object({}) { |result, hsh|
