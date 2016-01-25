@@ -105,7 +105,7 @@ class Deploy < ActiveRecord::Base
       validator = JsonSchema.parse!(options_validator)
       valid, errors = validator.validate(options || {})
       errors.each do |error|
-        self.errors.add("options[#{error.path.last}]", error.message)
+        self.errors.add("options", error.to_s)
       end
     end
   end
