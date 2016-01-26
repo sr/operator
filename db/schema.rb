@@ -59,8 +59,8 @@ ActiveRecord::Schema.define(version: 20160121195651) do
     t.integer  "locking_user_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "enabled",                     default: true, null: false
-    t.boolean  "production",                  default: true, null: false
+    t.boolean  "enabled",                     default: true,  null: false
+    t.boolean  "production",                  default: false, null: false
   end
 
   add_index "deploy_targets", ["enabled"], name: "index_deploy_targets_on_enabled", using: :btree
