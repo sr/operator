@@ -68,7 +68,7 @@ module CanoeHelper
   end
 
   def print_time(time)
-    time.localtime.strftime("%m/%d/%y @ %l:%M %p")
+    time.in_time_zone.strftime("%m/%d/%y @ %l:%M %p")
   end
 
   def print_relative_time(time)
