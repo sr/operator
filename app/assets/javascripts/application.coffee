@@ -15,6 +15,8 @@
 #= require jquery_nested_form
 #= require bootstrap-sprockets
 #= require selectize
+#= require handlebars
+#= require alpaca
 #= require_tree .
 
 window.isProduction = ->
