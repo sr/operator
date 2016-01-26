@@ -30,9 +30,6 @@ class DeploysController < ApplicationController
       @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
       @server_hostnames = current_target.servers(repo: current_repo).enabled.pluck(:hostname).sort
-      if @prov_deploy.options_validator.present?
-        @options_form = Canoe::DeployOptionsForm.new(schema: @prov_deploy.options_validator, values: @prov_deploy.options)
-      end
 
       @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
     else
