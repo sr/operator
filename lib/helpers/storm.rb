@@ -3,46 +3,45 @@ require "shell_helper"
 
 # module to include in the proper environments for required hooks
 module StormEnvModule
-  WAIT_TIME = 45
+
+  PROC_KILL_WAIT_TIME = 45
   STORM_BIN = '/opt/storm/current/bin/storm'
 
-  def load_murdoc
-    load_topology('murdoc-topo')
-  end
-
-  def load_topology(topo_name)
-    if active?(topo_name)
-      remove_topology(topo_name)
-      sleep WAIT_TIME + 2
+  def load_topology(topo)
+    if active?(topo)
+      remove_topology(topo)
+      sleep PROC_KILL_WAIT_TIME + 2
     end
-    add_topology(topo_name)
+    add_topology(topo)
   end
 
   private
 
-  def remove_topology(topo_name)
-    ShellHelper.sudo_execute("#{STORM_BIN} kill #{topo_name} -w #{WAIT_TIME}", "storm")
+  def topo_name(full_topo_param)
+    "#{full_topo_param}".split(':')[0]
   end
 
-  def active?(topo_name)
-    is_active = ShellHelper.sudo_execute("#{STORM_BIN} list | grep #{topo_name} | grep 'ACTIVE' | wc -l", "storm")
+  def topo_class(full_topo_param)
+    "#{full_topo_param}".split(':')[1]
+  end
+
+  def remove_topology(topo)
+    ShellHelper.sudo_execute("#{STORM_BIN} kill #{topo_name(topo)} -w #{PROC_KILL_WAIT_TIME}", "storm")
+  end
+
+  def active?(topo)
+    is_active = ShellHelper.sudo_execute("#{STORM_BIN} list | grep #{topo_name(topo)} | grep 'ACTIVE' | wc -l", "storm")
     is_active == 1
   end
 
-  def add_topology(topo_name)
-    ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{environment.payload.current_link} #{topo_class(topo_name)} #{topo_name} remote", "storm")
+  def add_topology(topo)
+    ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{environment.payload.current_link} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
   end
 
-  def topo_class(topo_name)
-    case topo_name
-    when 'murdoc-topo'
-      'murdoc.processing.topology.MurdocTopology'
-    when 'action-topo'
-      'murdoc.processing.topology.ActionApplicationTopology'
-    when 'reporting-topo'
-      'murdoc.reporting.topology.MurdocReportingTopology'
-    end
-end
+  def deploy(topo)
+    load_topology(topo)
+  end
 
+end
 
 
