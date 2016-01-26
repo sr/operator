@@ -10,7 +10,7 @@
   </p>
 <%- end %>
 
-<blockquote>
+<blockquote class="deploy-changes">
   <p class="lead muted">
     <strong>
       What will change?
@@ -42,9 +42,9 @@
 
 <div class="confirm-deploy">
   <%= form_tag repo_deploys_path(current_repo.name),
-      class: "form-horizontal form-disable-on-submit",
-      role: "form",
-      data: {confirm: "Are you sure? Like *really* sure?"} do %>
+      class: "form-horizontal",
+      id: "deploy-form",
+      role: "form" do %>
 
     <%- if @prov_deploy.artifact_url.present? %>
       <%= hidden_field_tag "artifact_url", @prov_deploy.artifact_url %>
@@ -54,15 +54,12 @@
     <%- end %>
     <%= hidden_field_tag "target_name", current_target.name %>
 
-    <%- if @options_form %>
-      <div class="panel panel-default">
-        <div class="panel-heading">Options</div>
-        <div class="panel-body">
-          <%= @options_form.render %>
-        </div>
-      </div>
+    <%- if @prov_deploy.options_validator.present? %>
+      <%= content_tag :div, class: "panel panel-default" do %>
+        <%= content_tag :div, "Options", class: "panel-heading" %>
+        <%= content_tag :div, "", class: "panel-body", id: "deploy-options-form", data: {validator: @prov_deploy.options_validator, data: @prov_deploy.options} %>
+      <%- end %>
     <%- end %>
-
 
     <div class="checkbox">
       <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
