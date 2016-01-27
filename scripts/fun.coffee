@@ -20,6 +20,7 @@
 #   hubot panic - PANIC!1!1!!!
 #   hubot jarsh - jarsh
 #   hubot kyle - kyle
+#   hubot nippon - nippon
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
@@ -102,6 +103,12 @@ module.exports = (robot) ->
       'https://media.giphy.com/media/YPjFIgSccMHS0/giphy.gif'
     ]
     msg.send msg.random bees
+
+  robot.respond /nippon$/i, (msg) ->
+    nippon = [
+      'http://i.imgur.com/T8uvhOu.png'
+    ]
+    msg.send msg.random nippon
 
   robot.respond /tomcat(\s)?waits$/i, (msg) ->
     tomcatwaits = [
