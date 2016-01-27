@@ -170,13 +170,11 @@ type Stream struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	// method records the associated RPC method of the stream.
-	method       string
-	recvCompress string
-	sendCompress string
-	buf          *recvBuffer
-	dec          io.Reader
-	fc           *inFlow
-	recvQuota    uint32
+	method    string
+	buf       *recvBuffer
+	dec       io.Reader
+	fc        *inFlow
+	recvQuota uint32
 	// The accumulated inbound quota pending for window update.
 	updateQuota uint32
 	// The handler to control the window update procedure for both this
@@ -201,17 +199,6 @@ type Stream struct {
 	// the status received from the server.
 	statusCode codes.Code
 	statusDesc string
-}
-
-// RecvCompress returns the compression algorithm applied to the inbound
-// message. It is empty string if there is no compression applied.
-func (s *Stream) RecvCompress() string {
-	return s.recvCompress
-}
-
-// SetSendCompress sets the compression algorithm to the stream.
-func (s *Stream) SetSendCompress(str string) {
-	s.sendCompress = str
 }
 
 // Header acquires the key-value pairs of header metadata once it
@@ -361,14 +348,8 @@ type Options struct {
 
 // CallHdr carries the information of a particular RPC.
 type CallHdr struct {
-	// Host specifies peer host.
-	Host string
-	// Method specifies the operation to perform.
-	Method string
-	// RecvCompress specifies the compression algorithm applied on inbound messages.
-	RecvCompress string
-	// SendCompress specifies the compression algorithm applied on outbound message.
-	SendCompress string
+	Host   string // peer host
+	Method string // the operation to perform on the specified host
 }
 
 // ClientTransport is the common interface for all gRPC client side transport

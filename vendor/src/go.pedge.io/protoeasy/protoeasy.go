@@ -92,12 +92,6 @@ type FileCompileOptions struct {
 			FileName       string `json:"file_name,omitempty" yaml:"file_name,omitempty"`
 			IncludeImports bool   `json:"include_imports,omitempty" yaml:"include_imports,omitempty"`
 		} `json:"descriptor_set,omitempty" yaml:"descriptor_set,omitempty"`
-		Letmegrpc struct {
-			RelOut             string            `json:"rel_out,omitempty" yaml:"rel_out,omitempty"`
-			ImportPath         string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
-			NoDefaultModifiers bool              `json:"no_default_modifiers,omitempty" yaml:"no_default_modifiers,omitempty"`
-			Modifiers          map[string]string `json:"modifiers,omitempty" yaml:"modifiers,omitempty"`
-		} `json:"letmegrpc,omitempty" yaml:"letmegrpc,omitempty"`
 	} `json:"options,omitempty" yaml:"options,omitempty"`
 }
 

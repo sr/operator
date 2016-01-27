@@ -11,8 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"go.pedge.io/lion"
-	"go.pedge.io/lion/proto"
+	"go.pedge.io/protolog"
 )
 
 var (
@@ -31,7 +30,7 @@ func SetDebug(debug bool) {
 	defer lock.Unlock()
 	globalDebug = debug
 	if debug {
-		lion.SetLogger(lion.GlobalLogger().AtLevel(lion.LevelDebug))
+		protolog.SetLogger(protolog.GlobalLogger().AtLevel(protolog.Level_LEVEL_DEBUG))
 	}
 }
 
@@ -84,7 +83,7 @@ func RunIO(ioObj IO, args ...string) error {
 	cmd.Stdout = ioObj.Stdout
 	cmd.Stderr = stderr
 	if globalDebug {
-		protolion.Debug(&RunningCommand{Args: strings.Join(args, " ")})
+		protolog.Debug(&RunningCommand{Args: strings.Join(args, " ")})
 	}
 	if err := cmd.Run(); err != nil {
 		data, _ := ioutil.ReadAll(debugStderr)

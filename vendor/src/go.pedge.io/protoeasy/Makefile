@@ -2,51 +2,22 @@ PKGS := $(shell go list ./... | grep -v 'go.pedge.io/protoeasy/vendor')
 
 EXTRA_PKGS := \
 	github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/... \
-	github.com/gengo/grpc-gateway/runtime/... \
 	github.com/golang/protobuf/protoc-gen-go/... \
 	github.com/gogo/protobuf/protoc-gen-gofast/... \
 	github.com/gogo/protobuf/protoc-gen-gogo/... \
 	github.com/gogo/protobuf/protoc-gen-gogofast/... \
 	github.com/gogo/protobuf/protoc-gen-gogofaster/... \
 	github.com/gogo/protobuf/protoc-gen-gogoslick/... \
-	github.com/gogo/letmegrpc/form/... \
-	github.com/gogo/letmegrpc/html/... \
-	github.com/gogo/letmegrpc/protoc-gen-letmegrpc/... \
-	go.pedge.io/pb/go/google/api/... \
-	go.pedge.io/pb/go/google/datastore/v1beta3/... \
-	go.pedge.io/pb/go/google/devtools/cloudtrace/v1/... \
-	go.pedge.io/pb/go/google/example/library/v1/... \
-	go.pedge.io/pb/go/google/iam/v1/... \
-	go.pedge.io/pb/go/google/logging/type/... \
-	go.pedge.io/pb/go/google/logging/v2/... \
-	go.pedge.io/pb/go/google/longrunning/... \
-	go.pedge.io/pb/go/google/pubsub/v1/... \
-	go.pedge.io/pb/go/google/pubsub/v1beta2/... \
-	go.pedge.io/pb/go/google/rpc/... \
-	go.pedge.io/pb/go/google/type/... \
-	go.pedge.io/pb/go/pb/common/... \
-	go.pedge.io/pb/go/pb/geo/... \
-	go.pedge.io/pb/go/pb/money/... \
-	go.pedge.io/pb/go/pb/net/... \
-	go.pedge.io/pb/go/pb/phone/... \
-	go.pedge.io/pb/gogo/google/api/... \
-	go.pedge.io/pb/gogo/google/datastore/v1beta3/... \
-	go.pedge.io/pb/gogo/google/devtools/cloudtrace/v1/... \
-	go.pedge.io/pb/gogo/google/example/library/v1/... \
-	go.pedge.io/pb/gogo/google/iam/v1/... \
-	go.pedge.io/pb/gogo/google/logging/type/... \
-	go.pedge.io/pb/gogo/google/logging/v2/... \
-	go.pedge.io/pb/gogo/google/longrunning/... \
-	go.pedge.io/pb/gogo/google/protobuf/... \
-	go.pedge.io/pb/gogo/google/pubsub/v1/... \
-	go.pedge.io/pb/gogo/google/pubsub/v1beta2/... \
-	go.pedge.io/pb/gogo/google/rpc/... \
-	go.pedge.io/pb/gogo/google/type/... \
-	go.pedge.io/pb/gogo/pb/common/... \
-	go.pedge.io/pb/gogo/pb/geo/... \
-	go.pedge.io/pb/gogo/pb/money/... \
-	go.pedge.io/pb/gogo/pb/net/... \
-	go.pedge.io/pb/gogo/pb/phone/...
+	github.com/gengo/grpc-gateway/runtime/... \
+	go.pedge.io/googleapis/google/datastore/v1beta3/... \
+	go.pedge.io/googleapis/google/devtools/cloudtrace/v1/... \
+	go.pedge.io/googleapis/google/example/library/v1/... \
+	go.pedge.io/googleapis/google/iam/v1/... \
+	go.pedge.io/googleapis/google/longrunning/... \
+	go.pedge.io/googleapis/google/pubsub/v1/... \
+	go.pedge.io/googleapis/google/pubsub/v1beta2/... \
+	go.pedge.io/googleapis/google/rpc/... \
+	go.pedge.io/googleapis/google/type/...
 
 EXTRA_CMDS := \
 	go.pedge.io/protoeasy/vendor/github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway \
@@ -55,8 +26,7 @@ EXTRA_CMDS := \
 	go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf/protoc-gen-gogo \
 	go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf/protoc-gen-gogofast \
 	go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf/protoc-gen-gogofaster \
-	go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf/protoc-gen-gogoslick \
-	go.pedge.io/protoeasy/vendor/github.com/gogo/letmegrpc/protoc-gen-letmegrpc
+	go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf/protoc-gen-gogoslick
 
 export GO15VENDOREXPERIMENT=1
 
@@ -84,8 +54,7 @@ vendornoupdate:
 	GOOS=linux GOARCH=amd64 govendor add $(EXTRA_PKGS)
 	GOOS=linux GOARCH=amd64 govendor add +external
 	GOOS=linux GOARCH=amd64 govendor update +vendor
-	mkdir -p vendor/go.pedge.io/pb
-	cp -R ../pb/proto vendor/go.pedge.io/pb/proto
+	cd vendor/github.com/gengo/grpc-gateway/third_party/googleapis && protoeasy --go .
 
 vendor: vendorupdate vendornoupdate
 
@@ -178,6 +147,19 @@ docker-launch:
 docker-test: docker-build
 	docker run quay.io/pedge/protoeasy make test
 
+docker-build-proto2:
+	docker build -t quay.io/pedge/protoeasy-proto2 -f Dockerfile.proto2 .
+
+docker-push-proto2: docker-build-proto2
+	docker push quay.io/pedge/protoeasy-proto2
+
+docker-pull-proto2:
+	docker pull quay.io/pedge/protoeasy
+
+docker-launch-proto2:
+	docker rm -f protoeasy-proto2 || true
+	docker run -d -p 6789:6789 --name=protoeasy-proto2 quay.io/pedge/protoeasy-proto2
+
 integration: build docker-build docker-launch proto examples
 
 docker-integration: build docker-build
@@ -210,5 +192,9 @@ docker-integration: build docker-build
 	docker-pull \
 	docker-launch \
 	docker-test \
+	docker-build-proto2 \
+	docker-push-proto2 \
+	docker-pull-proto2 \
+	docker-launch-proto2 \
 	integration \
 	docker-integration

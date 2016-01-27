@@ -215,8 +215,8 @@ var (
 {{range $svc := .}}
 // Register{{$svc.GetName}}HandlerFromEndpoint is same as Register{{$svc.GetName}}Handler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func Register{{$svc.GetName}}HandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+func Register{{$svc.GetName}}HandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string) (err error) {
+	conn, err := grpc.Dial(endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
@@ -247,7 +247,7 @@ func Register{{$svc.GetName}}Handler(ctx context.Context, mux *runtime.ServeMux,
 	mux.Handle({{$b.HTTPMethod | printf "%q"}}, pattern_{{$svc.GetName}}_{{$m.GetName}}_{{$b.Index}}, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		resp, err := request_{{$svc.GetName}}_{{$m.GetName}}_{{$b.Index}}(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
-			runtime.HTTPError(ctx, w, req, err)
+			runtime.HTTPError(ctx, w, err)
 			return
 		}
 		{{if $m.GetServerStreaming}}

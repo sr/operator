@@ -58,13 +58,10 @@ var (
 	// HTTPError replies to the request with the error.
 	// You can set a custom function to this variable to customize error format.
 	HTTPError = DefaultHTTPError
-	// This handles the following error used by the gateway: StatusMethodNotAllowed StatusNotFound and StatusBadRequest
-	OtherErrorHandler = DefaultOtherErrorHandler
 )
 
 type errorBody struct {
 	Error string `json:"error"`
-	Code  int    `json:"code"`
 }
 
 // DefaultHTTPError is the default implementation of HTTPError.
@@ -73,11 +70,11 @@ type errorBody struct {
 //
 // The response body returned by this function is a JSON object,
 // which contains a member whose key is "error" and whose value is err.Error().
-func DefaultHTTPError(ctx context.Context, w http.ResponseWriter, _ *http.Request, err error) {
+func DefaultHTTPError(ctx context.Context, w http.ResponseWriter, err error) {
 	const fallback = `{"error": "failed to marshal error message"}`
 
 	w.Header().Set("Content-Type", "application/json")
-	body := errorBody{Error: grpc.ErrorDesc(err), Code: int(grpc.Code(err))}
+	body := errorBody{Error: err.Error()}
 	buf, merr := json.Marshal(body)
 	if merr != nil {
 		glog.Errorf("Failed to marshal error message %q: %v", body, merr)
@@ -93,8 +90,4 @@ func DefaultHTTPError(ctx context.Context, w http.ResponseWriter, _ *http.Reques
 	if _, err := w.Write(buf); err != nil {
 		glog.Errorf("Failed to write response: %v", err)
 	}
-}
-
-func DefaultOtherErrorHandler(w http.ResponseWriter, _ *http.Request, error string, code int) {
-	http.Error(w, error, code)
 }

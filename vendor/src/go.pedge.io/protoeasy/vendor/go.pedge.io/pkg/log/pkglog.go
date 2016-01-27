@@ -7,9 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.pedge.io/lion"
-	"go.pedge.io/lion/syslog"
-
+	"go.pedge.io/protolog"
+	"go.pedge.io/protolog/syslog"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -34,23 +33,27 @@ type Env struct {
 
 // SetupLogging sets up logging.
 func SetupLogging(appName string, env Env) error {
-	var pushers []lion.Pusher
+	var pushers []protolog.Pusher
 	if !env.DisableStderrLog {
 		pushers = append(
 			pushers,
-			lion.NewTextWritePusher(
-				os.Stderr,
+			protolog.NewDefaultTextWritePusher(
+				protolog.NewFileFlusher(
+					os.Stderr,
+				),
 			),
 		)
 	}
 	if env.LogDir != "" {
 		pushers = append(
 			pushers,
-			lion.NewTextWritePusher(
-				&lumberjack.Logger{
-					Filename:   filepath.Join(env.LogDir, fmt.Sprintf("%s.log", appName)),
-					MaxBackups: 3,
-				},
+			protolog.NewDefaultTextWritePusher(
+				protolog.NewWriterFlusher(
+					&lumberjack.Logger{
+						Filename:   filepath.Join(env.LogDir, fmt.Sprintf("%s.log", appName)),
+						MaxBackups: 3,
+					},
+				),
 			),
 		)
 	}
@@ -66,31 +69,32 @@ func SetupLogging(appName string, env Env) error {
 		}
 		pushers = append(
 			pushers,
-			sysloglion.NewPusher(
+			protolog_syslog.NewDefaultTextPusher(
 				writer,
 			),
 		)
 	}
 	if len(pushers) > 0 {
-		lion.SetLogger(
-			lion.NewLogger(
-				lion.NewMultiPusher(
+		protolog.SetLogger(
+			protolog.NewLogger(
+				protolog.NewMultiPusher(
 					pushers...,
 				),
+				protolog.LoggerOptions{},
 			),
 		)
 	} else {
-		lion.SetLogger(
-			lion.DiscardLogger,
+		protolog.SetLogger(
+			protolog.DiscardLogger,
 		)
 	}
-	lion.RedirectStdLogger()
+	protolog.RedirectStdLogger()
 	if env.LogLevel != "" {
-		level, err := lion.NameToLevel(strings.ToUpper(env.LogLevel))
-		if err != nil {
-			return err
+		levelValue, ok := protolog.Level_value[fmt.Sprintf("LEVEL_%s", strings.ToUpper(env.LogLevel))]
+		if !ok {
+			return fmt.Errorf("pkglog: unknown log level: %s", env.LogLevel)
 		}
-		lion.SetLevel(level)
+		protolog.SetLevel(protolog.Level(levelValue))
 	}
 	return nil
 }
