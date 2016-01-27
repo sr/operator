@@ -114,8 +114,9 @@ $(OPERATORD): $(GB) proto-operatord
 $(K8S_EXEC): $(GB)
 	$< build cmd/k8s-exec
 
-$(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
-	$< build go.pedge.io/protoeasy/cmd/protoeasy
+$(PROTOEASY): $(PROTOC_GEN_GO)
+	env GOPATH="$(shell pwd)/vendor:$(GOPATH)" \
+		go build -o $@ go.pedge.io/protoeasy/cmd/protoeasy
 
 $(PROTOC_GEN_GO): $(GB)
 	$< build github.com/golang/protobuf/protoc-gen-go
