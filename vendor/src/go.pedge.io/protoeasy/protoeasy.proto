@@ -58,6 +58,12 @@ message CompileOptions {
   string descriptor_set_rel_out = 91;
   string descriptor_set_file_name = 92;
   bool descriptor_set_include_imports = 93;
+
+  bool letmegrpc = 100;
+  string letmegrpc_rel_out = 101;
+  string letmegrpc_import_path = 102;
+  bool letmegrpc_no_default_modifiers = 103;
+  map<string, string> letmegrpc_modifiers = 104;
 }
 
 message Command {

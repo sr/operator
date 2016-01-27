@@ -7,8 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.pedge.io/protolog"
-	"go.pedge.io/protolog/syslog"
+	"go.pedge.io/lion"
+	"go.pedge.io/lion/syslog"
+
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -33,27 +34,23 @@ type Env struct {
 
 // SetupLogging sets up logging.
 func SetupLogging(appName string, env Env) error {
-	var pushers []protolog.Pusher
+	var pushers []lion.Pusher
 	if !env.DisableStderrLog {
 		pushers = append(
 			pushers,
-			protolog.NewDefaultTextWritePusher(
-				protolog.NewFileFlusher(
-					os.Stderr,
-				),
+			lion.NewTextWritePusher(
+				os.Stderr,
 			),
 		)
 	}
 	if env.LogDir != "" {
 		pushers = append(
 			pushers,
-			protolog.NewDefaultTextWritePusher(
-				protolog.NewWriterFlusher(
-					&lumberjack.Logger{
-						Filename:   filepath.Join(env.LogDir, fmt.Sprintf("%s.log", appName)),
-						MaxBackups: 3,
-					},
-				),
+			lion.NewTextWritePusher(
+				&lumberjack.Logger{
+					Filename:   filepath.Join(env.LogDir, fmt.Sprintf("%s.log", appName)),
+					MaxBackups: 3,
+				},
 			),
 		)
 	}
@@ -69,32 +66,31 @@ func SetupLogging(appName string, env Env) error {
 		}
 		pushers = append(
 			pushers,
-			protolog_syslog.NewDefaultTextPusher(
+			sysloglion.NewPusher(
 				writer,
 			),
 		)
 	}
 	if len(pushers) > 0 {
-		protolog.SetLogger(
-			protolog.NewLogger(
-				protolog.NewMultiPusher(
+		lion.SetLogger(
+			lion.NewLogger(
+				lion.NewMultiPusher(
 					pushers...,
 				),
-				protolog.LoggerOptions{},
 			),
 		)
 	} else {
-		protolog.SetLogger(
-			protolog.DiscardLogger,
+		lion.SetLogger(
+			lion.DiscardLogger,
 		)
 	}
-	protolog.RedirectStdLogger()
+	lion.RedirectStdLogger()
 	if env.LogLevel != "" {
-		levelValue, ok := protolog.Level_value[fmt.Sprintf("LEVEL_%s", strings.ToUpper(env.LogLevel))]
-		if !ok {
-			return fmt.Errorf("pkglog: unknown log level: %s", env.LogLevel)
+		level, err := lion.NameToLevel(strings.ToUpper(env.LogLevel))
+		if err != nil {
+			return err
 		}
-		protolog.SetLevel(protolog.Level(levelValue))
+		lion.SetLevel(level)
 	}
 	return nil
 }

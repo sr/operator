@@ -547,14 +547,14 @@
 		{
 			"importpath": "go.pedge.io/protoeasy",
 			"repository": "https://github.com/peter-edge/protoeasy-go",
-			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
+			"revision": "ad15dd02ad33d68cfa275e3bf40cd20b10a3c2e5",
 			"branch": "master"
 		},
 		{
 			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
 			"repository": "https://github.com/peter-edge/protoeasy-go",
-			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
-			"branch": "master",
+			"revision": "ae1d6d6d5a17cfec44d1a9d00e294e3df6a9779c",
+			"branch": "HEAD",
 			"path": "/cmd/protoeasy"
 		},
 		{
