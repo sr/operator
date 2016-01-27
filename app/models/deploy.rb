@@ -1,15 +1,19 @@
 require "deployable"
+require "json_schema"
 
 class Deploy < ActiveRecord::Base
   include Deployable
 
-  # validations, uniqueness, etc
-  # validate type = %w[tag branch commit]
   belongs_to :deploy_target
   belongs_to :auth_user
   belongs_to :restart_server, class_name: Server
 
   has_many :results, class_name: DeployResult
+
+  serialize :options, JSON
+  serialize :options_validator, JSON
+
+  validate :options_are_valid
 
   after_commit on: :create do |deploy|
     Hipchat.notify_deploy_start(deploy)
@@ -94,5 +98,15 @@ class Deploy < ActiveRecord::Base
 
   def incomplete_results_present?
     results.incomplete.any?
+  end
+
+  def options_are_valid
+    if options_validator.present?
+      validator = JsonSchema.parse!(options_validator)
+      valid, errors = validator.validate(options || {})
+      errors.each do |error|
+        self.errors.add("options", error.to_s)
+      end
+    end
   end
 end

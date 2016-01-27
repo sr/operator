@@ -10,11 +10,14 @@
 # Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 # about supported directives.
 #
+#= require underscore
 #= require jquery
 #= require jquery_ujs
 #= require jquery_nested_form
 #= require bootstrap-sprockets
 #= require selectize
+#= require handlebars
+#= require alpaca
 #= require_tree .
 
 window.isProduction = ->

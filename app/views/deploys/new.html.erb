@@ -10,7 +10,7 @@
   </p>
 <%- end %>
 
-<blockquote>
+<blockquote class="deploy-changes">
   <p class="lead muted">
     <strong>
       What will change?
@@ -42,9 +42,9 @@
 
 <div class="confirm-deploy">
   <%= form_tag repo_deploys_path(current_repo.name),
-      class: "form-inline form-disable-on-submit",
-      role: "form",
-      data: {confirm: "Are you sure? Like *really* sure?"} do %>
+      class: "form-horizontal",
+      id: "deploy-form",
+      role: "form" do %>
 
     <%- if @prov_deploy.artifact_url.present? %>
       <%= hidden_field_tag "artifact_url", @prov_deploy.artifact_url %>
@@ -54,17 +54,18 @@
     <%- end %>
     <%= hidden_field_tag "target_name", current_target.name %>
 
-    <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
+    <%- if @prov_deploy.options_validator.present? %>
+      <%= content_tag :div, class: "panel panel-default" do %>
+        <%= content_tag :div, "Options", class: "panel-heading" %>
+        <%= content_tag :div, "", class: "panel-body", id: "deploy-options-form", data: {validator: @prov_deploy.options_validator, data: @prov_deploy.options} %>
+      <%- end %>
+    <%- end %>
 
     <div class="checkbox">
-      &nbsp;&nbsp;
+      <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
       <label>
         <input type="checkbox" name="lock"> Lock
       </label>
-    </div>
-
-    <div class="checkbox">
-      &nbsp;&nbsp;
       <label>
         <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="deploy-servers"> Specify Server(s)
       </label>

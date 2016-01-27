@@ -1,9 +1,12 @@
 require "deployable"
+require "base64"
+require "json"
 
 class ProvisionalDeploy
   include Deployable
 
   attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
+  attr_reader :options_validator, :options
 
   def self.from_artifact_url(repo, artifact_url)
     hash = Artifactory.client.get(artifact_url, properties: nil)
@@ -27,6 +30,14 @@ class ProvisionalDeploy
       properties["gitSha"] && \
       properties["buildTimeStamp"]
 
+    options_validator = \
+      begin
+        properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
+      rescue
+        Rails.logger.warn("Unable to parse optionsValidator: #{$!}")
+        nil
+      end
+
     new(
       repo: repo,
       artifact_url: artifact_url,
@@ -36,49 +47,8 @@ class ProvisionalDeploy
       sha: properties["gitSha"],
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
       created_at: Time.parse(properties["buildTimeStamp"]),
-    )
-  end
-
-  def self.from_tag(repo, tag)
-    sha = nil
-    begin
-      ref = Octokit.ref(repo.full_name, "tags/#{tag}")
-      tag_ref = Octokit.tag(repo.full_name, ref[:object][:sha])
-      sha = tag_ref[:object][:sha]
-      created_at = tag_ref[:tagger][:date]
-    rescue Octokit::NotFound
-      sha = nil
-    end
-
-    new(
-      repo: repo,
-      artifact_url: nil,
-      what: "tag",
-      what_details: tag,
-      build_number: tag.sub(/\Abuild/, "").to_i,
-      sha: sha,
-      passed_ci: true,
-      created_at: created_at,
-    )
-  end
-
-  def self.from_branch(repo, branch)
-    sha = nil
-    begin
-      ref = Octokit.ref(repo.full_name, "heads/#{branch}")
-      sha = ref[:object][:sha]
-    rescue Octokit::NotFound
-      sha = nil
-    end
-
-    new(
-      repo: repo,
-      artifact_url: nil,
-      what: "branch",
-      what_details: branch,
-      build_number: nil,
-      sha: sha,
-      passed_ci: true,
+      options_validator: options_validator,
+      options: {}
     )
   end
 
@@ -91,10 +61,12 @@ class ProvisionalDeploy
       build_number: deploy.build_number,
       sha: deploy.sha,
       passed_ci: deploy.passed_ci,
+      options_validator: deploy.options_validator,
+      options: deploy.options
     )
   end
 
-  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil)
+  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
     @repo = repo
     @artifact_url = artifact_url
     @what = what
@@ -103,6 +75,8 @@ class ProvisionalDeploy
     @sha = sha
     @passed_ci = passed_ci
     @created_at = created_at
+    @options_validator = options_validator
+    @options = options
   end
 
   def repo_name

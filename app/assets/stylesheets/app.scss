@@ -40,8 +40,6 @@
   padding:5px 20px;
 }
 
-.confirm-deploy { padding:20px; }
-
 .under {
   border-bottom: 1px solid #CCC;
 }
@@ -110,4 +108,7 @@ ul.nav {
 
 #deploy-servers {
   margin-top: 1em;
+}
+#deploy-options-form {
+  padding: 0px 15px 0px 15px;
 }
