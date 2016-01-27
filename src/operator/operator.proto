@@ -4,6 +4,28 @@ package operator;
 
 import "google/protobuf/descriptor.proto";
 
+message Source {
+	SourceType type = 1;
+	User user = 2;
+	Room room = 3;
+}
+
+message Room {
+	string name = 1;
+}
+
+message User {
+	string id = 1;
+	string login = 2;
+	string real_name = 3;
+	string email = 4;
+}
+
+enum SourceType {
+	HUBOT_SLACK = 0;
+	COMMAND = 1;
+}
+
 message Output {
 	string PlainText = 1;
 }
