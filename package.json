@@ -18,7 +18,7 @@
     "hubot-redis-brain": "0.0.3",
     "hubot-schedule": "^0.4.0",
     "hubot-scripts": "^2.16.2",
-    "hubot-twitter-stream": "0.0.2",
+    "hubot-twitter-stream": "0.0.3",
     "hubot-yubikey-invalidation": "0.0.3",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.0",
