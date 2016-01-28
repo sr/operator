@@ -34,4 +34,3 @@ module.exports = (robot) ->
         msg.send("```\nSearch error: #{err.message}\n```")
       else
         msg.send("```\n#{response.output.PlainText}\n```")
-
