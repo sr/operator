@@ -38,10 +38,6 @@ module StormEnvModule
     ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{environment.payload.current_link} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
   end
 
-  def deploy(topo)
-    load_topology(topo)
-  end
-
 end
 
 
