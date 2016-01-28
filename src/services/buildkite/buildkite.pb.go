@@ -104,7 +104,7 @@ type BuildkiteServiceClient interface {
 	// all projects.
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	// List the last builds of one or all projects, optionally limited to a
-	// branch.
+	// project.
 	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*ListBuildsResponse, error)
 }
 
@@ -141,7 +141,7 @@ type BuildkiteServiceServer interface {
 	// all projects.
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 	// List the last builds of one or all projects, optionally limited to a
-	// branch.
+	// project.
 	ListBuilds(context.Context, *ListBuildsRequest) (*ListBuildsResponse, error)
 }
 
