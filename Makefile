@@ -48,6 +48,13 @@ proto-operatord: $(PROTOC_GEN_OPERATORD) proto-grpcinstrument
 	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operatord
 
+proto-protoeasy: $(PROTOEASY)
+	go get -v go.pedge.io/pkg/cmd/strip-package-comments
+	cd vendor/src/go.pedge.io/protoeasy && $(shell pwd)/$< && \
+		find . -name *\.pb\*\.go | \
+		grep -v vendor | \
+		xargs strip-package-comments
+
 proto-grpc: $(PROTOEASY)
 	$< --go --grpc --exclude hubot src/
 
