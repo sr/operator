@@ -115,5 +115,8 @@ func getPlugins(compileOptions *CompileOptions) []plugin {
 	if compileOptions.DescriptorSet {
 		plugins = append(plugins, newDescriptorSetPlugin(compileOptions))
 	}
+	if compileOptions.OperatorHubot {
+		plugins = append(plugins, newOperatorHubotPlugin(compileOptions))
+	}
 	return plugins
 }
