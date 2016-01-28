@@ -16,13 +16,12 @@
 :use_locking: true
 :lock_location: /var/lock/staging
 
-:canoe_url: http://tools-s1.dev
+:canoe_url: https://canoe.dev.pardot.com
 :canoe_target: staging
 
 :repos:
   :pardot:
     :repo_path: /var/www/pardot
-    :services_env: staging
   :node_modules:
     :repo_path: /var/www/node_modules/
   :pithumbs:
@@ -30,8 +29,8 @@
   :realtime-frontend:
     :repo_path: /opt/realtime_frontend
     :current_link: /opt/realtime_frontend/realtime-frontend
-  :workflow:
-    :repo_path: /opt/workflow
+  :workflow-stats:
+    :repo_path: /opt/workflow_stats
   :murdoc:
     :repo_path: /opt/murdoc
 

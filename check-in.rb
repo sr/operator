@@ -6,9 +6,13 @@ require 'bundler/setup'
 
 require 'pathname'
 require 'cli'
+require 'proxy_selector'
 require 'logger'
 
 LOCKFILE = '/var/lock/pull-agent/deploy.lock'.freeze
+
+proxy_selector = ProxySelector.new
+proxy_selector.configure_random_proxy
 
 cli = CLI.new
 cli.parse_arguments!
