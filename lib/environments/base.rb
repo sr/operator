@@ -188,10 +188,6 @@ module Environments
       restart_upstart_job("pithumbs")
     end
 
-    def restart_murdoc
-      restart_upstart_job("murdoc")
-    end
-
     def restart_workflowstats_service
       restart_upstart_job("workflowstats")
     end
