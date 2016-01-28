@@ -1,6 +1,5 @@
 .DS_Store
 .dev_settings.yml
 coverage
-test_destinations/*
 vendor/s3-curl/.s3curl
 .idea
