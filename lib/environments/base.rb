@@ -8,6 +8,7 @@ require "strategies"
 require "discovery_client"
 require "core_ext/extract_options"
 require "core_ext/underscore_string"
+require "../helpers/storm"
 
 module Environments
   class Base
@@ -206,6 +207,11 @@ module Environments
 
     def restart_workflowstats_service
       restart_upstart_job("workflowstats")
+    end
+
+    def deploy_topology
+      topo="" #<-- TODO: need to parse param from canoe
+      StormEnvModule.load(topo)
     end
 
     def restart_upstart_job(job)
