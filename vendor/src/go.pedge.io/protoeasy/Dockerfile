@@ -1,4 +1,4 @@
-FROM golang:1.5.3
+FROM golang:1.5.2
 MAINTAINER peter.edge@gmail.com
 
 RUN \
@@ -29,7 +29,6 @@ RUN \
 RUN \
   git clone https://github.com/grpc/grpc.git && \
   cd grpc && \
-  git checkout release-0_12_0 && \
   git submodule update --init && \
   make && \
   make install
