@@ -1,4 +1,5 @@
 export PATH := bin/:$(PATH)
+export GO15VENDOREXPERIMENT = 1
 ifndef VERSION
 	VERSION = $(shell git rev-parse --short HEAD)
 endif
