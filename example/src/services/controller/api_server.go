@@ -3,8 +3,7 @@ package controller
 import (
 	"fmt"
 
-	"operator"
-
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"k8s.io/kubernetes/pkg/api"
 	errors "k8s.io/kubernetes/pkg/api/errors"

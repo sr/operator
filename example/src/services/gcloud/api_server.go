@@ -11,8 +11,7 @@ import (
 
 	"github.com/jmcvetta/randutil"
 
-	"operator"
-
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
