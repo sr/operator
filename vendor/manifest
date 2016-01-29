@@ -82,6 +82,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/golang/protobuf",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "45bba206dd5270d96bac4942dcfe515726613249",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/golang/protobuf/jsonpb",
 			"repository": "https://github.com/golang/protobuf",
 			"revision": "45bba206dd5270d96bac4942dcfe515726613249",
