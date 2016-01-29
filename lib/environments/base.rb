@@ -8,7 +8,7 @@ require "strategies"
 require "discovery_client"
 require "core_ext/extract_options"
 require "core_ext/underscore_string"
-require "../helpers/storm"
+require_relative("../helpers/storm")
 
 module Environments
   class Base
@@ -209,8 +209,12 @@ module Environments
       restart_upstart_job("workflowstats")
     end
 
-    def deploy_topology(topo)
-      StormEnvModule.load_topology(topo, payload.current_link)
+    def deploy_topology
+      if !deploy.options['topology'].nil?
+        StormEnvModule.load_topology(deploy.options['topology'], payload.current_link)
+      else
+        Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+      end
     end
 
     def restart_upstart_job(job)
