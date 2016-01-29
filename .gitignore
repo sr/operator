@@ -1,10 +1,5 @@
 /bin
 /doc/TODO*
 /etc/k8s/**/secrets.json
-/pkg
-/src/hubot/.hubot_history
-/src/hubot/nodes_modules
-/src/hubot/proto
 /tmp
-/vendor/pkg
 !/bin/ci

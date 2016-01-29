@@ -1,0 +1,4 @@
+/pkg/
+/hubot/.hubot_history
+/hubot/nodes_modules
+/vendor/pkg
