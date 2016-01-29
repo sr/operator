@@ -3,7 +3,7 @@ package operator
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/sr/grpcinstrument"
-	"go.pedge.io/protolog"
+	"github.com/sr/protolog"
 )
 
 type logger struct {

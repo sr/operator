@@ -120,6 +120,12 @@
 			"path": "/log"
 		},
 		{
+			"importpath": "github.com/golang/glog",
+			"repository": "https://github.com/golang/glog",
+			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/golang/protobuf",
 			"repository": "https://github.com/golang/protobuf",
 			"revision": "45bba206dd5270d96bac4942dcfe515726613249",
@@ -324,6 +330,12 @@
 			"path": "/protologger"
 		},
 		{
+			"importpath": "github.com/sr/protolog",
+			"repository": "https://github.com/sr/protolog",
+			"revision": "f70696d716241a5dce6ddcf1dad7a74b7c27d8f2",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/ugorji/go/codec",
 			"repository": "https://github.com/ugorji/go",
 			"revision": "646ae4a518c1c3be0739df898118d9bccf993858",
@@ -465,6 +477,27 @@
 			"revision": "04b9de9b512f58addf28c9853d50ebef61c3953e",
 			"branch": "master",
 			"path": "/trace"
+		},
+		{
+			"importpath": "google.golang.org/api/gensupport",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f6ba98773d96b877b246f3a9266493dfc11e276b",
+			"branch": "master",
+			"path": "/gensupport"
+		},
+		{
+			"importpath": "google.golang.org/api/googleapi",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f6ba98773d96b877b246f3a9266493dfc11e276b",
+			"branch": "master",
+			"path": "/googleapi"
+		},
+		{
+			"importpath": "google.golang.org/api/logging/v1beta3",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "f6ba98773d96b877b246f3a9266493dfc11e276b",
+			"branch": "master",
+			"path": "/logging/v1beta3"
 		},
 		{
 			"importpath": "google.golang.org/grpc",
