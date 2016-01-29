@@ -209,8 +209,7 @@ module Environments
       restart_upstart_job("workflowstats")
     end
 
-    def deploy_topology
-      topo="" #<-- TODO: need to parse param from canoe
+    def deploy_topology(topo)
       StormEnvModule.load_topology(topo)
     end
 
