@@ -4,6 +4,8 @@ package operator;
 
 import "google/protobuf/descriptor.proto";
 
+option go_package = "operatorproto";
+
 message Source {
 	SourceType type = 1;
 	User user = 2;
