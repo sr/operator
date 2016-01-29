@@ -1,3 +1,4 @@
+require "logger"
 require "shell_helper"
 
 # module to include in the proper environments for required hooks
@@ -8,7 +9,9 @@ module StormEnvModule
 
   def load_topology(topo, jar)
     if active?(topo)
+      Logger.log(:info, "Topology #{topo_name(topo)} 'isactive'; removing...")
       remove_topology(topo)
+      Logger.log(:info, "Topology #{topo_name(topo)} removed")
       sleep PROC_KILL_WAIT_TIME + 2
     end
     add_topology(topo, jar)
@@ -34,6 +37,7 @@ module StormEnvModule
   end
 
   def add_topology(topo, jar)
+    Logger.log(:info,  "Topology #{topo_name(topo)} added to nimbus host")
     ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
   end
 
