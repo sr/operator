@@ -76,10 +76,29 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/dustin/go-broadcast",
+			"repository": "https://github.com/dustin/go-broadcast",
+			"revision": "3bdf6d4a7164a50bc19d5f230e2981d87d2584f1",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/fatih/color",
 			"repository": "https://github.com/fatih/color",
 			"revision": "9aae6aaa22315390f03959adca2c4d395b02fcef",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/gin-gonic/gin",
+			"repository": "https://github.com/gin-gonic/gin",
+			"revision": "44978ff780ce235a830f6be7cfde42d350b1484d",
+			"branch": "develop"
+		},
+		{
+			"importpath": "github.com/go-kit/kit/log",
+			"repository": "https://github.com/go-kit/kit",
+			"revision": "8e8823691c88d1c57bd1c91a8f3ae51c8bc015e0",
+			"branch": "master",
+			"path": "/log"
 		},
 		{
 			"importpath": "github.com/golang/protobuf",
@@ -109,6 +128,12 @@
 			"path": "/protoc-gen-go/descriptor"
 		},
 		{
+			"importpath": "github.com/hpcloud/tail",
+			"repository": "https://github.com/hpcloud/tail",
+			"revision": "1a0242e795eeefe54261ff308dc685f7d29cc58c",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/kr/pty",
 			"repository": "https://github.com/kr/pty",
 			"revision": "f7ee69f31298ecbe5d2b349c711e2547a617d398",
@@ -118,6 +143,18 @@
 			"importpath": "github.com/kr/text",
 			"repository": "https://github.com/kr/text",
 			"revision": "bb797dc4fb8320488f47bf11de07a733d7233e1f",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/manucorporat/sse",
+			"repository": "https://github.com/manucorporat/sse",
+			"revision": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/manucorporat/stats",
+			"repository": "https://github.com/manucorporat/stats",
+			"revision": "8f2d6ace262eba462e9beb552382c98be51d807b",
 			"branch": "master"
 		},
 		{
@@ -324,6 +361,48 @@
 			"repository": "https://github.com/grpc/grpc-go",
 			"revision": "23d551898cf40a24d0ce7a859c75b322a7035673",
 			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/airbrake/gobrake.v2",
+			"repository": "https://gopkg.in/airbrake/gobrake.v2",
+			"revision": "c9d51adc624b5cc4c1bf8de730a09af4878ffe2d",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/fsnotify.v1",
+			"repository": "https://gopkg.in/fsnotify.v1",
+			"revision": "8611c35ab31c1c28aa903d33cf8b6e44a399b09e",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"revision": "31e6fd4bd5a98d8ee7673d24bc54ec73c31810dd",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/go-playground/validator.v8",
+			"repository": "https://gopkg.in/go-playground/validator.v8",
+			"revision": "c193cecd124b5cc722d7ee5538e945bdb3348435",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/logfmt.v0",
+			"repository": "https://gopkg.in/logfmt.v0",
+			"revision": "c50dc9aa845e681529d8e49d3dc11ec0195aacac",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/stack.v1",
+			"repository": "https://gopkg.in/stack.v1",
+			"revision": "0585967eab0016c8e4e2d55ac20585b469574cec",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/tomb.v1",
+			"repository": "https://gopkg.in/tomb.v1",
+			"revision": "dd632973f1e7218eb1089048e0798ec9ae7dceb8",
+			"branch": "v1"
 		},
 		{
 			"importpath": "gopkg.in/yaml.v2",
