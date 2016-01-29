@@ -1,4 +1,3 @@
-require "console"
 require "shell_helper"
 
 # module to include in the proper environments for required hooks
