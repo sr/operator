@@ -42,7 +42,6 @@ func (c *serverCompiler) Compile(dirPath string, outDirPath string, compileOptio
 }
 
 func (c *serverCompiler) commands(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error) {
-	// getPlugins in plugins.go
 	plugins := getPlugins(compileOptions)
 	protoSpec, err := getProtoSpec(dirPath, compileOptions.ExcludePattern)
 	if err != nil {
@@ -88,4 +87,36 @@ func getProtoSpec(dirPath string, excludeFilePatterns []string) (*protoSpec, err
 		DirPath:           dirPath,
 		RelDirPathToFiles: getRelDirPathToFiles(relFilePaths),
 	}, nil
+}
+
+func getPlugins(compileOptions *CompileOptions) []plugin {
+	var plugins []plugin
+	if compileOptions.Cpp {
+		plugins = append(plugins, newCppPlugin(compileOptions))
+	}
+	if compileOptions.Csharp {
+		plugins = append(plugins, newCsharpPlugin(compileOptions))
+	}
+	if compileOptions.Go {
+		plugins = append(plugins, newGoPlugin(compileOptions))
+	}
+	if compileOptions.Gogo {
+		plugins = append(plugins, newGogoPlugin(compileOptions))
+	}
+	if compileOptions.Objc {
+		plugins = append(plugins, newObjcPlugin(compileOptions))
+	}
+	if compileOptions.Python {
+		plugins = append(plugins, newPythonPlugin(compileOptions))
+	}
+	if compileOptions.Ruby {
+		plugins = append(plugins, newRubyPlugin(compileOptions))
+	}
+	if compileOptions.DescriptorSet {
+		plugins = append(plugins, newDescriptorSetPlugin(compileOptions))
+	}
+	if compileOptions.OperatorHubot {
+		plugins = append(plugins, newOperatorHubotPlugin(compileOptions))
+	}
+	return plugins
 }

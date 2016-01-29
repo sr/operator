@@ -9,7 +9,11 @@ var (
 	errGoPathNotSet = errors.New("protoeasy: GOPATH not set")
 
 	defaultGoPathRelIncludes = []string{
-		"src/go.pedge.io/protoeasy/vendor/go.pedge.io/pb/proto",
+		"src/go.pedge.io/protoeasy/vendor/go.pedge.io/google-protobuf",
+		"src/go.pedge.io/protoeasy/vendor/github.com/golang/protobuf/protoc-gen-go/descriptor",
+		"src/go.pedge.io/protoeasy/vendor/github.com/gengo/grpc-gateway/third_party/googleapis",
+		"src/go.pedge.io/protoeasy/vendor/go.pedge.io/googleapis",
+		"src/go.pedge.io/protoeasy/vendor/github.com/gogo/protobuf",
 	}
 
 	defaultGoModifierOptions = mergeStringStringMaps(
@@ -27,7 +31,7 @@ var (
 				"type.proto",
 				"wrappers.proto",
 			},
-			"go.pedge.io/pb/go/google/protobuf",
+			"go.pedge.io/google-protobuf",
 		),
 		newGoModifierOptions(
 			"google/protobuf",
@@ -45,35 +49,27 @@ var (
 			"github.com/gengo/grpc-gateway/third_party/googleapis/google/api",
 		),
 		newGoModifierOptions(
-			"google/api",
-			[]string{
-				"label.proto",
-				"monitored_resource.proto",
-			},
-			"go.pedge.io/pb/go/google/api",
-		),
-		newGoModifierOptions(
 			"google/datastore/v1beta3",
 			[]string{
 				"datastore.proto",
 				"entity.proto",
 				"query.proto",
 			},
-			"go.pedge.io/pb/go/google/datastore/v1beta3",
+			"go.pedge.io/googleapis/google/datastore/v1beta3",
 		),
 		newGoModifierOptions(
 			"google/devtools/cloudtrace/v1",
 			[]string{
 				"trace.proto",
 			},
-			"go.pedge.io/pb/go/google/devtools/cloudtrace/v1",
+			"go.pedge.io/googleapis/google/devtools/cloudtrace/v1",
 		),
 		newGoModifierOptions(
 			"google/example/library/v1",
 			[]string{
 				"library.proto",
 			},
-			"go.pedge.io/pb/go/google/example/library/v1",
+			"go.pedge.io/googleapis/google/example/library/v1",
 		),
 		newGoModifierOptions(
 			"google/iam/v1",
@@ -81,46 +77,28 @@ var (
 				"iam_policy.proto",
 				"policy.proto",
 			},
-			"go.pedge.io/pb/go/google/iam/v1",
-		),
-		newGoModifierOptions(
-			"google/logging/type",
-			[]string{
-				"http_request.proto",
-				"log_severity.proto",
-			},
-			"go.pedge.io/pb/go/google/logging/type",
-		),
-		newGoModifierOptions(
-			"google/logging/v2",
-			[]string{
-				"log_entry.proto",
-				"logging.proto",
-				"logging_config.proto",
-				"logging_metrics.proto",
-			},
-			"go.pedge.io/pb/go/google/logging/v2",
+			"go.pedge.io/googleapis/google/iam/v1",
 		),
 		newGoModifierOptions(
 			"google/longrunning",
 			[]string{
 				"operations.proto",
 			},
-			"go.pedge.io/pb/go/google/longrunning",
+			"go.pedge.io/googleapis/google/longrunning",
 		),
 		newGoModifierOptions(
 			"google/pubsub/v1",
 			[]string{
 				"pubsub.proto",
 			},
-			"go.pedge.io/pb/go/google/pubsub/v1",
+			"go.pedge.io/googleapis/google/pubsub/v1",
 		),
 		newGoModifierOptions(
 			"google/pubsub/v1beta2",
 			[]string{
 				"pubsub.proto",
 			},
-			"go.pedge.io/pb/go/google/pubsub/v1beta2",
+			"go.pedge.io/googleapis/google/pubsub/v1beta2",
 		),
 		newGoModifierOptions(
 			"google/rpc",
@@ -129,7 +107,7 @@ var (
 				"error_details.proto",
 				"status.proto",
 			},
-			"go.pedge.io/pb/go/google/rpc",
+			"go.pedge.io/googleapis/google/rpc",
 		),
 		newGoModifierOptions(
 			"google/type",
@@ -141,44 +119,7 @@ var (
 				"money.proto",
 				"timeofday.proto",
 			},
-			"go.pedge.io/pb/go/google/type",
-		),
-		newGoModifierOptions(
-			"pb/common",
-			[]string{
-				"common.proto",
-			},
-			"go.pedge.io/pb/go/pb/common",
-		),
-		newGoModifierOptions(
-			"pb/geo",
-			[]string{
-				"geo.gen.proto",
-				"geo.proto",
-			},
-			"go.pedge.io/pb/go/pb/geo",
-		),
-		newGoModifierOptions(
-			"pb/money",
-			[]string{
-				"money.gen.proto",
-				"money.proto",
-			},
-			"go.pedge.io/pb/go/pb/money",
-		),
-		newGoModifierOptions(
-			"pb/net",
-			[]string{
-				"net.proto",
-			},
-			"go.pedge.io/pb/go/pb/net",
-		),
-		newGoModifierOptions(
-			"pb/phone",
-			[]string{
-				"phone.proto",
-			},
-			"go.pedge.io/pb/go/pb/phone",
+			"go.pedge.io/googleapis/google/type",
 		),
 	)
 
@@ -186,169 +127,9 @@ var (
 		newGoModifierOptions(
 			"google/protobuf",
 			[]string{
-				"any.proto",
-				"api.proto",
-				"duration.proto",
-				"empty.proto",
-				"field_mask.proto",
-				"source_context.proto",
-				"struct.proto",
-				"timestamp.proto",
-				"type.proto",
-				"wrappers.proto",
-			},
-			"go.pedge.io/pb/gogo/google/protobuf",
-		),
-		newGoModifierOptions(
-			"google/protobuf",
-			[]string{
 				"descriptor.proto",
 			},
 			"github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
-		),
-		newGoModifierOptions(
-			"google/api",
-			[]string{
-				"annotations.proto",
-				"http.proto",
-			},
-			"github.com/gengo/grpc-gateway/third_party/googleapis/google/api",
-		),
-		newGoModifierOptions(
-			"google/api",
-			[]string{
-				"label.proto",
-				"monitored_resource.proto",
-			},
-			"go.pedge.io/pb/gogo/google/api",
-		),
-		newGoModifierOptions(
-			"google/datastore/v1beta3",
-			[]string{
-				"datastore.proto",
-				"entity.proto",
-				"query.proto",
-			},
-			"go.pedge.io/pb/gogo/google/datastore/v1beta3",
-		),
-		newGoModifierOptions(
-			"google/devtools/cloudtrace/v1",
-			[]string{
-				"trace.proto",
-			},
-			"go.pedge.io/pb/gogo/google/devtools/cloudtrace/v1",
-		),
-		newGoModifierOptions(
-			"google/example/library/v1",
-			[]string{
-				"library.proto",
-			},
-			"go.pedge.io/pb/gogo/google/example/library/v1",
-		),
-		newGoModifierOptions(
-			"google/iam/v1",
-			[]string{
-				"iam_policy.proto",
-				"policy.proto",
-			},
-			"go.pedge.io/pb/gogo/google/iam/v1",
-		),
-		newGoModifierOptions(
-			"google/logging/type",
-			[]string{
-				"http_request.proto",
-				"log_severity.proto",
-			},
-			"go.pedge.io/pb/gogo/google/logging/type",
-		),
-		newGoModifierOptions(
-			"google/logging/v2",
-			[]string{
-				"log_entry.proto",
-				"logging.proto",
-				"logging_config.proto",
-				"logging_metrics.proto",
-			},
-			"go.pedge.io/pb/gogo/google/logging/v2",
-		),
-		newGoModifierOptions(
-			"google/longrunning",
-			[]string{
-				"operations.proto",
-			},
-			"go.pedge.io/pb/gogo/google/longrunning",
-		),
-		newGoModifierOptions(
-			"google/pubsub/v1",
-			[]string{
-				"pubsub.proto",
-			},
-			"go.pedge.io/pb/gogo/google/pubsub/v1",
-		),
-		newGoModifierOptions(
-			"google/pubsub/v1beta2",
-			[]string{
-				"pubsub.proto",
-			},
-			"go.pedge.io/pb/gogo/google/pubsub/v1beta2",
-		),
-		newGoModifierOptions(
-			"google/rpc",
-			[]string{
-				"code.proto",
-				"error_details.proto",
-				"status.proto",
-			},
-			"go.pedge.io/pb/gogo/google/rpc",
-		),
-		newGoModifierOptions(
-			"google/type",
-			[]string{
-				"color.proto",
-				"date.proto",
-				"dayofweek.proto",
-				"latlng.proto",
-				"money.proto",
-				"timeofday.proto",
-			},
-			"go.pedge.io/pb/gogo/google/type",
-		),
-		newGoModifierOptions(
-			"pb/common",
-			[]string{
-				"common.proto",
-			},
-			"go.pedge.io/pb/gogo/pb/common",
-		),
-		newGoModifierOptions(
-			"pb/geo",
-			[]string{
-				"geo.gen.proto",
-				"geo.proto",
-			},
-			"go.pedge.io/pb/gogo/pb/geo",
-		),
-		newGoModifierOptions(
-			"pb/money",
-			[]string{
-				"money.gen.proto",
-				"money.proto",
-			},
-			"go.pedge.io/pb/gogo/pb/money",
-		),
-		newGoModifierOptions(
-			"pb/net",
-			[]string{
-				"net.proto",
-			},
-			"go.pedge.io/pb/gogo/pb/net",
-		),
-		newGoModifierOptions(
-			"pb/phone",
-			[]string{
-				"phone.proto",
-			},
-			"go.pedge.io/pb/gogo/pb/phone",
 		),
 		newGoModifierOptions(
 			"gogoproto",

@@ -98,8 +98,6 @@ func toCompileOptionsV1(from *FileCompileOptions) (*CompileOptions, error) {
 			to.Ruby = true
 		case "descriptor_set":
 			to.DescriptorSet = true
-		case "letmegrpc":
-			to.Letmegrpc = true
 		default:
 			return nil, fmt.Errorf("protoeasy: unknown plugin: %s", plugin)
 		}
@@ -148,10 +146,6 @@ func toCompileOptionsV1(from *FileCompileOptions) (*CompileOptions, error) {
 	to.DescriptorSetRelOut = from.Options.DescriptorSet.RelOut
 	to.DescriptorSetFileName = from.Options.DescriptorSet.FileName
 	to.DescriptorSetIncludeImports = from.Options.DescriptorSet.IncludeImports
-	to.LetmegrpcRelOut = from.Options.Letmegrpc.RelOut
-	to.LetmegrpcImportPath = from.Options.Letmegrpc.ImportPath
-	to.LetmegrpcNoDefaultModifiers = from.Options.Letmegrpc.NoDefaultModifiers
-	to.LetmegrpcModifiers = from.Options.Letmegrpc.Modifiers
 	// TODO(pedge): this should not be in this function
 	// TODO(pedge): duplicated logic in goPlugin struct
 	if to.NoDefaultIncludes {
