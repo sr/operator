@@ -1,5 +1,3 @@
-/bin
 /doc/TODO*
 /etc/k8s/**/secrets.json
 /tmp
-!/bin/ci
