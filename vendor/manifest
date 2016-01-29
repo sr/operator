@@ -107,6 +107,48 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/descriptor",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/protoc-gen-grpc-gateway/descriptor"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/generator",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/protoc-gen-grpc-gateway/generator"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/gengateway",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/protoc-gen-grpc-gateway/gengateway"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/httprule",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/protoc-gen-grpc-gateway/httprule"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/third_party/googleapis/google/api",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/third_party/googleapis/google/api"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/utilities",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
+			"branch": "master",
+			"path": "/utilities"
+		},
+		{
 			"importpath": "github.com/gin-gonic/gin",
 			"repository": "https://github.com/gin-gonic/gin",
 			"revision": "44978ff780ce235a830f6be7cfde42d350b1484d",
@@ -118,6 +160,174 @@
 			"revision": "8e8823691c88d1c57bd1c91a8f3ae51c8bc015e0",
 			"branch": "master",
 			"path": "/log"
+		},
+		{
+			"importpath": "github.com/gogo/letmegrpc/form",
+			"repository": "https://github.com/gogo/letmegrpc",
+			"revision": "d9e70ab6c48be9a1a130359784b3c26118a8f52c",
+			"branch": "master",
+			"path": "/form"
+		},
+		{
+			"importpath": "github.com/gogo/letmegrpc/html",
+			"repository": "https://github.com/gogo/letmegrpc",
+			"revision": "d9e70ab6c48be9a1a130359784b3c26118a8f52c",
+			"branch": "master",
+			"path": "/html"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/gogoproto",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/gogoproto"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/defaultcheck",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/defaultcheck"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/description",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/description"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/embedcheck",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/embedcheck"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/enumstringer",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/enumstringer"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/equal",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/equal"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/face",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/face"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/gostring",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/gostring"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/grpc",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/grpc"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/marshalto",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/marshalto"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/oneofcheck",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/oneofcheck"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/populate",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/populate"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/size",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/size"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/stringer",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/stringer"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/testgen",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/testgen"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/union",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/union"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/plugin/unmarshal",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/plugin/unmarshal"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/proto",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/proto"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/protoc-gen-gogo/descriptor"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/generator",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/protoc-gen-gogo/generator"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/plugin",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/protoc-gen-gogo/plugin"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/vanity",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
+			"branch": "master",
+			"path": "/vanity"
 		},
 		{
 			"importpath": "github.com/golang/glog",

@@ -59,8 +59,14 @@ message CompileOptions {
   string descriptor_set_file_name = 92;
   bool descriptor_set_include_imports = 93;
 
-  bool operator_hubot = 100;
-  string operator_hubot_out = 101;
+  bool letmegrpc = 100;
+  string letmegrpc_rel_out = 101;
+  string letmegrpc_import_path = 102;
+  bool letmegrpc_no_default_modifiers = 103;
+  map<string, string> letmegrpc_modifiers = 104;
+
+  bool operator_hubot = 110;
+  string operator_hubot_out = 111;
 }
 
 message Command {
