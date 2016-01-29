@@ -73,6 +73,8 @@ var (
 // values passed to Dial.
 type dialOptions struct {
 	codec    Codec
+	cg       CompressorGenerator
+	dg       DecompressorGenerator
 	picker   Picker
 	block    bool
 	insecure bool
@@ -89,6 +91,23 @@ func WithCodec(c Codec) DialOption {
 	}
 }
 
+// WithCompressor returns a DialOption which sets a CompressorGenerator for generating message
+// compressor.
+func WithCompressor(f CompressorGenerator) DialOption {
+	return func(o *dialOptions) {
+		o.cg = f
+	}
+}
+
+// WithDecompressor returns a DialOption which sets a DecompressorGenerator for generating
+// message decompressor.
+func WithDecompressor(f DecompressorGenerator) DialOption {
+	return func(o *dialOptions) {
+		o.dg = f
+	}
+}
+
+// WithPicker returns a DialOption which sets a picker for connection selection.
 func WithPicker(p Picker) DialOption {
 	return func(o *dialOptions) {
 		o.picker = p
@@ -104,6 +123,8 @@ func WithBlock() DialOption {
 	}
 }
 
+// WithInsecure returns a DialOption which disables transport security for this ClientConn.
+// Note that transport security is required unless WithInsecure is set.
 func WithInsecure() DialOption {
 	return func(o *dialOptions) {
 		o.insecure = true

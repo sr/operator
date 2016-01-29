@@ -634,12 +634,6 @@
 			"path": "/time"
 		},
 		{
-			"importpath": "go.pedge.io/protoeasy",
-			"repository": "https://github.com/peter-edge/protoeasy-go",
-			"revision": "ad15dd02ad33d68cfa275e3bf40cd20b10a3c2e5",
-			"branch": "master"
-		},
-		{
 			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
 			"repository": "https://github.com/peter-edge/protoeasy-go",
 			"revision": "ad15dd02ad33d68cfa275e3bf40cd20b10a3c2e5",
