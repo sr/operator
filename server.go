@@ -3,8 +3,6 @@ package operator
 import (
 	"net"
 
-	"go.pedge.io/protolog"
-
 	"github.com/sr/grpcinstrument"
 
 	"google.golang.org/grpc"
@@ -17,14 +15,14 @@ const protocol = "tcp"
 type server struct {
 	server         *grpc.Server
 	config         *Config
-	logger         protolog.Logger
+	logger         Logger
 	instrumentator grpcinstrument.Instrumentator
 }
 
 func newServer(
 	grpcServer *grpc.Server,
 	config *Config,
-	logger protolog.Logger,
+	logger Logger,
 	instrumentator grpcinstrument.Instrumentator,
 ) *server {
 	return &server{
