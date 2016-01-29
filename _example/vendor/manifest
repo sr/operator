@@ -676,7 +676,7 @@
 		{
 			"importpath": "github.com/sr/grpcinstrument",
 			"repository": "https://github.com/sr/grpcinstrument",
-			"revision": "ca6c0e8964a34f1a60d1b43970616bd9f5eefe2b",
+			"revision": "2be68faf50b97c4f2eea58b2b6fb45ff58f17f5a",
 			"branch": "master"
 		},
 		{
