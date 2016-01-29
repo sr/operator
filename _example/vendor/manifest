@@ -603,12 +603,6 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/peter-edge/openflights-go",
-			"repository": "https://github.com/peter-edge/openflights-go",
-			"revision": "3af10b053134fcdba1e02eaa91a528b051b45f38",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/prometheus/client_golang/prometheus",
 			"repository": "https://github.com/prometheus/client_golang",
 			"revision": "67994f177195311c3ea3d4407ed0175e34a4256f",
@@ -857,13 +851,6 @@
 			"repository": "https://github.com/peter-edge/protoeasy-go",
 			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
 			"branch": "master"
-		},
-		{
-			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
-			"repository": "https://github.com/peter-edge/protoeasy-go",
-			"revision": "64acb3be109aa4548f534579248db3aa86702ce5",
-			"branch": "master",
-			"path": "/cmd/protoeasy"
 		},
 		{
 			"importpath": "golang.org/x/crypto/curve25519",
