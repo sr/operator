@@ -16,9 +16,11 @@
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
 #   hubot catbongos - Like, far out, man...
+#   hubot cookiecakes - They see me roooolllin'.... They hungryyyyy.... 
 #   hubot headdesk - Get headdesk.gif
 #   hubot hater - They gonna hate
 #   hubot panic - PANIC!1!1!!!
+#   hubot elmo - ...elmo
 #   hubot jarsh - jarsh
 #   hubot kyle - kyle
 #   hubot nippon - nippon
@@ -68,6 +70,9 @@
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /cookiecakes$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/233/RdkTKW0cD8dGQ2e/ezgif.com-add-text.gif"
+
   robot.respond /elmo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/YTCOYslSLDAuTGx/ElmoStop.jpg"
 
