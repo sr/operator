@@ -853,6 +853,13 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
+			"repository": "https://github.com/peter-edge/protoeasy-go",
+			"revision": "ad15dd02ad33d68cfa275e3bf40cd20b10a3c2e5",
+			"branch": "master",
+			"path": "/cmd/protoeasy"
+		},
+		{
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"revision": "f23ba3a5ee43012fcb4b92e1a2a405a92554f4f2",
