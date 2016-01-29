@@ -1,0 +1,15 @@
+package example;
+
+option java_package = "com.pedge.example";
+
+message Request {
+  optional int64 i = 1;
+}
+
+message Response {
+  optional int64 i = 1;
+}
+
+service API {
+  rpc Do(Request) returns (Response);
+}
