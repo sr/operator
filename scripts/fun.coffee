@@ -392,6 +392,7 @@ module.exports = (robot) ->
   robot.respond /catbongos$/i, (msg) ->
     why_cats_playing_bongos_of_course=[
       'http://media2.giphy.com/media/c57rkrOxZGfTi/giphy.gif',
+      'https://media3.giphy.com/media/dAmyloqasB48E/200.gif',
       'http://i.imgur.com/Xa31J4O.gif.png',
       'http://media2.giphy.com/media/3BVbN30qgZZvO/giphy.gif',
       'http://media3.giphy.com/media/11tyQ1rFQuNGrS/giphy.gif'
@@ -403,7 +404,6 @@ module.exports = (robot) ->
       'http://media4.giphy.com/media/EeIzKI0uDz916/giphy.gif',
       'http://media2.giphy.com/media/YOvJuai8jPGpO/giphy.gif',
       'http://media4.giphy.com/media/ToMjGpqWojvqz7ts2li/giphy.gif',
-      'https://media3.giphy.com/media/dAmyloqasB48E/200.gif',
       'http://media3.giphy.com/media/lcmYVxHTvkOLC/giphy.gif'
     ]
     msg.send msg.random TLDRS
