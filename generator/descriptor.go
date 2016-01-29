@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 
-	"operator"
+	"github.com/sr/operator"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {

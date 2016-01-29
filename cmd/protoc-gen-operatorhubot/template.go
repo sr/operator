@@ -1,6 +1,6 @@
 package main
 
-import "generator"
+import "github.com/sr/operator/generator"
 
 var template = generator.NewTemplate("script.coffee",
 	`# Description:
