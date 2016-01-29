@@ -7,12 +7,12 @@ module StormEnvModule
   PROC_KILL_WAIT_TIME = 45
   STORM_BIN = '/opt/storm/current/bin/storm'
 
-  def load_topology(topo)
+  def load_topology(topo, jar)
     if active?(topo)
       remove_topology(topo)
       sleep PROC_KILL_WAIT_TIME + 2
     end
-    add_topology(topo)
+    add_topology(topo, jar)
   end
 
   private
@@ -34,8 +34,8 @@ module StormEnvModule
     is_active == 1
   end
 
-  def add_topology(topo)
-    ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{environment.payload.current_link} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
+  def add_topology(topo, jar)
+    ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
   end
 
 end

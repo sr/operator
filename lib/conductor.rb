@@ -33,14 +33,6 @@ class Conductor
       environment.execute_post_deploy_hooks(deploy)
     end
 
-    ## Option Based Deployment Actions
-    if !deploy['options'].nil?
-      ## BREAD-215: Topology Deployment
-      if !deploy['options']['topology'].nil?
-        environment.deploy_topology(deploy['options']['topology'])
-      end
-    end
-
     success
   end
 

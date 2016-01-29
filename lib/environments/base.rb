@@ -210,7 +210,7 @@ module Environments
     end
 
     def deploy_topology(topo)
-      StormEnvModule.load_topology(topo)
+      StormEnvModule.load_topology(topo, payload.current_link)
     end
 
     def restart_upstart_job(job)
