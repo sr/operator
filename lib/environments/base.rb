@@ -210,10 +210,10 @@ module Environments
     end
 
     def deploy_topology
-      if !deploy.options['topology'].nil?
-        StormEnvModule.load_topology(deploy.options['topology'], payload.current_link)
-      else
+      if deploy.options['topology'].nil?
         Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+      else
+        StormEnvModule.load_topology(deploy.options['topology'], payload.current_link)
       end
     end
 
