@@ -1,42 +1,25 @@
-GB = $(GOBIN)/gb
-GBVENDOR = bin/gb-vendor
-GOLINT = bin/golint
-ERRCHECK = bin/errcheck
+export GO15VENDOREXPERIMENT := 1
 
-$(GB):
-	go get github.com/constabulary/gb/...
+build:
+	go build -v ./cmd/...
 
-$(GBVENDOR): $(GB)
-	$< build github.com/constabulary/gb/cmd/gb-vendor
-
-$(GOLINT): $(GB)
-	$< build github.com/golang/lint/golint
-
-$(ERRCHECK): $(GB)
-	$< build github.com/kisielk/errcheck
-
-build: $(GB)
-	$< build all
+install:
+	go install -v ./cmd/...
 
 lint: $(GOLINT)
-	go get github.com/golang/lint/golint
-	@ for file in $$(find src -name '*.go'); do \
-		bin/golint-custom $${file}; \
-		failure=false; \
-		test -n "$$(bin/golint-custom $${file})" && failure=true; \
-	  done; \
-	  if $$failure; \
-	  then exit 1; \
-	  fi
+	golint *.go | grep -v '\.pb\.go'
+	golint cmd/**/*.go
+	golint generator/*.go
 
 vet:
-	go vet ./src/...
+	go vet ./...
 
-errcheck: $(ERRCHECK)
-	$< ./src/...
+errcheck:
+	errcheck ./...
 
 .PHONY: \
 	build \
+	install \
 	lint \
 	vet \
 	errcheck \
