@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DefaultBinaryName       = "github.com/sr/operator"
+	DefaultBinaryName       = "operator"
 	undocumentedPlaceholder = "Undocumented."
 )
 

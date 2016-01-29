@@ -1,0 +1,26 @@
+version: v1
+dir: example/complete
+plugins:
+  - grpc
+  - grpc_gateway
+  - cpp
+  - csharp
+  - go
+  - gogo
+  - objc
+  - python
+  - ruby
+options:
+  cpp:
+    rel_out: cpp
+  csharp:
+    rel_out: csharp
+  go:
+    rel_out: go
+    import_path: go.pedge.io/protoeasy/_example-out/complete/go
+  objc:
+    rel_out: objc
+  python:
+    rel_out: python
+  ruby:
+    rel_out: ruby

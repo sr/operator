@@ -3,7 +3,7 @@ package prototime // import "go.pedge.io/proto/time"
 import (
 	"time"
 
-	"go.pedge.io/google-protobuf"
+	"go.pedge.io/pb/go/google/protobuf"
 )
 
 // TimeToTimestamp converts a go Time to a protobuf Timestamp.

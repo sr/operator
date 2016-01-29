@@ -6,8 +6,6 @@ https://github.com/go-kit/kit
 package kitlion // import "go.pedge.io/lion/kit"
 
 import (
-	"fmt"
-
 	"go.pedge.io/lion"
 
 	"github.com/go-kit/kit/log"
@@ -32,13 +30,6 @@ func newLogger(l lion.Logger) *logger {
 }
 
 func (l *logger) Log(keyvals ...interface{}) error {
-	if len(keyvals)%2 != 0 {
-		keyvals = append(keyvals, "MISSING")
-	}
-	fields := make(map[string]interface{}, len(keyvals)/2)
-	for i := 0; i < len(keyvals); i += 2 {
-		fields[fmt.Sprintf("%v", keyvals[i])] = keyvals[i+1]
-	}
-	l.l.WithFields(fields).Println()
+	l.l.WithKeyValues(keyvals...).Println()
 	return nil
 }

@@ -1,13 +1,19 @@
 package operator
 
 import (
+	"github.com/golang/protobuf/proto"
 	"github.com/sr/grpcinstrument"
 	"github.com/sr/grpcinstrument/promeasurer"
-	"github.com/sr/grpcinstrument/protologger"
 	"go.pedge.io/env"
-	"go.pedge.io/protolog"
 	"google.golang.org/grpc"
 )
+
+type Logger interface {
+	Init() error
+	Log(*grpcinstrument.Call)
+	Info(proto.Message)
+	Error(proto.Message)
+}
 
 type Server interface {
 	LogServiceRegistered(service string)
@@ -30,7 +36,7 @@ func NewConfigFromEnv() (*Config, error) {
 func NewServer(
 	server *grpc.Server,
 	config *Config,
-	logger protolog.Logger,
+	logger Logger,
 	instrumentator grpcinstrument.Instrumentator,
 ) Server {
 	return newServer(
@@ -41,13 +47,13 @@ func NewServer(
 	)
 }
 
-func NewLogger() protolog.Logger {
-	return protolog.DefaultLogger
+func NewLogger() Logger {
+	return newLogger()
 }
 
-func NewInstrumentator(logger protolog.Logger) grpcinstrument.Instrumentator {
+func NewInstrumentator(logger Logger) grpcinstrument.Instrumentator {
 	return grpcinstrument.NewLoggerMeasurer(
-		protologger.NewLogger(logger),
+		logger,
 		promeasurer.NewMeasurer(),
 	)
 }

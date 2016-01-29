@@ -3,7 +3,7 @@
 // DO NOT EDIT!
 
 /*
-Package google_protobuf_compiler is a generated protocol buffer package.
+Package plugin_go is a generated protocol buffer package.
 
 It is generated from these files:
 	plugin.proto
@@ -12,7 +12,7 @@ It has these top-level messages:
 	CodeGeneratorRequest
 	CodeGeneratorResponse
 */
-package google_protobuf_compiler
+package plugin_go
 
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
@@ -185,4 +185,10 @@ func (m *CodeGeneratorResponse_File) GetContent() string {
 		return *m.Content
 	}
 	return ""
+}
+
+func init() {
+	proto.RegisterType((*CodeGeneratorRequest)(nil), "google.protobuf.compiler.CodeGeneratorRequest")
+	proto.RegisterType((*CodeGeneratorResponse)(nil), "google.protobuf.compiler.CodeGeneratorResponse")
+	proto.RegisterType((*CodeGeneratorResponse_File)(nil), "google.protobuf.compiler.CodeGeneratorResponse.File")
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 
-	"github.com/sr/operator"
+	"github.com/sr/operator/proto"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -50,7 +50,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			if service.Options == nil {
 				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
 			}
-			name, err := proto.GetExtension(service.Options, operator.E_Name)
+			name, err := proto.GetExtension(service.Options, operatorproto.E_Name)
 			if err != nil {
 				return nil, err
 			}

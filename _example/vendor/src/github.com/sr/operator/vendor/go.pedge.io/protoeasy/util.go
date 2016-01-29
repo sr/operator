@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"go.pedge.io/lion/proto"
 	"go.pedge.io/pkg/exec"
-	"go.pedge.io/protolog"
 
 	"github.com/docker/docker/pkg/archive"
 )
@@ -163,7 +163,7 @@ func getGoPath() (string, error) {
 	}
 	split := strings.Split(goPath, ":")
 	if len(split) > 1 {
-		protolog.Warnf("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
+		protolion.Warnf("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
 		return split[0], nil
 	}
 	return goPath, nil

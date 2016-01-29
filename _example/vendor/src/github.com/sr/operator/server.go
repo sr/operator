@@ -3,11 +3,11 @@ package operator
 import (
 	"net"
 
-	"go.pedge.io/protolog"
-
 	"github.com/sr/grpcinstrument"
 
 	"google.golang.org/grpc"
+
+	"github.com/sr/operator/proto"
 )
 
 const protocol = "tcp"
@@ -15,14 +15,14 @@ const protocol = "tcp"
 type server struct {
 	server         *grpc.Server
 	config         *Config
-	logger         protolog.Logger
+	logger         Logger
 	instrumentator grpcinstrument.Instrumentator
 }
 
 func newServer(
 	grpcServer *grpc.Server,
 	config *Config,
-	logger protolog.Logger,
+	logger Logger,
 	instrumentator grpcinstrument.Instrumentator,
 ) *server {
 	return &server{
@@ -36,25 +36,25 @@ func newServer(
 func (s *server) Serve() error {
 	listener, err := net.Listen(protocol, s.config.Address)
 	if err != nil {
-		s.logger.Error(&ServerStartupError{err.Error()})
+		s.logger.Error(&operatorproto.ServerStartupError{err.Error()})
 		return err
 	}
-	s.logger.Info(&ServerStartupNotice{Address: s.config.Address, Protocol: protocol})
+	s.logger.Info(&operatorproto.ServerStartupNotice{Address: s.config.Address, Protocol: protocol})
 	err = s.server.Serve(listener)
 	if err != nil {
-		s.logger.Error(&ServerStartupError{err.Error()})
+		s.logger.Error(&operatorproto.ServerStartupError{err.Error()})
 		return err
 	}
 	return nil
 }
 
 func (s *server) LogServiceRegistered(serviceName string) {
-	s.logger.Info(&ServiceRegistered{&Service{Name: serviceName}})
+	s.logger.Info(&operatorproto.ServiceRegistered{&operatorproto.Service{Name: serviceName}})
 }
 
 func (s *server) LogServiceStartupError(serviceName string, err error) {
-	s.logger.Error(&ServiceStartupError{
-		Service: &Service{
+	s.logger.Error(&operatorproto.ServiceStartupError{
+		Service: &operatorproto.Service{
 			Name: serviceName,
 		},
 		Message: err.Error(),
