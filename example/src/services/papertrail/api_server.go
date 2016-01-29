@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"operator"
+	"github.com/sr/operator/src/operator"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
