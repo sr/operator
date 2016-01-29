@@ -15,6 +15,7 @@
 #   hubot visualstudio - Get lawlz
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
+#   hubot catbongos - Like, far out, man...
 #   hubot headdesk - Get headdesk.gif
 #   hubot hater - They gonna hate
 #   hubot panic - PANIC!1!1!!!
@@ -387,6 +388,16 @@ module.exports = (robot) ->
 
   robot.respond /nope$/i, (msg) ->
     msg.send "http://media.giphy.com/media/b4pPnoO1QDd1C/giphy.gif"
+
+  robot.respond /catbongos$/i, (msg) ->
+    why_cats_playing_bongos_of_course=[
+      'http://media2.giphy.com/media/c57rkrOxZGfTi/giphy.gif',
+      'https://media3.giphy.com/media/dAmyloqasB48E/200.gif',
+      'http://i.imgur.com/Xa31J4O.gif.png',
+      'http://media2.giphy.com/media/3BVbN30qgZZvO/giphy.gif',
+      'http://media3.giphy.com/media/11tyQ1rFQuNGrS/giphy.gif'
+    ]
+    msg.send msg.random why_cats_playing_bongos_of_course
 
   robot.respond /(tldr|tl;dr)$/i, (msg) ->
     TLDRS=[
