@@ -75,6 +75,7 @@ func resetHooks() {
 type serverTesterOpt string
 
 var optOnlyServer = serverTesterOpt("only_server")
+var optQuiet = serverTesterOpt("quiet_logging")
 
 func newServerTester(t testing.TB, handler http.HandlerFunc, opts ...interface{}) *serverTester {
 	resetHooks()
@@ -89,7 +90,7 @@ func newServerTester(t testing.TB, handler http.HandlerFunc, opts ...interface{}
 		NextProtos: []string{NextProtoTLS, "h2-14"},
 	}
 
-	onlyServer := false
+	var onlyServer, quiet bool
 	for _, opt := range opts {
 		switch v := opt.(type) {
 		case func(*tls.Config):
@@ -97,7 +98,12 @@ func newServerTester(t testing.TB, handler http.HandlerFunc, opts ...interface{}
 		case func(*httptest.Server):
 			v(ts)
 		case serverTesterOpt:
-			onlyServer = (v == optOnlyServer)
+			switch v {
+			case optOnlyServer:
+				onlyServer = true
+			case optQuiet:
+				quiet = true
+			}
 		default:
 			t.Fatalf("unknown newServerTester option type %T", v)
 		}
@@ -116,7 +122,11 @@ func newServerTester(t testing.TB, handler http.HandlerFunc, opts ...interface{}
 	st.hpackDec = hpack.NewDecoder(initialHeaderTableSize, st.onHeaderField)
 
 	ts.TLS = ts.Config.TLSConfig // the httptest.Server has its own copy of this TLS config
-	ts.Config.ErrorLog = log.New(io.MultiWriter(stderrv(), twriter{t: t, st: st}, logBuf), "", log.LstdFlags)
+	if quiet {
+		ts.Config.ErrorLog = log.New(ioutil.Discard, "", 0)
+	} else {
+		ts.Config.ErrorLog = log.New(io.MultiWriter(stderrv(), twriter{t: t, st: st}, logBuf), "", log.LstdFlags)
+	}
 	ts.StartTLS()
 
 	if VerboseLogs {
@@ -834,6 +844,30 @@ func TestServer_Request_Reject_CapitalHeader(t *testing.T) {
 	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("UPPER", "v") })
 }
 
+func TestServer_Request_Reject_HeaderFieldNameColon(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("has:colon", "v") })
+}
+
+func TestServer_Request_Reject_HeaderFieldNameNULL(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("has\x00null", "v") })
+}
+
+func TestServer_Request_Reject_HeaderFieldNameEmpty(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("", "v") })
+}
+
+func TestServer_Request_Reject_HeaderFieldValueNewline(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("foo", "has\nnewline") })
+}
+
+func TestServer_Request_Reject_HeaderFieldValueCR(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("foo", "has\rcarriage") })
+}
+
+func TestServer_Request_Reject_HeaderFieldValueDEL(t *testing.T) {
+	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1("foo", "has\x7fdel") })
+}
+
 func TestServer_Request_Reject_Pseudo_Missing_method(t *testing.T) {
 	testRejectRequest(t, func(st *serverTester) { st.bodylessReq1(":method", "") })
 }
@@ -982,6 +1016,10 @@ func TestServer_Ping(t *testing.T) {
 }
 
 func TestServer_RejectsLargeFrames(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("see golang.org/issue/13434")
+	}
+
 	st := newServerTester(t, nil)
 	defer st.Close()
 	st.greet()
@@ -1120,8 +1158,9 @@ func TestServer_RSTStream_Unblocks_Read(t *testing.T) {
 			}
 		},
 		func(err error) {
-			if err == nil {
-				t.Error("unexpected nil error from Request.Body.Read")
+			want := StreamError{StreamID: 0x1, Code: 0x8}
+			if !reflect.DeepEqual(err, want) {
+				t.Errorf("Read error = %v; want %v", err, want)
 			}
 		},
 	)

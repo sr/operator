@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc"
 
 	"go.pedge.io/env"
+	"go.pedge.io/lion/proto"
 	"go.pedge.io/pkg/cobra"
 	"go.pedge.io/protoeasy"
-	"go.pedge.io/protolog"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -27,6 +27,7 @@ type options struct {
 	GoPluginType           string
 	GogoModifiers          []string
 	GogoPluginType         string
+	LetmegrpcModifiers     []string
 	OutDirPath             string
 	NoFileCompileOptions   bool
 	FileCompileOptionsPath string
@@ -59,7 +60,7 @@ func do(appEnvObj interface{}) error {
 						return err
 					}
 				} else {
-					protolog.Infof("Using protoeasy options file at %s", fileCompileOptionsPath)
+					protolion.Infof("Using protoeasy options file at %s", fileCompileOptionsPath)
 					fileCompileOptions, err := protoeasy.ParseFileCompileOptions(fileCompileOptionsPath)
 					if err != nil {
 						return err
@@ -80,17 +81,17 @@ func do(appEnvObj interface{}) error {
 			if dirPath == "" {
 				return fmt.Errorf("Directory path to base protoeasy compile must either be the first argument if no protoeasy options file found (usually %s)", protoeasy.DefaultFileCompileOptionsFile)
 			}
-			protolog.Infof("Using input directory %s", dirPath)
+			protolion.Infof("Using input directory %s", dirPath)
 			outDirPath := dirPath
 			if options.OutDirPath != "" {
 				outDirPath = options.OutDirPath
 			}
-			protolog.Infof("Using output directory %s", outDirPath)
+			protolion.Infof("Using output directory %s", outDirPath)
 			data, err := json.Marshal(compileOptions)
 			if err != nil {
 				return err
 			}
-			protolog.Infof("Using compile options %s", string(data))
+			protolion.Infof("Using compile options %s", string(data))
 			pkgcobra.Check(run(appEnv, dirPath, outDirPath, compileOptions))
 			return nil
 		}),
@@ -272,6 +273,31 @@ func bindCompileOptions(flagSet *pflag.FlagSet, compileOptions *protoeasy.Compil
 		false,
 		"Pass --include_imports to protoc.",
 	)
+
+	flagSet.BoolVar(
+		&compileOptions.Letmegrpc,
+		"letmegrpc",
+		false,
+		"Output letmegrpc files.",
+	)
+	flagSet.StringVar(
+		&compileOptions.LetmegrpcRelOut,
+		"letmegrpc-rel-out",
+		"",
+		"The directory, relative to the output directory, to output letmegrpc files.",
+	)
+	flagSet.StringVar(
+		&compileOptions.LetmegrpcImportPath,
+		"letmegrpc-import-path",
+		"",
+		"Letmegrpc package.",
+	)
+	flagSet.BoolVar(
+		&compileOptions.LetmegrpcNoDefaultModifiers,
+		"letmegrpc-no-default-modifiers",
+		false,
+		"Do not set the default Mfile=package modifiers for --letmegrpc_out.",
+	)
 }
 
 func bindOptions(flagSet *pflag.FlagSet, options *options) {
@@ -298,6 +324,12 @@ func bindOptions(flagSet *pflag.FlagSet, options *options) {
 		"gogo-plugin",
 		"gogofast",
 		fmt.Sprintf("The gogo protoc plugin to use, allowed values are %s.", strings.Join(protoeasy.AllGogoPluginTypeSimpleStrings(), ",")),
+	)
+	flagSet.StringSliceVar(
+		&options.LetmegrpcModifiers,
+		"letmegrpc-modifier",
+		[]string{},
+		"Extra Mfile=package modifiers for --letmegrpc_out, specify just as file=package to this flag.",
 	)
 	flagSet.StringVar(
 		&options.OutDirPath,
@@ -350,6 +382,11 @@ func optionsToCompileOptions(options *options, compileOptions *protoeasy.Compile
 		return err
 	}
 	compileOptions.GogoModifiers = gogoModifiers
+	letmegrpcModifiers, err := getModifiers(options.LetmegrpcModifiers)
+	if err != nil {
+		return err
+	}
+	compileOptions.LetmegrpcModifiers = letmegrpcModifiers
 	// TODO(pedge): this should not be in this function
 	// TODO(pedge): duplicated logic in goPlugin struct
 	if compileOptions.NoDefaultIncludes {
@@ -392,7 +429,7 @@ func run(appEnv *appEnv, dirPath string, outDirPath string, compileOptions *prot
 	}
 	for _, command := range commands {
 		if len(command.Arg) > 0 {
-			protolog.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+			protolion.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
 		}
 	}
 	return nil

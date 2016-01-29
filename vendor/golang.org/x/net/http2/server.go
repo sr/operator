@@ -48,6 +48,8 @@ import (
 	"net/http"
 	"net/textproto"
 	"net/url"
+	"os"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -482,12 +484,55 @@ func (sc *serverConn) logf(format string, args ...interface{}) {
 	}
 }
 
+// errno returns v's underlying uintptr, else 0.
+//
+// TODO: remove this helper function once http2 can use build
+// tags. See comment in isClosedConnError.
+func errno(v error) uintptr {
+	if rv := reflect.ValueOf(v); rv.Kind() == reflect.Uintptr {
+		return uintptr(rv.Uint())
+	}
+	return 0
+}
+
+// isClosedConnError reports whether err is an error from use of a closed
+// network connection.
+func isClosedConnError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// TODO: remove this string search and be more like the Windows
+	// case below. That might involve modifying the standard library
+	// to return better error types.
+	str := err.Error()
+	if strings.Contains(str, "use of closed network connection") {
+		return true
+	}
+
+	// TODO(bradfitz): x/tools/cmd/bundle doesn't really support
+	// build tags, so I can't make an http2_windows.go file with
+	// Windows-specific stuff. Fix that and move this, once we
+	// have a way to bundle this into std's net/http somehow.
+	if runtime.GOOS == "windows" {
+		if oe, ok := err.(*net.OpError); ok && oe.Op == "read" {
+			if se, ok := oe.Err.(*os.SyscallError); ok && se.Syscall == "wsarecv" {
+				const WSAECONNABORTED = 10053
+				const WSAECONNRESET = 10054
+				if n := errno(se.Err); n == WSAECONNRESET || n == WSAECONNABORTED {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 func (sc *serverConn) condlogf(err error, format string, args ...interface{}) {
 	if err == nil {
 		return
 	}
-	str := err.Error()
-	if err == io.EOF || strings.Contains(str, "use of closed network connection") {
+	if err == io.EOF || err == io.ErrUnexpectedEOF || isClosedConnError(err) {
 		// Boring, expected errors.
 		sc.vlogf(format, args...)
 	} else {
@@ -501,7 +546,7 @@ func (sc *serverConn) onNewHeaderField(f hpack.HeaderField) {
 		sc.vlogf("http2: server decoded %v", f)
 	}
 	switch {
-	case !validHeader(f.Name):
+	case !validHeaderFieldValue(f.Value): // f.Name checked _after_ pseudo check, since ':' is invalid
 		sc.req.invalidHeader = true
 	case strings.HasPrefix(f.Name, ":"):
 		if sc.req.sawRegularHeader {
@@ -535,6 +580,8 @@ func (sc *serverConn) onNewHeaderField(f hpack.HeaderField) {
 			return
 		}
 		*dst = f.Value
+	case !validHeaderFieldName(f.Name):
+		sc.req.invalidHeader = true
 	default:
 		sc.req.sawRegularHeader = true
 		sc.req.header.Add(sc.canonicalHeader(f.Name), f.Value)
@@ -553,10 +600,10 @@ func (st *stream) onNewTrailerField(f hpack.HeaderField) {
 		sc.vlogf("http2: server decoded trailer %v", f)
 	}
 	switch {
-	case !validHeader(f.Name):
+	case strings.HasPrefix(f.Name, ":"):
 		sc.req.invalidHeader = true
 		return
-	case strings.HasPrefix(f.Name, ":"):
+	case !validHeaderFieldName(f.Name) || !validHeaderFieldValue(f.Value):
 		sc.req.invalidHeader = true
 		return
 	default:
@@ -1029,7 +1076,7 @@ func (sc *serverConn) processFrameFromReader(res readFrameResult) bool {
 			sc.goAway(ErrCodeFrameSize)
 			return true // goAway will close the loop
 		}
-		clientGone := err == io.EOF || strings.Contains(err.Error(), "use of closed network connection")
+		clientGone := err == io.EOF || err == io.ErrUnexpectedEOF || isClosedConnError(err)
 		if clientGone {
 			// TODO: could we also get into this state if
 			// the peer does a half close
@@ -1065,7 +1112,7 @@ func (sc *serverConn) processFrameFromReader(res readFrameResult) bool {
 		return true // goAway will handle shutdown
 	default:
 		if res.err != nil {
-			sc.logf("http2: server closing client connection; error reading frame from client %s: %v", sc.conn.RemoteAddr(), err)
+			sc.vlogf("http2: server closing client connection; error reading frame from client %s: %v", sc.conn.RemoteAddr(), err)
 		} else {
 			sc.logf("http2: server closing client connection: %v", err)
 		}

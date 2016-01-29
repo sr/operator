@@ -8,13 +8,13 @@ import (
 
 var (
 	levelToLogFunc = map[lion.Level]func(*syslog.Writer, string) error{
-		lion.LevelNone:  (*syslog.Writer).Info,
 		lion.LevelDebug: (*syslog.Writer).Debug,
 		lion.LevelInfo:  (*syslog.Writer).Info,
 		lion.LevelWarn:  (*syslog.Writer).Warning,
 		lion.LevelError: (*syslog.Writer).Err,
 		lion.LevelFatal: (*syslog.Writer).Crit,
 		lion.LevelPanic: (*syslog.Writer).Alert,
+		lion.LevelNone:  (*syslog.Writer).Info,
 	}
 )
 

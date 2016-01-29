@@ -73,6 +73,36 @@ func TestCannotParse(t *testing.T) {
 	)
 }
 
+type keyValueEnv struct {
+	KeyValue string `env:"KEY_VALUE,default=a=b,c=d"`
+}
+
+func TestKeyValueDefault(t *testing.T) {
+	keyValueEnv := &keyValueEnv{}
+	if err := Populate(keyValueEnv); err != nil {
+		t.Error(err)
+		return
+	}
+	checkEqual(t, "a=b,c=d", keyValueEnv.KeyValue)
+}
+
+func TestKeyValue(t *testing.T) {
+	setEnv(
+		t,
+		map[string]string{
+			"KEY_VALUE": "b=a,c=e,e=f,g=h",
+		},
+		func(t *testing.T) {
+			keyValueEnv := &keyValueEnv{}
+			if err := Populate(keyValueEnv); err != nil {
+				t.Error(err)
+				return
+			}
+			checkEqual(t, "b=a,c=e,e=f,g=h", keyValueEnv.KeyValue)
+		},
+	)
+}
+
 func runTest(t *testing.T, f func(*testing.T, *testEnv), env map[string]string, envFiles ...string) {
 	runTestLong(t, "", f, env, envFiles...)
 }
@@ -93,6 +123,37 @@ func runTestLong(t *testing.T, expectedError string, f func(*testing.T, *testEnv
 			t.Fatalf("unknown suffix for file name: %s", envFile)
 		}
 	}
+	setEnv(
+		t,
+		env,
+		func(t *testing.T) {
+			testEnv := &testEnv{}
+			err := Populate(
+				testEnv,
+				decoders...,
+			)
+			if err != nil && expectedError == "" {
+				t.Error(err)
+				return
+			}
+			if err != nil && expectedError != "" {
+				if !strings.HasPrefix(err.Error(), expectedError) {
+					t.Errorf("expected error type %s, got error %s", expectedError, err.Error())
+					return
+				}
+			}
+			if err == nil && expectedError != "" {
+				t.Errorf("expected error %s, but no error", expectedError)
+				return
+			}
+			if f != nil {
+				f(t, testEnv)
+			}
+		},
+	)
+}
+
+func setEnv(t *testing.T, env map[string]string, f func(t *testing.T)) {
 	originalEnv := make(map[string]string)
 	for key, value := range env {
 		originalEnv[key] = os.Getenv(key)
@@ -103,28 +164,7 @@ func runTestLong(t *testing.T, expectedError string, f func(*testing.T, *testEnv
 			_ = os.Setenv(key, value)
 		}
 	}()
-	testEnv := &testEnv{}
-	err := Populate(
-		testEnv,
-		decoders...,
-	)
-	if err != nil && expectedError == "" {
-		t.Error(err)
-		return
-	}
-	if err != nil && expectedError != "" {
-		if !strings.HasPrefix(err.Error(), expectedError) {
-			t.Errorf("expected error type %s, got error %s", expectedError, err.Error())
-			return
-		}
-	}
-	if err == nil && expectedError != "" {
-		t.Errorf("expected error %s, but no error", expectedError)
-		return
-	}
-	if f != nil {
-		f(t, testEnv)
-	}
+	f(t)
 }
 
 func getTestReader(t *testing.T, filePath string) io.Reader {

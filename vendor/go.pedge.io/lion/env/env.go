@@ -19,7 +19,7 @@ import (
 // Env defines a struct for environment variables that can be parsed with go.pedge.io/env.
 type Env struct {
 	// The log app name, will default to app if not set.
-	LogAppName string `env:"LOG_APP_NAME"`
+	LogAppName string `env:"LOG_APP_NAME,default=app"`
 	// The level to log at, must be one of DEBUG, INFO, WARN, ERROR, FATAL, PANIC.
 	LogLevel string `env:"LOG_LEVEL"`
 	// LogDisableStderr says to disable logging to stderr.

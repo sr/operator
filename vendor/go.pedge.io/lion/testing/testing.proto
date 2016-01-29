@@ -31,3 +31,7 @@ message Baz {
 }
 
 message Empty {}
+
+message NoStdJson {
+  map<uint64, string> one = 1;
+}
