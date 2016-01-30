@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sr/operator"
+	"github.com/sr/operator/proto"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
@@ -46,6 +47,6 @@ func (s *apiServer) Search(
 	}
 	return &SearchResponse{
 		Objects: logEvents,
-		Output:  &operator.Output{PlainText: output.String()},
+		Output:  &operatorproto.Output{PlainText: output.String()},
 	}, nil
 }

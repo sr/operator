@@ -12,6 +12,7 @@ import (
 	"github.com/jmcvetta/randutil"
 
 	"github.com/sr/operator"
+	"github.com/sr/operator/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
@@ -88,7 +89,7 @@ func (s *apiServer) CreateContainerCluster(
 		return nil, err
 	}
 	return &CreateContainerClusterResponse{
-		Output: &operator.Output{PlainText: operation.SelfLink},
+		Output: &operatorproto.Output{PlainText: operation.SelfLink},
 	}, nil
 }
 
@@ -135,6 +136,6 @@ func (s *apiServer) ListInstances(
 
 	return &ListInstancesResponse{
 		Objects: instances,
-		Output:  &operator.Output{PlainText: output.String()},
+		Output:  &operatorproto.Output{PlainText: output.String()},
 	}, nil
 }

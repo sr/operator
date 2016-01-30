@@ -7,8 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/sr/operator"
-
+	"github.com/sr/operator/proto"
 	buildkiteapi "github.com/wolfeidau/go-buildkite/buildkite"
 	"golang.org/x/net/context"
 )
@@ -53,7 +52,7 @@ func (s *apiServer) Status(
 	}
 	w.Flush()
 	return &StatusResponse{
-		Output: &operator.Output{
+		Output: &operatorproto.Output{
 			PlainText: output.String(),
 		},
 	}, nil
@@ -100,7 +99,7 @@ func (s *apiServer) ListBuilds(
 	}
 	w.Flush()
 	return &ListBuildsResponse{
-		Output: &operator.Output{
+		Output: &operatorproto.Output{
 			PlainText: output.String(),
 		},
 	}, nil

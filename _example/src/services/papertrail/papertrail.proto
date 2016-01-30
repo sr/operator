@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "operator/operator.proto";
+import "operator.proto";
 
 package papertrail;
 
