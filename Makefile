@@ -31,6 +31,17 @@ operatord-dev: $(OPERATORD)
 
 proto: build proto-grpc proto-cmd proto-hubot proto-operatord
 
+example-vendor:
+	rm -rf _example/vendor/src/github.com/sr/operator
+	for file in $$(gvt list -f "{{.Importpath}}"); do \
+		rm -rf _example/vendor/src/$$file; \
+	done
+	cp -r vendor/* _example/vendor/src/
+	mkdir -p  _example/vendor/src/github.com/sr/operator
+	cp -r *.go cmd proto  _example/vendor/src/github.com/sr/operator
+	git add -A _example/vendor/src _example/vendor/src/github.com/sr/operator
+	git add -u _example/vendor/src _example/vendor/src/github.com/sr/operator
+
 proto-cmd: $(PROTOC_GEN_OPERATORCMD)
 	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
 	@ gofmt -s -w src/cmd/operator
