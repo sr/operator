@@ -483,6 +483,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/serenize/snaker",
+			"repository": "https://github.com/serenize/snaker",
+			"revision": "d88cc11617e4f179fa2c821a60908d5fabd7bdad",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/spf13/cast",
 			"repository": "https://github.com/spf13/cast",
 			"revision": "ee7b3e0353166ab1f3a605294ac8cd2b77953778",
