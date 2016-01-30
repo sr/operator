@@ -99,7 +99,6 @@ func TestTransport(t *testing.T) {
 	} else if string(slurp) != body {
 		t.Errorf("Body = %q; want %q", slurp, body)
 	}
-
 }
 
 func TestTransportReusesConns(t *testing.T) {
@@ -332,14 +331,19 @@ var bodyTests = []struct {
 }
 
 func TestTransportBody(t *testing.T) {
-	gotc := make(chan interface{}, 1)
+	type reqInfo struct {
+		req   *http.Request
+		slurp []byte
+		err   error
+	}
+	gotc := make(chan reqInfo, 1)
 	st := newServerTester(t,
 		func(w http.ResponseWriter, r *http.Request) {
 			slurp, err := ioutil.ReadAll(r.Body)
 			if err != nil {
-				gotc <- err
+				gotc <- reqInfo{err: err}
 			} else {
-				gotc <- string(slurp)
+				gotc <- reqInfo{req: r, slurp: slurp}
 			}
 		},
 		optOnlyServer,
@@ -364,12 +368,20 @@ func TestTransportBody(t *testing.T) {
 			t.Fatalf("#%d: %v", i, err)
 		}
 		defer res.Body.Close()
-		got := <-gotc
-		if err, ok := got.(error); ok {
-			t.Fatalf("#%d: %v", i, err)
-		} else if got.(string) != tt.body {
-			got := got.(string)
+		ri := <-gotc
+		if ri.err != nil {
+			t.Errorf("%#d: read error: %v", i, ri.err)
+			continue
+		}
+		if got := string(ri.slurp); got != tt.body {
 			t.Errorf("#%d: Read body mismatch.\n got: %q (len %d)\nwant: %q (len %d)", i, shortString(got), len(got), shortString(tt.body), len(tt.body))
+		}
+		wantLen := int64(len(tt.body))
+		if tt.noContentLen && tt.body != "" {
+			wantLen = -1
+		}
+		if ri.req.ContentLength != wantLen {
+			t.Errorf("#%d. handler got ContentLength = %v; want %v", i, ri.req.ContentLength, wantLen)
 		}
 	}
 }
@@ -735,6 +747,7 @@ func TestTransportFullDuplex(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	req.ContentLength = -1
 	res, err := c.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -1087,9 +1100,19 @@ func TestTransportInvalidTrailer_Capital2(t *testing.T) {
 	testTransportInvalidTrailer_Capital(t, splitHeader)
 }
 func testTransportInvalidTrailer_Capital(t *testing.T, trailers headerType) {
-	testInvalidTrailer(t, trailers, errInvalidHeaderKey, func(enc *hpack.Encoder) {
+	testInvalidTrailer(t, trailers, errInvalidHeaderFieldName, func(enc *hpack.Encoder) {
 		enc.WriteField(hpack.HeaderField{Name: "foo", Value: "bar"})
 		enc.WriteField(hpack.HeaderField{Name: "Capital", Value: "bad"})
+	})
+}
+func TestTransportInvalidTrailer_EmptyFieldName(t *testing.T) {
+	testInvalidTrailer(t, oneHeader, errInvalidHeaderFieldName, func(enc *hpack.Encoder) {
+		enc.WriteField(hpack.HeaderField{Name: "", Value: "bad"})
+	})
+}
+func TestTransportInvalidTrailer_BinaryFieldValue(t *testing.T) {
+	testInvalidTrailer(t, oneHeader, errInvalidHeaderFieldValue, func(enc *hpack.Encoder) {
+		enc.WriteField(hpack.HeaderField{Name: "", Value: "has\nnewline"})
 	})
 }
 
@@ -1230,5 +1253,299 @@ func TestTransportChecksResponseHeaderListSize(t *testing.T) {
 		}
 	}
 	ct.run()
+}
 
+// Test that the the Transport returns a typed error from Response.Body.Read calls
+// when the server sends an error. (here we use a panic, since that should generate
+// a stream error, but others like cancel should be similar)
+func TestTransportBodyReadErrorType(t *testing.T) {
+	doPanic := make(chan bool, 1)
+	st := newServerTester(t,
+		func(w http.ResponseWriter, r *http.Request) {
+			w.(http.Flusher).Flush() // force headers out
+			<-doPanic
+			panic("boom")
+		},
+		optOnlyServer,
+		optQuiet,
+	)
+	defer st.Close()
+
+	tr := &Transport{TLSClientConfig: tlsConfigInsecure}
+	defer tr.CloseIdleConnections()
+	c := &http.Client{Transport: tr}
+
+	res, err := c.Get(st.ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	doPanic <- true
+	buf := make([]byte, 100)
+	n, err := res.Body.Read(buf)
+	want := StreamError{StreamID: 0x1, Code: 0x2}
+	if !reflect.DeepEqual(want, err) {
+		t.Errorf("Read = %v, %#v; want error %#v", n, err, want)
+	}
+}
+
+// golang.org/issue/13924
+// This used to fail after many iterations, especially with -race:
+// go test -v -run=TestTransportDoubleCloseOnWriteError -count=500 -race
+func TestTransportDoubleCloseOnWriteError(t *testing.T) {
+	var (
+		mu   sync.Mutex
+		conn net.Conn // to close if set
+	)
+
+	st := newServerTester(t,
+		func(w http.ResponseWriter, r *http.Request) {
+			mu.Lock()
+			defer mu.Unlock()
+			if conn != nil {
+				conn.Close()
+			}
+		},
+		optOnlyServer,
+	)
+	defer st.Close()
+
+	tr := &Transport{
+		TLSClientConfig: tlsConfigInsecure,
+		DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+			tc, err := tls.Dial(network, addr, cfg)
+			if err != nil {
+				return nil, err
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			conn = tc
+			return tc, nil
+		},
+	}
+	defer tr.CloseIdleConnections()
+	c := &http.Client{Transport: tr}
+	c.Get(st.ts.URL)
+}
+
+// Test that the http1 Transport.DisableKeepAlives option is respected
+// and connections are closed as soon as idle.
+// See golang.org/issue/14008
+func TestTransportDisableKeepAlives(t *testing.T) {
+	st := newServerTester(t,
+		func(w http.ResponseWriter, r *http.Request) {
+			io.WriteString(w, "hi")
+		},
+		optOnlyServer,
+	)
+	defer st.Close()
+
+	connClosed := make(chan struct{}) // closed on tls.Conn.Close
+	tr := &Transport{
+		t1: &http.Transport{
+			DisableKeepAlives: true,
+		},
+		TLSClientConfig: tlsConfigInsecure,
+		DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+			tc, err := tls.Dial(network, addr, cfg)
+			if err != nil {
+				return nil, err
+			}
+			return &noteCloseConn{Conn: tc, closefn: func() { close(connClosed) }}, nil
+		},
+	}
+	c := &http.Client{Transport: tr}
+	res, err := c.Get(st.ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ioutil.ReadAll(res.Body); err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	select {
+	case <-connClosed:
+	case <-time.After(1 * time.Second):
+		t.Errorf("timeout")
+	}
+
+}
+
+// Test concurrent requests with Transport.DisableKeepAlives. We can share connections,
+// but when things are totally idle, it still needs to close.
+func TestTransportDisableKeepAlives_Concurrency(t *testing.T) {
+	const D = 25 * time.Millisecond
+	st := newServerTester(t,
+		func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(D)
+			io.WriteString(w, "hi")
+		},
+		optOnlyServer,
+	)
+	defer st.Close()
+
+	var dials int32
+	var conns sync.WaitGroup
+	tr := &Transport{
+		t1: &http.Transport{
+			DisableKeepAlives: true,
+		},
+		TLSClientConfig: tlsConfigInsecure,
+		DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+			tc, err := tls.Dial(network, addr, cfg)
+			if err != nil {
+				return nil, err
+			}
+			atomic.AddInt32(&dials, 1)
+			conns.Add(1)
+			return &noteCloseConn{Conn: tc, closefn: func() { conns.Done() }}, nil
+		},
+	}
+	c := &http.Client{Transport: tr}
+	var reqs sync.WaitGroup
+	const N = 20
+	for i := 0; i < N; i++ {
+		reqs.Add(1)
+		if i == N-1 {
+			// For the final request, try to make all the
+			// others close. This isn't verified in the
+			// count, other than the Log statement, since
+			// it's so timing dependent. This test is
+			// really to make sure we don't interrupt a
+			// valid request.
+			time.Sleep(D * 2)
+		}
+		go func() {
+			defer reqs.Done()
+			res, err := c.Get(st.ts.URL)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if _, err := ioutil.ReadAll(res.Body); err != nil {
+				t.Error(err)
+				return
+			}
+			res.Body.Close()
+		}()
+	}
+	reqs.Wait()
+	conns.Wait()
+	t.Logf("did %d dials, %d requests", atomic.LoadInt32(&dials), N)
+}
+
+type noteCloseConn struct {
+	net.Conn
+	onceClose sync.Once
+	closefn   func()
+}
+
+func (c *noteCloseConn) Close() error {
+	c.onceClose.Do(c.closefn)
+	return c.Conn.Close()
+}
+
+func isTimeout(err error) bool {
+	switch err := err.(type) {
+	case nil:
+		return false
+	case *url.Error:
+		return isTimeout(err.Err)
+	case net.Error:
+		return err.Timeout()
+	}
+	return false
+}
+
+// Test that the http1 Transport.ResponseHeaderTimeout option and cancel is sent.
+func TestTransportResponseHeaderTimeout_NoBody(t *testing.T) {
+	testTransportResponseHeaderTimeout(t, false)
+}
+func TestTransportResponseHeaderTimeout_Body(t *testing.T) {
+	testTransportResponseHeaderTimeout(t, true)
+}
+
+func testTransportResponseHeaderTimeout(t *testing.T, body bool) {
+	ct := newClientTester(t)
+	ct.tr.t1 = &http.Transport{
+		ResponseHeaderTimeout: 5 * time.Millisecond,
+	}
+	ct.client = func() error {
+		c := &http.Client{Transport: ct.tr}
+		var err error
+		var n int64
+		const bodySize = 4 << 20
+		if body {
+			_, err = c.Post("https://dummy.tld/", "text/foo", io.LimitReader(countingReader{&n}, bodySize))
+		} else {
+			_, err = c.Get("https://dummy.tld/")
+		}
+		if !isTimeout(err) {
+			t.Errorf("client expected timeout error; got %#v", err)
+		}
+		if body && n != bodySize {
+			t.Errorf("only read %d bytes of body; want %d", n, bodySize)
+		}
+		return nil
+	}
+	ct.server = func() error {
+		ct.greet()
+		for {
+			f, err := ct.fr.ReadFrame()
+			if err != nil {
+				t.Logf("ReadFrame: %v", err)
+				return nil
+			}
+			switch f := f.(type) {
+			case *DataFrame:
+				dataLen := len(f.Data())
+				if dataLen > 0 {
+					if err := ct.fr.WriteWindowUpdate(0, uint32(dataLen)); err != nil {
+						return err
+					}
+					if err := ct.fr.WriteWindowUpdate(f.StreamID, uint32(dataLen)); err != nil {
+						return err
+					}
+				}
+			case *RSTStreamFrame:
+				if f.StreamID == 1 && f.ErrCode == ErrCodeCancel {
+					return nil
+				}
+			}
+		}
+		return nil
+	}
+	ct.run()
+}
+
+func TestTransportDisableCompression(t *testing.T) {
+	const body = "sup"
+	st := newServerTester(t, func(w http.ResponseWriter, r *http.Request) {
+		want := http.Header{
+			"User-Agent": []string{"Go-http-client/2.0"},
+		}
+		if !reflect.DeepEqual(r.Header, want) {
+			t.Errorf("request headers = %v; want %v", r.Header, want)
+		}
+	}, optOnlyServer)
+	defer st.Close()
+
+	tr := &Transport{
+		TLSClientConfig: tlsConfigInsecure,
+		t1: &http.Transport{
+			DisableCompression: true,
+		},
+	}
+	defer tr.CloseIdleConnections()
+
+	req, err := http.NewRequest("GET", st.ts.URL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res, err := tr.RoundTrip(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
 }

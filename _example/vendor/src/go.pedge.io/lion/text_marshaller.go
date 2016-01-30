@@ -2,7 +2,6 @@ package lion
 
 import (
 	"bytes"
-	"encoding/json"
 	"time"
 	"unicode"
 
@@ -18,6 +17,12 @@ var (
 		LevelError: color.RedString(LevelError.String()),
 		LevelFatal: color.RedString(LevelFatal.String()),
 		LevelPanic: color.RedString(LevelPanic.String()),
+	}
+	// TODO(pedge): clean up
+	fourLetterLevels = map[Level]bool{
+		LevelNone: true,
+		LevelInfo: true,
+		LevelWarn: true,
 	}
 )
 
@@ -100,7 +105,7 @@ func textMarshalEntry(
 		}
 		_, _ = buffer.WriteString(levelString)
 		_ = buffer.WriteByte(' ')
-		if len(levelString) == 4 {
+		if _, ok := fourLetterLevels[entry.Level]; ok {
 			_ = buffer.WriteByte(' ')
 		}
 	}
@@ -139,11 +144,9 @@ func textMarshalEntry(
 		if eventSeen {
 			_ = buffer.WriteByte(' ')
 		}
-		data, err := json.Marshal(entry.Fields)
-		if err != nil {
+		if err := globalJSONMarshalFunc(buffer, entry.Fields); err != nil {
 			return nil, err
 		}
-		_, _ = buffer.Write(data)
 	}
 	data := trimRightSpaceBytes(buffer.Bytes())
 	if !disableNewlines {
@@ -164,12 +167,7 @@ func textMarshalMessage(buffer *bytes.Buffer, message *EntryMessage) error {
 	}
 	_, _ = buffer.WriteString(name)
 	_ = buffer.WriteByte(' ')
-	data, err := json.Marshal(message.Value)
-	if err != nil {
-		return err
-	}
-	_, err = buffer.Write(data)
-	return err
+	return globalJSONMarshalFunc(buffer, message.Value)
 }
 
 func trimRightSpaceBytes(b []byte) []byte {
