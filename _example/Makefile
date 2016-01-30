@@ -6,12 +6,12 @@ GBVENDOR = bin/gb-vendor
 GOLINT = bin/golint
 OPERATORC = bin/operatorc
 PROTOC_GEN_GO = bin/protoc-gen-go
-PROTOEASY = $(GOBIN)/protoeasy
+PROTOEASY = bin/protoeasy
 
-build-operator: build $(OPERATORC)
-	$< --hubot-out hubot/scripts/
+build-operator: $(OPERATORC)
+	$< --hubot-out=hubot/scripts/ src/
 
-proto-grpc: $(PROTOEASY)
+proto-golang: $(PROTOC_GEN_GO)
 	for file in $$(find src/services -name *.proto); do \
 		protoc --go_out=plugins=grpc,Moperator.proto=github.com/sr/operator/proto:src/ \
 			-Isrc/ \
@@ -31,9 +31,13 @@ vet:
 	go vet ./src/...
 
 clean:
-	rm -f $(GOVENDOR) \
+	rm -f $(ERRCHECK) \
+		$(GB) \
+		$(GBVENDOR) \
 		$(GOLINT) \
-		$(ERRCHECK)
+		$(OPERATORC) \
+		$(PROTOC_GEN_GO) \
+		$(PROTOEASY)
 
 errcheck: $(ERRCHECK)
 	$< ./src/...
