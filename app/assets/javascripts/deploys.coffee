@@ -38,7 +38,7 @@ $ ->
         e.preventDefault()
         return
 
-    if confirm("Are you sure? This is your last change to abort!")
+    if confirm("Are you sure? This is your last chance to abort!")
       $form.find("input[type='submit']").disable()
     else
       e.preventDefault()
