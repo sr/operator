@@ -25,4 +25,9 @@ class ShellHelper
   def self.execute_shell(command)
     IO.popen(command){ |io| io.read.strip }
   end
+
+  def self.sudo_execute(command, user = 'root')
+    sudo_command = "sudo -u #{user} #{command}"
+    execute_shell(sudo_command)
+  end
 end

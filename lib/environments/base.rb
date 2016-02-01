@@ -8,6 +8,7 @@ require "strategies"
 require "discovery_client"
 require "core_ext/extract_options"
 require "core_ext/underscore_string"
+require_relative("../helpers/storm")
 
 module Environments
   class Base
@@ -204,12 +205,23 @@ module Environments
       restart_upstart_job("pithumbs")
     end
 
-    def restart_murdoc
-      restart_upstart_job("murdoc")
-    end
-
     def restart_workflowstats_service
       restart_upstart_job("workflowstats")
+    end
+
+    def deploy_topology(deploy)
+      if deploy.options['topology'].nil? || payload.current_link.nil?
+        deploy.options['topology'].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+        payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
+      else
+        jarfile=ShellHelper.execute_shell("find #{payload.current_link}/ -name '*.jar'") # trailing slash is necessary
+        if jarfile.nil? || jarfile == ""
+          Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
+        else
+          StormEnvModule.load_topology(deploy.options['topology'], jarfile)
+          Logger.log(:err, "Topology Deployed: #{deploy.options['topology']}")
+        end
+      end
     end
 
     def restart_upstart_job(job)
