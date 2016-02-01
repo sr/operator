@@ -67,9 +67,9 @@
       "from": "core-util-is@>=1.0.0 <1.1.0"
     },
     "cron-parser": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "from": "cron-parser@>=1.0.1 <1.1.0",
-      "resolved": "https://registry.npmjs.org/cron-parser/-/cron-parser-1.0.1.tgz"
+      "resolved": "https://registry.npmjs.org/cron-parser/-/cron-parser-1.0.2.tgz"
     },
     "cryptiles": {
       "version": "2.0.5",
