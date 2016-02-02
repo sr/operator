@@ -2568,8 +2568,8 @@
     },
     "hubot-schedule": {
       "version": "0.4.0",
-      "from": "hubot-schedule@0.4.0",
-      "resolved": "https://registry.npmjs.org/hubot-schedule/-/hubot-schedule-0.4.0.tgz"
+      "from": "git+https://github.com/moqada/hubot-schedule.git#ec967b07e6c6fe191108cab8b2b9886d57b4ff9a",
+      "resolved": "git+https://github.com/moqada/hubot-schedule.git#ec967b07e6c6fe191108cab8b2b9886d57b4ff9a"
     },
     "hubot-scripts": {
       "version": "2.16.2",
@@ -2707,14 +2707,14 @@
       }
     },
     "node-schedule": {
-      "version": "0.5.1",
-      "from": "node-schedule@>=0.5.1 <0.6.0",
-      "resolved": "https://registry.npmjs.org/node-schedule/-/node-schedule-0.5.1.tgz",
+      "version": "1.0.0",
+      "from": "node-schedule@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/node-schedule/-/node-schedule-1.0.0.tgz",
       "dependencies": {
         "cron-parser": {
-          "version": "0.6.2",
-          "from": "cron-parser@0.6.2",
-          "resolved": "https://registry.npmjs.org/cron-parser/-/cron-parser-0.6.2.tgz"
+          "version": "1.1.0",
+          "from": "cron-parser@1.1.0",
+          "resolved": "https://registry.npmjs.org/cron-parser/-/cron-parser-1.1.0.tgz"
         }
       }
     },
