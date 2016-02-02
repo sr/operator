@@ -3,6 +3,7 @@ require "shell_helper"
 
 # module to include in the proper environments for required hooks
 module StormEnvModule
+  extend self
 
   PROC_KILL_WAIT_TIME = 45
   STORM_BIN = '/opt/storm/current/bin/storm'
@@ -42,5 +43,3 @@ module StormEnvModule
   end
 
 end
-
-
