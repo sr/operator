@@ -113,6 +113,12 @@ module.exports = (robot) ->
     ]
     msg.send msg.random bees
 
+  robot.respond /bingo$/i, (msg) ->
+    bingo = [
+      'https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png'
+    ]
+    msg.send msg.random bingo
+
   robot.respond /nippon$/i, (msg) ->
     nippon = [
       'http://i.imgur.com/T8uvhOu.png'
