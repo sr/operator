@@ -1,0 +1,10 @@
+version: v1
+plugins:
+  - go
+  - grpc
+options:
+  go:
+    import_path: go.pedge.io/protoeasy
+  exclude:
+    - vendor
+    - example

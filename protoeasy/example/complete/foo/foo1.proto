@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package example.foo;
+
+option java_package = "com.pedge.example.foo";
+option go_package = "foo";
+
+message One {
+  int64 i = 1;
+}

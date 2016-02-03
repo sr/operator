@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+
+package protoeasy;
+
+enum GoPluginType {
+  GO_PLUGIN_TYPE_NONE = 0;
+  GO_PLUGIN_TYPE_GO = 1;
+  GO_PLUGIN_TYPE_GOFAST = 2;
+}
+
+enum GogoPluginType {
+  GOGO_PLUGIN_TYPE_NONE = 0;
+  GOGO_PLUGIN_TYPE_GOGO = 1;
+  GOGO_PLUGIN_TYPE_GOGOFAST = 2;
+  GOGO_PLUGIN_TYPE_GOGOFASTER = 3;
+  GOGO_PLUGIN_TYPE_GOGOSLICK = 4;
+}
+
+message CompileOptions {
+  bool grpc = 1;
+  bool grpc_gateway = 2;
+  bool no_default_includes = 3;
+  repeated string exclude_pattern = 4;
+  string rel_context = 5;
+
+  bool cpp = 20;
+  string cpp_rel_out = 21;
+
+  bool csharp = 30;
+  string csharp_rel_out = 31;
+
+  bool go = 40;
+  GoPluginType go_plugin_type = 41;
+  string go_rel_out = 42;
+  string go_import_path = 43;
+  bool go_no_default_modifiers = 44;
+  map<string, string> go_modifiers = 45;
+
+  bool gogo = 50;
+  GogoPluginType gogo_plugin_type = 51;
+  string gogo_rel_out = 52;
+  string gogo_import_path = 53;
+  bool gogo_no_default_modifiers = 54;
+  map<string, string> gogo_modifiers = 55;
+
+  bool objc = 60;
+  string objc_rel_out = 61;
+
+  bool python = 70;
+  string python_rel_out = 71;
+
+  bool ruby = 80;
+  string ruby_rel_out = 81;
+
+  bool descriptor_set = 90;
+  string descriptor_set_rel_out = 91;
+  string descriptor_set_file_name = 92;
+  bool descriptor_set_include_imports = 93;
+
+  bool letmegrpc = 100;
+  string letmegrpc_rel_out = 101;
+  string letmegrpc_import_path = 102;
+  bool letmegrpc_no_default_modifiers = 103;
+  map<string, string> letmegrpc_modifiers = 104;
+
+  bool operator_hubot = 110;
+  string operator_hubot_out = 111;
+}
+
+message Command {
+  repeated string arg = 1;
+}
+
+message CompileInfo {
+  repeated Command command = 1;
+  uint64 input_size_bytes = 2;
+  uint64 output_size_bytes = 3;
+  google.protobuf.Duration duration = 4;
+}
+
+message CompileRequest {
+  bytes tar = 1;
+  CompileOptions compile_options = 2;
+}
+
+message CompileResponse {
+  bytes tar = 1;
+  CompileInfo compile_info = 2;
+}
+
+service API {
+  rpc Compile(CompileRequest) returns (CompileResponse) {}
+}

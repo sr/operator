@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "foo/foo1.proto";
+
+package example.bar;
+
+option java_package = "com.pedge.example.bar";
+option go_package = "bar";
+
+message One {
+  int64 i = 1;
+  foo.One foo_one = 2;
+}
