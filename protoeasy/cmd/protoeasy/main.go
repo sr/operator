@@ -9,13 +9,12 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/sr/operator/protoeasy"
 	"go.pedge.io/env"
 	"go.pedge.io/lion/proto"
 	"go.pedge.io/pkg/cobra"
-	"go.pedge.io/protoeasy"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type appEnv struct {

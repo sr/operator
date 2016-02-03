@@ -12,7 +12,7 @@ local development machine.
 
 See the README.md file for more details.
 */
-package protoeasy // import "go.pedge.io/protoeasy"
+package protoeasy
 
 import (
 	"fmt"

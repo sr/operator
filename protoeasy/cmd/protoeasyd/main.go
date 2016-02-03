@@ -7,9 +7,9 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/sr/operator/protoeasy"
 	"go.pedge.io/env"
 	"go.pedge.io/pkg/log"
-	"go.pedge.io/protoeasy"
 )
 
 type appEnv struct {
