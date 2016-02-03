@@ -1,5 +1,5 @@
 export PATH := bin/:$(PATH)
-export GO15VENDOREXPERIMENT = 1
+export GO15VENDOREXPERIMENT := 1
 ifndef VERSION
 	VERSION = $(shell git rev-parse --short HEAD)
 endif
@@ -18,6 +18,30 @@ PROTOC_GEN_OPERATORCMD = bin/protoc-gen-operatorcmd
 PROTOC_GEN_OPERATORD = bin/protoc-gen-operatord
 
 -include etc/mk/golang.mk
+
+build:
+	go build -v ./...
+
+install:
+	go install -v ./...
+
+lint: $(GOLINT)
+	golint *.go | grep -v '\.pb\.go'
+	golint cmd/**/*.go
+	golint generator/*.go
+
+vet:
+	go vet ./...
+
+errcheck:
+	errcheck ./...
+
+.PHONY: \
+	build \
+	install \
+	lint \
+	vet \
+	errcheck
 
 hubot-dev:
 	@ touch $(shell pwd)/tmp/.hubot_history
