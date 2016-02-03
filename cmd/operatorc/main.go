@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"go.pedge.io/protoeasy"
+	"github.com/sr/operator/protoeasy"
 )
 
 var (
