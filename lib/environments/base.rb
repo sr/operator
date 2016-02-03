@@ -218,9 +218,9 @@ module Environments
         if jarfile.nil? || jarfile == ""
           Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
         else
-          Logger.log(:err, "Topology Parameters: #{deploy.options['topology']}")
+          Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
           StormEnvModule.load_topology(deploy.options['topology'], jarfile)
-          Logger.log(:err, "Topology Deployed: #{deploy.options['topology']}")
+          Logger.log(:info, "Topology Deployed: #{deploy.options['topology']}")
         end
       end
     end
