@@ -38,8 +38,8 @@ module StormEnvModule
   end
 
   def add_topology(topo, jar)
-    Logger.log(:info,  "Topology #{topo_name(topo)} added to nimbus host")
-    ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
+    Logger.log(:info, "Topology Deploy Routine Output:\n#{ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")}" )
+    Logger.log(:info, "Topology #{topo_name(topo)} added to nimbus host")
   end
 
 end
