@@ -2,14 +2,13 @@ export PATH := bin/:$(PATH)
 
 ERRCHECK = bin/errcheck
 GB = $(GOBIN)/gb
-GBVENDOR = bin/gb-vendor
 GOLINT = bin/golint
 OPERATORC = bin/operatorc
 PROTOC_GEN_GO = bin/protoc-gen-go
 PROTOEASY = bin/protoeasy
 
 build-operator: $(OPERATORC)
-	$< --hubot-out=hubot/scripts/ src/
+	$< --hubot-out=hubot/scripts src/services/buildkite/*.proto
 
 proto-golang: $(PROTOC_GEN_GO)
 	for file in $$(find src/services -name *.proto); do \
@@ -33,7 +32,6 @@ vet:
 clean:
 	rm -f $(ERRCHECK) \
 		$(GB) \
-		$(GBVENDOR) \
 		$(GOLINT) \
 		$(OPERATORC) \
 		$(PROTOC_GEN_GO) \
@@ -47,9 +45,6 @@ $(ERRCHECK): $(GB)
 
 $(GB):
 	go get github.com/constabulary/gb/...
-
-$(GBVENDOR): $(GB)
-	$< build github.com/constabulary/gb/cmd/gb-vendor
 
 $(GOLINT): $(GB)
 	$< build github.com/golang/lint/golint
