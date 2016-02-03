@@ -9,6 +9,7 @@ module StormEnvModule
   STORM_BIN = '/opt/storm/current/bin/storm'
 
   def load_topology(topo, jar)
+    Logger.log(:info, "Loading Topology #{topo_name(topo)} : #{topo_class(topo)}")
     if active?(topo)
       Logger.log(:info, "Topology #{topo_name(topo)} 'isactive'; removing...")
       remove_topology(topo)
@@ -38,7 +39,8 @@ module StormEnvModule
   end
 
   def add_topology(topo, jar)
-    Logger.log(:info, "Topology Deploy Routine Output:\n#{ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")}" )
+    add_topo_output = ShellHelper.sudo_execute("#{STORM_BIN} jar -c env=prod #{jar} #{topo_class(topo)} #{topo_name(topo)} remote", "storm")
+    Logger.log(:info, "Topology Deploy Routine Output:\n#{add_topo_output}" )
     Logger.log(:info, "Topology #{topo_name(topo)} added to nimbus host")
   end
 
