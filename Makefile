@@ -3,6 +3,7 @@ export GO15VENDOREXPERIMENT = 1
 ifndef VERSION
 	VERSION = $(shell git rev-parse --short HEAD)
 endif
+ERRCHECK = $(GOBIN)/errcheck
 GCLOUD_PROJECT_ID = dev-europe-west1
 GCLOUD_CLUSTER = operator
 GCLOUD_ZONE = europe-west1-d
@@ -129,6 +130,9 @@ $(OPERATOR): $(GB) proto-cmd
 
 $(OPERATORD): $(GB) proto-operatord
 	$< build cmd/operatord
+
+$(ERRCHECK):
+	go get github.com/kisielk/errcheck
 
 $(K8S_EXEC): $(GB)
 	$< build cmd/k8s-exec
