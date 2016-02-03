@@ -214,6 +214,7 @@ module Environments
         deploy.options['topology'].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
         payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
       else
+        # this finds a JAR inside of a tarball blown up and linked-to at the base level
         jarfile=ShellHelper.execute_shell("find #{payload.current_link}/ -name '*.jar'") # trailing slash is necessary
         if jarfile.nil? || jarfile == ""
           Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
