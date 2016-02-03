@@ -640,13 +640,6 @@
 			"path": "/time"
 		},
 		{
-			"importpath": "go.pedge.io/protoeasy/cmd/protoeasy",
-			"repository": "https://github.com/peter-edge/protoeasy-go",
-			"revision": "ad15dd02ad33d68cfa275e3bf40cd20b10a3c2e5",
-			"branch": "master",
-			"path": "/cmd/protoeasy"
-		},
-		{
 			"importpath": "golang.org/x/crypto/cast5",
 			"repository": "https://go.googlesource.com/crypto",
 			"revision": "1f22c0103821b9390939b6776727195525381532",
