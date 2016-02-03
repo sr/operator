@@ -169,6 +169,7 @@ func getGoPath() (string, error) {
 	return goPath, nil
 }
 
+// TODO(sr) use exec.LookPath instead
 func which(executable string) (string, error) {
 	output, err := pkgexec.RunOutput("which", executable)
 	if err != nil {
