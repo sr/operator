@@ -1,40 +1,37 @@
 export PATH := bin/:$(PATH)
 export GO15VENDOREXPERIMENT := 1
-ifndef VERSION
-	VERSION = $(shell git rev-parse --short HEAD)
-endif
+VERSION ?= $(shell git rev-parse --short HEAD)
+GO ?= go
 ERRCHECK = $(GOBIN)/errcheck
-GCLOUD_PROJECT_ID = dev-europe-west1
-GCLOUD_CLUSTER = operator
-GCLOUD_ZONE = europe-west1-d
-PROTOEASY = bin/protoeasy
-OPERATORD = bin/operatord
-OPERATOR = bin/operator
-K8S_EXEC = bin/k8s-exec
-PROTOC_GEN_GO = bin/protoc-gen-go
-PROTOC_GEN_GRPCINSTRUMENT = bin/protoc-gen-grpcinstrument
-PROTOC_GEN_OPERATORHUBOT = bin/protoc-gen-operatorhubot
-PROTOC_GEN_OPERATORCMD = bin/protoc-gen-operatorcmd
-PROTOC_GEN_OPERATORD = bin/protoc-gen-operatord
+GOLINT ?= $(GOBIN)/golint
 
 -include etc/mk/golang.mk
 
 build:
-	go build -v ./...
+	$(GO) build -v ./...
 
 install:
-	go install -v ./...
+	$(GO) install -v ./...
 
 lint: $(GOLINT)
-	golint *.go | grep -v '\.pb\.go'
-	golint cmd/**/*.go
-	golint generator/*.go
+	@ for file in $$(find . -name '*.go' | grep -v _example | grep -v vendor); do \
+			$< $$file; \
+	  done
 
 vet:
-	go vet ./...
+	$(GO) vet ./...
 
-errcheck:
-	errcheck ./...
+errcheck: $(ERRCHECK)
+	$< ./...
+
+clean:
+	$(GO) clean -i ./..
+
+$(ERRCHECK):
+	$(GO) get -v github.com/kisielk/errcheck
+
+$(GOLINT):
+	$(GO) get -v github.com/golang/lint/golint
 
 .PHONY: \
 	build \
@@ -134,50 +131,6 @@ docker-build-openflightsd: goget-openflights
 docker-push-openflightsd:
 	docker tag pedge/openflightsd gcr.io/operator-europe-west/openflightsd:$(VERSION)
 	gcloud docker push gcr.io/operator-europe-west/openflightsd
-
-clean:
-	rm -f src/cmd/**/*-gen.go \
-		src/hubot/scripts/*-gen.coffee \
-		$(OPERATOR) \
-		$(OPERATORD) \
-		$(K8S_EXEC) \
-		$(PROTOEASY) \
-		$(PROTOC_GEN_GO) \
-		$(PROTOC_GEN_GRPCINSTRUMENT) \
-		$(PROTOC_GEN_OPERATORCMD) \
-		$(PROTOC_GEN_OPERATORD) \
-		$(PROTOC_GEN_OPERATORHUBOT) \
-	rm -rf tmp/
-
-$(OPERATOR): $(GB) proto-cmd
-	$< build cmd/operator
-
-$(OPERATORD): $(GB) proto-operatord
-	$< build cmd/operatord
-
-$(ERRCHECK):
-	go get github.com/kisielk/errcheck
-
-$(K8S_EXEC): $(GB)
-	$< build cmd/k8s-exec
-
-$(PROTOEASY): $(GB) $(PROTOC_GEN_GO)
-	$< build go.pedge.io/protoeasy/cmd/protoeasy
-
-$(PROTOC_GEN_GO): $(GB)
-	$< build github.com/golang/protobuf/protoc-gen-go
-
-$(PROTOC_GEN_GRPCINSTRUMENT): $(GB)
-	$< build github.com/sr/grpcinstrument/cmd/protoc-gen-grpcinstrument
-
-$(PROTOC_GEN_OPERATORCMD): $(GB)
-	$< build cmd/protoc-gen-operatorcmd
-
-$(PROTOC_GEN_OPERATORD): $(GB)
-	$< build cmd/protoc-gen-operatord
-
-$(PROTOC_GEN_OPERATORHUBOT): $(GB)
-	$< build cmd/protoc-gen-operatorhubot
 
 .PHONY: \
 	hubot-dev \
