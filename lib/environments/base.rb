@@ -352,8 +352,8 @@ module Environments
       @config.fetch(:autojob_hosts, [])
     end
 
-    def eager_deploy?
-      payload.eager_deploy
+    def bypass_version_detection?
+      payload.bypass_version_detection
     end
 
     private

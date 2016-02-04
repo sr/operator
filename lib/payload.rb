@@ -69,7 +69,7 @@ class Payload
       end
   end
 
-  def eager_deploy
-    @options[:eager_deploy]
+  def bypass_version_detection
+    @options[:bypass_version_detection]
   end
 end
