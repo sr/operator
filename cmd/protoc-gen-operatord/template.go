@@ -13,7 +13,7 @@ import (
 	"{{.ImportPath}}"
 {{end}}
 	"google.golang.org/grpc"
-	"operator"
+	"github.com/sr/operator/server"
 	"go.pedge.io/env"
 )
 
