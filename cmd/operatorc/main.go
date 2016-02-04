@@ -11,58 +11,66 @@ import (
 )
 
 var (
-	hubotOutDir string
+	cmdOutDir    string
+	hubotOutDir  string
+	serverOutDir string
+
+	errNoSourceDir = errors.New("Please specify a input source directory.")
+	errNoOutDir    = errors.New("Please specify one of --cmd-out, --hubot-out, or --server-out.")
 )
 
 func run() error {
-	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output generated Hubot scripts.")
+	flag.StringVar(&cmdOutDir, "cmd-out", "", "The `directory` where to output command-line Go code.")
+	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output Hubot scripts.")
+	flag.StringVar(&serverOutDir, "server-out", "", "The `directory` where to output operator server Go code.")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		return errors.New("Please specify a input source directory.")
+		return errNoSourceDir
 	}
 	inputDirPath := flag.Args()[0]
 	outDirPath := inputDirPath
 	options := &protoeasy.CompileOptions{
 		Go:          true,
+		Grpc:        true,
 		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator/proto"},
 		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
 		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this
 		NoDefaultIncludes: true,
 	}
+	if cmdOutDir == "" && hubotOutDir == "" && serverOutDir == "" {
+		return errNoOutDir
+	}
+	if cmdOutDir != "" {
+		options.OperatorCmd = true
+		options.OperatorCmdOut = cmdOutDir
+	}
 	if hubotOutDir != "" {
 		options.OperatorHubot = true
 		options.OperatorHubotOut = hubotOutDir
 	}
-	// TODO(sr) bail if none of hubot, cmd, or server are set
+	if serverOutDir != "" {
+		options.OperatorServer = true
+		options.OperatorServerOut = serverOutDir
+	}
 	compiler := protoeasy.DefaultClientCompiler
 	commands, err := compiler.Compile(inputDirPath, outDirPath, options)
 	if err != nil {
 		return err
 	}
-	for _, command := range commands {
-		if len(command.Arg) > 0 {
-			fmt.Printf("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+	if _, ok := os.LookupEnv("OPERATORC_DEBUG"); ok {
+		for _, command := range commands {
+			if len(command.Arg) > 0 {
+				fmt.Printf("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+			}
 		}
 	}
 	return nil
 }
 
-func getModifiers(modifierStrings []string) (map[string]string, error) {
-	modifiers := make(map[string]string)
-	for _, modifierString := range modifierStrings {
-		split := strings.SplitN(modifierString, "=", 2)
-		if len(split) != 2 {
-			return nil, fmt.Errorf("invalid go modifier value: %s", modifierString)
-		}
-		modifiers[split[0]] = split[1]
-	}
-	return modifiers, nil
-}
-
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "operatorc: %v", err)
+		fmt.Fprintf(os.Stderr, "operatorc: %v\n", err)
 		os.Exit(1)
 	}
 }
