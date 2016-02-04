@@ -3,7 +3,7 @@
 #
 # Commands:
 #   hubot buildkite status  [slug=value] - List the status of all (i.e. the status of the last build) of one or  all projects.
-#   hubot buildkite list-builds  [project_slug=value] - List the last builds of one or all projects, optionally limited to a  branch.
+#   hubot buildkite list-builds  [project_slug=value] - List the last builds of one or all projects, optionally limited to a  project.
 #
 # Configuration:
 #   OPERATORD_ADDRESS
