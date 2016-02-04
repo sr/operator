@@ -352,6 +352,10 @@ module Environments
       @config.fetch(:autojob_hosts, [])
     end
 
+    def eager_deploy?
+      payload.eager_deploy
+    end
+
     private
 
     # Returns our fetch and deploy strategies based on defaults, env specific, and payload specific settings
@@ -373,5 +377,6 @@ module Environments
         @config.merge!(YAML.load(ERB.new(File.read(filename)).result))
       end
     end
+
   end
 end
