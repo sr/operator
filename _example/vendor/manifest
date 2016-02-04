@@ -161,6 +161,18 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/kisielk/errcheck",
+			"repository": "https://github.com/kisielk/errcheck",
+			"revision": "1cd10f9f7824cdbedd5175a6cea0da9763bbeece",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/kisielk/gotool",
+			"repository": "https://github.com/kisielk/gotool",
+			"revision": "58a7a198f2ec6ea7af221fd216e7f559d663ce02",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/pborman/uuid",
 			"repository": "https://github.com/pborman/uuid",
 			"revision": "dee7705ef7b324f27ceb85a121c61f2c2e8ce988",
@@ -225,6 +237,27 @@
 			"revision": "8a57ed94ffd43444c0879fe75701732a38afc985",
 			"branch": "master",
 			"path": "/google"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/ast/astutil",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "35b3d645bc84b6874ecb165b70b488f1b19fc9c4",
+			"branch": "master",
+			"path": "/go/ast/astutil"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/buildutil",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "35b3d645bc84b6874ecb165b70b488f1b19fc9c4",
+			"branch": "master",
+			"path": "/go/buildutil"
+		},
+		{
+			"importpath": "golang.org/x/tools/go/loader",
+			"repository": "https://go.googlesource.com/tools",
+			"revision": "35b3d645bc84b6874ecb165b70b488f1b19fc9c4",
+			"branch": "master",
+			"path": "/go/loader"
 		},
 		{
 			"importpath": "google.golang.org/api/compute/v1",
