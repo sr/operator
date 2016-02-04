@@ -377,6 +377,5 @@ module Environments
         @config.merge!(YAML.load(ERB.new(File.read(filename)).result))
       end
     end
-
   end
 end
