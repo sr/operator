@@ -65,7 +65,7 @@ class CLI
         environment.conductor.restart!(requested_deploy)
         Canoe.notify_server(environment, requested_deploy)
       elsif requested_deploy.action == "deploy"
-        if current_build_version && current_build_version.instance_of_deploy?(requested_deploy)
+        if current_build_version && current_build_version.instance_of_deploy?(requested_deploy) && !environment.bypass_version_detection?
           Logger.log(:info, "We are up to date")
           Canoe.notify_server(environment, requested_deploy)
         else

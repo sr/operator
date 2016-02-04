@@ -69,4 +69,7 @@ class Payload
       end
   end
 
+  def bypass_version_detection
+    @options[:bypass_version_detection]
+  end
 end
