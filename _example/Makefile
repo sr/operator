@@ -4,7 +4,9 @@ ERRCHECK ?= bin/errcheck
 GB ?= $(GOBIN)/gb
 GO ?= go
 GOLINT ?= bin/golint
+OPERATOR ?= bin/operator
 OPERATORC ?= bin/operatorc
+OPERATORD ?= bin/operatord
 PROTOC_GEN_GO ?= bin/protoc-gen-go
 PROTOC_GEN_OPERATORCMD ?= bin/protoc-gen-operatorcmd
 PROTOC_GEN_OPERATORD ?= bin/protoc-gen-operatord
@@ -52,8 +54,14 @@ $(GB):
 $(GOLINT): $(GB)
 	$< build github.com/golang/lint/golint
 
+$(OPERATOR): $(GB)
+	$< build cmd/operator
+
 $(OPERATORC): $(GB)
 	$< build github.com/sr/operator/cmd/operatorc
+
+$(OPERATORD): $(GB)
+	$< build cmd/operatord
 
 $(PROTOC_GEN_GO): $(GB)
 	$< build github.com/golang/protobuf/protoc-gen-go
