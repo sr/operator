@@ -16,7 +16,7 @@
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
 #   hubot catbongos - Like, far out, man...
-#   hubot cookiecakes - They see me roooolllin'.... They hungryyyyy.... 
+#   hubot cookiecakes - They see me roooolllin'.... They hungryyyyy....
 #   hubot headdesk - Get headdesk.gif
 #   hubot hater - They gonna hate
 #   hubot panic - PANIC!1!1!!!
@@ -66,6 +66,7 @@
 #   hubot thebestgifever - just ask FOWLER
 #   hubot bishop - Diffs cat
 #   hubot tomcatwaits - Caseys cat
+#   hubot mikacat - Brendas cat
 
 _ = require "underscore"
 
@@ -203,6 +204,62 @@ module.exports = (robot) ->
       'https://media.giphy.com/media/3oxRmsdUQ50pclDYOs/giphy.gif'
     ]
     msg.send msg.random fondant
+
+  robot.respond /mikacat$/i, (msg) ->
+    mikacat = [
+      'http://i.imgur.com/68Bo5g1.jpg',
+      'http://i.imgur.com/5neuGdB.jpg',
+      'http://i.imgur.com/awlRzL9.jpg',
+      'http://i.imgur.com/Hk6qbAV.jpg',
+      'http://i.imgur.com/lHGwQTX.jpg',
+      'http://i.imgur.com/OUnQRoT.jpg',
+      'http://i.imgur.com/bINno4i.jpg',
+      'http://i.imgur.com/tomP6ms.jpg',
+      'http://i.imgur.com/q4ED3cg.jpg',
+      'http://i.imgur.com/Ve1Vme7.jpg',
+      'http://i.imgur.com/KFru4xC.jpg',
+      'http://i.imgur.com/hagikyl.jpg',
+      'http://i.imgur.com/93KPdH0.jpg',
+      'http://i.imgur.com/joh02uR.jpg',
+      'http://i.imgur.com/NhiezbD.jpg',
+      'http://i.imgur.com/9oONlEk.jpg',
+      'http://i.imgur.com/pA85cNq.jpg',
+      'http://i.imgur.com/Zhfajnq.jpg',
+      'http://i.imgur.com/flsoZuD.jpg',
+      'http://i.imgur.com/BrJ4Xul.jpg',
+      'http://i.imgur.com/KtLAhCQ.jpg',
+      'http://i.imgur.com/0X91zRZ.jpg',
+      'http://i.imgur.com/VMf7FkO.jpg',
+      'http://i.imgur.com/c0zd0Om.jpg',
+      'http://i.imgur.com/ZZ1S2h9.jpg',
+      'http://i.imgur.com/y41s5aS.jpg',
+      'http://i.imgur.com/nOGsE0o.jpg',
+      'http://i.imgur.com/11zzQJm.jpg',
+      'http://i.imgur.com/30SpOgT.jpg',
+      'http://i.imgur.com/jzC6NJ2.jpg',
+      'http://i.imgur.com/zX1mcBZ.jpg',
+      'http://i.imgur.com/3FhrmIq.jpg',
+      'http://i.imgur.com/jqDqcup.jpg',
+      'http://i.imgur.com/Fd6jnkL.jpg',
+      'http://i.imgur.com/uCyoFL0.jpg',
+      'http://i.imgur.com/O3dirZa.jpg',
+      'http://i.imgur.com/R1YCz5n.jpg',
+      'http://i.imgur.com/OeNu0IY.jpg',
+      'http://i.imgur.com/xBz26I2.jpg',
+      'http://i.imgur.com/QUTaTZ1.jpg',
+      'http://i.imgur.com/n6UVBgj.jpg',
+      'http://i.imgur.com/gexttJg.jpg',
+      'http://i.imgur.com/a6TtW1m.jpg',
+      'http://i.imgur.com/2RUnSBr.jpg',
+      'http://i.imgur.com/5frQNxC.jpg',
+      'http://i.imgur.com/ACEv0wO.jpg',
+      'http://i.imgur.com/wJJ6ftj.jpg',
+      'http://i.imgur.com/LmPlOms.jpg',
+      'http://i.imgur.com/sxTp34l.jpg',
+      'http://i.imgur.com/ARxMovy.jpg',
+      'http://i.imgur.com/ySlWcLA.jpg'
+    ]
+    msg.send msg.random mikacat
 
   robot.respond /caleb$/i, (msg) ->
     calebapple = [
