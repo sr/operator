@@ -61,6 +61,7 @@ func (c *serverCompiler) commands(dirPath string, outDirPath string, compileOpti
 					args = append(args, fmt.Sprintf("-I%s", filepath.Join(goPath, goPathRelInclude)))
 				}
 			}
+			args = appendOperatorIncludes(goPath, args)
 			flags, err := plugin.Flags(protoSpec, relDirPath, outDirPath)
 			if err != nil {
 				return nil, err
