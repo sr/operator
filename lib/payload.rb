@@ -26,11 +26,11 @@ class Payload
 
   def artifacts_path
     @_artifacts_path ||= \
-    begin
-      path = File.join(Dir.tmpdir, "pull-agent")
-      FileUtils.mkdir_p(path, mode: 00700)
-      path
-    end
+      begin
+        path = File.join(Dir.tmpdir, "pull-agent")
+        FileUtils.mkdir_p(path, mode: 00700)
+        path
+      end
   end
 
   def current_link
@@ -59,14 +59,14 @@ class Payload
 
   def repo_path
     @_repo_path ||= \
-    begin
-      path = @options[:repo_path]
-      if path.to_s.strip.empty?
-        nil
-      else
-        safe_path(File.expand_path(path))
+      begin
+        path = @options[:repo_path]
+        if path.to_s.strip.empty?
+          nil
+        else
+          safe_path(File.expand_path(path))
+        end
       end
-    end
   end
 
   def eager_deploy
