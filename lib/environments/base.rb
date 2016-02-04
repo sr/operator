@@ -222,7 +222,7 @@ module Environments
           Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
           Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
           StormEnvModule.load_topology(deploy.options['topology'], jarfile)
-          Logger.log(:info, "Topology Deployed: #{deploy.options['topology']}")
+          Logger.log(:info, "Topology Deployment Complete!")
         end
       end
     end
