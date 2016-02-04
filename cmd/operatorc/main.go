@@ -17,7 +17,7 @@ var (
 func run() error {
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output generated Hubot scripts.")
 	flag.Parse()
-	if len(flag.Args()) != 1 {
+	if flag.NArg() != 1 {
 		return errors.New("Please specify a input source directory.")
 	}
 	inputDirPath := flag.Args()[0]
