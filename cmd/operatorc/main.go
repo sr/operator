@@ -17,17 +17,18 @@ var (
 func run() error {
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output generated Hubot scripts.")
 	flag.Parse()
-	fmt.Printf("%v", flag.Args())
 	if len(flag.Args()) != 1 {
 		return errors.New("Please specify a input source directory.")
 	}
 	inputDirPath := flag.Args()[0]
 	outDirPath := inputDirPath
 	options := &protoeasy.CompileOptions{
-		// TODO(sr) Deal with hubot/proto. Perhaps write out ourselves??
-		ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
+		Go:          true,
+		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator/proto"},
+		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
+		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this
-		NoDefaultIncludes: false,
+		NoDefaultIncludes: true,
 	}
 	if hubotOutDir != "" {
 		options.OperatorHubot = true

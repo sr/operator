@@ -1,6 +1,11 @@
 package protoeasy
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+)
+
+const operatorProto = "github.com/sr/operator/proto"
 
 type operatorPlugin struct {
 	name   string
@@ -19,4 +24,8 @@ func (p *operatorPlugin) Flags(
 	var flags []string
 	flags = append(flags, fmt.Sprintf("--operator%s_out=%s", p.name, p.outDir))
 	return flags, nil
+}
+
+func appendOperatorIncludes(goPath string, args []string) []string {
+	return append(args, fmt.Sprintf("-I%s", filepath.Join(goPath, "src", operatorProto)))
 }
