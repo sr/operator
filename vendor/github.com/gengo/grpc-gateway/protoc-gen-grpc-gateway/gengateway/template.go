@@ -114,7 +114,7 @@ var _ codes.Code
 var _ io.Reader
 var _ = runtime.String
 var _ = json.Marshal
-var _ = utilities.PascalFromSnake
+var _ = utilities.NewDoubleArray
 `))
 
 	handlerTemplate = template.Must(template.New("handler").Parse(`
@@ -245,6 +245,14 @@ func Register{{$svc.GetName}}Handler(ctx context.Context, mux *runtime.ServeMux,
 	{{range $m := $svc.Methods}}
 	{{range $b := $m.Bindings}}
 	mux.Handle({{$b.HTTPMethod | printf "%q"}}, pattern_{{$svc.GetName}}_{{$m.GetName}}_{{$b.Index}}, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(ctx)
+		closeNotifier, ok := w.(http.CloseNotifier)
+		if ok {
+			go func() {
+				<-closeNotifier.CloseNotify()
+				cancel()
+			}()
+		}
 		resp, err := request_{{$svc.GetName}}_{{$m.GetName}}_{{$b.Index}}(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, req, err)

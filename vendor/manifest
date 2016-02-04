@@ -68,6 +68,13 @@
 			"path": "/pkg/ioutils"
 		},
 		{
+			"importpath": "github.com/docker/docker/pkg/longpath",
+			"repository": "https://github.com/docker/docker",
+			"revision": "38e774d32caf29155d27aad4fad964b082246a73",
+			"branch": "master",
+			"path": "/pkg/longpath"
+		},
+		{
 			"importpath": "github.com/docker/docker/pkg/pools",
 			"repository": "https://github.com/docker/docker",
 			"revision": "6c6729ef5b74a54e20eb2a11812bf5f80e03b174",
@@ -107,6 +114,13 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "97a6b0bb81ad84bae9d324c704900db6df96c2b2",
+			"branch": "master",
+			"path": "/protoc-gen-grpc-gateway"
+		},
+		{
 			"importpath": "github.com/gengo/grpc-gateway/protoc-gen-grpc-gateway/descriptor",
 			"repository": "https://github.com/gengo/grpc-gateway",
 			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
@@ -133,6 +147,13 @@
 			"revision": "2ecd37b59efda27299491bf05e1bd1783bb67a77",
 			"branch": "master",
 			"path": "/protoc-gen-grpc-gateway/httprule"
+		},
+		{
+			"importpath": "github.com/gengo/grpc-gateway/runtime",
+			"repository": "https://github.com/gengo/grpc-gateway",
+			"revision": "97a6b0bb81ad84bae9d324c704900db6df96c2b2",
+			"branch": "master",
+			"path": "/runtime"
 		},
 		{
 			"importpath": "github.com/gengo/grpc-gateway/third_party/googleapis/google/api",
@@ -174,6 +195,13 @@
 			"revision": "d9e70ab6c48be9a1a130359784b3c26118a8f52c",
 			"branch": "master",
 			"path": "/html"
+		},
+		{
+			"importpath": "github.com/gogo/letmegrpc/protoc-gen-letmegrpc",
+			"repository": "https://github.com/gogo/letmegrpc",
+			"revision": "d9e70ab6c48be9a1a130359784b3c26118a8f52c",
+			"branch": "master",
+			"path": "/protoc-gen-letmegrpc"
 		},
 		{
 			"importpath": "github.com/gogo/protobuf/gogoproto",
@@ -302,6 +330,20 @@
 			"path": "/proto"
 		},
 		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gofast",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/protoc-gen-gofast"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/protoc-gen-gogo"
+		},
+		{
 			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
 			"repository": "https://github.com/gogo/protobuf",
 			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
@@ -323,11 +365,39 @@
 			"path": "/protoc-gen-gogo/plugin"
 		},
 		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogofast",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/protoc-gen-gogofast"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogofaster",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/protoc-gen-gogofaster"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogoslick",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/protoc-gen-gogoslick"
+		},
+		{
 			"importpath": "github.com/gogo/protobuf/vanity",
 			"repository": "https://github.com/gogo/protobuf",
 			"revision": "e8904f58e872a473a5b91bc9bf3377d223555263",
 			"branch": "master",
 			"path": "/vanity"
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/vanity/command",
+			"repository": "https://github.com/gogo/protobuf",
+			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
+			"branch": "master",
+			"path": "/vanity/command"
 		},
 		{
 			"importpath": "github.com/golang/glog",
@@ -356,11 +426,39 @@
 			"path": "/proto"
 		},
 		{
+			"importpath": "github.com/golang/protobuf/protoc-gen-go",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "b982704f8bb716bb608144408cff30e15fbde841",
+			"branch": "master",
+			"path": "/protoc-gen-go"
+		},
+		{
 			"importpath": "github.com/golang/protobuf/protoc-gen-go/descriptor",
 			"repository": "https://github.com/golang/protobuf",
 			"revision": "45bba206dd5270d96bac4942dcfe515726613249",
 			"branch": "master",
 			"path": "/protoc-gen-go/descriptor"
+		},
+		{
+			"importpath": "github.com/golang/protobuf/protoc-gen-go/generator",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "b982704f8bb716bb608144408cff30e15fbde841",
+			"branch": "master",
+			"path": "/protoc-gen-go/generator"
+		},
+		{
+			"importpath": "github.com/golang/protobuf/protoc-gen-go/internal/grpc",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "b982704f8bb716bb608144408cff30e15fbde841",
+			"branch": "master",
+			"path": "/protoc-gen-go/internal/grpc"
+		},
+		{
+			"importpath": "github.com/golang/protobuf/protoc-gen-go/plugin",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "b982704f8bb716bb608144408cff30e15fbde841",
+			"branch": "master",
+			"path": "/protoc-gen-go/plugin"
 		},
 		{
 			"importpath": "github.com/hashicorp/hcl",
@@ -372,6 +470,12 @@
 			"importpath": "github.com/hpcloud/tail",
 			"repository": "https://github.com/hpcloud/tail",
 			"revision": "1a0242e795eeefe54261ff308dc685f7d29cc58c",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/inconshreveable/mousetrap",
+			"repository": "https://github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
 			"branch": "master"
 		},
 		{
@@ -605,11 +709,263 @@
 			"path": "/proto"
 		},
 		{
+			"importpath": "go.pedge.io/lion/syslog",
+			"repository": "https://github.com/peter-edge/lion-go",
+			"revision": "1db63580c4c171775e67cae30d1036cd375c1c6a",
+			"branch": "master",
+			"path": "/syslog"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/api",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/api"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/datastore/v1beta3",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/datastore/v1beta3"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/devtools/cloudtrace/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/devtools/cloudtrace/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/example/library/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/example/library/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/iam/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/iam/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/logging/type",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/logging/type"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/logging/v2",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/logging/v2"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/longrunning",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/longrunning"
+		},
+		{
 			"importpath": "go.pedge.io/pb/go/google/protobuf",
 			"repository": "https://github.com/peter-edge/pb",
 			"revision": "451f1f4dfdcc45c764740012a3251e98a182239e",
 			"branch": "master",
 			"path": "/go/google/protobuf"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/pubsub/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/pubsub/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/pubsub/v1beta2",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/pubsub/v1beta2"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/rpc",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/rpc"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/google/type",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/google/type"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/pb/common",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/pb/common"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/pb/geo",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/pb/geo"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/pb/money",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/pb/money"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/pb/net",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/pb/net"
+		},
+		{
+			"importpath": "go.pedge.io/pb/go/pb/phone",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/go/pb/phone"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/api",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/api"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/datastore/v1beta3",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/datastore/v1beta3"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/devtools/cloudtrace/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/devtools/cloudtrace/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/example/library/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/example/library/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/iam/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/iam/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/logging/type",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/logging/type"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/logging/v2",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/logging/v2"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/longrunning",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/longrunning"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/protobuf",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/protobuf"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/pubsub/v1",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/pubsub/v1"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/pubsub/v1beta2",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/pubsub/v1beta2"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/rpc",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/rpc"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/google/type",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/google/type"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/pb/common",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/pb/common"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/pb/geo",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/pb/geo"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/pb/money",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/pb/money"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/pb/net",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/pb/net"
+		},
+		{
+			"importpath": "go.pedge.io/pb/gogo/pb/phone",
+			"repository": "https://github.com/peter-edge/pb",
+			"revision": "bb2b0ea4d06fa052f688e8a7142b968f5f84db7d",
+			"branch": "master",
+			"path": "/gogo/pb/phone"
 		},
 		{
 			"importpath": "go.pedge.io/pkg/cobra",
@@ -624,6 +980,13 @@
 			"revision": "8a11a67a8b727f4961bd30f0b0957c226fed9420",
 			"branch": "master",
 			"path": "/exec"
+		},
+		{
+			"importpath": "go.pedge.io/pkg/log",
+			"repository": "https://github.com/peter-edge/pkg-go",
+			"revision": "8a11a67a8b727f4961bd30f0b0957c226fed9420",
+			"branch": "master",
+			"path": "/log"
 		},
 		{
 			"importpath": "go.pedge.io/proto/rpclog",
@@ -668,6 +1031,13 @@
 			"path": "/http2"
 		},
 		{
+			"importpath": "golang.org/x/net/http2/hpack",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "6ccd6698c634f5d835c40c1c31848729e0cecda1",
+			"branch": "master",
+			"path": "/http2/hpack"
+		},
+		{
 			"importpath": "golang.org/x/net/internal/timeseries",
 			"repository": "https://go.googlesource.com/net",
 			"revision": "04b9de9b512f58addf28c9853d50ebef61c3953e",
@@ -680,6 +1050,12 @@
 			"revision": "04b9de9b512f58addf28c9853d50ebef61c3953e",
 			"branch": "master",
 			"path": "/trace"
+		},
+		{
+			"importpath": "golang.org/x/oauth2",
+			"repository": "https://go.googlesource.com/oauth2",
+			"revision": "8a57ed94ffd43444c0879fe75701732a38afc985",
+			"branch": "master"
 		},
 		{
 			"importpath": "google.golang.org/api/gensupport",
@@ -703,10 +1079,73 @@
 			"path": "/logging/v1beta3"
 		},
 		{
+			"importpath": "google.golang.org/cloud/compute/metadata",
+			"repository": "https://code.googlesource.com/gocloud",
+			"revision": "5a3b06f8b5da3b7c3a93da43163b872c86c509ef",
+			"branch": "master",
+			"path": "/compute/metadata"
+		},
+		{
+			"importpath": "google.golang.org/cloud/internal",
+			"repository": "https://code.googlesource.com/gocloud",
+			"revision": "5a3b06f8b5da3b7c3a93da43163b872c86c509ef",
+			"branch": "master",
+			"path": "/internal"
+		},
+		{
 			"importpath": "google.golang.org/grpc",
 			"repository": "https://github.com/grpc/grpc-go",
 			"revision": "23d551898cf40a24d0ce7a859c75b322a7035673",
 			"branch": "master"
+		},
+		{
+			"importpath": "google.golang.org/grpc/codes",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/codes"
+		},
+		{
+			"importpath": "google.golang.org/grpc/credentials",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/credentials"
+		},
+		{
+			"importpath": "google.golang.org/grpc/grpclog",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/grpclog"
+		},
+		{
+			"importpath": "google.golang.org/grpc/metadata",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/metadata"
+		},
+		{
+			"importpath": "google.golang.org/grpc/naming",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/naming"
+		},
+		{
+			"importpath": "google.golang.org/grpc/peer",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/peer"
+		},
+		{
+			"importpath": "google.golang.org/grpc/transport",
+			"repository": "https://github.com/grpc/grpc-go",
+			"revision": "66b94b9f6b45652d6824be23517979d31f27cd15",
+			"branch": "master",
+			"path": "/transport"
 		},
 		{
 			"importpath": "gopkg.in/airbrake/gobrake.v2",
@@ -737,6 +1176,12 @@
 			"repository": "https://gopkg.in/logfmt.v0",
 			"revision": "c50dc9aa845e681529d8e49d3dc11ec0195aacac",
 			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/natefinch/lumberjack.v2",
+			"repository": "https://gopkg.in/natefinch/lumberjack.v2",
+			"revision": "514cbda263a734ae8caac038dadf05f8f3f9f738",
+			"branch": "v2.0"
 		},
 		{
 			"importpath": "gopkg.in/stack.v1",
