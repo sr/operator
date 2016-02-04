@@ -5,18 +5,10 @@ GB = $(GOBIN)/gb
 GOLINT = bin/golint
 OPERATORC = bin/operatorc
 PROTOC_GEN_GO = bin/protoc-gen-go
-PROTOEASY = bin/protoeasy
+PROTOC_GEN_OPERATORHUBOT = bin/protoc-gen-operatorhubot
 
-build-operator: $(OPERATORC)
-	$< --hubot-out=hubot/scripts src/services/buildkite/*.proto
-
-proto-golang: $(PROTOC_GEN_GO)
-	for file in $$(find src/services -name *.proto); do \
-		protoc --go_out=plugins=grpc,Moperator.proto=github.com/sr/operator/proto:src/ \
-			-Isrc/ \
-			-Ivendor/src/github.com/sr/operator/proto \
-			$$file; \
-	done
+build-operator: $(OPERATORC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORHUBOT)
+	$< --hubot-out=hubot/scripts src/
 
 build: $(GB)
 	$< build all
@@ -35,7 +27,7 @@ clean:
 		$(GOLINT) \
 		$(OPERATORC) \
 		$(PROTOC_GEN_GO) \
-		$(PROTOEASY)
+		$(PROTOC_GEN_OPERATORHUBOT)
 
 errcheck: $(ERRCHECK)
 	$< ./src/...
@@ -52,14 +44,11 @@ $(GOLINT): $(GB)
 $(PROTOC_GEN_GO): $(GB)
 	$< build github.com/golang/protobuf/protoc-gen-go
 
-$(PROTOEASY): $(GB)
-	$< build go.pedge.io/protoeasy/cmd/protoeasy
-
-$(OPERATORC): $(GB)
-	$< build github.com/sr/operator/cmd/operatorc
+$(PROTOC_GEN_OPERATORHUBOT): $(GB)
+	$< build github.com/sr/operator/cmd/protoc-gen-operatorhubot
 
 .PHONY: \
 	build \
 	lint \
 	vet \
-	errcheck \
+	errcheck
