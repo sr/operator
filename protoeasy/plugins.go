@@ -42,9 +42,6 @@ func getPlugins(compileOptions *CompileOptions) []plugin {
 	if compileOptions.Letmegrpc {
 		plugins = append(plugins, newLetmegrpcPlugin(compileOptions))
 	}
-	if compileOptions.OperatorHubot {
-		plugins = append(plugins, newOperatorHubotPlugin(compileOptions))
-	}
 	return plugins
 }
 

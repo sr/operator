@@ -73,7 +73,17 @@ func (c *serverCompiler) commands(dirPath string, outDirPath string, compileOpti
 			commands = append(commands, &Command{Arg: args})
 		}
 	}
-	return commands, nil
+	operatorCommands, err := getOperatorCommands(
+		dirPath,
+		outDirPath,
+		goPath,
+		protoSpec,
+		compileOptions,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return append(commands, operatorCommands...), nil
 }
 
 func getProtoSpec(dirPath string, excludeFilePatterns []string) (*protoSpec, error) {

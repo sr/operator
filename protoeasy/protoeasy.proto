@@ -65,8 +65,12 @@ message CompileOptions {
   bool letmegrpc_no_default_modifiers = 103;
   map<string, string> letmegrpc_modifiers = 104;
 
-  bool operator_hubot = 110;
-  string operator_hubot_out = 111;
+  bool operator_cmd = 110;
+  string operator_cmd_out = 111;
+  bool operator_hubot = 120;
+  string operator_hubot_out = 121;
+  bool operator_server = 130;
+  string operator_server_out = 131;
 }
 
 message Command {
