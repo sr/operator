@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"go.pedge.io/protoeasy"
+	"github.com/sr/operator/protoeasy"
 )
 
 var (
@@ -17,17 +17,18 @@ var (
 func run() error {
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output generated Hubot scripts.")
 	flag.Parse()
-	fmt.Printf("%v", flag.Args())
-	if len(flag.Args()) != 1 {
+	if flag.NArg() != 1 {
 		return errors.New("Please specify a input source directory.")
 	}
 	inputDirPath := flag.Args()[0]
 	outDirPath := inputDirPath
 	options := &protoeasy.CompileOptions{
-		// TODO(sr) Deal with hubot/proto. Perhaps write out ourselves??
-		ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
+		Go:          true,
+		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator/proto"},
+		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
+		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this
-		NoDefaultIncludes: false,
+		NoDefaultIncludes: true,
 	}
 	if hubotOutDir != "" {
 		options.OperatorHubot = true
@@ -41,7 +42,7 @@ func run() error {
 	}
 	for _, command := range commands {
 		if len(command.Arg) > 0 {
-			fmt.Printf("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+			//fmt.Printf("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
 		}
 	}
 	return nil
@@ -61,7 +62,7 @@ func getModifiers(modifierStrings []string) (map[string]string, error) {
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "operatorc: %v", err)
+		fmt.Fprintf(os.Stderr, "operatorc: %v\n", err)
 		os.Exit(1)
 	}
 }
