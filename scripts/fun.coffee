@@ -66,6 +66,7 @@
 #   hubot thebestgifever - just ask FOWLER
 #   hubot bishop - Diffs cat
 #   hubot tomcatwaits - Caseys cat
+#   hubot mikacat - Brendas cat
 
 _ = require "underscore"
 
