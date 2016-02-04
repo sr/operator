@@ -13,6 +13,9 @@ build:
 install:
 	$(GO) install -v ./...
 
+clean:
+	$(GO) clean -i ./..
+
 lint: $(GOLINT)
 	@ for file in $$(find . -name '*.go' | grep -v _example | grep -v vendor); do \
 			$< $$file; \
@@ -24,9 +27,6 @@ vet:
 errcheck: $(ERRCHECK)
 	$< ./...
 
-clean:
-	$(GO) clean -i ./..
-
 $(ERRCHECK):
 	$(GO) get -v github.com/kisielk/errcheck
 
@@ -36,6 +36,7 @@ $(GOLINT):
 .PHONY: \
 	build \
 	install \
+	clean \
 	lint \
 	vet \
 	errcheck
@@ -51,49 +52,26 @@ hubot-dev:
 operatord-dev: $(OPERATORD)
 	$<
 
-proto: build proto-grpc proto-cmd proto-hubot proto-operatord
-
 example-vendor:
 	rm -rf _example/vendor/src/github.com/sr/operator
 	for file in $$(gvt list -f "{{.Importpath}}"); do \
 		rm -rf _example/vendor/src/$$file; \
 	done
 	cp -r vendor/* _example/vendor/src/
+	rm -f _example/vendor/src/manifest
 	mkdir -p  _example/vendor/src/github.com/sr/operator
-	cp -r *.go cmd proto  _example/vendor/src/github.com/sr/operator
+	cp -r cmd generator proto protoeasy server _example/vendor/src/github.com/sr/operator
+	rm -rf _example/vendor/src/github.com/sr/operator/protoeasy/.git
 	git add -A _example/vendor/src _example/vendor/src/github.com/sr/operator
 	git add -u _example/vendor/src _example/vendor/src/github.com/sr/operator
 
-proto-cmd: $(PROTOC_GEN_OPERATORCMD)
-	protoc --operatorcmd_out=src/cmd/operator -Isrc -I/usr/local/include src/services/**/*.proto
-	@ gofmt -s -w src/cmd/operator
-
-proto-hubot: $(PROTOC_GEN_OPERATORHUBOT)
-	rm -rf src/hubot/proto src/hubot/scripts
-	cp -r vendor/proto src/hubot
-	mkdir src/hubot/proto/operator src/hubot/scripts
-	for file in $$(find src/services -name '*.proto'); do \
-		cp $$file src/hubot/proto; \
-	done
-	cp src/operator/operator.proto src/hubot/proto/operator/
-	protoc --operatorhubot_out=src/hubot/scripts/ -Isrc src/services/**/*.proto
-
-proto-operatord: $(PROTOC_GEN_OPERATORD) proto-grpcinstrument
-	protoc --operatord_out=src/cmd/operatord/ -Isrc src/services/**/*.proto
-	@ gofmt -s -w src/cmd/operatord
 
 proto-protoeasy: $(PROTOEASY)
 	go get -v go.pedge.io/pkg/cmd/strip-package-comments
-	cd vendor/src/go.pedge.io/protoeasy && $(shell pwd)/$< && \
+	cd protoeasy && $(shell pwd)/$< && \
 		find . -name *\.pb\*\.go | \
 		grep -v vendor | \
 		xargs strip-package-comments
-
-proto-grpc: $(PROTOEASY)
-	$< --go --grpc --exclude hubot src/
-
-proto-grpcinstrument: $(PROTOC_GEN_GRPCINSTRUMENT)
-	protoc --grpcinstrument_out=src/ -Isrc src/services/**/*.proto
 
 goget-openflights:
 	go get go.pedge.io/openflights
