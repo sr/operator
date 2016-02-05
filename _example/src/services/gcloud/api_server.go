@@ -10,9 +10,8 @@ import (
 	"text/tabwriter"
 
 	"github.com/jmcvetta/randutil"
+	"github.com/sr/operator/pb"
 
-	"github.com/sr/operator"
-	"github.com/sr/operator/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
@@ -89,7 +88,7 @@ func (s *apiServer) CreateContainerCluster(
 		return nil, err
 	}
 	return &CreateContainerClusterResponse{
-		Output: &operatorproto.Output{PlainText: operation.SelfLink},
+		Output: &pb.Output{PlainText: operation.SelfLink},
 	}, nil
 }
 
@@ -136,6 +135,6 @@ func (s *apiServer) ListInstances(
 
 	return &ListInstancesResponse{
 		Objects: instances,
-		Output:  &operatorproto.Output{PlainText: output.String()},
+		Output:  &pb.Output{PlainText: output.String()},
 	}, nil
 }
