@@ -21,11 +21,11 @@ module StormEnvModule
   private
 
   def topo_name(full_topo_param)
-    "#{full_topo_param}".split(':')[0].strip!
+    "#{full_topo_param}".split(':')[0].strip
   end
 
   def topo_class(full_topo_param)
-    "#{full_topo_param}".split(':')[1].strip!
+    "#{full_topo_param}".split(':')[1].strip
   end
 
   def remove_topology(topo)
