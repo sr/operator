@@ -14,19 +14,19 @@ import (
 	"services/papertrail"
 
 	"google.golang.org/grpc"
-	"operator"
+	"github.com/sr/operator/server"
 	"go.pedge.io/env"
 )
 
 func run() error {
-	config, err := operator.NewConfigFromEnv()
+	config, err := server.NewConfigFromEnv()
 	if err != nil {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	logger := operator.NewLogger()
-	instrumentator := operator.NewInstrumentator(logger)
-	server := operator.NewServer(grpcServer, config, logger, instrumentator)
+	logger := server.NewLogger()
+	instrumentator := server.NewInstrumentator(logger)
+	server := server.NewServer(grpcServer, config, logger, instrumentator)
 
 	buildkiteEnv := &buildkite.Env{}
 	if err := env.Populate(buildkiteEnv); err != nil {
