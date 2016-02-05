@@ -140,6 +140,60 @@ module.exports = (robot) ->
     ]
     msg.send msg.random tomcatwaits
 
+  robot.respond /franciskitty$/i, (msg) ->
+    franciskitty = [
+      'http://i.imgur.com/lk2AF0Z.jpg'
+      'http://i.imgur.com/eSl4bjv.jpg'
+      'http://i.imgur.com/lLVPGgT.jpg'
+      'http://i.imgur.com/u3bnpha.jpg'
+      'http://i.imgur.com/AbMV7mZ.jpg'
+      'http://i.imgur.com/GQpVxx7.jpg'
+      'http://i.imgur.com/AQekPbY.jpg'
+      'http://i.imgur.com/8qH7aV2.jpg'
+      'http://i.imgur.com/tbqLCZM.jpg'
+      'http://i.imgur.com/pP0Wpt4.jpg'
+      'http://i.imgur.com/tU4sboO.jpg'
+      'http://i.imgur.com/gK8ovRq.jpg'
+      'http://i.imgur.com/32hlBIZ.jpg'
+      'http://i.imgur.com/8zA5sBF.jpg'
+      'http://i.imgur.com/FgyDrnS.jpg'
+      'http://i.imgur.com/sFNhpJ7.jpg'
+      'http://i.imgur.com/q5eUZzr.jpg'
+      'http://i.imgur.com/M6GSXYR.jpg'
+      'http://i.imgur.com/VOTJXWf.jpg'
+      'http://i.imgur.com/BOtPbYr.jpg'
+      'http://i.imgur.com/mPGxexh.jpg'
+      'http://i.imgur.com/BWxKv1w.jpg'
+      'http://i.imgur.com/iD3Ab3L.jpg'
+      'http://i.imgur.com/6XyhrNb.jpg'
+      'http://i.imgur.com/bwmpXE9.jpg'
+      'http://i.imgur.com/PzFRrnO.jpg'
+      'http://i.imgur.com/Wl3FquX.jpg'
+      'http://i.imgur.com/YET5N0W.jpg'
+      'http://i.imgur.com/LB1ljDc.jpg'
+      'http://i.imgur.com/pYmYkPY.jpg'
+      'http://i.imgur.com/4N7zupq.jpg'
+      'http://i.imgur.com/Nilv8nH.jpg'
+      'http://i.imgur.com/5HxTRL2.jpg'
+      'http://i.imgur.com/YdjNjSV.jpg'
+      'http://i.imgur.com/0XI4zUx.jpg'
+      'http://i.imgur.com/PATmKSh.jpg'
+      'http://i.imgur.com/rtNkSaK.jpg'
+      'http://i.imgur.com/OZI4j9W.jpg'
+      'http://i.imgur.com/IFyqmGl.jpg'
+      'http://i.imgur.com/XJxoikU.jpg'
+      'http://i.imgur.com/J7GIJ01.jpg'
+      'http://i.imgur.com/XvmQ6DC.jpg'
+      'http://i.imgur.com/1yBuBew.jpg'
+      'http://i.imgur.com/eh00hLg.jpg'
+      'http://i.imgur.com/TejvjgK.jpg'
+      'http://i.imgur.com/oAwN9FI.jpg'
+      'http://i.imgur.com/RBoWOw7.jpg'
+      'http://i.imgur.com/FSg3ouG.jpg'
+      'http://i.imgur.com/bmt83vn.jpg'
+    ]
+    msg.send msg.random franciskitty
+
   robot.respond /bishop$/i, (msg) ->
     tehbishop = [
       'https://www.dropbox.com/s/uxy0wxomh49wqmy/2015-10-27%2016.13.43.jpg',
