@@ -87,7 +87,7 @@ describe Strategies::Deploy::Atomic do
           is_rollback = strategy.rollback?(rollback_deploy)
           expect(is_rollback).to be_truthy
 
-          allow(ShellHelper).to receive(:execute_shell).never
+          allow(ShellHelper).to receive(:execute).never
           strategy.rollback(rollback_deploy)
           expect(File.readlink("#{tempdir}/current")).to eq(build1link)
         end

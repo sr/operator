@@ -2,7 +2,7 @@ require "logger"
 require "shell_helper"
 
 # module to include in the proper environments for required hooks
-module StormEnvModule
+module Storm
   extend self
 
   PROC_KILL_WAIT_TIME = 45
@@ -22,25 +22,25 @@ module StormEnvModule
   private
 
   def topo_name(full_topo_param)
-    "#{full_topo_param}".split(':')[0]
+    full_topo_param.to_s.split(':')[0]
   end
 
   def topo_class(full_topo_param)
-    "#{full_topo_param}".split(':')[1]
+    full_topo_param.to_s.split(':')[1]
   end
 
   def remove_topology(topo)
-    ShellHelper.sudo_execute("#{STORM_BIN} kill #{topo_name(topo)} -w #{PROC_KILL_WAIT_TIME}", "storm")
+    ShellHelper.sudo_execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME], "storm", err: [:child, :out])
   end
 
   def active?(topo)
-    is_active = ShellHelper.sudo_execute("#{STORM_BIN} list | grep #{topo_name(topo)} | grep 'ACTIVE' | wc -l", "storm")
-    is_active == 1
+    list = ShellHelper.sudo_execute([STORM_BIN, "list"], "storm")
+    /^#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ =~ list
   end
 
   def add_topology(topo, jar)
-    add_topo_command = "#{STORM_BIN} jar -c env=prod #{jar} com.pardot.storm.topology.TopologyRunner --topo-def=#{topo_class(topo)} --name=#{topo_name(topo)} --remote"
-    add_topo_output = ShellHelper.sudo_execute("#{add_topo_command}", "storm")
+    add_topo_command = [STORM_BIN, "jar", "-c", "env=prod", jar, "com.pardot.storm.topology.TopologyRunner", "--topo-def=#{topo_class(topo)}", "--name=#{topo_name(topo)}", "--remote"]
+    add_topo_output = ShellHelper.sudo_execute(add_topo_command, "storm", err: [:child, :out])
     Logger.log(:info, "Topology Deploy Routine Command:\n#{add_topo_command}\n" )
     Logger.log(:info, "Topology Deploy Routine Output:\n#{add_topo_output}\n" )
   end
