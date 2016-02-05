@@ -1,4 +1,3 @@
-
 package controller
 
 import (
@@ -7,14 +6,12 @@ import (
 	"time"
 )
 
-
 // InstrumentedControllerServer implements and instruments ControllerServer
 // using the grpcinstrument package.
 type InstrumentedControllerServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	server         ControllerServer
 }
-
 
 // NewInstrumentedControllerServer constructs a instrumentation wrapper for
 // ControllerServer.

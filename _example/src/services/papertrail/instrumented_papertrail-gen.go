@@ -1,4 +1,3 @@
-
 package papertrail
 
 import (
@@ -7,14 +6,12 @@ import (
 	"time"
 )
 
-
 // InstrumentedPapertrailServiceServer implements and instruments PapertrailServiceServer
 // using the grpcinstrument package.
 type InstrumentedPapertrailServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	server         PapertrailServiceServer
 }
-
 
 // NewInstrumentedPapertrailServiceServer constructs a instrumentation wrapper for
 // PapertrailServiceServer.

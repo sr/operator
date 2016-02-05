@@ -18,7 +18,7 @@ package papertrail
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import operator "github.com/sr/operator/proto"
+import operator "github.com/sr/operator/pb"
 
 import (
 	context "golang.org/x/net/context"

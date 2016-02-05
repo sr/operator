@@ -1,4 +1,3 @@
-
 package buildkite
 
 import (
@@ -7,14 +6,12 @@ import (
 	"time"
 )
 
-
 // InstrumentedBuildkiteServiceServer implements and instruments BuildkiteServiceServer
 // using the grpcinstrument package.
 type InstrumentedBuildkiteServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	server         BuildkiteServiceServer
 }
-
 
 // NewInstrumentedBuildkiteServiceServer constructs a instrumentation wrapper for
 // BuildkiteServiceServer.

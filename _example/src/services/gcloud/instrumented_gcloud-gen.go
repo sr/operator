@@ -1,4 +1,3 @@
-
 package gcloud
 
 import (
@@ -7,14 +6,12 @@ import (
 	"time"
 )
 
-
 // InstrumentedGcloudServiceServer implements and instruments GcloudServiceServer
 // using the grpcinstrument package.
 type InstrumentedGcloudServiceServer struct {
 	instrumentator grpcinstrument.Instrumentator
 	server         GcloudServiceServer
 }
-
 
 // NewInstrumentedGcloudServiceServer constructs a instrumentation wrapper for
 // GcloudServiceServer.
