@@ -18,14 +18,14 @@ import (
 )
 
 func run() error {
-	config, err := operator.NewConfigFromEnv()
+	config, err := server.NewConfigFromEnv()
 	if err != nil {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	logger := operator.NewLogger()
-	instrumentator := operator.NewInstrumentator(logger)
-	server := operator.NewServer(grpcServer, config, logger, instrumentator)
+	logger := server.NewLogger()
+	instrumentator := server.NewInstrumentator(logger)
+	server := server.NewServer(grpcServer, config, logger, instrumentator)
 {{range .Services}}
 	{{.Name}}Env := &{{.PackageName}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
