@@ -67,6 +67,8 @@
 #   hubot bishop - Diffs cat
 #   hubot tomcatwaits - Caseys cat
 #   hubot mikacat - Brendas cat
+#   hubot franciskitty - Katis cat
+#   hubot waiting on op to deliver - OP IS A... nice person...
 
 _ = require "underscore"
 
@@ -116,6 +118,18 @@ module.exports = (robot) ->
       'https://media.giphy.com/media/YPjFIgSccMHS0/giphy.gif'
     ]
     msg.send msg.random bees
+
+  robot.respond /waiting(\s)?on(\s)?op(\s)?(to)?(\s)?(deliver)?$/i, (msg) ->
+    op = [
+      'http://i.imgur.com/ndeQyDK.jpg',
+      'http://imgur.com/KvS9SCN.jpg',
+      'http://i.imgur.com/rLKhdjB.jpg',
+      'http://i.imgur.com/QVsCo4c.jpg',
+      'http://i.imgur.com/IvvSf6k.jpg',
+      'http://i.imgur.com/h2FzYcr.jpg',
+      'http://i.imgur.com/6lYZZM6.png'
+    ]
+    msg.send msg.random op
 
   robot.respond /bingo$/i, (msg) ->
     bingo = [
