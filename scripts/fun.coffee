@@ -73,6 +73,9 @@
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /beningo$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
+
   robot.respond /cookiecakes$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/233/RdkTKW0cD8dGQ2e/ezgif.com-add-text.gif"
 
