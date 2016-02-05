@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sr/operator/pb"
+	"github.com/sr/operator/server"
 	"golang.org/x/net/context"
 	"k8s.io/kubernetes/pkg/api"
 	errors "k8s.io/kubernetes/pkg/api/errors"
@@ -57,7 +58,7 @@ func (s *apiServer) Deploy(
 	request *DeployRequest,
 ) (*DeployResponse, error) {
 	if request.BuildId == "" {
-		return nil, operator.NewArgumentRequiredError("BuildId")
+		return nil, server.NewArgumentRequiredError("BuildId")
 	}
 	hubotImage := getImage(s.hubot.Image, request.BuildId)
 	operatordImage := getImage(s.operatord.Image, request.BuildId)

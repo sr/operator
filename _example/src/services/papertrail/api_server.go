@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sr/operator/pb"
+	"github.com/sr/operator/server"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
@@ -23,7 +24,7 @@ func (s *apiServer) Search(
 	request *SearchRequest,
 ) (*SearchResponse, error) {
 	if request.Query == "" {
-		return nil, operator.NewArgumentRequiredError("Query")
+		return nil, server.NewArgumentRequiredError("Query")
 	}
 	options := papertrailapi.SearchOptions{
 		Query: request.Query,
