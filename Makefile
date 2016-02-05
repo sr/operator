@@ -67,7 +67,7 @@ example-vendor:
 	cp -r vendor/* _example/vendor/src/
 	rm -f _example/vendor/src/manifest
 	mkdir -p  _example/vendor/src/github.com/sr/operator
-	cp -r cmd generator proto protoeasy server _example/vendor/src/github.com/sr/operator
+	cp -r cmd generator pb proto protoeasy server _example/vendor/src/github.com/sr/operator
 	rm -rf _example/vendor/src/github.com/sr/operator/protoeasy/.git
 	git add -A _example/vendor/src _example/vendor/src/github.com/sr/operator
 	git add -u _example/vendor/src _example/vendor/src/github.com/sr/operator
