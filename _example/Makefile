@@ -12,6 +12,8 @@ PROTOC_GEN_OPERATORCMD ?= bin/protoc-gen-operatorcmd
 PROTOC_GEN_OPERATORD ?= bin/protoc-gen-operatord
 PROTOC_GEN_OPERATORHUBOT ?= bin/protoc-gen-operatorhubot
 
+all: build-operator $(OPERATOR) $(OPERATORD)
+
 build-operator: $(OPERATORC) \
 	$(PROTOC_GEN_GO) \
 	$(PROTOC_GEN_OPERATORCMD) \
@@ -34,10 +36,7 @@ vet:
 
 clean:
 	rm -f $(ERRCHECK) \
-		$(GB) \
-		$(GOLINT) \
 		$(OPERATORC) \
-		$(PROTOC_GEN_GO) \
 		$(PROTOC_GEN_OPERATORCMD) \
 		$(PROTOC_GEN_OPERATORD) \
 		$(PROTOC_GEN_OPERATORHUBOT)
@@ -76,6 +75,7 @@ $(PROTOC_GEN_OPERATORD): $(GB)
 	$< build github.com/sr/operator/cmd/protoc-gen-operatord
 
 .PHONY: \
+	all \
 	build-operator \
 	build \
 	clean \
