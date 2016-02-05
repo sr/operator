@@ -4,10 +4,9 @@ import (
 	"net"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator/pb"
 
 	"google.golang.org/grpc"
-
-	"github.com/sr/operator/proto"
 )
 
 const protocol = "tcp"
@@ -36,25 +35,25 @@ func newServer(
 func (s *server) Serve() error {
 	listener, err := net.Listen(protocol, s.config.Address)
 	if err != nil {
-		s.logger.Error(&operatorproto.ServerStartupError{err.Error()})
+		s.logger.Error(&pb.ServerStartupError{err.Error()})
 		return err
 	}
-	s.logger.Info(&operatorproto.ServerStartupNotice{Address: s.config.Address, Protocol: protocol})
+	s.logger.Info(&pb.ServerStartupNotice{Address: s.config.Address, Protocol: protocol})
 	err = s.server.Serve(listener)
 	if err != nil {
-		s.logger.Error(&operatorproto.ServerStartupError{err.Error()})
+		s.logger.Error(&pb.ServerStartupError{err.Error()})
 		return err
 	}
 	return nil
 }
 
 func (s *server) LogServiceRegistered(serviceName string) {
-	s.logger.Info(&operatorproto.ServiceRegistered{&operatorproto.Service{Name: serviceName}})
+	s.logger.Info(&pb.ServiceRegistered{&pb.Service{Name: serviceName}})
 }
 
 func (s *server) LogServiceStartupError(serviceName string, err error) {
-	s.logger.Error(&operatorproto.ServiceStartupError{
-		Service: &operatorproto.Service{
+	s.logger.Error(&pb.ServiceStartupError{
+		Service: &pb.Service{
 			Name: serviceName,
 		},
 		Message: err.Error(),
