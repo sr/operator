@@ -34,8 +34,8 @@ module StormEnvModule
 
   def active?(topo)
     is_active = ShellHelper.sudo_execute("#{STORM_BIN} list | grep #{topo_name(topo)} | grep 'ACTIVE' | wc -l", "storm")
-    Logger.log(:info, "Topology #{topo_name(topo)}: active? == #{is_active.strip.contains("1")}")
-    is_active.strip.contains("1")
+    Logger.log(:info, "Topology #{topo_name(topo)}: active? == #{is_active.strip == '1'}")
+    is_active.strip == '1'
   end
 
   def add_topology(topo, jar)
