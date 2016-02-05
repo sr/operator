@@ -259,7 +259,8 @@ module.exports = (robot) ->
 
   robot.respond /rubbs$/i, (msg) ->
     tehrubbs = [
-      'http://i.imgur.com/4R6F3bZ.png'
+      'http://i.imgur.com/4R6F3bZ.png',
+      'http://i.imgur.com/ECG14iD.gif'
     ]
     msg.send msg.random tehrubbs
 
