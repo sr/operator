@@ -1,14 +1,18 @@
-export PATH := bin/:$(PATH)
 export GO15VENDOREXPERIMENT := 1
-VERSION ?= $(shell git rev-parse --short HEAD)
-GO ?= go
+export PATH := bin/:$(PATH)
 ERRCHECK = $(GOBIN)/errcheck
+GO ?= go
 GOLINT ?= $(GOBIN)/golint
+PROTOEASY = $(GOBIN)/protoeasy
+VERSION ?= $(shell git rev-parse --short HEAD)
 
 -include etc/mk/golang.mk
 
 build:
 	$(GO) build -v ./...
+
+proto: $(PROTOEASY)
+	$< --go --grpc --go-import-path github.com/sr/operator/pb --out pb proto
 
 install:
 	$(GO) install -v ./...
@@ -32,6 +36,9 @@ $(ERRCHECK):
 
 $(GOLINT):
 	$(GO) get -v github.com/golang/lint/golint
+
+$(PROTOEASY):
+	$(GO) get -v go.pedge.io/protoeasy/cmd/protoeasy
 
 .PHONY: \
 	build \
