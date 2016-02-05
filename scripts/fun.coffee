@@ -69,10 +69,14 @@
 #   hubot mikacat - Brendas cat
 #   hubot franciskitty - Katis cat
 #   hubot waiting on op to deliver - OP IS A... nice person...
+#   hubot pingpong - ... ping pong
 
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /ping(\s)?pong$/i, (msg) ->
+    msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
+
   robot.respond /beningo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
 
