@@ -11,6 +11,7 @@ import (
 
 	"github.com/jmcvetta/randutil"
 	"github.com/sr/operator/pb"
+	"github.com/sr/operator/server"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
@@ -97,7 +98,7 @@ func (s *apiServer) ListInstances(
 	request *ListInstancesRequest,
 ) (*ListInstancesResponse, error) {
 	if request.ProjectId == "" {
-		return nil, operator.NewArgumentRequiredError("ProjectId")
+		return nil, server.NewArgumentRequiredError("ProjectId")
 	}
 
 	response, err := s.computeService.Instances.AggregatedList(request.ProjectId).Do()
