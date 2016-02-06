@@ -1,0 +1,5 @@
+FROM srozet/operator/ci:latest
+ENV PATH $GOBIN:$PATH
+VOLUME ["/in", "/ou"]
+WORKDIR /in
+ENTRYPOINT ["operatorc"]
