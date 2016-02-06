@@ -7,7 +7,7 @@ import (
 
 const (
 	protocCmd     = "protoc"
-	operatorProto = "github.com/sr/operator/proto"
+	operatorProto = "github.com/sr/operator"
 )
 
 type operatorPlugin struct {

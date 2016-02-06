@@ -32,7 +32,7 @@ func run() error {
 	options := &protoeasy.CompileOptions{
 		Go:          true,
 		Grpc:        true,
-		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator/pb"},
+		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator"},
 		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
 		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this
