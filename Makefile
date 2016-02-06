@@ -40,10 +40,18 @@ lint: $(GOLINT)
 	  done
 
 vet:
-	$(GO) vet ./...
+	@ for pkg in $$(go list ./... | grep -v github.com/sr/operator/vendor); do \
+			out="$$(go vet $$pkg)"; \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
+				exit 1; \
+			fi \
+	  done
 
 errcheck: $(ERRCHECK)
-	$< ./...
+	@ for pkg in $$(go list ./... | grep -v github.com/sr/operator/vendor); do \
+			$< $$pkg; \
+		done
 
 $(ERRCHECK):
 	$(GO) get -v github.com/kisielk/errcheck
