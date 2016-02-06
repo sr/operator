@@ -5,6 +5,11 @@ import (
 	"os"
 	"fmt"
 
+	"github.com/sr/operator/server"
+	"google.golang.org/grpc"
+	"go.pedge.io/env"
+
+
 	"services/buildkite"
 
 	"services/controller"
@@ -13,9 +18,6 @@ import (
 
 	"services/papertrail"
 
-	"google.golang.org/grpc"
-	"github.com/sr/operator/server"
-	"go.pedge.io/env"
 )
 
 func run() error {
@@ -35,7 +37,7 @@ func run() error {
 		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
 			server.LogServiceStartupError("buildkite", err)
 		} else {
-			instrumented := buildkite.NewInstrumentedBuildkiteServiceServer(instrumentator, buildkiteServer)
+			instrumented := &instrumented_buildkite_BuildkiteService{instrumentator, buildkiteServer}
 			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
 			server.LogServiceRegistered("buildkite")
 		}
@@ -48,7 +50,7 @@ func run() error {
 		if controllerServer, err := controller.NewAPIServer(controllerEnv); err != nil {
 			server.LogServiceStartupError("controller", err)
 		} else {
-			instrumented := controller.NewInstrumentedControllerServer(instrumentator, controllerServer)
+			instrumented := &instrumented_controller_Controller{instrumentator, controllerServer}
 			controller.RegisterControllerServer(grpcServer, instrumented)
 			server.LogServiceRegistered("controller")
 		}
@@ -61,7 +63,7 @@ func run() error {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
 			server.LogServiceStartupError("gcloud", err)
 		} else {
-			instrumented := gcloud.NewInstrumentedGcloudServiceServer(instrumentator, gcloudServer)
+			instrumented := &instrumented_gcloud_GcloudService{instrumentator, gcloudServer}
 			gcloud.RegisterGcloudServiceServer(grpcServer, instrumented)
 			server.LogServiceRegistered("gcloud")
 		}
@@ -74,7 +76,7 @@ func run() error {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
 			server.LogServiceStartupError("papertrail", err)
 		} else {
-			instrumented := papertrail.NewInstrumentedPapertrailServiceServer(instrumentator, papertrailServer)
+			instrumented := &instrumented_papertrail_PapertrailService{instrumentator, papertrailServer}
 			papertrail.RegisterPapertrailServiceServer(grpcServer, instrumented)
 			server.LogServiceRegistered("papertrail")
 		}
