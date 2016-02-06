@@ -674,6 +674,13 @@
 			"path": "/openpgp"
 		},
 		{
+			"importpath": "golang.org/x/crypto/ssh/terminal",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "1f22c0103821b9390939b6776727195525381532",
+			"branch": "master",
+			"path": "/ssh/terminal"
+		},
+		{
 			"importpath": "golang.org/x/net/context",
 			"repository": "https://go.googlesource.com/net",
 			"revision": "04b9de9b512f58addf28c9853d50ebef61c3953e",
