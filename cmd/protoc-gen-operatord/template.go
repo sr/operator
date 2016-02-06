@@ -27,7 +27,7 @@ func run() error {
 	}
 	grpcServer := grpc.NewServer()
 	logger := operator.NewLogger()
-	instrumentator := operator.NewInstrumentator(logger)
+	instrumentator := operator.NewInstrumentor(logger)
 	server := operator.NewServer(grpcServer, config, logger, instrumentator)
 {{range .Services}}
 	{{.Name}}Env := &{{.PackageName}}.Env{}
@@ -79,15 +79,17 @@ func (a *instrumented_{{$.PackageName}}_{{$.FullName}}) {{.Name}}(
 	request *servicepkg.{{.Input}},
 ) (response *servicepkg.{{.Output}}, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"{{$.PackageName}}",
-			"{{.Name}}",
-			"{{.Input}}",
-			"{{.Output}}",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"{{$.PackageName}}",
+				"{{.Name}}",
+				"{{.Input}}",
+				"{{.Output}}",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.{{.Name}}(ctx, request)
 }

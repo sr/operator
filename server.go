@@ -3,31 +3,29 @@ package operator
 import (
 	"net"
 
-	"github.com/sr/grpcinstrument"
-
 	"google.golang.org/grpc"
 )
 
 const protocol = "tcp"
 
 type server struct {
-	server         *grpc.Server
-	config         *Config
-	logger         Logger
-	instrumentator grpcinstrument.Instrumentator
+	server       *grpc.Server
+	config       *Config
+	logger       Logger
+	instrumentor Instrumentor
 }
 
 func newServer(
 	grpcServer *grpc.Server,
 	config *Config,
 	logger Logger,
-	instrumentator grpcinstrument.Instrumentator,
+	instrumentor Instrumentor,
 ) *server {
 	return &server{
 		grpcServer,
 		config,
 		logger,
-		instrumentator,
+		instrumentor,
 	}
 }
 

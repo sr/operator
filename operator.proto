@@ -3,13 +3,24 @@ syntax = "proto3";
 package operator;
 
 import "google/protobuf/descriptor.proto";
+import "vendor/github.com/sr/grpcinstrument/grpcinstrument.proto";
 
 option go_package = "operator";
+
+message Request {
+	Source source = 1;
+	grpcinstrument.Call call = 2;
+}
 
 message Source {
 	SourceType type = 1;
 	User user = 2;
 	Room room = 3;
+}
+
+enum SourceType {
+	HUBOT_SLACK = 0;
+	COMMAND = 1;
 }
 
 message Room {
@@ -23,11 +34,6 @@ message User {
 	string email = 4;
 }
 
-enum SourceType {
-	HUBOT_SLACK = 0;
-	COMMAND = 1;
-}
-
 message Output {
 	string PlainText = 1;
 }
@@ -36,6 +42,10 @@ message ServerStartupNotice {
 	string Address = 1;
 	string Protocol = 2;
 	repeated Service services = 3;
+}
+
+message Service {
+	string name = 1;
 }
 
 message ServerStartupError {
@@ -49,10 +59,6 @@ message ServiceRegistered {
 message ServiceStartupError {
 	Service service = 1;
 	string message = 2;
-}
-
-message Service {
-	string name = 1;
 }
 
 extend google.protobuf.ServiceOptions {
