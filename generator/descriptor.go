@@ -69,11 +69,13 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			}
 			for j, method := range service.Method {
 				inputName := strings.Split(method.GetInputType(), ".")[2]
+				outputName := strings.Split(method.GetOutputType(), ".")[2]
 				input := messagesByName[inputName]
 				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
 					Input:       inputName,
+					Output:      outputName,
 					Arguments:   make([]*Argument, len(input.Field)),
 				}
 				for k, field := range input.Field {
