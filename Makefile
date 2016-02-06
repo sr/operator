@@ -24,7 +24,7 @@ docker-build-operatorc:
 	$(DOCKER) build -t srozet/operator/operatorc -f etc/docker/Dockerfile.operatorc .
 
 proto: $(PROTOEASY)
-	$< --go --grpc --go-import-path $(PACKAGE)/pb --out pb proto
+	$< --go --grpc --go-import-path $(PACKAGE) --exclude _example,vendor,protoeasy .
 
 build:
 	$(GO) build -v ./...
