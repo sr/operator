@@ -1,7 +1,5 @@
-.git/
 _example/
 bin/
 doc/
 tmp/
-.gitingore
 vendor/manifest

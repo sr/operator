@@ -11,11 +11,17 @@ VERSION ?= $(shell git rev-parse --short HEAD)
 
 ci: clean fmt lint vet errcheck install
 
-ci-docker: docker-build-ci
-	$(DOCKER) run --rm srozet/operator/ci make ci
+ci-docker: docker-build-grpc docker-build-ci docker-build-operatorc
+	$(DOCKER) run --rm srozet/operator/ci
+
+docker-build-grpc:
+	$(DOCKER) build -t srozet/operator/grpc -f etc/docker/Dockerfile.grpc .
 
 docker-build-ci:
 	$(DOCKER) build -t srozet/operator/ci -f etc/docker/Dockerfile.ci .
+
+docker-build-operatorc:
+	$(DOCKER) build -t srozet/operator/operatorc -f etc/docker/Dockerfile.operatorc .
 
 proto: $(PROTOEASY)
 	$< --go --grpc --go-import-path $(PACKAGE)/pb --out pb proto
