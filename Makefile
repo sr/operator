@@ -2,6 +2,7 @@ export GO15VENDOREXPERIMENT := 1
 export PATH := bin/:$(PATH)
 ERRCHECK = $(GOBIN)/errcheck
 GO ?= go
+GOFMT ?= $(GOROOT)/bin/gofmt
 GOLINT ?= $(GOBIN)/golint
 PROTOEASY = $(GOBIN)/protoeasy
 VERSION ?= $(shell git rev-parse --short HEAD)
@@ -20,9 +21,18 @@ install:
 clean:
 	$(GO) clean -i ./..
 
+fmt: $(GOFMT)
+	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
+			out="$$($< -s -d $$file)"; \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
+				exit 1; \
+			fi \
+	  done
+
 lint: $(GOLINT)
 	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
-			out=$$($< $$file | grep -v 'should have comment'); \
+			out="$$($< $$file | grep -v 'should have comment')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				exit 1; \
