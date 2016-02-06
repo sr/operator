@@ -3,8 +3,7 @@ package controller
 import (
 	"fmt"
 
-	"github.com/sr/operator/pb"
-	"github.com/sr/operator/server"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"k8s.io/kubernetes/pkg/api"
 	errors "k8s.io/kubernetes/pkg/api/errors"
@@ -43,7 +42,7 @@ func (s *apiServer) CreateCluster(
 		return nil, fmt.Errorf("failed to create hubot resources: %v", err)
 	}
 	return &CreateClusterResponse{
-		Output: &pb.Output{
+		Output: &operator.Output{
 			PlainText: fmt.Sprintf(
 				"replication controllers: operatord=%s hubot=%s",
 				s.operatord.Name,
@@ -58,7 +57,7 @@ func (s *apiServer) Deploy(
 	request *DeployRequest,
 ) (*DeployResponse, error) {
 	if request.BuildId == "" {
-		return nil, server.NewArgumentRequiredError("BuildId")
+		return nil, operator.NewArgumentRequiredError("BuildId")
 	}
 	hubotImage := getImage(s.hubot.Image, request.BuildId)
 	operatordImage := getImage(s.operatord.Image, request.BuildId)
@@ -97,7 +96,7 @@ func (s *apiServer) Deploy(
 		return nil, fmt.Errorf("failed to deploy operatord: %v", err)
 	}
 	return &DeployResponse{
-		Output: &pb.Output{
+		Output: &operator.Output{
 			PlainText: fmt.Sprintf(
 				"deployed hubot=%s operatord=%s",
 				hubotImage,

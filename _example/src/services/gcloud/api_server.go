@@ -10,8 +10,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/jmcvetta/randutil"
-	"github.com/sr/operator/pb"
-	"github.com/sr/operator/server"
+	"github.com/sr/operator"
 
 	"golang.org/x/net/context"
 	"google.golang.org/api/compute/v1"
@@ -89,7 +88,7 @@ func (s *apiServer) CreateContainerCluster(
 		return nil, err
 	}
 	return &CreateContainerClusterResponse{
-		Output: &pb.Output{PlainText: operation.SelfLink},
+		Output: &operator.Output{PlainText: operation.SelfLink},
 	}, nil
 }
 
@@ -98,7 +97,7 @@ func (s *apiServer) ListInstances(
 	request *ListInstancesRequest,
 ) (*ListInstancesResponse, error) {
 	if request.ProjectId == "" {
-		return nil, server.NewArgumentRequiredError("ProjectId")
+		return nil, operator.NewArgumentRequiredError("ProjectId")
 	}
 
 	response, err := s.computeService.Instances.AggregatedList(request.ProjectId).Do()
@@ -136,6 +135,6 @@ func (s *apiServer) ListInstances(
 
 	return &ListInstancesResponse{
 		Objects: instances,
-		Output:  &pb.Output{PlainText: output.String()},
+		Output:  &operator.Output{PlainText: output.String()},
 	}, nil
 }

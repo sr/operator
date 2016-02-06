@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/sr/operator/pb"
-	"github.com/sr/operator/server"
+	"github.com/sr/operator"
 
 	papertrailapi "github.com/sourcegraph/go-papertrail/papertrail"
 	"golang.org/x/net/context"
@@ -24,7 +23,7 @@ func (s *apiServer) Search(
 	request *SearchRequest,
 ) (*SearchResponse, error) {
 	if request.Query == "" {
-		return nil, server.NewArgumentRequiredError("Query")
+		return nil, operator.NewArgumentRequiredError("Query")
 	}
 	options := papertrailapi.SearchOptions{
 		Query: request.Query,
@@ -47,6 +46,6 @@ func (s *apiServer) Search(
 	}
 	return &SearchResponse{
 		Objects: logEvents,
-		Output:  &pb.Output{PlainText: output.String()},
+		Output:  &operator.Output{PlainText: output.String()},
 	}, nil
 }
