@@ -741,9 +741,23 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "google.golang.org/api/bigquery/v2",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "ddff2aff599105a55549cf173852507dfa094b7f",
+			"branch": "master",
+			"path": "/bigquery/v2"
+		},
+		{
+			"importpath": "google.golang.org/api/container/v1",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "ddff2aff599105a55549cf173852507dfa094b7f",
+			"branch": "master",
+			"path": "/container/v1"
+		},
+		{
 			"importpath": "google.golang.org/api/gensupport",
 			"repository": "https://code.googlesource.com/google-api-go-client",
-			"revision": "f6ba98773d96b877b246f3a9266493dfc11e276b",
+			"revision": "ddff2aff599105a55549cf173852507dfa094b7f",
 			"branch": "master",
 			"path": "/gensupport"
 		},
@@ -760,6 +774,46 @@
 			"revision": "f6ba98773d96b877b246f3a9266493dfc11e276b",
 			"branch": "master",
 			"path": "/logging/v1beta3"
+		},
+		{
+			"importpath": "google.golang.org/api/pubsub/v1",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "ddff2aff599105a55549cf173852507dfa094b7f",
+			"branch": "master",
+			"path": "/pubsub/v1"
+		},
+		{
+			"importpath": "google.golang.org/api/storage/v1",
+			"repository": "https://code.googlesource.com/google-api-go-client",
+			"revision": "ddff2aff599105a55549cf173852507dfa094b7f",
+			"branch": "master",
+			"path": "/storage/v1"
+		},
+		{
+			"importpath": "google.golang.org/appengine",
+			"repository": "https://github.com/golang/appengine",
+			"revision": "6a436539be38c296a8075a871cc536686b458371",
+			"branch": "master"
+		},
+		{
+			"importpath": "google.golang.org/cloud",
+			"repository": "https://code.googlesource.com/gocloud",
+			"revision": "7b74a8091e8f9470c1977a210a15dceac1da8824",
+			"branch": "master"
+		},
+		{
+			"importpath": "google.golang.org/cloud/compute/metadata",
+			"repository": "https://code.googlesource.com/gocloud",
+			"revision": "7b74a8091e8f9470c1977a210a15dceac1da8824",
+			"branch": "master",
+			"path": "/compute/metadata"
+		},
+		{
+			"importpath": "google.golang.org/cloud/internal",
+			"repository": "https://code.googlesource.com/gocloud",
+			"revision": "7b74a8091e8f9470c1977a210a15dceac1da8824",
+			"branch": "master",
+			"path": "/internal"
 		},
 		{
 			"importpath": "google.golang.org/grpc",
