@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	servicepkg "services/controller"
 )
 
 type instrumented_controller_Controller struct {
-	instrumentator grpcinstrument.Instrumentator
-	server         servicepkg.ControllerServer
+	instrumentor operator.Instrumentor
+	server       servicepkg.ControllerServer
 }
 
 
@@ -22,15 +23,17 @@ func (a *instrumented_controller_Controller) CreateCluster(
 	request *servicepkg.CreateClusterRequest,
 ) (response *servicepkg.CreateClusterResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"controller",
-			"CreateCluster",
-			"CreateClusterRequest",
-			"CreateClusterResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"controller",
+				"CreateCluster",
+				"CreateClusterRequest",
+				"CreateClusterResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.CreateCluster(ctx, request)
 }
@@ -41,15 +44,17 @@ func (a *instrumented_controller_Controller) Deploy(
 	request *servicepkg.DeployRequest,
 ) (response *servicepkg.DeployResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"controller",
-			"Deploy",
-			"DeployRequest",
-			"DeployResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"controller",
+				"Deploy",
+				"DeployRequest",
+				"DeployResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.Deploy(ctx, request)
 }

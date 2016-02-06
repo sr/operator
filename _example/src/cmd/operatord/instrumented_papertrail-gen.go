@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	servicepkg "services/papertrail"
 )
 
 type instrumented_papertrail_PapertrailService struct {
-	instrumentator grpcinstrument.Instrumentator
-	server         servicepkg.PapertrailServiceServer
+	instrumentor operator.Instrumentor
+	server       servicepkg.PapertrailServiceServer
 }
 
 
@@ -22,15 +23,17 @@ func (a *instrumented_papertrail_PapertrailService) Search(
 	request *servicepkg.SearchRequest,
 ) (response *servicepkg.SearchResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"papertrail",
-			"Search",
-			"SearchRequest",
-			"SearchResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"papertrail",
+				"Search",
+				"SearchRequest",
+				"SearchResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.Search(ctx, request)
 }

@@ -5,80 +5,80 @@ import (
 	"os"
 	"fmt"
 
-	"github.com/sr/operator/server"
+	"github.com/sr/operator"
 	"google.golang.org/grpc"
 	"go.pedge.io/env"
 
-
-	"services/buildkite"
-
-	"services/controller"
 
 	"services/gcloud"
 
 	"services/papertrail"
 
+	"services/buildkite"
+
+	"services/controller"
+
 )
 
 func run() error {
-	config, err := server.NewConfigFromEnv()
+	config, err := operator.NewConfigFromEnv()
 	if err != nil {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	logger := server.NewLogger()
-	instrumentator := server.NewInstrumentator(logger)
-	server := server.NewServer(grpcServer, config, logger, instrumentator)
-
-	buildkiteEnv := &buildkite.Env{}
-	if err := env.Populate(buildkiteEnv); err != nil {
-		server.LogServiceStartupError("buildkite", err)
-	} else {
-		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
-			server.LogServiceStartupError("buildkite", err)
-		} else {
-			instrumented := &instrumented_buildkite_BuildkiteService{instrumentator, buildkiteServer}
-			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("buildkite")
-		}
-	}
-
-	controllerEnv := &controller.Env{}
-	if err := env.Populate(controllerEnv); err != nil {
-		server.LogServiceStartupError("controller", err)
-	} else {
-		if controllerServer, err := controller.NewAPIServer(controllerEnv); err != nil {
-			server.LogServiceStartupError("controller", err)
-		} else {
-			instrumented := &instrumented_controller_Controller{instrumentator, controllerServer}
-			controller.RegisterControllerServer(grpcServer, instrumented)
-			server.LogServiceRegistered("controller")
-		}
-	}
+	logger := operator.NewLogger()
+	instrumentator := operator.NewInstrumentor(logger)
+	server := operator.NewServer(grpcServer, config, logger, instrumentator)
 
 	gcloudEnv := &gcloud.Env{}
 	if err := env.Populate(gcloudEnv); err != nil {
-		server.LogServiceStartupError("gcloud", err)
+		operator.LogServiceStartupError("gcloud", err)
 	} else {
 		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
-			server.LogServiceStartupError("gcloud", err)
+			operator.LogServiceStartupError("gcloud", err)
 		} else {
 			instrumented := &instrumented_gcloud_GcloudService{instrumentator, gcloudServer}
 			gcloud.RegisterGcloudServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("gcloud")
+			operator.LogServiceRegistered("gcloud")
 		}
 	}
 
 	papertrailEnv := &papertrail.Env{}
 	if err := env.Populate(papertrailEnv); err != nil {
-		server.LogServiceStartupError("papertrail", err)
+		operator.LogServiceStartupError("papertrail", err)
 	} else {
 		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
-			server.LogServiceStartupError("papertrail", err)
+			operator.LogServiceStartupError("papertrail", err)
 		} else {
 			instrumented := &instrumented_papertrail_PapertrailService{instrumentator, papertrailServer}
 			papertrail.RegisterPapertrailServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("papertrail")
+			operator.LogServiceRegistered("papertrail")
+		}
+	}
+
+	buildkiteEnv := &buildkite.Env{}
+	if err := env.Populate(buildkiteEnv); err != nil {
+		operator.LogServiceStartupError("buildkite", err)
+	} else {
+		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
+			operator.LogServiceStartupError("buildkite", err)
+		} else {
+			instrumented := &instrumented_buildkite_BuildkiteService{instrumentator, buildkiteServer}
+			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
+			operator.LogServiceRegistered("buildkite")
+		}
+	}
+
+	controllerEnv := &controller.Env{}
+	if err := env.Populate(controllerEnv); err != nil {
+		operator.LogServiceStartupError("controller", err)
+	} else {
+		if controllerServer, err := controller.NewAPIServer(controllerEnv); err != nil {
+			operator.LogServiceStartupError("controller", err)
+		} else {
+			instrumented := &instrumented_controller_Controller{instrumentator, controllerServer}
+			controller.RegisterControllerServer(grpcServer, instrumented)
+			operator.LogServiceRegistered("controller")
 		}
 	}
 
