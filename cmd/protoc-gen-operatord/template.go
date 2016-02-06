@@ -62,14 +62,15 @@ import (
 	"time"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	servicepkg "{{.ImportPath}}"
 )
 
 type instrumented_{{.PackageName}}_{{.FullName}} struct {
-	instrumentator grpcinstrument.Instrumentator
-	server         servicepkg.{{.FullName}}Server
+	instrumentor operator.Instrumentor
+	server       servicepkg.{{.FullName}}Server
 }
 
 {{range .Methods}}
