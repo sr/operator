@@ -11,7 +11,7 @@ import (
 	"os"
 	"fmt"
 
-	"github.com/sr/operator/server"
+	"github.com/sr/operator"
 	"google.golang.org/grpc"
 	"go.pedge.io/env"
 
@@ -21,25 +21,25 @@ import (
 )
 
 func run() error {
-	config, err := server.NewConfigFromEnv()
+	config, err := operator.NewConfigFromEnv()
 	if err != nil {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	logger := server.NewLogger()
-	instrumentator := server.NewInstrumentator(logger)
-	server := server.NewServer(grpcServer, config, logger, instrumentator)
+	logger := operator.NewLogger()
+	instrumentator := operator.NewInstrumentator(logger)
+	server := operator.NewServer(grpcServer, config, logger, instrumentator)
 {{range .Services}}
 	{{.Name}}Env := &{{.PackageName}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
-		server.LogServiceStartupError("{{.Name}}", err)
+		operator.LogServiceStartupError("{{.Name}}", err)
 	} else {
 		if {{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Env); err != nil {
-			server.LogServiceStartupError("{{.Name}}", err)
+			operator.LogServiceStartupError("{{.Name}}", err)
 		} else {
 			instrumented := &instrumented_{{.PackageName}}_{{.FullName}}{instrumentator, {{.Name}}Server}
 			{{.Name}}.Register{{camelCase .FullName}}Server(grpcServer, instrumented)
-			server.LogServiceRegistered("{{.Name}}")
+			operator.LogServiceRegistered("{{.Name}}")
 		}
 	}
 {{end}}
