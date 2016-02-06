@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	servicepkg "services/buildkite"
 )
 
 type instrumented_buildkite_BuildkiteService struct {
-	instrumentator grpcinstrument.Instrumentator
-	server         servicepkg.BuildkiteServiceServer
+	instrumentor operator.Instrumentor
+	server       servicepkg.BuildkiteServiceServer
 }
 
 
@@ -22,15 +23,17 @@ func (a *instrumented_buildkite_BuildkiteService) Status(
 	request *servicepkg.StatusRequest,
 ) (response *servicepkg.StatusResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"buildkite",
-			"Status",
-			"StatusRequest",
-			"StatusResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"buildkite",
+				"Status",
+				"StatusRequest",
+				"StatusResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.Status(ctx, request)
 }
@@ -41,15 +44,17 @@ func (a *instrumented_buildkite_BuildkiteService) ListBuilds(
 	request *servicepkg.ListBuildsRequest,
 ) (response *servicepkg.ListBuildsResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"buildkite",
-			"ListBuilds",
-			"ListBuildsRequest",
-			"ListBuildsResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"buildkite",
+				"ListBuilds",
+				"ListBuildsRequest",
+				"ListBuildsResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.ListBuilds(ctx, request)
 }

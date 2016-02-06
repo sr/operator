@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/sr/grpcinstrument"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	servicepkg "services/gcloud"
 )
 
 type instrumented_gcloud_GcloudService struct {
-	instrumentator grpcinstrument.Instrumentator
-	server         servicepkg.GcloudServiceServer
+	instrumentor operator.Instrumentor
+	server       servicepkg.GcloudServiceServer
 }
 
 
@@ -22,15 +23,17 @@ func (a *instrumented_gcloud_GcloudService) CreateContainerCluster(
 	request *servicepkg.CreateContainerClusterRequest,
 ) (response *servicepkg.CreateContainerClusterResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"gcloud",
-			"CreateContainerCluster",
-			"CreateContainerClusterRequest",
-			"CreateContainerClusterResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"gcloud",
+				"CreateContainerCluster",
+				"CreateContainerClusterRequest",
+				"CreateContainerClusterResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.CreateContainerCluster(ctx, request)
 }
@@ -41,15 +44,17 @@ func (a *instrumented_gcloud_GcloudService) ListInstances(
 	request *servicepkg.ListInstancesRequest,
 ) (response *servicepkg.ListInstancesResponse, err error) {
 	defer func(start time.Time) {
-		grpcinstrument.Instrument(
-			a.instrumentator,
-			"gcloud",
-			"ListInstances",
-			"ListInstancesRequest",
-			"ListInstancesResponse",
-			err,
-			start,
-		)
+		a.instrumentor.Instrument(&operator.Request{
+			Source: request.Source,
+			Call: grpcinstrument.NewCall(
+				"gcloud",
+				"ListInstances",
+				"ListInstancesRequest",
+				"ListInstancesResponse",
+				err,
+				start,
+			),
+		})
 	}(time.Now())
 	return a.server.ListInstances(ctx, request)
 }
