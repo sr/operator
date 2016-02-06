@@ -16,7 +16,7 @@ var (
 	serverOutDir string
 
 	errNoSourceDir = errors.New("Please specify a input source directory.")
-	errNoOutDir    = errors.New("Please specify one of --cmd-out, --hubot-out, or --server-out.")
+	errNoOutDir    = errors.New("Please specify at least one of --cmd-out, --hubot-out, or --server-out.")
 )
 
 func run() error {
