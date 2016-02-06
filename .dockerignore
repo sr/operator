@@ -1,11 +1,7 @@
-.git
-.gitingore
+.git/
+_example/
 bin/
-pkg/
-src/hubot/node_modules/
+doc/
 tmp/
-vendor/pkg/
-!bin/ci
-!bin/k8s-hubot
-!tmp/k8s-exec
-!tmp/operatord
+.gitingore
+vendor/manifest
