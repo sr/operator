@@ -21,8 +21,12 @@ clean:
 	$(GO) clean -i ./..
 
 lint: $(GOLINT)
-	@ for file in $$(find . -name '*.go' | grep -v _example | grep -v vendor); do \
-			$< $$file; \
+	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
+			out=$$($< $$file | grep -v 'should have comment'); \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
+				exit 1; \
+			fi \
 	  done
 
 vet:
