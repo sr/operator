@@ -1,0 +1,8 @@
+FROM golang:1.6rc2
+MAINTAINER Simon Rozet <me@simonrozet.com>
+WORKDIR $GOPATH/src/github.com/sr/operator
+ENV GOROOT /usr/local/go
+ENV GOBIN $GOPATH/bin
+ENV PATH $GOBIN:$PATH
+ADD . $GOPATH/src/github.com/sr/operator
+WORKDIR $GOPATH/src/github.com/sr/operator

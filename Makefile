@@ -1,25 +1,33 @@
 export GO15VENDOREXPERIMENT := 1
 export PATH := bin/:$(PATH)
+DOCKER ?= docker
 ERRCHECK = $(GOBIN)/errcheck
 GO ?= go
 GOFMT ?= $(GOROOT)/bin/gofmt
 GOLINT ?= $(GOBIN)/golint
+PACKAGE ?= github.com/sr/operator
 PROTOEASY = $(GOBIN)/protoeasy
 VERSION ?= $(shell git rev-parse --short HEAD)
 
--include etc/mk/golang.mk
+ci: clean fmt lint vet errcheck install
+
+ci-docker: docker-build-ci
+	$(DOCKER) run --rm srozet/operator/ci make ci
+
+docker-build-ci:
+	$(DOCKER) build -t srozet/operator/ci -f etc/docker/Dockerfile.ci .
+
+proto: $(PROTOEASY)
+	$< --go --grpc --go-import-path $(PACKAGE)/pb --out pb proto
 
 build:
 	$(GO) build -v ./...
-
-proto: $(PROTOEASY)
-	$< --go --grpc --go-import-path github.com/sr/operator/pb --out pb proto
 
 install:
 	$(GO) install -v ./...
 
 clean:
-	$(GO) clean -i ./..
+	$(GO) clean -i ./...
 
 fmt: $(GOFMT)
 	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
@@ -40,7 +48,7 @@ lint: $(GOLINT)
 	  done
 
 vet:
-	@ for pkg in $$(go list ./... | grep -v github.com/sr/operator/vendor); do \
+	@ for pkg in $$(go list ./... | grep -v $(PACKAGE)/vendor); do \
 			out="$$(go vet $$pkg)"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
@@ -49,7 +57,7 @@ vet:
 	  done
 
 errcheck: $(ERRCHECK)
-	@ for pkg in $$(go list ./... | grep -v github.com/sr/operator/vendor); do \
+	@ for pkg in $$(go list ./... | grep -v $(PACKAGE)/vendor); do \
 			$< $$pkg; \
 		done
 
@@ -104,12 +112,6 @@ proto-protoeasy: $(PROTOEASY)
 
 goget-openflights:
 	go get go.pedge.io/openflights
-
-docker-ci: docker-build-ci
-	docker run --rm -e GITHUB_REPO_TOKEN=$(GITHUB_REPO_TOKEN) sr/ci bin/ci
-
-docker-build-ci:
-	docker build -t sr/ci -f etc/docker/Dockerfile.ci .
 
 docker-build-hubot:
 	docker build -t sr/hubot -f etc/docker/Dockerfile.hubot .
