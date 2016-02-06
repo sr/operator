@@ -16,7 +16,7 @@ var (
 	serverOutDir string
 
 	errNoSourceDir = errors.New("Please specify a input source directory.")
-	errNoOutDir    = errors.New("Please specify one of --cmd-out, --hubot-out, or --server-out.")
+	errNoOutDir    = errors.New("Please specify at least one of --cmd-out, --hubot-out, or --server-out.")
 )
 
 func run() error {
@@ -32,7 +32,7 @@ func run() error {
 	options := &protoeasy.CompileOptions{
 		Go:          true,
 		Grpc:        true,
-		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator/pb"},
+		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator"},
 		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
 		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this

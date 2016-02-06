@@ -9,8 +9,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-
-	"github.com/sr/operator/pb"
+	"github.com/sr/operator"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -50,7 +49,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			if service.Options == nil {
 				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
 			}
-			name, err := proto.GetExtension(service.Options, pb.E_Name)
+			name, err := proto.GetExtension(service.Options, operator.E_Name)
 			if err != nil {
 				return nil, err
 			}
@@ -69,11 +68,13 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			}
 			for j, method := range service.Method {
 				inputName := strings.Split(method.GetInputType(), ".")[2]
+				outputName := strings.Split(method.GetOutputType(), ".")[2]
 				input := messagesByName[inputName]
 				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
 					Input:       inputName,
+					Output:      outputName,
 					Arguments:   make([]*Argument, len(input.Field)),
 				}
 				for k, field := range input.Field {

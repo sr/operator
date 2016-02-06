@@ -41,6 +41,7 @@ type Method struct {
 	Name        string
 	Description string
 	Input       string
+	Output      string
 	Arguments   []*Argument
 }
 

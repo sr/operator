@@ -2,7 +2,7 @@ package protologger
 
 import (
 	"github.com/sr/grpcinstrument"
-	"go.pedge.io/protolog"
+	"github.com/sr/protolog"
 )
 
 type logger struct {
