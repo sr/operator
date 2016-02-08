@@ -2,6 +2,18 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/armon/go-radix",
+			"repository": "https://github.com/armon/go-radix",
+			"revision": "4239b77079c7b5d1243b7b4736304ce8ddb6f0f2",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/bgentry/speakeasy",
+			"repository": "https://github.com/bgentry/speakeasy",
+			"revision": "36e9cfdd690967f4f690c6edcc9ffacd006014a0",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"revision": "aea32c919a18e5ef4537bbd283ff29594b1b0165",
@@ -170,6 +182,18 @@
 			"importpath": "github.com/kisielk/gotool",
 			"repository": "https://github.com/kisielk/gotool",
 			"revision": "58a7a198f2ec6ea7af221fd216e7f559d663ce02",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/mitchellh/cli",
+			"repository": "https://github.com/mitchellh/cli",
+			"revision": "5c87c51cedf76a1737bf5ca3979e8644871598a6",
 			"branch": "master"
 		},
 		{
