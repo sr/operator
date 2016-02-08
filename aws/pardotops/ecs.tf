@@ -1,6 +1,6 @@
 variable "ecs_ami_id" {
   # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html
-  default = "ami-2b3b6041"
+  default = "ami-cb2305a1"
 }
 
 resource "aws_iam_role" "ecs_cluster_role" {
