@@ -9,7 +9,15 @@ TRUSTED_NETWORKS = [
   '169.45.0.88/32',     # squid-d4
   '136.147.104.20/30',  # pardot-proxyout1-{1,2,3,4}-dfw
   '136.147.96.20/30',   # pardot-proxyout1-{1,2,3,4}-phx
-].map { |i| IPAddr.new(i) }.freeze
+]
+
+# VirtualBox NAT IP for local development
+if Rails.env.development?
+  TRUSTED_NETWORKS << '10.0.2.2/32'
+end
+
+TRUSTED_NETWORKS.map! { |i| IPAddr.new(i) }
+TRUSTED_NETWORKS.freeze
 
 Rack::Attack.whitelist('ip whitelist') do |req|
   remote_ip = IPAddr.new(req.ip)
