@@ -34,7 +34,10 @@ module Storm
 
   def active?(topo)
     list = ShellHelper.sudo_execute([STORM_BIN, "list"], "storm")
-    list.each_line.select { |line| /#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ }.any?
+    topo_active = list.each_line.select { |line| /#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ }.any?
+    Logger.log(:info, "Topology #{topo_name(topo)}: active? == #{topo_active}")
+
+    topo_active
   end
 
   def add_topology(topo, jar)
