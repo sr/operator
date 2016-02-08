@@ -11,9 +11,8 @@ module Storm
   def load_topology(topo, jar)
     Logger.log(:info, "Loading Topology #{topo_name(topo)} : #{topo_class(topo)}")
     if active?(topo)
-      Logger.log(:info, "Topology #{topo_name(topo)} 'isactive'; removing...")
       remove_topology(topo)
-      Logger.log(:info, "Topology #{topo_name(topo)} removed")
+      Logger.log(:info, "Topology #{topo_name(topo)} killed! Waiting #{PROC_KILL_WAIT_TIME} seconds to resume deploy")
       sleep PROC_KILL_WAIT_TIME + 2
     end
     add_topology(topo, jar)
@@ -22,11 +21,11 @@ module Storm
   private
 
   def topo_name(full_topo_param)
-    full_topo_param.to_s.split(':')[0]
+    full_topo_param.to_s.split(':')[0].strip
   end
 
   def topo_class(full_topo_param)
-    full_topo_param.to_s.split(':')[1]
+    full_topo_param.to_s.split(':')[1].strip
   end
 
   def remove_topology(topo)
@@ -35,7 +34,7 @@ module Storm
 
   def active?(topo)
     list = ShellHelper.sudo_execute([STORM_BIN, "list"], "storm")
-    /^#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ =~ list
+    list.each_line.select { |line| /#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ }.any?
   end
 
   def add_topology(topo, jar)
