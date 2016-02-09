@@ -1,4 +1,5 @@
 require "time"
+require "timeout"
 require "helpers/salesedge"
 require_relative "base"
 
@@ -28,9 +29,14 @@ module Environments
     end
 
     def add_graphite_annotation(deploy)
-      cmd = "echo \"events.deploy.prod 1 #{Time.parse(deploy.created_at).to_i}\" | " + \
-            "nc #{GRAPHITE_HOST} #{GRAPHITE_PORT}"
-      ShellHelper.execute_shell(cmd)
+      Timeout.timeout(5) do
+        TCPSocket.open(GRAPHITE_HOST, GRAPHITE_PORT) do |sock|
+          sock.puts("events.deploy.prod 1 #{Time.parse(deploy.created_at).to_i}")
+          sock.close_write
+        end
+      end
+    rescue
+      Logger.log(:error, "Unable to connect to graphite: #{$!}")
     end
   end
 
