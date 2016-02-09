@@ -22,6 +22,7 @@
 #   hubot panic - PANIC!1!1!!!
 #   hubot elmo - ...elmo
 #   hubot jarsh - jarsh
+#   hubot rubbs - gifs
 #   hubot kyle - kyle
 #   hubot nippon - nippon
 #   hubot superkyle - superkyle
@@ -267,7 +268,8 @@ module.exports = (robot) ->
   robot.respond /rubbs$/i, (msg) ->
     tehrubbs = [
       'http://i.imgur.com/4R6F3bZ.png',
-      'http://i.imgur.com/ECG14iD.gif.png'
+      'http://i.imgur.com/ECG14iD.gif.png',
+      'http://i.imgur.com/MJxHYxq.gif.png'
     ]
     msg.send msg.random tehrubbs
 
