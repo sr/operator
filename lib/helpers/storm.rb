@@ -29,7 +29,7 @@ module Storm
   end
 
   def remove_topology(topo)
-    ShellHelper.sudo_execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME], "storm", err: [:child, :out])
+    ShellHelper.sudo_execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME.to_s], "storm", err: [:child, :out])
   end
 
   def active?(topo)
