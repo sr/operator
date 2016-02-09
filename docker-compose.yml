@@ -11,11 +11,10 @@ services:
     environment:
       PORT: "4000"
       BIND: "0.0.0.0"
+      CANOE_DATABASE_HOST: "mysql"
     volumes:
       - .:/app
     ports:
       - "4000:4000"
-    environment:
-      - CANOE_DATABASE_HOST=mysql
     links:
       - mysql
