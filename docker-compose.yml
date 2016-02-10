@@ -1,0 +1,15 @@
+version: "2"
+services:
+  redis:
+    image: redis:3.0.7
+    expose:
+      - "6379"
+  bot:
+    build: .
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+    volumes:
+      - .:/app
+    links:
+      - redis
