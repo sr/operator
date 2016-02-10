@@ -69,7 +69,7 @@
 #   hubot tomcatwaits - Caseys cat
 #   hubot mikacat - Brendas cat
 #   hubot franciskitty - Katis cat
-#   hubot waiting on op to deliver - OP IS A... nice person...
+#   hubot waiting on op to deliver || op || op will deliver || surely op will deliver - 2spoopy4me
 #   hubot pingpong - ... ping pong
 
 _ = require "underscore"
