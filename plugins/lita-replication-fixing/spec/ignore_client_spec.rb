@@ -1,3 +1,4 @@
+require "spec_helper"
 require "replication_fixing/ignore_client"
 
 module ReplicationFixing
