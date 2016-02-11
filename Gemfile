@@ -49,5 +49,4 @@ end
 
 group :production do
   gem 'rails_12factor', '0.0.3'
-  gem 'therubyracer', '~> 0.12', '>= 0.12.2'
 end
