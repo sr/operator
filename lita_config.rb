@@ -1,3 +1,5 @@
+require_relative "lib/lita/adapters/nothing"
+
 Lita.configure do |config|
   config.robot.name = "Hal 9000"
   config.robot.alias = "!"
@@ -14,6 +16,9 @@ Lita.configure do |config|
   # config.robot.admins = ["1", "2"]
 
   config.robot.adapter = (ENV.fetch("LITA_ADAPTER", "shell")).to_sym
+
+  config.http.host = "0.0.0.0"
+  config.http.port = 8080
 
   ## Example: Set options for the chosen adapter.
   # config.adapter.username = "myname"

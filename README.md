@@ -13,7 +13,7 @@ devenv compose up
 In another shell, connect to the bot:
 
 ```bash
-devenv compose run bot
+devenv compose run -e LITA_ADAPTER=shell bot
 ```
 
 You should be connect to an interactive session with Hal9000:
