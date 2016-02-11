@@ -510,7 +510,8 @@ module.exports = (robot) ->
 
   robot.respond /tbone$/i, (msg) ->
     tbones = [
-      "https://hipchat.dev.pardot.com/files/1/42/ttSs2Ol0zENJGq0/TBone.jpeg"
+      "https://hipchat.dev.pardot.com/files/1/42/ttSs2Ol0zENJGq0/TBone.jpeg",
+      "https://i.imgur.com/CxladXR.gif.png"
     ]
 
     msg.send msg.random tbones
