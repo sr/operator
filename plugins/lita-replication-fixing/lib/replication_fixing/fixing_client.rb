@@ -47,6 +47,7 @@ module ReplicationFixing
 
     private
     def execute_fix(hostname)
+      @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)
     end
   end
 end

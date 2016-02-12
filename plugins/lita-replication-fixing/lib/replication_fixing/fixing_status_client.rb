@@ -2,6 +2,12 @@ module ReplicationFixing
   class FixingStatusClient
     SHARD_NAMESPACE = "fixing_status"
 
+    # Status keys expire after 10 minutes. The assumption is that if we haven't
+    # touched the key in 10 minutes, the errors have subsided. In the future,
+    # it'd be nice to be sure of this assumption (e.g., by having rep_fix report
+    # success).
+    KEY_TTL = 60 * 10
+
     Status = Struct.new(:fixing?, :started_at)
 
     def initialize(redis)
@@ -11,7 +17,11 @@ module ReplicationFixing
     # Ensures that we have taken note of the fixing that's going on. Creates a
     # status if one doesn't exist, or does nothing if one already does.
     def ensure_fixing_status_ongoing(shard_id)
-      @redis.hsetnx([SHARD_NAMESPACE, shard_id].join(":"), "started_at", Time.now.to_i)
+      key = [SHARD_NAMESPACE, shard_id].join(":")
+      @redis.multi do
+        @redis.hsetnx(key, "started_at", Time.now.to_i)
+        @redis.expire(key, KEY_TTL)
+      end
     end
 
     def status(shard_id)

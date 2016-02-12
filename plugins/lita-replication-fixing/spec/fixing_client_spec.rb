@@ -43,7 +43,9 @@ module ReplicationFixing
 
           expect(ignore_client.skipped_errors_count).to eq(0)
         end
+      end
 
+      context "normal case" do
         it "returns an error if repfix returns an error" do
           hostname = Hostname.new("db-s11")
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
@@ -72,6 +74,25 @@ module ReplicationFixing
 
           result = fixing_client.fix(hostname)
           expect(result).to be_kind_of(FixingClient::NoErrorDetected)
+        end
+
+        it "keeps status about the error, if present and fixable" do
+          hostname = Hostname.new("db-s11")
+          stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+
+          fixing_client.fix(hostname)
+          expect(fixing_status_client.status(11).fixing?).to be_truthy
+          expect(fixing_status_client.status(11).started_at.to_i).to be_within(1).of(Time.now.to_i)
+        end
+
+        it "does not keep status about the error, if it's not fixable" do
+          hostname = Hostname.new("db-s11")
+          stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
+
+          fixing_client.fix(hostname)
+          expect(fixing_status_client.status(11).fixing?).to be_falsey
         end
       end
     end
