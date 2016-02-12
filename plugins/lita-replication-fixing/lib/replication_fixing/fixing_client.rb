@@ -89,7 +89,7 @@ module ReplicationFixing
     def send_page(description, incident_key:)
       @pager.trigger(description, incident_key: incident_key)
     rescue => e
-      log.error("Unable to dispatch page: #{description}")
+      @log.error("Unable to dispatch page: #{description}")
     end
 
     def build_incident_key(hostname:)
