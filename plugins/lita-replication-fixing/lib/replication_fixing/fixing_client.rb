@@ -11,9 +11,8 @@ module ReplicationFixing
       @ignore_client = ignore_client
 
       @repfix = Faraday.new(url: @repfix_url) do |faraday|
-        faraday.request  :url_encoded
-        faraday.response :logger
-        faraday.adapter  Faraday.default_adapter
+        faraday.request :url_encoded
+        faraday.adapter Faraday.default_adapter
       end
     end
 
