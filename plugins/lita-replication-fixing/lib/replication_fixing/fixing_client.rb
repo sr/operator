@@ -38,7 +38,7 @@ module ReplicationFixing
             elsif json["is_erroring"] && json["is_fixable"]
               execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user)
             elsif json["is_erroring"]
-              # TODO: Notify PagerDuty
+              send_page("#{hostname}: replication broken, no automated fix available", hostname)
               # TODO: Reset status
               NotFixable.new(json)
             else !json["is_erroring"]
@@ -71,7 +71,7 @@ module ReplicationFixing
             elsif json["is_erroring"] && json["is_fixable"]
               FixInProgress.new(true, current_status.started_at)
             elsif json["is_erroring"]
-              # TODO: Notify PagerDuty
+              send_page("#{hostname}: replication broken, no automated fix available", hostname)
               # TODO: Reset status
               NotFixable.new(json)
             else !json["is_erroring"]
@@ -86,8 +86,8 @@ module ReplicationFixing
       end
     end
 
-    def send_page(description, incident_key:)
-      @pager.trigger(description, incident_key: incident_key)
+    def send_page(description, hostname)
+      @pager.trigger(description, incident_key: build_incident_key(hostname: hostname))
     rescue => e
       @log.error("Unable to dispatch page: #{description}")
     end

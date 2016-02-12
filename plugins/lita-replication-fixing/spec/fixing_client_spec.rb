@@ -71,6 +71,15 @@ module ReplicationFixing
           expect(result.status).to eq("is_erroring" => true, "is_fixable" => false)
         end
 
+        it "pages if an error is present and it is not fixable" do
+          hostname = Hostname.new("db-s11")
+          stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
+
+          fixing_client.fix(hostname: hostname)
+          expect(pager.incidents.count).to eq(1)
+        end
+
         it "returns no error detected if the shard is not erroring" do
           hostname = Hostname.new("db-s11")
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
