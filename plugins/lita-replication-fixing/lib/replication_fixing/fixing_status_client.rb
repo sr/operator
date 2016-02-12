@@ -24,6 +24,11 @@ module ReplicationFixing
       end
     end
 
+    # Deletes the status entry. Used when the fix is no longer active.
+    def reset_status(shard_id)
+      @redis.del([SHARD_NAMESPACE, shard_id].join(":"))
+    end
+
     def status(shard_id)
       hash = @redis.hgetall([SHARD_NAMESPACE, shard_id].join(":"))
 

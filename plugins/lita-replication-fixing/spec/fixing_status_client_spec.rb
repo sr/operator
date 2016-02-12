@@ -19,5 +19,17 @@ module ReplicationFixing
         expect(client.status(11).started_at.to_i).to be_within(1).of(Time.now.to_i)
       end
     end
+
+    describe "#reset_status" do
+      it "deletes the status" do
+        client = FixingStatusClient.new(Lita.redis)
+        client.ensure_fixing_status_ongoing(11)
+
+        expect(client.status(11).fixing?).to be_truthy
+
+        client.reset_status(11)
+        expect(client.status(11).fixing?).to be_falsey
+      end
+    end
   end
 end

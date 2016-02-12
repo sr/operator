@@ -80,6 +80,18 @@ module ReplicationFixing
           expect(pager.incidents.count).to eq(1)
         end
 
+        it "resets the status of the fixing if the error is no longer fixable" do
+          hostname = Hostname.new("db-s11")
+          stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
+
+          fixing_status_client.ensure_fixing_status_ongoing(11)
+          expect(fixing_status_client.status(11).fixing?).to be_truthy
+
+          fixing_client.fix(hostname: hostname)
+          expect(fixing_status_client.status(11).fixing?).to be_falsey
+        end
+
         it "returns no error detected if the shard is not erroring" do
           hostname = Hostname.new("db-s11")
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")

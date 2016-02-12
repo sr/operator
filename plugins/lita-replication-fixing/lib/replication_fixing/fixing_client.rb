@@ -39,7 +39,7 @@ module ReplicationFixing
               execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user)
             elsif json["is_erroring"]
               send_page("#{hostname}: replication broken, no automated fix available", hostname)
-              # TODO: Reset status
+              @fixing_status_client.reset_status(hostname.shard_id)
               NotFixable.new(json)
             else !json["is_erroring"]
               NoErrorDetected.new(json)
@@ -72,7 +72,7 @@ module ReplicationFixing
               FixInProgress.new(true, current_status.started_at)
             elsif json["is_erroring"]
               send_page("#{hostname}: replication broken, no automated fix available", hostname)
-              # TODO: Reset status
+              @fixing_status_client.reset_status(hostname.shard_id)
               NotFixable.new(json)
             else !json["is_erroring"]
               NoErrorDetected.new(json)
