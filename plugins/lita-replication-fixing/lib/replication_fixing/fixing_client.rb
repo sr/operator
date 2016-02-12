@@ -6,9 +6,10 @@ module ReplicationFixing
     NoErrorDetected = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error, :status)
 
-    def initialize(repfix_url:, ignore_client:, repfix_api_key: ENV["REPFIX_API_KEY"])
+    def initialize(repfix_url:, ignore_client:, fixing_status_client:)
       @repfix_url = repfix_url
       @ignore_client = ignore_client
+      @fixing_status_client = fixing_status_client
 
       @repfix = Faraday.new(url: @repfix_url) do |faraday|
         faraday.request :url_encoded

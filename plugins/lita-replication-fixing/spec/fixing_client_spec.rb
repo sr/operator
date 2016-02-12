@@ -8,13 +8,13 @@ module ReplicationFixing
     include Lita::RSpec
 
     let(:ignore_client) { IgnoreClient.new(Lita.redis) }
-    let(:repfix_api_key) { "abc123".freeze }
+    let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
 
     subject(:fixing_client) {
       FixingClient.new(
         repfix_url: "https://repfix.example",
         ignore_client: ignore_client,
-        repfix_api_key: repfix_api_key,
+        fixing_status_client: fixing_status_client,
       )
     }
 
