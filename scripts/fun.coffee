@@ -449,7 +449,8 @@ module.exports = (robot) ->
       'https://www.youtube.com/watch?v=QCniMXdbO6c',
       'https://www.youtube.com/watch?v=JYc05gZFly0',
       'https://www.youtube.com/watch?v=NsICCjOQ3Dg',
-      'https://i.imgur.com/KZf5kWZ.png'
+      'https://i.imgur.com/KZf5kWZ.png',
+      'https://hipchat.dev.pardot.com/files/1/282/rqc8fbRx4NvHwop/2016-02-12%2014_42_30.gif'
     ]
 
     msg.send msg.random panics
