@@ -2,6 +2,7 @@ require "spec_helper"
 require "replication_fixing/ignore_client"
 require "replication_fixing/fixing_client"
 require "replication_fixing/hostname"
+require "replication_fixing/test_pager"
 
 module ReplicationFixing
   RSpec.describe FixingClient do
@@ -9,12 +10,16 @@ module ReplicationFixing
 
     let(:ignore_client) { IgnoreClient.new(Lita.redis) }
     let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
+    let(:pager) { TestPager.new }
+    let(:logger) { Logger.new("/dev/null") }
 
     subject(:fixing_client) {
       FixingClient.new(
         repfix_url: "https://repfix.example",
         ignore_client: ignore_client,
         fixing_status_client: fixing_status_client,
+        pager: pager,
+        log: logger,
       )
     }
 

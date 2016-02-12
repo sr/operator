@@ -9,10 +9,12 @@ module ReplicationFixing
     ErrorCheckingFixability = Struct.new(:error)
     FixInProgress = Struct.new(:new_fix, :started_at)
 
-    def initialize(repfix_url:, ignore_client:, fixing_status_client:)
+    def initialize(repfix_url:, ignore_client:, fixing_status_client:, pager:, log:)
       @repfix_url = repfix_url
       @ignore_client = ignore_client
       @fixing_status_client = fixing_status_client
+      @pager = pager
+      @log = log
 
       @repfix = Faraday.new(url: @repfix_url, ssl: {verify: false}) do |faraday|
         faraday.request :url_encoded
@@ -82,6 +84,16 @@ module ReplicationFixing
           ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
         end
       end
+    end
+
+    def send_page(description, incident_key:)
+      @pager.trigger(description, incident_key: incident_key)
+    rescue => e
+      log.error("Unable to dispatch page: #{description}")
+    end
+
+    def build_incident_key(hostname:)
+      ["replication-error", hostname.to_s].join("/")
     end
   end
 end

@@ -2,6 +2,8 @@ require "json"
 require "replication_fixing/ignore_client"
 require "replication_fixing/fixing_status_client"
 require "replication_fixing/fixing_client"
+require "replication_fixing/pagerduty_pager"
+require "replication_fixing/test_pager"
 require "replication_fixing/hostname"
 
 module Lita
@@ -9,11 +11,23 @@ module Lita
     class ReplicationFixing < Handler
       config :repfix_url, default: "https://repfix.tools.pardot.com"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
+      config :pager, default: "pagerduty"
+      config :pagerduty_service_key
 
       http.post "/replication/errors", :create_replication_error
 
-      def initialize(*)
+      def initialize(robot)
         super
+
+        @pager = \
+          case config.pager.to_s
+          when "pagerduty"
+            ::ReplicationFixing::PagerdutyPager.new(config.pagerduty_service_key)
+          when "test"
+            ::ReplicationFixing::TestPager.new
+          else
+            raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
+          end
 
         @ignore_client = ::ReplicationFixing::IgnoreClient.new(redis)
         @fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(redis)
@@ -21,6 +35,8 @@ module Lita
           repfix_url: config.repfix_url,
           ignore_client: @ignore_client,
           fixing_status_client: @fixing_status_client,
+          pager: @pager,
+          log: log,
         )
       end
 
@@ -38,6 +54,7 @@ module Lita
             case result
             when ::ReplicationFixing::FixingClient::NoErrorDetected
               log.debug("Got an error for #{hostname} but rep_fix reported no error when I checked")
+              # TODO: Say something anyway, because that's what current Hal does
             when ::ReplicationFixing::FixingClient::ShardIsIgnored
               log.debug("Shard is ignored: #{hostname}")
             when ::ReplicationFixing::FixingClient::AllShardsIgnored

@@ -2,6 +2,10 @@ require "spec_helper"
 require "json"
 
 describe Lita::Handlers::ReplicationFixing, lita_handler: true do
+  before do
+    registry.config.handlers.replication_fixing.pager = "test"
+  end
+
   describe "POST /replication/errors" do
     it "attempts to fix the error and notifies the ops room" do
       stub_request(:get, "https://repfix.tools.pardot.com/replication/fixes/for/db/1/dallas")
