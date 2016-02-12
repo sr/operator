@@ -62,8 +62,7 @@ module ReplicationFixing
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
           result = fixing_client.fix(hostname: hostname)
-          expect(result).to be_kind_of(FixingClient::ErrorCheckingFixability)
-          expect(result.error).to eq("not fixable")
+          expect(result).to be_kind_of(FixingClient::NotFixable)
           expect(result.status).to eq("is_erroring" => true, "is_fixable" => false)
         end
 

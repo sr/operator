@@ -1,5 +1,7 @@
 module ReplicationFixing
   class Hostname
+    MalformedHostname = Class.new(StandardError)
+
     DATACENTER_ABBREVIATIONS = {
       "s" => "seattle",
       "d" => "dallas",
@@ -10,6 +12,10 @@ module ReplicationFixing
     def initialize(hostname)
       @hostname = hostname
       parse_hostname
+    end
+
+    def to_s
+      @hostname
     end
 
     private
@@ -36,6 +42,8 @@ module ReplicationFixing
 
         @shard_id = shard_id.to_i
         @datacenter = DATACENTER_ABBREVIATIONS.fetch(datacenter_abbreviation)
+      else
+        raise MalformedHostname
       end
     end
   end

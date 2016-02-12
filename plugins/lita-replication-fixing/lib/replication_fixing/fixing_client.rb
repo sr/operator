@@ -2,24 +2,25 @@ require "faraday"
 
 module ReplicationFixing
   class FixingClient
+    NoErrorDetected = Struct.new(:status)
     ShardIsIgnored = Class.new
     AllShardsIgnored = Struct.new(:skipped_errors_count)
-    NoErrorDetected = Struct.new(:status)
-    ErrorCheckingFixability = Struct.new(:error, :status)
-    FixInProgress = Struct.new(:new_fix, :started_at, :strategy)
+    NotFixable = Struct.new(:status)
+    ErrorCheckingFixability = Struct.new(:error)
+    FixInProgress = Struct.new(:new_fix, :started_at)
 
     def initialize(repfix_url:, ignore_client:, fixing_status_client:)
       @repfix_url = repfix_url
       @ignore_client = ignore_client
       @fixing_status_client = fixing_status_client
 
-      @repfix = Faraday.new(url: @repfix_url) do |faraday|
+      @repfix = Faraday.new(url: @repfix_url, ssl: {verify: false}) do |faraday|
         faraday.request :url_encoded
         faraday.adapter Faraday.default_adapter
       end
     end
 
-    def fix(hostname:, user: "unknown")
+    def fix(hostname:, user: "system")
       ignoring = @ignore_client.ignoring?(hostname.shard_id)
       if ignoring == :shard
         ShardIsIgnored.new
@@ -31,11 +32,13 @@ module ReplicationFixing
           begin
             json = JSON.parse(response.body)
             if json["error"]
-              ErrorCheckingFixability.new(json["error"], {})
+              ErrorCheckingFixability.new(json["error"])
             elsif json["is_erroring"] && json["is_fixable"]
               execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user)
             elsif json["is_erroring"]
-              ErrorCheckingFixability.new("not fixable", json)
+              # TODO: Notify PagerDuty
+              # TODO: Reset status
+              NotFixable.new(json)
             else !json["is_erroring"]
               NoErrorDetected.new(json)
             end
@@ -55,18 +58,20 @@ module ReplicationFixing
 
       if fix["active"]
         # Rep fix is still trying to fix this
-        FixInProgress.new(false, current_status.started_at, fix["strategy"])
+        FixInProgress.new(false, current_status.started_at)
       else
         response = @repfix.post("/replication/fix/#{hostname.prefix}/#{hostname.shard_id}", user: user)
         if response.status == 200
           begin
             json = JSON.parse(response.body)
             if json["error"]
-              ErrorCheckingFixability.new(json["error"], {})
+              ErrorCheckingFixability.new(json["error"])
             elsif json["is_erroring"] && json["is_fixable"]
-              FixInProgress.new(true, current_status.started_at, json["strategy"])
+              FixInProgress.new(true, current_status.started_at)
             elsif json["is_erroring"]
-              ErrorCheckingFixability.new("not fixable", json)
+              # TODO: Notify PagerDuty
+              # TODO: Reset status
+              NotFixable.new(json)
             else !json["is_erroring"]
               NoErrorDetected.new(json)
             end
