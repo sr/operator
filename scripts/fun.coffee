@@ -511,6 +511,7 @@ module.exports = (robot) ->
 
   robot.respond /tbone$/i, (msg) ->
     tbones = [
+      "https://hipchat.dev.pardot.com/files/1/282/rqc8fbRx4NvHwop/2016-02-12%2014_42_30.gif",
       "https://hipchat.dev.pardot.com/files/1/42/ttSs2Ol0zENJGq0/TBone.jpeg",
       "https://i.imgur.com/CxladXR.gif.png"
     ]
