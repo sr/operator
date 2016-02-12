@@ -2,7 +2,8 @@ require "faraday"
 
 module ReplicationFixing
   class FixingClient
-    ShardIsIgnored = Struct.new(:ignore_count)
+    ShardIsIgnored = Class.new
+    AllShardsIgnored = Struct.new(:skipped_errors_count)
     NoErrorDetected = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error, :status)
 
@@ -18,9 +19,11 @@ module ReplicationFixing
     end
 
     def fix(hostname)
-      if @ignore_client.ignoring?(hostname.shard_id)
-        # TODO: count
-        return ShardIsIgnored.new(0)
+      ignoring = @ignore_client.ignoring?(hostname.shard_id)
+      if ignoring == :shard
+        ShardIsIgnored.new
+      elsif ignoring == :all
+        AllShardsIgnored.new(@ignore_client.incr_skipped_errors_count)
       else
         response = @repfix.get("/replication/fixes/for/#{hostname.prefix}/#{hostname.shard_id}/#{hostname.datacenter}")
         if response.status == 200

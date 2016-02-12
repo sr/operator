@@ -19,10 +19,29 @@ module ReplicationFixing
     }
 
     describe "#fix" do
+      context "when fixing is globally ignored" do
+        it "does nothing and returns a AllShardsIgnored result" do
+          ignore_client.ignore_all
+          expect(fixing_client.fix(Hostname.new("db-s11"))).to be_kind_of(FixingClient::AllShardsIgnored)
+        end
+
+        it "increments the skipped error count" do
+          ignore_client.ignore_all
+          expect(fixing_client.fix(Hostname.new("db-s11")).skipped_errors_count).to eq(1)
+        end
+      end
+
       context "when the shard is ignored" do
         it "does nothing and returns a ShardIsIgnored result" do
           ignore_client.ignore(11)
           expect(fixing_client.fix(Hostname.new("db-s11"))).to be_kind_of(FixingClient::ShardIsIgnored)
+        end
+
+        it "does not increment the skipped error count" do
+          ignore_client.ignore(11)
+          fixing_client.fix(Hostname.new("db-s11"))
+
+          expect(ignore_client.skipped_errors_count).to eq(0)
         end
 
         it "returns an error if repfix returns an error" do
