@@ -457,25 +457,25 @@ module.exports = (robot) ->
 
   robot.respond /engage$/i, (msg) ->
     engages = [
-      'http://i.imgur.com/kSUHUU7.gif',
+      'http://i.imgur.com/kSUHUU7.gif.png',
       'http://i.imgur.com/MX458aQ.jpg',
-      'http://i.imgur.com/s4kO6Zj.gif',
-      'http://i.imgur.com/GfzcTu0.gif',
-      'http://i.imgur.com/utFIfjv.gif',
-      'http://i.imgur.com/pjEU3Fo.gif',
-      'http://i.imgur.com/Y6PRvR3.gif',
-      'http://i.imgur.com/KQujX2P.gif',
-      'http://i.imgur.com/JuA0Ts4.gif',
-      'http://i.imgur.com/otOwD1Q.gif',
-      'http://i.imgur.com/O0t44wR.gif',
-      'http://i.imgur.com/bjc4vlo.gif',
-      'http://i.imgur.com/yEyw4FU.gif',
-      'http://i.imgur.com/HgjO87I.gif',
-      'http://i.imgur.com/QJvY45C.gif',
-      'http://i.imgur.com/gGDcx0W.gif',
-      'http://i.imgur.com/R0ZVqSo.gif',
-      'http://i.imgur.com/4LWaG0a.gif',
-      'http://i.imgur.com/e2WJpvI.gif'
+      'http://i.imgur.com/s4kO6Zj.gif.png',
+      'http://i.imgur.com/GfzcTu0.gif.png',
+      'http://i.imgur.com/utFIfjv.gif.png',
+      'http://i.imgur.com/pjEU3Fo.gif.png',
+      'http://i.imgur.com/Y6PRvR3.gif.png',
+      'http://i.imgur.com/KQujX2P.gif.png',
+      'http://i.imgur.com/JuA0Ts4.gif.png',
+      'http://i.imgur.com/otOwD1Q.gif.png',
+      'http://i.imgur.com/O0t44wR.gif.png',
+      'http://i.imgur.com/bjc4vlo.gif.png',
+      'http://i.imgur.com/yEyw4FU.gif.png',
+      'http://i.imgur.com/HgjO87I.gif.png',
+      'http://i.imgur.com/QJvY45C.gif.png',
+      'http://i.imgur.com/gGDcx0W.gif.png',
+      'http://i.imgur.com/R0ZVqSo.gif.png',
+      'http://i.imgur.com/4LWaG0a.gif.png',
+      'http://i.imgur.com/e2WJpvI.gif.png'
     ]
     msg.send msg.random engages
 
