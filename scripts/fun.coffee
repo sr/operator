@@ -142,7 +142,7 @@ module.exports = (robot) ->
       'http://cdn.meme.li/instances/400x/25527349.jpg',
       'http://i.imgur.com/dgH8ht8.png',
       'http://new4.fjcdn.com/pictures/Op_00374b_2061066.jpeg',
-      'http://i1.kym-cdn.com/photos/images/facebook/000/592/253/714.jpg;,
+      'http://i1.kym-cdn.com/photos/images/facebook/000/592/253/714.jpg',
       'http://i0.kym-cdn.com/photos/images/original/000/160/195/OP-Will-deliver-soon.jpg'
     ]
     msg.send msg.random op
