@@ -189,6 +189,45 @@ resource "aws_security_group" "internal_apps_http_lb" {
   }
 }
 
+resource "aws_security_group" "internal_apps_dc_only_http_lb" {
+  name = "internal_apps_dc_only_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC datacenters only"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group_rule" "internal_apps_allow_lb_http" {
   type = "ingress"
   from_port = 80
