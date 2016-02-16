@@ -2,7 +2,6 @@ require "spec_helper"
 require "replication_fixing/ignore_client"
 require "replication_fixing/fixing_client"
 require "replication_fixing/hostname"
-require "replication_fixing/test_pager"
 
 module ReplicationFixing
   RSpec.describe FixingClient do
@@ -10,7 +9,6 @@ module ReplicationFixing
 
     let(:ignore_client) { IgnoreClient.new(Lita.redis) }
     let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
-    let(:pager) { TestPager.new }
     let(:logger) { Logger.new("/dev/null") }
 
     subject(:fixing_client) {
@@ -18,7 +16,6 @@ module ReplicationFixing
         repfix_url: "https://repfix.example",
         ignore_client: ignore_client,
         fixing_status_client: fixing_status_client,
-        pager: pager,
         log: logger,
       )
     }
@@ -69,15 +66,6 @@ module ReplicationFixing
           result = fixing_client.fix(hostname: hostname)
           expect(result).to be_kind_of(FixingClient::NotFixable)
           expect(result.status).to eq("is_erroring" => true, "is_fixable" => false)
-        end
-
-        it "pages if an error is present and it is not fixable" do
-          hostname = Hostname.new("db-s11")
-          stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
-            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
-
-          fixing_client.fix(hostname: hostname)
-          expect(pager.incidents.count).to eq(1)
         end
 
         it "resets the status of the fixing if the error is no longer fixable" do

@@ -1,10 +1,11 @@
 require "json"
-require "replication_fixing/ignore_client"
-require "replication_fixing/fixing_status_client"
+require "replication_fixing/alerting_manager"
 require "replication_fixing/fixing_client"
+require "replication_fixing/fixing_status_client"
+require "replication_fixing/hostname"
+require "replication_fixing/ignore_client"
 require "replication_fixing/pagerduty_pager"
 require "replication_fixing/test_pager"
-require "replication_fixing/hostname"
 
 module Lita
   module Handlers
@@ -29,13 +30,17 @@ module Lita
             raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
           end
 
+        @alerting_manager = ::ReplicationFixing::AlertingManager.new(
+          pager: @pager,
+          log: log,
+        )
+
         @ignore_client = ::ReplicationFixing::IgnoreClient.new(redis)
         @fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(redis)
         @fixing_client = ::ReplicationFixing::FixingClient.new(
           repfix_url: config.repfix_url,
           ignore_client: @ignore_client,
           fixing_status_client: @fixing_status_client,
-          pager: @pager,
           log: log,
         )
       end
@@ -51,6 +56,8 @@ module Lita
             hostname = ::ReplicationFixing::Hostname.new(json["hostname"])
 
             result = @fixing_client.fix(hostname: hostname)
+            @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
+
             case result
             when ::ReplicationFixing::FixingClient::NoErrorDetected
               log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
@@ -61,21 +68,18 @@ module Lita
               log.debug("All shards are ignored")
               if (result.skipped_errors_count % 200).zero?
                 robot.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
-                send_page("Replication fixing is globally disabled, but errors are still being observed")
               end
             when ::ReplicationFixing::FixingClient::NotFixable
               robot.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
-              # TODO: Send page
               # TODO: Report error in ops-replication
             when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-              # TODO: Notify PagerDuty
               robot.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
             when ::ReplicationFixing::FixingClient::FixInProgress
               if result.new_fix
                 robot.send_message(config.status_room, "Fixing replication on #{hostname}")
               elsif (Time.now - result.started_at) > 10 * 60
+                @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
                 robot.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
-                # TODO: Notify PagerDuty
               end
             else
               log.error("Got unknown response from client: #{result}")
@@ -90,13 +94,6 @@ module Lita
           response.status = 400
           response.body << JSON.dump("error" => "mysql_last_error or hostname missing")
         end
-      end
-
-      private
-      def send_page(description, incident_key: nil)
-        @pager.trigger(description, incident_key: incident_key)
-      rescue => e
-        @log.error("Unable to dispatch page: #{description}")
       end
 
       Lita.register_handler(self)
