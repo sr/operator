@@ -99,6 +99,23 @@ module.exports = (robot) ->
   robot.respond /the(\s)?best(\s)?gif(\s)?ever$/i, (msg) ->
     msg.send "http://media4.giphy.com/media/V9qc3Adm2wWyY/giphy.gif"
 
+  robot.respond /op$/i, (msg) ->
+    op = [
+      'http://i.imgur.com/rLKhdjB.jpg',
+      'http://i1027.photobucket.com/albums/y333/doomcrusader_photos/op-will-surely-deliver-lets-just-wait.jpg',
+      'http://www.quickmeme.com/img/f2/f2094f8ab40fd53d787fd13087c5fb3074bf7be616dee3b970e98b138d2f1b1c.jpg',
+      'http://2.bp.blogspot.com/-jfCvSmoNazI/UCFTCnVsKBI/AAAAAAAACN4/UgknohceyVo/s1600/reddit-repost.gif',
+      'http://cdn.memegenerator.net/instances/400x/33472244.jpg',
+      'http://i.imgur.com/aMTO97c.png',
+      'http://i0.kym-cdn.com/photos/images/facebook/000/345/125/92a.png',
+      'http://cdn.meme.li/instances/400x/25527349.jpg',
+      'http://i.imgur.com/dgH8ht8.png',
+      'http://new4.fjcdn.com/pictures/Op_00374b_2061066.jpeg',
+      'http://i1.kym-cdn.com/photos/images/facebook/000/592/253/714.jpg;,
+      'http://i0.kym-cdn.com/photos/images/original/000/160/195/OP-Will-deliver-soon.jpg'
+    ]
+    msg.send msg.random op
+
   robot.respond /bees$/i, (msg) ->
     bees = [
       'http://i.giphy.com/dcubXtnbck0RG.gif',
