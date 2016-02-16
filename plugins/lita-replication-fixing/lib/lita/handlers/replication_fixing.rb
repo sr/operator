@@ -12,6 +12,7 @@ module Lita
     class ReplicationFixing < Handler
       config :repfix_url, default: "https://repfix.tools.pardot.com"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
+      config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
 
@@ -71,7 +72,7 @@ module Lita
               end
             when ::ReplicationFixing::FixingClient::NotFixable
               robot.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
-              # TODO: Report error in ops-replication
+              robot.send_message(config.replication_room, "#{hostname}: #{json["mysql_last_error"]}")
             when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
               robot.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
             when ::ReplicationFixing::FixingClient::FixInProgress
