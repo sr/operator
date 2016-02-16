@@ -53,18 +53,20 @@ module Lita
             result = @fixing_client.fix(hostname: hostname)
             case result
             when ::ReplicationFixing::FixingClient::NoErrorDetected
-              log.debug("Got an error for #{hostname} but rep_fix reported no error when I checked")
-              # TODO: Say something anyway, because that's what current Hal does
+              log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
+              robot.send_message(config.status_room, "Replication error reported for #{hostname}, but I couldn't find an error message. Replication might be broken for another reason (e.g., network connectivity or misconfiguration)")
             when ::ReplicationFixing::FixingClient::ShardIsIgnored
               log.debug("Shard is ignored: #{hostname}")
             when ::ReplicationFixing::FixingClient::AllShardsIgnored
               log.debug("All shards are ignored")
               if (result.skipped_errors_count % 200).zero?
-                # TODO: Notify PagerDuty
                 robot.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
+                send_page("Replication fixing is globally disabled, but errors are still being observed")
               end
             when ::ReplicationFixing::FixingClient::NotFixable
               robot.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+              # TODO: Send page
+              # TODO: Report error in ops-replication
             when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
               # TODO: Notify PagerDuty
               robot.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
@@ -88,6 +90,13 @@ module Lita
           response.status = 400
           response.body << JSON.dump("error" => "mysql_last_error or hostname missing")
         end
+      end
+
+      private
+      def send_page(description, incident_key: nil)
+        @pager.trigger(description, incident_key: incident_key)
+      rescue => e
+        @log.error("Unable to dispatch page: #{description}")
       end
 
       Lita.register_handler(self)

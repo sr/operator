@@ -9,11 +9,10 @@ module ReplicationFixing
     ErrorCheckingFixability = Struct.new(:error)
     FixInProgress = Struct.new(:new_fix, :started_at)
 
-    def initialize(repfix_url:, ignore_client:, fixing_status_client:, pager:, log:)
+    def initialize(repfix_url:, ignore_client:, fixing_status_client:, log:)
       @repfix_url = repfix_url
       @ignore_client = ignore_client
       @fixing_status_client = fixing_status_client
-      @pager = pager
       @log = log
 
       @repfix = Faraday.new(url: @repfix_url, ssl: {verify: false}) do |faraday|
@@ -38,7 +37,6 @@ module ReplicationFixing
             elsif json["is_erroring"] && json["is_fixable"]
               execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user)
             elsif json["is_erroring"]
-              send_page("#{hostname}: replication broken, no automated fix available", hostname)
               @fixing_status_client.reset_status(hostname.shard_id)
               NotFixable.new(json)
             else !json["is_erroring"]
@@ -71,7 +69,6 @@ module ReplicationFixing
             elsif json["is_erroring"] && json["is_fixable"]
               FixInProgress.new(true, current_status.started_at)
             elsif json["is_erroring"]
-              send_page("#{hostname}: replication broken, no automated fix available", hostname)
               @fixing_status_client.reset_status(hostname.shard_id)
               NotFixable.new(json)
             else !json["is_erroring"]
@@ -84,12 +81,6 @@ module ReplicationFixing
           ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
         end
       end
-    end
-
-    def send_page(description, hostname)
-      @pager.trigger(description, incident_key: build_incident_key(hostname: hostname))
-    rescue => e
-      @log.error("Unable to dispatch page: #{description}")
     end
 
     def build_incident_key(hostname:)
