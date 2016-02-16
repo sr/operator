@@ -66,32 +66,7 @@ module Lita
 
             result = @fixing_client.fix(hostname: hostname)
             @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
-
-            case result
-            when ::ReplicationFixing::FixingClient::NoErrorDetected
-              log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
-              @throttler.send_message(config.status_room, "Replication error reported for #{hostname}, but I couldn't find an error message. Replication might be broken for another reason (e.g., network connectivity or misconfiguration)")
-            when ::ReplicationFixing::FixingClient::ShardIsIgnored
-              log.debug("Shard is ignored: #{hostname}")
-            when ::ReplicationFixing::FixingClient::AllShardsIgnored
-              log.debug("All shards are ignored")
-              if (result.skipped_errors_count % 200).zero?
-                @throttler.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
-              end
-            when ::ReplicationFixing::FixingClient::NotFixable
-              @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
-            when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-              @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
-            when ::ReplicationFixing::FixingClient::FixInProgress
-              if result.new_fix
-                @throttler.send_message(config.status_room, "Fixing replication on #{hostname}")
-              elsif (Time.now - result.started_at) > 10 * 60
-                @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
-                @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
-              end
-            else
-              log.error("Got unknown response from client: #{result}")
-            end
+            reply_with_fix_result(hostname: hostname, result: result)
 
             response.status = 201
           rescue ::ReplicationFixing::Hostname::MalformedHostname
@@ -101,6 +76,36 @@ module Lita
         else
           response.status = 400
           response.body << JSON.dump("error" => "mysql_last_error or hostname missing")
+        end
+      end
+
+      private
+      def reply_with_fix_result(hostname:, result:)
+        case result
+        when ::ReplicationFixing::FixingClient::NoErrorDetected
+          log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
+        when ::ReplicationFixing::FixingClient::ShardIsIgnored
+          log.debug("Shard is ignored: #{hostname}")
+        when ::ReplicationFixing::FixingClient::AllShardsIgnored
+          log.debug("All shards are ignored")
+          if (result.skipped_errors_count % 200).zero?
+            @throttler.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
+          end
+        when ::ReplicationFixing::FixingClient::NotFixable
+          @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+        when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
+          @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
+        when ::ReplicationFixing::FixingClient::FixInProgress
+          if result.new_fix
+            @throttler.send_message(config.status_room, "/me is fixing replication on #{hostname}")
+          elsif (Time.now - result.started_at) > 10 * 60
+            @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
+            @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
+          else
+            @throttler.send_message(config.status_room, "/me still fixing replication on #{hostname}")
+          end
+        else
+          log.error("Got unknown response from client: #{result}")
         end
       end
 
