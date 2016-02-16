@@ -4,6 +4,7 @@ require "replication_fixing/fixing_client"
 require "replication_fixing/fixing_status_client"
 require "replication_fixing/hostname"
 require "replication_fixing/ignore_client"
+require "replication_fixing/message_throttler"
 require "replication_fixing/pagerduty_pager"
 require "replication_fixing/test_pager"
 
@@ -20,6 +21,8 @@ module Lita
 
       def initialize(robot)
         super
+
+        @throttler = ::ReplicationFixing::MessageThrottler.new(robot: robot)
 
         @pager = \
           case config.pager.to_s
@@ -62,25 +65,25 @@ module Lita
             case result
             when ::ReplicationFixing::FixingClient::NoErrorDetected
               log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
-              robot.send_message(config.status_room, "Replication error reported for #{hostname}, but I couldn't find an error message. Replication might be broken for another reason (e.g., network connectivity or misconfiguration)")
+              @throttler.send_message(config.status_room, "Replication error reported for #{hostname}, but I couldn't find an error message. Replication might be broken for another reason (e.g., network connectivity or misconfiguration)")
             when ::ReplicationFixing::FixingClient::ShardIsIgnored
               log.debug("Shard is ignored: #{hostname}")
             when ::ReplicationFixing::FixingClient::AllShardsIgnored
               log.debug("All shards are ignored")
               if (result.skipped_errors_count % 200).zero?
-                robot.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
+                @throttler.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
               end
             when ::ReplicationFixing::FixingClient::NotFixable
-              robot.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
-              robot.send_message(config.replication_room, "#{hostname}: #{json["mysql_last_error"]}")
+              @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+              @throttler.send_message(config.replication_room, "#{hostname}: #{json["mysql_last_error"]}")
             when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-              robot.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
+              @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
             when ::ReplicationFixing::FixingClient::FixInProgress
               if result.new_fix
-                robot.send_message(config.status_room, "Fixing replication on #{hostname}")
+                @throttler.send_message(config.status_room, "Fixing replication on #{hostname}")
               elsif (Time.now - result.started_at) > 10 * 60
                 @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
-                robot.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
+                @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
               end
             else
               log.error("Got unknown response from client: #{result}")
