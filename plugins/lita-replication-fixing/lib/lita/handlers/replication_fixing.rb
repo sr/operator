@@ -6,6 +6,7 @@ require "replication_fixing/hostname"
 require "replication_fixing/ignore_client"
 require "replication_fixing/message_throttler"
 require "replication_fixing/pagerduty_pager"
+require "replication_fixing/replication_error_sanitizer"
 require "replication_fixing/test_pager"
 
 module Lita
@@ -23,6 +24,7 @@ module Lita
         super
 
         @throttler = ::ReplicationFixing::MessageThrottler.new(robot: robot)
+        @sanitizer = ::ReplicationFixing::ReplicationErrorSanitizer.new
 
         @pager = \
           case config.pager.to_s
@@ -59,6 +61,9 @@ module Lita
           begin
             hostname = ::ReplicationFixing::Hostname.new(json["hostname"])
 
+            sanitized_error = @sanitizer.sanitize(json["mysql_last_error"])
+            @throttler.send_message(config.replication_room, "#{hostname}: #{sanitized_error}")
+
             result = @fixing_client.fix(hostname: hostname)
             @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
 
@@ -75,7 +80,6 @@ module Lita
               end
             when ::ReplicationFixing::FixingClient::NotFixable
               @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
-              @throttler.send_message(config.replication_room, "#{hostname}: #{json["mysql_last_error"]}")
             when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
               @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
             when ::ReplicationFixing::FixingClient::FixInProgress
