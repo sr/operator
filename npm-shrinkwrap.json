@@ -2567,9 +2567,9 @@
       }
     },
     "hubot-schedule": {
-      "version": "0.4.0",
-      "from": "git+https://github.com/moqada/hubot-schedule.git#ec967b07e6c6fe191108cab8b2b9886d57b4ff9a",
-      "resolved": "git+https://github.com/moqada/hubot-schedule.git#ec967b07e6c6fe191108cab8b2b9886d57b4ff9a"
+      "version": "0.4.1",
+      "from": "hubot-schedule@0.4.1",
+      "resolved": "https://registry.npmjs.org/hubot-schedule/-/hubot-schedule-0.4.1.tgz"
     },
     "hubot-scripts": {
       "version": "2.16.2",
