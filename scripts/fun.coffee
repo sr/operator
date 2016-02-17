@@ -71,6 +71,7 @@
 #   hubot franciskitty - Katis cat
 #   hubot waiting on op to deliver || op || op will deliver || surely op will deliver - 2spoopy4me
 #   hubot pingpong - ... ping pong
+#   hubot squirrelmaster - behold the master of squirrels
 
 _ = require "underscore"
 
@@ -530,6 +531,8 @@ module.exports = (robot) ->
 
     msg.send msg.random tbones
 
+  robot.respond /squirrelmaster/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/287/NsridkQpvzIyzsu/squirrelmaster.png"
 
   robot.respond /bestfriends$/i, (msg) ->
     bestfriendss = [
