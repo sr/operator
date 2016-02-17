@@ -28,6 +28,9 @@ Lita.configure do |config|
   config.adapters.hipchat.password = ENV.fetch("HIPCHAT_PASSWORD", "")
   config.adapters.hipchat.debug = true
 
+  # Replication fixing
+  config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
+
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
   config.redis[:port] = ENV.fetch("REDIS_PORT", "6379").to_i

@@ -21,7 +21,7 @@ module ReplicationFixing
       end
     end
 
-    def fix(hostname:, user: "system")
+    def fix(hostname:, user: "system", monitor_only: false)
       ignoring = @ignore_client.ignoring?(hostname.shard_id)
       if ignoring == :shard
         ShardIsIgnored.new
@@ -35,7 +35,7 @@ module ReplicationFixing
             if json["error"]
               ErrorCheckingFixability.new(json["error"])
             elsif json["is_erroring"] && json["is_fixable"]
-              execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user)
+              execute_fix(hostname: hostname, fix: json.fetch("fix", {}), user: user, monitor_only: monitor_only)
             elsif json["is_erroring"]
               @fixing_status_client.reset_status(hostname.shard_id)
               NotFixable.new(json)
@@ -52,11 +52,11 @@ module ReplicationFixing
     end
 
     private
-    def execute_fix(hostname:, fix:, user:)
+    def execute_fix(hostname:, fix:, user:, monitor_only:)
       @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)
       current_status = @fixing_status_client.status(hostname.shard_id)
 
-      if fix["active"]
+      if fix["active"] || monitor_only
         # Rep fix is still trying to fix this
         FixInProgress.new(false, current_status.started_at)
       else
