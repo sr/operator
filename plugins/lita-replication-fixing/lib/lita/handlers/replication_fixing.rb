@@ -54,6 +54,7 @@ module Lita
 
       on(:connected) do
         robot.join(config.status_room)
+        robot.join(config.replication_room)
       end
 
       def create_replication_error(request, response)
