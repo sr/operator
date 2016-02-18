@@ -19,6 +19,7 @@ module Lita
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
 
+      http.get "/replication/_ping", :ping
       http.post "/replication/errors", :create_replication_error
 
       def initialize(robot)
@@ -55,6 +56,11 @@ module Lita
       on(:connected) do
         robot.join(config.status_room)
         robot.join(config.replication_room)
+      end
+
+      def ping(request, response)
+        response.status = 200
+        response.body = ""
       end
 
       def create_replication_error(request, response)
