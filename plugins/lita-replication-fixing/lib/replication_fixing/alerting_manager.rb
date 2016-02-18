@@ -15,7 +15,7 @@ module ReplicationFixing
         @pager.trigger("#{hostname}: replication is not automatically fixable", incident_key: incident_key(hostname))
       when FixingClient::AllShardsIgnored
         if (result.skipped_errors_count % 200).zero?
-          @pager.trigger("replication fixing is disabled, but many errors are still occurring")
+          @pager.trigger("replication fixing is disabled, but many errors are still occurring", incident_key: "replication/all-shards-ignored")
         end
       end
     rescue

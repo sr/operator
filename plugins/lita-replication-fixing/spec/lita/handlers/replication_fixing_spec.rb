@@ -9,7 +9,10 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
   describe "POST /replication/errors" do
     it "attempts to fix the error and notifies the ops room" do
       stub_request(:get, "https://repfix.tools.pardot.com/replication/fixes/for/db/1/dallas")
-        .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+        .and_return(
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+        )
       fix_request = stub_request(:post, "https://repfix.tools.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
@@ -20,14 +23,17 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
 
       expect(response.status).to eq(201)
       expect(fix_request).to have_been_made
-      expect(replies.last).to eq("/me is fixing replication on db-d1")
+      expect(replies.last).to match(%r{/me is fixing replication on db-d1})
     end
 
     it "notifies the ops-replication room with a sanitized error message" do
       stub_request(:get, "https://repfix.tools.pardot.com/replication/fixes/for/db/1/dallas")
+        .and_return(
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+        )
+      stub_request(:post, "https://repfix.tools.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
-      fix_request = stub_request(:post, "https://repfix.tools.pardot.com/replication/fix/db/1")
-                    .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       response = http.post("/replication/errors", JSON.dump(
         "hostname"         => "db-d1",

@@ -94,17 +94,18 @@ module Lita
           end
         when ::ReplicationFixing::FixingClient::NotFixable
           @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+        when ::ReplicationFixing::FixingClient::FixInProgress
+          ongoing_minutes = (Time.now - result.started_at) / 60.0
+          if ongoing_minutes >= 10.0
+            @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
+            @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{ongoing_minutes.to_i} minutes now")
+          else
+            @throttler.send_message(config.status_room, "/me is fixing replication on #{hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
+          end
+        when ::ReplicationFixing::FixingClient::FixableErrorOccurring
+          @throttler.send_message(config.status_room, "/me is noticing a fixable replication error on #{hostname}")
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
           @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
-        when ::ReplicationFixing::FixingClient::FixInProgress
-          if result.new_fix
-            @throttler.send_message(config.status_room, "/me is fixing replication on #{hostname}")
-          elsif (Time.now - result.started_at) > 10 * 60
-            @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
-            @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{(Time.now - result.started_at).to_i} minutes now")
-          else
-            @throttler.send_message(config.status_room, "/me still fixing replication on #{hostname}")
-          end
         else
           log.error("Got unknown response from client: #{result}")
         end

@@ -110,16 +110,18 @@ module ReplicationFixing
           expect(fixing_status_client.status(11).fixing?).to be_falsey
         end
 
-        it "returns information about the fix in progress if it's a new fix" do
+        it "returns information about the fix in progress" do
           hostname = Hostname.new("db-s11")
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
-            .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+            .and_return(
+              {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+              {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+            )
           stub_request(:post, "https://repfix.example/replication/fix/db/11")
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
           result = fixing_client.fix(hostname: hostname)
           expect(result).to be_kind_of(FixingClient::FixInProgress)
-          expect(result.new_fix).to be_truthy
           expect(result.started_at.to_i).to be_within(1).of(Time.now.to_i)
         end
       end
