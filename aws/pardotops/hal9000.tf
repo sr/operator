@@ -58,7 +58,7 @@ resource "aws_elb" "hal9000_production" {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:80/_ping"
+    target = "HTTP:80/replication/_ping"
     interval = 5
   }
 
