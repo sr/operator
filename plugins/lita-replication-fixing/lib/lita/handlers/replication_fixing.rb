@@ -60,7 +60,7 @@ module Lita
 
       def ping(request, response)
         response.status = 200
-        response.body = ""
+        response.body << ""
       end
 
       def create_replication_error(request, response)
