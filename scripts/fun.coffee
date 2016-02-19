@@ -542,8 +542,13 @@ module.exports = (robot) ->
     msg.send msg.random bestfriendss
 
 
-  robot.respond /it\'?s\shappening$/i, (msg) ->
-    msg.send "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif"
+  robot.respond /it\'?s\s?happening$/i, (msg) ->
+    happenings = [
+      "http://i.kinja-img.com/gawker-media/image/upload/19c35oidyf35igif.gif",
+      "http://i.imgur.com/T67NQsm.gif"
+    ]
+
+    msg.send msg.random happenings
 
 
   robot.respond /situation$/i, (msg) ->
