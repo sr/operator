@@ -116,7 +116,7 @@ module Lita
         when ::ReplicationFixing::FixingClient::FixableErrorOccurring
           @throttler.send_message(config.status_room, "/me is noticing a fixable replication error on #{hostname}")
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-          @throttler.send_message(config.status_room, "@all Got an error while trying to check the fixability of #{hostname}: #{result.error}")
+          @throttler.send_message(config.status_room, "/me is getting an error while trying to check the fixability of #{hostname}: #{result.error}")
         else
           log.error("Got unknown response from client: #{result}")
         end
