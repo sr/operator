@@ -52,5 +52,17 @@ module ReplicationFixing
         expect(Hostname.new("pardot0-whoisdb1-1-phx").datacenter).to eq("phx")
       end
     end
+
+    describe "equality" do
+      it "tests for equality" do
+        expect(Hostname.new("db-d1")).to eq(Hostname.new("db-d1"))
+        expect(Hostname.new("db-d1")).to eql(Hostname.new("db-d1"))
+        expect(Hostname.new("db-d1").hash).to eq(Hostname.new("db-d1").hash)
+
+        expect(Hostname.new("db-d1")).not_to eq(Hostname.new("db-d2"))
+        expect(Hostname.new("db-d1")).not_to eql(Hostname.new("db-d2"))
+        expect(Hostname.new("db-d1").hash).not_to eq(Hostname.new("db-d2").hash)
+      end
+    end
   end
 end

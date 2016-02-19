@@ -10,6 +10,7 @@ module ReplicationFixing
     FixableErrorOccurring = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error)
 
+    # TODO: This class should not deal with ignore_client, move it out to another level
     def initialize(repfix_url:, ignore_client:, fixing_status_client:, log:)
       @repfix_url = repfix_url
       @ignore_client = ignore_client

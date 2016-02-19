@@ -7,7 +7,7 @@ module ReplicationFixing
       "d" => "dallas",
     }.freeze
 
-    attr_reader :prefix, :shard_id, :datacenter
+    attr_reader :hostname, :prefix, :shard_id, :datacenter
 
     def initialize(hostname)
       @hostname = hostname
@@ -16,6 +16,18 @@ module ReplicationFixing
 
     def to_s
       @hostname
+    end
+
+    def ==(other)
+      Hostname === other && hostname == other.hostname
+    end
+
+    def eql?(other)
+      Hostname === other && hostname == other.hostname
+    end
+
+    def hash
+      @hostname.hash
     end
 
     private
