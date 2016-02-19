@@ -14,8 +14,8 @@ module Lita
   module Handlers
     class ReplicationFixing < Handler
       config :repfix_url, default: "https://repfix.pardot.com"
-      config :status_room, default: "1_ops@conf.btf.hipchat.com"
-      config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
+      config :status_room, default: "1_ops"
+      config :replication_room, default: "1_ops-replication"
       config :monitor_only, default: true
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
@@ -53,6 +53,9 @@ module Lita
           log: log,
         )
         @monitor_supervisor = ::ReplicationFixing::MonitorSupervisor.new(fixing_client: @fixing_client)
+
+        @status_room = ::Lita::Room.create_or_update(config.status_room)
+        @replication_room = ::Lita::Room.create_or_update(config.replication_room)
       end
 
       on(:connected) do
@@ -72,8 +75,8 @@ module Lita
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
 
             sanitized_error = @sanitizer.sanitize(body["mysql_last_error"])
-            @throttler.send_message(config.replication_room, "#{hostname}: #{body["error"]}") if body["error"]
-            @throttler.send_message(config.replication_room, "#{hostname}: #{sanitized_error}")
+            @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}") if body["error"]
+            @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
 
             result = \
               if config.monitor_only
@@ -101,28 +104,28 @@ module Lita
       def reply_with_fix_result(hostname:, result:)
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
-          @throttler.send_message(config.status_room, "(successful) Replication is fixed on #{hostname}")
+          @throttler.send_message(@status_room, "(successful) Replication is fixed on #{hostname}")
         when ::ReplicationFixing::FixingClient::ShardIsIgnored
           log.debug("Shard is ignored: #{hostname}")
         when ::ReplicationFixing::FixingClient::AllShardsIgnored
           log.debug("All shards are ignored")
           if (result.skipped_errors_count % 200).zero?
-            @throttler.send_message(config.status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
+            @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
           end
         when ::ReplicationFixing::FixingClient::NotFixable
-          @throttler.send_message(config.status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+          @throttler.send_message(@status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
         when ::ReplicationFixing::FixingClient::FixInProgress
           ongoing_minutes = (Time.now - result.started_at) / 60.0
           if ongoing_minutes >= 10.0
             @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
-            @throttler.send_message(config.status_room, "@all I've been trying to fix replication on #{hostname} for #{ongoing_minutes.to_i} minutes now")
+            @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{hostname} for #{ongoing_minutes.to_i} minutes now")
           else
-            @throttler.send_message(config.status_room, "/me is fixing replication on #{hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
+            @throttler.send_message(@status_room, "/me is fixing replication on #{hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
           end
         when ::ReplicationFixing::FixingClient::FixableErrorOccurring
-          @throttler.send_message(config.status_room, "/me is noticing a fixable replication error on #{hostname}")
+          @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{hostname}")
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-          @throttler.send_message(config.status_room, "/me is getting an error while trying to check the fixability of #{hostname}: #{result.error}")
+          @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{hostname}: #{result.error}")
         else
           log.error("Got unknown response from client: #{result}")
         end
