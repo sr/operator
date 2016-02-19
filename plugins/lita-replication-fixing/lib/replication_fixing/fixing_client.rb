@@ -56,10 +56,10 @@ module ReplicationFixing
           ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
         end
       else
-        ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
+        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
       end
     rescue => e
-      ErrorCheckingFixability.new("error checking fixability: #{response}")
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
     end
 
     def fix(hostname:, user: "system")
@@ -98,10 +98,10 @@ module ReplicationFixing
           ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
         end
       else
-        ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
+        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
       end
     rescue => e
-      ErrorCheckingFixability.new("error executing fix: #{response}")
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
     end
 
     def build_incident_key(hostname:)
