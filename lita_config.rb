@@ -1,7 +1,7 @@
 require_relative "lib/lita/adapters/nothing"
 
 Lita.configure do |config|
-  config.robot.name = "Hal 9000"
+  config.robot.name = "Hal9000"
   config.robot.alias = "!"
   config.robot.locale = :en
 
