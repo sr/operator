@@ -16,7 +16,7 @@ module ReplicationFixing
       @fixing_status_client = fixing_status_client
       @log = log
 
-      @repfix = Faraday.new(url: @repfix_url, ssl: {verify: false}) do |faraday|
+      @repfix = Faraday.new(url: @repfix_url, ssl: {verify: true}) do |faraday|
         faraday.request :url_encoded
         faraday.adapter Faraday.default_adapter
       end

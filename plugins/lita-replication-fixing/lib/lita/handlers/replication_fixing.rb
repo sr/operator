@@ -12,7 +12,7 @@ require "replication_fixing/test_pager"
 module Lita
   module Handlers
     class ReplicationFixing < Handler
-      config :repfix_url, default: "https://repfix.tools.pardot.com"
+      config :repfix_url, default: "https://repfix.pardot.com"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
       config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
       config :monitor_only, default: true
