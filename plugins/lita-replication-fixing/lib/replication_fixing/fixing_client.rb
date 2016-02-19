@@ -62,7 +62,7 @@ module ReplicationFixing
       ErrorCheckingFixability.new("error checking fixability: #{response}")
     end
 
-    def fix(hostname:, user: "system", monitor_only: false)
+    def fix(hostname:, user: "system")
       ignoring = @ignore_client.ignoring?(hostname.shard_id)
       if ignoring == :shard
         ShardIsIgnored.new
@@ -70,11 +70,7 @@ module ReplicationFixing
         AllShardsIgnored.new(@ignore_client.incr_skipped_errors_count)
       else result = status(hostname: hostname)
         if result.kind_of?(FixableErrorOccurring)
-          if monitor_only
-            result
-          else
-            execute_fix(hostname: hostname, user: user)
-          end
+          execute_fix(hostname: hostname, user: user)
         else
           result
         end

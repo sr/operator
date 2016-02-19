@@ -75,7 +75,13 @@ module Lita
             @throttler.send_message(config.replication_room, "#{hostname}: #{body["error"]}") if body["error"]
             @throttler.send_message(config.replication_room, "#{hostname}: #{sanitized_error}")
 
-            result = @fixing_client.fix(hostname: hostname)
+            result = \
+              if config.monitor_only
+                @fixing_client.status(hostname: hostname)
+              else
+                @fixing_client.fix(hostname: hostname)
+              end
+
             @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
             reply_with_fix_result(hostname: hostname, result: result)
             ensure_monitoring(hostname: hostname)

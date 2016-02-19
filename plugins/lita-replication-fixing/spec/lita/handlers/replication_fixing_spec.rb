@@ -5,6 +5,7 @@ require "json"
 describe Lita::Handlers::ReplicationFixing, lita_handler: true do
   before do
     registry.config.handlers.replication_fixing.pager = "test"
+    registry.config.handlers.replication_fixing.monitor_only = false
   end
 
   describe "POST /replication/errors" do
