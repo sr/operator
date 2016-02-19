@@ -25,7 +25,7 @@ Lita.configure do |config|
   # config.adapter.password = "secret"
   config.adapters.hipchat.server = ENV.fetch("HIPCHAT_SERVER", "hipchat.dev.pardot.com")
   config.adapters.hipchat.jid = ENV.fetch("HIPCHAT_JID", "1_342@chat.btf.hipchat.com")
-  config.adapters.hipchat.muc_domain = ENV.fetch("HIPCHAT_MUC_DOMAIN", "chat.btf.hipchat.com")
+  config.adapters.hipchat.muc_domain = ENV.fetch("HIPCHAT_MUC_DOMAIN", "conf.btf.hipchat.com")
   config.adapters.hipchat.password = ENV.fetch("HIPCHAT_PASSWORD", "")
   config.adapters.hipchat.debug = true
 
