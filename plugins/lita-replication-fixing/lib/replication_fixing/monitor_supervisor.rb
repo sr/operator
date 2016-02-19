@@ -9,23 +9,23 @@ module ReplicationFixing
       @tick = tick
 
       @on_replication_fixed = []
-      @on_status = []
+      @on_tick = []
     end
 
     def on_replication_fixed(&blk)
       @on_replication_fixed << blk
     end
 
-    def on_status(&blk)
-      @on_status << blk
+    def on_tick(&blk)
+      @on_tick << blk
     end
 
     def signal_replication_fixed
       @on_replication_fixed.each(&:call)
     end
 
-    def signal_status(status)
-      @on_status.each { |blk| blk.call(status) }
+    def signal_tick(result)
+      @on_tick.each { |blk| blk.call(result) }
     end
   end
 
@@ -38,11 +38,18 @@ module ReplicationFixing
     end
 
     def start_exclusive_monitor(monitor)
-      @mutex.synchronize do
-        @monitors[monitor.hostname] = monitor
-      end
+      success = \
+        @mutex.synchronize do
+          if @monitors.key?(monitor.hostname)
+            false
+          else
+            @monitors[monitor.hostname] = monitor
+            true
+          end
+        end
 
-      run_monitor(monitor)
+      Thread.new { run_monitor(monitor) } if success
+      success
     end
 
     private
@@ -52,10 +59,10 @@ module ReplicationFixing
         sleep(monitor.tick)
 
         break unless @monitors.key?(monitor.hostname)
-        status = @fixing_client.status(hostname: monitor.hostname)
-        monitor.signal_status(status)
+        result = @fixing_client.status(hostname: monitor.hostname)
+        monitor.signal_tick(result)
 
-        if status.kind_of?(FixingClient::NoErrorDetected)
+        if result.kind_of?(FixingClient::NoErrorDetected)
           monitor.signal_replication_fixed
           break
         end

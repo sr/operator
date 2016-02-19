@@ -40,9 +40,9 @@ module ReplicationFixing
         hostname = Hostname.new("db-d1")
         monitor = Monitor.new(hostname: hostname, tick: 0.001)
 
-        statuses = []
-        monitor.on_status do |status|
-          statuses << status
+        results = []
+        monitor.on_tick do |result|
+          results << result
         end
 
         fixed = false
@@ -53,13 +53,31 @@ module ReplicationFixing
           end
         end
 
-        supervisor.start_exclusive_monitor(monitor)
+        expect(supervisor.start_exclusive_monitor(monitor)).to be_truthy
         mutex.synchronize do
           var.wait(mutex, 0.2)
           fail "Monitor never signaled the fix was completed" unless fixed
 
-          expect(statuses.length).to eq(3)
+          expect(results.length).to eq(3)
         end
+      end
+
+      it "doesn't start a new monitor if one already exists" do
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dallas")
+          .and_return(
+            {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+            {body: JSON.dump("is_erroring" => false)},
+          )
+
+        mutex = Mutex.new
+        var = ConditionVariable.new
+
+        hostname = Hostname.new("db-d1")
+        monitor = Monitor.new(hostname: hostname, tick: 1)
+
+        expect(supervisor.start_exclusive_monitor(monitor)).to be_truthy
+        expect(supervisor.start_exclusive_monitor(monitor)).to be_falsey
+        expect(supervisor.start_exclusive_monitor(monitor)).to be_falsey
       end
     end
   end

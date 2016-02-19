@@ -5,6 +5,7 @@ require "replication_fixing/fixing_status_client"
 require "replication_fixing/hostname"
 require "replication_fixing/ignore_client"
 require "replication_fixing/message_throttler"
+require "replication_fixing/monitor_supervisor"
 require "replication_fixing/pagerduty_pager"
 require "replication_fixing/replication_error_sanitizer"
 require "replication_fixing/test_pager"
@@ -51,6 +52,7 @@ module Lita
           fixing_status_client: @fixing_status_client,
           log: log,
         )
+        @monitor_supervisor = ::ReplicationFixing::MonitorSupervisor.new(fixing_client: @fixing_client)
       end
 
       on(:connected) do
@@ -76,6 +78,7 @@ module Lita
             result = @fixing_client.fix(hostname: hostname)
             @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
             reply_with_fix_result(hostname: hostname, result: result)
+            ensure_monitoring(hostname: hostname)
 
             response.status = 201
           rescue ::ReplicationFixing::Hostname::MalformedHostname
@@ -92,7 +95,7 @@ module Lita
       def reply_with_fix_result(hostname:, result:)
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
-          log.debug("Got an error for #{hostname} but rep_fix reported no replication error when I checked")
+          @throttler.send_message(config.status_room, "(successful) Replication is fixed on #{hostname}")
         when ::ReplicationFixing::FixingClient::ShardIsIgnored
           log.debug("Shard is ignored: #{hostname}")
         when ::ReplicationFixing::FixingClient::AllShardsIgnored
@@ -117,6 +120,13 @@ module Lita
         else
           log.error("Got unknown response from client: #{result}")
         end
+      end
+
+      def ensure_monitoring(hostname:)
+        monitor = ::ReplicationFixing::Monitor.new(hostname: hostname, tick: 30)
+        monitor.on_tick { |result| reply_with_fix_result(hostname: hostname, result: result) }
+
+        @monitor_supervisor.start_exclusive_monitor(monitor)
       end
 
       Lita.register_handler(self)

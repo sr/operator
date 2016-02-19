@@ -58,6 +58,8 @@ module ReplicationFixing
       else
         ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
       end
+    rescue => e
+      ErrorCheckingFixability.new("error checking fixability: #{response}")
     end
 
     def fix(hostname:, user: "system", monitor_only: false)
@@ -102,6 +104,8 @@ module ReplicationFixing
       else
         ErrorCheckingFixability.new("non-200 status code from repfix: #{response.body}")
       end
+    rescue => e
+      ErrorCheckingFixability.new("error executing fix: #{response}")
     end
 
     def build_incident_key(hostname:)
