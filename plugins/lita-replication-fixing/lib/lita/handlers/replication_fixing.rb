@@ -54,8 +54,8 @@ module Lita
         )
         @monitor_supervisor = ::ReplicationFixing::MonitorSupervisor.new(fixing_client: @fixing_client)
 
-        @status_room = ::Lita::Room.create_or_update(config.status_room)
-        @replication_room = ::Lita::Room.create_or_update(config.replication_room)
+        @status_room = ::Lita::Source.new(room: config.status_room)
+        @replication_room = ::Lita::Source.new(room: config.replication_room)
       end
 
       on(:connected) do
