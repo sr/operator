@@ -99,7 +99,7 @@ resource "aws_launch_configuration" "canoe_production" {
   name_prefix = "canoe_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
-  key_name = "canoe"
+  key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   associate_public_ip_address = false
 
