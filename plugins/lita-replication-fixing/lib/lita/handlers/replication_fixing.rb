@@ -86,9 +86,9 @@ module Lita
                 @fixing_client.status(hostname: hostname)
               else
                 @fixing_client.fix(hostname: hostname)
+                @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
               end
 
-            @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
             reply_with_fix_result(hostname: hostname, result: result)
             ensure_monitoring(hostname: hostname)
 
