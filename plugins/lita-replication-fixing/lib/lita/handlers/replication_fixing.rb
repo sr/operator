@@ -14,8 +14,8 @@ module Lita
   module Handlers
     class ReplicationFixing < Handler
       config :repfix_url, default: "https://repfix.pardot.com"
-      config :status_room, default: "1_ops"
-      config :replication_room, default: "1_ops-replication"
+      config :status_room, default: "1_ops@conf.btf.hipchat.com"
+      config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
       config :monitor_only, default: true
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
