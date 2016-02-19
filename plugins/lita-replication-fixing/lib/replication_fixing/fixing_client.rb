@@ -29,7 +29,7 @@ module ReplicationFixing
         begin
           json = JSON.parse(response.body)
           if json["error"]
-            ErrorCheckingFixability.new(json["error"])
+            ErrorCheckingFixability.new(json["message"])
           elsif json["fix"] && json["fix"]["active"]
             begin
               @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)
@@ -84,7 +84,7 @@ module ReplicationFixing
         begin
           json = JSON.parse(response.body)
           if json["error"]
-            ErrorCheckingFixability.new(json["error"])
+            ErrorCheckingFixability.new(json["message"])
           else
             begin
               @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)

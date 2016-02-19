@@ -51,7 +51,7 @@ module ReplicationFixing
         it "returns an error if repfix returns an error" do
           hostname = Hostname.new("db-s11")
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
-            .and_return(body: JSON.dump("error" => "the world exploded"))
+            .and_return(body: JSON.dump("error" => true, "message" => "the world exploded"))
 
           result = fixing_client.fix(hostname: hostname)
           expect(result).to be_kind_of(FixingClient::ErrorCheckingFixability)
