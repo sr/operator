@@ -64,12 +64,13 @@ module Lita
       end
 
       def create_replication_error(request, response)
-        json = JSON.parse(request.body.string)
-        if json["mysql_last_error"] && json["hostname"]
+        body = request.POST
+        if body["mysql_last_error"] && body["hostname"]
           begin
-            hostname = ::ReplicationFixing::Hostname.new(json["hostname"])
+            hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
 
-            sanitized_error = @sanitizer.sanitize(json["mysql_last_error"])
+            sanitized_error = @sanitizer.sanitize(body["mysql_last_error"])
+            @throttler.send_message(config.replication_room, "#{hostname}: #{body["error"]}") if body["error"]
             @throttler.send_message(config.replication_room, "#{hostname}: #{sanitized_error}")
 
             result = @fixing_client.fix(hostname: hostname)
