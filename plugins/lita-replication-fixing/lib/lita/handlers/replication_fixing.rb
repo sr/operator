@@ -70,13 +70,16 @@ module Lita
 
       def create_replication_error(request, response)
         body = request.POST
-        if body["mysql_last_error"] && body["hostname"]
+        if body["hostname"]
           begin
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
 
-            sanitized_error = @sanitizer.sanitize(body["mysql_last_error"])
             @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}") if body["error"]
-            @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
+
+            if mysql_last_error = body["mysql_last_error"]
+              sanitized_error = @sanitizer.sanitize(mysql_last_error)
+              @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
+            end
 
             result = \
               if config.monitor_only
@@ -96,7 +99,7 @@ module Lita
           end
         else
           response.status = 400
-          response.body << JSON.dump("error" => "mysql_last_error or hostname missing")
+          response.body << JSON.dump("error" => "hostname missing")
         end
       end
 

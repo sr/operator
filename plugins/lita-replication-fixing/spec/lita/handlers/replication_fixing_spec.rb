@@ -47,7 +47,7 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies[1]).to eq("db-d1: Query: 'INSERT INTO foo VALUES ([REDACTED], '1', '1.2')")
     end
 
-    it "responds with HTTP 400 if mysql_last_error is missing" do
+    it "responds with HTTP 400 if hostname is missing" do
       response = http.post("/replication/errors", URI.encode_www_form({}), {'Content-Type' => 'application/x-www-form-urlencoded'})
       expect(response.status).to eq(400)
     end
