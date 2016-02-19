@@ -10,13 +10,17 @@ module ReplicationFixing
       @last_cache_clean = Time.now
     end
 
-    def send_message(room, message)
-      entry = @messages[room][message]
-      if !entry || entry.last_sent < (Time.now - @ttl)
-        @robot.send_message(room, message).tap { |result|
-          @messages[room][message] = Entry.new(last_sent: Time.now)
-          clean_cache
-        }
+    def send_message(target, message)
+      if room = target.room
+        entry = @messages[room][message]
+        if !entry || entry.last_sent < (Time.now - @ttl)
+          @robot.send_message(target, message).tap { |result|
+            @messages[room][message] = Entry.new(Time.now)
+            clean_cache
+          }
+        end
+      else
+        @robot.send_message(target, message)
       end
     end
 
