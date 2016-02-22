@@ -148,9 +148,8 @@ module Lita
                 @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
               else
                 reply_with_fix_result(shard_or_hostname: hostname, result: result)
+                ensure_monitoring(shard: hostname.shard)
               end
-
-              ensure_monitoring(shard: hostname.shard)
             end
 
             response.status = 201
