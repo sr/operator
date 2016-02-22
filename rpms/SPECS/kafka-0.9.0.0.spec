@@ -1,5 +1,5 @@
 Name: kafka
-Version: 0.9.0.1
+Version: 0.9.0.0
 Release: 1%{?dist}
 BuildArch: noarch
 Summary: Kafka is a distributed, partitioned, replicated commit log service
