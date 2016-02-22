@@ -18,6 +18,10 @@ module ReplicationFixing
       end
     end
 
+    def ignoring_all?
+      @redis.exists(IGNORE_ALL_KEY)
+    end
+
     def ignore(shard, expire: 600)
       @redis.setex([IGNORE_SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":"), expire, "")
     end

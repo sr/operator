@@ -136,4 +136,20 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("I'm currently fixing: db-12, db-32")
     end
   end
+
+  describe "!stopfixing and !startfixing" do
+    it "globally stops and starts fixing" do
+      send_command("stopfixing")
+      expect(replies.last).to eq("OK, I've stopped fixing replication for ALL shards")
+
+      send_command("checkfixing")
+      expect(replies.last).to eq("(nope) Replication fixing is globally disabled")
+
+      send_command("startfixing")
+      expect(replies.last).to eq("OK, I've started fixing replication")
+
+      send_command("checkfixing")
+      expect(replies.last).to eq("(goodnews) Replication fixing is globally enabled")
+    end
+  end
 end

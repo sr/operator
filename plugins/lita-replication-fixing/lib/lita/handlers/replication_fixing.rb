@@ -50,6 +50,18 @@ module Lita
         "currentfixes" => "Lists ongoing replication fixes",
       }
 
+      route /^stopfixing/i, :stop_fixing, help: {
+        "stopfixing" => "Globally pauses fixing of replication errors",
+      }
+
+      route /^startfixing/i, :start_fixing, help: {
+        "startfixing" => "Globally starts fixing of replication errors",
+      }
+
+      route /^checkfixing/i, :check_fixing, help: {
+        "startfixing" => "Reports whether fixing is globally enabled or disabled",
+      }
+
       def initialize(robot)
         super
 
@@ -220,6 +232,36 @@ module Lita
           response.reply("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
         else
           response.reply("I'm not fixing anything right now")
+        end
+      end
+
+      def stop_fixing(response)
+        begin
+          @ignore_client.ignore_all
+          response.reply("OK, I've stopped fixing replication for ALL shards")
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
+        end
+      end
+
+      def start_fixing(response)
+        begin
+          @ignore_client.reset_ignore_all
+          response.reply("OK, I've started fixing replication")
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
+        end
+      end
+
+      def check_fixing(response)
+        begin
+          if @ignore_client.ignoring_all?
+            response.reply("(nope) Replication fixing is globally disabled")
+          else
+            response.reply("(goodnews) Replication fixing is globally enabled")
+          end
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
         end
       end
 
