@@ -1,42 +1,30 @@
 module ReplicationFixing
   class MessageThrottler
-    Entry = Struct.new(:last_sent)
+    THROTTLER_NAMESPACE = "throttler"
 
-    def initialize(robot:, ttl: 300)
+    def initialize(robot:, redis:, ttl: 300)
       @robot = robot
-
-      @messages = Hash.new { |h, k| h[k] = {} }
+      @redis = redis
       @ttl = ttl
-      @last_cache_clean = Time.now
     end
 
     def send_message(target, message)
       if room = target.room
-        entry = @messages[room][message]
-        if !entry || entry.last_sent < (Time.now - @ttl)
-          @robot.send_message(target, message).tap { |result|
-            @messages[room][message] = Entry.new(Time.now)
-            clean_cache
-          }
+        key = [THROTTLER_NAMESPACE, target.room.to_s, message].join(":")
+        unless @redis.exists(key)
+          set, _ = @redis.multi do
+            @redis.setnx(key, "")
+            @redis.expire(key, @ttl)
+          end
+
+          @robot.send_message(target, message) if set
         end
       else
         @robot.send_message(target, message)
       end
-    end
-
-    private
-    def clean_cache
-      now = Time.now
-      return unless (now - @last_cache_clean) >= @ttl
-
-      expired_time = (now - @ttl)
-      @messages.each do |room, messages|
-        messages.delete_if do |message, entry|
-          entry.last_sent < expired_time
-        end
-      end
-
-      @last_cache_clean = now
+    rescue ::Redis::BaseError
+      # fail open
+      @robot.send_message(target, message)
     end
   end
 end

@@ -65,7 +65,7 @@ module Lita
       def initialize(robot)
         super
 
-        @throttler = ::ReplicationFixing::MessageThrottler.new(robot: robot)
+        @throttler = ::ReplicationFixing::MessageThrottler.new(robot: robot, redis: redis)
         @sanitizer = ::ReplicationFixing::ReplicationErrorSanitizer.new
 
         @pager = \
