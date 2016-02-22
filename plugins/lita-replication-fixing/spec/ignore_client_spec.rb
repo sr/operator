@@ -8,20 +8,21 @@ module ReplicationFixing
     describe "#ignoring?" do
       it "returns truthy if ignoring all of the keys" do
         client = IgnoreClient.new(Lita.redis)
-        expect(client.ignoring?(11)).to be_falsey
+        expect(client.ignoring?("db", 11)).to be_falsey
 
         client.ignore_all
-        expect(client.ignoring?(11)).to eq(:all)
-        expect(client.ignoring?(12)).to eq(:all)
+        expect(client.ignoring?("db", 11)).to eq(:all)
+        expect(client.ignoring?("db", 12)).to eq(:all)
       end
 
       it "returns truthy if ignoring a particular shard" do
         client = IgnoreClient.new(Lita.redis)
-        expect(client.ignoring?(11)).to be_falsey
+        expect(client.ignoring?("db", 11)).to be_falsey
 
-        client.ignore(11)
-        expect(client.ignoring?(11)).to eq(:shard)
-        expect(client.ignoring?(12)).to be_falsey
+        client.ignore("db", 11)
+        expect(client.ignoring?("db", 11)).to eq(:shard)
+        expect(client.ignoring?("whoisdb", 11)).to be_falsey
+        expect(client.ignoring?("db", 12)).to be_falsey
       end
     end
 

@@ -8,18 +8,18 @@ module ReplicationFixing
       @redis = redis
     end
 
-    def ignoring?(shard_id)
+    def ignoring?(prefix, shard_id)
       if @redis.exists(IGNORE_ALL_KEY)
         :all
-      elsif @redis.exists([IGNORE_SHARD_NAMESPACE, shard_id].join(":"))
+      elsif @redis.exists([IGNORE_SHARD_NAMESPACE, prefix, shard_id].join(":"))
         :shard
       else
         false
       end
     end
 
-    def ignore(shard_id, expire: 600)
-      @redis.setex([IGNORE_SHARD_NAMESPACE, shard_id].join(":"), expire, "")
+    def ignore(prefix, shard_id, expire: 600)
+      @redis.setex([IGNORE_SHARD_NAMESPACE, prefix, shard_id].join(":"), expire, "")
     end
 
     def ignore_all

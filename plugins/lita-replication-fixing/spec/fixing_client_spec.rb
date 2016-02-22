@@ -35,12 +35,12 @@ module ReplicationFixing
 
       context "when the shard is ignored" do
         it "does nothing and returns a ShardIsIgnored result" do
-          ignore_client.ignore(11)
+          ignore_client.ignore("db", 11)
           expect(fixing_client.fix(hostname: Hostname.new("db-s11"))).to be_kind_of(FixingClient::ShardIsIgnored)
         end
 
         it "does not increment the skipped error count" do
-          ignore_client.ignore(11)
+          ignore_client.ignore("db", 11)
           fixing_client.fix(hostname: Hostname.new("db-s11"))
 
           expect(ignore_client.skipped_errors_count).to eq(0)

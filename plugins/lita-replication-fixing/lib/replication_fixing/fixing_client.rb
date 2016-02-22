@@ -63,7 +63,7 @@ module ReplicationFixing
     end
 
     def fix(hostname:, user: "system")
-      ignoring = @ignore_client.ignoring?(hostname.shard_id)
+      ignoring = @ignore_client.ignoring?(hostname.prefix, hostname.shard_id)
       if ignoring == :shard
         ShardIsIgnored.new
       elsif ignoring == :all

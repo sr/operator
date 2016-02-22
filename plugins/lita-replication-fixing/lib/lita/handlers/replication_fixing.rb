@@ -23,6 +23,9 @@ module Lita
       http.get "/replication/_ping", :ping
       http.post "/replication/errors", :create_replication_error
 
+      # http://rubular.com/r/Gz3fLQiR5L
+      route /ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore
+
       def initialize(robot)
         super
 
@@ -101,6 +104,15 @@ module Lita
           response.status = 400
           response.body << JSON.dump("error" => "hostname missing")
         end
+      end
+
+      def create_ignore(response)
+        shard_id = response.match_data["shard_id"].to_i
+        prefix = response.match_data["prefix"] || "db"
+        minutes = (response.match_data["minutes"] || "10").to_i
+
+        @ignore_client.ignore(prefix, shard_id)
+        response.reply("/me is ignoring #{prefix}-#{shard_id} for #{minutes} minutes")
       end
 
       private
