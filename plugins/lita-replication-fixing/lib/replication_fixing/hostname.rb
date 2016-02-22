@@ -32,6 +32,14 @@ module ReplicationFixing
       @hostname.hash
     end
 
+    def prefix
+      shard.prefix
+    end
+
+    def shard_id
+      shard.shard_id
+    end
+
     private
     def parse_hostname
       if /\Apardot0-(?<type>dbshard|whoisdb)1-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname

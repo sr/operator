@@ -1,30 +1,30 @@
 module ReplicationFixing
   class Shard
-    attr_reader :prefix, :id
+    attr_reader :prefix, :shard_id
 
-    def initialize(prefix, id)
+    def initialize(prefix, shard_id)
       @prefix = prefix
-      @id = id
+      @shard_id = shard_id
     end
 
     def to_s
-      "#{prefix}-#{id}"
+      "#{prefix}-#{shard_id}"
     end
 
     def ==(other)
       Shard === other && (
-        prefix == other.prefix && id == other.id
+        prefix == other.prefix && shard_id == other.shard_id
       )
     end
 
     def eql?(other)
       Shard === other && (
-        prefix == other.prefix && id == other.id
+        prefix == other.prefix && shard_id == other.shard_id
       )
     end
 
     def hash
-      prefix.hash ^ id.hash
+      prefix.hash ^ shard_id.hash
     end
   end
 end

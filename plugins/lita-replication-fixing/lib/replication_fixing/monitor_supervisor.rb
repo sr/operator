@@ -59,7 +59,7 @@ module ReplicationFixing
         sleep(monitor.tick)
 
         break unless @monitors.key?(monitor.shard)
-        result = @fixing_client.shard_status(shard: monitor.shard)
+        result = @fixing_client.status(shard_or_hostname: monitor.shard)
         monitor.signal_tick(result)
 
         if result.kind_of?(FixingClient::NoErrorDetected)

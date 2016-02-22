@@ -88,7 +88,7 @@ module Lita
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
             shard = hostname.shard
 
-            ignoring = @ignore_client.ignoring?(shard.prefix, shard.id)
+            ignoring = @ignore_client.ignoring?(shard.prefix, shard.shard_id)
             if ignoring
               log.debug("Shard is ignored: #{shard}")
 
@@ -107,10 +107,10 @@ module Lita
 
               result = \
                 if config.monitor_only
-                  @fixing_client.host_status(hostname: hostname)
+                  @fixing_client.status(shard_or_hostname: hostname)
                 else
                   @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
-                  @fixing_client.fix_host(hostname: hostname)
+                  @fixing_client.fix(shard_or_hostname: hostname)
                 end
 
               reply_with_fix_result(shard_or_hostname: hostname, result: result)
@@ -146,7 +146,7 @@ module Lita
         prefix = response.match_data["prefix"] || "db"
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
 
-        result = @fixing_client.fix_shard(shard: shard)
+        result = @fixing_client.fix(shard_or_hostname: shard)
 
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
