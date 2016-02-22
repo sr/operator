@@ -31,18 +31,18 @@ module ReplicationFixing
             ErrorCheckingFixability.new(json["message"])
           elsif json["fix"] && json["fix"]["active"]
             begin
-              @fixing_status_client.ensure_fixing_status_ongoing(shard_or_hostname.shard_id)
+              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard_or_hostname)
             rescue => e
               @log.error("Unable to keep state about fix: #{e}")
             end
 
-            current_status = @fixing_status_client.status(shard_or_hostname.shard_id)
+            current_status = @fixing_status_client.status(shard: shard_or_hostname)
             FixInProgress.new(current_status.started_at)
           elsif json["is_erroring"] && json["is_fixable"]
             FixableErrorOccurring.new(json)
           elsif json["is_erroring"]
             begin
-              @fixing_status_client.reset_status(shard_or_hostname.shard_id)
+              @fixing_status_client.reset_status(shard: shard_or_hostname)
             rescue => e
               @log.error("Unable to reset status: #{e}")
             end
@@ -80,7 +80,7 @@ module ReplicationFixing
             ErrorCheckingFixability.new(json["message"])
           else
             begin
-              @fixing_status_client.ensure_fixing_status_ongoing(shard_or_hostname.shard_id)
+              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard_or_hostname)
             rescue => e
               @log.error("Unable to keep state about fix: #{e}")
             end

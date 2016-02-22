@@ -44,11 +44,11 @@ module ReplicationFixing
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
-          fixing_status_client.ensure_fixing_status_ongoing(11)
-          expect(fixing_status_client.status(11).fixing?).to be_truthy
+          fixing_status_client.ensure_fixing_status_ongoing(shard: hostname)
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
 
           fixing_client.fix(shard_or_hostname: hostname)
-          expect(fixing_status_client.status(11).fixing?).to be_falsey
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_falsey
         end
 
         it "returns no error detected if the shard is not erroring" do
@@ -68,8 +68,8 @@ module ReplicationFixing
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
           fixing_client.fix(shard_or_hostname: hostname)
-          expect(fixing_status_client.status(11).fixing?).to be_truthy
-          expect(fixing_status_client.status(11).started_at.to_i).to be_within(1).of(Time.now.to_i)
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
+          expect(fixing_status_client.status(shard: hostname).started_at.to_i).to be_within(1).of(Time.now.to_i)
         end
 
         it "does not keep status about the error, if it's not fixable" do
@@ -78,7 +78,7 @@ module ReplicationFixing
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
           fixing_client.fix(shard_or_hostname: hostname)
-          expect(fixing_status_client.status(11).fixing?).to be_falsey
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_falsey
         end
 
         it "returns information about the fix in progress" do
@@ -123,11 +123,11 @@ module ReplicationFixing
           stub_request(:get, "https://repfix.example/replication/fixes/for/db/11")
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
-          fixing_status_client.ensure_fixing_status_ongoing(11)
-          expect(fixing_status_client.status(11).fixing?).to be_truthy
+          fixing_status_client.ensure_fixing_status_ongoing(shard: hostname)
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
 
           fixing_client.fix(shard_or_hostname: hostname.shard)
-          expect(fixing_status_client.status(11).fixing?).to be_falsey
+          expect(fixing_status_client.status(shard: hostname).fixing?).to be_falsey
         end
 
         it "returns no error detected if the shard is not erroring" do
@@ -147,8 +147,8 @@ module ReplicationFixing
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
           fixing_client.fix(shard_or_hostname: hostname.shard)
-          expect(fixing_status_client.status(11).fixing?).to be_truthy
-          expect(fixing_status_client.status(11).started_at.to_i).to be_within(1).of(Time.now.to_i)
+          expect(fixing_status_client.status(shard: hostname.shard).fixing?).to be_truthy
+          expect(fixing_status_client.status(shard: hostname.shard).started_at.to_i).to be_within(1).of(Time.now.to_i)
         end
 
         it "does not keep status about the error, if it's not fixable" do
@@ -157,7 +157,7 @@ module ReplicationFixing
             .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
           fixing_client.fix(shard_or_hostname: hostname.shard)
-          expect(fixing_status_client.status(11).fixing?).to be_falsey
+          expect(fixing_status_client.status(shard: hostname.shard).fixing?).to be_falsey
         end
 
         it "returns information about the fix in progress" do
