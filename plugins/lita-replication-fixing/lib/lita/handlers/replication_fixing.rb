@@ -24,7 +24,12 @@ module Lita
       http.post "/replication/errors", :create_replication_error
 
       # http://rubular.com/r/Gz3fLQiR5L
-      route /ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore
+      route /ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, help: {
+        "ignore SHARD_ID" => "Ignores db-SHARD_ID for 10 minutes",
+        "ignore SHARD_ID PREFIX" => "Ignores PREFIX-SHARD_ID for 10 minutes (PREFIX is, e.g., db or whoisdb)",
+        "ignore SHARD_ID MINUTES" => "Ignores db-SHARD_ID for MINUTES minutes",
+        "ignore SHARD_ID PREFIX MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
+      }
 
       def initialize(robot)
         super
