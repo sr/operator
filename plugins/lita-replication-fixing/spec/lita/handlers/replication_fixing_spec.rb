@@ -72,4 +72,32 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("/me is ignoring whoisdb-1 for 15 minutes")
     end
   end
+
+  describe "!fix" do
+    it "attempts to fix the shard" do
+      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/11")
+        .and_return(
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+        )
+      stub_request(:post, "https://repfix.pardot.com/replication/fix/db/11")
+        .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+
+      send_command("fix 11")
+      expect(replies.last).not_to be_nil
+    end
+
+    it "attempts to fix the whoisdb shard" do
+      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/whoisdb/1")
+        .and_return(
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+        )
+      stub_request(:post, "https://repfix.pardot.com/replication/fix/whoisdb/1")
+        .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+
+      send_command("fix 1 whoisdb")
+      expect(replies.last).not_to be_nil
+    end
+  end
 end

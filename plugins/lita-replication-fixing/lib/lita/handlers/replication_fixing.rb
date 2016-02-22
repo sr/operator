@@ -32,6 +32,11 @@ module Lita
         "ignore SHARD_ID PREFIX MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
       }
 
+      route /fix\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :create_fix, help: {
+        "fix SHARD_ID" => "Attempts to fix db-SHARD_ID",
+        "fix SHARD_ID PREFIX" => "Attempts to fix PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+      }
+
       def initialize(robot)
         super
 
@@ -130,6 +135,22 @@ module Lita
 
         @ignore_client.ignore(prefix, shard_id)
         response.reply("/me is ignoring #{prefix}-#{shard_id} for #{minutes} minutes")
+      end
+
+      def create_fix(response)
+        if config.monitor_only
+          response.reply "/me is in monitor-only mode. Ignoring the last !fix command"
+          return
+        end
+
+        shard_id = response.match_data["shard_id"].to_i
+        prefix = response.match_data["prefix"] || "db"
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
+
+        result = @fixing_client.fix_shard(shard: shard)
+
+        reply_with_fix_result(shard_or_hostname: shard, result: result)
+        ensure_monitoring(shard: shard)
       end
 
       private
