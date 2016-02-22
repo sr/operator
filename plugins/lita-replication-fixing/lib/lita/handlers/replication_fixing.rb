@@ -147,8 +147,8 @@ module Lita
                 # This generally means there was an error, but it's not a replication statement issue
                 @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
               else
-                reply_with_fix_result(shard_or_hostname: hostname, result: result)
-                ensure_monitoring(shard: hostname.shard)
+                reply_with_fix_result(shard: shard, result: result)
+                ensure_monitoring(shard: shard)
               end
             end
 
@@ -280,28 +280,28 @@ module Lita
       end
 
       private
-      def reply_with_fix_result(shard_or_hostname:, result:)
-        ignoring = @ignore_client.ignoring?(shard_or_hostname)
+      def reply_with_fix_result(shard:, result:)
+        ignoring = @ignore_client.ignoring?(shard)
         if ignoring
           log.debug("Shard is ignored: #{shard}")
         else
           case result
           when ::ReplicationFixing::FixingClient::NoErrorDetected
-            @throttler.send_message(@status_room, "(successful) Replication is fixed on #{shard_or_hostname}")
+            @throttler.send_message(@status_room, "(successful) Replication is fixed on #{shard}")
           when ::ReplicationFixing::FixingClient::NotFixable
-            @throttler.send_message(@status_room, "@all Replication is broken on #{shard_or_hostname}, but I'm not able to fix it")
+            @throttler.send_message(@status_room, "@all Replication is broken on #{shard}, but I'm not able to fix it")
           when ::ReplicationFixing::FixingClient::FixInProgress
             ongoing_minutes = (Time.now - result.started_at) / 60.0
             if ongoing_minutes >= 10.0
-              @alerting_manager.notify_fixing_a_long_while(shard_or_hostname: shard_or_hostname, started_at: result.started_at)
-              @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{shard_or_hostname} for #{ongoing_minutes.to_i} minutes now")
+              @alerting_manager.notify_fixing_a_long_while(shard: shard, started_at: result.started_at)
+              @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{shard} for #{ongoing_minutes.to_i} minutes now")
             else
-              @throttler.send_message(@status_room, "/me is fixing replication on #{shard_or_hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
+              @throttler.send_message(@status_room, "/me is fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
             end
           when ::ReplicationFixing::FixingClient::FixableErrorOccurring
-            @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{shard_or_hostname}")
+            @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{shard}")
           when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-            @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{shard_or_hostname}: #{result.error}")
+            @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{shard}: #{result.error}")
           else
             log.error("Got unknown response from client: #{result}")
           end
@@ -310,7 +310,7 @@ module Lita
 
       def ensure_monitoring(shard:)
         monitor = ::ReplicationFixing::Monitor.new(shard: shard, tick: 30)
-        monitor.on_tick { |result| reply_with_fix_result(shard_or_hostname: shard, result: result) }
+        monitor.on_tick { |result| reply_with_fix_result(shard: shard, result: result) }
 
         @monitor_supervisor.start_exclusive_monitor(monitor)
       end

@@ -50,9 +50,9 @@ module ReplicationFixing
       it "sends a page" do
         twenty_minutes_ago = Time.now - 20*60
 
-        manager.notify_fixing_a_long_while(shard_or_hostname: hostname, started_at: twenty_minutes_ago)
+        manager.notify_fixing_a_long_while(shard: hostname.shard, started_at: twenty_minutes_ago)
 
-        expect(pager.incidents[0]).to match(/#{hostname}/)
+        expect(pager.incidents[0]).to match(/#{hostname.shard}/)
         expect(pager.incidents[0]).to match(/automatic replication fixing has been going on for 2[01] minutes/)
       end
     end

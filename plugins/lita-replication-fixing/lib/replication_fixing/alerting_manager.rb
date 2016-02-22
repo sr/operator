@@ -26,9 +26,9 @@ module ReplicationFixing
 
     # Notifies the pager that the bot has been trying to fix replication for
     # long enough that a human will probably need to intervene
-    def notify_fixing_a_long_while(shard_or_hostname:, started_at:)
+    def notify_fixing_a_long_while(shard:, started_at:)
       minutes_fixing = (Time.now - started_at) / 60
-      @pager.trigger("#{shard_or_hostname}: automatic replication fixing has been going on for #{minutes_fixing.to_i} minutes", incident_key: incident_key(shard_or_hostname))
+      @pager.trigger("#{shard}: automatic replication fixing has been going on for #{minutes_fixing.to_i} minutes", incident_key: incident_key(shard))
     rescue
       @log.error("Error sending page: #{$!}")
     end
