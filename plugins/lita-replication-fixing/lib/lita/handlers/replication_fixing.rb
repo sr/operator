@@ -134,12 +134,11 @@ module Lita
         minutes = (response.match_data["minutes"] || "10").to_i
 
         @ignore_client.ignore(prefix, shard_id)
-        response.reply("/me is ignoring #{prefix}-#{shard_id} for #{minutes} minutes")
+        response.reply("I will ignore #{prefix}-#{shard_id} for #{minutes} minutes")
       end
 
       def create_fix(response)
         if config.monitor_only
-          response.reply "/me is in monitor-only mode. Ignoring the last !fix command"
           return
         end
 
@@ -149,7 +148,24 @@ module Lita
 
         result = @fixing_client.fix_shard(shard: shard)
 
-        reply_with_fix_result(shard_or_hostname: shard, result: result)
+        case result
+        when ::ReplicationFixing::FixingClient::NoErrorDetected
+          response.reply "No errors detected on #{shard}"
+        when ::ReplicationFixing::FixingClient::NotFixable
+          response.reply "Sorry, I'm not able to fix #{shard} right now. I need a human to resolve it."
+        when ::ReplicationFixing::FixingClient::FixInProgress
+          ongoing_minutes = ((Time.now - result.started_at) / 60.0).to_i
+          if ongoing_minutes <= 0
+            response.reply "OK, I'm trying to fix #{shard}"
+          else
+            response.reply "I've been trying to fix #{shard} for #{ongoing_minutes.to_i} minutes now"
+          end
+        when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
+          response.reply "I got an error while checking fixability: #{result.error}"
+        else
+          response.reply "Uh, I got an unknown result: #{result}"
+        end
+
         ensure_monitoring(shard: shard)
       end
 
@@ -159,7 +175,7 @@ module Lita
         when ::ReplicationFixing::FixingClient::NoErrorDetected
           @throttler.send_message(@status_room, "(successful) Replication is fixed on #{shard_or_hostname}")
         when ::ReplicationFixing::FixingClient::NotFixable
-          @throttler.send_message(@status_room, "@all Replication is broken on #{shard_or_hostname}, but I'm not able to fix it.")
+          @throttler.send_message(@status_room, "@all Replication is broken on #{shard_or_hostname}, but I'm not able to fix it")
         when ::ReplicationFixing::FixingClient::FixInProgress
           ongoing_minutes = (Time.now - result.started_at) / 60.0
           if ongoing_minutes >= 10.0
