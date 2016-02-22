@@ -114,7 +114,7 @@ module Lita
                   @fixing_client.status(shard_or_hostname: hostname)
                 else
                   @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
-                  @fixing_client.fix(shard_or_hostname: hostname)
+                  @fixing_client.fix(shard: hostname)
                 end
 
               reply_with_fix_result(shard_or_hostname: hostname, result: result)
@@ -148,7 +148,7 @@ module Lita
         prefix = response.match_data["prefix"] || "db"
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
 
-        result = @fixing_client.fix(shard_or_hostname: shard)
+        result = @fixing_client.fix(shard: shard)
 
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected

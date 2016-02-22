@@ -63,10 +63,10 @@ module ReplicationFixing
       ErrorCheckingFixability.new("error checking fixability: #{e}")
     end
 
-    def fix(shard_or_hostname:, user: "system")
-      result = status(shard_or_hostname: shard_or_hostname)
+    def fix(shard:, user: "system")
+      result = status(shard_or_hostname: shard)
       if result.kind_of?(FixableErrorOccurring)
-        execute_fix(shard_or_hostname: shard_or_hostname, user: user)
+        execute_fix(shard: shard, user: user)
       else
         result
       end
@@ -89,8 +89,8 @@ module ReplicationFixing
     end
 
     private
-    def execute_fix(shard_or_hostname:, user:)
-      response = @repfix.post("/replication/fix/#{shard_or_hostname.prefix}/#{shard_or_hostname.shard_id}", user: user)
+    def execute_fix(shard:, user:)
+      response = @repfix.post("/replication/fix/#{shard.prefix}/#{shard.shard_id}", user: user)
       if response.status == 200
         begin
           json = JSON.parse(response.body)
@@ -98,12 +98,12 @@ module ReplicationFixing
             ErrorCheckingFixability.new(json["message"])
           else
             begin
-              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard_or_hostname)
+              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard)
             rescue => e
               @log.error("Unable to keep state about fix: #{e}")
             end
 
-            status(shard_or_hostname: shard_or_hostname)
+            status(shard_or_hostname: shard)
           end
         rescue JSON::ParserError
           ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
