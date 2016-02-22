@@ -2,10 +2,10 @@ require "thread"
 
 module ReplicationFixing
   class Monitor
-    attr_reader :hostname, :tick
+    attr_reader :shard, :tick
 
-    def initialize(hostname:, tick: 30)
-      @hostname = hostname
+    def initialize(shard:, tick: 30)
+      @shard = shard
       @tick = tick
 
       @on_replication_fixed = []
@@ -40,10 +40,10 @@ module ReplicationFixing
     def start_exclusive_monitor(monitor)
       success = \
         @mutex.synchronize do
-          if @monitors.key?(monitor.hostname)
+          if @monitors.key?(monitor.shard)
             false
           else
-            @monitors[monitor.hostname] = monitor
+            @monitors[monitor.shard] = monitor
             true
           end
         end
@@ -58,8 +58,8 @@ module ReplicationFixing
       loop do
         sleep(monitor.tick)
 
-        break unless @monitors.key?(monitor.hostname)
-        result = @fixing_client.status(hostname: monitor.hostname)
+        break unless @monitors.key?(monitor.shard)
+        result = @fixing_client.shard_status(shard: monitor.shard)
         monitor.signal_tick(result)
 
         if result.kind_of?(FixingClient::NoErrorDetected)
@@ -69,7 +69,7 @@ module ReplicationFixing
       end
     ensure
       @mutex.synchronize do
-        @monitors.delete(monitor.hostname)
+        @monitors.delete(monitor.shard)
       end
     end
   end

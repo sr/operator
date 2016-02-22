@@ -15,7 +15,7 @@ module ReplicationFixing
       it "pages when there is an error checking fixability" do
         result = FixingClient::ErrorCheckingFixability.new(error: "everything is broken")
 
-        manager.ingest_fix_result(hostname: hostname, result: result)
+        manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
 
         expect(pager.incidents[0]).to match(/#{hostname}/)
         expect(pager.incidents[0]).to match(/everything is broken/)
@@ -24,34 +24,25 @@ module ReplicationFixing
       it "pages when a shard is not fixable" do
         result = FixingClient::NotFixable.new(status: {})
 
-        manager.ingest_fix_result(hostname: hostname, result: result)
+        manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
 
         expect(pager.incidents[0]).to match(/#{hostname}/)
         expect(pager.incidents[0]).to match(/replication is not automatically fixable/)
       end
 
-      it "pages if fixing is globally disabled and a lot of errors have occurred" do
-        result = FixingClient::AllShardsIgnored.new(400)
-
-        manager.ingest_fix_result(hostname: hostname, result: result)
-
-        expect(pager.incidents[0]).to match(/replication fixing is disabled, but many errors/)
-      end
-
-      it "does not page if fixing is globally disabled and only a few errors have occurred" do
-        result = FixingClient::AllShardsIgnored.new(42)
-
-        manager.ingest_fix_result(hostname: hostname, result: result)
-
-        expect(pager.incidents[0]).to eq(nil)
-      end
-
       it "does not page for other results" do
-        result = FixingClient::ShardIsIgnored.new
+        result = FixingClient::FixInProgress.new
 
-        manager.ingest_fix_result(hostname: hostname, result: result)
+        manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
 
         expect(pager.incidents[0]).to eq(nil)
+      end
+    end
+
+    describe "#notify_replication_disabled_by_many_errors" do
+      it "sends a page" do
+        manager.notify_replication_disabled_but_many_errors
+        expect(pager.incidents[0]).to match(/replication fixing is disabled, but many errors are still occurring/)
       end
     end
 
@@ -59,7 +50,7 @@ module ReplicationFixing
       it "sends a page" do
         twenty_minutes_ago = Time.now - 20*60
 
-        manager.notify_fixing_a_long_while(hostname: hostname, started_at: twenty_minutes_ago)
+        manager.notify_fixing_a_long_while(shard_or_hostname: hostname, started_at: twenty_minutes_ago)
 
         expect(pager.incidents[0]).to match(/#{hostname}/)
         expect(pager.incidents[0]).to match(/automatic replication fixing has been going on for 2[01] minutes/)

@@ -1,20 +1,18 @@
 require "spec_helper"
 require "thread"
-require "replication_fixing/hostname"
+require "replication_fixing/shard"
 require "replication_fixing/monitor_supervisor"
 
 module ReplicationFixing
   RSpec.describe MonitorSupervisor do
     include Lita::RSpec
 
-    let(:ignore_client) { IgnoreClient.new(Lita.redis) }
     let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
     let(:logger) { Logger.new("/dev/null") }
 
     let(:fixing_client) {
       FixingClient.new(
         repfix_url: "https://repfix.example",
-        ignore_client: ignore_client,
         fixing_status_client: fixing_status_client,
         log: logger,
       )
@@ -27,7 +25,7 @@ module ReplicationFixing
         # 1) Fixable error
         # 2) Fix active
         # 3) No longer erroring
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dallas")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -37,8 +35,8 @@ module ReplicationFixing
         mutex = Mutex.new
         var = ConditionVariable.new
 
-        hostname = Hostname.new("db-d1")
-        monitor = Monitor.new(hostname: hostname, tick: 0.001)
+        shard = Shard.new("db", 1)
+        monitor = Monitor.new(shard: shard, tick: 0.001)
 
         results = []
         monitor.on_tick do |result|
@@ -72,8 +70,8 @@ module ReplicationFixing
         mutex = Mutex.new
         var = ConditionVariable.new
 
-        hostname = Hostname.new("db-d1")
-        monitor = Monitor.new(hostname: hostname, tick: 1)
+        shard = Shard.new("db", 1)
+        monitor = Monitor.new(shard: shard, tick: 1)
 
         expect(supervisor.start_exclusive_monitor(monitor)).to be_truthy
         expect(supervisor.start_exclusive_monitor(monitor)).to be_falsey

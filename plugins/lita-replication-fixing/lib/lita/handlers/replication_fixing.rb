@@ -8,6 +8,7 @@ require "replication_fixing/message_throttler"
 require "replication_fixing/monitor_supervisor"
 require "replication_fixing/pagerduty_pager"
 require "replication_fixing/replication_error_sanitizer"
+require "replication_fixing/shard"
 require "replication_fixing/test_pager"
 
 module Lita
@@ -56,7 +57,6 @@ module Lita
         @fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(redis)
         @fixing_client = ::ReplicationFixing::FixingClient.new(
           repfix_url: config.repfix_url,
-          ignore_client: @ignore_client,
           fixing_status_client: @fixing_status_client,
           log: log,
         )
@@ -81,24 +81,36 @@ module Lita
         if body["hostname"]
           begin
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
+            shard = hostname.shard
 
-            @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}") if body["error"]
+            ignoring = @ignore_client.ignoring?(shard.prefix, shard.id)
+            if ignoring
+              log.debug("Shard is ignored: #{shard}")
 
-            if mysql_last_error = body["mysql_last_error"]
-              sanitized_error = @sanitizer.sanitize(mysql_last_error)
-              @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
-            end
+              count = @ignore_client.incr_skipped_errors_count
+              if (count % 200).zero?
+                @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
+                @alerting_manager.notify_replication_disabled_but_many_errors
+              end
+            else
+              @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}") if body["error"]
 
-            result = \
-              if config.monitor_only
-                @fixing_client.status(hostname: hostname)
-              else
-                @alerting_manager.ingest_fix_result(hostname: hostname, result: result)
-                @fixing_client.fix(hostname: hostname)
+              if mysql_last_error = body["mysql_last_error"]
+                sanitized_error = @sanitizer.sanitize(mysql_last_error)
+                @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
               end
 
-            reply_with_fix_result(hostname: hostname, result: result)
-            ensure_monitoring(hostname: hostname)
+              result = \
+                if config.monitor_only
+                  @fixing_client.host_status(hostname: hostname)
+                else
+                  @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
+                  @fixing_client.fix_host(hostname: hostname)
+                end
+
+              reply_with_fix_result(shard_or_hostname: hostname, result: result)
+              ensure_monitoring(shard: hostname.shard)
+            end
 
             response.status = 201
           rescue ::ReplicationFixing::Hostname::MalformedHostname
@@ -121,39 +133,32 @@ module Lita
       end
 
       private
-      def reply_with_fix_result(hostname:, result:)
+      def reply_with_fix_result(shard_or_hostname:, result:)
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
-          @throttler.send_message(@status_room, "(successful) Replication is fixed on #{hostname}")
-        when ::ReplicationFixing::FixingClient::ShardIsIgnored
-          log.debug("Shard is ignored: #{hostname}")
-        when ::ReplicationFixing::FixingClient::AllShardsIgnored
-          log.debug("All shards are ignored")
-          if (result.skipped_errors_count % 200).zero?
-            @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
-          end
+          @throttler.send_message(@status_room, "(successful) Replication is fixed on #{shard_or_hostname}")
         when ::ReplicationFixing::FixingClient::NotFixable
-          @throttler.send_message(@status_room, "@all Replication is broken on #{hostname}, but I'm not able to fix it.")
+          @throttler.send_message(@status_room, "@all Replication is broken on #{shard_or_hostname}, but I'm not able to fix it.")
         when ::ReplicationFixing::FixingClient::FixInProgress
           ongoing_minutes = (Time.now - result.started_at) / 60.0
           if ongoing_minutes >= 10.0
-            @alerting_manager.notify_fixing_a_long_while(hostname: hostname, started_at: result.started_at)
-            @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{hostname} for #{ongoing_minutes.to_i} minutes now")
+            @alerting_manager.notify_fixing_a_long_while(shard_or_hostname: shard_or_hostname, started_at: result.started_at)
+            @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{shard_or_hostname} for #{ongoing_minutes.to_i} minutes now")
           else
-            @throttler.send_message(@status_room, "/me is fixing replication on #{hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
+            @throttler.send_message(@status_room, "/me is fixing replication on #{shard_or_hostname} (ongoing for #{ongoing_minutes.to_i} minutes)")
           end
         when ::ReplicationFixing::FixingClient::FixableErrorOccurring
-          @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{hostname}")
+          @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{shard_or_hostname}")
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-          @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{hostname}: #{result.error}")
+          @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{shard_or_hostname}: #{result.error}")
         else
           log.error("Got unknown response from client: #{result}")
         end
       end
 
-      def ensure_monitoring(hostname:)
-        monitor = ::ReplicationFixing::Monitor.new(hostname: hostname, tick: 30)
-        monitor.on_tick { |result| reply_with_fix_result(hostname: hostname, result: result) }
+      def ensure_monitoring(shard:)
+        monitor = ::ReplicationFixing::Monitor.new(shard: shard, tick: 30)
+        monitor.on_tick { |result| reply_with_fix_result(shard_or_hostname: shard, result: result) }
 
         @monitor_supervisor.start_exclusive_monitor(monitor)
       end

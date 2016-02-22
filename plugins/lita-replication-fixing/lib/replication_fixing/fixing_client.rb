@@ -3,17 +3,13 @@ require "faraday"
 module ReplicationFixing
   class FixingClient
     NoErrorDetected = Struct.new(:status)
-    ShardIsIgnored = Class.new
-    AllShardsIgnored = Struct.new(:skipped_errors_count)
     NotFixable = Struct.new(:status)
     FixInProgress = Struct.new(:started_at)
     FixableErrorOccurring = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error)
 
-    # TODO: This class should not deal with ignore_client, move it out to another level
-    def initialize(repfix_url:, ignore_client:, fixing_status_client:, log:)
+    def initialize(repfix_url:, fixing_status_client:, log:)
       @repfix_url = repfix_url
-      @ignore_client = ignore_client
       @fixing_status_client = fixing_status_client
       @log = log
 
@@ -23,8 +19,92 @@ module ReplicationFixing
       end
     end
 
-    def status(hostname:)
-      response = @repfix.get("/replication/fixes/for/#{hostname.prefix}/#{hostname.shard_id}/#{hostname.datacenter}")
+    def shard_status(shard:)
+      response = @repfix.get("/replication/fixes/for/#{shard.prefix}/#{shard.id}")
+      parse_status_response(shard: shard, response: response)
+    rescue => e
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
+    end
+
+    def host_status(hostname:)
+      response = @repfix.get("/replication/fixes/for/#{hostname.shard.prefix}/#{hostname.shard.id}/#{hostname.datacenter}")
+      parse_status_response(shard: hostname.shard, response: response)
+    rescue => e
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
+    end
+
+    def fix_shard(shard:, user: "system")
+      result = shard_status(shard: shard)
+      if result.kind_of?(FixableErrorOccurring)
+        execute_fix_shard(shard: shard, user: user)
+      else
+        result
+      end
+    end
+
+    def fix_host(hostname:, user: "system")
+      result = host_status(hostname: hostname)
+      if result.kind_of?(FixableErrorOccurring)
+        execute_fix_host(hostname: hostname, user: user)
+      else
+        result
+      end
+    end
+
+    private
+    def execute_fix_shard(shard:, user:)
+      response = @repfix.post("/replication/fix/#{shard.prefix}/#{shard.id}", user: user)
+      if response.status == 200
+        begin
+          json = JSON.parse(response.body)
+          if json["error"]
+            ErrorCheckingFixability.new(json["message"])
+          else
+            begin
+              @fixing_status_client.ensure_fixing_status_ongoing(shard.id)
+            rescue => e
+              @log.error("Unable to keep state about fix: #{e}")
+            end
+
+            shard_status(shard: shard)
+          end
+        rescue JSON::ParserError
+          ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
+        end
+      else
+        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
+      end
+    rescue => e
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
+    end
+
+    def execute_fix_host(hostname:, user:)
+      response = @repfix.post("/replication/fix/#{hostname.shard.prefix}/#{hostname.shard.id}", user: user)
+      if response.status == 200
+        begin
+          json = JSON.parse(response.body)
+          if json["error"]
+            ErrorCheckingFixability.new(json["message"])
+          else
+            begin
+              @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard.id)
+            rescue => e
+              @log.error("Unable to keep state about fix: #{e}")
+            end
+
+            host_status(hostname: hostname)
+          end
+        rescue JSON::ParserError
+          ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
+        end
+      else
+        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
+      end
+    rescue => e
+      ErrorCheckingFixability.new("error checking fixability: #{e}")
+    end
+
+    def parse_status_response(shard:, response:)
       if response.status == 200
         begin
           json = JSON.parse(response.body)
@@ -32,18 +112,18 @@ module ReplicationFixing
             ErrorCheckingFixability.new(json["message"])
           elsif json["fix"] && json["fix"]["active"]
             begin
-              @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)
+              @fixing_status_client.ensure_fixing_status_ongoing(shard.id)
             rescue => e
               @log.error("Unable to keep state about fix: #{e}")
             end
 
-            current_status = @fixing_status_client.status(hostname.shard_id)
+            current_status = @fixing_status_client.status(shard.id)
             FixInProgress.new(current_status.started_at)
           elsif json["is_erroring"] && json["is_fixable"]
             FixableErrorOccurring.new(json)
           elsif json["is_erroring"]
             begin
-              @fixing_status_client.reset_status(hostname.shard_id)
+              @fixing_status_client.reset_status(shard.id)
             rescue => e
               @log.error("Unable to reset status: #{e}")
             end
@@ -58,50 +138,6 @@ module ReplicationFixing
       else
         ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
       end
-    rescue => e
-      ErrorCheckingFixability.new("error checking fixability: #{e}")
-    end
-
-    def fix(hostname:, user: "system")
-      ignoring = @ignore_client.ignoring?(hostname.prefix, hostname.shard_id)
-      if ignoring == :shard
-        ShardIsIgnored.new
-      elsif ignoring == :all
-        AllShardsIgnored.new(@ignore_client.incr_skipped_errors_count)
-      else result = status(hostname: hostname)
-        if result.kind_of?(FixableErrorOccurring)
-          execute_fix(hostname: hostname, user: user)
-        else
-          result
-        end
-      end
-    end
-
-    private
-    def execute_fix(hostname:, user:)
-      response = @repfix.post("/replication/fix/#{hostname.prefix}/#{hostname.shard_id}", user: user)
-      if response.status == 200
-        begin
-          json = JSON.parse(response.body)
-          if json["error"]
-            ErrorCheckingFixability.new(json["message"])
-          else
-            begin
-              @fixing_status_client.ensure_fixing_status_ongoing(hostname.shard_id)
-            rescue => e
-              @log.error("Unable to keep state about fix: #{e}")
-            end
-
-            status(hostname: hostname)
-          end
-        rescue JSON::ParserError
-          ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
-        end
-      else
-        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
-      end
-    rescue => e
-      ErrorCheckingFixability.new("error checking fixability: #{e}")
     end
 
     def build_incident_key(hostname:)

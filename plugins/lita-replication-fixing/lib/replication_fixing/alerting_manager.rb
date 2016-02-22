@@ -7,33 +7,35 @@ module ReplicationFixing
       @log = log
     end
 
-    def ingest_fix_result(hostname:, result:)
+    def ingest_fix_result(shard_or_hostname:, result:)
       case result
       when FixingClient::ErrorCheckingFixability
-        @pager.trigger("#{hostname}: error checking fixability for #{hostname}: #{result.error}", incident_key: incident_key(hostname))
+        @pager.trigger("#{shard_or_hostname}: error checking fixability for: #{result.error}", incident_key: incident_key(shard_or_hostname))
       when FixingClient::NotFixable
-        @pager.trigger("#{hostname}: replication is not automatically fixable", incident_key: incident_key(hostname))
-      when FixingClient::AllShardsIgnored
-        if (result.skipped_errors_count % 200).zero?
-          @pager.trigger("replication fixing is disabled, but many errors are still occurring", incident_key: "replication/all-shards-ignored")
-        end
+        @pager.trigger("#{shard_or_hostname}: replication is not automatically fixable", incident_key: incident_key(shard_or_hostname))
       end
     rescue
       @log.error("Error sending page: #{$!}")
     end
 
+    # Notifies the pager that fixing is globally ignored, but a lot of errors
+    # are still being noticed
+    def notify_replication_disabled_but_many_errors
+      @pager.trigger("replication fixing is disabled, but many errors are still occurring", incident_key: "replication/all-shards-ignored")
+    end
+
     # Notifies the pager that the bot has been trying to fix replication for
     # long enough that a human will probably need to intervene
-    def notify_fixing_a_long_while(hostname:, started_at:)
+    def notify_fixing_a_long_while(shard_or_hostname:, started_at:)
       minutes_fixing = (Time.now - started_at) / 60
-      @pager.trigger("#{hostname}: automatic replication fixing has been going on for #{minutes_fixing.to_i} minutes", incident_key: incident_key(hostname))
+      @pager.trigger("#{shard_or_hostname}: automatic replication fixing has been going on for #{minutes_fixing.to_i} minutes", incident_key: incident_key(shard_or_hostname))
     rescue
       @log.error("Error sending page: #{$!}")
     end
 
     private
-    def incident_key(hostname)
-      ["replication-error", hostname.to_s].join("/")
+    def incident_key(shard_or_hostname)
+      ["replication-error", shard_or_hostname.to_s].join("/")
     end
   end
 end
