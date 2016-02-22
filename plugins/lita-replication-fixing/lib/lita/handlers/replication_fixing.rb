@@ -123,9 +123,13 @@ module Lita
                 @alerting_manager.notify_replication_disabled_but_many_errors
               end
             else
-              @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}") if body["error"]
+              error = body["error"].to_s
+              unless error.empty?
+                @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}")
+              end
 
-              if mysql_last_error = body["mysql_last_error"]
+              mysql_last_error = body["mysql_last_error"].to_s
+              unless mysql_last_error.empty?
                 sanitized_error = @sanitizer.sanitize(mysql_last_error)
                 @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
               end
