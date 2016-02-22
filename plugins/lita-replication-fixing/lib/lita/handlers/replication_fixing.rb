@@ -227,11 +227,15 @@ module Lita
       end
 
       def current_fixes(response)
-        fixes = @fixing_status_client.current_fixes
-        if fixes.length > 0
-          response.reply("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
-        else
-          response.reply("I'm not fixing anything right now")
+        begin
+          fixes = @fixing_status_client.current_fixes
+          if fixes.length > 0
+            response.reply("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
+          else
+            response.reply("I'm not fixing anything right now")
+          end
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
         end
       end
 
