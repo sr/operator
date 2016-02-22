@@ -138,7 +138,14 @@ module Lita
                   @fixing_client.fix(shard: hostname)
                 end
 
-              reply_with_fix_result(shard_or_hostname: hostname, result: result)
+              case result
+              when ::ReplicationFixing::FixingClient::NoErrorDetected
+                # This generally means there was an error, but it's not a replication statement issue
+                @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
+              else
+                reply_with_fix_result(shard_or_hostname: hostname, result: result)
+              end
+
               ensure_monitoring(shard: hostname.shard)
             end
 
