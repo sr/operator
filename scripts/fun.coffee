@@ -534,7 +534,7 @@ module.exports = (robot) ->
   robot.respond /megaman$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"
 
-  robot.respond /squirrelmaster/i, (msg) ->
+  robot.respond /squirrelmaster$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/NsridkQpvzIyzsu/squirrelmaster.png"
 
   robot.respond /bestfriends$/i, (msg) ->
