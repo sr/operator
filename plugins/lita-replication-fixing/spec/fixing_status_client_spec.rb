@@ -39,4 +39,20 @@ module ReplicationFixing
       end
     end
   end
+
+  describe "#current_fixes" do
+    it "lists all of the shards currently being fixed" do
+      shard11 = Shard.new("db", 11)
+      shard12 = Shard.new("db", 12)
+
+      client = FixingStatusClient.new(Lita.redis)
+      client.ensure_fixing_status_ongoing(shard: shard11)
+      client.ensure_fixing_status_ongoing(shard: shard12)
+
+      fixes = client.current_fixes
+      expect(fixes.length).to eq(2)
+      expect(fixes[0].shard).to eq(shard11)
+      expect(fixes[1].shard).to eq(shard12)
+    end
+  end
 end

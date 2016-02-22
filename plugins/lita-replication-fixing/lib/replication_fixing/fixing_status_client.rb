@@ -1,3 +1,5 @@
+require "replication_fixing/shard"
+
 module ReplicationFixing
   class FixingStatusClient
     SHARD_NAMESPACE = "fixing_status"
@@ -8,7 +10,7 @@ module ReplicationFixing
     # success).
     KEY_TTL = 60 * 10
 
-    Status = Struct.new(:fixing?, :started_at)
+    Status = Struct.new(:fixing?, :shard, :started_at)
 
     def initialize(redis)
       @redis = redis
@@ -33,10 +35,19 @@ module ReplicationFixing
       hash = @redis.hgetall([SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":"))
 
       if hash.empty?
-        Status.new(false, nil)
+        Status.new(false, shard, nil)
       else
-        Status.new(true, Time.at(hash.fetch("started_at", "0").to_i))
+        Status.new(true, shard, Time.at(hash.fetch("started_at", "0").to_i))
       end
+    end
+
+    def current_fixes
+      @redis.keys([SHARD_NAMESPACE, "*"].join(":")).sort.map { |key|
+        _, prefix, shard_id = key.split(":")
+
+        shard = Shard.new(prefix, shard_id.to_i)
+        status(shard: shard)
+      }.select { |s| s.fixing? }
     end
   end
 end

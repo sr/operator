@@ -125,4 +125,15 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("OK, I will no longer ignore whoisdb-1")
     end
   end
+
+  describe "!currentautofixes" do
+    it "lists the fixes currently ongoing" do
+      fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(subject.redis)
+      fixing_status_client.ensure_fixing_status_ongoing(shard: ::ReplicationFixing::Shard.new("db", 12))
+      fixing_status_client.ensure_fixing_status_ongoing(shard: ::ReplicationFixing::Shard.new("db", 32))
+
+      send_command("currentautofixes")
+      expect(replies.last).to eq("I'm currently fixing: db-12, db-32")
+    end
+  end
 end

@@ -116,7 +116,7 @@ module ReplicationFixing
         shard = Shard.new("db", 11)
 
         request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
-                  .and_return(status: 500, body: "")
+          .and_return(status: 500, body: "")
 
         result = fixing_client.cancel(shard: shard)
         expect(result).to be_kind_of(FixingClient::CancelResult)

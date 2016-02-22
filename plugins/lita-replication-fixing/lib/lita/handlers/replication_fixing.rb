@@ -46,6 +46,10 @@ module Lita
         "resetignore SHARD_ID PREFIX" => "Stops ignoreing PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
       }
 
+      route /^current(?:auto)?fixes/i, :current_fixes, help: {
+        "currentfixes" => "Lists ongoing replication fixes",
+      }
+
       def initialize(robot)
         super
 
@@ -207,6 +211,15 @@ module Lita
           response.reply("OK, I will no longer ignore #{shard}")
         rescue => e
           response.reply("Sorry, something went wrong: #{e}")
+        end
+      end
+
+      def current_fixes(response)
+        fixes = @fixing_status_client.current_fixes
+        if fixes.length > 0
+          response.reply("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
+        else
+          response.reply("I'm not fixing anything right now")
         end
       end
 
