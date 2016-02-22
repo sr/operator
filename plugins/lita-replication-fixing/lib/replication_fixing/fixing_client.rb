@@ -8,6 +8,8 @@ module ReplicationFixing
     FixableErrorOccurring = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error)
 
+    CancelResult = Struct.new(:success?, :message)
+
     def initialize(repfix_url:, fixing_status_client:, log:)
       @repfix_url = repfix_url
       @fixing_status_client = fixing_status_client
@@ -55,7 +57,7 @@ module ReplicationFixing
           ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
         end
       else
-        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
+        ErrorCheckingFixability.new("HTTP #{response.status} status code from repfix: #{response.body}")
       end
     rescue => e
       ErrorCheckingFixability.new("error checking fixability: #{e}")
@@ -68,6 +70,22 @@ module ReplicationFixing
       else
         result
       end
+    end
+
+    def cancel(shard:)
+      response = @repfix.post("/replication/fixes/cancel/#{shard.shard_id}")
+      if response.status == 200
+        begin
+          json = JSON.parse(response.body)
+          CancelResult.new(json["is_canceled"], json["message"])
+        rescue JSON::ParserError
+          CancelResult.new(false, "invalid JSON response from repfix: #{response.body}")
+        end
+      else
+        CancelResult.new(false, "HTTP #{response.status} status code from repfix: #{response.body}")
+      end
+    rescue => e
+      CancelResult.new(false, e.to_s)
     end
 
     private
@@ -91,7 +109,7 @@ module ReplicationFixing
           ErrorCheckingFixability.new("invalid JSON response from repfix: #{response.body}")
         end
       else
-        ErrorCheckingFixability.new("HTTP #{response.code} status code from repfix: #{response.body}")
+        ErrorCheckingFixability.new("HTTP #{response.status} status code from repfix: #{response.body}")
       end
     rescue => e
       ErrorCheckingFixability.new("error checking fixability: #{e}")

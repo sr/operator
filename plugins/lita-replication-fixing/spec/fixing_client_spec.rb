@@ -1,5 +1,6 @@
 require "spec_helper"
 require "replication_fixing/fixing_client"
+require "replication_fixing/shard"
 require "replication_fixing/hostname"
 
 module ReplicationFixing
@@ -174,6 +175,36 @@ module ReplicationFixing
           expect(result).to be_kind_of(FixingClient::FixInProgress)
           expect(result.started_at.to_i).to be_within(1).of(Time.now.to_i)
         end
+      end
+    end
+
+    describe "#cancel" do
+      it "cancels the fix" do
+        shard = Shard.new("db", 11)
+
+        request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
+          .and_return(body: JSON.dump("is_canceled" => true, "message" => "All fixes canceled"))
+
+        result = fixing_client.cancel(shard: shard)
+        expect(result).to be_kind_of(FixingClient::CancelResult)
+        expect(result.success?).to be_truthy
+        expect(result.message).to eq("All fixes canceled")
+
+        expect(request).to have_been_made
+      end
+
+      it "returns an error if the fix cannot be canceled" do
+        shard = Shard.new("db", 11)
+
+        request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
+                  .and_return(status: 500, body: "")
+
+        result = fixing_client.cancel(shard: shard)
+        expect(result).to be_kind_of(FixingClient::CancelResult)
+        expect(result.success?).to be_falsey
+        expect(result.message).to match(/HTTP 500/)
+
+        expect(request).to have_been_made
       end
     end
   end

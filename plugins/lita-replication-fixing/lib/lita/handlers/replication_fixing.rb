@@ -25,16 +25,20 @@ module Lita
       http.post "/replication/errors", :create_replication_error
 
       # http://rubular.com/r/Gz3fLQiR5L
-      route /ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, help: {
+      route /^ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, help: {
         "ignore SHARD_ID" => "Ignores db-SHARD_ID for 10 minutes",
         "ignore SHARD_ID PREFIX" => "Ignores PREFIX-SHARD_ID for 10 minutes (PREFIX is, e.g., db or whoisdb)",
         "ignore SHARD_ID MINUTES" => "Ignores db-SHARD_ID for MINUTES minutes",
         "ignore SHARD_ID PREFIX MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
       }
 
-      route /fix\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :create_fix, help: {
+      route /^fix\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :create_fix, help: {
         "fix SHARD_ID" => "Attempts to fix db-SHARD_ID",
         "fix SHARD_ID PREFIX" => "Attempts to fix PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+      }
+
+      route /^cancelfix\s+(?<shard_id>\d+)/, :cancel_fix, help: {
+        "cancelfix SHARD_ID" => "Cancels the fix for SHARD_ID",
       }
 
       def initialize(robot)
@@ -138,9 +142,7 @@ module Lita
       end
 
       def create_fix(response)
-        if config.monitor_only
-          return
-        end
+        return if config.monitor_only
 
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
@@ -167,6 +169,22 @@ module Lita
         end
 
         ensure_monitoring(shard: shard)
+      end
+
+      def cancel_fix(response)
+        return if config.monitor_only
+
+        shard_id = response.match_data["shard_id"].to_i
+        prefix = "db" # TODO: Apparently there is no way to cancel a fix on a specific prefix in rep_fix
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
+
+        result = @fixing_client.cancel(shard: shard)
+
+        if result.success?
+          response.reply "OK, I cancelled all the fixes for #{shard}"
+        else
+          response.reply "Sorry, I wasn't able to cancel the fixes for #{shard}: #{result.message}"
+        end
       end
 
       private

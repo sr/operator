@@ -80,11 +80,12 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      stub_request(:post, "https://repfix.pardot.com/replication/fix/db/11")
+      request = stub_request(:post, "https://repfix.pardot.com/replication/fix/db/11")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       send_command("fix 11")
       expect(replies.last).to eq("OK, I'm trying to fix db-11")
+      expect(request).to have_been_made
     end
 
     it "attempts to fix the whoisdb shard" do
@@ -93,11 +94,23 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      stub_request(:post, "https://repfix.pardot.com/replication/fix/whoisdb/1")
+      request = stub_request(:post, "https://repfix.pardot.com/replication/fix/whoisdb/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       send_command("fix 1 whoisdb")
       expect(replies.last).to eq("OK, I'm trying to fix whoisdb-1")
+      expect(request).to have_been_made
+    end
+  end
+
+  describe "!cancelfix" do
+    it "cancels the fix for the shard" do
+      request = stub_request(:post, "https://repfix.pardot.com/replication/fixes/cancel/11")
+        .and_return(body: JSON.dump("is_canceled" => true, "message" => "Fixes canceled"))
+
+      send_command("cancelfix 11")
+      expect(replies.last).to eq("OK, I cancelled all the fixes for db-11")
+      expect(request).to have_been_made
     end
   end
 end
