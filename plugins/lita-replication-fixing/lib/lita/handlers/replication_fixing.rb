@@ -281,7 +281,7 @@ module Lita
 
       private
       def reply_with_fix_result(shard_or_hostname:, result:)
-        ignoring = @ignore_client.ignoring?(shard)
+        ignoring = @ignore_client.ignoring?(shard_or_hostname)
         if ignoring
           log.debug("Shard is ignored: #{shard}")
         else
