@@ -125,13 +125,13 @@ module Lita
             else
               error = body["error"].to_s
               unless error.empty?
-                @throttler.send_message(@replication_room, "#{hostname}: #{body["error"]}")
+                robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
               end
 
               mysql_last_error = body["mysql_last_error"].to_s
               unless mysql_last_error.empty?
                 sanitized_error = @sanitizer.sanitize(mysql_last_error)
-                @throttler.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
+                robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
               end
 
               result = \
@@ -171,9 +171,9 @@ module Lita
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
         begin
           @ignore_client.ignore(shard)
-          response.reply("OK, I will ignore #{shard} for #{minutes} minutes")
+          response.reply_with_mention("OK, I will ignore #{shard} for #{minutes} minutes")
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
@@ -188,20 +188,20 @@ module Lita
 
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
-          response.reply "I didn't detect any errors detected on #{shard}"
+          response.reply_with_mention "I didn't detect any errors detected on #{shard}"
         when ::ReplicationFixing::FixingClient::NotFixable
-          response.reply "Sorry, I'm not able to fix #{shard} right now. I need a human to resolve it."
+          response.reply_with_mention "Sorry, I'm not able to fix #{shard} right now. I need a human to resolve it."
         when ::ReplicationFixing::FixingClient::FixInProgress
           ongoing_minutes = ((Time.now - result.started_at) / 60.0).to_i
           if ongoing_minutes <= 0
-            response.reply "OK, I'm trying to fix #{shard}"
+            response.reply_with_mention "OK, I'm trying to fix #{shard}"
           else
-            response.reply "Hmm, I've already been trying to fix #{shard} for #{ongoing_minutes.to_i} minutes now"
+            response.reply_with_mention "Hmm, I've already been trying to fix #{shard} for #{ongoing_minutes.to_i} minutes now"
           end
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-          response.reply "Sorry, I got an error while checking fixability: #{result.error}"
+          response.reply_with_mention "Sorry, I got an error while checking fixability: #{result.error}"
         else
-          response.reply "Sorry, I got an unknown result: #{result}"
+          response.reply_with_mention "Sorry, I got an unknown result: #{result}"
         end
 
         ensure_monitoring(shard: shard)
@@ -217,9 +217,9 @@ module Lita
         result = @fixing_client.cancel(shard: shard)
 
         if result.success?
-          response.reply "OK, I cancelled all the fixes for #{shard}"
+          response.reply_with_mention "OK, I cancelled all the fixes for #{shard}"
         else
-          response.reply "Sorry, I wasn't able to cancel the fixes for #{shard}: #{result.message}"
+          response.reply_with_mention "Sorry, I wasn't able to cancel the fixes for #{shard}: #{result.message}"
         end
       end
 
@@ -230,9 +230,9 @@ module Lita
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
         begin
           @ignore_client.ignore(shard)
-          response.reply("OK, I will no longer ignore #{shard}")
+          response.reply_with_mention("OK, I will no longer ignore #{shard}")
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
@@ -240,42 +240,42 @@ module Lita
         begin
           fixes = @fixing_status_client.current_fixes
           if fixes.length > 0
-            response.reply("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
+            response.reply_with_mention("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
           else
-            response.reply("I'm not fixing anything right now")
+            response.reply_with_mention("I'm not fixing anything right now")
           end
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
       def stop_fixing(response)
         begin
           @ignore_client.ignore_all
-          response.reply("OK, I've stopped fixing replication for ALL shards")
+          response.reply_with_mention("OK, I've stopped fixing replication for ALL shards")
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
       def start_fixing(response)
         begin
           @ignore_client.reset_ignore_all
-          response.reply("OK, I've started fixing replication")
+          response.reply_with_mention("OK, I've started fixing replication")
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
       def check_fixing(response)
         begin
           if @ignore_client.ignoring_all?
-            response.reply("(nope) Replication fixing is globally disabled")
+            response.reply_with_mention("(nope) Replication fixing is globally disabled")
           else
-            response.reply("(goodnews) Replication fixing is globally enabled")
+            response.reply_with_mention("(goodnews) Replication fixing is globally enabled")
           end
         rescue => e
-          response.reply("Sorry, something went wrong: #{e}")
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
