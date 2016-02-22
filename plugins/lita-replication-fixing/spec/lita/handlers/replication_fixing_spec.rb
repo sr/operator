@@ -113,4 +113,16 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(request).to have_been_made
     end
   end
+
+  describe "!resetignore" do
+    it "resets the ignore for the shard" do
+      send_command("resetignore 11")
+      expect(replies.last).to eq("OK, I will no longer ignore db-11")
+    end
+
+    it "resets the ignore for the shard with a given prefix" do
+      send_command("resetignore 1 whoisdb")
+      expect(replies.last).to eq("OK, I will no longer ignore whoisdb-1")
+    end
+  end
 end

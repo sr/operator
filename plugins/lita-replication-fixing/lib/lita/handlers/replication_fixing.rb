@@ -41,6 +41,11 @@ module Lita
         "cancelfix SHARD_ID" => "Cancels the fix for SHARD_ID",
       }
 
+      route /^resetignore\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :reset_ignore, help: {
+        "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID",
+        "resetignore SHARD_ID PREFIX" => "Stops ignoreing PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+      }
+
       def initialize(robot)
         super
 
@@ -92,7 +97,7 @@ module Lita
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
             shard = hostname.shard
 
-            ignoring = @ignore_client.ignoring?(shard.prefix, shard.shard_id)
+            ignoring = @ignore_client.ignoring?(shard)
             if ignoring
               log.debug("Shard is ignored: #{shard}")
 
@@ -137,8 +142,13 @@ module Lita
         prefix = response.match_data["prefix"] || "db"
         minutes = (response.match_data["minutes"] || "10").to_i
 
-        @ignore_client.ignore(prefix, shard_id)
-        response.reply("OK, I will ignore #{prefix}-#{shard_id} for #{minutes} minutes")
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
+        begin
+          @ignore_client.ignore(shard)
+          response.reply("OK, I will ignore #{shard} for #{minutes} minutes")
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
+        end
       end
 
       def create_fix(response)
@@ -184,6 +194,19 @@ module Lita
           response.reply "OK, I cancelled all the fixes for #{shard}"
         else
           response.reply "Sorry, I wasn't able to cancel the fixes for #{shard}: #{result.message}"
+        end
+      end
+
+      def reset_ignore(response)
+        shard_id = response.match_data["shard_id"].to_i
+        prefix = response.match_data["prefix"] || "db"
+
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
+        begin
+          @ignore_client.ignore(shard)
+          response.reply("OK, I will no longer ignore #{shard}")
+        rescue => e
+          response.reply("Sorry, something went wrong: #{e}")
         end
       end
 
