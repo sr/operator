@@ -138,7 +138,7 @@ module Lita
         minutes = (response.match_data["minutes"] || "10").to_i
 
         @ignore_client.ignore(prefix, shard_id)
-        response.reply("I will ignore #{prefix}-#{shard_id} for #{minutes} minutes")
+        response.reply("OK, I will ignore #{prefix}-#{shard_id} for #{minutes} minutes")
       end
 
       def create_fix(response)
@@ -152,7 +152,7 @@ module Lita
 
         case result
         when ::ReplicationFixing::FixingClient::NoErrorDetected
-          response.reply "No errors detected on #{shard}"
+          response.reply "I didn't detect any errors detected on #{shard}"
         when ::ReplicationFixing::FixingClient::NotFixable
           response.reply "Sorry, I'm not able to fix #{shard} right now. I need a human to resolve it."
         when ::ReplicationFixing::FixingClient::FixInProgress
@@ -160,12 +160,12 @@ module Lita
           if ongoing_minutes <= 0
             response.reply "OK, I'm trying to fix #{shard}"
           else
-            response.reply "I've been trying to fix #{shard} for #{ongoing_minutes.to_i} minutes now"
+            response.reply "Hmm, I've already been trying to fix #{shard} for #{ongoing_minutes.to_i} minutes now"
           end
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-          response.reply "I got an error while checking fixability: #{result.error}"
+          response.reply "Sorry, I got an error while checking fixability: #{result.error}"
         else
-          response.reply "Uh, I got an unknown result: #{result}"
+          response.reply "Sorry, I got an unknown result: #{result}"
         end
 
         ensure_monitoring(shard: shard)
