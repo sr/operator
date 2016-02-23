@@ -17,7 +17,7 @@ module Lita
       config :repfix_url, default: "https://repfix.pardot.com"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
       config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
-      config :monitor_only, default: true
+      config :monitor_only, default: false
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
 
