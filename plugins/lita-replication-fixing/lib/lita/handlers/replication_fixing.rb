@@ -25,40 +25,40 @@ module Lita
       http.post "/replication/errors", :create_replication_error
 
       # http://rubular.com/r/Gz3fLQiR5L
-      route /^ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, help: {
+      route /^ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, command: true, help: {
         "ignore SHARD_ID" => "Ignores db-SHARD_ID for 10 minutes",
         "ignore SHARD_ID PREFIX" => "Ignores PREFIX-SHARD_ID for 10 minutes (PREFIX is, e.g., db or whoisdb)",
         "ignore SHARD_ID MINUTES" => "Ignores db-SHARD_ID for MINUTES minutes",
         "ignore SHARD_ID PREFIX MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
       }
 
-      route /^fix\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :create_fix, help: {
+      route /^fix\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :create_fix, command: true, help: {
         "fix SHARD_ID" => "Attempts to fix db-SHARD_ID",
         "fix SHARD_ID PREFIX" => "Attempts to fix PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
       }
 
-      route /^cancelfix\s+(?<shard_id>\d+)/, :cancel_fix, help: {
+      route /^cancelfix\s+(?<shard_id>\d+)/, :cancel_fix, command: true, help: {
         "cancelfix SHARD_ID" => "Cancels the fix for SHARD_ID",
       }
 
-      route /^resetignore\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :reset_ignore, help: {
+      route /^resetignore\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :reset_ignore, command: true, help: {
         "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID",
         "resetignore SHARD_ID PREFIX" => "Stops ignoreing PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
       }
 
-      route /^current(?:auto)?fixes/i, :current_fixes, help: {
+      route /^current(?:auto)?fixes/i, :current_fixes, command: true, help: {
         "currentfixes" => "Lists ongoing replication fixes",
       }
 
-      route /^stopfixing/i, :stop_fixing, help: {
+      route /^stopfixing/i, :stop_fixing, command: true, help: {
         "stopfixing" => "Globally pauses fixing of replication errors",
       }
 
-      route /^startfixing/i, :start_fixing, help: {
+      route /^startfixing/i, :start_fixing, command: true, help: {
         "startfixing" => "Globally starts fixing of replication errors",
       }
 
-      route /^checkfixing/i, :check_fixing, help: {
+      route /^checkfixing/i, :check_fixing, command: true, help: {
         "startfixing" => "Reports whether fixing is globally enabled or disabled",
       }
 
