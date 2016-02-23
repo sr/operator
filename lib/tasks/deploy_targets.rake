@@ -1,3 +1,5 @@
+# Font awesome icons - http://fontawesome.io/3.2.1/icons/
+
 namespace :canoe do
   desc 'Create repos for deployment'
   task :create_repos => :environment do
@@ -41,6 +43,14 @@ namespace :canoe do
       repo.supports_branch_deploy = true
       repo.bamboo_project = 'PDT'
       repo.bamboo_plan = 'MDOC'
+    }.save!
+
+    Repo.find_or_initialize_by(name: 'chef').tap { |repo|
+      repo.icon = 'food'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = false
+      repo.bamboo_project = 'BREAD'
+      repo.bamboo_plan = 'CHEF'
     }.save!
 
     if Rails.env.production? || Rails.env.development? || Rails.env.test?
