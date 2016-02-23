@@ -7,7 +7,7 @@
 
 ## Development Setup
 
-Hal9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
+Canoe encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
 
 ```bash
 devenv compose up
