@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem "lita", "4.7.0"
-gem "lita-hipchat", "3.0.1"
+gem "lita-hipchat", "3.0.2"
 
 gem "lita-replication-fixing", path: "plugins/lita-replication-fixing"
 
