@@ -26,8 +26,8 @@ module Lita
 
       # http://rubular.com/r/Gz3fLQiR5L
       route /^ignore\s+(?<shard_id>\d+)(?:\s+(?:(?<prefix>db|whoisdb)|(?<minutes>\d+))(?:\s+(?<minutes>\d+))?)?/i, :create_ignore, command: true, help: {
-        "ignore SHARD_ID" => "Ignores db-SHARD_ID for 10 minutes",
-        "ignore SHARD_ID PREFIX" => "Ignores PREFIX-SHARD_ID for 10 minutes (PREFIX is, e.g., db or whoisdb)",
+        "ignore SHARD_ID" => "Ignores db-SHARD_ID for 15 minutes",
+        "ignore SHARD_ID PREFIX" => "Ignores PREFIX-SHARD_ID for 15 minutes (PREFIX is, e.g., db or whoisdb)",
         "ignore SHARD_ID MINUTES" => "Ignores db-SHARD_ID for MINUTES minutes",
         "ignore SHARD_ID PREFIX MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
       }
@@ -166,7 +166,7 @@ module Lita
       def create_ignore(response)
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
-        minutes = (response.match_data["minutes"] || "10").to_i
+        minutes = (response.match_data["minutes"] || "15").to_i
 
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
         begin
