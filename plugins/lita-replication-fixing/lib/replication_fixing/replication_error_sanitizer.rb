@@ -5,7 +5,7 @@ module ReplicationFixing
 
     def sanitize(error)
       error.gsub(/Query: '(.+)'/) do
-        sanitized_query = $1.gsub(/'([^'\\]|\\.)*?'/) do
+        sanitized_query = $1.gsub(/'((?:[^'\\]|\\.)*?)'/) do
           quoted_string = $&.to_s
 
           potential_string = $1.to_s
