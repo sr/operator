@@ -7,15 +7,13 @@
 
 ## Development Setup
 
-Canoe uses GitHub style [scripts-to-rule-them-all](https://github.com/github/scripts-to-rule-them-all).
+Hal9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
 
-To install required gems and to setup the database:
-
-```
-script/setup
+```bash
+devenv compose up
 ```
 
-`script/setup` should only need to be run once. Use `script/update` in future after adding new gems or pulling new code.
+Then nativate to <http://localhost:4000> in your browser.
 
 ### Secrets
 
@@ -42,16 +40,22 @@ ENV["ARTIFACTORY_API_KEY"] = "my_api_key"
 
 ### Tests
 
-Run all the tests:
-
-```
-script/test
+```bash
+devenv compose run app script/test
 ```
 
 Run specific tests:
 
 ```
-script/test spec/path/to/whatever_spec.rb
+devenv compose run app script/test spec/path/to/whatever_spec.rb
+```
+
+### Updating a Gem
+
+Bump the gem in `Gemfile`, then run:
+
+```bash
+devenv compose run app script/update
 ```
 
 ## Production Setup
