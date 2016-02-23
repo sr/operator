@@ -310,7 +310,16 @@ module Lita
 
       def ensure_monitoring(shard:)
         monitor = ::ReplicationFixing::Monitor.new(shard: shard, tick: 30)
-        monitor.on_tick { |result| reply_with_fix_result(shard: shard, result: result) }
+        monitor.on_tick do |result|
+          reply_with_fix_result(shard: shard, result: result)
+        end
+        monitor.on_replication_fixed do |result|
+          begin
+            @fixing_status_client.reset_status(shard: shard)
+          rescue => e
+            log.error("Unable to reset status: #{e}")
+          end
+        end
 
         @monitor_supervisor.start_exclusive_monitor(monitor)
       end
