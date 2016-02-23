@@ -35,27 +35,27 @@
 </h4>
 
 <%- if current_deploy.options %>
-<div class="panel panel-default">
-  <div class="panel-heading">Options</div>
-  <div id="deploy-options-table-panel" class="panel-body">
-    <table class="table table-condensed table-striped">
-      <thead>
-        <tr>
-          <th>Option</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <%- current_deploy.options.each do |k, v| %>
+  <div class="panel panel-default">
+    <div class="panel-heading">Options</div>
+    <div id="deploy-options-table-panel" class="panel-body">
+      <table class="table table-condensed table-striped">
+        <thead>
           <tr>
-            <td><%= k %></td>
-            <td><%= v %></td>
+            <th>Option</th>
+            <th>Value</th>
           </tr>
-        <%- end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <%- current_deploy.options.each do |k, v| %>
+            <tr>
+              <td><%= k %></td>
+              <td><%= v %></td>
+            </tr>
+          <%- end %>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 <%- end %>
 
 <% if current_deploy.canceled? %>
