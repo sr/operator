@@ -1,10 +1,10 @@
-# hal9000
+# HAL9000
 
 Hal reincarnated as a Lita bot. Lita is stable, maintained, and written in Ruby.
 
 ## Development
 
-Hal9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
+HAL9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
 
 ```bash
 devenv compose up
