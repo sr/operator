@@ -54,22 +54,22 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
   end
 
   describe "!ignore" do
-    it "ignores the shard for 10 minutes by default" do
+    it "ignores the shard for 15 minutes by default" do
       send_command("ignore 11")
-      expect(replies.last).to eq("OK, I will ignore db-11 for 10 minutes")
+      expect(replies.last).to eq("OK, I will ignore db-11 for 15 minutes")
     end
 
-    it "ignores the shard with a given prefix for 10 minutes by default" do
+    it "ignores the shard with a given prefix for 15 minutes by default" do
       send_command("ignore 1 whoisdb")
-      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 10 minutes")
+      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 15 minutes")
     end
 
     it "allows the number of minutes to be specified" do
-      send_command("ignore 11 15")
-      expect(replies.last).to eq("OK, I will ignore db-11 for 15 minutes")
+      send_command("ignore 11 10")
+      expect(replies.last).to eq("OK, I will ignore db-11 for 10 minutes")
 
-      send_command("ignore 1 whoisdb 15")
-      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 15 minutes")
+      send_command("ignore 1 whoisdb 10")
+      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 10 minutes")
     end
   end
 
