@@ -60,10 +60,9 @@ module ReplicationFixing
         next_run = Process.clock_gettime(Process::CLOCK_MONOTONIC) + monitor.tick
         until Process.clock_gettime(Process::CLOCK_MONOTONIC) >= next_run
           @redis.expire(key, monitor.tick.ceil)
-          sleep [1, monitor.tick].min
+          sleep([1, monitor.tick].min)
         end
 
-        break unless @redis.exists(key)
         result = @fixing_client.status(shard_or_hostname: monitor.shard)
         monitor.signal_tick(result)
 
