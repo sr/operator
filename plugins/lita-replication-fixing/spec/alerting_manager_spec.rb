@@ -13,6 +13,8 @@ module ReplicationFixing
 
     describe "#ingest_fix_result" do
       it "pages when there is an error checking fixability" do
+        pending "Not sure this is a good idea yet. We need to figure out what generally causes these alerts first"
+
         result = FixingClient::ErrorCheckingFixability.new(error: "everything is broken")
 
         manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
