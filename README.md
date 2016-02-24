@@ -62,7 +62,7 @@ gem "lita-replication-fixing", path: "plugins/lita-replication-fixing"
 Add a `COPY` directive to `Dockerfile` that eagerly copies in the `Gemfile` and `.gemspec` file from the new plugin:
 
 ```
-COPY plugins/lita-replication-fixing/*.gemspec plugins/lita-replication-fixing/Gemfile /app/plugins/lita-replication-fixing/
+COPY plugins/lita-replication-fixing/*.gemspec plugins/lita-replication-fixing/Gemfile* /app/plugins/lita-replication-fixing/
 ```
 
 Lock the dependency:
