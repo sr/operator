@@ -17,7 +17,6 @@ module Lita
       config :repfix_url, default: "https://repfix.pardot.com"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
       config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
-      config :monitor_only, default: false
       config :pager, default: "pagerduty"
       config :pagerduty_service_key
 
@@ -134,13 +133,8 @@ module Lita
                 robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
               end
 
-              result = \
-                if config.monitor_only
-                  @fixing_client.status(shard_or_hostname: hostname)
-                else
-                  @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
-                  @fixing_client.fix(shard: hostname)
-                end
+              result = @fixing_client.fix(shard: hostname)
+              @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
 
               case result
               when ::ReplicationFixing::FixingClient::NoErrorDetected
@@ -178,8 +172,6 @@ module Lita
       end
 
       def create_fix(response)
-        return if config.monitor_only
-
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
@@ -208,8 +200,6 @@ module Lita
       end
 
       def cancel_fix(response)
-        return if config.monitor_only
-
         shard_id = response.match_data["shard_id"].to_i
         prefix = "db" # TODO: Apparently there is no way to cancel a fix on a specific prefix in rep_fix
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)

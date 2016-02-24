@@ -14,8 +14,8 @@ module ReplicationFixing
       when FixingClient::NotFixable
         @pager.trigger("#{shard_or_hostname}: replication is not automatically fixable", incident_key: incident_key(shard_or_hostname))
       end
-    rescue
-      @log.error("Error sending page: #{$!}")
+    rescue => e
+      @log.error("Error sending page: #{e}")
     end
 
     # Notifies the pager that fixing is globally ignored, but a lot of errors
