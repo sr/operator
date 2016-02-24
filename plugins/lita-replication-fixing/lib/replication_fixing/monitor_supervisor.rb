@@ -38,14 +38,14 @@ module ReplicationFixing
     end
 
     def start_exclusive_monitor(monitor)
-      namespaced_key = [@redis.namespace, build_key(monitor)].join(":")
+      key = build_key(monitor)
       success = !!@redis.eval(%(
-        if redis.call('exists', '#{namespaced_key}') == 0 then
-          return redis.call('setex', '#{namespaced_key}', #{monitor.tick.ceil}, '')
+        if redis.call('exists', KEYS[1]) == 0 then
+          return redis.call('setex', KEYS[1], #{monitor.tick.ceil}, '')
         else
           return nil
         end
-      ))
+      ), keys: [key])
 
       Thread.new { run_monitor(monitor) } if success
       success
