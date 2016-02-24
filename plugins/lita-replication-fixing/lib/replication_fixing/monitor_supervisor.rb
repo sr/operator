@@ -30,23 +30,22 @@ module ReplicationFixing
   end
 
   class MonitorSupervisor
-    def initialize(fixing_client:)
-      @fixing_client = fixing_client
+    MONITOR_NAMESPACE = "monitor_supervisor"
 
-      @monitors = {}
-      @mutex = Mutex.new
+    def initialize(redis:, fixing_client:)
+      @redis = redis
+      @fixing_client = fixing_client
     end
 
     def start_exclusive_monitor(monitor)
-      success = \
-        @mutex.synchronize do
-          if @monitors.key?(monitor.shard)
-            false
-          else
-            @monitors[monitor.shard] = monitor
-            true
-          end
+      namespaced_key = [@redis.namespace, build_key(monitor)].join(":")
+      success = !!@redis.eval(%(
+        if redis.call('exists', '#{namespaced_key}') == 0 then
+          return redis.call('setex', '#{namespaced_key}', #{monitor.tick.ceil}, '')
+        else
+          return nil
         end
+      ))
 
       Thread.new { run_monitor(monitor) } if success
       success
@@ -55,10 +54,16 @@ module ReplicationFixing
     private
     # Loops every tick seconds waiting for replication to be fixed
     def run_monitor(monitor)
-      loop do
-        sleep(monitor.tick)
+      key = build_key(monitor)
 
-        break unless @monitors.key?(monitor.shard)
+      loop do
+        next_run = Process.clock_gettime(Process::CLOCK_MONOTONIC) + monitor.tick
+        until Process.clock_gettime(Process::CLOCK_MONOTONIC) >= next_run
+          @redis.expire(key, monitor.tick.ceil)
+          sleep [1, monitor.tick].min
+        end
+
+        break unless @redis.exists(key)
         result = @fixing_client.status(shard_or_hostname: monitor.shard)
         monitor.signal_tick(result)
 
@@ -68,9 +73,12 @@ module ReplicationFixing
         end
       end
     ensure
-      @mutex.synchronize do
-        @monitors.delete(monitor.shard)
-      end
+      @redis.del(key)
+    end
+
+    private
+    def build_key(monitor)
+      [MONITOR_NAMESPACE, monitor.shard.to_s].join(":")
     end
   end
 end

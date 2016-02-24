@@ -89,7 +89,10 @@ module Lita
           fixing_status_client: @fixing_status_client,
           log: log,
         )
-        @monitor_supervisor = ::ReplicationFixing::MonitorSupervisor.new(fixing_client: @fixing_client)
+        @monitor_supervisor = ::ReplicationFixing::MonitorSupervisor.new(
+          redis: redis,
+          fixing_client: @fixing_client
+        )
 
         @status_room = ::Lita::Source.new(room: config.status_room)
         @replication_room = ::Lita::Source.new(room: config.replication_room)

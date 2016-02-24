@@ -18,7 +18,7 @@ module ReplicationFixing
       )
     }
 
-    subject(:supervisor) { MonitorSupervisor.new(fixing_client: fixing_client) }
+    subject(:supervisor) { MonitorSupervisor.new(redis: Lita.redis, fixing_client: fixing_client) }
 
     describe "#start_exclusive_monitor" do
       it "monitors the host every <tick> seconds, until it is fixed" do
