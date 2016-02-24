@@ -77,6 +77,15 @@ module ReplicationFixing
       if response.status == 200
         begin
           json = JSON.parse(response.body)
+
+          if json["is_canceled"]
+            begin
+              @fixing_status_client.reset_status(shard: shard)
+            rescue => e
+              log.error("Unable to reset status: #{e}")
+            end
+          end
+
           CancelResult.new(json["is_canceled"], json["message"])
         rescue JSON::ParserError
           CancelResult.new(false, "invalid JSON response from repfix: #{response.body}")
