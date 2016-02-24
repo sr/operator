@@ -42,7 +42,7 @@ module Lita
 
       route /^resetignore\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :reset_ignore, command: true, help: {
         "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID",
-        "resetignore SHARD_ID PREFIX" => "Stops ignoreing PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+        "resetignore SHARD_ID PREFIX" => "Stops ignoring PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
       }
 
       route /^current(?:auto)?fixes/i, :current_fixes, command: true, help: {
@@ -58,7 +58,7 @@ module Lita
       }
 
       route /^checkfixing/i, :check_fixing, command: true, help: {
-        "startfixing" => "Reports whether fixing is globally enabled or disabled",
+        "checkfixing" => "Reports whether fixing is globally enabled or disabled",
       }
 
       def initialize(robot)
