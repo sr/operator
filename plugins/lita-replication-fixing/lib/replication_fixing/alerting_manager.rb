@@ -9,8 +9,6 @@ module ReplicationFixing
 
     def ingest_fix_result(shard_or_hostname:, result:)
       case result
-      when FixingClient::ErrorCheckingFixability
-        @pager.trigger("#{shard_or_hostname}: error checking fixability for: #{result.error}", incident_key: incident_key(shard_or_hostname))
       when FixingClient::NotFixable
         @pager.trigger("#{shard_or_hostname}: replication is not automatically fixable", incident_key: incident_key(shard_or_hostname))
       end
