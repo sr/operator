@@ -164,7 +164,7 @@ module Lita
 
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
         begin
-          @ignore_client.ignore(shard)
+          @ignore_client.ignore(shard, expire: minutes*60)
           response.reply_with_mention("OK, I will ignore #{shard} for #{minutes} minutes")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -219,7 +219,7 @@ module Lita
 
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
         begin
-          @ignore_client.ignore(shard)
+          @ignore_client.reset_ignore(shard)
           response.reply_with_mention("OK, I will no longer ignore #{shard}")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
