@@ -11,9 +11,9 @@ TRUSTED_NETWORKS = [
   '136.147.96.20/30',   # pardot-proxyout1-{1,2,3,4}-phx
 ]
 
-# VirtualBox NAT IP for local development
 if Rails.env.development?
-  TRUSTED_NETWORKS << '10.0.2.2/32'
+  TRUSTED_NETWORKS << '10.0.2.2/32'   # VirtualBox NAT IP
+  TRUSTED_NETWORKS << '172.18.0.0/24' # Docker compose instances
 end
 
 TRUSTED_NETWORKS.map! { |i| IPAddr.new(i) }
