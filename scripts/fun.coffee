@@ -72,12 +72,16 @@
 #   hubot waiting on op to deliver || op || op will deliver || surely op will deliver - 2spoopy4me
 #   hubot pingpong - ... ping pong
 #   hubot squirrelmaster - behold the master of squirrels
-
+#   hubot inconvievable - TPB!
+ 
 _ = require "underscore"
 
 module.exports = (robot) ->
   robot.respond /ping(\s)?pong$/i, (msg) ->
     msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
+
+  robot.respond /^inconcievable/i, (msg) ->
+    msg.send "http://i.giphy.com/ohBeIPJ4MEuas.gif"
 
   robot.respond /beningo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
