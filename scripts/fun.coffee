@@ -73,12 +73,16 @@
 #   hubot pingpong - ... ping pong
 #   hubot squirrelmaster - behold the master of squirrels
 #   hubot inconceivable - inconceivable!!!
+#   hubot bonk - bonks adventure
  
 _ = require "underscore"
 
 module.exports = (robot) ->
   robot.respond /ping(\s)?pong$/i, (msg) ->
     msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
+
+  robot.respond /bonk$/i, (msg) ->
+    msg.send "http://media4.giphy.com/media/Iel2zZmvUWyf6/giphy.gif"
 
   robot.respond /inconceivable$/i, (msg) ->
     msg.send "http://i.giphy.com/ohBeIPJ4MEuas.gif"
