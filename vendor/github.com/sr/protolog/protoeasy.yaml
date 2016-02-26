@@ -1,6 +1,0 @@
-version: v1
-plugins:
-  - go
-options:
-  go:
-    import_path: go.pedge.io/protolog

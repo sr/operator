@@ -1,1 +1,0 @@
-package protolog_benchmark_marshal
