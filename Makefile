@@ -1,4 +1,3 @@
-export GO15VENDOREXPERIMENT := 1
 export PATH := bin/:$(PATH)
 DOCKER ?= docker
 ERRCHECK = $(GOBIN)/errcheck
