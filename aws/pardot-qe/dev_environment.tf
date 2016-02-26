@@ -17,6 +17,18 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
   ]
 }
 
+resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+  cidr_blocks = [
+    "204.14.236.0/24", # aloha-east
+    "204.14.239.0/24"  # aloha-west
+  ]
+}
+
 resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   type = "ingress"
   from_port = 443
