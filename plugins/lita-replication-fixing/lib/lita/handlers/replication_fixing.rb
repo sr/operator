@@ -308,7 +308,7 @@ module Lita
         end
         monitor.on_replication_fixed do |result|
           begin
-            @fixing_status_client.reset_status(shard: shard)
+            @fixing_status_client.reset(shard: shard)
           rescue => e
             log.error("Unable to reset status: #{e}")
           end

@@ -39,16 +39,18 @@ module ReplicationFixing
         expect(result.status).to eq("is_erroring" => true, "is_fixable" => false)
       end
 
-      it "resets the status of the fixing if the error is no longer fixable" do
+      it "resets the status of the fixing if the error is no longer being fixed" do
         hostname = Hostname.new("db-s11")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
-          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
+          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => {"active" => false}))
 
-        fixing_status_client.ensure_fixing_status_ongoing(shard: hostname)
+        fixing_status_client.set_active(shard: hostname, active: true)
         expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
+        expect(fixing_status_client.status(shard: hostname).started_at).to be
 
         fixing_client.fix(shard: hostname)
         expect(fixing_status_client.status(shard: hostname).fixing?).to be_falsey
+        expect(fixing_status_client.status(shard: hostname).started_at).to be
       end
 
       it "returns no error detected if the shard is not erroring" do
@@ -60,6 +62,18 @@ module ReplicationFixing
         expect(result).to be_kind_of(FixingClient::NoErrorDetected)
       end
 
+      it "keeps status about the error, if active" do
+        hostname = Hostname.new("db-s11")
+        stub_request(:post, "https://repfix.example/replication/fix/db/11")
+          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true}))
+
+        fixing_client.fix(shard: hostname)
+        expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
+        expect(fixing_status_client.status(shard: hostname).started_at.to_i).to be_within(1).of(Time.now.to_i)
+      end
+
       it "keeps status about the error, if present and fixable" do
         hostname = Hostname.new("db-s11")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
@@ -68,7 +82,7 @@ module ReplicationFixing
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
         fixing_client.fix(shard: hostname)
-        expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
+        expect(fixing_status_client.status(shard: hostname).fixing?).to be_falsey
         expect(fixing_status_client.status(shard: hostname).started_at.to_i).to be_within(1).of(Time.now.to_i)
       end
 

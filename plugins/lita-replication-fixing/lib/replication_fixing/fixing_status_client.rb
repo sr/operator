@@ -18,16 +18,17 @@ module ReplicationFixing
 
     # Ensures that we have taken note of the fixing that's going on. Creates a
     # status if one doesn't exist, or does nothing if one already does.
-    def ensure_fixing_status_ongoing(shard:)
+    def set_active(shard:, active:)
       key = [SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":")
       @redis.multi do
         @redis.hsetnx(key, "started_at", Time.now.to_i)
+        @redis.hset(key, "active", active)
         @redis.expire(key, KEY_TTL)
       end
     end
 
     # Deletes the status entry. Used when the fix is no longer active.
-    def reset_status(shard:)
+    def reset(shard:)
       @redis.del([SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":"))
     end
 
@@ -37,7 +38,11 @@ module ReplicationFixing
       if hash.empty?
         Status.new(false, shard, nil)
       else
-        Status.new(true, shard, Time.at(hash.fetch("started_at", "0").to_i))
+        Status.new(
+          (hash.fetch("active", "false") == "true"),
+          shard,
+          Time.at(hash.fetch("started_at", "0").to_i)
+        )
       end
     end
 

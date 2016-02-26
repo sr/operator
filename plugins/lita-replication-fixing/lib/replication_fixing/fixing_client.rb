@@ -29,28 +29,30 @@ module ReplicationFixing
       if response.status == 200
         begin
           json = JSON.parse(response.body)
+
+          begin
+            if json["is_erroring"]
+              @fixing_status_client.set_active(
+                shard:  shard_or_hostname,
+                active: (json["fix"] && json["fix"]["active"]),
+              )
+            else
+              @fixing_status_client.reset(shard: shard_or_hostname)
+            end
+          rescue => e
+            @log.error("Unable to keep state about fix: #{e}")
+          end
+
           if json["error"]
             ErrorCheckingFixability.new(json["message"])
           elsif json["fix"] && json["fix"]["active"]
-            begin
-              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard_or_hostname)
-            rescue => e
-              @log.error("Unable to keep state about fix: #{e}")
-            end
-
             current_status = @fixing_status_client.status(shard: shard_or_hostname)
             FixInProgress.new(current_status.started_at)
           elsif json["is_erroring"] && json["is_fixable"]
             FixableErrorOccurring.new(json)
           elsif json["is_erroring"]
-            begin
-              @fixing_status_client.reset_status(shard: shard_or_hostname)
-            rescue => e
-              @log.error("Unable to reset status: #{e}")
-            end
-
             NotFixable.new(json)
-          else !json["is_erroring"]
+          else
             NoErrorDetected.new(json)
           end
         rescue JSON::ParserError
@@ -80,7 +82,7 @@ module ReplicationFixing
 
           if json["is_canceled"]
             begin
-              @fixing_status_client.reset_status(shard: shard)
+              @fixing_status_client.reset(shard: shard)
             rescue => e
               log.error("Unable to reset status: #{e}")
             end
@@ -106,12 +108,6 @@ module ReplicationFixing
           if json["error"]
             ErrorCheckingFixability.new(json["message"])
           else
-            begin
-              @fixing_status_client.ensure_fixing_status_ongoing(shard: shard)
-            rescue => e
-              @log.error("Unable to keep state about fix: #{e}")
-            end
-
             status(shard_or_hostname: shard)
           end
         rescue JSON::ParserError

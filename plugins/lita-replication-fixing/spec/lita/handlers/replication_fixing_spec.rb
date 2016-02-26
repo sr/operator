@@ -128,11 +128,11 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
   describe "!currentautofixes" do
     it "lists the fixes currently ongoing" do
       fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(subject.redis)
-      fixing_status_client.ensure_fixing_status_ongoing(shard: ::ReplicationFixing::Shard.new("db", 12))
-      fixing_status_client.ensure_fixing_status_ongoing(shard: ::ReplicationFixing::Shard.new("db", 32))
+      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 12), active: true)
+      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 32), active: false)
 
       send_command("currentautofixes")
-      expect(replies.last).to eq("I'm currently fixing: db-12, db-32")
+      expect(replies.last).to eq("I'm currently fixing: db-12")
     end
   end
 
