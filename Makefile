@@ -27,15 +27,6 @@ proto: $(PROTOEASY)
 		--go-modifier vendor/github.com/sr/grpcinstrument/grpcinstrument.proto=github.com/sr/grpcinstrument \
 		--exclude _example,vendor,protoeasy .
 
-build:
-	$(GO) build -v ./...
-
-install:
-	$(GO) install -v ./...
-
-clean:
-	$(GO) clean -i ./...
-
 fmt: $(GOFMT)
 	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
 			out="$$($< -s -d $$file)"; \
@@ -68,19 +59,6 @@ errcheck: $(ERRCHECK)
 			$< $$pkg; \
 		done
 
-example-vendor:
-	rm -rf _example/vendor/src/github.com/sr/operator
-	for file in $$(gvt list -f "{{.Importpath}}"); do \
-		rm -rf _example/vendor/src/$$file; \
-	done
-	cp -r vendor/* _example/vendor/src/
-	rm -f _example/vendor/src/manifest
-	mkdir -p  _example/vendor/src/github.com/sr/operator
-	cp -r cmd generator protoeasy *.go _example/vendor/src/github.com/sr/operator
-	rm -rf _example/vendor/src/github.com/sr/operator/protoeasy/.git
-	git add -A _example/vendor/src _example/vendor/src/github.com/sr/operator
-	git add -u _example/vendor/src _example/vendor/src/github.com/sr/operator
-
 $(ERRCHECK):
 	$(GO) get -v github.com/kisielk/errcheck
 
@@ -90,7 +68,6 @@ $(GOLINT):
 $(PROTOEASY):
 	$(GO) get -v go.pedge.io/protoeasy/cmd/protoeasy
 
-
 .PHONY: \
 	ci \
 	ci-docker \
@@ -98,11 +75,7 @@ $(PROTOEASY):
 	docker-build-ci \
 	docker-build-operatorc \
 	proto \
-	build \
-	install \
-	clean \
 	fmt \
 	lint \
 	vet \
-	errcheck \
-	example-vendor
+	errcheck
