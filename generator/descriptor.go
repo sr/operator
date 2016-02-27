@@ -14,7 +14,10 @@ import (
 )
 
 // TODO(sr) this should be a flag for in operatorc and all protoc-operator* commands
-const importPathBase = "sr/chatoops"
+const (
+	importPathBase = "sr/chatoops"
+	sourceField    = "source"
+)
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	numFiles := len(request.FileToGenerate)
@@ -81,10 +84,13 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 					Description: undocumentedPlaceholder,
 					Input:       inputName,
 					Output:      outputName,
-					Arguments:   make([]*Argument, len(input.Field)),
+					Arguments:   make([]*Argument, len(input.Field)-1),
 				}
 				for k, field := range input.Field {
-					desc.Services[i].Methods[j].Arguments[k] = &Argument{
+					if field.GetName() == sourceField {
+						continue
+					}
+					desc.Services[i].Methods[j].Arguments[k-1] = &Argument{
 						// TODO(sr) deal with ID => Id etc better
 						Name:        strings.Replace(field.GetName(), "ID", "Id", 1),
 						Description: undocumentedPlaceholder,

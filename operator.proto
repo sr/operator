@@ -16,6 +16,7 @@ message Source {
 	SourceType type = 1;
 	User user = 2;
 	Room room = 3;
+	string hostname = 4;
 }
 
 enum SourceType {

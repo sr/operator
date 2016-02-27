@@ -83,9 +83,10 @@ func (m *Request) GetCall() *grpcinstrument.Call {
 }
 
 type Source struct {
-	Type SourceType `protobuf:"varint,1,opt,name=type,enum=operator.SourceType" json:"type,omitempty"`
-	User *User      `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
-	Room *Room      `protobuf:"bytes,3,opt,name=room" json:"room,omitempty"`
+	Type     SourceType `protobuf:"varint,1,opt,name=type,enum=operator.SourceType" json:"type,omitempty"`
+	User     *User      `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	Room     *Room      `protobuf:"bytes,3,opt,name=room" json:"room,omitempty"`
+	Hostname string     `protobuf:"bytes,4,opt,name=hostname" json:"hostname,omitempty"`
 }
 
 func (m *Source) Reset()                    { *m = Source{} }
