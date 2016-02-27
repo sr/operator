@@ -3,7 +3,7 @@ syntax = "proto3";
 package operator;
 
 import "google/protobuf/descriptor.proto";
-import "vendor/github.com/sr/grpcinstrument/grpcinstrument.proto";
+import "vendor/grpcinstrument.proto";
 
 option go_package = "operator";
 
