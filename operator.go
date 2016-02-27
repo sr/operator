@@ -34,6 +34,13 @@ type Command struct {
 	services []ServiceCommand
 }
 
+type CommandContext struct {
+	Address string
+	Source  *Source
+	Flags   *flag.FlagSet
+	Args    []string
+}
+
 type ServiceCommand struct {
 	Name     string
 	Synopsis string
@@ -43,7 +50,7 @@ type ServiceCommand struct {
 type MethodCommand struct {
 	Name     string
 	Synopsis string
-	Run      func([]string, *flag.FlagSet) (string, error)
+	Run      func(*CommandContext) (string, error)
 }
 
 func NewServer(

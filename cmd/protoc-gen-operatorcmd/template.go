@@ -7,7 +7,6 @@ var mainTemplate = generator.NewTemplate("main-gen.go",
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -43,12 +42,12 @@ var cmd = operator.NewCommand(
 				{
 					Name:	  "{{dasherize .Name}}",
 					Synopsis: `+"`"+`{{.Description}}`+"`"+`,
-					Run: func(args []string, flags *flag.FlagSet, address string) (string, error) {
+					Run: func(ctx *operator.CommandContext) (string, error) {
 			{{- range .Arguments}}
-						{{.Name}} := flags.String("{{dasherize .Name}}", "", "")
+						{{.Name}} := ctx.Flags.String("{{dasherize .Name}}", "", "")
 			{{- end}}
-						flags.Parse(os.Args[3:])
-						conn, err := dial(address)
+						ctx.Flags.Parse(ctx.Args)
+						conn, err := dial(ctx.Address)
 						if err != nil {
 							return "", err
 						}
@@ -78,7 +77,7 @@ var cmd = operator.NewCommand(
 func main() {
 	status, output := cmd.Run(os.Args)
 	if status != 0 {
-		fmt.Fprintf(os.Stderr, "%s\n", output)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output)
 	} else {
 		io.WriteString(os.Stdout, output)
 	}
