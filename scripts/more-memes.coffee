@@ -30,10 +30,10 @@ module.exports = (robot) ->
     memeGenerator msg, 'SdxrkQ', '', '" ' + msg.match[1] + ' "'
 
   robot.respond /HEAVE (.*)/i, id: 'meme.dry-heave', (msg) ->
-    memeGenerator msg, '7MX6Hw', '', msg.match[1]
+    memeGenerator msg, 'dmbIUg', '', msg.match[1]
 
   robot.respond /WORKING ON (.*)/i, id: 'meme.working-on', (msg) ->
-    memeGenerator msg, 'gCpvKg', 'Working on ', msg.match[1]
+    memeGenerator msg, 'QnvWJA', 'Working on ', msg.match[1]
 
   robot.respond /DUDE YOU'?RE? GETTING A (.*)/i, id: 'meme.dell-guy', (msg) ->
     memeGenerator msg, 'iXkgvA', 'Dude, you\'re getting a', msg.match[1]
