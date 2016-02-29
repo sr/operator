@@ -7,6 +7,8 @@ import (
 	"html/template"
 	"os"
 	"os/user"
+
+	"github.com/kr/text"
 )
 
 const (
@@ -17,16 +19,16 @@ Use  "{{.Program}} help <service>" for help with a particular service.
 Available services:
 {{range $n, $s:= .Services}}
 {{$n}}
-{{$s}}
+{{WrappedIndent $s "  "}}
 {{end}}`
 	serviceUsageTemplate = `Usage: {{.Program}} {{.ServiceName}} [command]
 
-{{.Synopsis}}
+{{Wrap .Synopsis}}
 
 Available Commands:
 {{range .Methods}}
 {{.Name}}
-{{.Synopsis}}
+{{WrappedIndent .Synopsis "  "}}
 {{end}}`
 )
 
@@ -118,7 +120,8 @@ func (c *Command) getServiceUsage(svc ServiceCommand) (string, error) {
 }
 
 func executeTemplate(s string, data interface{}) (string, error) {
-	t, err := template.New("t").Parse(s)
+	t, err := template.New("t").Funcs(template.FuncMap{
+		"Wrap": wrap, "WrappedIndent": wrappedIndent}).Parse(s)
 	if err != nil {
 		return "", err
 	}
@@ -148,4 +151,12 @@ func getSource() *Source {
 		}
 	}
 	return s
+}
+
+func wrap(s string) string {
+	return text.Wrap(s, 80)
+}
+
+func wrappedIndent(s string, indentS string) string {
+	return text.Indent(text.Wrap(s, 80-len(indentS)), indentS)
 }
