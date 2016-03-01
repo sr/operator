@@ -3,7 +3,8 @@ ENV LANG C.UTF-8
 
 RUN apt-get update -qq && \
    apt-get install -y build-essential && \
-   apt-get install -y nodejs
+   apt-get install -y nodejs && \
+   apt-get install -y netcat
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker
