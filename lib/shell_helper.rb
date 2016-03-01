@@ -4,7 +4,8 @@ class ShellHelper
   SecurityException = Class.new(StandardError)
 
   def self.hostname
-    Socket.gethostname.sub(/(\.pardot\.com|\.ops\.sfdc\.net|\.pd25\.com|\.pd26\.com)$/, "")
+    # Let the environment variable override the hostname
+    ENV.fetch("PULL_HOSTNAME", Socket.gethostname.sub(/(\.pardot\.com|\.ops\.sfdc\.net|\.pd25\.com|\.pd26\.com)$/, ""))
   end
 
   # this should make it easier to test, etc...
