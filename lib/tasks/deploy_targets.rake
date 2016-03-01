@@ -70,8 +70,12 @@ namespace :canoe do
 
     case Rails.env
     when 'development'
-      DeployTarget.find_or_initialize_by(name: 'dev').save!
       DeployTarget.find_or_initialize_by(name: 'test').save!
+      DeployScenario.find_or_create_by(
+        repo: Repo.find_or_create_by(name: 'pardot'),
+        server: Server.find_or_create_by(hostname: 'local-1'),
+        deploy_target: DeployTarget.find_or_create_by(name: 'dev')
+      )
     when 'production'
       DeployTarget.find_or_initialize_by(name: 'staging').save!
       DeployTarget.find_or_initialize_by(name: "production").tap { |target|
