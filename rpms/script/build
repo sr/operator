@@ -4,8 +4,9 @@ MACHINE="${MACHINE:-el6}"
 BUILD_DIRECTORY="/home/vagrant/rpmbuild"
 
 if [ $# -lt 1 ]; then
-  echo "$0 -n <package> <package...>"
+  echo "$0 [-f] [-n] <package> <package...>"
   echo
+  echo "-f: Forces spectool to redownload sources"
   echo "-n: Do not run spectool. Sources must be downloaded manually and placed in SOURCES/"
   exit 1
 fi

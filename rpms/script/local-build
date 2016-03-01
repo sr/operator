@@ -1,17 +1,22 @@
 #!/bin/bash -e
 
 if [ $# -lt 1 ]; then
-  echo "$0 -n <package> <package...>"
+  echo "$0 [-f] [-n] <package> <package...>"
   echo
+  echo "-f: Forces spectool to redownload sources"
   echo "-n: Do not run spectool. Sources must be downloaded manually and placed in SOURCES/"
   exit 1
 fi
 
+SPECOPTS=""
 NOSPECTOOL=0
 while getopts n opt; do
   case "$opt" in
     n)
       NOSPECTOOL=1
+      ;;
+    f)
+      SPECOPTS+="-f "
       ;;
     esac
 done
@@ -41,6 +46,6 @@ for package in "$@"; do
       xargs sudo yum install -y
   fi
 
-  [ "$NOSPECTOOL" -eq 1 ] || spectool -C SOURCES/ -g SPECS/${package}.spec;
+  [ "$NOSPECTOOL" -eq 1 ] || spectool $SPECOPTS -C SOURCES/ -g SPECS/${package}.spec;
   rpmbuild -ba SPECS/${package}.spec
 done
