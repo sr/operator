@@ -78,6 +78,9 @@
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /dance$/i, (msg) ->
+    msg.send "http://media2.giphy.com/media/8rcikGsC4jED6/giphy.gif"
+
   robot.respond /ping(\s)?pong$/i, (msg) ->
     msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
 
