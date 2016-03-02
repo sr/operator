@@ -73,6 +73,7 @@
 #   hubot waiting on op to deliver || op || op will deliver || surely op will deliver - 2spoopy4me
 #   hubot pingpong - ... ping pong
 #   hubot squirrelmaster - behold the master of squirrels
+#   hubot dartz - Dartz!!!
 #   hubot inconceivable - inconceivable!!!
 #   hubot bonk - bonks adventure
  
@@ -545,6 +546,9 @@ module.exports = (robot) ->
     ]
 
     msg.send msg.random tbones
+
+  robot.respond /dartz/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG"
 
   robot.respond /megaman$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"
