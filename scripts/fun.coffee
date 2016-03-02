@@ -25,6 +25,7 @@
 #   hubot rubbs - gifs
 #   hubot kyle - kyle
 #   hubot nippon - nippon
+#   hubot parker - parker
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
@@ -78,6 +79,9 @@
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /parker$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
+
   robot.respond /dance$/i, (msg) ->
     msg.send "http://media2.giphy.com/media/8rcikGsC4jED6/giphy.gif"
 
