@@ -41,6 +41,34 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   ]
 }
 
+# https://help.salesforce.com/apex/HTViewSolution?id=000003652
+resource "aws_security_group_rule" "dev_environment_allow_salesforce_http" {
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+  cidr_blocks = [
+    "96.43.144.0/20",
+    "136.146.0.0/15",
+    "204.14.232.0/21"
+  ]
+}
+
+# https://help.salesforce.com/apex/HTViewSolution?id=000003652
+resource "aws_security_group_rule" "dev_environment_allow_salesforce_https" {
+  type = "ingress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+  cidr_blocks = [
+    "96.43.144.0/20",
+    "136.146.0.0/15",
+    "204.14.232.0/21"
+  ]
+}
+
 resource "aws_subnet" "dev_environment_us_east_1b" {
   vpc_id = "${aws_vpc.dev_environment.id}"
   availability_zone = "us-east-1b"
