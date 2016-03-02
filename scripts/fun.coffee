@@ -8,6 +8,7 @@
 #   None
 #
 # Commands:
+#   hubot casey - Get casey
 #   hubot toiletnuggets - Get rid of some nuggets
 #   hubot reversenuggets - Get nuggets
 #   hubot puppies - Get puppies
@@ -292,6 +293,12 @@ module.exports = (robot) ->
       'https://www.dropbox.com/s/sbuty386e22eh85/2015-06-07%2018.13.08-1.jpg'
     ]
     msg.send msg.random tehbishop
+
+  robot.respond /casey$/i, (msg) ->
+    tehcehseh = [
+      'http://i.imgur.com/cuxU9VC.gif'
+    ]
+    msg.send msg.random tehcehseh
 
   robot.respond /rubbs$/i, (msg) ->
     tehrubbs = [
