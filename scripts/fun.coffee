@@ -25,6 +25,7 @@
 #   hubot rubbs - gifs
 #   hubot kyle - kyle
 #   hubot nippon - nippon
+#   hubot parker - parker
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
@@ -73,12 +74,26 @@
 #   hubot pingpong - ... ping pong
 #   hubot squirrelmaster - behold the master of squirrels
 #   hubot dartz - Dartz!!!
-
+#   hubot inconceivable - inconceivable!!!
+#   hubot bonk - bonks adventure
+ 
 _ = require "underscore"
 
 module.exports = (robot) ->
+  robot.respond /parker$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
+
+  robot.respond /dance$/i, (msg) ->
+    msg.send "http://media2.giphy.com/media/8rcikGsC4jED6/giphy.gif"
+
   robot.respond /ping(\s)?pong$/i, (msg) ->
     msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
+
+  robot.respond /bonk$/i, (msg) ->
+    msg.send "http://media4.giphy.com/media/Iel2zZmvUWyf6/giphy.gif"
+
+  robot.respond /inconceivable$/i, (msg) ->
+    msg.send "http://i.giphy.com/ohBeIPJ4MEuas.gif"
 
   robot.respond /beningo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
@@ -535,7 +550,10 @@ module.exports = (robot) ->
   robot.respond /dartz/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG"
 
-  robot.respond /squirrelmaster/i, (msg) ->
+  robot.respond /megaman$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"
+
+  robot.respond /squirrelmaster$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/NsridkQpvzIyzsu/squirrelmaster.png"
 
   robot.respond /bestfriends$/i, (msg) ->
