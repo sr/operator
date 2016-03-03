@@ -7,15 +7,15 @@ resource "aws_vpc" "tools_egress" {
   }
 }
 
-resource "aws_security_group" "tools_egress_nat_gw" {
+resource "aws_security_group" "tools_egress_proxy" {
   vpc_id = "${aws_vpc.tools_egress.id}"
-  name_prefix = "tools_egress_nat_gw"
+  name_prefix = "tools_egress_proxy"
   description = "Security group for NAT gateway"
 
   ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port = 8888
+    to_port = 8888
+    protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.tools_egress.cidr_block}",
       "172.30.0.0/16" # internal_apps from pardotops
@@ -89,11 +89,21 @@ resource "aws_internet_gateway" "tools_egress_internet_gw" {
   vpc_id = "${aws_vpc.tools_egress.id}"
 }
 
+resource "aws_route" "tools_egress_to_internal_tools" {
+  route_table_id = "${aws_vpc.tools_egress.main_route_table_id}"
+  destination_cidr_block = "172.30.0.0/16"
+  vpc_peering_connection_id = "pcx-fbf25a92" # pardotops/internal_apps
+}
+
 resource "aws_route_table" "tools_egress_route_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.tools_egress_internet_gw.id}"
+  }
+  route {
+    cidr_block = "172.30.0.0/16"
+    vpc_peering_connection_id = "pcx-fbf25a92" # pardotops/internal_apps
   }
 }
 
@@ -137,19 +147,20 @@ resource "aws_route_table_association" "tools_egress_us_east_1e_dmz" {
   route_table_id = "${aws_route_table.tools_egress_route_dmz.id}"
 }
 
-resource "aws_eip" "tools_egress_nat_gw" {
+resource "aws_eip" "tools_egress_proxy" {
   vpc = true
-  instance = "${aws_instance.tools_egress_nat_gw.id}"
+  instance = "${aws_instance.tools_egress_proxy.id}"
 }
 
-resource "aws_instance" "tools_egress_nat_gw" {
-  ami = "ami-a7f5dfcd" # amzn-ami-vpc-nat-hvm
+resource "aws_instance" "tools_egress_proxy" {
+  ami = "ami-6d1c2007" # CentOS 7 with Updates
   instance_type = "t2.micro"
-  vpc_security_group_ids = ["${aws_security_group.tools_egress_nat_gw.id}"]
+  vpc_security_group_ids = ["${aws_security_group.tools_egress_proxy.id}"]
   subnet_id = "${aws_subnet.tools_egress_us_east_1b_dmz.id}"
-  private_ip = "172.29.130.1"
-  source_dest_check = false
+  private_ip = "172.29.129.1"
+  user_data = "${file(\"tinyproxy_user_data.sh\")}"
+  key_name = "pardot-atlassian-instances"
   tags {
-    Name = "tools_egress_nat_gw"
+    Name = "tools_egress_proxy"
   }
 }
