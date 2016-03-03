@@ -15,7 +15,7 @@ describe Strategies::Deploy::Atomic do
 
   after { FileUtils.rm_rf(tempdir) }
 
-  describe "#deploy_to_server" do
+  describe "#deploy" do
     it "should deploy and link to the first choice when there is no current_link" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
