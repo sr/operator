@@ -248,3 +248,23 @@ resource "aws_db_subnet_group" "internal_apps" {
     "${aws_subnet.internal_apps_us_east_1e.id}"
   ]
 }
+
+# VPC Peering with tools_egress
+
+resource "aws_vpc_peering_connection" "internal_apps_peer_tools_egress" {
+  peer_owner_id = "010094454891" # pardot-atlassian
+  peer_vpc_id = "vpc-b64769d2" # tools_egress
+  vpc_id = "${aws_vpc.internal_apps.id}"
+}
+
+resource "aws_route" "internal_apps_route_tools_egress" {
+  route_table_id = "${aws_vpc.internal_apps.main_route_table_id}"
+  destination_cidr_block = "172.29.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_peer_tools_egress.id}"
+}
+
+resource "aws_route" "internal_apps_route_tools_proxy_dfw_via_tools_egress" {
+  route_table_id = "${aws_vpc.internal_apps.main_route_table_id}"
+  destination_cidr_block = "136.147.104.28/32" # tools-proxy in DFW
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_peer_tools_egress.id}"
+}

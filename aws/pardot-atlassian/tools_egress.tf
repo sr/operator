@@ -1,7 +1,7 @@
 # A VPC with the sole purpose of being peered with so egress traffic appears
 # from a whitelisted IP.
 resource "aws_vpc" "tools_egress" {
-  cidr_block = "172.31.0.0/16"
+  cidr_block = "172.29.0.0/16"
   tags {
     Name = "tools_egress"
   }
@@ -10,56 +10,56 @@ resource "aws_vpc" "tools_egress" {
 resource "aws_subnet" "tools_egress_us_east_1b" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1b"
-  cidr_block = "172.31.0.0/19"
+  cidr_block = "172.29.0.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "tools_egress_us_east_1c" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.31.32.0/19"
+  cidr_block = "172.29.32.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "tools_egress_us_east_1d" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.31.64.0/19"
+  cidr_block = "172.29.64.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "tools_egress_us_east_1e" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.31.96.0/19"
+  cidr_block = "172.29.96.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "tools_egress_us_east_1b_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1b"
-  cidr_block = "172.31.128.0/19"
+  cidr_block = "172.29.128.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "tools_egress_us_east_1c_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.31.160.0/19"
+  cidr_block = "172.29.160.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "tools_egress_us_east_1d_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.31.192.0/19"
+  cidr_block = "172.29.192.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "tools_egress_us_east_1e_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.31.224.0/19"
+  cidr_block = "172.29.224.0/19"
   map_public_ip_on_launch = true
 }
 
