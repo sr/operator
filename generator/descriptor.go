@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -24,6 +25,16 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	if numFiles == 0 {
 		return nil, errors.New("no file to generate")
 	}
+	filesByName := make(map[string]*descriptor.FileDescriptorProto, numFiles)
+	numServices := 0
+	for _, f := range request.ProtoFile {
+		for _, fn := range request.FileToGenerate {
+			if f.GetName() == fn {
+				numServices = numServices + len(f.Service)
+				filesByName[f.GetName()] = f
+			}
+		}
+	}
 	params := make(map[string]string)
 	for _, p := range strings.Split(request.GetParameter(), ",") {
 		if i := strings.Index(p, "="); i < 0 {
@@ -36,10 +47,6 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	if val, ok := params["binary"]; ok {
 		binaryName = val
 	}
-	numServices := 0
-	for _, file := range request.ProtoFile {
-		numServices = numServices + len(file.Service)
-	}
 	desc := &Descriptor{
 		Options: &Options{
 			BinaryName: binaryName,
@@ -47,7 +54,9 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		Services: make([]*Service, numServices),
 	}
 	i := 0
-	for _, file := range request.ProtoFile {
+	sort.Strings(request.FileToGenerate)
+	for _, fn := range request.FileToGenerate {
+		file := filesByName[fn]
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
 		for _, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
