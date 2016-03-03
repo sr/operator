@@ -71,17 +71,6 @@ resource "aws_eip" "tools_egress_nat_gw" {
   vpc = true
 }
 
-resource "aws_nat_gateway" "tools_egress_nat_gw" {
-  allocation_id = "${aws_eip.tools_egress_nat_gw.id}"
-  subnet_id = "${aws_subnet.tools_egress_us_east_1b_dmz.id}"
-}
-
-resource "aws_route" "tools_egress_route" {
-  route_table_id = "${aws_vpc.tools_egress.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = "${aws_nat_gateway.tools_egress_nat_gw.id}"
-}
-
 resource "aws_route_table" "tools_egress_route_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   route {

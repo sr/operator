@@ -262,9 +262,3 @@ resource "aws_route" "internal_apps_route_tools_egress" {
   destination_cidr_block = "172.29.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_peer_tools_egress.id}"
 }
-
-resource "aws_route" "internal_apps_route_tools_proxy_dfw_via_tools_egress" {
-  route_table_id = "${aws_vpc.internal_apps.main_route_table_id}"
-  destination_cidr_block = "136.147.104.28/32" # tools-proxy in DFW
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_peer_tools_egress.id}"
-}
