@@ -7,6 +7,28 @@ resource "aws_vpc" "tools_egress" {
   }
 }
 
+resource "aws_security_group" "tools_egress_nat_gw" {
+  vpc_id = "${aws_vpc.tools_egress.id}"
+  name_prefix = "tools_egress_nat_gw"
+  description = "Security group for NAT gateway"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [
+      "${aws_vpc.tools_egress.cidr_block}",
+      "172.30.0.0/16" # internal_apps from pardotops
+    ]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_subnet" "tools_egress_us_east_1b" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   availability_zone = "us-east-1b"
@@ -67,10 +89,6 @@ resource "aws_internet_gateway" "tools_egress_internet_gw" {
   vpc_id = "${aws_vpc.tools_egress.id}"
 }
 
-resource "aws_eip" "tools_egress_nat_gw" {
-  vpc = true
-}
-
 resource "aws_route_table" "tools_egress_route_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
   route {
@@ -117,4 +135,21 @@ resource "aws_route_table_association" "tools_egress_us_east_1d_dmz" {
 resource "aws_route_table_association" "tools_egress_us_east_1e_dmz" {
   subnet_id = "${aws_subnet.tools_egress_us_east_1e_dmz.id}"
   route_table_id = "${aws_route_table.tools_egress_route_dmz.id}"
+}
+
+resource "aws_eip" "tools_egress_nat_gw" {
+  vpc = true
+  instance = "${aws_instance.tools_egress_nat_gw.id}"
+}
+
+resource "aws_instance" "tools_egress_nat_gw" {
+  ami = "ami-a7f5dfcd" # amzn-ami-vpc-nat-hvm
+  instance_type = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.tools_egress_nat_gw.id}"]
+  subnet_id = "${aws_subnet.tools_egress_us_east_1b_dmz.id}"
+  private_ip = "172.29.130.1"
+  source_dest_check = false
+  tags {
+    Name = "tools_egress_nat_gw"
+  }
 }
