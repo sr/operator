@@ -17,7 +17,9 @@ import (
 const (
 	binaryParam     = "binary"
 	importPathParam = "import_path"
-	sourceField     = "source"
+
+	outputField = "output"
+	sourceField = "source"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -90,18 +92,16 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
 				input, ok := messagesByName[inputName]
 				if !ok {
-					return nil, fmt.Errorf("No message definition for %s", inputName)
+					return nil, fmt.Errorf("No definition for input message %s", inputName)
 				}
+				output, ok := messagesByName[outputName]
+				if !ok {
+					return nil, fmt.Errorf("No definition for output message %s", outputName)
+				}
+				// TODO(sr) make this more robust somehow?
 				inputHasSource := false
-				desc.Services[i].Methods[j] = &Method{
-					Name:        method.GetName(),
-					Description: undocumentedPlaceholder,
-					Input:       inputName,
-					Output:      outputName,
-					Arguments:   make([]*Argument, len(input.Field)-1),
-				}
+				outputHasOutput := false
 				for _, f := range input.Field {
-					// TODO(sr) make this more robust?
 					if f.GetTypeName() == ".operator.Source" && f.GetName() == sourceField {
 						inputHasSource = true
 						break
@@ -109,6 +109,23 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				}
 				if !inputHasSource {
 					return nil, fmt.Errorf("service '%s' input message '%s' is missing source field", service.GetName(), inputName)
+				}
+				for _, f := range output.Field {
+					// TODO(sr) make this more robust?
+					if f.GetTypeName() == ".operator.Output" && f.GetName() == outputField {
+						outputHasOutput = true
+						break
+					}
+				}
+				if !outputHasOutput {
+					return nil, fmt.Errorf("service '%s' output message '%s' is missing output field", service.GetName(), inputName)
+				}
+				desc.Services[i].Methods[j] = &Method{
+					Name:        method.GetName(),
+					Description: undocumentedPlaceholder,
+					Input:       inputName,
+					Output:      outputName,
+					Arguments:   make([]*Argument, len(input.Field)-1),
 				}
 				for k, field := range input.Field {
 					if field.GetName() == sourceField {
