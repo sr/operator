@@ -1,4 +1,4 @@
-FROM golang:1.6rc2
+FROM golang:1.6
 MAINTAINER Simon Rozet <me@simonrozet.com>
 ENV PROTOBUF_REPO https://github.com/google/protobuf
 ENV PROTOBUF_VERSION v3.0.0-beta-2
