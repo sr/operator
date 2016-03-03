@@ -14,25 +14,32 @@ var (
 	cmdOutDir    string
 	hubotOutDir  string
 	serverOutDir string
+	importPath   string
 
-	errNoSourceDir = errors.New("Please specify a input source directory.")
-	errNoOutDir    = errors.New("Please specify at least one of --cmd-out, --hubot-out, or --server-out.")
+	errNoSourceDir  = errors.New("Please specify a input source directory.")
+	errNoOutDir     = errors.New("Please specify at least one of --cmd-out, --hubot-out, or --server-out.")
+	errNoImportPath = errors.New("The `import-path` flag is required.")
 )
 
 func run() error {
 	flag.StringVar(&cmdOutDir, "cmd-out", "", "The `directory` where to output command-line Go code.")
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output Hubot scripts.")
 	flag.StringVar(&serverOutDir, "server-out", "", "The `directory` where to output operator server Go code.")
+	flag.StringVar(&importPath, "import-path", "", "The base `import-path` under which service packages are defined.")
 	flag.Parse()
 	if flag.NArg() != 1 {
 		return errNoSourceDir
 	}
+	if importPath == "" {
+		return errNoImportPath
+	}
 	inputDirPath := flag.Args()[0]
 	outDirPath := inputDirPath
 	options := &protoeasy.CompileOptions{
-		Go:          true,
-		Grpc:        true,
-		GoModifiers: map[string]string{"operator.proto": "github.com/sr/operator"},
+		Go:           true,
+		Grpc:         true,
+		GoImportPath: importPath,
+		GoModifiers:  map[string]string{"operator.proto": protoeasy.OperatorPackage},
 		// TODO(sr) Deal with hubot/proto. Perhaps write it out ourselves?
 		//ExcludePattern: []string{"hubot/node_modules", "hubot/proto"},
 		// TODO(sr) Will need to include operator.proto in this

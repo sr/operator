@@ -6,13 +6,14 @@ import (
 )
 
 const (
-	protocCmd     = "protoc"
-	operatorProto = "github.com/sr/operator"
+	OperatorPackage = "github.com/sr/operator"
+	protocProgram   = "protoc"
 )
 
 type operatorPlugin struct {
-	name   string
-	outDir string
+	name         string
+	outDir       string
+	goImportPath string
 }
 
 func (p *operatorPlugin) Flags(
@@ -20,9 +21,15 @@ func (p *operatorPlugin) Flags(
 	relDirPath string,
 	outDirPath string,
 ) ([]string, error) {
-	return []string{fmt.Sprintf("--operator%s_out=%s", p.name, p.outDir)}, nil
+	return []string{
+		fmt.Sprintf(
+			"--operator%s_out=import_path=%s:%s",
+			p.name,
+			p.goImportPath,
+			p.outDir,
+		),
+	}, nil
 }
-
 func getOperatorCommands(
 	dirPath string,
 	outDirPath string,
@@ -32,7 +39,7 @@ func getOperatorCommands(
 ) ([]*Command, error) {
 	var commands []*Command
 	for _, plugin := range getOperatorPlugins(options) {
-		args := []string{protocCmd, fmt.Sprintf("-I%s", dirPath)}
+		args := []string{protocProgram, fmt.Sprintf("-I%s", dirPath)}
 		args = appendOperatorIncludes(goPath, args)
 		flags, err := plugin.Flags(protoSpec, "", outDirPath)
 		if err != nil {
@@ -52,17 +59,29 @@ func getOperatorCommands(
 func getOperatorPlugins(options *CompileOptions) []plugin {
 	var plugins []plugin
 	if options.OperatorCmd {
-		plugins = append(plugins, &operatorPlugin{"cmd", options.OperatorCmdOut})
+		plugins = append(plugins, &operatorPlugin{
+			"cmd",
+			options.OperatorCmdOut,
+			options.GoImportPath,
+		})
 	}
 	if options.OperatorHubot {
-		plugins = append(plugins, &operatorPlugin{"hubot", options.OperatorHubotOut})
+		plugins = append(plugins, &operatorPlugin{
+			"hubot",
+			options.OperatorHubotOut,
+			options.GoImportPath,
+		})
 	}
 	if options.OperatorServer {
-		plugins = append(plugins, &operatorPlugin{"d", options.OperatorServerOut})
+		plugins = append(plugins, &operatorPlugin{
+			"d",
+			options.OperatorServerOut,
+			options.GoImportPath,
+		})
 	}
 	return plugins
 }
 
 func appendOperatorIncludes(goPath string, args []string) []string {
-	return append(args, fmt.Sprintf("-I%s", filepath.Join(goPath, "src", operatorProto)))
+	return append(args, fmt.Sprintf("-I%s", filepath.Join(goPath, "src", OperatorPackage)))
 }

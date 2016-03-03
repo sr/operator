@@ -14,10 +14,10 @@ import (
 	"github.com/sr/operator"
 )
 
-// TODO(sr) this should be a flag for in operatorc and all protoc-operator* commands
 const (
-	importPathBase = "sr/chatoops"
-	sourceField    = "source"
+	binaryParam     = "binary"
+	importPathParam = "import_path"
+	sourceField     = "source"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -43,8 +43,12 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			params[p[0:i]] = p[i+1:]
 		}
 	}
+	importPathPrefix, ok := params[importPathParam]
+	if !ok {
+		return nil, fmt.Errorf("%s parameter is required", importPathParam)
+	}
 	binaryName := DefaultBinaryName
-	if val, ok := params["binary"]; ok {
+	if val, ok := params[binaryParam]; ok {
 		binaryName = val
 	}
 	desc := &Descriptor{
@@ -70,11 +74,8 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				return nil, err
 			}
 			nameStr := *name.(*string)
-			// TODO(sr) substitute path.Ext() or whatever
-			// b := fmt.Sprintf("/%s", path.Base(file.GetName()))
-			// importPath := strings.Replace(file.GetName(), b, "", 1)
 			fn := file.GetName()
-			importPath := filepath.Join(importPathBase, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
+			importPath := filepath.Join(importPathPrefix, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
 			desc.Services[i] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),
