@@ -59,8 +59,8 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	}
 	i := 0
 	sort.Strings(request.FileToGenerate)
-	for _, fn := range request.FileToGenerate {
-		file := filesByName[fn]
+	for _, fileName := range request.FileToGenerate {
+		file := filesByName[fileName]
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
 		for _, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
@@ -88,13 +88,27 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			for j, method := range service.Method {
 				inputName := strings.Split(method.GetInputType(), ".")[2]
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
-				input := messagesByName[inputName]
+				input, ok := messagesByName[inputName]
+				if !ok {
+					return nil, fmt.Errorf("No message definition for %s", inputName)
+				}
+				inputHasSource := false
 				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
 					Input:       inputName,
 					Output:      outputName,
 					Arguments:   make([]*Argument, len(input.Field)-1),
+				}
+				for _, f := range input.Field {
+					// TODO(sr) make this more robust?
+					if f.GetTypeName() == ".operator.Source" && f.GetName() == sourceField {
+						inputHasSource = true
+						break
+					}
+				}
+				if !inputHasSource {
+					return nil, fmt.Errorf("service '%s' input message '%s' is missing source field", service.GetName(), inputName)
 				}
 				for k, field := range input.Field {
 					if field.GetName() == sourceField {
