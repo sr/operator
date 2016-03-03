@@ -68,7 +68,7 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 	}
 	desc, err := describe(request)
 	if err != nil {
-		return fmt.Errorf("failed to normalize proto request: %s", err)
+		return fmt.Errorf("could not parse proto request: %s", err)
 	}
 	files, err := gen(desc)
 	if err != nil {

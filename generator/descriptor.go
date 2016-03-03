@@ -94,31 +94,15 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				if !ok {
 					return nil, fmt.Errorf("No definition for input message %s", inputName)
 				}
+				if err := validateInputMessage(input); err != nil {
+					return nil, err
+				}
 				output, ok := messagesByName[outputName]
 				if !ok {
 					return nil, fmt.Errorf("No definition for output message %s", outputName)
 				}
-				// TODO(sr) make this more robust somehow?
-				inputHasSource := false
-				outputHasOutput := false
-				for _, f := range input.Field {
-					if f.GetTypeName() == ".operator.Source" && f.GetName() == sourceField {
-						inputHasSource = true
-						break
-					}
-				}
-				if !inputHasSource {
-					return nil, fmt.Errorf("service '%s' input message '%s' is missing source field", service.GetName(), inputName)
-				}
-				for _, f := range output.Field {
-					// TODO(sr) make this more robust?
-					if f.GetTypeName() == ".operator.Output" && f.GetName() == outputField {
-						outputHasOutput = true
-						break
-					}
-				}
-				if !outputHasOutput {
-					return nil, fmt.Errorf("service '%s' output message '%s' is missing output field", service.GetName(), inputName)
+				if err := validateOutputMessage(output); err != nil {
+					return nil, err
 				}
 				desc.Services[i].Methods[j] = &Method{
 					Name:        method.GetName(),
@@ -152,6 +136,42 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		}
 	}
 	return desc, nil
+}
+
+func validateInputMessage(msg *descriptor.DescriptorProto) error {
+	if len(msg.Field) == 0 {
+		return fmt.Errorf("Input message '%s' has no field", msg.GetName())
+	}
+	var field *descriptor.FieldDescriptorProto
+	ok := false
+	for _, f := range msg.Field {
+		if f.GetNumber() == 1 {
+			ok = true
+			field = f
+		}
+	}
+	if !ok || field.GetName() != "source" || field.GetTypeName() != ".operator.Source" {
+		return fmt.Errorf("Input message '%s' does not have a valid source field", msg.GetName())
+	}
+	return nil
+}
+
+func validateOutputMessage(msg *descriptor.DescriptorProto) error {
+	if len(msg.Field) == 0 {
+		return fmt.Errorf("Output message '%s' has no field", msg.GetName())
+	}
+	var field *descriptor.FieldDescriptorProto
+	ok := false
+	for _, f := range msg.Field {
+		if f.GetNumber() == 1 {
+			ok = true
+			field = f
+		}
+	}
+	if !ok || field.GetName() != "output" || field.GetTypeName() != ".operator.Output" {
+		return fmt.Errorf("Output message '%s' does not have a valid output field", msg.GetName())
+	}
+	return nil
 }
 
 func clean(s string) string {
