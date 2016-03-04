@@ -22,4 +22,10 @@ module ZabbixTestHelpers
       .with(:body => /"method":"hostgroup.get"/)
       .to_return(:status => 200, :body => JSON.dump("jsonrpc": "2.0", "result": result))
   end
+
+  def stub_host_update(url: "https://zabbix-dfw.example/api_jsonrpc.php", result: [])
+    stub_request(:post, url)
+      .with(:body => /"method":"host.update"/)
+      .to_return(:status => 200, :body => JSON.dump("jsonrpc": "2.0", "result": result))
+  end
 end
