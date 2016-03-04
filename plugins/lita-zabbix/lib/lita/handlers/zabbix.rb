@@ -14,8 +14,6 @@ module Lita
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
-      config :host_domain, default: "ops.sfdc.net"
-
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
         "zabbix maintenance start HOST until=24h" => "Puts hosts matching HOST in maintenance mode for 24 hours",
@@ -143,14 +141,6 @@ module Lita
           user: config.zabbix_user,
           password: config.zabbix_password,
         )
-      end
-
-      def host_with_fqdn(host)
-        if host.end_with?(config.host_domain)
-          host
-        else
-          [host, config.host_domain].join(".")
-        end
       end
 
       def parse_options(options)
