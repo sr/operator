@@ -11,9 +11,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"github.com/sr/operator"
 
 	{{- range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
@@ -71,7 +71,7 @@ var cmd = operator.NewCommand(
 	{{- end }}
 			},
 		},
-{{end -}}
+{{end}}
 	},
 )
 
