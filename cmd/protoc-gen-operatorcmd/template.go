@@ -46,12 +46,14 @@ var cmd = operator.NewCommand(
 			{{- range .Arguments}}
 						{{.Name}} := ctx.Flags.String("{{dasherize .Name}}", "", "")
 			{{- end}}
-						ctx.Flags.Parse(ctx.Args)
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
 						conn, err := dial(ctx.Address)
 						if err != nil {
 							return "", err
 						}
-						defer conn.Close()
+						defer func() { _ = conn.Close() }()
 						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
 						response, err := client.{{.Name}}(
 							context.Background(),
@@ -78,9 +80,13 @@ var cmd = operator.NewCommand(
 func main() {
 	status, output := cmd.Run(os.Args)
 	if status != 0 {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output)
+		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output); err != nil {
+			panic(err)
+		}
 	} else {
-		io.WriteString(os.Stdout, output)
+		if _, err := io.WriteString(os.Stdout, output); err != nil {
+			panic(err)
+		}
 	}
 	os.Exit(status)
 }

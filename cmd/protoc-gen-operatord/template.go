@@ -37,7 +37,7 @@ func run() error {
 		if {{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Env); err != nil {
 			server.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := &instrumented_{{.PackageName}}_{{.FullName}}{instrumenter, {{.Name}}Server}
+			instrumented := &instrumented{{.PackageName}}{{.FullName}}{instrumenter, {{.Name}}Server}
 			{{.Name}}.Register{{camelCase .FullName}}Server(grpcServer, instrumented)
 			server.LogServiceRegistered("{{.Name}}")
 		}
