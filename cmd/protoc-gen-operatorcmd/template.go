@@ -40,7 +40,7 @@ var cmd = operator.NewCommand(
 			Methods: []operator.MethodCommand{
 	{{- range .Methods}}
 				{
-					Name:	  "{{dasherize .Name}}",
+					Name: "{{dasherize .Name}}",
 					Synopsis: `+"`"+`{{.Description}}`+"`"+`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
 			{{- range .Arguments}}

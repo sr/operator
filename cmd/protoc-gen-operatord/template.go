@@ -72,7 +72,7 @@ type instrumented_{{.PackageName}}_{{.FullName}} struct {
 	server       servicepkg.{{.FullName}}Server
 }
 
-{{range .Methods}}
+{{- range .Methods}}
 // {{.Name}} instruments the {{$.FullName}}.{{.Name}} method.
 func (a *instrumented_{{$.PackageName}}_{{$.FullName}}) {{.Name}}(
 	ctx context.Context,
