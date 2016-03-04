@@ -4,6 +4,7 @@ package generator
 
 import (
 	"fmt"
+	"go/format"
 	"io"
 	"io/ioutil"
 	"text/template"
@@ -80,7 +81,11 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 	for i, file := range files {
 		response.File[i] = new(plugin.CodeGeneratorResponse_File)
 		response.File[i].Name = proto.String(file.Name)
-		response.File[i].Content = proto.String(file.Content)
+		s, err := format.Source([]byte(file.Content))
+		if err != nil {
+			return fmt.Errorf("could not gofmt generated code: %v", err)
+		}
+		response.File[i].Content = proto.String(string(s))
 	}
 	if err != nil {
 		return fmt.Errorf("failed to generate proto response: %s", err)
