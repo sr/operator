@@ -2,7 +2,7 @@ export PATH := bin/:$(PATH)
 DOCKER ?= docker
 ERRCHECK = $(GOBIN)/errcheck
 GO ?= go
-GOFMT ?= $(GOROOT)/bin/gofmt
+GOFMT ?= gofmt
 GOLINT ?= $(GOBIN)/golint
 PACKAGE ?= github.com/sr/operator
 PROTOEASY = $(GOBIN)/protoeasy
@@ -25,9 +25,9 @@ docker-build-operatorc:
 proto: $(PROTOEASY)
 	$< --go --grpc --go-import-path $(PACKAGE) --exclude protoeasy .
 
-fmt: $(GOFMT)
+fmt:
 	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
-			out="$$($< -s -d $$file)"; \
+			out="$$($(GOFMT) -s -d $$file)"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				exit 1; \
