@@ -8,12 +8,16 @@ Lita.configure do |config|
   # The severity of messages to log. Options are:
   # :debug, :info, :warn, :error, :fatal
   # Messages at the selected level and above will be logged.
-  config.robot.log_level = :info
+  config.robot.log_level = :debug
 
   # An array of user IDs that are considered administrators. These users
   # the ability to add and remove other users from authorization groups.
   # What is considered a user ID will change depending on which adapter you use.
-  # config.robot.admins = ["1", "2"]
+  config.robot.admins = [
+    "1_104@chat.btf.hipchat.com", # Jan Ulrich
+    "1_261@chat.btf.hipchat.com", # Rory Kiefer
+    "1_282@chat.btf.hipchat.com", # Andy Lindeman
+  ]
 
   config.robot.adapter = (ENV.fetch("LITA_ADAPTER", "shell")).to_sym
 
@@ -31,6 +35,10 @@ Lita.configure do |config|
 
   # Replication fixing
   config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
+
+  # Zabbix
+  config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
+  config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")

@@ -5,6 +5,13 @@ PATH
       lita (>= 4.7)
       pagerduty (= 2.1.0)
 
+PATH
+  remote: plugins/lita-zabbix
+  specs:
+    lita-zabbix (0.1.0)
+      lita (>= 4.7)
+      zabbixapi (~> 2.4, >= 2.4.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -59,6 +66,8 @@ GEM
     url_mount (0.2.1)
       rack
     xmpp4r (0.5.6)
+    zabbixapi (2.4.6)
+      json (~> 1.6, >= 1.6.0)
 
 PLATFORMS
   ruby
@@ -67,6 +76,7 @@ DEPENDENCIES
   lita (= 4.7.0)
   lita-hipchat (= 3.0.2)
   lita-replication-fixing!
+  lita-zabbix!
   rspec (~> 3.4, >= 3.4.0)
 
 BUNDLED WITH
