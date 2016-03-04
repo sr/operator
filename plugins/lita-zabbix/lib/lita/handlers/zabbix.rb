@@ -16,11 +16,14 @@ module Lita
 
       config :host_domain, default: "ops.sfdc.net"
 
-      route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+set\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :set_maintenance, command: true, help: {
-        "zabbix maintenance set HOST" => "Puts HOST in maintenance mode for 1 hour",
-        "zabbix maintenance set HOST until=24h" => "Puts HOST in maintenance mode for 24 hours",
+      route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
+        "zabbix maintenance start HOST" => "Puts HOST in maintenance mode for 1 hour",
+        "zabbix maintenance start HOST until=24h" => "Puts HOST in maintenance mode for 24 hours",
       }
 
+      route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:stop)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :stop_maintenance, command: true, help: {
+        "zabbix maintenance stop HOST" => "Brings HOST out of maintenance mode",
+      }
 
       def initialize(robot)
         super
@@ -46,7 +49,7 @@ module Lita
         robot.join(config.status_room)
       end
 
-      def set_maintenance(response)
+      def start_maintenance(response)
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
 
@@ -72,7 +75,7 @@ module Lita
             log: log,
           )
 
-          maintenance_supervisor.set_maintenance(
+          maintenance_supervisor.start_maintenance(
             host: host,
             until_time: until_time,
           )
@@ -83,17 +86,28 @@ module Lita
         end
       end
 
-      def expire_maintenances
-        @maintenance_supervisors.each do |_, supervisor|
-          expired = supervisor.expire_maintenances
-          expired.each do |host|
-            robot.send_message(@status_room, "/me is removing #{host} from maintenance")
-          end
+      def stop_maintenance(response)
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
+        validate_datacenter(datacenter: datacenter, response: response) || return
+
+        host = host_with_fqdn(response.match_data["host"])
+
+        begin
+          maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+            datacenter: datacenter,
+            redis: redis,
+            client: @clients[datacenter],
+            log: log,
+          )
+
+          maintenance_supervisor.stop_maintenance(host: host)
+          response.reply_with_mention("OK, I've brought #{host} out of maintenance")
+        rescue => e
+          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
       end
 
       private
-
       def validate_datacenter(datacenter:, response:)
         if @clients.key?(datacenter)
           true

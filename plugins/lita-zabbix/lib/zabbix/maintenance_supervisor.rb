@@ -31,13 +31,13 @@ module Zabbix
       true
     end
 
-    def set_maintenance(host:, until_time:)
+    def start_maintenance(host:, until_time:)
       if @client.ensure_host_in_zabbix_maintenance_group(host)
         @redis.hset(REDIS_EXPIRATIONS_KEY, host, until_time.to_i)
       end
     end
 
-    def remove_maintenance(host:)
+    def stop_maintenance(host:)
       if @client.ensure_host_not_in_zabbix_maintenance_group(host)
         @redis.hdel(REDIS_EXPIRATIONS_KEY, host) > 0
       end
@@ -50,8 +50,8 @@ module Zabbix
       expired = @redis.hgetall(REDIS_EXPIRATIONS_KEY).select { |k, v| v.to_i <= now.to_i }.keys
       expired.select { |host|
         begin
-          remove_maintenance(host: host)
-          @log.info("Removed host from maintenance: #{host}")
+          stop_maintenance(host: host)
+          @log.info("Brought host out of maintenance: #{host}")
         rescue ::Zabbix::Client::HostNotFound
           @log.warn("Host not found while removing it from maintenance: #{host}")
           false
