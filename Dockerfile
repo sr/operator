@@ -4,7 +4,9 @@ ENV LANG C.UTF-8
 RUN apt-get update -qq && \
    apt-get install -y build-essential && \
    apt-get install -y cron && \
-   apt-get install -y rsync
+   apt-get install -y rsync && \
+   apt-get install -y supervisor && \
+   apt-get install -y rsyslog
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /pull-agent -s /sbin/nologin -c "Docker image user" docker
@@ -18,8 +20,8 @@ ADD Gemfile.lock /pull-agent/Gemfile.lock
 RUN bundle install
 
 ADD . /pull-agent
-RUN echo "* * * * * cd /pull-agent && /usr/bin/env ruby ./check-in.rb dev chef\n\
-* * * * * cd /pull-agent && /usr/bin/env ruby ./check-in.rb dev pardot" > /etc/cron.d/pull-agent
+ADD docker/crontab /etc/cron.d/pull-agent
 
 # CMD crond -n # on CentOS
-CMD cron -f
+# CMD cron -f
+CMD ["supervisord", "-n", "-c", "docker/supervisor.conf"]
