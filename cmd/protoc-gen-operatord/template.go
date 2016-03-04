@@ -27,8 +27,8 @@ func run() error {
 	}
 	grpcServer := grpc.NewServer()
 	logger := operator.NewLogger()
-	instrumentator := operator.NewInstrumentor(logger)
-	server := operator.NewServer(grpcServer, config, logger, instrumentator)
+	instrumenter := operator.NewInstrumenter(logger)
+	server := operator.NewServer(grpcServer, config, logger, instrumenter)
 {{range .Services}}
 	{{.Name}}Env := &{{.PackageName}}.Env{}
 	if err := env.Populate({{.Name}}Env); err != nil {
@@ -37,7 +37,7 @@ func run() error {
 		if {{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Env); err != nil {
 			server.LogServiceStartupError("{{.Name}}", err)
 		} else {
-			instrumented := &instrumented_{{.PackageName}}_{{.FullName}}{instrumentator, {{.Name}}Server}
+			instrumented := &instrumented_{{.PackageName}}_{{.FullName}}{instrumenter, {{.Name}}Server}
 			{{.Name}}.Register{{camelCase .FullName}}Server(grpcServer, instrumented)
 			server.LogServiceRegistered("{{.Name}}")
 		}
@@ -61,7 +61,6 @@ package main
 import (
 	"time"
 
-	"github.com/sr/grpcinstrument"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
@@ -69,7 +68,7 @@ import (
 )
 
 type instrumented_{{.PackageName}}_{{.FullName}} struct {
-	instrumentor operator.Instrumentor
+	instrumenter operator.Instrumenter
 	server       servicepkg.{{.FullName}}Server
 }
 
@@ -80,9 +79,9 @@ func (a *instrumented_{{$.PackageName}}_{{$.FullName}}) {{.Name}}(
 	request *servicepkg.{{.Input}},
 ) (response *servicepkg.{{.Output}}, err error) {
 	defer func(start time.Time) {
-		a.instrumentor.Instrument(&operator.Request{
-			Source: request.Source,
-			Call: grpcinstrument.NewCall(
+		a.instrumenter.Instrument(
+			operator.NewRequest(
+				request.Source,
 				"{{$.PackageName}}",
 				"{{.Name}}",
 				"{{.Input}}",
@@ -90,7 +89,7 @@ func (a *instrumented_{{$.PackageName}}_{{$.FullName}}) {{.Name}}(
 				err,
 				start,
 			),
-		})
+		)
 	}(time.Now())
 	return a.server.{{.Name}}(ctx, request)
 }

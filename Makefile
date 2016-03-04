@@ -23,9 +23,7 @@ docker-build-operatorc:
 	$(DOCKER) build -t srozet/operator/operatorc -f etc/docker/Dockerfile.operatorc .
 
 proto: $(PROTOEASY)
-	$< --go --grpc --go-import-path $(PACKAGE) \
-		--go-modifier vendor/github.com/sr/grpcinstrument/grpcinstrument.proto=github.com/sr/grpcinstrument \
-		--exclude _example,vendor,protoeasy .
+	$< --go --grpc --go-import-path $(PACKAGE) --exclude protoeasy .
 
 fmt: $(GOFMT)
 	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \

@@ -12,20 +12,20 @@ type server struct {
 	server       *grpc.Server
 	config       *Config
 	logger       Logger
-	instrumentor Instrumentor
+	instrumenter Instrumenter
 }
 
 func newServer(
 	grpcServer *grpc.Server,
 	config *Config,
 	logger Logger,
-	instrumentor Instrumentor,
+	instrumenter Instrumenter,
 ) *server {
 	return &server{
 		grpcServer,
 		config,
 		logger,
-		instrumentor,
+		instrumenter,
 	}
 }
 
