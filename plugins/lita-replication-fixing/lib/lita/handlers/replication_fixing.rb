@@ -185,7 +185,7 @@ module Lita
         when ::ReplicationFixing::FixingClient::NoErrorDetected
           response.reply_with_mention "I didn't detect any errors detected on #{shard}"
         when ::ReplicationFixing::FixingClient::NotFixable
-          response.reply_with_mention "Sorry, I'm not able to fix #{shard} right now. I need a human to resolve it."
+          response.reply_with_mention "Sorry, I'm afraid I can't do that. I need a human to resolve errors on #{shard}."
         when ::ReplicationFixing::FixingClient::FixInProgress
           ongoing_minutes = ((Time.now - result.started_at) / 60.0).to_i
           if ongoing_minutes <= 0
