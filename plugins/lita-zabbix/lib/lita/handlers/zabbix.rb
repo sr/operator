@@ -17,12 +17,12 @@ module Lita
       config :host_domain, default: "ops.sfdc.net"
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
-        "zabbix maintenance start HOST" => "Puts HOST in maintenance mode for 1 hour",
-        "zabbix maintenance start HOST until=24h" => "Puts HOST in maintenance mode for 24 hours",
+        "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
+        "zabbix maintenance start HOST until=24h" => "Puts hosts matching HOST in maintenance mode for 24 hours",
       }
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:stop)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :stop_maintenance, command: true, help: {
-        "zabbix maintenance stop HOST" => "Brings HOST out of maintenance mode",
+        "zabbix maintenance stop HOST" => "Brings hosts matching HOST out of maintenance mode",
       }
 
       def initialize(robot)
@@ -56,7 +56,8 @@ module Lita
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
 
-        host = host_with_fqdn(response.match_data["host"])
+        host_glob = response.match_data["host"]
+        hosts = @clients[datacenter].search_hosts(host_glob)
         options = parse_options(response.match_data["options"])
 
         until_time = \
@@ -70,48 +71,60 @@ module Lita
             Time.now + 3600
           end
 
-        begin
-          maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
-            datacenter: datacenter,
-            redis: redis,
-            client: @clients[datacenter],
-            log: log,
-          )
+        maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+          datacenter: datacenter,
+          redis: redis,
+          client: @clients[datacenter],
+          log: log,
+        )
 
+        hosts.each do |host|
           maintenance_supervisor.start_maintenance(
             host: host,
             until_time: until_time,
           )
-
-          response.reply_with_mention("OK, I've started maintenance on #{host} until #{until_time}")
-        rescue => e
-          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
+
+        if hosts.length > 0
+          response.reply_with_mention("OK, I've started maintenance on #{host_glob} (matched #{hosts.length} hosts) until #{until_time}")
+        else
+          response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
+        end
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
       def stop_maintenance(response)
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
 
-        host = host_with_fqdn(response.match_data["host"])
+        host_glob = response.match_data["host"]
+        hosts = @clients[datacenter].search_hosts(host_glob)
 
-        begin
-          maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
-            datacenter: datacenter,
-            redis: redis,
-            client: @clients[datacenter],
-            log: log,
+        maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+          datacenter: datacenter,
+          redis: redis,
+          client: @clients[datacenter],
+          log: log,
+        )
+
+        hosts.each do |host|
+          maintenance_supervisor.stop_maintenance(
+            host: host,
           )
-
-          maintenance_supervisor.stop_maintenance(host: host)
-          response.reply_with_mention("OK, I've brought #{host} out of maintenance")
-        rescue => e
-          response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
+
+        if hosts.length > 0
+          response.reply_with_mention("OK, I've stopped maintenance on #{host_glob} (matched #{hosts.length} hosts)")
+        else
+          response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
+        end
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
-      def host_maintenance_expired(host)
-        robot.send_message(@status_room, "/me is bringing #{host} out of maintenance")
+      def host_maintenance_expired(hostname)
+        robot.send_message(@status_room, "/me is bringing #{hostname} out of maintenance")
       end
 
       private

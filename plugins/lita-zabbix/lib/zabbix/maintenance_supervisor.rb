@@ -35,27 +35,29 @@ module Zabbix
 
     def start_maintenance(host:, until_time:)
       if @client.ensure_host_in_zabbix_maintenance_group(host)
-        @redis.hset(redis_expirations_key, host, until_time.to_i)
+        @redis.hset(redis_expirations_key, host["host"], until_time.to_i)
       end
     end
 
     def stop_maintenance(host:)
       if @client.ensure_host_not_in_zabbix_maintenance_group(host)
-        @redis.hdel(redis_expirations_key, host) > 0
+        @redis.hdel(redis_expirations_key, host["host"]) > 0
       end
-    rescue ::Zabbix::Client::HostNotFound
-      @redis.hdel(redis_expirations_key, host)
-      raise
     end
 
     def run_expirations(now: Time.now)
       expired = @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i <= now.to_i }.keys
-      expired.select { |host|
+      expired.select { |hostname|
         begin
+          host = @client.get_host(hostname)
           stop_maintenance(host: host)
-          @log.info("Brought host out of maintenance: #{host}")
+
+          @log.info("Brought host out of maintenance: #{hostname}")
+          true
         rescue ::Zabbix::Client::HostNotFound
-          @log.warn("Host not found while removing it from maintenance: #{host}")
+          @redis.hdel(redis_expirations_key, hostname)
+
+          @log.warn("Host not found while removing it from maintenance: #{hostname}")
           false
         rescue => e
           @log.error("Error while removing host from maintenance: #{e}")
@@ -82,7 +84,7 @@ module Zabbix
                 []
               end
 
-            expirations.each { |host| notify_host_maintenance_expired(host) }
+            expirations.each { |host| notify_host_maintenance_expired(hostname) }
             sleep 60
           end
         ensure
@@ -93,8 +95,8 @@ module Zabbix
       end
     end
 
-    def notify_host_maintenance_expired(host)
-      on_host_maintenance_expired.call(host) if on_host_maintenance_expired
+    def notify_host_maintenance_expired(hostname)
+      on_host_maintenance_expired.call(hostname) if on_host_maintenance_expired
     rescue => e
       @log.error("Error notifying host maintenance expired: #{e}")
     end
