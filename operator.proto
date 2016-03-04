@@ -3,13 +3,28 @@ syntax = "proto3";
 package operator;
 
 import "google/protobuf/descriptor.proto";
-import "vendor/grpcinstrument.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "operator";
 
 message Request {
 	Source source = 1;
-	grpcinstrument.Call call = 2;
+	Call call = 2;
+}
+
+// Call represents a completed gRPC call. The Error field will be non-nil if
+// it resulted in an error.
+message Call {
+	string service = 1;
+	string method = 2;
+	string input_type = 3;
+	string output_type = 4;
+	Error error = 5;
+	google.protobuf.Duration duration = 6;
+}
+
+message Error {
+	string message = 1;
 }
 
 message Source {

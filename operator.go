@@ -2,15 +2,15 @@ package operator
 
 import (
 	"flag"
+	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/sr/grpcinstrument/promeasurer"
 	"go.pedge.io/env"
+	"go.pedge.io/proto/time"
 	"google.golang.org/grpc"
 )
 
-type Instrumentor interface {
-	Init() error
+type Instrumenter interface {
 	Instrument(*Request)
 }
 
@@ -57,13 +57,13 @@ func NewServer(
 	server *grpc.Server,
 	config *Config,
 	logger Logger,
-	instrumentor Instrumentor,
+	instrumenter Instrumenter,
 ) Server {
 	return newServer(
 		server,
 		config,
 		logger,
-		instrumentor,
+		instrumenter,
 	)
 }
 
@@ -75,11 +75,30 @@ func NewLogger() Logger {
 	return newLogger()
 }
 
-func NewInstrumentor(logger Logger) Instrumentor {
-	return newInstrumentor(
-		logger,
-		promeasurer.NewMeasurer(),
-	)
+func NewInstrumenter(logger Logger) Instrumenter {
+	return newInstrumenter(logger)
+}
+
+func NewRequest(
+	source *Source,
+	serviceName string,
+	methodName string,
+	inputType string,
+	outputType string,
+	err error,
+	start time.Time,
+) *Request {
+	call := &Call{
+		Service:    serviceName,
+		Method:     methodName,
+		InputType:  inputType,
+		OutputType: outputType,
+		Duration:   prototime.DurationToProto(time.Since(start)),
+	}
+	if err != nil {
+		call.Error = &Error{Message: err.Error()}
+	}
+	return &Request{Source: source, Call: call}
 }
 
 func NewConfigFromEnv() (*Config, error) {
