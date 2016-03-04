@@ -67,14 +67,14 @@ import (
 	servicepkg "{{.ImportPath}}"
 )
 
-type instrumented_{{.PackageName}}_{{.FullName}} struct {
+type instrumented{{.PackageName}}{{.FullName}} struct {
 	instrumenter operator.Instrumenter
 	server       servicepkg.{{.FullName}}Server
 }
 
 {{- range .Methods}}
 // {{.Name}} instruments the {{$.FullName}}.{{.Name}} method.
-func (a *instrumented_{{$.PackageName}}_{{$.FullName}}) {{.Name}}(
+func (a *instrumented{{$.PackageName}}{{$.FullName}}) {{.Name}}(
 	ctx context.Context,
 	request *servicepkg.{{.Input}},
 ) (response *servicepkg.{{.Output}}, err error) {
