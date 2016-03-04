@@ -31,12 +31,15 @@ module Lita
         @clients = Hash.new { |h, k| h[k] = build_zabbix_client(datacenter: k) }
         config.datacenters.each do |datacenter|
           begin
-            ::Zabbix::MaintenanceSupervisor.get_or_create(
+            supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
               datacenter: datacenter,
               redis: redis,
               client: @clients[datacenter],
               log: log
-            ).ensure_supervising
+            )
+
+            supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
+            supervisor.ensure_supervising
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
           end
@@ -80,7 +83,7 @@ module Lita
             until_time: until_time,
           )
 
-          response.reply_with_mention("OK, I've added #{host} to maintenance until #{until_time}")
+          response.reply_with_mention("OK, I've started #{host} maintenance on until #{until_time}")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
@@ -105,6 +108,10 @@ module Lita
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
+      end
+
+      def host_maintenance_expired(host)
+        robot.send_message(@status_room, "/me is bringing #{host} out of maintenance")
       end
 
       private

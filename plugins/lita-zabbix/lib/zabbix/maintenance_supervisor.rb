@@ -7,6 +7,8 @@ module Zabbix
 
     GLOBAL_MUTEX = Mutex.new
 
+    attr_accessor :on_host_maintenance_expired
+
     def self.get_or_create(datacenter:, redis:, client:, log:)
       if @supervisors && supervisor = @supervisors[datacenter]
         supervisor
@@ -68,12 +70,15 @@ module Zabbix
       if @supervising_lock.try_lock
         begin
           loop do
-            begin
-              run_expirations
-            rescue => e
-              @log.error("Error while running expirations: #{e}")
-            end
+            expirations = \
+              begin
+                run_expirations
+              rescue => e
+                @log.error("Error while running expirations: #{e}")
+                []
+              end
 
+            expirations.each { |host| notify_host_maintenance_expired(host) }
             sleep 10
           end
         ensure
@@ -82,6 +87,12 @@ module Zabbix
       else
         @log.debug("Supervisor already executing")
       end
+    end
+
+    def notify_host_maintenance_expired(host)
+      on_host_maintenance_expired.call(host) if on_host_maintenance_expired
+    rescue => e
+      @log.error("Error notifying host maintenance expired: #{e}")
     end
   end
 end
