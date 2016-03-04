@@ -37,7 +37,7 @@ class Conductor
 
       success
     ensure
-      FileUtils.rm_f(payload_path)
+      fetch_strategy.cleanup(deploy)
     end
   end
 

@@ -2,6 +2,7 @@ require "uri"
 require "net/http"
 require "net/https"
 require "artifactory"
+require "fileutils"
 require_relative "base"
 
 module Strategies
@@ -62,7 +63,7 @@ module Strategies
         download_uri.path = URI.parse(artifact.download_uri).path
 
         FileUtils.mkdir_p(environment.payload.artifacts_path)
-        filename = File.join(environment.payload.artifacts_path, File.basename(download_uri.to_s))
+        filename = temporary_artifact_path(deploy)
 
         # We deliberately do not use Artifactory.client.get because it loads the
         # entire download into memory.
@@ -89,6 +90,15 @@ module Strategies
         end
 
         filename
+      end
+
+      def cleanup(deploy)
+        FileUtils.rm_f(temporary_artifact_path(deploy))
+      end
+
+      private
+      def temporary_artifact_path(deploy)
+        File.join(environment.payload.artifacts_path, File.basename(deploy.artifact_url))
       end
     end
   end
