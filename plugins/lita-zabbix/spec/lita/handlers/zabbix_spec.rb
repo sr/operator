@@ -15,7 +15,7 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
       stub_hostgroup_get(result: [{"name": "zMaintenance", "groupid": "99999"}])
 
       send_command("zabbix maintenance start pardot0-fake1-1-dfw until=+20min")
-      expect(replies.last).to match(/^OK, I've added pardot0-fake1-1-dfw.ops.sfdc.net to maintenance until/)
+      expect(replies.last).to match(/^OK, I've started maintenance on pardot0-fake1-1-dfw.ops.sfdc.net until/)
     end
   end
 

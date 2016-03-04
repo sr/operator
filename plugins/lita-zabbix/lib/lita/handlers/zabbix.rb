@@ -83,7 +83,7 @@ module Lita
             until_time: until_time,
           )
 
-          response.reply_with_mention("OK, I've started #{host} maintenance on until #{until_time}")
+          response.reply_with_mention("OK, I've started maintenance on #{host} until #{until_time}")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
         end
