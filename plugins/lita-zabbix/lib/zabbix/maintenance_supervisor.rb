@@ -83,7 +83,7 @@ module Zabbix
               end
 
             expirations.each { |host| notify_host_maintenance_expired(host) }
-            sleep 10
+            sleep 60
           end
         ensure
           @supervising_lock.unlock
