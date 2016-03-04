@@ -4,9 +4,7 @@ ENV LANG C.UTF-8
 RUN apt-get update -qq && \
    apt-get install -y build-essential && \
    apt-get install -y cron && \
-   apt-get install -y rsync && \
-   apt-get install -y supervisor && \
-   apt-get install -y rsyslog
+   apt-get install -y rsync
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /pull-agent -s /sbin/nologin -c "Docker image user" docker
@@ -23,5 +21,4 @@ ADD . /pull-agent
 ADD docker/crontab /etc/cron.d/pull-agent
 
 # CMD crond -n # on CentOS
-# CMD cron -f
-CMD ["supervisord", "-n", "-c", "docker/supervisor.conf"]
+CMD docker/cron.sh && tail -f /var/log/cron.log

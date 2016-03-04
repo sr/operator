@@ -1,3 +1,5 @@
-# Pull in saved docker envs
-#* * * * * root source /tmp/.pullagent.env; cd /pull-agent && /usr/local/bin/ruby ./check-in.rb dev chef 2>&1 | /usr/bin/logger -t pull_agent_chef
-* * * * * root bash -c '. /tmp/.pullagent.env; cd /pull-agent && /usr/local/bin/ruby ./check-in.rb dev pardot 2>&1 | /usr/bin/logger -t pull_agent_pardot'
+GEM_HOME=/usr/local/bundle
+BUNDLE_APP_CONFIG=/usr/local/bundle
+
+#* * * * * root . /tmp/.pullhostname.env; cd /pull-agent && /usr/local/bin/ruby ./check-in.rb dev chef 2>&1 | /usr/bin/logger -t pull_agent_chef
+* * * * * root . /tmp/.pullhostname.env; cd /pull-agent && /usr/local/bin/ruby ./check-in.rb dev pardot >>/var/log/cron.log 2>&1
