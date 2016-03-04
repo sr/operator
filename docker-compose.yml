@@ -8,22 +8,6 @@ services:
       - .:/pull_agent
     links:
       - canoe
-  app2:
-    build: .
-    environment:
-      PULL_HOSTNAME: "local-2"
-    volumes:
-      - .:/pull_agent
-    links:
-      - canoe
-  app3:
-    build: .
-    environment:
-      PULL_HOSTNAME: "local-dfw"
-    volumes:
-      - .:/pull_agent
-    links:
-      - canoe
   canoe:
     build: ../canoe
     environment:
