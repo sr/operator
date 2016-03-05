@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+cd $(dirname "$0")/..
+PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
+export PATH
+exec node_modules/.bin/hubot "$@"
