@@ -84,7 +84,7 @@ module Zabbix
                 []
               end
 
-            expirations.each { |host| notify_host_maintenance_expired(hostname) }
+            expirations.each { |hostname| notify_host_maintenance_expired(hostname) }
             sleep 60
           end
         ensure
