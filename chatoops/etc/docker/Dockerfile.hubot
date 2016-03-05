@@ -1,0 +1,16 @@
+FROM grpc/node:0.11
+MAINTAINER me@simonrozet.com
+RUN \
+  apt-get install -y --no-install-recommends \
+    build-essential \
+    libicu-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /var/cache
+ADD /src/hubot /hubot
+ADD /vendor/proto /hubot/proto
+COPY /src/operator/operator.proto /hubot/proto/operator/operator.proto
+ADD /src/services/**/*.proto /hubot/proto/
+ADD /bin/k8s-hubot /hubot/bin/k8s-hubot
+WORKDIR /hubot
+RUN npm install
+ENTRYPOINT ["bin/hubot"]

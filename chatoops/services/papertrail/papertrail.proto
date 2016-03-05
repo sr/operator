@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "operator.proto";
+
+package papertrail;
+
+service PapertrailService {
+	option (operator.name) = "papertrail";
+	rpc Search(SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+  operator.Source source = 1;
+  string query = 2;
+}
+
+message SearchResponse {
+	operator.Output output = 1;
+	repeated LogEvent objects = 2;
+}
+
+message LogEvent {
+	string id = 1;
+	string source = 2;
+	string program = 3;
+	string log_message = 4;
+}
