@@ -108,6 +108,9 @@ class DeploysController < ApplicationController
     authors.collect do |author|
       author.try(:login) || author.try(:name)
     end.uniq.sort
+  rescue Octokit::InternalServerError => e
+    Rails.logger.error("Internal server while attempting to fetch committers: #{e}")
+    []
   rescue Octokit::NotFound
     []
   end
