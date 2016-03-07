@@ -8,6 +8,7 @@ import (
 
 	"github.com/sr/operator"
 	buildkite "github.com/sr/operator/chatoops/services/buildkite"
+	gcloud "github.com/sr/operator/chatoops/services/gcloud"
 	papertrail "github.com/sr/operator/chatoops/services/papertrail"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -77,6 +78,73 @@ var cmd = operator.NewCommand(
 							&buildkite.ListBuildsRequest{
 								Source:      ctx.Source,
 								ProjectSlug: *project_slug,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+			},
+		},
+
+		{
+			Name:     "gcloud",
+			Synopsis: `Undocumented.`,
+			Methods: []operator.MethodCommand{
+				{
+					Name:     "create-container-cluster",
+					Synopsis: `Undocumented.`,
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						project_id := ctx.Flags.String("project-id", "", "")
+						name := ctx.Flags.String("name", "", "")
+						node_count := ctx.Flags.String("node-count", "", "")
+						zone := ctx.Flags.String("zone", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := dial(ctx.Address)
+						if err != nil {
+							return "", err
+						}
+						defer func() { _ = conn.Close() }()
+						client := gcloud.NewGcloudServiceClient(conn)
+						response, err := client.CreateContainerCluster(
+							context.Background(),
+							&gcloud.CreateContainerClusterRequest{
+								Source:    ctx.Source,
+								ProjectId: *project_id,
+								Name:      *name,
+								NodeCount: *node_count,
+								Zone:      *zone,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+				{
+					Name:     "list-instances",
+					Synopsis: `Undocumented.`,
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						project_id := ctx.Flags.String("project-id", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := dial(ctx.Address)
+						if err != nil {
+							return "", err
+						}
+						defer func() { _ = conn.Close() }()
+						client := gcloud.NewGcloudServiceClient(conn)
+						response, err := client.ListInstances(
+							context.Background(),
+							&gcloud.ListInstancesRequest{
+								Source:    ctx.Source,
+								ProjectId: *project_id,
 							},
 						)
 						if err != nil {

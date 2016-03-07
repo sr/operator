@@ -11,6 +11,8 @@ import (
 
 	"github.com/sr/operator/chatoops/services/buildkite"
 
+	"github.com/sr/operator/chatoops/services/gcloud"
+
 	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
@@ -34,6 +36,19 @@ func run() error {
 			instrumented := &instrumentedbuildkiteBuildkiteService{instrumenter, buildkiteServer}
 			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
 			server.LogServiceRegistered("buildkite")
+		}
+	}
+
+	gcloudEnv := &gcloud.Env{}
+	if err := env.Populate(gcloudEnv); err != nil {
+		server.LogServiceStartupError("gcloud", err)
+	} else {
+		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
+			server.LogServiceStartupError("gcloud", err)
+		} else {
+			instrumented := &instrumentedgcloudGcloudService{instrumenter, gcloudServer}
+			gcloud.RegisterGcloudServiceServer(grpcServer, instrumented)
+			server.LogServiceRegistered("gcloud")
 		}
 	}
 
