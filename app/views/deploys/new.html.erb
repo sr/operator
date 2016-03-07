@@ -76,10 +76,10 @@
         <legend>Tags</legend>
 
         <div class="container-fluid">
-          <%- @tags.each_slice(6).each do |slice| %>
+          <%- @tags.each_slice(4).each do |slice| %>
             <div class="row">
               <%- slice.each do |tag| %>
-                <div class="col-xs-2">
+                <div class="col-xs-3">
                   <label class="checkbox-inline">
                     <%= check_box_tag "server_tags[]", tag.id, false, data: {server_hostnames: tag.servers.map(&:hostname)} %> <%= tag.name %>
                   </label>
@@ -94,10 +94,10 @@
         <legend>Servers</legend>
 
         <div class="container-fluid">
-          <%- @server_hostnames.each_slice(6) do |slice| %>
+          <%- @server_hostnames.each_slice(4) do |slice| %>
             <div class="row">
               <%- slice.each do |hostname| %>
-                <div class="col-xs-2">
+                <div class="col-xs-3">
                   <label class="checkbox-inline">
                     <%= check_box_tag "server_hostnames[]", hostname %>
                     <%= hostname %>
