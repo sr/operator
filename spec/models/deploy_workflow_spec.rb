@@ -23,7 +23,7 @@ RSpec.describe DeployWorkflow do
 
       deploy.reload
       expect(deploy.results.for_server(server).stage).to eq("deployed")
-      expect(deploy.restart_server).to eq(server)
+      expect(deploy.restart_servers).to eq([server])
     end
   end
 
@@ -42,6 +42,24 @@ RSpec.describe DeployWorkflow do
       server3 = servers[2]
       workflow.notify_action_successful(server: server3, action: "deploy")
       expect(deploy.results.for_server(server3).stage).to eq("completed")
+    end
+
+    it "there should be one restart server per datacenter" do
+      servers = FactoryGirl.create_list(:server, 2)
+      servers << FactoryGirl.create(:server, hostname: "bastion-dfw")
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
+
+      server1 = servers.first
+      workflow.notify_action_successful(server: server1, action: "deploy")
+      expect(deploy.results.for_server(server1).stage).to eq("deployed")
+      
+      server2 = servers[1]
+      workflow.notify_action_successful(server: server2, action: "deploy")
+      expect(deploy.results.for_server(server2).stage).to eq("completed")
+
+      server3 = servers[2]
+      workflow.notify_action_successful(server: server3, action: "deploy")
+      expect(deploy.results.for_server(server3).stage).to eq("deployed")
     end
   end
 

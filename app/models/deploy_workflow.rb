@@ -5,6 +5,9 @@ class DeployWorkflow
     servers.each do |server|
       deploy.results.create!(server: server, stage: "initiated")
     end
+    servers.group_by(&:datacenter).keys.each do |dc|
+      deploy.deploy_restart_servers.create!(datacenter: dc)
+    end
 
     new(deploy: deploy)
   end
@@ -45,7 +48,7 @@ class DeployWorkflow
     result ||= require_result_for(server: server)
     if result.initiated?
       "deploy"
-    elsif @deploy.restart_server == server && @deploy.results.initiated.empty?
+    elsif @deploy.restart_servers.include?(server) && @deploy.results.initiated.empty?
       "restart"
     else
       nil
@@ -63,8 +66,7 @@ class DeployWorkflow
     # This update_all line is atomic. It can't race with another restart server
     # being assigned. As far as I know, this is the only way to achieve this
     # kind of thing in Rails :/
-    if Deploy.where(id: @deploy.id, restart_server_id: nil).update_all(restart_server_id: result.server_id) > 0
-      @deploy.reload
+    if DeployRestartServer.where(deploy_id: @deploy.id, datacenter: result.server.datacenter, server_id: nil).update_all(server_id: result.server_id) > 0
       result.update(stage: "deployed")
     else
       result.update(stage: "completed")

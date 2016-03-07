@@ -26,4 +26,12 @@ class Server < ActiveRecord::Base
   def server_tag_names
     server_tags.map(&:name)
   end
+
+  def datacenter
+    case hostname
+      when /-dfw$/ then :dfw
+      when /-phx$/ then :phx
+      else :sl
+    end
+  end
 end
