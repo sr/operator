@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
 	"text/tabwriter"
 
 	"github.com/jmcvetta/randutil"
 	"github.com/sr/operator"
-
 	"golang.org/x/net/context"
-	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/container/v1"
-	"google.golang.org/api/logging/v1beta3"
+	compute "google.golang.org/api/compute/v1"
+	container "google.golang.org/api/container/v1"
+	logging "google.golang.org/api/logging/v1beta3"
 )
 
 const (
@@ -92,6 +92,13 @@ func (s *apiServer) CreateContainerCluster(
 	}, nil
 }
 
+func (s *apiServer) CreateDevInstance(
+	ctx context.Context,
+	request *CreateDevInstanceRequest,
+) (*CreateDevInstanceResponse, error) {
+	return nil, nil
+}
+
 func (s *apiServer) ListInstances(
 	ctx context.Context,
 	request *ListInstancesRequest,
@@ -99,12 +106,10 @@ func (s *apiServer) ListInstances(
 	if request.ProjectId == "" {
 		return nil, operator.NewArgumentRequiredError("ProjectId")
 	}
-
 	response, err := s.computeService.Instances.AggregatedList(request.ProjectId).Do()
 	if err != nil {
 		return nil, err
 	}
-
 	var instances []*Instance
 	for _, item := range response.Items {
 		for _, instance := range item.Instances {
@@ -117,7 +122,6 @@ func (s *apiServer) ListInstances(
 			})
 		}
 	}
-
 	output := bytes.NewBufferString("")
 	w := new(tabwriter.Writer)
 	w.Init(output, 0, 8, 0, '\t', 0)
@@ -132,7 +136,6 @@ func (s *apiServer) ListInstances(
 		)
 	}
 	w.Flush()
-
 	return &ListInstancesResponse{
 		Objects: instances,
 		Output:  &operator.Output{PlainText: output.String()},

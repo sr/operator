@@ -3,6 +3,7 @@
 #
 # Commands:
 #   hubot gcloud create-container-cluster  [project_id=value] [name=value] [node_count=value] [zone=value] - Undocumented.
+#   hubot gcloud create-dev-instance  - Undocumented.
 #   hubot gcloud list-instances  [project_id=value] - Undocumented.
 #
 # Configuration:
@@ -33,6 +34,18 @@ module.exports = (robot) ->
     client.createContainerCluster input, (err, response) ->
       if err
         msg.send("```\nCreateContainerCluster error: #{err.message}\n```")
+      else
+        msg.send("```\n#{response.output.PlainText}\n```")
+
+  robot.respond /gcloud create-dev-instance(.*)/, (msg) ->
+    input = {}
+    for arg in msg.match[1].split(" ")
+      parts = arg.split("=")
+      if parts.length == 2 && parts[0] != "" && parts[1] != ""
+        input[parts[0]] = parts[1]
+    client.createDevInstance input, (err, response) ->
+      if err
+        msg.send("```\nCreateDevInstance error: #{err.message}\n```")
       else
         msg.send("```\n#{response.output.PlainText}\n```")
 

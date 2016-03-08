@@ -127,6 +127,31 @@ var cmd = operator.NewCommand(
 					},
 				},
 				{
+					Name:     "create-dev-instance",
+					Synopsis: `Undocumented.`,
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := dial(ctx.Address)
+						if err != nil {
+							return "", err
+						}
+						defer func() { _ = conn.Close() }()
+						client := gcloud.NewGcloudServiceClient(conn)
+						response, err := client.CreateDevInstance(
+							context.Background(),
+							&gcloud.CreateDevInstanceRequest{
+								Source: ctx.Source,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+				{
 					Name:     "list-instances",
 					Synopsis: `Undocumented.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
