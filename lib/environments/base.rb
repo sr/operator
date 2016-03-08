@@ -118,7 +118,7 @@ module Environments
             method = method(method_name)
             if method.arity == 0
               __send__(method_name)
-            elsif method.arity == 1 || method.arity == -1
+            else
               __send__(method_name, deploy)
             end
           end
@@ -134,10 +134,9 @@ module Environments
 
       tasks.uniq.each do |method_name|
         m = method(method_name)
-        case m.arity.abs
-        when 0
+        if m.arity == 0
           __send__(method_name)
-        when 1
+        else
           __send__(method_name, deploy)
         end
       end
