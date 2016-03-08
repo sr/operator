@@ -58,5 +58,8 @@ describe "deploying a new build" do
 
     expect(canoe_request).to have_been_made
     expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/B$})
+
+    # Should clean up the artifact lest the disk fill up over time
+    expect(Dir[File.join(cli.environment.payload.artifacts_path, File.basename(artifact_url))]).to eq([])
   end
 end

@@ -17,6 +17,10 @@ module Strategies
         raise "Must be defined by sub-classes"
       end
 
+      # Cleans up any temporary files
+      def cleanup(deploy)
+      end
+
       def type
         self.class.to_s.split("::").last.downcase.to_sym
       end

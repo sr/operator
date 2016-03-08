@@ -26,14 +26,19 @@ class Conductor
     environment.execute_pre_fetch_hooks(deploy)
     payload_path = fetch_strategy.fetch(deploy)
     exit_for_invalid_fetch_path if payload_path.empty?
-    environment.execute_post_fetch_hooks(deploy)
 
-    environment.execute_pre_deploy_hooks(deploy)
-    if success = deploy_strategy.deploy(payload_path, deploy)
-      environment.execute_post_deploy_hooks(deploy)
+    begin
+      environment.execute_post_fetch_hooks(deploy)
+
+      environment.execute_pre_deploy_hooks(deploy)
+      if success = deploy_strategy.deploy(payload_path, deploy)
+        environment.execute_post_deploy_hooks(deploy)
+      end
+
+      success
+    ensure
+      fetch_strategy.cleanup(deploy)
     end
-
-    success
   end
 
   def rollback!(deploy, deploy_strategy)

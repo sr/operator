@@ -11,7 +11,7 @@
 ---
 <% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
 
-:canoe_url: "http://localhost:4000"
+:canoe_url: "http://canoe:4000"
 :canoe_target: "dev"
 :canoe_api_token: "canoe123"
 
@@ -29,3 +29,6 @@
     :current_link: <%= destinations_path %>/current-salesedge
   :workflow:
     :repo_path: <%= destinations_path %>/workflow
+  :murdoc:
+    :repo_path: <%= destinations_path %>/murdoc
+    :bypass_version_detection: true

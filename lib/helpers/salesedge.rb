@@ -31,10 +31,14 @@ class SalesEdge
   def restart_service!(service, port)
     Logger.log(:info, "Restarting #{service} (#{port})...")
 
-    restart_cmd = "sudo -H /sbin/stop  pardot-push-#{service}; " + \
-                  "sudo -H /sbin/start pardot-push-#{service}; "
-    output = ShellHelper.execute_shell(restart_cmd)
-    Logger.log(:debug, output)
+    stop_command = ["/sbin/stop", "pardot-push-#{service}"]
+    output = ShellHelper.sudo_execute(stop_command, "root", err: [:child, :out])
+    Logger.log(:debug, "Stopped pardot-push-#{service}: #{output}")
+
+    start_command = ["/sbin/start", "pardot-push-#{service}"]
+    output = ShellHelper.sudo_execute(start_command, "root", err: [:child, :out])
+    Logger.log(:debug, "Started pardot-push-#{service}: #{output}")
+
     pause_and_wait(15)
 
     if port
@@ -51,8 +55,8 @@ class SalesEdge
   end
 
   def service_is_up?(port)
-    curl_cmd = "curl -s http://localhost:#{port}/health"
-    output = ShellHelper.execute_shell(curl_cmd)
+    curl_cmd = ["curl", "-s", "http://localhost:#{port}/health"]
+    output = ShellHelper.execute(curl_cmd)
     # http://rubular.com/r/CqgqqmgAwZ
     output.match(/\"status\":\s*true/)
   end

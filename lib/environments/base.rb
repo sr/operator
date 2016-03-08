@@ -8,6 +8,7 @@ require "strategies"
 require "discovery_client"
 require "core_ext/extract_options"
 require "core_ext/underscore_string"
+require_relative("../helpers/storm")
 
 module Environments
   class Base
@@ -183,8 +184,8 @@ module Environments
     end
 
     def restart_old_style_jobs
-      cmd = "#{payload.current_link}/symfony-#{symfony_env} restart-old-jobs"
-      output = ShellHelper.execute_shell(cmd)
+      cmd = ["#{payload.current_link}/symfony-#{symfony_env}", "restart-old-jobs"]
+      output = ShellHelper.execute(cmd)
       Logger.log(:info, "Restarted old style jobs (#{cmd}): #{output}")
     end
 
@@ -210,22 +211,36 @@ module Environments
       restart_upstart_job("pithumbs")
     end
 
-    def restart_murdoc
-      restart_upstart_job("murdoc")
-    end
-
     def restart_workflowstats_service
       restart_upstart_job("workflowstats")
     end
 
+    def deploy_topology(deploy)
+      if deploy.options['topology'].nil? || payload.current_link.nil?
+        deploy.options['topology'].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+        payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
+      else
+        # this finds a JAR inside of a tarball blown up and linked-to at the base level
+        jarfile = ShellHelper.execute(["find", "#{payload.current_link}/", "-name", "*.jar"]) # trailing slash is necessary
+        if jarfile.nil? || jarfile == ""
+          Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
+        else
+          Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
+          Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
+          Storm.load_topology(deploy.options['topology'], jarfile)
+          Logger.log(:info, "Topology Deployment Complete!")
+        end
+      end
+    end
+
     def restart_upstart_job(job)
-      result = ShellHelper.execute_shell("sudo /sbin/restart #{job} 2>&1")
+      result = ShellHelper.execute(["sudo", "/sbin/restart", job], err: [:child, :out])
       if result.include?("#{job} start/running")
         Logger.log(:info, "Restarted #{job} service")
       elsif result.include?("Unknown instance")
         Logger.log(:info, "#{job} service was not running, attempting start")
 
-        start_result = ShellHelper.execute_shell("sudo /sbin/start #{job} 2>&1")
+        start_result = ShellHelper.execute(["sudo", "/sbin/start", job], err: [:child, :out])
         if start_result.include?("#{job} start/running")
           Logger.log(:info, "Started #{job} service")
         else
@@ -263,10 +278,6 @@ module Environments
 
     def conductor
       @conductor ||= Conductor.new(self)
-    end
-
-    def user
-      ShellHelper.real_user(@user)
     end
 
     def dev?
@@ -337,6 +348,10 @@ module Environments
 
     def canoe_target
       @config.fetch(:canoe_target, "")
+    end
+
+    def bypass_version_detection?
+      payload.bypass_version_detection
     end
 
     private
