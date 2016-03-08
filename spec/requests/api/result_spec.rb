@@ -8,6 +8,7 @@ RSpec.describe "/targets/:target_name/deploys/:deploy_id/results/:server_hostnam
 
   before do
     deploy.results.create!(server: server)
+    deploy.deploy_restart_servers.create!(datacenter: server.datacenter)
   end
 
   describe "PUT #update" do

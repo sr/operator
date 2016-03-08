@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160125221150) do
+ActiveRecord::Schema.define(version: 20160301215553) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -35,6 +35,16 @@ ActiveRecord::Schema.define(version: 20160125221150) do
 
   add_index "deploy_acl_entries", ["deploy_target_id", "repo_id"], name: "index_deploy_acl_entries_on_deploy_target_id_and_repo_id", unique: true, using: :btree
   add_index "deploy_acl_entries", ["repo_id"], name: "index_deploy_acl_entries_on_repo_id", using: :btree
+
+  create_table "deploy_restart_servers", force: :cascade do |t|
+    t.integer  "deploy_id",  limit: 4,   null: false
+    t.integer  "server_id",  limit: 4
+    t.string   "datacenter", limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "deploy_restart_servers", ["deploy_id"], name: "index_deploy_restart_servers_on_deploy_id", using: :btree
 
   create_table "deploy_results", force: :cascade do |t|
     t.integer "server_id", limit: 4,                           null: false
@@ -83,7 +93,6 @@ ActiveRecord::Schema.define(version: 20160125221150) do
     t.integer  "build_number",      limit: 4
     t.string   "artifact_url",      limit: 255
     t.boolean  "passed_ci",                       default: true,  null: false
-    t.integer  "restart_server_id", limit: 4
     t.text     "options_validator", limit: 65535
     t.text     "options",           limit: 65535
   end

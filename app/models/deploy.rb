@@ -6,8 +6,8 @@ class Deploy < ActiveRecord::Base
 
   belongs_to :deploy_target
   belongs_to :auth_user
-  belongs_to :restart_server, class_name: Server
-
+  has_many :restart_servers, class_name: Server, through: :deploy_restart_servers, source: :server
+  has_many :deploy_restart_servers
   has_many :results, class_name: DeployResult
 
   serialize :options, JSON
