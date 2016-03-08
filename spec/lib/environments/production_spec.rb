@@ -39,6 +39,34 @@ describe Environments::Production do
     end
   end
 
+  describe '#restart_autojobs' do
+    it 'restarts autojob masters found via disco client' do
+      env = Environments.build(:production)
+
+      disco = instance_double("DiscoveryClient")
+      allow(disco).to receive(:service)
+        .with("redis-rules-cache-1")
+        .and_return([
+          {
+            "address" => "127.0.0.1",
+            "port" => "6379",
+            "payload" => {
+              "role" => "master"
+            }
+          }
+        ])
+      (2..9).each { |i| allow(disco).to receive(:service).with("redis-rules-cache-#{i}").and_return([]) }
+
+      redis = class_spy("Redis")
+      env.restart_autojobs(nil, disco, redis)
+
+      expect(redis).to have_received(:bounce_workers).with("automationWorkers", ["127.0.0.1:6379"])
+      expect(redis).to have_received(:bounce_workers).with("PerAccountAutomationWorker", ["127.0.0.1:6379"])
+      expect(redis).to have_received(:bounce_workers).with("automationRelatedObjectWorkers", ["127.0.0.1:6379"])
+      expect(redis).to have_received(:bounce_workers).with("previewWorkers", ["127.0.0.1:6379"])
+    end
+  end
+
   # --------------------------------------------------------------------------
   def reset_class_defaults!
     # we need this because we're mucking with class level instance variables

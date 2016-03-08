@@ -166,15 +166,21 @@ module Environments
       Canoe.notify_server(self, deploy)
     end
 
-    def restart_autojobs
+    def restart_autojobs(deploy, disco = DiscoveryClient.new, redis = Redis)
+      Logger.log(:info, "Querying the disco service to find redis rule cache masters")
+
+      autojob_hosts = (1..9).flat_map { |i|
+        disco.service("redis-rules-cache-#{i}").select { |s| s['payload'] && s['payload']['role'] == 'master' }
+      }.map { |s| [s['address'], s['port']].join(':') }
+
       # Restart automation workers
-      Redis.bounce_workers("automationWorkers", autojob_hosts)
+      redis.bounce_workers("automationWorkers", autojob_hosts)
       # Restart per account automation workers
-      Redis.bounce_workers("PerAccountAutomationWorker", autojob_hosts)
+      redis.bounce_workers("PerAccountAutomationWorker", autojob_hosts)
       # Restart related object workers
-      Redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
+      redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
       # Restart automation preview workers
-      Redis.bounce_workers("previewWorkers", autojob_hosts)
+      redis.bounce_workers("previewWorkers", autojob_hosts)
     end
 
     def restart_old_style_jobs
@@ -342,10 +348,6 @@ module Environments
 
     def canoe_target
       @config.fetch(:canoe_target, "")
-    end
-
-    def autojob_hosts
-      @config.fetch(:autojob_hosts, [])
     end
 
     def bypass_version_detection?
