@@ -118,7 +118,7 @@ module Environments
             method = method(method_name)
             if method.arity == 0
               __send__(method_name)
-            elsif method.arity == 1 || method.arity == -1
+            elsif method.arity == 1 || method.arity <= -1
               __send__(method_name, deploy)
             end
           end
