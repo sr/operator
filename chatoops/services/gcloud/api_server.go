@@ -135,7 +135,9 @@ func (s *apiServer) ListInstances(
 			instance.Zone,
 		)
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		return nil, err
+	}
 	return &ListInstancesResponse{
 		Objects: instances,
 		Output:  &operator.Output{PlainText: output.String()},
