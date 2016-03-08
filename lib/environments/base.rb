@@ -118,7 +118,7 @@ module Environments
             method = method(method_name)
             if method.arity == 0
               __send__(method_name)
-            elsif method.arity == 1 || method.arity <= -1
+            else
               __send__(method_name, deploy)
             end
           end
@@ -136,7 +136,7 @@ module Environments
         m = method(method_name)
         if m.arity == 0
           __send__(method_name)
-        elsif m.arity == 1 || m.arity <= -1
+        else
           __send__(method_name, deploy)
         end
       end
