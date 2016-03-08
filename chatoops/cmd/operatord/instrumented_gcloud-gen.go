@@ -36,6 +36,27 @@ func (a *instrumentedgcloudGcloudService) CreateContainerCluster(
 	return a.server.CreateContainerCluster(ctx, request)
 }
 
+// CreateDevInstance instruments the GcloudService.CreateDevInstance method.
+func (a *instrumentedgcloudGcloudService) CreateDevInstance(
+	ctx context.Context,
+	request *servicepkg.CreateDevInstanceRequest,
+) (response *servicepkg.CreateDevInstanceResponse, err error) {
+	defer func(start time.Time) {
+		a.instrumenter.Instrument(
+			operator.NewRequest(
+				request.Source,
+				"gcloud",
+				"CreateDevInstance",
+				"CreateDevInstanceRequest",
+				"CreateDevInstanceResponse",
+				err,
+				start,
+			),
+		)
+	}(time.Now())
+	return a.server.CreateDevInstance(ctx, request)
+}
+
 // ListInstances instruments the GcloudService.ListInstances method.
 func (a *instrumentedgcloudGcloudService) ListInstances(
 	ctx context.Context,
