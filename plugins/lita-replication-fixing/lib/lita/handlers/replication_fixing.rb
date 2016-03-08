@@ -282,7 +282,7 @@ module Lita
           when ::ReplicationFixing::FixingClient::NoErrorDetected
             @throttler.send_message(@status_room, "(successful) Replication is fixed on #{shard}")
           when ::ReplicationFixing::FixingClient::NotFixable
-            @throttler.send_message(@status_room, "@all Replication is broken on #{shard}, but I'm not able to fix it")
+            @throttler.send_message(@status_room, "(failed) Replication is broken on #{shard}, but I'm not able to fix it")
           when ::ReplicationFixing::FixingClient::FixInProgress
             ongoing_minutes = (Time.now - result.started_at) / 60.0
             if ongoing_minutes >= 10.0
