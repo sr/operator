@@ -36,8 +36,6 @@ var cmd = operator.NewCommand(
  all projects.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						slug := ctx.Flags.String("slug", "", "")
-						if ctx.Help == true {
-						}
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
