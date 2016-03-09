@@ -6,11 +6,10 @@ RUN \
     libicu-dev \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache
-ADD /src/hubot /hubot
-ADD /vendor/proto /hubot/proto
-COPY /src/operator/operator.proto /hubot/proto/operator/operator.proto
-ADD /src/services/**/*.proto /hubot/proto/
-ADD /bin/k8s-hubot /hubot/bin/k8s-hubot
+COPY /hubot/package.json /hubot/package.json
 WORKDIR /hubot
 RUN npm install
+COPY /hubot/bin/hubot /hubot/bin/hubot
+COPY /hubot/hubot-scripts.json /hubot/hubot-scripts.json
+COPY /hubot/external-scripts.json /hubot/external-scripts.json
 ENTRYPOINT ["bin/hubot"]
