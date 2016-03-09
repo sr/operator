@@ -1,0 +1,12 @@
+sudo: false
+language: go
+go:
+  - 1.6
+  - tip
+matrix:
+  allow_failures:
+    - go: tip
+script:
+  - make
+notifications:
+  irc: "chat.freenode.net#chatoperator"
