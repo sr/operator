@@ -8,7 +8,7 @@ PACKAGES = $(shell go list ./... | grep -v -E '^vendor' | sort -r)
 all: deps fmt lint vet errcheck deps install
 
 deps:
-	go get -d -v ./...
+	go get -d ./...
 
 install:
 	go install -v $(PACKAGES)
@@ -56,10 +56,10 @@ errcheck: $(ERRCHECK)
 	  test $$fail && exit 1; true
 
 $(ERRCHECK):
-	$(GO) install github.com/kisielk/errcheck
+	$(GO) get github.com/kisielk/errcheck
 
 $(GOLINT):
-	$(GO) install github.com/golang/lint/golint
+	$(GO) get github.com/golang/lint/golint
 
 .PHONY: \
 	all \
