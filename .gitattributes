@@ -1,3 +1,2 @@
-_example/hubot/proto/google/* linguist-vendored
-_example/vendor/src/* linguist-vendored
 vendor/* linguist-vendored
+chatoops/hubot/proto/google linguist-vendored
