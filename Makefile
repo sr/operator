@@ -1,78 +1,70 @@
-export PATH := bin/:$(PATH)
-DOCKER ?= docker
-ERRCHECK = $(GOBIN)/errcheck
 GO ?= go
+GOBIN ?= $(GOPATH)/bin
 GOFMT ?= gofmt
 GOLINT ?= $(GOBIN)/golint
-PACKAGE ?= github.com/sr/operator
-PROTOEASY = $(GOBIN)/protoeasy
-VERSION ?= $(shell git rev-parse --short HEAD)
+ERRCHECK = $(GOBIN)/errcheck
+PACKAGES = $(shell go list ./... | grep -v -E '^vendor' | sort -r)
 
-ci: clean fmt lint vet errcheck install
+all: deps fmt lint vet errcheck deps install
 
-ci-docker: docker-build-grpc docker-build-ci docker-build-operatorc
-	$(DOCKER) run --rm srozet/operator/ci
+deps:
+	go get -d -v ./...
 
-docker-build-grpc:
-	$(DOCKER) build -t srozet/operator/grpc -f etc/docker/Dockerfile.grpc .
-
-docker-build-ci:
-	$(DOCKER) build -t srozet/operator/ci -f etc/docker/Dockerfile.ci .
-
-docker-build-operatorc:
-	$(DOCKER) build -t srozet/operator/operatorc -f etc/docker/Dockerfile.operatorc .
-
-proto: $(PROTOEASY)
-	$< --go --grpc --go-import-path $(PACKAGE) --exclude protoeasy .
+install:
+	go install -v $(PACKAGES)
 
 fmt:
-	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
+	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|\.pb\.go$$'); do \
 			out="$$($(GOFMT) -s -d $$file)"; \
+			if [ $$? -ne 0 ]; then \
+				echo "fmt: $$out"; \
+				exit 1; \
+			fi; \
 			if [ -n "$$out" ]; then \
-				echo "$$out"; \
+				echo "fmt: $$out"; \
 				exit 1; \
 			fi \
 	  done
 
 lint: $(GOLINT)
-	@ for file in $$(find . -name '*.go' | grep -v -E '^\.\/_example|^\.\/vendor|\.pb\.go$$'); do \
+	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|\-gen\.go$$|^./github.com/sr/protolog|\.pb\.go$$'); do \
 			out="$$($< $$file | grep -v 'should have comment')"; \
 			if [ -n "$$out" ]; then \
-				echo "$$out"; \
+				echo "lint: $$out"; \
 				exit 1; \
 			fi \
 	  done
 
 vet:
-	@ for pkg in $$(go list ./... | grep -v $(PACKAGE)/vendor); do \
-			out="$$(go vet $$pkg)"; \
+	@ for pkg in $(PACKAGES); do \
+			out="$$($(GO) vet $$pkg)"; \
+			if [ $$? -ne 0 ]; then \
+				exit 1; \
+			fi; \
 			if [ -n "$$out" ]; then \
-				echo "$$out"; \
 				exit 1; \
 			fi \
 	  done
 
 errcheck: $(ERRCHECK)
-	@ for pkg in $$(go list ./... | grep -v $(PACKAGE)/vendor); do \
+	@ for pkg in $(PACKAGES); do \
 			$< $$pkg; \
-		done
+			if [ $$? -ne 0 ]; then \
+				fail=true; \
+			fi; \
+	  done; \
+	  test $$fail && exit 1; true
 
 $(ERRCHECK):
-	$(GO) get -v github.com/kisielk/errcheck
+	$(GO) install github.com/kisielk/errcheck
 
 $(GOLINT):
-	$(GO) get -v github.com/golang/lint/golint
-
-$(PROTOEASY):
-	$(GO) get -v go.pedge.io/protoeasy/cmd/protoeasy
+	$(GO) install github.com/golang/lint/golint
 
 .PHONY: \
-	ci \
-	ci-docker \
-	docker-build-grpc \
-	docker-build-ci \
-	docker-build-operatorc \
-	proto \
+	all \
+	install \
+	deps \
 	fmt \
 	lint \
 	vet \
