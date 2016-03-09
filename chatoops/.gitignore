@@ -1,5 +1,3 @@
-/bin/
-/pkg/
 /hubot/nodes_modules
-/vendor/pkg
+/hubot/proto/*.proto
 /.hubot_history
