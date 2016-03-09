@@ -8,3 +8,5 @@ matrix:
     - go: tip
 script:
   - make
+notifications:
+  irc: "chat.freenode.net#chatoperator"
