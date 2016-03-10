@@ -9,4 +9,5 @@ matrix:
 script:
   - make
 notifications:
+  email: false
   irc: "chat.freenode.net#chatoperator"
