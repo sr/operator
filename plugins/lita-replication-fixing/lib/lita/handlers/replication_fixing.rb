@@ -287,7 +287,7 @@ module Lita
             ongoing_minutes = (Time.now - result.started_at) / 60.0
             if ongoing_minutes >= 10.0
               @alerting_manager.notify_fixing_a_long_while(shard: shard, started_at: result.started_at)
-              @throttler.send_message(@status_room, "@all I've been trying to fix replication on #{shard} for #{ongoing_minutes.to_i} minutes now")
+              @throttler.send_message(@status_room, "(failed) I've been trying to fix replication on #{shard} for #{ongoing_minutes.to_i} minutes now")
             else
               @throttler.send_message(@status_room, "/me is fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
             end
