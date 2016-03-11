@@ -19,11 +19,31 @@ import (
 )
 
 const (
+	// TODO(sr) Kill container cluster stuff?
 	clusterAdminUsername = "admin"
 	loggingService       = "logging.googleapis.com"
-	machineType          = "n1-standard-1"
-	userAccountScope     = "https://www.googleapis.com/auth/cloud.useraccounts"
-	userInfoEmailScope   = "https://www.googleapis.com/auth/userinfo.email"
+	// TODO(sr) Get service account email via instance metadata API
+	// curl -H "Metadata-Flavor: Google" "http://metadata/computeMetadata/v1/instance/service-accounts
+	serviceAccountEmail = "467917727604-compute@developer.gserviceaccount.com"
+	// TODO(sr) Make this configurable via Config
+	defaultZone = "europe-west1-d"
+	// TODO(sr) Make this configurable via Config. Rename to defaultProjectId
+	projectId = "babelstoemp"
+	// TODO(sr) Make this configurable via Config + request param
+	// TODO(sr) provide map with small = g1-small medium = n1-standard-1 large = n1-standard-2
+	defaultMachineType = "g1-small"
+	// TODO(sr) Make this automatic (Name + timestamp or something)
+	defaultInstanceName = "dev2"
+	// TODO(sr) Make this configurable via Config + request param
+	// TODO(sr) Allow getting a list of custom images
+	defaultImageName   = "dev-1457636147"
+	defaultNetworkName = "default"
+	// Gives instance full access to all Google Cloud services
+	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
+	startupScriptKey   = "startup-script"
+
+	userAccountScope   = "https://www.googleapis.com/auth/cloud.useraccounts"
+	userInfoEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 )
 
 var oauthScopes = []string{
@@ -34,6 +54,7 @@ var oauthScopes = []string{
 	userAccountScope,
 	userInfoEmailScope,
 }
+var startupScriptValue = "#!bin/sh\necho boom"
 
 type apiServer struct {
 	client           *http.Client
@@ -78,7 +99,7 @@ func (s *apiServer) CreateContainerCluster(
 					Password: password,
 				},
 				NodeConfig: &container.NodeConfig{
-					MachineType: machineType,
+					MachineType: defaultMachineType,
 					OauthScopes: oauthScopes,
 				},
 			},
@@ -96,7 +117,71 @@ func (s *apiServer) CreateDevInstance(
 	ctx context.Context,
 	request *CreateDevInstanceRequest,
 ) (*CreateDevInstanceResponse, error) {
-	return nil, nil
+	zone, err := s.computeService.Zones.Get(projectId, defaultZone).Do()
+	if err != nil {
+		return nil, err
+	}
+	image, err := s.computeService.Images.Get(projectId, defaultImageName).Do()
+	if err != nil {
+		return nil, err
+	}
+	machineType, err := s.computeService.MachineTypes.Get(projectId, zone.Name, defaultMachineType).Do()
+	if err != nil {
+		return nil, err
+	}
+	network, err := s.computeService.Networks.Get(projectId, defaultNetworkName).Do()
+	if err != nil {
+		return nil, err
+	}
+	op, err := s.computeService.Instances.Insert(projectId, defaultZone,
+		&compute.Instance{
+			Name:        defaultInstanceName,
+			MachineType: machineType.SelfLink,
+			Metadata: &compute.Metadata{
+				Items: []*compute.MetadataItems{
+					{
+						Key:   startupScriptKey,
+						Value: &startupScriptValue,
+					},
+				},
+			},
+			Disks: []*compute.AttachedDisk{
+				{
+					Type:       "PERSISTENT",
+					Mode:       "READ_WRITE",
+					Kind:       "compute#attachedDisk",
+					Boot:       true,
+					AutoDelete: true,
+					InitializeParams: &compute.AttachedDiskInitializeParams{
+						SourceImage: image.SelfLink,
+						DiskSizeGb:  image.DiskSizeGb,
+						DiskType:    fmt.Sprintf("zones/%s/diskTypes/%s", zone.Name, "pd-standard"),
+					},
+				},
+			},
+			NetworkInterfaces: []*compute.NetworkInterface{
+				{
+					Network: network.SelfLink,
+					AccessConfigs: []*compute.AccessConfig{
+						{
+							Type: "ONE_TO_ONE_NAT",
+						},
+					},
+				},
+			},
+			ServiceAccounts: []*compute.ServiceAccount{
+				{
+					Email:  serviceAccountEmail,
+					Scopes: []string{cloudPlatformScope},
+				},
+			},
+		}).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+	return &CreateDevInstanceResponse{
+		Output: &operator.Output{PlainText: op.SelfLink},
+	}, nil
 }
 
 func (s *apiServer) ListInstances(
