@@ -20,6 +20,7 @@
 #   brianhays
 
 memeGenerator = require "hubot-meme/src/lib/memecaptain.coffee"
+ermahgerd = require "node-ermahgerd"
 
 module.exports = (robot) ->
   robot.respond /YOU GET (.*)/i, id: 'meme.oprah-you-get', (msg) ->
@@ -68,3 +69,9 @@ module.exports = (robot) ->
 
   robot.respond /DUMPSTER FIRE (.*)/i, id: 'meme.dumpster-fire', (msg) ->
     memeGenerator msg, 'hEeVrg', '', msg.match[1]
+
+  robot.respond /OMG (.*)/i, id: 'meme.omg', (msg) ->
+
+    translation = ermahgerd.translate(msg.match[1])
+
+    memeGenerator msg, 'ZGzUaw', 'ERMAHGERD', translation
