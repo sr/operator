@@ -176,6 +176,8 @@ module Environments
       redis.bounce_workers("automationWorkers", autojob_hosts)
       # Restart per account automation workers
       redis.bounce_workers("PerAccountAutomationWorker", autojob_hosts)
+      # Restart timed automation workers
+      redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_hosts)
       # Restart related object workers
       redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
       # Restart automation preview workers
