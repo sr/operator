@@ -2706,6 +2706,11 @@
         }
       }
     },
+    "node-ermahgerd": {
+      "version": "0.0.1",
+      "from": "node-ermahgerd@0.0.1",
+      "resolved": "https://registry.npmjs.org/node-ermahgerd/-/node-ermahgerd-0.0.1.tgz"
+    },
     "node-schedule": {
       "version": "1.0.0",
       "from": "node-schedule@>=1.0.0 <1.1.0",
