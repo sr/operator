@@ -8,6 +8,7 @@
 #   None
 #
 # Commands:
+#   hubot aggablagblag - agga blag blag
 #   hubot casey - Get casey
 #   hubot toiletnuggets - Get rid of some nuggets
 #   hubot reversenuggets - Get nuggets
@@ -176,6 +177,14 @@ module.exports = (robot) ->
       'http://i.imgur.com/T8uvhOu.png'
     ]
     msg.send msg.random nippon
+
+  robot.respond /aggablagblag$/i, (msg) ->
+    schwifty = [
+      'https://i.imgur.com/1eFO5v6.png',
+      'https://www.youtube.com/watch?v=VlAMsYMNd7g',
+      'https://www.youtube.com/watch?v=hup9eowiZHQ'
+    ]
+    msg.send msg.random schwifty
 
   robot.respond /tomcat(\s)?waits$/i, (msg) ->
     tomcatwaits = [
