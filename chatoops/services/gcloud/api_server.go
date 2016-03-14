@@ -22,22 +22,13 @@ const (
 	// TODO(sr) Kill container cluster stuff?
 	clusterAdminUsername = "admin"
 	loggingService       = "logging.googleapis.com"
-	// TODO(sr) Get service account email via instance metadata API
-	// curl -H "Metadata-Flavor: Google" "http://metadata/computeMetadata/v1/instance/service-accounts
-	serviceAccountEmail = "467917727604-compute@developer.gserviceaccount.com"
-	// TODO(sr) Make this configurable via Config
-	defaultZone = "europe-west1-d"
-	// TODO(sr) Make this configurable via Config. Rename to defaultProjectId
-	projectId = "babelstoemp"
-	// TODO(sr) Make this configurable via Config + request param
-	// TODO(sr) provide map with small = g1-small medium = n1-standard-1 large = n1-standard-2
-	defaultMachineType = "g1-small"
-	// TODO(sr) Make this automatic (Name + timestamp or something)
+
+	// TODO(sr) Make this automatic (Namespace + timestamp or something)
 	defaultInstanceName = "dev2"
-	// TODO(sr) Make this configurable via Config + request param
-	// TODO(sr) Allow getting a list of custom images
-	defaultImageName   = "dev-1457636147"
-	defaultNetworkName = "default"
+	// TODO(sr) Allow listing all available custom images
+	// TODO(sr) Use the most recent image by default
+	defaultImageName = "dev-1457636147"
+
 	// Gives instance full access to all Google Cloud services
 	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	startupScriptKey   = "startup-script"
@@ -57,17 +48,20 @@ var oauthScopes = []string{
 var startupScriptValue = "#!bin/sh\necho boom"
 
 type apiServer struct {
+	config           *Env
 	client           *http.Client
 	computeService   *compute.Service
 	containerService *container.Service
 }
 
 func newAPIServer(
+	config *Env,
 	client *http.Client,
 	computeService *compute.Service,
 	containerService *container.Service,
 ) *apiServer {
 	return &apiServer{
+		config,
 		client,
 		computeService,
 		containerService,
@@ -99,7 +93,7 @@ func (s *apiServer) CreateContainerCluster(
 					Password: password,
 				},
 				NodeConfig: &container.NodeConfig{
-					MachineType: defaultMachineType,
+					MachineType: s.config.DefaultMachineType,
 					OauthScopes: oauthScopes,
 				},
 			},
@@ -117,23 +111,23 @@ func (s *apiServer) CreateDevInstance(
 	ctx context.Context,
 	request *CreateDevInstanceRequest,
 ) (*CreateDevInstanceResponse, error) {
-	zone, err := s.computeService.Zones.Get(projectId, defaultZone).Do()
+	zone, err := s.computeService.Zones.Get(s.config.ProjectID, s.config.DefaultZone).Do()
 	if err != nil {
 		return nil, err
 	}
-	image, err := s.computeService.Images.Get(projectId, defaultImageName).Do()
+	image, err := s.computeService.Images.Get(s.config.ProjectID, defaultImageName).Do()
 	if err != nil {
 		return nil, err
 	}
-	machineType, err := s.computeService.MachineTypes.Get(projectId, zone.Name, defaultMachineType).Do()
+	machineType, err := s.computeService.MachineTypes.Get(s.config.ProjectID, zone.Name, s.config.DefaultMachineType).Do()
 	if err != nil {
 		return nil, err
 	}
-	network, err := s.computeService.Networks.Get(projectId, defaultNetworkName).Do()
+	network, err := s.computeService.Networks.Get(s.config.ProjectID, s.config.DefaultNetwork).Do()
 	if err != nil {
 		return nil, err
 	}
-	op, err := s.computeService.Instances.Insert(projectId, defaultZone,
+	op, err := s.computeService.Instances.Insert(s.config.ProjectID, s.config.DefaultZone,
 		&compute.Instance{
 			Name:        defaultInstanceName,
 			MachineType: machineType.SelfLink,
@@ -171,7 +165,7 @@ func (s *apiServer) CreateDevInstance(
 			},
 			ServiceAccounts: []*compute.ServiceAccount{
 				{
-					Email:  serviceAccountEmail,
+					Email:  s.config.ServiceAccountEmail,
 					Scopes: []string{cloudPlatformScope},
 				},
 			},
