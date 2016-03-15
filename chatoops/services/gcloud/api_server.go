@@ -2,27 +2,18 @@ package gcloud
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"text/tabwriter"
 
-	"github.com/jmcvetta/randutil"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	compute "google.golang.org/api/compute/v1"
-	container "google.golang.org/api/container/v1"
-	logging "google.golang.org/api/logging/v1beta3"
 )
 
 const (
-	// TODO(sr) Kill container cluster stuff?
-	clusterAdminUsername = "admin"
-	loggingService       = "logging.googleapis.com"
-
 	// TODO(sr) Make this automatic (Namespace + timestamp or something)
 	defaultInstanceName = "dev2"
 	// TODO(sr) Allow listing all available custom images
@@ -37,74 +28,24 @@ const (
 	userInfoEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 )
 
-var oauthScopes = []string{
-	compute.CloudPlatformScope,
-	compute.ComputeScope,
-	compute.DevstorageReadWriteScope,
-	logging.LoggingAdminScope,
-	userAccountScope,
-	userInfoEmailScope,
-}
 var startupScriptValue = "#!bin/sh\necho boom"
 
 type apiServer struct {
-	config           *Env
-	client           *http.Client
-	computeService   *compute.Service
-	containerService *container.Service
+	config         *Env
+	client         *http.Client
+	computeService *compute.Service
 }
 
 func newAPIServer(
 	config *Env,
 	client *http.Client,
 	computeService *compute.Service,
-	containerService *container.Service,
 ) *apiServer {
 	return &apiServer{
 		config,
 		client,
 		computeService,
-		containerService,
 	}
-}
-
-func (s *apiServer) CreateContainerCluster(
-	ctx context.Context,
-	request *CreateContainerClusterRequest,
-) (*CreateContainerClusterResponse, error) {
-	nodeCount, err := strconv.ParseInt(request.NodeCount, 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid node count value: %v", request.NodeCount)
-	}
-	password, err := randutil.String(10, randutil.Alphanumeric)
-	if err != nil {
-		return nil, errors.New("failed to generated password")
-	}
-	operation, err := s.containerService.Projects.Zones.Clusters.Create(
-		request.ProjectId,
-		request.Zone,
-		&container.CreateClusterRequest{
-			Cluster: &container.Cluster{
-				Name:             request.Name,
-				InitialNodeCount: nodeCount,
-				LoggingService:   loggingService,
-				MasterAuth: &container.MasterAuth{
-					Username: clusterAdminUsername,
-					Password: password,
-				},
-				NodeConfig: &container.NodeConfig{
-					MachineType: s.config.DefaultMachineType,
-					OauthScopes: oauthScopes,
-				},
-			},
-		},
-	).Do()
-	if err != nil {
-		return nil, err
-	}
-	return &CreateContainerClusterResponse{
-		Output: &operator.Output{PlainText: operation.SelfLink},
-	}, nil
 }
 
 func (s *apiServer) CreateDevInstance(

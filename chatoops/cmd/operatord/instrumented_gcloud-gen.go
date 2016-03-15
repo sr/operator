@@ -15,27 +15,6 @@ type instrumentedgcloudGcloudService struct {
 	server       servicepkg.GcloudServiceServer
 }
 
-// CreateContainerCluster instruments the GcloudService.CreateContainerCluster method.
-func (a *instrumentedgcloudGcloudService) CreateContainerCluster(
-	ctx context.Context,
-	request *servicepkg.CreateContainerClusterRequest,
-) (response *servicepkg.CreateContainerClusterResponse, err error) {
-	defer func(start time.Time) {
-		a.instrumenter.Instrument(
-			operator.NewRequest(
-				request.Source,
-				"gcloud",
-				"CreateContainerCluster",
-				"CreateContainerClusterRequest",
-				"CreateContainerClusterResponse",
-				err,
-				start,
-			),
-		)
-	}(time.Now())
-	return a.server.CreateContainerCluster(ctx, request)
-}
-
 // CreateDevInstance instruments the GcloudService.CreateDevInstance method.
 func (a *instrumentedgcloudGcloudService) CreateDevInstance(
 	ctx context.Context,
