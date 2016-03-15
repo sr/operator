@@ -94,39 +94,6 @@ var cmd = operator.NewCommand(
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "create-container-cluster",
-					Synopsis: `Undocumented.`,
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						project_id := ctx.Flags.String("project-id", "", "")
-						name := ctx.Flags.String("name", "", "")
-						node_count := ctx.Flags.String("node-count", "", "")
-						zone := ctx.Flags.String("zone", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := dial(ctx.Address)
-						if err != nil {
-							return "", err
-						}
-						defer func() { _ = conn.Close() }()
-						client := gcloud.NewGcloudServiceClient(conn)
-						response, err := client.CreateContainerCluster(
-							context.Background(),
-							&gcloud.CreateContainerClusterRequest{
-								Source:    ctx.Source,
-								ProjectId: *project_id,
-								Name:      *name,
-								NodeCount: *node_count,
-								Zone:      *zone,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-				{
 					Name:     "create-dev-instance",
 					Synopsis: `Undocumented.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {

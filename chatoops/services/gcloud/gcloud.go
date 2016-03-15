@@ -4,7 +4,6 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	compute "google.golang.org/api/compute/v1"
-	container "google.golang.org/api/container/v1"
 )
 
 type Env struct {
@@ -26,9 +25,5 @@ func NewAPIServer(env *Env) (GcloudServiceServer, error) {
 	if err != nil {
 		return nil, nil
 	}
-	containerService, err := container.New(client)
-	if err != nil {
-		return nil, nil
-	}
-	return newAPIServer(env, client, computeService, containerService), nil
+	return newAPIServer(env, client, computeService), nil
 }

@@ -6,21 +6,8 @@ package gcloud;
 
 service GcloudService {
 	option (operator.name) = "gcloud";
-	rpc CreateContainerCluster(CreateContainerClusterRequest) returns (CreateContainerClusterResponse);
 	rpc CreateDevInstance(CreateDevInstanceRequest) returns (CreateDevInstanceResponse);
 	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
-}
-
-message CreateContainerClusterRequest {
-  operator.Source source = 1;
-  string project_id = 2;
-  string name = 3;
-  string node_count = 4;
-  string zone = 5;
-}
-
-message CreateContainerClusterResponse {
-  operator.Output output = 1;
 }
 
 message CreateDevInstanceRequest {
