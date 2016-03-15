@@ -52,23 +52,29 @@ func (s *apiServer) CreateDevInstance(
 	ctx context.Context,
 	request *CreateDevInstanceRequest,
 ) (*CreateDevInstanceResponse, error) {
-	zone, err := s.computeService.Zones.Get(s.config.ProjectID, s.config.DefaultZone).Do()
+	zone, err := s.computeService.Zones.Get(s.config.ProjectID,
+		s.config.DefaultZone).Do()
 	if err != nil {
 		return nil, err
 	}
-	image, err := s.computeService.Images.Get(s.config.ProjectID, defaultImageName).Do()
+	image, err := s.computeService.Images.Get(s.config.ProjectID,
+		defaultImageName).Do()
 	if err != nil {
 		return nil, err
 	}
-	machineType, err := s.computeService.MachineTypes.Get(s.config.ProjectID, zone.Name, s.config.DefaultMachineType).Do()
+	machineType, err := s.computeService.MachineTypes.Get(s.config.ProjectID,
+		zone.Name, s.config.DefaultMachineType).Do()
 	if err != nil {
 		return nil, err
 	}
-	network, err := s.computeService.Networks.Get(s.config.ProjectID, s.config.DefaultNetwork).Do()
+	network, err := s.computeService.Networks.Get(s.config.ProjectID,
+		s.config.DefaultNetwork).Do()
 	if err != nil {
 		return nil, err
 	}
-	op, err := s.computeService.Instances.Insert(s.config.ProjectID, s.config.DefaultZone,
+	operation, err := s.computeService.Instances.Insert(
+		s.config.ProjectID,
+		s.config.DefaultZone,
 		&compute.Instance{
 			Name:        defaultInstanceName,
 			MachineType: machineType.SelfLink,
@@ -115,7 +121,7 @@ func (s *apiServer) CreateDevInstance(
 		return nil, err
 	}
 	return &CreateDevInstanceResponse{
-		Output: &operator.Output{PlainText: op.SelfLink},
+		Output: &operator.Output{PlainText: operation.SelfLink},
 	}, nil
 }
 
