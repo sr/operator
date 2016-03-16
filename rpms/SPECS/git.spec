@@ -1,5 +1,5 @@
 Name: git
-Version: 2.7.2
+Version: 2.7.3
 Release: 1%{?dist}
 Summary: Fast Version Control System
 License: GPLv2
