@@ -179,6 +179,7 @@ module Lita
         prefix = response.match_data["prefix"] || "db"
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
 
+        @ignore_client.reset_ignore(shard)
         result = @fixing_client.fix(shard: shard)
 
         case result
