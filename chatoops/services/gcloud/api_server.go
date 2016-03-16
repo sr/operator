@@ -15,10 +15,10 @@ import (
 
 const (
 	// TODO(sr) Make this automatic (Namespace + timestamp or something)
-	defaultInstanceName = "dev2"
+	defaultInstanceName = "dev1"
 	// TODO(sr) Allow listing all available custom images
 	// TODO(sr) Use the most recent image by default
-	defaultImageName = "dev-1457636147"
+	defaultImageName = "dev-1458162790"
 
 	// Gives instance full access to all Google Cloud services
 	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
