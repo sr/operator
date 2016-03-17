@@ -15,10 +15,6 @@ import (
 )
 
 const (
-	// TODO(sr) Allow listing all available custom images
-	// TODO(sr) Use the most recent image by default
-	defaultImageName = "dev-1458162790"
-
 	// Gives instance full access to all Google Cloud services
 	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	startupScriptKey   = "startup-script"
@@ -57,7 +53,7 @@ func (s *apiServer) CreateDevInstance(
 		return nil, err
 	}
 	image, err := s.computeService.Images.Get(s.config.ProjectID,
-		defaultImageName).Do()
+		s.config.DefaultImage).Do()
 	if err != nil {
 		return nil, err
 	}
