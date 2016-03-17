@@ -81,7 +81,7 @@ func (c Command) Run(args []string) (int, string) {
 		Address: addr,
 		Source:  getSource(),
 		Flags:   flag.CommandLine,
-		Args:    args[1:],
+		Args:    args[3:],
 	})
 	if err != nil {
 		return 1, err.Error()
