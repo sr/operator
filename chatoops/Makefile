@@ -50,7 +50,7 @@ $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/...
 
 $(PROTOC_GEN_GO):
-	$(GO) get install -v github.com/golang/protobuf/protoc-gen-go
+	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
 
 .PHONY: \
 	build \
