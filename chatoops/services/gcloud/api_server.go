@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"text/tabwriter"
 
@@ -14,8 +15,6 @@ import (
 )
 
 const (
-	// TODO(sr) Make this automatic (Namespace + timestamp or something)
-	defaultInstanceName = "dev1"
 	// TODO(sr) Allow listing all available custom images
 	// TODO(sr) Use the most recent image by default
 	defaultImageName = "dev-1458162790"
@@ -76,7 +75,7 @@ func (s *apiServer) CreateDevInstance(
 		s.config.ProjectID,
 		s.config.DefaultZone,
 		&compute.Instance{
-			Name:        defaultInstanceName,
+			Name:        fmt.Sprintf("dev-%s", time.Now().Format(time.RFC3339)),
 			MachineType: machineType.SelfLink,
 			Metadata: &compute.Metadata{
 				Items: []*compute.MetadataItems{
