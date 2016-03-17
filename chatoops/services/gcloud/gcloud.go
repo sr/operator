@@ -10,6 +10,10 @@ type Env struct {
 	ProjectID      string `env:"GCLOUD_PROJECT_ID,required"`
 	DefaultZone    string `env:"GCLOUD_DEFAULT_ZONE,required"`
 	DefaultNetwork string `env:"GCLOUD_DEFAULT_NETWORK,default=default"`
+	// TODO(sr) Allow listing all available custom images
+	// TODO(sr) Use the most recent image by default
+	// TODO(sr) Allow to override this per request
+	DefaultImage string `env:"GCLOUD_DEFAULT_IMAGE,required"`
 	// TODO(sr) Allow overriding this via request parameter
 	// TODO(sr) Provider map (e.g. small = n1-standard, large = n2-standard, ...)
 	DefaultMachineType  string `env:"GCLOUD_DEFAULT_MACHINE_TYPE,required"`
