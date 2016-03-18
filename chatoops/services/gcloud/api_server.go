@@ -71,7 +71,7 @@ func (s *apiServer) CreateDevInstance(
 		s.config.ProjectID,
 		s.config.DefaultZone,
 		&compute.Instance{
-			Name:        fmt.Sprintf("dev-%s", time.Now().Format(time.RFC3339)),
+			Name:        fmt.Sprintf("dev-%v", time.Now().Unix()),
 			MachineType: machineType.SelfLink,
 			Metadata: &compute.Metadata{
 				Items: []*compute.MetadataItems{
