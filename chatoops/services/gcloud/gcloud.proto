@@ -26,12 +26,12 @@ message Instance {
 }
 
 message ListInstancesRequest {
-  operator.Source source = 1;
+	operator.Source source = 1;
 	string project_id = 2;
 }
 
 message ListInstancesResponse {
-  operator.Output output = 1;
-  operator.Source source = 2;
-  repeated Instance objects = 3;
+	operator.Output output = 1;
+	operator.Source source = 2;
+	repeated Instance objects = 3;
 }
