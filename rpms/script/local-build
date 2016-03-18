@@ -10,7 +10,7 @@ fi
 
 SPECOPTS=""
 NOSPECTOOL=0
-while getopts n opt; do
+while getopts nf opt; do
   case "$opt" in
     n)
       NOSPECTOOL=1
