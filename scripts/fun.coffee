@@ -305,7 +305,8 @@ module.exports = (robot) ->
 
   robot.respond /casey$/i, (msg) ->
     tehcehseh = [
-      'http://i.imgur.com/cuxU9VC.gif'
+      'http://i.imgur.com/cuxU9VC.gif',
+      'http://i.imgur.com/kfyhTcm.gif'
     ]
     msg.send msg.random tehcehseh
 
