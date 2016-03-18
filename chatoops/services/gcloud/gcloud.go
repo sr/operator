@@ -23,11 +23,11 @@ type Env struct {
 func NewAPIServer(env *Env) (GcloudServiceServer, error) {
 	client, err := google.DefaultClient(context.Background())
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	computeService, err := compute.New(client)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return newAPIServer(env, client, computeService), nil
 }
