@@ -10,7 +10,7 @@ import (
 
 const (
 	executable = "protoc-gen-operatorhubot"
-	fileExt    = "coffee"
+	fileExt    = "js"
 )
 
 type serviceDescriptor struct {
