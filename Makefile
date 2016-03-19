@@ -2,7 +2,7 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 GOFMT ?= gofmt
 GOLINT ?= $(GOBIN)/golint
-ERRCHECK = $(GOBIN)/errcheck
+ERRCHECK ?= $(GOBIN)/errcheck
 PACKAGES = $(shell go list ./... | grep -v -E '^vendor' | sort -r)
 
 all: deps fmt lint vet errcheck deps install
