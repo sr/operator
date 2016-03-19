@@ -31,6 +31,14 @@ module.exports = function(robot) {
 	robot.respond(/{{$service}} {{dasherize .Name}}(.*)/, function(msg) {
 		var input = {},
 			ref = msg.match[1].split(" ");
+		input.source = {
+			type: operator.SourceType.HUBOT,
+			room: {name: msg.message.room},
+			user: {
+				id: msg.message.user.id,
+				login: msg.message.user.name,
+			}
+		}
 		for (i = 0, len = ref.length; i < len; i++) {
 			var arg = ref[i],
 				parts = arg.split("=");
