@@ -23,23 +23,24 @@ const (
 	userInfoEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 )
 
-var startupScriptValue = "#!bin/sh\necho boom"
-
 type apiServer struct {
 	config         *Env
 	client         *http.Client
 	computeService *compute.Service
+	startupScript  string
 }
 
 func newAPIServer(
 	config *Env,
 	client *http.Client,
 	computeService *compute.Service,
+	startupScript string,
 ) *apiServer {
 	return &apiServer{
 		config,
 		client,
 		computeService,
+		startupScript,
 	}
 }
 
@@ -77,7 +78,7 @@ func (s *apiServer) CreateDevInstance(
 				Items: []*compute.MetadataItems{
 					{
 						Key:   startupScriptKey,
-						Value: &startupScriptValue,
+						Value: &s.startupScript,
 					},
 				},
 			},
