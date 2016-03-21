@@ -56,3 +56,24 @@ func (a *instrumentedgcloudGcloudService) ListInstances(
 	}(time.Now())
 	return a.server.ListInstances(ctx, request)
 }
+
+// Stop instruments the GcloudService.Stop method.
+func (a *instrumentedgcloudGcloudService) Stop(
+	ctx context.Context,
+	request *servicepkg.StopRequest,
+) (response *servicepkg.StopResponse, err error) {
+	defer func(start time.Time) {
+		a.instrumenter.Instrument(
+			operator.NewRequest(
+				request.Source,
+				"gcloud",
+				"Stop",
+				"StopRequest",
+				"StopResponse",
+				err,
+				start,
+			),
+		)
+	}(time.Now())
+	return a.server.Stop(ctx, request)
+}

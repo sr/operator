@@ -145,6 +145,35 @@ var cmd = operator.NewCommand(
 						return response.Output.PlainText, nil
 					},
 				},
+				{
+					Name:     "stop",
+					Synopsis: `Undocumented.`,
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						instance := ctx.Flags.String("instance", "", "")
+						zone := ctx.Flags.String("zone", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := dial(ctx.Address)
+						if err != nil {
+							return "", err
+						}
+						defer func() { _ = conn.Close() }()
+						client := gcloud.NewGcloudServiceClient(conn)
+						response, err := client.Stop(
+							context.Background(),
+							&gcloud.StopRequest{
+								Source:   ctx.Source,
+								Instance: *instance,
+								Zone:     *zone,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
 			},
 		},
 

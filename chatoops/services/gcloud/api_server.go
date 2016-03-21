@@ -165,3 +165,28 @@ func (s *apiServer) ListInstances(
 		Output:  &operator.Output{PlainText: output.String()},
 	}, nil
 }
+
+func (s *apiServer) Stop(
+	ctx context.Context,
+	request *StopRequest,
+) (*StopResponse, error) {
+	if request.Zone == "" {
+		return nil, operator.NewArgumentRequiredError("Zone")
+	}
+	if request.Instance == "" {
+		return nil, operator.NewArgumentRequiredError("Instance")
+	}
+	_, err := s.computeService.Instances.Stop(
+		s.config.ProjectID,
+		request.Zone,
+		request.Instance,
+	).Do()
+	if err != nil {
+		return nil, err
+	}
+	return &StopResponse{
+		Output: &operator.Output{
+			PlainText: "OK",
+		},
+	}, nil
+}

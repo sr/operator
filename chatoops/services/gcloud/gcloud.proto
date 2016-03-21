@@ -6,8 +6,13 @@ package gcloud;
 
 service GcloudService {
 	option (operator.name) = "gcloud";
+
+	// Provision a development instance using the configured image.
 	rpc CreateDevInstance(CreateDevInstanceRequest) returns (CreateDevInstanceResponse);
+	// List all instances under the configured project.
 	rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse);
+	// Stop a running instance.
+	rpc Stop(StopRequest) returns (StopResponse);
 }
 
 message CreateDevInstanceRequest {
@@ -15,6 +20,16 @@ message CreateDevInstanceRequest {
 }
 
 message CreateDevInstanceResponse {
+	operator.Output output = 1;
+}
+
+message StopRequest {
+	operator.Source source = 1;
+	string instance = 2;
+	string zone = 3;
+}
+
+message StopResponse {
 	operator.Output output = 1;
 }
 
