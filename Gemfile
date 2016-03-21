@@ -7,7 +7,6 @@ gem 'jquery-rails'
 gem 'mysql2'
 gem 'rails', '4.2.6'
 gem 'sass-rails', '~> 4.0.3'
-gem 'spring', group: :development
 gem 'sql-parser', github: "janSF/sql-parser"
 gem 'turbolinks'
 gem 'uglifier', '>= 1.3.0'
