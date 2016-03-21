@@ -100,7 +100,7 @@ namespace :canoe do
     when 'production'
       # Until we coordinate with the Security team to make more granular groups,
       # require 'releasebox' for all production deployments in all repos
-      production_targets = DeployTarget.where(name: ["production", "production_phx"])
+      production_targets = DeployTarget.where(name: ["production", "production_dfw", "production_phx"])
       Repo.find_each do |repo|
         production_targets.each do |target|
           DeployACLEntry.find_or_initialize_by(repo_id: repo.id, deploy_target_id: target.id).tap { |entry|
