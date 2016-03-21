@@ -35,8 +35,8 @@ message Source {
 }
 
 enum SourceType {
-	HUBOT = 1;
-	COMMAND = 2;
+	HUBOT = 0;
+	COMMAND = 1;
 }
 
 message Room {
