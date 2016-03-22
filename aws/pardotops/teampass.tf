@@ -1,5 +1,5 @@
-resource "aws_elb" "teampass_production" {
-  name = "teampass-production"
+resource "aws_elb" "teampass" {
+  name = "teampass"
   security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
@@ -28,16 +28,16 @@ resource "aws_elb" "teampass_production" {
   }
 
   tags {
-    Name = "teampass_production"
+    Name = "teampass"
   }
 }
 
-resource "aws_ecs_cluster" "teampass_production" {
-  name = "teampass_production"
+resource "aws_ecs_cluster" "teampass" {
+  name = "teampass"
 }
 
-resource "aws_launch_configuration" "teampass_production" {
-  name_prefix = "teampass_production"
+resource "aws_launch_configuration" "teampass" {
+  name_prefix = "teampass"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
@@ -46,7 +46,7 @@ resource "aws_launch_configuration" "teampass_production" {
 
   user_data = <<EOF
 #!/bin/bash
-echo ECS_CLUSTER=teampass_production >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=teampass >> /etc/ecs/ecs.config
 EOF
 
   root_block_device {
@@ -60,10 +60,10 @@ EOF
   }
 }
 
-resource "aws_autoscaling_group" "teampass_production" {
+resource "aws_autoscaling_group" "teampass" {
   max_size = 1
   min_size = 1
-  launch_configuration = "${aws_launch_configuration.teampass_production.id}"
+  launch_configuration = "${aws_launch_configuration.teampass.id}"
   vpc_zone_identifier = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
     "${aws_subnet.internal_apps_us_east_1c.id}",
@@ -76,8 +76,8 @@ resource "aws_autoscaling_group" "teampass_production" {
   }
 }
 
-resource "aws_db_instance" "teampass_production" {
-  identifier = "teampass-production"
+resource "aws_db_instance" "teampass" {
+  identifier = "teampass"
   allocated_storage = 10
   engine = "mysql"
   engine_version = "5.5.48"
@@ -93,4 +93,21 @@ resource "aws_db_instance" "teampass_production" {
   storage_encrypted = true
   backup_retention_period = 5
   apply_immediately = true
+}
+
+resource "aws_ecs_task_definition" "teampass" {
+  family = "teampass"
+  container_definitions {
+    "name": "teampass",
+    "image": "teampass/teampass",
+    "cpu": 1,
+    "memory": 1000,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 80
+      }
+    ]
+  }
 }
