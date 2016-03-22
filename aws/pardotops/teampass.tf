@@ -91,15 +91,15 @@ resource "aws_autoscaling_group" "teampass_production" {
   }
 }
 
-resource "aws_db_instance" "wps_production" {
-  identifier = "wps_production-rds"
+resource "aws_db_instance" "teampass_production" {
+  identifier = "teampass_production-rds"
   allocated_storage = 10
   engine = "mysql"
   engine_version = "5.5.48"
   instance_class = "db.t1.micro"
-  name = "${var.mysql_database}"
-  username = "${var.mysql_username}"
-  password = "${var.mysql_password}"
+  name = "teampass"
+  username = "teampass"
+  password = "teampass"
   storage_encrypted = true
   vpc_security_group_ids = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
