@@ -81,7 +81,7 @@ resource "aws_db_instance" "teampass_production" {
   allocated_storage = 10
   engine = "mysql"
   engine_version = "5.5.48"
-  instance_class = "db.t1.micro"
+  instance_class = "db.t2.large"
   name = "teampass"
   username = "teampass"
   password = "NLz2#zT&XfStJv6"
