@@ -1,18 +1,3 @@
-resource "aws_ecr_repository" "teampass" {
-  name = "teampass"
-}
-
-resource "aws_elasticache_subnet_group" "teampass_production" {
-  name = "teampass-production"
-  description = "teampass production"
-  subnet_ids = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}"
-  ]
-}
-
 resource "aws_elb" "teampass_production" {
   name = "teampass-production"
   security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
@@ -99,7 +84,7 @@ resource "aws_db_instance" "teampass_production" {
   instance_class = "db.t1.micro"
   name = "teampass"
   username = "teampass"
-  password = "teampass"
+  password = "NLz2#zT&XfStJv6"
   storage_encrypted = true
   vpc_security_group_ids = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
