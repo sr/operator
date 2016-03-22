@@ -97,17 +97,31 @@ resource "aws_db_instance" "teampass" {
 
 resource "aws_ecs_task_definition" "teampass" {
   family = "teampass"
-  container_definitions {
+  container_definitions = <<EOF {
     "name": "teampass",
-    "image": "teampass/teampass",
+    "image": "teampass/teampass:2.1.25.2",
     "cpu": 512,
     "memory": 1024,
     "essential": true,
     "portMappings": [
       {
         "containerPort": 80,
-        "hostPort": 80
+        "hostPort": 80,
+        "protocol": "tcp"
       }
-    ]
+    ],
+    "environment": [
+      {
+        "MYSQL_ROOT_PASSWORD": "NLz2#zT&XfStJv6"
+        "MYSQL_DATABASE": "teampass"
+        "MYSQL_PASSWORD": "NLz2#zT&XfStJv6"
+        "MYSQL_USER": "teampass"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "syslog",
+      "options": null
+    }
   }
+  EOF
 }
