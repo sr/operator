@@ -77,20 +77,20 @@ resource "aws_autoscaling_group" "teampass_production" {
 }
 
 resource "aws_db_instance" "teampass_production" {
-  identifier = "teampass_production-rds"
+  identifier = "teampass-production"
   allocated_storage = 10
   engine = "mysql"
   engine_version = "5.5.48"
   instance_class = "db.t2.large"
+  storage_type = "gp2"
   name = "teampass"
   username = "teampass"
   password = "NLz2#zT&XfStJv6"
+  maintenance_window = "Mon:20:00-Mon:23:00"
+  multi_az = true
+  publicly_accessible = false
+  db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
   storage_encrypted = true
-  vpc_security_group_ids = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}"
-  ]
-  parameter_group_name = "default.mysql5.5"
+  backup_retention_period = 5
+  apply_immediately = true
 }
