@@ -1,6 +1,6 @@
 resource "aws_elb" "teampass" {
   name = "teampass"
-  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
+  security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
