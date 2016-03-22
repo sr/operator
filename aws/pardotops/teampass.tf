@@ -100,8 +100,8 @@ resource "aws_ecs_task_definition" "teampass" {
   container_definitions {
     "name": "teampass",
     "image": "teampass/teampass",
-    "cpu": 1,
-    "memory": 1000,
+    "cpu": 512,
+    "memory": 1024,
     "essential": true,
     "portMappings": [
       {
