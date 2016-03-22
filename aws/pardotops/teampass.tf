@@ -1,10 +1,10 @@
-resource "aws_ecr_repository" "webpasswordsafe" {
-  name = "webpasswordsafe"
+resource "aws_ecr_repository" "teampass" {
+  name = "teampass"
 }
 
-resource "aws_elasticache_subnet_group" "wps_production" {
-  name = "wps-production"
-  description = "webpasswordsafe production"
+resource "aws_elasticache_subnet_group" "teampass_production" {
+  name = "teampass-production"
+  description = "teampass production"
   subnet_ids = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
     "${aws_subnet.internal_apps_us_east_1c.id}",
@@ -13,8 +13,8 @@ resource "aws_elasticache_subnet_group" "wps_production" {
   ]
 }
 
-resource "aws_elb" "wps_production" {
-  name = "wps-production"
+resource "aws_elb" "teampass_production" {
+  name = "teampass-production"
   security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
@@ -29,8 +29,8 @@ resource "aws_elb" "wps_production" {
   listener {
     lb_port = 443
     lb_protocol = "https"
-    instance_port = 8443
-    instance_protocol = "https"
+    instance_port = 80
+    instance_protocol = "http"
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com"
   }
 
@@ -38,22 +38,31 @@ resource "aws_elb" "wps_production" {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTPS:8443/"
+    target = "HTTP:80/"
     interval = 5
   }
 
   tags {
-    Name = "wps_production"
+    Name = "teampass_production"
   }
 }
 
-resource "aws_launch_configuration" "wps_production" {
-  name_prefix = "wps_production"
+resource "aws_ecs_cluster" "teampass_production" {
+  name = "teampass_production"
+}
+
+resource "aws_launch_configuration" "teampass_production" {
+  name_prefix = "teampass_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   associate_public_ip_address = false
+
+  user_data = <<EOF
+#!/bin/bash
+echo ECS_CLUSTER=teampass_production >> /etc/ecs/ecs.config
+EOF
 
   root_block_device {
     volume_type = "gp2"
@@ -66,10 +75,10 @@ resource "aws_launch_configuration" "wps_production" {
   }
 }
 
-resource "aws_autoscaling_group" "wps_production" {
+resource "aws_autoscaling_group" "teampass_production" {
   max_size = 1
   min_size = 1
-  launch_configuration = "${aws_launch_configuration.wps_production.id}"
+  launch_configuration = "${aws_launch_configuration.teampass_production.id}"
   vpc_zone_identifier = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
     "${aws_subnet.internal_apps_us_east_1c.id}",
@@ -86,7 +95,7 @@ resource "aws_db_instance" "wps_production" {
   identifier = "wps_production-rds"
   allocated_storage = 10
   engine = "mysql"
-  engine_version = "5.6.29"
+  engine_version = "5.5.48"
   instance_class = "db.t1.micro"
   name = "${var.mysql_database}"
   username = "${var.mysql_username}"
@@ -98,5 +107,5 @@ resource "aws_db_instance" "wps_production" {
     "${aws_subnet.internal_apps_us_east_1d.id}",
     "${aws_subnet.internal_apps_us_east_1e.id}"
   ]
-  parameter_group_name = "default.mysql5.6"
+  parameter_group_name = "default.mysql5.5"
 }
