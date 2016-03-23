@@ -12,6 +12,8 @@ services:
       - MYSQL_DATABASE=teampass
       - MYSQL_PASSWORD=teampass
       - MYSQL_USER=teampass
+      - CSRFP_TOKEN=sampletoken
+      - SALT=samplesalt
   
   db:
     restart: always
