@@ -2,11 +2,13 @@
 set -e
 
 # From /start.sh to bypass dual /teampassinit and /teampass dirs
-ROOTTP="/teampass"
-mkdir -p $ROOTTP/sk
-mv /teampassinit /$ROOTTP/www
+mkdir -p /teampass/sk
+chown -Rf www-data.www-data /teampass/sk
+ROOTTP="/teampass/www"
+[ -d /teampassinit ] && mv /teampassinit /$ROOTTP
 chown -Rf www-data.www-data $ROOTTP
-rm -rf $ROOTTP/www/install
+
+rm -rf $ROOTTP/install
 
 # To get db config from docker env
 echo "<?php
@@ -25,7 +27,9 @@ global \$server, \$user, \$pass, \$database, \$pre, \$db, \$port, \$encoding;
 @date_default_timezone_set(\$_SESSION['settings']['timezone']);
 @define('SECUREPATH', '/teampass/www/includes');
 require_once '/teampass/www/includes/sk.php';
-?>" > /teampass/www/includes/settings.php
+?>" > $ROOTTP/includes/settings.php
+
+sed -i "s/self::\$config\['jsUrl'\]/\$_SESSION\['url_path'\]\.'\/includes\/libraries\/csrfp\/js\/csrfprotector\.js'/" $ROOTTP/includes/libraries/csrfp/libs/csrf/csrfprotector.php
 
 echo '<?php
 /**
@@ -41,13 +45,12 @@ return array(
    "errorRedirectionPage" => "",
    "customErrorMessage" => "",
    "jsPath" => "../js/csrfprotector.js",
-   "jsUrl" => "http://localhost:8080/includes/libraries/csrfp/js/csrfprotector.js",
    "tokenLength" => 25,
    "disabledJavascriptMessage" => "This site attempts to protect users against <a href=\"https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29\">
    Cross-Site Request Forgeries </a> attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you.
     See details of your web browser for how to enable JavaScript.",
     "verifyGetFor" => array()
-);' > /teampass/www/includes/libraries/csrfp/libs/csrfp.config.php
+);' > $ROOTTP/includes/libraries/csrfp/libs/csrfp.config.php
 
 echo "<?php
 @define('SALT', getenv('SALT')); //Never Change it once it has been used !!!!!
@@ -55,7 +58,7 @@ echo "<?php
 @define('AKEY', '');
 @define('IKEY', '');
 @define('SKEY', '');
-@define('HOST', '');" > /teampass/www/includes/sk.php
+@define('HOST', '');" > $ROOTTP/includes/sk.php
 
 /usr/sbin/apache2ctl -D FOREGROUND & 
 tail -f /var/log/apache2/*log
