@@ -7,4 +7,5 @@ EXPOSE 80
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-CMD ["/usr/sbin/apache2ctl -D FOREGROUND && tail -f /var/log/apache2/*log"]
+# This doesn't seem to be working, so launching from ENTRYPOINT instead
+#CMD ["/bin/sh -c \"/usr/sbin/apache2ctl -D FOREGROUND &; tail -f /var/log/apache2/*log\""]
