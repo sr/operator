@@ -80,7 +80,7 @@ resource "aws_db_instance" "teampass" {
   identifier = "teampass"
   allocated_storage = 10
   engine = "mysql"
-  engine_version = "5.5.48"
+  engine_version = "5.5"
   instance_class = "db.t2.large"
   storage_type = "gp2"
   name = "teampass"
@@ -93,35 +93,4 @@ resource "aws_db_instance" "teampass" {
   storage_encrypted = true
   backup_retention_period = 5
   apply_immediately = true
-}
-
-resource "aws_ecs_task_definition" "teampass" {
-  family = "teampass"
-  container_definitions = <<EOF {
-    "name": "teampass",
-    "image": "teampass/teampass:2.1.25.2",
-    "cpu": 512,
-    "memory": 1024,
-    "essential": true,
-    "portMappings": [
-      {
-        "containerPort": 80,
-        "hostPort": 80,
-        "protocol": "tcp"
-      }
-    ],
-    "environment": [
-      {
-        "MYSQL_ROOT_PASSWORD": "NLz2#zT&XfStJv6"
-        "MYSQL_DATABASE": "teampass"
-        "MYSQL_PASSWORD": "NLz2#zT&XfStJv6"
-        "MYSQL_USER": "teampass"
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "syslog",
-      "options": null
-    }
-  }
-  EOF
 }
