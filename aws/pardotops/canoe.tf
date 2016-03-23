@@ -72,6 +72,24 @@ resource "aws_elb" "canoe_production" {
   }
 }
 
+resource "aws_security_group" "canoe_db_production" {
+  name = "canoe_db_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.canoe_app_production.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_instance" "canoe_production" {
   identifier = "canoe-production"
   allocated_storage = 20
@@ -86,6 +104,7 @@ resource "aws_db_instance" "canoe_production" {
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
+  #vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
   storage_encrypted = false
   backup_retention_period = 5
   apply_immediately = true
@@ -93,6 +112,30 @@ resource "aws_db_instance" "canoe_production" {
 
 resource "aws_ecs_cluster" "canoe_production" {
   name = "canoe_production"
+}
+
+resource "aws_security_group" "canoe_app_production" {
+  name = "canoe_app_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_launch_configuration" "canoe_production" {
