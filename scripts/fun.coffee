@@ -85,7 +85,7 @@ module.exports = (robot) ->
   robot.respond /parker$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
 
-  robot.respond /thumbsup/i, (msg) ->
+  robot.respond /thumbsup$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/88/MVcZU1s2CcLTCeS/thumbsup.png"
 
   robot.respond /catdance$/i, (msg) ->
