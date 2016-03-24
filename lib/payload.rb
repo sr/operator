@@ -28,7 +28,7 @@ class Payload
     @_artifacts_path ||= \
       begin
         path = File.join(Dir.tmpdir, "pull-agent")
-        FileUtils.mkdir_p(path, mode: 00700)
+        FileUtils.mkdir_p(path, mode: 01777)
         path
       end
   end
