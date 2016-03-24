@@ -262,6 +262,52 @@ module Environments
       end
     end
 
+    def link_repfix_env_files
+      payload.path_choices.each do |release_dir|
+        begin
+          FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, ".envvars_#{name}.rb"))
+        rescue Errno::EEXIST
+          # already exists
+        end
+
+        begin
+          FileUtils.ln_s(File.join(payload.repo_path, "env.rb"), File.join(release_dir, "env.rb"))
+        rescue Errno::EEXIST
+          # already exists
+        end
+      end
+    end
+
+    def link_repfix_shared_folders
+      payload.path_choices.each do |release_dir|
+        begin
+          FileUtils.ln_s(File.join(payload.repo_path, "log"), File.join(release_dir, "log"))
+        rescue Errno::EEXIST
+          # already exists
+        end
+
+        begin
+          FileUtils.ln_s(File.join(payload.repo_path, "output"), File.join(release_dir, "output"))
+        rescue Errno::EEXIST
+          # already exists
+        end
+      end
+    end
+
+    def restart_repfix_service
+      pid = File.read("/var/run/repfix/puma.pid").chomp
+
+      # Killing puma with USR1 performs a rolling restart
+      output = ShellHelpers.sudo_execute(["kill", "-USR1", pid], "repfix")
+      if $?.success?
+        Logger.log(:info, "Restarted Repfix Puma server: #{output}")
+      else
+        Logger.log(:error, "Error restarting Repfix Puma server: #{output}")
+      end
+    rescue Error::ENOENT
+      Logger.log(:info, "Repfix PID file not found. Service might not be started yet")
+    end
+
     # =========================================================================
     def name
       self.class.to_s.split("::").last.underscore

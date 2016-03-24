@@ -24,6 +24,10 @@ module Environments
 
     after_deploy :deploy_topology, only: :'murdoc'
 
+    after_deploy :link_repfix_env_files, only: :'repfix'
+    after_deploy :link_repfix_shared_folders, only: :'repfix'
+    after_deploy :restart_repfix_service, only: :'repfix'
+
     def short_name
       "prod"
     end
