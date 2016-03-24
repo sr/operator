@@ -101,6 +101,7 @@ resource "aws_launch_configuration" "hal9000_production" {
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  security_groups = ["${aws_security_group.hal9000_app_production.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
