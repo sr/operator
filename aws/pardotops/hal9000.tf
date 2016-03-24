@@ -71,12 +71,37 @@ resource "aws_ecs_cluster" "hal9000_production" {
   name = "hal9000_production"
 }
 
+resource "aws_security_group" "hal9000_app_production" {
+  name = "hal9000_app_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_launch_configuration" "hal9000_production" {
   name_prefix = "hal9000_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  security_groups = ["${aws_security_group.hal9000_app_production.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF

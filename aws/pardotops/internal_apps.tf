@@ -5,24 +5,6 @@ resource "aws_vpc" "internal_apps" {
   }
 }
 
-resource "aws_security_group_rule" "internal_apps_allow_internal_ssh" {
-  type = "ingress"
-  from_port = 22
-  to_port = 22
-  protocol = "tcp"
-  security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
-  cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-}
-
-resource "aws_security_group_rule" "internal_apps_allow_internal_http" {
-  type = "ingress"
-  from_port = 80
-  to_port = 80
-  protocol = "tcp"
-  security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
-  cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-}
-
 resource "aws_subnet" "internal_apps_us_east_1a" {
   vpc_id = "${aws_vpc.internal_apps.id}"
   availability_zone = "us-east-1a"
@@ -158,6 +140,9 @@ resource "aws_security_group" "internal_apps_http_lb" {
     cidr_blocks = [
       "204.14.236.0/24",    # aloha-east
       "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
       "173.192.141.222/32", # tools-s1 (prodbot)
       "174.37.191.2/32",    # proxy.dev
       "169.45.0.88/32",     # squid-d4
@@ -173,6 +158,9 @@ resource "aws_security_group" "internal_apps_http_lb" {
     cidr_blocks = [
       "204.14.236.0/24",    # aloha-east
       "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
       "173.192.141.222/32", # tools-s1 (prodbot)
       "174.37.191.2/32",    # proxy.dev
       "169.45.0.88/32",     # squid-d4
@@ -227,15 +215,6 @@ resource "aws_security_group" "internal_apps_dc_only_http_lb" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group_rule" "internal_apps_allow_lb_http" {
-  type = "ingress"
-  from_port = 80
-  to_port = 80
-  protocol = "tcp"
-  security_group_id = "${aws_vpc.internal_apps.default_security_group_id}"
-  source_security_group_id = "${aws_security_group.internal_apps_http_lb.id}"
 }
 
 resource "aws_db_subnet_group" "internal_apps" {

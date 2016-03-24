@@ -24,8 +24,11 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
   protocol = "tcp"
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
   cidr_blocks = [
-    "204.14.236.0/24", # aloha-east
-    "204.14.239.0/24"  # aloha-west
+    "204.14.236.0/24",    # aloha-east
+    "204.14.239.0/24",    # aloha-west
+    "62.17.146.140/30",   # aloha-emea
+    "62.17.146.144/28",   # aloha-emea
+    "62.17.146.160/27",   # aloha-emea
   ]
 }
 
@@ -36,8 +39,11 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   protocol = "tcp"
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
   cidr_blocks = [
-    "204.14.236.0/24", # aloha-east
-    "204.14.239.0/24"  # aloha-west
+    "204.14.236.0/24",    # aloha-east
+    "204.14.239.0/24",    # aloha-west
+    "62.17.146.140/30",   # aloha-emea
+    "62.17.146.144/28",   # aloha-emea
+    "62.17.146.160/27",   # aloha-emea
   ]
 }
 

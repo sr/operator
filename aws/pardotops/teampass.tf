@@ -40,12 +40,37 @@ resource "aws_ecs_cluster" "teampass" {
   name = "teampass"
 }
 
+resource "aws_security_group" "teampass_app" {
+  name = "teampass_app"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_launch_configuration" "teampass" {
   name_prefix = "teampass"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  security_groups = ["${aws_security_group.teampass_app.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
@@ -80,11 +105,29 @@ resource "aws_autoscaling_group" "teampass" {
   }
 }
 
+resource "aws_security_group" "teampass_db" {
+  name = "teampass_db"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.teampass_app.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_instance" "teampass" {
   identifier = "teampass"
   allocated_storage = 10
   engine = "mysql"
-  engine_version = "5.5"
+  engine_version = "5.5.46"
   instance_class = "db.t2.large"
   storage_type = "gp2"
   name = "teampass"
@@ -94,6 +137,7 @@ resource "aws_db_instance" "teampass" {
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
+  vpc_security_group_ids = ["${aws_security_group.teampass_db.id}"]
   storage_encrypted = true
   backup_retention_period = 5
   apply_immediately = true
