@@ -53,6 +53,14 @@ namespace :canoe do
       repo.bamboo_plan = 'CHEF'
     }.save!
 
+    Repo.find_or_initialize_by(name: 'repfix').tap { |repo|
+      repo.icon = 'wrench'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = false
+      repo.bamboo_project = 'BREAD'
+      repo.bamboo_plan = 'REPFIX'
+    }.save!
+
     if Rails.env.production? || Rails.env.development? || Rails.env.test?
       Repo.find_or_initialize_by(name: 'blue-mesh').tap { |repo|
         repo.icon = 'th'
