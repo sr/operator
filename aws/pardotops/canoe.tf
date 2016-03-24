@@ -104,7 +104,7 @@ resource "aws_db_instance" "canoe_production" {
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
-  #vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
+  vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
   storage_encrypted = false
   backup_retention_period = 5
   apply_immediately = true
@@ -144,6 +144,7 @@ resource "aws_launch_configuration" "canoe_production" {
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  security_groups = ["${aws_security_group.canoe_app_production.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
