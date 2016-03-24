@@ -66,6 +66,7 @@ resource "aws_launch_configuration" "teampass" {
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  security_groups = ["${aws_security_group.teampass_app.id}"]
   associate_public_ip_address = false
 
   user_data = <<EOF
@@ -132,7 +133,7 @@ resource "aws_db_instance" "teampass" {
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
-  #vpc_security_group_ids = ["${aws_security_group.teampass_db.id}"]
+  vpc_security_group_ids = ["${aws_security_group.teampass_db.id}"]
   storage_encrypted = true
   backup_retention_period = 5
   apply_immediately = true
