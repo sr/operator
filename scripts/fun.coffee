@@ -78,7 +78,8 @@
 #   hubot dartz - Dartz!!!
 #   hubot inconceivable - inconceivable!!!
 #   hubot bonk - bonks adventure
- 
+#   hubot pd - pagerduty phone smash :)
+
 _ = require "underscore"
 
 module.exports = (robot) ->
@@ -188,6 +189,15 @@ module.exports = (robot) ->
       'https://www.youtube.com/watch?v=hup9eowiZHQ'
     ]
     msg.send msg.random schwifty
+
+  robot.respond /pd$/i, (msg) ->
+    pagerdootie = [
+      'http://i.giphy.com/xTiTnzvzlEj5vD3Tkk.gif',
+      'http://i.giphy.com/1306MTkHlXkUZG.gif',
+      'http://i.giphy.com/6sI9YC1GJx1G8.gif',
+      'http://i.giphy.com/DOdsiolqbxCbm.gif'
+    ]
+    msg.send msg.random pagerdootie
 
   robot.respond /tomcat(\s)?waits$/i, (msg) ->
     tomcatwaits = [
