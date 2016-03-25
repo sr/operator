@@ -265,7 +265,7 @@ module Environments
     def link_repfix_env_files
       payload.path_choices.each do |release_dir|
         begin
-          FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, ".envvars_#{name}.rb"))
+          FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, "api", ".envvars_#{name}.rb"))
         rescue Errno::EEXIST
           # already exists
         end
