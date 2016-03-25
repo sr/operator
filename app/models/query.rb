@@ -25,9 +25,9 @@ class Query < ActiveRecord::Base
       account.shard(datacenter).connection
     when DB::Global
       case datacenter
-      when DC::Dallas
+      when DataCenter::DALLAS
         GlobalDallas.connection
-      when DC::Seattle
+      when DataCenter::SEATTLE
         GlobalSeattle.connection
       end
     end

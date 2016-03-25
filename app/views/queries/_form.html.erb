@@ -13,8 +13,8 @@
   </div>
   <%= f.hidden_field :datacenter %>
   <div class="btn-group datacenter">
-    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DC::Dallas) %>" data-val="<%= DC::Dallas %>">Dallas</button>
-    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DC::Seattle) %>" data-val="<%= DC::Seattle %>">Seattle</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::DALLAS) %>" data-val="<%= DataCenter::DALLAS %>">Dallas</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::SEATTLE) %>" data-val="<%= DataCenter::SEATTLE %>">Seattle</button>
   </div>
   <div class="viewoption" <%= is_active?(:view, VW::UI, 'style="display:none;"') %>>
     <%= f.text_area(:sql, rows: "6") %>

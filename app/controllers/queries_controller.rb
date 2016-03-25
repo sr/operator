@@ -36,7 +36,7 @@ class QueriesController < ApplicationController
   end
 
   def new
-    defaults = {datacenter: DC::Dallas, view: VW::SQL}
+    defaults = {datacenter: DataCenter::DALLAS, view: VW::SQL}
     if account_params[:account_id]
       # Accounts query
       @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: DB::Account, account_id: account_params[:account_id]))

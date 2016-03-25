@@ -13,10 +13,10 @@ class Account < GlobalDallas
     account.shard_id
   end
 
-  def shard(datacenter = DC::Dallas)
+  def shard(datacenter = DataCenter::DALLAS)
     @_shard ||= {
-        DC::Dallas => Account.create_shard(shard_id, DC::Dallas),
-        DC::Seattle => Account.create_shard(shard_id, DC::Seattle)
+        DataCenter::DALLAS => Account.create_shard(shard_id, DataCenter::DALLAS),
+        DataCenter::SEATTLE => Account.create_shard(shard_id, DataCenter::SEATTLE)
       }
     @_shard[datacenter]
   end
@@ -26,7 +26,7 @@ class Account < GlobalDallas
     !account_accesses.where(role: 7).where("expires_at > ?", Time.now).empty?
   end
 
-  def self.create_shard(shard_id, datacenter = DC::Dallas)
+  def self.create_shard(shard_id, datacenter = DataCenter::DALLAS)
     # Dynamically creates Shard Classes which hold the db connection for us
     shard_name = "Shard#{shard_id}#{datacenter}"
     begin
@@ -41,5 +41,4 @@ class Account < GlobalDallas
       end
     end
   end
-
 end

@@ -26,9 +26,3 @@ class VW
   UI = "UI"
   CSV = "CSV" #for CSV output
 end
-
-# Datacenter
-class DC
-  Dallas = "Dallas"
-  Seattle = "Seattle"
-end

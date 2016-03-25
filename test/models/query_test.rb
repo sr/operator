@@ -4,11 +4,11 @@ class QueryTest < ActiveSupport::TestCase
   setup do 
     @gquery = Query.new(
       database: DB::Global,
-      datacenter: DC::Dallas,
+      datacenter: DataCenter::DALLAS,
     )
     @aquery = Query.new(
       database: DB::Account,
-      datacenter: DC::Dallas,
+      datacenter: DataCenter::DALLAS,
       account_id: 1,
     )
     @limit = "LIMIT 10"
