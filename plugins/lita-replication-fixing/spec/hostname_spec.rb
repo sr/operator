@@ -35,6 +35,20 @@ module ReplicationFixing
       end
     end
 
+    describe "#cluster_id" do
+      it "returns nil for DAL and SEA servers" do
+        expect(Hostname.new("db-d1").cluster_id).to eq(nil)
+        expect(Hostname.new("db-s1").cluster_id).to eq(nil)
+      end
+
+      it "returns the cluster ID for DFW and PHX servers" do
+        expect(Hostname.new("pardot0-dbshard1-1-dfw").cluster_id).to eq(1)
+        expect(Hostname.new("pardot0-dbshard1-1-phx").cluster_id).to eq(1)
+        expect(Hostname.new("pardot0-dbshard2-1-dfw").cluster_id).to eq(2)
+        expect(Hostname.new("pardot0-dbshard2-1-phx").cluster_id).to eq(2)
+      end
+    end
+
     describe "#datacenter" do
       it "parses DAL and SEA servers" do
         expect(Hostname.new("db-d1").datacenter).to eq("dallas")
