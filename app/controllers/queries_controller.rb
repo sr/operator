@@ -39,10 +39,10 @@ class QueriesController < ApplicationController
     defaults = {datacenter: DataCenter::DALLAS, view: VW::SQL}
     if account_params[:account_id]
       # Accounts query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: DB::Account, account_id: account_params[:account_id]))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: Database::SHARD, account_id: account_params[:account_id]))
     else
       # Global query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: DB::Global))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: Database::GLOBAL))
     end
   end
 

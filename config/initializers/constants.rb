@@ -14,12 +14,6 @@ else
   ENV['DB_S_SHARD2'] = 'mysql2://pardot:pardot@localhost:3306/pardot_shard2'
 end
 
-# Database
-class DB
-  Account = "Account"
-  Global = "Global"
-end
-
 # View
 class VW
   SQL = "SQL"

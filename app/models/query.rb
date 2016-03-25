@@ -4,7 +4,7 @@ class Query < ActiveRecord::Base
   validates :account_id, presence: true, if: :account?
 
   def account?
-    database == DB::Account
+    database == Database::SHARD
   end
 
   def select_all?
@@ -21,9 +21,9 @@ class Query < ActiveRecord::Base
 
   def connection
     case database
-    when DB::Account
+    when Database::SHARD
       account.shard(datacenter).connection
-    when DB::Global
+    when Database::GLOBAL
       case datacenter
       when DataCenter::DALLAS
         GlobalDallas.connection

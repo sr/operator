@@ -3,11 +3,11 @@ require 'test_helper'
 class QueryTest < ActiveSupport::TestCase
   setup do 
     @gquery = Query.new(
-      database: DB::Global,
+      database: Database::GLOBAL,
       datacenter: DataCenter::DALLAS,
     )
     @aquery = Query.new(
-      database: DB::Account,
+      database: Database::SHARD,
       datacenter: DataCenter::DALLAS,
       account_id: 1,
     )
