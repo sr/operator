@@ -1,4 +1,4 @@
-class Account < GlobalD
+class Account < GlobalDallas
   self.table_name = 'global_account'
   self.inheritance_column = :_type_disabled
   has_many :queries

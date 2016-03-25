@@ -26,9 +26,9 @@ class Query < ActiveRecord::Base
     when DB::Global
       case datacenter
       when DC::Dallas
-        GlobalD.connection
+        GlobalDallas.connection
       when DC::Seattle
-        GlobalS.connection
+        GlobalSeattle.connection
       end
     end
   end
