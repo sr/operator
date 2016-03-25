@@ -10,7 +10,14 @@ class ApplicationController < ActionController::Base
 
   before_filter :require_oauth_authentication
 
+  protected
+
+  def append_info_to_payload(payload)
+    payload[:request_id] = request.env["action_dispatch.request_id"]
+  end
+
   private
+
   def no_ssl_ok?
     Rails.env.development? || Rails.env.test? || request.ip =~ /\A(10\.|127\.)/
   end

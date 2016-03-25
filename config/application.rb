@@ -56,5 +56,12 @@ module Canoe
         !!Repo.count
       end
     end
+
+    config.lograge.enabled = true
+    config.lograge.custom_options = lambda do |event|
+      {
+        :request_id => event.payload[:request_id],
+      }
+    end
   end
 end
