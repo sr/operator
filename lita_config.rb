@@ -31,6 +31,15 @@ Lita.configure do |config|
   config.adapters.hipchat.jid = ENV.fetch("HIPCHAT_JID", "1_342@chat.btf.hipchat.com")
   config.adapters.hipchat.muc_domain = ENV.fetch("HIPCHAT_MUC_DOMAIN", "conf.btf.hipchat.com")
   config.adapters.hipchat.password = ENV.fetch("HIPCHAT_PASSWORD", "")
+  config.adapters.hipchat.rooms = [
+    "1_build__automate@conf.btf.hipchat.com",
+    "1_bread_privileged@conf.btf.hipchat.com",
+    "1_opsbros@conf.btf.hipchat.com",
+    "1_ops@conf.btf.hipchat.com",
+    "1_project_terminus@conf.btf.hipchat.com",
+    "1_engineering@conf.btf.hipchat.com",
+    "1_bottest@conf.btf.hipchat.com",
+  ]
   config.adapters.hipchat.debug = true
 
   # Replication fixing
