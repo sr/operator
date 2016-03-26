@@ -13,6 +13,24 @@ resource "aws_elasticache_subnet_group" "hal9000_production" {
   ]
 }
 
+resource "aws_security_group" "hal9000_redis_production" {
+  name = "hal9000_redis_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 6379
+    to_port = 6379
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.hal9000_app_production.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_elasticache_cluster" "hal9000_production" {
   cluster_id = "hal9000-production"
   engine = "redis"
@@ -23,6 +41,7 @@ resource "aws_elasticache_cluster" "hal9000_production" {
   parameter_group_name = "default.redis2.8"
   port = 6379
   subnet_group_name = "${aws_elasticache_subnet_group.hal9000_production.name}"
+  security_group_ids = ["${aws_security_group.hal9000_redis_production.id}"]
   snapshot_retention_limit = 0 # disable
 }
 
