@@ -150,7 +150,7 @@ func validateInputMessage(msg *descriptor.DescriptorProto) error {
 			field = f
 		}
 	}
-	if !ok || field.GetName() != "source" || field.GetTypeName() != ".operator.Source" {
+	if !ok || field.GetName() != sourceField || field.GetTypeName() != ".operator.Source" {
 		return fmt.Errorf("Input message '%s' does not have a valid source field", msg.GetName())
 	}
 	return nil
@@ -168,7 +168,7 @@ func validateOutputMessage(msg *descriptor.DescriptorProto) error {
 			field = f
 		}
 	}
-	if !ok || field.GetName() != "output" || field.GetTypeName() != ".operator.Output" {
+	if !ok || field.GetName() != outputField || field.GetTypeName() != ".operator.Output" {
 		return fmt.Errorf("Output message '%s' does not have a valid output field", msg.GetName())
 	}
 	return nil
