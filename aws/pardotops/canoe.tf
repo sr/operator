@@ -56,7 +56,7 @@ resource "aws_elb" "canoe_production" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016"
   }
 
   health_check {

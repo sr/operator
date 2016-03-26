@@ -59,18 +59,11 @@ resource "aws_elb" "hal9000_production" {
   connection_draining_timeout = 30
 
   listener {
-    lb_port = 80
-    lb_protocol = "http"
-    instance_port = 80
-    instance_protocol = "http"
-  }
-
-  listener {
     lb_port = 443
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016"
   }
 
   health_check {
