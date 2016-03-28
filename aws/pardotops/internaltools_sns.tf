@@ -1,8 +1,8 @@
 /* define SNS email endpoints */
-variable "internal-alert-email-endpoints" {
+variable "internal_alert_email_endpoints" {
   type = "map"
   default = {
-    non-paging = "pd-bread+internaltoolsalerts@salesforce.com"
+    non_paging = "pd-bread+internaltoolsalerts@salesforce.com"
     paging = "bread@pardot.pagerduty.com"
   }
 }
@@ -13,15 +13,15 @@ resource "aws_sns_topic" "internaltools" {
   display_name = "IntTools" /* has a 10 char limit for some reason */
 }
 
-/* sub to the topic; pick paging or non-paging */
-resource "aws_sns_topic_subscription" "internaltools-scrip" {
+/* sub to the topic; pick paging or non_paging */
+resource "aws_sns_topic_subscription" "internaltools_scrip" {
   topic_arn = "${aws_sns_topic.internaltools.arn}"
   protocol  = "email"
-  endpoint  = "${var.internal-alert-email-endpoints.non-paging}"
+  endpoint  = "${var.internal_alert_email_endpoints.non_paging}"
 }
 
 /* define ASG event based notifiers */
-resource "aws_autoscaling_notification" "internaltools-asg-events-notifier" {
+resource "aws_autoscaling_notification" "internaltools_asg_events_notifier" {
   group_names = [
     "${aws_autoscaling_group.canoe_production.name}",
     "${aws_autoscaling_group.hal9000_production.name}"
