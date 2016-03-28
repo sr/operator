@@ -241,3 +241,40 @@ resource "aws_route" "internal_apps_route_tools_egress" {
   destination_cidr_block = "172.29.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_peer_tools_egress.id}"
 }
+
+# Bastion host
+
+resource "aws_security_group" "internal_apps_ssh" {
+  name = "internal_apps_ssh"
+  description = "Allow SSH from SFDC VPN only"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27"    # aloha-emea
+    ]
+  }
+}
+
+resource "aws_instance" "internal_apps_bastion" {
+  ami = "${var.amazon_linux_hvm_ebs_ami}"
+  instance_type = "t2.nano"
+  key_name = "internal_apps"
+  subnet_id = "${aws_subnet.internal_apps_us_east_1c_dmz.id}"
+  vpc_security_group_ids = ["${aws_security_group.internal_apps_ssh.id}"]
+  tags {
+    Name = "internal_apps_bastion"
+  }
+}
+
+resource "aws_eip" "internal_apps_bastion" {
+  vpc = true
+  instance = "${aws_instance.internal_apps_bastion.id}"
+}
