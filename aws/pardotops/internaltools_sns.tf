@@ -10,14 +10,14 @@ variable "internal-alert-email-endpoints" {
 /* establish the topic */
 resource "aws_sns_topic" "internaltools" {
   name = "internaltools"
-  display_name = "internalTools"
+  display_name = "IntTools" /* has a 10 char limit for some reason*/
 }
 
 /* sub to the topic; pick paging or non-paging*/
 resource "aws_sns_topic_subscription" "internaltools-scrip" {
-    topic_arn = "${aws_sns_topic.internaltools.arn}"
-    protocol  = "email"
-    endpoint  = "${var.internal-alert-email-endpoints.non-paging}"
+  topic_arn = "${aws_sns_topic.internaltools.arn}"
+  protocol  = "email"
+  endpoint  = "${var.internal-alert-email-endpoints.non-paging}"
 }
 
 /* define ASG event based notifiers */
