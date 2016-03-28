@@ -59,7 +59,6 @@ resource "aws_instance" "ldap_master" {
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
   vpc_security_group_ids = [
-    "${aws_security_group.internal_apps_ssh.id}",
     "${aws_security_group.internal_apps_ldap_server.id}"
   ]
   root_block_device {
