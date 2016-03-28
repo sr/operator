@@ -21,7 +21,7 @@ resource "aws_sns_topic_subscription" "internaltools-scrip" {
 }
 
 /* define ASG event based notifiers */
-resource "aws_autoscaling_notification" "internaltools-asg-notification" {
+resource "aws_autoscaling_notification" "internaltools-asg-events-notifier" {
   group_names = [
     "${aws_autoscaling_group.canoe_production.name}",
     "${aws_autoscaling_group.hal9000_production.name}"
