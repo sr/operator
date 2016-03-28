@@ -45,6 +45,17 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     ]
   }
 
+  # SSH from bastion
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.internal_apps_bastion.public_ip}/32"
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
