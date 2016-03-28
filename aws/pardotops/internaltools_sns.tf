@@ -14,11 +14,12 @@ resource "aws_sns_topic" "internaltools" {
 }
 
 /* sub to the topic; pick paging or non_paging */
-resource "aws_sns_topic_subscription" "internaltools_scrip" {
+/* !! 'email' protocol NOT CURRENTLY SUPPORTED IN TERRAFORM! :( !!  */
+/* resource "aws_sns_topic_subscription" "internaltools_scrip" {
   topic_arn = "${aws_sns_topic.internaltools.arn}"
   protocol  = "email"
   endpoint  = "${var.internal_alert_email_endpoints.non_paging}"
-}
+} */
 
 /* define ASG event based notifiers */
 resource "aws_autoscaling_notification" "internaltools_asg_events_notifier" {
