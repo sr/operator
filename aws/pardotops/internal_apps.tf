@@ -261,6 +261,13 @@ resource "aws_security_group" "internal_apps_ssh" {
       "62.17.146.160/27"    # aloha-emea
     ]
   }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_instance" "internal_apps_bastion" {
