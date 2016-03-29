@@ -3,6 +3,7 @@
 # This script will then iterate through all the passwords
 require 'io/console'
 require 'json'
+require 'csv'
 #require 'byebug'
 WPS_HOST = "https://secrets.pardot.com/wps"
 USERNAME = "jan.ulrich"
@@ -25,14 +26,14 @@ def blank?(hash)
   blank
 end
 
-File.open("wps.csv", "w") do |f|
-  f.puts(teampass_format(%w(Label Login Password Web\ Site Comments)))
+CSV.open("wps.csv", "w") do |f|
+  f << %w(Label Login Password Web\ Site Comments)
   (1..MAX).each do |id|
     pw_info = `curl -s -H "X-WPS-Username: #{USERNAME}" -H "X-WPS-Password: #{PASSWORD}" #{WPS_HOST}/rest/passwords/#{id}`
     json = JSON.parse(pw_info)
     next if blank?(json['password'])
     password = `curl -s -H "X-WPS-Username: #{USERNAME}" -H "X-WPS-Password: #{PASSWORD}" #{WPS_HOST}/rest/passwords/#{id}/currentValue`
     json['password'].merge!(JSON.parse(password))
-    f.puts(teampass_format(WPS_FIELDS.map{|field|json['password'][field]}))
+    f << WPS_FIELDS.map{|field|json['password'][field]}
   end
 end
