@@ -10,7 +10,7 @@ USERNAME = "jan.ulrich"
 print "Please enter Jan's password: "
 PASSWORD = STDIN.noecho(&:gets)
 puts
-MAX = 2
+MAX = 2 #4146
 WPS_FIELDS = %w(title username currentPassword label notes)
 
 def teampass_format(array)
@@ -29,6 +29,7 @@ end
 CSV.open("wps.csv", "w") do |f|
   f << %w(Label Login Password Web\ Site Comments)
   (1..MAX).each do |id|
+    next if id % 2 == 1 # WPS increments ids by 2
     pw_info = `curl -s -H "X-WPS-Username: #{USERNAME}" -H "X-WPS-Password: #{PASSWORD}" #{WPS_HOST}/rest/passwords/#{id}`
     json = JSON.parse(pw_info)
     next if blank?(json['password'])
