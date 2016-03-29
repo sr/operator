@@ -1,6 +1,6 @@
 require "pagerduty"
 
-module Zabbix
+module Notifiers
   class PagerdutyPager
     def initialize(service_key)
       @client = ::Pagerduty.new(service_key)

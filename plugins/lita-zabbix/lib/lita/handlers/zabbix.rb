@@ -12,6 +12,7 @@ module Lita
       config :zabbix_password, required: "changeme"
       config :datacenters, default: ["dfw"]
       config :default_datacenter, default: "dfw"
+      config :monitor_interval_seconds, default: 60
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -42,7 +43,7 @@ module Lita
             maintenance_supervisor.ensure_supervising
 
 
-            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+            monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 client: @clients[datacenter],
@@ -166,6 +167,23 @@ module Lita
         Hash[Shellwords.split(options.to_s).map { |o| o.split("=", 2) }]
       end
 
+      def run_monitors(response)
+        every(config.monitor_interval_seconds) do |timer|
+
+          monitor_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+              datacenter: datacenter,
+              redis: redis,
+              client: @clients[datacenter],
+              log: log,
+          )
+
+          paused_monitors = monitor_supervisor.get_paused_monitors
+          active_monitors.reject {|x| active_monitors.include? x}.each do |monitor|
+
+
+          end
+        end
+      end
       Lita.register_handler(self)
     end
   end

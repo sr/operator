@@ -1,6 +1,6 @@
 require "thread"
 
-module Zabbix
+module Monitors
   class MonitorSupervisor
     REDIS_NAMESPACE = "monitor_supervisor"
 

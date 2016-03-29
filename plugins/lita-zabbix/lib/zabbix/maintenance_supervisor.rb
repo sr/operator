@@ -3,12 +3,10 @@ require "thread"
 module Zabbix
   class MaintenanceSupervisor
     REDIS_NAMESPACE = "maintenance_supervisor"
-    REDIS_MONITOR_NAMESPACE = "monitor_supervisor"
 
     GLOBAL_MUTEX = Mutex.new
 
     attr_accessor :on_host_maintenance_expired
-    attr_accessor :on_monitor_unpaused
 
     def self.get_or_create(datacenter:, redis:, client:, log:)
       if @supervisors && supervisor = @supervisors[datacenter]
@@ -47,16 +45,7 @@ module Zabbix
       end
     end
 
-    def pause_monitor(monitorname:, until_time:)
-      @redis.hset(redis_monitor_expirations_key, monitor, until_time.to_i)
-    end
-
-    def unpause_monitor(monitorname:)
-      @redis.hdel(redis_monitor_expirations_key, monitor) > 0
-    end
-
     def run_expirations(now: Time.now)
-      # maintenance expirations
       expired = @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i <= now.to_i }.keys
       expired.select { |hostname|
         begin
@@ -75,34 +64,11 @@ module Zabbix
           false
         end
       }
-
-      # paused monitor expirations
-      expired_monitors = @redis.hgetall(redis_monitor_expirations_key).select { |k, v| v.to_i <= now.to_i }.keys
-      expired_monitors.select { |monitor|
-        begin
-          unpause_monitor(monitor: monitor)
-
-          @log.info("Unpaused monitor: #{hostname}")
-          true
-        rescue ::Zabbix::Client::MonitorNotFound
-          @redis.hdel(redis_monitor_expirations_key, monitor)
-
-          @log.warn("Monitor not found while attempting to unpause: #{monitor}")
-          false
-        rescue => e
-          @log.error("Error unpausing monitor: #{e}")
-          false
-        end
-      }
     end
 
     private
 
     def redis_expirations_key
-      [REDIS_NAMESPACE, "maintenance_expirations", @datacenter].join(":")
-    end
-
-    def redis_monitor_expirations_key
       [REDIS_NAMESPACE, "maintenance_expirations", @datacenter].join(":")
     end
 
@@ -112,11 +78,11 @@ module Zabbix
           loop do
             expirations = \
               begin
-                run_expirations
-              rescue => e
-                @log.error("Error while running expirations: #{e}")
-                []
-              end
+              run_expirations
+            rescue => e
+              @log.error("Error while running expirations: #{e}")
+              []
+            end
 
             expirations.each { |hostname| notify_host_maintenance_expired(hostname) }
             sleep 60
@@ -127,12 +93,6 @@ module Zabbix
       else
         @log.debug("Supervisor already executing")
       end
-    end
-
-    def notify_monitor_unpaused(monitorname)
-      on_monitor_unpaused.call(monitorname) if on_monitor_unpaused
-    rescue => e
-      @log.error("Error notifying monitor unpaused: #{e}")
     end
 
     def notify_host_maintenance_expired(hostname)
