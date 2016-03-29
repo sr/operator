@@ -1,4 +1,5 @@
 require "set"
+require "monitors/zabbixmon"
 
 module Zabbix
   class Client
@@ -14,6 +15,11 @@ module Zabbix
         user: user,
         password: password,
       )
+
+      @zabbixmon = ::Zabbix::Monitors::Zabbixmon.new()
+
+      @monitors = [@zabbixmon.monitor_name]
+
     end
 
     def ensure_host_in_zabbix_maintenance_group(host)

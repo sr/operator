@@ -1,5 +1,6 @@
 require "zabbixapi"
 require "zabbix/maintenance_supervisor"
+require "monitors/zabbixmon"
 require "zabbix/client"
 require "human_time"
 
@@ -29,16 +30,29 @@ module Lita
         @clients = Hash.new { |h, k| h[k] = build_zabbix_client(datacenter: k) }
         config.datacenters.each do |datacenter|
           begin
-            supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+            maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
               datacenter: datacenter,
               redis: redis,
               client: @clients[datacenter],
               log: log
             )
 
-            supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
-            supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
-            supervisor.ensure_supervising
+            maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
+            maintenance_supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
+            maintenance_supervisor.ensure_supervising
+
+
+            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+                datacenter: datacenter,
+                redis: redis,
+                client: @clients[datacenter],
+                log: log
+            )
+
+            monitor_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
+            monitor_supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
+            monitor_supervisor.ensure_supervising
+
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
           end
