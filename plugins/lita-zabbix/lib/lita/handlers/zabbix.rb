@@ -1,8 +1,9 @@
 require "zabbixapi"
+require "zabbix/client"
 require "zabbix/maintenance_supervisor"
 require "monitors/zabbixmon"
 require "monitors/monitor_supervisor"
-require "zabbix/client"
+require "notifiers/pagerduty_pager"
 require "human_time"
 
 module Lita
@@ -189,8 +190,12 @@ module Lita
               log: log,
           )
 
-          paused_monitors = monitor_supervisor.get_paused_monitors
-          active_monitors.reject {|x| active_monitors.include? x}.each do |monitor|
+          # loop through (active && unpaused) monitors
+          active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
+
+            # insert your zabbix-based-monitor here
+
+            # zabbixmon: engage!
             if monitor == zabbixmon.monitor_name
               zabbixmon.monitor
 
@@ -198,6 +203,7 @@ module Lita
                 monitor_hard_fail(failure['monitorname'], failure['message'])
               end
             end
+
           end
 
 
