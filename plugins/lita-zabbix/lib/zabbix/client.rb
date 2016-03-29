@@ -1,5 +1,4 @@
 require "set"
-require "monitors/zabbixmon"
 
 module Zabbix
   class Client
