@@ -4,7 +4,6 @@ require "monitors/zabbixmon"
 module Zabbix
   class Client
     HostNotFound = Class.new(StandardError)
-    MonitorNotFound = Class.new(StandardError)
     MaintenanceGroupDoesNotExist = Class.new(StandardError)
 
     MAINTENANCE_GROUP_NAME = "zMaintenance"
@@ -15,11 +14,6 @@ module Zabbix
         user: user,
         password: password,
       )
-
-      @zabbixmon = ::Zabbix::Monitors::Zabbixmon.new()
-
-      @monitors = [@zabbixmon.monitor_name]
-
     end
 
     def ensure_host_in_zabbix_maintenance_group(host)
@@ -71,10 +65,6 @@ module Zabbix
           searchWildcardsEnabled: 1,
         }
       )
-    end
-
-    def check_zabbix_status()
-      # TODO
     end
 
     private

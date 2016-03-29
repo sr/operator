@@ -14,15 +14,14 @@ module Monitors
       else
         GLOBAL_MUTEX.synchronize do
           @supervisors ||= {}
-          @supervisors[datacenter] = new(datacenter: datacenter, redis: redis, client: client, log: log)
+          @supervisors[datacenter] = new(datacenter: datacenter, redis: redis, log: log)
         end
       end
     end
 
-    def initialize(datacenter:, redis:, client:, log:)
+    def initialize(datacenter:, redis:, log:)
       @datacenter = datacenter
       @redis = redis
-      @client = client
       @log = log
 
       @supervising_lock = Mutex.new
@@ -49,7 +48,7 @@ module Monitors
 
           @log.info("Unpaused monitor: #{monitorname}")
           true
-        rescue ::Zabbix::Client::MonitorNotFound
+        rescue ::Lita::Handlers::Zabbix::MonitorNotFound
           @redis.hdel(redis_monitor_expirations_key, monitorname)
 
           @log.warn("Monitor not found while attempting to unpause: #{monitorname}")
@@ -88,6 +87,10 @@ module Monitors
       else
         @log.debug("Supervisor already executing")
       end
+    end
+
+    def get_paused_monitors
+      @redis.hgetall(redis_expirations_key).select { |k, v| }.keys
     end
 
     def notify_monitor_unpaused(monitorname)

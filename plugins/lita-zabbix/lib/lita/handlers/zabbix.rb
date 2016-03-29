@@ -1,18 +1,24 @@
 require "zabbixapi"
 require "zabbix/maintenance_supervisor"
 require "monitors/zabbixmon"
+require "monitors/monitor_supervisor"
 require "zabbix/client"
 require "human_time"
 
 module Lita
   module Handlers
     class Zabbix < Handler
+
+      MonitorNotFound = Class.new(StandardError)
+
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
       config :datacenters, default: ["dfw"]
       config :default_datacenter, default: "dfw"
       config :monitor_interval_seconds, default: 60
+      config :active_monitors, default: "zabbixmon"
+      config :paging_monitors, default: "zabbixmon"
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -170,18 +176,31 @@ module Lita
       def run_monitors(response)
         every(config.monitor_interval_seconds) do |timer|
 
-          monitor_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
+          monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
               datacenter: datacenter,
               redis: redis,
-              client: @clients[datacenter],
+              log: log,
+          )
+
+          zabbixmon = ::Monitors::Zabbixmon.new(
+              datacenters: config.datacenters,
+              redis: redis,
+              clients: @clients,
               log: log,
           )
 
           paused_monitors = monitor_supervisor.get_paused_monitors
           active_monitors.reject {|x| active_monitors.include? x}.each do |monitor|
+            if monitor == zabbixmon.monitor_name
+              zabbixmon.monitor
 
-
+              zabbixmon.failures.each do |failure|
+                monitor_hard_fail(failure['monitorname'], failure['message'])
+              end
+            end
           end
+
+
         end
       end
       Lita.register_handler(self)
