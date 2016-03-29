@@ -78,11 +78,11 @@ module Zabbix
           loop do
             expirations = \
               begin
-              run_expirations
-            rescue => e
-              @log.error("Error while running expirations: #{e}")
-              []
-            end
+                run_expirations
+              rescue => e
+                @log.error("Error while running expirations: #{e}")
+                []
+              end
 
             expirations.each { |hostname| notify_host_maintenance_expired(hostname) }
             sleep 60
