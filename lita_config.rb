@@ -17,6 +17,7 @@ Lita.configure do |config|
     "1_104@chat.btf.hipchat.com", # Jan Ulrich
     "1_261@chat.btf.hipchat.com", # Rory Kiefer
     "1_282@chat.btf.hipchat.com", # Andy Lindeman
+    "1_350@chat.btf.hipchat.com", # Simon Rozet
   ]
 
   config.robot.adapter = (ENV.fetch("LITA_ADAPTER", "shell")).to_sym
@@ -43,6 +44,15 @@ Lita.configure do |config|
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
   config.redis[:port] = ENV.fetch("REDIS_PORT", "6379").to_i
+
+  config.zabbixmon.datacenter.domain.shortnames = ['dfw','phx']
+  config.zabbixmon.sentinel.domain = '[DC_DOMAIN_SHORTNAME]'
+  config.zabbixmon.zabbix.hostname.template = "zabbix-#{config.zabbixmon.sentinel.domain}.pardot.com"
+  #config.zabbixmon.zabbix.hostname.template = "pardot0-monitor1-1-#{config.zabbixmon.sentinel.domain}.ops.sfdc.net"
+  config.zabbixmon.monitor.hostname.template = "pardot0-monitor1-1-#{config.zabbixmon.sentinel.domain}.ops.sfdc.net"
+  config.zabbixmon.monitor.item = 'system:general'
+  config.zabbixmon.monitor.key = 'zabbix_status'
+
 
   ## Example: Set configuration for any loaded handlers. See the handler's
   ## documentation for options.

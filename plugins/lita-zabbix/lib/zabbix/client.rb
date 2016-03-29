@@ -3,6 +3,7 @@ require "set"
 module Zabbix
   class Client
     HostNotFound = Class.new(StandardError)
+    MonitorNotFound = Class.new(StandardError)
     MaintenanceGroupDoesNotExist = Class.new(StandardError)
 
     MAINTENANCE_GROUP_NAME = "zMaintenance"
@@ -64,6 +65,10 @@ module Zabbix
           searchWildcardsEnabled: 1,
         }
       )
+    end
+
+    def check_zabbix_status()
+      @client.cliean
     end
 
     private
