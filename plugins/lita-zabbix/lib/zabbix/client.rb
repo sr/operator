@@ -68,7 +68,7 @@ module Zabbix
     end
 
     def check_zabbix_status()
-      @client.cliean
+      # TODO
     end
 
     private

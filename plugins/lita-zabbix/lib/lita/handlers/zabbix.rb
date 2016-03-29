@@ -37,6 +37,7 @@ module Lita
             )
 
             supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
+            supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
             supervisor.ensure_supervising
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
@@ -123,6 +124,10 @@ module Lita
 
       def host_maintenance_expired(hostname)
         robot.send_message(@status_room, "/me is bringing #{hostname} out of maintenance")
+      end
+
+      def monitor_expired(monitorname)
+        robot.send_message(@status_room, "/me is unpausing #{monitor}")
       end
 
       private

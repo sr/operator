@@ -40,18 +40,16 @@ Lita.configure do |config|
   # Zabbix
   config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
   config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
+  #config.handlers.zabbix.datacenters = ['dfw','phx']
+  config.handlers.zabbix.zabbixmon.monitor.item = 'system:general'
+  config.handlers.zabbix.zabbixmon.monitor.key = 'zabbix_status'
+
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
   config.redis[:port] = ENV.fetch("REDIS_PORT", "6379").to_i
 
-  config.zabbixmon.datacenter.domain.shortnames = ['dfw','phx']
-  config.zabbixmon.sentinel.domain = '[DC_DOMAIN_SHORTNAME]'
-  config.zabbixmon.zabbix.hostname.template = "zabbix-#{config.zabbixmon.sentinel.domain}.pardot.com"
-  #config.zabbixmon.zabbix.hostname.template = "pardot0-monitor1-1-#{config.zabbixmon.sentinel.domain}.ops.sfdc.net"
-  config.zabbixmon.monitor.hostname.template = "pardot0-monitor1-1-#{config.zabbixmon.sentinel.domain}.ops.sfdc.net"
-  config.zabbixmon.monitor.item = 'system:general'
-  config.zabbixmon.monitor.key = 'zabbix_status'
+
 
 
   ## Example: Set configuration for any loaded handlers. See the handler's
