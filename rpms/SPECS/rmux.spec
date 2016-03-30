@@ -1,6 +1,6 @@
 Name: rmux
-Version: 0.3.2.0
-Release: 6%{?dist}
+Version: 0.3.3.0
+Release: 1%{?dist}
 Summary: Redis multiplexer and connection pooling solution
 Group: Applications/Internet
 License: Salesforce
@@ -8,7 +8,7 @@ URL: https://github.com/SalesforceEng/rmux
 Source0: https://github.com/SalesforceEng/rmux/archive/%{version}.tar.gz
 
 BuildRequires: gcc
-BuildRequires: golang >= 1.5.3
+BuildRequires: golang >= 1.5.0
 
 %description
 Redis multiplexer and connection pooling solution
