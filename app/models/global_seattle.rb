@@ -1,4 +1,4 @@
 class GlobalSeattle < PardotGlobalExternal
   self.abstract_class = true
-  establish_connection ENV['DB_S_GLOBAL']
+  establish_connection :seattle_global
 end
