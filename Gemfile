@@ -11,6 +11,7 @@ gem 'omniauth-ldap', '1.0.4'
 gem 'puma', '2.15.3'
 gem 'rails', '4.2.6'
 gem 'sass-rails', '~> 4.0.3'
+gem 'scrolls', '0.3.8'
 gem 'sql-parser', github: "janSF/sql-parser"
 gem 'turbolinks'
 gem 'uglifier', '>= 1.3.0'
