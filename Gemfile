@@ -2,9 +2,11 @@ source 'https://rubygems.org'
 gem 'byebug', group: [:development, :test]
 gem 'coffee-rails', '~> 4.0.0'
 gem 'dotenv'
+gem 'foreman', '0.78.0'
 gem 'jbuilder', '~> 2.0'
 gem 'jquery-rails'
 gem 'mysql2'
+gem 'puma', '2.15.3'
 gem 'rails', '4.2.6'
 gem 'sass-rails', '~> 4.0.3'
 gem 'sql-parser', github: "janSF/sql-parser"
