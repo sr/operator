@@ -8,19 +8,19 @@
   <%= f.hidden_field :is_limited %>
   <%= f.hidden_field :view %>
   <div class="btn-group view">
-    <button type="button" class="btn btn-default<%= is_active?(:view, VW::SQL) %>" data-val="<%= VW::SQL %>">I like my SQL</button>
-    <button type="button" class="btn btn-default<%= is_active?(:view, VW::UI) %>" data-val="<%= VW::UI %>">Pretty UI View</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
   <%= f.hidden_field :datacenter %>
   <div class="btn-group datacenter">
     <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::DALLAS) %>" data-val="<%= DataCenter::DALLAS %>">Dallas</button>
     <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::SEATTLE) %>" data-val="<%= DataCenter::SEATTLE %>">Seattle</button>
   </div>
-  <div class="viewoption" <%= is_active?(:view, VW::UI, 'style="display:none;"') %>>
+  <div class="viewoption" <%= is_active?(:view, Query::UI, 'style="display:none;"') %>>
     <%= f.text_area(:sql, rows: "6") %>
     <%= f.submit "Run Query" %>
   </div>
-  <div class="viewoption" <%= is_active?(:view, VW::SQL, 'style="display:none;"') %>>
+  <div class="viewoption" <%= is_active?(:view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
       <% @query.tables.each do |table| %>
         <tr>

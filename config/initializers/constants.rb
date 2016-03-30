@@ -13,10 +13,3 @@ else
   ENV['DB_S_SHARD1'] = 'mysql2://pardot:pardot@localhost:3306/pardot_shard1'
   ENV['DB_S_SHARD2'] = 'mysql2://pardot:pardot@localhost:3306/pardot_shard2'
 end
-
-# View
-class VW
-  SQL = "SQL"
-  UI = "UI"
-  CSV = "CSV" #for CSV output
-end

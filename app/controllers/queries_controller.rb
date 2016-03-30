@@ -14,7 +14,7 @@ class QueriesController < ApplicationController
     end
     @query.access_logs.create(user: "")
 
-    if @query.view == VW::CSV
+    if @query.view == Query::CSV
       render 'show.csv.erb'
     end
   end
@@ -36,7 +36,7 @@ class QueriesController < ApplicationController
   end
 
   def new
-    defaults = {datacenter: DataCenter::DALLAS, view: VW::SQL}
+    defaults = {datacenter: DataCenter::DALLAS, view: Query::SQL}
     if account_params[:account_id]
       # Accounts query
       @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: Database::SHARD, account_id: account_params[:account_id]))
