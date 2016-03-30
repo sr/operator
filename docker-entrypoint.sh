@@ -36,7 +36,7 @@ sed -i "s/self::\$config\['jsUrl'\]/'\/includes\/libraries\/csrfp\/js\/csrfprote
 sed -i "s/, 50/, 10000/" $ROOTTP/items.load.php
 
 # Make ops managers the default managers (this should be taken out if it's a db without an ops role)
-sed -i "s/'fonction_id' => '0',/'fonction_id' => '0','isAdministratedByRole' => '1'/" $ROOTTP/sources/identify.php
+sed -i "s/'fonction_id' => '0',/'fonction_id' => '0','isAdministratedByRole' => '1',/" $ROOTTP/sources/identify.php
 
 echo '<?php
 /**
