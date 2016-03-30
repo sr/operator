@@ -428,7 +428,11 @@ module.exports = (robot) ->
     msg.send "http://i.imgur.com/Ryv8YVP.gif"
 
   robot.respond /waffles$/i, (msg) ->
-    msg.send "http://i.imgur.com/8TkPJcP.gif"
+    waffleses = [
+      "http://i.imgur.com/8TkPJcP.gif",
+      "https://hipchat.dev.pardot.com/files/1/282/7QJbcMToMrhk7ZR/2016-03-30%2016_31_37.gif"
+    ]
+    msg.send msg.random waffleses
 
   robot.respond /blame\s+(.*)$/i, (msg) ->
     target = msg.match[1]
