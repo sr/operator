@@ -37,11 +37,27 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     ]
   }
   ingress {
+    from_port = 389
+    to_port = 389
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32" # tools-s1 (password.pardot.com)
+    ]
+  }
+  ingress {
     from_port = 636
     to_port = 636
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.canoe_app_production.id}"
+    ]
+  }
+  ingress {
+    from_port = 636
+    to_port = 636
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32" # tools-s1 (password.pardot.com)
     ]
   }
 
