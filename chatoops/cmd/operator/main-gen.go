@@ -18,10 +18,6 @@ const (
 	programName = "operator"
 )
 
-type config struct {
-	Address string `env:"OPERATORD_ADDRESS,default="`
-}
-
 var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{

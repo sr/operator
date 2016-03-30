@@ -18,9 +18,6 @@ const (
 	// Gives instance full access to all Google Cloud services
 	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	startupScriptKey   = "startup-script"
-
-	userAccountScope   = "https://www.googleapis.com/auth/cloud.useraccounts"
-	userInfoEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 )
 
 type apiServer struct {
