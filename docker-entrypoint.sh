@@ -33,7 +33,7 @@ require_once '/teampass/www/includes/sk.php';
 sed -i "s/self::\$config\['jsUrl'\]/'\/includes\/libraries\/csrfp\/js\/csrfprotector\.js'/" $ROOTTP/includes/libraries/csrfp/libs/csrf/csrfprotector.php
 
 # Fix really short password show timeout 50ms to 10s
-sed -i "s/, 50/, 10000" $ROOTTP/items.load.php
+sed -i "s/, 50/, 10000/" $ROOTTP/items.load.php
 
 echo '<?php
 /**
