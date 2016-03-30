@@ -203,12 +203,11 @@ module Lita
                 monitor_hard_fail(failure['monitorname'], failure['message'])
               end
             end
-
           end
-
 
         end
       end
+
       Lita.register_handler(self)
     end
   end
