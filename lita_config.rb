@@ -41,9 +41,6 @@ Lita.configure do |config|
   config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
   config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
   #config.handlers.zabbix.datacenters = ['dfw','phx']
-  config.handlers.zabbix.monitors.zabbixmon.monitor.item = 'system:general'
-  config.handlers.zabbix.monitors.zabbixmon.monitor.key = 'zabbix_status'
-
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")

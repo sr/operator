@@ -1,11 +1,12 @@
-require "set"
+require 'set'
+require 'net/http'
 
 module Zabbix
   class Client
     HostNotFound = Class.new(StandardError)
     MaintenanceGroupDoesNotExist = Class.new(StandardError)
 
-    MAINTENANCE_GROUP_NAME = "zMaintenance"
+    MAINTENANCE_GROUP_NAME = 'zMaintenance'
 
     def initialize(url:, user:, password:)
       @client = ZabbixApi.connect(

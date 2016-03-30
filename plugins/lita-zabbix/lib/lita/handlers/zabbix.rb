@@ -13,13 +13,14 @@ module Lita
       MonitorNotFound = Class.new(StandardError)
 
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
+      config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
       config :datacenters, default: ["dfw"]
-      config :default_datacenter, default: "dfw"
+      config :default_datacenter, default: 'dfw'
       config :monitor_interval_seconds, default: 60
-      config :active_monitors, default: "zabbixmon"
-      config :paging_monitors, default: "zabbixmon"
+      config :active_monitors, default: 'zabbixmon'
+      config :paging_monitors, default: ''
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -197,15 +198,31 @@ module Lita
 
             # zabbixmon: engage!
             if monitor == zabbixmon.monitor_name
-              zabbixmon.monitor
+              zabbixmon.monitor(config.zabbix_host.gsub(/%datacenter%/, datacenter), config.zabbix_user, config.zabbix_password)
 
               zabbixmon.failures.each do |failure|
-                monitor_hard_fail(failure['monitorname'], failure['message'])
+                monitor_hard_fail(zabbixmon.monitor_name, failure['datacenter'], failure['message'])
               end
             end
           end
 
         end
+      end
+
+      def monitor_fail_notify(response:, monitorname:, data_center:, error_msg:, status_room='', pagerduty_alert='')
+        #let me sing you the song of my people
+
+        if !pagerduty_alert.empty?
+          #yo dawg, page pagerduty
+
+
+        end
+
+        if !status_room.empty?
+          #fazha can you hear me?
+
+        end
+
       end
 
       Lita.register_handler(self)

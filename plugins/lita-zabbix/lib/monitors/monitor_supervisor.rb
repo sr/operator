@@ -63,7 +63,7 @@ module Monitors
     private
 
     def redis_expirations_key
-      [REDIS_NAMESPACE, "maintenance_expirations", @datacenter].join(":")
+      [REDIS_NAMESPACE, "monitor_pause_expirations", @datacenter].join(":")
     end
 
     def try_supervise
@@ -90,7 +90,7 @@ module Monitors
     end
 
     def get_paused_monitors
-      @redis.hgetall(redis_expirations_key).select { |k, v| }.keys
+      @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i > now.to_i }.keys
     end
 
     def notify_monitor_unpaused(monitorname)
