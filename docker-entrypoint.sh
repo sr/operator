@@ -29,7 +29,11 @@ global \$server, \$user, \$pass, \$database, \$pre, \$db, \$port, \$encoding;
 require_once '/teampass/www/includes/sk.php';
 ?>" > $ROOTTP/includes/settings.php
 
-sed -i "s/self::\$config\['jsUrl'\]/\$_SESSION\['url_path'\]\.'\/includes\/libraries\/csrfp\/js\/csrfprotector\.js'/" $ROOTTP/includes/libraries/csrfp/libs/csrf/csrfprotector.php
+# No need to hardcode the full url
+sed -i "s/self::\$config\['jsUrl'\]/'\/includes\/libraries\/csrfp\/js\/csrfprotector\.js'/" $ROOTTP/includes/libraries/csrfp/libs/csrf/csrfprotector.php
+
+# Fix really short password show timeout 50ms to 10s
+sed -i "s/, 50/, 10000" $ROOTTP/items.load.php
 
 echo '<?php
 /**

@@ -1,6 +1,7 @@
 # This file does a CSV export from webpasswordsafe
 # To use it find the id of the last password by creating a new one, and adjust the MAX variable accordingly
 # This script will then iterate through all the passwords
+# NOTE: As of 2.1.25.2, you'll have to manually update any backslashes as, they won't be imported
 require 'io/console'
 require 'json'
 require 'csv'
@@ -26,7 +27,9 @@ def blank?(hash)
   blank
 end
 
+CSV.open("wps-sl.csv", "w") do |sl|
 CSV.open("wps.csv", "w") do |f|
+  sl << %w(Label Login Password Web\ Site Comments)
   f << %w(Label Login Password Web\ Site Comments)
   (1..MAX).each do |id|
     next if id % 2 == 1 # WPS increments ids by 2
@@ -35,6 +38,11 @@ CSV.open("wps.csv", "w") do |f|
     next if blank?(json['password'])
     password = `curl -s -H "X-WPS-Username: #{USERNAME}" -H "X-WPS-Password: #{PASSWORD}" #{WPS_HOST}/rest/passwords/#{id}/currentValue`
     json['password'].merge!(JSON.parse(password))
-    f << WPS_FIELDS.map{|field|json['password'][field]}
+    if json['password']['title'][/SLID:/]
+      sl << WPS_FIELDS.map{|field|json['password'][field].gsub('\\', '\\\\')}
+    else
+      f << WPS_FIELDS.map{|field|json['password'][field].gsub('\\', '\\\\')}
+    end
   end
+end
 end
