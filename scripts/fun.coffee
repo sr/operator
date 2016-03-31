@@ -10,6 +10,7 @@
 # Commands:
 #   hubot aggablagblag - agga blag blag
 #   hubot casey - Get casey
+#   hubot meeks - Get meeks
 #   hubot toiletnuggets - Get rid of some nuggets
 #   hubot reversenuggets - Get nuggets
 #   hubot puppies - Get puppies
@@ -315,6 +316,12 @@ module.exports = (robot) ->
       'https://www.dropbox.com/s/sbuty386e22eh85/2015-06-07%2018.13.08-1.jpg'
     ]
     msg.send msg.random tehbishop
+
+  robot.respond /meeks$/i, (msg) ->
+    misterseemeeks = [
+      'http://i.imgur.com/BuMr8wB.png'
+    ]
+    msg.send msg.random misterseemeeks
 
   robot.respond /casey$/i, (msg) ->
     tehcehseh = [
