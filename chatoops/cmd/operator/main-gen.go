@@ -14,9 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	programName = "operator"
-)
+const programName = "operator"
 
 var cmd = operator.NewCommand(
 	programName,

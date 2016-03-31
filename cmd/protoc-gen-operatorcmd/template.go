@@ -20,13 +20,7 @@ import (
 	{{- end}}
 )
 
-const (
-	programName = "{{.Options.BinaryName}}"
-)
-
-type config struct {
-	Address string `+"`"+`env:"OPERATORD_ADDRESS,default={{.Options.DefaultAddress}}"`+"`"+`
-}
+const programName = "{{.Options.BinaryName}}"
 
 var cmd = operator.NewCommand(
 	programName,
