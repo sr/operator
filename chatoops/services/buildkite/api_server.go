@@ -35,7 +35,7 @@ func (s *apiServer) Status(
 	w.Init(output, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "NAME", "STATUS", "BRANCH", "URL")
 	for _, organization := range organizations {
-		projects, err := s.fetchAllOrganizationProjects(organization)
+		projects, err := s.fetchAllOrganizationPipelines(organization)
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +65,7 @@ func (s *apiServer) ListBuilds(
 	request *ListBuildsRequest,
 ) (*ListBuildsResponse, error) {
 	options := &buildkiteapi.BuildsListOptions{
-		State:       "",
+		State:       []string{},
 		Branch:      "",
 		ListOptions: buildkiteapi.ListOptions{Page: 1, PerPage: buildsLimit},
 	}
@@ -80,7 +80,7 @@ func (s *apiServer) ListBuilds(
 		if len(p) != 2 {
 			return nil, errors.New("invalid slug. must be in the form org/repo")
 		}
-		builds, _, err = s.client.Builds.ListByProject(p[0], p[1], options)
+		builds, _, err = s.client.Builds.ListByPipeline(p[0], p[1], options)
 	}
 	if err != nil {
 		return nil, err
@@ -135,15 +135,15 @@ func (s *apiServer) fetchAllOrganizations() ([]buildkiteapi.Organization, error)
 	return organizations, nil
 }
 
-func (s *apiServer) fetchAllOrganizationProjects(
+func (s *apiServer) fetchAllOrganizationPipelines(
 	organization buildkiteapi.Organization,
-) ([]buildkiteapi.Project, error) {
-	var projects []buildkiteapi.Project
+) ([]buildkiteapi.Pipeline, error) {
+	var projects []buildkiteapi.Pipeline
 	pageNumber := 1
 	for {
-		collection, response, err := s.client.Projects.List(
+		collection, response, err := s.client.Pipelines.List(
 			*organization.Slug,
-			&buildkiteapi.ProjectListOptions{
+			&buildkiteapi.PipelineListOptions{
 				ListOptions: buildkiteapi.ListOptions{
 					Page:    pageNumber,
 					PerPage: 100,
