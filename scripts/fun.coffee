@@ -80,6 +80,7 @@
 #   hubot inconceivable - inconceivable!!!
 #   hubot bonk - bonks adventure
 #   hubot pd - pagerduty phone smash :)
+#   hubot rogerroger - What's your vector, Victor? Huh? you have clearance, Clarence. What?
 
 _ = require "underscore"
 
@@ -92,6 +93,9 @@ module.exports = (robot) ->
 
   robot.respond /catdance$/i, (msg) ->
     msg.send "http://media2.giphy.com/media/8rcikGsC4jED6/giphy.gif"
+
+  robot.respond /rogerroger$/i, (msg) ->
+    msg.send "https://www.youtube.com/watch?v=NfDUkR3DOFw&feature=youtu.be&t=55"
 
   robot.respond /ping(\s)?pong$/i, (msg) ->
     msg.send "https://media.giphy.com/media/4IAzyrhy9rkis/giphy.gif"
