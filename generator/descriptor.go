@@ -57,17 +57,17 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		Options: &Options{
 			BinaryName: binaryName,
 		},
-		Services: make([]*Service, numServices),
 	}
 	i := 0
 	sort.Strings(request.FileToGenerate)
 	for _, fileName := range request.FileToGenerate {
 		file := filesByName[fileName]
+		services := make([]*Service, len(file.Service))
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
 		for _, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
 		}
-		for _, service := range file.Service {
+		for j, service := range file.Service {
 			if service.Options == nil {
 				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
 			}
@@ -78,7 +78,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			nameStr := *name.(*string)
 			fn := file.GetName()
 			importPath := filepath.Join(importPathPrefix, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
-			desc.Services[i] = &Service{
+			services[j] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),
 				Description: undocumentedPlaceholder,
@@ -87,7 +87,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				PackageName: file.GetPackage(),
 				ImportPath:  importPath,
 			}
-			for j, method := range service.Method {
+			for k, method := range service.Method {
 				inputName := strings.Split(method.GetInputType(), ".")[2]
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
 				input, ok := messagesByName[inputName]
@@ -104,18 +104,18 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				if err := validateMessageHasField(output, outputField); err != nil {
 					return nil, err
 				}
-				desc.Services[i].Methods[j] = &Method{
+				services[j].Methods[k] = &Method{
 					Name:        method.GetName(),
 					Description: undocumentedPlaceholder,
 					Input:       inputName,
 					Output:      outputName,
 					Arguments:   make([]*Argument, len(input.Field)-1),
 				}
-				for k, field := range input.Field {
+				for l, field := range input.Field {
 					if field.GetName() == sourceField {
 						continue
 					}
-					desc.Services[i].Methods[j].Arguments[k-1] = &Argument{
+					services[j].Methods[k].Arguments[l-1] = &Argument{
 						// TODO(sr) deal with ID => Id etc better
 						Name:        strings.Replace(field.GetName(), "ID", "Id", 1),
 						Description: undocumentedPlaceholder,
@@ -129,11 +129,14 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
-				desc.Services[loc.Path[1]].Description = clean(*loc.LeadingComments)
+				services[loc.Path[1]].Description = clean(*loc.LeadingComments)
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
-				desc.Services[loc.Path[1]].Methods[loc.Path[3]].Description = clean(*loc.LeadingComments)
+				s := services[loc.Path[1]]
+				m := s.Methods[loc.Path[3]]
+				m.Description = clean(*loc.LeadingComments)
 			}
 		}
+		desc.Services = append(desc.Services, services...)
 	}
 	return desc, nil
 }

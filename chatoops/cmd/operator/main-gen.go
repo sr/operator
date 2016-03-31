@@ -91,7 +91,7 @@ var cmd = operator.NewCommand(
 			Methods: []operator.MethodCommand{
 				{
 					Name:     "create-dev-instance",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Provision a development instance using the configured image.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
@@ -116,7 +116,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "list-instances",
-					Synopsis: `Undocumented.`,
+					Synopsis: `List all instances under the configured project.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						project_id := ctx.Flags.String("project-id", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
@@ -143,7 +143,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "stop",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Stop a running instance.`,
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						instance := ctx.Flags.String("instance", "", "")
 						zone := ctx.Flags.String("zone", "", "")

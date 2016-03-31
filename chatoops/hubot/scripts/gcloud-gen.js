@@ -2,9 +2,9 @@
 //  Undocumented.
 //
 // Commands:
-//   hubot gcloud create-dev-instance  - Undocumented.
-//   hubot gcloud list-instances  [project_id=value] - Undocumented.
-//   hubot gcloud stop  [instance=value] [zone=value] - Undocumented.
+//   hubot gcloud create-dev-instance  - Provision a development instance using the configured image.
+//   hubot gcloud list-instances  [project_id=value] - List all instances under the configured project.
+//   hubot gcloud stop  [instance=value] [zone=value] - Stop a running instance.
 //
 // Configuration:
 //   OPERATORD_ADDRESS
