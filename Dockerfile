@@ -14,7 +14,8 @@ WORKDIR /app
 
 ADD Gemfile /app/Gemfile
 ADD Gemfile.lock /app/Gemfile.lock
-RUN bundle install
+ADD vendor/cache /app/vendor/cache
+RUN bundle install --local
 
 ADD . /app
 RUN bundle exec rake assets:precompile
