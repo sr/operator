@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'lograge', '0.3.6'
+gem 'scrolls', '0.3.8'
 gem 'rails', '4.2.5.1'
 gem 'mysql2', '~> 0.3', '>= 0.3.18'
 
