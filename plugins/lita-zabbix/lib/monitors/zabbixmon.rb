@@ -18,7 +18,7 @@ module Monitors
     ERR_NON_200_HTTP_CODE = "[HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ERR_ZABBIX_STATUS_KEY_MISSING = "HAL9000 was able to load the system:general 'item' but was unable to locate the key zabbix_status 'key' "
-    ERR_VALUE_MISMATCH = "HAL9000 was able to load system:general/zabbix_status, but the value it expected was not the one received. Data insertion may be compromised. See: 'zabbix-status-check.sh'"
+    ERR_VALUE_MISMATCH = "HAL9000 was able to load system:general/zabbix_status, but the value it expected was not the one received."
 
     def initialize(datacenters:, redis:, clients:, log:)
       @datacenters = datacenters
@@ -69,7 +69,7 @@ module Monitors
 
           begin
             # pull the "item" that contains the desired K/V pair
-            system_general = @clients['datacenter'].get_item(config.item)
+            system_general = @clients['datacenter'].get_item_by_lastvalue(payload)
             @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
           rescue => e
             @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
@@ -141,4 +141,3 @@ module Monitors
     end
   end
 end
-

@@ -1,5 +1,4 @@
 require 'set'
-require 'net/http'
 
 module Zabbix
   class Client
@@ -67,14 +66,12 @@ module Zabbix
       )
     end
 
-    def get_item(itemname)
+    def get_item_by_lastvalue(lastvalue:)
       @client.client.api_request(
           method: "item.get",
           params: {
-              output: "extend",
-              selectGroups: "extend",
               filter: {
-                  host: hostname
+                  lastvalue: lastvalue
               },
           },
       ).first.tap { |host|
