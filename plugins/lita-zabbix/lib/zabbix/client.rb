@@ -6,7 +6,7 @@ module Zabbix
     HostNotFound = Class.new(StandardError)
     MaintenanceGroupDoesNotExist = Class.new(StandardError)
 
-    MAINTENANCE_GROUP_NAME = 'zMaintenance'
+    MAINTENANCE_GROUP_NAME = "zMaintenance"
 
     def initialize(url:, user:, password:)
       @client = ZabbixApi.connect(
@@ -65,6 +65,21 @@ module Zabbix
           searchWildcardsEnabled: 1,
         }
       )
+    end
+
+    def get_item(itemname)
+      @client.client.api_request(
+          method: "item.get",
+          params: {
+              output: "extend",
+              selectGroups: "extend",
+              filter: {
+                  host: hostname
+              },
+          },
+      ).first.tap { |host|
+        raise HostNotFound if host.nil?
+      }
     end
 
     private
