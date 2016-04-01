@@ -66,17 +66,16 @@ module Zabbix
       )
     end
 
-    def get_item_by_lastvalue(lastvalue:)
+    def get_item_by_key_and_lastvalue(key:, lastvalue:)
       @client.client.api_request(
           method: "item.get",
           params: {
-              filter: {
+              search: {
+                  key_: key,
                   lastvalue: lastvalue
               },
           },
-      ).first.tap { |host|
-        raise HostNotFound if host.nil?
-      }
+      )
     end
 
     private

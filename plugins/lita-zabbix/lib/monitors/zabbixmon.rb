@@ -69,7 +69,7 @@ module Monitors
 
           begin
             # pull the "item" that contains the desired K/V pair
-            system_general = @clients['datacenter'].get_item_by_lastvalue(payload)
+            system_general = @clients['datacenter'].get_item_by_key_and_lastvalue(config.key, payload)
             @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
           rescue => e
             @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
