@@ -4,7 +4,6 @@ class Query < ActiveRecord::Base
   SQL = "SQL"
 
   belongs_to :account
-  has_many :access_logs
   validates :account_id, presence: true, if: :account?
 
   def account?

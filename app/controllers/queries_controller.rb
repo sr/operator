@@ -12,8 +12,6 @@ class QueriesController < ApplicationController
       @query.errors.add :sqlerror, e
       render :new
     end
-    @query.access_logs.create(user: "")
-
     if @query.view == Query::CSV
       render 'show.csv.erb'
     end

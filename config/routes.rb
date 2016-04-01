@@ -12,7 +12,6 @@ Rails.application.routes.draw do
   resource :global, only: [] do
     resources :queries, except: [:destroy, :edit]
   end
-  resources :access_logs, only: :index
 
   root 'welcome#index'
 end
