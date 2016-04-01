@@ -1,6 +1,6 @@
 require "zabbixapi"
-require "zabbix/client"
 require "zabbix/maintenance_supervisor"
+require "zabbix/client"
 require "monitors/zabbixmon"
 require "monitors/monitor_supervisor"
 require "notifiers/pagerduty_pager"
@@ -17,7 +17,7 @@ module Lita
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
       config :datacenters, default: ["dfw"]
-      config :default_datacenter, default: 'dfw'
+      config :default_datacenter, default: "dfw"
       config :monitor_interval_seconds, default: 60
       config :active_monitors, default: 'zabbixmon'
       config :paging_monitors, default: ''
