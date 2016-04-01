@@ -39,6 +39,10 @@ module Canoe
       g.factory_girl false
     end
 
+    initializer "instrumentation_library" do
+      Instrumentation.setup(Rails.env)
+    end
+
     # Autoload files from lib/
     config.autoload_paths << Rails.root.join("lib")
 

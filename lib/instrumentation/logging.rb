@@ -23,6 +23,10 @@ module Instrumentation
       @logger.log(data, &block)
     end
 
+    def log_exception(exception, data, &block)
+      @logger.log_exception(exception, data, &block)
+    end
+
     def reset
       @logger.reset
     end

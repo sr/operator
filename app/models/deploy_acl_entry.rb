@@ -24,7 +24,7 @@ class DeployACLEntry < ActiveRecord::Base
     when "ldap_group"
       ldap_group_authorized?(user)
     else
-      Rails.logger.error "Unknown ACL type: #{type}"
+      Instrumentation.error("unknown-acl-type", type: type)
       false
     end
   end

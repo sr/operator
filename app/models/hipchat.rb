@@ -88,7 +88,6 @@ class Hipchat
       request.set_form_data(body)
 
       http.request(request) if Rails.env.production?
-      Rails.logger.info("HIPCHAT: [#{room}] #{msg}")
     end
 
     def build_link(deploy, link = true)

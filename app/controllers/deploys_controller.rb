@@ -100,8 +100,7 @@ class DeploysController < ApplicationController
 
     # we have to work around stevie's busted git setup (facepalm)
     # gather some sort of author from each commit
-    authors = \
-      output.commits.collect do |commit|
+    authors = output.commits.collect do |commit|
       commit.author || commit.committer || commit.commit.author || commit.commit.committer
     end
     # try to pull out the username or email (yes, stevie's email is in the name field)
@@ -109,7 +108,7 @@ class DeploysController < ApplicationController
       author.try(:login) || author.try(:name)
     end.uniq.sort
   rescue Octokit::InternalServerError => e
-    Rails.logger.error("Internal server while attempting to fetch committers: #{e}")
+    Instrumentation.log_exception(e, "github-committers")
     []
   rescue Octokit::NotFound
     []

@@ -33,8 +33,8 @@ class ProvisionalDeploy
     options_validator = \
       begin
         properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
-      rescue
-        Rails.logger.warn("Unable to parse optionsValidator: #{$!}")
+      rescue JSON::ParseError
+        Instrumentation.log_exception($!, "options-validator")
         nil
       end
 

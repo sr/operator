@@ -140,11 +140,15 @@ class ApplicationController < ActionController::Base
     else
       acl = DeployACLEntry.for_repo_and_deploy_target(current_repo, current_target)
       if acl && !acl.authorized?(current_user)
-        Rails.logger.info "#{current_user.uid} is NOT authorized to deploy to #{current_repo.name} in #{current_target.name}"
+        Instrumentation.error(
+          "deploy-not-authorized",
+          current_user: current_user.uid,
+          repo: current_repo.name,
+          target: current_target.name,
+        )
         render template: "application/not_authorized_for_deploy", status: :unauthorized
         false
       else
-        Rails.logger.info "#{current_user.uid} is authorized to deploy to #{current_repo.name} in #{current_target.name}"
         true
       end
     end
