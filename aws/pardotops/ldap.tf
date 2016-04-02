@@ -32,6 +32,12 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     from_port = 389
     to_port = 389
     protocol = "tcp"
+    self = true
+  }
+  ingress {
+    from_port = 389
+    to_port = 389
+    protocol = "tcp"
     security_groups = [
       "${aws_security_group.canoe_app_production.id}"
     ]
@@ -43,6 +49,12 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     cidr_blocks = [
       "173.192.141.222/32" # tools-s1 (password.pardot.com)
     ]
+  }
+  ingress {
+    from_port = 636
+    to_port = 636
+    protocol = "tcp"
+    self = true
   }
   ingress {
     from_port = 636
@@ -67,7 +79,6 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
       "${aws_eip.internal_apps_bastion.public_ip}/32"
     ]
   }
