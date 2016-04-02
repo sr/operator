@@ -102,3 +102,13 @@ resource "aws_eip" "ldap_master" {
   vpc = true
   instance = "${aws_instance.ldap_master.id}"
 }
+
+resource "aws_route53_record" "ldap_ops_pardot_com" {
+  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
+  name = "ldap.ops.pardot.com"
+  type = "A"
+  ttl = "300"
+  records = [
+    "${aws_eip.ldap_master.public_ip}"
+  ]
+}

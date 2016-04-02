@@ -1,5 +1,7 @@
 resource "aws_vpc" "internal_apps" {
   cidr_block = "172.30.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
   tags {
     Name = "internal_apps"
   }
@@ -226,6 +228,13 @@ resource "aws_db_subnet_group" "internal_apps" {
     "${aws_subnet.internal_apps_us_east_1d.id}",
     "${aws_subnet.internal_apps_us_east_1e.id}"
   ]
+}
+
+# DNS
+
+resource "aws_route53_zone" "internal_apps_ops_pardot_com" {
+  name = "ops.pardot.com"
+  vpc_id = "${aws_vpc.internal_apps.id}"
 }
 
 # VPC Peering with tools_egress
