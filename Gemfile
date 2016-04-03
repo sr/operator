@@ -31,5 +31,5 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.3', '>= 3.3.3'
   gem 'spring'
   gem 'web-console', '~> 2.0'
-  gem 'webmock', '~> 1.21', '>= 1.21.0', require: false
+  gem 'webmock', '~> 1.21', '>= 1.21.0'
 end
