@@ -47,6 +47,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     to_port = 389
     protocol = "tcp"
     cidr_blocks = [
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.internal_apps_bastion.public_ip}/32",
       "173.192.141.222/32" # tools-s1 (password.pardot.com)
     ]
   }
@@ -69,6 +71,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     to_port = 636
     protocol = "tcp"
     cidr_blocks = [
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.internal_apps_bastion.public_ip}/32",
       "173.192.141.222/32" # tools-s1 (password.pardot.com)
     ]
   }
