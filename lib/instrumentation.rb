@@ -6,6 +6,10 @@ module Instrumentation
     Logging.setup(rails_env)
   end
 
+  def context(data, &block)
+    Logging.context(data, &block)
+  end
+
   def log(data, &block)
     Logging.log(data, &block)
   end
@@ -20,6 +24,7 @@ module Instrumentation
 
   module_function \
     :setup,
+    :context,
     :log,
     :request_id,
     :request_id=

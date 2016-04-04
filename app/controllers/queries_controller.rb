@@ -7,7 +7,7 @@ class QueriesController < ApplicationController
     @query = Query.find(params[:id])
     @ast = @query.parse(@query.sql)
     begin
-      @result = @query.execute(@ast.try(:to_sql))
+      @result = @query.execute(current_user, @ast.try(:to_sql))
     rescue ActiveRecord::StatementInvalid => e
       @query.errors.add :sqlerror, e
       render :new

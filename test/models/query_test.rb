@@ -2,6 +2,10 @@ require 'test_helper'
 
 class QueryTest < ActiveSupport::TestCase
   setup do 
+    @user = AuthUser.new(
+      email: "user@salesforce.com",
+      name: "user",
+    )
     @gquery = Query.new(
       database: Database::GLOBAL,
       datacenter: DataCenter::DALLAS,
@@ -31,6 +35,21 @@ class QueryTest < ActiveSupport::TestCase
     ast = SQLParser::Parser.new.scan_str(command)
     @query = Query.new
     assert_equal expected, @query.extract_table_name(ast)
+  end
+
+  test "execute" do
+    assert_raises(ArgumentError) do
+      @gquery.execute(nil, "SELECT 1")
+    end
+    result = @gquery.execute(@user, "SELECT 1")
+    assert_equal "1", result.fields[0]
+
+    log = Instrumentation::Logging.entries[0]
+    assert_equal DataCenter::DALLAS, log[:datacenter]
+    assert_equal Database::GLOBAL, log[:database]
+    assert_equal "SELECT 1", log[:query]
+    assert_equal "user@salesforce.com", log[:user_email]
+    assert_equal "user", log[:user_name]
   end
 
   # Do different selects

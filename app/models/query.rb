@@ -18,8 +18,24 @@ class Query < ActiveRecord::Base
     connection.tables
   end
 
-  def execute(cmd)
-    connection.execute(cmd)
+  def execute(user, query)
+    if !user.kind_of?(AuthUser)
+      raise ArgumentError, "user must be a AuthUser"
+    end
+
+    data = {
+      database: database,
+      datacenter: datacenter,
+      query: query,
+      user_name: user.name,
+      user_email: user.email,
+    }
+    if account_id
+      data[:account_id] = account_id
+    end
+    Instrumentation.log(data)
+
+    connection.execute(query)
   end
 
   def connection

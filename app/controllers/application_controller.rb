@@ -4,7 +4,15 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_filter :require_oauth_authentication
 
+  around_filter :log_context
+
   protected
+
+  def log_context
+    Instrumentation.context(request_id: Instrumentation.request_id) do
+      yield
+    end
+  end
 
   def append_info_to_payload(payload)
     payload[:request_id] = Instrumentation.request_id
