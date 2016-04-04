@@ -14,7 +14,10 @@ class AccountTest < ActiveSupport::TestCase
     assert_not Account.find(2).access?
   end
 
-  test "Dynamically create shard" do
-    assert Account.create_shard(1)
+  test "shard" do
+    account = Account.find(1)
+    shard = account.shard(DataCenter::DALLAS)
+    assert_not_nil shard
+    assert_equal "Shard1Dallas", shard.name
   end
 end

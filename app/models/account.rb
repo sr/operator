@@ -27,8 +27,7 @@ class Account < GlobalDallas
   end
 
   def self.create_shard(shard_id, datacenter = DataCenter::DALLAS)
-    # Dynamically creates Shard Classes which hold the db connection for us
-    shard_name = "Shard#{shard_id}#{datacenter}"
+    shard_name = "Shard#{shard_id}#{datacenter.capitalize}"
     begin
       shard_name.constantize
     rescue NameError
@@ -36,9 +35,11 @@ class Account < GlobalDallas
         self.table_name = "account"
       end
       Object.const_set shard_name, klass
-      shard_name.constantize.class_eval do
+      constant = shard_name.constantize
+      constant.class_eval do
         establish_connection_on_shard(shard_id, datacenter)
       end
+      constant
     end
   end
 end
