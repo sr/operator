@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$(dirname "$0")/.."
+databases="pardot_global pardot_shard1 pardot_shard2"
+vagrant_id="$(vagrant global-status | grep vagrant-dev | awk '{ print $1 }')"
+vagrant ssh "$vagrant_id" -c "mysqldump -uroot -ppardot07 --databases $databases"
