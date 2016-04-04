@@ -198,8 +198,13 @@ module Lita
             if monitor == zabbixmon.monitor_name
               zabbixmon.monitor(config.zabbix_host.gsub(/%datacenter%/, datacenter), config.zabbix_user, config.zabbix_password)
 
-              zabbixmon.failures.each do |failure|
-                monitor_hard_fail(zabbixmon.monitor_name, failure['datacenter'], failure['message'])
+              zabbixmon.failures.each do |datacenter, message|
+                monitor_fail_notify(zabbixmon.monitor_name,
+                                    datacenter,
+                                    message,
+                                    zabbixmon.notify_status_channel?,
+                                    config.paging_monitors.include?(zabbixmon.monitor_name)
+                )
               end
             end
           end
@@ -207,20 +212,19 @@ module Lita
         end
       end
 
-      def monitor_fail_notify(response:, monitorname:, data_center:, error_msg:, status_room='', pagerduty_alert='')
+      def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, pagerduty_alert)
         #let me sing you the song of my people
 
-        if !pagerduty_alert.empty?
+        if pagerduty_alert
           #yo dawg, page pagerduty
-
-
+          @log.info("Paging sequence initiated. Paging pagerduty")
+          #TODO: PAGE-R-(seriouspoo)
         end
 
-        if !status_room.empty?
-          #fazha can you hear me?
-
-        end
-
+        #fazha can you hear me?
+        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
+        @log.info("Telling hipchat channel #{@status_room}: #{whining}")
+        robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
       end
 
       Lita.register_handler(self)

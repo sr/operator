@@ -25,7 +25,7 @@ module Monitors
       @redis = redis
       @clients = clients
       @log = log
-      @hard_failures = []
+      @hard_failures = {}
     end
 
 
@@ -104,9 +104,9 @@ module Monitors
         if monitor_success
           # we did it, reddit!
 
-          @log.info("[#{monitor_name}] 's work is done here'(successkid)")
+          @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
           # wipe fails; they dont matter
-          @hard_failures = []
+          @hard_failures = {}
           soft_failures = []
 
         else
@@ -125,8 +125,12 @@ module Monitors
     end
 
 
-    def monitor_name()
+    def monitor_name
       MONITOR_NAME
+    end
+
+    def notify_status_channel?
+      config.hipchat_notify
     end
 
     private
