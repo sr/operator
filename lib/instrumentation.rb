@@ -2,7 +2,7 @@ module Instrumentation
   autoload :Logging, "instrumentation/logging"
   autoload :RequestId, "instrumentation/request_id"
 
-  def setup(rails_env:)
+  def setup(rails_env)
     Logging.setup(rails_env)
   end
 

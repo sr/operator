@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def append_info_to_payload(payload)
-    payload[:request_id] = request.env["action_dispatch.request_id"]
+    payload[:request_id] = Instrumentation.request_id
   end
 
   private
