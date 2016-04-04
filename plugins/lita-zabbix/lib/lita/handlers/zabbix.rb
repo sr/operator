@@ -47,7 +47,6 @@ module Lita
             )
 
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
-            maintenance_supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
             maintenance_supervisor.ensure_supervising
 
 
@@ -58,8 +57,7 @@ module Lita
                 log: log
             )
 
-            monitor_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
-            monitor_supervisor.on_maintenance_unpaused = proc { |monitorname| monitor_expired(monitorname) }
+            monitor_supervisor.monitor_unpause = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
 
           rescue => e
