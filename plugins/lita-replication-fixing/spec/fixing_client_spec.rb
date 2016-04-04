@@ -30,8 +30,8 @@ module ReplicationFixing
       end
 
       it "returns an error if the shard is erroring and not fixable" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard2-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw2")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
         result = fixing_client.fix(shard: hostname)
