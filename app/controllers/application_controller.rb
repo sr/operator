@@ -4,6 +4,12 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_filter :require_oauth_authentication
 
+  protected
+
+  def append_info_to_payload(payload)
+    payload[:request_id] = request.env["action_dispatch.request_id"]
+  end
+
   private
 
   def require_oauth_authentication
