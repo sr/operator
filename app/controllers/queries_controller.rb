@@ -20,12 +20,9 @@ class QueriesController < ApplicationController
   def create
     @query = Query.new(query_params)
     @query.account_id = account_params[:account_id]
+    @result = @query.execute(current_user, "")
     
-    if @query.save
-      redirect_to @query.account? ? account_query_path(@query.account, @query) : global_query_path(@query)
-    else
-      render :new
-    end
+    render :show
   end
 
   def update
@@ -47,7 +44,7 @@ class QueriesController < ApplicationController
   private
 
   def query_params
-    params.require(:query).permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
+    params.permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
   end
 
   def account_params

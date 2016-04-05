@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140915151939) do
+ActiveRecord::Schema.define(version: 20131002130914) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -23,16 +23,5 @@ ActiveRecord::Schema.define(version: 20140915151939) do
   end
 
   add_index "auth_users", ["email"], name: "index_auth_users_on_email", using: :btree
-
-  create_table "queries", force: :cascade do |t|
-    t.string   "database",   limit: 255
-    t.string   "datacenter", limit: 255
-    t.integer  "account_id", limit: 4
-    t.text     "sql",        limit: 65535
-    t.string   "view",       limit: 255
-    t.boolean  "is_limited",               default: true
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
 end

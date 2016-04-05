@@ -1,21 +1,47 @@
-class Query < ActiveRecord::Base
+class Query
   CSV = "CSV"
   UI = "UI"
   SQL = "SQL"
 
-  belongs_to :account
-  validates :account_id, presence: true, if: :account?
+  def initialize(attributes = {})
+    @datacenter = attributes.fetch(:datacenter, DataCenter::DALLAS)
+    @database = attributes.fetch(:database, Database::GLOBAL)
+    @sql = attributes.fetch(:sql, "")
+    @account_id = attributes.delete(:account_id)
+    @view = attributes.fetch(:view, SQL)
+  end
+
+  attr_reader :view, :datacenter, :database, :sql
+  attr_accessor :account_id
+  attr_writer :is_limited, :sql
+
+  def errors
+    []
+  end
+
+  # belongs_to :account
+  # validates :account_id, presence: true, if: :account?
 
   def account?
-    database == Database::SHARD
+    @database == Database::SHARD
   end
 
   def select_all?
-    sql.match(/SELECT \*/i)
+    @sql.match(/SELECT \*/i)
   end
 
   def tables
     connection.tables
+  end
+
+  def is_limited
+    true
+  end
+
+  def account
+    if @account_id
+      Account.find(@account_id)
+    end
   end
 
   def execute(user, query)
@@ -24,26 +50,26 @@ class Query < ActiveRecord::Base
     end
 
     data = {
-      database: database,
-      datacenter: datacenter,
-      query: query,
+      database: @database,
+      datacenter: @datacenter,
+      query: @sql,
       user_name: user.name,
       user_email: user.email,
     }
-    if account_id
-      data[:account_id] = account_id
+    if @account_id
+      data[:account_id] = @account_id
     end
     Instrumentation.log(data)
 
-    connection.execute(query)
+    connection.execute(@sql)
   end
 
   def connection
-    case database
+    case @database
     when Database::SHARD
-      account.shard(datacenter).connection
+      account.shard(@datacenter).connection
     when Database::GLOBAL
-      case datacenter
+      case @datacenter
       when DataCenter::DALLAS
         GlobalDallas.connection
       when DataCenter::SEATTLE

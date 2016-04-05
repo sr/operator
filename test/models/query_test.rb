@@ -41,6 +41,7 @@ class QueryTest < ActiveSupport::TestCase
     assert_raises(ArgumentError) do
       @gquery.execute(nil, "SELECT 1")
     end
+    @gquery.sql = "SELECT 1"
     result = @gquery.execute(@user, "SELECT 1")
     assert_equal "1", result.fields[0]
 
