@@ -11,7 +11,7 @@ class PardotShardExternal < ActiveRecord::Base
       raise ArgumentError, "shard_id can not be nil"
     end
 
-    establish_connection("test_pardot_shard#{shard_id}")
+    establish_connection("pardot_shard#{shard_id}_#{Rails.env}")
   end
 
   private

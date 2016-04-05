@@ -1,26 +1,32 @@
-development: &development
+default: &default
   adapter: mysql2
-  host: <%= ENV.fetch("BOXEN_MYSQL_HOST", "127.0.0.1") %>
-  port: <%= ENV.fetch("BOXEN_MYSQL_PORT", 3306) %>
+  encoding: utf8
+  pool: 5
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
+  port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
   username: <%= ENV.fetch("BOXEN_MYSQL_USER", "root") %>
+  password:
+
+development: &development
+  <<: *default
   database: pardot_explorer_development
 
 dallas_global:
   <<: *development
-  database: test_pardot_global
+  database: pardot_global_test
 
 test:
   <<: *development
   database: pardot_explorer_test
 
-test_pardot_global:
+pardot_global_test:
   <<: *development
-  database: test_pardot_global
+  database: pardot_global_test
 
-test_pardot_shard1:
+pardot_shard1_test:
   <<: *development
-  database: test_pardot_shard1
+  database: pardot_shard1_test
 
-test_pardot_shard2:
+pardot_shard2_test:
   <<: *development
-  database: test_pardot_shard2
+  database: pardot_shard2_test

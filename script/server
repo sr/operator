@@ -1,15 +1,16 @@
 #!/bin/sh
 # script/server: Launch the application and any extra required processes
 #                locally.
-set -e
-
+set -eu
 cd "$(dirname "$0")/.."
+
+: "${RACK_ENV:="development"}"
 
 # Race condition when starting up multiple containers
 # So wait for mysql in docker composer
 # https://github.com/docker/compose/issues/374
-test -n "$CANOE_DATABASE_HOST" &&
-  while ! nc -w 1 $CANOE_DATABASE_HOST 3306 1>/dev/null 2>/dev/null
+test -n "$DATABASE_HOST" &&
+  while ! nc -w 1 "$DATABASE_HOST" "$DATABASE_PORT" 1>/dev/null 2>/dev/null
   do
     echo "Waiting for MySQL"
     sleep 1
@@ -17,9 +18,6 @@ test -n "$CANOE_DATABASE_HOST" &&
 
 # ensure everything in the app is up to date.
 script/update
-
-test -z "$RACK_ENV" &&
-  RACK_ENV='development'
 
 rm -f tmp/pids/server.pid
 

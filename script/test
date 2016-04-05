@@ -1,10 +1,15 @@
 #!/bin/sh
 # script/test: Run test suite for application. Optionallly pass in a path to an
 #              individual test file to run a single test.
-set -e
+set -eu
 
 cd "$(dirname "$0")/.."
 
+RACK_ENV="test"
+RAILS_ENV="test"
+export RACK_ENV RAILS_ENV
+
+: "${DEBUG:=""}"
 [ -z "$DEBUG" ] || set -x
 
 export RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
@@ -25,9 +30,21 @@ else
   script/update
 fi
 
+for i in pardot_global pardot_shard1 pardot_shard2
+do
+    dbname="${i}_test"
+    dump="db/vagrant-dev/${i}.sql"
+    echo "==> Importing $dump into database $dbname"
+    mysqladmin -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+        create "$dbname" 2>/dev/null || true
+    cat "$dump" | sed -e "s/$i/$dbname/g" |
+    mysql -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname"
+done
+
+
 echo "===> Running tests..."
 
-if [ -n "$1" ]; then
+if [ -n "${1:-""}" ]; then
   # pass arguments to test call. This is useful for calling a single test.
   bin/rake test "$1"
 else
