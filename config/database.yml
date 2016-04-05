@@ -1,46 +1,26 @@
-development:
+development: &development
   adapter: mysql2
   host: <%= ENV.fetch("BOXEN_MYSQL_HOST", "127.0.0.1") %>
   port: <%= ENV.fetch("BOXEN_MYSQL_PORT", 3306) %>
   username: <%= ENV.fetch("BOXEN_MYSQL_USER", "root") %>
   database: pardot_explorer_development
 
-vagrant_dev_global: &vagrant_dev_global
-  adapter: mysql2
-  host: 127.0.0.1
-  username: root
-  password: pardot07
-  database: pardot_global
-
-vagrant_dev_shard1: &vagrant_dev_shard1
-  <<: *vagrant_dev_global
-  database: pardot_shard1
-
-vagrant_dev_shard2: &vagrant_dev_shard2
-  <<: *vagrant_dev_global
-  database: pardot_shard2
-
 dallas_global:
-  <<: *vagrant_dev_global
-
-dallas_shard1:
-  <<: *vagrant_dev_shard1
-
-dallas_shard2:
-  <<: *vagrant_dev_shard2
-
-seattle_global:
-  <<: *vagrant_dev_global
-
-seattle_shard1:
-  <<: *vagrant_dev_shard1
-
-seattle_shard2:
-  <<: *vagrant_dev_shard2
+  <<: *development
+  database: test_pardot_global
 
 test:
-  adapter: mysql2
-  host: 127.0.0.1
-  port: 13306
-  username: root
-  database: pardot_global_test
+  <<: *development
+  database: pardot_explorer_test
+
+test_pardot_global:
+  <<: *development
+  database: test_pardot_global
+
+test_pardot_shard1:
+  <<: *development
+  database: test_pardot_shard1
+
+test_pardot_shard2:
+  <<: *development
+  database: test_pardot_shard2

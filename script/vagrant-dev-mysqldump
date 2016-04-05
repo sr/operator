@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e
 cd "$(dirname "$0")/.."
+
 databases="pardot_global pardot_shard1 pardot_shard2"
 vagrant_id="$(vagrant global-status | grep vagrant-dev | awk '{ print $1 }')"
-vagrant ssh "$vagrant_id" -c "mysqldump -uroot -ppardot07 --databases $databases"
+
+for i in pardot_global pardot_shard1 pardot_shard2
+do
+    echo "==> Setting up database test_$i"
+    mysqladmin create "test_$i" || true
+    vagrant ssh "$vagrant_id" -c "mysqldump -uroot -ppardot07 --databases $i" |
+    sed -e "s/$i/test_$i/g" |
+    mysql -h "$BOXEN_MYSQL_HOST" -P "$BOXEN_MYSQL_PORT" "test_$i"
+done

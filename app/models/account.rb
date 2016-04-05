@@ -37,7 +37,7 @@ class Account < GlobalDallas
       Object.const_set shard_name, klass
       constant = shard_name.constantize
       constant.class_eval do
-        establish_connection_on_shard(shard_id, datacenter)
+        establish_shard_connection(datacenter, shard_id)
       end
       constant
     end

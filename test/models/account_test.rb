@@ -6,8 +6,12 @@ class AccountTest < ActiveSupport::TestCase
   end
 
   test "test account access" do
-    # Solaris Panels should have access
-    assert @account.access?
+    assert_equal false, @account.access?
+    @account.account_accesses.create!(
+      role: 7,
+      created_by: 1,
+      expires_at: Time.current + 1.hour
+    )
   end
 
   test "EC Software should not have access" do
