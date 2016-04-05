@@ -19,9 +19,6 @@ class Query
     []
   end
 
-  # belongs_to :account
-  # validates :account_id, presence: true, if: :account?
-
   def account?
     @database == Database::SHARD
   end
