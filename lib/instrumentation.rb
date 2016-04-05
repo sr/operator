@@ -6,12 +6,16 @@ module Instrumentation
     Logging.setup(rails_env)
   end
 
-  def error(code, data, &block)
-    log(data.merge(level: "info", error: code), &block)
+  def context(data, &block)
+    Logging.context(data, &block)
   end
 
   def log(data, &block)
     Logging.log(data, &block)
+  end
+
+  def error(code, data, &block)
+    log(data.merge(level: "error", error: code), &block)
   end
 
   def log_exception(exception, code = nil, data = {}, &block)
@@ -34,6 +38,7 @@ module Instrumentation
 
   module_function \
     :setup,
+    :context,
     :log,
     :error,
     :request_id,

@@ -41,6 +41,9 @@ module Canoe
 
     initializer "instrumentation_library" do
       Instrumentation.setup(Rails.env)
+
+      config.middleware.insert_after ::ActionDispatch::RequestId, \
+        Instrumentation::RequestId::RackMiddleware
     end
 
     # Autoload files from lib/

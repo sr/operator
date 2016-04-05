@@ -10,10 +10,18 @@ class ApplicationController < ActionController::Base
 
   before_filter :require_oauth_authentication
 
+  around_filter :log_context
+
   protected
 
+  def log_context
+    Instrumentation.context(request_id: Instrumentation.request_id) do
+      yield
+    end
+  end
+
   def append_info_to_payload(payload)
-    payload[:request_id] = request.env["action_dispatch.request_id"]
+    payload[:request_id] = Instrumentation.request_id
   end
 
   private
