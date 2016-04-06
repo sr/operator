@@ -10,7 +10,7 @@
 # Commands:
 #   hubot pr - does nothing yet
 # Author:
-#   JERN UHRMERN
+#   JERN UHRMERN and GERGE GERSSERN
 
 GithubApiWrapper = require "../lib/github/github_api_wrapper"
 PullRequestUtils = require "../lib/github/pull_request_utils"
