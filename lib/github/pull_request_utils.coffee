@@ -1,4 +1,4 @@
-class PullRequestFormatter
+class PullRequestUtils
 	getPrsForUsers: (prs, users) ->
 		filteredPrs = []
 		for pr in prs
@@ -7,4 +7,6 @@ class PullRequestFormatter
 				filteredPrs.push pr
 		return filteredPrs
 
-module.exports = PullRequestFormatter
+	addUser: (robot, user) ->
+
+module.exports = PullRequestUtils

@@ -13,10 +13,17 @@
 #   JERN UHRMERN
 
 GithubApiWrapper = require "../lib/github/github_api_wrapper"
+PullRequestUtils = require "../lib/github/pull_request_utils"
 
 module.exports = (robot) ->
-  robot.respond /pr/i, (msg) ->
-    github = new GithubApiWrapper()
-    github.pulls (pr) ->
-        console.log pr
-        msg.send pr
+    robot.respond /pr for user (.*)$/i, (msg) ->
+        github = new GithubApiWrapper()
+        github.pulls prCallback, [msg.match[1]]
+
+    robot.respond /pr$/i, (msg) ->
+        github = new GithubApiWrapper()
+        pullRequestUtils = new PullRequestUtils()
+        github.pulls prCallback
+
+prCallback = (pr) ->
+    console.log pr
