@@ -27,7 +27,7 @@ module.exports = (robot) ->
     pullRequestUtils = new PullRequestUtils()
     github.pulls prCallback, msg
 
-  robot.respond /addUserToPrList\s+(.*)$/i, (msg) ->
+  robot.respond /prAddUser\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     if !robot.brain.get(STORE_KEY)
       robot.brain.set(STORE_KEY, {})
@@ -41,7 +41,7 @@ module.exports = (robot) ->
     rooms[msg.message.user.room] = users
     robot.brain.set(STORE_KEY, rooms)
 
-  robot.respond /listPrUsers/i, (msg) ->
+  robot.respond /prListUsers/i, (msg) ->
     rooms = robot.brain.get(STORE_KEY)
     if !rooms[msg.message.user.room]
       msg.send("There are no saved users for this room")
