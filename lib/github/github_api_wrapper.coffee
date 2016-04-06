@@ -21,7 +21,7 @@ class GithubApiWrapper
 
     github.get url, (pulls) ->
         tableMaker = new PullRequestTableMaker()
-        table = tableMaker.createPullRequestTable(pulls)
+        table = tableMaker.createPullRequestTable(pulls['items'])
         cb(table, msg)
 
 module.exports = GithubApiWrapper
