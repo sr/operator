@@ -20,12 +20,12 @@ STORE_KEY = 'prUsersList'
 module.exports = (robot) ->
   robot.respond /pr for user (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
-    github.pulls prCallback, msg, [msg.match[1]]
+    github.pulls prCallback, msg, 'pardot', [msg.match[1]]
 
   robot.respond /pr$/i, (msg) ->
     github = new GithubApiWrapper()
     pullRequestUtils = new PullRequestUtils()
-    github.pulls prCallback, msg
+    github.pulls prCallback, msg,
 
   robot.respond /prAddUser\s+(.*)$/i, (msg) ->
     username = msg.match[1]

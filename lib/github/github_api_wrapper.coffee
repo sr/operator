@@ -4,12 +4,17 @@ PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
 
-  pulls: (cb, msg, users) ->
-    search_query = 'repo:pardot/Pardot+type:pr+state:open'
+  pulls: (cb, msg, repo, users) ->
+    search_query = 'type:pr+state:open'
+
+    if not repo
+        repo = 'Pardot'
+
+    search_query += "+repo:pardot/#{repo}"
 
     if users
         for user in users
-            search_query = search_query + "+author:#{user}"
+            search_query += "+author:#{user}"
 
     url = "https://git.dev.pardot.com/api/v3/search/issues?q=#{search_query}"
     console.log url
