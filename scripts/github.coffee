@@ -15,6 +15,8 @@
 GithubApiWrapper = require "../lib/github/github_api_wrapper"
 PullRequestUtils = require "../lib/github/pull_request_utils"
 
+STORE_KEY = 'prUsersList'
+
 module.exports = (robot) ->
   robot.respond /pr for user (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
@@ -24,6 +26,27 @@ module.exports = (robot) ->
     github = new GithubApiWrapper()
     pullRequestUtils = new PullRequestUtils()
     github.pulls prCallback, msg
+
+  robot.respond /addUserToPrList\s+(.*)$/i, (msg) ->
+    username = msg.match[1]
+    if !robot.brain.get(STORE_KEY)
+      robot.brain.set(STORE_KEY, {})
+
+    rooms = robot.brain.get(STORE_KEY)
+    if !rooms[msg.message.user.room]
+      users = []
+    else
+      users = rooms[msg.message.user.room]
+    users.push username
+    rooms[msg.message.user.room] = users
+    robot.brain.set(STORE_KEY, rooms)
+
+  robot.respond /listPrUsers/i, (msg) ->
+    rooms = robot.brain.get(STORE_KEY)
+    if !rooms[msg.message.user.room]
+      msg.send("There are no saved users for this room")
+    else
+      msg.send(rooms[msg.message.user.room].toString())
 
 prCallback = (prTable, msg) ->
     msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}
