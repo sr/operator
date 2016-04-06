@@ -1,3 +1,5 @@
 /.bundle
+/config/pi/*
 /log/*.log
 /tmp
+!/config/pi/test.yaml

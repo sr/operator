@@ -1,4 +1,4 @@
 class DataCenter
   DALLAS = "dallas"
-  SEATTLE = "Seattle"
+  SEATTLE = "seattle"
 end
