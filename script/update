@@ -1,0 +1,12 @@
+#!/bin/sh
+# script/update: Update application to run for its current checkout.
+set -eu
+
+cd "$(dirname "$0")/.."
+
+script/bootstrap
+
+echo "==> Updating db..."
+# run all database migrations to ensure everything is up to date.
+bin/rake db:create || true
+bin/rake db:migrate

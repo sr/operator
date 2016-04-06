@@ -1,7 +1,6 @@
-class Account < GlobalD
+class Account < GlobalDallas
   self.table_name = 'global_account'
   self.inheritance_column = :_type_disabled
-  has_many :queries
   has_many :account_accesses
 
   def descriptive_name
@@ -13,10 +12,10 @@ class Account < GlobalD
     account.shard_id
   end
 
-  def shard(datacenter = DC::Dallas)
+  def shard(datacenter = DataCenter::DALLAS)
     @_shard ||= {
-        DC::Dallas => Account.create_shard(shard_id, DC::Dallas),
-        DC::Seattle => Account.create_shard(shard_id, DC::Seattle)
+        DataCenter::DALLAS => Account.create_shard(shard_id, DataCenter::DALLAS),
+        DataCenter::SEATTLE => Account.create_shard(shard_id, DataCenter::SEATTLE)
       }
     @_shard[datacenter]
   end
@@ -26,9 +25,8 @@ class Account < GlobalD
     !account_accesses.where(role: 7).where("expires_at > ?", Time.now).empty?
   end
 
-  def self.create_shard(shard_id, datacenter = DC::Dallas)
-    # Dynamically creates Shard Classes which hold the db connection for us
-    shard_name = "Shard#{shard_id}#{datacenter}"
+  def self.create_shard(shard_id, datacenter = DataCenter::DALLAS)
+    shard_name = "Shard#{shard_id}#{datacenter.capitalize}"
     begin
       shard_name.constantize
     rescue NameError
@@ -36,10 +34,11 @@ class Account < GlobalD
         self.table_name = "account"
       end
       Object.const_set shard_name, klass
-      shard_name.constantize.class_eval do
-        establish_connection_on_shard(shard_id, datacenter)
+      constant = shard_name.constantize
+      constant.class_eval do
+        establish_shard_connection(datacenter, shard_id)
       end
+      constant
     end
   end
-
 end

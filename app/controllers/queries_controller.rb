@@ -7,14 +7,12 @@ class QueriesController < ApplicationController
     @query = Query.find(params[:id])
     @ast = @query.parse(@query.sql)
     begin
-      @result = @query.execute(@ast.try(:to_sql))
+      @result = @query.execute(current_user, @ast.try(:to_sql))
     rescue ActiveRecord::StatementInvalid => e
       @query.errors.add :sqlerror, e
       render :new
     end
-    @query.access_logs.create(user: "")
-
-    if @query.view == VW::CSV
+    if @query.view == Query::CSV
       render 'show.csv.erb'
     end
   end
@@ -22,12 +20,9 @@ class QueriesController < ApplicationController
   def create
     @query = Query.new(query_params)
     @query.account_id = account_params[:account_id]
+    @result = @query.execute(current_user, "")
     
-    if @query.save
-      redirect_to @query.account? ? account_query_path(@query.account, @query) : global_query_path(@query)
-    else
-      render :new
-    end
+    render :show
   end
 
   def update
@@ -36,20 +31,20 @@ class QueriesController < ApplicationController
   end
 
   def new
-    defaults = {datacenter: DC::Dallas, view: VW::SQL}
+    defaults = {datacenter: DataCenter::DALLAS, view: Query::SQL}
     if account_params[:account_id]
       # Accounts query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: DB::Account, account_id: account_params[:account_id]))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: Database::SHARD, account_id: account_params[:account_id]))
     else
       # Global query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: DB::Global))
+      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: Database::GLOBAL))
     end
   end
 
   private
 
   def query_params
-    params.require(:query).permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
+    params.permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
   end
 
   def account_params

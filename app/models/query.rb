@@ -1,34 +1,76 @@
-class Query < ActiveRecord::Base
-  belongs_to :account
-  has_many :access_logs
-  validates :account_id, presence: true, if: :account?
+class Query
+  CSV = "CSV"
+  UI = "UI"
+  SQL = "SQL"
+
+  def initialize(attributes = {})
+    @datacenter = attributes.fetch(:datacenter, DataCenter::DALLAS)
+    @database = attributes.fetch(:database, Database::GLOBAL)
+    @sql = attributes.fetch(:sql, "")
+    @account_id = attributes.delete(:account_id)
+    @view = attributes.fetch(:view, SQL)
+  end
+
+  attr_reader :view, :datacenter, :database, :sql
+  attr_accessor :account_id
+  attr_writer :is_limited, :sql
+
+  def errors
+    []
+  end
 
   def account?
-    database == DB::Account
+    @database == Database::SHARD
   end
 
   def select_all?
-    sql.match(/SELECT \*/i)
+    @sql.match(/SELECT \*/i)
   end
 
   def tables
     connection.tables
   end
 
-  def execute(cmd)
-    connection.execute(cmd)
+  def is_limited
+    true
+  end
+
+  def account
+    if @account_id
+      Account.find(@account_id)
+    end
+  end
+
+  def execute(user, query)
+    if !user.kind_of?(AuthUser)
+      raise ArgumentError, "user must be a AuthUser"
+    end
+
+    data = {
+      database: @database,
+      datacenter: @datacenter,
+      query: @sql,
+      user_name: user.name,
+      user_email: user.email,
+    }
+    if @account_id
+      data[:account_id] = @account_id
+    end
+    Instrumentation.log(data)
+
+    connection.execute(@sql)
   end
 
   def connection
-    case database
-    when DB::Account
-      account.shard(datacenter).connection
-    when DB::Global
-      case datacenter
-      when DC::Dallas
-        GlobalD.connection
-      when DC::Seattle
-        GlobalS.connection
+    case @database
+    when Database::SHARD
+      account.shard(@datacenter).connection
+    when Database::GLOBAL
+      case @datacenter
+      when DataCenter::DALLAS
+        GlobalDallas.connection
+      when DataCenter::SEATTLE
+        GlobalSeattle.connection
       end
     end
   end

@@ -6,15 +6,22 @@ class AccountTest < ActiveSupport::TestCase
   end
 
   test "test account access" do
-    # Solaris Panels should have access
-    assert @account.access?
+    assert_equal false, @account.access?
+    @account.account_accesses.create!(
+      role: 7,
+      created_by: 1,
+      expires_at: Time.current + 1.hour
+    )
   end
 
   test "EC Software should not have access" do
     assert_not Account.find(2).access?
   end
 
-  test "Dynamically create shard" do
-    assert Account.create_shard(1)
+  test "shard" do
+    account = Account.find(1)
+    shard = account.shard(DataCenter::DALLAS)
+    assert_not_nil shard
+    assert_equal "Shard1Dallas", shard.name
   end
 end

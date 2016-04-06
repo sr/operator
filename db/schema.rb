@@ -11,24 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140915151939) do
+ActiveRecord::Schema.define(version: 20131002130914) do
 
-  create_table "access_logs", force: true do |t|
-    t.string   "user"
-    t.integer  "query_id"
+  create_table "auth_users", force: :cascade do |t|
+    t.string   "email",      limit: 255
+    t.string   "name",       limit: 255
+    t.string   "uid",        limit: 255
+    t.string   "token",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "queries", force: true do |t|
-    t.string   "database"
-    t.string   "datacenter"
-    t.integer  "account_id"
-    t.text     "sql"
-    t.string   "view"
-    t.boolean  "is_limited", default: true
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+  add_index "auth_users", ["email"], name: "index_auth_users_on_email", using: :btree
 
 end

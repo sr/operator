@@ -3,24 +3,29 @@
     <span>Account: <%= @query.account.descriptive_name %></span>
 </div>
 <% end %>
-<%= form_for @query, url: query_form_path do |f| %>
-  <%= f.hidden_field :database %>
-  <%= f.hidden_field :is_limited %>
-  <%= f.hidden_field :view %>
+<% if !params[:account_id].blank?
+  query_url = "/accounts/#{params[:account_id]}/queries"
+else
+  query_url = "/global/queries"
+end %>
+<%= form_tag query_url do -%>
+  <%= hidden_field_tag :database, @query.database %>
+  <%= hidden_field_tag :is_limited %>
+  <%= hidden_field_tag :view, @query.view %>
   <div class="btn-group view">
-    <button type="button" class="btn btn-default<%= is_active?(:view, VW::SQL) %>" data-val="<%= VW::SQL %>">I like my SQL</button>
-    <button type="button" class="btn btn-default<%= is_active?(:view, VW::UI) %>" data-val="<%= VW::UI %>">Pretty UI View</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
+    <button type="button" class="btn btn-default<%= is_active?(:view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
-  <%= f.hidden_field :datacenter %>
+  <%= hidden_field_tag :datacenter, @query.datacenter %>
   <div class="btn-group datacenter">
-    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DC::Dallas) %>" data-val="<%= DC::Dallas %>">Dallas</button>
-    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DC::Seattle) %>" data-val="<%= DC::Seattle %>">Seattle</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::DALLAS) %>" data-val="<%= DataCenter::DALLAS %>">Dallas</button>
+    <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::SEATTLE) %>" data-val="<%= DataCenter::SEATTLE %>">Seattle</button>
   </div>
-  <div class="viewoption" <%= is_active?(:view, VW::UI, 'style="display:none;"') %>>
-    <%= f.text_area(:sql, rows: "6") %>
-    <%= f.submit "Run Query" %>
+  <div class="viewoption" <%= is_active?(:view, Query::UI, 'style="display:none;"') %>>
+    <%= text_area_tag(:sql, @query.sql, rows: 10, cols: 80) %>
+    <%= submit_tag "Run Query" %>
   </div>
-  <div class="viewoption" <%= is_active?(:view, VW::SQL, 'style="display:none;"') %>>
+  <div class="viewoption" <%= is_active?(:view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
       <% @query.tables.each do |table| %>
         <tr>
