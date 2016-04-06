@@ -1,4 +1,5 @@
 require "rails"
+require "lograge"
 
 module Instrumentation
   class Railtie < Rails::Railtie
