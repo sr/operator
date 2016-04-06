@@ -1,4 +1,5 @@
 require File.expand_path('../boot', __FILE__)
+$LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
 
 require "rails"
 # Pick the frameworks you want:
@@ -12,6 +13,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 require "pinglish"
+require "instrumentation"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -39,13 +41,6 @@ module Canoe
       g.factory_girl false
     end
 
-    initializer "instrumentation_library" do
-      Instrumentation.setup(Rails.env)
-
-      config.middleware.insert_after ::ActionDispatch::RequestId, \
-        Instrumentation::RequestId::RackMiddleware
-    end
-
     # Autoload files from lib/
     config.autoload_paths << Rails.root.join("lib")
 
@@ -62,13 +57,6 @@ module Canoe
       ping.check :db do
         !!Repo.count
       end
-    end
-
-    config.lograge.enabled = true
-    config.lograge.custom_options = lambda do |event|
-      {
-        :request_id => event.payload[:request_id],
-      }
     end
   end
 end

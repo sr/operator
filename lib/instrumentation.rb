@@ -1,9 +1,13 @@
+if defined?(Rails::Railtie)
+  require "instrumentation/railtie"
+end
+
 module Instrumentation
   autoload :Logging, "instrumentation/logging"
   autoload :RequestId, "instrumentation/request_id"
 
-  def setup(rails_env)
-    Logging.setup(rails_env)
+  def setup(env)
+    Logging.setup(env)
   end
 
   def context(data, &block)

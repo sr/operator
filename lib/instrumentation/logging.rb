@@ -2,9 +2,9 @@ require "scrolls"
 
 module Instrumentation
   module Logging
-    def setup(rails_env)
+    def setup(env)
       @logger =
-        if rails_env == "test"
+        if env == "test"
           FakeLogger.new
         else
           Scrolls.init(
