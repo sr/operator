@@ -22,6 +22,14 @@ module.exports = (robot) ->
     github = new GithubApiWrapper()
     github.pulls prCallback, msg, 'pardot', [msg.match[1]]
 
+  robot.respond /pr for repo (.*)$/i, (msg) ->
+    github = new GithubApiWrapper()
+    github.pulls prCallback, msg, [msg.match[1]]
+
+  robot.respond /pr for user (.*) in repo (.*)$/i, (msg) ->
+    github = new GithubApiWrapper()
+    github.pulls prCallback, msg, [msg.match[2]], [msg.match[1]]
+
   robot.respond /pr$/i, (msg) ->
     rooms = robot.brain.get(STORE_KEY)
     if !rooms[msg.message.user.room]
