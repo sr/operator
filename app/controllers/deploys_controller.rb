@@ -93,31 +93,13 @@ class DeploysController < ApplicationController
     end
   end
 
-  # TODO: Extract these to a different place -@alindeman
   def committers_for_compare(item1, item2)
-    output = commits_for_compare(item1, item2)
-    return [] if output.nil?
-
-    # we have to work around stevie's busted git setup (facepalm)
-    # gather some sort of author from each commit
-    authors = \
-      output.commits.collect do |commit|
-      commit.author || commit.committer || commit.commit.author || commit.commit.committer
-    end
-    # try to pull out the username or email (yes, stevie's email is in the name field)
-    authors.collect do |author|
-      author.try(:login) || author.try(:name)
-    end.uniq.sort
-  rescue Octokit::InternalServerError => e
-    Rails.logger.error("Internal server while attempting to fetch committers: #{e}")
-    []
-  rescue Octokit::NotFound
-    []
-  end
-
-  def commits_for_compare(item1, item2)
-    return unless item1 && item2
-    Octokit.compare(current_repo.full_name, item1.sha, item2.sha)
+    compare = GithubComparison.new(
+      current_repo.full_name,
+      item1,
+      item2
+    )
+    compare.committers
   end
 
   def render_invalid_provisional_deploy

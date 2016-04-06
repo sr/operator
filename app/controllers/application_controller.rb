@@ -10,7 +10,18 @@ class ApplicationController < ActionController::Base
 
   before_filter :require_oauth_authentication
 
+  around_filter :log_context
+
+  protected
+
+  def log_context
+    Instrumentation.context(request_id: Instrumentation.request_id) do
+      yield
+    end
+  end
+
   private
+
   def no_ssl_ok?
     Rails.env.development? || Rails.env.test? || request.ip =~ /\A(10\.|127\.)/
   end
@@ -133,11 +144,15 @@ class ApplicationController < ActionController::Base
     else
       acl = DeployACLEntry.for_repo_and_deploy_target(current_repo, current_target)
       if acl && !acl.authorized?(current_user)
-        Rails.logger.info "#{current_user.uid} is NOT authorized to deploy to #{current_repo.name} in #{current_target.name}"
+        Instrumentation.error(
+          error: "unauthorized-deploy",
+          current_user: current_user.uid,
+          repo: current_repo.name,
+          target: current_target.name,
+        )
         render template: "application/not_authorized_for_deploy", status: :unauthorized
         false
       else
-        Rails.logger.info "#{current_user.uid} is authorized to deploy to #{current_repo.name} in #{current_target.name}"
         true
       end
     end
