@@ -8,6 +8,6 @@ class PullRequestTableMaker
     return tableMarkup + "</table>"
 
   tableRow: (pullRequest) ->
-    "<tr><td>#{pullRequest.title}</td><td>#{pullRequest.user.login}</td><td>#{pullRequest.url}</td><td>#{pullRequest.created_at.substring(0, 7)}</td></tr>"
+    "<tr><td>#{pullRequest.title}</td><td>#{pullRequest.user.login}</td><td>#{pullRequest.url}</td><td>#{pullRequest.created_at.substring(0, 10)}</td></tr>"
 
 module.exports = PullRequestTableMaker
