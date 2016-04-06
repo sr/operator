@@ -34,7 +34,10 @@ class ProvisionalDeploy
       begin
         properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
       rescue JSON::ParseError
-        Instrumentation.log_exception($!, "options-validator")
+        Instrumentation.log_exception($!, {
+          at: "ProvisionalDeploy",
+          fn: "from_artifact_url_and_properties",
+        })
         nil
       end
 

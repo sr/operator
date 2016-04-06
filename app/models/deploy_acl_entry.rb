@@ -24,7 +24,7 @@ class DeployACLEntry < ActiveRecord::Base
     when "ldap_group"
       ldap_group_authorized?(user)
     else
-      Instrumentation.error("unknown-acl-type", type: type)
+      Instrumentation.error(at: "DeployACLEntry", fn: "authorized?", type: type)
       false
     end
   end

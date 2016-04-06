@@ -22,12 +22,9 @@ module Instrumentation
     log(data.merge(level: "error", error: code), &block)
   end
 
-  def log_exception(exception, code = nil, data = {}, &block)
+  def log_exception(exception, data = {}, &block)
     if !data.respond_to?(:to_hash)
       raise ArgumentError, "invalid data: #{data.inspect}"
-    end
-    if code
-      data[:code] = code
     end
     Logging.log_exception(exception, data.to_hash, &block)
   end
@@ -44,6 +41,7 @@ module Instrumentation
     :setup,
     :context,
     :log,
+    :log_exception,
     :error,
     :request_id,
     :request_id=

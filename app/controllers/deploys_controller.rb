@@ -108,7 +108,7 @@ class DeploysController < ApplicationController
       author.try(:login) || author.try(:name)
     end.uniq.sort
   rescue Octokit::InternalServerError => e
-    Instrumentation.log_exception(e, "github-committers")
+    Instrumentation.log_exception(e, fn: "committers_for_compare")
     []
   rescue Octokit::NotFound
     []
