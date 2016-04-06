@@ -23,9 +23,13 @@ module.exports = (robot) ->
     github.pulls prCallback, msg, [msg.match[1]]
 
   robot.respond /pr$/i, (msg) ->
-    github = new GithubApiWrapper()
-    pullRequestUtils = new PullRequestUtils()
-    github.pulls prCallback, msg
+    rooms = robot.brain.get(STORE_KEY)
+    if !rooms[msg.message.user.room]
+      msg.send("We ain\'t found no pull requests")
+    else
+      github = new GithubApiWrapper()
+      github.pulls prCallback, msg, rooms[msg.message.user.room]
+
 
   robot.respond /prAddUser\s+(.*)$/i, (msg) ->
     username = msg.match[1]
@@ -47,6 +51,9 @@ module.exports = (robot) ->
       msg.send("There are no saved users for this room")
     else
       msg.send(rooms[msg.message.user.room].toString())
+
+  robot.respond /prResetUserList$/i, (msg) ->
+    robot.brain.set(STORE_KEY, {})
 
 prCallback = (prTable, msg) ->
     msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}
