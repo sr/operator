@@ -1,9 +1,10 @@
 httpClient = require "scoped-http-client"
 github = require('githubot')
+PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
 
-  pulls: (cb, users) ->
+  pulls: (cb, msg, users) ->
     search_query = 'repo:pardot/Pardot+type:pr+state:open'
 
     if users
@@ -14,6 +15,8 @@ class GithubApiWrapper
     console.log url
 
     github.get url, (pulls) ->
-        cb(pulls)
+        tableMaker = new PullRequestTableMaker()
+        table = tableMaker.createPullRequestTable(pulls)
+        cb(table, msg)
 
 module.exports = GithubApiWrapper
