@@ -51,17 +51,27 @@ module.exports = (robot) ->
     github.users = [msg.match[1]]
     github.pulls prCallback, msg
 
-  robot.respond /prAddRepo\s+(.*)$/i, (msg) ->
+  robot.respond /pr add repo\s+(.*)$/i, (msg) ->
     repo = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addRepoToRoomList(robot, msg.message.user.room, repo)
 
-  robot.respond /prAddUser\s+(.*)$/i, (msg) ->
+  robot.respond /pr add user\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addUserToRoomList(robot, msg.message.user.room, username)
 
-  robot.respond /prListUsers/i, (msg) ->
+  robot.respond /pr remove repo\s+(.*)$/i, (msg) ->
+    repo = msg.match[1]
+    robotBrain = new GithubRobotBrain
+    robotBrain.removeRepoFromRoomList(robot, msg.message.user.room, repo)
+
+  robot.respond /pr remove user\s+(.*)$/i, (msg) ->
+    username = msg.match[1]
+    robotBrain = new GithubRobotBrain
+    robotBrain.removeUserFromRoomList(robot, msg.message.user.room, username)
+
+  robot.respond /pr list user/i, (msg) ->
     robotBrain = new GithubRobotBrain
     users = robotBrain.getUserListForRoom(robot, msg.message.user.room)
     if !users || users.length < 1
@@ -69,7 +79,7 @@ module.exports = (robot) ->
     else
       msg.send("These are the users for this room: " + users.toString())
 
-  robot.respond /prListRepos/i, (msg) ->
+  robot.respond /pr list repo/i, (msg) ->
     robotBrain = new GithubRobotBrain
     repos = robotBrain.getRepoListForRoom(robot, msg.message.user.room)
     if !repos || repos.length < 1
@@ -77,11 +87,11 @@ module.exports = (robot) ->
     else
       msg.send("These are the repos for this room: " + repos.toString())
 
-  robot.respond /prResetUserList$/i, (msg) ->
+  robot.respond /pr reset user list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomUserList(robot, msg.message.user.room)
 
-  robot.respond /prResetRepoList$/i, (msg) ->
+  robot.respond /pr reset repo list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomRepoList(robot, msg.message.user.room)
 
