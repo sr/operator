@@ -12,11 +12,7 @@ class ApplicationController < ActionController::Base
     data = {request_id: Instrumentation.request_id}
 
     if current_user
-      data.update(
-        user_id: current_user.id,
-        user_name: current_user.name,
-        user_email: current_user.email,
-      )
+      data[:user_email] = current_user.email
     end
 
     Instrumentation.context(data) do
@@ -28,13 +24,8 @@ class ApplicationController < ActionController::Base
 
   def append_info_to_payload(payload)
     if current_user
-      payload[:context] = {
-        user_id: current_user.id,
-        user_name: current_user.name,
-        user_email: current_user.email,
-      }
+      payload[:context] = {user_email: current_user.email}
     end
-    payload
   end
 
   def require_oauth_authentication
