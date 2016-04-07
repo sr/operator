@@ -21,6 +21,10 @@ class Account < GlobalDallas
   end
 
   def access?
+    if Rails.env.development?
+      return true
+    end
+
     # Role 7 is engineering
     !account_accesses.where(role: 7).where("expires_at > ?", Time.now).empty?
   end
