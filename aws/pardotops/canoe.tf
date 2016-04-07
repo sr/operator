@@ -138,6 +138,15 @@ resource "aws_security_group" "canoe_app_production" {
   }
 }
 
+
+resource "template_file" "canoe_production_user_data" {
+  template = "${file("ecs_user_data.tpl")}"
+
+  vars {
+    ecs_cluster = "canoe_production"
+  }
+}
+
 resource "aws_launch_configuration" "canoe_production" {
   name_prefix = "canoe_production"
   image_id = "${var.ecs_ami_id}"
@@ -146,11 +155,7 @@ resource "aws_launch_configuration" "canoe_production" {
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   security_groups = ["${aws_security_group.canoe_app_production.id}"]
   associate_public_ip_address = false
-
-  user_data = <<EOF
-#!/bin/bash
-echo ECS_CLUSTER=canoe_production >> /etc/ecs/ecs.config
-EOF
+  user_data = "${template_file.canoe_production_user_data.rendered}"
 
   root_block_device {
     volume_type = "gp2"
