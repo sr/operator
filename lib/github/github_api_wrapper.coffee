@@ -4,13 +4,17 @@ PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
 
-  pulls: (cb, msg, repo, users) ->
+  pulls: (cb, msg, repos, users) ->
     search_query = 'type:pr+state:open'
 
-    if not repo
-        repo = 'Pardot'
+    repos_query = ''
+    if repos
+        for repo in repos
+            repos_query += "+repo:pardot/#{repo}"
+    else
+        repos_query += '+repo:pardot/Pardot'
 
-    search_query += "+repo:pardot/#{repo}"
+    search_query += repos_query
 
     if users
         for user in users
