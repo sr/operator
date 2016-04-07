@@ -2,14 +2,18 @@ require "scrolls"
 
 module Instrumentation
   module Logging
-    def setup(env)
+    def setup(app_name, env_name)
       @logger =
-        if env == "test"
+        if env_name == "test"
           FakeLogger.new
         else
           Scrolls.init(
             stream: STDOUT,
             exceptions: "single",
+            global_context: {
+              app: app_name,
+              env: env_name,
+            },
           )
           Scrolls
         end
