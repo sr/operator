@@ -14,10 +14,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def append_info_to_payload(payload)
-    payload[:request_id] = Instrumentation.request_id
-  end
-
   private
 
   def require_oauth_authentication
