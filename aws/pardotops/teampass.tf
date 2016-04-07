@@ -86,6 +86,11 @@ resource "aws_launch_configuration" "teampass" {
   user_data = <<EOF
 #!/bin/bash
 echo ECS_CLUSTER=teampass >> /etc/ecs/ecs.config
+yum update -y
+yum install -y awslogs-1.1.2.1.10.amzn1
+sed -i 's/log_group_name = \/var\/log\/messages/log_group_name = bread/g' awslogs.conf
+service awslogs start
+chkconfig awslogs on
 EOF
 
   root_block_device {
