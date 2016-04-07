@@ -19,8 +19,8 @@ module Lita
       config :datacenters, default: ["dfw"]
       config :default_datacenter, default: "dfw"
       config :monitor_interval_seconds, default: 60
-      config :active_monitors, default: 'zabbixmon'
-      config :paging_monitors, default: ''
+      config :active_monitors, default: [::Zabbixmon::MONITOR_NAME]
+      config :paging_monitors, default: []
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -32,6 +32,17 @@ module Lita
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:stop)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :stop_maintenance, command: true, help: {
         "zabbix maintenance stop HOST" => "Brings hosts matching HOST out of maintenance mode",
       }
+
+      route /^zabbixmon(?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
+          "zabbixmon <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour [options: #{config.datacenters.join(",")}]",
+          "zabbixmon <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours [options: #{config.datacenters.join(",")}]",
+      }
+
+      route /^zabbixmon(?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
+          "zabbixmon <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{config.datacenters.join(",")}]",
+      }
+
+
 
       def initialize(robot)
         super
@@ -114,6 +125,39 @@ module Lita
         response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
+      def pause_monitor(response)
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
+        validate_datacenter(datacenter: datacenter, response: response) || return
+        options = parse_options(response.match_data["options"])
+
+        until_time = \
+          if options["until"]
+                                 begin
+                                   HumanTime.parse(options["until"])
+                                 rescue ArgumentError
+                                   response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
+                                 end
+          else
+            Time.now + 3600
+          end
+
+        monitor_supervisor = ::Zabbixmon::MonitorSupervisor.get_or_create(
+            datacenter: datacenter,
+            redis: redis,
+            client: @clients[datacenter],
+            log: log,
+        )
+
+        monitor_supervisor.pause_monitor(
+            monitorname: ::Zabbixmon::MONITOR_NAME,
+            until_time: until_time,
+        )
+
+        response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong: #{e}")
+      end
+
       def stop_maintenance(response)
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
@@ -142,6 +186,23 @@ module Lita
       rescue => e
         response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
+
+      def unpause_monitor(response)
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
+        validate_datacenter(datacenter: datacenter, response: response) || return
+        monitor_supervisor = ::Zabbixmon::MonitorSupervisor.get_or_create(
+            datacenter: datacenter,
+            redis: redis,
+            client: @clients[datacenter],
+            log: log,
+        )
+        monitor_supervisor.unpause_monitor(::Zabbixmon::MONITOR_NAME)
+        response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
+
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong: #{e}")
+      end
+
 
       def host_maintenance_expired(hostname)
         robot.send_message(@status_room, "/me is bringing #{hostname} out of maintenance")
@@ -176,39 +237,39 @@ module Lita
       def run_monitors(response)
         every(config.monitor_interval_seconds) do |timer|
 
-          monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
-              datacenter: datacenter,
-              redis: redis,
-              log: log,
-          )
+          config.datacenters.each do |datacenter|
 
-          zabbixmon = ::Monitors::Zabbixmon.new(
-              datacenters: config.datacenters,
-              redis: redis,
-              clients: @clients,
-              log: log,
-          )
+            monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
+                datacenter: datacenter,
+                redis: redis,
+                log: log,
+            )
 
-          # loop through (active && unpaused) monitors
-          active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
+            zabbixmon = ::Monitors::Zabbixmon.new(
+                datacenters: config.datacenters,
+                redis: redis,
+                clients: @clients,
+                log: log,
+            )
 
-            # insert your zabbix-based-monitor here
+            # loop through (active && unpaused) monitors
+            active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
 
-            # zabbixmon: engage!
-            if monitor == zabbixmon.monitor_name
-              zabbixmon.monitor(config.zabbix_host.gsub(/%datacenter%/, datacenter), config.zabbix_user, config.zabbix_password)
+              # zabbixmon: engage!
+              if monitor == ::Zabbixmon::MONITOR_NAME
+                zabbixmon.monitor(config.zabbix_host.gsub(/%datacenter%/, datacenter), config.zabbix_user, datacenter)
 
-              zabbixmon.failures.each do |datacenter, message|
+
                 monitor_fail_notify(zabbixmon.monitor_name,
                                     datacenter,
-                                    message,
+                                    zabbixmon.hard_failure,
                                     zabbixmon.notify_status_channel?,
                                     config.paging_monitors.include?(zabbixmon.monitor_name)
-                )
+                ) unless zabbixmon.hard_failure.nil?
               end
+
             end
           end
-
         end
       end
 
