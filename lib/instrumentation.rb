@@ -6,8 +6,8 @@ module Instrumentation
   autoload :Logging, "instrumentation/logging"
   autoload :RequestId, "instrumentation/request_id"
 
-  def setup(env)
-    Logging.setup(env)
+  def setup(app_name, env)
+    Logging.setup(app_name, env)
   end
 
   def context(data, &block)
