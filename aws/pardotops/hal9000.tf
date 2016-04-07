@@ -107,6 +107,14 @@ resource "aws_security_group" "hal9000_app_production" {
   }
 }
 
+resource "template_file" "hal9000_production_user_data" {
+  template = "${file("ecs_user_data.tpl")}"
+
+  vars {
+    ecs_cluster = "hal9000_production"
+  }
+}
+
 resource "aws_launch_configuration" "hal9000_production" {
   name_prefix = "hal9000_production"
   image_id = "${var.ecs_ami_id}"
@@ -115,16 +123,7 @@ resource "aws_launch_configuration" "hal9000_production" {
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   security_groups = ["${aws_security_group.hal9000_app_production.id}"]
   associate_public_ip_address = false
-
-  user_data = <<EOF
-#!/bin/bash
-echo ECS_CLUSTER=hal9000_production >> /etc/ecs/ecs.config
-yum update -y
-yum install -y awslogs-1.1.2.1.10.amzn1
-sed -i 's/log_group_name = \/var\/log\/messages/log_group_name = bread/g' awslogs.conf
-service awslogs start
-chkconfig awslogs on
-EOF
+  user_data = "${template_file.hal9000_production_user_data.rendered}"
 
   root_block_device {
     volume_type = "gp2"
