@@ -15,13 +15,13 @@ module Monitors
     config :http_read_timeout, default: 30
 
     MONITOR_NAME = "zabbixmon"
+    INCIDENT_KEY = "#{MONITOR_NAME}-%datacenter%"
     ERR_NON_200_HTTP_CODE = "[HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ERR_ZABBIX_STATUS_KEY_MISSING = "HAL9000 was able to load the system:general 'item' but was unable to locate the key zabbix_status 'key' "
     ERR_VALUE_MISMATCH = "HAL9000 was able to load system:general/zabbix_status, but the value it expected was not the one received."
 
-    def initialize(datacenters:, redis:, clients:, log:)
-      @datacenters = datacenters
+    def initialize(redis:, clients:, log:)
       @redis = redis
       @clients = clients
       @log = log

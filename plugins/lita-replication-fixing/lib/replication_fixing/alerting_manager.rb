@@ -1,4 +1,4 @@
-module ReplicationFixing
+2emodule ReplicationFixing
   # Determines whether to alert a human based on an outcome of the FixingClient
   # API (i.e., rep_fix)
   class AlertingManager
@@ -7,14 +7,14 @@ module ReplicationFixing
       @log = log
     end
 
-    def ingest_fix_result(shard_or_hostname:, result:)
-      case result
-      when FixingClient::NotFixable
-        @pager.trigger("#{shard_or_hostname}: replication is not automatically fixable", incident_key: incident_key(shard_or_hostname))
+      def ingest_fix_result(shard_or_hostname:, result:)
+        case result
+        when FixingClient::NotFixable
+          @pager.trigger("#{shard_or_hostname}: replication is not automatically fixable", incident_key: incident_key(shard_or_hostname))
+        end
+      rescue => e
+        @log.error("Error sending page: #{e}")
       end
-    rescue => e
-      @log.error("Error sending page: #{e}")
-    end
 
     # Notifies the pager that fixing is globally ignored, but a lot of errors
     # are still being noticed

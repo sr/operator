@@ -21,6 +21,7 @@ module Lita
       config :monitor_interval_seconds, default: 60
       config :active_monitors, default: [::Zabbixmon::MONITOR_NAME]
       config :paging_monitors, default: []
+      config :pager, default: "test"
 
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -46,6 +47,16 @@ module Lita
 
       def initialize(robot)
         super
+
+        @pager = \
+          case config.pager.to_s
+                             when "pagerduty"
+                               ::Notifiers::PagerdutyPager.new(config.pagerduty_service_key)
+                             when "test"
+                               ::Notifiers::TestPager.new
+                             else
+                               raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
+          end
 
         @clients = Hash.new { |h, k| h[k] = build_zabbix_client(datacenter: k) }
         config.datacenters.each do |datacenter|
@@ -286,6 +297,12 @@ module Lita
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
         @log.info("Telling hipchat channel #{@status_room}: #{whining}")
         robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
+      end
+
+      def page_r_doodie(message:, datacenter:)
+        @pager.trigger("#{message}", incident_key: ::Zabbixmon::INCIDENT_KEY.gsub('%datacenter%',datacenter))
+      rescue => e
+        @log.error("Error sending page: #{e}")
       end
 
       Lita.register_handler(self)
