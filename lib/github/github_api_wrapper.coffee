@@ -3,22 +3,39 @@ github = require('githubot')
 PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
+  repos: ['Pardot']
+  users: []
+  states: ['open']
+  types: ['pr']
 
-  pulls: (cb, msg, repos, users) ->
-    search_query = 'type:pr+state:open'
+  buildSearchQuery: ->
+    search_query = ''
 
-    repos_query = ''
-    if repos
-        for repo in repos
-            repos_query += "+repo:pardot/#{repo}"
-    else
-        repos_query += '+repo:pardot/Pardot'
+    for type in this.types
+      if search_query
+        search_query += '+'
+      search_query += "type:#{type}"
 
-    search_query += repos_query
+    for state in this.states
+      if search_query
+        search_query += '+'
+      search_query += "+state:#{state}"
 
-    if users
-        for user in users
-            search_query += "+author:#{user}"
+    for repo in this.repos
+      if search_query
+        search_query += '+'
+      search_query += "+repo:pardot/#{repo}"
+
+    if this.users
+        for user in this.users
+          if search_query
+            search_query += '+'
+          search_query += "+author:#{user}"
+
+    return search_query
+
+  pulls: (cb, msg) ->
+    search_query = @buildSearchQuery()
 
     url = "https://git.dev.pardot.com/api/v3/search/issues?q=#{search_query}"
     console.log url

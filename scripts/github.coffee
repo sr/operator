@@ -20,15 +20,20 @@ STORE_KEY = 'prUsersList'
 module.exports = (robot) ->
   robot.respond /pr for user (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
-    github.pulls prCallback, msg, ['pardot'], [msg.match[1]]
+    github.repos = ['pardot']
+    github.users = [msg.match[1]]
+    github.pulls prCallback, msg
 
   robot.respond /pr for repo (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
-    github.pulls prCallback, msg, [msg.match[1]]
+    github.repos = [msg.match[1]]
+    github.pulls prCallback, msg
 
   robot.respond /pr for user (.*) in repo (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
-    github.pulls prCallback, msg, [msg.match[2]], [msg.match[1]]
+    github.repos = [msg.match[2]]
+    github.users = [msg.match[1]]
+    github.pulls prCallback, msg
 
   robot.respond /pr$/i, (msg) ->
     rooms = robot.brain.get(STORE_KEY)
