@@ -20,7 +20,7 @@ STORE_KEY = 'prUsersList'
 module.exports = (robot) ->
   robot.respond /pr for user (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
-    github.pulls prCallback, msg, 'pardot', [msg.match[1]]
+    github.pulls prCallback, msg, ['pardot'], [msg.match[1]]
 
   robot.respond /pr for repo (.*)$/i, (msg) ->
     github = new GithubApiWrapper()
@@ -36,7 +36,7 @@ module.exports = (robot) ->
       msg.send("We ain\'t found no pull requests")
     else
       github = new GithubApiWrapper()
-      github.pulls prCallback, msg, 'pardot', rooms[msg.message.user.room]
+      github.pulls prCallback, msg, ['pardot'], rooms[msg.message.user.room]
 
 
   robot.respond /prAddUser\s+(.*)$/i, (msg) ->
