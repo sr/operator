@@ -8,16 +8,16 @@
 #   None
 #
 # Commands:
-#   hubot pr - does nothing yet
-#   hubot pr for user - does nothing yet
-#   hubot pr for repo - does nothing yet
-#   hubot pr for user - does nothing yet
-#   hubot pr add repo - does nothing yet
-#   hubot pr add user - does nothing yet
-#   hubot pr list user - does nothing yet
-#   hubot pr list repo - does nothing yet
-#   hubot pr reset user - does nothing yet
-#   hubot pr reset repo - does nothing yet
+#   hubot pr - lists all of the prs for all of the repos and users associated with the current room (defaults to Pardot and all users)
+#   hubot pr for user <github username> - does nothing yet
+#   hubot pr for repo <repo name> - does nothing yet
+#   hubot pr for user <github username> in repo <repo name>  - does nothing yet
+#   hubot pr add repo <repo name> - adds a repo to the current room, for use with the !pr and !pr for user commands
+#   hubot pr add user <github username> - adds a user to the current room, for use with the !pr and !pr for repo commands
+#   hubot pr list user - lists all of the github users associated with the current room
+#   hubot pr list repo - lists all of the repos associated with the current room
+#   hubot pr reset user - removes all of the github users associated with the current room
+#   hubot pr reset repo - resets the repo of the current room to Pardot
 # Author:
 #   JERN UHRMERN and GERGE GERSSERN
 
