@@ -94,10 +94,14 @@ class DeploysController < ApplicationController
   end
 
   def committers_for_compare(item1, item2)
+    if !item1.respond_to?(:sha) || !item2.respond_to?(:sha)
+      return []
+    end
+
     compare = GithubComparison.new(
       current_repo.full_name,
-      item1,
-      item2
+      item1.sha,
+      item2.sha,
     )
     compare.committers
   end

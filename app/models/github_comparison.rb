@@ -3,6 +3,14 @@ class GithubComparison
     @repo_name = repo_name
     @sha_a = sha_a
     @sha_b = sha_b
+
+    if !@sha_a
+      raise ArgumentError, "sha_a can not be nil"
+    end
+
+    if !@sha_b
+      raise ArgumentError, "sha_b can not be nil"
+    end
   end
 
   def committers
@@ -28,10 +36,6 @@ class GithubComparison
   end
 
   def commits
-    if !@deploy_a && !@deploy_b
-      return []
-    end
-
     Octokit.compare(@repo_name, @sha_a, @sha_b).commits
   end
 end
