@@ -11,6 +11,15 @@ class GithubApiWrapper
   buildSearchQuery: ->
     search_query = ''
 
+    if not repos
+      repos = ['Pardot']
+
+    if not states
+      states = ['open']
+
+    if not types
+      types = ['pr']
+
     for type in this.types
       if search_query
         search_query += '+'
@@ -19,18 +28,18 @@ class GithubApiWrapper
     for state in this.states
       if search_query
         search_query += '+'
-      search_query += "+state:#{state}"
+      search_query += "state:#{state}"
 
     for repo in this.repos
       if search_query
         search_query += '+'
-      search_query += "+repo:pardot/#{repo}"
+      search_query += "repo:pardot/#{repo}"
 
     if this.users
-        for user in this.users
-          if search_query
-            search_query += '+'
-          search_query += "+author:#{user}"
+      for user in this.users
+        if search_query
+          search_query += '+'
+        search_query += "author:#{user}"
 
     return search_query
 
