@@ -14,6 +14,8 @@
 #   hubot pr for user <github username> in repo <repo name>  - does nothing yet
 #   hubot pr add repo <repo name> - adds a repo to the current room, for use with the !pr and !pr for user commands
 #   hubot pr add user <github username> - adds a user to the current room, for use with the !pr and !pr for repo commands
+#   hubot pr remove repo <repo name> - removes a repo from the current rooms repo list, for use with the !pr and !pr for repo commands
+#   hubot pr remove user <github username> - removes a user from the current rooms user list, for use with the !pr and !pr for repo commands
 #   hubot pr list user - lists all of the github users associated with the current room
 #   hubot pr list repo - lists all of the repos associated with the current room
 #   hubot pr reset user - removes all of the github users associated with the current room
