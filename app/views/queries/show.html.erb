@@ -1,5 +1,7 @@
 <%= render partial: 'form' %>
-Parsed Query: <%= @ast.try(:to_sql) %>
+<p>
+<pre><%= @query.sql %></pre>
+</p>
 <div>
   <table class="table table-striped">
     <thead>

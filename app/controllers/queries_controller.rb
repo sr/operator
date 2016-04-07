@@ -3,33 +3,6 @@ require 'sql-parser'
 class QueriesController < ApplicationController
   before_action :permission_check
 
-  def show
-    @query = Query.find(params[:id])
-    @ast = @query.parse(@query.sql)
-    begin
-      @result = @query.execute(current_user, @ast.try(:to_sql))
-    rescue ActiveRecord::StatementInvalid => e
-      @query.errors.add :sqlerror, e
-      render :new
-    end
-    if @query.view == Query::CSV
-      render 'show.csv.erb'
-    end
-  end
-
-  def create
-    @query = Query.new(query_params)
-    @query.account_id = account_params[:account_id]
-    @result = @query.execute(current_user, "")
-    
-    render :show
-  end
-
-  def update
-    # Allows create new entries
-    create
-  end
-
   def new
     defaults = {datacenter: DataCenter::DALLAS, view: Query::SQL}
     if account_params[:account_id]
@@ -39,6 +12,14 @@ class QueriesController < ApplicationController
       # Global query
       @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: Database::GLOBAL))
     end
+  end
+
+  def create
+    @query = Query.new(query_params)
+    @query.account_id = account_params[:account_id]
+    @result = @query.execute(current_user, "")
+
+    render :show
   end
 
   private

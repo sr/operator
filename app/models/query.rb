@@ -11,6 +11,10 @@ class Query
     @view = attributes.fetch(:view, SQL)
   end
 
+  def sql
+    @sql
+  end
+
   attr_reader :view, :datacenter, :database, :sql
   attr_accessor :account_id
   attr_writer :is_limited, :sql
