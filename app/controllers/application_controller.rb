@@ -9,12 +9,33 @@ class ApplicationController < ActionController::Base
   protected
 
   def log_context
-    Instrumentation.context(request_id: Instrumentation.request_id) do
+    data = {request_id: Instrumentation.request_id}
+
+    if current_user
+      data.update(
+        user_id: current_user.id,
+        user_name: current_user.name,
+        user_email: current_user.email,
+      )
+    end
+
+    Instrumentation.context(data) do
       yield
     end
   end
 
   private
+
+  def append_info_to_payload(payload)
+    if current_user
+      payload[:context] = {
+        user_id: current_user.id,
+        user_name: current_user.name,
+        user_email: current_user.email,
+      }
+    end
+    payload
+  end
 
   def require_oauth_authentication
     redirect_to oauth_path unless current_user.present?
