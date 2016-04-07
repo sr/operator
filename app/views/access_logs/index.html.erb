@@ -1,9 +1,0 @@
-<h1>Query Access</h1>
-<% @logs.each do |log| %>
-  <div>
-    <span class="table-item"><%= log.id %></span>
-    <span class="table-item"><%= log.user %></span>
-    <span class="table-item"><%= log.created_at.to_formatted_s(:long) %></span>
-  </div>
-<% end %>
-<%= will_paginate @logs %>
