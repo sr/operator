@@ -25,7 +25,6 @@
 
 GithubApiWrapper = require "../lib/github/github_api_wrapper"
 GithubRobotBrain = require "../lib/github/github_robot_brain"
-PullRequestUtils = require "../lib/github/pull_request_utils"
 
 module.exports = (robot) ->
 
