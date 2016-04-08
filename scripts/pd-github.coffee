@@ -8,10 +8,10 @@
 #   None
 #
 # Commands:
-#   hubot pr - lists all of the prs for all of the repos and users associated with the current room (defaults to Pardot and all users)
-#   hubot pr for user <github username> - does nothing yet
-#   hubot pr for repo <repo name> - does nothing yet
-#   hubot pr for user <github username> in repo <repo name>  - does nothing yet
+#   hubot pr - lists all of the prs for all of the repos and users associated with the current room (defaults to all repos and all users)
+#   hubot pr for user <github username> - gets all prs for this user in any repos you have associated with this room. All repos if you have not defined any repos
+#   hubot pr for repo <repo name> - gets all prs for the specified repo for any users you have associated with this room. Defaults to all repos
+#   hubot pr for user <github username> in repo <repo name>  - gets all prs for the specified user in the specified repo
 #   hubot pr add repo <repo name> - adds a repo to the current room, for use with the !pr and !pr for user commands
 #   hubot pr add user <github username> - adds a user to the current room, for use with the !pr and !pr for repo commands
 #   hubot pr remove repo <repo name> - removes a repo from the current rooms repo list, for use with the !pr and !pr for repo commands
@@ -19,7 +19,7 @@
 #   hubot pr list user - lists all of the github users associated with the current room
 #   hubot pr list repo - lists all of the repos associated with the current room
 #   hubot pr reset user - removes all of the github users associated with the current room
-#   hubot pr reset repo - resets the repo of the current room to Pardot
+#   hubot pr reset repo - removes all of the repos associated with this room
 # Author:
 #   JERN UHRMERN and GERGE GERSSERN
 
