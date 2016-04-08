@@ -3,7 +3,7 @@ github = require('githubot')
 PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
-  repos: ['Pardot']
+  repos: []
   users: []
   states: ['open']
   types: ['pr']
@@ -12,7 +12,7 @@ class GithubApiWrapper
     search_query = ''
 
     if not repos
-      repos = ['Pardot']
+      repos = []
 
     if not states
       states = ['open']

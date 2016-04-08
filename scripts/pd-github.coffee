@@ -8,10 +8,10 @@
 #   None
 #
 # Commands:
-#   hubot pr - lists all of the prs for all of the repos and users associated with the current room (defaults to Pardot and all users)
-#   hubot pr for user <github username> - does nothing yet
-#   hubot pr for repo <repo name> - does nothing yet
-#   hubot pr for user <github username> in repo <repo name>  - does nothing yet
+#   hubot pr - lists all of the prs for all of the repos and users associated with the current room (defaults to all repos and all users)
+#   hubot pr for user <github username> - gets all prs for this user in any repos you have associated with this room. All repos if you have not defined any repos
+#   hubot pr for repo <repo name> - gets all prs for the specified repo for any users you have associated with this room. Defaults to all repos
+#   hubot pr for user <github username> in repo <repo name>  - gets all prs for the specified user in the specified repo
 #   hubot pr add repo <repo name> - adds a repo to the current room, for use with the !pr and !pr for user commands
 #   hubot pr add user <github username> - adds a user to the current room, for use with the !pr and !pr for repo commands
 #   hubot pr remove repo <repo name> - removes a repo from the current rooms repo list, for use with the !pr and !pr for repo commands
@@ -19,7 +19,7 @@
 #   hubot pr list user - lists all of the github users associated with the current room
 #   hubot pr list repo - lists all of the repos associated with the current room
 #   hubot pr reset user - removes all of the github users associated with the current room
-#   hubot pr reset repo - resets the repo of the current room to Pardot
+#   hubot pr reset repo - removes all of the repos associated with this room
 # Author:
 #   JERN UHRMERN and GERGE GERSSERN
 
@@ -59,21 +59,25 @@ module.exports = (robot) ->
     repo = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addRepoToRoomList(robot, msg.message.user.room, repo)
+    msg.send(repo + " has been added to this room's repo list")
 
   robot.respond /pr add user\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addUserToRoomList(robot, msg.message.user.room, username)
+    msg.send(username + " has been added to this room's user list")
 
   robot.respond /pr remove repo\s+(.*)$/i, (msg) ->
     repo = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.removeRepoFromRoomList(robot, msg.message.user.room, repo)
+    msg.send(repo + " has been removed from this room's repo list")
 
   robot.respond /pr remove user\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.removeUserFromRoomList(robot, msg.message.user.room, username)
+    msg.send(username + " has been removed from this room's user list")
 
   robot.respond /pr list user/i, (msg) ->
     robotBrain = new GithubRobotBrain
@@ -94,10 +98,12 @@ module.exports = (robot) ->
   robot.respond /pr reset user list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomUserList(robot, msg.message.user.room)
+    msg.send("All users for this room's pr list have been removed")
 
   robot.respond /pr reset repo list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomRepoList(robot, msg.message.user.room)
+    msg.send("All repos for this room's pr list have been removed")
 
 prCallback = (prTable, msg) ->
     msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}
