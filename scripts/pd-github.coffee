@@ -35,7 +35,7 @@ module.exports = (robot) ->
     github.users = robotBrain.getUserListForRoom(robot, msg.message.user.room)
     github.pulls prCallback, msg
 
-  robot.respond /pr (repo)?(user)?/i, (msg) ->
+  robot.respond /pr (repo|user)/i, (msg) ->
     msg.send("Invalid Syntax. Valid Syntax Examples: '! pr add user' or '! pr remove repo'")
 
   robot.respond /pr for user (.*)$/i, (msg) ->
