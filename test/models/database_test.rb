@@ -7,6 +7,7 @@ class DatabaseTest < ActiveSupport::TestCase
   end
 
   test "name" do
+    authorize_access(@datacenter, 1)
     assert_equal "pardot_shard1", @datacenter.shard_for(1).name
   end
 
@@ -17,6 +18,7 @@ class DatabaseTest < ActiveSupport::TestCase
   end
 
   test "execute" do
+    authorize_access(@datacenter, 2)
     database = @datacenter.shard_for(2)
     results = database.execute("SELECT * FROM object_audit")
     row = results.first
@@ -57,6 +59,7 @@ class DatabaseTest < ActiveSupport::TestCase
     assert_equal @user.email, log[:user_email]
     assert_equal [], log[:params]
 
+    authorize_access(@datacenter, 1)
     database = @datacenter.shard_for(1)
     assert log = Instrumentation::Logging.entries.pop
     assert_equal [1], log[:params]

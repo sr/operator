@@ -11,8 +11,18 @@ class DataCenterTest < ActiveSupport::TestCase
   end
 
   test "shard_for" do
+    authorize_access(@datacenter, 2)
     database = @datacenter.shard_for(2)
     assert_equal "pardot_shard1", database.name
+
+    assert_raise(DataCenter::UnauthorizedAccountAccess) do
+      @datacenter.shard_for(1)
+    end
+
+    authorize_access(@datacenter, 1, 6)
+    assert_raise(DataCenter::UnauthorizedAccountAccess) do
+      @datacenter.shard_for(1)
+    end
   end
 
   test "find_account" do

@@ -5,7 +5,7 @@ class GlobalAccount
     @shard_id = attributes.fetch(:shard_id)
   end
 
-  attr_reader :company, :shard_id
+  attr_reader :id, :company, :shard_id
 
   def descriptive_name
     "#{@company} #{@shard_id}/#{@id}"
