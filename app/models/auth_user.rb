@@ -7,4 +7,9 @@ class AuthUser < ActiveRecord::Base
       user.save!
     }
   end
+
+  def datacenter(name = nil)
+    name ||= DataCenter.default_name
+    DataCenter.new(self, name)
+  end
 end

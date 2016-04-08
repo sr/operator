@@ -5,19 +5,23 @@ class GlobalAccountsCollection
     end
   end
 
-  def initialize(database)
+  def initialize(user, database)
     @database = database
   end
 
   def all
-    @database.execute(nil, default_query).map do |result|
+    @database.execute(default_query).map do |result|
       GlobalAccount.new(result)
     end
   end
 
   def find(id)
-    query = "#{default_query} WHERE id = ? LIMIT 1"
-    results = @database.execute(nil, query, [id])
+    if !id.respond_to?(:to_int)
+      raise ArgumentError, "invalid account id: #{id.inspect}"
+    end
+
+    sql_query = "#{default_query} WHERE id = ? LIMIT 1"
+    results = @database.execute(sql_query, [id.to_int])
 
     if results.count.zero?
       raise NotFound, id

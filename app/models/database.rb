@@ -2,39 +2,29 @@ class Database
   GLOBAL = "global".freeze
   SHARD = "shard".freeze
 
-  class ExecutionError < StandardError
+  class QueryError < StandardError
   end
 
-  def initialize(config)
-    @hostname = config.fetch("host")
-    @username = config.fetch("username")
-    @password = config.fetch("password")
-    @name = config.fetch("database")
-    @port = config.fetch("port", 3306)
+  def initialize(user, config)
+    @user = user
+    @config = config
   end
 
-  attr_reader :name
+  def hostname
+    @config.hostname
+  end
+
+  def name
+    @config.name
+  end
 
   def tables
     activerecord_connection.tables
   end
 
-  def execute(user, query, values=[])
-    if !auth_user.is_a?(AuthUser)
-      raise ExecutionError, "invalid user: #{user.inspect}"
-    end
-
-    if !auth_user.email.present?
-      raise ExecutionError, "user has not email: #{user.inspect}"
-    end
-
-    if query.respond_to?(:sql)
-      q = query.sql
-    else
-      q = query
-    end
-    statement = connection.prepare(q)
-    result = statement.execute(*values)
+  def execute(sql, params = [])
+    query = Query.new(self, connection, @user, sql)
+    query.execute(params)
   end
 
   private
@@ -50,12 +40,18 @@ class Database
   end
 
   def connection
-    @connection ||= Mysql2::Client.new(
-      host: @hostname,
-      port: @port,
-      username: @username,
-      password: @password,
-      database: @name,
-    ).tap { |c| c.query_options.merge!(:symbolize_keys => true) }
+    @connection ||= establish_connection
+  end
+
+  def establish_connection
+    connection = Mysql2::Client.new(
+      host: @config.hostname,
+      port: @config.port,
+      username: @config.username,
+      password: @config.password,
+      database: @config.name,
+    )
+    connection.query_options.merge!(symbolize_keys: true)
+    connection
   end
 end
