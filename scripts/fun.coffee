@@ -127,6 +127,9 @@ module.exports = (robot) ->
   robot.respond /the(\s)?best(\s)?gif(\s)?ever$/i, (msg) ->
     msg.send "http://media4.giphy.com/media/V9qc3Adm2wWyY/giphy.gif"
 
+  robot.respond /abs$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1%2F62%2FrPK7cHsJFVD7cUr%2FIMG_1642%20%282%29.JPG"
+
   robot.respond /bees$/i, (msg) ->
     bees = [
       'http://i.giphy.com/dcubXtnbck0RG.gif',
