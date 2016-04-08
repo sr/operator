@@ -17,9 +17,9 @@ class PullRequestTableMaker
     regex[1]
 
   truncatePullRequestTitle: (title) ->
-    if title.length <= 18
-      title.substring(0, 17)
+    if title.length <= 30
+      title.substring(0, 29)
     else
-      title.substring(0, 17) + "..."
+      title.substring(0, 26) + "..."
 
 module.exports = PullRequestTableMaker
