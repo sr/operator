@@ -10,10 +10,16 @@ class PullRequestTableMaker
       tableMarkup + "</table>"
 
   tableRow: (pullRequest) ->
-    "<tr><td>#{pullRequest.title}</td><td>#{pullRequest.user.login}</td><td><a href = \"#{pullRequest.html_url}\">#{pullRequest.number}</a></td><td>#{@extractRepoName(pullRequest.html_url)}</td><td>#{pullRequest.created_at.substring(0, 10)}</td></tr>"
+    "<tr><td>#{@truncatePullRequestTitle(pullRequest.title)}</td><td>#{pullRequest.user.login}</td><td><a href = \"#{pullRequest.html_url}\">#{pullRequest.number}</a></td><td>#{@extractRepoName(pullRequest.html_url)}</td><td>#{pullRequest.created_at.substring(0, 10)}</td></tr>"
 
   extractRepoName: (pullRequestUrl) ->
     regex = pullRequestUrl.match(/Pardot\/([A-Za-z-_]+).*/)
     regex[1]
+
+  truncatePullRequestTitle: (title) ->
+    if title.length <= 18
+      title.substring(0, 17)
+    else
+      title.substring(0, 17) + "..."
 
 module.exports = PullRequestTableMaker

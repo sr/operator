@@ -56,21 +56,25 @@ module.exports = (robot) ->
     repo = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addRepoToRoomList(robot, msg.message.user.room, repo)
+    msg.send(repo + " has been added to this room's repo list")
 
   robot.respond /pr add user\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.addUserToRoomList(robot, msg.message.user.room, username)
+    msg.send(username + " has been added to this room's user list")
 
   robot.respond /pr remove repo\s+(.*)$/i, (msg) ->
     repo = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.removeRepoFromRoomList(robot, msg.message.user.room, repo)
+    msg.send(repo + " has been removed from this room's repo list")
 
   robot.respond /pr remove user\s+(.*)$/i, (msg) ->
     username = msg.match[1]
     robotBrain = new GithubRobotBrain
     robotBrain.removeUserFromRoomList(robot, msg.message.user.room, username)
+    msg.send(username + " has been removed from this room's user list")
 
   robot.respond /pr list user/i, (msg) ->
     robotBrain = new GithubRobotBrain
@@ -91,10 +95,12 @@ module.exports = (robot) ->
   robot.respond /pr reset user list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomUserList(robot, msg.message.user.room)
+    msg.send("All users for this room's pr list have been removed")
 
   robot.respond /pr reset repo list$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     robotBrain.resetRoomRepoList(robot, msg.message.user.room)
+    msg.send("All repos for this room's pr list have been removed")
 
 prCallback = (prTable, msg) ->
     msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}
