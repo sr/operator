@@ -1,18 +1,15 @@
 class AccountsController < ApplicationController
   def index
-    database = datacenter.global
-    accounts = database.global_accounts
-
-    render locals: {accounts: accounts.all}
+    render locals: {accounts: datacenter.accounts}
   end
 
   private
 
   def datacenter
     if params[:datacenter].present?
-      DataCenter.find(query_params[:datacenter])
+      current_user.datacenter(params[:datacenter])
     else
-      DataCenter.default
+      current_user.datacenter
     end
   end
 

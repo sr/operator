@@ -1,4 +1,8 @@
 class Query
+  # TODO(sr) Remove these constants
+  SQL = "sql".freeze
+  UI = "ui".freeze
+
   class ExecutionRefused < StandardError
   end
 

@@ -5,6 +5,9 @@
 <% end %>
 <%= form_tag "/queries" do -%>
   <%= hidden_field_tag :database, database_name %>
+  <% if account.present? %>
+    <%= hidden_field_tag :account_id, account.id %>
+  <% end %>
   <%= hidden_field_tag :is_limited %>
   <%= hidden_field_tag :view, params[:view] %>
   <div class="btn-group view">
@@ -17,7 +20,7 @@
     <button type="button" class="btn btn-default<%= is_active?(:datacenter, DataCenter::SEATTLE) %>" data-val="<%= DataCenter::SEATTLE %>">Seattle</button>
   </div>
   <div class="viewoption" <%= is_active?(:view, Query::UI, 'style="display:none;"') %>>
-    <%= text_area_tag(:sql, sql_query, rows: 10, cols: 80) %>
+    <%= text_area_tag(:sql, sql_query.sql, rows: 10, cols: 80) %>
   </div>
   <%= submit_tag "Run Query" %>
   <div class="viewoption" <%= is_active?(:view, Query::SQL, 'style="display:none;"') %>>

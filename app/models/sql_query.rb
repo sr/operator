@@ -19,6 +19,10 @@ class SQLQuery
     @ast.to_sql
   end
 
+  def select_all?
+    @ast.to_sql.match(/SELECT \*/i)
+  end
+
   def limit(count = DEFAULT_LIMIT)
     if !@ast.limit
       @ast.limit = SQLParser::Statement::Limit.new(count)

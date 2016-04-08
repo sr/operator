@@ -8,6 +8,8 @@ class ActiveSupport::TestCase
     reset_account_access(DataCenter::DALLAS)
   end
 
+  protected
+
   def reset_account_access(datacenter)
     config = DatabaseConfigurationFile.load.global(datacenter)
     connection = Mysql2::Client.new(

@@ -1,6 +1,14 @@
-<%= render partial: 'form', locals: query %>
+<%=
+  render partial: 'form', locals: {
+    account: account,
+    database_name: database_name,
+    datacenter_name: datacenter_name,
+    sql_query: sql_query,
+    tables: tables,
+  }
+%>
 <p>
-<pre><%= query[:sql_query] %></pre>
+<pre><%= sql_query.sql %></pre>
 </p>
 <div>
   <table class="table table-striped">
@@ -9,7 +17,7 @@
     <% results.fields.each_with_index do |field, i| %>
       <th>
         <%= link_to field, "#", class: 'select_column' %>
-        <% if !@query.select_all? && (i == @result.fields.length-1) %>
+        <% if !sql_query.select_all? && (i == results.fields.length-1) %>
           <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>
@@ -20,7 +28,7 @@
     <% results.each do |fields| %>
       <tr>
         <% fields.each do |field| %>
-        <td class="filterable-cell"><%= field %></td>
+        <td class="filterable-cell"><%= field[1] %></td>
         <% end %>
       </tr>
     <% end %>

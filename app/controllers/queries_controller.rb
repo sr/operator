@@ -1,25 +1,29 @@
 class QueriesController < ApplicationController
-  before_action :permission_check
+  rescue_from DataCenter::UnauthorizedAccountAccess do |e|
+    message = "Please request engineering access to account #{e.account_id}."
+    flash[:error] = message
+    redirect_to "/accounts"
+  end
 
   def new
     render "_form", locals: {
+      account: account,
       database_name: database.name,
       datacenter_name: datacenter.name,
+      sql_query: sql_query,
       tables: database.tables,
-      sql_query: sql_query.sql,
-      account: account,
     }
   end
 
   def create
     render :show, locals: {
-      results: database.execute(current_user, sql_query),
-      query: {
-        database_name: database.name,
-        datacenter_name: datacenter.name,
-        tables: database.tables,
-        sql_query: sql_query.sql,
-      },
+      account: account,
+      database_name: database.name,
+      datacenter_name: datacenter.name,
+      is_limited: params[:is_limited].present?,
+      results: database.execute(sql_query.sql),
+      sql_query: sql_query,
+      tables: database.tables,
     }
   end
 
@@ -35,19 +39,19 @@ class QueriesController < ApplicationController
     end
   end
 
-  def datacenter
-    if query_params[:datacenter].present?
-      DataCenter.find(query_params[:datacenter])
+  def database
+    if params[:account_id].present?
+      datacenter.shard_for(params[:account_id])
     else
-      DataCenter.default
+      datacenter.global
     end
   end
 
-  def database
-    if params[:account_id].present?
-      datacenter.shard(params[:account_id])
+  def datacenter
+    if query_params[:datacenter].present?
+      current_user.datacenter
     else
-      datacenter.global
+      current_user.datacenter(query_params[:datacenter])
     end
   end
 
@@ -73,17 +77,5 @@ class QueriesController < ApplicationController
 
   def account_params
     params.permit(:account_id)
-  end
-
-  def permission_check
-    account = account_params[:account_id]
-    if account
-      unless Account.find(account).access?
-        flash[:error] = "Please request engineering access to account #{account}."
-        redirect_to accounts_path
-      end
-    else
-      true
-    end
   end
 end

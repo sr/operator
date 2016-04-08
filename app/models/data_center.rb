@@ -7,8 +7,12 @@ class DataCenter
 
   class UnauthorizedAccountAccess < StandardError
     def initialize(account_id)
+      @account_id = account_id
+
       super "access to account #{account_id.inspect} is not authorized"
     end
+
+    attr_reader :account_id
   end
 
   ENGINEERING_ROLE = 7.freeze

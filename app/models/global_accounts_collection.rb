@@ -16,12 +16,8 @@ class GlobalAccountsCollection
   end
 
   def find(id)
-    if !id.respond_to?(:to_int)
-      raise ArgumentError, "invalid account id: #{id.inspect}"
-    end
-
     sql_query = "#{default_query} WHERE id = ? LIMIT 1"
-    results = @database.execute(sql_query, [id.to_int])
+    results = @database.execute(sql_query, [Integer(id)])
 
     if results.count.zero?
       raise NotFound, id
