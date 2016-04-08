@@ -3,7 +3,7 @@ github = require('githubot')
 PullRequestTableMaker = require './pull_request_table_maker'
 
 class GithubApiWrapper
-  repos: ['pardot']
+  repos: []
   users: []
   states: ['open']
   types: ['pr']
