@@ -41,7 +41,6 @@ do
     mysql -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname"
 done
 
-
 echo "===> Running tests..."
 
 if [ -n "${1:-""}" ]; then

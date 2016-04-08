@@ -15,8 +15,6 @@ class DatabaseConfiguration
     end
   end
 
-  Database = Struct.new(:hostname, :username, :password, :database)
-
   def self.load
     path = Rails.root.join("config", "pi", "#{Rails.env}.yaml")
     config = YAML.load_file(path)
@@ -38,7 +36,7 @@ class DatabaseConfiguration
         raise DataCenterNotFound.new(datacenter)
       end
 
-    load(config)
+    Database.new(config)
   end
 
   def shard(datacenter, id)
@@ -58,13 +56,13 @@ class DatabaseConfiguration
         raise DataCenterNotFound.new(datacenter, id)
       end
 
-    load(config)
+    Database.new(config)
   end
 
   private
 
   def load(config)
-    Database.new(*config.values_at("host", "username", "password", "database"))
+    Database.new(config)
   end
 
   def shards

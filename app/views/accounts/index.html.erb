@@ -9,8 +9,8 @@
 <% end %>
 <div>
 <ul>
-<% @accounts.each do |account| %>
-  <li><%= link_to account.descriptive_name, "/queries/new?account_id=#{account.id}" %></li>
+<% accounts.each do |account| %>
+  <li><%= link_to account.descriptive_name, "/queries?account_id=#{account.id}" %></li>
 <% end %>
 </ul>
 </div>

@@ -1,12 +1,12 @@
-<%= render partial: 'form' %>
+<%= render partial: 'form', locals: query %>
 <p>
-<pre><%= @query.sql %></pre>
+<pre><%= query[:sql_query] %></pre>
 </p>
 <div>
   <table class="table table-striped">
     <thead>
     <tr>
-    <% @result.fields.each_with_index do |field, i| %>
+    <% results.fields.each_with_index do |field, i| %>
       <th>
         <%= link_to field, "#", class: 'select_column' %>
         <% if !@query.select_all? && (i == @result.fields.length-1) %>
@@ -17,7 +17,7 @@
     </tr>
     </thead>
     <tbody>
-    <% @result.each do |fields| %>
+    <% results.each do |fields| %>
       <tr>
         <% fields.each do |field| %>
         <td class="filterable-cell"><%= field %></td>
@@ -27,5 +27,5 @@
     </tbody>
   </table>
 </div>
-<%= link_to("Show All Rows", "#", class: "all_rows") if @query.is_limited %>
+<%= link_to("Show All Rows", "#", class: "all_rows") if is_limited %>
 <%= link_to "Export to CSV", "#", class: "export_csv" %>

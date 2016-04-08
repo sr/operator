@@ -8,7 +8,7 @@ module QueriesHelper
   end
 
   def is_active?(type, value, output = " active")
-    result = @query.send(type) == value
+    result = params[type] == value
     result ? output.html_safe : ""
   end
 

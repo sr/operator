@@ -1,28 +1,71 @@
-require 'sql-parser'
-
 class QueriesController < ApplicationController
   before_action :permission_check
 
   def new
-    defaults = {datacenter: DataCenter::DALLAS, view: Query::SQL}
-    if account_params[:account_id]
-      # Accounts query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM account", database: Database::SHARD, account_id: account_params[:account_id]))
-    else
-      # Global query
-      @query = Query.new(defaults.merge(sql: "SELECT * FROM global_account", database: Database::GLOBAL))
-    end
+    render "_form", locals: {
+      database_name: database.name,
+      datacenter_name: datacenter.name,
+      tables: database.tables,
+      sql_query: sql_query.sql,
+      account: account,
+    }
   end
 
   def create
-    @query = Query.new(query_params)
-    @query.account_id = account_params[:account_id]
-    @result = @query.execute(current_user, "")
-
-    render :show
+    render :show, locals: {
+      results: database.execute(current_user, sql_query),
+      query: {
+        database_name: database.name,
+        datacenter_name: datacenter.name,
+        tables: database.tables,
+        sql_query: sql_query.sql,
+      },
+    }
   end
 
   private
+
+  def sql_query
+    SQLQuery.parse(raw_sql_query)
+  end
+
+  def account
+    if query_params[:account_id].present?
+      datacenter.find_account(query_params[:account_id])
+    end
+  end
+
+  def datacenter
+    if query_params[:datacenter].present?
+      DataCenter.find(query_params[:datacenter])
+    else
+      DataCenter.default
+    end
+  end
+
+  def database
+    if params[:account_id].present?
+      datacenter.shard(params[:account_id])
+    else
+      datacenter.global
+    end
+  end
+
+  def raw_sql_query
+    if query_params[:sql].present?
+      query_params[:sql]
+    else
+      default_sql_query
+    end
+  end
+
+  def default_sql_query
+    if query_params[:account_id].present?
+      "SELECT * FROM account"
+    else
+      "SELECT * FROM global_account"
+    end
+  end
 
   def query_params
     params.permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)

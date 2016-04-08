@@ -7,26 +7,10 @@ default: &default
   username: <%= ENV.fetch("BOXEN_MYSQL_USER", "root") %>
   password:
 
-development: &development
+development:
   <<: *default
   database: pardot_explorer_development
 
-dallas_global:
-  <<: *development
-  database: pardot_global_test
-
 test:
-  <<: *development
+  <<: *default
   database: pardot_explorer_test
-
-pardot_global_test:
-  <<: *development
-  database: pardot_global_test
-
-pardot_shard1_test:
-  <<: *development
-  database: pardot_shard1_test
-
-pardot_shard2_test:
-  <<: *development
-  database: pardot_shard2_test
