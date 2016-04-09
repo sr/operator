@@ -16,6 +16,12 @@ class GlobalAccountsCollection
   end
 
   def find(id)
+    begin
+      Integer(id)
+    rescue TypeError
+      raise ArgumentError, "invalid account id: #{id.inspect}"
+    end
+
     sql_query = "#{default_query} WHERE id = ? LIMIT 1"
     results = @database.execute(sql_query, [Integer(id)])
 
