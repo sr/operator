@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 gem 'byebug', group: [:development, :test]
 gem 'coffee-rails', '~> 4.0.0'
 gem 'foreman', '0.78.0'
-gem 'jbuilder', '~> 2.0'
 gem 'jquery-rails'
 gem 'lograge', '0.3.6'
 gem 'mysql2', '0.4.3'
