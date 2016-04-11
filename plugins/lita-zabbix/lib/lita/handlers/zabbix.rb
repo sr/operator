@@ -19,14 +19,13 @@ module Lita
       config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
-      config :datacenters, default: ["dfw"]
-      config :default_datacenter, default: "dfw"
+      config :datacenters, default: ['dfw'], type: Array
+      config :default_datacenter, default: 'dfw'
       config :monitor_interval_seconds, default: 60
-      config :active_monitors, default: [::Zabbixmon::MONITOR_NAME]
-      config :paging_monitors, default: []
-      config :pager, default: "test"
-
-      config :status_room, default: "1_ops@conf.btf.hipchat.com"
+      config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
+      config :paging_monitors, default: [], type: Array
+      config :pager, default: 'test'
+      config :status_room, default: '1_ops@conf.btf.hipchat.com'
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
@@ -38,17 +37,18 @@ module Lita
       }
 
       route /^zabbixmon(?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
-          "zabbixmon <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour [options: #{config.datacenters.join(",")}]",
-          "zabbixmon <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours [options: #{config.datacenters.join(",")}]",
+          "zabbixmon <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
+          "zabbixmon <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
       }
 
       route /^zabbixmon(?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
-          "zabbixmon <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{config.datacenters.join(",")}]",
+          "zabbixmon <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
       }
 
 
 
       def initialize(robot)
+        @datacenter_options = config.datacenters.join(",") #cant seem to use config.datacenters in route definition, so trying instance variable instead
         super
         @pager = \
           case config.pager.to_s
@@ -206,7 +206,7 @@ module Lita
         monitor_supervisor.unpause_monitor(::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
 
-      rescue ::Lita::Handlers::Zabbix:MonitorUnpauseFailed
+      rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
         response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
@@ -257,6 +257,7 @@ module Lita
                 redis: redis,
                 clients: @clients,
                 log: log,
+                config: config
             )
 
             # loop through (active && unpaused) monitors
@@ -270,7 +271,7 @@ module Lita
                 monitor_fail_notify(zabbixmon.monitor_name,
                                     datacenter,
                                     zabbixmon.hard_failure,
-                                    zabbixmon.notify_status_channel?,
+                                    config.zbxmon_hipchat_notify,
                                     config.paging_monitors.include?(zabbixmon.monitor_name)
                 ) unless zabbixmon.hard_failure.nil?
               end
