@@ -5,7 +5,7 @@ class GlobalAccountsCollection
     end
   end
 
-  def initialize(user, database)
+  def initialize(database)
     @database = database
   end
 

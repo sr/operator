@@ -72,7 +72,7 @@ class DataCenter
   end
 
   def global_accounts
-    @global_accounts ||= GlobalAccountsCollection.new(@user, global)
+    @global_accounts ||= GlobalAccountsCollection.new(global)
   end
 
   def config_file
