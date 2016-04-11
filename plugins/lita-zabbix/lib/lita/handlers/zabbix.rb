@@ -26,6 +26,15 @@ module Lita
       config :paging_monitors, default: [], type: Array
       config :pager, default: 'test'
       config :status_room, default: '1_ops@conf.btf.hipchat.com'
+      config :zbxmon_test_api_endpoint, default: 'cgi-bin/zabbix-server-check.sh'
+      config :zbxmon_item, default: 'system:general'
+      config :zbxmon_key, default: 'zabbix_status'
+      config :zbxmon_retries, default: 5
+      config :zbxmon_retry_interval_seconds, default: 5
+      config :zbxmon_payload_length, default: 10
+      config :zbxmon_hipchat_notify, default: false
+      config :zbxmon_status_room, default: "1_ops@conf.btf.hipchat.com"
+      config :zbxmon_http_read_timeout, default: 30
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
@@ -36,16 +45,18 @@ module Lita
         "zabbix maintenance stop HOST" => "Brings hosts matching HOST out of maintenance mode",
       }
 
-      route /^zabbixmon(?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
-          "zabbixmon <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
-          "zabbixmon <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
+      route /^zabbix monitor (?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
+          "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
+          "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
       }
 
-      route /^zabbixmon(?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
-          "zabbixmon <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
+      route /^zabbix monitor (?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
+          "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
       }
 
-
+      route /^zabbix monitor status$/, :monitor_status, command:true,  help: {
+          "zabbix monitor status" => "Provides details on monitoring particulars"
+      }
 
       def initialize(robot)
         @datacenter_options = config.datacenters.join(",") #cant seem to use config.datacenters in route definition, so trying instance variable instead
@@ -88,6 +99,19 @@ module Lita
 
       on(:connected) do
         robot.join(config.status_room)
+      end
+
+      def monitor_status(response)
+        msg = "Active Monitors: #{config.active_monitors.join[',']}"
+        msg +="\nPaging Monitors: #{config.paging_monitors.join[',']}"
+        msg +="\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
+        msg +="\nDatacenters: #{config.datacenters.join(',')}"
+        config.each do |k, v|
+          msg += "\n#{k}: #{v}" if k.include?(::Zabbix::Zabbixmon::MONITOR_SHORTHAND)
+        end
+        response.reply_with_mention("Monitor Status:\n#{msg}")
+      rescue => e
+        response.reply_with_mention("Sorry, the monitor status check failed: #{e}")
       end
 
       def start_maintenance(response)
@@ -133,7 +157,11 @@ module Lita
       end
 
       def pause_monitor(response)
-        datacenter = response.match_data["datacenter"] || config.default_datacenter
+
+        datacenter = response.match_data["datacenter"]
+        response.reply("/me failed to parse a datacenter from your request. Defaulting to #{config.default_datacenter}") unless datacenter
+        datacenter ||= config.default_datacenter
+
         validate_datacenter(datacenter: datacenter, response: response) || return
         options = parse_options(response.match_data["options"])
 

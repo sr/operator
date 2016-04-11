@@ -4,6 +4,7 @@ module Zabbix
   class Zabbixmon
 
     MONITOR_NAME = "zabbixmon"
+    MONITOR_SHORTHAND = "zbxmon"
     INCIDENT_KEY = "#{MONITOR_NAME}-%datacenter%"
     ERR_NON_200_HTTP_CODE = "[HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
@@ -24,7 +25,7 @@ module Zabbix
       
       retry_attmept_iterator=0
       # make a one time use random string to insert and detect
-      payload = SecureRandom.random_number(36**config.zbxmon_payload_length).to_s(36).rjust(config.zbxmon_payload_length, '0')
+      payload = SecureRandom.random_number(36**config._payload_lengthzbxmon).to_s(36).rjust(config.zbxmon_payload_length, '0')
       @log.info("[#{monitor_name}] value generated: #{payload}")
       url="https://#{zbx_host}/#{config.zbxmon_test_api_endpoint}?#{payload}"
 
@@ -67,7 +68,7 @@ module Zabbix
         if system_general.keys.contains(config.zbxmon_key)
           # we found the key
           @log.debug("[#{monitor_name}] 'observed key' successfully: #{config.zbxmon_key} (#{retry_sz})")
-          
+
           if payload == system_general[config.zbxmon_key]
             # we found the value
             @log.info("[#{monitor_name}] 'observed value' successfully: #{system_general[config.zbxmon_key]} (#{retry_sz})")
