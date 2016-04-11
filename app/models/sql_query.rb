@@ -24,9 +24,11 @@ class SQLQuery
   end
 
   def limit(count = DEFAULT_LIMIT)
-    if !@ast.limit
-      @ast.limit = SQLParser::Statement::Limit.new(count)
+    if @ast.limit
+      return
     end
+
+    @ast.limit = SQLParser::Statement::Limit.new(count)
   end
 
   def scope_to(account_id)

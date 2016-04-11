@@ -17,7 +17,11 @@ module Canoe
 
       group_cn_filter = "(|" + Array(group_cns).map { |cn| "(cn=#{escape(cn)})" }.join("") + ")"
       result = @ldap.search(base: @base, filter: "(&(ou:dn:=Group)#{group_cn_filter})").first
-      !!(result && result["memberuid"].include?(user_uid))
+      if !result
+        return false
+      end
+
+      result["memberuid"].include?(user_uid)
     end
 
     def escape(str)
