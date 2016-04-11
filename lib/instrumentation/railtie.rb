@@ -13,9 +13,9 @@ module Instrumentation
       config.lograge.enabled = true
       config.lograge.custom_options = lambda do |event|
         data = {
-          :app => app_name,
-          :env => Rails.env.to_str,
-          :request_id => Instrumentation.request_id
+          app: app_name,
+          env: Rails.env.to_str,
+          request_id: Instrumentation.request_id
         }
 
         context = event.payload[:context]

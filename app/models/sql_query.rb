@@ -2,7 +2,7 @@ class SQLQuery
   class ParseError < StandardError
   end
 
-  DEFAULT_LIMIT = 10.freeze
+  DEFAULT_LIMIT = 10
 
   def self.parse(query)
     ast = SQLParser::Parser.new.scan_str(query)
