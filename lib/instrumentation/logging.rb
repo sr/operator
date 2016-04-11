@@ -12,8 +12,8 @@ module Instrumentation
             exceptions: "single",
             global_context: {
               app: app_name,
-              env: env_name,
-            },
+              env: env_name
+            }
           )
           Scrolls
         end

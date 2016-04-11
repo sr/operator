@@ -49,9 +49,9 @@ class Database
       port: @config.port,
       username: @config.username,
       password: @config.password,
-      database: @config.name,
+      database: @config.name
     )
-    connection.query_options.merge!(symbolize_keys: true)
+    connection.query_options[:symbolize_keys] = true
     connection
   end
 end

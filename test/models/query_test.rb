@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
 class QueryTest < ActiveSupport::TestCase
-  setup do 
+  setup do
     @user = AuthUser.new(
       email: "user@salesforce.com",
       name: "user",
