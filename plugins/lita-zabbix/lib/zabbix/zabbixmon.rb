@@ -1,6 +1,6 @@
 require 'securerandom'
 
-module Monitors
+module Zabbix
   class Zabbixmon
 
     config :test_api_endpoint, default: 'cgi-bin/zabbix-server-check.sh'

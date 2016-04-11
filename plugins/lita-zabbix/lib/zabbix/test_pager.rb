@@ -1,4 +1,4 @@
-module Notifiers
+module Zabbix
   class TestPager
     attr_reader :incidents
 

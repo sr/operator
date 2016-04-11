@@ -1,9 +1,9 @@
 require "zabbixapi"
 require "zabbix/maintenance_supervisor"
 require "zabbix/client"
-require "monitors/zabbixmon"
-require "monitors/monitor_supervisor"
-require "notifiers/pagerduty_pager"
+require "zabbix/zabbixmon"
+require "zabbix/monitor_supervisor"
+require "zabbix/pagerduty_pager"
 require "human_time"
 
 module Lita
@@ -11,6 +11,8 @@ module Lita
     class Zabbix < Handler
 
       MonitorNotFound = Class.new(StandardError)
+      MonitorPauseFailed = Class.new(StandardError)
+      PagerFailed = Class.new(StandardError)
 
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
@@ -165,7 +167,7 @@ module Lita
         )
 
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
-      rescue => e
+      rescue ::Lita::Handlers::Zabbix::MonitorPauseFailed
         response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
@@ -301,7 +303,7 @@ module Lita
 
       def page_r_doodie(message:, datacenter:)
         @pager.trigger("#{message}", incident_key: ::Zabbixmon::INCIDENT_KEY.gsub('%datacenter%',datacenter))
-      rescue => e
+      rescue ::Lita::Handlers::Zabbix::PagerFailed
         @log.error("Error sending page: #{e}")
       end
 
