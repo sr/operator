@@ -26,15 +26,7 @@ module Lita
       config :paging_monitors, default: [], type: Array
       config :pager, default: 'test'
       config :status_room, default: '1_ops@conf.btf.hipchat.com'
-      config :zbxmon_test_api_endpoint, default: 'cgi-bin/zabbix-server-check.sh'
-      config :zbxmon_item, default: 'system:general'
-      config :zbxmon_key, default: 'zabbix_status'
-      config :zbxmon_retries, default: 5
-      config :zbxmon_retry_interval_seconds, default: 5
-      config :zbxmon_payload_length, default: 10
-      config :zbxmon_hipchat_notify, default: false
-      config :zbxmon_status_room, default: "1_ops@conf.btf.hipchat.com"
-      config :zbxmon_http_read_timeout, default: 30
+
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",

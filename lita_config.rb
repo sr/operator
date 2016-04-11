@@ -37,10 +37,25 @@ Lita.configure do |config|
   # Replication fixing
   config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
 
-  # Zabbix
+  # Set the Hipchat Chatroom
+  config.handlers.zabbix.status_room = "1_ops@conf.btf.hipchat.com"
+
+  # Set the datacenters
+  #config.handlers.zabbix.datacenters = ['dfw','phx']
+
+  # Zabbix Setup
   config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
   config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
-  #config.handlers.zabbix.datacenters = ['dfw','phx']
+
+  # Zabbix Monitor Config
+  config.handlers.zabbix.zbxmon_test_api_endpoint =  'cgi-bin/zabbix-server-check.sh'
+  config.handlers.zabbix.zbxmon_item = 'system:general'
+  config.handlers.zabbix.zbxmon_key = 'zabbix_status'
+  config.handlers.zabbix.zbxmon_retries = 5
+  config.handlers.zabbix.zbxmon_retry_interval_seconds = 5
+  config.handlers.zabbix.zbxmon_payload_length = 10
+  config.handlers.zabbix.zbxmon_hipchat_notify = false
+  config.handlers.zabbix.zbxmon_http_read_timeout =  30
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
