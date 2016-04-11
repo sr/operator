@@ -11,7 +11,7 @@ class QueriesController < ApplicationController
       database_name: database.name,
       datacenter_name: datacenter.name,
       sql_query: sql_query,
-      tables: database.tables,
+      tables: database.tables
     }
   end
 
@@ -23,7 +23,7 @@ class QueriesController < ApplicationController
       is_limited: params[:is_limited].present?,
       results: database.execute(sql_query.sql),
       sql_query: sql_query,
-      tables: database.tables,
+      tables: database.tables
     }
   end
 

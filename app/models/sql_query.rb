@@ -2,7 +2,7 @@ class SQLQuery
   class ParseError < StandardError
   end
 
-  DEFAULT_LIMIT = 10.freeze
+  DEFAULT_LIMIT = 10
 
   def self.parse(query)
     ast = SQLParser::Parser.new.scan_str(query)
@@ -24,9 +24,11 @@ class SQLQuery
   end
 
   def limit(count = DEFAULT_LIMIT)
-    if !@ast.limit
-      @ast.limit = SQLParser::Statement::Limit.new(count)
+    if @ast.limit
+      return
     end
+
+    @ast.limit = SQLParser::Statement::Limit.new(count)
   end
 
   def scope_to(account_id)

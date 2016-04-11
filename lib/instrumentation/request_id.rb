@@ -22,7 +22,8 @@ module Instrumentation
       def call(env)
         RequestId.request_id = nil
 
-        if id = env["action_dispatch.request_id"]
+        id = env["action_dispatch.request_id"]
+        if id
           RequestId.request_id = id
         end
 

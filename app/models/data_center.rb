@@ -15,7 +15,7 @@ class DataCenter
     attr_reader :account_id
   end
 
-  ENGINEERING_ROLE = 7.freeze
+  ENGINEERING_ROLE = 7
   DALLAS = "dallas".freeze
   SEATTLE = "seattle".freeze
 

@@ -33,7 +33,7 @@ class DatabaseConfigurationFile
       when DataCenter::SEATTLE
         globals.fetch("seattle")
       else
-        raise DataCenterNotFound.new(datacenter)
+        raise DataCenterNotFound, datacenter
       end
 
     DatabaseConfiguration.new(config)

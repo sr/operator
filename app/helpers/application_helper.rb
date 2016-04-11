@@ -1,5 +1,5 @@
 module ApplicationHelper
-  def is_active?(type, value, output = " active")
+  def active?(type, value, output = " active")
     result = params[type] == value
     result ? output.html_safe : ""
   end

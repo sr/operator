@@ -23,9 +23,6 @@ class SQLQueryTest < ActiveSupport::TestCase
     query.scope_to(5)
     assert_equal "SELECT `id` FROM `audit_log` WHERE `account_id` = 5",
       query.sql
-
-    user = AuthUser.create!(email: "sr@sfdc.be")
-    datacenter = user.datacenter
   end
 
   test "only backticks work as quotes" do
