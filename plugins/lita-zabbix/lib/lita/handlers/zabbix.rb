@@ -12,6 +12,7 @@ module Lita
 
       MonitorNotFound = Class.new(StandardError)
       MonitorPauseFailed = Class.new(StandardError)
+      MonitorUnpauseFailed = Class.new(StandardError)
       PagerFailed = Class.new(StandardError)
 
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
@@ -212,7 +213,7 @@ module Lita
         monitor_supervisor.unpause_monitor(::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
 
-      rescue => e
+      rescue ::Lita::Handlers::Zabbix:MonitorUnpauseFailed
         response.reply_with_mention("Sorry, something went wrong: #{e}")
       end
 
@@ -222,7 +223,7 @@ module Lita
       end
 
       def monitor_expired(monitorname)
-        robot.send_message(@status_room, "/me is unpausing #{monitor}")
+        robot.send_message(@status_room, "/me is unpausing #{monitorname}")
       end
 
       private
