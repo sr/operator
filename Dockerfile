@@ -6,8 +6,13 @@ RUN \
   && apt-get install -y --no-install-recommends \
     build-essential \
     mysql-client \
+    php5 \
+    php5-dev \
+    php-pear \
     nodejs \
-    netcat
+    netcat \
+  && pecl install yaml \
+  && echo "extension=yaml.so" >> /etc/php5/cli/php.ini
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker

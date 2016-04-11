@@ -6,12 +6,9 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
-  resources :accounts, only: :index do
-    resources :queries, except: [:destroy, :edit]
-  end
-  resource :global, only: [] do
-    resources :queries, except: [:destroy, :edit]
-  end
+  get "/accounts", to: "accounts#index"
+  get "/queries", to: "queries#new"
+  post "/queries(.:format)", to: "queries#create"
 
-  root 'welcome#index'
+  root "welcome#index"
 end

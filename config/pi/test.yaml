@@ -1,0 +1,32 @@
+---
+globals:
+  global:
+    dallas:
+      host: mysql
+      database: pardot_global
+      username: root
+      password:
+shards:
+  1:
+    dallas:
+      host: mysql
+      database: pardot_shard1
+      username: root
+      password:
+    seattle:
+      host: mysql
+      database: pardot_shard1
+      username: root
+      password:
+  2:
+    dallas:
+      host: mysql
+      database: pardot_shard1
+      username: root
+      password:
+    seattle:
+      host: mysql
+      database: pardot_shard1
+      username: root
+      password:
+...

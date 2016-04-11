@@ -2,14 +2,18 @@ require "scrolls"
 
 module Instrumentation
   module Logging
-    def setup(rails_env)
+    def setup(app_name, env_name)
       @logger =
-        if rails_env == "test"
+        if env_name == "test"
           FakeLogger.new
         else
           Scrolls.init(
             stream: STDOUT,
             exceptions: "single",
+            global_context: {
+              app: app_name,
+              env: env_name,
+            },
           )
           Scrolls
         end
@@ -21,6 +25,10 @@ module Instrumentation
 
     def log(data, &block)
       @logger.log(data, &block)
+    end
+
+    def log_exception(exception, data, &block)
+      @logger.log_exception(exception, data, &block)
     end
 
     def reset

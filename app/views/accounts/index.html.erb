@@ -1,12 +1,17 @@
 <h2>Select the account to query</h2>
 
-<div>
-  <%= select_tag :account_id, options_for_select(accounts_name_id_hash) %>
-</div>
 <% if flash[:error] %>
-  <div class='alert-error'>
-    <span class='alert alert-error alert-danger'>
-      Error: <%= flash[:error] %>
-    </span>
-  </div>
+<div class='alert-error'>
+  <span class='alert alert-error alert-danger'>
+    Error: <%= flash[:error] %>
+  </span>
+</div>
 <% end %>
+
+<p>
+<ul>
+<% accounts.each do |account| %>
+  <li><%= link_to account.descriptive_name, "/queries?account_id=#{account.id}" %></li>
+<% end %>
+</ul>
+</p>
