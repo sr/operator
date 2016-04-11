@@ -50,17 +50,15 @@ module Lita
 
       def initialize(robot)
         super
-
         @pager = \
           case config.pager.to_s
-                             when "pagerduty"
-                               ::Notifiers::PagerdutyPager.new(config.pagerduty_service_key)
-                             when "test"
-                               ::Notifiers::TestPager.new
-                             else
-                               raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
+            when "pagerduty"
+              ::Notifiers::PagerdutyPager.new(config.pagerduty_service_key)
+            when "test"
+              ::Notifiers::TestPager.new
+            else
+              raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
           end
-
         @clients = Hash.new { |h, k| h[k] = build_zabbix_client(datacenter: k) }
         config.datacenters.each do |datacenter|
           begin
@@ -70,11 +68,8 @@ module Lita
               client: @clients[datacenter],
               log: log
             )
-
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
             maintenance_supervisor.ensure_supervising
-
-
             monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
@@ -84,12 +79,10 @@ module Lita
 
             monitor_supervisor.monitor_unpause = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
-
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
           end
         end
-
         @status_room = ::Lita::Source.new(room: config.status_room)
       end
 
@@ -146,11 +139,11 @@ module Lita
 
         until_time = \
           if options["until"]
-                                 begin
-                                   HumanTime.parse(options["until"])
-                                 rescue ArgumentError
-                                   response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
-                                 end
+           begin
+             HumanTime.parse(options["until"])
+           rescue ArgumentError
+             response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
+           end
           else
             Time.now + 3600
           end
