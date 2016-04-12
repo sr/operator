@@ -9,7 +9,7 @@ module ReplicationFixing
       "d" => "dallas",
     }.freeze
 
-    attr_reader :hostname, :shard, :datacenter
+    attr_reader :hostname, :shard, :cluster_id, :datacenter
 
     def initialize(hostname)
       @hostname = hostname
@@ -42,7 +42,7 @@ module ReplicationFixing
 
     private
     def parse_hostname
-      if /\Apardot0-(?<type>dbshard|whoisdb)1-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname
+      if /\Apardot0-(?<type>dbshard|whoisdb)(?<cluster_id>\d+)-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname
         prefix = \
           case type
           when "whoisdb"
@@ -54,6 +54,7 @@ module ReplicationFixing
         shard_id = shard_id.to_i
 
         @shard = Shard.new(prefix, shard_id)
+        @cluster_id = cluster_id.to_i
         @datacenter = datacenter
       elsif /\A(?<type>db|whoisdb)-(?<datacenter_abbreviation>[ds])(?<shard_id>\d+)\z/ =~ @hostname
         prefix = \
@@ -67,6 +68,7 @@ module ReplicationFixing
         shard_id = shard_id.to_i
 
         @shard = Shard.new(prefix, shard_id)
+        @cluster_id = nil
         @datacenter = DATACENTER_ABBREVIATIONS.fetch(datacenter_abbreviation)
       else
         raise MalformedHostname
