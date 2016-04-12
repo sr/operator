@@ -112,7 +112,7 @@ module Zabbix
         http.request(req)
       }
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
-      @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
+      @log.error("[#{monitor_name}] has hard failed: ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed")
     end
   end
 end
