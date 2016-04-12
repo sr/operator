@@ -9,7 +9,6 @@ require "human_time"
 module Lita
   module Handlers
     class Zabbix < Handler
-      namespace "Lita-Zabbix"
 
       MonitorNotFound = Class.new(StandardError)
       MonitorPauseFailed = Class.new(StandardError)
@@ -39,8 +38,6 @@ module Lita
       config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
       config :paging_monitors, default: [], type: Array
       config :pager, default: 'test'
-
-
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",

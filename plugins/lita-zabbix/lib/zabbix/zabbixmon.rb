@@ -1,7 +1,7 @@
 require 'securerandom'
 
 module Zabbix
-  class Zabbixmon <
+  class Zabbixmon
 
     MONITOR_NAME = "zabbixmon"
     MONITOR_SHORTHAND = "zbxmon"
@@ -22,16 +22,7 @@ module Zabbix
 
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
-    def monitor(zbx_host, 
-                zbx_username, 
-                zbx_password, 
-                datacenter,
-                payload_length,
-                num_retries,
-                retry_interval_seconds,
-                timeout_seconds,
-    )
-
+    def monitor(zbx_host, zbx_username, zbx_password, datacenter, payload_length, num_retries, retry_interval_seconds, timeout_seconds)
       retry_attmept_iterator=0
       retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{num_retries}" # human readable retry counter
       
@@ -95,22 +86,14 @@ module Zabbix
       # work is done! Establish pass/fail here
       if monitor_success
         # we did it, reddit!
-
         @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
         # wipe fails; they dont matter
         @hard_failure = nil
         soft_failures = []
-
       else
         # (okay)(feelsbadman)
-
-        # scenario: insertion returned 200, but we did not find the right value
-        if @hard_failure.nil?
-          # WHAT HAPPEN? WE GET SIGNAL. MAIN SCREEN TURN ON.
-          @hard_failure = soft_failures.join('; ')
+        @hard_failure ||= soft_failures.join('; ')
         # scenario: data insertion failed and the read process never started
-        end
-        # collect errors
         @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
       end
     end
