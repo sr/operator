@@ -23,6 +23,13 @@ resource "aws_elb" "teampass" {
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
   }
 
+  listener {
+    lb_port = 80
+    lb_protocol = "http"
+    instance_port = 80
+    instance_protocol = "http"
+  }
+
   health_check {
     healthy_threshold = 2
     unhealthy_threshold = 2
