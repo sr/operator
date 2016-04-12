@@ -38,7 +38,7 @@ module Lita
       config :monitor_retries, default: 5
       config :monitor_retry_interval_seconds, default: 5
       config :monitor_http_timeout_seconds, default: 30
-      config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME}], type: Array
+      config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
       config :paging_monitors, default: []
 
       # config: page-r-doodie
@@ -54,12 +54,12 @@ module Lita
         "zabbix maintenance stop HOST" => "Brings hosts matching HOST out of maintenance mode",
       }
 
-      route /^zabbix monitor (?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
+      route /^zabbix monitor (?<datacenter>\S+)\s+pause(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
         "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour",
         "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours",
       }
 
-      route /^zabbix monitor (?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
+      route /^zabbix monitor (?<datacenter>\S+)\s+unpause(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
         "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor",
       }
 
@@ -169,7 +169,6 @@ module Lita
       end
 
       def pause_monitor(response)
-
         datacenter = response.match_data["datacenter"]
         response.reply("/me failed to parse a datacenter from your request. Defaulting to #{config.default_datacenter}") unless datacenter
         datacenter ||= config.default_datacenter
