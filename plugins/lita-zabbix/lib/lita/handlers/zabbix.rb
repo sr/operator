@@ -37,7 +37,10 @@ module Lita
       config :monitor_http_timeout_seconds, default: 30
       config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
       config :paging_monitors, default: [], type: Array
+
+      # config: page-r-doodie
       config :pager, default: 'test'
+      config :pagerduty_service_key
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
         "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
@@ -49,27 +52,26 @@ module Lita
       }
 
       route /^zabbix monitor (?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
-        "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
-        "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
+        "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour",
+        "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours",
       }
 
       route /^zabbix monitor (?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
-        "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
+        "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor",
       }
 
-      route /^zabbix monitor status$/, :monitor_status, command:true,  help: {
-        "zabbix monitor status" => "Provides details on monitoring particulars"
+      route /^zabbix monitor status$/i, :monitor_status, command:true,  help: {
+        "zabbix monitor status" => "Provides details on monitoring particulars",
       }
 
       def initialize(robot)
-        @datacenter_options = config.datacenters.join(",") #cant seem to use config.datacenters in route definition, so trying instance variable instead
         super
         @pager = \
           case config.pager.to_s
             when "pagerduty"
-              ::Notifiers::PagerdutyPager.new(config.pagerduty_service_key)
+              ::Zabbix::PagerdutyPager.new(config.pagerduty_service_key)
             when "test"
-              ::Notifiers::TestPager.new
+              ::Zabbix::TestPager.new
             else
               raise ArgumentError, "unknown pager type: #{config.pager.to_s}"
           end
@@ -84,7 +86,7 @@ module Lita
             )
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
             maintenance_supervisor.ensure_supervising
-            monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
+            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 client: @clients[datacenter],
@@ -192,7 +194,7 @@ module Lita
         )
 
         monitor_supervisor.pause_monitor(
-            monitorname: ::Zabbixmon::MONITOR_NAME,
+            monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME,
             until_time: until_time,
         )
 
@@ -233,13 +235,13 @@ module Lita
       def unpause_monitor(response)
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
-        monitor_supervisor = ::Zabbixmon::MonitorSupervisor.get_or_create(
+        monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
             datacenter: datacenter,
             redis: redis,
             client: @clients[datacenter],
             log: log,
         )
-        monitor_supervisor.unpause_monitor(::Zabbixmon::MONITOR_NAME)
+        monitor_supervisor.unpause_monitor(::Zabbix::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
 
       rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
@@ -281,7 +283,7 @@ module Lita
         every(config.monitor_interval_seconds) do |timer|
 
           # instantiate zabbixmon monitor
-          zabbixmon = ::Monitors::Zabbixmon.new(
+          zabbixmon = ::Zabbix::Zabbixmon.new(
               redis: redis,
               clients: @clients,
               log: log,
@@ -289,7 +291,7 @@ module Lita
 
           # for each datacenter
           config.datacenters.each do |datacenter|
-            monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
+            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 log: log,
@@ -298,7 +300,7 @@ module Lita
             # loop through (active && unpaused) monitors
             active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
               # zabbixmon: engage!
-              if monitor == ::Zabbixmon::MONITOR_NAME
+              if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                 zabbixmon.monitor(
                   config.zabbix_host.gsub(/%datacenter%/, datacenter),
                   config.zabbix_user,
@@ -340,7 +342,7 @@ module Lita
       end
 
       def page_r_doodie(message:, datacenter:)
-        @pager.trigger("#{message}", incident_key: ::Zabbixmon::INCIDENT_KEY.gsub('%datacenter%',datacenter))
+        @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY.gsub('%datacenter%',datacenter))
       rescue ::Lita::Handlers::Zabbix::PagerFailed
         @log.error("Error sending page: #{e}")
       end

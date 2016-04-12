@@ -45,6 +45,7 @@ Lita.configure do |config|
 
   # Replication fixing
   config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
+  config.handlers.zabbix.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
 
   # Set the Hipchat Chatroom
   config.handlers.zabbix.status_room = "1_ops@conf.btf.hipchat.com"
