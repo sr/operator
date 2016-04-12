@@ -13,19 +13,35 @@ module Lita
       MonitorNotFound = Class.new(StandardError)
       MonitorPauseFailed = Class.new(StandardError)
       MonitorUnpauseFailed = Class.new(StandardError)
+      MonitorDataInsertionFailed = Class.new(StandardError)
       PagerFailed = Class.new(StandardError)
 
+      # config: zabbix
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
+
+      # config: datacenters
       config :datacenters, default: ['dfw'], type: Array
       config :default_datacenter, default: 'dfw'
+
+      # config: hal9000's "home room"
+      config :status_room, default: '1_ops@conf.btf.hipchat.com'
+
+      # config: zabbix monitor
+      config :monitor_hipchat_notify, default: false
       config :monitor_interval_seconds, default: 60
+      config :monitor_retries, default: 5
+      config :monitor_retry_interval_seconds, default: 5
+      config :monitor_http_read_timeout_seconds, default: 30
       config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
       config :paging_monitors, default: [], type: Array
       config :pager, default: 'test'
-      config :status_room, default: '1_ops@conf.btf.hipchat.com'
+      config :zbxmon_test_api_endpoint, default: 'cgi-bin/zabbix-server-check.sh'
+      config :zbxmon_item, default: 'system:general'
+      config :zbxmon_key, default: 'zabbix_status'
+      config :zbxmon_payload_length, default: 10
 
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
@@ -38,16 +54,16 @@ module Lita
       }
 
       route /^zabbix monitor (?:-(?<datacenter>\S+))s+(?:pause)(?:\s+(?<options>.*))?$/i, :pause_monitor, command: true, help: {
-          "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
-          "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
+        "zabbix monitor <datacenter> pause" => "Pauses the zabbix monitor for <datacenter> for 1 hour (options: #{@datacenter_options})",
+        "zabbix monitor <datacenter> pause until=24h" => "Pauses the zabbix monitor for <datacenter> for 24 hours (options: #{@datacenter_options})",
       }
 
       route /^zabbix monitor (?:-(?<datacenter>\S+))\s+(?:unpause)(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
-          "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
+        "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor [options: #{@datacenter_options}]",
       }
 
       route /^zabbix monitor status$/, :monitor_status, command:true,  help: {
-          "zabbix monitor status" => "Provides details on monitoring particulars"
+        "zabbix monitor status" => "Provides details on monitoring particulars"
       }
 
       def initialize(robot)
@@ -94,13 +110,18 @@ module Lita
       end
 
       def monitor_status(response)
-        msg = "Active Monitors: #{config.active_monitors.join[',']}"
+        msg +="Datacenters: #{config.datacenters.join(',')}"
+        msg = "\nActive Monitors: #{config.active_monitors.join[',']}"
         msg +="\nPaging Monitors: #{config.paging_monitors.join[',']}"
+        msg +="\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
         msg +="\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
-        msg +="\nDatacenters: #{config.datacenters.join(',')}"
-        config.each do |k, v|
-          msg += "\n#{k}: #{v}" if k.include?(::Zabbix::Zabbixmon::MONITOR_SHORTHAND)
-        end
+        msg +="\nRetries: #{config.monitor_retries}"
+        msg +="\nRetry Interval: #{config.monitor_retry_interval_seconds}"
+        msg +="\nRead Timeout: #{config.monitor_http_read_timeout_seconds}"
+        #TODO: Last known status per-datacenter
+
+        msg += "\n#{k}: #{v}" if k.include?(::Zabbix::Zabbixmon::MONITOR_SHORTHAND)
+
         response.reply_with_mention("Monitor Status:\n#{msg}")
       rescue => e
         response.reply_with_mention("Sorry, the monitor status check failed: #{e}")
@@ -306,7 +327,7 @@ module Lita
 
         if pagerduty_alert
           #yo dawg, page pagerduty
-          @log.info("Paging sequence initiated. Paging pagerduty")
+          @log.info("Paging sequence initiated. Paging pagerduty.")
           #TODO: PAGE-R-(seriouspoo)
         end
 

@@ -24,9 +24,12 @@ module Zabbix
     def monitor(zbx_host:, zbx_username:, zbx_password:, datacenter:)
       
       retry_attmept_iterator=0
+      
       # make a one time use random string to insert and detect
-      payload = SecureRandom.random_number(36**config._payload_lengthzbxmon).to_s(36).rjust(config.zbxmon_payload_length, '0')
+      payload =  SecureRandom.urlsafe_base64(config.zbxmon_payload_length)
       @log.info("[#{monitor_name}] value generated: #{payload}")
+      
+      # generate url w/ url payload
       url="https://#{zbx_host}/#{config.zbxmon_test_api_endpoint}?#{payload}"
 
       # deliver the test payload
@@ -43,14 +46,14 @@ module Zabbix
 
       soft_failures = [] # track soft-fail state - used to provide feedback on hard-fail
       monitor_success = false # if true then "we did it, reddit!"
-      while retry_attempt_iterator < config.zbxmon_retries && @hard_failure.nil? && !monitor_success do
-        # try config.zbxmon_retries number of times, config.zbxmon_retry_interval seconds between each try, then pass/fail after this loop
+      while retry_attempt_iterator < config.monitor_retries && @hard_failure.nil? && !monitor_success do
+        # try config.monitor_retries number of times, config.zbxmon_retry_interval seconds between each try, then pass/fail after this loop
 
         # delay before (re)trying
         sleep config.zbxmon_retry_interval_seconds
 
         # human readable retry counter for logging purposes
-        retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{config.zbxmon_retries}"
+        retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{config.monitor_retries}"
 
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = hard stop and notify
         # do not overwrite a !200 w/ something above it on the app stack, like 'cant find key' for example
@@ -86,29 +89,28 @@ module Zabbix
         end
 
         retry_attempt_iterator+=1
+      end
 
+      # work is done! Establish pass/fail here
+      if monitor_success
+        # we did it, reddit!
 
-        # work is done! Establish pass/fail here
-        if monitor_success
-          # we did it, reddit!
+        @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
+        # wipe fails; they dont matter
+        @hard_failure = nil
+        soft_failures = []
 
-          @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
-          # wipe fails; they dont matter
-          @hard_failure = nil
-          soft_failures = []
+      else
+        # (okay)(feelsbadman)
 
-        else
-          # (okay)(feelsbadman)
-
-          # scenario: insertion returned 200, but we did not find the right value
-          if @hard_failure.nil?
-            # WHAT HAPPEN? WE GET SIGNAL. MAIN SCREEN TURN ON.
-            @hard_failure = soft_failures.join('; ')
-          # scenario: data insertion failed and the read process never started
-          end
-          # collect errors
-          @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
+        # scenario: insertion returned 200, but we did not find the right value
+        if @hard_failure.nil?
+          # WHAT HAPPEN? WE GET SIGNAL. MAIN SCREEN TURN ON.
+          @hard_failure = soft_failures.join('; ')
+        # scenario: data insertion failed and the read process never started
         end
+        # collect errors
+        @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
       end
     end
 
@@ -125,6 +127,8 @@ module Zabbix
       res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => config.zbxmon_http_read_timeout) {|http|
         http.request(req)
       }
+    rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
+      @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
     end
   end
 end
