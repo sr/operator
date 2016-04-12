@@ -68,7 +68,7 @@ echo "<?php
 @define('HOST', '');" > $ROOTTP/includes/sk.php
 
 # Add apache http redirect entry
-ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
+ln -sf /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
 
 /usr/sbin/apache2ctl -D FOREGROUND & 
 tail -f /var/log/apache2/*log
