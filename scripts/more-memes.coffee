@@ -15,6 +15,8 @@
 #   ! DUDE YOU'RE GETTING A <text> - Meme: Dell guy
 #   ! THIS IS <text> - Meme: 300 Sparta meme
 #   ! DUMPSTER FIRE <text> - Meme: Name your own dumpster fire!
+#   ! OMG <text> - Meme: Ermahgerd terxt
+#   ! ELF <text_top>...<text_bottom> - Buddy the Elf
 #
 # Author:
 #   brianhays
@@ -75,3 +77,6 @@ module.exports = (robot) ->
     translation = ermahgerd.translate(msg.match[1])
 
     memeGenerator msg, 'ZGzUaw', 'ERMAHGERD', translation
+
+  robot.respond /ELF (.*)\s*\.\.\.\s*(.*)/i, id: 'meme.elf', (msg) ->
+    memeGenerator msg, '0tzPkw', msg.match[1], msg.match[2]
