@@ -89,12 +89,6 @@ module Lita
             )
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
             maintenance_supervisor.ensure_supervising
-            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
-                datacenter: datacenter,
-                redis: redis,
-                client: @clients[datacenter],
-                log: log
-            )
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
           end
