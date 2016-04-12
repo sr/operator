@@ -4,6 +4,7 @@ require "zabbix/client"
 require "zabbix/zabbixmon"
 require "zabbix/monitor_supervisor"
 require "zabbix/pagerduty_pager"
+require "zabbix/test_pager"
 require "human_time"
 
 module Lita
@@ -107,17 +108,15 @@ module Lita
       end
 
       def monitor_status(response)
-        msg +="Datacenters: #{config.datacenters.join(',')}"
-        msg = "\nActive Monitors: #{config.active_monitors.join[',']}"
+        msg ="Datacenters: #{config.datacenters.join(',')}"
+        msg += "\nActive Monitors: #{config.active_monitors.join[',']}"
         msg +="\nPaging Monitors: #{config.paging_monitors.join[',']}"
         msg +="\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
         msg +="\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
         msg +="\nRetries: #{config.monitor_retries}"
         msg +="\nRetry Interval: #{config.monitor_retry_interval_seconds}"
-        msg +="\nRead Timeout: #{config.monitor_http_read_timeout_seconds}"
+        msg +="\nRead Timeout: #{config.monitor_http_timeout_seconds}"
         #TODO: Last known status per-datacenter
-
-        msg += "\n#{k}: #{v}" if k.include?(::Zabbix::Zabbixmon::MONITOR_SHORTHAND)
 
         response.reply_with_mention("Monitor Status:\n#{msg}")
       rescue => e
