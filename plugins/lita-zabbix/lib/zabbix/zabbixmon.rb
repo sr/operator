@@ -26,11 +26,11 @@ module Zabbix
       retry_attmept_iterator=0
       
       # make a one time use random string to insert and detect
-      payload =  SecureRandom.urlsafe_base64(config.zbxmon_payload_length)
+      payload = "#{SecureRandom.urlsafe_base64(@config.zbxmon_payload_length)}"
       @log.info("[#{monitor_name}] value generated: #{payload}")
       
       # generate url w/ url payload
-      url="https://#{zbx_host}/#{config.zbxmon_test_api_endpoint}?#{payload}"
+      url="https://#{zbx_host}/#{@config.zbxmon_test_api_endpoint}?#{payload}"
 
       # deliver the test payload
       payload_delivery_response=deliver_zabbixmon_payload(url, zbx_username, zbx_password)
@@ -46,21 +46,21 @@ module Zabbix
 
       soft_failures = [] # track soft-fail state - used to provide feedback on hard-fail
       monitor_success = false # if true then "we did it, reddit!"
-      while retry_attempt_iterator < config.monitor_retries && @hard_failure.nil? && !monitor_success do
-        # try config.monitor_retries number of times, config.zbxmon_retry_interval seconds between each try, then pass/fail after this loop
+      while retry_attempt_iterator < @config.monitor_retries && @hard_failure.nil? && !monitor_success do
+        # try @config.monitor_retries number of times, @config.monitor_retry_interval_seconds seconds between each try, then pass/fail after this loop
 
         # delay before (re)trying
-        sleep config.zbxmon_retry_interval_seconds
+        sleep @config.monitor_retry_interval_seconds_seconds
 
         # human readable retry counter for logging purposes
-        retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{config.monitor_retries}"
+        retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{@config.monitor_retries}"
 
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = hard stop and notify
         # do not overwrite a !200 w/ something above it on the app stack, like 'cant find key' for example
 
         begin
           # pull the "item" that contains the desired K/V pair
-          system_general = @clients['datacenter'].get_item_by_key_and_lastvalue(config.zbxmon_key, payload)
+          system_general = @clients['datacenter'].get_item_by_key_and_lastvalue(@config.zbxmon_key, payload)
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
           @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
@@ -68,23 +68,23 @@ module Zabbix
         end
 
 
-        if system_general.keys.contains(config.zbxmon_key)
+        if system_general.keys.contains(@config.zbxmon_key)
           # we found the key
-          @log.debug("[#{monitor_name}] 'observed key' successfully: #{config.zbxmon_key} (#{retry_sz})")
+          @log.debug("[#{monitor_name}] 'observed key' successfully: #{@config.zbxmon_key} (#{retry_sz})")
 
-          if payload == system_general[config.zbxmon_key]
+          if payload == system_general[@config.zbxmon_key]
             # we found the value
-            @log.info("[#{monitor_name}] 'observed value' successfully: #{system_general[config.zbxmon_key]} (#{retry_sz})")
+            @log.info("[#{monitor_name}] 'observed value' successfully: #{system_general[@config.zbxmon_key]} (#{retry_sz})")
             monitor_success = true
           else
             # we did not find the value :(
-            @log.warn("[#{monitor_name}] 'observed value' FAILED : #{system_general[config.zbxmon_key]} (#{retry_sz})")
+            @log.warn("[#{monitor_name}] 'observed value' FAILED : #{system_general[@config.zbxmon_key]} (#{retry_sz})")
             soft_failures.push("#{ERR_VALUE_MISMATCH}") unless soft_failures.include? "#{ERR_VALUE_MISMATCH}"
           end
 
         else
           #we did not find the key :(
-          @log.warn("[#{monitor_name}] 'observed key' FAILED : #{config.zbxmon_key} (#{retry_sz})")
+          @log.warn("[#{monitor_name}] 'observed key' FAILED : #{@config.zbxmon_key} (#{retry_sz})")
           soft_failures.push("#{ERR_ZABBIX_STATUS_KEY_MISSING}") unless soft_failures.include? "#{ERR_ZABBIX_STATUS_KEY_MISSING}"
         end
 
@@ -124,7 +124,7 @@ module Zabbix
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
       req.basic_auth user, password
-      res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => config.zbxmon_http_read_timeout) {|http|
+      res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => @config.monitor_http_read_timeout_seconds) {|http|
         http.request(req)
       }
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
