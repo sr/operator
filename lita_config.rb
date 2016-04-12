@@ -52,7 +52,7 @@ Lita.configure do |config|
   config.handlers.zabbix.monitor_interval_seconds = 60
   config.handlers.zabbix.monitor_retries = 5
   config.handlers.zabbix.monitor_retry_interval_seconds = 5
-  config.handlers.zabbix.monitor_http_read_timeout_seconds =  30
+  config.handlers.zabbix.monitor_http_timeout_seconds =  30
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")

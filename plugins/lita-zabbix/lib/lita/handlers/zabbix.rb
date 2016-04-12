@@ -9,6 +9,7 @@ require "human_time"
 module Lita
   module Handlers
     class Zabbix < Handler
+      namespace "Lita-Zabbix"
 
       MonitorNotFound = Class.new(StandardError)
       MonitorPauseFailed = Class.new(StandardError)
@@ -34,14 +35,11 @@ module Lita
       config :monitor_interval_seconds, default: 60
       config :monitor_retries, default: 5
       config :monitor_retry_interval_seconds, default: 5
-      config :monitor_http_read_timeout_seconds, default: 30
+      config :monitor_http_timeout_seconds, default: 30
       config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
       config :paging_monitors, default: [], type: Array
       config :pager, default: 'test'
-      config :zbxmon_test_api_endpoint, default: 'cgi-bin/zabbix-server-check.sh'
-      config :zbxmon_item, default: 'system:general'
-      config :zbxmon_key, default: 'zabbix_status'
-      config :zbxmon_payload_length, default: 10
+
 
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
@@ -285,39 +283,46 @@ module Lita
       def run_monitors(response)
         every(config.monitor_interval_seconds) do |timer|
 
-          config.datacenters.each do |datacenter|
+          # instantiate zabbixmon monitor
+          zabbixmon = ::Monitors::Zabbixmon.new(
+              redis: redis,
+              clients: @clients,
+              log: log,
+          )
 
+          # for each datacenter
+          config.datacenters.each do |datacenter|
             monitor_supervisor = ::Monitors::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 log: log,
             )
 
-            zabbixmon = ::Monitors::Zabbixmon.new(
-                datacenters: config.datacenters,
-                redis: redis,
-                clients: @clients,
-                log: log,
-                config: config
-            )
-
             # loop through (active && unpaused) monitors
             active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
-
               # zabbixmon: engage!
               if monitor == ::Zabbixmon::MONITOR_NAME
-                zabbixmon.monitor(config.zabbix_host.gsub(/%datacenter%/, datacenter), config.zabbix_user, datacenter)
-
-
-                monitor_fail_notify(zabbixmon.monitor_name,
-                                    datacenter,
-                                    zabbixmon.hard_failure,
-                                    config.zbxmon_hipchat_notify,
-                                    config.paging_monitors.include?(zabbixmon.monitor_name)
-                ) unless zabbixmon.hard_failure.nil?
+                zabbixmon.monitor(
+                  config.zabbix_host.gsub(/%datacenter%/, datacenter),
+                  config.zabbix_user,
+                  config.zabbix_password,
+                  datacenter,
+                  config.zbxmon_payload_length,
+                  config.monitor_retries,
+                  config.monitor_retry_interval_seconds,
+                  config.monitor_http_timeout_seconds,
+                )
               end
-
             end
+
+            # bitch and moan (unless ...)
+            monitor_fail_notify(zabbixmon.monitor_name,
+                                datacenter,
+                                zabbixmon.hard_failure,
+                                config.zbxmon_hipchat_notify,
+                                config.paging_monitors.include?(zabbixmon.monitor_name)
+            ) unless zabbixmon.hard_failure.nil?
+
           end
         end
       end
