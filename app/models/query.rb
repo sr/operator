@@ -29,7 +29,7 @@ class Query
       database: @database.name,
       query: @sql,
       params: params,
-      user_email: @user.email,
+      user_email: @user.email
     }
     Instrumentation.log(data)
   end
