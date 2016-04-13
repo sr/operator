@@ -58,7 +58,7 @@ module Zabbix
 
         begin
           # pull the "item" that contains the desired K/V pair
-          system_general = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
+          zbx_items = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload).result
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
           @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
@@ -68,9 +68,9 @@ module Zabbix
         end
 
 
-        if system_general.result.length > 0
+        if zbx_items.length > 0
           # we found the key
-           @log.info("[#{monitor_name}] successfully observed #{ZBXMON_KEY} : #{payload} from #{zbx_host} (#{retry_sz})")
+           @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
             monitor_success = true
         else
           #we did not find the item
