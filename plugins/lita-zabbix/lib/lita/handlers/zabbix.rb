@@ -99,7 +99,7 @@ module Lita
                 client: @clients[datacenter],
                 log: log
             )
-            monitor_supervisor.monitor_unpause = proc { |monitor| monitor_expired(monitor) }
+            monitor_supervisor.unpause_monitor = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
           rescue => e
             log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}")
