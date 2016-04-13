@@ -8,19 +8,13 @@ cd "$(dirname "$0")/.."
 : "${DEBUG:=""}"
 [ -z "$DEBUG" ] || set -x
 
-export RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
+RACK_ENV="test"
+RAILS_ENV="test"
+RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
+export RACK_ENV RAILS_ENV RACK_ROOT
 
-if [ "${RAILS_ENV:-""}" = "test" ] || [ -n "${bamboo_buildNumber:-""}" ]
-then
-    script/setup
-    script/vagrant-dev-mysqlimport
-else
-    RACK_ENV="test"
-    RAILS_ENV="test"
-    export RACK_ENV RAILS_ENV
-
-    script/update
-fi
+script/setup
+script/vagrant-dev-mysqlimport
 
 echo "===> Running tests..."
 
