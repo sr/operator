@@ -5,7 +5,7 @@ module Zabbix
 
     MONITOR_NAME = "zabbixmon"
     MONITOR_SHORTHAND = "zbxmon"
-    INCIDENT_KEY = "#{MONITOR_NAME}-%datacenter%"
+    INCIDENT_KEY = "#{MONITOR_NAME}-%s"
     ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ZABBIX_ITEM_NOT_FOUND = "HAL9000 searched for an iteam w/ a particluar key and value, but did not find it. This is bad."
@@ -56,9 +56,12 @@ module Zabbix
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = hard stop and notify
         # do not overwrite a !200 w/ something above it on the app stack, like 'cant find key' for example
 
+        zbx_items = nil
+
         begin
           # pull the "item" that contains the desired K/V pair
-          zbx_items = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload).result
+          apiresponse = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
+          zbx_items = apiresponse.result unless apiresponse.nil?
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
           @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
@@ -67,19 +70,25 @@ module Zabbix
           ) unless soft_failures.include? "#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e)
         end
 
-
-        if zbx_items.length > 0
-          # we found the key
-           @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
-            monitor_success = true
+        if zbx_items
+          if zbx_items.length > 0
+            # we found the key
+             @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
+              monitor_success = true
+          else
+            #we did not find the item
+            soft_failures.push(
+                "#{ZABBIX_ITEM_NOT_FOUND}"
+            ) unless soft_failures.include? "#{ZABBIX_ITEM_NOT_FOUND}"
+          end
         else
           #we did not find the item
-          @log.warn("[#{monitor_name}] 'observed key' FAILED : #{ZBXMON_KEY} (#{retry_sz})")
           soft_failures.push(
               "#{ZABBIX_ITEM_NOT_FOUND}"
           ) unless soft_failures.include? "#{ZABBIX_ITEM_NOT_FOUND}"
         end
 
+        @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
         retry_attempt_iterator+=1
       end
 

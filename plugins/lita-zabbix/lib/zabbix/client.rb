@@ -75,7 +75,7 @@ module Zabbix
                   lastvalue: lastvalue
               },
           },
-      )
+      ) unless (key.nil? || lastvalue.nil?)
     end
 
     private

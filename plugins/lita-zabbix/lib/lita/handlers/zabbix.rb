@@ -352,9 +352,15 @@ module Lita
       end
 
       def page_r_doodie(message:, datacenter:)
-        @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY.gsub('%datacenter%',datacenter))
+        @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
+        robot.send_message(
+            @status_room,
+            "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})",
+            notify_hipchat=config.monitor_hipchat_notify
+        ) if (message.nil? || datacenter.nil?)
       rescue ::Lita::Handlers::Zabbix::PagerFailed
         @log.error("Error sending page: ::Lita::Handlers::Zabbix::PagerFailed")
+        robot.send_message(@status_room, "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed", notify_hipchat=config.monitor_hipchat_notify)
       end
 
       Lita.register_handler(self)
