@@ -43,16 +43,6 @@ resource "aws_elb" "teampass" {
   }
 }
 
-resource "aws_route53_record" "teampass_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "teampass.ops.pardot.com"
-  type = "CNAME"
-  ttl = "300"
-  records = [
-    "${aws_elb.teampass.dns_name}"
-  ]
-}
-
 resource "aws_ecs_cluster" "teampass" {
   name = "teampass"
 }
