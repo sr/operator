@@ -2,7 +2,7 @@ require "test_helper"
 
 class DataCenterTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(email: "sr@sfdc.be")
+    @user = AuthUser.create!(name: "boom", email: "sr@sfdc.be")
     @datacenter = @user.datacenter
   end
 
