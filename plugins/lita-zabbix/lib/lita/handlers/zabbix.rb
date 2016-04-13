@@ -16,7 +16,7 @@ module Lita
       MonitorUnpauseFailed = Class.new(StandardError)
       MonitorDataInsertionFailed = Class.new(StandardError)
       MonitoringFailure = Class.new(StandardError)
-      MONITOR_FAIL_ERRMSG = 'Apologies, but Zabbixmon is unable to perform its monitor duties. :( Firing up the BREAD signal...'
+      MONITOR_FAIL_ERRMSG = '::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause'
       PagerFailed = Class.new(StandardError)
 
       # config: zabbix
@@ -201,7 +201,7 @@ module Lita
 
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
       rescue ::Lita::Handlers::Zabbix::MonitorPauseFailed
-        response.reply_with_mention("Sorry, something went wrong: #{e}")
+        response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorPauseFailed")
       end
 
       def stop_maintenance(response)
@@ -246,7 +246,7 @@ module Lita
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
 
       rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
-        response.reply_with_mention("Sorry, something went wrong: #{e}")
+        response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorUnpauseFailed")
       end
 
 
@@ -317,10 +317,10 @@ module Lita
 
             # bitch and moan (unless ...)
             monitor_fail_notify(zabbixmon.monitor_name,
-                                datacenter,
-                                zabbixmon.hard_failure,
-                                config.zbxmon_hipchat_notify,
-                                config.paging_monitors.include?(zabbixmon.monitor_name)
+              datacenter,
+              zabbixmon.hard_failure,
+              config.zbxmon_hipchat_notify,
+              config.paging_monitors.include?(zabbixmon.monitor_name)
             ) unless zabbixmon.hard_failure.nil?
 
           end
