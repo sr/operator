@@ -16,7 +16,7 @@ TRUSTED_NETWORKS = [
 
 if Rails.env.development?
   TRUSTED_NETWORKS << '10.0.2.2/32'   # VirtualBox NAT IP
-  TRUSTED_NETWORKS << '172.18.0.0/24' # Docker compose instances
+  TRUSTED_NETWORKS << '172.16.0.0/12' # Docker compose instances
 end
 
 TRUSTED_NETWORKS.map! { |i| IPAddr.new(i) }
