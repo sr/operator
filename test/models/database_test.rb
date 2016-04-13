@@ -2,7 +2,8 @@ require "test_helper"
 
 class DatabaseTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(name: "boom town", email: "sr@sfdc.be")
+    @user = AuthUser.create!(uid: SecureRandom.hex,
+      name: "boom town", email: "sr@sfdc.be")
     @datacenter = @user.datacenter
   end
 
