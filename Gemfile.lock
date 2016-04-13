@@ -10,6 +10,7 @@ PATH
   specs:
     lita-zabbix (0.1.0)
       lita (>= 4.7)
+      pagerduty (= 2.1.0)
       zabbixapi (~> 2.4, >= 2.4.6)
 
 GEM
@@ -66,7 +67,7 @@ GEM
     url_mount (0.2.1)
       rack
     xmpp4r (0.5.6)
-    zabbixapi (2.4.6)
+    zabbixapi (2.4.7)
       json (~> 1.6, >= 1.6.0)
 
 PLATFORMS

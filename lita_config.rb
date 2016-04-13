@@ -43,7 +43,7 @@ Lita.configure do |config|
   ]
   config.adapters.hipchat.debug = true
 
-  # Replication fixing
+  # PagerDuty
   config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
   config.handlers.zabbix.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
 
