@@ -5,7 +5,7 @@ class CreateAuthUsers < ActiveRecord::Migration
       t.string :name
       t.string :uid
       t.string :token
-      t.timestamps
+      t.timestamps, null: false
     end
     add_index :auth_users, :email
   end
