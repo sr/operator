@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 
 export RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
 
-if test "${RAILS_ENV:-""}" = "test"
+if [ "${RAILS_ENV:-""}" = "test" ] || [ -n "${bamboo_buildNumber:-""}" ]
 then
     script/setup
     script/vagrant-dev-mysqlimport
