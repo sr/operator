@@ -99,7 +99,7 @@ module Lita
                 client: @clients[datacenter],
                 log: log
             )
-            monitor_supervisor.unpause_monitor = proc { |monitor| monitor_expired(monitor) }
+            monitor_supervisor.on_monitor_unpaused = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
           rescue => e
             log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}")
@@ -236,15 +236,13 @@ module Lita
       def unpause_monitor(response)
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
-        monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+        ::Zabbix::MonitorSupervisor.get_or_create(
             datacenter: datacenter,
             redis: redis,
             client: @clients[datacenter],
             log: log,
-        )
-        monitor_supervisor.unpause_monitor(::Zabbix::Zabbixmon::MONITOR_NAME)
+        ).unpause_monitor(::Zabbix::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
-
       rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
         response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorUnpauseFailed")
       end
