@@ -9,6 +9,6 @@ class CreateAuthUsers < ActiveRecord::Migration
     end
     add_index :auth_users, :email, unique: true
     add_index :auth_users, :token, unique: true
-    add_index :auth_users, :uid, null: false
+    add_index :auth_users, :uid, unique: true
   end
 end
