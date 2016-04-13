@@ -2,7 +2,8 @@ require "test_helper"
 
 class AuthUserTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(email: "sr@sfdc.be")
+    @user = AuthUser.create!(uid: SecureRandom.hex, token: SecureRandom.hex,
+      name: "boom", email: "sr@sfdc.be")
   end
 
   # TODO(sr) test "find_or_create_by_omniauth"
