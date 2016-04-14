@@ -194,7 +194,7 @@ module Lita
             Time.now + 3600
           end
 
-        monitor_supervisor = ::Zabbix::Zabbixmon::MonitorSupervisor.get_or_create(
+        monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
             datacenter: datacenter,
             redis: redis,
             client: @clients[datacenter],
