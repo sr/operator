@@ -61,7 +61,7 @@ module Zabbix
     end
 
 
-    def get_paused_monitors
+    def get_paused_monitors(now: Time.now)
       @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i > now.to_i }.keys
     end
 
