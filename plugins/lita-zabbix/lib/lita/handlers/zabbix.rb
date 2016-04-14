@@ -339,14 +339,13 @@ module Lita
 
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
-            debug_output(e)
-            monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
-                                'N/A',
-                                MONITOR_FAIL_ERRMSG,
-                                config.zbxmon_hipchat_notify,
-                                config.paging_monitors.include?(zabbixmon.monitor_name)
-            )
-
+            # debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
+            # monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
+            #                     'N/A',
+            #                     MONITOR_FAIL_ERRMSG,
+            #                     config.zbxmon_hipchat_notify,
+            #                     config.paging_monitors.include?(zabbixmon.monitor_name)
+            # )
           end
         end
       end
