@@ -134,7 +134,7 @@ module Lita
           )
           status = monitor_supervisor.get_paused_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAUSED" : "ACTIVE"
           paging = config.paging_monitors.include? (::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
-          msg += "#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
+          msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
           #TODO: Last known status per-datacenter
         end
         response.reply_with_mention("#{msg}")
