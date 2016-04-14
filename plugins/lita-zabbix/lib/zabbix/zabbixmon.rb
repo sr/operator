@@ -21,6 +21,7 @@ module Zabbix
       @hard_failure = nil
     end
 
+    attr_accessor :hard_failure
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
     def monitor(zbx_host, zbx_username, zbx_password, datacenter, payload_length, num_retries, retry_interval_seconds, timeout_seconds)
