@@ -248,7 +248,7 @@ module Lita
             redis: redis,
             client: @clients[datacenter],
             log: log,
-        ).unpause_monitor(::Zabbix::Zabbixmon::MONITOR_NAME)
+        ).unpause_monitor(monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
       rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
         response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorUnpauseFailed")
