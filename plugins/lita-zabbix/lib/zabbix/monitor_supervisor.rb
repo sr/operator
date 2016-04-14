@@ -32,11 +32,11 @@ module Zabbix
       true
     end
 
-    def pause_monitor(monitorname:, until_time:)
+    def pause_monitor(monitorname, until_time)
       @redis.hset(redis_expirations_key, monitorname, until_time.to_i)
     end
 
-    def unpause_monitor(monitorname:)
+    def unpause_monitor(monitorname)
       @redis.hdel(redis_expirations_key, monitorname) > 0
     end
 
