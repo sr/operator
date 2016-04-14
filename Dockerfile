@@ -14,4 +14,4 @@ RUN bundle install
 RUN for i in plugins/*; do cd "$i"; bundle install; cd ../..; done
 
 COPY . /app
-CMD ["bundle", "exec", "lita"]
+CMD ["bundle", "exec", "lita", "2&>1"]
