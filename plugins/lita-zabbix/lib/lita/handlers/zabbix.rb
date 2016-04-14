@@ -67,6 +67,12 @@ module Lita
         "zabbix monitor status" => "Provides details on monitoring particulars",
       }
 
+      route /^zabbix monitor pause.*$/i, :invalid_zabbixmon_syntax, command: true
+
+      def invalid_zabbixmon_syntax(response)
+        response.reply_with_mention('Invalid syntax, "zabbix monitor pause ..." - try "zabbix monitor <datacenter> pause" (try "zabbix monitor status" for a list of datacenter option)')
+      end
+
       def initialize(robot)
         super
         @pager = \
@@ -99,6 +105,7 @@ module Lita
                 client: @clients[datacenter],
                 log: log
             )
+
             monitor_supervisor.on_monitor_unpaused = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
           rescue => e
@@ -187,7 +194,7 @@ module Lita
             Time.now + 3600
           end
 
-        monitor_supervisor = ::Zabbixmon::MonitorSupervisor.get_or_create(
+        monitor_supervisor = ::Zabbix::Zabbixmon::MonitorSupervisor.get_or_create(
             datacenter: datacenter,
             redis: redis,
             client: @clients[datacenter],
