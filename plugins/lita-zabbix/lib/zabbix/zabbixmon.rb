@@ -18,6 +18,7 @@ module Zabbix
       @redis = redis
       @clients = clients
       @log = log
+      @hard_failure = nil
     end
 
 
