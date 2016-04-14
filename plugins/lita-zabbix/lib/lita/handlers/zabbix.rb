@@ -74,6 +74,9 @@ module Lita
 
       route /^zabbix monitor (pause|unpause).*$/i, :invalid_zabbixmon_syntax, command: true
 
+      # DO (monitor) WORK
+      on :connected, :run_monitors
+
       def invalid_zabbixmon_syntax(response)
         response.reply_with_mention('Invalid syntax; try "zabbix monitor <datacenter> pause/unpause"')
       end
