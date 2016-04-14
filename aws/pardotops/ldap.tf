@@ -111,6 +111,7 @@ resource "aws_instance" "internal_apps_ldap_master" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
+  private_ip = "172.30.93.181"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d.id}"
   vpc_security_group_ids = [
     "${aws_security_group.internal_apps_ldap_server.id}"
