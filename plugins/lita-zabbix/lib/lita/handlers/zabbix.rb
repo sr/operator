@@ -305,36 +305,43 @@ module Lita
 
           # for each datacenter
           config.datacenters.each do |datacenter|
-            monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
-                datacenter: datacenter,
-                redis: redis,
-                log: log,
-            )
 
-            # loop through (active && unpaused) monitors
-            config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
-              # zabbixmon: engage!
-              if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
-                zabbixmon.monitor(
-                    config.zabbix_host.gsub(/%datacenter%/, datacenter),
-                    config.zabbix_user,
-                    config.zabbix_password,
-                    datacenter,
-                    config.zbxmon_payload_length,
-                    config.monitor_retries,
-                    config.monitor_retry_interval_seconds,
-                    config.monitor_http_timeout_seconds,
-                )
+            begin
+              monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+                  datacenter: datacenter,
+                  redis: redis,
+                  log: log,
+                  client: @clients[datacenter]
+              )
+
+              # loop through (active && unpaused) monitors
+              config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
+                # zabbixmon: engage!
+                if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
+                  zabbixmon.monitor(
+                      config.zabbix_host.gsub(/%datacenter%/, datacenter),
+                      config.zabbix_user,
+                      config.zabbix_password,
+                      datacenter,
+                      config.zbxmon_payload_length,
+                      config.monitor_retries,
+                      config.monitor_retry_interval_seconds,
+                      config.monitor_http_timeout_seconds,
+                  )
+                end
               end
+
+              # bitch and moan (unless ...)
+              monitor_fail_notify(zabbixmon.monitor_name,
+                                  datacenter,
+                                  zabbixmon.hard_failure,
+                                  config.zbxmon_hipchat_notify,
+                                  config.paging_monitors.include?(zabbixmon.monitor_name)
+              ) unless zabbixmon.hard_failure.nil?
+            rescue => e
+              log.error("::Lita::Handlers::Zabbix::run_monitors has failed (#{e})")
             end
 
-            # bitch and moan (unless ...)
-            monitor_fail_notify(zabbixmon.monitor_name,
-                                datacenter,
-                                zabbixmon.hard_failure,
-                                config.zbxmon_hipchat_notify,
-                                config.paging_monitors.include?(zabbixmon.monitor_name)
-            ) unless zabbixmon.hard_failure.nil?
           end
 
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
