@@ -336,7 +336,7 @@ module Lita
                                 config.paging_monitors.include?(zabbixmon.monitor_name)
             ) unless zabbixmon.hard_failure.nil?
           end
-            
+
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
             debug_output(e)
@@ -348,7 +348,9 @@ module Lita
             )
 
           end
+        end
       end
+
       private
       def validate_datacenter(datacenter:, response:)
         if @clients.key?(datacenter)
