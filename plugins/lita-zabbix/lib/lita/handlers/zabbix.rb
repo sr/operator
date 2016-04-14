@@ -33,7 +33,7 @@ module Lita
       config :status_room, default: '1_ops@conf.btf.hipchat.com'
 
       # config: zabbix monitor
-      config :monitor_debug_out_target, default: "1_261@chat.btf.hipchat.com"
+      config :monitor_debug_out_targets, default: ["1_261@chat.btf.hipchat.com"]
       config :monitor_hipchat_notify, default: false
       config :monitor_interval_seconds, default: 60
       config :monitor_retries, default: 5
@@ -391,13 +391,16 @@ module Lita
             "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})",
             notify_hipchat=config.monitor_hipchat_notify
         ) if (message.nil? || datacenter.nil?)
+        debug_output("A smoke signal appears over the horizon") if config.pager.to_s == 'test'
       rescue ::Lita::Handlers::Zabbix::PagerFailed
         log.error("Error sending page: ::Lita::Handlers::Zabbix::PagerFailed")
         robot.send_message(@status_room, "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed", notify_hipchat=config.monitor_hipchat_notify)
       end
 
       def debug_output(message:)
-        robot.send_message(config.monitor_debug_out_target, message)
+        config.monitor_debug_out_targets.each do |target|
+          robot.send_message(target, message)
+        end
       end
 
       Lita.register_handler(self)
