@@ -94,8 +94,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = [
-      "${aws_instance.internal_apps_bastion.private_ip}/32"
+    security_groups = [
+      "${aws_security_group.internal_apps_bastion.id}"
     ]
   }
 

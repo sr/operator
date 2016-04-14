@@ -253,9 +253,9 @@ resource "aws_route" "internal_apps_route_tools_egress" {
 
 # Bastion host
 
-resource "aws_security_group" "internal_apps_ssh" {
-  name = "internal_apps_ssh"
-  description = "Allow SSH from SFDC VPN only"
+resource "aws_security_group" "internal_apps_bastion" {
+  name = "internal_apps_bastion"
+  description = "Bastion host, allows SSH from SFDC VPNs"
   vpc_id = "${aws_vpc.internal_apps.id}"
 
   ingress {
@@ -285,7 +285,7 @@ resource "aws_instance" "internal_apps_bastion" {
   key_name = "internal_apps"
   private_ip = "172.30.180.0"
   subnet_id = "${aws_subnet.internal_apps_us_east_1c_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.internal_apps_ssh.id}"]
+  vpc_security_group_ids = ["${aws_security_group.internal_apps_bastion.id}"]
   tags {
     Name = "internal_apps_bastion"
   }

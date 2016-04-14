@@ -87,18 +87,23 @@ resource "aws_security_group" "hal9000_app_production" {
   name = "hal9000_app_production"
   vpc_id = "${aws_vpc.internal_apps.id}"
 
+  # SSH from bastion
   ingress {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+    security_groups = [
+      "${aws_security_group.internal_apps_bastion.id}"
+    ]
   }
+
   ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
     cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
   }
+
   egress {
     from_port = 0
     to_port = 0
