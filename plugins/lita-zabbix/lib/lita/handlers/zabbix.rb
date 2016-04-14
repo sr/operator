@@ -288,6 +288,8 @@ module Lita
       def run_monitors(response)
         every(config.monitor_interval_seconds) do |timer|
 
+          @log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] running monitors!")
+
           # instantiate zabbixmon monitor
           zabbixmon = ::Zabbix::Zabbixmon.new(
               redis: redis,
