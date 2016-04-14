@@ -290,30 +290,9 @@ module Lita
         robot.send_message(@status_room, "/me is unpausing #{monitorname}")
       end
 
-      private
-      def validate_datacenter(datacenter:, response:)
-        if @clients.key?(datacenter)
-          true
-        else
-          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(", ")}")
-          false
-        end
-      end
-
-      def build_zabbix_client(datacenter:)
-        ::Zabbix::Client.new(
-          url: config.zabbix_url.gsub(/%datacenter%/, datacenter),
-          user: config.zabbix_user,
-          password: config.zabbix_password,
-        )
-      end
-
-      def parse_options(options)
-        Hash[Shellwords.split(options.to_s).map { |o| o.split("=", 2) }]
-      end
-
       def run_monitors(response)
         every(config.monitor_interval_seconds) do |timer|
+          begin
 
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] running monitors!")
 
@@ -337,38 +316,59 @@ module Lita
               # zabbixmon: engage!
               if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                 zabbixmon.monitor(
-                  config.zabbix_host.gsub(/%datacenter%/, datacenter),
-                  config.zabbix_user,
-                  config.zabbix_password,
-                  datacenter,
-                  config.zbxmon_payload_length,
-                  config.monitor_retries,
-                  config.monitor_retry_interval_seconds,
-                  config.monitor_http_timeout_seconds,
+                    config.zabbix_host.gsub(/%datacenter%/, datacenter),
+                    config.zabbix_user,
+                    config.zabbix_password,
+                    datacenter,
+                    config.zbxmon_payload_length,
+                    config.monitor_retries,
+                    config.monitor_retry_interval_seconds,
+                    config.monitor_http_timeout_seconds,
                 )
               end
             end
 
             # bitch and moan (unless ...)
             monitor_fail_notify(zabbixmon.monitor_name,
-              datacenter,
-              zabbixmon.hard_failure,
-              config.zbxmon_hipchat_notify,
-              config.paging_monitors.include?(zabbixmon.monitor_name)
+                                datacenter,
+                                zabbixmon.hard_failure,
+                                config.zbxmon_hipchat_notify,
+                                config.paging_monitors.include?(zabbixmon.monitor_name)
             ) unless zabbixmon.hard_failure.nil?
+          end
+            
+          rescue ::Lita::Handlers::Zabbix::MonitoringFailure
+            log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
+            debug_output(e)
+            monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
+                                'N/A',
+                                MONITOR_FAIL_ERRMSG,
+                                config.zbxmon_hipchat_notify,
+                                config.paging_monitors.include?(zabbixmon.monitor_name)
+            )
 
           end
+      end
+      private
+      def validate_datacenter(datacenter:, response:)
+        if @clients.key?(datacenter)
+          true
+        else
+          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(", ")}")
+          false
         end
-      #rescue ::Lita::Handlers::Zabbix::MonitoringFailure
-      rescue => e
-        log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
-          debug_output(e)
-        # monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
-        #                     'N/A',
-        #                     MONITOR_FAIL_ERRMSG,
-        #                     config.zbxmon_hipchat_notify,
-        #                     config.paging_monitors.include?(zabbixmon.monitor_name)
-        # )
+      end
+
+      def build_zabbix_client(datacenter:)
+        ::Zabbix::Client.new(
+          url: config.zabbix_url.gsub(/%datacenter%/, datacenter),
+          user: config.zabbix_user,
+          password: config.zabbix_password,
+        )
+      end
+
+      def parse_options(options)
+        Hash[Shellwords.split(options.to_s).map { |o| o.split("=", 2) }]
       end
 
       def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, pagerduty_alert)
