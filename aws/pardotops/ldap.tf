@@ -129,7 +129,7 @@ resource "aws_instance" "internal_apps_ldap_master" {
 resource "aws_route53_record" "ldap1_aws_ops_pardot_com" {
   zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
   name = "ldap1-aws.ops.pardot.com"
-  type = "CNAME"
+  type = "A"
   ttl = "300"
   records = [
     "${aws_instance.internal_apps_ldap_master.private_ip}"
