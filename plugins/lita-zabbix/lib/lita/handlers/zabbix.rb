@@ -338,6 +338,7 @@ module Lita
                                   config.zbxmon_hipchat_notify,
                                   config.paging_monitors.include?(zabbixmon.monitor_name)
               ) unless zabbixmon.hard_failure.nil?
+              log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.")
             rescue => e
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (#{e})")
             end
