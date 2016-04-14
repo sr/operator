@@ -67,10 +67,10 @@ module Lita
         "zabbix monitor status" => "Provides details on monitoring particulars",
       }
 
-      route /^zabbix monitor pause.*$/i, :invalid_zabbixmon_syntax, command: true
+      route /^zabbix monitor (pause|unpause).*$/i, :invalid_zabbixmon_syntax, command: true
 
       def invalid_zabbixmon_syntax(response)
-        response.reply_with_mention('Invalid syntax, "zabbix monitor pause ..." - try "zabbix monitor <datacenter> pause" (try "zabbix monitor status" for a list of datacenter option)')
+        response.reply_with_mention('Invalid syntax; try "zabbix monitor <datacenter> pause/unpause"')
       end
 
       def initialize(robot)
@@ -120,17 +120,25 @@ module Lita
       end
 
       def monitor_status(response)
-        msg ="Datacenters: #{config.datacenters.join(',')}"
-        msg +="\nActive Monitors: #{config.active_monitors.join(',')}"
-        msg +="\nPaging Monitors: #{config.paging_monitors.join(',')}"
-        msg +="\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
-        msg +="\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
-        msg +="\nRetries: #{config.monitor_retries}"
-        msg +="\nRetry Interval: #{config.monitor_retry_interval_seconds}"
-        msg +="\nRead Timeout: #{config.monitor_http_timeout_seconds}"
+
+        msg ="\nMonitor / Status / Paging?"
+
+        config.datacenters.each do |datacenter|
+          monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+              datacenter: datacenter,
+              redis: redis,
+              client: @clients[datacenter],
+              log: log
+          )
+
+          status = monitor_supervisor.get_paused_monitors.include(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAUSED" : "ACTIVE"
+          paging = config.paging_monitors.include(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
+
+          msg += "#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
+        end
         #TODO: Last known status per-datacenter
 
-        response.reply_with_mention("Monitor Status:\n#{msg}")
+        response.reply_with_mention("#{msg}")
       end
 
       def start_maintenance(response)

@@ -60,6 +60,11 @@ module Zabbix
       }
     end
 
+
+    def get_paused_monitors
+      @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i > now.to_i }.keys
+    end
+
     private
 
     def redis_expirations_key
@@ -71,7 +76,7 @@ module Zabbix
         begin
           loop do
             expirations = \
-              begin
+            begin
               run_expirations
             rescue => e
               @log.error("Error while running expirations: #{e}")
@@ -87,10 +92,6 @@ module Zabbix
       else
         @log.debug("Supervisor already executing")
       end
-    end
-
-    def get_paused_monitors
-      @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i > now.to_i }.keys
     end
 
     def notify_monitor_unpaused(monitorname)
