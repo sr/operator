@@ -203,7 +203,8 @@ module.exports = (robot) ->
       'http://i.giphy.com/xTiTnzvzlEj5vD3Tkk.gif',
       'http://i.giphy.com/1306MTkHlXkUZG.gif',
       'http://i.giphy.com/6sI9YC1GJx1G8.gif',
-      'http://i.giphy.com/DOdsiolqbxCbm.gif'
+      'http://i.giphy.com/DOdsiolqbxCbm.gif',
+      'http://i.imgur.com/6mbgddS.gif'
     ]
     msg.send msg.random pagerdootie
 
