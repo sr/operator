@@ -4,17 +4,14 @@ $:.unshift File.realpath(File.dirname(__FILE__), "lib")
 require 'rubygems'
 require 'bundler/setup'
 
-require 'pathname'
-require 'cli'
-require 'proxy_selector'
-require 'logger'
+require "pardot/pull_agent"
 
 LOCKFILE = '/var/lock/pull-agent/deploy.lock'.freeze
 
-proxy_selector = ProxySelector.new
+proxy_selector = Pardot::PullAgent::ProxySelector.new
 proxy_selector.configure_random_proxy
 
-cli = CLI.new
+cli = Pardot::PullAgent::CLI.new
 cli.parse_arguments!
 environment = cli.environment
 
@@ -27,10 +24,10 @@ begin
   if lockfile.flock(File::LOCK_NB|File::LOCK_EX)
     cli.checkin
   else
-    Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
+    Pardot::PullAgent::Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
   end
 rescue => e
-  Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
+  Pardot::PullAgent::Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
   raise e
 ensure
   lockfile.close
