@@ -319,7 +319,7 @@ module Lita
                 # zabbixmon: engage!
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   zabbixmon.monitor(
-                      config.zabbix_host.gsub(/%datacenter%/, datacenter),
+                      config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
                       config.zabbix_user,
                       config.zabbix_password,
                       datacenter,
