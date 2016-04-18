@@ -290,7 +290,7 @@ module Lita
         robot.send_message(@status_room, "/me is unpausing #{monitorname}")
       end
 
-      def run_monitors(response)
+      def run_monitors(payload)
         every(config.monitor_interval_seconds) do |timer|
           begin
 
@@ -331,15 +331,15 @@ module Lita
               end
 
               # bitch and moan (unless ...)
-              monitor_fail_notify(zabbixmon.monitor_name,
-                                  datacenter,
-                                  zabbixmon.hard_failure,
-                                  config.zbxmon_hipchat_notify,
-                                  config.paging_monitors.include?(zabbixmon.monitor_name)
-              ) unless zabbixmon.hard_failure.nil?
-              log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.")
+              # monitor_fail_notify(zabbixmon.monitor_name,
+              #                     datacenter,
+              #                     zabbixmon.hard_failure,
+              #                     config.zbxmon_hipchat_notify,
+              #                     config.paging_monitors.include?(zabbixmon.monitor_name)
+              # ) unless zabbixmon.hard_failure.nil?
+              log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
             rescue => e
-              log.error("::Lita::Handlers::Zabbix::run_monitors has failed (#{e})")
+              log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
             end
 
           end
