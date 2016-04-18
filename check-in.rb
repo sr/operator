@@ -24,10 +24,10 @@ begin
   if lockfile.flock(File::LOCK_NB|File::LOCK_EX)
     cli.checkin
   else
-    Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
+    Pardot::PullAgent::Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
   end
 rescue => e
-  Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
+  Pardot::PullAgent::Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
   raise e
 ensure
   lockfile.close
