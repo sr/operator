@@ -33,29 +33,28 @@ module Zabbix
       @log.info("[#{monitor_name}] value generated: #{payload}")
 
       url="https://#{zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
-      payload_delivery_response = deliver_zabbixmon_payload url, zbx_username, zbx_password, timeout_seconds
-      if payload_delivery_response.code == '200'
+      payload_delivery_response_code = deliver_zabbixmon_payload url, zbx_username, zbx_password, timeout_seconds
+      if payload_delivery_response_code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
         @hard_failure = "ZabbixMon[#{datacenter}].payload_delivery_response.code : #{ERR_NON_200_HTTP_CODE}"
       end
 
 
-      soft_failures = Set.new [] # soft-fails can used to provide feedback when we hard-fail
+      soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
       monitor_success = false
       while retry_attempt_iterator < num_retries && @hard_failure.nil? && !monitor_success do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
 
         sleep retry_interval_seconds
-        zbx_items = nil
-        begin
+        begin # get zabbix item
           apiresponse = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
-          zbx_items = apiresponse.result unless apiresponse.nil?
+          zbx_items = apiresponse['result']
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
           @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
           soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-        end
+        end rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed # 'handle' it to keep the process moving
 
         if zbx_items
           if zbx_items.length > 0  # success case
@@ -94,6 +93,7 @@ module Zabbix
       res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }
+      res.code
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
       @log.error("[#{monitor_name}] has hard failed: ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed")
     end
