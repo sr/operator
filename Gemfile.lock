@@ -1,11 +1,15 @@
+PATH
+  remote: .
+  specs:
+    pardot_pull-agent (1)
+      artifactory (~> 2.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.8)
     artifactory (2.3.2)
-    byebug (5.0.0)
-      columnize (= 0.9.0)
-    columnize (0.9.0)
+    byebug (8.2.4)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
@@ -39,12 +43,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  artifactory (~> 2.3, >= 2.3.2)
-  byebug
-  rake
+  byebug (~> 8.2)
+  pardot_pull-agent!
+  rake (~> 10.4)
   rspec (~> 3.4)
-  simplecov (>= 0.9.0)
+  simplecov (~> 0.9)
   webmock (~> 1.21)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2
