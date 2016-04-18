@@ -55,7 +55,7 @@ describe Pardot::PullAgent::Redis do
         end
 
         host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
-        expect(host.key?("foo")).to be_truthy
+        expect(host.has_key?("foo")).to be_truthy
       end
     end
 
@@ -70,7 +70,7 @@ describe Pardot::PullAgent::Redis do
         end
 
         host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
-        expect(host.key?("foo")).to be_falsey
+        expect(host.has_key?("foo")).to be_falsey
       end
     end
   end
