@@ -160,16 +160,18 @@ resource "aws_elb" "internal_apps_ldap_admin_server" {
 
   listener {
     lb_port = 80
-    lb_protocol = "tcp"
+    lb_protocol = "http"
     instance_port = 80
-    instance_protocol = "tcp"
+    instance_protocol = "http"
   }
   listener {
     lb_port = 443
-    lb_protocol = "tcp"
+    lb_protocol = "https"
     instance_port = 80
-    instance_protocol = "tcp"
+    instance_protocol = "http"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
   }
+
 
   health_check {
     healthy_threshold = 2
