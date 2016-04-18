@@ -6,7 +6,7 @@ module Pardot
       # action: e.g., "fetch" or "deploy"
       # name: e.g., "artifactory"
       def self.register(action, name, klass)
-        @strategies ||= Hash.new { |h, k| h[k] = Hash.new }
+        @strategies ||= Hash.new { |h, k| h[k] = {} }
         @strategies[action.to_sym][name.to_sym] = klass
       end
 

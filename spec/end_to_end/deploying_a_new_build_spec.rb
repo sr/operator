@@ -25,15 +25,15 @@ describe "deploying a new build" do
 
   it "downloads the artifact, unpacks it, and switches over the symlink" do
     # API request for the Artifact
-    stub_request(:get, %r{#{Regexp.escape(artifact_url)}(\?properties=)?}).
-      to_return(
+    stub_request(:get, /#{Regexp.escape(artifact_url)}(\?properties=)?/)
+      .to_return(
         status: 200,
         body: JSON.dump(
           uri: artifact_url,
           downloadUri: artifact_download_url,
-          properties: {"gitSha" => [sha]},
+          properties: { "gitSha" => [sha] },
         ),
-        headers: {"Content-Type" => "application/json"}
+        headers: { "Content-Type" => "application/json" }
       )
 
     # Download request for the Artifact
@@ -41,13 +41,13 @@ describe "deploying a new build" do
       .to_return(
         status: 200,
         body: empty_tar_gz_contents,
-        headers: {"Content-Type" => "application/x-gzip"}
+        headers: { "Content-Type" => "application/x-gzip" }
       )
 
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

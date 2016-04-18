@@ -12,7 +12,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "prints help and exits if --help is passed as an argument" do
-      cli = Pardot::PullAgent::CLI.new(%w[--help])
+      cli = Pardot::PullAgent::CLI.new(%w(--help))
       output = capturing_stdout do
         cli.parse_arguments!
       end
@@ -21,7 +21,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "expects valid argument as first argument" do
-      cli = Pardot::PullAgent::CLI.new(%w[foo])
+      cli = Pardot::PullAgent::CLI.new(%w(foo))
       output = capturing_stdout do
         cli.parse_arguments!
       end
@@ -30,7 +30,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "expects valid payload as second argument" do
-      cli = Pardot::PullAgent::CLI.new(%w[test bad])
+      cli = Pardot::PullAgent::CLI.new(%w(test bad))
       output = capturing_stdout do
         cli.parse_arguments!
       end
@@ -39,7 +39,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "prints an error on unknown arguments" do
-      cli = Pardot::PullAgent::CLI.new(%w[test pardot bogus])
+      cli = Pardot::PullAgent::CLI.new(%w(test pardot bogus))
       output = capturing_stdout do
         cli.parse_arguments!
       end
@@ -48,7 +48,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "parses payload as second argument" do
-      cli = Pardot::PullAgent::CLI.new(%w[test pithumbs])
+      cli = Pardot::PullAgent::CLI.new(%w(test pithumbs))
       capturing_stdout do
         cli.parse_arguments!
       end
@@ -59,14 +59,14 @@ describe Pardot::PullAgent::CLI do
 
   describe "environment" do
     it "should return production environment if requested" do
-      cli = Pardot::PullAgent::CLI.new(%w[production pardot])
+      cli = Pardot::PullAgent::CLI.new(%w(production pardot))
       cli.parse_arguments!
 
       expect(cli.environment).to be_instance_of(Pardot::PullAgent::Environments::Production)
     end
 
     it "should return development environment if requested" do
-      cli = Pardot::PullAgent::CLI.new(%w[dev pardot])
+      cli = Pardot::PullAgent::CLI.new(%w(dev pardot))
       cli.parse_arguments!
 
       expect(cli.environment).to be_instance_of(Pardot::PullAgent::Environments::Dev)

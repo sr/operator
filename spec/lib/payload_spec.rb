@@ -25,7 +25,7 @@ describe Pardot::PullAgent::Payload do
 
   it "should use to the current symlink given" do
     id = :pardot
-    payload = Pardot::PullAgent::Payload.new(id: id, current_link: '/current-pi')
+    payload = Pardot::PullAgent::Payload.new(id: id, current_link: "/current-pi")
     expect(File.basename(payload.current_link)).to eq("current-pi")
   end
 
@@ -33,6 +33,6 @@ describe Pardot::PullAgent::Payload do
     id = :pardot
     repo_path = File.expand_path(File.dirname(File.dirname(__FILE__)))
     payload = Pardot::PullAgent::Payload.new(id: id, repo_path: repo_path)
-    expect(payload.path_choices).to eq(['releases/A', 'releases/B'].map{ |p| File.expand_path(p, repo_path) })
+    expect(payload.path_choices).to eq(["releases/A", "releases/B"].map { |p| File.expand_path(p, repo_path) })
   end
 end

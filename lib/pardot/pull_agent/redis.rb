@@ -16,7 +16,7 @@ module Pardot
         def has_key?(key)
           output = execute("EXISTS #{key}")
           # http://redis.io/topics/protocol#resp-protocol-description
-          !!(output =~ /\A:1\r\n/)
+          !!output.start_with?(":1\r\n")
         end
 
         def hset(key, entry, value)
@@ -36,31 +36,29 @@ module Pardot
       end # Host
 
       class << self
-        def bounce_workers(type, redis_hosts=[])
-
+        def bounce_workers(type, redis_hosts = [])
           valid_types = \
-            %w[ automationWorkers
+            %w( automationWorkers
                 PerAccountAutomationWorker
                 automationRelatedObjectWorkers
                 previewWorkers
-                PerAccountAutomationWorker ]
-          return false if ! valid_types.include?(type)
+                PerAccountAutomationWorker )
+          return false if !valid_types.include?(type)
 
           key = "#{type}-manager-config"
           entry = "restart"
           value = Time.now.to_i
           found = false
           Array(redis_hosts).each do |host_and_port|
-            hostname, port_string = host_and_port.split(':')
+            hostname, port_string = host_and_port.split(":")
             port_string ||= "6379" # Default Redis port
             port = Integer(port_string)
 
             host = Redis::Host.new(hostname, port)
-            if host.has_key?(key)
-              Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
-              host.hset(key, entry, value)
-              found = true
-            end
+            next unless host.key?(key)
+            Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
+            host.hset(key, entry, value)
+            found = true
           end
           found
         end

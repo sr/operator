@@ -9,7 +9,7 @@ module Pardot
 
       def parse_arguments!
         @arguments.each_with_index do |arg, index|
-          if %w[help --help -h].include?(arg.downcase)
+          if %w(help --help -h).include?(arg.downcase)
             print_help
             return
           end
@@ -65,7 +65,7 @@ module Pardot
               Logger.log(:info, "We are up to date")
               Canoe.notify_server(environment, requested_deploy)
             else
-              Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || "<< None >>"}")
+              Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || '<< None >>'}")
               Logger.log(:info, "Requested deploy: #{requested_deploy.artifact_url}")
               environment.conductor.deploy!(requested_deploy)
             end
@@ -78,6 +78,7 @@ module Pardot
       end
 
       private
+
       def print_help
         readme = File.expand_path("../../../../README.md", __FILE__)
         if File.exist?(readme)

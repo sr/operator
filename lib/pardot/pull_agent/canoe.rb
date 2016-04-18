@@ -14,7 +14,7 @@ module Pardot
         Deploy.from_hash(json)
       end
 
-      def self.call_api(environment, method, path, params={})
+      def self.call_api(environment, method, path, params = {})
         canoe_url = URI(environment.canoe_url)
         Net::HTTP.start(canoe_url.host, canoe_url.port, :ENV, use_ssl: (canoe_url.scheme == "https")) do |http|
           if method == "GET" && !params.empty?
@@ -25,7 +25,7 @@ module Pardot
                 when "GET" then Net::HTTP::Get.new(path)
                 when "PUT" then Net::HTTP::Put.new(path)
                 end
-          req['X-Api-Token'] = environment.canoe_api_token
+          req["X-Api-Token"] = environment.canoe_api_token
           req.form_data = params if method != "GET" && !params.empty?
 
           http.request(req)

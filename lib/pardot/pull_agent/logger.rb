@@ -12,7 +12,7 @@ module Pardot
         alert: Syslog::LOG_ALERT,
         err: Syslog::LOG_ERR,
         error: Syslog::LOG_ERR,
-        crit: Syslog::LOG_CRIT,
+        crit: Syslog::LOG_CRIT
       }.freeze
 
       class Context
@@ -47,7 +47,7 @@ module Pardot
         context_str = context.to_s
         message = "[#{context_str}] #{message}" unless context_str.empty?
 
-        puts "[%s] %s" % [our_priority, message] unless ENV['CRON']
+        puts "[%s] %s" % [our_priority, message] unless ENV["CRON"]
 
         Syslog.open("pull-agent") do
           Syslog.log(PRIORITIES.fetch(our_priority), message)

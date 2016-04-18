@@ -3,18 +3,18 @@ module Pardot
     module Strategies
       module Deploy
         class Atomic < Base
-          def deploy(artifact_path, deploy)
+          def deploy(artifact_path, _deploy)
             deploy_path = determine_next_deploy_path
             if deploy_path.nil?
               Logger.log(:error, "Unable to determine deploy path")
               return false
             end
 
-            extract_artifact(deploy_path, artifact_path).tap { |success|
+            extract_artifact(deploy_path, artifact_path).tap do |success|
               if success
                 move_current_link(deploy_path)
               end
-            }
+            end
           end
 
           def rollback?(deploy)
@@ -35,6 +35,7 @@ module Pardot
           end
 
           private
+
           def current_link_pointed_at
             if File.symlink?(environment.payload.current_link)
               File.readlink(environment.payload.current_link)
@@ -52,43 +53,43 @@ module Pardot
           end
 
           def find_existing_deploy_on_disk(deploy)
-            environment.payload.path_choices.find { |path|
+            environment.payload.path_choices.find do |path|
               if current_build_version = BuildVersion.load(File.join(path, "build.version"))
                 current_build_version.instance_of_deploy?(deploy)
               else
                 false
               end
-            }
+            end
           end
 
           def determine_next_deploy_path
             path = if current = current_link_pointed_at
-                    if next_choice = pick_next_choice(environment.payload.path_choices, current)
-                      next_choice
-                    else
-                      # current isn't pointed at either release directory
-                      # we are safe to choose the first
-                      environment.payload.path_choices.first
-                    end
-                  else
-                    # First deployment - pick first one
-                    environment.payload.path_choices.first
+                     if next_choice = pick_next_choice(environment.payload.path_choices, current)
+                       next_choice
+                     else
+                       # current isn't pointed at either release directory
+                       # we are safe to choose the first
+                       environment.payload.path_choices.first
+                     end
+                   else
+                     # First deployment - pick first one
+                     environment.payload.path_choices.first
                   end
 
             normalize_path(path)
           end
 
           def pick_next_choice(array, current)
-            _, next_choice = array.cycle.each_cons(2).take(array.length).find { |element, next_element|
+            _, next_choice = array.cycle.each_cons(2).take(array.length).find do |element, _next_element|
               normalize_path(element) == normalize_path(current)
-            }
+            end
 
             next_choice
           end
 
           # Removes any trailing slashes from a pathname
           def normalize_path(path)
-            path && path.sub(/\/+$/, '')
+            path && path.sub(/\/+$/, "")
           end
 
           def extract_artifact(deploy_path, artifact)

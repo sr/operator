@@ -16,7 +16,7 @@ module Pardot
         @_services ||= {
           "rest"      => "4954",
           "ingestion" => "8989",
-          "socket-manager" => nil,
+          "socket-manager" => nil
         }
       end
 
@@ -60,21 +60,20 @@ module Pardot
         output.match(/\"status\":\s*true/)
       end
 
-      def did_service_start?(port, attempts=10)
+      def did_service_start?(port, attempts = 10)
         return false if attempts < 1
 
         if service_is_up?(port)
           return true
         else
           pause_and_wait
-          return did_service_start?(port, attempts-1)
+          return did_service_start?(port, attempts - 1)
         end
       end
 
       def pause_and_wait(time = 4)
         sleep(time)
       end
-
     end
   end
 end

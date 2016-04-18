@@ -9,11 +9,11 @@ module Pardot
             @environment = environment
           end
 
-          def deploy(path, deploy)
+          def deploy(_path, _deploy)
             raise "Must be defined by sub-classes"
           end
 
-          def rollback?(deploy)
+          def rollback?(_deploy)
             false
           end
         end

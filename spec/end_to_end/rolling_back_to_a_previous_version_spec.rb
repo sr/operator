@@ -33,7 +33,7 @@ describe "rollback back to a previous version" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

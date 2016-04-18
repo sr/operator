@@ -1,5 +1,5 @@
 describe "ignoring deploys of the same artifact as currently deployed" do
-  let(:build_number) { 1234}
+  let(:build_number) { 1234 }
   let(:sha) { "abc123" }
   let(:artifact_url) { "https://artifactory.dev.pardot.com/build1234.tar.gz" }
   let(:artifact_download_url) { "https://artifactory.dev.pardot.com/download/build1234.tar.gz" }
@@ -19,7 +19,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   it "exits immediately without changing anything" do
     stub_request(:put, %r{^http://canoe.test/})
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
@@ -29,10 +29,10 @@ describe "ignoring deploys of the same artifact as currently deployed" do
 
   it "notifies Canoe that the deployment is completed" do
     request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-      .with(body: {action: "deploy", success: "true"})
+      .with(body: { action: "deploy", success: "true" })
       .to_return(status: 200)
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

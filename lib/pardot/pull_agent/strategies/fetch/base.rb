@@ -9,12 +9,12 @@ module Pardot
             @environment = environment
           end
 
-          def valid?(deploy)
+          def valid?(_deploy)
             # returns boolean value indicating the combination is valid
             raise "Must be defined by sub-classes"
           end
 
-          def fetch(deploy)
+          def fetch(_deploy)
             # returns path to fetched asset (file or directory)
             raise "Must be defined by sub-classes"
           end

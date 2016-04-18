@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe Pardot::PullAgent::Canoe do
-  let(:env) {
+  let(:env) do
     Pardot::PullAgent::Environments.build(:test).tap { |e| e.payload = "pardot" }
-  }
+  end
 
   describe ".latest_deploy" do
     it "fetches the latest deploy from the Canoe API" do
@@ -22,9 +22,9 @@ describe Pardot::PullAgent::Canoe do
 
   describe ".notify_server" do
     it "reports that the server has completed its deployment" do
-      deploy = Pardot::PullAgent::Deploy.from_hash("id" => 445, "servers" => {Pardot::PullAgent::ShellHelper.hostname => {"action" => "deploy" }})
+      deploy = Pardot::PullAgent::Deploy.from_hash("id" => 445, "servers" => { Pardot::PullAgent::ShellHelper.hostname => { "action" => "deploy" } })
       stub_request(:put, "#{env.canoe_url}/api/targets/#{env.canoe_target}/deploys/#{deploy.id}/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-        .with(body: {action: "deploy", success: "true"})
+        .with(body: { action: "deploy", success: "true" })
         .to_return(body: %({"success": true}))
 
       Pardot::PullAgent::Canoe.notify_server(env, deploy)

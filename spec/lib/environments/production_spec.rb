@@ -13,13 +13,13 @@ describe Pardot::PullAgent::Environments::Production do
     it "should allow setting single hook" do
       expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to be_nil
       Pardot::PullAgent::Environments::Production.after_fetch :foo
-      expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to eq(common_hooks(:after,:fetch) + [:foo])
+      expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to eq(common_hooks(:after, :fetch) + [:foo])
     end
 
     it "should allow setting multiple hooks" do
       expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to be_nil
       Pardot::PullAgent::Environments::Production.after_fetch :bar, :baz
-      expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to eq(common_hooks(:after,:fetch) + [:bar, :baz])
+      expect(Pardot::PullAgent::Environments::Production.hooks[:all][:after][:fetch]).to eq(common_hooks(:after, :fetch) + [:bar, :baz])
     end
   end
 
@@ -38,21 +38,21 @@ describe Pardot::PullAgent::Environments::Production do
   end
 
   describe '#restart_autojobs' do
-    it 'restarts autojob masters found via disco client' do
+    it "restarts autojob masters found via disco client" do
       env = Pardot::PullAgent::Environments.build(:production)
 
       disco = instance_double("DiscoveryClient")
       allow(disco).to receive(:service)
         .with("redis-rules-cache-1")
         .and_return([
-          {
-            "address" => "127.0.0.1",
-            "port" => "6379",
-            "payload" => {
-              "role" => "master"
-            }
-          }
-        ])
+                      {
+                        "address" => "127.0.0.1",
+                        "port" => "6379",
+                        "payload" => {
+                          "role" => "master"
+                        }
+                      }
+                    ])
       (2..9).each { |i| allow(disco).to receive(:service).with("redis-rules-cache-#{i}").and_return([]) }
 
       redis = class_spy("Redis")
@@ -74,7 +74,7 @@ describe Pardot::PullAgent::Environments::Production do
     Pardot::PullAgent::Environments::Production.instance_variable_set(:@common_hooks, nil)
   end
 
-  def common_hooks(period,action,payload = :all)
+  def common_hooks(period, action, payload = :all)
     Array(Pardot::PullAgent::Environments::Production.common_hooks[payload][period][action])
   end
 end

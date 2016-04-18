@@ -12,7 +12,7 @@ module Pardot
             self.environment = environment
 
             ::Artifactory.configure do |config|
-              config.endpoint = 'https://artifactory.dev.pardot.com/artifactory'
+              config.endpoint = "https://artifactory.dev.pardot.com/artifactory"
               config.username = environment.artifactory_user
               config.password = environment.artifactory_token
               config.ssl_verify = true
@@ -31,7 +31,7 @@ module Pardot
                   # Proxies in app.dev are too old to support vhost-based caching. Since
                   # app.dev is dying and only has a small number of hosts, we're not
                   # going to worry about it there.
-                  config.endpoint = 'http://artifactory.dev.pardot.com/artifactory'
+                  config.endpoint = "http://artifactory.dev.pardot.com/artifactory"
                 end
               end
             end
@@ -63,7 +63,7 @@ module Pardot
             # We deliberately do not use Artifactory.client.get because it loads the
             # entire download into memory.
             proxy = download_uri.find_proxy
-            Net::HTTP.start(download_uri.host, download_uri.port, proxy && proxy.hostname, proxy && proxy.port, use_ssl: (download_uri.scheme == 'https')) do |http|
+            Net::HTTP.start(download_uri.host, download_uri.port, proxy && proxy.hostname, proxy && proxy.port, use_ssl: (download_uri.scheme == "https")) do |http|
               http.read_timeout = 300
 
               request = Net::HTTP::Get.new(download_uri.path)
@@ -92,6 +92,7 @@ module Pardot
           end
 
           private
+
           def temporary_artifact_path(deploy)
             File.join(environment.payload.artifacts_path, File.basename(deploy.artifact_url))
           end
