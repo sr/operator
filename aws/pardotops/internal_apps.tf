@@ -281,11 +281,15 @@ resource "aws_security_group" "internal_apps_bastion" {
 
 resource "aws_instance" "internal_apps_bastion" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "t2.micro"
+  instance_type = "t2.small"
   key_name = "internal_apps"
-  private_ip = "172.30.180.0"
-  subnet_id = "${aws_subnet.internal_apps_us_east_1c_dmz.id}"
+  subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.internal_apps_bastion.id}"]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "20"
+    delete_on_termination = false
+  }
   tags {
     Name = "internal_apps_bastion"
   }
@@ -294,4 +298,45 @@ resource "aws_instance" "internal_apps_bastion" {
 resource "aws_eip" "internal_apps_bastion" {
   vpc = true
   instance = "${aws_instance.internal_apps_bastion.id}"
+}
+
+resource "aws_route53_record" "bastion1_aws_ops_pardot_com" {
+  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
+  name = "bastion1-aws.ops.pardot.com"
+  type = "A"
+  ttl = "300"
+  records = [
+    "${aws_eip.internal_apps_bastion.public_ip}"
+  ]
+}
+
+resource "aws_instance" "internal_apps_bastion_2" {
+  ami = "${var.centos_6_hvm_ebs_ami}"
+  instance_type = "t2.small"
+  key_name = "internal_apps"
+  subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
+  vpc_security_group_ids = ["${aws_security_group.internal_apps_bastion.id}"]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "20"
+    delete_on_termination = false
+  }
+  tags {
+    Name = "internal_apps_bastion_2"
+  }
+}
+
+resource "aws_eip" "internal_apps_bastion_2" {
+  vpc = true
+  instance = "${aws_instance.internal_apps_bastion_2.id}"
+}
+
+resource "aws_route53_record" "bastion2_aws_ops_pardot_com" {
+  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
+  name = "bastion2-aws.ops.pardot.com"
+  type = "A"
+  ttl = "300"
+  records = [
+    "${aws_eip.internal_apps_bastion_2.public_ip}"
+  ]
 }
