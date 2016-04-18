@@ -248,6 +248,7 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, ".env"), File.join(release_dir, ".env"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
@@ -258,12 +259,16 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, "api", ".envvars_#{name}.rb"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
+          end
 
+          payload.path_choices.each do |release_dir|
             begin
               FileUtils.ln_s(File.join(payload.repo_path, "env.rb"), File.join(release_dir, "env.rb"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
@@ -274,12 +279,16 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, "log"), File.join(release_dir, "log"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
+          end
 
+          payload.path_choices.each do |release_dir|
             begin
               FileUtils.ln_s(File.join(payload.repo_path, "output"), File.join(release_dir, "output"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
