@@ -9,12 +9,31 @@ resource "aws_security_group" "internal_apps_ldap_server_lb" {
   # LDAPS is run on port 443.
 
   ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  ingress {
+    from_port = 389
+    to_port = 389
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32"  # tools-s1 (password.pardot.com)
     ]
   }
 
@@ -49,12 +68,24 @@ resource "aws_elb" "internal_apps_ldap_server" {
   connection_draining_timeout = 30
 
   listener {
+    lb_port = 80
+    lb_protocol = "tcp"
+    instance_port = 389
+    instance_protocol = "tcp"
+  }
+  listener {
     lb_port = 443
     lb_protocol = "tcp"
     instance_port = 636
     instance_protocol = "tcp"
   }
 
+  listener {
+    lb_port = 389
+    lb_protocol = "tcp"
+    instance_port = 389
+    instance_protocol = "tcp"
+  }
   listener {
     lb_port = 636
     lb_protocol = "tcp"
@@ -66,7 +97,7 @@ resource "aws_elb" "internal_apps_ldap_server" {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 5
-    target = "TCP:636"
+    target = "TCP:389"
     interval = 60
   }
 
@@ -80,6 +111,14 @@ resource "aws_security_group" "internal_apps_ldap_server" {
   description = "Allow LDAP and LDAPS from SFDC datacenters and internal apps"
   vpc_id = "${aws_vpc.internal_apps.id}"
 
+  ingress {
+    from_port = 389
+    to_port = 389
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.internal_apps.cidr_block}"
+    ]
+  }
   ingress {
     from_port = 636
     to_port = 636
