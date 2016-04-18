@@ -18,7 +18,11 @@ module Pardot
           end
 
           def rollback?(deploy)
-            !!find_existing_deploy_on_disk(deploy)
+            if find_existing_deploy_on_disk(deploy)
+              true
+            else
+              false
+            end
           end
 
           def rollback(deploy)
@@ -31,7 +35,11 @@ module Pardot
               return false
             end
 
-            !!move_current_link(rollback_path)
+            if move_current_link(rollback_path)
+              true
+            else
+              false
+            end
           end
 
           private

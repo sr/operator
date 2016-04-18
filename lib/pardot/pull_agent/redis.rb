@@ -16,7 +16,11 @@ module Pardot
         def has_key?(key)
           output = execute("EXISTS #{key}")
           # http://redis.io/topics/protocol#resp-protocol-description
-          !!output.start_with?(":1\r\n")
+          if output.start_with?(":1\r\n")
+            true
+          else
+            false
+          end
         end
 
         def hset(key, entry, value)
