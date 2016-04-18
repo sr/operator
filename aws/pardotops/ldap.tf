@@ -174,3 +174,32 @@ resource "aws_route53_record" "ldap1_aws_ops_pardot_com" {
     "${aws_instance.internal_apps_ldap_master.private_ip}"
   ]
 }
+
+resource "aws_instance" "internal_apps_ldap_replica" {
+  ami = "${var.centos_6_hvm_ebs_ami}"
+  instance_type = "t2.medium"
+  key_name = "internal_apps"
+  private_ip = "172.30.1.110"
+  subnet_id = "${aws_subnet.internal_apps_us_east_1a.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.internal_apps_ldap_server.id}"
+  ]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "40"
+    delete_on_termination = false
+  }
+  tags {
+    Name = "ldap_replica"
+  }
+}
+
+resource "aws_route53_record" "ldap2_aws_ops_pardot_com" {
+  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
+  name = "ldap2-aws.ops.pardot.com"
+  type = "A"
+  ttl = "300"
+  records = [
+    "${aws_instance.internal_apps_ldap_replica.private_ip}"
+  ]
+}
