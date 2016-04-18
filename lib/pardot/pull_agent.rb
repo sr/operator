@@ -4,6 +4,7 @@ require "net/http"
 require "socket"
 
 require "artifactory"
+require "redis"
 
 require "pardot/pull_agent/build_version"
 require "pardot/pull_agent/canoe"

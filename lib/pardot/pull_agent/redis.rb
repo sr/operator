@@ -1,39 +1,23 @@
-require "socket"
-require "logger"
-
 module Pardot
   module PullAgent
     class Redis
       class Host
-        attr_accessor :host, :port, :db
-
         def initialize(host, port, db = nil)
-          self.host = host
-          self.port = port
-          self.db   = db
+          @redis = ::Redis.new(host: host, port: port, db: db)
         end
 
         def has_key?(key)
-          output = execute("EXISTS #{key}")
-          # http://redis.io/topics/protocol#resp-protocol-description
-          !!(output =~ /\A:1\r\n/)
+          @redis.exists?(key)
         end
 
         def hset(key, entry, value)
-          execute("HSET #{key} #{entry} #{value}")
+          @redis.hset(key, entry, value)
         end
 
         def set(key, value)
-          execute("SET #{key} #{value}")
+          @redis.set(key, value)
         end
-
-        def execute(cmd)
-          TCPSocket.open(@host, @port) do |socket|
-            socket.puts("#{"SELECT #{@db}\r\n" if @db}#{cmd}\r\nQUIT\r\n")
-            socket.read
-          end
-        end
-      end # Host
+      end
 
       class << self
         def bounce_workers(type, redis_hosts=[])
@@ -55,7 +39,7 @@ module Pardot
             port_string ||= "6379" # Default Redis port
             port = Integer(port_string)
 
-            host = Redis::Host.new(hostname, port)
+            host = Host.new(hostname, port)
             if host.has_key?(key)
               Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
               host.hset(key, entry, value)
@@ -68,11 +52,11 @@ module Pardot
         def bounce_redis_jobs(hostname, port)
           Logger.log(:info, "Resetting job nodes and monitors for host #{hostname}:#{port}")
 
-          host = Redis::Host.new(hostname, port, 10)
+          host = Host.new(hostname, port, 10)
           host.set("node_reset", Time.now.to_i)
           host.set("monitor_reset", Time.now.to_i)
         end
-      end # << self
+      end
     end
   end
 end

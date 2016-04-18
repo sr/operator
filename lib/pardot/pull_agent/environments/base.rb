@@ -155,7 +155,7 @@ module Pardot
           Canoe.notify_server(self, deploy)
         end
 
-        def restart_autojobs(deploy, disco = DiscoveryClient.new, redis = Redis)
+        def restart_autojobs(deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
           autojob_hosts = (1..9).flat_map { |i|
