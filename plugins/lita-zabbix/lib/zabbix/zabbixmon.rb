@@ -27,67 +27,45 @@ module Zabbix
     def monitor(zbx_host, zbx_username, zbx_password, datacenter, num_retries, retry_interval_seconds, timeout_seconds)
       retry_attmept_iterator=0
       retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{num_retries}" # human readable retry counter
-      
-      # make a one time use random string to insert and detect
-      payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}"
+
+
+      payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
       @log.info("[#{monitor_name}] value generated: #{payload}")
-      
-      # generate url w/ url payload
+
       url="https://#{zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
-
-      # deliver the test payload
-      payload_delivery_response=deliver_zabbixmon_payload(url, zbx_username, zbx_password, timeout_seconds)
-
-      # parse the test payload response
+      payload_delivery_response = deliver_zabbixmon_payload url, zbx_username, zbx_password, timeout_seconds
       if payload_delivery_response.code == '200'
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
-        # hard fail! :(
         @hard_failure = "ZabbixMon[#{datacenter}].payload_delivery_response.code : #{ERR_NON_200_HTTP_CODE}"
       end
 
 
-      soft_failures = [] # track soft-fail state - used to provide feedback on hard-fail
-      monitor_success = false # if true then "we did it, reddit!"
+      soft_failures = Set.new [] # soft-fails can used to provide feedback when we hard-fail
+      monitor_success = false
       while retry_attempt_iterator < num_retries && @hard_failure.nil? && !monitor_success do
-        # try num_retries number of times, retry_interval_seconds seconds between each try, then pass/fail after this loop
+        # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
 
-        # delay before (re)trying
         sleep retry_interval_seconds
-
-        # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = hard stop and notify
-        # do not overwrite a !200 w/ something above it on the app stack, like 'cant find key' for example
-
         zbx_items = nil
-
         begin
-          # pull the "item" that contains the desired K/V pair
           apiresponse = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
           zbx_items = apiresponse.result unless apiresponse.nil?
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
           @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-          soft_failures.push(
-            "#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e)
-          ) unless soft_failures.include? "#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e)
+          soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
         end
 
         if zbx_items
-          if zbx_items.length > 0
-            # we found the key
-             @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
-              monitor_success = true
-          else
-            #we did not find the item
-            soft_failures.push(
-                "#{ZABBIX_ITEM_NOT_FOUND}"
-            ) unless soft_failures.include? "#{ZABBIX_ITEM_NOT_FOUND}"
+          if zbx_items.length > 0  # success case
+            @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
+            monitor_success = true
+          else # fail case
+            soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
           end
-        else
-          #we did not find the item
-          soft_failures.push(
-              "#{ZABBIX_ITEM_NOT_FOUND}"
-          ) unless soft_failures.include? "#{ZABBIX_ITEM_NOT_FOUND}"
+        else # fail case
+          soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
         end
 
         @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
@@ -96,15 +74,10 @@ module Zabbix
 
       # work is done! Establish pass/fail here
       if monitor_success
-        # we did it, reddit!
         @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
-        # wipe fails; they dont matter
         @hard_failure = nil
-        soft_failures = []
       else
-        # (okay)(feelsbadman)
-        @hard_failure ||= soft_failures.join('; ')
-        # scenario: data insertion failed and the read process never started
+        @hard_failure ||= soft_failures.to_a.join('; ')
         @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
       end
     end
@@ -114,8 +87,7 @@ module Zabbix
     end
 
     private
-    def deliver_zabbixmon_payload(url:, user:, password:, timeout_seconds:)
-      # example: https://zabbix-dfw.pardot.com/cgi-bin/zabbix-server-check.sh?<date-or-other-thing-you-want-here>
+    def deliver_zabbixmon_payload(url, user, password, timeout_seconds = 30)
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
       req.basic_auth user, password
