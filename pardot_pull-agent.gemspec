@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.files = Dir["lib/**/*"]
   s.files += Dir["environments/"]
   s.files += ["README.md"]
+  s.executables = ["pull-agent"]
   s.add_dependency "artifactory", "~>2.3"
   s.add_development_dependency "byebug", "~>8.2"
   s.add_development_dependency "rake", "~>10.4"
