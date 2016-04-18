@@ -1,5 +1,3 @@
-require "cli"
-
 describe "ignoring deploys of the same artifact as currently deployed" do
   let(:build_number) { 1234}
   let(:sha) { "abc123" }
@@ -10,18 +8,18 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   after { FileUtils.rm_rf(tempdir) }
 
   before do
-    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
+    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
+      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
     bootstrap_repo_path(tempdir)
-    current_version = BuildVersion.new(build_number, sha, artifact_url)
+    current_version = Pardot::PullAgent::BuildVersion.new(build_number, sha, artifact_url)
     File.write(File.join(tempdir, "current", "build.version"), current_version.to_s)
   end
 
   it "exits immediately without changing anything" do
     stub_request(:put, %r{^http://canoe.test/})
 
-    cli = CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
@@ -30,11 +28,11 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   end
 
   it "notifies Canoe that the deployment is completed" do
-    request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{ShellHelper.hostname}")
+    request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .with(body: {action: "deploy", success: "true"})
       .to_return(status: 200)
 
-    cli = CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

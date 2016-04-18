@@ -1,17 +1,13 @@
-require "strategies"
-require "environments"
-require "deploy"
-
-describe Strategies::Fetch::Artifactory do
+describe Pardot::PullAgent::Strategies::Fetch::Artifactory do
   let(:tempdir) { Dir.mktmpdir("pull-agent") }
   let(:environment) {
-    Environments.build(:test).tap { |e|
+    Pardot::PullAgent::Environments.build(:test).tap { |e|
       e.payload = "pardot"
       e.payload.options[:repo_path] = tempdir
     }
   }
 
-  let!(:strategy) { Strategies.build(:fetch, :artifactory, environment) }
+  let!(:strategy) { Pardot::PullAgent::Strategies.build(:fetch, :artifactory, environment) }
 
   after { FileUtils.rm_rf(tempdir) }
 
@@ -22,7 +18,7 @@ describe Strategies::Fetch::Artifactory do
       .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
       .and_return(artifact)
 
-    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
+    deploy = Pardot::PullAgent::Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
     expect(strategy.valid?(deploy)).to be_truthy
   end
 
@@ -33,7 +29,7 @@ describe Strategies::Fetch::Artifactory do
       .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
       .and_return(artifact)
 
-    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
+    deploy = Pardot::PullAgent::Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
     expect(strategy.valid?(deploy)).to be_falsey
   end
 
@@ -52,7 +48,7 @@ describe Strategies::Fetch::Artifactory do
       .with("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
       .and_return(artifact)
 
-    deploy = Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
+    deploy = Pardot::PullAgent::Deploy.from_hash("artifact_url" => "https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/WFST/WFS/WFS-153.tar.gz")
     filename = strategy.fetch(deploy)
     expect(filename).to eq(local_artifact)
     expect(File.read(filename)).to eq(empty_tar_gz_contents)

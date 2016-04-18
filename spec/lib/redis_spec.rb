@@ -1,14 +1,12 @@
-require "redis"
-
-describe Redis do
+describe Pardot::PullAgent::Redis do
   before do
-    @r = Redis::Host.new('localhost', 6379)
+    @r = Pardot::PullAgent::Redis::Host.new('localhost', 6379)
   end
 
   specify ".hset" do
     TCPServer.open("127.0.0.1", 0) do |sock|
       Thread.new do
-        host = Redis::Host.new("127.0.0.1", sock.addr[1])
+        host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
         host.hset("foo", "bar", "baz")
       end
 
@@ -21,7 +19,7 @@ describe Redis do
   specify ".set" do
     TCPServer.open("127.0.0.1", 0) do |sock|
       Thread.new do
-        host = Redis::Host.new("127.0.0.1", sock.addr[1])
+        host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
         host.set("foo", "bar")
       end
 
@@ -34,7 +32,7 @@ describe Redis do
   it ".set with db" do
     TCPServer.open("127.0.0.1", 0) do |sock|
       Thread.new do
-        host = Redis::Host.new("127.0.0.1", sock.addr[1], 10)
+        host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1], 10)
         host.set("foo", "bar")
       end
 
@@ -56,7 +54,7 @@ describe Redis do
           s.close
         end
 
-        host = Redis::Host.new("127.0.0.1", sock.addr[1])
+        host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
         expect(host.has_key?("foo")).to be_truthy
       end
     end
@@ -71,7 +69,7 @@ describe Redis do
           s.close
         end
 
-        host = Redis::Host.new("127.0.0.1", sock.addr[1])
+        host = Pardot::PullAgent::Redis::Host.new("127.0.0.1", sock.addr[1])
         expect(host.has_key?("foo")).to be_falsey
       end
     end
