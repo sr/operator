@@ -42,11 +42,11 @@ module Pardot
       class << self
         def bounce_workers(type, redis_hosts = [])
           valid_types = \
-            %w( automationWorkers
+            %w[ automationWorkers
                 PerAccountAutomationWorker
                 automationRelatedObjectWorkers
                 previewWorkers
-                PerAccountAutomationWorker )
+                PerAccountAutomationWorker ]
           return false if !valid_types.include?(type)
 
           key = "#{type}-manager-config"

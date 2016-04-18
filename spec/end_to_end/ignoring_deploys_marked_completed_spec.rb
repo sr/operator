@@ -13,7 +13,7 @@ describe "ignoring deploys marked completed" do
   end
 
   it "exits immediately without changing anything" do
-    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

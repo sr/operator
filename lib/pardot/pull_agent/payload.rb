@@ -40,7 +40,7 @@ module Pardot
       end
 
       def path_choices
-        @options.fetch(:path_choices, %w(A B).map { |letter| File.expand_path("releases/#{letter}", repo_path) })
+        @options.fetch(:path_choices, %w[A B].map { |letter| File.expand_path("releases/#{letter}", repo_path) })
       end
 
       def artifact_prefix

@@ -9,7 +9,7 @@ module Pardot
 
       def parse_arguments!
         @arguments.each_with_index do |arg, index|
-          if %w(help --help -h).include?(arg.downcase)
+          if %w[help --help -h].include?(arg.downcase)
             print_help
             return
           end

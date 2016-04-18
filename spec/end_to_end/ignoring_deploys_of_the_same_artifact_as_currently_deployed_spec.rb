@@ -19,7 +19,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   it "exits immediately without changing anything" do
     stub_request(:put, %r{^http://canoe.test/})
 
-    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
@@ -32,7 +32,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
       .with(body: { action: "deploy", success: "true" })
       .to_return(status: 200)
 
-    cli = Pardot::PullAgent::CLI.new(%w(test pardot))
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
