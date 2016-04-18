@@ -33,7 +33,8 @@ resource "aws_security_group" "internal_apps_ldap_server_lb" {
     to_port = 389
     protocol = "tcp"
     cidr_blocks = [
-      "173.192.141.222/32"  # tools-s1 (password.pardot.com)
+      "173.192.141.222/32", # tools-s1 (password.pardot.com)
+      "67.228.6.68/32"      # auth-d1
     ]
   }
 
@@ -42,7 +43,8 @@ resource "aws_security_group" "internal_apps_ldap_server_lb" {
     to_port = 636
     protocol = "tcp"
     cidr_blocks = [
-      "173.192.141.222/32"  # tools-s1 (password.pardot.com)
+      "173.192.141.222/32", # tools-s1 (password.pardot.com)
+      "67.228.6.68/32"      # auth-d1
     ]
   }
 
