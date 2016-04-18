@@ -110,7 +110,40 @@ resource "aws_security_group" "internal_apps_ldap_admin_server_lb" {
   name = "internal_apps_ldap_admin_server_lb"
   description = "External load balancer for the LDAP admin frontend server"
   vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+    ]
+  }
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
 
 resource "aws_elb" "internal_apps_ldap_admin_server" {
   name = "ldap-admin-server"
