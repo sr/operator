@@ -24,12 +24,12 @@ module Zabbix
     attr_accessor :hard_failure
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
-    def monitor(zbx_host, zbx_username, zbx_password, datacenter, payload_length, num_retries, retry_interval_seconds, timeout_seconds)
+    def monitor(zbx_host, zbx_username, zbx_password, datacenter, num_retries, retry_interval_seconds, timeout_seconds)
       retry_attmept_iterator=0
       retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{num_retries}" # human readable retry counter
       
       # make a one time use random string to insert and detect
-      payload = "#{SecureRandom.urlsafe_base64(payload_length)}"
+      payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}"
       @log.info("[#{monitor_name}] value generated: #{payload}")
       
       # generate url w/ url payload

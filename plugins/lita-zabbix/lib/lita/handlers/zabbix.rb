@@ -323,7 +323,6 @@ module Lita
                       config.zabbix_user,
                       config.zabbix_password,
                       datacenter,
-                      config.zbxmon_payload_length,
                       config.monitor_retries,
                       config.monitor_retry_interval_seconds,
                       config.monitor_http_timeout_seconds,
