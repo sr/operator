@@ -95,35 +95,35 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
     it "Basecase" do
       array = []
       current = nil
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Basecase with current" do
       array = []
       current = "a"
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Singleton" do
       array = ["a"]
       current = "a"
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to eq("a")
     end
 
     it "Middle" do
       array = %w(a b c d)
       current = "b"
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to eq("c")
     end
 
     it "Wrap Around" do
       array = %w(a b c d)
       current = "d"
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to eq("a")
     end
   end
