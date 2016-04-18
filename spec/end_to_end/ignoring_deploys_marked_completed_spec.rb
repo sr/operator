@@ -1,5 +1,5 @@
 describe "ignoring deploys marked completed" do
-  let(:build_number) { 1234}
+  let(:build_number) { 1234 }
   let(:sha) { "abc123" }
   let(:artifact_url) { "https://artifactory.dev.pardot.com/build1234.tar.gz" }
   let(:artifact_download_url) { "https://artifactory.dev.pardot.com/download/build1234.tar.gz" }

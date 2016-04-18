@@ -15,8 +15,7 @@ module Pardot
 
         after_deploy :restart_workflowstats_service, only: :'workflow-stats'
 
-        after_deploy :deploy_topology, only: :'murdoc'
-
+        after_deploy :deploy_topology, only: :murdoc
       end
 
       register(:staging, Staging)

@@ -1,5 +1,5 @@
-require 'fileutils'
-require 'tmpdir'
+require "fileutils"
+require "tmpdir"
 
 module Pardot
   module PullAgent
@@ -16,14 +16,14 @@ module Pardot
 
       def name
         @_name ||= \
-        # Camelize
-        begin
-          string = id.to_s
-          string = string.sub(/^[a-z\d]*/) { $&.capitalize }
-          string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
-          string.gsub!('/', '::')
-          string
-        end
+          # Camelize
+          begin
+            string = id.to_s
+            string = string.sub(/^[a-z\d]*/) { $&.capitalize }
+            string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }
+            string.gsub!("/", "::")
+            string
+          end
       end
 
       def artifacts_path
@@ -40,7 +40,7 @@ module Pardot
       end
 
       def path_choices
-        @options.fetch(:path_choices, %w(A B).map {|letter| File.expand_path("releases/#{letter}", repo_path)})
+        @options.fetch(:path_choices, %w[A B].map { |letter| File.expand_path("releases/#{letter}", repo_path) })
       end
 
       def artifact_prefix
@@ -55,7 +55,7 @@ module Pardot
       def safe_path(path)
         return nil if path.to_s.strip.empty?
         # make double-damn sure this ends with a / (stupid unix/rsync)
-        path += '/' unless path.to_s.strip[-1] == '/'
+        path += "/" unless path.to_s.strip[-1] == "/"
         path
       end
 

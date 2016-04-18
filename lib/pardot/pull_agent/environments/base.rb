@@ -26,13 +26,13 @@ module Pardot
 
         def self.common_hooks
           @common_hooks ||= \
-          begin
-            tmp_hooks = Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
-            #tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
-            tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
-            tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana, :notify_complete_canoe]
-            tmp_hooks
-          end
+            begin
+              tmp_hooks = Hash.new { |hash, key| hash[key] = Hash.new { |hash1, key1| hash1[key1] = {} } }
+              # tmp_hooks[:all][:after][:deploy] = [:log_deploy, :notify_canoe, :announce_deploy_to_hipchat]
+              tmp_hooks[:all][:before][:fetch] = [:notify_begin_kibana]
+              tmp_hooks[:all][:after][:deploy] = [:notify_complete_kibana, :notify_complete_canoe]
+              tmp_hooks
+            end
         end
 
         # Support after_fetch :log_fetch, only: :pardot
@@ -155,12 +155,12 @@ module Pardot
           Canoe.notify_server(self, deploy)
         end
 
-        def restart_autojobs(deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
+        def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
-          autojob_hosts = (1..9).flat_map { |i|
-            disco.service("redis-rules-cache-#{i}").select { |s| s['payload'] && s['payload']['role'] == 'master' }
-          }.map { |s| [s['address'], s['port']].join(':') }
+          autojob_hosts = (1..9).flat_map do |i|
+            disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
+          end.map { |s| [s["address"], s["port"]].join(":") }
 
           # Restart automation workers
           redis.bounce_workers("automationWorkers", autojob_hosts)
@@ -186,10 +186,10 @@ module Pardot
           disco = DiscoveryClient.new
           found = false
           (1..9).each do |i|
-            masters = disco.service("redis-job-#{i}").select { |s| s['payload'] && s['payload']['role'] == 'master' }
+            masters = disco.service("redis-job-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
             masters.each do |master|
               found = true
-              Redis.bounce_redis_jobs(master['address'], master['port'])
+              Redis.bounce_redis_jobs(master["address"], master["port"])
             end
           end
 
@@ -207,8 +207,8 @@ module Pardot
         end
 
         def deploy_topology(deploy)
-          if deploy.options['topology'].nil? || payload.current_link.nil?
-            deploy.options['topology'].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+          if deploy.options["topology"].nil? || payload.current_link.nil?
+            deploy.options["topology"].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
             payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
           else
             # this finds a JAR inside of a tarball blown up and linked-to at the base level
@@ -218,7 +218,7 @@ module Pardot
             else
               Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
-              Storm.load_topology(deploy.options['topology'], jarfile)
+              Storm.load_topology(deploy.options["topology"], jarfile)
               Logger.log(:info, "Topology Deployment Complete!")
             end
           end
@@ -248,6 +248,7 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, ".env"), File.join(release_dir, ".env"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
@@ -258,12 +259,16 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, "api", ".envvars_#{name}.rb"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
+          end
 
+          payload.path_choices.each do |release_dir|
             begin
               FileUtils.ln_s(File.join(payload.repo_path, "env.rb"), File.join(release_dir, "env.rb"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
@@ -274,12 +279,16 @@ module Pardot
               FileUtils.ln_s(File.join(payload.repo_path, "log"), File.join(release_dir, "log"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
+          end
 
+          payload.path_choices.each do |release_dir|
             begin
               FileUtils.ln_s(File.join(payload.repo_path, "output"), File.join(release_dir, "output"))
             rescue Errno::EEXIST
               # already exists
+              next
             end
           end
         end
@@ -345,7 +354,7 @@ module Pardot
         def payload=(payload_name)
           payload_name = payload_name.downcase.to_sym
           if valid_payload?(payload_name)
-            @payload = Payload.new({id: payload_name}.merge(repos[payload_name]))
+            @payload = Payload.new({ id: payload_name }.merge(repos[payload_name]))
           end
         end
 

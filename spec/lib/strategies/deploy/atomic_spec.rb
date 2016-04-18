@@ -1,11 +1,11 @@
 describe Pardot::PullAgent::Strategies::Deploy::Atomic do
   let(:tempdir) { Dir.mktmpdir("pull-agent") }
-  let(:environment) {
-    Pardot::PullAgent::Environments.build(:test).tap { |e|
+  let(:environment) do
+    Pardot::PullAgent::Environments.build(:test).tap do |e|
       e.payload = "pardot"
       e.payload.options[:repo_path] = tempdir
-    }
-  }
+    end
+  end
 
   let(:strategy) { Pardot::PullAgent::Strategies.build(:deploy, :atomic, environment) }
 
@@ -95,36 +95,36 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
     it "Basecase" do
       array = []
       current = nil
-      pick = strategy.send(:pick_next_choice, array, current)
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Basecase with current" do
       array = []
-      current = 'a'
-      pick = strategy.send(:pick_next_choice, array, current)
+      current = "a"
+      pick = strategy.__send__(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Singleton" do
-      array = ['a']
-      current = 'a'
-      pick = strategy.send(:pick_next_choice, array, current)
-      expect(pick).to eq('a')
+      array = ["a"]
+      current = "a"
+      pick = strategy.__send__(:pick_next_choice, array, current)
+      expect(pick).to eq("a")
     end
 
     it "Middle" do
-      array = ['a', 'b', 'c', 'd']
-      current = 'b'
-      pick = strategy.send(:pick_next_choice, array, current)
-      expect(pick).to eq('c')
+      array = %w[a b c d]
+      current = "b"
+      pick = strategy.__send__(:pick_next_choice, array, current)
+      expect(pick).to eq("c")
     end
 
     it "Wrap Around" do
-      array = ['a', 'b', 'c', 'd']
-      current = 'd'
-      pick = strategy.send(:pick_next_choice, array, current)
-      expect(pick).to eq('a')
+      array = %w[a b c d]
+      current = "d"
+      pick = strategy.__send__(:pick_next_choice, array, current)
+      expect(pick).to eq("a")
     end
   end
 end

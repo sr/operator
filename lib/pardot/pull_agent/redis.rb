@@ -20,31 +20,29 @@ module Pardot
       end
 
       class << self
-        def bounce_workers(type, redis_hosts=[])
-
+        def bounce_workers(type, redis_hosts = [])
           valid_types = \
             %w[ automationWorkers
                 PerAccountAutomationWorker
                 automationRelatedObjectWorkers
                 previewWorkers
                 PerAccountAutomationWorker ]
-          return false if ! valid_types.include?(type)
+          return false if !valid_types.include?(type)
 
           key = "#{type}-manager-config"
           entry = "restart"
           value = Time.now.to_i
           found = false
           Array(redis_hosts).each do |host_and_port|
-            hostname, port_string = host_and_port.split(':')
+            hostname, port_string = host_and_port.split(":")
             port_string ||= "6379" # Default Redis port
             port = Integer(port_string)
 
             host = Host.new(hostname, port)
-            if host.has_key?(key)
-              Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
-              host.hset(key, entry, value)
-              found = true
-            end
+            next if host.has_key?(key)
+            Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
+            host.hset(key, entry, value)
+            found = true
           end
           found
         end

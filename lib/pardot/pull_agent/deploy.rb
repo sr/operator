@@ -21,8 +21,6 @@ module Pardot
       def action
         if server_actions && server_actions[ShellHelper.hostname]
           server_actions[ShellHelper.hostname]["action"]
-        else
-          nil
         end
       end
 
