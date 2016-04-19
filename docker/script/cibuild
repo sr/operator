@@ -4,4 +4,12 @@ set -euo pipefail
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)
 
 "$dir/build" --all
-"$dir/push" --all
+
+head="$(git rev-parse HEAD)"
+master="$(git rev-parse origin/master)"
+
+if [ "$head" = "$master" ]; then
+  "$dir/push" --all
+else
+  echo "HEAD is ${head}, but master is ${master}. Skipping push."
+fi
