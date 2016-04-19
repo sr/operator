@@ -32,6 +32,7 @@ images.each do |image|
   system(
     File.join(File.dirname(__FILE__), "docker"),
     "build",
+    "--pull",
     "-t", image,
     all_images[image].fetch("build")
   )
