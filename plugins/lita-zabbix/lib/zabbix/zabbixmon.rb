@@ -37,8 +37,8 @@ module Zabbix
       if payload_delivery_response_code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
-        @hard_failure = "ZabbixMon[#{datacenter}].payload_delivery_response.code : #{ERR_NON_200_HTTP_CODE}"
-        @log.error("[#{monitor_name}] #{ERR_NON_200_HTTP_CODE}")
+        @hard_failure = "ZabbixMon[#{datacenter}] payload insertion failed! : #{ERR_NON_200_HTTP_CODE}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{datacenter}] payload insertion failed! ERROR = '#{ERR_NON_200_HTTP_CODE}'")
       end
 
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
@@ -90,7 +90,7 @@ module Zabbix
       }
       res.code
     rescue Timeout::Error
-      @log.error("[#{monitor_name}] Zabbixmon::delivery_zabbixmon_payload: HTTP TIMEOUT")
+      @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
       @log.error("[#{monitor_name}] has hard failed: ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed")
     end
