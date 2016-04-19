@@ -25,10 +25,10 @@ module Zabbix
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
     def monitor(zbx_host, zbx_username, zbx_password, datacenter, num_retries, retry_interval_seconds, timeout_seconds)
-      retry_attmept_iterator=0
-      retry_sz="retry attempt #{(retry_attmept_iterator + 1)} / #{num_retries}"
+      retry_attempt_iterator = 0
+      retry_sz = "retry attempt #{(retry_attmept_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
-      url="https://#{zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
+      url = "https://#{zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
       monitor_success = false
       soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
@@ -63,7 +63,7 @@ module Zabbix
           soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
         end
         @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
-        retry_attempt_iterator+=1
+        retry_attempt_iterator += 1
       end
 
       # work is done! Establish pass/fail here
