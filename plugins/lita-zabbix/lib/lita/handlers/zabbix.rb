@@ -381,9 +381,6 @@ module Lita
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
         log.info("Telling hipchat channel #{@status_room}: #{whining}")
         robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
-
-      rescue => e # fyi this should not be hit, so I'm keeping it unhandled on porpoise
-        log.info("[#{monitorname}] has encountered an error reporting the status back to hipchat.")
       end
 
       def page_r_doodie(message:, datacenter:)
