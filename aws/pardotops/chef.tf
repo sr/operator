@@ -64,6 +64,6 @@ resource "aws_instance" "internal_apps_chef_server" {
     delete_on_termination = false
   }
   tags {
-    Name = "chef_server"
+    Name = "pardot0-chef1-1-ue1"
   }
 }
