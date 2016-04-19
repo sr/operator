@@ -293,17 +293,12 @@ module Lita
       def run_monitors(payload)
         every(config.monitor_interval_seconds) do |timer|
           begin
-
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] running monitors!")
-
-          # instantiate zabbixmon monitor
           zabbixmon = ::Zabbix::Zabbixmon.new(
               redis: redis,
               clients: @clients,
               log: log,
           )
-
-          # for each datacenter
           config.datacenters.each do |datacenter|
 
             begin
@@ -313,10 +308,7 @@ module Lita
                   log: log,
                   client: @clients[datacenter]
               )
-
-              # loop through (active && unpaused) monitors
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
-                # zabbixmon: engage!
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   zabbixmon.monitor(
                       config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
