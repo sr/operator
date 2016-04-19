@@ -1,6 +1,11 @@
+version = ENV["RUBYGEM_VERSION"]
+if version.to_s.empty?
+  abort "Please set the gem version via the RUBYGEM_VERSION environment variable."
+end
+
 Gem::Specification.new do |s|
   s.name = "pardot_pull-agent"
-  s.version = "1"
+  s.version = ENV["RUBYGEM_VERSION"]
   s.summary = "Pardot code deploy agent."
   s.description = s.summary
   s.homepage = "https://confluence.dev.pardot.com/display/PTechops/Pull-based+Deployment+Overview"
