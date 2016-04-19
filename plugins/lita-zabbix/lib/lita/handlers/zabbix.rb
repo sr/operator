@@ -292,7 +292,7 @@ module Lita
 
       def run_monitors(payload)
         every(config.monitor_interval_seconds) do |timer|
-          begin
+          begin # outer catch block: to keep things moving
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] running monitors!")
           zabbixmon = ::Zabbix::Zabbixmon.new(
               redis: redis,
@@ -301,7 +301,7 @@ module Lita
           )
           config.datacenters.each do |datacenter|
 
-            begin
+            begin # inner catch block: to be able to "see" what happened on failure.
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                   datacenter: datacenter,
                   redis: redis,
@@ -322,13 +322,12 @@ module Lita
                 end
               end
 
-              # bitch and moan (unless ...)
-              # monitor_fail_notify(zabbixmon.monitor_name,
-              #                     datacenter,
-              #                     zabbixmon.hard_failure,
-              #                     config.zbxmon_hipchat_notify,
-              #                     config.paging_monitors.include?(zabbixmon.monitor_name)
-              # ) unless zabbixmon.hard_failure.nil?
+              monitor_fail_notify(zabbixmon.monitor_name,
+                                  datacenter,
+                                  zabbixmon.hard_failure,
+                                  config.zbxmon_hipchat_notify,
+                                  config.paging_monitors.include?(zabbixmon.monitor_name)
+              ) unless zabbixmon.hard_failure.nil?
               log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
             rescue => e
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
@@ -338,13 +337,13 @@ module Lita
 
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
-            # debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
-            # monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
-            #                     'N/A',
-            #                     MONITOR_FAIL_ERRMSG,
-            #                     config.zbxmon_hipchat_notify,
-            #                     config.paging_monitors.include?(zabbixmon.monitor_name)
-            # )
+            debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
+            monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
+                                'N/A',
+                                MONITOR_FAIL_ERRMSG,
+                                config.zbxmon_hipchat_notify,
+                                config.paging_monitors.include?(zabbixmon.monitor_name)
+            )
           end
         end
       end
@@ -372,19 +371,19 @@ module Lita
       end
 
       def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, pagerduty_alert)
-        #let me sing you the song of my people
 
         if pagerduty_alert
-          #yo dawg, page pagerduty
           log.info("Paging sequence initiated. Paging pagerduty.")
           #TODO: PAGE-R-(seriouspoo)
           page_r_doodie(error_msg, data_center)
         end
 
-        #fazha can you hear me?
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
         log.info("Telling hipchat channel #{@status_room}: #{whining}")
         robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
+
+      rescue => e # fyi this should not be hit, so I'm keeping it unhandled on porpoise
+        log.info("[#{monitorname}] has encountered an error reporting the status back to hipchat.")
       end
 
       def page_r_doodie(message:, datacenter:)
