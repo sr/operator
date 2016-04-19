@@ -230,13 +230,6 @@ resource "aws_db_subnet_group" "internal_apps" {
   ]
 }
 
-# DNS
-
-resource "aws_route53_zone" "internal_apps_ops_pardot_com" {
-  name = "ops.pardot.com"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-}
-
 # VPC Peering with tools_egress
 
 resource "aws_vpc_peering_connection" "internal_apps_peer_tools_egress" {
@@ -300,16 +293,6 @@ resource "aws_eip" "internal_apps_bastion" {
   instance = "${aws_instance.internal_apps_bastion.id}"
 }
 
-resource "aws_route53_record" "bastion1_aws_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "bastion1-aws.ops.pardot.com"
-  type = "A"
-  ttl = "300"
-  records = [
-    "${aws_eip.internal_apps_bastion.public_ip}"
-  ]
-}
-
 resource "aws_instance" "internal_apps_bastion_2" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.small"
@@ -329,14 +312,4 @@ resource "aws_instance" "internal_apps_bastion_2" {
 resource "aws_eip" "internal_apps_bastion_2" {
   vpc = true
   instance = "${aws_instance.internal_apps_bastion_2.id}"
-}
-
-resource "aws_route53_record" "bastion2_aws_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "bastion2-aws.ops.pardot.com"
-  type = "A"
-  ttl = "300"
-  records = [
-    "${aws_eip.internal_apps_bastion_2.public_ip}"
-  ]
 }

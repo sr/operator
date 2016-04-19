@@ -255,16 +255,6 @@ resource "aws_instance" "internal_apps_ldap_master" {
   }
 }
 
-resource "aws_route53_record" "ldap1_aws_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "ldap1-aws.ops.pardot.com"
-  type = "A"
-  ttl = "300"
-  records = [
-    "${aws_instance.internal_apps_ldap_master.private_ip}"
-  ]
-}
-
 resource "aws_instance" "internal_apps_ldap_replica" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
@@ -282,14 +272,4 @@ resource "aws_instance" "internal_apps_ldap_replica" {
   tags {
     Name = "ldap_replica"
   }
-}
-
-resource "aws_route53_record" "ldap2_aws_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "ldap2-aws.ops.pardot.com"
-  type = "A"
-  ttl = "300"
-  records = [
-    "${aws_instance.internal_apps_ldap_replica.private_ip}"
-  ]
 }

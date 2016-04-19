@@ -67,13 +67,3 @@ resource "aws_instance" "internal_apps_chef_server" {
     Name = "chef_server"
   }
 }
-
-resource "aws_route53_record" "chef1_aws_ops_pardot_com" {
-  zone_id = "${aws_route53_zone.internal_apps_ops_pardot_com.zone_id}"
-  name = "chef1-aws.ops.pardot.com"
-  type = "A"
-  ttl = "300"
-  records = [
-    "${aws_instance.internal_apps_chef_server.private_ip}"
-  ]
-}
