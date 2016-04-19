@@ -284,7 +284,7 @@ resource "aws_instance" "internal_apps_bastion" {
     delete_on_termination = false
   }
   tags {
-    Name = "internal_apps_bastion"
+    Name = "pardot0-bastion1-1-ue1"
   }
 }
 
@@ -305,7 +305,7 @@ resource "aws_instance" "internal_apps_bastion_2" {
     delete_on_termination = false
   }
   tags {
-    Name = "internal_apps_bastion_2"
+    Name = "pardot0-bastion1-2-ue1"
   }
 }
 
