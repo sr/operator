@@ -32,6 +32,10 @@ module Environments
       "prod"
     end
 
+    def symfony_env
+      "prod-s"
+    end
+
     def add_graphite_annotation(deploy)
       Timeout.timeout(5) do
         TCPSocket.open(GRAPHITE_HOST, GRAPHITE_PORT) do |sock|
