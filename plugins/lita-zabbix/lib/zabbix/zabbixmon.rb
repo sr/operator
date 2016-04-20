@@ -37,7 +37,7 @@ module Zabbix
       soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
       @log.debug("[#{monitor_name}] value generated: #{payload}")
-      payload_delivery_response_code = deliver_zabbixmon_payload url, zbx_username, zbx_password, timeout_seconds
+      payload_delivery_response_code = deliver_zabbixmon_payload url, timeout_seconds
       if payload_delivery_response_code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
