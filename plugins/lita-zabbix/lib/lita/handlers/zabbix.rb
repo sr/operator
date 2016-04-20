@@ -20,7 +20,7 @@ module Lita
       PagerFailed = Class.new(StandardError)
 
       # config: zabbix
-      config :zabbix_url, default: "http://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
+      config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
