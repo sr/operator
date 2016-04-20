@@ -13,18 +13,22 @@ module Zabbix
     ZBXMON_ITEM = 'system:general'
     ZBXMON_KEY = 'zabbix_status'
     ZBXMON_PAYLOAD_LENGTH = 10
-
-    def initialize(redis:, clients:, log:)
+    
+    def initialize(redis:, client, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
       @redis = redis
-      @clients = clients
+      @client = client
       @log = log
+      @zbx_host = zbx_host
+      @zbx_username = zbx_username
+      @zbx_password = zbx_password
+      @datacenter = datacenter
       @hard_failure = nil
     end
 
     attr_accessor :hard_failure
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
-    def monitor(zbx_host, zbx_username, zbx_password, datacenter, num_retries, retry_interval_seconds, timeout_seconds)
+    def monitor(num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
@@ -37,15 +41,15 @@ module Zabbix
       if payload_delivery_response_code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
-        @hard_failure = "ZabbixMon[#{datacenter}] payload insertion failed! : #{ERR_NON_200_HTTP_CODE}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{datacenter}] payload insertion failed! ERROR = '#{ERR_NON_200_HTTP_CODE}'")
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! : #{ERR_NON_200_HTTP_CODE}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! ERROR = '#{ERR_NON_200_HTTP_CODE}'")
       end
 
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
         begin # get zabbix item
-          apiresponse = @clients['datacenter'].get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
+          apiresponse = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
           zbx_items = apiresponse['result']
           @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
         rescue => e
@@ -81,11 +85,11 @@ module Zabbix
     end
 
     private
-    def deliver_zabbixmon_payload(url, user, password, timeout_seconds = 30)
+    def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
-      req.basic_auth user, password
+      req.basic_auth @zbx_username, @zbx_password
       res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }

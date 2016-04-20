@@ -296,8 +296,12 @@ module Lita
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] executing run_monitors")
           zabbixmon = ::Zabbix::Zabbixmon.new(
             redis: redis,
-            clients: @clients,
+            client: @clients[@datacenter],
             log: log,
+            zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
+            zbx_username: config.zabbix_user,
+            zbx_password: config.zabbix_password,
+            datacenter: datacenter,
           )
           config.datacenters.each do |datacenter|
 
@@ -311,10 +315,6 @@ module Lita
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   zabbixmon.monitor(
-                    config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
-                    config.zabbix_user,
-                    config.zabbix_password,
-                    datacenter,
                     config.monitor_retries,
                     config.monitor_retry_interval_seconds,
                     config.monitor_http_timeout_seconds
