@@ -296,7 +296,7 @@ module Lita
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] executing run_monitors")
           zabbixmon = ::Zabbix::Zabbixmon.new(
             redis: redis,
-            client: @clients[@datacenter],
+            zbx_client: @clients[@datacenter],
             log: log,
             zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
             zbx_username: config.zabbix_user,

@@ -14,9 +14,9 @@ module Zabbix
     ZBXMON_KEY = 'zabbix_status'
     ZBXMON_PAYLOAD_LENGTH = 10
     
-    def initialize(redis:, client, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
+    def initialize(redis:, zbx_client:, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
       @redis = redis
-      @client = client
+      @client = zbx_client
       @log = log
       @zbx_host = zbx_host
       @zbx_username = zbx_username
