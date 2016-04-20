@@ -125,8 +125,8 @@ module Lita
       end
 
       def monitor_status(response)
-        config.active_monitors.each do |active_monitor|
         msg ="\nMonitor / Status / Paging?"
+        config.active_monitors.each do |active_monitor|
           config.datacenters.each do |datacenter|
             if active_monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
