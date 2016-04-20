@@ -32,7 +32,7 @@ module Zabbix
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
-      url = "https://#{zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
+      url = "https://#{@zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
       monitor_success = false
       soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
@@ -58,7 +58,7 @@ module Zabbix
         end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
         if zbx_items
           if zbx_items.length > 0  # success case
-            @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{zbx_host} (#{retry_sz})")
+            @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{@zbx_host} (#{retry_sz})")
             monitor_success = true
           else # fail case
             soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
