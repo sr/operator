@@ -282,6 +282,7 @@ module Lita
 
       def run_monitors(payload)
         every(config.monitor_interval_seconds) do |timer|
+
           begin # outer catch block: to keep things moving (handled)
           log.info("[lita-zabbix] executing run_monitors")
           config.datacenters.each do |datacenter|
@@ -292,12 +293,15 @@ module Lita
                 zbx_username: config.zabbix_user,
                 zbx_password: config.zabbix_password,
                 datacenter: datacenter)
+            log.debug("[lita-zabbix] zabbixmon: #{zabbixmon.to_s}")
+
             begin # inner catch block: to be able to "see" what happened on failure (unhandled)
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 log: log,
                 client: @clients[datacenter])
+              log.debug("[lita-zabbix] monitor_supervisor: #{monitor_supervisor.to_s}")
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
@@ -316,16 +320,19 @@ module Lita
             rescue => e
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
             end
+
           end
+
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
             debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
             monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
-              'N/A',
+              '[no-DC]',
               MONITOR_FAIL_ERRMSG,
               config.monitor_hipchat_notify,
               config.paging_monitors.include?(zabbixmon.monitor_name))
           end
+
         end
       end
 
