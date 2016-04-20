@@ -82,6 +82,7 @@ module Zabbix
 
     private
     def deliver_zabbixmon_payload(url, user, password, timeout_seconds = 30)
+      @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
       req.basic_auth user, password
