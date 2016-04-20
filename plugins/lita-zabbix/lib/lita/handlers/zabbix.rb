@@ -314,11 +314,10 @@ module Lita
               )
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
-                  zabbixmon.monitor(
-                    config.monitor_retries,
+                  log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
+                  zabbixmon.monitor(config.monitor_retries,
                     config.monitor_retry_interval_seconds,
-                    config.monitor_http_timeout_seconds
-                  )
+                    config.monitor_http_timeout_seconds)
                   log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
                   monitor_fail_notify(zabbixmon.monitor_name,
                     datacenter,
