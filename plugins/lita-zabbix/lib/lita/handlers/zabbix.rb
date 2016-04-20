@@ -325,7 +325,7 @@ module Lita
               monitor_fail_notify(zabbixmon.monitor_name,
                                   datacenter,
                                   zabbixmon.hard_failure,
-                                  config.zbxmon_hipchat_notify,
+                                  config.monitor_hipchat_notify,
                                   config.paging_monitors.include?(zabbixmon.monitor_name)
               ) unless zabbixmon.hard_failure.nil?
               log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
@@ -341,7 +341,7 @@ module Lita
             monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
                                 'N/A',
                                 MONITOR_FAIL_ERRMSG,
-                                config.zbxmon_hipchat_notify,
+                                config.monitor_hipchat_notify,
                                 config.paging_monitors.include?(zabbixmon.monitor_name)
             )
           end
