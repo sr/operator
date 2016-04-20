@@ -99,8 +99,7 @@ module Lita
               datacenter: datacenter,
               redis: redis,
               client: @clients[datacenter],
-              log: log
-            )
+              log: log)
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
             maintenance_supervisor.ensure_supervising
           rescue => e
@@ -111,9 +110,7 @@ module Lita
               datacenter: datacenter,
               redis: redis,
               client: @clients[datacenter],
-              log: log
-            )
-
+              log: log)
             monitor_supervisor.on_monitor_unpaused = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
           rescue => e
@@ -128,18 +125,21 @@ module Lita
       end
 
       def monitor_status(response)
+        config.active_monitors.each do |active_monitor|
         msg ="\nMonitor / Status / Paging?"
-        config.datacenters.each do |datacenter|
-          monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
-            datacenter: datacenter,
-            redis: redis,
-            client: @clients[datacenter],
-            log: log
-          )
-          status = monitor_supervisor.get_paused_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAUSED" : "ACTIVE"
-          paging = config.paging_monitors.include? (::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
-          msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
-          #TODO: Last known status per-datacenter
+          config.datacenters.each do |datacenter|
+            if active_monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
+              monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
+                datacenter: datacenter,
+                redis: redis,
+                client: @clients[datacenter],
+                log: log)
+              status = monitor_supervisor.get_paused_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "paused (failed)" : "active (successful)"
+              paging = config.paging_monitors.include? (::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
+              msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
+              #TODO: Last known status per-datacenter
+            end
+          end
         end
         response.reply_with_mention("#{msg}")
       rescue => e
@@ -206,10 +206,8 @@ module Lita
         datacenter = response.match_data["datacenter"]
         response.reply("/me failed to parse a datacenter from your request. Defaulting to #{config.default_datacenter}") unless datacenter
         datacenter ||= config.default_datacenter
-
         validate_datacenter(datacenter: datacenter, response: response) || return
         options = parse_options(response.match_data["options"])
-
         until_time = \
           if options["until"]
            begin
@@ -220,19 +218,14 @@ module Lita
           else
             Time.now + 3600
           end
-
         monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
           datacenter: datacenter,
           redis: redis,
           client: @clients[datacenter],
-          log: log,
-        )
-
+          log: log)
         monitor_supervisor.pause_monitor(
           monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME,
-          until_time: until_time,
-        )
-
+          until_time: until_time)
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
       rescue ::Lita::Handlers::Zabbix::MonitorPauseFailed
         response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorPauseFailed")
@@ -249,13 +242,10 @@ module Lita
           datacenter: datacenter,
           redis: redis,
           client: @clients[datacenter],
-          log: log,
-        )
-
+          log: log)
         hosts.each do |host|
           maintenance_supervisor.stop_maintenance(
-            host: host,
-          )
+            host: host)
         end
 
         if hosts.length > 0
@@ -294,24 +284,20 @@ module Lita
         every(config.monitor_interval_seconds) do |timer|
           begin # outer catch block: to keep things moving (handled)
           log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] executing run_monitors")
-          zabbixmon = ::Zabbix::Zabbixmon.new(
-            redis: redis,
-            zbx_client: @clients[@datacenter],
-            log: log,
-            zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
-            zbx_username: config.zabbix_user,
-            zbx_password: config.zabbix_password,
-            datacenter: datacenter,
-          )
           config.datacenters.each do |datacenter|
-
+            zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
+                zbx_client: @clients[datacenter],
+                log: log,
+                zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
+                zbx_username: config.zabbix_user,
+                zbx_password: config.zabbix_password,
+                datacenter: datacenter)
             begin # inner catch block: to be able to "see" what happened on failure (unhandled)
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
                 redis: redis,
                 log: log,
-                client: @clients[datacenter]
-              )
+                client: @clients[datacenter])
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
@@ -331,17 +317,14 @@ module Lita
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
             end
           end
-
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
             debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
-            monitor_fail_notify(
-              ::Zabbix::Zabbixmon::MONITOR_NAME,
+            monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
               'N/A',
               MONITOR_FAIL_ERRMSG,
               config.monitor_hipchat_notify,
-              config.paging_monitors.include?(zabbixmon.monitor_name)
-            )
+              config.paging_monitors.include?(zabbixmon.monitor_name))
           end
         end
       end
@@ -357,11 +340,9 @@ module Lita
       end
 
       def build_zabbix_client(datacenter:)
-        ::Zabbix::Client.new(
-          url: config.zabbix_url.gsub(/%datacenter%/, datacenter),
+        ::Zabbix::Client.new(url: config.zabbix_url.gsub(/%datacenter%/, datacenter),
           user: config.zabbix_user,
-          password: config.zabbix_password,
-        )
+          password: config.zabbix_password)
       end
 
       def parse_options(options)
@@ -369,12 +350,10 @@ module Lita
       end
 
       def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, pagerduty_alert)
-
         if pagerduty_alert
           log.info("Paging sequence initiated. Paging pagerduty.")
           page_r_doodie(error_msg, data_center)
         end
-
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
         log.info("Telling hipchat channel #{@status_room}: #{whining}")
         robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
