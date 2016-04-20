@@ -20,7 +20,7 @@ module Lita
       PagerFailed = Class.new(StandardError)
 
       # config: zabbix
-      config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
+      config :zabbix_url, default: "http://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
@@ -283,7 +283,7 @@ module Lita
       def run_monitors(payload)
         every(config.monitor_interval_seconds) do |timer|
           begin # outer catch block: to keep things moving (handled)
-          log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] executing run_monitors")
+          log.info("[lita-zabbix] executing run_monitors")
           config.datacenters.each do |datacenter|
             zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
                 zbx_client: @clients[datacenter],
