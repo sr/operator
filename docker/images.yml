@@ -1,4 +1,15 @@
 images:
+  # Stable base images
   docker.dev.pardot.com/base/centos:7:
     build: centos/7
     pull: true
+
+  # Pardot/pardot base images
+  docker.dev.pardot.com/base/pardot/app:
+    build: pardot/app
+  docker.dev.pardot.com/base/pardot/redis:
+    build: pardot/redis
+  docker.dev.pardot.com/base/pardot/rmux:
+    build: pardot/rmux
+  docker.dev.pardot.com/base/pardot/mysql:
+    build: pardot/mysql
