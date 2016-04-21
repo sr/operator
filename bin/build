@@ -109,8 +109,9 @@ do
             true
             ;;
         terraform)
-            find src/terraform/ -mindepth 2 -type d -print0 |
-            xargs -0 -n1 terraform validate
+            # TODO(sr) Turn on terraform suite
+            # find src/terraform/ -mindepth 2 -type d -print0 |
+            # xargs -0 -n1 terraform validate
             ;;
         *)
             exit 1
