@@ -87,7 +87,7 @@ RUN mkdir -p ~/.ssh && \
 
 # GeoIP
 RUN mkdir -p /var/www && \
-  curl -L https://${artifactory_host}/artifactory/pd-tarball/bamboo-elastic-instance/geoip.tgz | tar -xzv
+  curl -L https://${artifactory_host}/artifactory/pd-tarball/bamboo-elastic-instance/geoip.tgz | tar -xzv -C /var/www
 
 # Make room for demo fixtures
 RUN mkdir -p /opt/pardot

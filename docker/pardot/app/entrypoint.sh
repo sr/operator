@@ -14,6 +14,7 @@ done
 
 mkdir -p /app/cache
 chown -R apache:apache /app/cache
+mkdir -p /app/log
 chown -R apache:apache /app/log
 
 mkdir -p /tmp/httpd.core
