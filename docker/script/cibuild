@@ -3,7 +3,7 @@ set -eo pipefail
 
 dir=$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)
 
-"$dir/build" --all
+"$dir/build" --all --artifactory-host="artifactory-internal.dev.pardot.com"
 
 head="$(git rev-parse HEAD)"
 master="$(git rev-parse origin/master)"

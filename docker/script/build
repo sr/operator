@@ -4,11 +4,16 @@ require "yaml"
 require "optparse"
 
 all = false
+artifactory_host = "artifactory.dev.pardot.com"
 parser = OptionParser.new { |opts|
   opts.banner = "Usage: build [--all] image [image...]"
 
   opts.on("-a", "--all", "Build all images") do
     all = true
+  end
+
+  opts.on("--artifactory-host=HOST", "Sets the artifactory_host build argument (default: artifactory.dev.pardot.com)") do |arg|
+    artifactory_host = arg
   end
 }
 parser.parse!
@@ -29,13 +34,17 @@ images.each do |image|
 end
 
 images.each do |image|
-  system(*[
+  docker_cmd = [
     File.join(File.dirname(__FILE__), "docker"),
     "build",
-    all_images[image].fetch("pull", false) ? "--pull" : nil,
+    "--build-arg", "artifactory_host=#{artifactory_host}",
     "-t", image,
+    all_images[image].fetch("pull", false) ? "--pull" : nil,
     all_images[image].fetch("build")
-  ].compact)
+  ].compact
+
+  puts "+ #{docker_cmd.inspect}"
+  system(*docker_cmd)
 
   exit $?.exitstatus unless $?.success?
 end
