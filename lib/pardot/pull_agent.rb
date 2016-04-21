@@ -1,7 +1,9 @@
 require "cgi"
+require "erb"
 require "json"
 require "net/http"
 require "socket"
+require "yaml"
 
 require "artifactory"
 require "redis"
