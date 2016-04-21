@@ -98,10 +98,7 @@ for project in $projects
 do
     case "$project" in
         pardot-explorer)
-            lint-ruby src/pardot-explorer
-            compose pardot-explorer build --pull
-            compose pardot-explorer run app sleep 30
-            compose pardot-explorer run app script/test
+            build-ruby "$project"
             ;;
         teampass)
             true
