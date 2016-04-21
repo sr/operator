@@ -90,6 +90,11 @@ then
         then projects="${projects}${projectname} "
         fi
     done
+
+    # Workaround for <https://github.com/docker/libnetwork/issues/1113>
+    # Please remove when the bug is resolved, and a fixed version deployed
+    sudo /bin/systemctl restart docker.service
+    sleep 5
 fi
 
 # List all projects if --all was given
