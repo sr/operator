@@ -40,16 +40,17 @@ module Zabbix
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
         monitor_success = retrieve_payload
+        @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
       end
 
       # work is done! Establish pass/fail here
       if monitor_success
-        @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
+        @log.info("[#{monitor_name}] successfully retrieved payload (#{retry_sz})")
         @hard_failure = nil
       else
         @hard_failure ||= @soft_failures.to_a.join('; ')
-        @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
+        @log.error("[#{monitor_name}] has hard failed: #{@hard_failure}")
       end
     end
 
@@ -85,7 +86,7 @@ module Zabbix
       end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
       if zbx_items
         if zbx_items.length > 0  # success case
-          @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{@zbx_host} (#{retry_sz})")
+          @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{@zbx_host} ")
           success = true
         else # fail case
           @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
@@ -93,7 +94,6 @@ module Zabbix
       else # fail case
         @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
       end
-      @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless success
       success
     end
 
