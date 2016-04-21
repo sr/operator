@@ -65,7 +65,7 @@ then
         # modified, such as configuration files or the build script itself.
         # This is a rather radical and simplistic heuristic but it is better to
         # err on the safe side and build too much than too little.
-        treename="$(printf "$path" | cut -d/ -f1)"
+        treename="$(echo "$path" | cut -d/ -f1)"
         if [ "$treename" != "src" ]
         then
             buildall=true
@@ -73,7 +73,7 @@ then
         fi
 
         # Collect all projects that were modified in this change set.
-        projectname="$(printf "$path" | cut -d/ -f2)"
+        projectname="$(echo "$path" | cut -d/ -f2)"
         seen=false
         for i in $projects
         do test "$i" = "$projectname" && seen=true
