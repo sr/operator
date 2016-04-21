@@ -109,8 +109,7 @@ do
             build-ruby "$project"
             ;;
         teampass)
-            # TODO(sr) Verify the teampass Docker image builds
-            true
+            docker build -f src/teampass/Dockerfile src/teampass
             ;;
         terraform)
             # TODO(sr) Turn on terraform suite
