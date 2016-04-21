@@ -21,7 +21,7 @@ module Lita
 
       # config: zabbix
       config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
-      config :zabbix_hostname, default: 'zabbix-%datacenter%.pardot.com'
+      config :zabbix_hostname, default: "zabbix-%datacenter%.pardot.com"
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
 
@@ -286,15 +286,6 @@ module Lita
           begin # outer catch block: to keep things moving (handled)
           log.info("[lita-zabbix] executing run_monitors")
           config.datacenters.each do |datacenter|
-            zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
-                zbx_client: @clients[datacenter],
-                log: log,
-                zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
-                zbx_username: config.zabbix_user,
-                zbx_password: config.zabbix_password,
-                datacenter: datacenter)
-            log.debug("[lita-zabbix] zabbixmon: #{zabbixmon.to_s}")
-
             begin # inner catch block: to be able to "see" what happened on failure (unhandled)
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
@@ -304,6 +295,13 @@ module Lita
               log.debug("[lita-zabbix] monitor_supervisor: #{monitor_supervisor.to_s}")
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
+                  zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
+                                                      zbx_client: @clients[datacenter],
+                                                      log: log,
+                                                      zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
+                                                      zbx_username: config.zabbix_user,
+                                                      zbx_password: config.zabbix_password,
+                                                      datacenter: datacenter)
                   log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
                   zabbixmon.monitor(config.monitor_retries,
                     config.monitor_retry_interval_seconds,
