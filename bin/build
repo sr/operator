@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-#/ Usage: build [--ci] [--all] [<project...>]
+#/ Usage: build [--help] [--ci] [--all] [<project...>]
+#/ Build program for the BREAD team repository.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -37,11 +38,16 @@ do
     esac
 done
 
+# In CI mode (enabled on Bamboo by default) this analyzes the diff to figure
+# out what project(s) need(s) building. A projects is defined as a subdirectory
+# of the src/ directory.
 if $cimode
 then
     sha1a="${bamboo_repository_previous_revision_number:-""}"
     sha1b="${bamboo_repository_revision_number:-"HEAD"}"
 
+    # It is unclear when this can happen as of yet so we just bail out if it
+    # does for now.
     if [ -z "$sha1a" ]
     then
         echo "Unable to complete build without a base SHA1" 2>&1
@@ -66,8 +72,7 @@ then
             break
         fi
 
-        # List all projects that were modified in this change set. Projects
-        # are defined as direct subtrees of the src/ tree.
+        # Collect all projects that were modified in this change set.
         projectname="$(printf "$path" | cut -d/ -f2)"
         seen=false
         for i in $projects
@@ -84,12 +89,18 @@ then
     sleep 5
 fi
 
-# List all projects if --all was given
+# Build all projects if --all was given.
 if $buildall
 then projects="$(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2)"
 fi
 
-# Iterate over all selected projects, either explicitly or because of CI mode
+# Bail out if there is nothing to build.
+test -z "$projects"  && {
+    echo "Nothing to build." 2>&1
+    exit 1
+}
+
+# Iterate over all selected projects, either explicitly or because of CI mode,
 # and execute the build commands in sequence.
 for project in $projects
 do
@@ -98,6 +109,7 @@ do
             build-ruby "$project"
             ;;
         teampass)
+            # TODO(sr) Verify the teampass Docker image builds
             true
             ;;
         terraform)
@@ -106,6 +118,7 @@ do
             # xargs -0 -n1 terraform validate
             ;;
         *)
+            echo "No build rule defined for project \"$project\"." 2>&1
             exit 1
             ;;
     esac
