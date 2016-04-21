@@ -112,9 +112,10 @@ do
             docker build -f src/teampass/Dockerfile src/teampass
             ;;
         terraform)
-            # TODO(sr) Turn on terraform suite
-            # find src/terraform/ -mindepth 2 -type d -print0 |
-            # xargs -0 -n1 terraform validate
+            docker build -f etc/Dockerfile.terraform -t build/terraform .
+            docker run --rm -v "$(pwd):/data" \
+                build/terraform \
+                make -C src/terraform validate
             ;;
         *)
             echo "No build rule defined for project \"$project\"." 2>&1
