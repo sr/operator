@@ -22,6 +22,7 @@ module Zabbix
       @zbx_password = zbx_password
       @datacenter = datacenter
       @hard_failure = nil
+      @soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
     end
 
     attr_accessor :hard_failure
@@ -31,41 +32,14 @@ module Zabbix
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
-      url="#{url.gsub(/%datacenter%/, @datacenter)}#{payload}"
       monitor_success = false
-      soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
-      @log.debug("[#{monitor_name}] value generated: #{payload}")
-      payload_delivery_response_code = deliver_zabbixmon_payload url, timeout_seconds
-      if payload_delivery_response_code =~ /20./
-        @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
-      else
-        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! : #{ERR_NON_200_HTTP_CODE}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! ERROR = '#{ERR_NON_200_HTTP_CODE}'")
-      end
+      insert_payload(payload)
 
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
-        begin # get zabbix item
-          apiresponse = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
-          zbx_items = apiresponse['result']
-          @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
-        rescue => e
-          @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-          soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-        end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
-        if zbx_items
-          if zbx_items.length > 0  # success case
-            @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{@zbx_host} (#{retry_sz})")
-            monitor_success = true
-          else # fail case
-            soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
-          end
-        else # fail case
-          soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
-        end
-        @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
+        monitor_success = retrieve_payload
         retry_attempt_iterator += 1
       end
 
@@ -74,7 +48,7 @@ module Zabbix
         @log.info("[#{monitor_name}] 's work is done here. There is no issue to report. (successkid)")
         @hard_failure = nil
       else
-        @hard_failure ||= soft_failures.to_a.join('; ')
+        @hard_failure ||= @soft_failures.to_a.join('; ')
         @log.error("[#{monitor_name}] has hard failed: #{@hard_failure} ")
       end
     end
@@ -84,6 +58,45 @@ module Zabbix
     end
 
     private
+    def insert_payload(payload)
+      url="#{url.gsub(/%datacenter%/, @datacenter)}#{payload}"
+      @log.debug("[#{monitor_name}] value generated: #{payload}")
+
+      payload_delivery_response = deliver_zabbixmon_payload url, timeout_seconds
+
+      if payload_delivery_response.code =~ /20./
+        @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
+      else
+        err = "#{payload_delivery_response.code} : #{payload_delivery_response.body}"
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
+      end
+    end
+
+    def retrieve_payload()
+      begin # get zabbix item
+        success = false
+        apiresponse = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
+        zbx_items = apiresponse['result']
+        @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
+      rescue => e
+        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
+        @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
+      end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
+      if zbx_items
+        if zbx_items.length > 0  # success case
+          @log.info("[#{monitor_name}] successfully observed '#{ZBXMON_KEY} : #{payload}' from #{@zbx_host} (#{retry_sz})")
+          success = true
+        else # fail case
+          @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
+        end
+      else # fail case
+        @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
+      end
+      @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless success
+      success
+    end
+
     def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI(url)
@@ -92,7 +105,7 @@ module Zabbix
       res = Net::HTTP.start(uri.host, uri.port, :ENV, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }
-      res.code
+      res
     rescue Timeout::Error
       @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
