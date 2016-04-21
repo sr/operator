@@ -1,0 +1,50 @@
+Lint/UnusedMethodArgument:
+  Enabled: true
+  Severity: error
+Lint/HandleExceptions:
+  Enabled: true
+  Severity: error
+Rails/Delegate:
+  Enabled: false
+Style/AlignParameters:
+  Enabled: false
+Style/TrailingCommaInLiteral:
+  Enabled: true
+  Severity: error
+Style/DoubleNegation:
+  Enabled: true
+  Severity: error
+Style/Documentation:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Style/Send:
+  Enabled: true
+  Severity: error
+Style/SpecialGlobalVars:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+  Severity: error
+Style/TrailingCommaInArguments:
+  Enabled: false
+Style/NegatedIf:
+  Enabled: false
+Style/WordArray:
+  Enabled: true
+  EnforcedStyle: percent
+  Severity: error
+Style/PercentLiteralDelimiters:
+  Enabled: true
+  Severity: error
+  PreferredDelimiters:
+    '%w': '[]'
+    '%W': '[]'
+AllCops:
+  Exclude:
+    - "src/**/bin/*"
+    - "src/**/db/schema.rb"
+    - "src/**/vendor/cache/**/*"
