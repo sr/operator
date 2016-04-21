@@ -27,7 +27,7 @@ module Zabbix
     attr_accessor :hard_failure
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
-    def monitor(url:, num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
+    def monitor(url, num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
