@@ -34,7 +34,7 @@ module Zabbix
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
       monitor_success = false
 
-      insert_payload(payload)
+      insert_payload(payload, url)
 
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
@@ -59,11 +59,10 @@ module Zabbix
     end
 
     private
-    def insert_payload(payload)
-      url="#{url.gsub(/%datacenter%/, @datacenter)}#{payload}"
+    def insert_payload(payload, url)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
 
-      payload_delivery_response = deliver_zabbixmon_payload url, timeout_seconds
+      payload_delivery_response = deliver_zabbixmon_payload "#{url.gsub(/%datacenter%/, @datacenter)}#{payload}", timeout_seconds
 
       if payload_delivery_response.code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
