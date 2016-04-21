@@ -295,27 +295,11 @@ module Lita
                 client: @clients[datacenter])
               log.debug("[lita-zabbix] monitor_supervisor: #{monitor_supervisor.to_s}")
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
+
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
-                  zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
-                    zbx_client: @clients[datacenter],
-                    zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
-                    zbx_username: config.zabbix_user,
-                    zbx_password: config.zabbix_password,
-                    datacenter: datacenter,
-                    log: log)
-                  log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-                  zabbixmon.monitor(config.zabbix_monitor_payload_url,
-                    config.monitor_retries,
-                    config.monitor_retry_interval_seconds,
-                    config.monitor_http_timeout_seconds)
-                  log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
-                  monitor_fail_notify(zabbixmon.monitor_name,
-                    datacenter,
-                    zabbixmon.hard_failure,
-                    config.monitor_hipchat_notify,
-                    config.paging_monitors.include?(zabbixmon.monitor_name)
-                  ) unless zabbixmon.hard_failure.nil?
+                  monitor_zabbix
                 end
+
               end
             rescue => e
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
@@ -344,6 +328,30 @@ module Lita
           response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(", ")}")
           false
         end
+      end
+
+      def monitor_zabbix()
+        zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
+          zbx_client: @clients[datacenter],
+          zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
+          zbx_username: config.zabbix_user,
+          zbx_password: config.zabbix_password,
+          datacenter: datacenter,
+          log: log)
+        log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
+        zabbixmon.monitor(config.zabbix_monitor_payload_url,
+          config.monitor_retries,
+          config.monitor_retry_interval_seconds,
+          config.monitor_http_timeout_seconds)
+        log.info(
+          "[#{::Zabbix::Zabbixmon::MONITOR_NAME}] #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful."
+        ) if zabbixmon.hard_failure.nil?
+        monitor_fail_notify(zabbixmon.monitor_name,
+          datacenter,
+          zabbixmon.hard_failure,
+          config.monitor_hipchat_notify,
+          config.paging_monitors.include?(zabbixmon.monitor_name)
+        ) unless zabbixmon.hard_failure.nil?
       end
 
       def build_zabbix_client(datacenter:)

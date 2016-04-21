@@ -33,7 +33,6 @@ module Zabbix
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
       monitor_success = false
-
       insert_payload(payload, url)
 
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
@@ -44,7 +43,6 @@ module Zabbix
         retry_attempt_iterator += 1
       end
 
-      # work is done! Establish pass/fail here
       if monitor_success
         @log.info("[#{monitor_name}] successfully retrieved payload (#{retry_sz})")
         @hard_failure = nil
