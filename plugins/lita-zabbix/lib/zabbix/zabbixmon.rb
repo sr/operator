@@ -59,7 +59,6 @@ module Zabbix
     private
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
-
       payload_delivery_response = deliver_zabbixmon_payload "#{url.gsub(/%datacenter%/, @datacenter)}#{payload}", timeout_seconds
 
       if payload_delivery_response.code =~ /20./
@@ -102,7 +101,6 @@ module Zabbix
       res = Net::HTTP.start(uri.host, uri.port, :ENV, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }
-      res
     rescue Timeout::Error
       @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
