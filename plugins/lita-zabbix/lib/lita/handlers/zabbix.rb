@@ -297,7 +297,7 @@ module Lita
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
 
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
-                  monitor_zabbix
+                  monitor_zabbix(datacenter)
                 end
 
               end
@@ -330,7 +330,7 @@ module Lita
         end
       end
 
-      def monitor_zabbix()
+      def monitor_zabbix(datacenter:)
         zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
           zbx_client: @clients[datacenter],
           zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
