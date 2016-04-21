@@ -91,7 +91,7 @@ fi
 
 # Build all projects if --all was given.
 if $buildall
-then projects="$(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2)"
+then projects="$(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2) shell"
 fi
 
 # Bail out if there is nothing to build.
@@ -107,6 +107,12 @@ do
     case "$project" in
         pardot-explorer)
             build-ruby "$project"
+            ;;
+        shell)
+            docker build -f etc/Dockerfile.shellcheck -t build/shellcheck .
+            docker run --rm -v "$(pwd):/data" \
+                build/shellcheck \
+                shellcheck -f gcc bin/*
             ;;
         teampass)
             docker build -f src/teampass/Dockerfile src/teampass
