@@ -89,7 +89,7 @@ module Zabbix
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
       req.basic_auth @zbx_username, @zbx_password
-      res = Net::HTTP.start(uri, uri.port, :read_timeout => timeout_seconds) {|http|
+      res = Net::HTTP.start(uri.host, uri.port, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }
       res.code
