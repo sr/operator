@@ -31,6 +31,7 @@ module Zabbix
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
+      url="#{url.gsub(/%datacenter%/, @datacenter)}#{payload}"
       monitor_success = false
       soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
