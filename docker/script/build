@@ -29,13 +29,13 @@ images.each do |image|
 end
 
 images.each do |image|
-  system(
+  system(*[
     File.join(File.dirname(__FILE__), "docker"),
     "build",
-    "--pull",
+    all_images[image].fetch("pull", false) ? "--pull" : nil,
     "-t", image,
     all_images[image].fetch("build")
-  )
+  ].compact)
 
   exit $?.exitstatus unless $?.success?
 end
