@@ -4,7 +4,7 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
   include ZabbixTestHelpers
 
   before do
-    registry.config.handlers.zabbix.zabbix_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
+    registry.config.handlers.zabbix.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
   end
 
   describe "!zabbix maintenance start" do
