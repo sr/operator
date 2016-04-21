@@ -101,7 +101,4 @@ ADD supervisord.conf /etc/supervisord.conf
 ADD entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-ADD . /app
-WORKDIR /app
-
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
