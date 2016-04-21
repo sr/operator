@@ -9,7 +9,6 @@ module Zabbix
     ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ZABBIX_ITEM_NOT_FOUND = "HAL9000 searched for an iteam w/ a particluar key and value, but did not find it. This is bad."
-    ZBXMON_TEST_API_ENDPOINT = 'cgi-bin/zabbix-server-check.sh'
     ZBXMON_ITEM = 'system:general'
     ZBXMON_KEY = 'zabbix_status'
     ZBXMON_PAYLOAD_LENGTH = 10
@@ -28,11 +27,10 @@ module Zabbix
     attr_accessor :hard_failure
 
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
-    def monitor(num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
+    def monitor(url:, num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
       retry_attempt_iterator = 0
       retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
-      url = "https://#{@zbx_host}/#{ZBXMON_TEST_API_ENDPOINT}?#{payload}"
       monitor_success = false
       soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
 
@@ -90,7 +88,7 @@ module Zabbix
       uri = URI(url)
       req = Net::HTTP::Get.new(uri)
       req.basic_auth @zbx_username, @zbx_password
-      res = Net::HTTP.start(uri.hostname, uri.port, :read_timeout => timeout_seconds) {|http|
+      res = Net::HTTP.start(uri, uri.port, :read_timeout => timeout_seconds) {|http|
         http.request(req)
       }
       res.code

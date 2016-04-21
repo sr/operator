@@ -20,8 +20,9 @@ module Lita
       PagerFailed = Class.new(StandardError)
 
       # config: zabbix
-      config :zabbix_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
-      config :zabbix_hostname, default: "zabbix-%datacenter%.pardot.com"
+      config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
+      config :zabbix_monitor_payload_url, default: "https://zabbix-%datacenter%.pardot.com/cgi-bin/zabbix-server-check.sh?"
+      config :zabbix_hostname, default: ""
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
 
@@ -277,7 +278,7 @@ module Lita
       end
 
       def monitor_expired(monitorname)
-        robot.send_message(@status_room, "/me is unpausing #{monitorname}")
+        robot.send_message(@status_room, "/me is unpausing #{monitorname} (warning)")
       end
 
       def run_monitors(payload)
@@ -296,14 +297,15 @@ module Lita
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
-                                                      zbx_client: @clients[datacenter],
-                                                      log: log,
-                                                      zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
-                                                      zbx_username: config.zabbix_user,
-                                                      zbx_password: config.zabbix_password,
-                                                      datacenter: datacenter)
+                    zbx_client: @clients[datacenter],
+                    zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
+                    zbx_username: config.zabbix_user,
+                    zbx_password: config.zabbix_password,
+                    datacenter: datacenter,
+                    log: log)
                   log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-                  zabbixmon.monitor(config.monitor_retries,
+                  zabbixmon.monitor(config.zabbix_monitor_payload_url,
+                    config.monitor_retries,
                     config.monitor_retry_interval_seconds,
                     config.monitor_http_timeout_seconds)
                   log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] monitoring for #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
@@ -345,7 +347,7 @@ module Lita
       end
 
       def build_zabbix_client(datacenter:)
-        ::Zabbix::Client.new(url: config.zabbix_url.gsub(/%datacenter%/, datacenter),
+        ::Zabbix::Client.new(url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
           user: config.zabbix_user,
           password: config.zabbix_password)
       end
