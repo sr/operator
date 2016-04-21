@@ -61,6 +61,11 @@ then
         exit 1
     fi
 
+    # If the two SHA1s are identical it most likely means this is a restarted
+    # build, in which case we trigger a full build.
+    test "$sha1a" = "$sha1b" &&
+    buildall=true
+
     for path in $(git diff --name-only "${sha1a}..${sha1b}")
     do
         # Trigger a complete rebuild if anything other than the src/ tree was
