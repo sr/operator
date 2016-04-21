@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+
+: "${RAILS_ENV:="development"}"
+
+if [ "$RAILS_ENV" != "development" ] && [ "$RAILS_ENV" != "test" ]
+then
+    echo "script/$(basename "$0") should never run in ${RAILS_ENV} environment"
+    exit 1
+fi
+
+for dbname in pardot_global pardot_shard1 pardot_shard2
+do
+    dump="db/vagrant-dev/${dbname}.sql"
+    echo "==> Importing $dump into database $dbname"
+    mysqladmin -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+        create "$dbname" 2>/dev/null || true
+    mysql -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
+done

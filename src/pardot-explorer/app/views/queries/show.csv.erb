@@ -1,0 +1,5 @@
+<% require 'csv' %>
+<%= @result.fields.to_csv.strip %>
+<% @result.each do |fields| %>
+<%= fields.to_csv.strip %>
+<% end %>

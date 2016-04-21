@@ -1,0 +1,21 @@
+version: "2"
+services:
+  mysql:
+    image: mysql:5.5
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  app:
+    build: .
+    environment:
+      PORT: "4000"
+      BIND: "0.0.0.0"
+      DATABASE_HOST: "mysql"
+      DATABASE_PORT: 3306
+    volumes:
+      - .:/app
+    ports:
+      - "4000:4000"
+    links:
+      - mysql

@@ -1,0 +1,25 @@
+#!/bin/sh
+# script/test: Run test suite for application. Optionallly pass in a path to an
+#              individual test file to run a single test.
+set -eu
+
+cd "$(dirname "$0")/.."
+
+: "${DEBUG:=""}"
+[ -z "$DEBUG" ] || set -x
+
+RACK_ENV="test"
+RAILS_ENV="test"
+RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
+export RACK_ENV RAILS_ENV RACK_ROOT
+
+script/setup
+script/vagrant-dev-mysqlimport
+
+echo "===> Running tests..."
+
+if [ -n "${1:-""}" ]; then
+  bin/rake test "$1"
+else
+  bin/rake
+fi

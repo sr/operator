@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pardot Explorer</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag '//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css', media: 'all' %>
+  <%= stylesheet_link_tag '//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css' %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <header role="banner">
+    <div class="navbar-header">
+        <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class: "img-responsive" %></a>
+        <span class="title">Pardot Explorer</span>
+    </div>
+  </header>
+  <aside role="navigation">
+    <nav>
+      <ul class="nav nav-stacked">
+        <li class="li-label"><span>Database</span></li>
+        <li>
+          <a href="/queries"><i class="fa fa-globe"></i>Global</a>
+        </li>
+        <li>
+          <a href="/accounts"><i class="fa fa-cloud"></i>Account</a>
+        </li>
+        <li class="newsection">
+          <%= link_to "Access Log", "https://logs.pardot.com/?q=TODO(sr)" %>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <%= yield %>
+  </div>
+</body>
+</html>
