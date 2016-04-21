@@ -37,7 +37,7 @@ resource "aws_instance" "pull_agent_dev" {
     delete_on_termination = true
   }
   tags {
-    Name = "pull_agent_dev"
+    Name = "pardot0-pullagent1-1-ue1"
     terraform = true
   }
 }
