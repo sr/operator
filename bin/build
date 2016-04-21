@@ -13,19 +13,6 @@ usage() {
     exit 1
 }
 
-compose() {
-    project="$1"
-    shift
-
-    config="src/${project}/docker-compose.yml"
-    test -f "$config" || {
-        echo "$project project is missing a docker-compose.yml config file." 2>&1
-        exit 1
-    }
-
-    docker-compose -p "$project" -f "$config" "$@"
-}
-
 cimode=false
 buildall=false
 projects=""
