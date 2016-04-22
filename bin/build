@@ -43,45 +43,51 @@ done
 # of the src/ directory.
 if $cimode
 then
+    branch="${bamboo_planRepository_branch:-"$(git rev-parse --abbrev-ref HEAD)"}"
     sha1a="${bamboo_repository_previous_revision_number:-""}"
     sha1b="${bamboo_repository_revision_number:-"HEAD"}"
 
     # It is unclear when this can happen as of yet so we just bail out if it
-    # does for now.
-    if [ -z "$sha1a" ]
+    # does for now. If this is a topic branch build, compare the list of
+    # changed files against the remote master branch.
+    if [ "$branch" = "master" ] && [ -z "$sha1a" ]
     then
-        echo "Unable to complete build without a base SHA1" 2>&1
+        echo "Unable to build master branch without a base SHA1" 2>&1
         exit 1
+    else
+        sha1b="$(git rev-parse origin/master)"
     fi
 
     # If the two SHA1s are identical it most likely means this is a restarted
-    # build, in which case we trigger a full build.
-    test "$sha1a" = "$sha1b" &&
-    buildall=true
+    # build, in which case a full build is triggered. Otherwise this analyzes
+    # the list of files that were modified between the last build and this one.
+    if test "$sha1a" = "$sha1b"
+    then buildall=true
+    else
+        for path in $(git diff --name-only "${sha1a}..${sha1b}")
+        do
+            # Trigger a complete rebuild if anything other than the src/ tree was
+            # modified, such as configuration files or the build script itself.
+            # This is a rather radical and simplistic heuristic but it is better to
+            # err on the safe side and build too much than too little.
+            treename="$(echo "$path" | cut -d/ -f1)"
+            if [ "$treename" != "src" ]
+            then
+                buildall=true
+                break
+            fi
 
-    for path in $(git diff --name-only "${sha1a}..${sha1b}")
-    do
-        # Trigger a complete rebuild if anything other than the src/ tree was
-        # modified, such as configuration files or the build script itself.
-        # This is a rather radical and simplistic heuristic but it is better to
-        # err on the safe side and build too much than too little.
-        treename="$(echo "$path" | cut -d/ -f1)"
-        if [ "$treename" != "src" ]
-        then
-            buildall=true
-            break
-        fi
-
-        # Collect all projects that were modified in this change set.
-        projectname="$(echo "$path" | cut -d/ -f2)"
-        seen=false
-        for i in $projects
-        do test "$i" = "$projectname" && seen=true
+            # Collect all projects that were modified in this change set.
+            projectname="$(echo "$path" | cut -d/ -f2)"
+            seen=false
+            for i in $projects
+            do test "$i" = "$projectname" && seen=true
+            done
+            if ! $seen
+            then projects="${projects}${projectname} "
+            fi
         done
-        if ! $seen
-        then projects="${projects}${projectname} "
-        fi
-    done
+    fi
 
     # Workaround for <https://github.com/docker/libnetwork/issues/1113>
     # Please remove when the bug is resolved, and a fixed version deployed
@@ -96,7 +102,8 @@ if $buildall
 then projects="shell $(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2)"
 fi
 
-# Bail out if there is nothing to build.
+# Bail out in case there is nothing to build. This typically does should not
+# happen during normal usage and is therefore considered an error.
 test -z "$projects"  && {
     echo "Nothing to build." 2>&1
     exit 1
