@@ -144,9 +144,8 @@ module Lita
         end
         response.reply_with_mention("#{msg}")
       rescue => e
-        errmsg = "Error polling for Zabbix monitor status: #{e}".gsub(config.zabbix_password, '**************')
-        log.error(errmsg)
-        response.reply_with_mention(errmsg)
+        response.reply_with_mention("Sorry, something went wrong.")
+        log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def monitor_info(response)
@@ -200,7 +199,8 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
+        response.reply_with_mention("Sorry, something went wrong.")
+        log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def pause_monitor(response)
@@ -228,8 +228,9 @@ module Lita
           monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME,
           until_time: until_time)
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
-      rescue ::Lita::Handlers::Zabbix::MonitorPauseFailed
-        response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorPauseFailed")
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong.")
+        log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def stop_maintenance(response)
@@ -255,7 +256,8 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
+        response.reply_with_mention("Sorry, something went wrong.")
+        log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def unpause_monitor(response)
@@ -268,8 +270,9 @@ module Lita
           log: log,
         ).unpause_monitor(monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
-      rescue ::Lita::Handlers::Zabbix::MonitorUnpauseFailed
-        response.reply_with_mention("Sorry, something went wrong: ::Lita::Handlers::Zabbix::MonitorUnpauseFailed")
+      rescue => e
+        response.reply_with_mention("Sorry, something went wrong.")
+        log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
 
@@ -369,8 +372,8 @@ module Lita
           log.info("Paging sequence initiated. Paging pagerduty.")
           page_r_doodie(error_msg, data_center)
         end
-        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}: #{error_msg}"
-        log.info("Telling hipchat channel #{@status_room}: #{whining}")
+        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center} (more detail in logging)"
+        log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
         robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
       end
 

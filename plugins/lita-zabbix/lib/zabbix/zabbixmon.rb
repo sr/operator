@@ -78,7 +78,7 @@ module Zabbix
         @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-        @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
+        @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e).gsub(@zbx_password, '**************'))
       end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
       if zbx_items
         if zbx_items.length > 0  # success case
