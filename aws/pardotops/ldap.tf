@@ -33,6 +33,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "173.192.141.222/32", # tools-s1 (password.pardot.com)
       "67.228.6.68/32"      # auth-d1
     ]
@@ -43,6 +44,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "173.192.141.222/32", # tools-s1 (password.pardot.com)
       "67.228.6.68/32"      # auth-d1
     ]
