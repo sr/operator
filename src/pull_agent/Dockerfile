@@ -14,8 +14,9 @@ RUN mkdir /pull-agent
 RUN mkdir /var/lock/pull-agent
 WORKDIR /pull-agent
 
+ENV RUBYGEM_VERSION 1
 ADD Gemfile /pull-agent/Gemfile
-ADD Gemfile.lock /pull-agent/Gemfile.lock
+ADD pardot_pull-agent.gemspec /pull-agent/pardot_pull-agent.gemspec
 RUN bundle install
 
 ADD . /pull-agent

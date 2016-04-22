@@ -126,7 +126,7 @@ test -z "$projects"  && {
 for project in $projects
 do
     case "$project" in
-        pardot-explorer)
+        pardot-explorer|pull_agent)
             build-ruby "$project"
             ;;
         shell)
