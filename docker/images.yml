@@ -6,6 +6,8 @@ images:
   docker.dev.pardot.com/base/centos:6:
     build: centos/6
     pull: true
+  docker.dev.pardot.com/base/percona-server:5.5:
+    build: percona-server/5.5
 
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
