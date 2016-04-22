@@ -1,0 +1,23 @@
+FROM alpine:3.2
+ENV TERRAFORM_VERSION=0.6.14
+ENV TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+VOLUME ["/data"]
+WORKDIR /data
+CMD ["--help"]
+RUN \
+  apk update \
+  && \
+    apk add \
+      bash \
+      ca-certificates \
+      git \
+      make \
+      openssl \
+      unzip \
+  && \
+    curl -fsSL "$TERRAFORM_URL" -o /tmp/terraform.zip \
+  && \
+    unzip /tmp/terraform.zip -d /usr/bin \
+  && \
+      rm -rf /tmp/* && \
+      rm -rf /var/tmp/*
