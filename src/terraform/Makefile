@@ -5,7 +5,7 @@ TERRAFORM_OPTS =
 DIR = aws/pardotops
 
 .PHONY: plan
-plan: $(DIR)
+plan: $(DIR) validate
 	cd $(DIR) && $(TERRAFORM) plan -out plan.out -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
 
 .PHONY: apply
