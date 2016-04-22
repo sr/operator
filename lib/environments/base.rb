@@ -340,7 +340,7 @@ module Environments
     end
 
     def production?
-      name == "production" || name == "production_dfw"
+      name == "production" || name == "production_dfw" || name == "production_phx"
     end
 
     def valid_payload?(payload_name = nil)
