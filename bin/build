@@ -89,9 +89,11 @@ then
     sleep 5
 fi
 
-# Build all projects if --all was given.
+# Build all projects if --all was given. Note the "shell" project at the
+# beginning which is a sort of special snowflake in that it isn't located
+# under the "src/" directory but still is considered a project.
 if $buildall
-then projects="$(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2) shell"
+then projects="shell $(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2)"
 fi
 
 # Bail out if there is nothing to build.
