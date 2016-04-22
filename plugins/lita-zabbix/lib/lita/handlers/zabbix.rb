@@ -104,7 +104,7 @@ module Lita
             maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
             maintenance_supervisor.ensure_supervising
           rescue => e
-            log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
+            log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, '**************'))
           end
           begin
             monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
@@ -115,7 +115,7 @@ module Lita
             monitor_supervisor.on_monitor_unpaused = proc { |monitor| monitor_expired(monitor) }
             monitor_supervisor.ensure_supervising
           rescue => e
-            log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}")
+            log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, '**************'))
           end
         end
         @status_room = ::Lita::Source.new(room: config.status_room)
@@ -126,7 +126,7 @@ module Lita
       end
 
       def monitor_status(response)
-        msg ="\nMonitor / Status / Paging?"
+        msg = "\nMonitor / Status / Paging?"
         config.active_monitors.each do |active_monitor|
           config.datacenters.each do |datacenter|
             if active_monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
@@ -144,7 +144,7 @@ module Lita
         end
         response.reply_with_mention("#{msg}")
       rescue => e
-        errmsg="Error polling for Zabbix monitor status: #{e}"
+        errmsg = "Error polling for Zabbix monitor status: #{e}".gsub(config.zabbix_password, '**************')
         log.error(errmsg)
         response.reply_with_mention(errmsg)
       end
@@ -200,7 +200,7 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong: #{e}")
+        response.reply_with_mention("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def pause_monitor(response)
@@ -255,7 +255,7 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong: #{e}")
+        response.reply_with_mention("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
       def unpause_monitor(response)
@@ -302,7 +302,7 @@ module Lita
 
               end
             rescue => e
-              log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
+              log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})".gsub(config.zabbix_password, '**************'))
             end
 
           end
