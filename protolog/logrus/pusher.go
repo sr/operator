@@ -10,7 +10,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/golang/protobuf/proto"
-	"github.com/sr/protolog"
+	"github.com/sr/operator/protolog"
 )
 
 var (
@@ -35,11 +35,6 @@ func newPusher(options PusherOptions) *pusher {
 	logger := logrus.New()
 	if options.Out != nil {
 		logger.Out = options.Out
-	}
-	if options.Hooks != nil && len(options.Hooks) > 0 {
-		for _, hook := range options.Hooks {
-			logger.Hooks.Add(hook)
-		}
 	}
 	if options.Formatter != nil {
 		logger.Formatter = options.Formatter

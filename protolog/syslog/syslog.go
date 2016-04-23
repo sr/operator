@@ -6,7 +6,7 @@ package protolog_syslog
 import (
 	"log/syslog"
 
-	"github.com/sr/protolog"
+	"github.com/sr/operator/protolog"
 )
 
 var (
