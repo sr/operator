@@ -10,6 +10,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+type Authorizer interface {
+	Authorize(*Source) error
+}
+
 type Instrumenter interface {
 	Instrument(*Request)
 }
