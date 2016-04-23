@@ -20,8 +20,6 @@ var (
 		protolog.LevelInfo:  logrus.InfoLevel,
 		protolog.LevelWarn:  logrus.WarnLevel,
 		protolog.LevelError: logrus.ErrorLevel,
-		protolog.LevelFatal: logrus.FatalLevel,
-		protolog.LevelPanic: logrus.PanicLevel,
 	}
 )
 

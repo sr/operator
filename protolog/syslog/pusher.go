@@ -13,8 +13,6 @@ var (
 		protolog.LevelInfo:  (*syslog.Writer).Info,
 		protolog.LevelWarn:  (*syslog.Writer).Warning,
 		protolog.LevelError: (*syslog.Writer).Err,
-		protolog.LevelFatal: (*syslog.Writer).Crit,
-		protolog.LevelPanic: (*syslog.Writer).Alert,
 	}
 )
 

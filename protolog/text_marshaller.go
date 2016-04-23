@@ -17,8 +17,6 @@ var (
 		LevelInfo:  color.BlueString(LevelInfo.String()),
 		LevelWarn:  color.YellowString(LevelWarn.String()),
 		LevelError: color.RedString(LevelError.String()),
-		LevelFatal: color.RedString(LevelFatal.String()),
-		LevelPanic: color.RedString(LevelPanic.String()),
 	}
 )
 
