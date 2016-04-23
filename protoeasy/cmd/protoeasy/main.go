@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/sr/operator/protoeasy"
+	"github.com/sr/operator/protolog"
 	"go.pedge.io/env"
-	"go.pedge.io/lion/proto"
 	"go.pedge.io/pkg/cobra"
 )
 
@@ -40,6 +40,7 @@ func do(appEnvObj interface{}) error {
 	appEnv := appEnvObj.(*appEnv)
 	compileOptions := &protoeasy.CompileOptions{}
 	options := &options{}
+	logger := protolog.DefaultLogger
 
 	rootCmd := &cobra.Command{
 		Use: fmt.Sprintf("%s directory", os.Args[0]),
@@ -59,7 +60,7 @@ func do(appEnvObj interface{}) error {
 						return err
 					}
 				} else {
-					protolion.Infof("Using protoeasy options file at %s", fileCompileOptionsPath)
+					logger.Infof("Using protoeasy options file at %s", fileCompileOptionsPath)
 					fileCompileOptions, err := protoeasy.ParseFileCompileOptions(fileCompileOptionsPath)
 					if err != nil {
 						return err
@@ -80,17 +81,17 @@ func do(appEnvObj interface{}) error {
 			if dirPath == "" {
 				return fmt.Errorf("Directory path to base protoeasy compile must either be the first argument if no protoeasy options file found (usually %s)", protoeasy.DefaultFileCompileOptionsFile)
 			}
-			protolion.Infof("Using input directory %s", dirPath)
+			logger.Infof("Using input directory %s", dirPath)
 			outDirPath := dirPath
 			if options.OutDirPath != "" {
 				outDirPath = options.OutDirPath
 			}
-			protolion.Infof("Using output directory %s", outDirPath)
+			logger.Infof("Using output directory %s", outDirPath)
 			data, err := json.Marshal(compileOptions)
 			if err != nil {
 				return err
 			}
-			protolion.Infof("Using compile options %s", string(data))
+			logger.Infof("Using compile options %s", string(data))
 			pkgcobra.Check(run(appEnv, dirPath, outDirPath, compileOptions))
 			return nil
 		}),
@@ -428,7 +429,7 @@ func run(appEnv *appEnv, dirPath string, outDirPath string, compileOptions *prot
 	}
 	for _, command := range commands {
 		if len(command.Arg) > 0 {
-			protolion.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+			logger.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
 		}
 	}
 	return nil
