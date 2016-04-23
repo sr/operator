@@ -193,7 +193,7 @@ func DecompressStream(archive io.Reader) (io.ReadCloser, error) {
 }
 
 // CompressStream compresses the dest with specified compression algorithm.
-func CompressStream(dest io.Writer, compression Compression) (io.WriteCloser, error) {
+func CompressStream(dest io.WriteCloser, compression Compression) (io.WriteCloser, error) {
 	p := pools.BufioWriter32KPool
 	buf := p.Get(dest)
 	switch compression {
@@ -425,19 +425,10 @@ func createTarFile(path, extractDir string, hdr *tar.Header, reader io.Reader, L
 		}
 	}
 
-	var errors []string
 	for key, value := range hdr.Xattrs {
 		if err := system.Lsetxattr(path, key, []byte(value), 0); err != nil {
-			// We ignore errors here because not all graphdrivers support xattrs.
-			errors = append(errors, err.Error())
+			return err
 		}
-
-	}
-
-	if len(errors) > 0 {
-		logrus.WithFields(logrus.Fields{
-			"errors": errors,
-		}).Warn("ignored xattrs in archive: underlying filesystem doesn't support them")
 	}
 
 	// There is no LChmod, so ignore mode for symlink. Also, this
@@ -511,13 +502,13 @@ func TarWithOptions(srcPath string, options *TarOptions) (io.ReadCloser, error) 
 		defer func() {
 			// Make sure to check the error on Close.
 			if err := ta.TarWriter.Close(); err != nil {
-				logrus.Errorf("Can't close tar writer: %s", err)
+				logrus.Debugf("Can't close tar writer: %s", err)
 			}
 			if err := compressWriter.Close(); err != nil {
-				logrus.Errorf("Can't close compress writer: %s", err)
+				logrus.Debugf("Can't close compress writer: %s", err)
 			}
 			if err := pipeWriter.Close(); err != nil {
-				logrus.Errorf("Can't close pipe writer: %s", err)
+				logrus.Debugf("Can't close pipe writer: %s", err)
 			}
 		}()
 
@@ -560,7 +551,7 @@ func TarWithOptions(srcPath string, options *TarOptions) (io.ReadCloser, error) 
 			walkRoot := getWalkRoot(srcPath, include)
 			filepath.Walk(walkRoot, func(filePath string, f os.FileInfo, err error) error {
 				if err != nil {
-					logrus.Errorf("Tar: Can't stat file %s to tar: %s", srcPath, err)
+					logrus.Debugf("Tar: Can't stat file %s to tar: %s", srcPath, err)
 					return nil
 				}
 
@@ -585,42 +576,16 @@ func TarWithOptions(srcPath string, options *TarOptions) (io.ReadCloser, error) 
 				if include != relFilePath {
 					skip, err = fileutils.OptimizedMatches(relFilePath, patterns, patDirs)
 					if err != nil {
-						logrus.Errorf("Error matching %s: %v", relFilePath, err)
+						logrus.Debugf("Error matching %s: %v", relFilePath, err)
 						return err
 					}
 				}
 
 				if skip {
-					// If we want to skip this file and its a directory
-					// then we should first check to see if there's an
-					// excludes pattern (eg !dir/file) that starts with this
-					// dir. If so then we can't skip this dir.
-
-					// Its not a dir then so we can just return/skip.
-					if !f.IsDir() {
-						return nil
-					}
-
-					// No exceptions (!...) in patterns so just skip dir
-					if !exceptions {
+					if !exceptions && f.IsDir() {
 						return filepath.SkipDir
 					}
-
-					dirSlash := relFilePath + string(filepath.Separator)
-
-					for _, pat := range patterns {
-						if pat[0] != '!' {
-							continue
-						}
-						pat = pat[1:] + string(filepath.Separator)
-						if strings.HasPrefix(pat, dirSlash) {
-							// found a match - so can't skip this dir
-							return nil
-						}
-					}
-
-					// No matching exclusion dir so just skip dir
-					return filepath.SkipDir
+					return nil
 				}
 
 				if seen[relFilePath] {
@@ -642,11 +607,7 @@ func TarWithOptions(srcPath string, options *TarOptions) (io.ReadCloser, error) 
 				}
 
 				if err := ta.addTarFile(filePath, relFilePath); err != nil {
-					logrus.Errorf("Can't add file %s to tar: %s", filePath, err)
-					// if pipe is broken, stop writing tar stream to it
-					if err == io.ErrClosedPipe {
-						return err
-					}
+					logrus.Debugf("Can't add file %s to tar: %s", filePath, err)
 				}
 				return nil
 			})
@@ -699,7 +660,7 @@ loop:
 			parent := filepath.Dir(hdr.Name)
 			parentPath := filepath.Join(dest, parent)
 			if _, err := os.Lstat(parentPath); err != nil && os.IsNotExist(err) {
-				err = idtools.MkdirAllNewAs(parentPath, 0777, remappedRootUID, remappedRootGID)
+				err = system.MkdirAll(parentPath, 0777)
 				if err != nil {
 					return err
 				}
@@ -890,17 +851,9 @@ func (archiver *Archiver) CopyWithTar(src, dst string) error {
 	if !srcSt.IsDir() {
 		return archiver.CopyFileWithTar(src, dst)
 	}
-
-	// if this archiver is set up with ID mapping we need to create
-	// the new destination directory with the remapped root UID/GID pair
-	// as owner
-	rootUID, rootGID, err := idtools.GetRootUIDGID(archiver.UIDMaps, archiver.GIDMaps)
-	if err != nil {
-		return err
-	}
 	// Create dst, copy src's content into it
 	logrus.Debugf("Creating dest directory: %s", dst)
-	if err := idtools.MkdirAllNewAs(dst, 0755, rootUID, rootGID); err != nil {
+	if err := system.MkdirAll(dst, 0755); err != nil {
 		return err
 	}
 	logrus.Debugf("Calling TarUntar(%s, %s)", src, dst)

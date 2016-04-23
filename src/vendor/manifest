@@ -30,8 +30,8 @@
 			"importpath": "github.com/docker/docker/pkg/archive",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
-			"branch": "master",
+			"revision": "590d5108bbdaabb05af590f76c9757daceb6d02e",
+			"branch": "HEAD",
 			"path": "/pkg/archive",
 			"notests": true
 		},
@@ -39,7 +39,7 @@
 			"importpath": "github.com/docker/docker/pkg/fileutils",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/fileutils",
 			"notests": true
@@ -48,7 +48,7 @@
 			"importpath": "github.com/docker/docker/pkg/idtools",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/idtools",
 			"notests": true
@@ -57,7 +57,7 @@
 			"importpath": "github.com/docker/docker/pkg/ioutils",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/ioutils",
 			"notests": true
@@ -66,7 +66,7 @@
 			"importpath": "github.com/docker/docker/pkg/pools",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/pools",
 			"notests": true
@@ -75,7 +75,7 @@
 			"importpath": "github.com/docker/docker/pkg/promise",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/promise",
 			"notests": true
@@ -84,7 +84,7 @@
 			"importpath": "github.com/docker/docker/pkg/system",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "9837ec4da53f15f9120d53a6e1517491ba8b0261",
+			"revision": "82141a28f525182ee638d5a63558f9545dcd1a7d",
 			"branch": "master",
 			"path": "/pkg/system",
 			"notests": true
