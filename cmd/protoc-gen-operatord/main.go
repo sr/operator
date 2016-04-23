@@ -9,23 +9,23 @@ import (
 )
 
 const (
-	executable   = "protoc-gen-operatord"
-	mainFileName = "main-gen.go"
+	executable       = "protoc-gen-operatord"
+	servicesFileName = "services-gen.go"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
 	response := make([]*generator.File, len(descriptor.Services)+1)
-	if err := mainTemplate.Execute(&buffer, descriptor); err != nil {
+	if err := servicesTemplate.Execute(&buffer, descriptor); err != nil {
 		return nil, err
 	}
 	response[0] = &generator.File{
-		Name:    mainFileName,
+		Name:    servicesFileName,
 		Content: buffer.String(),
 	}
 	for i, service := range descriptor.Services {
 		buffer.Reset()
-		if err := instrumentedTemplate.Execute(&buffer, service); err != nil {
+		if err := interceptorTemplate.Execute(&buffer, service); err != nil {
 			return nil, err
 		}
 		response[i+1] = &generator.File{
