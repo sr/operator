@@ -141,6 +141,9 @@ do
             then docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
+        chatops)
+            make -f etc/mk/golang.mk
+            ;;
         pardot-explorer)
             build-ruby "$project"
             ;;
