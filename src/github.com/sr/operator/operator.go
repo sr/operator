@@ -7,7 +7,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"go.pedge.io/env"
-	"google.golang.org/grpc"
 )
 
 type Authorizer interface {
@@ -21,12 +20,6 @@ type Instrumenter interface {
 type Logger interface {
 	Info(proto.Message)
 	Error(proto.Message)
-}
-
-type Server interface {
-	LogServiceRegistered(service string)
-	LogServiceStartupError(service string, err error)
-	Serve() error
 }
 
 type Config struct {
@@ -55,20 +48,6 @@ type MethodCommand struct {
 	Name     string
 	Synopsis string
 	Run      func(*CommandContext) (string, error)
-}
-
-func NewServer(
-	server *grpc.Server,
-	config *Config,
-	logger Logger,
-	instrumenter Instrumenter,
-) Server {
-	return newServer(
-		server,
-		config,
-		logger,
-		instrumenter,
-	)
 }
 
 func NewCommand(name string, services []ServiceCommand) Command {
