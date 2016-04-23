@@ -6,10 +6,8 @@ package protolog
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -75,11 +73,6 @@ var (
 		"FATAL": LevelFatal,
 		"PANIC": LevelPanic,
 	}
-
-	globalLogger            = DefaultLogger
-	globalHooks             = make([]GlobalHook, 0)
-	globalRedirectStdLogger = false
-	globalLock              = &sync.Mutex{}
 )
 
 // Level is a logging level.
@@ -103,61 +96,12 @@ func NameToLevel(name string) (Level, error) {
 	return level, nil
 }
 
-// GlobalHook is a function that handles a change in the global Logger instance.
-type GlobalHook func(Logger)
-
-// GlobalLogger returns the global Logger instance.
-func GlobalLogger() Logger {
-	return globalLogger
-}
-
-// SetLogger sets the global Logger instance.
-func SetLogger(logger Logger) {
-	globalLock.Lock()
-	defer globalLock.Unlock()
-	globalLogger = logger
-	for _, globalHook := range globalHooks {
-		globalHook(globalLogger)
-	}
-}
-
-// SetLevel sets the global Logger to to be at the given Level.
-func SetLevel(level Level) {
-	globalLock.Lock()
-	defer globalLock.Unlock()
-	globalLogger = globalLogger.AtLevel(level)
-	for _, globalHook := range globalHooks {
-		globalHook(globalLogger)
-	}
-}
-
-// AddGlobalHook adds a GlobalHook that will be called any time SetLogger or SetLevel is called.
-// It will also be called when added.
-func AddGlobalHook(globalHook GlobalHook) {
-	globalLock.Lock()
-	defer globalLock.Unlock()
-	globalHooks = append(globalHooks, globalHook)
-	globalHook(globalLogger)
-}
-
-// RedirectStdLogger will redirect logs to golang's standard logger to the global Logger instance.
-func RedirectStdLogger() {
-	AddGlobalHook(
-		func(logger Logger) {
-			log.SetFlags(0)
-			log.SetOutput(logger.Writer())
-			log.SetPrefix("")
-		},
-	)
-}
-
 // Flusher is an object that can be flushed to a persistent store.
 type Flusher interface {
 	Flush() error
 }
 
-// Logger is the main logging interface. All methods are also replicated
-// on the package and attached to a global Logger.
+// Logger is the main logging interface.
 type Logger interface {
 	Flusher
 
@@ -368,159 +312,4 @@ func NewTextMarshaller(options ...TextMarshallerOption) TextMarshaller {
 // NewMultiPusher constructs a new Pusher that calls all the given Pushers.
 func NewMultiPusher(pushers ...Pusher) Pusher {
 	return newMultiPusher(pushers)
-}
-
-// Flush calls Flush on the global Logger.
-func Flush() error {
-	return globalLogger.Flush()
-}
-
-// AtLevel calls AtLevel on the global Logger.
-func AtLevel(level Level) Logger {
-	return globalLogger.AtLevel(level)
-}
-
-// WithContext calls WithContext on the global Logger.
-func WithContext(context proto.Message) Logger {
-	return globalLogger.WithContext(context)
-}
-
-// Debug calls Debug on the global Logger.
-func Debug(Event proto.Message) {
-	globalLogger.Debug(Event)
-}
-
-// Info calls Info on the global Logger.
-func Info(Event proto.Message) {
-	globalLogger.Info(Event)
-}
-
-// Warn calls Warn on the global Logger.
-func Warn(Event proto.Message) {
-	globalLogger.Warn(Event)
-}
-
-// Error calls Error on the global Logger.
-func Error(Event proto.Message) {
-	globalLogger.Error(Event)
-}
-
-// Fatal calls Fatal on the global Logger.
-func Fatal(Event proto.Message) {
-	globalLogger.Fatal(Event)
-}
-
-// Panic calls Panic on the global Logger.
-func Panic(Event proto.Message) {
-	globalLogger.Panic(Event)
-}
-
-// Print calls Print on the global Logger.
-func Print(Event proto.Message) {
-	globalLogger.Print(Event)
-}
-
-// DebugWriter calls DebugWriter on the global Logger.
-func DebugWriter() io.Writer {
-	return globalLogger.DebugWriter()
-}
-
-// InfoWriter calls InfoWriter on the global Logger.
-func InfoWriter() io.Writer {
-	return globalLogger.InfoWriter()
-}
-
-// WarnWriter calls WarnWriter on the global Logger.
-func WarnWriter() io.Writer {
-	return globalLogger.WarnWriter()
-}
-
-// ErrorWriter calls ErrorWriter on the global Logger.
-func ErrorWriter() io.Writer {
-	return globalLogger.ErrorWriter()
-}
-
-// Writer calls Writer on the global Logger.
-func Writer() io.Writer {
-	return globalLogger.Writer()
-}
-
-// WithField calls WithField on the global Logger.
-func WithField(key string, value interface{}) Logger {
-	return globalLogger.WithField(key, value)
-}
-
-// WithFields calls WithFields on the global Logger.
-func WithFields(fields map[string]interface{}) Logger {
-	return globalLogger.WithFields(fields)
-}
-
-// Debugf calls Debugf on the global Logger.
-func Debugf(format string, args ...interface{}) {
-	globalLogger.Debugf(format, args...)
-}
-
-// Debugln calls Debugln on the global Logger.
-func Debugln(args ...interface{}) {
-	globalLogger.Debugln(args...)
-}
-
-// Infof calls Infof on the global Logger.
-func Infof(format string, args ...interface{}) {
-	globalLogger.Infof(format, args...)
-}
-
-// Infoln calls Infoln on the global Logger.
-func Infoln(args ...interface{}) {
-	globalLogger.Infoln(args...)
-}
-
-// Warnf calls Warnf on the global Logger.
-func Warnf(format string, args ...interface{}) {
-	globalLogger.Warnf(format, args...)
-}
-
-// Warnln calls Warnln on the global Logger.
-func Warnln(args ...interface{}) {
-	globalLogger.Warnln(args...)
-}
-
-// Errorf calls Errorf on the global Logger.
-func Errorf(format string, args ...interface{}) {
-	globalLogger.Errorf(format, args...)
-}
-
-// Errorln calls Errorln on the global Logger.
-func Errorln(args ...interface{}) {
-	globalLogger.Errorln(args...)
-}
-
-// Fatalf calls Fatalf on the global Logger.
-func Fatalf(format string, args ...interface{}) {
-	globalLogger.Fatalf(format, args...)
-}
-
-// Fatalln calls Fatalln on the global Logger.
-func Fatalln(args ...interface{}) {
-	globalLogger.Fatalln(args...)
-}
-
-// Panicf calls Panicf on the global Logger.
-func Panicf(format string, args ...interface{}) {
-	globalLogger.Panicf(format, args...)
-}
-
-// Panicln calls Panicln on the global Logger.
-func Panicln(args ...interface{}) {
-	globalLogger.Panicln(args...)
-}
-
-// Printf calls Printf on the global Logger.
-func Printf(format string, args ...interface{}) {
-	globalLogger.Printf(format, args...)
-}
-
-// Println calls Println on the global Logger.
-func Println(args ...interface{}) {
-	globalLogger.Println(args...)
 }
