@@ -7,20 +7,21 @@ import (
 	"path/filepath"
 	"time"
 
-	"go.pedge.io/proto/rpclog"
+	"github.com/sr/operator/protolog"
+
 	"go.pedge.io/proto/time"
 
 	"golang.org/x/net/context"
 )
 
 type apiServer struct {
-	protorpclog.Logger
+	logger   protolog.Logger
 	compiler Compiler
 	options  APIServerOptions
 }
 
 func newAPIServer(compiler Compiler, options APIServerOptions) *apiServer {
-	return &apiServer{protorpclog.NewLogger("protoeasy.API"), compiler, options}
+	return &apiServer{protolog.DefaultLogger, compiler, options}
 }
 
 func (a *apiServer) Compile(ctx context.Context, request *CompileRequest) (response *CompileResponse, retErr error) {
@@ -103,5 +104,5 @@ func (a *apiServer) logCompile(request *CompileRequest, response *CompileRespons
 	if response != nil {
 		compileInfo = response.CompileInfo
 	}
-	a.Log(compileOptions, compileInfo, err, time.Since(start))
+	a.logger.Infoln(compileOptions, compileInfo, err, time.Since(start))
 }

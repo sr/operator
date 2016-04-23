@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -168,11 +169,7 @@ func getGoPath() (string, error) {
 }
 
 func which(executable string) (string, error) {
-	output, err := pkgexec.RunOutput("which", executable)
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(string(output)), nil
+	return exec.LookPath(executable)
 }
 
 func mergeStringStringMaps(maps ...map[string]string) map[string]string {
