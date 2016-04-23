@@ -315,32 +315,10 @@ func NewTextWritePusher(writer io.Writer, textMarshallerOptions ...TextMarshalle
 	)
 }
 
-// Puller pulls Entry objects from a persistent store.
-type Puller interface {
-	Pull() (*Entry, error)
-}
-
 // Unmarshaller unmarshalls a marshalled Entry object. At the end
 // of a stream, Unmarshaller will return io.EOF.
 type Unmarshaller interface {
 	Unmarshal(reader io.Reader, entry *Entry) error
-}
-
-// ReadPullerOption is an option for a read Puller.
-type ReadPullerOption func(*readPuller)
-
-// ReadPullerWithUnmarshaller uses the Unmarshaller for the read Puller.
-//
-// By default, DelimitedUnmarshaller is used.
-func ReadPullerWithUnmarshaller(unmarshaller Unmarshaller) ReadPullerOption {
-	return func(readPuller *readPuller) {
-		readPuller.unmarshaller = unmarshaller
-	}
-}
-
-// NewReadPuller constructs a new Puller that reads from the given Reader.
-func NewReadPuller(reader io.Reader, options ...ReadPullerOption) Puller {
-	return newReadPuller(reader, options...)
 }
 
 // TextMarshaller is a Marshaller used for text.
