@@ -10,13 +10,14 @@ import (
 	servicepkg "chatops/ping"
 )
 
-type instrumentedpingerPinger struct {
+type interceptedpingerPinger struct {
+	authorizer   operator.Authorizer
 	instrumenter operator.Instrumenter
 	server       servicepkg.PingerServer
 }
 
-// Ping instruments the Pinger.Ping method.
-func (a *instrumentedpingerPinger) Ping(
+// Ping intercepts the Pinger.Ping method.
+func (a *interceptedpingerPinger) Ping(
 	ctx context.Context,
 	request *servicepkg.PingRequest,
 ) (response *servicepkg.PingResponse, err error) {
@@ -33,5 +34,8 @@ func (a *instrumentedpingerPinger) Ping(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.Ping(ctx, request)
 }
