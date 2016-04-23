@@ -126,8 +126,20 @@ test -z "$projects"  && {
 for project in $projects
 do
     case "$project" in
-        pardot-explorer|pull_agent)
+        pardot-explorer)
             build-ruby "$project"
+            ;;
+        pull_agent)
+            build-ruby "$project"
+
+            # Build the gem and push it to Artifactory on CI.
+            if $cimode
+            then
+                docker run --rm \
+                    -v "$(pwd):/data" \
+                    -v "/etc/env/artifactoryenv:/etc/env/artifactoryenv" \
+                    build/ruby build-gem-pull_agent
+            fi
             ;;
         shell)
             docker build -f etc/Dockerfile.shellcheck -t build/shellcheck .
