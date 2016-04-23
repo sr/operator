@@ -30,7 +30,7 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 		}
 		response[i+1] = &generator.File{
 			Name: fmt.Sprintf(
-				"instrumented_%s-gen.go",
+				"intercepted_%s-gen.go",
 				service.PackageName,
 			),
 			Content: buffer.String(),
