@@ -9,7 +9,7 @@ import (
 
 	"github.com/sr/operator/protolog"
 
-	"go.pedge.io/proto/time"
+	"github.com/golang/protobuf/ptypes"
 
 	"golang.org/x/net/context"
 )
@@ -90,7 +90,7 @@ func (a *apiServer) Compile(ctx context.Context, request *CompileRequest) (respo
 			Command:         commands,
 			InputSizeBytes:  uint64(len(request.Tar)),
 			OutputSizeBytes: uint64(len(tar)),
-			Duration:        prototime.DurationToProto(time.Since(start)),
+			Duration:        ptypes.DurationProto(time.Since(start)),
 		},
 	}, nil
 }
