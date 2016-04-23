@@ -6,18 +6,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/fatih/color"
 	"github.com/golang/protobuf/proto"
-)
-
-var (
-	levelToColorString = map[Level]string{
-		LevelNone:  color.BlueString(LevelNone.String()),
-		LevelDebug: color.WhiteString(LevelDebug.String()),
-		LevelInfo:  color.BlueString(LevelInfo.String()),
-		LevelWarn:  color.YellowString(LevelWarn.String()),
-		LevelError: color.RedString(LevelError.String()),
-	}
 )
 
 type textMarshaller struct {
@@ -25,12 +14,10 @@ type textMarshaller struct {
 	disableLevel    bool
 	disableContexts bool
 	disableNewlines bool
-	colorize        bool
 }
 
 func newTextMarshaller(options ...TextMarshallerOption) *textMarshaller {
 	textMarshaller := &textMarshaller{
-		false,
 		false,
 		false,
 		false,
@@ -48,7 +35,6 @@ func (t *textMarshaller) WithColors() TextMarshaller {
 		t.disableLevel,
 		t.disableContexts,
 		t.disableNewlines,
-		true,
 	}
 }
 
@@ -58,7 +44,6 @@ func (t *textMarshaller) WithoutColors() TextMarshaller {
 		t.disableLevel,
 		t.disableContexts,
 		t.disableNewlines,
-		false,
 	}
 }
 
@@ -69,7 +54,6 @@ func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
 		t.disableLevel,
 		t.disableContexts,
 		t.disableNewlines,
-		t.colorize,
 	)
 }
 
@@ -79,7 +63,6 @@ func textMarshalEntry(
 	disableLevel bool,
 	disableContexts bool,
 	disableNewlines bool,
-	colorize bool,
 ) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
 	if entry.ID != "" {
@@ -91,12 +74,7 @@ func textMarshalEntry(
 		_ = buffer.WriteByte(' ')
 	}
 	if !disableLevel {
-		var levelString string
-		if colorize {
-			levelString = levelToColorString[entry.Level]
-		} else {
-			levelString = entry.Level.String()
-		}
+		levelString := entry.Level.String()
 		_, _ = buffer.WriteString(levelString)
 		_ = buffer.WriteByte(' ')
 		if len(levelString) == 4 {

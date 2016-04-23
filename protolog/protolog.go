@@ -147,7 +147,7 @@ func (g *Entry) String() string {
 	if g == nil {
 		return ""
 	}
-	data, err := textMarshalEntry(g, false, false, false, true, false)
+	data, err := textMarshalEntry(g, false, false, false, true)
 	if err != nil {
 		return ""
 	}
