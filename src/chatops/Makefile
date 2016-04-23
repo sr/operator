@@ -2,6 +2,8 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 OPERATORC ?= $(GOBIN)/operatorc
 PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
+PROTOC_GEN_OPERATORCMD ?= $(GOBIN)/protoc-gen-operatorcmd
+PROTOC_GEN_OPERATORD ?= $(GOBIN)/protoc-gen-operatord
 DOCKER ?= docker
 
 OPERATORCTL ?= $(GOBIN)/operatorctl
@@ -14,7 +16,7 @@ export OPERATORD_ADDRESS
 
 IMPORTPATH ?= chatops
 
-build: $(OPERATORC) $(PROTOC_GEN_GO)
+build: $(OPERATORC) $(PROTOC_GEN_OPERATORCMD) $(PROTOC_GEN_OPERATORD) $(PROTOC_GEN_GO)
 	$< \
 		--import-path $(IMPORTPATH) \
 		--cmd-out cmd/operatorctl \
@@ -23,7 +25,11 @@ build: $(OPERATORC) $(PROTOC_GEN_GO)
 
 clean:
 	go clean -i ./...
-	rm -f $(OPERATORC) $(PROTOC_GEN_GO)
+	rm -f \
+		$(OPERATORC) \
+		$(PROTOC_GEN_OPERATORCMD) \
+		$(PROTOC_GEN_OPERATORD) \
+		$(PROTOC_GEN_GO)
 
 docker-build:
 	$(DOCKER) run --rm  \
@@ -35,8 +41,17 @@ docker-build:
 			--server-out /out/cmd/operatord \
 			/in
 
+$(OPERATORC):
+	$(GO) install -v github.com/sr/operator/cmd/operatorc
+
 $(PROTOC_GEN_GO):
 	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
+
+$(PROTOC_GEN_OPERATORCMD):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorcmd
+
+$(PROTOC_GEN_OPERATORD):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatord
 
 .PHONY: \
 	build \
