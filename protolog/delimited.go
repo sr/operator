@@ -7,9 +7,9 @@ import (
 	"reflect"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/matttproud/golang_protobuf_extensions/pbutil"
 	"github.com/sr/operator/protolog/pb"
-	"go.pedge.io/proto/time"
 )
 
 var (
@@ -75,10 +75,14 @@ func entryToPBEntry(entry *Entry) (*protologpb.Entry, error) {
 	if !ok {
 		return nil, fmt.Errorf("protolog: unknown level: %v", entry.Level)
 	}
+	timestamp, err := ptypes.TimestampProto(entry.Time)
+	if err != nil {
+		return nil, err
+	}
 	return &protologpb.Entry{
 		Id:           entry.ID,
 		Level:        pbLevel,
-		Timestamp:    prototime.TimeToTimestamp(entry.Time),
+		Timestamp:    timestamp,
 		Context:      contexts,
 		Fields:       entry.Fields,
 		Event:        event,
@@ -100,10 +104,14 @@ func pbEntryToEntry(pbEntry *protologpb.Entry) (*Entry, error) {
 	if !ok {
 		return nil, fmt.Errorf("protolog: unknown level: %v", pbEntry.Level)
 	}
+	t, err := ptypes.Timestamp(pbEntry.Timestamp)
+	if err != nil {
+		return nil, err
+	}
 	return &Entry{
 		ID:           pbEntry.Id,
 		Level:        level,
-		Time:         prototime.TimestampToTime(pbEntry.Timestamp),
+		Time:         t,
 		Contexts:     contexts,
 		Fields:       pbEntry.Fields,
 		Event:        event,
