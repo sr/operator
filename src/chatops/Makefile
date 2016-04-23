@@ -21,6 +21,10 @@ build: $(OPERATORC) $(PROTOC_GEN_GO)
 		--server-out cmd/operatord \
 		.
 
+clean:
+	go clean -i ./...
+	rm -f $(OPERATORC) $(PROTOC_GEN_GO)
+
 docker-build:
 	$(DOCKER) run --rm  \
 		-v "$(shell pwd):/in" \
@@ -36,4 +40,5 @@ $(PROTOC_GEN_GO):
 
 .PHONY: \
 	build \
+	clean \
 	docker-build
