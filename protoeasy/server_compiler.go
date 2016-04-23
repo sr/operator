@@ -2,9 +2,8 @@ package protoeasy
 
 import (
 	"fmt"
+	"os/exec"
 	"path/filepath"
-
-	"go.pedge.io/pkg/exec"
 )
 
 type serverCompiler struct {
@@ -34,7 +33,8 @@ func (c *serverCompiler) Compile(dirPath string, outDirPath string, compileOptio
 		return nil, err
 	}
 	for _, command := range commands {
-		if err := pkgexec.Run(command.Arg...); err != nil {
+		cmd := exec.Command(command.Arg[0], command.Arg[1:]...)
+		if err := cmd.Run(); err != nil {
 			return nil, err
 		}
 	}
