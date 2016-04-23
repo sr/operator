@@ -24,10 +24,6 @@ const (
 	LevelWarn Level = 3
 	// LevelError is the error Level.
 	LevelError Level = 4
-	// LevelFatal is the fatal Level.
-	LevelFatal Level = 5
-	// LevelPanic is the panic Level.
-	LevelPanic Level = 6
 )
 
 var (
@@ -61,8 +57,6 @@ var (
 		LevelInfo:  "INFO",
 		LevelWarn:  "WARN",
 		LevelError: "ERROR",
-		LevelFatal: "FATAL",
-		LevelPanic: "PANIC",
 	}
 	nameToLevel = map[string]Level{
 		"NONE":  LevelNone,
@@ -70,8 +64,6 @@ var (
 		"INFO":  LevelInfo,
 		"WARN":  LevelWarn,
 		"ERROR": LevelError,
-		"FATAL": LevelFatal,
-		"PANIC": LevelPanic,
 	}
 )
 
@@ -112,8 +104,6 @@ type Logger interface {
 	Info(event proto.Message)
 	Warn(event proto.Message)
 	Error(event proto.Message)
-	Fatal(event proto.Message)
-	Panic(event proto.Message)
 	Print(event proto.Message)
 
 	DebugWriter() io.Writer
@@ -132,10 +122,6 @@ type Logger interface {
 	Warnln(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Errorln(args ...interface{})
-	Fatalf(format string, args ...interface{})
-	Fatalln(args ...interface{})
-	Panicf(format string, args ...interface{})
-	Panicln(args ...interface{})
 	Printf(format string, args ...interface{})
 	Println(args ...interface{})
 }

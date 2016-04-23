@@ -3,7 +3,6 @@ package protolog
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -80,16 +79,6 @@ func (l *logger) Warn(event proto.Message) {
 
 func (l *logger) Error(event proto.Message) {
 	l.print(LevelError, event, "", nil)
-}
-
-func (l *logger) Fatal(event proto.Message) {
-	l.print(LevelFatal, event, "", nil)
-	os.Exit(1)
-}
-
-func (l *logger) Panic(event proto.Message) {
-	l.print(LevelPanic, event, "", nil)
-	panic(fmt.Sprintf("%+v", event))
 }
 
 func (l *logger) Print(event proto.Message) {
@@ -184,26 +173,6 @@ func (l *logger) Errorf(format string, args ...interface{}) {
 
 func (l *logger) Errorln(args ...interface{}) {
 	l.print(LevelError, nil, fmt.Sprint(args...), nil)
-}
-
-func (l *logger) Fatalf(format string, args ...interface{}) {
-	l.print(LevelFatal, nil, fmt.Sprintf(format, args...), nil)
-	os.Exit(1)
-}
-
-func (l *logger) Fatalln(args ...interface{}) {
-	l.print(LevelFatal, nil, fmt.Sprint(args...), nil)
-	os.Exit(1)
-}
-
-func (l *logger) Panicf(format string, args ...interface{}) {
-	l.print(LevelPanic, nil, fmt.Sprintf(format, args...), nil)
-	panic(fmt.Sprintf(format, args...))
-}
-
-func (l *logger) Panicln(args ...interface{}) {
-	l.print(LevelPanic, nil, fmt.Sprint(args...), nil)
-	panic(fmt.Sprint(args...))
 }
 
 func (l *logger) Printf(format string, args ...interface{}) {

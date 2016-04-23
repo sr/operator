@@ -19,8 +19,6 @@ var (
 		LevelInfo:  protologpb.Level_LEVEL_INFO,
 		LevelWarn:  protologpb.Level_LEVEL_WARN,
 		LevelError: protologpb.Level_LEVEL_ERROR,
-		LevelFatal: protologpb.Level_LEVEL_FATAL,
-		LevelPanic: protologpb.Level_LEVEL_PANIC,
 	}
 	pbToLevel = map[protologpb.Level]Level{
 		protologpb.Level_LEVEL_NONE:  LevelNone,
@@ -28,8 +26,6 @@ var (
 		protologpb.Level_LEVEL_INFO:  LevelInfo,
 		protologpb.Level_LEVEL_WARN:  LevelWarn,
 		protologpb.Level_LEVEL_ERROR: LevelError,
-		protologpb.Level_LEVEL_FATAL: LevelFatal,
-		protologpb.Level_LEVEL_PANIC: LevelPanic,
 	}
 )
 
