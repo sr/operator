@@ -1,8 +1,9 @@
 package operator
 
 import (
+	"github.com/sr/operator/protolog"
+
 	"github.com/golang/protobuf/proto"
-	"github.com/sr/protolog"
 )
 
 type logger struct {
