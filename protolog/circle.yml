@@ -1,9 +1,0 @@
-machine:
-  services:
-    - docker
-dependencies:
-  override:
-    - docker build -t quay.io/pedge/protolog .
-test:
-  override:
-    - docker run quay.io/pedge/protolog make test
