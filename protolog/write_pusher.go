@@ -5,10 +5,6 @@ import (
 	"sync"
 )
 
-var (
-	newlineBytes = []byte{'\n'}
-)
-
 type writePusher struct {
 	writer     io.Writer
 	marshaller Marshaller
