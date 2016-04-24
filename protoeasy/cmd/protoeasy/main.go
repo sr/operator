@@ -429,7 +429,7 @@ func run(appEnv *appEnv, dirPath string, outDirPath string, compileOptions *prot
 	}
 	for _, command := range commands {
 		if len(command.Arg) > 0 {
-			logger.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
+			protolog.DefaultLogger.Infof("\n%s\n", strings.Join(command.Arg, " \\\n\t"))
 		}
 	}
 	return nil
