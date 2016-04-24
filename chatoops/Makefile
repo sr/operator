@@ -14,7 +14,7 @@ export OPERATORD_ADDRESS
 
 IMPORTPATH ?= github.com/sr/operator/chatoops
 
-build: $(OPERATORC)
+build: $(OPERATORC) $(PROTOC_GEN_GO)
 	$< \
 		--import-path $(IMPORTPATH)/services \
 		--cmd-out cmd/operator \
@@ -64,7 +64,7 @@ $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/...
 
 $(PROTOC_GEN_GO):
-	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
+	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
 
 .PHONY: \
 	build \

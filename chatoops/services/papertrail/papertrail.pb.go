@@ -99,7 +99,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion1
+const _ = grpc.SupportPackageIsVersion2
 
 // Client API for PapertrailService service
 
@@ -134,16 +134,22 @@ func RegisterPapertrailServiceServer(s *grpc.Server, srv PapertrailServiceServer
 	s.RegisterService(&_PapertrailService_serviceDesc, srv)
 }
 
-func _PapertrailService_Search_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _PapertrailService_Search_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SearchRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(PapertrailServiceServer).Search(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(PapertrailServiceServer).Search(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/papertrail.PapertrailService/Search",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PapertrailServiceServer).Search(ctx, req.(*SearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _PapertrailService_serviceDesc = grpc.ServiceDesc{
