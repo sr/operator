@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -166,10 +165,6 @@ func getGoPath() (string, error) {
 		return split[0], nil
 	}
 	return goPath, nil
-}
-
-func which(executable string) (string, error) {
-	return exec.LookPath(executable)
 }
 
 func mergeStringStringMaps(maps ...map[string]string) map[string]string {

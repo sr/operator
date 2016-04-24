@@ -2,6 +2,7 @@ package protoeasy
 
 import (
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -296,7 +297,7 @@ func (p *grpcPlugin) Flags(protoSpec *protoSpec, relDirPath string, outDirPath s
 		if p.relOutDirPath != "" {
 			outDirPath = filepath.Join(outDirPath, p.relOutDirPath)
 		}
-		whichGrpcPlugin, err := which(fmt.Sprintf("grpc_%s_plugin", p.grpcName))
+		whichGrpcPlugin, err := exec.LookPath(fmt.Sprintf("grpc_%s_plugin", p.grpcName))
 		if err != nil {
 			return nil, err
 		}
