@@ -2,7 +2,6 @@ package protolog
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -83,26 +82,6 @@ func (l *logger) Error(event proto.Message) {
 
 func (l *logger) Print(event proto.Message) {
 	l.print(LevelNone, event, "", nil)
-}
-
-func (l *logger) DebugWriter() io.Writer {
-	return l.printWriter(LevelDebug)
-}
-
-func (l *logger) InfoWriter() io.Writer {
-	return l.printWriter(LevelInfo)
-}
-
-func (l *logger) WarnWriter() io.Writer {
-	return l.printWriter(LevelWarn)
-}
-
-func (l *logger) ErrorWriter() io.Writer {
-	return l.printWriter(LevelError)
-}
-
-func (l *logger) Writer() io.Writer {
-	return l.printWriter(LevelNone)
 }
 
 func (l *logger) WithField(key string, value interface{}) Logger {
@@ -189,14 +168,6 @@ func (l *logger) print(level Level, event proto.Message, message string, writerO
 	}
 }
 
-func (l *logger) printWriter(level Level) io.Writer {
-	// TODO(pedge): think more about this
-	//if !l.isLoggedLevel(level) {
-	//return ioutil.Discard
-	//}
-	return newLogWriter(l, level)
-}
-
 func (l *logger) printWithError(level Level, event proto.Message, message string, writerOutput []byte) error {
 	if !l.isLoggedLevel(level) {
 		return nil
@@ -220,20 +191,4 @@ func (l *logger) printWithError(level Level, event proto.Message, message string
 
 func (l *logger) isLoggedLevel(level Level) bool {
 	return level >= l.level || level == LevelNone
-}
-
-type logWriter struct {
-	logger *logger
-	level  Level
-}
-
-func newLogWriter(logger *logger, level Level) *logWriter {
-	return &logWriter{logger, level}
-}
-
-func (w *logWriter) Write(p []byte) (int, error) {
-	if err := w.logger.printWithError(w.level, nil, "", p); err != nil {
-		return 0, err
-	}
-	return len(p), nil
 }
