@@ -254,8 +254,6 @@ type Unmarshaller interface {
 // TextMarshaller is a Marshaller used for text.
 type TextMarshaller interface {
 	Marshaller
-	WithColors() TextMarshaller
-	WithoutColors() TextMarshaller
 }
 
 // TextMarshallerOption is an option for creating Marshallers.
