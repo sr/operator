@@ -1,15 +1,11 @@
 package protolog
 
-import (
-	"io"
-	"sync"
-)
+import "io"
 
 type writePusher struct {
 	writer     io.Writer
 	marshaller Marshaller
 	newline    bool
-	lock       *sync.Mutex
 }
 
 func newWritePusher(writer io.Writer, options ...WritePusherOption) *writePusher {
@@ -17,7 +13,6 @@ func newWritePusher(writer io.Writer, options ...WritePusherOption) *writePusher
 		writer,
 		DelimitedMarshaller,
 		false,
-		&sync.Mutex{},
 	}
 	for _, option := range options {
 		option(writePusher)
@@ -47,8 +42,6 @@ func (w *writePusher) Push(entry *Entry) error {
 	if err != nil {
 		return err
 	}
-	w.lock.Lock()
-	defer w.lock.Unlock()
 	if _, err := w.writer.Write(data); err != nil {
 		return err
 	}
