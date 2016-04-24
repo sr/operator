@@ -142,7 +142,10 @@ do
             fi
             ;;
         chatops)
-            make -f etc/mk/golang.mk
+            docker run --rm \
+                -v "$(pwd):/go" \
+                golang:1.6.2 \
+                make -f etc/mk/golang.mk
             ;;
         pardot-explorer)
             build-ruby "$project"
