@@ -1,7 +1,5 @@
-/*
-Package protolog_logrus defines functionality for integration with Logrus.
-*/
-package protolog_logrus
+// Package protologlogrus defines functionality for integration with Logrus.
+package protologlogrus
 
 import (
 	"io"
