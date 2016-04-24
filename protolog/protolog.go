@@ -106,12 +106,6 @@ type Logger interface {
 	Error(event proto.Message)
 	Print(event proto.Message)
 
-	DebugWriter() io.Writer
-	InfoWriter() io.Writer
-	WarnWriter() io.Writer
-	ErrorWriter() io.Writer
-	Writer() io.Writer
-
 	WithField(key string, value interface{}) Logger
 	WithFields(fields map[string]interface{}) Logger
 	Debugf(format string, args ...interface{})
