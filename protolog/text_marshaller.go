@@ -29,24 +29,6 @@ func newTextMarshaller(options ...TextMarshallerOption) *textMarshaller {
 	return textMarshaller
 }
 
-func (t *textMarshaller) WithColors() TextMarshaller {
-	return &textMarshaller{
-		t.disableTime,
-		t.disableLevel,
-		t.disableContexts,
-		t.disableNewlines,
-	}
-}
-
-func (t *textMarshaller) WithoutColors() TextMarshaller {
-	return &textMarshaller{
-		t.disableTime,
-		t.disableLevel,
-		t.disableContexts,
-		t.disableNewlines,
-	}
-}
-
 func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
 	return textMarshalEntry(
 		entry,
