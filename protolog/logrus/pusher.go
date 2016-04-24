@@ -72,19 +72,17 @@ func (p *pusher) getLogrusEntry(entry *protolog.Entry) (*logrus.Entry, error) {
 	if entry.ID != "" {
 		logrusEntry.Data["_id"] = entry.ID
 	}
-	if !p.options.DisableContexts {
-		for _, context := range entry.Contexts {
-			if context == nil {
-				continue
-			}
-			if err := addProtoMessage(logrusEntry, context); err != nil {
-				return nil, err
-			}
+	for _, context := range entry.Contexts {
+		if context == nil {
+			continue
 		}
-		for key, value := range entry.Fields {
-			if value != "" {
-				logrusEntry.Data[key] = value
-			}
+		if err := addProtoMessage(logrusEntry, context); err != nil {
+			return nil, err
+		}
+	}
+	for key, value := range entry.Fields {
+		if value != "" {
+			logrusEntry.Data[key] = value
 		}
 	}
 	// TODO(pedge): verify only one of Event, Message, WriterOutput?

@@ -12,7 +12,6 @@ import (
 type textMarshaller struct {
 	disableTime     bool
 	disableLevel    bool
-	disableContexts bool
 	disableNewlines bool
 }
 
@@ -34,7 +33,6 @@ func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
 		entry,
 		t.disableTime,
 		t.disableLevel,
-		t.disableContexts,
 		t.disableNewlines,
 	)
 }
@@ -43,7 +41,6 @@ func textMarshalEntry(
 	entry *Entry,
 	disableTime bool,
 	disableLevel bool,
-	disableContexts bool,
 	disableNewlines bool,
 ) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
@@ -75,7 +72,7 @@ func textMarshalEntry(
 	if entry.WriterOutput != nil {
 		_, _ = buffer.Write(trimRightSpaceBytes(entry.WriterOutput))
 	}
-	if len(entry.Contexts) > 0 && !disableContexts {
+	if len(entry.Contexts) > 0 {
 		_ = buffer.WriteByte(' ')
 		lenContexts := len(entry.Contexts)
 		for i, context := range entry.Contexts {
@@ -87,7 +84,7 @@ func textMarshalEntry(
 			}
 		}
 	}
-	if len(entry.Fields) > 0 && !disableContexts {
+	if len(entry.Fields) > 0 {
 		_ = buffer.WriteByte(' ')
 		data, err := json.Marshal(entry.Fields)
 		if err != nil {

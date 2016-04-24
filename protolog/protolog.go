@@ -260,13 +260,6 @@ func TextMarshallerDisableLevel() TextMarshallerOption {
 	}
 }
 
-// TextMarshallerDisableContexts will suppress the printing of Entry contexts.
-func TextMarshallerDisableContexts() TextMarshallerOption {
-	return func(textMarshaller *textMarshaller) {
-		textMarshaller.disableContexts = true
-	}
-}
-
 // TextMarshallerDisableNewlines disables newlines after each marshalled Entry.
 func TextMarshallerDisableNewlines() TextMarshallerOption {
 	return func(textMarshaller *textMarshaller) {

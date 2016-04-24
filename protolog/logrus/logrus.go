@@ -13,9 +13,8 @@ import (
 
 // PusherOptions defines options for constructing a new Logrus protolog.Pusher.
 type PusherOptions struct {
-	Out             io.Writer
-	Formatter       logrus.Formatter
-	DisableContexts bool
+	Out       io.Writer
+	Formatter logrus.Formatter
 }
 
 // NewPusher creates a new protolog.Pusher that logs using Logrus.
