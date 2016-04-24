@@ -18,8 +18,6 @@ const (
 	LevelDebug Level = 1
 	// LevelInfo is the info Level.
 	LevelInfo Level = 2
-	// LevelWarn is the warn Level.
-	LevelWarn Level = 3
 	// LevelError is the error Level.
 	LevelError Level = 4
 )
@@ -52,13 +50,11 @@ var (
 	levelToName = map[Level]string{
 		LevelDebug: "DEBUG",
 		LevelInfo:  "INFO",
-		LevelWarn:  "WARN",
 		LevelError: "ERROR",
 	}
 	nameToLevel = map[string]Level{
 		"DEBUG": LevelDebug,
 		"INFO":  LevelInfo,
-		"WARN":  LevelWarn,
 		"ERROR": LevelError,
 	}
 )
@@ -98,7 +94,6 @@ type Logger interface {
 	WithContext(context proto.Message) Logger
 	Debug(event proto.Message)
 	Info(event proto.Message)
-	Warn(event proto.Message)
 	Error(event proto.Message)
 
 	WithField(key string, value interface{}) Logger
@@ -107,8 +102,6 @@ type Logger interface {
 	Debugln(args ...interface{})
 	Infof(format string, args ...interface{})
 	Infoln(args ...interface{})
-	Warnf(format string, args ...interface{})
-	Warnln(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Errorln(args ...interface{})
 }

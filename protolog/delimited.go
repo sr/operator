@@ -16,13 +16,11 @@ var (
 	levelToPB = map[Level]protologpb.Level{
 		LevelDebug: protologpb.Level_LEVEL_DEBUG,
 		LevelInfo:  protologpb.Level_LEVEL_INFO,
-		LevelWarn:  protologpb.Level_LEVEL_WARN,
 		LevelError: protologpb.Level_LEVEL_ERROR,
 	}
 	pbToLevel = map[protologpb.Level]Level{
 		protologpb.Level_LEVEL_DEBUG: LevelDebug,
 		protologpb.Level_LEVEL_INFO:  LevelInfo,
-		protologpb.Level_LEVEL_WARN:  LevelWarn,
 		protologpb.Level_LEVEL_ERROR: LevelError,
 	}
 )
