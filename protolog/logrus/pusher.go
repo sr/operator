@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"strings"
-	"sync"
 	"unicode"
 
 	"github.com/Sirupsen/logrus"
@@ -24,7 +23,6 @@ var (
 
 type pusher struct {
 	logger  *logrus.Logger
-	lock    *sync.Mutex
 	options PusherOptions
 }
 
@@ -36,7 +34,7 @@ func newPusher(options PusherOptions) *pusher {
 	if options.Formatter != nil {
 		logger.Formatter = options.Formatter
 	}
-	return &pusher{logger, &sync.Mutex{}, options}
+	return &pusher{logger, options}
 }
 
 func (p *pusher) Push(entry *protolog.Entry) error {
@@ -113,8 +111,6 @@ func (p *pusher) logLogrusEntry(entry *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
-	p.lock.Lock()
-	defer p.lock.Unlock()
 	_, err = io.Copy(entry.Logger.Out, reader)
 	return err
 }
