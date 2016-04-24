@@ -1,7 +1,5 @@
-/*
-Package protolog_syslog defines functionality for integration with syslog.
-*/
-package protolog_syslog
+// Package protologsyslog defines functionality for integration with syslog.
+package protologsyslog
 
 import (
 	"log/syslog"

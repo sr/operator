@@ -1,4 +1,4 @@
-package protolog_logrus
+package protologlogrus
 
 import (
 	"bytes"
