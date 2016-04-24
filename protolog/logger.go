@@ -80,10 +80,6 @@ func (l *logger) Error(event proto.Message) {
 	l.print(LevelError, event, "", nil)
 }
 
-func (l *logger) Print(event proto.Message) {
-	l.print(LevelNone, event, "", nil)
-}
-
 func (l *logger) WithField(key string, value interface{}) Logger {
 	contextFields := make(map[string]string, len(l.fields)+1)
 	contextFields[key] = fmt.Sprintf("%v", value)
@@ -152,14 +148,6 @@ func (l *logger) Errorf(format string, args ...interface{}) {
 
 func (l *logger) Errorln(args ...interface{}) {
 	l.print(LevelError, nil, fmt.Sprint(args...), nil)
-}
-
-func (l *logger) Printf(format string, args ...interface{}) {
-	l.print(LevelNone, nil, fmt.Sprintf(format, args...), nil)
-}
-
-func (l *logger) Println(args ...interface{}) {
-	l.print(LevelNone, nil, fmt.Sprint(args...), nil)
 }
 
 func (l *logger) print(level Level, event proto.Message, message string, writerOutput []byte) {

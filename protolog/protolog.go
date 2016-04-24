@@ -100,7 +100,6 @@ type Logger interface {
 	Info(event proto.Message)
 	Warn(event proto.Message)
 	Error(event proto.Message)
-	Print(event proto.Message)
 
 	WithField(key string, value interface{}) Logger
 	WithFields(fields map[string]interface{}) Logger
@@ -112,8 +111,6 @@ type Logger interface {
 	Warnln(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Errorln(args ...interface{})
-	Printf(format string, args ...interface{})
-	Println(args ...interface{})
 }
 
 // Entry is the go equivalent of an Entry.
