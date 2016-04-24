@@ -1,6 +1,6 @@
 package buildkite
 
-import "github.com/wolfeidau/go-buildkite/buildkite"
+import "github.com/buildkite/go-buildkite/buildkite"
 
 type Env struct {
 	BuildkiteAPIToken string `env:"BUILDKITE_API_TOKEN,required"`

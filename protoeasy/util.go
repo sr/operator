@@ -7,10 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.pedge.io/lion/proto"
-	"go.pedge.io/pkg/exec"
-
 	"github.com/docker/docker/pkg/archive"
+	"github.com/sr/operator/protolog"
 )
 
 const (
@@ -163,18 +161,10 @@ func getGoPath() (string, error) {
 	}
 	split := strings.Split(goPath, ":")
 	if len(split) > 1 {
-		protolion.Warnf("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
+		protolog.DefaultLogger.Infof("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
 		return split[0], nil
 	}
 	return goPath, nil
-}
-
-func which(executable string) (string, error) {
-	output, err := pkgexec.RunOutput("which", executable)
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(string(output)), nil
 }
 
 func mergeStringStringMaps(maps ...map[string]string) map[string]string {

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"go.pedge.io/env"
-	"go.pedge.io/proto/time"
 	"google.golang.org/grpc"
 )
 
@@ -93,7 +93,7 @@ func NewRequest(
 		Method:     methodName,
 		InputType:  inputType,
 		OutputType: outputType,
-		Duration:   prototime.DurationToProto(time.Since(start)),
+		Duration:   ptypes.DurationProto(time.Since(start)),
 	}
 	if err != nil {
 		call.Error = &Error{Message: err.Error()}
