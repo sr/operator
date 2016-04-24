@@ -8,7 +8,6 @@ import (
 
 var (
 	levelToLogFunc = map[protolog.Level]func(*syslog.Writer, string) error{
-		protolog.LevelNone:  (*syslog.Writer).Info,
 		protolog.LevelDebug: (*syslog.Writer).Debug,
 		protolog.LevelInfo:  (*syslog.Writer).Info,
 		protolog.LevelWarn:  (*syslog.Writer).Warning,
