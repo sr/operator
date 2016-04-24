@@ -134,7 +134,7 @@ func (g *Entry) String() string {
 	if g == nil {
 		return ""
 	}
-	data, err := textMarshalEntry(g, false, false, false, true)
+	data, err := textMarshalEntry(g, false, true)
 	if err != nil {
 		return ""
 	}
@@ -250,13 +250,6 @@ type TextMarshallerOption func(*textMarshaller)
 func TextMarshallerDisableTime() TextMarshallerOption {
 	return func(textMarshaller *textMarshaller) {
 		textMarshaller.disableTime = true
-	}
-}
-
-// TextMarshallerDisableLevel will suppress the printing of Entry Levels.
-func TextMarshallerDisableLevel() TextMarshallerOption {
-	return func(textMarshaller *textMarshaller) {
-		textMarshaller.disableLevel = true
 	}
 }
 
