@@ -115,7 +115,7 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion1
+const _ = grpc.SupportPackageIsVersion2
 
 // Client API for BuildkiteService service
 
@@ -169,28 +169,40 @@ func RegisterBuildkiteServiceServer(s *grpc.Server, srv BuildkiteServiceServer) 
 	s.RegisterService(&_BuildkiteService_serviceDesc, srv)
 }
 
-func _BuildkiteService_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _BuildkiteService_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(BuildkiteServiceServer).Status(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(BuildkiteServiceServer).Status(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buildkite.BuildkiteService/Status",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildkiteServiceServer).Status(ctx, req.(*StatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _BuildkiteService_ListBuilds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _BuildkiteService_ListBuilds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListBuildsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(BuildkiteServiceServer).ListBuilds(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(BuildkiteServiceServer).ListBuilds(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/buildkite.BuildkiteService/ListBuilds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildkiteServiceServer).ListBuilds(ctx, req.(*ListBuildsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _BuildkiteService_serviceDesc = grpc.ServiceDesc{
