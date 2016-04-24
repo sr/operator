@@ -11,14 +11,11 @@ import (
 
 type textMarshaller struct {
 	disableTime     bool
-	disableLevel    bool
 	disableNewlines bool
 }
 
 func newTextMarshaller(options ...TextMarshallerOption) *textMarshaller {
 	textMarshaller := &textMarshaller{
-		false,
-		false,
 		false,
 		false,
 	}
@@ -32,7 +29,6 @@ func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
 	return textMarshalEntry(
 		entry,
 		t.disableTime,
-		t.disableLevel,
 		t.disableNewlines,
 	)
 }
@@ -40,7 +36,6 @@ func (t *textMarshaller) Marshal(entry *Entry) ([]byte, error) {
 func textMarshalEntry(
 	entry *Entry,
 	disableTime bool,
-	disableLevel bool,
 	disableNewlines bool,
 ) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
@@ -52,13 +47,11 @@ func textMarshalEntry(
 		_, _ = buffer.WriteString(entry.Time.Format(time.RFC3339))
 		_ = buffer.WriteByte(' ')
 	}
-	if !disableLevel {
-		levelString := entry.Level.String()
-		_, _ = buffer.WriteString(levelString)
+	levelString := entry.Level.String()
+	_, _ = buffer.WriteString(levelString)
+	_ = buffer.WriteByte(' ')
+	if len(levelString) == 4 {
 		_ = buffer.WriteByte(' ')
-		if len(levelString) == 4 {
-			_ = buffer.WriteByte(' ')
-		}
 	}
 	// TODO(pedge): verify only one of Event, Message, WriterOutput?
 	if entry.Event != nil {
