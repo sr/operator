@@ -16,7 +16,6 @@ var (
 	levelToLogrusLevel = map[protolog.Level]logrus.Level{
 		protolog.LevelDebug: logrus.DebugLevel,
 		protolog.LevelInfo:  logrus.InfoLevel,
-		protolog.LevelWarn:  logrus.WarnLevel,
 		protolog.LevelError: logrus.ErrorLevel,
 	}
 )

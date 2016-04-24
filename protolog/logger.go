@@ -72,10 +72,6 @@ func (l *logger) Info(event proto.Message) {
 	l.print(LevelInfo, event, "", nil)
 }
 
-func (l *logger) Warn(event proto.Message) {
-	l.print(LevelWarn, event, "", nil)
-}
-
 func (l *logger) Error(event proto.Message) {
 	l.print(LevelError, event, "", nil)
 }
@@ -132,14 +128,6 @@ func (l *logger) Infof(format string, args ...interface{}) {
 
 func (l *logger) Infoln(args ...interface{}) {
 	l.print(LevelInfo, nil, fmt.Sprint(args...), nil)
-}
-
-func (l *logger) Warnf(format string, args ...interface{}) {
-	l.print(LevelWarn, nil, fmt.Sprintf(format, args...), nil)
-}
-
-func (l *logger) Warnln(args ...interface{}) {
-	l.print(LevelWarn, nil, fmt.Sprint(args...), nil)
 }
 
 func (l *logger) Errorf(format string, args ...interface{}) {

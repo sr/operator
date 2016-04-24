@@ -161,7 +161,7 @@ func getGoPath() (string, error) {
 	}
 	split := strings.Split(goPath, ":")
 	if len(split) > 1 {
-		protolog.DefaultLogger.Warnf("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
+		protolog.DefaultLogger.Infof("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
 		return split[0], nil
 	}
 	return goPath, nil

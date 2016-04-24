@@ -10,7 +10,6 @@ var (
 	levelToLogFunc = map[protolog.Level]func(*syslog.Writer, string) error{
 		protolog.LevelDebug: (*syslog.Writer).Debug,
 		protolog.LevelInfo:  (*syslog.Writer).Info,
-		protolog.LevelWarn:  (*syslog.Writer).Warning,
 		protolog.LevelError: (*syslog.Writer).Err,
 	}
 )
