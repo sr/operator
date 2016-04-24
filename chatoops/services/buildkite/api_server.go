@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	buildkiteapi "github.com/buildkite/go-buildkite/buildkite"
 	"github.com/sr/operator"
-	buildkiteapi "github.com/wolfeidau/go-buildkite/buildkite"
 	"golang.org/x/net/context"
 )
 
@@ -26,30 +26,13 @@ func (s *apiServer) Status(
 	ctx context.Context,
 	request *StatusRequest,
 ) (*StatusResponse, error) {
-	organizations, err := s.fetchAllOrganizations()
-	if err != nil {
-		return nil, err
-	}
 	output := bytes.NewBufferString("")
 	w := new(tabwriter.Writer)
 	w.Init(output, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "NAME", "STATUS", "BRANCH", "URL")
-	for _, organization := range organizations {
-		projects, err := s.fetchAllOrganizationPipelines(organization)
-		if err != nil {
-			return nil, err
-		}
-		for _, project := range projects {
-			fmt.Fprintf(
-				w,
-				"%s\t%s\t%s\t%s\n",
-				fmt.Sprintf("%s/%s", *organization.Slug, *project.Slug),
-				*project.FeaturedBuild.State,
-				*project.FeaturedBuild.Branch,
-				*project.WebURL,
-			)
-		}
-	}
+	// TODO(sr) The API for this has changed and I am too lazy to fix it. See:
+	// https://github.com/buildkite/go-buildkite/pull/7
+	fmt.Fprintf(w, "TODO")
 	if err := w.Flush(); err != nil {
 		return nil, err
 	}
