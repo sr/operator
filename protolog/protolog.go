@@ -14,8 +14,6 @@ import (
 )
 
 const (
-	// LevelNone represents no Level.
-	LevelNone Level = 0
 	// LevelDebug is the debug Level.
 	LevelDebug Level = 1
 	// LevelInfo is the info Level.
@@ -52,14 +50,12 @@ var (
 	DefaultLogger = NewLogger(DefaultPusher)
 
 	levelToName = map[Level]string{
-		LevelNone:  "NONE",
 		LevelDebug: "DEBUG",
 		LevelInfo:  "INFO",
 		LevelWarn:  "WARN",
 		LevelError: "ERROR",
 	}
 	nameToLevel = map[string]Level{
-		"NONE":  LevelNone,
 		"DEBUG": LevelDebug,
 		"INFO":  LevelInfo,
 		"WARN":  LevelWarn,
@@ -83,7 +79,7 @@ func (l Level) String() string {
 func NameToLevel(name string) (Level, error) {
 	level, ok := nameToLevel[name]
 	if !ok {
-		return LevelNone, fmt.Errorf("protolog: no level for name: %s", name)
+		return LevelInfo, fmt.Errorf("protolog: no level for name: %s", name)
 	}
 	return level, nil
 }

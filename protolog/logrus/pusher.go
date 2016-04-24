@@ -15,7 +15,6 @@ import (
 
 var (
 	levelToLogrusLevel = map[protolog.Level]logrus.Level{
-		protolog.LevelNone:  logrus.InfoLevel,
 		protolog.LevelDebug: logrus.DebugLevel,
 		protolog.LevelInfo:  logrus.InfoLevel,
 		protolog.LevelWarn:  logrus.WarnLevel,
