@@ -169,9 +169,6 @@ func (l *logger) print(level Level, event proto.Message, message string, writerO
 }
 
 func (l *logger) printWithError(level Level, event proto.Message, message string, writerOutput []byte) error {
-	if !l.isLoggedLevel(level) {
-		return nil
-	}
 	entry := &Entry{
 		Level: level,
 		Time:  l.timer.Now(),
@@ -187,8 +184,4 @@ func (l *logger) printWithError(level Level, event proto.Message, message string
 		entry.ID = l.idAllocator.Allocate()
 	}
 	return l.pusher.Push(entry)
-}
-
-func (l *logger) isLoggedLevel(level Level) bool {
-	return level >= l.level || level == LevelNone
 }
