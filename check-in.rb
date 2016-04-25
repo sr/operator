@@ -2,7 +2,6 @@
 $:.unshift File.realpath(File.dirname(__FILE__), "lib")
 
 require "rubygems"
-require "bundler/setup"
 
 require "pardot/pull_agent"
 
