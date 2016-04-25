@@ -12,12 +12,10 @@ module Lita
     class Zabbix < Handler
 
       MonitorNotFound = Class.new(StandardError)
-      MonitorPauseFailed = Class.new(StandardError)
-      MonitorUnpauseFailed = Class.new(StandardError)
       MonitorDataInsertionFailed = Class.new(StandardError)
       MonitoringFailure = Class.new(StandardError)
-      MONITOR_FAIL_ERRMSG = '::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause'
       PagerFailed = Class.new(StandardError)
+      MONITOR_FAIL_ERRMSG = '::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause'
 
       # config: zabbix
       config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
