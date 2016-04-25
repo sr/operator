@@ -2,7 +2,8 @@
 #/ Usage: build-gem-pull_agent
 #/ Build the pardot_pull-agent Ruby gem and push it to Artifactory. This is
 #/ typically only invoked on the CI server. Requires the /etc/env/artifactoryenv
-#/ to contain the hostname and authentication credentials for Artifactory.
+#/ file to be readable and to contain the hostname and authentication credentials
+#/ of the Artifactory server.
 set -euo pipefail
 
 cd "$(dirname "$0")/../src/pull_agent"
