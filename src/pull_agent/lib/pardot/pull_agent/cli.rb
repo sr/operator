@@ -58,8 +58,6 @@ module Pardot
           fail "unable to retrieve status of checkout: #{output.inspect}"
         end
 
-        checkout = JSON.parse(output)
-
         payload = {
           environment: environment.name,
           hostname: ShellHelper.hostname,

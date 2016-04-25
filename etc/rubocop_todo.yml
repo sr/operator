@@ -1,8 +1,107 @@
-Metrics/LineLength:
-  Enabled: false
-Metrics/MethodLength:
-  Enabled: false
 Metrics/AbcSize:
   Enabled: false
 Metrics/ClassLength:
   Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/LineLength:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# Offense count: 2
+# Configuration parameters: AllowSafeAssignment.
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'src/canoe/app/controllers/application_controller.rb'
+    - 'src/canoe/app/models/deploy_target.rb'
+
+# Offense count: 1
+Lint/CircularArgumentReference:
+  Exclude:
+    - 'src/canoe/app/models/deploy_workflow.rb'
+
+# Offense count: 2
+# Configuration parameters: CountKeywordArgs.
+Metrics/ParameterLists:
+  Exclude:
+    - 'src/canoe/app/models/provisional_deploy.rb'
+    - 'src/canoe/lib/canoe/deployer.rb'
+
+# Offense count: 3
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: strict, flexible
+Rails/TimeZone:
+  Exclude:
+    - 'src/canoe/app/controllers/application_controller.rb'
+    - 'src/canoe/app/helpers/canoe_helper.rb'
+    - 'src/canoe/app/models/provisional_deploy.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: braces, no_braces, context_dependent
+Style/BracesAroundHashParameters:
+  Exclude:
+    - 'src/canoe/app/models/provisional_deploy.rb'
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, SingleLineConditionsOnly.
+# SupportedStyles: assign_to_condition, assign_inside_condition
+Style/ConditionalAssignment:
+  Exclude:
+    - 'src/canoe/app/models/project.rb'
+
+# Offense count: 3
+Style/DoubleNegation:
+  Exclude:
+    - 'src/canoe/app/models/provisional_deploy.rb'
+    - 'src/canoe/config/application.rb'
+    - 'src/canoe/lib/canoe/ldap_authorizer.rb'
+
+# Offense count: 1
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: format, sprintf, percent
+Style/FormatString:
+  Exclude:
+    - 'src/canoe/app/helpers/canoe_helper.rb'
+
+# Offense count: 2
+Style/IdenticalConditionalBranches:
+  Exclude:
+    - 'src/canoe/app/helpers/pagination_helper.rb'
+
+# Offense count: 2
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
+# SupportedStyles: slashes, percent_r, mixed
+Style/RegexpLiteral:
+  Exclude:
+    - 'src/canoe/spec/features/user_deploys_pardot_project_from_artifactory_spec.rb'
+    - 'src/canoe/spec/support/test_helpers.rb'
+
+# Offense count: 36
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
+# SupportedStyles: space, no_space
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+# Offense count: 1
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SupportedStyles.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+# Offense count: 3
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyleForMultiline, SupportedStyles.
+# SupportedStyles: comma, consistent_comma, no_comma
+Style/TrailingCommaInLiteral:
+  Exclude:
+    - 'src/canoe/app/models/project.rb'
+    - 'src/canoe/app/models/provisional_deploy.rb'

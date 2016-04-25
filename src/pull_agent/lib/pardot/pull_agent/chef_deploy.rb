@@ -15,6 +15,7 @@ module Pardot
         @deploy = deploy
       end
 
+      # rubocop:disable Lint/RescueException
       def apply(env)
         hostname = ShellHelper.hostname
         datacenter = hostname.split("-")[3]

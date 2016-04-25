@@ -63,7 +63,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             deploy_target: @target,
             specified_servers: "localhost,#{server.hostname}",
             servers_used: "localhost",
-            completed: false,
+            completed: false
           )
           deploy.results.create!(server: server, stage: "initiated")
 
