@@ -7,7 +7,7 @@ module Pardot
         end
 
         def has_key?(key)
-          @redis.exists?(key)
+          @redis.exists(key)
         end
 
         def hset(key, entry, value)
