@@ -5,8 +5,10 @@
 #/ file to be readable and to contain the hostname and authentication credentials
 #/ of the Artifactory server.
 set -euo pipefail
-
 cd "$(dirname "$0")/../../src/pull_agent"
+
+: "${DEBUG:=""}"
+test -n "$DEBUG" && set -x
 
 # Configure RubyGems for pushing to our Artifactory repository
 . /etc/env/artifactoryenv
