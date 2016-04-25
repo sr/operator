@@ -154,7 +154,7 @@ do
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v "/etc/env/artifactoryenv:/etc/env/artifactoryenv" \
-                    build/ruby build-gem-pull_agent
+                    build/ruby src/build/build-gem-pull_agent
             fi
             ;;
         shell)
