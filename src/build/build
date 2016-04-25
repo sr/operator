@@ -146,6 +146,7 @@ do
             # Build the gem and push it to Artifactory on CI.
             if $cimode
             then
+                sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v "/etc/env/artifactoryenv:/etc/env/artifactoryenv" \
