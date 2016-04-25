@@ -1,9 +1,4 @@
 #!/usr/bin/env ruby
-$:.unshift File.realpath(File.dirname(__FILE__), "lib")
-
-require "rubygems"
-require "bundler/setup"
-
 require "pardot/pull_agent"
 
 LOCKFILE = "/var/lock/pull-agent/deploy.lock".freeze
@@ -17,6 +12,11 @@ environment = cli.environment
 
 # Wait a random number of seconds, since cron can't be set by second
 sleep(rand * 60) unless environment.dev?
+
+# TODO(sr) Remove this and setup a real end-to-end test that hits a Canoe server
+if environment.dev? && ENV["PULL_AGENT_ENV"] == "test"
+  exit 0
+end
 
 # Only one-concurrent process using file lock
 lockfile = File.new(LOCKFILE, "w")
