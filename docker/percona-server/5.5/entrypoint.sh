@@ -35,9 +35,8 @@ if [ "$program" = "mysqld" ]; then
         mysql --protocol=socket -uroot <<-EOF
           SET @@SESSION.SQL_LOG_BIN=0;
 
-          CREATE USER '${arr[0]}'@'%' IDENTIFIED BY '${arr[1]}';
           CREATE DATABASE IF NOT EXISTS ${arr[2]};
-          GRANT ALL ON ${arr[2]}.* TO '${arr[0]}'@'%';
+          GRANT ALL ON ${arr[2]}.* TO '${arr[0]}'@'%' IDENTIFIED BY '${arr[1]}';
 EOF
       done
     fi
