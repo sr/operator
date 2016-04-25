@@ -1,13 +1,17 @@
-describe Pardot::PullAgent::Strategies::Deploy::Atomic do
+require "strategies"
+require "environments"
+require "deploy"
+
+describe Strategies::Deploy::Atomic do
   let(:tempdir) { Dir.mktmpdir("pull-agent") }
-  let(:environment) do
-    Pardot::PullAgent::Environments.build(:test).tap do |e|
+  let(:environment) {
+    Environments.build(:test).tap { |e|
       e.payload = "pardot"
       e.payload.options[:repo_path] = tempdir
-    end
-  end
+    }
+  }
 
-  let(:strategy) { Pardot::PullAgent::Strategies.build(:deploy, :atomic, environment) }
+  let(:strategy) { Strategies.build(:deploy, :atomic, environment) }
 
   after { FileUtils.rm_rf(tempdir) }
 
@@ -17,7 +21,7 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
         f.write(empty_tar_gz_contents)
         f.flush
 
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
       end
     end
@@ -29,7 +33,7 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
 
         FileUtils.ln_s("#{tempdir}/releases/foo123", "#{tempdir}/current")
 
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
       end
     end
@@ -39,7 +43,7 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
         f.write(hello_tar_gz_contents)
         f.flush
 
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.read(File.join(tempdir, "current", "hello.txt"))).to eq("hello world\n")
       end
     end
@@ -49,41 +53,41 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
         f.write(empty_tar_gz_contents)
         f.flush
 
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/B")
-        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        strategy.deploy(f.path, Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
       end
     end
 
     describe "#rollback" do
       it "should not roll back because there hasn't been a deploy" do
-        deploy = Pardot::PullAgent::Deploy.from_hash("artifact_url" => "https://artifactory.example/build1.tar.gz")
+        deploy = Deploy.from_hash("artifact_url" => "https://artifactory.example/build1.tar.gz")
         expect(strategy.rollback?(deploy)).to be_falsey
       end
 
       it "roll backs to a previous version it finds on disk" do
-        build1 = Pardot::PullAgent::BuildVersion.new(1, "abc123", "https://artifactory.example/build1.tar.gz")
-        build2 = Pardot::PullAgent::BuildVersion.new(2, "bcd345", "https://artifactory.example/build2.tar.gz")
+        build1 = BuildVersion.new(1, "abc123", "https://artifactory.example/build1.tar.gz")
+        build2 = BuildVersion.new(2, "bcd345", "https://artifactory.example/build2.tar.gz")
 
         Tempfile.create("empty.tar.gz") do |f|
           f.write(empty_tar_gz_contents)
           f.flush
 
-          strategy.deploy(f.path, Pardot::PullAgent::Deploy.from_hash("artifact_url" => build1.artifact_url))
+          strategy.deploy(f.path, Deploy.from_hash("artifact_url" => build1.artifact_url))
           File.write("#{tempdir}/current/build.version", build1.to_s)
           build1link = File.readlink("#{tempdir}/current")
 
-          strategy.deploy(f.path, Pardot::PullAgent::Deploy.from_hash("artifact_url" => build2.artifact_url))
+          strategy.deploy(f.path, Deploy.from_hash("artifact_url" => build2.artifact_url))
           File.write("#{tempdir}/current/build.version", build2.to_s)
 
-          rollback_deploy = Pardot::PullAgent::Deploy.from_hash("artifact_url" => build1.artifact_url)
+          rollback_deploy = Deploy.from_hash("artifact_url" => build1.artifact_url)
           is_rollback = strategy.rollback?(rollback_deploy)
           expect(is_rollback).to be_truthy
 
-          allow(Pardot::PullAgent::ShellHelper).to receive(:execute).never
+          allow(ShellHelper).to receive(:execute).never
           strategy.rollback(rollback_deploy)
           expect(File.readlink("#{tempdir}/current")).to eq(build1link)
         end
@@ -95,36 +99,36 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
     it "Basecase" do
       array = []
       current = nil
-      pick = strategy.__send__(:pick_next_choice, array, current)
+      pick = strategy.send(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Basecase with current" do
       array = []
-      current = "a"
-      pick = strategy.__send__(:pick_next_choice, array, current)
+      current = 'a'
+      pick = strategy.send(:pick_next_choice, array, current)
       expect(pick).to be_nil
     end
 
     it "Singleton" do
-      array = ["a"]
-      current = "a"
-      pick = strategy.__send__(:pick_next_choice, array, current)
-      expect(pick).to eq("a")
+      array = ['a']
+      current = 'a'
+      pick = strategy.send(:pick_next_choice, array, current)
+      expect(pick).to eq('a')
     end
 
     it "Middle" do
-      array = %w[a b c d]
-      current = "b"
-      pick = strategy.__send__(:pick_next_choice, array, current)
-      expect(pick).to eq("c")
+      array = ['a', 'b', 'c', 'd']
+      current = 'b'
+      pick = strategy.send(:pick_next_choice, array, current)
+      expect(pick).to eq('c')
     end
 
     it "Wrap Around" do
-      array = %w[a b c d]
-      current = "d"
-      pick = strategy.__send__(:pick_next_choice, array, current)
-      expect(pick).to eq("a")
+      array = ['a', 'b', 'c', 'd']
+      current = 'd'
+      pick = strategy.send(:pick_next_choice, array, current)
+      expect(pick).to eq('a')
     end
   end
 end
