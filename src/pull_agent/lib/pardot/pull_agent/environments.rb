@@ -19,7 +19,5 @@ module Pardot
     require_relative "environments/test"
     require_relative "environments/staging"
     require_relative "environments/production"
-    require_relative "environments/production_dfw"
-    require_relative "environments/production_phx"
   end
 end

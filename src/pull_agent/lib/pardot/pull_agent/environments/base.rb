@@ -339,7 +339,7 @@ module Pardot
         end
 
         def production?
-          name == "production" || name == "production_dfw" || name == "production_phx"
+          name == "production"
         end
 
         def valid_payload?(payload_name = nil)
