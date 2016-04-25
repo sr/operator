@@ -11,7 +11,9 @@ Gem::Specification.new do |s|
   s.homepage = "https://confluence.dev.pardot.com/display/PTechops/Pull-based+Deployment+Overview"
   s.email = "pd-bread@salesforce.com"
   s.authors = ["https://confluence.dev.pardot.com/display/PTechops/BREAD+Ops"]
-  s.files = `git ls-files -z`.split("\x0").reject {|f| f.match(%r{^(test|spec|features)/}) }
+  s.files += ["README.md"]
+  s.files += Dir.glob("environments/*")
+  s.files += Dir.glob("lib/**/*")
   s.executables = ["pull-agent"]
   s.add_dependency "artifactory", "~>2.3"
   s.add_dependency "redis", "~>3.3"
