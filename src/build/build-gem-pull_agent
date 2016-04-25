@@ -12,6 +12,7 @@ test -n "$DEBUG" && set -x
 
 # Configure RubyGems for pushing to our Artifactory repository
 . /etc/env/artifactoryenv
+ARTIFACTORYHOST="artifactory-internal.dev.pardot.com"
 RUBYGEMS_HOST="${PROTOCOL}://${ARTIFACTORYHOST}/artifactory/api/gems/pd-gem-local"
 test -d "${HOME}/.gem" || mkdir "${HOME}/.gem"
 curl -s -u "${USERNAME}:${PASSWORD}" "${RUBYGEMS_HOST}/api/v1/api_key.yaml" \
