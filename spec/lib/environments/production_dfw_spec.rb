@@ -1,8 +1,8 @@
-require "environments"
+require "spec_helper"
 
-describe Environments::ProductionDfw do
+describe Pardot::PullAgent::Environments::ProductionDfw do
   it "returns its name as production_dfw" do
-    environment = Environments.build(:production_dfw)
+    environment = Pardot::PullAgent::Environments.build(:production_dfw)
     expect(environment.name).to eq("production_dfw")
   end
 end

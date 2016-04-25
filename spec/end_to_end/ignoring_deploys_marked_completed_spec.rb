@@ -1,7 +1,5 @@
-require "cli"
-
 describe "ignoring deploys marked completed" do
-  let(:build_number) { 1234}
+  let(:build_number) { 1234 }
   let(:sha) { "abc123" }
   let(:artifact_url) { "https://artifactory.dev.pardot.com/build1234.tar.gz" }
   let(:artifact_download_url) { "https://artifactory.dev.pardot.com/download/build1234.tar.gz" }
@@ -10,12 +8,12 @@ describe "ignoring deploys marked completed" do
   after { FileUtils.rm_rf(tempdir) }
 
   before do
-    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{ShellHelper.hostname}":{"stage":"completed","action":null}}}))
+    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
+      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"completed","action":null}}}))
   end
 
   it "exits immediately without changing anything" do
-    cli = CLI.new(%w[test pardot])
+    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 

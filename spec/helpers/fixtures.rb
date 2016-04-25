@@ -12,7 +12,7 @@ module TestHelpers
       HELLO_TAR_GZ_CONTENTS
     end
 
-    def bootstrap_repo_path(tempdir, link_current: true)
+    def bootstrap_repo_path(tempdir)
       FileUtils.mkdir_p(File.join(tempdir, "releases", "A"))
       FileUtils.mkdir_p(File.join(tempdir, "releases", "B"))
       File.symlink(File.join(tempdir, "releases", "A"), File.join(tempdir, "current"))
