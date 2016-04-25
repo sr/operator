@@ -3,7 +3,7 @@
 #/ Build a BREAD Ruby project. It must be located under the src/ tree and have
 #/ a valid docker-compose.yml configuration file at its root.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 project="${1:-""}"
 test -z "$project" && {
@@ -14,8 +14,8 @@ test -z "$project" && {
 dir="src/$project"
 config="$dir/docker-compose.yml"
 
-docker build -f etc/Dockerfile.ruby -t build/ruby .
-docker run --rm -v "$(pwd):/data" build/ruby lint-ruby "$dir"
+docker build -f etc/docker/Dockerfile.ruby -t build/ruby .
+docker run --rm -v "$(pwd):/data" build/ruby src/build/lint-ruby "$dir"
 
 docker-compose -p "$project" -f "$config" build --pull
 # TODO(sr) Remove the sleep test...

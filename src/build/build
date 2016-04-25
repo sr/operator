@@ -154,7 +154,7 @@ do
             fi
             ;;
         shell)
-            docker build -f etc/Dockerfile.shellcheck -t build/shellcheck .
+            docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
             docker run --rm -v "$(pwd):/data" \
                 build/shellcheck \
                 find src/build bin -maxdepth 1 -type f -exec shellcheck -f gcc {} +
@@ -163,7 +163,7 @@ do
             docker build -f src/teampass/Dockerfile src/teampass
             ;;
         terraform)
-            docker build -f etc/Dockerfile.terraform -t build/terraform .
+            docker build -f etc/docker/Dockerfile.terraform -t build/terraform .
             docker run --rm -v "$(pwd):/data" \
                 build/terraform \
                 make -C src/terraform validate
