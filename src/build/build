@@ -132,9 +132,10 @@ do
 
             if $cimode
             then
-                image="${CANOE_DOCKER_REPO}:${bamboo_BuildNumber}"
+                # shellcheck disable=SC2154
+                image="${CANOE_ECR_REPO}:${bamboo_buildNumber}"
                 docker tag "canoe_app" "$image"
-                docker push "canoe"
+                docker push "$image"
             fi
             ;;
         pardot-explorer)
@@ -156,7 +157,7 @@ do
             docker build -f etc/Dockerfile.shellcheck -t build/shellcheck .
             docker run --rm -v "$(pwd):/data" \
                 build/shellcheck \
-                shellcheck -f gcc src/build/*
+                find src/build bin -maxdepth 1 -type f -exec shellcheck -f gcc {} +
             ;;
         teampass)
             docker build -f src/teampass/Dockerfile src/teampass

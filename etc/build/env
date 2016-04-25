@@ -1,1 +1,7 @@
-: "${CANOE_DOCKER_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe"}"
+#!/bin/sh
+: "${AWS_PROFILE="pardotops"}"
+: "${AWS_DEFAULT_REGION="us-east-1"}"
+
+: "${CANOE_ECS_CLUSTER:="canoe_production"}"
+: "${CANOE_ECS_SERVICE:="canoe"}"
+: "${CANOE_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe"}"
