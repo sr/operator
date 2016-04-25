@@ -95,11 +95,11 @@ module Zabbix
 
     def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
-      uri = URI(url)
-      req = Net::HTTP::Get.new(uri)
+      uri = URI url
+      req = Net::HTTP::Get.new uri.request_uri
       req.basic_auth @zbx_username, @zbx_password
       res = Net::HTTP.start(uri.host, uri.port, :ENV, :read_timeout => timeout_seconds) {|http|
-        http.request(req)
+        http.request req
       }
     rescue Timeout::Error
       @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
