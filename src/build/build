@@ -158,7 +158,7 @@ do
                     build/ruby src/build/build-gem-pull_agent
             fi
             ;;
-        shell)
+        build|shell)
             docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
             docker run --rm -v "$(pwd):/data" \
                 build/shellcheck \
