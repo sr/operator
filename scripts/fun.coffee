@@ -28,6 +28,7 @@
 #   hubot rubbs - gifs
 #   hubot kyle - kyle
 #   hubot nippon - nippon
+#   hubot raptorcamp - praise raptors!
 #   hubot parker - parker
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
@@ -87,6 +88,9 @@ _ = require "underscore"
 module.exports = (robot) ->
   robot.respond /parker$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
+
+  robot.respond /raptorcamp$/i, (msg) ->
+    msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
 
   robot.respond /thumbsup$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/88/MVcZU1s2CcLTCeS/thumbsup.png"
