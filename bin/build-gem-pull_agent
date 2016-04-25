@@ -30,8 +30,10 @@ export RUBYGEMS_HOST
 # command. See this article for more info:
 #
 # http://guides.rubygems.org/patterns/#prerelease-gems
+# shellcheck disable=SC2154
 if [ "$bamboo_repository_branch_name" = "master" ]
 then
+    # shellcheck disable=SC2154
     RUBYGEM_VERSION="${bamboo_buildNumber}"
 else
     RUBYGEM_VERSION="0.${bamboo_shortPlanKey}.${bamboo_buildNumber}"
