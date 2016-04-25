@@ -6,7 +6,7 @@
 #/ of the Artifactory server.
 set -euo pipefail
 
-cd "$(dirname "$0")/../src/pull_agent"
+cd "$(dirname "$0")/../../src/pull_agent"
 
 # Configure RubyGems for pushing to our Artifactory repository
 . /etc/env/artifactoryenv
