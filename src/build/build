@@ -7,6 +7,9 @@ cd "$(dirname "$0")/../.."
 PATH="$(pwd)/bin:$PATH"
 export PATH
 
+# Bring in configuration settings
+. etc/build/env
+
 : "${DEBUG:=""}"
 test -n "$DEBUG" && set -x
 
@@ -126,6 +129,13 @@ do
     case "$project" in
         canoe)
             build-ruby "$project"
+
+            if $cimode
+            then
+                image="${CANOE_DOCKER_REPO}:${bamboo_BuildNumber}"
+                docker tag "canoe_app" "$image"
+                docker push "canoe"
+            fi
             ;;
         pardot-explorer)
             build-ruby "$project"
