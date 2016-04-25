@@ -1,4 +1,4 @@
-require "core_ext/underscore_string"
+require "spec_helper"
 
 describe String do
   it "expects snakecase" do
