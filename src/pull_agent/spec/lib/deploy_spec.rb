@@ -20,10 +20,16 @@ describe Pardot::PullAgent::Deploy do
 
   describe "applies_to_this_server?" do
     it "is truthy if this server is in the list of servers" do
-      allow(Socket).to receive(:gethostname).and_return("localhost1.example.pardot.com")
-      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1.example" => { "action" => nil } })
+      begin
+        orig = ENV["PULL_HOSTNAME"]
+        ENV["PULL_HOSTNAME"] = nil
+        allow(Socket).to receive(:gethostname).and_return("localhost1.example.pardot.com")
+        deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1.example" => { "action" => nil } })
 
-      expect(deploy.applies_to_this_server?).to eq(true)
+        expect(deploy.applies_to_this_server?).to eq(true)
+      ensure
+        ENV["PULL_HOSTNAME"] = orig
+      end
     end
 
     it "is falsey if this server is not in the list of servers" do
