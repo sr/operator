@@ -1,2 +1,11 @@
-source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
-gemspec
+source "https://rubygems.org"
+
+gem "rake"
+gem "artifactory", "~> 2.3", ">= 2.3.2"
+
+group :test do
+  gem "rspec", "~> 3.4"
+  gem "simplecov", ">= 0.9.0", require: false
+  gem "byebug", require: false
+  gem "webmock", "~> 1.21", require: false
+end
