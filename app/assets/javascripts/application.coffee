@@ -48,9 +48,3 @@ $ ->
 
     for hostname in $checkbox.data("server-hostnames")
       $("input[name='server_hostnames[]'][value='#{hostname}']").prop("checked", checked)
-
-  if $('.shipithere') && $('.repo').text().match(/pardot/)
-    if $('h2 > span').text().match(/derweze/i)
-      $('.shipithere[data-target="production"]').attr("disabled", true)
-    else
-      $('.shipithere[data-target="production_phx"]').attr("disabled", true)
