@@ -95,7 +95,7 @@ namespace :canoe do
       }.save!
       DeployTarget.find_or_initialize_by(name: "production_phx").tap { |target|
         target.production = true
-        target.enabled = true
+        target.enabled = false
       }.save!
     end
   end
