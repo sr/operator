@@ -12,6 +12,7 @@ fi
 
 mkdir -p ~/.aws
 cp /etc/aws/credentials ~/.aws/credentials
+export AWS_PROFILE AWS_DEFAULT_REGION
 eval "$(aws ecr get-login)"
 
 # shellcheck disable=SC2154
