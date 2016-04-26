@@ -150,6 +150,9 @@ do
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
+                    -e "bamboo_repository_branch_name=$bamboo_repository_branch_name" \
+                    -e "bamboo_buildNumber=$bamboo_buildNumber" \
+                    -e "bamboo_shortPlanKey=$bamboo_shortPlanKey" \
                     -e "DEBUG=$DEBUG" \
                     build/ruby src/build/build-gem-pull_agent
             fi
