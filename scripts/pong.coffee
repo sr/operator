@@ -37,7 +37,7 @@ module.exports = (robot) ->
             if payload.team_a_score > payload.team_b_score
               msg.send payload.name + ' status: ' + teamAString + ' is beating ' +
                   teamBString + ' ' + payload.team_a_score + ' to ' + payload.team_b_score
-            else if payload.team_b_score > payload.team_b_score
+            else if payload.team_b_score > payload.team_a_score
               msg.send payload.name + ' status: ' + teamBString + ' is beating ' +
                   teamAString + ' ' + payload.team_b_score + ' to ' + payload.team_a_score
             else
