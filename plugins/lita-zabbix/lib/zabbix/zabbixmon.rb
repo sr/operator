@@ -76,7 +76,7 @@ module Zabbix
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
         @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e).gsub(@zbx_password, '**************'))
-      end rescue StandardError # consume the exception and continue; zbx_items being nil is okay from here
+      end
       if zbx_items
         if zbx_items.length > 0  # success case
           @log.info("[#{monitor_name}] successfully observed #{payload} from #{@zbx_host} ")
