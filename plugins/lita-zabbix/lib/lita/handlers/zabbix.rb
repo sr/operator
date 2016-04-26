@@ -93,6 +93,7 @@ module Lita
           end
         @clients = Hash.new { |h, k| h[k] = build_zabbix_client(datacenter: k) }
         config.datacenters.each do |datacenter|
+
           begin
             maintenance_supervisor = ::Zabbix::MaintenanceSupervisor.get_or_create(
               datacenter: datacenter,
@@ -104,6 +105,7 @@ module Lita
           rescue => e
             log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, '**************'))
           end
+
           begin
             monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
               datacenter: datacenter,
@@ -115,6 +117,7 @@ module Lita
           rescue => e
             log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, '**************'))
           end
+
         end
         @status_room = ::Lita::Source.new(room: config.status_room)
       end
@@ -127,6 +130,7 @@ module Lita
         msg = "\nMonitor / Status / Paging?"
         config.active_monitors.each do |active_monitor|
           config.datacenters.each do |datacenter|
+
             if active_monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
               monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
                 datacenter: datacenter,
@@ -138,6 +142,7 @@ module Lita
               msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
               #TODO: Last known status per-datacenter
             end
+
           end
         end
         response.reply_with_mention("#{msg}")
@@ -207,6 +212,7 @@ module Lita
         datacenter ||= config.default_datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
         options = parse_options(response.match_data["options"])
+
         until_time = \
           if options["until"]
            begin
@@ -217,6 +223,7 @@ module Lita
           else
             Time.now + 3600
           end
+
         monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
           datacenter: datacenter,
           redis: redis,
@@ -225,6 +232,7 @@ module Lita
         monitor_supervisor.pause_monitor(
           monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME,
           until_time: until_time)
+
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
       rescue => e
         response.reply_with_mention("Sorry, something went wrong.")
@@ -334,7 +342,6 @@ module Lita
       def monitor_zabbix(datacenter)
         zabbixmon = ::Zabbix::Zabbixmon.new(redis: redis,
           zbx_client: @clients[datacenter],
-          zbx_host: config.zabbix_hostname.gsub(/%datacenter%/, datacenter),
           zbx_username: config.zabbix_user,
           zbx_password: config.zabbix_password,
           datacenter: datacenter,

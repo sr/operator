@@ -12,11 +12,10 @@ module Zabbix
     ZBXMON_KEY = "Zabbix_status"
     ZBXMON_PAYLOAD_LENGTH = 20
     
-    def initialize(redis:, zbx_client:, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
+    def initialize(redis:, zbx_client:, log:, zbx_username:, zbx_password:, datacenter:)
       @redis = redis
       @client = zbx_client
       @log = log
-      @zbx_host = zbx_host
       @zbx_username = zbx_username
       @zbx_password = zbx_password
       @datacenter = datacenter
@@ -41,11 +40,11 @@ module Zabbix
         monitor_success = retrieve_payload payload
         @log.warn("[#{monitor_name}] FAILED to find an item that contains #{payload} from the zabbix (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
-        retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
+        retry_sz = "retry attempt #{(retry_attempt_iterator)} / #{num_retries}"
       end
 
       if monitor_success
-        @log.info("[#{monitor_name}] successfully retrieved payload (#{retry_sz})")
+        @log.debug("[#{monitor_name}] successfully retrieved payload (#{retry_sz})")
         @hard_failure = nil
       else
         @hard_failure ||= @soft_failures.to_a.join('; ')
@@ -81,7 +80,7 @@ module Zabbix
       end
       if zbx_items
         if zbx_items.length > 0  # success case
-          @log.info("[#{monitor_name}] successfully observed #{payload} from #{@zbx_host} ")
+          @log.debug("[#{monitor_name}] successfully observed #{payload} from Zabbix-#{@datacenter}")
           success = true
         else # fail case
           @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
@@ -89,6 +88,8 @@ module Zabbix
         end
       else # fail case
         @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
+        @log.error("[#{monitor_name}] zbx_items=nil") if zbx_items.nil?
+        @log.error("[#{monitor_name}] zbx_items=[]") if zbx_items.length == 0
       end
       success
     end
