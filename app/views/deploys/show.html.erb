@@ -62,7 +62,7 @@
   <div class="alert alert-danger">
     <i class="icon-remove-sign"></i>
     <strong>Stopped</strong>:
-    this deploy was canceled and marked completed on <%= print_time current_deploy.updated_at %>
+    this deploy was stopped and marked completed on <%= print_time current_deploy.updated_at %>
   </div>
 <% elsif current_deploy.completed? %>
   <div class="alert alert-success">
@@ -160,7 +160,7 @@
         </td>
         <td>No</td>
         <td>
-          Immediately cancels the deploy. This is appropriate only when a rollback is going to be performed immediately following. Restart tasks (e.g., restarting jobs) <strong>are not</strong> performed, so the deploy will exit immediately.
+          Immediately stops the deploy. This is appropriate only when a rollback is going to be performed immediately following. Restart tasks (e.g., restarting jobs) <strong>are not</strong> performed, so the deploy will exit immediately.
         </td>
       </tr>
     <% end %>
