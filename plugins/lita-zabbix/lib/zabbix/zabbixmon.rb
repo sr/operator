@@ -9,6 +9,7 @@ module Zabbix
     ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ZABBIX_ITEM_NOT_FOUND = "HAL9000 failed to find the payload via the API"
+    ZBXMON_KEY = "Zabbix_status"
     ZBXMON_PAYLOAD_LENGTH = 20
     
     def initialize(redis:, zbx_client:, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
@@ -36,6 +37,7 @@ module Zabbix
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
+        @log.debug("[#{monitor_name}] searching for #{payload} via API...")
         monitor_success = retrieve_payload payload
         @log.warn("[#{monitor_name}] FAILED to find an item that contains #{payload} from the zabbix (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
@@ -72,8 +74,7 @@ module Zabbix
     def retrieve_payload(payload)
       begin # get zabbix item
         success = false
-        @log.debug("[#{monitor_name}] searching for #{payload} via API...")
-        zbx_items = @client.get_item_by_lastvalue(payload)
+        zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
         @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e).gsub(@zbx_password, '**************'))
@@ -115,7 +116,8 @@ module Zabbix
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
       end
-      http.read_timeout = timeout_seconds.to_i
+      #TODO: figure out timeout
+      # http.read_timeout = timeout_seconds.to_i
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth @zbx_username, @zbx_password if @zbx_username
       response = http.request(request)
