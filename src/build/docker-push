@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #/ Usage: docker-push <image> <ecr-repo>
-#/ Push a built Docker image to EC2 Container Service.
+#/ Push a built Docker image to EC2 Container Service. Requires the AWS_PROFILE
+#/ and AWS_DEFAULT_REGION environment variables to be set. AWS credentials must
+#/ be configured in the /etc/aws/credentials file.
 set -euo pipefail
 
 awscredentials="/etc/aws/credentials"
