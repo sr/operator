@@ -344,9 +344,7 @@ module Lita
           config.monitor_retries,
           config.monitor_retry_interval_seconds,
           config.monitor_http_timeout_seconds)
-        log.info(
-          "[#{::Zabbix::Zabbixmon::MONITOR_NAME}] #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful."
-        ) if zabbixmon.hard_failure.nil?
+        log.info("[#{::Zabbix::Zabbixmon::MONITOR_NAME}] #{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter} was successful.") if zabbixmon.hard_failure.nil?
         monitor_fail_notify(zabbixmon.monitor_name,
           datacenter,
           zabbixmon.hard_failure,

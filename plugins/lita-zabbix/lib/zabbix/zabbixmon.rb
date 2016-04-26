@@ -72,7 +72,7 @@ module Zabbix
     def retrieve_payload(payload)
       begin # get zabbix item
         success = false
-        zbx_items = @client.get_item_by_lastvalue(payload)
+        zbx_items = @client.get_item_by_lastvalue(lastvalue: payload)
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
         @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e).gsub(@zbx_password, '**************'))
