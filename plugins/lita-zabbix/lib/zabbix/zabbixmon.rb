@@ -96,11 +96,30 @@ module Zabbix
     def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI url
-      req = Net::HTTP::Get.new uri.request_uri
-      req.basic_auth @zbx_username, @zbx_password
-      res = Net::HTTP.start(uri.host, uri.port, :ENV, :read_timeout => timeout_seconds) {|http|
-        http.request req
-      }
+      unless ENV['http_proxy'].nil?
+        @proxy_uri = URI.parse(ENV['http_proxy'])
+        @proxy_host = @proxy_uri.host
+        @proxy_port = @proxy_uri.port
+        @proxy_user, @proxy_pass = @proxy_uri.userinfo.split(/:/) if @proxy_uri.userinfo
+      end
+      unless @proxy_uri.nil?
+        http = Net::HTTP.Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(uri.host, uri.port)
+
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+      else
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+      end
+      request = Net::HTTP::Get.new uri.request_uri
+      request.basic_auth @zbx_username, @zbx_password if @zbx_username
+      response = http.request(request)
+
     rescue Timeout::Error
       @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
