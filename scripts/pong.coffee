@@ -26,7 +26,9 @@ module.exports = (robot) ->
     url = pongApiUrl + 'rooms/1/status'
     robot.http(url)
       .get() (error, response, body) ->
-        if !error
+        if error
+          msg.send "Pong server failed to respond: #{error}"
+        else
           payload = JSON.parse(body)
           if payload.has_active_game
             teamAString = getPlayerString(payload.player_data.team_a, 'a')
