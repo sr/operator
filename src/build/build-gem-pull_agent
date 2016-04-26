@@ -38,7 +38,7 @@ export RUBYGEMS_HOST
 if [ "$bamboo_repository_branch_name" = "master" ]
 then
     # shellcheck disable=SC2154
-    RUBYGEM_VERSION="$(($bamboo_buildNumber + 140))"
+    RUBYGEM_VERSION="$((bamboo_buildNumber + 140))"
 else
     RUBYGEM_VERSION="0.${bamboo_shortPlanKey}.${bamboo_buildNumber}"
 fi

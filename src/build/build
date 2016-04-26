@@ -130,11 +130,7 @@ do
             build-ruby "$project"
 
             if $cimode
-            then
-                # shellcheck disable=SC2154
-                image="${CANOE_ECR_REPO}:${bamboo_buildNumber}"
-                docker tag "canoe_app" "$image"
-                docker push "$image"
+            then docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
         pardot-explorer)
