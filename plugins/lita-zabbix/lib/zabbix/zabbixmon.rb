@@ -8,7 +8,7 @@ module Zabbix
     INCIDENT_KEY = "#{MONITOR_NAME}-%s"
     ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
-    ZABBIX_ITEM_NOT_FOUND = "HAL9000 searched for an item w/ a particluar key and value, but did not find it. This is bad."
+    ZABBIX_ITEM_NOT_FOUND = "HAL9000 failed to find the payload via the API"
     ZBXMON_PAYLOAD_LENGTH = 20
     
     def initialize(redis:, zbx_client:, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
@@ -72,6 +72,7 @@ module Zabbix
     def retrieve_payload(payload)
       begin # get zabbix item
         success = false
+        @log.debug("[#{monitor_name}] searching for #{payload} via API...")
         zbx_items = @client.get_item_by_lastvalue(payload)
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
@@ -114,7 +115,7 @@ module Zabbix
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
       end
-      http.read_timeout = timeout_seconds
+      http.read_timeout = timeout_seconds.to_i
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth @zbx_username, @zbx_password if @zbx_username
       response = http.request(request)
