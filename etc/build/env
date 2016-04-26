@@ -1,6 +1,7 @@
 #!/bin/sh
 : "${AWS_PROFILE:="pardotops"}"
 : "${AWS_DEFAULT_REGION:="us-east-1"}"
+export AWS_PROFILE AWS_DEFAULT_REGION
 
 : "${CANOE_ECS_CLUSTER:="canoe_production"}"
 : "${CANOE_ECS_SERVICE:="canoe"}"
