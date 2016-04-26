@@ -73,8 +73,7 @@ module Zabbix
     def retrieve_payload(payload)
       begin # get zabbix item
         success = false
-        apiresponse = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
-        zbx_items = apiresponse['result']
+        zbx_items = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
         @log.debug("[#{monitor_name}] zabbix client 'got_item' successfully")
       rescue => e
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
