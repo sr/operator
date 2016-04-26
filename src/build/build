@@ -147,6 +147,7 @@ do
             # Build the gem and push it to Artifactory on CI.
             if $cimode
             then
+                # shellcheck disable=SC2154
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
