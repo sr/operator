@@ -9,8 +9,7 @@ module Zabbix
     ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
     ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
     ZABBIX_ITEM_NOT_FOUND = "HAL9000 searched for an iteam w/ a particluar key and value, but did not find it. This is bad."
-    ZBXMON_ITEM = 'system:general'
-    ZBXMON_KEY = 'zabbix_status'
+    ZBXMON_KEY = 'Zabbix_status'
     ZBXMON_PAYLOAD_LENGTH = 10
     
     def initialize(redis:, zbx_client:, log:, zbx_host:, zbx_username:, zbx_password:, datacenter:)
@@ -38,9 +37,10 @@ module Zabbix
       while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
-        monitor_success = retrieve_payload
+        monitor_success = retrieve_payload payload
         @log.warn("[#{monitor_name}] FAILED to find #{ZBXMON_KEY} : #{payload} from the zabbix 'item' (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
+        retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       end
 
       if monitor_success
@@ -70,7 +70,7 @@ module Zabbix
       end
     end
 
-    def retrieve_payload()
+    def retrieve_payload(payload)
       begin # get zabbix item
         success = false
         apiresponse = @client.get_item_by_key_and_lastvalue(ZBXMON_KEY, payload)
@@ -102,9 +102,9 @@ module Zabbix
         @proxy_port = @proxy_uri.port
         @proxy_user, @proxy_pass = @proxy_uri.userinfo.split(/:/) if @proxy_uri.userinfo
       end
+
       unless @proxy_uri.nil?
         http = Net::HTTP.Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(uri.host, uri.port)
-
         if uri.scheme == 'https'
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -116,6 +116,7 @@ module Zabbix
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         end
       end
+      http.read_timeout = timeout_seconds
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth @zbx_username, @zbx_password if @zbx_username
       response = http.request(request)
