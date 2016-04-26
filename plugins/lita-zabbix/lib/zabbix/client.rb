@@ -66,8 +66,8 @@ module Zabbix
       )
     end
 
-    def get_item_by_key_and_lastvalue(key:, lastvalue:)
-      @client.items.get(name: key, lastvalue: lastvalue) unless (key.nil? || lastvalue.nil?)
+    def get_item_by_lastvalue(lastvalue:)
+      @client.items.get(lastvalue: lastvalue) unless (lastvalue.nil?)
     end
 
     private
