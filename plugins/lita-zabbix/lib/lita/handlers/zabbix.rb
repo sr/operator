@@ -392,7 +392,7 @@ module Lita
         notify_hipchat_channel ? robot.send_message_with_mention(@status_room, whining) : robot.send_message(@status_room, whining)
       end
 
-      def page_r_doodie(message:, datacenter:)
+      def page_r_doodie(message, datacenter)
         @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
         errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
         if message.nil? || datacenter.nil?
