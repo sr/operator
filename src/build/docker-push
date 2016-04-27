@@ -22,6 +22,6 @@ eval "$(aws ecr get-login)"
 set -x
 
 # shellcheck disable=SC2154
-image="${2}:${bamboo_buildNumber}"
+image="${2}:1-${bamboo_buildNumber}"
 docker tag "$1" "$image"
 docker push "$image"
