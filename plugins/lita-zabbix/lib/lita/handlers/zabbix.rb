@@ -317,11 +317,9 @@ module Lita
                 client: @clients[datacenter])
               log.debug("[lita-zabbix] monitor_supervisor: #{monitor_supervisor.to_s}")
               config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
-
                 if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
                   monitor_zabbix datacenter
                 end
-
               end
             rescue => e
               log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})".gsub(config.zabbix_password, '**************'))
