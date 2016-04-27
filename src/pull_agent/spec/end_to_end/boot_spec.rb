@@ -30,4 +30,18 @@ describe "pull-agent executable" do
 
     expect(status.exitstatus).to eq(0)
   end
+
+  it "exists non-zero if PULL_AGENT_CONFIG_FILE is set and points to a non-existing file" do
+    r, w = IO.pipe
+    env = ENV.to_hash.merge(
+      "PULL_AGENT_ENV" => "test",
+      "PULL_AGENT_CONFIG_FILE" => "/boom/town.yml"
+    )
+    pid = Process.spawn(env, BIN, "dev", "pardot", out: w, err: w)
+    w.close
+    _, status = Process.wait2(pid)
+
+    expect(status.exitstatus).to eq(1)
+    expect(r.read.include?("/boom/town.yml")).to eq(true)
+  end
 end
