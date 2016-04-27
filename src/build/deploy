@@ -23,7 +23,9 @@ fi
 
 mkdir -p ~/.aws
 cp /etc/aws/credentials ~/.aws/credentials
+set +x
 eval "$(aws ecr get-login)"
+set -x
 
 case "$project" in
   canoe)

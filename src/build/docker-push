@@ -17,7 +17,9 @@ fi
 
 mkdir -p ~/.aws
 cp /etc/aws/credentials ~/.aws/credentials
+set +x
 eval "$(aws ecr get-login)"
+set -x
 
 # shellcheck disable=SC2154
 image="${2}:${bamboo_buildNumber}"
