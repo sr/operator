@@ -61,8 +61,8 @@
 <% if current_deploy.canceled? %>
   <div class="alert alert-danger">
     <i class="icon-remove-sign"></i>
-    <strong>Canceled</strong>:
-    this deploy was canceled and marked completed on <%= print_time current_deploy.updated_at %>
+    <strong>Stopped</strong>:
+    this deploy was stopped and marked completed on <%= print_time current_deploy.updated_at %>
   </div>
 <% elsif current_deploy.completed? %>
   <div class="alert alert-success">
@@ -106,10 +106,17 @@
 
 <hr>
 
+<% if current_deploy.deploy_target.name == 'staging' %>
+  <div class="alert alert-warning">
+    Zookeeper machines have been shut down in app.dev, so we can't restart services because discoclient is down. Please just stop a deploy after the code has gone out and it's in the restart stage. Sorry for the inconvenience.
+  </div>
+<% end %>
+
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>Task</th>
+      <th>Restart</th>
       <th>Description</th>
     </tr>
   </thead>
@@ -122,6 +129,7 @@
             <i class="icon-train2"></i> REDEPLOY
           <%- end %>
         </td>
+        <td>Yes</td>
         <td>
           Prepares to redeploy this build.
         </td>
@@ -137,6 +145,7 @@
             <%- end %>
           <%- end %>
         </td>
+        <td>Yes</td>
         <td>
           Forces the deploy to move toward completion, failing the deploy on any outstanding servers. This is appropriate to use if a few servers aren't completing, because they are down or unresponsive. Restart tasks (e.g., restarting jobs) <strong>are</strong> performed, so it's expected that the deploy will run for a few minutes after pushing this button.
         </td>
@@ -146,11 +155,12 @@
       <tr>
         <td>
           <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
-            <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> CANCEL</button>
+            <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> STOP</button>
           <%- end %>
         </td>
+        <td>No</td>
         <td>
-          Immediately cancels the deploy. This is appropriate only when a rollback is going to be performed immediately following. Restart tasks (e.g., restarting jobs) <strong>are not</strong> performed, so the deploy will exit immediately.
+          Immediately stops the deploy. This is appropriate only when a rollback is going to be performed immediately following. Restart tasks (e.g., restarting jobs) <strong>are not</strong> performed, so the deploy will exit immediately.
         </td>
       </tr>
     <% end %>
