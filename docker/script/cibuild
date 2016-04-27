@@ -6,7 +6,7 @@ dir=$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)
 "$dir/build" --all --artifactory-host="artifactory-internal.dev.pardot.com"
 
 head="$(git rev-parse HEAD)"
-master="$(git rev-parse origin/master)"
+master="$(git rev-parse master)"
 
 if [ "$head" = "$master" ]; then
   "$dir/push" --all
