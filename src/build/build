@@ -67,7 +67,7 @@ then
         echo "Unable to build master branch without a base SHA1" 2>&1
         exit 1
     else
-        sha1b="$(git rev-parse origin/master)"
+        sha1a="$(git rev-parse origin/master)"
     fi
 
     # If the two SHA1s are identical it most likely means this is a restarted
