@@ -11,6 +11,9 @@ then
     exit 1
 fi
 
+# Bring in configuration settings (AWS_DEFAULT_REGION etc)
+. etc/build/env
+
 awscredentials="/etc/aws/credentials"
 if ! test -f "$awscredentials"
 then
