@@ -13,7 +13,7 @@ module Pardot
           config_file = ENV["PULL_AGENT_CONFIG_FILE"]
           if !config_file.to_s.empty?
             if !File.exists?(config_file)
-              abort "Config file doesn't not exists: #{config_file.inspect}"
+              abort "Config file does not exist: #{config_file.inspect}"
             end
 
             load_yaml(config_file)
