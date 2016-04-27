@@ -1,5 +1,3 @@
-require "securerandom"
-
 module Pardot
   module PullAgent
     module Environments
@@ -269,11 +267,17 @@ module Pardot
         end
 
         def link_atomic_force(source, target)
+          retries = 0
           begin
             tmp_suffix = SecureRandom.hex(8)
             FileUtils.ln_s(source, target + tmp_suffix)
           rescue Errno::EEXIST
-            retry
+            retries += 1
+            if retries >= 10
+              raise "unable to link '#{source}' to '#{target}'"
+            else
+              retry
+            end
           end
 
           FileUtils.rm_rf(target) if File.directory?(target)
