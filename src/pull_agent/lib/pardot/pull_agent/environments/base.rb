@@ -9,7 +9,13 @@ module Pardot
         def initialize
           @user = nil
           load_yaml(File.join(File.dirname(__FILE__), "..", "..", "..", "..", "environments", "#{short_name}.yml.erb"))
-          load_yaml(File.join(File.dirname(__FILE__), "..", "..", "..", "..", ".#{name}_settings.yml"))
+
+          config_file = ENV["PULL_AGENT_CONFIG_FILE"]
+          if !config_file.to_s.empty?
+            load_yaml(config_file)
+          else
+            load_yaml(File.join(File.dirname(__FILE__), "..", "..", "..", "..", ".#{name}_settings.yml"))
+          end
         end
 
         def self.strategies
