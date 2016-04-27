@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Pardot
   module PullAgent
     module Environments
@@ -262,8 +264,20 @@ module Pardot
           else
             Logger.log(:error, "Error restarting Puma server: #{output}")
           end
-        rescue Error::ENOENT
+        rescue Errno::ENOENT
           Logger.log(:info, "PID file '#{pid_file}' not found. Service might not be started yet")
+        end
+
+        def link_atomic_force(source, target)
+          begin
+            tmp_suffix = SecureRandom.hex(8)
+            FileUtils.ln_s(source, target + tmp_suffix)
+          rescue Errno::EEXIST
+            retry
+          end
+
+          FileUtils.rm_rf(target) if File.directory?(target)
+          File.rename(target + tmp_suffix, target)
         end
 
         # Links files in the repo_path into each release_dir
@@ -276,12 +290,7 @@ module Pardot
             next unless File.exist?(release_dir)
 
             files.each do |source, target|
-              begin
-                FileUtils.ln_s(File.join(payload.repo_path, source), File.join(release_dir, target))
-              rescue Errno::EEXIST
-                # already exists
-                next
-              end
+              link_atomic_force(File.join(payload.repo_path, source), File.join(release_dir, target))
             end
           end
         end
