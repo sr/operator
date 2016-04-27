@@ -41,7 +41,7 @@ module Lita
       config :paging_monitors, default: []
 
       # config: page-r-doodie
-      config :pager, default: 'test'
+      config :pager, default: 'pagerduty'
       config :pagerduty_service_key
 
       route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
@@ -382,15 +382,15 @@ module Lita
         Hash[Shellwords.split(options.to_s).map { |o| o.split("=", 2) }]
       end
 
-      def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, pagerduty_alert)
-        if pagerduty_alert
+      def monitor_fail_notify(monitorname, data_center, error_msg, notify_hipchat_channel, alert_pagerduty)
+        if alert_pagerduty
           log.info("Paging sequence initiated. Paging pagerduty.")
           page_r_doodie(error_msg, data_center)
         end
-        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center} (more detail in logging)"
+        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}. Details: #{error_msg}"
         log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
-        errmsg = "@all : #{errmsg}" if notify_hipchat_channel
-        robot.send_message(@status_room, errmsg)
+        whining = "@all : #{whining}" if notify_hipchat_channel
+        robot.send_message(@status_room, whining)
       end
 
       def page_r_doodie(message, datacenter)
