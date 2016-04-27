@@ -39,6 +39,9 @@ case "$project" in
   ;;
 esac
 
+PATH="$(dirname "$0")/vendor:$PATH"
+export PATH
+
 # shellcheck disable=SC2154
 ecs-deploy \
   --cluster "$AWS_ECS_CLUSTER" \
