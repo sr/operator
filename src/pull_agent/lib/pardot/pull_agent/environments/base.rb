@@ -263,6 +263,8 @@ module Pardot
         #     link_shared_files(".env" => ".env") # links .env to releases/{A,B}/.env
         def link_shared_files(files)
           payload.path_choices.each do |release_dir|
+            next unless File.exist?(release_dir)
+
             files.each do |source, target|
               begin
                 FileUtils.ln_s(File.join(payload.repo_path, source), File.join(release_dir, target))
