@@ -389,19 +389,22 @@ module Lita
         end
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center} (more detail in logging)"
         log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
-        notify_hipchat_channel ? robot.send_message_with_mention(@status_room, whining) : robot.send_message(@status_room, whining)
+        errmsg = "@all : #{errmsg}" if notify_hipchat_channel
+        robot.send_message(@status_room, errmsg)
       end
 
       def page_r_doodie(message, datacenter)
         @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
         errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
         if message.nil? || datacenter.nil?
-          config.monitor_hipchat_notify ? robot.send_message_with_mention(@status_room, errmsg) : robot.send_message(@status_room, errmsg)
+          errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
+          robot.send_message(@status_room, errmsg)
         end
       rescue ::Lita::Handlers::Zabbix::PagerFailed
         errmsg = 'Error sending page: ::Zabbix::PagerFailed'
         log.error(errmsg)
-        config.monitor_hipchat_notify ? robot.send_message_with_mention(@status_room, errmsg) : robot.send_message(@status_room, errmsg)
+        errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
+        robot.send_message(@status_room, errmsg)
       end
 
       Lita.register_handler(self)
