@@ -3,8 +3,11 @@
 #/ Writes the image ID of the current build.
 set -euo pipefail
 
+# shellcheck disable=SC2154
 PROJECT="$(echo "${bamboo_planKey}" | cut -d "-" -f 1)"
+# shellcheck disable=SC2154
 PLAN="${bamboo_shortPlanKey}"
+# shellcheck disable=SC2154
 BUILDNUM="${bamboo_buildNumber}"
 
 printf "%s-%s-%s" "$PROJECT" "$PLAN" "$BUILDNUM"
