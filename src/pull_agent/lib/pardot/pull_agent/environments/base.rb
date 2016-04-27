@@ -242,69 +242,64 @@ module Pardot
           end
         end
 
+        def restart_puma(pid_file)
+          pid = File.read(pid_file).chomp
+
+          # Killing puma with USR1 performs a rolling restart
+          output = ShellHelpers.execute(["kill", "-USR1", pid])
+          if $?.success?
+            Logger.log(:info, "Restarted Puma server: #{output}")
+          else
+            Logger.log(:error, "Error restarting Puma server: #{output}")
+          end
+        rescue Error::ENOENT
+          Logger.log(:info, "PID file '#{pid_file}' not found. Service might not be started yet")
+        end
+
+        # Links files in the repo_path into each release_dir
+        #
+        # Example:
+        #
+        #     link_shared_files(".env" => ".env") # links .env to releases/{A,B}/.env
+        def link_shared_files(files)
+          payload.path_choices.each do |release_dir|
+            files.each do |source, target|
+              begin
+                FileUtils.ln_s(File.join(payload.repo_path, source), File.join(release_dir, target))
+              rescue Errno::EEXIST
+                # already exists
+              end
+            end
+          end
+        end
+
         def link_blue_mesh_env_file
-          payload.path_choices.each do |release_dir|
-            begin
-              FileUtils.ln_s(File.join(payload.repo_path, ".env"), File.join(release_dir, ".env"))
-            rescue Errno::EEXIST
-              # already exists
-              next
-            end
-          end
+          link_shared_files(".env" => ".env")
         end
 
-        def link_repfix_env_files
-          payload.path_choices.each do |release_dir|
-            begin
-              FileUtils.ln_s(File.join(payload.repo_path, ".envvars_#{name}.rb"), File.join(release_dir, "api", ".envvars_#{name}.rb"))
-            rescue Errno::EEXIST
-              # already exists
-              next
-            end
-          end
-
-          payload.path_choices.each do |release_dir|
-            begin
-              FileUtils.ln_s(File.join(payload.repo_path, "env.rb"), File.join(release_dir, "env.rb"))
-            rescue Errno::EEXIST
-              # already exists
-              next
-            end
-          end
-        end
-
-        def link_repfix_shared_folders
-          payload.path_choices.each do |release_dir|
-            begin
-              FileUtils.ln_s(File.join(payload.repo_path, "log"), File.join(release_dir, "log"))
-            rescue Errno::EEXIST
-              # already exists
-              next
-            end
-          end
-
-          payload.path_choices.each do |release_dir|
-            begin
-              FileUtils.ln_s(File.join(payload.repo_path, "output"), File.join(release_dir, "output"))
-            rescue Errno::EEXIST
-              # already exists
-              next
-            end
-          end
+        def link_repfix_shared_files
+          link_shared_files(
+            "env.rb" => "env.rb",
+            ".envvars_#{name}.rb" => "api/.envvars_#{name}.rb",
+            "log" => "log",
+            "output" => "output"
+          )
         end
 
         def restart_repfix_service
-          pid = File.read("/var/run/repfix/puma.pid").chomp
+          restart_puma("/var/run/repfix/puma.pid")
+        end
 
-          # Killing puma with USR1 performs a rolling restart
-          output = ShellHelpers.sudo_execute(["kill", "-USR1", pid], "repfix")
-          if $?.success?
-            Logger.log(:info, "Restarted Repfix Puma server: #{output}")
-          else
-            Logger.log(:error, "Error restarting Repfix Puma server: #{output}")
-          end
-        rescue Error::ENOENT
-          Logger.log(:info, "Repfix PID file not found. Service might not be started yet")
+        def link_internal_api_shared_files
+          link_shared_files(
+            "shared/.envvars_#{name}.rb" => ".envvars_#{name}.rb",
+            "shared/database.yml" => "config/database.yml",
+            "log" => "log"
+          )
+        end
+
+        def restart_internal_api_service
+          restart_puma("/var/run/internal_api/puma.pid")
         end
 
         # =========================================================================
