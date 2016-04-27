@@ -47,4 +47,4 @@ ecs-deploy \
   --cluster "$AWS_ECS_CLUSTER" \
   --timeout 180 \
   --service-name "$AWS_ECS_SERVICE" \
-  --image "${AWS_ECR_REPO}:BREAD-BREAD-${bamboo_buildNumber}"
+  --image "${AWS_ECR_REPO}:$(docker-image-tag)"
