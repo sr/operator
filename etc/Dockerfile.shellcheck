@@ -1,9 +1,0 @@
-FROM ubuntu:wily
-VOLUME ["/data"]
-WORKDIR "/data"
-RUN \
-  apt-get update \
-  && \
-    apt-get install -y --no-install-recommends \
-      devscripts \
-      shellcheck

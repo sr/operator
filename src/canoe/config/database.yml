@@ -1,0 +1,18 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  host: <%= ENV.fetch('CANOE_DATABASE_HOST', 'localhost') %>
+  username: root
+  password:
+
+development:
+  <<: *default
+  database: canoe_development
+
+test:
+  <<: *default
+  database: canoe_test
+
+production: &production
+  url: <%= ENV['DATABASE_URL'] %>

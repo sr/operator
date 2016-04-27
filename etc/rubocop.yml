@@ -48,3 +48,4 @@ AllCops:
     - "src/**/bin/*"
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
+    - "src/canoe/**/*"

@@ -1,0 +1,46 @@
+<h1 class="steps-count">Step 2 of 3</h1>
+<h2>What do you want to deploy?</h2>
+<br>
+
+<p class="lead muted">
+  Select the <%= deploy_type_icon("build") %> <strong>build</strong> for the <%= deploy_type_icon("branch") %> <strong><%= current_branch.name %></strong> branch.
+</p>
+
+<div>
+  <%= render partial: "application/deploy_what_tabs" %>
+
+  <div class="well well-sm">
+    <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
+      <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
+      <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
+    <%- end %>
+  </div>
+
+  <%- if @builds.empty? %>
+    <p>
+      <strong>Sorry, there are no recent builds for this branch.</strong>
+    </p>
+  <%- else %>
+    <ul class="list-unstyled deploy-list">
+      <% @builds.each do |build| %>
+        <li>
+          <h4>
+            <%= link_to "Ship This", select_target_repo_deploys_path(current_repo, artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success deploy-button" %>
+            &nbsp;
+            <%= deploy_type_icon("build") %> build<%= build.build_number %>
+            <%- if !build.passed_ci? %>
+              <span class="label label-danger">Untested</span>
+            <%- end %>
+          </h4>
+          <small class="muted">
+            commit:
+            <%= link_to current_repo.sha_url(build.sha), title: build.sha do %>
+              <%= sha_span(build.sha)  %>
+            <%- end %>
+          </small>
+          <hr>
+        </li>
+      <% end %>
+    </ul>
+  <%- end %>
+</div>
