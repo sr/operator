@@ -38,7 +38,7 @@ module Lita
       config :monitor_retry_interval_seconds, default: 5
       config :monitor_http_timeout_seconds, default: 30
       config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
-      config :paging_monitors, default: []
+      config :paging_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME]
 
       # config: page-r-doodie
       config :pager, default: 'pagerduty'
