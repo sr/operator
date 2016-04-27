@@ -32,7 +32,6 @@ module Lita
       config :status_room, default: '1_ops@conf.btf.hipchat.com'
 
       # config: zabbix monitor
-      config :monitor_debug_out_targets, default: ["1_261@chat.btf.hipchat.com"]
       config :monitor_hipchat_notify, default: false
       config :monitor_interval_seconds, default: 60
       config :monitor_retries, default: 5
@@ -61,6 +60,10 @@ module Lita
 
       route /^zabbix monitor (?<datacenter>\S+)\s+unpause(?:\s+(?<options>.*))?$/i, :unpause_monitor, command: true, help: {
         "zabbix monitor <datacenter> unpause" => "Unpauses <datacenter>s zabbix monitor",
+      }
+
+      route /^zabbix monitor testpager$/i, :test_pager, command: true, help: {
+        "zabbix monitor testpager" => "invokes a test page to pagerduty",
       }
 
       route /^zabbix monitor status$/i, :monitor_status, command:true,  help: {
@@ -138,7 +141,7 @@ module Lita
                 client: @clients[datacenter],
                 log: log)
               status = monitor_supervisor.get_paused_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "paused (failed)" : "active (successful)"
-              paging = config.paging_monitors.include? (::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
+              paging = config.paging_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
               msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
               #TODO: Last known status per-datacenter
             end
@@ -152,15 +155,25 @@ module Lita
       end
 
       def monitor_info(response)
-        msg ="Datacenters: #{config.datacenters.join(',')}"
-        msg +="\nActive Monitors: #{config.active_monitors.join(',')}"
-        msg +="\nPaging Monitors: #{config.paging_monitors.join(',')}"
-        msg +="\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
-        msg +="\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
-        msg +="\nRetries: #{config.monitor_retries}"
-        msg +="\nRetry Interval: #{config.monitor_retry_interval_seconds}"
-        msg +="\nRead Timeout: #{config.monitor_http_timeout_seconds}"
+        msg = "Datacenters: #{config.datacenters.join(',')}"
+        msg += "\nActive Monitors: #{config.active_monitors.join(',')}"
+        msg += "\nPaging Monitors: #{config.paging_monitors.join(',')}"
+        msg += "\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
+        msg += "\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
+        msg += "\nRetries: #{config.monitor_retries}"
+        msg += "\nRetry Interval: #{config.monitor_retry_interval_seconds}"
+        msg += "\nRead Timeout: #{config.monitor_http_timeout_seconds}"
         response.reply_with_mention("Monitor Status:\n#{msg}")
+      end
+
+      def test_pager(response)
+        response.reply_with_mention("Initiating paging routine.")
+        monitor_fail_notify(
+        ::Zabbix::Zabbixmon::MONITOR_NAME,
+        'test',
+        'This is a test of the ZabbixMon pager. Please dismiss and ignore.',
+        true,
+        true)
       end
 
       def start_maintenance(response)
@@ -318,7 +331,6 @@ module Lita
 
           rescue ::Lita::Handlers::Zabbix::MonitoringFailure
             log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
-            debug_output("::Lita::Handlers::Zabbix::run_monitors has failed")
             monitor_fail_notify(::Zabbix::Zabbixmon::MONITOR_NAME,
               '[no-DC]',
               MONITOR_FAIL_ERRMSG,
@@ -377,27 +389,21 @@ module Lita
         end
         whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center} (more detail in logging)"
         log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
-        robot.send_message(@status_room, whining, notify_hipchat=notify_hipchat_channel)
+        notify_hipchat_channel ? robot.send_message_with_mention(@status_room, whining) : robot.send_message(@status_room, whining)
       end
 
       def page_r_doodie(message:, datacenter:)
         @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
-        robot.send_message(
-          @status_room,
-          "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})",
-          notify_hipchat=config.monitor_hipchat_notify
-        ) if (message.nil? || datacenter.nil?)
-        debug_output("A smoke signal appears over the horizon") if config.pager.to_s == 'test'
+        errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
+        if message.nil? || datacenter.nil?
+          config.monitor_hipchat_notify ? robot.send_message_with_mention(@status_room, errmsg) : robot.send_message(@status_room, errmsg)
+        end
       rescue ::Lita::Handlers::Zabbix::PagerFailed
-        log.error("Error sending page: ::Lita::Handlers::Zabbix::PagerFailed")
-        robot.send_message(@status_room, "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed", notify_hipchat=config.monitor_hipchat_notify)
+        errmsg = 'Error sending page: ::Zabbix::PagerFailed'
+        log.error(errmsg)
+        config.monitor_hipchat_notify ? robot.send_message_with_mention(@status_room, errmsg) : robot.send_message(@status_room, errmsg)
       end
 
-      def debug_output(message:)
-        config.monitor_debug_out_targets.each do |target|
-          robot.send_message(target, message)
-        end
-      end
       Lita.register_handler(self)
     end
   end

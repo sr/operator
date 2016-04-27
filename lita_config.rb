@@ -58,7 +58,7 @@ Lita.configure do |config|
   config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
 
   # Zabbix Monitor Config
-  config.handlers.zabbix.monitor_hipchat_notify = false
+  config.handlers.zabbix.monitor_hipchat_notify = true
   config.handlers.zabbix.monitor_interval_seconds = 60
   config.handlers.zabbix.monitor_retries = 5
   config.handlers.zabbix.monitor_retry_interval_seconds = 5

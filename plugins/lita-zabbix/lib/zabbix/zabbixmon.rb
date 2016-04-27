@@ -28,7 +28,7 @@ module Zabbix
     # assumes not paused (pausing handled by supervisor and handler and prevents this call)
     def monitor(url, num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
       retry_attempt_iterator = 0
-      retry_sz = "retry attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
+      retry_sz = "attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
       payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
       monitor_success = false
       insert_payload(payload, url, timeout_seconds)
@@ -40,7 +40,7 @@ module Zabbix
         monitor_success = retrieve_payload payload
         @log.warn("[#{monitor_name}] FAILED to find an item that contains #{payload} from the zabbix (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
-        retry_sz = "retry attempt #{(retry_attempt_iterator)} / #{num_retries}"
+        retry_sz = "attempt #{(retry_attempt_iterator)} / #{num_retries}"
       end
 
       if monitor_success
@@ -84,13 +84,11 @@ module Zabbix
           success = true
         else # fail case
           @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
-          @log.error("[#{monitor_name}] zbx_items='#{zbx_items}'")
         end
       else # fail case
         @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
-        @log.error("[#{monitor_name}] zbx_items=nil") if zbx_items.nil?
-        @log.error("[#{monitor_name}] zbx_items=[]") if zbx_items.length == 0
       end
+      @log.error("[#{monitor_name}] zbx_items=#{zbx_items}") unless success
       success
     end
 
