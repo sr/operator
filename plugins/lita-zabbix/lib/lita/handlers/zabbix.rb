@@ -394,14 +394,19 @@ module Lita
       end
 
       def page_r_doodie(message, datacenter)
-        @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
-        errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
-        if message.nil? || datacenter.nil?
-          errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
-          robot.send_message(@status_room, errmsg)
+        begin
+          @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
+          # FYI: everything beyond this line in this function is 'non-happy-path'
+          errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
+          if message.nil? || datacenter.nil?
+            errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
+            robot.send_message(@status_room, errmsg)
+          end
+        rescue => e # error and report
+          log.error("[lita-zabbix] error sending page: #{e}")
         end
-      rescue ::Lita::Handlers::Zabbix::PagerFailed
-        errmsg = 'Error sending page: ::Zabbix::PagerFailed'
+      rescue ::Lita::Handlers::Zabbix::PagerFailed # but consume the error and keep on truckin'
+        errmsg = '[lita-zabbix] Error sending page: ::Zabbix::PagerFailed'
         log.error(errmsg)
         errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
         robot.send_message(@status_room, errmsg)
