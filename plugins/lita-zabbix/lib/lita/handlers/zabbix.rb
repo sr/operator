@@ -37,7 +37,7 @@ module Lita
       config :monitor_retries, default: 5
       config :monitor_retry_interval_seconds, default: 5
       config :monitor_http_timeout_seconds, default: 30
-      config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME], type: Array
+      config :active_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME]
       config :paging_monitors, default: [::Zabbix::Zabbixmon::MONITOR_NAME]
 
       # config: page-r-doodie
@@ -385,7 +385,7 @@ module Lita
           log.info("Paging sequence initiated. Paging pagerduty.")
           page_r_doodie(error_msg, data_center)
         end
-        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}. Details: #{error_msg}"
+        whining="#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}. Details: #{error_msg}".gsub(config.zabbix_password, '**************')
         log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
         whining = "@all : #{whining}" if notify_hipchat_channel
         robot.send_message(@status_room, whining)
@@ -395,13 +395,13 @@ module Lita
         begin
           @pager.trigger("#{message}", incident_key: ::Zabbix::Zabbixmon::INCIDENT_KEY % datacenter) unless (message.nil? || datacenter.nil?)
           # FYI: everything beyond this line in this function is 'non-happy-path'
-          errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})"
+          errmsg = "Error sending page: ::Lita::Handlers::Zabbix::PagerFailed (message: #{message}, datacenter=#{datacenter})")
           if message.nil? || datacenter.nil?
             errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
             robot.send_message(@status_room, errmsg)
           end
         rescue => e # error and report
-          log.error("[lita-zabbix] error sending page: #{e}")
+          log.error("[lita-zabbix] error sending page: #{e}".gsub(config.zabbix_password, '**************'))
         end
       rescue ::Lita::Handlers::Zabbix::PagerFailed # but consume the error and keep on truckin'
         errmsg = '[lita-zabbix] Error sending page: ::Zabbix::PagerFailed'
