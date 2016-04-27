@@ -268,6 +268,7 @@ module Pardot
                 FileUtils.ln_s(File.join(payload.repo_path, source), File.join(release_dir, target))
               rescue Errno::EEXIST
                 # already exists
+                next
               end
             end
           end
