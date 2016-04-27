@@ -2,6 +2,7 @@ require "cgi"
 require "erb"
 require "json"
 require "net/http"
+require "securerandom"
 require "socket"
 require "yaml"
 
