@@ -8,6 +8,8 @@ images:
     pull: true
   docker.dev.pardot.com/base/percona-server:5.5:
     build: percona-server/5.5
+  docker.dev.pardot.com/base/ruby:2.3.0:
+    build: ruby/2.3.0
 
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
@@ -22,3 +24,7 @@ images:
   # Pardot/internal-api
   docker.dev.pardot.com/base/internal-api/app:
     build: internal-api/app
+
+  # Pardot/mesh
+  docker.dev.pardot.com/base/mesh/app:
+    build: mesh/app
