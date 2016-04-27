@@ -78,6 +78,7 @@
 #   hubot pingpong - ... ping pong
 #   hubot squirrelmaster - behold the master of squirrels
 #   hubot dartz - Dartz!!!
+#   hubot picklegusta - picklegusta
 #   hubot inconceivable - inconceivable!!!
 #   hubot bonk - bonks adventure
 #   hubot pd - pagerduty phone smash :)
@@ -91,6 +92,9 @@ module.exports = (robot) ->
 
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
+
+  robot.respond /picklegusta$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/62/SmWraho0s2Iyhkf/upload.png"
 
   robot.respond /thumbsup$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/88/MVcZU1s2CcLTCeS/thumbsup.png"
