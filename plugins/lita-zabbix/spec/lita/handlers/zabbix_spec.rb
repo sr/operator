@@ -9,6 +9,7 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
     registry.config.handlers.zabbix.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
     registry.config.handlers.zabbix.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
     registry.config.handlers.zabbix.pager = 'pagerduty'
+    registry.config.handlers.zabbix.zabbix_password = 'abc123'
   end
 
   describe "!zabbix maintenance start" do
@@ -64,13 +65,24 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
     end
   end
 
-  # describe "!zabbix monitor run dfw" do
-  #   it "successfully completes manually_run_monitor('dfw')" do
-  #     stub_user_login
-  #     stub_insert_payload
-  #     stub_item_get(result: [ { fake_item_key: "fake item value" } ] )
-  #     send_command("zabbix monitor run dfw")
-  #     expect(replies.last).to match(/^.*is confirmed alive*$/)
-  #   end
-  # end
+  describe "!zabbix monitor testpager" do
+    it "shows the proper status" do
+      stub_api_version
+      stub_user_login
+      stub_page_pagerduty
+      send_command("zabbix monitor testpager")
+      expect(replies.last).to match(/^.*This is a test of the ZabbixMon pager\. Please dismiss and ignore\.$/)
+    end
+  end
+
+  describe "!zabbix monitor run dfw" do
+    it "successfully completes manually_run_monitor('dfw')" do
+      stub_api_version
+      stub_user_login
+      stub_insert_payload
+      stub_item_get(result: [ { fake_item_key: "fake item value" } ] )
+      send_command("zabbix monitor run dfw")
+      expect(replies.last).to match(/^.*is confirmed alive*$/)
+    end
+  end
 end

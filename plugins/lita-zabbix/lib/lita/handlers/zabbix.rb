@@ -146,7 +146,6 @@ module Lita
               status = monitor_supervisor.get_paused_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "paused (failed)" : "active (successful)"
               paging = config.paging_monitors.include?(::Zabbix::Zabbixmon::MONITOR_NAME) ? "PAGER: #{config.pager.to_s}" : "NOT PAGING"
               msg += "\n#{::Zabbix::Zabbixmon::MONITOR_NAME}-#{datacenter}  / #{status} / #{paging}"
-              #TODO: Last known status per-datacenter
             end
 
           end
@@ -309,10 +308,11 @@ module Lita
       def manually_run_monitor(response)
         datacenter = response.match_data["datacenter"]
         response.reply("/me failed to parse a datacenter from your request") unless datacenter
+        validate_datacenter(datacenter: datacenter, response: response) || return
         if datacenter
           success = run_monitor(datacenter, true)
           response.reply_with_mention("zabbix-#{datacenter} is confirmed alive") if success
-          response.reply_with_mention("zabbix-#{datacenter} is dead, jim") unless success
+          response.reply_with_mention("zabbix-#{datacenter} is dead, Jim") unless success
         end
       end
 
