@@ -27,6 +27,9 @@ module Pardot
         after_deploy :link_internal_api_shared_files, only: :'internal-api'
         after_deploy :restart_internal_api_service, only: :'internal-api'
 
+        after_deploy :link_mesh_shared_files, only: :mesh
+        after_deploy :restart_mesh_service, only: :mesh
+
         def short_name
           "prod"
         end
