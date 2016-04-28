@@ -6,7 +6,7 @@ namespace :canoe do
     next if Rails.env.test?
 
     Repo.find_or_initialize_by(name: 'explorer').tap { |repo|
-      repo.icon = 'cloud'
+      repo.icon = 'search'
       repo.supports_branch_deploy = true
       repo.deploys_via_artifacts = true
       repo.bamboo_project = 'BREAD'
