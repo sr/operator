@@ -20,7 +20,6 @@ module Lita
       # config: zabbix
       config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
       config :zabbix_monitor_payload_url, default: "https://zabbix-%datacenter%.pardot.com/cgi-bin/zabbix-status-check.sh?"
-      config :zabbix_hostname, default: ""
       config :zabbix_user, default: "Admin"
       config :zabbix_password, required: "changeme"
 
@@ -388,7 +387,7 @@ module Lita
           config.monitor_hipchat_notify,
           config.paging_monitors.include?(zabbixmon.monitor_name)
         ) unless zabbixmon.hard_failure.nil?
-        !zabbixmon.hard_failure.nil? # returns true for success, false for fail
+        zabbixmon.hard_failure.nil? # returns true for success, false for fail
       end
 
       def build_zabbix_client(datacenter:)
