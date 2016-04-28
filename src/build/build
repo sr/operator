@@ -168,6 +168,9 @@ do
                     build/ruby src/build/build-gem-pull_agent
             fi
             ;;
+        rubylib)
+            docker-lint-ruby "src/rubylib"
+            ;;
         build|shell)
             docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
             docker run --rm -v "$(pwd):/data" \

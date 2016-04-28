@@ -22,7 +22,7 @@ WORKDIR /app
 
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
-ADD vendor/cache /app/vendor/cache
+COPY vendor/cache /app/vendor/cache
 RUN bundle install --local
 
 ADD . /app
