@@ -318,7 +318,7 @@ module Pardot
 
         def link_internal_api_shared_files
           link_shared_files(
-            "shared/.envvars_#{name}.rb" => ".envvars_#{name}.rb",
+            "shared/.envvars_#{name}" => ".envvars_#{name}",
             "shared/database.yml" => "config/database.yml",
             "log" => "log"
           )
@@ -326,6 +326,18 @@ module Pardot
 
         def restart_internal_api_service
           restart_puma("/var/run/internal_api/puma.pid")
+        end
+
+        def link_mesh_shared_files
+          link_shared_files(
+            "shared/.envvars_#{name}" => ".envvars_#{name}",
+            "shared/database.yml" => "config/database.yml",
+            "log" => "log"
+          )
+        end
+
+        def restart_mesh_service
+          restart_puma("/var/run/mesh/puma.pid")
         end
 
         # =========================================================================
