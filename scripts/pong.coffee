@@ -15,11 +15,11 @@ pongApiUrl = 'https://pardot-pingpong.herokuapp.com/api/'
 
 getPlayerString = (playerNameArray, teamId) ->
   if playerNameArray.length > 1
-    return 'team ' + playerNameArray.join(' and ')
+    return playerNameArray.join(' and ')
   else if playerNameArray.length == 1
     return playerNameArray[0]
   else
-    return 'team ' + teamId
+    return "team #{teamId}"
 
 module.exports = (robot) ->
   robot.respond /pong\s+status$/i, (msg) ->
@@ -31,17 +31,21 @@ module.exports = (robot) ->
         else
           payload = JSON.parse(body)
           if payload.has_active_game
+            out = "#{payload.name} status: "
             teamAString = getPlayerString(payload.player_data.team_a, 'a')
             teamBString = getPlayerString(payload.player_data.team_b, 'b')
 
             if payload.team_a_score > payload.team_b_score
-              msg.send payload.name + ' status: ' + teamAString + ' is beating ' +
+              out += teamAString + ' beating ' +
                   teamBString + ' ' + payload.team_a_score + ' to ' + payload.team_b_score
-            else if payload.team_b_score > payload.team_a_score
-              msg.send payload.name + ' status: ' + teamBString + ' is beating ' +
+            else if payload.team_b_score > payload.team_b_score
+              out += teamBString + ' beating ' +
                   teamAString + ' ' + payload.team_b_score + ' to ' + payload.team_a_score
             else
               # Tie
-              msg.send payload.name + ' status: ' + teamAString + ' and ' + teamBString + ' are tied at ' + payload.team_a_score
+              out += teamAString + ' and ' + teamBString + ' are tied at ' + payload.team_a_score
+            if payload.hasOwnProperty('game_count')
+              out += ", playing game #{payload.game_count}"
+            msg.send out
           else
             msg.send 'Pong room unoccupied'
