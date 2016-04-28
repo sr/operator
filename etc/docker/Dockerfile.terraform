@@ -1,9 +1,11 @@
 FROM alpine:3.2
+ENV JFROG_CLI_VERSION=1.1.0
+ENV JFROG_CLI_SHA256=e7b47d08bb1b1cc506f3334dfafeac28c4e3886412b6527d12ceed61bd28007e
+ENV JFROG_CLI_URL=https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path=${JFROG_CLI_VERSION}%2Fjfrog-cli-linux-amd64%2Fjfrog
 ENV TERRAFORM_VERSION=0.6.14
 ENV TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 VOLUME ["/data"]
 WORKDIR /data
-CMD ["--help"]
 RUN \
   apk update \
   && \
@@ -15,7 +17,11 @@ RUN \
       openssl \
       unzip \
   && \
+    curl -fsSL $JFROG_CLI_URL -o /usr/bin/jfrog \
+  && \
     curl -fsSL "$TERRAFORM_URL" -o /tmp/terraform.zip \
+  && \
+    echo "$JFROG_CLI_SHA256  /usr/bin/jfrog" | sha256sum -c - \
   && \
     unzip /tmp/terraform.zip -d /usr/bin \
   && \
