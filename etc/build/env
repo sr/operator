@@ -29,12 +29,15 @@ export AWS_PROFILE AWS_DEFAULT_REGION
 # shellcheck disable=SC2154
 : "${BAMBOO_PLAN_KEY:="${bamboo_planKey:-""}"}"
 # shellcheck disable=SC2154
+: "${BAMBOO_REPO_BRANCH_NAME:="${bamboo_repository_branch_name:-""}"}"
+# shellcheck disable=SC2154
 : "${BAMBOO_SHORT_PLAN_KEY:="${bamboo_shortPlanKey:-""}"}"
 # shellcheck disable=SC2154
 : "${BAMBOO_BUILD_NUMBER:="${bamboo_buildNumber:-""}"}"
 : "${CI_PROJECT:="$(echo "$BAMBOO_PLAN_KEY" | cut -d"-" -f1)"}"
 : "${CI_PLAN:="${BAMBOO_SHORT_PLAN_KEY:-""}"}"
 : "${CI_BUILD_NUMBER:="$BAMBOO_BUILD_NUMBER"}"
+: "${CI_BRANCH:="$BAMBOO_REPO_BRANCH_NAME"}"
 
 : "${CANOE_ECS_CLUSTER:="canoe_production"}"
 : "${CANOE_ECS_SERVICE:="canoe"}"
