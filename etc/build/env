@@ -7,7 +7,7 @@ export AWS_PROFILE AWS_DEFAULT_REGION
 : "${CANOE_ECS_SERVICE:="canoe"}"
 : "${CANOE_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe"}"
 
-test -f "/etc/docker" && {
+test -d "/etc/docker" && {
     DOCKER_CONFIG="/etc/docker"
     export DOCKER_CONFIG
 }

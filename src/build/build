@@ -116,8 +116,6 @@ test -z "$projects"  && {
 
 
 # Build the container used for most builds.
-    DOCKER_CONFIG="/etc/docker"
-    export DOCKER_CONFIG
 docker build -f etc/docker/Dockerfile.build -t build/build .
 
 # Iterate over all selected projects, either explicitly or because of CI mode,
