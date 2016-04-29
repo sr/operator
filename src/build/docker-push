@@ -19,6 +19,7 @@ fi
 # the current user. This temporarily resets it to the normal location under
 # the $HOME directory.
 unset -v DOCKER_CONFIG
+export DOCKER_CONFIG
 
 mkdir -p ~/.aws
 cp /etc/aws/credentials ~/.aws/credentials
