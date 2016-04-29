@@ -1,5 +1,5 @@
 resource "aws_security_group" "cloned_chef_server" {
-  name = "internal_apps_chef_server"
+  name = "cloned_chef_server"
   description = "Cloned Chef Server for testing"
   vpc_id = "${aws_vpc.internal_apps.id}"
 
