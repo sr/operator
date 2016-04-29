@@ -15,6 +15,11 @@ then
   exit 1
 fi
 
+# On CI machines DOCKER_CONFIG is set to a directory that is not writable by
+# the current user. This temporarily resets it to the normal location under
+# the $HOME directory.
+unset -v DOCKER_CONFIG
+
 mkdir -p ~/.aws
 cp /etc/aws/credentials ~/.aws/credentials
 set +x
