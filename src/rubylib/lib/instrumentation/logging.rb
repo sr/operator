@@ -1,22 +1,57 @@
+require "logstash/event"
 require "scrolls"
 
 module Instrumentation
   module Logging
-    def setup(app_name, env_name)
-      @logger =
-        if env_name == "test"
-          FakeLogger.new
+    class UnsupportedFormat < StandardError
+      def initialize(format)
+        super "log format #{format.inspect} is not supported"
+      end
+    end
+
+    module LogstashFormatter
+      def unparse(data)
+        LogStash::Event.new(data).to_json
+      end
+    end
+
+    def RawFormatter
+      def unparse(data)
+        data
+      end
+    end
+
+    def setup(app_name, env_name, format)
+      stream =
+        case env_name
+        when "test"
+          FakeStream.new
         else
-          Scrolls.init(
-            stream: STDOUT,
-            exceptions: "single",
-            global_context: {
-              app: app_name,
-              env: env_name
-            }
-          )
-          Scrolls
+          STDOUT
         end
+
+      Scrolls.init(
+        stream: stream,
+        exceptions: "single",
+        global_context: {
+          app: app_name,
+          env: env_name
+        }
+      )
+
+      case format
+      when LOG_NOOP
+        Scrolls::Log.extend RawFormatter
+      when LOG_LOGSTASH
+        Scrolls::Log.extend LogstashFormatter
+      when LOG_LOGFMT
+        # Use Scrolls::Parser
+      else
+        raise UnsupportedFormat, format
+      end
+
+      @stream = stream
+      @logger = Scrolls
     end
 
     def context(data, &block)
@@ -32,35 +67,31 @@ module Instrumentation
     end
 
     def reset
-      @logger.reset
+      @stream.reset
     end
 
     def entries
-      @logger.entries
+      @stream.entries
     end
 
     module_function :setup, :context, :log, :reset, :entries
 
-    class FakeLogger
+    class FakeStream
       def initialize
         @entries = []
-        @context = {}
       end
 
       attr_reader :entries
 
       def reset
         @entries.clear
-        @context.clear
       end
 
-      def context(data)
-        @context = data
-        yield
+      def sync=(_)
       end
 
-      def log(data)
-        @entries << data.merge(@context)
+      def puts(data)
+        @entries << data
         if block_given?
           yield
         end
