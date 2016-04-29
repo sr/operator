@@ -1,7 +1,40 @@
 #!/bin/sh
+#/ Usage: . etc/build/env
+#/ Defines various settings for use throughout the build and deploy scripts.
+#/ Please keep variables sorted alphabetically.
+
+# This file on the build machines defines variables USERNAME and PASSWORD.
+envfile="/etc/env/artifactoryenv"
+if test -f "$envfile"
+then . /etc/env/artifactoryenv
+else echo "WARN: $envfile not found" 2>&1
+fi
+: "${ARTIFACTORY_HOST:="artifactory-internal.dev.pardot.com"}"
+: "${ARTIFACTORY_URL:="https://${ARTIFACTORY_HOST}/artifactory"}"
+: "${ARTIFACTORY_USER:="${USERNAME:-""}"}"
+: "${ARTIFACTORY_PASSWORD:="${PASSWORD:-""}"}"
+: "${ARTIFACTORY_REPO_CANOE:="pd-canoe"}"
+: "${ARTIFACTORY_REPO_GEM_LOCAL:="pd-gem-local"}"
+export \
+  ARTIFACTORY_HOST \
+  ARTIFACTORY_URL \
+  ARTIFACTORY_USER \
+  ARTIFACTORY_PASSWORD
+
 : "${AWS_PROFILE:="pardotops"}"
 : "${AWS_DEFAULT_REGION:="us-east-1"}"
 export AWS_PROFILE AWS_DEFAULT_REGION
+
+# Wrap Bamboo variables to make them easier to find and override.
+# shellcheck disable=SC2154
+: "${BAMBOO_PLAN_KEY:="${bamboo_planKey:-""}"}"
+# shellcheck disable=SC2154
+: "${BAMBOO_SHORT_PLAN_KEY:="${bamboo_shortPlanKey:-""}"}"
+# shellcheck disable=SC2154
+: "${BAMBOO_BUILD_NUMBER:="${bamboo_buildNumber:-""}"}"
+: "${CI_PROJECT:="$(echo "$BAMBOO_PLAN_KEY" | cut -d"-" -f1)"}"
+: "${CI_PLAN:="${BAMBOO_SHORT_PLAN_KEY:-""}"}"
+: "${CI_BUILD_NUMBER:="$BAMBOO_BUILD_NUMBER"}"
 
 : "${CANOE_ECS_CLUSTER:="canoe_production"}"
 : "${CANOE_ECS_SERVICE:="canoe"}"

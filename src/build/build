@@ -135,6 +135,16 @@ do
             ;;
         pardot-explorer)
             build-ruby "$project"
+
+            if $cimode
+            then
+                # Build a tarball from the app container built above
+                tarball="$(tarball-build-ruby "pardotexplorer_app")"
+                trap 'rm -f $tarball' EXIT
+
+                # Prepare the tarball and upload it to Artifactory
+                docker-tarball-upload
+            fi
             ;;
         pull_agent)
             if $cimode

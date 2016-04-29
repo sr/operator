@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#/ Usage: docker-tarball-upload <tarball>
+set -euo pipefail
+
+cd "$(dirname "$0")/../.."
+. etc/build/env
+
+tarball="$1"
+
+# Build a container with Artifactory CLI installed
+docker build -f etc/docker/Dockerfile.jfrog -t build/jfrog .
+
+docker run --rm \
+  -v "$(pwd):/data" \
+  -v "${tarball}:/data/tarball.tar" \
+  -w "/data" \
+  -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
+  -e "ARTIFACTORY_URL=$ARTIFACTORY_URL" \
+  -e "ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" \
+  -e "ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" \
+  -e "CANOE_ARTIFACTORY_REPO=$ARTIFACTORY_REPO_CANOE" \
+  -e "CI_PLAN=$CI_PLAN" \
+  -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+  build/jfrog \
+  tarball-upload "$(git rev-parse HEAD)" /data/tarball.tar
