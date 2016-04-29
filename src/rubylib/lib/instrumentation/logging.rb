@@ -15,7 +15,7 @@ module Instrumentation
       end
     end
 
-    def RawFormatter
+    module RawFormatter
       def unparse(data)
         data
       end

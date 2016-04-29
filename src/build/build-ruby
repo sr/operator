@@ -17,7 +17,14 @@ config="$dir/docker-compose.yml"
 # Lint the code with RuboCop
 docker-lint-ruby "$dir"
 
-docker-compose -p "$project" -f "$config" build --pull
-# TODO(sr) Remove the sleep test...
-docker-compose -p "$project" -f "$config" run app sleep 30
-docker-compose -p "$project" -f "$config" run app script/test
+# Assume it's a Rails app if there's a docker-compose.yml file
+if test -f "$config"
+then
+    docker-compose -p "$project" -f "$config" build --pull
+    # TODO(sr) Remove the sleep test...
+    docker-compose -p "$project" -f "$config" run app sleep 30
+    docker-compose -p "$project" -f "$config" run app script/test
+# Otherwise just build it as a normal Ruby library
+else
+    build-ruby-lib "$dir"
+fi
