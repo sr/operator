@@ -1,4 +1,4 @@
-FROM docker.dev.pardot.com/base/ruby:2.3.0
+FROM ruby:2.3.0
 ENV LANG C.UTF-8
 
 RUN \
