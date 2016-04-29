@@ -10,7 +10,7 @@ test -z "$image" && {
   exit 1
 }
 
-app_archive="$(mktemp -t"${image}XXXXX").tar"
+app_archive="$(mktemp -t "${image}XXXXX").tar"
 bundle_archive="$(mktemp -t "${image}-bundleXXXXX").tar"
 trap 'rm -f $bundle_archive' EXIT
 
