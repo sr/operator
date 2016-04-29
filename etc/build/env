@@ -11,3 +11,5 @@ test -f "/etc/docker" && {
     DOCKER_CONFIG="/etc/docker"
     export DOCKER_CONFIG
 }
+
+true
