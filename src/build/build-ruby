@@ -14,8 +14,8 @@ test -z "$project" && {
 dir="src/$project"
 config="$dir/docker-compose.yml"
 
-docker build -f etc/docker/Dockerfile.ruby -t build/ruby .
-docker run --rm -v "$(pwd):/data" build/ruby src/build/lint-ruby "$dir"
+# Lint the code with RuboCop
+docker run --rm -v "$(pwd):/data" build/build src/build/lint-ruby "$dir"
 
 docker-compose -p "$project" -f "$config" build --pull
 # TODO(sr) Remove the sleep test...
