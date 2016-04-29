@@ -79,7 +79,6 @@ module Lita
 
       route /^zabbix monitor (pause|unpause).*$/i, :invalid_zabbixmon_syntax, command: true
 
-      # DO (monitor) WORK
       on :connected, :start_monitoring
 
       def invalid_zabbixmon_syntax(response)
@@ -310,7 +309,7 @@ module Lita
         response.reply("/me failed to parse a datacenter from your request") unless datacenter
         validate_datacenter(datacenter: datacenter, response: response) || return
         if datacenter
-          success = run_monitor(datacenter, true)
+          success = run_monitor(datacenter)
           response.reply_with_mention("zabbix-#{datacenter} is confirmed alive") if success
           response.reply_with_mention("zabbix-#{datacenter} is dead, Jim") unless success
         end
@@ -318,15 +317,15 @@ module Lita
 
       def start_monitoring(payload)
         every(config.monitor_interval_seconds) do |timer|
-          run_monitors
+          run_monitors()
         end
       end
 
-      def run_monitors
+      def run_monitors()
         begin # outer catch block: to keep things moving (handled)
           log.info("[lita-zabbix] executing run_monitors")
           config.datacenters.each do |datacenter|
-            run_monitor datacenter
+            run_monitor(datacenter)
           end
         rescue ::Lita::Handlers::Zabbix::MonitoringFailure
           log.error("::Lita::Handlers::Zabbix::run_monitors has failed")
@@ -338,7 +337,7 @@ module Lita
         end
       end
 
-      def run_monitor(datacenter, manual_run = false)
+      def run_monitor(datacenter)
         success = false
         begin # inner catch block: to be able to "see" what happened on failure (unhandled)
           monitor_supervisor = ::Zabbix::MonitorSupervisor.get_or_create(
@@ -349,7 +348,7 @@ module Lita
           log.debug("[lita-zabbix] monitor_supervisor: #{monitor_supervisor.to_s}")
           config.active_monitors.reject {|x| monitor_supervisor.get_paused_monitors.include? x}.each do |monitor|
             if monitor == ::Zabbix::Zabbixmon::MONITOR_NAME
-              success = monitor_zabbix datacenter
+              success = monitor_zabbix(datacenter)
             end
           end
         rescue => e

@@ -37,10 +37,10 @@ module Zabbix
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
         @log.debug("[#{monitor_name}] searching for #{payload} via API...")
-        monitor_success = retrieve_payload payload
+        monitor_success = retrieve_payload(payload)
         @log.warn("[#{monitor_name}] FAILED to find an item that contains #{payload} from the zabbix (#{retry_sz})") unless monitor_success
         retry_attempt_iterator += 1
-        retry_sz = "attempt #{(retry_attempt_iterator)} / #{num_retries}"
+        retry_sz = "attempt #{retry_attempt_iterator} / #{num_retries}"
       end
 
       if monitor_success
@@ -59,8 +59,8 @@ module Zabbix
     private
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
-      payload_delivery_response = deliver_zabbixmon_payload "#{url.gsub(/%datacenter%/, @datacenter)}#{payload}", timeout_seconds
-
+      payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter),
+          timeout_seconds)
       if payload_delivery_response.code =~ /20./
         @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
       else
@@ -102,22 +102,16 @@ module Zabbix
         @proxy_user, @proxy_pass = @proxy_uri.userinfo.split(/:/) if @proxy_uri.userinfo
       end
 
-      unless @proxy_uri.nil?
-        http = Net::HTTP.Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(uri.host, uri.port)
-        if uri.scheme == 'https'
-          http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
-      else
-        http = Net::HTTP.new(uri.host, uri.port)
-        if uri.scheme == 'https'
-          http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
+      http = Net::HTTP.new(uri.host, uri.port) if @proxy_uri.nil?
+      http = Net::HTTP.Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(uri.host, uri.port) unless @proxy_uri.nil?
+
+      if uri.scheme == 'https'
+        http.use_ssl = true
+        # http.verify_mode = OpenSSL::SSL::VERIFY_NONE # uncomment to not-verify https
       end
-      #TODO: figure out timeout
-      # http.read_timeout = timeout_seconds.to_i
-      request = Net::HTTP::Get.new uri.request_uri
+
+      http.read_timeout = timeout_seconds.to_i
+      request = Net::HTTP::Get.new(uri.request_uri)
       request.basic_auth @zbx_username, @zbx_password if @zbx_username
       response = http.request(request)
 
