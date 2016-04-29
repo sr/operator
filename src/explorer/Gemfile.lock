@@ -10,6 +10,7 @@ PATH
   specs:
     pardot-rubylib (1)
       lograge (= 0.3.6)
+      logstash-event (= 1.2.02)
       scrolls (= 0.3.8)
 
 GEM
@@ -78,6 +79,7 @@ GEM
       actionpack (>= 3)
       activesupport (>= 3)
       railties (>= 3)
+    logstash-event (1.2.02)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.4)
@@ -178,4 +180,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   1.11.2
+   1.12.0

@@ -12,5 +12,7 @@ module Dbquery
   class Application < Rails::Application
     config.time_zone = "Eastern Time (US & Canada)"
     config.active_record.schema_format = :ruby
+
+    config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
   end
 end
