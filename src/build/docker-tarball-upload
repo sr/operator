@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-#/ Usage: docker-tarball-upload <tarball>
+#/ Usage: docker-tarball-upload <git-sha1> <tarball>
+#/ Wrapper that runs 'tarball-upload' within a container.
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 . etc/build/env
 
-tarball="$1"
+gitsha1="$1"
+tarball="$2"
 
 # Build a container with Artifactory CLI installed
 docker build -f etc/docker/Dockerfile.jfrog -t build/jfrog .

@@ -143,7 +143,7 @@ do
                 trap 'rm -f $tarball' EXIT
 
                 # Prepare the tarball and upload it to Artifactory
-                docker-tarball-upload
+                docker-tarball-upload "$(git rev-parse HEAD)" "$tarball"
             fi
             ;;
         pull_agent)
