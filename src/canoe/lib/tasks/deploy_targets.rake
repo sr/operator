@@ -77,15 +77,21 @@ namespace :canoe do
       repo.bamboo_plan = 'INTAPI'
     }.save!
 
-    if Rails.env.production? || Rails.env.development? || Rails.env.test?
-      Repo.find_or_initialize_by(name: 'blue-mesh').tap { |repo|
-        repo.icon = 'th'
-        repo.deploys_via_artifacts = true
-        repo.supports_branch_deploy = true
-        repo.bamboo_project = 'PDT'
-        repo.bamboo_plan = 'BLUMSH'
-      }.save!
-    end
+    Repo.find_or_initialize_by(name: 'blue-mesh').tap { |repo|
+      repo.icon = 'th'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = true
+      repo.bamboo_project = 'PDT'
+      repo.bamboo_plan = 'BLUMSH'
+    }.save!
+
+    Repo.find_or_initialize_by(name: 'mesh').tap { |repo|
+      repo.icon = 'th-large'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = true
+      repo.bamboo_project = 'BREAD'
+      repo.bamboo_plan = 'MESH'
+    }.save!
   end
 
   desc 'Create targets for deployment'

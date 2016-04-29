@@ -6,6 +6,6 @@ class DeployScenario < ActiveRecord::Base
   belongs_to :server
   belongs_to :deploy_target
 
-  validates :server,
-    uniqueness: {scope: [:server_id, :deploy_target_id]}
+  validates :server_id,
+    uniqueness: {scope: [:repo_id, :deploy_target_id]}
 end
