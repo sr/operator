@@ -14,6 +14,7 @@ test -z "$project" && {
 dir="src/$project"
 config="$dir/docker-compose.yml"
 
+# Lint the code with RuboCop
 docker-lint-ruby "$dir"
 
 docker-compose -p "$project" -f "$config" build --pull
