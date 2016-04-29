@@ -133,13 +133,13 @@ do
             then docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
-        pardot-explorer)
+        explorer)
             build-ruby "$project"
 
             if $cimode
             then
                 # Build a tarball from the app container built above
-                tarball="$(tarball-build-ruby "pardotexplorer_app")"
+                tarball="$(tarball-build-ruby "explorer_app")"
                 trap 'rm -f $tarball' EXIT
 
                 # Prepare the tarball and upload it to Artifactory

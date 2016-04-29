@@ -9,8 +9,8 @@ default: &default
 
 development:
   <<: *default
-  database: pardot_explorer_development
+  database: explorer_development
 
 test:
   <<: *default
-  database: pardot_explorer_test
+  database: explorer_test
