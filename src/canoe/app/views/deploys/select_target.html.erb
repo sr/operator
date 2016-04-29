@@ -1,11 +1,16 @@
-<h1 class="steps-count">Step 2 of 3</h1>
-<h2>
+<h1>
+  <%= content_tag :i, "", class: "icon-#{current_repo.icon}" %>
+  <%= current_repo.name.capitalize %>
+</h1>
+
+<h2 class="steps-count">Step 3 of 4</h2>
+<h3>
   Where should we deploy this?
   <span class="muted">
     &nbsp;
     <%= print_deploy_what @prov_deploy %>
   </span>
-</h2>
+</h3>
 <br>
 
 <p class="lead muted">

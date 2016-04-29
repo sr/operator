@@ -1,3 +1,6 @@
+h1 {
+  margin-top: 0px;
+}
 .login-prompt {
    text-align:center;
    background:#FFC;
@@ -147,4 +150,32 @@ ul.nav {
     background-color: #cc8888;
   }
   border-radius: 3px;
+}
+
+.repos-index-grid {
+  width: 600px;
+
+  ul {
+    list-style: none;
+    padding-left: 0px;
+  }
+
+  li {
+    background: #f8f8f8;
+    float: left;
+    width: 194px;
+    text-align: center;
+    margin: 3px;
+    border: 1px dashed darken(#f8f8f8, 20%);
+
+    .icon {
+      display: inline-block;
+      font-size: 48px;
+    }
+    .repo-link {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  }
 }
