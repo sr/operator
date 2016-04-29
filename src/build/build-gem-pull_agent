@@ -47,5 +47,6 @@ export RUBYGEM_VERSION
 printf "Gem version: %s\n" "$RUBYGEM_VERSION"
 
 # Build the gem and push it to Artifactory
-gem build "pardot_pull-agent.gemspec"
+cd src/pull_agent
+gem build pardot_pull-agent.gemspec
 gem push "pardot_pull-agent-${RUBYGEM_VERSION}.gem"
