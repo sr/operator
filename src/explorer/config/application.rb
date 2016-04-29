@@ -8,7 +8,7 @@ Bundler.require(*Rails.groups)
 
 require "instrumentation"
 
-module Dbquery
+module Explorer
   class Application < Rails::Application
     config.time_zone = "Eastern Time (US & Canada)"
     config.active_record.schema_format = :ruby
