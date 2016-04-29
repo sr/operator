@@ -28,3 +28,7 @@ images:
   # Pardot/mesh
   docker.dev.pardot.com/base/mesh/app:
     build: mesh/app
+
+  # Pardot/repfix
+  docker.dev.pardot.com/base/repfix/app:
+    build: repfix/app
