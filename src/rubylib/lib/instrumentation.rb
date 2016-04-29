@@ -1,7 +1,3 @@
-if defined?(Rails::Railtie)
-  require "instrumentation/railtie"
-end
-
 module Instrumentation
   # Simple key-value text based logging format. See https://brandur.org/logfmt
   LOG_LOGFMT = :logfmt
@@ -56,4 +52,8 @@ module Instrumentation
     :error,
     :request_id,
     :request_id=
+end
+
+if defined?(Rails::Railtie)
+  require "instrumentation/railtie"
 end
