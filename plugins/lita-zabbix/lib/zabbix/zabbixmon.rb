@@ -20,7 +20,7 @@ module Zabbix
       @zbx_password = zbx_password
       @datacenter = datacenter
       @hard_failure = nil
-      @soft_failures = Set.new [] # soft-fails can used to provide feedback for hard-fail
+      @soft_failures = Set.new([]) # soft-fails can used to provide feedback for hard-fail
     end
 
     attr_accessor :hard_failure
