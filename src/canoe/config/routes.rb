@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
-  resources :repos, param: :name, only: [:show] do
+  resources :repos, param: :name, only: [:index, :show] do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
@@ -54,6 +54,5 @@ Rails.application.routes.draw do
     end
   end
 
-  get "home/index"
-  root to: "home#index"
+  root to: "repos#index"
 end

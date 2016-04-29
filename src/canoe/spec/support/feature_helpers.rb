@@ -6,6 +6,6 @@ module FeatureHelpers
     fill_in "email", with: email
     click_button "Sign In"
 
-    expect(page).to have_text("Ship It")
+    expect(page).to have_text("Welcome to Canoe")
   end
 end

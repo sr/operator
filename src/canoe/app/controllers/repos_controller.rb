@@ -1,6 +1,10 @@
 class ReposController < ApplicationController
   before_filter :require_target, only: [:lock, :unlock]
-  before_filter :require_repo
+  before_filter :require_repo, only: [:show, :lock, :unlock]
+
+  def index
+    @repos = all_repos
+  end
 
   def show
   end
