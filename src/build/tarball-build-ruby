@@ -11,7 +11,7 @@ test -z "$image" && {
 }
 
 app_archive="$(mktemp -t"${image}XXXXX").tar"
-bundle_archive="$(mktemp -t ${image}-bundleXXXXX).tar"
+bundle_archive="$(mktemp -t "${image}-bundleXXXXX").tar"
 trap 'rm -f $bundle_archive' EXIT
 
 docker run "$image" tar -C "/app" --exclude=".git" -cf - . \
