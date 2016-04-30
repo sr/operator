@@ -16,6 +16,7 @@ module Lita
       MonitoringFailure = Class.new(StandardError)
       PagerFailed = Class.new(StandardError)
       MONITOR_FAIL_ERRMSG = '::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause'
+      CHAT_ERRMSG = 'Sorry, something went wrong.'
 
       # config: zabbix
       config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
@@ -151,7 +152,7 @@ module Lita
         end
         response.reply_with_mention("#{msg}")
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong.")
+        response.reply_with_mention(CHAT_ERRMSG)
         log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
@@ -216,7 +217,7 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong.")
+        response.reply_with_mention(CHAT_ERRMSG)
         log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
@@ -249,7 +250,7 @@ module Lita
 
         response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong.")
+        response.reply_with_mention(CHAT_ERRMSG)
         log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
@@ -276,7 +277,7 @@ module Lita
           response.reply_with_mention("Sorry, no hosts matched #{host_glob}")
         end
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong.")
+        response.reply_with_mention(CHAT_ERRMSG)
         log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
@@ -291,7 +292,7 @@ module Lita
         ).unpause_monitor(monitorname: ::Zabbix::Zabbixmon::MONITOR_NAME)
         response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
       rescue => e
-        response.reply_with_mention("Sorry, something went wrong.")
+        response.reply_with_mention(CHAT_ERRMSG)
         log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, '**************'))
       end
 
