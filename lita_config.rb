@@ -17,6 +17,7 @@ Lita.configure do |config|
     "1_104@chat.btf.hipchat.com", # Jan Ulrich
     "1_261@chat.btf.hipchat.com", # Rory Kiefer
     "1_282@chat.btf.hipchat.com", # Andy Lindeman
+    "1_350@chat.btf.hipchat.com", # Simon Rozet
   ]
 
   config.robot.adapter = (ENV.fetch("LITA_ADAPTER", "shell")).to_sym
@@ -42,12 +43,26 @@ Lita.configure do |config|
   ]
   config.adapters.hipchat.debug = true
 
-  # Replication fixing
-  config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("PAGERDUTY_SERVICE_KEY", "")
+  # PagerDuty
+  config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("REPFIX_PAGERDUTY_SERVICE_KEY", "")
+  config.handlers.zabbix.pagerduty_service_key = ENV.fetch("ZABBIX_PAGERDUTY_SERVICE_KEY", "")
 
-  # Zabbix
+  # Set the Hipchat Chatroom
+  config.handlers.zabbix.status_room = "1_ops@conf.btf.hipchat.com"
+
+  # Set the datacenters
+  #config.handlers.zabbix.datacenters = ['dfw','phx']
+
+  # Zabbix Setup
   config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
   config.handlers.zabbix.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
+
+  # Zabbix Monitor Config
+  config.handlers.zabbix.monitor_hipchat_notify = true
+  config.handlers.zabbix.monitor_interval_seconds = 60
+  config.handlers.zabbix.monitor_retries = 5
+  config.handlers.zabbix.monitor_retry_interval_seconds = 5
+  config.handlers.zabbix.monitor_http_timeout_seconds =  30
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")

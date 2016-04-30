@@ -66,6 +66,10 @@ module Zabbix
       )
     end
 
+    def get_item_by_name_and_lastvalue(name, lastvalue)
+      @client.items.get(name: name, lastvalue: lastvalue) unless (name.nil? || lastvalue.nil?)
+    end
+
     private
     def maintenance_group_id
       @client.hostgroups.get_id(name: MAINTENANCE_GROUP_NAME).tap { |group_id|
