@@ -173,7 +173,7 @@ do
                     -e "bamboo_shortPlanKey=$bamboo_shortPlanKey" \
                     -e "DEBUG=$DEBUG" \
                     build/build \
-                    src/build/build-gem-pull_agent
+                    build-gem-pull_agent
             fi
             ;;
         rubylib)

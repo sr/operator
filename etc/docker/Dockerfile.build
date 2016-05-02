@@ -5,7 +5,7 @@ ENV JFROG_CLI_URL=https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path
 ENV TERRAFORM_VERSION=0.6.15
 ENV TERRAFORM_SHA256=2a81faa54ed6c5e7c065444617fc999f0ab6d433e4e03a0ad599892e74ffff6b
 ENV TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-ENV PATH "/data/bin:$PATH"
+ENV PATH "/data/bin:/data/src/build/docker:$PATH"
 VOLUME ["/data"]
 WORKDIR "/data"
 RUN \

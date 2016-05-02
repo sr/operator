@@ -22,4 +22,4 @@ docker run --rm \
   -e "CI_PLAN=$CI_PLAN" \
   -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
   build/build \
-  src/build/tarball-upload "$gitsha1" "$green" /data/tarball.tar
+  tarball-upload "$gitsha1" "$green" /data/tarball.tar

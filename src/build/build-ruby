@@ -26,5 +26,5 @@ then
     docker-compose -p "$project" -f "$config" run app script/test
 # Otherwise just build it as a normal Ruby library
 else
-    docker run --rm -v "$(pwd):/data" build/build src/build/build-ruby-lib "$dir"
+    docker run --rm -v "$(pwd):/data" build/build build-ruby-lib "$dir"
 fi
