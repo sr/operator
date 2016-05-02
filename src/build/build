@@ -51,13 +51,10 @@ then
     sha1a="${bamboo_repository_previous_revision_number:-""}"
     sha1b="${bamboo_repository_revision_number:-"HEAD"}"
 
-    if [ -n "$DEBUG" ]
-    then
-        echo "Current head SHA1: $(git rev-parse HEAD)" 2>&1
-        echo "Base SHA1: ${sha1a}" 2>&1
-        echo "Head SHA1: ${sha1b}" 2>&1
-        echo "Branch: ${branch}" 2>&1
-    fi
+    echo "Current head SHA1: $(git rev-parse HEAD)" 2>&1
+    echo "Base SHA1: ${sha1a}" 2>&1
+    echo "Head SHA1: ${sha1b}" 2>&1
+    echo "Branch: ${branch}" 2>&1
 
     # It is unclear when this can happen as of yet so we just bail out if it
     # does for now. If this is a topic branch build, compare the list of
