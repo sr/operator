@@ -2,6 +2,10 @@ require "minitest/autorun"
 require "instrumentation"
 
 class LoggingTest < Minitest::Test
+  def setup
+    Instrumentation::Logging.reset
+  end
+
   def test_logfmt
     Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_LOGFMT)
     Instrumentation.log(boom: "town")

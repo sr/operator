@@ -45,7 +45,7 @@ module Instrumentation
       when LOG_LOGSTASH
         Scrolls::Log.extend LogstashFormatter
       when LOG_LOGFMT
-        # Use Scrolls::Parser
+        Scrolls::Log.extend Scrolls::Parser
       else
         raise UnsupportedFormat, format
       end
@@ -67,7 +67,9 @@ module Instrumentation
     end
 
     def reset
-      @stream.reset
+      if @stream.respond_to?(:reset)
+        @stream.reset
+      end
     end
 
     def entries
