@@ -13,8 +13,7 @@ cd "$(dirname "$0")/../../.."
 test -n "$DEBUG" && set -x
 
 # Configure RubyGems for pushing to our Artifactory repository
-RUBYGEMS_HOST="${ARTIFACTORY_HOST}/artifactory/api/gems/"
-RUBYGEMS_HOST="${RUBYGEMS_HOST}${ARTIFACTORY_REPO_GEM_LOCAL}"
+RUBYGEMS_HOST="${ARTIFACTORY_URL}/api/gems/${ARTIFACTORY_REPO_GEM_LOCAL}"
 test -d "${HOME}/.gem" || mkdir "${HOME}/.gem"
 set +x
 curl -s -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" \
