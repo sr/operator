@@ -61,8 +61,8 @@ then
     then
         echo "Unable to build master branch without a base SHA1" 2>&1
         exit 1
-    else
-        sha1a="$(git rev-parse origin/master)"
+    elif [ -z "$sha1a" ]
+    then sha1a="$(git rev-parse origin/master)"
     fi
 
     printf "===> CI mode HEAD=%s branch=%s sha1a=%s sha1b=%s\n" \
