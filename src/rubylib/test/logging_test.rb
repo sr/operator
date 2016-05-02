@@ -1,3 +1,4 @@
+require "minitest/autorun"
 require "instrumentation"
 
 class LoggingTest < Minitest::Test

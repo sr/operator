@@ -48,4 +48,5 @@ AllCops:
     - "src/**/bin/*"
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
+    - "src/**/vendor/gems/**/*"
     - "src/canoe/**/*"

@@ -177,6 +177,9 @@ do
             fi
             ;;
         rubylib)
+            if [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]
+            then sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
+            fi
             build-ruby "rubylib"
             ;;
         build|shell)
