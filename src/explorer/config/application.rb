@@ -13,6 +13,10 @@ module Explorer
     config.time_zone = "Eastern Time (US & Canada)"
     config.active_record.schema_format = :ruby
 
-    config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
+    if Rails.env.test?
+      config.instrumentation.log_format = Instrumentation::LOG_NOOP
+    else
+      config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
+    end
   end
 end

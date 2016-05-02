@@ -18,4 +18,11 @@ class LoggingTest < Minitest::Test
     assert_equal "app", parsed["app"]
     assert_equal "test", parsed["env"]
   end
+
+  def test_noop
+    Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_NOOP)
+    Instrumentation.log(boom: "town")
+    log = Instrumentation::Logging.entries.pop
+    assert_equal({ app: "app", env: "test", boom: "town" }, log)
+  end
 end
