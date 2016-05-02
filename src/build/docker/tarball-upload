@@ -3,6 +3,7 @@
 #/ Appends build version file to the given tarball and uploads it to Artifactory.
 #/ This requires the JFrog CLI to be available in the PATH.
 set -euo pipefail
+cd "$(dirname "$0")/../../.."
 
 . etc/build/env
 
