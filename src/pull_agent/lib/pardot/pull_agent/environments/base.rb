@@ -321,7 +321,7 @@ module Pardot
             "shared/pi-db-password" => "config/pi/db-password_#{name}",
             "log" => "log"
           )
-        )
+        end
 
         def link_internal_api_shared_files
           link_shared_files(
