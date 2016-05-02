@@ -2,7 +2,7 @@ module Pardot
   module PullAgent
     # module to include in the proper environments for required hooks
     module Storm
-      extend self
+      module_function
 
       PROC_KILL_WAIT_TIME = 45
       STORM_BIN = "/opt/storm/current/bin/storm".freeze

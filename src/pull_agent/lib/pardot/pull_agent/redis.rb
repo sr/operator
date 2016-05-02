@@ -6,7 +6,7 @@ module Pardot
           @redis = ::Redis.new(host: host, port: port, db: db)
         end
 
-        def has_key?(key)
+        def key?(key)
           @redis.exists(key)
         end
 
@@ -39,7 +39,7 @@ module Pardot
             port = Integer(port_string)
 
             host = Host.new(hostname, port)
-            next if host.has_key?(key)
+            next if host.key?(key)
             Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
             host.hset(key, entry, value)
             found = true

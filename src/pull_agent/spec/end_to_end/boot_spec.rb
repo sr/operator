@@ -4,7 +4,7 @@ describe "pull-agent executable" do
   BIN = File.expand_path("../../../bin/pull-agent", __FILE__).freeze
 
   it "exits non-zero and when environment is not given" do
-    r, w = IO.pipe
+    _r, w = IO.pipe
     pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, out: w, err: w)
     w.close
     _, status = Process.wait2(pid)
@@ -23,7 +23,7 @@ describe "pull-agent executable" do
   end
 
   it "exits successfully when both environment and app are given" do
-    r, w = IO.pipe
+    _r, w = IO.pipe
     pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, "dev", "pardot", out: w, err: w)
     w.close
     _, status = Process.wait2(pid)

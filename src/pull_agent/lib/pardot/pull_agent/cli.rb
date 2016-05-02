@@ -8,76 +8,65 @@ module Pardot
       end
 
       def parse_arguments!
-        @arguments.each_with_index do |arg, index|
-          if %w[help --help -h].include?(arg.downcase)
-            print_help
-            return
-          end
-
-          if index == 0
-            begin
-              @environment = Environments.build(arg.downcase)
-            rescue Environments::NoSuchEnvironment
-              Logger.log(:crit, "Invalid environment specified: #{arg}")
-
-              print_help
-              return
-            end
-          elsif index == 1
-            # the payload (repository name) MUST be the second argument
-            if @environment.valid_payload?(arg)
-              @environment.payload = arg
-              Logger.context[:payload] = arg
-            else
-              Logger.log(:crit, "Invalid payload specified: #{arg}")
-
-              print_help
-              return
-            end
-          else
-            Logger.log(:crit, "Unknown argument: #{arg}")
-
-            print_help
-            return
-          end
-        end
-
         # environment and payload (repository name) are required
-        if @arguments.size < 2
+        if @arguments.size != 2
           print_help
           return
+        else
+          env, payload = @arguments
+        end
+
+        begin
+          @environment = Environments.build(env.downcase)
+          if @environment.valid_payload?(payload)
+            @environment.payload = payload
+            Logger.context[:payload] = payload
+          else
+            Logger.log(:crit, "Invalid payload specified: #{payload}")
+            print_help
+          end
+        rescue Environments::NoSuchEnvironment
+          Logger.log(:crit, "Invalid environment specified: #{env}")
+          print_help
         end
       end
 
       def checkin
-        current_build_version = BuildVersion.load(environment.payload.build_version_file)
+        request = Canoe.latest_deploy(environment)
+        Logger.context[:deploy_id] = request.id
 
-        requested_deploy = Canoe.latest_deploy(environment)
-        Logger.context[:deploy_id] = requested_deploy.id
-
-        if requested_deploy.applies_to_this_server?
-          if requested_deploy.action == "restart"
-            Logger.log(:info, "Executing restart tasks")
-            environment.conductor.restart!(requested_deploy)
-            Canoe.notify_server(environment, requested_deploy)
-          elsif requested_deploy.action == "deploy"
-            if current_build_version && current_build_version.instance_of_deploy?(requested_deploy) && !environment.bypass_version_detection?
-              Logger.log(:info, "We are up to date")
-              Canoe.notify_server(environment, requested_deploy)
-            else
-              Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || '<< None >>'}")
-              Logger.log(:info, "Requested deploy: #{requested_deploy.artifact_url}")
-              environment.conductor.deploy!(requested_deploy)
-            end
-          else
-            Logger.log(:debug, "Nothing to do for this deploy")
-          end
+        if request.applies_to_this_server?
+          client_action(request)
         else
           Logger.log(:debug, "The deploy does not apply to this server")
         end
       end
 
       private
+
+      def client_action(request)
+        if request.action == "restart"
+          Logger.log(:info, "Executing restart tasks")
+          environment.conductor.restart!(request)
+          Canoe.notify_server(environment, request)
+        elsif request.action == "deploy"
+          deploy_action(request)
+        else
+          Logger.log(:debug, "Nothing to do for this deploy")
+        end
+      end
+
+      def deploy_action(request)
+        current_build_version = BuildVersion.load(environment.payload.build_version_file)
+        if current_build_version && current_build_version.instance_of_deploy?(request) && !environment.bypass_version_detection?
+          Logger.log(:info, "We are up to date")
+          Canoe.notify_server(environment, request)
+        else
+          Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || '<< None >>'}")
+          Logger.log(:info, "Requested deploy: #{request.artifact_url}")
+          environment.conductor.deploy!(request)
+        end
+      end
 
       def print_help
         readme = File.expand_path("../../../../README.md", __FILE__)

@@ -11,16 +11,16 @@ module Pardot
 
           def valid?(_deploy)
             # returns boolean value indicating the combination is valid
-            raise "Must be defined by sub-classes"
+            fail "Must be defined by sub-classes"
           end
 
           def fetch(_deploy)
             # returns path to fetched asset (file or directory)
-            raise "Must be defined by sub-classes"
+            fail "Must be defined by sub-classes"
           end
 
           # Cleans up any temporary files
-          def cleanup(deploy)
+          def cleanup(_deploy)
           end
 
           def type

@@ -49,3 +49,11 @@ AllCops:
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
     - "src/canoe/**/*"
+Metrics/LineLength:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false

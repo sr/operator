@@ -12,7 +12,7 @@ module Pardot
 
           config_file = ENV["PULL_AGENT_CONFIG_FILE"]
           if !config_file.to_s.empty?
-            if !File.exists?(config_file)
+            if !File.exist?(config_file)
               abort "Config file does not exist: #{config_file.inspect}"
             end
 
@@ -76,7 +76,7 @@ module Pardot
             payloads.each do |payload|
               strategies[type][payload] ||= default_strategies(type)
               Array(what).each do |w|
-                raise "Unknown fetch type, '#{w}'" unless valid_types.include?(w.to_sym)
+                fail "Unknown fetch type, '#{w}'" unless valid_types.include?(w.to_sym)
                 strategies[type][payload][w.to_sym] = strategy.to_sym
               end
             end
@@ -168,9 +168,10 @@ module Pardot
         def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
-          autojob_hosts = (1..9).flat_map do |i|
+          autojob_disco_master = (1..9).flat_map do |i|
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-          end.map { |s| [s["address"], s["port"]].join(":") }
+          end
+          autojob_hosts = autojob_disco_master.map { |s| [s["address"], s["port"]].join(":") }
 
           # Restart automation workers
           redis.bounce_workers("automationWorkers", autojob_hosts)
@@ -217,9 +218,10 @@ module Pardot
         end
 
         def deploy_topology(deploy)
-          if deploy.options["topology"].nil? || payload.current_link.nil?
-            deploy.options["topology"].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
-            payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
+          if deploy.options["topology"].nil?
+            Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+          elsif payload.current_link.nil?
+            Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
           else
             # this finds a JAR inside of a tarball blown up and linked-to at the base level
             jarfile = ShellHelper.execute(["find", "#{payload.current_link}/", "-name", "*.jar"]) # trailing slash is necessary

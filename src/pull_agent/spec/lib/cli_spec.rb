@@ -21,7 +21,7 @@ describe Pardot::PullAgent::CLI do
     end
 
     it "expects valid argument as first argument" do
-      cli = Pardot::PullAgent::CLI.new(%w[foo])
+      cli = Pardot::PullAgent::CLI.new(%w[foo bad])
       output = capturing_stdout do
         cli.parse_arguments!
       end
@@ -44,7 +44,7 @@ describe Pardot::PullAgent::CLI do
         cli.parse_arguments!
       end
 
-      expect(output).to match(/Unknown argument: bogus/)
+      expect(output).to include("Usage")
     end
 
     it "parses payload as second argument" do

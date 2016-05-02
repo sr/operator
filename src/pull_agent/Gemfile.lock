@@ -1,0 +1,58 @@
+PATH
+  remote: .
+  specs:
+    pardot_pull-agent (0.pre)
+      artifactory (~> 2.3)
+      redis (~> 3.3)
+
+GEM
+  remote: https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/
+  specs:
+    addressable (2.4.0)
+    artifactory (2.3.2)
+    byebug (8.2.4)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
+    diff-lcs (1.2.5)
+    docile (1.1.5)
+    hashdiff (0.3.0)
+    json (1.8.3)
+    rake (10.5.0)
+    redis (3.3.0)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
+    safe_yaml (1.0.4)
+    simplecov (0.11.2)
+      docile (~> 1.1.0)
+      json (~> 1.8)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.0)
+    webmock (1.24.6)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  byebug (~> 8.2)
+  pardot_pull-agent!
+  rake (~> 10.4)
+  rspec (~> 3.4)
+  simplecov (~> 0.9)
+  webmock (~> 1.21)
+
+BUNDLED WITH
+   1.10.6

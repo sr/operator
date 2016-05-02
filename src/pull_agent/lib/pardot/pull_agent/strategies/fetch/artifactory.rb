@@ -73,12 +73,12 @@ module Pardot
 
               File.open(filename, "wb", 00600) do |f|
                 http.request(request) do |response|
-                  if Net::HTTPSuccess === response
+                  if response.is_a?(Net::HTTPSuccess)
                     response.read_body do |fragment|
                       f.write(fragment)
                     end
                   else
-                    raise DownloadError.new("Unable to download artifact: #{response}")
+                    fail DownloadError, "Unable to download artifact: #{response}"
                   end
                 end
               end
