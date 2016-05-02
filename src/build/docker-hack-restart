@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Workaround for <https://github.com/docker/libnetwork/issues/1113>
+# Please remove when the bug is resolved, and a fixed version deployed
+if [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]
+then
+    sudo /bin/systemctl restart docker.service
+    sleep 5
+fi
