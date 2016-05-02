@@ -10,8 +10,7 @@ module Pardot
       def parse_arguments!
         # environment and payload (repository name) are required
         if @arguments.size != 2
-          print_help
-          return
+          fail ArgumentError, print_help
         else
           env, payload = @arguments
         end
@@ -23,11 +22,11 @@ module Pardot
             Logger.context[:payload] = payload
           else
             Logger.log(:crit, "Invalid payload specified: #{payload}")
-            print_help
+            fail ArgumentError, print_help
           end
         rescue Environments::NoSuchEnvironment
           Logger.log(:crit, "Invalid environment specified: #{env}")
-          print_help
+          fail ArgumentError, print_help
         end
       end
 
@@ -71,9 +70,9 @@ module Pardot
       def print_help
         readme = File.expand_path("../../../../README.md", __FILE__)
         if File.exist?(readme)
-          puts File.read(readme)
+          File.read(readme)
         else
-          puts "Please refer to the README for usage information"
+          "Please refer to the README for usage information"
         end
       end
     end

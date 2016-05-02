@@ -4,26 +4,18 @@ describe Pardot::PullAgent::CLI do
   describe "parsing arguments" do
     it "expects environment as first argument" do
       cli = Pardot::PullAgent::CLI.new
-      output = capturing_stdout do
-        cli.parse_arguments!
-      end
-
-      expect(output).to include("Usage")
+      expect { cli.parse_arguments! }.to raise_error(ArgumentError)
     end
 
     it "prints help and exits if --help is passed as an argument" do
       cli = Pardot::PullAgent::CLI.new(%w[--help])
-      output = capturing_stdout do
-        cli.parse_arguments!
-      end
-
-      expect(output).to include("Usage")
+      expect { cli.parse_arguments! }.to raise_error(ArgumentError)
     end
 
     it "expects valid argument as first argument" do
       cli = Pardot::PullAgent::CLI.new(%w[foo bad])
       output = capturing_stdout do
-        cli.parse_arguments!
+        expect { cli.parse_arguments! }.to raise_error(ArgumentError)
       end
 
       expect(output).to match(/Invalid environment/)
@@ -32,7 +24,7 @@ describe Pardot::PullAgent::CLI do
     it "expects valid payload as second argument" do
       cli = Pardot::PullAgent::CLI.new(%w[test bad])
       output = capturing_stdout do
-        cli.parse_arguments!
+        expect { cli.parse_arguments! }.to raise_error(ArgumentError)
       end
 
       expect(output).to match(/Invalid payload specified/)
@@ -40,11 +32,7 @@ describe Pardot::PullAgent::CLI do
 
     it "prints an error on unknown arguments" do
       cli = Pardot::PullAgent::CLI.new(%w[test pardot bogus])
-      output = capturing_stdout do
-        cli.parse_arguments!
-      end
-
-      expect(output).to include("Usage")
+      expect { cli.parse_arguments! }.to raise_error(ArgumentError)
     end
 
     it "parses payload as second argument" do
