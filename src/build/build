@@ -134,7 +134,9 @@ do
             build-ruby "$project"
 
             if $cimode
-            then docker-push "canoe_app" "$CANOE_ECR_REPO"
+            then
+                sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
+                docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
         pardot-explorer)
