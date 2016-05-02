@@ -42,6 +42,9 @@ do
     esac
 done
 
+printf "===> Build ci=%s buildall=%s projects=%s\n" \
+    "$cimode" "$buildall" "$projects" 2>&1
+
 # In CI mode (enabled on Bamboo by default) this analyzes the diff to figure
 # out what project(s) need(s) building. A projects is defined as a subdirectory
 # of the src/ directory.
@@ -51,14 +54,6 @@ then
     sha1a="${bamboo_repository_previous_revision_number:-""}"
     sha1b="${bamboo_repository_revision_number:-"HEAD"}"
 
-    if [ -n "$DEBUG" ]
-    then
-        echo "Current head SHA1: $(git rev-parse HEAD)" 2>&1
-        echo "Base SHA1: ${sha1a}" 2>&1
-        echo "Head SHA1: ${sha1b}" 2>&1
-        echo "Branch: ${branch}" 2>&1
-    fi
-
     # It is unclear when this can happen as of yet so we just bail out if it
     # does for now. If this is a topic branch build, compare the list of
     # changed files against the remote master branch.
@@ -66,9 +61,15 @@ then
     then
         echo "Unable to build master branch without a base SHA1" 2>&1
         exit 1
-    else
-        sha1a="$(git rev-parse origin/master)"
+    elif [ -z "$sha1a" ]
+    then sha1a="$(git rev-parse origin/master)"
     fi
+
+    printf "===> CI mode HEAD=%s branch=%s sha1a=%s sha1b=%s\n" \
+        "$(git rev-parse HEAD)" \
+        "$branch" \
+        "$sha1a" \
+        "$sha1b" 2>&1
 
     # If the two SHA1s are identical it most likely means this is a restarted
     # build, in which case a full build is triggered. Otherwise this analyzes
@@ -114,7 +115,9 @@ test -z "$projects"  && {
     exit 1
 }
 
+echo "===> Projects scheduled to be built:$(echo "$projects" | tr "\n" " ")" 2>&1
 
+docker-hack-restart
 # Build the container used for most builds.
 docker build -f etc/docker/Dockerfile.build -t build/build .
 
@@ -122,15 +125,16 @@ docker build -f etc/docker/Dockerfile.build -t build/build .
 # and execute the build commands in sequence.
 for project in $projects
 do
-    # Workaround for <https://github.com/docker/libnetwork/issues/1113>
-    # Please remove when the bug is resolved, and a fixed version deployed
-    if [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]
-    then
-        sudo /bin/systemctl restart docker.service
-        sleep 5
-    fi
+    docker-hack-restart
+
+    echo "===> Building ${project}..." 2>&1
+
     case "$project" in
         canoe)
+            if [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]
+            then sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
+            fi
+
             build-ruby "$project"
 
             if $cimode
@@ -141,9 +145,8 @@ do
             build-ruby "$project"
             ;;
         pull_agent)
-            if $cimode
-            then
-                sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
+            if [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]
+            then sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g' src/pull_agent/Gemfile
             fi
 
             build-ruby "$project"
