@@ -1,13 +1,15 @@
-<h1 class="steps-count">Step 1 of 3</h1>
-<h2>What do you want to deploy?</h2>
+<h1>
+  <%= content_tag :i, "", class: "icon-#{current_repo.icon}" %>
+  <%= current_repo.name.capitalize %>
+</h1>
+
+<h2 class="steps-count">Step 1 of 4</h2>
 <br>
+
+<p class="lead muted">
+  <i class="icon-circle-arrow-down"></i> Select where to grab the code.
+</p>
 
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
-
-  <div class="container">
-    <h3 class="muted"><i class="icon-circle-arrow-up"></i>
-      Select where to grab the code.
-    </h3>
-  </div>
 </div>
