@@ -115,7 +115,7 @@ test -z "$projects"  && {
     exit 1
 }
 
-echo "===> Building projects: $projects" 2>&1
+echo "===> Projects scheduled to be built: $projects" 2>&1
 
 docker-hack-restart
 # Build the container used for most builds.
@@ -126,6 +126,9 @@ docker build -f etc/docker/Dockerfile.build -t build/build .
 for project in $projects
 do
     docker-hack-restart
+
+    echo "===> Building ${project}..." 2>&1
+
     case "$project" in
         canoe)
             build-ruby "$project"
