@@ -11,14 +11,14 @@ else echo "WARN: $envfile not found" 2>&1
 fi
 : "${ARTIFACTORY_HOST:="artifactory-internal.dev.pardot.com"}"
 : "${ARTIFACTORY_URL:="https://${ARTIFACTORY_HOST}/artifactory"}"
-: "${ARTIFACTORY_USER:="${USERNAME:-""}"}"
+: "${ARTIFACTORY_USERNAME:="${USERNAME:-""}"}"
 : "${ARTIFACTORY_PASSWORD:="${PASSWORD:-""}"}"
 : "${ARTIFACTORY_REPO_CANOE:="pd-canoe"}"
 : "${ARTIFACTORY_REPO_GEM_LOCAL:="pd-gem-local"}"
 export \
   ARTIFACTORY_HOST \
   ARTIFACTORY_URL \
-  ARTIFACTORY_USER \
+  ARTIFACTORY_USERNAME \
   ARTIFACTORY_PASSWORD
 
 : "${AWS_PROFILE:="pardotops"}"
