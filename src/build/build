@@ -115,7 +115,7 @@ test -z "$projects"  && {
     exit 1
 }
 
-echo "===> Projects scheduled to be built: $projects" 2>&1
+echo "===> Projects scheduled to be built:$(echo "$projects" | tr "\n" " ")" 2>&1
 
 docker-hack-restart
 # Build the container used for most builds.
