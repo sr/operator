@@ -9,18 +9,6 @@ module Instrumentation
       end
     end
 
-    module LogstashFormatter
-      def unparse(data)
-        LogStash::Event.new(data).to_json
-      end
-    end
-
-    module RawFormatter
-      def unparse(data)
-        data
-      end
-    end
-
     def setup(app_name, env_name, format)
       stream =
         case env_name
@@ -41,11 +29,23 @@ module Instrumentation
 
       case format
       when LOG_NOOP
-        Scrolls::Log.extend RawFormatter
+        Scrolls::Log.module_eval do
+          def self.unparse(data)
+            data
+          end
+        end
       when LOG_LOGSTASH
-        Scrolls::Log.extend LogstashFormatter
+        Scrolls::Log.module_eval do
+          def self.unparse(data)
+            LogStash::Event.new(data).to_json
+          end
+        end
       when LOG_LOGFMT
-        Scrolls::Log.extend Scrolls::Parser
+        Scrolls::Log.module_eval do
+          def self.unparse(data)
+            Scrolls::Parser.unparse(data)
+          end
+        end
       else
         raise UnsupportedFormat, format
       end
