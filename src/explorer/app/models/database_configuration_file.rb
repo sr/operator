@@ -20,7 +20,7 @@ class DatabaseConfigurationFile
 
   def self.load
     path = Rails.root.join("config", "pi", "#{Rails.env}.yaml")
-    auth = Rails.root.join("config", "pi", "#{Rails.env}.auth")
+    auth = Rails.root.join("config", "pi", "db-password_#{Rails.env}")
     config = YAML.load_file(path)
 
     new(config, auth.read.chomp)

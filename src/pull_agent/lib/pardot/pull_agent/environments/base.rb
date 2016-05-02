@@ -316,6 +316,13 @@ module Pardot
           restart_puma("/var/run/repfix/puma.pid")
         end
 
+        def link_explorer_shared_files
+          link_shared_files(
+            "shared/pi-db-password" => "config/pi/db-password_#{name}",
+            "log" => "log"
+          )
+        )
+
         def link_internal_api_shared_files
           link_shared_files(
             "shared/.envvars_#{name}" => ".envvars_#{name}",
