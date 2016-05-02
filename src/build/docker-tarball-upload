@@ -24,4 +24,4 @@ docker run --rm \
   -e "CI_PLAN=$CI_PLAN" \
   -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
   build/jfrog \
-  tarball-upload "$(git rev-parse HEAD)" /data/tarball.tar
+  tarball-upload "$gitsha1" /data/tarball.tar
