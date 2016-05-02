@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+dir="$1"
+cd "$dir"
+bundle install
+find test -type f -name "*.rb" -print0 |
+xargs -0 bundle exec ruby -rminitest/autorun -Ilib
