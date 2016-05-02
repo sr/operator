@@ -106,12 +106,6 @@
 
 <hr>
 
-<% if current_deploy.deploy_target.name == 'staging' %>
-  <div class="alert alert-warning">
-    Zookeeper machines have been shut down in app.dev, so we can't restart services because discoclient is down. Please just stop a deploy after the code has gone out and it's in the restart stage. Sorry for the inconvenience.
-  </div>
-<% end %>
-
 <table class="table table-bordered">
   <thead>
     <tr>
