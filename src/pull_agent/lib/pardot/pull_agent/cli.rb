@@ -26,7 +26,7 @@ module Pardot
           end
         rescue Environments::NoSuchEnvironment
           Logger.log(:crit, "Invalid environment specified: #{env}")
-          fail ArgumentError, print_help
+          raise ArgumentError, print_help
         end
       end
 

@@ -13,7 +13,7 @@ describe "pull-agent executable" do
   end
 
   it "exits non-zero and shows usage when app is not given" do
-    r, w = IO.pipe
+    _r, w = IO.pipe
     pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, "dev", out: w, err: w)
     w.close
     _, status = Process.wait2(pid)
