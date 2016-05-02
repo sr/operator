@@ -26,7 +26,7 @@ tar --append --file="$tarball" "$versionfile"
 props="bambooProject=${CI_PROJECT};" \
     "bambooPlan=${CI_PLAN};" \
     "bambooJob=${BAMBOO_SHORT_JOB_KEY};" \
-    "gitBranch=${CI_REPO_BRANCH_NAME};" \
+    "gitBranch=${CI_BRANCH};" \
     "gitRepo=${BAMBOO_REPO_URL};" \
     "gitSha=${sha1};" \
     "buildNumber=${CI_BUILD_NUMBER};" \

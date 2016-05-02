@@ -23,6 +23,6 @@ docker run --rm \
   -e "CANOE_ARTIFACTORY_REPO=$ARTIFACTORY_REPO_CANOE" \
   -e "CI_PLAN=$CI_PLAN" \
   -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
-  -e "CI_REPO_BRANCH_NAME=$CI_REPO_BRANCH_NAME" \
+  -e "CI_BRANCH=$CI_BRANCH" \
   build/build \
   tarball-upload "$gitsha1" "$green" /data/tarball.tar
