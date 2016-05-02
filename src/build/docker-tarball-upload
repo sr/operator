@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#/ Usage: docker-tarball-upload <git-sha1> <tarball>
+#/ Usage: docker-tarball-upload <git-sha1> <build-green> <tarball>
 #/ Wrapper that runs 'tarball-upload' within a container.
 set -euo pipefail
 
@@ -8,9 +8,7 @@ cd "$(dirname "$0")/../.."
 
 gitsha1="$1"
 tarball="$2"
-
-# Build a container with Artifactory CLI installed
-docker build -f etc/docker/Dockerfile.jfrog -t build/jfrog .
+green="$3"
 
 docker run --rm \
   -v "$(pwd):/data" \
@@ -23,5 +21,5 @@ docker run --rm \
   -e "CANOE_ARTIFACTORY_REPO=$ARTIFACTORY_REPO_CANOE" \
   -e "CI_PLAN=$CI_PLAN" \
   -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
-  build/jfrog \
-  tarball-upload "$gitsha1" /data/tarball.tar
+  build/build \
+  src/build/tarball-upload "$gitsha1" "$green" /data/tarball.tar
