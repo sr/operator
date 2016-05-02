@@ -26,5 +26,7 @@ then
     docker-compose -p "$project" -f "$config" run app script/test
 # Otherwise just build it as a normal Ruby library
 else
-    build-ruby-lib "$dir"
+    bundle install
+    find test -type f -name "*.rb" -print0 |
+    xargs -0 bundle exec ruby -rminitest/autorun -Ilib
 fi
