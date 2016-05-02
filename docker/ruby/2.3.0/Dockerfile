@@ -2,7 +2,7 @@ FROM docker.dev.pardot.com/base/centos:6
 
 ARG artifactory_host
 ARG ruby_version=2.3.0
-ARG bundler_version=1.11.2
+ARG bundler_version=1.12.1
 
 ENV BUNDLE_SILENCE_ROOT_WARNING=1
 ENV BUNDLE_PATH=/usr/local/bundle
