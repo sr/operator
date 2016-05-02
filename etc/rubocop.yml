@@ -43,6 +43,8 @@ Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     '%w': '[]'
     '%W': '[]'
+Style/MultilineBlockChain:
+  Enabled: false
 AllCops:
   Exclude:
     - "src/**/bin/*"

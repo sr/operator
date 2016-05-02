@@ -170,19 +170,18 @@ module Pardot
 
           autojob_disco_master = (1..9).flat_map do |i|
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-          end
-          autojob_hosts = autojob_disco_master.map { |s| [s["address"], s["port"]].join(":") }
+          end.map { |s| [s["address"], s["port"]].join(":") }
 
           # Restart automation workers
-          redis.bounce_workers("automationWorkers", autojob_hosts)
+          redis.bounce_workers("automationWorkers", autojob_disco_master)
           # Restart per account automation workers
-          redis.bounce_workers("PerAccountAutomationWorker", autojob_hosts)
+          redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)
           # Restart timed automation workers
-          redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_hosts)
+          redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_disco_master)
           # Restart related object workers
-          redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
+          redis.bounce_workers("automationRelatedObjectWorkers", autojob_disco_master)
           # Restart automation preview workers
-          redis.bounce_workers("previewWorkers", autojob_hosts)
+          redis.bounce_workers("previewWorkers", autojob_disco_master)
         end
 
         def restart_old_style_jobs
