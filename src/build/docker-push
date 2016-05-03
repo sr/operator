@@ -26,7 +26,6 @@ set +x
 eval "$(aws ecr get-login)"
 set -x
 
-# shellcheck disable=SC2154
 image="${2}:$(docker-image-tag)"
 docker tag "$1" "$image"
 docker push "$image"
