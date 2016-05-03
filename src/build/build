@@ -164,13 +164,12 @@ do
             # Build the gem and push it to Artifactory on CI.
             if $cimode
             then
-                # shellcheck disable=SC2154
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
-                    -e "bamboo_repository_branch_name=$bamboo_repository_branch_name" \
-                    -e "bamboo_buildNumber=$bamboo_buildNumber" \
-                    -e "bamboo_shortPlanKey=$bamboo_shortPlanKey" \
+                    -e "CI_BRANCH=$CI_BRANCH" \
+                    -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+                    -e "CI_PLAN=$CI_PLAN" \
                     -e "DEBUG=$DEBUG" \
                     build/build \
                     build-gem-pull_agent
