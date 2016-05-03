@@ -166,7 +166,8 @@ ul.nav {
     width: 194px;
     text-align: center;
     margin: 3px;
-    border: 1px dashed darken(#f8f8f8, 20%);
+    border: 1px solid #dddddd;
+    border-radius: 3px;
 
     .icon {
       display: inline-block;
