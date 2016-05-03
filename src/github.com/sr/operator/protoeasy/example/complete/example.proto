@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/type/date.proto";
+import "google/protobuf/empty.proto";
+import "foo/foo1.proto";
+import "foo/foo2.proto";
+import "bar/bar.proto";
+
+package example;
+
+option java_package = "com.pedge.example";
+
+message One {
+  int64 i = 1;
+  google.type.Date date = 2;
+}
+
+message Request {
+  One one = 1;
+  foo.One foo_one = 2;
+  foo.Two foo_two = 3;
+  bar.One bar_one = 4;
+}
+
+service API {
+  rpc Do(Request) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      get: "/do"
+    };
+  }
+}
