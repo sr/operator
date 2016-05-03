@@ -5,6 +5,14 @@ namespace :canoe do
   task :create_repos => :environment do
     next if Rails.env.test?
 
+    Repo.find_or_initialize_by(name: 'explorer').tap { |repo|
+      repo.icon = 'search'
+      repo.supports_branch_deploy = true
+      repo.deploys_via_artifacts = true
+      repo.bamboo_project = 'BREAD'
+      repo.bamboo_plan = 'BREAD'
+    }.save!
+
     Repo.find_or_initialize_by(name: 'pardot').tap { |repo|
       repo.icon = 'cloud'
       repo.supports_branch_deploy = true
