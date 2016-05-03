@@ -78,7 +78,7 @@ module Pardot
                       f.write(fragment)
                     end
                   else
-                    fail DownloadError, "Unable to download artifact: #{response}"
+                    raise DownloadError, "Unable to download artifact: #{response}"
                   end
                 end
               end

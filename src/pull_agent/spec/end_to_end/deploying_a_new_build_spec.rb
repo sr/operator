@@ -51,11 +51,11 @@ describe "deploying a new build" do
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/A$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
     _output = capturing_stdout { cli.checkin }
 
     expect(canoe_request).to have_been_made
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/B$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/B$/)
 
     # Should clean up the artifact lest the disk fill up over time
     expect(Dir[File.join(cli.environment.payload.artifacts_path, File.basename(artifact_url))]).to eq([])

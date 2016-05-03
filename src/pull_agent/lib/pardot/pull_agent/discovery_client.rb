@@ -23,7 +23,7 @@ module Pardot
         if response.is_a?(Net::HTTPOK)
           JSON.load(response.body)
         else
-          fail Error, response
+          raise Error, response
         end
       end
     end

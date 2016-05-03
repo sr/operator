@@ -37,10 +37,10 @@ describe "rollback back to a previous version" do
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/A$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
     _output = capturing_stdout { cli.checkin }
 
     expect(canoe_request).to have_been_made
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/B$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/B$/)
   end
 end

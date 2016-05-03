@@ -10,7 +10,7 @@ module Pardot
       def parse_arguments!
         # environment and payload (repository name) are required
         if @arguments.size != 2
-          fail ArgumentError, usage
+          raise ArgumentError, usage
         else
           env, payload = @arguments
         end
@@ -22,7 +22,7 @@ module Pardot
             Logger.context[:payload] = payload
           else
             Logger.log(:crit, "Invalid payload specified: #{payload}")
-            fail ArgumentError, usage
+            raise ArgumentError, usage
           end
         rescue Environments::NoSuchEnvironment
           Logger.log(:crit, "Invalid environment specified: #{env}")
@@ -44,11 +44,12 @@ module Pardot
       private
 
       def client_action(request)
-        if request.action == "restart"
+        case request.action
+        when "restart"
           Logger.log(:info, "Executing restart tasks")
           environment.conductor.restart!(request)
           Canoe.notify_server(environment, request)
-        elsif request.action == "deploy"
+        when "deploy"
           deploy_action(request)
         else
           Logger.log(:debug, "Nothing to do for this deploy")

@@ -98,7 +98,7 @@ module Pardot
 
           # Removes any trailing slashes from a pathname
           def normalize_path(path)
-            path && path.sub(%r{/+$}, "")
+            path && path.sub(/\/+$/, "")
           end
 
           def extract_artifact(deploy_path, artifact)

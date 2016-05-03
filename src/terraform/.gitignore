@@ -1,4 +1,0 @@
-*.tfvars
-*.backup
-.DS_Store
-plan.out

@@ -1,3 +1,4 @@
+inherit_from: rubocop_todo.yml
 Lint/UnusedMethodArgument:
   Enabled: true
   Severity: error
@@ -45,18 +46,13 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
 Style/MultilineBlockChain:
   Enabled: false
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
+Style/SignalException:
+  EnforcedStyle: only_raise
 AllCops:
   Exclude:
     - "src/**/bin/*"
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
     - "src/canoe/**/*"
-# Jan would be in favor or enabling these 4 below, but since we want them to be hard failures, it'll require quite a lot of refactoring
-Metrics/LineLength:
-  Enabled: false
-Metrics/MethodLength:
-  Enabled: false
-Metrics/AbcSize:
-  Enabled: false
-Metrics/ClassLength:
-  Enabled: false

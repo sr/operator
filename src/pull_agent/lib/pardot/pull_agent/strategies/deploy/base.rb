@@ -10,7 +10,7 @@ module Pardot
           end
 
           def deploy(_path, _deploy)
-            fail "Must be defined by sub-classes"
+            raise "Must be defined by sub-classes"
           end
 
           def rollback?(_deploy)

@@ -17,7 +17,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   end
 
   it "exits immediately without changing anything" do
-    stub_request(:put, %r{^http://canoe.test/})
+    stub_request(:put, /^http:\/\/canoe.test\//)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!

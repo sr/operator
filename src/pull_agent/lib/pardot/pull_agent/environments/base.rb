@@ -76,7 +76,7 @@ module Pardot
             payloads.each do |payload|
               strategies[type][payload] ||= default_strategies(type)
               Array(what).each do |w|
-                fail "Unknown fetch type, '#{w}'" unless valid_types.include?(w.to_sym)
+                raise "Unknown fetch type, '#{w}'" unless valid_types.include?(w.to_sym)
                 strategies[type][payload][w.to_sym] = strategy.to_sym
               end
             end

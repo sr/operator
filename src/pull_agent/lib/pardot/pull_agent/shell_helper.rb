@@ -10,13 +10,13 @@ module Pardot
 
       # this should make it easier to test, etc...
       def self.execute(command, opt = {})
-        fail SecurityException, "command must be an array to avoid shell expansion" unless command.is_a?(Array)
+        raise SecurityException, "command must be an array to avoid shell expansion" unless command.is_a?(Array)
 
         IO.popen(command, opt) { |io| io.read.strip }
       end
 
       def self.sudo_execute(command, user = "root", opt = {})
-        fail SecurityException, "command must be an array to avoid shell expansion" unless command.is_a?(Array)
+        raise SecurityException, "command must be an array to avoid shell expansion" unless command.is_a?(Array)
         execute(["sudo", "-u", user, *command], opt)
       end
     end
