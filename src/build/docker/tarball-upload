@@ -41,4 +41,4 @@ jfrog rt upload \
     --password "$ARTIFACTORY_PASSWORD" \
     --props  "$props" \
     "$tarball" \
-    "${CANOE_ARTIFACTORY_REPO}/${CI_PLAN}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.gz"
+    "${CANOE_ARTIFACTORY_REPO}/${CI_PROJECT}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.gz"
