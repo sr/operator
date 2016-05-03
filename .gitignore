@@ -1,4 +1,3 @@
 /**/.bundle
-/src/**/vendor/cache
 /src/**/vendor/gems
 /src/rubylib/Gemfile.lock
