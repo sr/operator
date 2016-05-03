@@ -10,9 +10,11 @@ vendor/s3-curl/.s3curl
 .idea
 *.sync.tmp
 Gemfile.lock
-src/canoe/.bundle
-src/canoe/config/pi/*
-src/canoe/log/*.log
-/tmp
-!src/canoe/config/pi/test.auth
-!src/canoe/config/pi/test.yaml
+/**/config/pi/*
+/**/log/*.log
+/**/tmp
+!/**/config/pi/test.auth
+!/**/config/pi/test.yaml
+/**/.bundle
+/src/**/vendor/gems
+/src/rubylib/Gemfile.lock

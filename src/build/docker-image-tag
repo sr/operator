@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 #/ Usage: docker-image-tag
-#/ Writes the image ID of the current build.
+#/ Writes the image ID of the current build to standard output.
 set -euo pipefail
-
-# shellcheck disable=SC2154
-PROJECT="$(echo "${bamboo_planKey}" | cut -d "-" -f 1)"
-# shellcheck disable=SC2154
-PLAN="${bamboo_shortPlanKey}"
-# shellcheck disable=SC2154
-BUILDNUM="${bamboo_buildNumber}"
-
-printf "%s-%s-%s" "$PROJECT" "$PLAN" "$BUILDNUM"
+cd "$(dirname "$0")/../.."
+. etc/build/env
+printf "%s-%s-%s" "$CI_PROJECT" "$CI_PLAN" "$CI_BUILD_NUMBER"
