@@ -1,5 +1,4 @@
 FROM docker.dev.pardot.com/base/ruby:2.3.0
-ENV LANG en_US.UTF-8
 
 RUN \
   yum install -y \
