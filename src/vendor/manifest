@@ -115,6 +115,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/golang/protobuf/protoc-gen-go",
+			"repository": "https://github.com/golang/protobuf",
+			"vcs": "git",
+			"revision": "7cc19b78d562895b13596ddce7aafb59dd789318",
+			"branch": "master",
+			"path": "/protoc-gen-go",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/golang/protobuf/protoc-gen-go/descriptor",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",

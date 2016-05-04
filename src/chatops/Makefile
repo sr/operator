@@ -32,7 +32,7 @@ docker-build:
 			/in
 
 $(PROTOC_GEN_GO):
-	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
+	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
 
 .PHONY: \
 	build \
