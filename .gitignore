@@ -2,7 +2,6 @@
 /bin/
 /pkg/
 /src/**/vendor/cache
-/src/**/vendor/gems
 /src/rubylib/Gemfile.lock
 !/bin/build
 !/bin/deploy
