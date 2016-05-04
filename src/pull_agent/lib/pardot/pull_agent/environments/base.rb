@@ -229,7 +229,7 @@ module Pardot
             else
               Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
-              Storm.load_topology(deploy.options["topology"], jarfile)
+              Storm.load_topology(deploy.options["topology"], deploy.options["topo_env"],  jarfile)
               Logger.log(:info, "Topology Deployment Complete!")
             end
           end
