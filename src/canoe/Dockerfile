@@ -1,15 +1,15 @@
-FROM ruby:2.3.0
-ENV LANG C.UTF-8
+FROM docker.dev.pardot.com/base/ruby:2.3.0
+ENV LANG en_US.UTF-8
 
-RUN apt-get update -qq && \
-   apt-get install -y build-essential && \
-   apt-get install -y nodejs && \
-   apt-get install -y netcat
+RUN \
+  yum install -y \
+   nodejs \
+   nc \
+  && \
+    groupadd -r docker \
+  && \
+    useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker
 
-RUN groupadd -r docker && \
-  useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker
-
-RUN mkdir /app
 WORKDIR /app
 
 ADD Gemfile /app/Gemfile
