@@ -7,8 +7,8 @@
 <div class="repos-index-grid">
   <ul class="repos-index-list">
     <%- @repos.each do |repo| %>
-      <li>
-        <%= link_to repo do %>
+      <%= link_to repo do %>
+        <li>
           <span class="icon">
             <%= content_tag :i, "", class: "icon-#{repo.icon}" %>
           </span>
@@ -16,8 +16,8 @@
           <span class="repo-link">
             <%= repo.name %>
           </span>
-        <%- end %>
-      </li>
+        </li>
+      <%- end %>
     <%- end %>
   </ul>
 </div>
