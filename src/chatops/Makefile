@@ -4,10 +4,10 @@ OPERATORC ?= $(GOBIN)/operatorc
 PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
 DOCKER ?= docker
 
-OPERATOR ?= $(GOBIN)/pistolet
-OPERATORD ?= $(GOBIN)/pistoletd
-OPERATOR_SRC ?= cmd/pistolet/main-gen.go
-OPERATORD_SRC ?= $(shell find cmd/pistoletd -type f -name "*.go")
+OPERATORCTL ?= $(GOBIN)/operatorctl
+OPERATORD ?= $(GOBIN)/operatord
+OPERATORCTL_SRC ?= cmd/operatorctl/main-gen.go
+OPERATORD_SRC ?= $(shell find cmd/operatord -type f -name "*.go")
 
 OPERATORD_ADDRESS ?= localhost:3000
 export OPERATORD_ADDRESS
@@ -17,8 +17,8 @@ IMPORTPATH ?= chatops
 build: $(OPERATORC) $(PROTOC_GEN_GO)
 	$< \
 		--import-path $(IMPORTPATH) \
-		--cmd-out cmd/pistolet \
-		--server-out cmd/pistoletd \
+		--cmd-out cmd/operatorctl \
+		--server-out cmd/operatord \
 		.
 
 docker-build:
@@ -27,8 +27,8 @@ docker-build:
 		-v "$(shell pwd):/out" \
 		srozet/operatorc:3b62142 \
 			--import-path $(IMPORTPATH) \
-			--cmd-out /out/cmd/pistolet \
-			--server-out /out/cmd/pistoletd \
+			--cmd-out /out/cmd/operatorctl \
+			--server-out /out/cmd/operatord \
 			/in
 
 $(PROTOC_GEN_GO):
