@@ -61,6 +61,11 @@ module Lita
         "checkfixing" => "Reports whether fixing is globally enabled or disabled",
       }
 
+      route /^status\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :status, command: true, help: {
+        "status SHARD_ID" => "Reports the status of db-SHARD_ID",
+        "status SHARD_ID PREFIX" => "Reports the status of PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+      }
+
       def initialize(robot)
         super
 
@@ -270,6 +275,31 @@ module Lita
           end
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
+        end
+      end
+
+      def status(response)
+        shard_id = response.match_data["shard_id"].to_i
+        prefix = response.match_data["prefix"] || "db"
+
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
+        result = @fixing_client.status(shard_or_hostname: shard)
+        case result
+        when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
+          response.reply_with_mention("Sorry, something went wrong: #{result.error}")
+        else
+          status = result.status
+          lines = []
+          lines << "status for #{shard}"
+          lines << "[fix in progress]" if result.is_a?(::ReplicationFixing::FixingClient::FixInProgress)
+          status.fetch("hosts", []).each do |host|
+            line = "* #{host["host"]}: #{host["lag"]} seconds behind"
+            line << " [erroring]" if host["is_erroring"]
+            line << " [fixable]" if host["is_fixable"]
+            lines << line
+          end
+
+          response.reply(lines.join("\n"))
         end
       end
 

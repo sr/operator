@@ -151,4 +151,38 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("(goodnews) Replication fixing is globally enabled")
     end
   end
+
+  describe "!status" do
+    it "prints the status of each database host" do
+      response = {
+        "fix" => {
+          "active" => false
+        },
+        "hosts" => [
+          {
+            "host" => "dfw",
+            "host_name" => "pardot0-dbshard1-1-dfw",
+            "is_erroring" => false,
+            "is_fixable" => false,
+            "lag" => 0
+          },
+          {
+            "host" => "dfw2",
+            "host_name" => "pardot0-dbshard2-1-dfw",
+            "is_erroring" => false,
+            "is_fixable" => false,
+            "lag" => 2
+          }
+        ],
+        "is_erroring" => false,
+        "is_fixable" => true
+      }
+
+      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/1")
+        .and_return(body: JSON.dump(response))
+
+      send_command("status 1")
+      expect(replies.last).to eq("status for db-1\n* dfw: 0 seconds behind\n* dfw2: 2 seconds behind")
+    end
+  end
 end

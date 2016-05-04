@@ -4,7 +4,7 @@ module ReplicationFixing
   class FixingClient
     NoErrorDetected = Struct.new(:status)
     NotFixable = Struct.new(:status)
-    FixInProgress = Struct.new(:started_at)
+    FixInProgress = Struct.new(:status, :started_at)
     FixableErrorOccurring = Struct.new(:status)
     ErrorCheckingFixability = Struct.new(:error)
 
@@ -52,7 +52,7 @@ module ReplicationFixing
             ErrorCheckingFixability.new(json["message"])
           elsif json["fix"] && json["fix"]["active"]
             current_status = @fixing_status_client.status(shard: shard_or_hostname)
-            FixInProgress.new(current_status.started_at)
+            FixInProgress.new(json, current_status.started_at)
           elsif json["is_erroring"] && json["is_fixable"]
             FixableErrorOccurring.new(json)
           elsif json["is_erroring"]
