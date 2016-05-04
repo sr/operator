@@ -43,8 +43,10 @@ Lita.configure do |config|
   ]
   config.adapters.hipchat.debug = true
 
-  # PagerDuty
+  # Replication fixing
   config.handlers.replication_fixing.pagerduty_service_key = ENV.fetch("REPFIX_PAGERDUTY_SERVICE_KEY", "")
+  config.handlers.replication_fixing.repfix_url = ENV.fetch("REPFIX_URL", "https://repfix.pardot.com")
+
   config.handlers.zabbix.pagerduty_service_key = ENV.fetch("ZABBIX_PAGERDUTY_SERVICE_KEY", "")
 
   # Set the Hipchat Chatroom
