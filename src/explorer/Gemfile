@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 gem "byebug", group: [:development, :test]
 gem "coffee-rails", "~> 4.0", group: [:development, :test]
 gem "foreman", "0.78.0"
