@@ -1,3 +1,7 @@
 /**/.bundle
-/src/**/vendor/gems
+/bin/
+/pkg/
+/src/**/vendor/cache
 /src/rubylib/Gemfile.lock
+!/bin/build
+!/bin/deploy

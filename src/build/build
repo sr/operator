@@ -141,6 +141,12 @@ do
             then docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
+        github\.com*|chatops)
+            docker run --rm \
+                -v "$(pwd):/go" \
+                golang:1.6.2 \
+                make -f etc/mk/golang.mk
+            ;;
         explorer)
             build-ruby "$project"
 
@@ -194,6 +200,12 @@ do
             docker run --rm -v "$(pwd):/data" \
                 build/build \
                 make -C src/terraform validate
+            ;;
+        # TODO(sr) Decide what to do about vendored Go code. I think building
+        # it might be worthwhile still, just not with the same level of
+        # attention as for our own code, so no linting etc.
+        vendor)
+            true
             ;;
         *)
             echo "No build rule defined for project \"$project\"." 2>&1
