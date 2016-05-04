@@ -2,8 +2,6 @@ module Pardot
   module PullAgent
     # module to include in the proper environments for required hooks
     module Storm
-      extend self
-
       PROC_KILL_WAIT_TIME = 45
       STORM_BIN = "/opt/storm/current/bin/storm".freeze
 
@@ -16,6 +14,7 @@ module Pardot
         end
         add_topology(topo, jar)
       end
+      module_function :load_topology
 
       private
 

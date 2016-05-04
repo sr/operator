@@ -18,7 +18,7 @@ tarball="${3:-""}"
 # Append version file to the tarball
 versionfile="build.version"
 fileurl="${ARTIFACTORY_HOST}/api/storage/${ARTIFACTORY_REPO_CANOE}/"
-fileurl="${fileurl}${CI_PLAN}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.tz"
+fileurl="${fileurl}${CI_PLAN}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.gz"
 printf "build%s\n%s\n%s\n" "${CI_BUILD_NUMBER}" "$sha1" "$fileurl" \
     > "$versionfile"
 tar --append --file="$tarball" "$versionfile"
@@ -34,11 +34,13 @@ props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP};"
 props+="buildResults=${BAMBOO_BUILD_RESULTS_URL};"
 props+="passedCI=${green};"
 
+gzip --stdout "$tarball" > "${tarball}.gz"
+
 # Upload the tarball to Artifactory using the official CLI
 jfrog rt upload \
     --url "$ARTIFACTORY_URL" \
     --user "$ARTIFACTORY_USERNAME" \
     --password "$ARTIFACTORY_PASSWORD" \
     --props  "$props" \
-    "$tarball" \
+    "${tarball}.gz" \
     "${CANOE_ARTIFACTORY_REPO}/${CI_PROJECT}/${CI_PLAN}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.gz"

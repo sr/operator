@@ -20,7 +20,7 @@ module Pardot
           end
 
           # Cleans up any temporary files
-          def cleanup(deploy)
+          def cleanup(_deploy)
           end
 
           def type

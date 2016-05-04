@@ -31,7 +31,7 @@ describe "deploying a new build" do
         body: JSON.dump(
           uri: artifact_url,
           downloadUri: artifact_download_url,
-          properties: { "gitSha" => [sha] },
+          properties: { "gitSha" => [sha] }
         ),
         headers: { "Content-Type" => "application/json" }
       )
@@ -45,17 +45,17 @@ describe "deploying a new build" do
       )
 
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(status: 200)
+                    .to_return(status: 200)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/A$})
-    output = capturing_stdout { cli.checkin }
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
+    _output = capturing_stdout { cli.checkin }
 
     expect(canoe_request).to have_been_made
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/B$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/B$/)
 
     # Should clean up the artifact lest the disk fill up over time
     expect(Dir[File.join(cli.environment.payload.artifacts_path, File.basename(artifact_url))]).to eq([])

@@ -1,3 +1,4 @@
+inherit_from: rubocop_todo.yml
 Lint/UnusedMethodArgument:
   Enabled: true
   Severity: error
@@ -43,6 +44,14 @@ Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     '%w': '[]'
     '%W': '[]'
+Style/MultilineBlockChain:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: true
+  AllowInnerSlashes: true
+Style/SignalException:
+  EnforcedStyle: only_raise
+  Enabled: true
 AllCops:
   Exclude:
     - "src/**/bin/*"

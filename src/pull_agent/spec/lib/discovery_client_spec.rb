@@ -7,22 +7,22 @@ describe Pardot::PullAgent::DiscoveryClient do
         .to_return(
           status: 200,
           body: JSON.dump([
-                            {
-                              "address" => "job-d1.dev",
-                              "id" => "2559d2dc-d1d6-46aa-8913-6d835ac9da99",
-                              "name" => "redis-job-1",
-                              "payload" => {
-                                "datacenter" => "seattle",
-                                "role" => "master",
-                                "syncCompleted" => false
-                              },
-                              "port" => 6379,
-                              "registrationTimeUTC" => 1_450_725_494_953,
-                              "serviceType" => "DYNAMIC",
-                              "sslPort" => nil,
-                              "uriSpec" => nil
-                            }
-                          ])
+            {
+              "address" => "job-d1.dev",
+              "id" => "2559d2dc-d1d6-46aa-8913-6d835ac9da99",
+              "name" => "redis-job-1",
+              "payload" => {
+                "datacenter" => "seattle",
+                "role" => "master",
+                "syncCompleted" => false
+              },
+              "port" => 6379,
+              "registrationTimeUTC" => 1_450_725_494_953,
+              "serviceType" => "DYNAMIC",
+              "sslPort" => nil,
+              "uriSpec" => nil
+            }
+          ])
         )
 
       servers = Pardot::PullAgent::DiscoveryClient.new.service("redis-job-1")

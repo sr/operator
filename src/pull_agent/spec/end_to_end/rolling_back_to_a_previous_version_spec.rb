@@ -31,16 +31,16 @@ describe "rollback back to a previous version" do
 
   it "rapidly changes the symlink back to the previous version" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(status: 200)
+                    .to_return(status: 200)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/A$})
-    output = capturing_stdout { cli.checkin }
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
+    _output = capturing_stdout { cli.checkin }
 
     expect(canoe_request).to have_been_made
-    expect(File.readlink(File.join(tempdir, "current"))).to match(%r{releases/B$})
+    expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/B$/)
   end
 end

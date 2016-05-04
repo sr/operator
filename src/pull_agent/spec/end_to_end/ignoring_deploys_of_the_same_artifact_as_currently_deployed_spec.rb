@@ -17,7 +17,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
   end
 
   it "exits immediately without changing anything" do
-    stub_request(:put, %r{^http://canoe.test/})
+    stub_request(:put, /^http:\/\/canoe.test\//)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
@@ -29,8 +29,8 @@ describe "ignoring deploys of the same artifact as currently deployed" do
 
   it "notifies Canoe that the deployment is completed" do
     request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-      .with(body: { action: "deploy", success: "true" })
-      .to_return(status: 200)
+              .with(body: { action: "deploy", success: "true" })
+              .to_return(status: 200)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
     cli.parse_arguments!
