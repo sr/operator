@@ -11,7 +11,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       host: ENV["LDAP_HOST"],
       port: ENV.fetch("LDAP_PORT", 389),
       method: :tls,
-      filter: "(&(objectClass=person)(ou:dn:=People))",
+      filter: "(&(uid=%{username})(objectClass=person)(ou:dn:=People))",
       base: ENV["LDAP_BASE"],
       uid: "uid"
   end
