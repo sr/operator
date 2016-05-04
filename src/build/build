@@ -142,9 +142,7 @@ do
             fi
             ;;
         github\.com*|chatops)
-            docker run --rm \
-                -v "$(pwd):/go" \
-                golang:1.6.2 \
+            docker run --rm -w /go -v "$(pwd):/go" build/build \
                 make -f etc/mk/golang.mk
             ;;
         explorer)
