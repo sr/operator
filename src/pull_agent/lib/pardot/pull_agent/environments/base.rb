@@ -12,7 +12,7 @@ module Pardot
 
           config_file = ENV["PULL_AGENT_CONFIG_FILE"]
           if !config_file.to_s.empty?
-            if !File.exists?(config_file)
+            if !File.exist?(config_file)
               abort "Config file does not exist: #{config_file.inspect}"
             end
 
@@ -168,20 +168,20 @@ module Pardot
         def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
-          autojob_hosts = (1..9).flat_map do |i|
+          autojob_disco_master = (1..9).flat_map do |i|
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
           end.map { |s| [s["address"], s["port"]].join(":") }
 
           # Restart automation workers
-          redis.bounce_workers("automationWorkers", autojob_hosts)
+          redis.bounce_workers("automationWorkers", autojob_disco_master)
           # Restart per account automation workers
-          redis.bounce_workers("PerAccountAutomationWorker", autojob_hosts)
+          redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)
           # Restart timed automation workers
-          redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_hosts)
+          redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_disco_master)
           # Restart related object workers
-          redis.bounce_workers("automationRelatedObjectWorkers", autojob_hosts)
+          redis.bounce_workers("automationRelatedObjectWorkers", autojob_disco_master)
           # Restart automation preview workers
-          redis.bounce_workers("previewWorkers", autojob_hosts)
+          redis.bounce_workers("previewWorkers", autojob_disco_master)
         end
 
         def restart_old_style_jobs
@@ -217,9 +217,10 @@ module Pardot
         end
 
         def deploy_topology(deploy)
-          if deploy.options["topology"].nil? || payload.current_link.nil?
-            deploy.options["topology"].nil? && Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
-            payload.current_link.nil? && Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
+          if deploy.options["topology"].nil?
+            Logger.log(:err, "deploy_topology was called, but deploy.options['topology'] was nil!")
+          elsif payload.current_link.nil?
+            Logger.log(:err, "deploy_topology was called, but payload.current_link was nil!")
           else
             # this finds a JAR inside of a tarball blown up and linked-to at the base level
             jarfile = ShellHelper.execute(["find", "#{payload.current_link}/", "-name", "*.jar"]) # trailing slash is necessary
@@ -314,6 +315,13 @@ module Pardot
 
         def restart_repfix_service
           restart_puma("/var/run/repfix/puma.pid")
+        end
+
+        def link_explorer_shared_files
+          link_shared_files(
+            "shared/pi-db-password" => "config/pi/db-password_#{name}",
+            "log" => "log"
+          )
         end
 
         def link_internal_api_shared_files

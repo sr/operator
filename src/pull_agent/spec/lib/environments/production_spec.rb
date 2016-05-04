@@ -45,14 +45,14 @@ describe Pardot::PullAgent::Environments::Production do
       allow(disco).to receive(:service)
         .with("redis-rules-cache-1")
         .and_return([
-                      {
-                        "address" => "127.0.0.1",
-                        "port" => "6379",
-                        "payload" => {
-                          "role" => "master"
-                        }
-                      }
-                    ])
+          {
+            "address" => "127.0.0.1",
+            "port" => "6379",
+            "payload" => {
+              "role" => "master"
+            }
+          }
+        ])
       (2..9).each { |i| allow(disco).to receive(:service).with("redis-rules-cache-#{i}").and_return([]) }
 
       redis = class_spy("::Pardot::PullAgent::Redis")

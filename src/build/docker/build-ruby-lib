@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -xeuo pipefail
+dir="$1"
+cd "$dir"
+rm -f Gemfile.lock
+rm -rf .bundle
+bundler install
+find test -type f -name "*.rb" -print0 |
+xargs -0 bundler exec ruby -Ilib

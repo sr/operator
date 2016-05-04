@@ -1,17 +1,16 @@
-FROM ruby:2.1.5
-ENV LANG C.UTF-8
+FROM docker.dev.pardot.com/base/ruby:2.3.0
 
-RUN apt-get update -qq && \
-   apt-get install -y build-essential && \
-   apt-get install -y cron && \
-   apt-get install -y rsync && \
-   apt-get install -y supervisor
+RUN \
+  yum install -y \
+    cron \
+    rsync \
+    supervisor \
+  && \
+    groupadd -r docker \
+  && \
+    useradd -r -g docker -d /pull-agent -s /sbin/nologin -c "Docker image user" docker
 
-RUN groupadd -r docker && \
-  useradd -r -g docker -d /pull-agent -s /sbin/nologin -c "Docker image user" docker
-
-RUN mkdir /pull-agent
-RUN mkdir /var/lock/pull-agent
+RUN mkdir /pull-agent /var/lock/pull-agent
 WORKDIR /pull-agent
 
 ENV RUBYGEM_VERSION 1

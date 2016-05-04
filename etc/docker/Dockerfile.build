@@ -1,17 +1,1 @@
-FROM docker.dev.pardot.com/base/ruby:2.3.0
-ENV TERRAFORM_VERSION=0.6.14
-ENV TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-ENV PATH "/data/bin:$PATH"
-VOLUME ["/data"]
-WORKDIR "/data"
-RUN \
-  yum install -y unzip \
-  && \
-    curl -fsSL "$TERRAFORM_URL" -o /tmp/terraform.zip \
-  && \
-    unzip /tmp/terraform.zip -d /usr/bin \
-  && \
-    rm -f /tmp/terraform.zip \
-  && \
-    gem install --no-ri --no-rdoc \
-      rubocop
+FROM docker.dev.pardot.com/base/bread/bread

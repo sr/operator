@@ -3,6 +3,10 @@ class Repo < ActiveRecord::Base
   GITHUB_URL = "https://git.dev.pardot.com".freeze
 
   def full_name
+    if name == "explorer"
+      return "Pardot/bread"
+    end
+
     "Pardot/#{name}"
   end
 
@@ -73,6 +77,7 @@ class Repo < ActiveRecord::Base
   end
 
   private
+
   def build_aql_query(branch:, include_untested_builds:)
     conditions = [
       {"repo"       => {"$eq"    => ARTIFACTORY_REPO}},

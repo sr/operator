@@ -30,7 +30,7 @@ module Pardot
           environment.execute_post_fetch_hooks(deploy)
 
           environment.execute_pre_deploy_hooks(deploy)
-          if success = deploy_strategy.deploy(payload_path, deploy)
+          if (success = deploy_strategy.deploy(payload_path, deploy))
             environment.execute_post_deploy_hooks(deploy)
           end
 
@@ -42,7 +42,7 @@ module Pardot
 
       def rollback!(deploy, deploy_strategy)
         environment.execute_pre_deploy_hooks(deploy)
-        if success = deploy_strategy.rollback(deploy)
+        if (success = deploy_strategy.rollback(deploy))
           environment.execute_post_deploy_hooks(deploy)
         end
 
