@@ -90,6 +90,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/docker/go-units",
+			"repository": "https://github.com/docker/go-units",
+			"vcs": "git",
+			"revision": "5d2041e26a699eaca682e2ea41c8f891e1060444",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/golang/lint",
 			"repository": "https://github.com/golang/lint",
 			"vcs": "git",
