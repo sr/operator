@@ -47,9 +47,11 @@ Style/PercentLiteralDelimiters:
 Style/MultilineBlockChain:
   Enabled: false
 Style/RegexpLiteral:
+  Enabled: true
   AllowInnerSlashes: true
 Style/SignalException:
   EnforcedStyle: only_raise
+  Enabled: true
 AllCops:
   Exclude:
     - "src/**/bin/*"
