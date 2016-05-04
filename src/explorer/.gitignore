@@ -1,6 +1,0 @@
-/.bundle
-/config/pi/*
-/log/*.log
-/tmp
-!/config/pi/test.auth
-!/config/pi/test.yaml

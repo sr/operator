@@ -20,10 +20,10 @@ module Pardot
       def service(service_name)
         service_uri = @uri.dup.tap { |u| u.path = "/v1/service/#{service_name}" }
         response = Net::HTTP.get_response(service_uri)
-        if Net::HTTPOK === response
+        if response.is_a?(Net::HTTPOK)
           JSON.load(response.body)
         else
-          raise Error.new(response)
+          raise Error, response
         end
       end
     end
