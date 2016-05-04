@@ -40,4 +40,4 @@ RUN \
     rm -f /tmp/terraform.zip \
   && \
     gem install --no-ri --no-rdoc \
-      rubocop
+      rubocop -v 0.39.0
