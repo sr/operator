@@ -17,7 +17,6 @@ Gemfile.lock
 !/**/config/pi/test.yaml
 /**/.bundle
 /src/**/vendor/gems
-/src/**/vendor/cache
 /src/rubylib/Gemfile.lock
 /bin/
 /pkg/
