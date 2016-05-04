@@ -34,7 +34,7 @@ props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP};"
 props+="buildResults=${BAMBOO_BUILD_RESULTS_URL};"
 props+="passedCI=${green};"
 
-gzip --keep "$tarball"
+gzip --stdout "$tarball" > "${tarball}.gz"
 
 # Upload the tarball to Artifactory using the official CLI
 jfrog rt upload \
