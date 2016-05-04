@@ -32,3 +32,7 @@ images:
   # Pardot/repfix
   docker.dev.pardot.com/base/repfix/app:
     build: repfix/app
+
+  # Pardot/bread base images
+  docker.dev.pardot.com/base/bread/bread:
+    build: bread/bread
