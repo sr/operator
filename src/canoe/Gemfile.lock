@@ -1,5 +1,5 @@
 GEM
-  remote: https://rubygems.org/
+  remote: https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/
   specs:
     actionmailer (4.2.5.2)
       actionpack (= 4.2.5.2)
@@ -268,4 +268,4 @@ DEPENDENCIES
   webmock (~> 1.21, >= 1.21.0)
 
 BUNDLED WITH
-   1.12.0
+   1.12.1

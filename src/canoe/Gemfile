@@ -1,5 +1,4 @@
-source 'https://rubygems.org'
-
+source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 gem 'artifactory', '~> 2.3'
 gem 'bootstrap-sass', '~> 3.3', '>= 3.3.6'
 gem 'coffee-rails', '~> 4.1.0'
