@@ -141,7 +141,7 @@ do
             then docker-push "canoe_app" "$CANOE_ECR_REPO"
             fi
             ;;
-        chatops)
+        github\.com*|chatops)
             docker run --rm \
                 -v "$(pwd):/go" \
                 golang:1.6.2 \
