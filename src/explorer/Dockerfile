@@ -1,23 +1,17 @@
-FROM ruby:2.3.0
-ENV LANG C.UTF-8
+FROM docker.dev.pardot.com/base/ruby:2.3.0
+ENV LANG en_US.UTF-8
 
 RUN \
-  apt-get update -qq \
-  && apt-get install -y --no-install-recommends \
-    build-essential \
-    mysql-client \
+  yum install -y \
     php5 \
-    php5-dev \
     php-pear \
     nodejs \
-    netcat \
-  && pecl install yaml \
-  && echo "extension=yaml.so" >> /etc/php5/cli/php.ini
+    nc \
+    php-pecl-yaml
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker
 
-RUN mkdir /app
 WORKDIR /app
 
 COPY Gemfile /app/Gemfile
