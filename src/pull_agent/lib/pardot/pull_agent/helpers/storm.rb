@@ -21,6 +21,7 @@ module Pardot
       def topo_name(full_topo_param)
         full_topo_param.to_s.split(":")[0].strip
       end
+      module_function :topo_name
 
       def topo_class(full_topo_param)
         full_topo_param.to_s.split(":")[1].strip
