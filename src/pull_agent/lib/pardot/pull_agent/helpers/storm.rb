@@ -19,10 +19,10 @@ module Pardot
       private
 
       def load_topology(topo, topo_env, jar)
-        Logger.log(:info, "Loading Topology #{topo_name(@topo)} : #{topo_class(@topo)} in environment #{@topo_env}")
-        if active?(@topo)
-          remove_topology(@topo)
-          Logger.log(:info, "Topology #{topo_name(@topo)} killed! Waiting #{PROC_KILL_WAIT_TIME} seconds to resume deploy")
+        Logger.log(:info, "Loading Topology #{topo_name(topo)} : #{topo_class(topo)} in environment #{topo_env}")
+        if active?(topo)
+          remove_topology(topo)
+          Logger.log(:info, "Topology #{topo_name(topo)} killed! Waiting #{PROC_KILL_WAIT_TIME} seconds to resume deploy")
           sleep PROC_KILL_WAIT_TIME + 2
         end
         add_topology(topo, topo_env, jar)
