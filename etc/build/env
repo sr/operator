@@ -9,7 +9,7 @@ if test -f "$envfile"
 then . /etc/env/artifactoryenv
 else echo "WARN: $envfile not found" 2>&1
 fi
-: "${ARTIFACTORY_HOST:="artifactory-internal.dev.pardot.com"}"
+: "${ARTIFACTORY_HOST:="artifactory.dev.pardot.com"}"
 : "${ARTIFACTORY_URL:="https://${ARTIFACTORY_HOST}/artifactory"}"
 : "${ARTIFACTORY_USERNAME:="${USERNAME:-""}"}"
 : "${ARTIFACTORY_PASSWORD:="${PASSWORD:-""}"}"

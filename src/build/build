@@ -118,16 +118,23 @@ test -z "$projects"  && {
 echo "===> Projects scheduled to be built:$(echo "$projects" | tr "\n" " ")" 2>&1
 
 docker-hack-restart
-# Build the container used for most builds.
-docker build -f etc/docker/Dockerfile.build -t build/build .
-
 # HACK: Override Artifactory host name on CI machines to workaround <JIRA>
 # TODO(sr) Link to the BREAD ticket for this
 if [ -n "$CI"  ]
 then
-    find src -t type f -name Gemfile -print0 |
-    xargs -1 sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g'
+    find src -type f -name Gemfile -print0 |
+    xargs -0 sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g'
+    artifactory_host="artifactory-internal.dev.pardot.com"
+else
+    artifactory_host="$ARTIFACTORY_HOST"
 fi
+
+# Build the container used for most builds.
+docker build \
+    -f etc/docker/Dockerfile.build \
+    -t build/build \
+    --build-arg "artifactory_host=${artifactory_host}" \
+    .
 
 # Iterate over all selected projects, either explicitly or because of CI mode,
 # and execute the build commands in sequence.
