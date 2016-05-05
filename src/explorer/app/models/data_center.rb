@@ -16,8 +16,8 @@ class DataCenter
   end
 
   ENGINEERING_ROLE = 7
-  DALLAS = "dallas".freeze
-  SEATTLE = "seattle".freeze
+  DALLAS = "dfw".freeze
+  SEATTLE = "phx".freeze
 
   def self.default_name
     DALLAS

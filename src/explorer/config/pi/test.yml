@@ -1,30 +1,31 @@
 ---
 globals:
   global:
-    dallas:
-      host: mysql
-      database: pardot_global
-      username: boom
-      password: town
+    dfw:
+      1:
+        host: mysql
+        database: pardot_global
+        username: boom
+        password: town
 shards:
   1:
-    dallas:
+    dfw:
       host: mysql
       database: pardot_shard1
       username: boom
       password: town
-    seattle:
+    phx:
       host: mysql
       database: pardot_shard1
       username: boom
       password: town
   2:
-    dallas:
+    dfw:
       host: mysql
       database: pardot_shard1
       username: boom
       password: town
-    seattle:
+    phx:
       host: mysql
       database: pardot_shard1
       username: boom
