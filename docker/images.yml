@@ -36,3 +36,7 @@ images:
   # Pardot/bread base images
   docker.dev.pardot.com/base/bread/bread:
     build: bread/bread
+
+  # password.pardot.com
+  docker.dev.pardot.com/base/pwm:1.7.1:
+    build: pwm/1.7.1
