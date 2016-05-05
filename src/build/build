@@ -118,8 +118,9 @@ test -z "$projects"  && {
 echo "===> Projects scheduled to be built:$(echo "$projects" | tr "\n" " ")" 2>&1
 
 docker-hack-restart
-# HACK: Override Artifactory host name on CI machines to workaround <JIRA>
-# TODO(sr) Link to the BREAD ticket for this
+
+# HACK: Override Artifactory host name on CI machines to workaround this:
+# https://jira.dev.pardot.com/browse/BREAD-797
 if [ -n "$CI"  ]
 then
     find src -type f -name Gemfile -print0 |
