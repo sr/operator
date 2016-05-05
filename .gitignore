@@ -13,8 +13,6 @@ Gemfile.lock
 /**/config/pi/*
 /**/log/*.log
 /**/tmp
-!/**/config/pi/test.auth
-!/**/config/pi/test.yaml
 /**/.bundle
 /src/**/vendor/gems
 /src/rubylib/Gemfile.lock
