@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	programName = "pistoletd"
-	protocol    = "tcp"
+	program  = "operatord"
+	protocol = "tcp"
 )
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", programName, err)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", program, err)
 		os.Exit(1)
 	}
 }
