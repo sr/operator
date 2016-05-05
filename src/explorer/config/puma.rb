@@ -9,7 +9,7 @@ port        ENV.fetch("PORT", 4000)
 environment ENV.fetch("RACK_ENV", "development")
 
 log = File.expand_path("../../log/#{ENV.fetch("RACK_ENV")}.log", __FILE__)
-redirect_stdout log, log, true
+stdout_redirect log, log, true
 
 on_worker_boot do
   # Worker specific setup for Rails 4.1+
