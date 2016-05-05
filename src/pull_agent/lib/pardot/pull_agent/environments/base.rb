@@ -229,7 +229,7 @@ module Pardot
             else
               Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
-              Storm.load_topology(deploy.options["topology"], jarfile)
+              Storm.load_topology(deploy.options["topology"], deploy.options["topo_env"],  jarfile)
               Logger.log(:info, "Topology Deployment Complete!")
             end
           end
@@ -319,7 +319,8 @@ module Pardot
 
         def link_explorer_shared_files
           link_shared_files(
-            "shared/pi-db-password" => "config/pi/db-password_#{name}",
+            "shared/envvars_#{name}.rb" => "envvars_#{name}.rb",
+            "shared/database.yml" => "config/database.yml",
             "log" => "log"
           )
         end
