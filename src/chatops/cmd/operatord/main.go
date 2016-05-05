@@ -2,6 +2,7 @@ package main
 
 import (
 	"chatops"
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -15,6 +16,10 @@ const (
 	protocol = "tcp"
 )
 
+var (
+	listenAddr string
+)
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", program, err)
@@ -23,19 +28,17 @@ func main() {
 }
 
 func run() error {
-	config, err := operator.NewConfigFromEnv()
-	if err != nil {
-		return err
-	}
+	flag.StringVar(&listenAddr, "listen", "localhost:3000", "Listening address of the server")
+	flag.Parse()
 	server := grpc.NewServer()
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
 	authorizer := chatops.NewLDAPAuthorizer()
 	registerServices(server, logger, instrumenter, authorizer)
-	listener, err := net.Listen(protocol, config.Address)
+	listener, err := net.Listen(protocol, listenAddr)
 	if err != nil {
 		return err
 	}
-	logger.Info(&operator.ServerStartupNotice{Address: config.Address, Protocol: protocol})
+	logger.Info(&operator.ServerStartupNotice{Address: listenAddr, Protocol: protocol})
 	return server.Serve(listener)
 }
