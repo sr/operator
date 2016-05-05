@@ -29,4 +29,4 @@ mkdir -p "config/pi"
 curl -s "$download_url" > "config/pi/${RAILS_ENV}.php"
 devenv compose run app \
   php -r "echo yaml_emit(include(\"./config/pi/${RAILS_ENV}.php\"));" > \
-  "config/pi/${RAILS_ENV}.yaml"
+  "config/pi/${RAILS_ENV}.yml"
