@@ -10,7 +10,9 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       title: "Pardot LDAP",
       host: ENV.fetch("LDAP_HOST"),
       port: ENV.fetch("LDAP_PORT", 389),
-      method: :tls,
+      encryption: {
+        method: :start_tls
+      },
       filter: "(&(uid=%{username})(objectClass=person)(ou:dn:=People))",
       base: ENV.fetch("LDAP_BASE"),
       uid: "uid"
