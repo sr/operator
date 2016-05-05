@@ -31,7 +31,7 @@ module Pardot
       def remove_topology(topo)
         ShellHelper.sudo_execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME.to_s], "storm", err: [:child, :out])
       end
-      module_function :rempove_topology
+      module_function :remove_topology
 
       def active?(topo)
         list = ShellHelper.sudo_execute([STORM_BIN, "list"], "storm")
