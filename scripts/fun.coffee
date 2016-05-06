@@ -200,7 +200,7 @@ module.exports = (robot) ->
     msg.send msg.random nippon
 
   robot.respond /bread$/i, (msg) ->
-     baguette = [
+    baguette = [
       'http://media3.giphy.com/media/zIZTz4PvRdufu/giphy.gif',
       'http://67.media.tumblr.com/0adc6893d9c300cc7ee0e73a766c4352/tumblr_n5m6o8xHa61tc0bnlo1_500.gif',
       'http://66.media.tumblr.com/33730c5150e513d7cd5334d80571b6da/tumblr_n6bufgdukL1tc0bnlo1_400.gif',
