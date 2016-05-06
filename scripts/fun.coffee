@@ -13,6 +13,7 @@
 #   hubot meeks - Get meeks
 #   hubot toiletnuggets - Get rid of some nuggets
 #   hubot reversenuggets - Get nuggets
+#   hubot bread - developers HATE them! Operations guys find ONE EASY TRICK to write code!
 #   hubot puppies - Get puppies
 #   hubot beyonce - Get charisma
 #   hubot visualstudio - Get lawlz
@@ -92,6 +93,9 @@ module.exports = (robot) ->
 
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
+
+  robot.respond /bread$/i, (msg) ->
+    msg.send "http://media3.giphy.com/media/zIZTz4PvRdufu/giphy.gif"
 
   robot.respond /picklegusta$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/62/SmWraho0s2Iyhkf/upload.png"
