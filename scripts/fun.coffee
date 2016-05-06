@@ -200,7 +200,7 @@ module.exports = (robot) ->
     msg.send msg.random nippon
 
   robot.respond /bread$/i, (msg) ->
-     les_haricot_vert = [
+     baguette = [
       'http://media3.giphy.com/media/zIZTz4PvRdufu/giphy.gif',
       'http://67.media.tumblr.com/0adc6893d9c300cc7ee0e73a766c4352/tumblr_n5m6o8xHa61tc0bnlo1_500.gif',
       'http://66.media.tumblr.com/33730c5150e513d7cd5334d80571b6da/tumblr_n6bufgdukL1tc0bnlo1_400.gif',
@@ -212,7 +212,7 @@ module.exports = (robot) ->
       'http://66.media.tumblr.com/acfc022d906c10767278adc4b0bd0cb7/tumblr_n5q1wbEP1R1tc0bnlo1_500.gif',
       'http://66.media.tumblr.com/95847806383c203e238b6cc88447ca06/tumblr_n5q3e7v3rl1tc0bnlo1_500.gif'
     ]
-    msg.send msg.random les_haricot_vert
+    msg.send msg.random baguette
 
   robot.respond /aggablagblag$/i, (msg) ->
     schwifty = [
