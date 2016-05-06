@@ -94,9 +94,6 @@ module.exports = (robot) ->
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
 
-  robot.respond /bread$/i, (msg) ->
-    msg.send "http://media3.giphy.com/media/zIZTz4PvRdufu/giphy.gif"
-
   robot.respond /picklegusta$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/62/SmWraho0s2Iyhkf/upload.png"
 
@@ -201,6 +198,21 @@ module.exports = (robot) ->
       'http://i.imgur.com/T8uvhOu.png'
     ]
     msg.send msg.random nippon
+
+  robot.respond /bread$/i, (msg) ->
+    baguette = [
+      'http://media3.giphy.com/media/zIZTz4PvRdufu/giphy.gif',
+      'http://67.media.tumblr.com/0adc6893d9c300cc7ee0e73a766c4352/tumblr_n5m6o8xHa61tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/33730c5150e513d7cd5334d80571b6da/tumblr_n6bufgdukL1tc0bnlo1_400.gif',
+      'http://67.media.tumblr.com/b3b17c4e74ebb950e7f6a7d469efc5fa/tumblr_ngd7ta86HM1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/2bd775e0c4afa8cf6e89d0824512785f/tumblr_n64avs5LEd1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/e76f8f3cb39a2cf8b0a401d6575aad9a/tumblr_n5tp10UbeE1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/623a9bec56d41b46a81087a79eb3249c/tumblr_n5rkv3kyLU1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/595159f392d6497fe1224f3d4c59d961/tumblr_n6dobgl6wT1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/acfc022d906c10767278adc4b0bd0cb7/tumblr_n5q1wbEP1R1tc0bnlo1_500.gif',
+      'http://66.media.tumblr.com/95847806383c203e238b6cc88447ca06/tumblr_n5q3e7v3rl1tc0bnlo1_500.gif'
+    ]
+    msg.send msg.random baguette
 
   robot.respond /aggablagblag$/i, (msg) ->
     schwifty = [
