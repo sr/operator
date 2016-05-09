@@ -30,7 +30,7 @@ resource "aws_elb" "pwm_production" {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:80/"
+    target = "HTTP:80/pwm/"
     interval = 5
   }
 
