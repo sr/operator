@@ -34,6 +34,24 @@ resource "aws_iam_role_policy" "ecs_cluster_role_policy" {
         "logs:DescribeLogStreams"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}/production/ecs"
+      ]
     }
   ]
 }
