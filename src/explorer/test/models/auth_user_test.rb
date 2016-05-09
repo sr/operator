@@ -2,7 +2,7 @@ require "test_helper"
 
 class AuthUserTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(uid: SecureRandom.hex, token: SecureRandom.hex,
+    @user = AuthUser.create!(uid: SecureRandom.hex,
       name: "boom", email: "sr@sfdc.be")
   end
 

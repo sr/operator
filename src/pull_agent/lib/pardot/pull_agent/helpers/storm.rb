@@ -1,9 +1,22 @@
 module Pardot
   module PullAgent
     # module to include in the proper environments for required hooks
-    module Storm
+    class Storm
       PROC_KILL_WAIT_TIME = 45
       STORM_BIN = "/opt/storm/current/bin/storm".freeze
+
+      def initialize(topo, topo_env, jar)
+        @topo = topo
+        @topo_env = topo_env
+        @jar = jar
+      end
+
+      def load
+        # am building this in a way that will be friendly to @topo becoming @topos[] later
+        load_topology(@topo, @topo_env, @jar)
+      end
+
+      private
 
       def load_topology(topo, topo_env, jar)
         Logger.log(:info, "Loading Topology #{topo_name(topo)} : #{topo_class(topo)} in environment #{topo_env}")
@@ -14,9 +27,6 @@ module Pardot
         end
         add_topology(topo, topo_env, jar)
       end
-      module_function :load_topology
-
-      private
 
       def topo_name(full_topo_param)
         full_topo_param.to_s.split(":")[0].strip
