@@ -84,6 +84,25 @@ resource "aws_iam_instance_profile" "internal_apps_ldap_master" {
   roles = ["${aws_iam_role.internal_apps_ldap_master.id}"]
 }
 
+resource "aws_iam_role_policy" "internal_apps_ldap_master_policy" {
+  name = "internal_apps_ldap_master_policy"
+  role = "${aws_iam_role.internal_apps_ldap_master.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_instance" "internal_apps_ldap_master" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
