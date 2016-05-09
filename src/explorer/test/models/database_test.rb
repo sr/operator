@@ -69,4 +69,27 @@ class DatabaseTest < ActiveSupport::TestCase
     assert log = Instrumentation::Logging.entries.pop
     assert_equal "SELECT 1", log[:query]
   end
+
+  test "rate limiting" do
+    assert_equal false, @user.rate_limit.exceeded?
+    assert_equal 0, @user.rate_limit.query_count
+    assert_nil @user.rate_limit.last_query_at
+
+    datacenter = @user.datacenter
+    datacenter.global.execute("SELECT 1")
+
+    assert_equal false, @user.rate_limit.exceeded?
+    assert_equal 1, @user.rate_limit.query_count
+    assert_not_nil @user.rate_limit.last_query_at
+
+    @user.rate_limit.reset
+
+    @user.rate_limit.max.times do
+      datacenter.global.execute("SELECT 1")
+    end
+
+    assert_raise(Query::RateLimitExceeded) do
+      datacenter.global.execute("SELECT 1")
+    end
+  end
 end

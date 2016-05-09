@@ -30,4 +30,8 @@ class AuthUser < ActiveRecord::Base
 
     auth.user_is_member_of_any_group?(uid, groups)
   end
+
+  def rate_limit
+    RateLimit.new(self)
+  end
 end

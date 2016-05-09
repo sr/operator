@@ -6,6 +6,12 @@ class Query
   class ExecutionRefused < StandardError
   end
 
+  class RateLimitExceeded < StandardError
+    def initialize(user)
+      super "query rate limit exceeded for user #{user.email}"
+    end
+  end
+
   def initialize(database, connection, user, sql)
     @database = database
     @connection = connection
@@ -16,6 +22,10 @@ class Query
   def execute(params = [])
     assert_valid
     audit_log(params)
+
+    if @user.rate_limit_exceeded?
+      raise RateLimitExceeded, @user
+    end
 
     statement = @connection.prepare(@sql)
     statement.execute(*params)
