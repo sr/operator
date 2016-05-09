@@ -50,7 +50,7 @@ resource "aws_iam_role_policy" "ecs_cluster_role_policy" {
         "s3:GetObject"
       ],
       "Resource": [
-        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}/production/ecs"
+        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}/production/ecs/*"
       ]
     }
   ]
