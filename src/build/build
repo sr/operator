@@ -173,6 +173,7 @@ do
                 docker run --rm \
                     -v "$(pwd):/data" \
                     -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
+                    -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
                     -e "CI_BRANCH=$CI_BRANCH" \
                     -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
                     -e "CI_PLAN=$CI_PLAN" \
