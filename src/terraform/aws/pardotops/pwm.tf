@@ -28,7 +28,7 @@ resource "aws_elb" "pwm_production" {
 
   health_check {
     healthy_threshold = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 6
     timeout = 3
     target = "HTTP:80/pwm/public/rest/health"
     interval = 5
