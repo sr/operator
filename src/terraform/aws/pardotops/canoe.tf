@@ -148,7 +148,12 @@ resource "template_file" "canoe_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
+    configuration_environment = "production"
     ecs_cluster = "canoe_production"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
