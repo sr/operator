@@ -189,7 +189,7 @@
     </setting>
     <setting key="ldap.serverUrls" syntax="STRING_ARRAY">
       <label>LDAP URLs</label>
-      <value><![CDATA[{{ var "PWN_LDAP_SERVER_URL" }}]]></value>
+      <value><![CDATA[{{ var "PWM_LDAP_SERVER_URL" }}]]></value>
     </setting>
     <setting key="ldap.serverCerts" syntax="X509CERT">
       <label>LDAP Certificates</label>
@@ -201,17 +201,17 @@
     </setting>
     <setting key="ldap.proxy.username" syntax="STRING">
       <label>LDAP Proxy User</label>
-      <value><![CDATA[{{ var "PWN_LDAP_PROXY_USER" | default "cn=sa_pwmproxy,ou=serviceaccounts,dc=pardot,dc=com" }}]]></value>
+      <value><![CDATA[{{ var "PWM_LDAP_PROXY_USER" | default "cn=sa_pwmproxy,ou=serviceaccounts,dc=pardot,dc=com" }}]]></value>
     </setting>
     <setting key="ldap.proxy.password" syntax="PASSWORD">
       <label>LDAP Proxy Password</label>
       <!--Note: This value is encrypted and can not be edited directly.-->
       <!--Please use the Configuration Manager GUI to modify this value.-->
-      <value>{{ var "PWN_LDAP_PROXY_PASSWORD" }}</value>
+      <value>{{ var "PWM_LDAP_PROXY_PASSWORD" }}</value>
     </setting>
     <setting key="ldap.rootContexts" syntax="STRING_ARRAY">
       <label>LDAP Contextless Login Roots</label>
-      <value><![CDATA[{{ var "PWN_LDAP_ROOT_CONTEXT" | default "ou=people,dc=pardot,dc=com" }}]]></value>
+      <value><![CDATA[{{ var "PWM_LDAP_ROOT_CONTEXT" | default "ou=people,dc=pardot,dc=com" }}]]></value>
     </setting>
     <setting key="ldap.selectableContexts" syntax="STRING_ARRAY">
       <label>User Selectable Login Contexts</label>
@@ -223,11 +223,11 @@
     </setting>
     <setting key="pwmAdmin.queryMatch" syntax="STRING">
       <label>Administrator Query String</label>
-      <value><![CDATA[{{ var "PWN_LDAP_ADMIN_QUERY" | default "groupMembership=cn=ldapadmins,ou=Groups,dc=pardot,dc=com" }}]]></value>
+      <value><![CDATA[{{ var "PWM_LDAP_ADMIN_QUERY" | default "groupMembership=cn=ldapadmins,ou=Groups,dc=pardot,dc=com" }}]]></value>
     </setting>
     <setting key="ldap.usernameSearchFilter" syntax="STRING">
       <label>Username Search Filter</label>
-      <value><![CDATA[{{ var "PWN_USERNAME_SEARCH_FILTER" | default "(&(objectClass=inetOrgPerson)(uid=%USERNAME%))" }}]]></value>
+      <value><![CDATA[{{ var "PWM_USERNAME_SEARCH_FILTER" | default "(&(objectClass=inetOrgPerson)(uid=%USERNAME%))" }}]]></value>
     </setting>
     <setting key="ldap.readPasswordPolicies" syntax="BOOLEAN">
       <label>Read Password Policies</label>
@@ -243,7 +243,7 @@
     </setting>
     <setting key="ldap.namingAttribute" syntax="STRING">
       <label>LDAP Naming Attribute</label>
-      <value><![CDATA[{{ var "PWN_LDAP_NAMING_ATTRIBUTE" | default "uid" }}]]></value>
+      <value><![CDATA[{{ var "PWM_LDAP_NAMING_ATTRIBUTE" | default "uid" }}]]></value>
     </setting>
     <setting key="ldap.idleTimeout" syntax="NUMERIC">
       <label>LDAP Idle Timeout</label>
@@ -271,7 +271,7 @@
     </setting>
     <setting key="ldap.defaultObjectClasses" syntax="STRING_ARRAY">
       <label>User Object Class</label>
-      <value><![CDATA[{{ var "PWN_USER_OBJECT_CLASS" | default "inetOrgPerson" }}]]></value>
+      <value><![CDATA[{{ var "PWM_USER_OBJECT_CLASS" | default "inetOrgPerson" }}]]></value>
     </setting>
     <setting key="email.smtp.address" syntax="STRING">
       <label>SMTP Email Server Address</label>
@@ -295,11 +295,11 @@
     </setting>
     <setting key="email.adminAlert.toAddress" syntax="STRING_ARRAY">
       <label>Admin Alert To Address</label>
-      <value><![CDATA[{{ var "PWN_ADMIN_ALERT_TO" | default "pd-ops+pwm@salesforce.com" }}]]></value>
+      <value><![CDATA[{{ var "PWM_ADMIN_ALERT_TO" | default "pd-ops+pwm@salesforce.com" }}]]></value>
     </setting>
     <setting key="email.adminAlert.fromAddress" syntax="STRING">
       <label>Admin Alert From Address</label>
-      <value><![CDATA[{{ var "PWN_ADMIN_ALERT_FROM" | default "pd-ops+pwm@salesforce.com" }}]]></value>
+      <value><![CDATA[{{ var "PWM_ADMIN_ALERT_FROM" | default "pd-ops+pwm@salesforce.com" }}]]></value>
     </setting>
     <setting key="email.changePassword" syntax="EMAIL">
       <label>Change Password Email</label>
