@@ -74,6 +74,11 @@ resource "aws_security_group" "internal_apps_ldap_server" {
   }
 }
 
+resource "aws_iam_role" "internal_apps_ldap_master" {
+  name = "internal_apps_ldap_master"
+  assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"
+}
+
 resource "aws_instance" "internal_apps_ldap_master" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
