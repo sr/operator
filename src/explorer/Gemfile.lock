@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/janSF/sql-parser.git
+  remote: https://github.com/janSF/sql-parser
   revision: 90f0c36ca4ff3f98a95f9fc74f47ebc619192ca1
   specs:
     sql-parser (0.0.3)

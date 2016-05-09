@@ -9,7 +9,7 @@ if test -f "$envfile"
 then . /etc/env/artifactoryenv
 else echo "WARN: $envfile not found" 2>&1
 fi
-: "${ARTIFACTORY_HOST:="artifactory-internal.dev.pardot.com"}"
+: "${ARTIFACTORY_HOST:="artifactory.dev.pardot.com"}"
 : "${ARTIFACTORY_URL:="https://${ARTIFACTORY_HOST}/artifactory"}"
 : "${ARTIFACTORY_USERNAME:="${USERNAME:-""}"}"
 : "${ARTIFACTORY_PASSWORD:="${PASSWORD:-""}"}"
@@ -42,6 +42,7 @@ export AWS_PROFILE AWS_DEFAULT_REGION
 : "${BAMBOO_BUILD_TIMESTAMP:="${bamboo_buildTimeStamp:-""}"}"
 # shellcheck disable=SC2154
 : "${BAMBOO_BUILD_RESULTS_URL:="${bamboo_buildResultsUrl:-""}"}"
+: "${CI:="$BAMBOO_PLAN_KEY"}"
 : "${CI_PROJECT:="$(echo "$BAMBOO_PLAN_KEY" | cut -d"-" -f1)"}"
 : "${CI_PLAN:="${BAMBOO_SHORT_PLAN_KEY:-""}"}"
 : "${CI_BUILD_NUMBER:="$BAMBOO_BUILD_NUMBER"}"

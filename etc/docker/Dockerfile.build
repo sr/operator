@@ -1,1 +1,12 @@
 FROM docker.dev.pardot.com/base/bread/bread
+ARG artifactory_host
+ENV RUBYGEMS_SOURCE "https://${artifactory_host}/artifactory/api/gems/pd-gem/"
+
+RUN \
+  gem install \
+    --no-ri --no-rdoc \
+    --source "${RUBYGEMS_SOURCE}" \
+    brakeman:3.2.1 \
+    bundler-audit:0.5.0 \
+  && \
+    bundle-audit update
