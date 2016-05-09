@@ -1,5 +1,5 @@
-resource "aws_elb" "pwm" {
-  name = "pwm"
+resource "aws_elb" "pwm_production" {
+  name = "pwm-production"
   security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
@@ -35,16 +35,16 @@ resource "aws_elb" "pwm" {
   }
 
   tags {
-    Name = "pwm"
+    Name = "pwm_production"
   }
 }
 
-resource "aws_ecs_cluster" "pwm" {
-  name = "pwm"
+resource "aws_ecs_cluster" "pwm_production" {
+  name = "pwm_production"
 }
 
-resource "aws_security_group" "pwm_app" {
-  name = "pwm_app"
+resource "aws_security_group" "pwm_app_production" {
+  name = "pwm_app_production"
   vpc_id = "${aws_vpc.internal_apps.id}"
 
   # SSH from bastion
@@ -72,7 +72,7 @@ resource "aws_security_group" "pwm_app" {
   }
 }
 
-resource "template_file" "pwm_user_data" {
+resource "template_file" "pwm_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
@@ -85,15 +85,15 @@ resource "template_file" "pwm_user_data" {
   }
 }
 
-resource "aws_launch_configuration" "pwm" {
-  name_prefix = "pwm"
+resource "aws_launch_configuration" "pwm_production" {
+  name_prefix = "pwm_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
-  security_groups = ["${aws_security_group.pwm_app.id}"]
+  security_groups = ["${aws_security_group.pwm_app_production.id}"]
   associate_public_ip_address = false
-  user_data = "${template_file.pwm_user_data.rendered}"
+  user_data = "${template_file.pwm_production_user_data.rendered}"
 
   root_block_device {
     volume_type = "gp2"
@@ -106,10 +106,10 @@ resource "aws_launch_configuration" "pwm" {
   }
 }
 
-resource "aws_autoscaling_group" "pwm" {
+resource "aws_autoscaling_group" "pwm_production" {
   max_size = 1
   min_size = 1
-  launch_configuration = "${aws_launch_configuration.pwm.id}"
+  launch_configuration = "${aws_launch_configuration.pwm_production.id}"
   vpc_zone_identifier = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
     "${aws_subnet.internal_apps_us_east_1c.id}",
