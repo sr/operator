@@ -5,6 +5,7 @@ set -eu
 cd "$(dirname "$0")/.."
 
 : "${RACK_ENV:="development"}"
+export RACK_ENV
 
 # Race condition when starting up multiple containers
 # So wait for mysql in docker composer
