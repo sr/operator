@@ -5,6 +5,7 @@ ARG pwm_version=1.7.1
 
 RUN yum install -y epel-release && \
   yum install -y tomcat tomcat-webapps tomcat-admin-webapps && \
+  yum install -y nginx && \
   yum install -y unzip supervisor && \
   curl -L 'https://github.com/progrium/entrykit/releases/download/v0.4.0/entrykit_0.4.0_Linux_x86_64.tgz' | tar -xzv -C /usr/bin && \
   entrykit --symlink
@@ -31,10 +32,15 @@ RUN mkdir /tmp/pwm && \
   rm -rf /tmp/pwm
 
 COPY supervisord.conf /etc/supervisord.conf
+
+# tomcat configuration
 COPY tomcat.sh /usr/local/bin/tomcat.sh
 COPY PwmConfiguration.xml.tmpl /usr/share/tomcat/webapps/pwm/WEB-INF/PwmConfiguration.xml.tmpl
 
-EXPOSE 8080
+# nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
 ENTRYPOINT [ \
   "render", "/usr/share/tomcat/webapps/pwm/WEB-INF/PwmConfiguration.xml", "--", \
   "supervisord", "-n", "-c", "/etc/supervisord.conf" \
