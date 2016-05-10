@@ -134,7 +134,6 @@ fi
 docker build \
     -f etc/docker/Dockerfile.build \
     -t build/build \
-    --build-arg "artifactory_host=${ARTIFACTORY_HOST}" \
     .
 
 # Iterate over all selected projects, either explicitly or because of CI mode,
