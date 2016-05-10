@@ -25,7 +25,7 @@ module ReplicationFixing
         # 1) Fixable error
         # 2) Fix active
         # 3) No longer erroring
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/2/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/2")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},

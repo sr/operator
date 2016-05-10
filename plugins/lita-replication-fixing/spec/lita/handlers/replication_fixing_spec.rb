@@ -79,7 +79,7 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
 
   describe "!fix" do
     it "attempts to fix the shard" do
-      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/11/dfw")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/11")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -93,7 +93,7 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     end
 
     it "attempts to fix the whoisdb shard" do
-      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/whoisdb/1/dfw")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/whoisdb/1")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -107,7 +107,7 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     end
 
     it "attempts to fix the shard in PHX" do
-      stub_request(:get, "https://repfix-phx.pardot.com/replication/fixes/for/db/11/phx")
+      stub_request(:get, "https://repfix-phx.pardot.com/replication/fixes/for/db/11")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -235,7 +235,7 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
         "is_fixable" => true
       }
 
-      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/dfw")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1")
         .and_return(body: JSON.dump(response))
 
       send_command("status 1")
