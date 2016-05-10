@@ -1,11 +1,14 @@
 FROM docker.dev.pardot.com/base/ruby:2.3.0
 ARG artifactory_host
+ENV BRAKEMAN_VERSION 3.2.1
+ENV BUNDLER_AUDIT_VERSION 0.5.0
 ENV GOLANG_VERSION 1.6.2
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
 ENV GOLANG_DOWNLOAD_SHA256 e40c36ae71756198478624ed1bb4ce17597b3c19d243f3f0899bb5740d56212a
 ENV JFROG_CLI_VERSION=1.1.0
 ENV JFROG_CLI_SHA256=e7b47d08bb1b1cc506f3334dfafeac28c4e3886412b6527d12ceed61bd28007e
 ENV JFROG_CLI_URL=https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path=${JFROG_CLI_VERSION}%2Fjfrog-cli-linux-amd64%2Fjfrog
+ENV RUBYGEMS_SOURCE=https://${artifactory_host}/artifactory/api/gems/pd-gem/
 ENV TERRAFORM_VERSION=0.6.15
 ENV TERRAFORM_SHA256=2a81faa54ed6c5e7c065444617fc999f0ab6d433e4e03a0ad599892e74ffff6b
 ENV TERRAFORM_URL=https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
@@ -40,5 +43,10 @@ RUN \
   && \
     rm -f /tmp/terraform.zip \
   && \
-    gem install --no-ri --no-rdoc \
-      rubocop -v 0.39.0
+    gem install \
+      --no-ri --no-rdoc \
+      --source "${RUBYGEMS_SOURCE}" \
+      "brakeman:${BRAKEMAN_VERSION}" \
+      "bundler-audit:${BUNDLER_AUDIT_VERSION}" \
+  && \
+    bundle-audit update
