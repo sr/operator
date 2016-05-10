@@ -10,13 +10,14 @@ import (
 	servicepkg "github.com/sr/operator/chatoops/services/buildkite"
 )
 
-type instrumentedbuildkiteBuildkiteService struct {
+type interceptedbuildkiteBuildkiteService struct {
+	authorizer   operator.Authorizer
 	instrumenter operator.Instrumenter
 	server       servicepkg.BuildkiteServiceServer
 }
 
-// Status instruments the BuildkiteService.Status method.
-func (a *instrumentedbuildkiteBuildkiteService) Status(
+// Status intercepts the BuildkiteService.Status method.
+func (a *interceptedbuildkiteBuildkiteService) Status(
 	ctx context.Context,
 	request *servicepkg.StatusRequest,
 ) (response *servicepkg.StatusResponse, err error) {
@@ -33,11 +34,14 @@ func (a *instrumentedbuildkiteBuildkiteService) Status(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.Status(ctx, request)
 }
 
-// ListBuilds instruments the BuildkiteService.ListBuilds method.
-func (a *instrumentedbuildkiteBuildkiteService) ListBuilds(
+// ListBuilds intercepts the BuildkiteService.ListBuilds method.
+func (a *interceptedbuildkiteBuildkiteService) ListBuilds(
 	ctx context.Context,
 	request *servicepkg.ListBuildsRequest,
 ) (response *servicepkg.ListBuildsResponse, err error) {
@@ -54,5 +58,8 @@ func (a *instrumentedbuildkiteBuildkiteService) ListBuilds(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.ListBuilds(ctx, request)
 }

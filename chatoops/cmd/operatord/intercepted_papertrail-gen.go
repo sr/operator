@@ -10,13 +10,14 @@ import (
 	servicepkg "github.com/sr/operator/chatoops/services/papertrail"
 )
 
-type instrumentedpapertrailPapertrailService struct {
+type interceptedpapertrailPapertrailService struct {
+	authorizer   operator.Authorizer
 	instrumenter operator.Instrumenter
 	server       servicepkg.PapertrailServiceServer
 }
 
-// Search instruments the PapertrailService.Search method.
-func (a *instrumentedpapertrailPapertrailService) Search(
+// Search intercepts the PapertrailService.Search method.
+func (a *interceptedpapertrailPapertrailService) Search(
 	ctx context.Context,
 	request *servicepkg.SearchRequest,
 ) (response *servicepkg.SearchResponse, err error) {
@@ -33,5 +34,8 @@ func (a *instrumentedpapertrailPapertrailService) Search(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.Search(ctx, request)
 }
