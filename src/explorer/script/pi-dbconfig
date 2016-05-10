@@ -1,13 +1,14 @@
 #!/bin/sh
+#/ Usage: script/pi-dbconfig <rails-env>
+#/ Sync the database configuration and list of shards from the Pardot/pardot
+#/ repository on GHE. This requires a personnal access token to be set via
+#/ the GITHUB_USER and GITHUB_TOKEN environment variables. Create a token for
+#/ your user here: https://git.dev.pardot.com/settings/tokens/new
 set -eu
 cd "$(dirname "$0")/.."
 
 : "${RAILS_ENV:="${1:-""}"}"
 export RAILS_ENV
-
-# TODO(sr) Revoke this token
-: "${GITHUB_USER:="simon-rozet"}"
-: "${GITHUB_TOKEN:="2f9552d3c394aa4d0bcdf652c9185543ce189bf5"}"
 
 case "$RAILS_ENV" in
   test|development)
