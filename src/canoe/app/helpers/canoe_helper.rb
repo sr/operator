@@ -92,18 +92,14 @@ module CanoeHelper
     output.html_safe
   end
 
-  def kibana_link(deploy:, host: nil)
+  def kibana_link(deploy:, datacenter:, host: nil)
     query = [
       %(program:pull-agent),
       %(message:"deploy_id=#{deploy.id}")
     ]
     query << %(host:#{host}) if host
+    qs = CGI.escape(query.join(" AND ")).gsub('+', '%20')
 
-    qs = {
-      query: query.join(" AND "),
-      fields: "@timestamp,host,message"
-    }.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v).gsub('+', '%20')}" }.join("&")
-
-    "https://logs.#{'dev.' unless deploy.deploy_target.production?}pardot.com/#/dashboard/script/logstash.js?#{qs}"
+    "https://logs-#{datacenter}.pardot.com/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),index:'logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'#{qs}')),sort:!('@timestamp',desc))"
   end
 end
