@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  SESSION_EXPIRATION = 8.hours
+  SESSION_EXPIRATION = 15.minutes
 
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
