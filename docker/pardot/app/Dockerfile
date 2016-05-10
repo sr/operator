@@ -34,7 +34,7 @@ RUN rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
 
 # PHP 7 compatible build of Protobuf
 RUN cd /tmp && \
-  git clone -b php7 https://github.com/ksmiley/php-protobuf && \
+  git clone -b php7 https://github.com/pd-aray/php-protobuf && \
   cd php-protobuf && \
   /opt/remi/php70/root/bin/phpize && \
   ./configure --with-php-config=/opt/remi/php70/root/bin/php-config && \
