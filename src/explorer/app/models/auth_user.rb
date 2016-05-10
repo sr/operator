@@ -17,7 +17,7 @@ class AuthUser < ActiveRecord::Base
   end
 
   def access_authorized?
-    if Rails.development?
+    if Rails.env.development?
       return true
     end
 
