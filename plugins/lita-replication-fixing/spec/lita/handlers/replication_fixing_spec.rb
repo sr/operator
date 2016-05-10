@@ -9,16 +9,16 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
 
   describe "POST /replication/errors" do
     it "attempts to fix the error and notifies the ops room" do
-      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/1/dallas")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/dfw")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      fix_request = stub_request(:post, "https://repfix.pardot.com/replication/fix/db/1")
+      fix_request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       response = http.post("/replication/errors", URI.encode_www_form(
-        "hostname"         => "db-d1",
+        "hostname"         => "pardot0-dbshard1-1-dfw",
         "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
       ), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
@@ -28,22 +28,22 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     end
 
     it "notifies the ops-replication room with a sanitized error messages" do
-      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/1/dallas")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/dfw")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      stub_request(:post, "https://repfix.pardot.com/replication/fix/db/1")
+      stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       response = http.post("/replication/errors", URI.encode_www_form(
-        "hostname"         => "db-d1",
+        "hostname"         => "pardot0-dbshard1-1-dfw",
         "error"            => "Replication is broken",
         "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
       ), {'Content-Type' => 'application/x-www-form-urlencoded'})
 
-      expect(replies[0]).to eq("db-d1: Replication is broken")
-      expect(replies[1]).to eq("db-d1: Query: 'INSERT INTO foo VALUES ([REDACTED], '1', '1.2')")
+      expect(replies[0]).to eq("pardot0-dbshard1-1-dfw: Replication is broken")
+      expect(replies[1]).to eq("pardot0-dbshard1-1-dfw: Query: 'INSERT INTO foo VALUES ([REDACTED], '1', '1.2')")
     end
 
     it "responds with HTTP 400 if hostname is missing" do
@@ -55,84 +55,117 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
   describe "!ignore" do
     it "ignores the shard for 15 minutes by default" do
       send_command("ignore 11")
-      expect(replies.last).to eq("OK, I will ignore db-11 for 15 minutes")
+      expect(replies.last).to eq("OK, I will ignore db-11-dfw for 15 minutes")
     end
 
     it "ignores the shard with a given prefix for 15 minutes by default" do
-      send_command("ignore 1 whoisdb")
-      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 15 minutes")
+      send_command("ignore whoisdb-1")
+      expect(replies.last).to eq("OK, I will ignore whoisdb-1-dfw for 15 minutes")
     end
 
     it "allows the number of minutes to be specified" do
       send_command("ignore 11 10")
-      expect(replies.last).to eq("OK, I will ignore db-11 for 10 minutes")
+      expect(replies.last).to eq("OK, I will ignore db-11-dfw for 10 minutes")
 
-      send_command("ignore 1 whoisdb 10")
-      expect(replies.last).to eq("OK, I will ignore whoisdb-1 for 10 minutes")
+      send_command("ignore whoisdb-1 10")
+      expect(replies.last).to eq("OK, I will ignore whoisdb-1-dfw for 10 minutes")
     end
   end
 
   describe "!fix" do
     it "attempts to fix the shard" do
-      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/11")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/11/dfw")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      request = stub_request(:post, "https://repfix.pardot.com/replication/fix/db/11")
+      request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/11")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       send_command("fix 11")
-      expect(replies.last).to eq("OK, I'm trying to fix db-11")
+      expect(replies.last).to eq("OK, I'm trying to fix db-11-dfw")
       expect(request).to have_been_made
     end
 
     it "attempts to fix the whoisdb shard" do
-      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/whoisdb/1")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/whoisdb/1/dfw")
         .and_return(
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
           {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
         )
-      request = stub_request(:post, "https://repfix.pardot.com/replication/fix/whoisdb/1")
+      request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/whoisdb/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
-      send_command("fix 1 whoisdb")
-      expect(replies.last).to eq("OK, I'm trying to fix whoisdb-1")
+      send_command("fix whoisdb-1")
+      expect(replies.last).to eq("OK, I'm trying to fix whoisdb-1-dfw")
       expect(request).to have_been_made
+    end
+
+    it "attempts to fix the shard in PHX" do
+      stub_request(:get, "https://repfix-phx.pardot.com/replication/fixes/for/db/11/phx")
+        .and_return(
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
+          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+        )
+      request = stub_request(:post, "https://repfix-phx.pardot.com/replication/fix/db/11")
+        .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
+
+      send_command("fix 11-phx")
+      expect(replies.last).to eq("OK, I'm trying to fix db-11-phx")
+      expect(request).to have_been_made
+    end
+
+    it "rejects an invalid datacenter" do
+      send_command("fix 11-nope")
+      expect(replies.last).to eq("Sorry, no such datacenter: nope")
     end
   end
 
   describe "!cancelfix" do
     it "cancels the fix for the shard" do
-      request = stub_request(:post, "https://repfix.pardot.com/replication/fixes/cancel/11")
+      request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fixes/cancel/11")
         .and_return(body: JSON.dump("is_canceled" => true, "message" => "Fixes canceled"))
 
       send_command("cancelfix 11")
-      expect(replies.last).to eq("OK, I cancelled all the fixes for db-11")
+      expect(replies.last).to eq("OK, I cancelled all the fixes for db-11-dfw")
       expect(request).to have_been_made
+    end
+
+    it "cancels the fix for the shard in PHX" do
+      request = stub_request(:post, "https://repfix-phx.pardot.com/replication/fixes/cancel/11")
+        .and_return(body: JSON.dump("is_canceled" => true, "message" => "Fixes canceled"))
+
+      send_command("cancelfix 11-phx")
+      expect(replies.last).to eq("OK, I cancelled all the fixes for db-11-phx")
+      expect(request).to have_been_made
+    end
+
+    it "rejects an invalid datacenter" do
+      send_command("cancelfix 11-nope")
+      expect(replies.last).to eq("Sorry, no such datacenter: nope")
     end
   end
 
   describe "!resetignore" do
     it "resets the ignore for the shard" do
       send_command("resetignore 11")
-      expect(replies.last).to eq("OK, I will no longer ignore db-11")
+      expect(replies.last).to eq("OK, I will no longer ignore db-11-dfw")
     end
 
     it "resets the ignore for the shard with a given prefix" do
-      send_command("resetignore 1 whoisdb")
-      expect(replies.last).to eq("OK, I will no longer ignore whoisdb-1")
+      send_command("resetignore whoisdb-1")
+      expect(replies.last).to eq("OK, I will no longer ignore whoisdb-1-dfw")
     end
   end
 
   describe "!currentautofixes" do
     it "lists the fixes currently ongoing" do
-      fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(subject.redis)
-      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 12), active: true)
-      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 32), active: false)
+      fixing_status_client = ::ReplicationFixing::FixingStatusClient.new("dfw", subject.redis)
+      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 12, "dfw"), active: true)
+      fixing_status_client.set_active(shard: ::ReplicationFixing::Shard.new("db", 32, "dfw"), active: false)
 
       send_command("currentautofixes")
-      expect(replies.last).to eq("I'm currently fixing: db-12")
+      expect(replies.last).to eq("I'm currently fixing: db-12-dfw")
     end
   end
 

@@ -5,7 +5,7 @@ require "replication_fixing/hostname"
 
 module ReplicationFixing
   RSpec.describe AlertingManager do
-    let(:hostname) { Hostname.new("db-d1") }
+    let(:hostname) { Hostname.new("pardot0-dbshard1-1-dfw") }
     let(:pager) { TestPager.new }
     let(:log) { Logger.new("/dev/null") }
 
