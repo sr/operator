@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  SESSION_EXPIRATION = 8.hours
+  SESSION_EXPIRATION = 15.minutes
 
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
@@ -31,7 +31,13 @@ class ApplicationController < ActionController::Base
   end
 
   def require_oauth_authentication
-    redirect_to oauth_path unless current_user.present?
+    unless current_user.present?
+      return redirect_to oauth_path
+    end
+
+    unless current_user.access_authorized?
+      return redirect_to "/auth/unauthorized"
+    end
   end
 
   def current_user
