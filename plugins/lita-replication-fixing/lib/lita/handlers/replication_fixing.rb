@@ -27,16 +27,19 @@ module Lita
       http.post "/replication/errors", :create_replication_error
 
       # http://rubular.com/r/Aos770vcM3
-      route /^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:\s+(?<minutes>\d+))?/i, :create_ignore, command: true, help: {
-        "ignore SHARD_ID" => "Ignores db-SHARD_ID for 15 minutes",
+      route /^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?(?:\s+(?<minutes>\d+))?/i, :create_ignore, command: true, help: {
+        "ignore SHARD_ID" => "Ignores db-SHARD_ID for 15 minutes in the default datacenter",
         "ignore PREFIX-SHARD_ID" => "Ignores PREFIX-SHARD_ID for 15 minutes (PREFIX is, e.g., db or whoisdb)",
+        "ignore PREFIX-SHARD_ID-DATACENTER" => "Ignores PREFIX-SHARD_ID-DATACENTER for 15 minutes (PREFIX is, e.g., db or whoisdb)",
         "ignore SHARD_ID MINUTES" => "Ignores db-SHARD_ID for MINUTES minutes",
-        "ignore PREFIX-SHARD_ID MINUTES" => "Ignores PREFIX-SHARD_ID for MINUTES minutes",
+        "ignore PREFIX-SHARD_ID MINUTES" => "Ignores PREFIX-SHARD_ID in the default datacenter for MINUTES minutes",
+        "ignore PREFIX-SHARD_ID-DATACENTER MINUTES" => "Ignores PREFIX-SHARD_ID-DATACENTER for MINUTES minutes",
       }
 
-      route /^resetignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)/i, :reset_ignore, command: true, help: {
-        "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID",
+      route /^resetignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :reset_ignore, command: true, help: {
+        "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID in the default datacenter",
         "resetignore PREFIX-SHARD_ID" => "Stops ignoring PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+        "resetignore PREFIX-SHARD_ID-DATACENTER" => "Stops ignoring PREFIX-SHARD_ID-DATACENTER (PREFIX is, e.g., db or whoisdb)",
       }
 
       # http://rubular.com/r/oud5IU1fji
@@ -59,12 +62,14 @@ module Lita
         "stopfixing" => "Globally pauses fixing of replication errors",
       }
 
-      route /^startfixing/i, :start_fixing, command: true, help: {
-        "startfixing" => "Globally starts fixing of replication errors",
+      route /^startfixing(?:\s+(?<datacenter>\S+))?/i, :start_fixing, command: true, help: {
+        "startfixing" => "Globally starts fixing of replication errors in the default datacenter",
+        "startfixing DATACENTER" => "Globally starts fixing of replication errors in DATACENTER",
       }
 
-      route /^checkfixing/i, :check_fixing, command: true, help: {
-        "checkfixing" => "Reports whether fixing is globally enabled or disabled",
+      route /^checkfixing(?:\s+(?<datacenter>\S+))?/i, :check_fixing, command: true, help: {
+        "checkfixing" => "Reports whether fixing is globally enabled or disabled in the default datacenter",
+        "checkfixing DATACENTER" => "Reports whether fixing is globally enabled or disabled in DATACENTER",
       }
 
       route /^status\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :status, command: true, help: {
@@ -94,13 +99,16 @@ module Lita
         )
 
         # TODO: Should ignores be per-datacenter too?
-        @ignore_client = ::ReplicationFixing::IgnoreClient.new(redis)
 
+        @ignore_clients = ::ReplicationFixing::DatacenterAwareRegistry.new
         @fixing_status_clients = ::ReplicationFixing::DatacenterAwareRegistry.new
         @fixing_clients = ::ReplicationFixing::DatacenterAwareRegistry.new
         @monitor_supervisors = ::ReplicationFixing::DatacenterAwareRegistry.new
 
         config.datacenters.each do |datacenter|
+          ignore_client = ::ReplicationFixing::IgnoreClient.new(datacenter, redis)
+          @ignore_clients.register(datacenter, ignore_client)
+
           fixing_status_client = ::ReplicationFixing::FixingStatusClient.new(datacenter, redis)
           @fixing_status_clients.register(datacenter, fixing_status_client)
 
@@ -139,11 +147,12 @@ module Lita
             hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
             shard = hostname.shard
 
-            ignoring = @ignore_client.ignoring?(shard)
+            ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+            ignoring = ignore_client.ignoring?(shard)
             if ignoring
               log.debug("Shard is ignored: #{shard}")
 
-              count = @ignore_client.incr_skipped_errors_count
+              count = ignore_client.incr_skipped_errors_count
               if (count % 200).zero?
                 @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
                 @alerting_manager.notify_replication_disabled_but_many_errors
@@ -191,11 +200,13 @@ module Lita
       def create_ignore(response)
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
         minutes = (response.match_data["minutes"] || "15").to_i
 
-        shard = ::ReplicationFixing::Shard.new(prefix, shard_id, config.default_datacenter)
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id, datacenter)
         begin
-          @ignore_client.ignore(shard, expire: minutes*60)
+          ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+          ignore_client.ignore(shard, expire: minutes*60)
           response.reply_with_mention("OK, I will ignore #{shard} for #{minutes} minutes")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -208,7 +219,8 @@ module Lita
         datacenter = response.match_data["datacenter"] || config.default_datacenter
         shard = ::ReplicationFixing::Shard.new(prefix, shard_id, datacenter)
 
-        @ignore_client.reset_ignore(shard)
+        ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+        ignore_client.reset_ignore(shard)
         fixing_client = @fixing_clients.for_datacenter(shard.datacenter)
         result = fixing_client.fix(shard: shard)
 
@@ -256,10 +268,12 @@ module Lita
       def reset_ignore(response)
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
 
-        shard = ::ReplicationFixing::Shard.new(prefix, shard_id, config.default_datacenter)
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id, datacenter)
         begin
-          @ignore_client.reset_ignore(shard)
+          ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+          ignore_client.reset_ignore(shard)
           response.reply_with_mention("OK, I will no longer ignore #{shard}")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -281,7 +295,11 @@ module Lita
 
       def stop_fixing(response)
         begin
-          @ignore_client.ignore_all
+          config.datacenters.each do |datacenter|
+            ignore_client = @ignore_clients.for_datacenter(datacenter)
+            ignore_client.ignore_all
+          end
+
           response.reply_with_mention("OK, I've stopped fixing replication for ALL shards")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -289,8 +307,10 @@ module Lita
       end
 
       def start_fixing(response)
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
         begin
-          @ignore_client.reset_ignore_all
+          ignore_client = @ignore_clients.for_datacenter(datacenter)
+          ignore_client.reset_ignore_all
           response.reply_with_mention("OK, I've started fixing replication")
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -298,11 +318,13 @@ module Lita
       end
 
       def check_fixing(response)
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
         begin
-          if @ignore_client.ignoring_all?
-            response.reply_with_mention("(nope) Replication fixing is globally disabled")
+          ignore_client = @ignore_clients.for_datacenter(datacenter)
+          if ignore_client.ignoring_all?
+            response.reply_with_mention("(nope) Replication fixing is globally disabled in #{datacenter}")
           else
-            response.reply_with_mention("(goodnews) Replication fixing is globally enabled")
+            response.reply_with_mention("(goodnews) Replication fixing is globally enabled in #{datacenter}")
           end
         rescue => e
           response.reply_with_mention("Sorry, something went wrong: #{e}")
@@ -336,7 +358,8 @@ module Lita
 
       private
       def reply_with_fix_result(shard:, result:)
-        ignoring = @ignore_client.ignoring?(shard)
+        ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+        ignoring = ignore_client.ignoring?(shard)
         if ignoring
           log.debug("Shard is ignored: #{shard}")
         else

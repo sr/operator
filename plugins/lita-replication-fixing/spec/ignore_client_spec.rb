@@ -8,7 +8,7 @@ module ReplicationFixing
 
     describe "#ignoring?" do
       it "returns truthy if ignoring all of the keys" do
-        client = IgnoreClient.new(Lita.redis)
+        client = IgnoreClient.new("dfw", Lita.redis)
 
         shard = Shard.new("db", 11, "dfw")
         expect(client.ignoring?(shard)).to be_falsey
@@ -19,7 +19,7 @@ module ReplicationFixing
       end
 
       it "returns truthy if ignoring a particular shard" do
-        client = IgnoreClient.new(Lita.redis)
+        client = IgnoreClient.new("dfw", Lita.redis)
 
         shard = Shard.new("db", 11, "dfw")
         expect(client.ignoring?(shard)).to be_falsey
@@ -33,7 +33,7 @@ module ReplicationFixing
 
     describe "#reset_ignore" do
       it "cancels the ignore for a given shard" do
-        client = IgnoreClient.new(Lita.redis)
+        client = IgnoreClient.new("dfw", Lita.redis)
 
         shard = Shard.new("db", 11, "dfw")
         client.ignore(shard)
@@ -47,7 +47,7 @@ module ReplicationFixing
 
     describe "#skipped_errors_count" do
       it "returns the number of errors skipped while a global ignore is in effect" do
-        client = IgnoreClient.new(Lita.redis)
+        client = IgnoreClient.new("dfw", Lita.redis)
 
         client.ignore_all
         expect(client.skipped_errors_count).to eq(0)

@@ -63,6 +63,11 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("OK, I will ignore whoisdb-1-dfw for 15 minutes")
     end
 
+    it "ignores the shard in PHX" do
+      send_command("ignore 11-phx")
+      expect(replies.last).to eq("OK, I will ignore db-11-phx for 15 minutes")
+    end
+
     it "allows the number of minutes to be specified" do
       send_command("ignore 11 10")
       expect(replies.last).to eq("OK, I will ignore db-11-dfw for 10 minutes")
@@ -152,6 +157,11 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("OK, I will no longer ignore db-11-dfw")
     end
 
+    it "resets the ignore for the shard in PHX" do
+      send_command("resetignore 11-phx")
+      expect(replies.last).to eq("OK, I will no longer ignore db-11-phx")
+    end
+
     it "resets the ignore for the shard with a given prefix" do
       send_command("resetignore whoisdb-1")
       expect(replies.last).to eq("OK, I will no longer ignore whoisdb-1-dfw")
@@ -175,13 +185,27 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
       expect(replies.last).to eq("OK, I've stopped fixing replication for ALL shards")
 
       send_command("checkfixing")
-      expect(replies.last).to eq("(nope) Replication fixing is globally disabled")
+      expect(replies.last).to eq("(nope) Replication fixing is globally disabled in dfw")
 
       send_command("startfixing")
       expect(replies.last).to eq("OK, I've started fixing replication")
 
       send_command("checkfixing")
-      expect(replies.last).to eq("(goodnews) Replication fixing is globally enabled")
+      expect(replies.last).to eq("(goodnews) Replication fixing is globally enabled in dfw")
+    end
+
+    it "globally stops and starts fixing in PHX" do
+      send_command("stopfixing phx")
+      expect(replies.last).to eq("OK, I've stopped fixing replication for ALL shards")
+
+      send_command("checkfixing phx")
+      expect(replies.last).to eq("(nope) Replication fixing is globally disabled in phx")
+
+      send_command("startfixing phx")
+      expect(replies.last).to eq("OK, I've started fixing replication")
+
+      send_command("checkfixing phx")
+      expect(replies.last).to eq("(goodnews) Replication fixing is globally enabled in phx")
     end
   end
 
