@@ -7,7 +7,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-: "${RAILS_ENV:="${1:-""}"}"
+: "${RAILS_ENV:="${1:-"production"}"}"
 export RAILS_ENV
 
 case "$RAILS_ENV" in
@@ -21,13 +21,12 @@ esac
 
 path="config/databaseConnections/${filename}"
 download_url="$(
-  curl -s -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
+  curl -fs -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
   "https://git.dev.pardot.com/api/v3/repos/Pardot/pardot/contents/${path}" |
   jq -cr '.download_url'
 )"
 
 mkdir -p "config/pi"
 curl -s "$download_url" > "config/pi/${RAILS_ENV}.php"
-devenv compose run app \
-  php -r "echo yaml_emit(include(\"./config/pi/${RAILS_ENV}.php\"));" > \
+php -r "echo yaml_emit(include(\"./config/pi/${RAILS_ENV}.php\"));" > \
   "config/pi/${RAILS_ENV}.yml"
