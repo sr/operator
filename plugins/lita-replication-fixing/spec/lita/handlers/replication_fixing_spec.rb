@@ -235,11 +235,11 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
         "is_fixable" => true
       }
 
-      stub_request(:get, "https://repfix.pardot.com/replication/fixes/for/db/1")
+      stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/dfw")
         .and_return(body: JSON.dump(response))
 
       send_command("status 1")
-      expect(replies.last).to eq("status for db-1\n* dfw: 0 seconds behind\n* dfw2: 2 seconds behind")
+      expect(replies.last).to eq("status for db-1-dfw\n* dfw: 0 seconds behind\n* dfw2: 2 seconds behind")
     end
   end
 end

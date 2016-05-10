@@ -72,9 +72,10 @@ module Lita
         "checkfixing DATACENTER" => "Reports whether fixing is globally enabled or disabled in DATACENTER",
       }
 
-      route /^status\s+(?<shard_id>\d+)(?:\s+(?<prefix>db|whoisdb))?/i, :status, command: true, help: {
-        "status SHARD_ID" => "Reports the status of db-SHARD_ID",
-        "status SHARD_ID PREFIX" => "Reports the status of PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+      route /^status\s+(?:\s+(?<prefix>db|whoisdb))?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :status, command: true, help: {
+        "status SHARD_ID" => "Reports the status of db-SHARD_ID in the default datacenter",
+        "status PREFIX-SHARD_ID" => "Reports the status of PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
+        "status PREFIX-SHARD_ID-DATACENTER" => "Reports the status of PREFIX-SHARD_ID-DATACENTER",
       }
 
       def initialize(robot)
@@ -97,8 +98,6 @@ module Lita
           pager: @pager,
           log: log,
         )
-
-        # TODO: Should ignores be per-datacenter too?
 
         @ignore_clients = ::ReplicationFixing::DatacenterAwareRegistry.new
         @fixing_status_clients = ::ReplicationFixing::DatacenterAwareRegistry.new
@@ -334,9 +333,11 @@ module Lita
       def status(response)
         shard_id = response.match_data["shard_id"].to_i
         prefix = response.match_data["prefix"] || "db"
+        datacenter = response.match_data["datacenter"] || config.default_datacenter
 
-        shard = ::ReplicationFixing::Shard.new(prefix, shard_id)
-        result = @fixing_client.status(shard_or_hostname: shard)
+        shard = ::ReplicationFixing::Shard.new(prefix, shard_id, datacenter)
+        fixing_client = @fixing_clients.for_datacenter(shard.datacenter)
+        result = fixing_client.status(shard_or_hostname: shard)
         case result
         when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
           response.reply_with_mention("Sorry, something went wrong: #{result.error}")
@@ -354,6 +355,8 @@ module Lita
 
           response.reply(lines.join("\n"))
         end
+      rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
+        response.reply_with_mention "Sorry, #{e}"
       end
 
       private
