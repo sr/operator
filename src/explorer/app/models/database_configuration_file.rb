@@ -19,30 +19,31 @@ class DatabaseConfigurationFile
   end
 
   def self.load
-    path = Rails.root.join("config", "pi", "#{Rails.env}.yaml")
-    auth = Rails.root.join("config", "pi", "db-password_#{Rails.env}")
-    config = YAML.load_file(path)
+    configfile = Rails.root.join("config", "pi", "#{Rails.env}.yml")
 
-    new(config, auth.read.chomp)
+    config = YAML.load_file(configfile)
+    auth = Rails.application.config.database_configuration
+
+    new(config, auth)
   end
 
   def initialize(config, auth)
     @config = config
-    @raw_auth = auth
+    @auth = auth
   end
 
   def global(datacenter)
     config =
       case datacenter
       when DataCenter::DALLAS
-        globals.fetch("dallas")
+        globals.fetch(DataCenter::DALLAS)
       when DataCenter::SEATTLE
-        globals.fetch("seattle")
+        globals.fetch(DataCenter::SEATTLE)
       else
         raise DataCenterNotFound, datacenter
       end
 
-    DatabaseConfiguration.new(config, auth)
+    DatabaseConfiguration.new(config.fetch(1), auth)
   end
 
   def shard(datacenter, id)
@@ -68,16 +69,11 @@ class DatabaseConfigurationFile
   private
 
   def auth
-    username, password = load_auth
-    DatabaseConfiguration::Auth.new(username, password)
-  end
-
-  def load_auth
-    parts = @raw_auth.split(":")
-    if ![1,2].include?(parts.length)
-      raise Error, "auth file is invalid"
-    end
-    parts
+    config = @auth.fetch(Rails.env.to_s)
+    DatabaseConfiguration::Auth.new(
+      config["username"],
+      config["password"]
+    )
   end
 
   def shards

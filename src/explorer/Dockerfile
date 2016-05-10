@@ -2,11 +2,8 @@ FROM docker.dev.pardot.com/base/ruby:2.3.0
 
 RUN \
   yum install -y \
-    php5 \
-    php-pear \
     nodejs \
-    nc \
-    php-pecl-yaml
+    nc
 
 RUN groupadd -r docker && \
   useradd -r -g docker -d /app -s /sbin/nologin -c "Docker image user" docker

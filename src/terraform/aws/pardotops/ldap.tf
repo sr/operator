@@ -74,9 +74,39 @@ resource "aws_security_group" "internal_apps_ldap_server" {
   }
 }
 
+resource "aws_iam_role" "internal_apps_ldap_master" {
+  name = "internal_apps_ldap_master"
+  assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"
+}
+
+resource "aws_iam_instance_profile" "internal_apps_ldap_master" {
+  name = "internal_apps_ldap_master"
+  roles = ["${aws_iam_role.internal_apps_ldap_master.id}"]
+}
+
+resource "aws_iam_role_policy" "internal_apps_ldap_master_policy" {
+  name = "internal_apps_ldap_master_policy"
+  role = "${aws_iam_role.internal_apps_ldap_master.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_instance" "internal_apps_ldap_master" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
+  iam_instance_profile = "${aws_iam_instance_profile.internal_apps_ldap_master.id}"
   key_name = "internal_apps"
   private_ip = "172.30.132.212"
   subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"

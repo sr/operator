@@ -1,13 +1,14 @@
 #!/bin/sh
+#/ Usage: script/pi-dbconfig <rails-env>
+#/ Sync the database configuration and list of shards from the Pardot/pardot
+#/ repository on GHE. This requires a personnal access token to be set via
+#/ the GITHUB_USER and GITHUB_TOKEN environment variables. Create a token for
+#/ your user here: https://git.dev.pardot.com/settings/tokens/new
 set -eu
 cd "$(dirname "$0")/.."
 
-: "${RAILS_ENV:="${1:-""}"}"
+: "${RAILS_ENV:="${1:-"production"}"}"
 export RAILS_ENV
-
-# TODO(sr) Revoke this token
-: "${GITHUB_USER:="simon-rozet"}"
-: "${GITHUB_TOKEN:="2f9552d3c394aa4d0bcdf652c9185543ce189bf5"}"
 
 case "$RAILS_ENV" in
   test|development)
@@ -20,13 +21,12 @@ esac
 
 path="config/databaseConnections/${filename}"
 download_url="$(
-  curl -s -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
+  curl -fs -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
   "https://git.dev.pardot.com/api/v3/repos/Pardot/pardot/contents/${path}" |
   jq -cr '.download_url'
 )"
 
 mkdir -p "config/pi"
 curl -s "$download_url" > "config/pi/${RAILS_ENV}.php"
-devenv compose run app \
-  php -r "echo yaml_emit(include(\"./config/pi/${RAILS_ENV}.php\"));" > \
-  "config/pi/${RAILS_ENV}.yaml"
+php -r "echo yaml_emit(include(\"./config/pi/${RAILS_ENV}.php\"));" > \
+  "config/pi/${RAILS_ENV}.yml"

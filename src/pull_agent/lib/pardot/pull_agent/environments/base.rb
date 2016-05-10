@@ -320,7 +320,7 @@ module Pardot
 
         def link_explorer_shared_files
           link_shared_files(
-            "shared/pi-db-password" => "config/pi/db-password_#{name}",
+            "shared/database.yml" => "config/database.yml",
             "log" => "log"
           )
         end

@@ -17,6 +17,16 @@ config="$dir/docker-compose.yml"
 # Lint the code with RuboCop
 docker-lint-ruby "$dir"
 
+test -f "${dir}/Gemfile.lock" && {
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
+        build/build bundle-audit check
+}
+
+test -d "${dir}/app/models" && {
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
+        build/build brakeman -A --table-width 260
+}
+
 # Assume it's a Rails app if there's a docker-compose.yml file
 if test -f "$config"
 then

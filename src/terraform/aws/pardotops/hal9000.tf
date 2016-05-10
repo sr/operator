@@ -116,7 +116,12 @@ resource "template_file" "hal9000_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
+    configuration_environment = "production"
     ecs_cluster = "hal9000_production"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

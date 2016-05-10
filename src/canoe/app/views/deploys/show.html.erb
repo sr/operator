@@ -94,8 +94,10 @@
   <%= render partial: "deploys/deploy_log" %>
 <%- else %>
   <div class="well well-sm">
-    <%= link_to kibana_link(deploy: current_deploy), class: "btn btn-info", target: "_blank" do %>
-      Logs <i class="icon-external-link"></i>
+    <%- %w(dfw phx).each do |datacenter| %>
+      <%= link_to kibana_link(deploy: current_deploy, datacenter: datacenter), class: "btn btn-info", target: "_blank" do %>
+        Logs (<%= datacenter %>) <i class="icon-external-link"></i>
+      <%- end %>
     <%- end %>
   </div>
 <%- end %>

@@ -80,7 +80,12 @@ resource "template_file" "teampass_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
+    configuration_environment = "production"
     ecs_cluster = "teampass"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

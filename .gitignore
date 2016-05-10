@@ -13,11 +13,9 @@ Gemfile.lock
 /**/config/pi/*
 /**/log/*.log
 /**/tmp
-!/**/config/pi/test.auth
-!/**/config/pi/test.yaml
 /**/.bundle
 /src/**/vendor/gems
-/src/**/vendor/cache
+/src/explorer/config/pi/*.php
 /src/rubylib/Gemfile.lock
 /bin/
 /pkg/

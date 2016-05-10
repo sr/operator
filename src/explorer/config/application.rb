@@ -7,6 +7,7 @@ require "rails/all"
 Bundler.require(*Rails.groups)
 
 require "instrumentation"
+require "canoe/ldap_authorizer"
 
 module Explorer
   class Application < Rails::Application

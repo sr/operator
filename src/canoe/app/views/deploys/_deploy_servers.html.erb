@@ -22,7 +22,7 @@
               <i class="icon-question-sign"></i>
             <%- end %>
 
-            <%= link_to result.server.hostname, kibana_link(deploy: deploy, host: result.server.hostname) %>
+            <%= link_to result.server.hostname, kibana_link(deploy: deploy, datacenter: result.server.datacenter, host: result.server.hostname) %>
           <%- end %>
         <%- end %>
       <%- end %>
