@@ -167,7 +167,8 @@ resource "aws_security_group" "internal_apps_http_lb" {
       "174.37.191.2/32",    # proxy.dev
       "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
+      "50.22.140.200"       # tools-s1.dev
     ]
   }
 
