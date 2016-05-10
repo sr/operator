@@ -2,6 +2,11 @@
   "name": "parbot",
   "version": "0.0.0",
   "dependencies": {
+    "each-cons": {
+      "version": "1.0.0",
+      "from": "each-cons@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/each-cons/-/each-cons-1.0.0.tgz"
+    },
     "ansi-regex": {
       "version": "2.0.0",
       "from": "ansi-regex@>=2.0.0 <3.0.0",
