@@ -72,7 +72,7 @@ module Lita
         "checkfixing DATACENTER" => "Reports whether fixing is globally enabled or disabled in DATACENTER",
       }
 
-      route /^status\s+(?:\s+(?<prefix>db|whoisdb))?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :status, command: true, help: {
+      route /^status\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :status, command: true, help: {
         "status SHARD_ID" => "Reports the status of db-SHARD_ID in the default datacenter",
         "status PREFIX-SHARD_ID" => "Reports the status of PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
         "status PREFIX-SHARD_ID-DATACENTER" => "Reports the status of PREFIX-SHARD_ID-DATACENTER",
