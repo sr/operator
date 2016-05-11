@@ -76,6 +76,6 @@ class DataCenter
   end
 
   def config_file
-    @config ||= DatabaseConfigurationFile.load
+    @config ||= Rails.application.config.x.database_config
   end
 end

@@ -19,5 +19,9 @@ module Explorer
     else
       config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
     end
+
+    initializer "explorer_app" do
+      config.x.database_config = DatabaseConfigurationFile.load
+    end
   end
 end
