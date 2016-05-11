@@ -12,14 +12,15 @@ module ReplicationFixing
 
     Status = Struct.new(:fixing?, :shard, :started_at)
 
-    def initialize(redis)
+    def initialize(datacenter, redis)
+      @datacenter = datacenter
       @redis = redis
     end
 
     # Ensures that we have taken note of the fixing that's going on. Creates a
     # status if one doesn't exist, or does nothing if one already does.
     def set_active(shard:, active:)
-      key = [SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":")
+      key = [SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":")
       @redis.multi do
         @redis.hsetnx(key, "started_at", Time.now.to_i)
         @redis.hset(key, "active", active)
@@ -29,11 +30,11 @@ module ReplicationFixing
 
     # Deletes the status entry. Used when the fix is no longer active.
     def reset(shard:)
-      @redis.del([SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":"))
+      @redis.del([SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":"))
     end
 
     def status(shard:)
-      hash = @redis.hgetall([SHARD_NAMESPACE, shard.prefix, shard.shard_id].join(":"))
+      hash = @redis.hgetall([SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":"))
 
       if hash.empty?
         Status.new(false, shard, nil)
@@ -47,10 +48,10 @@ module ReplicationFixing
     end
 
     def current_fixes
-      @redis.keys([SHARD_NAMESPACE, "*"].join(":")).sort.map { |key|
-        _, prefix, shard_id = key.split(":")
+      @redis.keys([SHARD_NAMESPACE, @datacenter, "*"].join(":")).sort.map { |key|
+        _, datacenter, prefix, shard_id = key.split(":")
 
-        shard = Shard.new(prefix, shard_id.to_i)
+        shard = Shard.new(prefix, shard_id.to_i, datacenter)
         status(shard: shard)
       }.select { |s| s.fixing? }
     end

@@ -7,7 +7,7 @@ module ReplicationFixing
   RSpec.describe MonitorSupervisor do
     include Lita::RSpec
 
-    let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
+    let(:fixing_status_client) { FixingStatusClient.new("dfw", Lita.redis) }
     let(:logger) { Logger.new("/dev/null") }
 
     let(:fixing_client) {
@@ -25,7 +25,7 @@ module ReplicationFixing
         # 1) Fixable error
         # 2) Fix active
         # 3) No longer erroring
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/2")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -35,7 +35,7 @@ module ReplicationFixing
         mutex = Mutex.new
         var = ConditionVariable.new
 
-        shard = Shard.new("db", 1)
+        shard = Shard.new("db", 2, "dfw")
         monitor = Monitor.new(shard: shard, tick: 0.001)
 
         results = []
@@ -61,7 +61,7 @@ module ReplicationFixing
       end
 
       it "doesn't start a new monitor if one already exists" do
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dallas")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dfw")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
             {body: JSON.dump("is_erroring" => false)},
@@ -70,7 +70,7 @@ module ReplicationFixing
         mutex = Mutex.new
         var = ConditionVariable.new
 
-        shard = Shard.new("db", 1)
+        shard = Shard.new("db", 1, "dfw")
         monitor = Monitor.new(shard: shard, tick: 1)
 
         expect(supervisor.start_exclusive_monitor(monitor)).to be_truthy

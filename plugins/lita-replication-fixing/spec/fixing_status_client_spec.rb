@@ -8,16 +8,16 @@ module ReplicationFixing
 
     describe "#status" do
       it "returns a status with fixing? == false if no fixing is going on" do
-        client = FixingStatusClient.new(Lita.redis)
+        client = FixingStatusClient.new("dfw", Lita.redis)
 
-        shard = Shard.new("db", 11)
+        shard = Shard.new("db", 11, "dfw")
         expect(client.status(shard: shard).fixing?).to be_falsey
       end
 
       it "returns a status with fixing? == true if fixing is going on" do
-        client = FixingStatusClient.new(Lita.redis)
+        client = FixingStatusClient.new("dfw", Lita.redis)
 
-        shard = Shard.new("db", 11)
+        shard = Shard.new("db", 11, "dfw")
         client.set_active(shard: shard, active: true)
 
         expect(client.status(shard: shard).fixing?).to be_truthy
@@ -27,9 +27,9 @@ module ReplicationFixing
 
     describe "#reset" do
       it "deletes the status" do
-        client = FixingStatusClient.new(Lita.redis)
+        client = FixingStatusClient.new("dfw", Lita.redis)
 
-        shard = Shard.new("db", 11)
+        shard = Shard.new("db", 11, "dfw")
         client.set_active(shard: shard, active: true)
 
         expect(client.status(shard: shard).fixing?).to be_truthy
@@ -42,10 +42,10 @@ module ReplicationFixing
 
   describe "#current_fixes" do
     it "lists all of the shards currently being fixed" do
-      shard11 = Shard.new("db", 11)
-      shard12 = Shard.new("db", 12)
+      shard11 = Shard.new("db", 11, "dfw")
+      shard12 = Shard.new("db", 12, "dfw")
 
-      client = FixingStatusClient.new(Lita.redis)
+      client = FixingStatusClient.new("dfw", Lita.redis)
       client.set_active(shard: shard11, active: true)
       client.set_active(shard: shard12, active: true)
 

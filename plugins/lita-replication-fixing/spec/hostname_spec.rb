@@ -4,27 +4,13 @@ require "replication_fixing/hostname"
 module ReplicationFixing
   RSpec.describe Hostname do
     describe "#shard" do
-      it "returns db for DAL and SEA shard servers" do
-        expect(Hostname.new("db-d1").prefix).to eq("db")
-        expect(Hostname.new("db-s1").prefix).to eq("db")
-      end
-
       it "returns whoisdb for whois servers" do
-        expect(Hostname.new("whoisdb-d1").prefix).to eq("whoisdb")
-        expect(Hostname.new("whoisdb-s1").prefix).to eq("whoisdb")
         expect(Hostname.new("pardot0-whoisdb1-1-dfw").prefix).to eq("whoisdb")
       end
 
       it "returns db for DFW and PHX shard servers" do
         expect(Hostname.new("pardot0-dbshard1-88-dfw").prefix).to eq("db")
         expect(Hostname.new("pardot0-dbshard1-88-phx").prefix).to eq("db")
-      end
-
-      it "parses DAL and SEA servers" do
-        expect(Hostname.new("db-d1").shard_id).to eq(1)
-        expect(Hostname.new("db-s2").shard_id).to eq(2)
-        expect(Hostname.new("whoisdb-d1").shard_id).to eq(1)
-        expect(Hostname.new("whoisdb-s2").shard_id).to eq(2)
       end
 
       it "parses DFW and PHX servers" do
@@ -36,11 +22,6 @@ module ReplicationFixing
     end
 
     describe "#cluster_id" do
-      it "returns nil for DAL and SEA servers" do
-        expect(Hostname.new("db-d1").cluster_id).to eq(nil)
-        expect(Hostname.new("db-s1").cluster_id).to eq(nil)
-      end
-
       it "returns the cluster ID for DFW and PHX servers" do
         expect(Hostname.new("pardot0-dbshard1-1-dfw").cluster_id).to eq(1)
         expect(Hostname.new("pardot0-dbshard1-1-phx").cluster_id).to eq(1)
@@ -50,13 +31,6 @@ module ReplicationFixing
     end
 
     describe "#datacenter" do
-      it "parses DAL and SEA servers" do
-        expect(Hostname.new("db-d1").datacenter).to eq("dallas")
-        expect(Hostname.new("db-s2").datacenter).to eq("seattle")
-        expect(Hostname.new("whoisdb-d1").datacenter).to eq("dallas")
-        expect(Hostname.new("whoisdb-s2").datacenter).to eq("seattle")
-      end
-
       it "parses DFW and PHX servers" do
         expect(Hostname.new("pardot0-dbshard1-88-dfw").datacenter).to eq("dfw")
         expect(Hostname.new("pardot0-dbshard1-89-phx").datacenter).to eq("phx")
@@ -67,13 +41,13 @@ module ReplicationFixing
 
     describe "equality" do
       it "tests for equality" do
-        expect(Hostname.new("db-d1")).to eq(Hostname.new("db-d1"))
-        expect(Hostname.new("db-d1")).to eql(Hostname.new("db-d1"))
-        expect(Hostname.new("db-d1").hash).to eq(Hostname.new("db-d1").hash)
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eq(Hostname.new("pardot0-dbshard1-1-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eql(Hostname.new("pardot0-dbshard1-1-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).to eq(Hostname.new("pardot0-dbshard1-1-dfw").hash)
 
-        expect(Hostname.new("db-d1")).not_to eq(Hostname.new("db-d2"))
-        expect(Hostname.new("db-d1")).not_to eql(Hostname.new("db-d2"))
-        expect(Hostname.new("db-d1").hash).not_to eq(Hostname.new("db-d2").hash)
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eq(Hostname.new("pardot0-dbshard1-2-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eql(Hostname.new("pardot0-dbshard1-2-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).not_to eq(Hostname.new("pardot0-dbshard1-2-dfw").hash)
       end
     end
   end

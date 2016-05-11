@@ -7,7 +7,7 @@ module ReplicationFixing
   RSpec.describe FixingClient do
     include Lita::RSpec
 
-    let(:fixing_status_client) { FixingStatusClient.new(Lita.redis) }
+    let(:fixing_status_client) { FixingStatusClient.new("dfw", Lita.redis) }
     let(:logger) { Logger.new("/dev/null") }
 
     subject(:fixing_client) {
@@ -20,8 +20,8 @@ module ReplicationFixing
 
     describe "#fix" do
       it "returns an error if repfix returns an error" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("error" => true, "message" => "the world exploded"))
 
         result = fixing_client.fix(shard: hostname)
@@ -40,8 +40,8 @@ module ReplicationFixing
       end
 
       it "resets the status of the fixing if the error is no longer being fixed" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => {"active" => false}))
 
         fixing_status_client.set_active(shard: hostname, active: true)
@@ -54,8 +54,8 @@ module ReplicationFixing
       end
 
       it "returns no error detected if the shard is not erroring" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("is_erroring" => false))
 
         result = fixing_client.fix(shard: hostname)
@@ -63,10 +63,10 @@ module ReplicationFixing
       end
 
       it "keeps status about the error, if active" do
-        hostname = Hostname.new("db-s11")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true}))
 
         fixing_client.fix(shard: hostname)
@@ -75,8 +75,8 @@ module ReplicationFixing
       end
 
       it "keeps status about the error, if present and fixable" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
@@ -87,8 +87,8 @@ module ReplicationFixing
       end
 
       it "does not keep status about the error, if it's not fixable" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
         fixing_client.fix(shard: hostname)
@@ -96,8 +96,8 @@ module ReplicationFixing
       end
 
       it "returns information about the fix in progress" do
-        hostname = Hostname.new("db-s11")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/seattle")
+        hostname = Hostname.new("pardot0-dbshard1-11-dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
@@ -113,7 +113,7 @@ module ReplicationFixing
 
     describe "#cancel" do
       it "cancels the fix" do
-        shard = Shard.new("db", 11)
+        shard = Shard.new("db", 11, "dfw")
 
         request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
           .and_return(body: JSON.dump("is_canceled" => true, "message" => "All fixes canceled"))
@@ -127,7 +127,7 @@ module ReplicationFixing
       end
 
       it "returns an error if the fix cannot be canceled" do
-        shard = Shard.new("db", 11)
+        shard = Shard.new("db", 11, "dfw")
 
         request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
           .and_return(status: 500, body: "")
