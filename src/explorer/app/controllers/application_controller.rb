@@ -1,6 +1,4 @@
 class ApplicationController < ActionController::Base
-  SESSION_EXPIRATION = 15.minutes
-
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
 
@@ -52,7 +50,7 @@ class ApplicationController < ActionController::Base
     end
 
     created_at = session[:created_at]
-    if created_at && Time.zone.at(created_at) >= SESSION_EXPIRATION.ago
+    if created_at && Time.zone.at(created_at) >= Rails.application.config.x.session_ttl.ago
       return AuthUser.find_by_id(session[:user_id])
     end
 
