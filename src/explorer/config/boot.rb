@@ -1,4 +1,4 @@
-rails_env = ENV.fetch("RAILS_ENV")
+rails_env = ENV.fetch("RAILS_ENV", "development")
 env_file = File.expand_path("../../.envvars_#{rails_env}.rb", __FILE__)
 if File.exist?(env_file)
   load env_file
