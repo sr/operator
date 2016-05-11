@@ -10,7 +10,6 @@ vendor/s3-curl/.s3curl
 .idea
 *.sync.tmp
 Gemfile.lock
-/**/config/pi/*
 /**/log/*.log
 /**/tmp
 /**/.bundle
