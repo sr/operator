@@ -6,7 +6,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"go.pedge.io/env"
 )
 
 type Authorizer interface {
@@ -23,7 +22,7 @@ type Logger interface {
 }
 
 type Config struct {
-	Address string `env:"PORT,default=:3000"`
+	Address string
 }
 
 type Command struct {
@@ -82,14 +81,6 @@ func NewRequest(
 		call.Error = &Error{Message: err.Error()}
 	}
 	return &Request{Source: source, Call: call}
-}
-
-func NewConfigFromEnv() (*Config, error) {
-	config := &Config{}
-	if err := env.Populate(config); err != nil {
-		return nil, err
-	}
-	return config, nil
 }
 
 func NewArgumentRequiredError(argument string) error {
