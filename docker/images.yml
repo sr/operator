@@ -18,8 +18,6 @@ images:
     build: pardot/redis
   docker.dev.pardot.com/base/pardot/rmux:
     build: pardot/rmux
-  docker.dev.pardot.com/base/pardot/mysql:
-    build: pardot/mysql
 
   # Pardot/internal-api
   docker.dev.pardot.com/base/internal-api/app:
