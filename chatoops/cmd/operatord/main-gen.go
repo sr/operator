@@ -2,70 +2,34 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
 	"github.com/sr/operator"
-	"go.pedge.io/env"
 	"google.golang.org/grpc"
-
-	"github.com/sr/operator/chatoops/services/buildkite"
-
-	"github.com/sr/operator/chatoops/services/gcloud"
-
-	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
+const defaultListenAddr = "localhost:3000"
+
+type noopAuthorizer struct{}
+
+func (a noopAuthorizer) Authorize(*operator.Source) error {
+	return nil
+}
+
 func run() error {
-	config, err := operator.NewConfigFromEnv()
-	if err != nil {
-		return err
+	config := &operator.Config{}
+	flag.StringVar(&config.Address, "listen-addr", defaultListenAddr, "Listen address of the operator server")
+	if config.Address == "" {
+		return fmt.Errorf("required -listen-addr flag is missing.")
 	}
-	grpcServer := grpc.NewServer()
+	flag.Parse()
+	server := grpc.NewServer()
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
-	server := operator.NewServer(grpcServer, config, logger, instrumenter)
-
-	buildkiteEnv := &buildkite.Env{}
-	if err := env.Populate(buildkiteEnv); err != nil {
-		server.LogServiceStartupError("buildkite", err)
-	} else {
-		if buildkiteServer, err := buildkite.NewAPIServer(buildkiteEnv); err != nil {
-			server.LogServiceStartupError("buildkite", err)
-		} else {
-			instrumented := &instrumentedbuildkiteBuildkiteService{instrumenter, buildkiteServer}
-			buildkite.RegisterBuildkiteServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("buildkite")
-		}
-	}
-
-	gcloudEnv := &gcloud.Env{}
-	if err := env.Populate(gcloudEnv); err != nil {
-		server.LogServiceStartupError("gcloud", err)
-	} else {
-		if gcloudServer, err := gcloud.NewAPIServer(gcloudEnv); err != nil {
-			server.LogServiceStartupError("gcloud", err)
-		} else {
-			instrumented := &instrumentedgcloudGcloudService{instrumenter, gcloudServer}
-			gcloud.RegisterGcloudServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("gcloud")
-		}
-	}
-
-	papertrailEnv := &papertrail.Env{}
-	if err := env.Populate(papertrailEnv); err != nil {
-		server.LogServiceStartupError("papertrail", err)
-	} else {
-		if papertrailServer, err := papertrail.NewAPIServer(papertrailEnv); err != nil {
-			server.LogServiceStartupError("papertrail", err)
-		} else {
-			instrumented := &instrumentedpapertrailPapertrailService{instrumenter, papertrailServer}
-			papertrail.RegisterPapertrailServiceServer(grpcServer, instrumented)
-			server.LogServiceRegistered("papertrail")
-		}
-	}
-
-	return server.Serve()
+	registerServices(server, logger, instrumenter, noopAuthorizer{})
+	return nil
 }
 
 func main() {
