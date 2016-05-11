@@ -20,7 +20,7 @@ class DataCenter
   SEATTLE = "phx".freeze
 
   def self.default_name
-    DALLAS
+    Rails.application.config.x.datacenter
   end
 
   def initialize(user, name)

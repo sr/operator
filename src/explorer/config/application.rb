@@ -22,6 +22,7 @@ module Explorer
 
     initializer "explorer_app" do
       config.x.database_config = DatabaseConfigurationFile.load
+      config.x.datacenter = ENV.fetch("EXPLORER_DATACENTER", "dfw")
     end
   end
 end
