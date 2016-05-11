@@ -28,12 +28,12 @@ func registerServices(
 	if err != nil {
 		logError(logger, "buildkite", err)
 	}
-	intercepted := &interceptedbuildkiteBuildkiteService{
+	interceptedbuildkiteBuildkiteService := &interceptedbuildkiteBuildkiteService{
 		authorizer,
 		instrumenter,
 		buildkiteServer,
 	}
-	buildkite.RegisterBuildkiteServiceServer(server, intercepted)
+	buildkite.RegisterBuildkiteServiceServer(server, interceptedbuildkiteBuildkiteService)
 	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
 
 	gcloudConfig := &gcloud.Env{}
@@ -44,12 +44,12 @@ func registerServices(
 	if err != nil {
 		logError(logger, "gcloud", err)
 	}
-	intercepted := &interceptedgcloudGcloudService{
+	interceptedgcloudGcloudService := &interceptedgcloudGcloudService{
 		authorizer,
 		instrumenter,
 		gcloudServer,
 	}
-	gcloud.RegisterGcloudServiceServer(server, intercepted)
+	gcloud.RegisterGcloudServiceServer(server, interceptedgcloudGcloudService)
 	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
 
 	papertrailConfig := &papertrail.Env{}
@@ -60,12 +60,12 @@ func registerServices(
 	if err != nil {
 		logError(logger, "papertrail", err)
 	}
-	intercepted := &interceptedpapertrailPapertrailService{
+	interceptedpapertrailPapertrailService := &interceptedpapertrailPapertrailService{
 		authorizer,
 		instrumenter,
 		papertrailServer,
 	}
-	papertrail.RegisterPapertrailServiceServer(server, intercepted)
+	papertrail.RegisterPapertrailServiceServer(server, interceptedpapertrailPapertrailService)
 	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
 
 }

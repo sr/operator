@@ -32,12 +32,12 @@ func registerServices(
 	if err != nil {
 		logError(logger, "{{.Name}}", err)
 	}
-	intercepted := &intercepted{{.PackageName}}{{.FullName}}{
+	intercepted{{.PackageName}}{{.FullName}} := &intercepted{{.PackageName}}{{.FullName}}{
 		authorizer,
 		instrumenter,
 		{{.Name}}Server,
 	}
-	{{.Name}}.Register{{camelCase .FullName}}Server(server, intercepted)
+	{{.Name}}.Register{{camelCase .FullName}}Server(server, intercepted{{.PackageName}}{{.FullName}})
 	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "{{.Name}}"}})
 {{end}}
 }
