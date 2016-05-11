@@ -1,6 +1,4 @@
 class AuthUser < ActiveRecord::Base
-  AUTHORIZED_LDAP_GROUPS = %w[releasebox]
-
   # TODO(sr) Add unit test for this
   def self.find_or_create_by_omniauth(auth_hash)
     find_or_initialize_by(uid: auth_hash["uid"]).tap do |user|
@@ -11,9 +9,11 @@ class AuthUser < ActiveRecord::Base
     end
   end
 
-  def datacenter(name = nil)
-    name ||= DataCenter.default_name
-    DataCenter.new(self, name)
+  def datacenter
+    datacenter = Rails.application.config.x.datacenter
+    config = Rails.application.config.x.database_config
+
+    DataCenter.new(datacenter, self, config)
   end
 
   def access_authorized?
@@ -25,7 +25,9 @@ class AuthUser < ActiveRecord::Base
       return false
     end
 
+    groups = Rails.application.config.x.authorized_ldap_groups
     auth = Canoe::LDAPAuthorizer.new
-    auth.user_is_member_of_any_group?(uid, AUTHORIZED_LDAP_GROUPS)
+
+    auth.user_is_member_of_any_group?(uid, groups)
   end
 end

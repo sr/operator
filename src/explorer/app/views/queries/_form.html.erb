@@ -14,11 +14,6 @@
     <button type="button" class="btn btn-default<%= active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
     <button type="button" class="btn btn-default<%= active?(:view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
-  <%= hidden_field_tag :datacenter, datacenter_name %>
-  <div class="btn-group datacenter">
-    <button type="button" class="btn btn-default<%= active?(:datacenter, DataCenter::DALLAS) %>" data-val="<%= DataCenter::DALLAS %>">Dallas</button>
-    <button type="button" class="btn btn-default<%= active?(:datacenter, DataCenter::SEATTLE) %>" data-val="<%= DataCenter::SEATTLE %>">Seattle</button>
-  </div>
   <div class="viewoption" <%= active?(:view, Query::UI, 'style="display:none;"') %>>
     <%= text_area_tag(:sql, sql_query.sql, rows: 10, cols: 80) %>
   </div>

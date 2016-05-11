@@ -11,9 +11,5 @@ class AuthUserTest < ActiveSupport::TestCase
   test "datacenter" do
     default = @user.datacenter
     assert_equal DataCenter::DALLAS, default.name
-
-    assert_raise(DataCenter::NotFound) do
-      @user.datacenter("brussels")
-    end
   end
 end

@@ -6,14 +6,6 @@ class AccountsController < ApplicationController
   private
 
   def datacenter
-    if params[:datacenter].present?
-      current_user.datacenter(params[:datacenter])
-    else
-      current_user.datacenter
-    end
-  end
-
-  def params
-    super.permit(:datacenter)
+    current_user.datacenter
   end
 end

@@ -7,10 +7,6 @@ class DataCenterTest < ActiveSupport::TestCase
     @datacenter = @user.datacenter
   end
 
-  test "default_name" do
-    assert_equal DataCenter::DALLAS, DataCenter.default_name
-  end
-
   test "shard_for" do
     authorize_access(@datacenter, 2)
     database = @datacenter.shard_for(2)
