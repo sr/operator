@@ -131,11 +131,10 @@ then
 fi
 
 # Build the container used for most builds.
-docker build \
-    -f etc/docker/Dockerfile.build \
-    -t build/build \
-    --build-arg "artifactory_host=${ARTIFACTORY_HOST}" \
-    .
+if [ -n "$CI" ]
+then docker build --pull -f etc/docker/Dockerfile.build -t build/build .
+else docker build -f etc/docker/Dockerfile.build -t build/build .
+fi
 
 # Iterate over all selected projects, either explicitly or because of CI mode,
 # and execute the build commands in sequence.
