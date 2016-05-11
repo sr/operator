@@ -8,6 +8,7 @@ ENV GOLANG_DOWNLOAD_SHA256 e40c36ae71756198478624ed1bb4ce17597b3c19d243f3f0899bb
 ENV JFROG_CLI_VERSION=1.1.0
 ENV JFROG_CLI_SHA256=e7b47d08bb1b1cc506f3334dfafeac28c4e3886412b6527d12ceed61bd28007e
 ENV JFROG_CLI_URL=https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path=${JFROG_CLI_VERSION}%2Fjfrog-cli-linux-amd64%2Fjfrog
+ENV RUBOCOP_VERSION 0.40.0
 ENV RUBYGEMS_SOURCE=https://${artifactory_host}/artifactory/api/gems/pd-gem/
 ENV TERRAFORM_VERSION=0.6.15
 ENV TERRAFORM_SHA256=2a81faa54ed6c5e7c065444617fc999f0ab6d433e4e03a0ad599892e74ffff6b
@@ -48,5 +49,6 @@ RUN \
       --source "${RUBYGEMS_SOURCE}" \
       "brakeman:${BRAKEMAN_VERSION}" \
       "bundler-audit:${BUNDLER_AUDIT_VERSION}" \
+      "rubocop:${RUBOCOP_VERSION}" \
   && \
     bundle-audit update
