@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #/ Usage: script/pi-dbconfig <rails-env>
 #/ Sync the database configuration and list of shards from the Pardot/pardot
 #/ repository on GHE. This requires a personnal access token to be set via
