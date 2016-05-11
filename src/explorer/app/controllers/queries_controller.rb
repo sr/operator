@@ -9,7 +9,6 @@ class QueriesController < ApplicationController
     render "_form", locals: {
       account: account,
       database_name: database.name,
-      datacenter_name: datacenter.name,
       sql_query: sql_query,
       tables: database.tables
     }
@@ -19,7 +18,6 @@ class QueriesController < ApplicationController
     render :show, locals: {
       account: account,
       database_name: database.name,
-      datacenter_name: datacenter.name,
       is_limited: params[:is_limited].present?,
       results: database.execute(sql_query.sql),
       sql_query: sql_query,
@@ -48,11 +46,7 @@ class QueriesController < ApplicationController
   end
 
   def datacenter
-    if query_params[:datacenter].present?
-      current_user.datacenter
-    else
-      current_user.datacenter(query_params[:datacenter])
-    end
+    current_user.datacenter
   end
 
   def raw_sql_query
@@ -72,7 +66,7 @@ class QueriesController < ApplicationController
   end
 
   def query_params
-    params.permit(:sql, :database, :datacenter, :view, :account_id, :is_limited)
+    params.permit(:sql, :database, :view, :account_id, :is_limited)
   end
 
   def account_params

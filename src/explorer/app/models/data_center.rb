@@ -19,13 +19,10 @@ class DataCenter
   DALLAS = "dfw".freeze
   SEATTLE = "phx".freeze
 
-  def self.default_name
-    Rails.application.config.x.datacenter
-  end
-
-  def initialize(user, name)
-    @user = user
+  def initialize(name, user, config)
     @name = name
+    @user = user
+    @config = config
 
     if ![DALLAS, SEATTLE].include?(name)
       raise NotFound, name
@@ -35,7 +32,7 @@ class DataCenter
   attr_reader :name
 
   def global
-    config = config_file.global(@name)
+    config = @config.global(@name)
 
     Database.new(@user, config)
   end
@@ -46,7 +43,7 @@ class DataCenter
     end
 
     account = find_account(account_id)
-    config = config_file.shard(@name, account.shard_id)
+    config = @config.shard(@name, account.shard_id)
 
     Database.new(@user, config)
   end
@@ -73,9 +70,5 @@ class DataCenter
 
   def global_accounts
     @global_accounts ||= GlobalAccountsCollection.new(global)
-  end
-
-  def config_file
-    @config ||= Rails.application.config.x.database_config
   end
 end

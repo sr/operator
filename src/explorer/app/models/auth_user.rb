@@ -11,9 +11,11 @@ class AuthUser < ActiveRecord::Base
     end
   end
 
-  def datacenter(name = nil)
-    name ||= DataCenter.default_name
-    DataCenter.new(self, name)
+  def datacenter
+    datacenter = Rails.application.config.x.datacenter
+    config = Rails.application.config.x.database_config
+
+    DataCenter.new(datacenter, self, config)
   end
 
   def access_authorized?
