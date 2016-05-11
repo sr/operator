@@ -15,7 +15,7 @@ dir="src/$project"
 config="$dir/docker-compose.yml"
 
 # Lint the code with RuboCop
-#docker-lint-ruby "$dir"
+docker-lint-ruby "$dir"
 
 test -f "${dir}/Gemfile.lock" && {
     docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
