@@ -97,5 +97,3 @@ ADD apache.pem /etc/httpd/conf/apache.pem
 
 ADD php.ini /etc/opt/remi/php70/php.d/90-pardot.ini
 ADD supervisord.conf /etc/supervisord.conf
-
-CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
