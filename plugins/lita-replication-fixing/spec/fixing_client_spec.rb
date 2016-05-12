@@ -21,7 +21,7 @@ module ReplicationFixing
     describe "#fix" do
       it "returns an error if repfix returns an error" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("error" => true, "message" => "the world exploded"))
 
         result = fixing_client.fix(shard: hostname)
@@ -31,7 +31,7 @@ module ReplicationFixing
 
       it "returns an error if the shard is erroring and not fixable" do
         hostname = Hostname.new("pardot0-dbshard2-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw2")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/2")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
         result = fixing_client.fix(shard: hostname)
@@ -41,7 +41,7 @@ module ReplicationFixing
 
       it "resets the status of the fixing if the error is no longer being fixed" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => {"active" => false}))
 
         fixing_status_client.set_active(shard: hostname, active: true)
@@ -55,7 +55,7 @@ module ReplicationFixing
 
       it "returns no error detected if the shard is not erroring" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => false))
 
         result = fixing_client.fix(shard: hostname)
@@ -66,7 +66,7 @@ module ReplicationFixing
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true}))
 
         fixing_client.fix(shard: hostname)
@@ -76,7 +76,7 @@ module ReplicationFixing
 
       it "keeps status about the error, if present and fixable" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
@@ -88,7 +88,7 @@ module ReplicationFixing
 
       it "does not keep status about the error, if it's not fixable" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false))
 
         fixing_client.fix(shard: hostname)
@@ -97,7 +97,7 @@ module ReplicationFixing
 
       it "returns information about the fix in progress" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
             {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
