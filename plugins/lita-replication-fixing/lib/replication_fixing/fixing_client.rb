@@ -24,8 +24,7 @@ module ReplicationFixing
     def status(shard_or_hostname:)
       path = "/replication/fixes/for/#{shard_or_hostname.prefix}/#{shard_or_hostname.shard_id}"
       if shard_or_hostname.respond_to?(:cluster_id)
-        path += "/#{shard_or_hostname.datacenter}"
-        path += "#{shard_or_hostname.cluster_id}" if shard_or_hostname.cluster_id && shard_or_hostname.cluster_id != 1
+        path += "/#{shard_or_hostname.cluster_id}" if shard_or_hostname.cluster_id
       end
 
       response = @repfix.get(path)
