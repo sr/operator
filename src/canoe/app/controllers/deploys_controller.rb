@@ -64,7 +64,7 @@ class DeploysController < ApplicationController
 
   def force_to_complete
     deploy_workflow_for(current_deploy).fail_deploy_on_initiated_servers
-    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+    redirect_to repo_deploy_path(current_repo.name, current_deploy.id, watching: "1")
   end
 
   def complete
