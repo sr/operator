@@ -84,6 +84,8 @@
 #   hubot bonk - bonks adventure
 #   hubot pd - pagerduty phone smash :)
 #   hubot rogerroger - What's your vector, Victor? Huh? you have clearance, Clarence. What?
+#   hubot abs - ET and BWare
+#   hubot pieces - Pieces (and murica!)
 
 _ = require "underscore"
 
@@ -138,6 +140,9 @@ module.exports = (robot) ->
 
   robot.respond /abs$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1%2F62%2FrPK7cHsJFVD7cUr%2FIMG_1642%20%282%29.JPG"
+
+  robot.respond /pieces$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/260/YB1QIGT1uFmyaLy/upload.png"
 
   robot.respond /bees$/i, (msg) ->
     bees = [
