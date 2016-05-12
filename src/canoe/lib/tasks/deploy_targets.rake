@@ -92,6 +92,14 @@ namespace :canoe do
       repo.bamboo_project = 'BREAD'
       repo.bamboo_plan = 'MESH'
     }.save!
+
+    Repo.find_or_initialize_by(name: 'ansible').tap { |repo|
+      repo.icon = 'signal'
+      repo.deploys_via_artifacts = true
+      repo.supports_branch_deploy = true
+      repo.bamboo_project = 'SRE'
+      repo.bamboo_plan = 'ANSBL'
+    }.save!
   end
 
   desc 'Create targets for deployment'
