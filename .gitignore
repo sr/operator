@@ -6,7 +6,11 @@
 /src/explorer/config/pi/*.php
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
+/src/pull_agent/.dev_settings.yml
 /bin/
 /pkg/
 !/bin/build
 !/bin/deploy
+.DS_Store
+*.tfstate.backup
+coverage
