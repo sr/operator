@@ -97,7 +97,7 @@ namespace :canoe do
       repo.icon = 'signal'
       repo.deploys_via_artifacts = true
       repo.supports_branch_deploy = true
-      repo.bamboo_project = 'SRA'
+      repo.bamboo_project = 'SRE'
       repo.bamboo_plan = 'ANSBL'
     }.save!
   end
