@@ -4,6 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"os"
 
 	"github.com/sr/operator"
@@ -20,16 +21,20 @@ func (a noopAuthorizer) Authorize(*operator.Source) error {
 
 func run() error {
 	config := &operator.Config{}
-	flag.StringVar(&config.Address, "listen-addr", defaultListenAddr, "Listen address of the operator server")
-	if config.Address == "" {
-		return fmt.Errorf("required -listen-addr flag is missing.")
-	}
-	flag.Parse()
+	flags := flag.CommandLine
+	flags.StringVar(&config.Address, "listen-addr", defaultListenAddr, "Listen address of the operator server")
 	server := grpc.NewServer()
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
-	registerServices(server, logger, instrumenter, noopAuthorizer{})
-	return nil
+	registerServices(server, logger, instrumenter, noopAuthorizer{}, flags)
+	if config.Address == "" {
+		return fmt.Errorf("required -listen-addr flag is missing.")
+	}
+	listener, err := net.Listen("tcp", config.Address)
+	if err != nil {
+		return err
+	}
+	return server.Serve(listener)
 }
 
 func main() {

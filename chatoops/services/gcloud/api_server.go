@@ -21,14 +21,14 @@ const (
 )
 
 type apiServer struct {
-	config         *Env
+	config         *GcloudServiceConfig
 	client         *http.Client
 	computeService *compute.Service
 	startupScript  string
 }
 
 func newAPIServer(
-	config *Env,
+	config *GcloudServiceConfig,
 	client *http.Client,
 	computeService *compute.Service,
 	startupScript string,
@@ -45,28 +45,28 @@ func (s *apiServer) CreateDevInstance(
 	ctx context.Context,
 	request *CreateDevInstanceRequest,
 ) (*CreateDevInstanceResponse, error) {
-	zone, err := s.computeService.Zones.Get(s.config.ProjectID,
+	zone, err := s.computeService.Zones.Get(s.config.ProjectId,
 		s.config.DefaultZone).Do()
 	if err != nil {
 		return nil, err
 	}
-	image, err := s.computeService.Images.Get(s.config.ProjectID,
+	image, err := s.computeService.Images.Get(s.config.ProjectId,
 		s.config.DefaultImage).Do()
 	if err != nil {
 		return nil, err
 	}
-	machineType, err := s.computeService.MachineTypes.Get(s.config.ProjectID,
+	machineType, err := s.computeService.MachineTypes.Get(s.config.ProjectId,
 		zone.Name, s.config.DefaultMachineType).Do()
 	if err != nil {
 		return nil, err
 	}
-	network, err := s.computeService.Networks.Get(s.config.ProjectID,
+	network, err := s.computeService.Networks.Get(s.config.ProjectId,
 		s.config.DefaultNetwork).Do()
 	if err != nil {
 		return nil, err
 	}
 	operation, err := s.computeService.Instances.Insert(
-		s.config.ProjectID,
+		s.config.ProjectId,
 		s.config.DefaultZone,
 		&compute.Instance{
 			Name:        fmt.Sprintf("dev-%v", time.Now().Unix()),
@@ -174,7 +174,7 @@ func (s *apiServer) Stop(
 		return nil, operator.NewArgumentRequiredError("Instance")
 	}
 	_, err := s.computeService.Instances.Stop(
-		s.config.ProjectID,
+		s.config.ProjectId,
 		request.Zone,
 		request.Instance,
 	).Do()

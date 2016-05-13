@@ -15,6 +15,21 @@ service GcloudService {
 	rpc Stop(StopRequest) returns (StopResponse);
 }
 
+message GcloudServiceConfig {
+	string project_id = 1;
+	string default_zone = 2;
+	string default_network = 3;
+	// TODO(sr) Allow listing all available custom images
+	// TODO(sr) Use the most recent image by default
+	// TODO(sr) Allow to override this per request
+	string default_image = 4;
+	// TODO(sr) Allow overriding this via request parameter
+	// TODO(sr) Provider map (e.g. small = n1-standard, large = n2-standard, ...)
+	string default_machine_type = 5;
+	string service_account_email = 6;
+	string startup_script = 7;
+}
+
 message CreateDevInstanceRequest {
 	operator.Source source = 1;
 }

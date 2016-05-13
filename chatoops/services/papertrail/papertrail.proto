@@ -9,6 +9,10 @@ service PapertrailService {
 	rpc Search(SearchRequest) returns (SearchResponse);
 }
 
+message PapertrailServiceConfig {
+	string api_key = 1;
+}
+
 message SearchRequest {
   operator.Source source = 1;
   string query = 2;
