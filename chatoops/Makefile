@@ -4,10 +4,10 @@ OPERATORC ?= $(GOBIN)/operatorc
 PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
 DOCKER ?= docker
 
-OPERATOR ?= $(GOBIN)/operator
-OPERATORD ?= $(GOBIN)/operatord
-OPERATOR_SRC ?= cmd/operator/main-gen.go
-OPERATORD_SRC ?= $(shell find cmd/operatord -type f -name "*.go")
+OPERATOR ?= $(GOBIN)/chatoopsctl
+OPERATORD ?= $(GOBIN)/chatoopsd
+OPERATOR_SRC ?= cmd/chatoopsctl/main-gen.go
+OPERATORD_SRC ?= $(shell find cmd/chatoopsd -type f -name "*.go")
 
 OPERATORD_ADDRESS ?= localhost:3000
 export OPERATORD_ADDRESS
@@ -17,9 +17,9 @@ IMPORTPATH ?= github.com/sr/operator/chatoops
 build: $(OPERATORC) $(PROTOC_GEN_GO)
 	$< \
 		--import-path $(IMPORTPATH)/services \
-		--cmd-out cmd/operator \
+		--cmd-out cmd/chatoopsctl \
 		--hubot-out hubot/scripts \
-		--server-out cmd/operatord \
+		--server-out cmd/chatoopsd \
 		services
 
 docker-build:
