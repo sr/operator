@@ -60,7 +60,7 @@ func getOperatorPlugins(options *CompileOptions) []plugin {
 	var plugins []plugin
 	if options.OperatorCmd {
 		plugins = append(plugins, &operatorPlugin{
-			"cmd",
+			"ctl",
 			options.OperatorCmdOut,
 			options.GoImportPath,
 		})
