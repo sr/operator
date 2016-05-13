@@ -8,13 +8,16 @@ var (
 package main
 
 import (
+	"errors"
+	"flag"
+	"os"
+
+	"github.com/sr/operator"
+	"google.golang.org/grpc"
+
 {{range .Services}}
 	"{{.ImportPath}}"
 {{end}}
-
-	"github.com/sr/operator"
-	"go.pedge.io/env"
-	"google.golang.org/grpc"
 )
 
 func registerServices(
@@ -22,24 +25,45 @@ func registerServices(
 	logger operator.Logger,
 	instrumenter operator.Instrumenter,
 	authorizer operator.Authorizer,
+	flags *flag.FlagSet,
 ) {
 {{range .Services}}
-	{{.Name}}Config := &{{.PackageName}}.Env{}
-	if err := env.Populate({{.Name}}Config); err != nil {
-		logError(logger, "{{.Name}}", err)
+	{{.Name}}Config := &{{.PackageName}}.{{.FullName}}Config{}
+{{- end}}
+{{range .Services}}
+	{{- $serviceName := .Name }}
+	{{- range .Config}}
+	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
+	{{- end}}
+{{- end}}
+	flags.Parse(os.Args[1:])
+	errs := make(map[string][]error)
+{{range .Services}}
+	{{- $serviceName := .Name }}
+	{{- range .Config}}
+	if {{$serviceName}}Config.{{camelCase .Name}} == "" {
+		errs["{{$serviceName}}"] = append(errs["{{$serviceName}}"], errors.New("{{.Name}}"))
 	}
-	{{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Config)
-	if err != nil {
-		logError(logger, "{{.Name}}", err)
+	{{- end }}
+{{- end }}
+{{range .Services}}
+	if len(errs["{{.Name}}"]) != 0 {
+		logError(logger, "{{.Name}}", errors.New("TODO"))
+	} else {
+		{{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Config)
+		if err != nil {
+			logError(logger, "{{.Name}}", err)
+		} else {
+			intercepted{{.PackageName}}{{.FullName}} := &intercepted{{.PackageName}}{{.FullName}}{
+				authorizer,
+				instrumenter,
+				{{.Name}}Server,
+			}
+			{{.Name}}.Register{{camelCase .FullName}}Server(server, intercepted{{.PackageName}}{{.FullName}})
+			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "{{.Name}}"}})
+		}
 	}
-	intercepted{{.PackageName}}{{.FullName}} := &intercepted{{.PackageName}}{{.FullName}}{
-		authorizer,
-		instrumenter,
-		{{.Name}}Server,
-	}
-	{{.Name}}.Register{{camelCase .FullName}}Server(server, intercepted{{.PackageName}}{{.FullName}})
-	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "{{.Name}}"}})
-{{end}}
+{{- end}}
 }
 
 func logError(logger operator.Logger, service string, err error) {

@@ -2,15 +2,18 @@
 package main
 
 import (
+	"errors"
+	"flag"
+	"os"
+
+	"github.com/sr/operator"
+	"google.golang.org/grpc"
+
 	"github.com/sr/operator/chatoops/services/buildkite"
 
 	"github.com/sr/operator/chatoops/services/gcloud"
 
 	"github.com/sr/operator/chatoops/services/papertrail"
-
-	"github.com/sr/operator"
-	"go.pedge.io/env"
-	"google.golang.org/grpc"
 )
 
 func registerServices(
@@ -18,56 +21,101 @@ func registerServices(
 	logger operator.Logger,
 	instrumenter operator.Instrumenter,
 	authorizer operator.Authorizer,
+	flags *flag.FlagSet,
 ) {
 
-	buildkiteConfig := &buildkite.Env{}
-	if err := env.Populate(buildkiteConfig); err != nil {
-		logError(logger, "buildkite", err)
-	}
-	buildkiteServer, err := buildkite.NewAPIServer(buildkiteConfig)
-	if err != nil {
-		logError(logger, "buildkite", err)
-	}
-	interceptedbuildkiteBuildkiteService := &interceptedbuildkiteBuildkiteService{
-		authorizer,
-		instrumenter,
-		buildkiteServer,
-	}
-	buildkite.RegisterBuildkiteServiceServer(server, interceptedbuildkiteBuildkiteService)
-	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
+	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
+	gcloudConfig := &gcloud.GcloudServiceConfig{}
+	papertrailConfig := &papertrail.PapertrailServiceConfig{}
 
-	gcloudConfig := &gcloud.Env{}
-	if err := env.Populate(gcloudConfig); err != nil {
-		logError(logger, "gcloud", err)
-	}
-	gcloudServer, err := gcloud.NewAPIServer(gcloudConfig)
-	if err != nil {
-		logError(logger, "gcloud", err)
-	}
-	interceptedgcloudGcloudService := &interceptedgcloudGcloudService{
-		authorizer,
-		instrumenter,
-		gcloudServer,
-	}
-	gcloud.RegisterGcloudServiceServer(server, interceptedgcloudGcloudService)
-	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
+	flags.StringVar(&buildkiteConfig.ApiToken, "buildkite-api_token", "", "")
+	flags.StringVar(&gcloudConfig.ProjectId, "gcloud-project_id", "", "")
+	flags.StringVar(&gcloudConfig.DefaultZone, "gcloud-default_zone", "", "")
+	flags.StringVar(&gcloudConfig.DefaultNetwork, "gcloud-default_network", "", "")
+	flags.StringVar(&gcloudConfig.DefaultImage, "gcloud-default_image", "", "")
+	flags.StringVar(&gcloudConfig.DefaultMachineType, "gcloud-default_machine_type", "", "")
+	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
+	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
+	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
+	flags.Parse(os.Args[1:])
+	errs := make(map[string][]error)
 
-	papertrailConfig := &papertrail.Env{}
-	if err := env.Populate(papertrailConfig); err != nil {
-		logError(logger, "papertrail", err)
+	if buildkiteConfig.ApiToken == "" {
+		errs["buildkite"] = append(errs["buildkite"], errors.New("api_token"))
 	}
-	papertrailServer, err := papertrail.NewAPIServer(papertrailConfig)
-	if err != nil {
-		logError(logger, "papertrail", err)
+	if gcloudConfig.ProjectId == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("project_id"))
 	}
-	interceptedpapertrailPapertrailService := &interceptedpapertrailPapertrailService{
-		authorizer,
-		instrumenter,
-		papertrailServer,
+	if gcloudConfig.DefaultZone == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("default_zone"))
 	}
-	papertrail.RegisterPapertrailServiceServer(server, interceptedpapertrailPapertrailService)
-	logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
+	if gcloudConfig.DefaultNetwork == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("default_network"))
+	}
+	if gcloudConfig.DefaultImage == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("default_image"))
+	}
+	if gcloudConfig.DefaultMachineType == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("default_machine_type"))
+	}
+	if gcloudConfig.ServiceAccountEmail == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("service_account_email"))
+	}
+	if gcloudConfig.StartupScript == "" {
+		errs["gcloud"] = append(errs["gcloud"], errors.New("startup_script"))
+	}
+	if papertrailConfig.ApiKey == "" {
+		errs["papertrail"] = append(errs["papertrail"], errors.New("api_key"))
+	}
 
+	if len(errs["buildkite"]) != 0 {
+		logError(logger, "buildkite", errors.New("TODO"))
+	} else {
+		buildkiteServer, err := buildkite.NewAPIServer(buildkiteConfig)
+		if err != nil {
+			logError(logger, "buildkite", err)
+		} else {
+			interceptedbuildkiteBuildkiteService := &interceptedbuildkiteBuildkiteService{
+				authorizer,
+				instrumenter,
+				buildkiteServer,
+			}
+			buildkite.RegisterBuildkiteServiceServer(server, interceptedbuildkiteBuildkiteService)
+			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
+		}
+	}
+	if len(errs["gcloud"]) != 0 {
+		logError(logger, "gcloud", errors.New("TODO"))
+	} else {
+		gcloudServer, err := gcloud.NewAPIServer(gcloudConfig)
+		if err != nil {
+			logError(logger, "gcloud", err)
+		} else {
+			interceptedgcloudGcloudService := &interceptedgcloudGcloudService{
+				authorizer,
+				instrumenter,
+				gcloudServer,
+			}
+			gcloud.RegisterGcloudServiceServer(server, interceptedgcloudGcloudService)
+			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
+		}
+	}
+	if len(errs["papertrail"]) != 0 {
+		logError(logger, "papertrail", errors.New("TODO"))
+	} else {
+		papertrailServer, err := papertrail.NewAPIServer(papertrailConfig)
+		if err != nil {
+			logError(logger, "papertrail", err)
+		} else {
+			interceptedpapertrailPapertrailService := &interceptedpapertrailPapertrailService{
+				authorizer,
+				instrumenter,
+				papertrailServer,
+			}
+			papertrail.RegisterPapertrailServiceServer(server, interceptedpapertrailPapertrailService)
+			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
+		}
+	}
 }
 
 func logError(logger operator.Logger, service string, err error) {
