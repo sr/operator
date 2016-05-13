@@ -5,9 +5,9 @@ require "optparse"
 
 all = false
 parser = OptionParser.new { |opts|
-  opts.banner = "Usage: push [--all] image [image...]"
+  opts.banner = "Usage: pull [--all] image [image...]"
 
-  opts.on("-a", "--all", "Push all images") do
+  opts.on("-a", "--all", "Pull all images") do
     all = true
   end
 }
@@ -31,7 +31,7 @@ end
 images.each do |image|
   Process.spawn(
     File.join(File.dirname(__FILE__), "docker"),
-    "push",
+    "pull",
     image
   )
 end
