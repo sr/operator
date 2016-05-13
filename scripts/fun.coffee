@@ -31,6 +31,7 @@
 #   hubot nippon - nippon
 #   hubot raptorcamp - praise raptors!
 #   hubot parker - parker
+#   hubot blakem - blakem
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
 #   hubot blame <person> - Objectively make it THEIR fault
@@ -88,8 +89,16 @@
 #   hubot pieces - Pieces (and murica!)
 
 _ = require "underscore"
+cycle = require "../lib/cycle"
 
 module.exports = (robot) ->
+  robot.respond /blakem$/i, (msg) ->
+    msg.send msg.random [
+      "https://hipchat.dev.pardot.com/files/1/64/Jn0SCSfycNWUgpQ/Blake.jpg",
+      "https://hipchat.dev.pardot.com/files/1/65/31Iel1Qje2560I0/Blake_braid.jpg",
+      "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
+    ]
+
   robot.respond /parker$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
 
