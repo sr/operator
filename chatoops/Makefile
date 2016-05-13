@@ -14,7 +14,7 @@ export OPERATORD_ADDRESS
 
 IMPORTPATH ?= github.com/sr/operator/chatoops
 
-build: $(OPERATORC) $(PROTOC_GEN_GO)
+build: $(OPERATORC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD) $(PROTOC_GEN_HUBOT)
 	$< \
 		--import-path $(IMPORTPATH)/services \
 		--cmd-out cmd/chatoopsctl \
@@ -62,6 +62,15 @@ $(OPERATORD): $(OPERATORD_SRC)
 
 $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/...
+
+$(PROTOC_GEN_OPERATORCTL):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorctl
+
+$(PROTOC_GEN_OPERATORD):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatord
+
+$(PROTOC_GEN_OPERATORHUBOT):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorhubot
 
 $(PROTOC_GEN_GO):
 	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
