@@ -22,7 +22,7 @@ var (
 )
 
 func run() error {
-	flag.StringVar(&cmdOutDir, "cmd-out", "", "The `directory` where to output command-line Go code.")
+	flag.StringVar(&cmdOutDir, "cmd-out", "", "The `directory` where to output the command-line Go code.")
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output Hubot scripts.")
 	flag.StringVar(&serverOutDir, "server-out", "", "The `directory` where to output operator server Go code.")
 	flag.StringVar(&importPath, "import-path", "", "The base `import-path` under which service packages are defined.")

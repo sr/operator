@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	programName = "protoc-gen-operatorcmd"
+	programName = "protoc-gen-operatorctl"
 	fileName    = "main-gen.go"
 )
 
