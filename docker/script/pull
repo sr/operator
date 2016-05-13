@@ -2,6 +2,9 @@
 
 require "yaml"
 require "optparse"
+require "thread"
+
+THREADS = 3
 
 all = false
 parser = OptionParser.new { |opts|
@@ -28,14 +31,29 @@ images.each do |image|
   end
 end
 
-images.each do |image|
-  Process.spawn(
-    File.join(File.dirname(__FILE__), "docker"),
-    "pull",
-    image
-  )
-end
+image_queue = Queue.new
+images.each { |i| image_queue << i }
 
-statuses = Process.waitall.map(&:last)
-error = statuses.detect { |s| !s.success? }
-exit error.exitstatus if error
+threads = THREADS.times.map { |t|
+  Thread.new do
+    until images.empty?
+      begin
+        image = image_queue.pop(true)
+
+        pid = Process.spawn(
+          File.join(File.dirname(__FILE__), "docker"),
+          "pull",
+          image,
+          close_others: true
+        )
+
+        Process.waitpid(pid)
+        exit $?.exitstatus unless $?.success?
+      rescue ThreadError
+        break # queue is empty; we're done here
+      end
+    end
+  end
+}
+
+threads.each(&:join)
