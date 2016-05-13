@@ -178,6 +178,9 @@ module.exports = (robot) ->
     ]
     msg.send msg.random bees
 
+  robot.respond /srd$/i, (msg) ->
+    msg.send "http://i.imgur.com/NZQhi.gif"
+
   robot.respond /(surely)?(\s)?(waiting)?(\s)?(on)?(\s)?op(\s)?(to)?(\s)?(will)?(\s)?(deliver)?$/i, (msg) ->
     op = [
       'http://i.imgur.com/ndeQyDK.jpg',
