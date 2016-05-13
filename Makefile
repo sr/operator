@@ -3,7 +3,7 @@ GOBIN ?= $(GOPATH)/bin
 GOFMT ?= gofmt
 GOLINT ?= $(GOBIN)/golint
 ERRCHECK ?= $(GOBIN)/errcheck
-PACKAGES = $(shell go list ./... | grep -v -E '^vendor' | sort -r)
+PACKAGES = $(shell go list ./... | grep -v -E '^vendor|chatoops' | sort -r)
 
 all: deps fmt lint vet errcheck deps install
 
