@@ -1,13 +1,11 @@
 header[role="banner"] {
   background: none repeat scroll 0 0 #009ddc;
   border-bottom: 0 none;
-
+  padding-bottom: 2px;
   .navbar-brand {
-    margin-left: -12px;
-    margin-top: -12px;
     padding: 0;
     img {
-      height: 58px;
+      height: 100%;
     }
   }
   
@@ -22,6 +20,7 @@ $sidebar-width: 140px;
 aside[role="navigation"] {
   width: $sidebar-width;
   float: left;
+  margin-top: 52px;
 
   a > i {
     margin-right: 5px;
@@ -73,4 +72,8 @@ header .title {
 
 .btn-group {
   margin-right: 10px;
+}
+.explorer_logo {
+  margin-left: 20px;
+  margin-top: -10px;
 }
