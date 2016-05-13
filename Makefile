@@ -8,13 +8,16 @@ PACKAGES = $(shell go list ./... | grep -v -E '^vendor|chatoops' | sort -r)
 all: deps fmt lint vet errcheck deps install
 
 deps:
-	go get -d ./...
+	go get -d $(PACKAGES)
+
+clean:
+	go clean -i $(PACKAGES)
 
 install:
 	go install -v $(PACKAGES)
 
 fmt:
-	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|\.pb\.go$$'); do \
+	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|chatoops|\.pb\.go$$'); do \
 			out="$$($(GOFMT) -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
