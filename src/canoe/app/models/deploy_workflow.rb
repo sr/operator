@@ -42,6 +42,19 @@ class DeployWorkflow
     @deploy.check_completed_status!
   end
 
+  def pick_new_restart_servers
+    @deploy.deploy_restart_servers.each_with_index do |restart, i|
+      old_restart_result = @deploy.results.for_server(restart.server)
+      unless old_restart_result.completed?
+        possible_servers = @deploy.results.completed.shuffle
+        restart_server = possible_servers[possible_servers.index{|s| s.datacenter == restart.server.datacenter}]
+        @deploy.deploy_restart_servers[i].server_id = restart_server.id
+        @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
+        old_restart_result.update_attribute(:stage, "completed")
+      end
+    end
+  end
+
   def next_action_for(server:, result: nil)
     return nil if @deploy.completed?
 

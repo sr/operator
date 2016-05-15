@@ -67,6 +67,11 @@ class DeploysController < ApplicationController
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id, watching: "1")
   end
 
+  def pick_new_restart_servers
+    deploy_workflow_for(current_deploy).pick_new_restart_servers
+    redirect_to repo_deploy_path(current_repo.name, current_deploy.id, watching: "1")
+  end
+
   def complete
     current_deploy.complete! if current_deploy
     redirect_to repo_deploy_path(current_repo.name, current_deploy.id)

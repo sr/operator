@@ -131,7 +131,7 @@
         </td>
       </tr>
     <%- end %>
-    <%- unless current_deploy.completed? %>
+    <%- unless current_deploy.completed? || current_deploy.sync_done? %>
       <tr>
         <td>
           <%= form_tag force_to_complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
@@ -144,6 +144,22 @@
         <td>Yes</td>
         <td>
           Forces the deploy to move toward completion, failing the deploy on any outstanding servers. This is appropriate to use if a few servers aren't completing, because they are down or unresponsive. Restart tasks (e.g., restarting jobs) <strong>are</strong> performed, so it's expected that the deploy will run for a few minutes after pushing this button.
+        </td>
+      </tr>
+    <%- end %>
+    <%- if !current_deploy.completed? && current_deploy.sync_done? %>
+      <tr>
+        <td>
+          <%= form_tag pick_new_restart_server_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to pick new restart servers?"} do %>
+            <%= button_tag type: "submit", class: "btn btn-warning" do %>
+              <%= content_tag :i, "", class: "icon-fast-forward" %>
+              PICK ANOTHER RESTART SERVER
+            <%- end %>
+          <%- end %>
+        </td>
+        <td>Yes</td>
+        <td>
+          Picks new restart servers for those datacenters that haven't finished. This is a good option if the deploy is currently hanging on restart. There may be a problem with the current restart server.
         </td>
       </tr>
     <%- end %>

@@ -100,6 +100,10 @@ class Deploy < ActiveRecord::Base
     results.incomplete.any?
   end
 
+  def sync_done?
+    !results.initiated.any?
+  end
+
   def options_are_valid
     if options_validator.present?
       validator = JsonSchema.parse!(options_validator)
