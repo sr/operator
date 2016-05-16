@@ -11,6 +11,8 @@ class SQLQueryTest < ActiveSupport::TestCase
     assert_equal "SELECT * FROM `global_agency` LIMIT 3", query.sql
     query.limit(10)
     assert_equal "SELECT * FROM `global_agency` LIMIT 3", query.sql
+    query = parse("SELECT * FROM global_agency LIMIT 1").limit(5)
+    assert_equal "SELECT * FROM `global_agency` LIMIT 1", query.sql
   end
 
   test "select_all?" do

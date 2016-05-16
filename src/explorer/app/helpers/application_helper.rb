@@ -1,7 +1,10 @@
 module ApplicationHelper
   def active?(type, value, output = " active")
-    result = params[type] == value
-    result ? output.html_safe : ""
+    if type == value
+      output.html_safe
+    else
+      ""
+    end
   end
 
   def table_columns

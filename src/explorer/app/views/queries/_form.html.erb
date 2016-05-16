@@ -9,16 +9,16 @@
     <%= hidden_field_tag :account_id, account.id %>
   <% end %>
   <%= hidden_field_tag :is_limited %>
-  <%= hidden_field_tag :view, params[:view] %>
+  <%= hidden_field_tag :view, current_view %>
   <div class="btn-group view">
-    <button type="button" class="btn btn-default<%= active?(:view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
-    <button type="button" class="btn btn-default<%= active?(:view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
+    <button type="button" class="btn btn-default<%= active?(current_view, Query::SQL) %>" data-val="<%= Query::SQL %>">I like my SQL</button>
+    <button type="button" class="btn btn-default<%= active?(current_view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
-  <div class="viewoption" <%= active?(:view, Query::UI, 'style="display:none;"') %>>
+  <div class="viewoption" <%= active?(current_view, Query::UI, 'style="display:none;"') %>>
     <%= text_area_tag(:sql, sql_query.sql, rows: 10, cols: 80) %>
   </div>
   <%= submit_tag "Run Query" %>
-  <div class="viewoption" <%= active?(:view, Query::SQL, 'style="display:none;"') %>>
+  <div class="viewoption" <%= active?(current_view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
       <% tables.each do |table| %>
         <tr>

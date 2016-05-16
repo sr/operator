@@ -39,6 +39,8 @@ class DatabaseConfigurationFile
         globals.fetch(DataCenter::DALLAS)
       when DataCenter::SEATTLE
         globals.fetch(DataCenter::SEATTLE)
+      when DataCenter::LOCAL
+        globals.fetch(DataCenter::LOCAL)
       else
         raise DataCenterNotFound, datacenter
       end
@@ -59,6 +61,8 @@ class DatabaseConfigurationFile
         shard.fetch(datacenter)
       when DataCenter::SEATTLE
         shard.fetch(datacenter)
+      when DataCenter::LOCAL
+        globals.fetch(DataCenter::LOCAL)
       else
         raise DataCenterNotFound.new(datacenter, id)
       end
