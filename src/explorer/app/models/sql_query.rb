@@ -25,7 +25,7 @@ class SQLQuery
 
   def limit(count = DEFAULT_LIMIT)
     if @ast.limit
-      return
+      return self
     end
 
     @ast.limit = SQLParser::Statement::Limit.new(count)
