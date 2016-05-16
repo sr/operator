@@ -1,5 +1,5 @@
 Name: rmux
-Version: 0.3.3.1
+Version: 0.3.3.2
 Release: 1%{?dist}
 Summary: Redis multiplexer and connection pooling solution
 Group: Applications/Internet
