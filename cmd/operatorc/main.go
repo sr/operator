@@ -13,17 +13,19 @@ import (
 var (
 	cmdOutDir    string
 	hubotOutDir  string
+	localOutDir  string
 	serverOutDir string
 	importPath   string
 
 	errNoSourceDir  = errors.New("Please specify a input source directory.")
-	errNoOutDir     = errors.New("Please specify at least one of --cmd-out, --hubot-out, or --server-out.")
+	errNoOutDir     = errors.New("Please specify at least one of --cmd-out, --hubot-out, --local-out, or --server-out.")
 	errNoImportPath = errors.New("The `import-path` flag is required.")
 )
 
 func run() error {
 	flag.StringVar(&cmdOutDir, "cmd-out", "", "The `directory` where to output the command-line Go code.")
 	flag.StringVar(&hubotOutDir, "hubot-out", "", "The `directory` where to output Hubot scripts.")
+	flag.StringVar(&localOutDir, "local-out", "", "The `directory` where to output TODO(sr).")
 	flag.StringVar(&serverOutDir, "server-out", "", "The `directory` where to output operator server Go code.")
 	flag.StringVar(&importPath, "import-path", "", "The base `import-path` under which service packages are defined.")
 	flag.Parse()
@@ -45,7 +47,7 @@ func run() error {
 		// TODO(sr) Will need to include operator.proto in this
 		NoDefaultIncludes: true,
 	}
-	if cmdOutDir == "" && hubotOutDir == "" && serverOutDir == "" {
+	if cmdOutDir == "" && hubotOutDir == "" && localOutDir == "" && serverOutDir == "" {
 		return errNoOutDir
 	}
 	if cmdOutDir != "" {
@@ -55,6 +57,10 @@ func run() error {
 	if hubotOutDir != "" {
 		options.OperatorHubot = true
 		options.OperatorHubotOut = hubotOutDir
+	}
+	if localOutDir != "" {
+		options.OperatorLocal = true
+		options.OperatorLocalOut = localOutDir
 	}
 	if serverOutDir != "" {
 		options.OperatorServer = true

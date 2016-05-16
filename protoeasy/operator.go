@@ -72,6 +72,13 @@ func getOperatorPlugins(options *CompileOptions) []plugin {
 			options.GoImportPath,
 		})
 	}
+	if options.OperatorLocal {
+		plugins = append(plugins, &operatorPlugin{
+			"local",
+			options.OperatorLocalOut,
+			options.GoImportPath,
+		})
+	}
 	if options.OperatorServer {
 		plugins = append(plugins, &operatorPlugin{
 			"d",
