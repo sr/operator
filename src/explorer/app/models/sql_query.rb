@@ -29,6 +29,7 @@ class SQLQuery
     end
 
     @ast.limit = SQLParser::Statement::Limit.new(count)
+    self
   end
 
   def scope_to(account_id)

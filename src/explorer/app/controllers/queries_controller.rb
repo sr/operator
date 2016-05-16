@@ -30,7 +30,7 @@ class QueriesController < ApplicationController
   private
 
   def sql_query
-    SQLQuery.parse(raw_sql_query)
+    SQLQuery.parse(raw_sql_query).limit
   end
 
   def account
