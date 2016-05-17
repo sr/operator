@@ -29,6 +29,18 @@ class SQLQueryTest < ActiveSupport::TestCase
     query = parse("SELECT * FROM account")
     query.scope_to(42)
     assert_equal "SELECT * FROM `account` WHERE `account`.`id` = 42", query.sql
+
+    query = parse("SELECT * FROM `account` WHERE `boom`.`id` = 42")
+    query.scope_to(42)
+    assert_equal "SELECT * FROM `account` WHERE (`boom`.`id` = 42 AND `account`.`id` = 42)", query.sql
+
+    query = parse("SELECT * FROM `account` WHERE `account`.`id` = 42")
+    query.scope_to(42)
+    assert_equal "SELECT * FROM `account` WHERE `account`.`id` = 42", query.sql
+
+    query = parse("SELECT * FROM `account` WHERE `account`.`id` = 42 AND `boom` = 1")
+    query.scope_to(42)
+    assert_equal "SELECT * FROM `account` WHERE (`account`.`id` = 42 AND `boom` = 1)", query.sql
   end
 
   test "only backticks work as quotes" do

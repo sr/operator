@@ -2,6 +2,8 @@ class UserQuery < ActiveRecord::Base
   class Error < StandardError
   end
 
+  DEFAULT_LIMIT = 10
+
   belongs_to :auth_user, foreign_key: :user_id
 
   def for_account?
@@ -24,8 +26,6 @@ class UserQuery < ActiveRecord::Base
     end
 
     query.scope_to(account_id)
-
-    query.limit
   end
 
   def execute
