@@ -17,10 +17,14 @@ class UserQuery < ActiveRecord::Base
   end
 
   def executable_query
-    query = SQLQuery.parse(raw_sql)
-    if for_account?
-      query.scope_to(account_id)
+    query = SQLQuery.parse(raw_sql).limit(DEFAULT_LIMIT)
+
+    if !for_account?
+      return query
     end
+
+    query.scope_to(account_id)
+
     query.limit
   end
 

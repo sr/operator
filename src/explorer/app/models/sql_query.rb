@@ -2,6 +2,7 @@ class SQLQuery
   class ParseError < StandardError
   end
 
+  ACCOUNT_TABLE = "account"
   DEFAULT_LIMIT = 10
 
   def self.parse(query)
@@ -35,14 +36,37 @@ class SQLQuery
   def scope_to(account_id)
     where = @ast.query_expression.table_expression.where_clause
     account_id = SQLParser::Statement::Integer.new(account_id)
-    column = SQLParser::Statement::Column.new("account_id")
-    condition = SQLParser::Statement::Equals.new(column, account_id)
+    condition = SQLParser::Statement::Equals.new(account_id_column, account_id)
+
     if !where
       where = SQLParser::Statement::WhereClause.new(condition)
     else
       and_condition = SQLParser::Statement::And.new(where.search_condition, condition)
       where = SQLParser::Statement::WhereClause.new(and_condition)
     end
+
     @ast.query_expression.table_expression.where_clause = where
+  end
+
+  private
+
+  def account_id_column
+    if table_name == ACCOUNT_TABLE
+      SQLParser::Statement::QualifiedColumn.new(
+        SQLParser::Statement::Table.new(ACCOUNT_TABLE),
+        SQLParser::Statement::Column.new("id")
+      )
+    else
+      SQLParser::Statement::Column.new("account_id")
+    end
+  end
+
+  # TODO(sr) Make this more robust and handle more than basic queries
+  def table_name
+    @ast.query_expression.
+      table_expression.
+      from_clause.
+      tables[0].
+      name
   end
 end
