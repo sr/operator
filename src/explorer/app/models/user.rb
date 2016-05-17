@@ -1,4 +1,4 @@
-class AuthUser < ActiveRecord::Base
+class User < ActiveRecord::Base
   has_many :queries, class_name: "UserQuery", foreign_key: :user_id
 
   # TODO(sr) Add unit test for this

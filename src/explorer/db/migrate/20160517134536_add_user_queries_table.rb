@@ -8,7 +8,7 @@ class AddUserQueriesTable < ActiveRecord::Migration
         user_id int(11) NOT NULL,
         created_at datetime NOT NULL,
         PRIMARY KEY (id),
-        FOREIGN KEY (user_id) REFERENCES auth_users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id)
       );
     SQL
   end

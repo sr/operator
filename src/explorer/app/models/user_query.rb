@@ -4,7 +4,7 @@ class UserQuery < ActiveRecord::Base
 
   DEFAULT_LIMIT = 10
 
-  belongs_to :auth_user, foreign_key: :user_id
+  belongs_to :user, foreign_key: :user_id
 
   def for_account?
     account_id.present?
@@ -55,6 +55,6 @@ class UserQuery < ActiveRecord::Base
   end
 
   def datacenter
-    auth_user.datacenter
+    user.datacenter
   end
 end

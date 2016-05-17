@@ -2,11 +2,7 @@ require "test_helper"
 
 class UserQueryTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(
-      uid: SecureRandom.hex,
-      name: "boom",
-      email: "sr@sfdc.be"
-    )
+    @user = create_user
     authorize_access(@user.datacenter, 1)
   end
 

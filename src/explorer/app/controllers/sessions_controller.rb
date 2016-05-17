@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
   def create
     session.destroy
 
-    user = AuthUser.find_or_create_by_omniauth(request.env["omniauth.auth"])
+    user = User.find_or_create_by_omniauth(request.env["omniauth.auth"])
     if user && user.persisted?
       self.current_user = user
       redirect_to root_url

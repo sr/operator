@@ -2,11 +2,7 @@ require "test_helper"
 
 class DatabaseTest < ActiveSupport::TestCase
   setup do
-    @user = AuthUser.create!(
-      uid: SecureRandom.hex,
-      name: "boom town",
-      email: "sr@sfdc.be"
-    )
+    @user = create_user
     @datacenter = @user.datacenter
   end
 
@@ -37,12 +33,12 @@ class DatabaseTest < ActiveSupport::TestCase
 
   test "execute with invalid query" do
     assert_raise(Query::ExecutionRefused) do
-      user = AuthUser.new
+      user = User.new
       user.datacenter.global.execute("SELECT * FROM job")
     end
 
     assert_raise(Query::ExecutionRefused) do
-      user = AuthUser.new(email: "sr@sfdc.be")
+      user = User.new(email: "sr@sfdc.be")
       user.datacenter.global.execute("SELECT * FROM job")
     end
 
