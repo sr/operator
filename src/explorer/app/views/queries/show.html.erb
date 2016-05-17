@@ -5,6 +5,7 @@
 %>
 <p>
 <pre><%= query.executable_query.sql %></pre>
+<%= link_to "Export to CSV", "/queries/#{query.id}.csv" %>
 </p>
 <div>
   <table class="table table-striped">
@@ -32,4 +33,3 @@
   </table>
 </div>
 <%= link_to("Show All Rows", "#", class: "all_rows") if false %> <!-- TODO(sr) Sup ->
-<%= link_to "Export to CSV", "#", class: "export_csv" %>

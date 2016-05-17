@@ -13,4 +13,10 @@ class UserQueryTest < ActiveSupport::TestCase
     query = @user.queries.new(raw_sql: "SELECT 1", account_id: 1)
     assert_equal "pardot_shard1", query.database_name
   end
+
+  test "execute_csv" do
+    query = @user.queries.create!(raw_sql: "SELECT * FROM global_account")
+    csv = query.execute_csv
+    assert csv.starts_with?("id,sfdc_org_id,sfdc_connector_username")
+  end
 end

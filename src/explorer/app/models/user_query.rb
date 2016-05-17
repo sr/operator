@@ -1,3 +1,5 @@
+require "csv"
+
 class UserQuery < ActiveRecord::Base
   class Error < StandardError
   end
@@ -30,6 +32,16 @@ class UserQuery < ActiveRecord::Base
 
   def execute
     database.execute(executable_query.sql)
+  end
+
+  def execute_csv
+    results = execute
+    CSV.generate(headers: true) do |csv|
+      csv << results.fields
+      results.each { |r|
+        csv << r.values
+      }
+    end
   end
 
   def database_tables

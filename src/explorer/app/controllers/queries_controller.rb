@@ -20,11 +20,18 @@ class QueriesController < ApplicationController
   def show
     query = UserQuery.find(params[:id])
 
-    render :show, locals: {
-      current_view: params[:view] || Query::SQL,
-      query: query,
-      results: query.execute
-    }
+    respond_to do |format|
+      format.html do
+        render :show, locals: {
+          current_view: params[:view] || Query::SQL,
+          query: query,
+          results: query.execute
+        }
+      end
+      format.csv do
+        render text: query.execute_csv
+      end
+    end
   end
 
   def create
