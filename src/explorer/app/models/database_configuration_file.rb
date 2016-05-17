@@ -35,14 +35,10 @@ class DatabaseConfigurationFile
   def global(datacenter)
     config =
       case datacenter
-      when DataCenter::DALLAS
-        globals.fetch(DataCenter::DALLAS)
-      when DataCenter::SEATTLE
-        globals.fetch(DataCenter::SEATTLE)
-      when DataCenter::LOCAL
-        globals.fetch(DataCenter::LOCAL)
+      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
+        globals.fetch(datacenter)
       else
-        raise DataCenterNotFound, datacenter
+        raise DataCenterNotFound.new(datacenter)
       end
 
     DatabaseConfiguration.new(config.fetch(1), auth)
@@ -57,17 +53,12 @@ class DatabaseConfigurationFile
 
     config =
       case datacenter
-      when DataCenter::DALLAS
+      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
         shard.fetch(datacenter)
-      when DataCenter::SEATTLE
-        shard.fetch(datacenter)
-      when DataCenter::LOCAL
-        globals.fetch(DataCenter::LOCAL)
       else
         raise DataCenterNotFound.new(datacenter, id)
       end
-
-    DatabaseConfiguration.new(config, auth)
+    DatabaseConfiguration.new(config.fetch(1), auth)
   end
 
   private

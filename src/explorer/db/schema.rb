@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131002130914) do
+ActiveRecord::Schema.define(version: 20160517134536) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
@@ -24,4 +24,14 @@ ActiveRecord::Schema.define(version: 20131002130914) do
   add_index "auth_users", ["email"], name: "index_auth_users_on_email", unique: true, using: :btree
   add_index "auth_users", ["uid"], name: "index_auth_users_on_uid", unique: true, using: :btree
 
+  create_table "user_queries", force: :cascade do |t|
+    t.integer  "account_id", limit: 4
+    t.text     "raw_sql",    limit: 65535, null: false
+    t.integer  "user_id",    limit: 4,     null: false
+    t.datetime "created_at",               null: false
+  end
+
+  add_index "user_queries", ["user_id"], name: "user_id", using: :btree
+
+  add_foreign_key "user_queries", "auth_users", column: "user_id", name: "user_queries_ibfk_1"
 end

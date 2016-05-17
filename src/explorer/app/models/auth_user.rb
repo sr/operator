@@ -1,4 +1,6 @@
 class AuthUser < ActiveRecord::Base
+  has_many :queries, class_name: "UserQuery", foreign_key: :user_id
+
   # TODO(sr) Add unit test for this
   def self.find_or_create_by_omniauth(auth_hash)
     find_or_initialize_by(uid: auth_hash["uid"]).tap do |user|

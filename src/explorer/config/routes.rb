@@ -8,8 +8,9 @@ Rails.application.routes.draw do
   get "/auth/unauthorized", to: "sessions#unauthorized"
 
   get "/accounts", to: "accounts#index"
-  get "/queries", to: "queries#new"
-  post "/queries(.:format)", to: "queries#create"
+  get "/queries/new", to: "queries#new"
+  get "/queries/:id", to: "queries#show"
+  post "/queries", to: "queries#create"
 
   root "welcome#index"
 end
