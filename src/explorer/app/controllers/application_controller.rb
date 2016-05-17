@@ -2,6 +2,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
 
+  rescue_from Exception do |exception|
+    Instrumentation.log_exception(exception)
+    render file: "public/500.html", layout: false, status: 500
+  end
+
   around_action :log_context
 
   protected

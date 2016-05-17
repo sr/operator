@@ -76,7 +76,7 @@ module Instrumentation
       @stream.entries
     end
 
-    module_function :setup, :context, :log, :reset, :entries
+    module_function :setup, :context, :log, :log_exception, :reset, :entries
 
     class FakeStream
       def initialize
