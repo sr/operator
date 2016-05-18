@@ -38,8 +38,6 @@ class User < ActiveRecord::Base
     auth.user_is_member_of_any_group?(uid, groups)
   end
 
-  private
-
   def datacenter
     datacenter = Rails.application.config.x.datacenter
     config = Rails.application.config.x.database_config
