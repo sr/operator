@@ -11,11 +11,16 @@ class User < ActiveRecord::Base
     end
   end
 
-  def datacenter
-    datacenter = Rails.application.config.x.datacenter
-    config = Rails.application.config.x.database_config
+  def account_query(sql, account_id)
+    queries.create!(raw_sql: sql, account_id: account_id)
+  end
 
-    DataCenter.new(datacenter, self, config)
+  def global_query(sql)
+    queries.create!(raw_sql: sql)
+  end
+
+  def global_accounts
+    datacenter.accounts
   end
 
   def access_authorized?
@@ -31,5 +36,14 @@ class User < ActiveRecord::Base
     auth = Canoe::LDAPAuthorizer.new
 
     auth.user_is_member_of_any_group?(uid, groups)
+  end
+
+  private
+
+  def datacenter
+    datacenter = Rails.application.config.x.datacenter
+    config = Rails.application.config.x.database_config
+
+    DataCenter.new(datacenter, self, config)
   end
 end
