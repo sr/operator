@@ -22,6 +22,12 @@ images:
   docker.dev.pardot.com/base/pardot/rmux:
     build: pardot/rmux
 
+  # Pardot/java-services
+  docker.dev.pardot.com/base/java-services/app:
+    build: java-services/app
+  docker.dev.pardot.com/base/java-services/cassandra:
+    build: java-services/cassandra
+
   # Pardot/internal-api
   docker.dev.pardot.com/base/internal-api/app:
     build: internal-api/app
