@@ -7,7 +7,7 @@ ARG artifactory_host
 ENV PATH="/usr/local/maven/bin:$PATH" \
   M2_HOME="/usr/local/maven"
 
-RUN yum install -y which rsync nc && \
+RUN yum install -y which rsync nmap && \
   yum install -y "https://${artifactory_host}/artifactory/pd-tarball/jdk/jdk-${jdk_version}-linux-x64.rpm"
 
 RUN curl -L "http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz" | tar -xzv -C /usr/local && \
