@@ -34,13 +34,16 @@ images.each do |image|
 end
 
 images.each do |image|
+  build = all_images[image].fetch("build")
+
   docker_cmd = [
     File.join(File.dirname(__FILE__), "docker"),
     "build",
     "--build-arg", "artifactory_host=#{artifactory_host}",
+    "-f", all_images[image].fetch("file") { File.join(build, "Dockerfile") },
     "-t", image,
     all_images[image].fetch("pull", false) ? "--pull" : nil,
-    all_images[image].fetch("build")
+    build
   ].compact
 
   puts "+ #{docker_cmd.inspect}"

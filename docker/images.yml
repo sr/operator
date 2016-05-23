@@ -12,12 +12,21 @@ images:
     build: ruby/2.3.0
 
   # Pardot/pardot base images
+  docker.dev.pardot.com/base/pardot/app-php7:
+    build: pardot/app
+    file: pardot/app/Dockerfile.php7
   docker.dev.pardot.com/base/pardot/app:
     build: pardot/app
   docker.dev.pardot.com/base/pardot/redis:
     build: pardot/redis
   docker.dev.pardot.com/base/pardot/rmux:
     build: pardot/rmux
+
+  # Pardot/java-services
+  docker.dev.pardot.com/base/java-services/app:
+    build: java-services/app
+  docker.dev.pardot.com/base/java-services/cassandra:
+    build: java-services/cassandra
 
   # Pardot/internal-api
   docker.dev.pardot.com/base/internal-api/app:

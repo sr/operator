@@ -6,7 +6,6 @@ ARG bower_version=1.7.2
 ARG parallel_version=20160322
 ARG zookeeper_version=3.4.8
 ARG phantomjs_version=2.1.1
-ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
 ARG artifactory_host
 
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
@@ -24,25 +23,24 @@ RUN cd /tmp && \
 
 # PHP
 RUN rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-  yum --enablerepo=remi install -y \
+  yum install -y \
     httpd mod_ssl \
-    php55-php php55-php-mcrypt php55-php-mysql php55-php-bcmath php55-php-dom \
-    php55-php-process php55-php-mbstring php55-php-zip php55-php-intl \
-    php55-php-soap php55-php-xml php55-php-xmlrpc php55-php-gd php55-php-pdo \
-    php55-php-opcache php55-php-tidy php55-php-pear php55-php-memcache \
-    php55-php-cli php55-php-devel && \
-  ln -sf /usr/bin/php55 /usr/bin/php && \
-  ln -sf /usr/bin/php55-pear /usr/bin/pear
+    php70-php php70-php-mcrypt php70-php-mysql php70-php-bcmath php70-php-dom \
+    php70-php-process php70-php-mbstring php70-php-zip php70-php-intl \
+    php70-php-soap php70-php-xml php70-php-xmlrpc php70-php-gd php70-php-pdo \
+    php70-php-opcache php70-php-tidy php70-php-pear php70-php-memcache \
+    php70-php-cli php70-php-devel && \
+  ln -sf /usr/bin/php70 /usr/bin/php && \
+  ln -sf /usr/bin/php70-pear /usr/bin/pear
 
-# PHP 5.5 compatible build of Protobuf
+# PHP 7 compatible build of Protobuf
 RUN cd /tmp && \
-  git clone https://github.com/pd-aray/php-protobuf && \
+  git clone -b php7 https://github.com/pd-aray/php-protobuf && \
   cd php-protobuf && \
-  git checkout ${php_protobuf_revision} && \
-  /opt/remi/php55/root/bin/phpize && \
-  ./configure --with-php-config=/opt/remi/php55/root/bin/php-config && \
+  /opt/remi/php70/root/bin/phpize && \
+  ./configure --with-php-config=/opt/remi/php70/root/bin/php-config && \
   make install && \
-  echo 'extension=protobuf.so' > /opt/remi/php55/root/etc/php.d/20-protobuf.ini && \
+  echo 'extension=protobuf.so' > /etc/opt/remi/php70/php.d/20-protobuf.ini && \
   cd /tmp && \
   rm -rf php-protobuf
 
@@ -56,9 +54,17 @@ RUN cd /tmp && \
   cd /tmp && \
   rm -rf "zookeeper-${zookeeper_version}"
 
-# PECL extensions
-RUN yes '' | /opt/remi/php55/root/usr/bin/pecl install zookeeper-beta && \
-  echo 'extension=zookeeper.so' > /opt/remi/php55/root/etc/php.d/20-zookeeper.ini
+# PHP 7 compatible build of Zookeeper
+RUN cd /tmp && \
+  git clone -b php7 https://github.com/jbboehr/php-zookeeper && \
+  cd php-zookeeper && \
+  /opt/remi/php70/root/bin/phpize && \
+  ./configure --with-php-config=/opt/remi/php70/root/bin/php-config && \
+  make && \
+  make install && \
+  echo 'extension=zookeeper.so' > /etc/opt/remi/php70/php.d/20-zookeeper.ini && \
+  cd /tmp && \
+  rm -rf php-zookeeper
 
 # Percona Client
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
@@ -90,5 +96,5 @@ RUN mkdir -p /opt/pardot
 ADD pardot.conf /etc/httpd/conf.d/pardot.conf
 ADD apache.pem /etc/httpd/conf/apache.pem
 
-ADD php.ini /opt/remi/php55/root/etc/php.d/90-pardot.ini
+ADD php.ini /etc/opt/remi/php70/php.d/90-pardot.ini
 ADD supervisord.conf /etc/supervisord.conf
