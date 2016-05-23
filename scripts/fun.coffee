@@ -22,6 +22,7 @@
 #   hubot catbongos - Like, far out, man...
 #   hubot cookiecakes - They see me roooolllin'.... They hungryyyyy....
 #   hubot headdesk - Get headdesk.gif
+#   hubot et - get wasted ET
 #   hubot hater - They gonna hate
 #   hubot panic - PANIC!1!1!!!
 #   hubot elmo - ...elmo
