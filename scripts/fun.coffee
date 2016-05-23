@@ -483,6 +483,9 @@ module.exports = (robot) ->
   robot.respond /magicword$/i, (msg) ->
     msg.send "http://i.imgur.com/Ryv8YVP.gif"
 
+  robot.respond /et$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/72/ON7zc24WS4tfT1M/IMG_0925.JPG"
+
   robot.respond /waffles$/i, (msg) ->
     waffleses = [
       "http://i.imgur.com/8TkPJcP.gif",
