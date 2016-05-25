@@ -23,17 +23,19 @@ const (
 type JobRunner struct {
 	BatchUnits int32
 
-	runnerID     string
-	privetDir    string
-	masterClient JobMasterClient
+	runnerID        string
+	privetDir       string
+	masterClient    JobMasterClient
+	currentResultId int
 }
 
 func NewJobRunner(privetDir string, masterClient JobMasterClient) *JobRunner {
 	runner := &JobRunner{
 		BatchUnits: 1,
 
-		privetDir:    privetDir,
-		masterClient: masterClient,
+		privetDir:       privetDir,
+		masterClient:    masterClient,
+		currentResultId: 0,
 	}
 	runner.generateRunnerID()
 
@@ -113,8 +115,10 @@ func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 		}
 	}
 
+	r.currentResultId = r.currentResultId + 1
 	completionReq := &ReportUnitsCompletionRequest{
 		RunnerId:                r.runnerID,
+		ResultId:                fmt.Sprintf("%s:%d", r.runnerID, r.currentResultId),
 		Units:                   popUnitsResp.Units,
 		UnitResult:              unitResult,
 		AdditionalResultPresent: additionalResultsPresent,

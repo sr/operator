@@ -110,6 +110,7 @@ func (m *JobMaster) removeTemporaryFile(name string) {
 func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletionRequest) {
 	env := []string{
 		fmt.Sprintf("PRIVET_RUNNER_ID=%s", completionRequest.RunnerId),
+		fmt.Sprintf("PRIVET_RESULT_ID=%s", completionRequest.ResultId),
 		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(completionRequest.Units, "\n")),
 	}
 

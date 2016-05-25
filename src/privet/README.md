@@ -88,6 +88,7 @@ The `receive-results` script is executed on the job master after results are rec
 When invoked, several environment variables will be set:
 
 * `PRIVET_RUNNER_ID`: The unique identifier of the runner that executed the unit
+* `PRIVET_RESULT_ID`: A unique identifier for the specific resultset received
 * `PRIVET_UNITS`: The units that were executed (separated by `\n`)
 * `PRIVET_UNIT_RESULT_FILE`: A file containing output (stdout and stderr) from the unit run
 * `PRIVET_UNIT_RESULT_CODE`: The exit code from the unit run

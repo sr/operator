@@ -23,10 +23,11 @@ message PopUnitsResponse {
 
 message ReportUnitsCompletionRequest {
   string runner_id = 1;
-  repeated string units = 2;
-  CommandResult unit_result = 3;
-  bool additional_result_present = 4;
-  CommandResult additional_result = 5;
+  string result_id = 2;
+  repeated string units = 3;
+  CommandResult unit_result = 4;
+  bool additional_result_present = 5;
+  CommandResult additional_result = 6;
 }
 
 message ReportUnitsCompletionResponse {
