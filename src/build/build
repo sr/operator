@@ -153,6 +153,16 @@ do
             docker run --rm -w /go -v "$(pwd):/go" build/build \
                 make -f etc/mk/golang.mk
             ;;
+        privet)
+            docker run --rm -w /go -v "$(pwd):/go" build/build \
+                make -f etc/mk/golang.mk
+
+            test -n "$CI" && {
+                cd "bin"
+                tarball="$(tarball-build "privet")"
+                docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+            }
+            ;;
         explorer)
             build-ruby "$project"
             test -n "$CI" && {
