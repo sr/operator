@@ -46,8 +46,8 @@ func main() {
 			startTime := time.Now()
 			timeoutDuration := time.Duration(timeout) * time.Second
 			for {
-				queueLength := master.QueueLength()
-				if queueLength == 0 {
+				queueStats := master.QueueStats()
+				if queueStats.UnitsInQueue == 0 && queueStats.UnitsInProgress == 0 {
 					os.Exit(master.ExitCode())
 				}
 

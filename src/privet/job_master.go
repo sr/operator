@@ -16,10 +16,16 @@ import (
 )
 
 type JobMaster struct {
-	privetDir string
-	exitCode  int
-	unitsLock sync.Mutex
-	units     []string
+	privetDir       string
+	exitCode        int
+	unitsLock       sync.Mutex
+	units           []string
+	unitsInProgress map[string]bool
+}
+
+type JobMasterQueueStats struct {
+	UnitsInQueue    int
+	UnitsInProgress int
 }
 
 func NewJobMaster(privetDir string) *JobMaster {
@@ -47,6 +53,7 @@ func (m *JobMaster) EnqueueUnits() error {
 			m.units = append(m.units, unit)
 		}
 	}
+	m.unitsInProgress = make(map[string]bool)
 
 	return nil
 }
@@ -67,6 +74,10 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 		units = []string{}
 	}
 
+	for _, unit := range units {
+		m.unitsInProgress[unit] = true
+	}
+
 	resp := &PopUnitsResponse{
 		Units: units,
 	}
@@ -76,6 +87,7 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 func (m *JobMaster) ReportUnitsCompletion(ctx context.Context, req *ReportUnitsCompletionRequest) (*ReportUnitsCompletionResponse, error) {
 	m.noticeExitCode(req.UnitResult.ExitCode)
 	m.noticeExitCode(req.AdditionalResult.ExitCode)
+	// TODO: Make this more of a queue. Or put the request on a channel?
 	go m.invokeReceiveResults(req)
 
 	return &ReportUnitsCompletionResponse{}, nil
@@ -90,9 +102,16 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 	}
 }
 
-func (m *JobMaster) QueueLength() int {
+func (m *JobMaster) QueueStats() JobMasterQueueStats {
 	m.unitsLock.Lock()
 	defer m.unitsLock.Unlock()
+
+	return JobMasterQueueStats{
+		UnitsInQueue:    len(m.units),
+		UnitsInProgress: len(m.unitsInProgress),
+	}
+}
+func (m *JobMaster) QueueLength() int {
 
 	return len(m.units)
 }
@@ -108,6 +127,14 @@ func (m *JobMaster) removeTemporaryFile(name string) {
 }
 
 func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletionRequest) {
+	defer func() {
+		m.unitsLock.Lock()
+		for _, unit := range completionRequest.Units {
+			delete(m.unitsInProgress, unit)
+		}
+		m.unitsLock.Unlock()
+	}()
+
 	env := []string{
 		fmt.Sprintf("PRIVET_RUNNER_ID=%s", completionRequest.RunnerId),
 		fmt.Sprintf("PRIVET_RESULT_ID=%s", completionRequest.ResultId),
