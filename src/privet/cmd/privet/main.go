@@ -26,10 +26,12 @@ func main() {
 	flag.StringVar(&connectAddress, "connect", "", "The address:port to connect as a client")
 	flag.StringVar(&privetDir, "privet-dir", "./test/privet", "Path to where privet scripts reside")
 	flag.IntVar(&batchUnits, "batch-units", 1, "Run multiple units at a time. Must be supported by the `run-units` script")
-	flag.IntVar(&timeout, "timeout", 3600, "Number of seconds before the master will exit, assuming there is a hung test run")
+	flag.IntVar(&timeout, "timeout", 3600, "Number of seconds before the process will exit, assuming there is a hung test run")
 	flag.Parse()
 
 	if bindAddress != "" {
+		go exitAfterTimeout(time.Duration(timeout) * time.Second)
+
 		listener, err := net.Listen("tcp", bindAddress)
 		if err != nil {
 			log.Fatalf("failed to bind: %v", err)
@@ -38,30 +40,25 @@ func main() {
 		server := grpc.NewServer()
 		master := privet.NewJobMaster(privetDir)
 
-		if err = master.EnqueueUnits(); err != nil {
-			log.Fatalf("failed to populate units: %v", err)
-		}
-
-		go func() {
-			startTime := time.Now()
-			timeoutDuration := time.Duration(timeout) * time.Second
+		go func(master *privet.JobMaster) {
 			for {
 				queueStats := master.QueueStats()
 				if queueStats.UnitsInQueue == 0 && queueStats.UnitsInProgress == 0 {
 					os.Exit(master.ExitCode())
 				}
-
-				if time.Now().Sub(startTime) > timeoutDuration {
-					log.Fatalf("timeout after %d seconds", timeout)
-				} else {
-					time.Sleep(1 * time.Second)
-				}
+				time.Sleep(1 * time.Second)
 			}
-		}()
+		}(master)
+
+		if err = master.EnqueueUnits(); err != nil {
+			log.Fatalf("failed to populate units: %v", err)
+		}
 
 		privet.RegisterJobMasterServer(server, master)
 		panic(server.Serve(listener))
 	} else if connectAddress != "" {
+		go exitAfterTimeout(time.Duration(timeout) * time.Second)
+
 		conn, err := grpc.Dial(connectAddress, grpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("failed to connect: %v", err)
@@ -91,5 +88,16 @@ func main() {
 	} else {
 		fmt.Fprintf(os.Stderr, "-bind or -connect must be specified\n")
 		os.Exit(1)
+	}
+}
+
+func exitAfterTimeout(timeout time.Duration) {
+	startTime := time.Now()
+	for {
+		if time.Now().Sub(startTime) > timeout {
+			log.Fatalf("timeout after %d", timeout)
+		} else {
+			time.Sleep(1 * time.Second)
+		}
 	}
 }
