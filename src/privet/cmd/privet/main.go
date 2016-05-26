@@ -40,6 +40,10 @@ func main() {
 		server := grpc.NewServer()
 		master := privet.NewJobMaster(privetDir)
 
+		if err = master.EnqueueUnits(); err != nil {
+			log.Fatalf("failed to populate units: %v", err)
+		}
+
 		go func(master *privet.JobMaster) {
 			for {
 				queueStats := master.QueueStats()
@@ -49,10 +53,6 @@ func main() {
 				time.Sleep(1 * time.Second)
 			}
 		}(master)
-
-		if err = master.EnqueueUnits(); err != nil {
-			log.Fatalf("failed to populate units: %v", err)
-		}
 
 		privet.RegisterJobMasterServer(server, master)
 		panic(server.Serve(listener))
