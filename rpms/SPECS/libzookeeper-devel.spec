@@ -11,7 +11,6 @@ URL: http://hadoop.apache.org/zookeeper/
 Source0: http://mirror.cogentco.com/pub/apache/zookeeper/zookeeper-%{rel_ver}/zookeeper-%{rel_ver}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{rel_ver}-%{release}-root
 BuildRequires: python-devel,gcc,make,libtool,autoconf,cppunit-devel
-AutoReqProv: no
 
 %description
 This package contains the libraries and header files needed for
