@@ -9,6 +9,12 @@ OPERATORD ?= $(GOBIN)/chatoopsd
 OPERATOR_SRC ?= cmd/chatoopsctl/main-gen.go
 OPERATORD_SRC ?= $(shell find cmd/chatoopsd -type f -name "*.go")
 
+PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
+PROTOC_GEN_OPERATORCTL ?= $(GOBIN)/protoc-gen-operatorctl
+PROTOC_GEN_OPERATORD ?= $(GOBIN)/protoc-gen-operatord
+PROTOC_GEN_OPERATORHUBOT ?= $(GOBIN)/protoc-gen-operatorhubot
+PROTOC_GEN_OPERATORLOCAL ?= $(GOBIN)/protoc-gen-operatorlocal
+
 OPERATORD_ADDRESS ?= localhost:3000
 export OPERATORD_ADDRESS
 
