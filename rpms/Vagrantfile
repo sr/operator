@@ -32,5 +32,9 @@ Vagrant.configure(2) do |config|
 
     mkdir -p /home/vagrant/rpmbuild/{BUILD,BUILDROOT}
     chown -R vagrant: /home/vagrant/rpmbuild
+
+    wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+    rpm -Uvh remi-release-6*.rpm
+    yum-config-manager --enable remi-php70
   SHELL
 end
