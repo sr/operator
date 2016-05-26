@@ -73,5 +73,5 @@ func (a *intercepted{{$.PackageName}}{{$.FullName}}) {{.Name}}(
 	}
 	return a.server.{{.Name}}(ctx, request)
 }
-{{end}}`)
+{{ end }}`)
 )
