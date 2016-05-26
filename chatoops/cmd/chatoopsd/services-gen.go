@@ -22,7 +22,7 @@ func registerServices(
 	instrumenter operator.Instrumenter,
 	authorizer operator.Authorizer,
 	flags *flag.FlagSet,
-) {
+) error {
 
 	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
 	gcloudConfig := &gcloud.GcloudServiceConfig{}
@@ -37,7 +37,9 @@ func registerServices(
 	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
 	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
 	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
-	flags.Parse(os.Args[1:])
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return err
+	}
 	errs := make(map[string][]error)
 
 	if buildkiteConfig.ApiToken == "" {
@@ -116,6 +118,7 @@ func registerServices(
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
 		}
 	}
+	return nil
 }
 
 func logError(logger operator.Logger, service string, err error) {

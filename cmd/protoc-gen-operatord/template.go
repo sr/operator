@@ -26,7 +26,7 @@ func registerServices(
 	instrumenter operator.Instrumenter,
 	authorizer operator.Authorizer,
 	flags *flag.FlagSet,
-) {
+) error {
 {{range .Services}}
 	{{.Name}}Config := &{{.PackageName}}.{{.FullName}}Config{}
 {{- end}}
@@ -36,7 +36,9 @@ func registerServices(
 	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
 	{{- end}}
 {{- end}}
-	flags.Parse(os.Args[1:])
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return err
+	}
 	errs := make(map[string][]error)
 {{range .Services}}
 	{{- $serviceName := .Name }}
@@ -64,6 +66,7 @@ func registerServices(
 		}
 	}
 {{- end}}
+	return nil
 }
 
 func logError(logger operator.Logger, service string, err error) {
