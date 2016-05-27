@@ -133,7 +133,7 @@ func executeTemplate(s string, data interface{}) (string, error) {
 }
 
 func isHelp(arg string) bool {
-	return arg == "-h" || arg == "--help"
+	return arg == "-h" || arg == "-help" || arg == "--help"
 }
 
 func getSource() *Source {
