@@ -5,14 +5,19 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"os"
 	"os/user"
+
+	"google.golang.org/grpc"
 
 	"github.com/kr/text"
 )
 
 const (
-	programUsageTemplate = `Usage: {{.Program}} <service> <command> [arguments]
+	defaultAddress       = "localhost:9000"
+	operatorAddr         = "OPERATOR_ADDR"
+	programUsageTemplate = `Usage: {{.Program}} <service> <command> [options]
 
 Use  "{{.Program}} <service> --help" for help with a particular service.
 
@@ -21,18 +26,25 @@ Available services:
 {{$n}}
 {{WrappedIndent $s "  "}}
 {{end}}`
-	serviceUsageTemplate = `Usage: {{.Program}} {{.ServiceName}} [command]
+	serviceUsageTemplate = `Usage: {{.Program}} {{.ServiceName}} [command] [options]
 
 {{Wrap .Synopsis}}
+
+General Options:
+
+  -operator-addr string
+	The address of the Operator server. Overrides the {{.AddrEnvVar}} environment
+	variable if set. (default "{{.DefaultAddr}}")
 
 Available Commands:
 {{range .Methods}}
 {{.Name}}
 {{WrappedIndent .Synopsis "  "}}
-{{end}}`
+{{ if .Usage }}
+{{.Usage}}
+{{- end }}
+{{- end}}`
 )
-
-const defaultAddress = "localhost:1234"
 
 func (c Command) Run(args []string) (int, string) {
 	if len(args) == 1 || isHelp(args[1]) {
@@ -54,12 +66,12 @@ func (c Command) Run(args []string) (int, string) {
 	if !ok {
 		return 1, fmt.Sprintf("No such service: %v", serviceName)
 	}
+	serviceUsage, err := c.getServiceUsage(service)
+	if err != nil {
+		return 1, fmt.Sprintf("Unable to generate service usage: %v", err)
+	}
 	if len(args) == 2 || (len(args) == 3 && isHelp(args[2])) {
-		s, err := c.getServiceUsage(service)
-		if err != nil {
-			return 1, fmt.Sprintf("Unable to generate service usage: %v", err)
-		}
-		return 0, s
+		return 0, serviceUsage
 	}
 	ok = false
 	methodName := args[2]
@@ -71,18 +83,20 @@ func (c Command) Run(args []string) (int, string) {
 		}
 	}
 	if !ok {
-		return 1, fmt.Sprintf("No such method: %v", methodName)
+		return 1, fmt.Sprintf("Service \"%s\" has no method \"%v\"", serviceName, methodName)
 	}
-	addr, ok := os.LookupEnv("OPERATORD_ADDRESS")
-	if !ok {
-		addr = defaultAddress
+	ctx := &CommandContext{
+		Args:   args[3:],
+		Flags:  flag.NewFlagSet(c.name, flag.ContinueOnError),
+		Source: getSource(),
 	}
-	output, err := method.Run(&CommandContext{
-		Address: addr,
-		Source:  getSource(),
-		Flags:   flag.CommandLine,
-		Args:    args[3:],
-	})
+	ctx.Flags.Usage = func() {}
+	ctx.Flags.SetOutput(ioutil.Discard)
+	ctx.Flags.StringVar(&ctx.Address, "operator-addr", "", "")
+	output, err := method.Run(ctx)
+	if err == flag.ErrHelp {
+		return 0, serviceUsage
+	}
 	if err != nil {
 		return 1, err.Error()
 	}
@@ -105,18 +119,62 @@ func (c *Command) getProgramUsage() (string, error) {
 }
 
 func (c *Command) getServiceUsage(svc ServiceCommand) (string, error) {
+	type cmd struct {
+		MethodCommand
+		Usage string
+	}
+	commands := make([]cmd, len(svc.Methods))
+	for i, m := range svc.Methods {
+		commands[i] = cmd{
+			MethodCommand: m,
+			Usage:         getMethodUsage(m),
+		}
+	}
 	data := struct {
+		AddrEnvVar  string
+		DefaultAddr string
+		Methods     []cmd
 		Program     string
 		ServiceName string
 		Synopsis    string
-		Methods     []MethodCommand
 	}{
+		operatorAddr,
+		defaultAddress,
+		commands,
 		c.name,
 		svc.Name,
 		svc.Synopsis,
-		svc.Methods,
 	}
 	return executeTemplate(serviceUsageTemplate, data)
+}
+
+func (c *CommandContext) GetConn() (*grpc.ClientConn, error) {
+	if v, ok := os.LookupEnv(operatorAddr); ok && c.Address == "" {
+		c.Address = v
+	}
+	if c.Address == "" {
+		c.Address = defaultAddress
+	}
+	return grpc.Dial(c.Address, grpc.WithInsecure())
+}
+
+func getMethodUsage(m MethodCommand) string {
+	s := ""
+	for _, f := range m.Flags {
+		s += fmt.Sprintf("  -%s", f.Name)
+		name, usage := flag.UnquoteUsage(f)
+		if len(name) > 0 {
+			s += " " + name
+		}
+		if len(s) <= 4 {
+			s += "\t"
+		} else {
+			s += "\n    \t"
+		}
+		s += usage
+		s += "\n"
+	}
+	return s
 }
 
 func executeTemplate(s string, data interface{}) (string, error) {
