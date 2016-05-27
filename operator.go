@@ -46,6 +46,7 @@ type ServiceCommand struct {
 type MethodCommand struct {
 	Name     string
 	Synopsis string
+	Flags    []*flag.Flag
 	Run      func(*CommandContext) (string, error)
 }
 

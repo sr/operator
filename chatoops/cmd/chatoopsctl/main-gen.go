@@ -2,6 +2,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -11,7 +12,6 @@ import (
 	gcloud "github.com/sr/operator/chatoops/services/gcloud"
 	papertrail "github.com/sr/operator/chatoops/services/papertrail"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 const programName = "operator"
@@ -28,16 +28,22 @@ var cmd = operator.NewCommand(
 					Name: "status",
 					Synopsis: `List the status of all (i.e. the status of the last build) of one or
  all projects.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "slug",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						slug := ctx.Flags.String("slug", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := buildkite.NewBuildkiteServiceClient(conn)
 						response, err := client.Status(
 							context.Background(),
@@ -56,16 +62,22 @@ var cmd = operator.NewCommand(
 					Name: "list-builds",
 					Synopsis: `List the last builds of one or all projects, optionally limited to a
  project.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "project-slug",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						project_slug := ctx.Flags.String("project-slug", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := buildkite.NewBuildkiteServiceClient(conn)
 						response, err := client.ListBuilds(
 							context.Background(),
@@ -90,15 +102,16 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "create-dev-instance",
 					Synopsis: `Provision a development instance using the configured image.`,
+					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := gcloud.NewGcloudServiceClient(conn)
 						response, err := client.CreateDevInstance(
 							context.Background(),
@@ -115,16 +128,22 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "list-instances",
 					Synopsis: `List all instances under the configured project.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "project-id",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						project_id := ctx.Flags.String("project-id", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := gcloud.NewGcloudServiceClient(conn)
 						response, err := client.ListInstances(
 							context.Background(),
@@ -142,17 +161,27 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "stop",
 					Synopsis: `Stop a running instance.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "instance",
+							Usage: "Undocumented.",
+						},
+						{
+							Name:  "zone",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						instance := ctx.Flags.String("instance", "", "")
 						zone := ctx.Flags.String("zone", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := gcloud.NewGcloudServiceClient(conn)
 						response, err := client.Stop(
 							context.Background(),
@@ -178,16 +207,22 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "search",
 					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "query",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						query := ctx.Flags.String("query", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := papertrail.NewPapertrailServiceClient(conn)
 						response, err := client.Search(
 							context.Background(),
@@ -219,12 +254,4 @@ func main() {
 		}
 	}
 	os.Exit(status)
-}
-
-func dial(address string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
 }

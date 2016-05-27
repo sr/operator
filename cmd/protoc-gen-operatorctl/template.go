@@ -7,13 +7,13 @@ var mainTemplate = generator.NewTemplate("main-gen.go",
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	{{- range .Services}}
 	{{.PackageName}} "{{.ImportPath}}"
@@ -36,6 +36,14 @@ var cmd = operator.NewCommand(
 				{
 					Name: "{{dasherize .Name}}",
 					Synopsis: `+"`"+`{{.Description}}`+"`"+`,
+					Flags: []*flag.Flag{
+					{{- range .Arguments }}
+						{
+							Name:  "{{dasherize .Name}}",
+							Usage: "{{.Description}}",
+						},
+					{{- end }}
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 			{{- range .Arguments}}
 						{{.Name}} := ctx.Flags.String("{{dasherize .Name}}", "", "")
@@ -43,11 +51,11 @@ var cmd = operator.NewCommand(
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
 						response, err := client.{{.Name}}(
 							context.Background(),
@@ -83,12 +91,4 @@ func main() {
 		}
 	}
 	os.Exit(status)
-}
-
-func dial(address string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
 }`)
