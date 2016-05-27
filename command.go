@@ -14,7 +14,7 @@ import (
 const (
 	programUsageTemplate = `Usage: {{.Program}} <service> <command> [arguments]
 
-Use  "{{.Program}} help <service>" for help with a particular service.
+Use  "{{.Program}} <service> --help" for help with a particular service.
 
 Available services:
 {{range $n, $s:= .Services}}
