@@ -52,7 +52,7 @@ func (c Command) Run(args []string) (int, string) {
 		}
 	}
 	if !ok {
-		return 1, fmt.Sprintf("No such service: %v\n", serviceName)
+		return 1, fmt.Sprintf("No such service: %v", serviceName)
 	}
 	if len(args) == 2 || (len(args) == 3 && isHelp(args[2])) {
 		s, err := c.getServiceUsage(service)
@@ -71,7 +71,7 @@ func (c Command) Run(args []string) (int, string) {
 		}
 	}
 	if !ok {
-		return 1, fmt.Sprintf("No such method: %v\n", methodName)
+		return 1, fmt.Sprintf("No such method: %v", methodName)
 	}
 	addr, ok := os.LookupEnv("OPERATORD_ADDRESS")
 	if !ok {
