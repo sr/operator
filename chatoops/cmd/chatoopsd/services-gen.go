@@ -10,9 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/sr/operator/chatoops/services/buildkite"
-
 	"github.com/sr/operator/chatoops/services/gcloud"
-
 	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
@@ -21,11 +19,9 @@ func registerServices(
 	logger operator.Logger,
 	flags *flag.FlagSet,
 ) error {
-
 	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
 	gcloudConfig := &gcloud.GcloudServiceConfig{}
 	papertrailConfig := &papertrail.PapertrailServiceConfig{}
-
 	flags.StringVar(&buildkiteConfig.ApiToken, "buildkite-api_token", "", "")
 	flags.StringVar(&gcloudConfig.ProjectId, "gcloud-project_id", "", "")
 	flags.StringVar(&gcloudConfig.DefaultZone, "gcloud-default_zone", "", "")
