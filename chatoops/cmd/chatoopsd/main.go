@@ -27,7 +27,7 @@ func run() error {
 	instrumenter := operator.NewInstrumenter(logger)
 	registerServices(server, logger, instrumenter, noopAuthorizer{}, flags)
 	if config.Address == "" {
-		return fmt.Errorf("required -listen-addr flag is missing.")
+		return fmt.Errorf("required -listen-addr flag is missing")
 	}
 	listener, err := net.Listen("tcp", config.Address)
 	if err != nil {
