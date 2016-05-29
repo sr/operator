@@ -93,10 +93,7 @@ func NewInterceptor(
 		}
 		request := &Request{
 			Source: sourcer.GetSource(),
-			Call: &Call{
-				Service: s[1],
-				Method:  s[2],
-			},
+			Call:   &Call{Service: s[1], Method: s[2]},
 		}
 		if err := authorizer.Authorize(request); err != nil {
 			return nil, err
