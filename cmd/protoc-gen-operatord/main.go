@@ -15,28 +15,15 @@ const (
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
-	response := make([]*generator.File, len(descriptor.Services)+1)
 	if err := servicesTemplate.Execute(&buffer, descriptor); err != nil {
 		return nil, err
 	}
-	response[0] = &generator.File{
-		Name:    servicesFileName,
-		Content: buffer.String(),
-	}
-	for i, service := range descriptor.Services {
-		buffer.Reset()
-		if err := interceptorTemplate.Execute(&buffer, service); err != nil {
-			return nil, err
-		}
-		response[i+1] = &generator.File{
-			Name: fmt.Sprintf(
-				"intercepted_%s-gen.go",
-				service.PackageName,
-			),
+	return []*generator.File{
+		{
+			Name:    servicesFileName,
 			Content: buffer.String(),
-		}
-	}
-	return response, nil
+		},
+	}, nil
 }
 
 func main() {
