@@ -10,24 +10,18 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/sr/operator/chatoops/services/buildkite"
-
 	"github.com/sr/operator/chatoops/services/gcloud"
-
 	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
 func registerServices(
 	server *grpc.Server,
 	logger operator.Logger,
-	instrumenter operator.Instrumenter,
-	authorizer operator.Authorizer,
 	flags *flag.FlagSet,
 ) error {
-
 	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
 	gcloudConfig := &gcloud.GcloudServiceConfig{}
 	papertrailConfig := &papertrail.PapertrailServiceConfig{}
-
 	flags.StringVar(&buildkiteConfig.ApiToken, "buildkite-api_token", "", "")
 	flags.StringVar(&gcloudConfig.ProjectId, "gcloud-project_id", "", "")
 	flags.StringVar(&gcloudConfig.DefaultZone, "gcloud-default_zone", "", "")
@@ -77,12 +71,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "buildkite", err)
 		} else {
-			interceptedbuildkiteBuildkiteService := &interceptedbuildkiteBuildkiteService{
-				authorizer,
-				instrumenter,
-				buildkiteServer,
-			}
-			buildkite.RegisterBuildkiteServiceServer(server, interceptedbuildkiteBuildkiteService)
+			buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
 		}
 	}
@@ -93,12 +82,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "gcloud", err)
 		} else {
-			interceptedgcloudGcloudService := &interceptedgcloudGcloudService{
-				authorizer,
-				instrumenter,
-				gcloudServer,
-			}
-			gcloud.RegisterGcloudServiceServer(server, interceptedgcloudGcloudService)
+			gcloud.RegisterGcloudServiceServer(server, gcloudServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
 		}
 	}
@@ -109,12 +93,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "papertrail", err)
 		} else {
-			interceptedpapertrailPapertrailService := &interceptedpapertrailPapertrailService{
-				authorizer,
-				instrumenter,
-				papertrailServer,
-			}
-			papertrail.RegisterPapertrailServiceServer(server, interceptedpapertrailPapertrailService)
+			papertrail.RegisterPapertrailServiceServer(server, papertrailServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
 		}
 	}
