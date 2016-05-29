@@ -16,7 +16,7 @@ import (
 
 {{range .Services}}
 	"{{.ImportPath}}"
-{{end}}
+{{- end}}
 )
 
 func registerServices(
@@ -24,10 +24,10 @@ func registerServices(
 	logger operator.Logger,
 	flags *flag.FlagSet,
 ) error {
-{{range .Services}}
+{{- range .Services}}
 	{{.Name}}Config := &{{.PackageName}}.{{.FullName}}Config{}
 {{- end}}
-{{range .Services}}
+{{- range .Services}}
 	{{- $serviceName := .Name }}
 	{{- range .Config}}
 	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
