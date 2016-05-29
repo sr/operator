@@ -10,30 +10,29 @@ import (
 
 const (
 	programName = "protoc-gen-operatorlocal"
+	// TODO(sr) Parameterize this.
+	filename = "chatoopslocal-gen.go"
+	pkgname  = "chatoopslocal"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
-	response := make([]*generator.File, len(descriptor.Services))
-	for i, service := range descriptor.Services {
-		if err := clientTemplate.Execute(&buffer, service); err != nil {
-			return nil, err
-		}
-		response[i] = &generator.File{
-			Name:    service.PackageName + "client-gen.go",
-			Content: buffer.String(),
-		}
-		buffer.Reset()
-		if err := serverTemplate.Execute(&buffer, service); err != nil {
-			return nil, err
-		}
-		response[i] = &generator.File{
-			Name:    service.PackageName + "server-gen.go",
-			Content: buffer.String(),
-		}
-		buffer.Reset()
+	data := struct {
+		*generator.Descriptor
+		LocalPackageName string
+	}{
+		descriptor,
+		pkgname,
 	}
-	return response, nil
+	if err := clientTemplate.Execute(&buffer, data); err != nil {
+		return nil, err
+	}
+	return []*generator.File{
+		{
+			Name:    filename,
+			Content: buffer.String(),
+		},
+	}, nil
 }
 
 func main() {
