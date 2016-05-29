@@ -4,22 +4,34 @@ OPERATORC ?= $(GOBIN)/operatorc
 PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
 DOCKER ?= docker
 
-OPERATOR ?= $(GOBIN)/operator
-OPERATORD ?= $(GOBIN)/operatord
-OPERATOR_SRC ?= cmd/operator/main-gen.go
-OPERATORD_SRC ?= $(shell find cmd/operatord -type f -name "*.go")
+OPERATOR ?= $(GOBIN)/chatoopsctl
+OPERATORD ?= $(GOBIN)/chatoopsd
+OPERATOR_SRC ?= cmd/chatoopsctl/main-gen.go
+OPERATORD_SRC ?= $(shell find cmd/chatoopsd -type f -name "*.go")
+
+PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
+PROTOC_GEN_OPERATORCTL ?= $(GOBIN)/protoc-gen-operatorctl
+PROTOC_GEN_OPERATORD ?= $(GOBIN)/protoc-gen-operatord
+PROTOC_GEN_OPERATORHUBOT ?= $(GOBIN)/protoc-gen-operatorhubot
+PROTOC_GEN_OPERATORLOCAL ?= $(GOBIN)/protoc-gen-operatorlocal
 
 OPERATORD_ADDRESS ?= localhost:3000
 export OPERATORD_ADDRESS
 
 IMPORTPATH ?= github.com/sr/operator/chatoops
 
-build: $(OPERATORC) $(PROTOC_GEN_GO)
+build: $(OPERATORC) \
+	$(PROTOC_GEN_GO) \
+	$(PROTOC_GEN_OPERATORCTL) \
+	$(PROTOC_GEN_OPERATORD) \
+	$(PROTOC_GEN_OPERATORHUBOT) \
+	$(PROTOC_GEN_OPERATORLOCAL)
 	$< \
 		--import-path $(IMPORTPATH)/services \
-		--cmd-out cmd/operator \
+		--cmd-out cmd/chatoopsctl \
 		--hubot-out hubot/scripts \
-		--server-out cmd/operatord \
+		--server-out cmd/chatoopsd \
+		--local-out cmd/chatoopslocal \
 		services
 
 docker-build:
@@ -62,6 +74,18 @@ $(OPERATORD): $(OPERATORD_SRC)
 
 $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/...
+
+$(PROTOC_GEN_OPERATORCTL):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorctl
+
+$(PROTOC_GEN_OPERATORD):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatord
+
+$(PROTOC_GEN_OPERATORHUBOT):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorhubot
+
+$(PROTOC_GEN_OPERATORLOCAL):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorlocal
 
 $(PROTOC_GEN_GO):
 	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go

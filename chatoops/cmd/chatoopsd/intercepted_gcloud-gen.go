@@ -10,13 +10,14 @@ import (
 	servicepkg "github.com/sr/operator/chatoops/services/gcloud"
 )
 
-type instrumentedgcloudGcloudService struct {
+type interceptedgcloudGcloudService struct {
+	authorizer   operator.Authorizer
 	instrumenter operator.Instrumenter
 	server       servicepkg.GcloudServiceServer
 }
 
-// CreateDevInstance instruments the GcloudService.CreateDevInstance method.
-func (a *instrumentedgcloudGcloudService) CreateDevInstance(
+// CreateDevInstance intercepts the GcloudService.CreateDevInstance method.
+func (a *interceptedgcloudGcloudService) CreateDevInstance(
 	ctx context.Context,
 	request *servicepkg.CreateDevInstanceRequest,
 ) (response *servicepkg.CreateDevInstanceResponse, err error) {
@@ -33,11 +34,14 @@ func (a *instrumentedgcloudGcloudService) CreateDevInstance(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.CreateDevInstance(ctx, request)
 }
 
-// ListInstances instruments the GcloudService.ListInstances method.
-func (a *instrumentedgcloudGcloudService) ListInstances(
+// ListInstances intercepts the GcloudService.ListInstances method.
+func (a *interceptedgcloudGcloudService) ListInstances(
 	ctx context.Context,
 	request *servicepkg.ListInstancesRequest,
 ) (response *servicepkg.ListInstancesResponse, err error) {
@@ -54,11 +58,14 @@ func (a *instrumentedgcloudGcloudService) ListInstances(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.ListInstances(ctx, request)
 }
 
-// Stop instruments the GcloudService.Stop method.
-func (a *instrumentedgcloudGcloudService) Stop(
+// Stop intercepts the GcloudService.Stop method.
+func (a *interceptedgcloudGcloudService) Stop(
 	ctx context.Context,
 	request *servicepkg.StopRequest,
 ) (response *servicepkg.StopResponse, err error) {
@@ -75,5 +82,8 @@ func (a *instrumentedgcloudGcloudService) Stop(
 			),
 		)
 	}(time.Now())
+	if err := a.authorizer.Authorize(request.Source); err != nil {
+		return nil, err
+	}
 	return a.server.Stop(ctx, request)
 }
