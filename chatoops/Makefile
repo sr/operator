@@ -31,7 +31,7 @@ build: $(OPERATORC) \
 		--cmd-out cmd/chatoopsctl \
 		--hubot-out hubot/scripts \
 		--server-out cmd/chatoopsd \
-		--local-out cmd/chatoopslocal \
+		--local-out local \
 		services
 
 docker-build:
