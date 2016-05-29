@@ -87,12 +87,10 @@ func (m *Request) GetCall() *Call {
 // Call represents a completed gRPC call. The Error field will be non-nil if
 // it resulted in an error.
 type Call struct {
-	Service    string                     `protobuf:"bytes,1,opt,name=service" json:"service,omitempty"`
-	Method     string                     `protobuf:"bytes,2,opt,name=method" json:"method,omitempty"`
-	InputType  string                     `protobuf:"bytes,3,opt,name=input_type,json=inputType" json:"input_type,omitempty"`
-	OutputType string                     `protobuf:"bytes,4,opt,name=output_type,json=outputType" json:"output_type,omitempty"`
-	Error      *Error                     `protobuf:"bytes,5,opt,name=error" json:"error,omitempty"`
-	Duration   *google_protobuf1.Duration `protobuf:"bytes,6,opt,name=duration" json:"duration,omitempty"`
+	Service  string                     `protobuf:"bytes,1,opt,name=service" json:"service,omitempty"`
+	Method   string                     `protobuf:"bytes,2,opt,name=method" json:"method,omitempty"`
+	Error    *Error                     `protobuf:"bytes,5,opt,name=error" json:"error,omitempty"`
+	Duration *google_protobuf1.Duration `protobuf:"bytes,6,opt,name=duration" json:"duration,omitempty"`
 }
 
 func (m *Call) Reset()                    { *m = Call{} }

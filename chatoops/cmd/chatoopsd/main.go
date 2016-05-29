@@ -14,7 +14,7 @@ const defaultListenAddr = "localhost:3000"
 
 type noopAuthorizer struct{}
 
-func (a noopAuthorizer) Authorize(*operator.Source) error {
+func (a noopAuthorizer) Authorize(*operator.Request) error {
 	return nil
 }
 
@@ -22,10 +22,14 @@ func run() error {
 	config := &operator.Config{}
 	flags := flag.CommandLine
 	flags.StringVar(&config.Address, "listen-addr", defaultListenAddr, "Listen address of the operator server")
-	server := grpc.NewServer()
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
-	registerServices(server, logger, instrumenter, noopAuthorizer{}, flags)
+	authorizer := noopAuthorizer{}
+	interceptor := operator.NewInterceptor(instrumenter, authorizer)
+	opts := []grpc.ServerOption{}
+	opts = append(opts, grpc.UnaryInterceptor(interceptor))
+	server := grpc.NewServer(opts...)
+	registerServices(server, logger, flags)
 	if config.Address == "" {
 		return fmt.Errorf("required -listen-addr flag is missing")
 	}

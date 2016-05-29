@@ -19,8 +19,6 @@ import (
 func registerServices(
 	server *grpc.Server,
 	logger operator.Logger,
-	instrumenter operator.Instrumenter,
-	authorizer operator.Authorizer,
 	flags *flag.FlagSet,
 ) error {
 
@@ -77,12 +75,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "buildkite", err)
 		} else {
-			interceptedbuildkiteBuildkiteService := &interceptedbuildkiteBuildkiteService{
-				authorizer,
-				instrumenter,
-				buildkiteServer,
-			}
-			buildkite.RegisterBuildkiteServiceServer(server, interceptedbuildkiteBuildkiteService)
+			buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
 		}
 	}
@@ -93,12 +86,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "gcloud", err)
 		} else {
-			interceptedgcloudGcloudService := &interceptedgcloudGcloudService{
-				authorizer,
-				instrumenter,
-				gcloudServer,
-			}
-			gcloud.RegisterGcloudServiceServer(server, interceptedgcloudGcloudService)
+			gcloud.RegisterGcloudServiceServer(server, gcloudServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
 		}
 	}
@@ -109,12 +97,7 @@ func registerServices(
 		if err != nil {
 			logError(logger, "papertrail", err)
 		} else {
-			interceptedpapertrailPapertrailService := &interceptedpapertrailPapertrailService{
-				authorizer,
-				instrumenter,
-				papertrailServer,
-			}
-			papertrail.RegisterPapertrailServiceServer(server, interceptedpapertrailPapertrailService)
+			papertrail.RegisterPapertrailServiceServer(server, papertrailServer)
 			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
 		}
 	}
