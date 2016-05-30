@@ -149,7 +149,7 @@ do
             build-ruby "$project"
             test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
             ;;
-        github\.com*|chatops)
+        github\.com*|chatops|bread)
             docker run --rm -w /go -v "$(pwd):/go" build/build \
                 make -f etc/mk/golang.mk
             ;;
