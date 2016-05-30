@@ -24,9 +24,7 @@ func run() error {
 	instrumenter := operator.NewInstrumenter(logger)
 	authorizer := noopAuthorizer{}
 	interceptor := operator.NewInterceptor(instrumenter, authorizer)
-	opts := []grpc.ServerOption{}
-	opts = append(opts, grpc.UnaryInterceptor(interceptor))
-	server := grpc.NewServer(opts...)
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 	registerServices(server, logger, flags)
 	if config.Address == "" {
 		return fmt.Errorf("required -listen-addr flag is missing")
