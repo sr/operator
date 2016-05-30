@@ -1,6 +1,6 @@
 DOCKER ?= docker
 GO ?= go
-WATCHMAN ?= watchman
+WATCHMAN_MAKE ?= watchman-make
 
 GOBIN ?= $(GOPATH)/bin
 OPERATORC ?= $(GOBIN)/operatorc
@@ -12,23 +12,30 @@ PROTOC_GEN_OPERATORD ?= $(GOBIN)/protoc-gen-operatord
 PROTOC_GEN_OPERATORHUBOT ?= $(GOBIN)/protoc-gen-operatorhubot
 PROTOC_GEN_OPERATORLOCAL ?= $(GOBIN)/protoc-gen-operatorlocal
 
-OPERATORD_GEN_SRC ?= cmd/chatoopsd/services-gen.go
-OPERATORCTL_GEN_SRC ?= cmd/chatoopsctl/main-gen.go
-OPERATORHUBOT_GEN_DIR ?= hubot/scripts
+OPERATORCTL_GEN_SRC ?= cmd/$(shell basename $(OPERATORCTL))/main-gen.go
+OPERATORD_GEN_SRC ?= cmd/$(shell basename $(OPERATORD))/builder-gen.go
+OPERATORHUBOT_GEN_SRC ?= $(shell find $(HUBOT_SCRIPTS_DIR) -type f -name "*-gen.js")
 
+HUBOT_SCRIPTS_DIR ?= hubot/scripts
 SVC_DIR ?= services
-SVC_SRC ?= $(shell find $(SVC_DIR) -type f -name "*.proto" -o -name "*.go" | sort)
+SVC_SRC ?= $(shell find $(SVC_DIR) -type f -name "*.proto" -o -name "*.go")
 
-IMPORTPATH ?= github.com/sr/operator/chatoops/$(SVC_DIR)
+IMPORTPATH ?= github.com/sr/operator/chatoops/services
+
+build: $(OPERATORD_GEN_SRC) $(OPERATORCTL_GEN_SRC) build-hubot
+
+clean:
+	go clean -i ./...
+	rm -f $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC) $(OPERATORHUBOT_GEN_SRC)
 
 dev: dev-run
-	watchman-make -p 'services/**/*.go' 'services/**/*.proto' \
-		'cmd/chatoopsd/main.go' -t dev-run
+	$(WATCHMAN_MAKE) -p '$(SVC_DIR)/**/*.go' '$(SVC_DIR)/**/*.proto' \
+		'cmd/$$(basename $(OPERATORD))/*.go' -t dev-run
 
 dev-run: $(OPERATORD_GEN_SRC)
-	pkill chatoopsd || true
+	pkill $$(basename $(OPERATORD)) || true
 	$(GO) install -v ./$$(dirname $(OPERATORD_GEN_SRC))
-	chatoopsd &
+	$$(basename $(OPERATORD)) &
 
 install: $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC)
 	$(GO) install -v ./$$(dirname $(OPERATORCTL_GEN_SRC)) \
@@ -36,7 +43,7 @@ install: $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC)
 
 build-hubot: $(SVC_SRC) $(OPERATORC) $(PROTOC_GEN_OPERATORHUBOT)
 	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--hubot-out $(OPERATORHUBOT_GEN_DIR) $(SVC_DIR)
+		--hubot-out $(HUBOT_SCRIPTS_DIR) $(SVC_DIR)
 
 hubot-dev: docker-build-hubot
 	@ touch .hubot_history
@@ -57,15 +64,15 @@ docker-build-operatorc: etc/docker/Dockerfile.operatorc
 $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/operatorc
 
-$(OPERATORCTL): $(OPERATORCTL_SRC)
-	$(GO) install -v ./cmd/operatorctl
+$(OPERATORCTL): $(OPERATORCTL_GEN_SRC)
+	$(GO) install -v ./cmd/$$(basename $(OPERATORCTL))
+
+$(OPERATORD): $(OPERATORD_SRC)
+	$(GO) install -v ./cmd/$$(basename $(OPERATORD))
 
 $(OPERATORCTL_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORCTL)
 	$(OPERATORC) --import-path $(IMPORTPATH) \
 		--cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) $(SVC_DIR)
-
-$(OPERATORD): $(OPERATORD_SRC)
-	$(GO) install -v ./cmd/operatord
 
 $(OPERATORD_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORD)
 	$(OPERATORC) --import-path $(IMPORTPATH) \
@@ -87,6 +94,7 @@ $(PROTOC_GEN_GO):
 	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
 
 .PHONY: \
+	build \
 	dev \
 	dev-run \
 	install \
