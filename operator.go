@@ -34,6 +34,8 @@ type Sourcer interface {
 	GetSource() *Source
 }
 
+type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
+
 type Config struct {
 	Address string
 }

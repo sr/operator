@@ -9,18 +9,18 @@ import (
 )
 
 const (
-	executable       = "protoc-gen-operatord"
-	servicesFileName = "services-gen.go"
+	executable = "protoc-gen-operatord"
+	filename   = "builder-gen.go"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
-	if err := servicesTemplate.Execute(&buffer, descriptor); err != nil {
+	if err := builderTemplate.Execute(&buffer, descriptor); err != nil {
 		return nil, err
 	}
 	return []*generator.File{
 		{
-			Name:    servicesFileName,
+			Name:    filename,
 			Content: buffer.String(),
 		},
 	}, nil
