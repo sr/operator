@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"strings"
 
 	"github.com/sr/operator"
 	"google.golang.org/grpc"
@@ -31,9 +32,19 @@ func registerServices(
 	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
 	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
 	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
+	flags.VisitAll(func(f *flag.Flag) {
+		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
+		v := os.Getenv(k)
+		if v != "" {
+			if err := f.Value.Set(v); err != nil {
+				return err
+			}
+		}
+	})
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
+
 	errs := make(map[string][]error)
 
 	if buildkiteConfig.ApiToken == "" {
