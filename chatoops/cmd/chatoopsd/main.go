@@ -37,6 +37,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	logger.Info(&operator.ServerStartupNotice{Protocol: "tcp", Address: config.Address})
 	return server.Serve(listener)
 }
 
