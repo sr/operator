@@ -10,8 +10,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const defaultListenAddr = "localhost:3000"
-
 type noopAuthorizer struct{}
 
 func (a noopAuthorizer) Authorize(*operator.Request) error {
@@ -21,7 +19,7 @@ func (a noopAuthorizer) Authorize(*operator.Request) error {
 func run() error {
 	config := &operator.Config{}
 	flags := flag.CommandLine
-	flags.StringVar(&config.Address, "listen-addr", defaultListenAddr, "Listen address of the operator server")
+	flags.StringVar(&config.Address, "listen-addr", operator.DefaultAddress, "Listen address of the operator server")
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
 	authorizer := noopAuthorizer{}

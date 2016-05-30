@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	defaultAddress       = "localhost:9000"
 	operatorAddr         = "OPERATOR_ADDR"
 	programUsageTemplate = `Usage: {{.Program}} <service> <command> [options]
 
@@ -139,7 +138,7 @@ func (c *Command) getServiceUsage(svc ServiceCommand) (string, error) {
 		Synopsis    string
 	}{
 		operatorAddr,
-		defaultAddress,
+		DefaultAddress,
 		commands,
 		c.name,
 		svc.Name,
@@ -153,7 +152,7 @@ func (c *CommandContext) GetConn() (*grpc.ClientConn, error) {
 		c.Address = v
 	}
 	if c.Address == "" {
-		c.Address = defaultAddress
+		c.Address = DefaultAddress
 	}
 	return grpc.Dial(c.Address, grpc.WithInsecure())
 }

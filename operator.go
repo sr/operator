@@ -13,6 +13,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
+const DefaultAddress = "localhost:9000"
+
 var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
