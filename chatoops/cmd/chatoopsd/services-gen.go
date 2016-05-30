@@ -32,21 +32,19 @@ func registerServices(
 	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
 	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
 	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
+	errs := make(map[string][]error)
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
 		v := os.Getenv(k)
 		if v != "" {
 			if err := f.Value.Set(v); err != nil {
-				return err
+				errs["envflags"] = append(errs["envflags"], err)
 			}
 		}
 	})
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
-
-	errs := make(map[string][]error)
-
 	if buildkiteConfig.ApiToken == "" {
 		errs["buildkite"] = append(errs["buildkite"], errors.New("api_token"))
 	}

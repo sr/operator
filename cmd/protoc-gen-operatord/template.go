@@ -33,19 +33,19 @@ func registerServices(
 	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
 	{{- end}}
 {{- end}}
+	errs := make(map[string][]error)
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
 		v := os.Getenv(k)
 		if v != "" {
 			if err := f.Value.Set(v); err != nil {
-				return err
+				errs["envflags"] = append(errs["envflags"], err)
 			}
 		}
 	})
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
-	errs := make(map[string][]error)
 {{range .Services}}
 	{{- $serviceName := .Name }}
 	{{- range .Config}}
