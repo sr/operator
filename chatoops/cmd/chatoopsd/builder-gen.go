@@ -5,8 +5,8 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"strings"
 
-	"github.com/sr/operator"
 	"google.golang.org/grpc"
 
 	"github.com/sr/operator/chatoops/services/buildkite"
@@ -14,11 +14,10 @@ import (
 	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
-func registerServices(
+func buildOperatorServer(
 	server *grpc.Server,
-	logger operator.Logger,
 	flags *flag.FlagSet,
-) error {
+) (map[string]error, error) {
 	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
 	gcloudConfig := &gcloud.GcloudServiceConfig{}
 	papertrailConfig := &papertrail.PapertrailServiceConfig{}
@@ -31,80 +30,70 @@ func registerServices(
 	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
 	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
 	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
+	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
-		return err
+		return services, err
 	}
-	errs := make(map[string][]error)
-
+	errs := make(map[string][]string)
 	if buildkiteConfig.ApiToken == "" {
-		errs["buildkite"] = append(errs["buildkite"], errors.New("api_token"))
+		errs["buildkite"] = append(errs["buildkite"], "api_token")
 	}
 	if gcloudConfig.ProjectId == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("project_id"))
+		errs["gcloud"] = append(errs["gcloud"], "project_id")
 	}
 	if gcloudConfig.DefaultZone == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("default_zone"))
+		errs["gcloud"] = append(errs["gcloud"], "default_zone")
 	}
 	if gcloudConfig.DefaultNetwork == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("default_network"))
+		errs["gcloud"] = append(errs["gcloud"], "default_network")
 	}
 	if gcloudConfig.DefaultImage == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("default_image"))
+		errs["gcloud"] = append(errs["gcloud"], "default_image")
 	}
 	if gcloudConfig.DefaultMachineType == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("default_machine_type"))
+		errs["gcloud"] = append(errs["gcloud"], "default_machine_type")
 	}
 	if gcloudConfig.ServiceAccountEmail == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("service_account_email"))
+		errs["gcloud"] = append(errs["gcloud"], "service_account_email")
 	}
 	if gcloudConfig.StartupScript == "" {
-		errs["gcloud"] = append(errs["gcloud"], errors.New("startup_script"))
+		errs["gcloud"] = append(errs["gcloud"], "startup_script")
 	}
 	if papertrailConfig.ApiKey == "" {
-		errs["papertrail"] = append(errs["papertrail"], errors.New("api_key"))
+		errs["papertrail"] = append(errs["papertrail"], "api_key")
 	}
-
 	if len(errs["buildkite"]) != 0 {
-		logError(logger, "buildkite", errors.New("TODO"))
+		services["buildkite"] = errors.New("required flag(s) missing: " + strings.Join(errs["buildkite"], ", "))
 	} else {
 		buildkiteServer, err := buildkite.NewAPIServer(buildkiteConfig)
 		if err != nil {
-			logError(logger, "buildkite", err)
+			services["buildkite"] = err
 		} else {
 			buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
-			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "buildkite"}})
+			services["buildkite"] = nil
 		}
 	}
 	if len(errs["gcloud"]) != 0 {
-		logError(logger, "gcloud", errors.New("TODO"))
+		services["gcloud"] = errors.New("required flag(s) missing: " + strings.Join(errs["gcloud"], ", "))
 	} else {
 		gcloudServer, err := gcloud.NewAPIServer(gcloudConfig)
 		if err != nil {
-			logError(logger, "gcloud", err)
+			services["gcloud"] = err
 		} else {
 			gcloud.RegisterGcloudServiceServer(server, gcloudServer)
-			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "gcloud"}})
+			services["gcloud"] = nil
 		}
 	}
 	if len(errs["papertrail"]) != 0 {
-		logError(logger, "papertrail", errors.New("TODO"))
+		services["papertrail"] = errors.New("required flag(s) missing: " + strings.Join(errs["papertrail"], ", "))
 	} else {
 		papertrailServer, err := papertrail.NewAPIServer(papertrailConfig)
 		if err != nil {
-			logError(logger, "papertrail", err)
+			services["papertrail"] = err
 		} else {
 			papertrail.RegisterPapertrailServiceServer(server, papertrailServer)
-			logger.Info(&operator.ServiceRegistered{&operator.Service{Name: "papertrail"}})
+			services["papertrail"] = nil
 		}
 	}
-	return nil
-}
-
-func logError(logger operator.Logger, service string, err error) {
-	logger.Error(&operator.ServiceStartupError{
-		Service: &operator.Service{
-			Name: service,
-		},
-		Message: err.Error(),
-	})
+	return services, nil
 }
