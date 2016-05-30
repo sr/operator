@@ -7,7 +7,7 @@ matrix:
   allow_failures:
     - go: tip
 script:
-  - make
+  - make ci
 notifications:
   email: false
   irc: "chat.freenode.net#chatoperator"

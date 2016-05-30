@@ -7,6 +7,9 @@ PACKAGES = $(shell go list ./... | grep -v -E '^vendor|chatoops' | sort -r)
 
 all: deps fmt lint vet errcheck deps install
 
+ci: clean all
+	make -C chatoops clean build install
+
 deps:
 	go get -d $(PACKAGES)
 
