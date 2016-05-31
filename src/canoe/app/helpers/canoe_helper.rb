@@ -97,7 +97,7 @@ module CanoeHelper
       %(program:pull-agent),
       %(message:"deploy_id=#{deploy.id}")
     ]
-    query << %(host:#{host}) if host
+    query << %(host:#{host}*) if host
     qs = CGI.escape(query.join(" AND ")).gsub('+', '%20')
 
     "https://logs-#{datacenter}.pardot.com/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),index:'logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'#{qs}')),sort:!('@timestamp',desc))"
