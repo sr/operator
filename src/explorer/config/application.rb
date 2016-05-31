@@ -20,6 +20,12 @@ module Explorer
       config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
     end
 
+    config.middleware.use Pinglish do |ping|
+      ping.check :db do
+        Integer(User.count)
+      end
+    end
+
     initializer "explorer_app" do
       config.x.database_config = DatabaseConfigurationFile.load
       config.x.datacenter = ENV.fetch("EXPLORER_DATACENTER")

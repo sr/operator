@@ -48,11 +48,5 @@ ready = ->
     $("#query_sql").val(query)
     $('form').submit()
 
-  $(".export_csv").on "click", (e) ->
-    e.preventDefault()
-    $("#query_view").val('CSV')
-    $('form').submit()
-
-
 $(document).ready(ready)
 $(document).on('page:load', ready)

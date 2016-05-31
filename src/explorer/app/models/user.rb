@@ -1,4 +1,6 @@
-class AuthUser < ActiveRecord::Base
+class User < ActiveRecord::Base
+  has_many :queries, class_name: "UserQuery", foreign_key: :user_id
+
   # TODO(sr) Add unit test for this
   def self.find_or_create_by_omniauth(auth_hash)
     find_or_initialize_by(uid: auth_hash["uid"]).tap do |user|
@@ -9,11 +11,16 @@ class AuthUser < ActiveRecord::Base
     end
   end
 
-  def datacenter
-    datacenter = Rails.application.config.x.datacenter
-    config = Rails.application.config.x.database_config
+  def account_query(sql, account_id)
+    queries.create!(raw_sql: sql, account_id: account_id)
+  end
 
-    DataCenter.new(datacenter, self, config)
+  def global_query(sql)
+    queries.create!(raw_sql: sql)
+  end
+
+  def global_accounts
+    datacenter.accounts
   end
 
   def access_authorized?
@@ -29,5 +36,12 @@ class AuthUser < ActiveRecord::Base
     auth = Canoe::LDAPAuthorizer.new
 
     auth.user_is_member_of_any_group?(uid, groups)
+  end
+
+  def datacenter
+    datacenter = Rails.application.config.x.datacenter
+    config = Rails.application.config.x.database_config
+
+    DataCenter.new(datacenter, self, config)
   end
 end
