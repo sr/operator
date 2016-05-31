@@ -1,3 +1,5 @@
+_ = require "underscore"
+
 class PullRequestTableMaker
 
   createPullRequestTable: (pullRequests) ->
@@ -10,7 +12,7 @@ class PullRequestTableMaker
       tableMarkup + "</table>"
 
   tableRow: (pullRequest) ->
-    "<tr><td>#{@truncatePullRequestTitle(pullRequest.title)}</td><td>#{pullRequest.user.login}</td><td><a href = \"#{pullRequest.html_url}\">#{pullRequest.number}</a></td><td>#{@extractRepoName(pullRequest.html_url)}</td><td>#{pullRequest.created_at.substring(0, 10)}</td></tr>"
+    "<tr><td title=\"#{_.escape(pullRequest.title)}\">#{@truncatePullRequestTitle(pullRequest.title)}</td><td>#{pullRequest.user.login}</td><td><a href = \"#{pullRequest.html_url}\">#{pullRequest.number}</a></td><td>#{@extractRepoName(pullRequest.html_url)}</td><td>#{pullRequest.created_at.substring(0, 10)}</td></tr>"
 
   extractRepoName: (pullRequestUrl) ->
     regex = pullRequestUrl.match(/Pardot\/([A-Za-z-_]+).*/)
