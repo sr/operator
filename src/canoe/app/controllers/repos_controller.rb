@@ -22,4 +22,8 @@ class ReposController < ApplicationController
   rescue
     redirect_to target_url(current_target), alert: "Unable to unlock: a lock already exists"
   end
+
+  def boomtown
+    fail "boomtown"
+  end
 end
