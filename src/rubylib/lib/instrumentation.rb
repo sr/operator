@@ -33,7 +33,7 @@ module Instrumentation
     if !data.respond_to?(:to_hash)
       raise ArgumentError, "invalid data: #{data.inspect}"
     end
-    Logging.log_exception(exception, data.to_hash, &block)
+    Logging.log_exception(data.to_hash, exception, &block)
   end
 
   def request_id
