@@ -2,15 +2,14 @@
 
 Name: seyren
 Version: 1.3.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: An alerting dashboard for Graphite
 Group: Applications/Internet
 License: Apache License v2.0
 URL: https://github.com/scobal/seyren
 Source0: https://github.com/scobal/seyren/archive/%{version}.tar.gz
 Patch0: https://patch-diff.githubusercontent.com/raw/scobal/seyren/pull/290.patch
-Patch1: https://patch-diff.githubusercontent.com/raw/scobal/seyren/pull/294.patch
-Patch2: https://gist.githubusercontent.com/alindeman/e86ef1c5c60d67d2c153e5b565fa2d62/raw/a3931165063b4904bff45dd4be6fbc3d935c071b/340.patch
+Patch1: https://gist.githubusercontent.com/alindeman/e86ef1c5c60d67d2c153e5b565fa2d62/raw/c08452ca570f32f4a2d37b3182b8092dd821bec5/340.patch
 BuildArch: noarch
 BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: curl
@@ -28,7 +27,6 @@ rm maven.tar.gz
 %setup -q -n seyren-%{version}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 ../apache-maven-%{maven_version}/bin/mvn clean package -DskipTests
