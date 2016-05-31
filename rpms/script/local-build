@@ -32,7 +32,9 @@ if [ "$REDHAT_RELEASE" -le 5 ]; then
 fi
 
 for package in "$@"; do
-  cd ${BUILD_DIRECTORY}
+  if [ -n "$BUILD_DIRECTORY" ]; then
+    cd "$BUILD_DIRECTORY"
+  fi
 
   rpmlint SPECS/${package}.spec || exit 1
 
