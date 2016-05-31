@@ -6,6 +6,10 @@ Vagrant.configure(2) do |config|
     el6.vm.box = "bento/centos-6.7"
   end
 
+  config.vm.define "el7" do |el6|
+    el6.vm.box = "bento/centos-7.2"
+  end
+
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
