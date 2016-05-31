@@ -15,7 +15,13 @@ class ApplicationController < ActionController::Base
   protected
 
   def log_context
-    Instrumentation.context(request_id: Instrumentation.request_id) do
+    data = { request_id: Instrumentation.request_id }
+
+    if current_user
+      data[:user_email] = current_user.email
+    end
+
+    Instrumentation.context(data) do
       yield
     end
   end
