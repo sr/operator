@@ -4,7 +4,7 @@ ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
 ARG parallel_version=20160322
-ARG phantomjs_version=2.1.1
+ARG phantomjs_version=2.0-1.el7
 ARG libzookeeper_version=3.4.6-1
 ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
 ARG artifactory_host
@@ -12,8 +12,11 @@ ARG artifactory_host
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
 RUN yum install -y epel-release && \
-  yum install -y font-config supervisor less which git openssh-clients redis bzip2 make unzip gcc file java-1.7.0-openjdk && \
+  yum install -y \
+    font-config supervisor less which git openssh-clients redis bzip2 make \
+    unzip gcc file libicu openssl java-1.7.0-openjdk && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/libzookeeper-devel-${libzookeeper_version}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.centos.x86_64.rpm" && \
   yum clean all
 
 # Parallel
@@ -53,9 +56,6 @@ RUN yes '' | pecl install zookeeper-beta && \
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
   yum install -y Percona-Server-client-${percona_major_version} Percona-Server-devel-${percona_major_version} && \
   yum clean all
-
-# Phantom JS
-RUN curl -L https://${artifactory_host}/artifactory/pd-tarball/phantomjs/phantomjs-${phantomjs_version}-linux-x86_64.tar.bz2 | tar -xjv -C /usr --strip-components=1
 
 # Node.JS & Bower
 RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.xz" | tar -xJ -C /usr --strip-components=1 && \
