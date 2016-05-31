@@ -29,4 +29,31 @@ class LoggingTest < Minitest::Test
     log = Instrumentation::Logging.entries.pop
     assert_equal({ app: "app", env: "test", boom: "town" }, log)
   end
+
+  def test_log_exception_noop
+    Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_NOOP)
+    begin
+      raise RuntimeError, "boomtown"
+    rescue RuntimeError
+      Instrumentation.log_exception($!, boom: "town")
+    end
+
+    log = Instrumentation::Logging.entries.pop
+    assert_equal RuntimeError, log[:class]
+    assert_equal "boomtown", log[:message]
+    assert !log[:site].nil?
+  end
+
+  def test_log_exception_logfmt
+    Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_LOGFMT)
+    begin
+      raise RuntimeError, "boomtown"
+    rescue RuntimeError
+      Instrumentation.log_exception($!, boom: "town")
+    end
+
+    log = Instrumentation::Logging.entries.pop
+    assert log.include?("class=RuntimeError")
+    assert log.include?("message=boomtown")
+  end
 end
