@@ -150,8 +150,7 @@ class ApplicationController < ActionController::Base
     else
       acl = DeployACLEntry.for_repo_and_deploy_target(current_repo, current_target)
       if acl && !acl.authorized?(current_user)
-        Instrumentation.error(
-          error: "unauthorized-deploy",
+        Instrumentation.error("unauthorized-deploy",
           current_user: current_user.uid,
           repo: current_repo.name,
           target: current_target.name,
