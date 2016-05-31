@@ -4,15 +4,17 @@ ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
 ARG parallel_version=20160322
-ARG zookeeper_version=3.4.8
 ARG phantomjs_version=2.1.1
+ARG libzookeeper_version=3.4.6-1
 ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
 ARG artifactory_host
 
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
 RUN yum install -y epel-release && \
- yum install -y supervisor less which git openssh-clients redis bzip2 make unzip gcc file java-1.7.0-openjdk
+  yum install -y font-config supervisor less which git openssh-clients redis bzip2 make unzip gcc file java-1.7.0-openjdk && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/libzookeeper-devel-${libzookeeper_version}.x86_64.rpm" && \
+  yum clean all
 
 # Parallel
 RUN cd /tmp && \
@@ -23,50 +25,37 @@ RUN cd /tmp && \
   rm -rf parallel-${parallel_version}
 
 # PHP
-RUN rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-  yum --enablerepo=remi install -y \
-    httpd mod_ssl \
-    php55-php php55-php-mcrypt php55-php-mysql php55-php-bcmath php55-php-dom \
-    php55-php-process php55-php-mbstring php55-php-zip php55-php-intl \
-    php55-php-soap php55-php-xml php55-php-xmlrpc php55-php-gd php55-php-pdo \
-    php55-php-opcache php55-php-tidy php55-php-pear php55-php-memcache \
-    php55-php-cli php55-php-devel && \
-  ln -sf /usr/bin/php55 /usr/bin/php && \
-  ln -sf /usr/bin/php55-pear /usr/bin/pear
+RUN yum install -y httpd mod_ssl && \
+  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
+  yum --enablerepo=remi-php55 install -y \
+    php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring \
+    php-zip php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache \
+    php-tidy php-pear php-memcache php-cli php-devel && \
+  yum clean all
 
 # PHP 5.5 compatible build of Protobuf
 RUN cd /tmp && \
   git clone https://github.com/pd-aray/php-protobuf && \
   cd php-protobuf && \
   git checkout ${php_protobuf_revision} && \
-  /opt/remi/php55/root/bin/phpize && \
-  ./configure --with-php-config=/opt/remi/php55/root/bin/php-config && \
+  phpize && \
+  ./configure && \
   make install && \
-  echo 'extension=protobuf.so' > /opt/remi/php55/root/etc/php.d/20-protobuf.ini && \
+  echo 'extension=protobuf.so' > /etc/php.d/20-protobuf.ini && \
   cd /tmp && \
   rm -rf php-protobuf
 
-# libzookeeper
-RUN cd /tmp && \
-  curl -s "http://apache.osuosl.org/zookeeper/zookeeper-${zookeeper_version}/zookeeper-${zookeeper_version}.tar.gz" | tar -xvz && \
-  cd "zookeeper-${zookeeper_version}/src/c" && \
-  ./configure && \
-  make && \
-  make install && \
-  cd /tmp && \
-  rm -rf "zookeeper-${zookeeper_version}"
-
 # PECL extensions
-RUN yes '' | /opt/remi/php55/root/usr/bin/pecl install zookeeper-beta && \
-  echo 'extension=zookeeper.so' > /opt/remi/php55/root/etc/php.d/20-zookeeper.ini
+RUN yes '' | pecl install zookeeper-beta && \
+  echo 'extension=zookeeper.so' > /etc/php.d/20-zookeeper.ini
 
 # Percona Client
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
-  yum install -y Percona-Server-client-${percona_major_version} Percona-Server-devel-${percona_major_version}
+  yum install -y Percona-Server-client-${percona_major_version} Percona-Server-devel-${percona_major_version} && \
+  yum clean all
 
 # Phantom JS
-RUN yum install -y fontconfig && \
-  curl -L https://${artifactory_host}/artifactory/pd-tarball/phantomjs/phantomjs-${phantomjs_version}-linux-x86_64.tar.bz2 | tar -xjv -C /usr --strip-components=1
+RUN curl -L https://${artifactory_host}/artifactory/pd-tarball/phantomjs/phantomjs-${phantomjs_version}-linux-x86_64.tar.bz2 | tar -xjv -C /usr --strip-components=1
 
 # Node.JS & Bower
 RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.xz" | tar -xJ -C /usr --strip-components=1 && \
@@ -90,5 +79,5 @@ RUN mkdir -p /opt/pardot
 ADD pardot.conf /etc/httpd/conf.d/pardot.conf
 ADD apache.pem /etc/httpd/conf/apache.pem
 
-ADD php.ini /opt/remi/php55/root/etc/php.d/90-pardot.ini
+ADD php.ini /etc/php.d/90-pardot.ini
 ADD supervisord.conf /etc/supervisord.conf
