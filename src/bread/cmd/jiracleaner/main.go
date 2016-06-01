@@ -29,8 +29,8 @@ var (
 	password     string
 	transitionID int
 
-	defaultMaxAge = (time.Hour * 24) * 30 * 3 // Three months
-	comment       = strings.Replace(`In in effort to keep our backlog realistic and up to date we have decided to automatically close stale tickets.
+	defaultMaxAge = (time.Hour * 24) * 30 * 3
+	comment       = strings.Replace(`In an effort to keep our backlog realistic and up to date we have decided to automatically close stale tickets.
 
 Please feel free to reopen or talk to us it if you think it should be prioritized.
 
