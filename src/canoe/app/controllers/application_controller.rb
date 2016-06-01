@@ -83,6 +83,8 @@ class ApplicationController < ActionController::Base
     @current_project =
       if params[:project_name].present?
         Project.find_by_name(params[:project_name].to_s)
+      elsif params[:repo_name].present? # backwards compatibility
+        Project.find_by_name(params[:repo_name].to_s)
       elsif params[:name].present?
         Project.find_by_name(params[:name].to_s)
       elsif current_deploy
