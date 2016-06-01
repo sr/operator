@@ -4,7 +4,12 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exception do |exception|
     Instrumentation.log_exception(exception)
-    render file: "public/500.html", layout: false, status: 500
+
+    if !Rails.env.development?
+      render file: "public/500.html", layout: false, status: 500
+    else
+      raise exception
+    end
   end
 
   around_action :log_context

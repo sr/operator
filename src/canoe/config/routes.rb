@@ -54,5 +54,6 @@ Rails.application.routes.draw do
     end
   end
 
+  get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"
 end
