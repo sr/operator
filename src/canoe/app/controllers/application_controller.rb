@@ -12,10 +12,26 @@ class ApplicationController < ActionController::Base
 
   around_filter :log_context
 
+  rescue_from Exception do |exception|
+    Instrumentation.log_exception(exception)
+
+    if !Rails.env.development?
+      render file: "public/500.html", layout: false, status: 500
+    else
+      raise exception
+    end
+  end
+
   protected
 
   def log_context
-    Instrumentation.context(request_id: Instrumentation.request_id) do
+    data = { request_id: Instrumentation.request_id }
+
+    if current_user
+      data[:user_email] = current_user.email
+    end
+
+    Instrumentation.context(data) do
       yield
     end
   end
@@ -146,8 +162,7 @@ class ApplicationController < ActionController::Base
     else
       acl = DeployACLEntry.for_project_and_deploy_target(current_project, current_target)
       if acl && !acl.authorized?(current_user)
-        Instrumentation.error(
-          error: "unauthorized-deploy",
+        Instrumentation.error("unauthorized-deploy",
           current_user: current_user.uid,
           project: current_project.name,
           target: current_target.name,
