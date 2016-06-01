@@ -30,10 +30,10 @@ mv modules/*.so .
 %install
 rm -rf %{buildroot}
 
-install -d %{buildroot}%{_libdir}/php/extensions
+install -d %{buildroot}%{_libdir}/php/modules
 install -d %{buildroot}%{_sysconfdir}/php.d
 
-install -m755 %{soname} %{buildroot}%{_libdir}/php/extensions/
+install -m755 %{soname} %{buildroot}%{_libdir}/php/modules/
 
 cat > %{buildroot}%{_sysconfdir}/php.d/%{inifile} << EOF
 extension = %{soname}
@@ -46,4 +46,4 @@ rm -rf %{buildroot}
 %defattr(-, root, root, -)
 %doc CREDITS ChangeLog LICENSE README.markdown zookeeper-api.php package*.xml
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/php.d/%{inifile}
-%attr(0755,root,root) %{_libdir}/php/extensions/%{soname}
+%attr(0755,root,root) %{_libdir}/php/modules/%{soname}
