@@ -6,72 +6,58 @@ class QueriesController < ApplicationController
   end
 
   def new
+    query = current_user.queries.new(
+      account_id: params[:account_id],
+      raw_sql: raw_sql_query,
+    )
+
     render "_form", locals: {
-      account: account,
-      database_name: database.name,
-      sql_query: sql_query,
-      tables: database.tables,
-      current_view: params[:view] || Query::SQL
+      query: query,
+      raw_sql: raw_sql_query
     }
   end
 
+  def show
+    query = UserQuery.find(params[:id])
+
+    respond_to do |format|
+      format.html do
+        render :show, locals: {
+          current_view: params[:view] || Query::SQL,
+          query: query,
+          results: query.execute
+        }
+      end
+      format.csv do
+        render text: query.execute_csv
+      end
+    end
+  end
+
   def create
-    render :show, locals: {
-      account: account,
-      database_name: database.name,
-      is_limited: params[:is_limited].present?,
-      results: database.execute(sql_query.sql),
-      sql_query: sql_query,
-      tables: database.tables,
-      current_view: params[:view] || Query::SQL
-    }
+    query = current_user.queries.create!(
+      account_id: params[:account_id],
+      raw_sql: params[:sql]
+    )
+
+    redirect_to "/queries/#{query.id}"
   end
 
   private
 
-  def sql_query
-    SQLQuery.parse(raw_sql_query).limit
-  end
-
-  def account
-    if query_params[:account_id].present?
-      datacenter.find_account(query_params[:account_id])
-    end
-  end
-
-  def database
-    if params[:account_id].present?
-      datacenter.shard_for(params[:account_id])
-    else
-      datacenter.global
-    end
-  end
-
-  def datacenter
-    current_user.datacenter
-  end
-
   def raw_sql_query
-    if query_params[:sql].present?
-      query_params[:sql]
+    if params[:sql].present?
+      params[:sql]
     else
       default_sql_query
     end
   end
 
   def default_sql_query
-    if query_params[:account_id].present?
+    if params[:account_id].present?
       "SELECT * FROM account"
     else
       "SELECT * FROM global_account"
     end
-  end
-
-  def query_params
-    params.permit(:sql, :database, :view, :account_id, :is_limited)
-  end
-
-  def account_params
-    params.permit(:account_id)
   end
 end

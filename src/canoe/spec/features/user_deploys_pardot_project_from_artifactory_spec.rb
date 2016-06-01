@@ -1,19 +1,18 @@
 require "rails_helper"
 
-RSpec.feature "user deploys pardot repo from artifactory artifact" do
+RSpec.feature "user deploys pardot project from artifactory artifact" do
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
-    @repo = FactoryGirl.create(:repo,
+    @project = FactoryGirl.create(:project,
       name: "pardot",
-      deploys_via_artifacts: true,
       bamboo_project: "PDT",
       bamboo_plan: "PPANT",
     )
     @server = FactoryGirl.create(:server, hostname: "app-s1.example")
-    @server.deploy_scenarios.create!(deploy_target: @deploy_target, repo: @repo)
+    @server.deploy_scenarios.create!(deploy_target: @deploy_target, project: @project)
 
     allow(Octokit).to receive(:branch)
-      .with("Pardot/#{@repo.name}", "master")
+      .with("Pardot/#{@project.name}", "master")
       .and_return(OpenStruct.new(name: "master", object: OpenStruct.new(sha: "abc123")))
 
     allow(Artifactory.client).to receive(:post)
@@ -48,17 +47,17 @@ RSpec.feature "user deploys pardot repo from artifactory artifact" do
   scenario "happy path deployment" do
     login_as "Joe Syncmaster", "joe.syncmaster@salesforce.com"
 
-    find(".repos-index-list a", text: @repo.name).click
+    find(".projects-index-list a", text: @project.name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
     find("a[data-target='test']", text: "Ship it Here").click
     click_button "SHIP IT!"
-    expect(page).to have_text("Watching deploy of #{@repo.name.capitalize}")
+    expect(page).to have_text("Watching deploy of #{@project.name.capitalize}")
 
     deploys = Deploy.all
     expect(deploys.length).to eq(1)
     expect(deploys[0].auth_user.email).to eq("joe.syncmaster@salesforce.com")
-    expect(deploys[0].repo_name).to eq(@repo.name)
+    expect(deploys[0].project_name).to eq(@project.name)
     expect(deploys[0].what).to eq("branch")
     expect(deploys[0].what_details).to eq("master")
     expect(deploys[0].build_number).to eq(1234)

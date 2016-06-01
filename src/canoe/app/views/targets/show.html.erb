@@ -3,42 +3,42 @@
   <%= current_target.name.capitalize %>
 </h1>
 
-<table class="table table-hover repos">
+<table class="table table-hover projects">
   <thead>
     <tr>
       <th></th>
-      <th>Repo</th>
+      <th>Project</th>
       <th>Latest Deploy</th>
       <th>Lock Status</th>
     </tr>
   </thead>
 
   <tbody>
-    <%- all_repos.each do |repo| %>
+    <%- all_projects.each do |project| %>
       <%-
-        lock = current_target.existing_lock(repo)
-        deploy = current_target.last_deploy_for(repo.name)
+        lock = current_target.existing_lock(project)
+        deploy = current_target.last_deploy_for(project.name)
       %>
 
-      <%= content_tag :tr, class: repo_row_class(lock, deploy), data: {repo: repo.name} do %>
+      <%= content_tag :tr, class: project_row_class(lock, deploy), data: {project: project.name} do %>
         <td style="width: 1px; white-space: nowrap">
           <%- if lock %>
-            <%= link_to unlock_target_repo_path(current_target, repo), method: "post", class: "btn btn-xs btn-warning", data: {confirm: lock.auth_user == current_user ? nil : "Are you sure you want to force unlock this repo?"} do %>
+            <%= link_to unlock_target_project_path(current_target, project), method: "post", class: "btn btn-xs btn-warning", data: {confirm: lock.auth_user == current_user ? nil : "Are you sure you want to force unlock this project?"} do %>
               <i class="icon-unlock"></i> Unlock
             <%- end %>
           <%- else %>
-            <%= link_to lock_target_repo_path(current_target, repo), method: "post", class: "btn btn-xs btn-danger" do %>
+            <%= link_to lock_target_project_path(current_target, project), method: "post", class: "btn btn-xs btn-danger" do %>
               <i class="icon-lock"></i> Lock
             <%- end %>
           <%- end %>
 
-          <%= link_to "All Deploys", target_repo_deploys_path(current_target, repo), class: "btn btn-xs btn-primary" %>
+          <%= link_to "All Deploys", target_project_deploys_path(current_target, project), class: "btn btn-xs btn-primary" %>
         </td>
 
-        <td><%= link_to repo.name, repo %></td>
+        <td><%= link_to project.name, project %></td>
 
         <td>
-          <%- if deploy = current_target.last_deploy_for(repo.name) %>
+          <%- if deploy = current_target.last_deploy_for(project.name) %>
             <%- if deploy.completed? %>
               <i class="icon-check"></i>
             <%- else %>
@@ -46,7 +46,7 @@
             <%- end %>
 
             <%= print_deploy_what(deploy) %>
-            <%= link_to "View", repo_deploy_path(repo, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
+            <%= link_to "View", project_deploy_path(project, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
           <%- end %>
         </td>
 

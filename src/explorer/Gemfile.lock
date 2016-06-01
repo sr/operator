@@ -89,7 +89,7 @@ GEM
     mime-types-data (3.2016.0221)
     mini_portile2 (2.0.0)
     minitest (5.8.4)
-    mysql2 (0.4.3)
+    mysql2 (0.4.4)
     net-ldap (0.14.0)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -101,6 +101,8 @@ GEM
       omniauth (~> 1.0)
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
+    pinglish (0.2.1)
+      rack
     puma (3.4.0)
     pyu-ruby-sasl (0.0.3.3)
     racc (1.4.14)
@@ -167,10 +169,11 @@ DEPENDENCIES
   coffee-rails (~> 4.0)
   foreman (= 0.78.0)
   jquery-rails
-  mysql2 (= 0.4.3)
+  mysql2 (= 0.4.4)
   omniauth (= 1.3.1)
   omniauth-ldap (~> 1.0)
   pardot-rubylib!
+  pinglish (~> 0.2)
   puma (~> 3.4)
   rails (= 4.2.6)
   sass-rails (~> 5.0)
@@ -180,4 +183,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   1.12.0
+   1.12.1

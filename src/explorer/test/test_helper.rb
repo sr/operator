@@ -11,6 +11,15 @@ module ActiveSupport
 
     protected
 
+    def create_user(attributes = {})
+      default_attributes = {
+        uid: SecureRandom.hex,
+        name: "boom",
+        email: "sr@sfdc.be"
+      }
+      User.create!(default_attributes.merge(attributes))
+    end
+
     def reset_account_access(datacenter)
       config = DatabaseConfigurationFile.load.global(datacenter)
       connection = Mysql2::Client.new(

@@ -1,21 +1,21 @@
 class Api::DeploysController < Api::Controller
-  before_filter :require_repo, only: [:index, :latest]
+  before_filter :require_project, only: [:index, :latest]
   before_filter :require_target, only: [:index, :latest]
   before_filter :require_deploy, only: [:show, :completed_server]
 
   def index
     @deploys = current_target.deploys
-      .where(repo_name: current_repo.name)
+      .where(project_name: current_project.name)
       .order(id: :desc)
       .limit(10)
   end
 
   def latest
-    if @deploy = current_target.last_deploy_for(current_repo.name)
+    if @deploy = current_target.last_deploy_for(current_project.name)
       @results = params[:server].present? ? @deploy.results.for_server_hostnames(params[:server]) : @deploy.results
       render action: "show"
     else
-      render json: {error: true, message: "Repo #{current_repo.name} hasn't been deployed to #{current_target.name}."}
+      render json: {error: true, message: "Project #{current_project.name} hasn't been deployed to #{current_target.name}."}
     end
   end
 

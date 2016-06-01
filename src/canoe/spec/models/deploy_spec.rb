@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe Deploy do
   describe "completion" do
     it "is not complete if a server is still pending" do
-      repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
-      deploy = FactoryGirl.create(:deploy, repo_name: repo.name, completed: false)
+      project = FactoryGirl.create(:project) # TODO Remove this when we've added an association btw Deploy & Project
+      deploy = FactoryGirl.create(:deploy, project_name: project.name, completed: false)
       server = FactoryGirl.create(:server)
       deploy.results.create!(server: server, stage: "initiated")
 
@@ -13,8 +13,8 @@ RSpec.describe Deploy do
     end
 
     it  "is complete if all results are completed or failed" do
-      repo = FactoryGirl.create(:repo) # TODO Remove this when we've added an association btw Deploy & Repo
-      deploy = FactoryGirl.create(:deploy, repo_name: repo.name, completed: false)
+      project = FactoryGirl.create(:project) # TODO Remove this when we've added an association btw Deploy & Project
+      deploy = FactoryGirl.create(:deploy, project_name: project.name, completed: false)
 
       server = FactoryGirl.create(:server)
       deploy.results.create!(server: server, stage: "completed")

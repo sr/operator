@@ -1,14 +1,11 @@
 <%=
   render partial: 'form', locals: {
-    account: account,
-    database_name: database_name,
-    sql_query: sql_query,
-    tables: tables,
-    current_view: current_view,
+    query: query
   }
 %>
 <p>
-<pre><%= sql_query.sql %></pre>
+<pre><%= query.executable_query.sql %></pre>
+<%= link_to "Export to CSV", "/queries/#{query.id}.csv" %>
 </p>
 <div>
   <table class="table table-striped">
@@ -17,7 +14,7 @@
     <% results.fields.each_with_index do |field, i| %>
       <th>
         <%= link_to field, "#", class: 'select_column' %>
-        <% if !sql_query.select_all? && (i == results.fields.length-1) %>
+        <% if !query.executable_query.select_all? && (i == results.fields.length-1) %>
           <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>
@@ -35,5 +32,4 @@
     </tbody>
   </table>
 </div>
-<%= link_to("Show All Rows", "#", class: "all_rows") if is_limited %>
-<%= link_to "Export to CSV", "#", class: "export_csv" %>
+<%= link_to("Show All Rows", "#", class: "all_rows") if false %> <!-- TODO(sr) Sup ->

@@ -21,11 +21,11 @@ class Hipchat
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
-            "just began syncing #{deploy.repo_name.capitalize} to " + \
+            "just began syncing #{deploy.project_name.capitalize} to " + \
             "#{build_link(deploy)} [#{server_msg}]"
 
       previous_deploy = deploy.deploy_target.previous_deploy(deploy)
-      msg += "<br>GitHub Diff: <a href='#{deploy.repo.diff_url(previous_deploy, deploy)}'>" + \
+      msg += "<br>GitHub Diff: <a href='#{deploy.project.diff_url(previous_deploy, deploy)}'>" + \
             "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" + \
             "</a>" if previous_deploy
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
@@ -39,13 +39,13 @@ class Hipchat
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
-            "just finished syncing #{deploy.repo_name.capitalize} to #{build_link(deploy)}"
+            "just finished syncing #{deploy.project_name.capitalize} to #{build_link(deploy)}"
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_cancelled(deploy)
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " + \
-            "CANCELLED syncing #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
+            "CANCELLED syncing #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
@@ -58,7 +58,7 @@ class Hipchat
 
     def notify_untested_deploy(deploy)
       msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " + \
-            "an UNTESTED deploy of #{deploy.repo_name.capitalize} to #{build_link(deploy, false)}"
+            "an UNTESTED deploy of #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?, "red")
     end
 
@@ -97,7 +97,7 @@ class Hipchat
       else
         build_txt = "#{deploy.what_details} build#{deploy.build_number}"
       end
-      commit_link = deploy.repo.commit_url(deploy)
+      commit_link = deploy.project.commit_url(deploy)
       link ? "<a href='#{commit_link}'>#{build_txt}</a>" : build_txt
     end
   end
