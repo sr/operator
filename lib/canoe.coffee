@@ -10,7 +10,7 @@ class Canoe
       .header("accept", "application/json")
 
   deploys: (target_name, repo_name, cb) ->
-    @_buildClient().path("/api/targets/#{target_name}/repos/#{repo_name}/deploys")
+    @_buildClient().path("/api/targets/#{target_name}/projects/#{repo_name}/deploys")
       .get() (err, res, body) ->
         if err?
           cb(err, null) if cb
@@ -18,7 +18,7 @@ class Canoe
           cb(null, JSON.parse(body)) if cb
 
   builds: (repo_name, branch_name, limit, cb) ->
-    @_buildClient().path("/api/repos/#{repo_name}/branches/#{branch_name}/builds")
+    @_buildClient().path("/api/projects/#{repo_name}/branches/#{branch_name}/builds")
       .query("limit", limit)
       .get() (err, res, body) ->
         if err?
