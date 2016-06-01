@@ -385,7 +385,11 @@ module.exports = (robot) ->
       'http://i.imgur.com/4R6F3bZ.png',
       'http://i.imgur.com/ECG14iD.gif.png',
       'http://i.imgur.com/MJxHYxq.gif.png',
-      'http://i.imgur.com/VbvnB2P.png'
+      'http://i.imgur.com/VbvnB2P.png',
+      'https://hipchat.dev.pardot.com/files/1/261/ZZGrAH9oJSAjmq4/reverserubbs.gif',
+      'https://hipchat.dev.pardot.com/files/1/261/TglCCcPz8cXOl5s/downwardrubbs.gif',
+      'https://hipchat.dev.pardot.com/files/1/261/FvcAWkrQ8y8Fl7O/upwardrubbs.gif',
+      'https://hipchat.dev.pardot.com/files/1/282/z9Aj3d510cHFnZG/aZEnsuw.gif'
     ]
     msg.send msg.random tehrubbs
 
