@@ -55,7 +55,7 @@ module Canoe
     config.middleware.use Rack::Attack
     config.middleware.use Pinglish do |ping|
       ping.check :db do
-        !!Repo.count
+        !!Project.count
       end
     end
   end

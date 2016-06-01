@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe "/targets/:target_name/deploys/:deploy_id/results/:server_hostname" do
   let(:target) { FactoryGirl.create(:deploy_target) }
-  let(:repo) { FactoryGirl.create(:repo) }
-  let(:deploy) { FactoryGirl.create(:deploy, deploy_target: target, repo_name: repo.name, completed: false) }
+  let(:project) { FactoryGirl.create(:project) }
+  let(:deploy) { FactoryGirl.create(:deploy, deploy_target: target, project_name: project.name, completed: false) }
   let(:server) { FactoryGirl.create(:server) }
 
   before do

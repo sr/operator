@@ -1,6 +1,6 @@
 <h1>
-  <%= content_tag :i, "", class: "icon-#{current_repo.icon}" %>
-  <%= current_repo.name.capitalize %>
+  <%= content_tag :i, "", class: "icon-#{current_project.icon}" %>
+  <%= current_project.name.capitalize %>
 </h1>
 
 <h2 class="steps-count">Step 4 of 4</h2>
@@ -8,7 +8,7 @@
 <%= content_tag :div, class: ["alert", current_target.production? ? "alert-danger" : "alert-info"].compact do %>
   <p class="lead">
     <strong>Deploy:</strong>
-    <%= current_repo.name.capitalize %>
+    <%= current_project.name.capitalize %>
     <%= print_deploy_what @prov_deploy %>
     to
     <i class="icon-bullseye"></i> <%= current_target.name.upcase %>
@@ -21,7 +21,7 @@
       What will change?
     </strong>
     &nbsp;&nbsp;
-    <a href="<%= current_repo.diff_url(@previous_deploy, @prov_deploy) %>">
+    <a href="<%= current_project.diff_url(@previous_deploy, @prov_deploy) %>">
       <% if @previous_deploy %>
         <%= print_deploy_what @previous_deploy %>
       <% else %>
@@ -46,7 +46,7 @@
 </blockquote>
 
 <div class="confirm-deploy">
-  <%= form_tag repo_deploys_path(current_repo.name),
+  <%= form_tag project_deploys_path(current_project.name),
       class: "form-horizontal",
       id: "deploy-form",
       role: "form" do %>

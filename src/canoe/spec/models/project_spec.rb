@@ -1,13 +1,12 @@
 require "rails_helper"
 
-RSpec.describe Repo do
+RSpec.describe Project do
   describe "#builds" do
     context "bamboo project and bamboo plan specified" do
-      let(:repo) do
-        FactoryGirl.create(:repo,
+      let(:project) do
+        FactoryGirl.create(:project,
           bamboo_project: "PDT",
           bamboo_plan: "PPANT",
-          deploys_via_artifacts: true,
         )
       end
 
@@ -28,7 +27,7 @@ RSpec.describe Repo do
             }
           ])
 
-        builds = repo.builds(branch: "master")
+        builds = project.builds(branch: "master")
         expect(builds.length).to eq(1)
         expect(builds[0].build_number).to eq(1234)
       end
