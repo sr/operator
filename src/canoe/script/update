@@ -13,8 +13,8 @@ echo "==> Updating db..."
 bin/rake db:create || true
 bin/rake db:migrate
 
-echo "===> Creating repos"
-bin/rake canoe:create_repos
+echo "===> Creating projects"
+bin/rake canoe:create_projects
 echo "===> Creating development targets"
 bin/rake canoe:create_targets
 echo "===> Creating deploy ACLs"

@@ -10,15 +10,15 @@ module CanoeHelper
 
   # ----------------------------------------------------------------------
   # ACTIVE X
-  def active_repo(repo = nil)
-    current_repo_name = current_repo && current_repo.name
-    repo_name = repo && repo.name
+  def active_project(project = nil)
+    current_project_name = current_project && current_project.name
+    project_name = project && project.name
 
-    current_repo_name == repo_name ? 'class="active"'.html_safe : ''
+    current_project_name == project_name ? 'class="active"'.html_safe : ''
   end
 
   def active_target(target_name="")
-    if !current_repo && current_target && \
+    if !current_project && current_target && \
         current_target.name.downcase == target_name.downcase
       'class="active"'.html_safe
     else

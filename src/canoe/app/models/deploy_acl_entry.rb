@@ -1,7 +1,7 @@
 class DeployACLEntry < ActiveRecord::Base
   ACL_TYPES = ["ldap_group"]
 
-  validates :repo_id,
+  validates :project_id,
     presence: true,
     uniqueness: {scope: [:deploy_target_id]}
   validates :deploy_target_id, presence: true
@@ -12,11 +12,11 @@ class DeployACLEntry < ActiveRecord::Base
 
   serialize :value, JSON
 
-  belongs_to :repo
+  belongs_to :project
   belongs_to :deploy_target
 
-  def self.for_repo_and_deploy_target(repo, deploy_target)
-    where(repo_id: repo, deploy_target_id: deploy_target).first
+  def self.for_project_and_deploy_target(project, deploy_target)
+    where(project_id: project, deploy_target_id: deploy_target).first
   end
 
   def authorized?(user)

@@ -69,27 +69,29 @@ class ApplicationController < ActionController::Base
     @current_deploy =
       if id = params[:deploy_id] || params[:id]
         deploy = Deploy.find_by_id(id.to_i)
-        if deploy && params[:repo_name].blank?
-          # set the repo name if it's not in the params hash already
-          params[:repo_name] = deploy.repo_name
+        if deploy && params[:project_name].blank?
+          # set the project name if it's not in the params hash already
+          params[:project_name] = deploy.project_name
         end
         deploy
       end
   end
   helper_method :current_deploy
 
-  def current_repo
-    return @current_repo if defined?(@current_repo)
-    @current_repo =
-      if params[:repo_name].present?
-        Repo.find_by_name(params[:repo_name].to_s)
+  def current_project
+    return @current_project if defined?(@current_project)
+    @current_project =
+      if params[:project_name].present?
+        Project.find_by_name(params[:project_name].to_s)
+      elsif params[:repo_name].present? # backwards compatibility
+        Project.find_by_name(params[:repo_name].to_s)
       elsif params[:name].present?
-        Repo.find_by_name(params[:name].to_s)
+        Project.find_by_name(params[:name].to_s)
       elsif current_deploy
-        Repo.find_by_name(current_deploy.repo_name)
+        Project.find_by_name(current_deploy.project_name)
       end
   end
-  helper_method :current_repo
+  helper_method :current_project
 
   def current_target
     return @current_target if defined?(@current_target)
@@ -109,14 +111,14 @@ class ApplicationController < ActionController::Base
   end
   helper_method :all_targets
 
-  def all_repos
-    @all_repos ||= Repo.order(:name)
+  def all_projects
+    @all_projects ||= Project.order(:name)
   end
-  helper_method :all_repos
+  helper_method :all_projects
 
-  def require_repo
-    return if current_repo
-    raise ActiveRecord::RecordNotFound.new("no repository found")
+  def require_project
+    return if current_project
+    raise ActiveRecord::RecordNotFound.new("no project found")
   end
 
   def require_target
@@ -137,17 +139,17 @@ class ApplicationController < ActionController::Base
   def require_deploy_acl_satisfied
     if current_user.nil?
       raise "No current user"
-    elsif current_repo.nil?
-      raise "No current repository"
+    elsif current_project.nil?
+      raise "No current project"
     elsif current_target.nil?
       raise "No current target"
     else
-      acl = DeployACLEntry.for_repo_and_deploy_target(current_repo, current_target)
+      acl = DeployACLEntry.for_project_and_deploy_target(current_project, current_target)
       if acl && !acl.authorized?(current_user)
         Instrumentation.error(
           error: "unauthorized-deploy",
           current_user: current_user.uid,
-          repo: current_repo.name,
+          project: current_project.name,
           target: current_target.name,
         )
         render template: "application/not_authorized_for_deploy", status: :unauthorized
@@ -160,11 +162,11 @@ class ApplicationController < ActionController::Base
 
   def build_provisional_deploy
     if params[:artifact_url]
-      ProvisionalDeploy.from_artifact_url(current_repo, params[:artifact_url])
+      ProvisionalDeploy.from_artifact_url(current_project, params[:artifact_url])
     elsif params[:what] == "tag"
-      ProvisionalDeploy.from_tag(current_repo, params[:what_details])
+      ProvisionalDeploy.from_tag(current_project, params[:what_details])
     elsif params[:what] == "branch"
-      ProvisionalDeploy.from_branch(current_repo, params[:what_details])
+      ProvisionalDeploy.from_branch(current_project, params[:what_details])
     end
   end
 

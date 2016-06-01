@@ -6,7 +6,7 @@
 
   <i class="icon-double-angle-right"></i>
 
-  <%= current_repo.name.capitalize %>
+  <%= current_project.name.capitalize %>
 </h1>
 
 <table class="table">
@@ -25,7 +25,7 @@
   <% @deploys.each do |deploy| %>
     <tr>
       <td>
-        <%= link_to "View", repo_deploy_path(current_repo, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
+        <%= link_to "View", project_deploy_path(current_project, deploy, watching: deploy.completed? ? nil : "1"), class: "btn btn-xs btn-primary" %>
       </td>
       <td>
         <%= print_deploy_what(deploy) %>

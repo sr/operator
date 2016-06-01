@@ -8,12 +8,12 @@ class ProvisionalDeploy
   attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
 
-  def self.from_artifact_url(repo, artifact_url)
+  def self.from_artifact_url(project, artifact_url)
     hash = Artifactory.client.get(artifact_url, properties: nil)
     artifact = Artifactory::Resource::Artifact.from_hash(hash)
     properties = artifact.properties.each_with_object({}) { |(k, v), h| h[k] = v.first }
 
-    from_artifact_url_and_properties(repo, artifact_url, properties)
+    from_artifact_url_and_properties(project, artifact_url, properties)
   end
 
   def self.from_artifact_hash(hash)
@@ -23,7 +23,7 @@ class ProvisionalDeploy
     from_artifact_url_and_properties(hash["repo"], artifact_url, properties)
   end
 
-  def self.from_artifact_url_and_properties(repo, artifact_url, properties)
+  def self.from_artifact_url_and_properties(project, artifact_url, properties)
     return nil unless
       properties["gitBranch"] && \
       properties["buildNumber"] && \
@@ -42,7 +42,7 @@ class ProvisionalDeploy
       end
 
     new(
-      repo: repo,
+      project: project,
       artifact_url: artifact_url,
       what: "branch",
       what_details: properties["gitBranch"],
@@ -55,9 +55,9 @@ class ProvisionalDeploy
     )
   end
 
-  def self.from_previous_deploy(repo, deploy)
+  def self.from_previous_deploy(project, deploy)
     new(
-      repo: repo,
+      project: project,
       artifact_url: deploy.artifact_url,
       what: deploy.what,
       what_details: deploy.what_details,
@@ -69,8 +69,8 @@ class ProvisionalDeploy
     )
   end
 
-  def initialize(repo:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
-    @repo = repo
+  def initialize(project:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
+    @project = project
     @artifact_url = artifact_url
     @what = what
     @what_details = what_details
@@ -82,8 +82,8 @@ class ProvisionalDeploy
     @options = options
   end
 
-  def repo_name
-    @repo.name
+  def project_name
+    @project.name
   end
 
   def is_valid?

@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe DeployWorkflow do
-  let(:repo) { FactoryGirl.create(:repo) }
-  let(:deploy) { FactoryGirl.create(:deploy, completed: false, repo_name: repo.name) }
+  let(:project) { FactoryGirl.create(:project) }
+  let(:deploy) { FactoryGirl.create(:deploy, completed: false, project_name: project.name) }
 
   context "initiating a deploy" do
     it "creates a deploy result for each server, initially setting them to stage: initiated" do
@@ -64,7 +64,7 @@ RSpec.describe DeployWorkflow do
   end
 
   context "deployed -> completed" do
-    it "moves the restart server to the completed stage after it reports a successful restart" do
+    it "moves the restart server to the completed stage after it projectrts a successful restart" do
       servers = FactoryGirl.create_list(:server, 3)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
 
