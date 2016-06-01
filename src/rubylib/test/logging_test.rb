@@ -33,7 +33,7 @@ class LoggingTest < Minitest::Test
   def test_log_exception_noop
     Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_NOOP)
     begin
-      raise RuntimeError, "boomtown"
+      raise "boomtown"
     rescue RuntimeError
       Instrumentation.log_exception($!, boom: "town")
     end
@@ -47,7 +47,7 @@ class LoggingTest < Minitest::Test
   def test_log_exception_logfmt
     Instrumentation.setup("app", "test", log_format: Instrumentation::LOG_LOGFMT)
     begin
-      raise RuntimeError, "boomtown"
+      raise "boomtown"
     rescue RuntimeError
       Instrumentation.log_exception($!, boom: "town")
     end
