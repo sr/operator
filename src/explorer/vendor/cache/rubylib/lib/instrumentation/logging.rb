@@ -62,8 +62,8 @@ module Instrumentation
       @logger.log(data, &block)
     end
 
-    def log_exception(exception, data, &block)
-      @logger.log_exception(data, exception, &block)
+    def log_exception(exception, data)
+      @logger.log_exception(data, exception)
     end
 
     def reset
