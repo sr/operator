@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
 
     if !Rails.env.development?
       render file: "public/500.html", layout: false, status: 500
+    else
+      raise exception
     end
   end
 
