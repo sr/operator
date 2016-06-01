@@ -4,7 +4,7 @@
 Summary: Headers and static libraries for libzookeeper
 Name: libzookeeper-devel
 Version: 3.4.6
-Release: 1
+Release: 1%{?dist}
 License: Apache License v2.0
 Group: Development/Libraries
 URL: http://hadoop.apache.org/zookeeper/
