@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+docker build -f etc/docker/Dockerfile.build -t build/build .
+
+: ${TMPDIR:="/tmp"}
+: ${GOOS:="linux"}
+tmpdir="$(mktemp -d "buildXXXXX")"
+trap 'rm -rf $tmpdir' EXIT
+docker run --rm \
+    -v "$(pwd):/go:ro" \
+    -v "$(pwd)/${tmpdir}:/tmp" \
+    -e "GOOS=${GOOS}" \
+    -e "CGO_ENABLED=0" \
+    build/build \
+    go build -a -tags netgo -ldflags "-w" -o /tmp/jiracleaner bread/cmd/jiracleaner
+    mv "${tmpdir}/jiracleaner" "$(pwd)/bin/jiracleaner"
+PATH="$(pwd)/bin:$PATH"
+export PATH
+
+jiracleaner -project BREAD -username breadbot -password "$BREADBOT_PASSWORD" \
+    -apply
