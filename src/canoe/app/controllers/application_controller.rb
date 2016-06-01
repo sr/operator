@@ -12,6 +12,14 @@ class ApplicationController < ActionController::Base
 
   around_filter :log_context
 
+  rescue_from Exception do |exception|
+    Instrumentation.log_exception(exception)
+
+    if !Rails.env.development?
+      render file: "public/500.html", layout: false, status: 500
+    end
+  end
+
   protected
 
   def log_context
