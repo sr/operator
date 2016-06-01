@@ -11,7 +11,7 @@ Release:       1%{?dist}
 License:       BSD
 Group:         Development/Languages
 URL:           https://github.com/allegro/php-protobuf
-Source0:       https://github.com/pd-array/php-protobuf/archive/%{repoversion}.tar.gz
+Source0:       https://github.com/pd-aray/php-protobuf/archive/%{repoversion}.tar.gz
 Requires:      php >= %{phpver}
 BuildRequires: php-cli >= %{phpver}
 BuildRequires: php-devel >= %{phpver}
