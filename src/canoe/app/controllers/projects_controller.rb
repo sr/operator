@@ -1,6 +1,7 @@
 class ProjectsController < ApplicationController
   before_filter :require_target, only: [:lock, :unlock]
   before_filter :require_project, only: [:show, :lock, :unlock]
+  skip_before_action :require_oauth_authentication, only: :boomtown
 
   def index
     @projects = all_projects
