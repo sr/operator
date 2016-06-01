@@ -6,10 +6,10 @@
 
 Summary:       PHP module for protobufs
 Name:          php-%{modname}
-Version:       %{repoversion}
+Version:       0.2.0
 Release:       1%{?dist}
-License:       Open
-Group:         PHP/Module
+License:       BSD
+Group:         Development/Languages
 URL:           https://github.com/allegro/php-protobuf
 Source0:       https://github.com/pd-array/php-protobuf/archive/%{repoversion}.tar.gz
 Requires:      php >= %{phpver}
@@ -20,7 +20,7 @@ BuildRequires: php-devel >= %{phpver}
 https://github.com/allegro/php-protobuf
 
 %prep
-%setup -q
+%setup -q -n php-protobuf-%{repoversion}
 
 %build
 phpize
