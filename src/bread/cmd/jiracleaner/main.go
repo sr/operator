@@ -101,6 +101,11 @@ func run() error {
 						}
 					]
 				},
+				"fields": {
+					"resolution": {
+						"name": "Won't Fix"
+					}
+				},
 				"transition": {
 					"id": "%d"
 				}
