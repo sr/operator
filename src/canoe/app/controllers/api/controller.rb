@@ -27,9 +27,9 @@ class Api::Controller < ApplicationController
     render status: 400, json: {error: true, message: "Invalid user specified."}
   end
 
-  def require_repo
-    return if current_repo
-    render status: 404, json: {error: true, message: "Invalid repo specified."}
+  def require_project
+    return if current_project
+    render status: 404, json: {error: true, message: "Invalid project specified."}
   end
 
   def require_deploy
