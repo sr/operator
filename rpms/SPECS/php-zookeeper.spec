@@ -6,7 +6,7 @@
 Summary:	PHP extension for interfacing with Apache ZooKeeper
 Name:		php-%{modname}
 Version:	0.3.0
-Release:	1
+Release:	1%{?dist}
 Group:		Development/Languages
 License:	PHP License
 URL:		https://github.com/mikemfrank/php-zookeeper
