@@ -5,7 +5,7 @@ ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
 ARG parallel_version=20160322
 ARG phantomjs_version=2.0-1
-ARG libzookeeper_version=3.4.6-1
+ARG libzookeeper_version=3.4.6-1.pardot
 ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
 ARG artifactory_host
 
@@ -15,7 +15,7 @@ RUN yum install -y epel-release && \
   yum install -y \
     font-config supervisor less which git openssh-clients redis bzip2 make \
     unzip xz gcc file libicu openssl java-1.7.0-openjdk && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.el6.x86_64.rpm" && \
   yum clean all
 
