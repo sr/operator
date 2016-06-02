@@ -8,7 +8,7 @@ namespace :canoe do
     Project.find_or_initialize_by(name: 'explorer').tap { |project|
       project.icon = 'search'
       project.bamboo_project = 'BREAD'
-      project.bamboo_plan = 'BREAD'
+      project.bamboo_plan = 'EX1'
       project.repository = 'Pardot/bread'
     }.save!
 
