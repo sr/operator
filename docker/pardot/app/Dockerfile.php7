@@ -6,6 +6,7 @@ ARG bower_version=1.7.2
 ARG parallel_version=20160322
 ARG phantomjs_version=2.0-1
 ARG libzookeeper_version=3.4.6-1.pardot
+ARG git_version=2.7.4-1
 ARG php_zookeeper_version=0.3.0-1.pardot
 ARG php_protobuf_version=0.2.0-1.pardot
 ARG artifactory_host
@@ -14,10 +15,11 @@ RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
 RUN yum install -y epel-release && \
   yum install -y \
-    font-config supervisor less which git openssh-clients redis bzip2 make \
+    font-config supervisor less which openssh-clients redis bzip2 make \
     unzip xz gcc file libicu openssl java-1.7.0-openjdk && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.el6.x86_64.rpm" && \
   yum clean all
 
 # Parallel
@@ -35,8 +37,8 @@ RUN yum install -y httpd mod_ssl && \
     php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring \
     php-zip php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache \
     php-tidy php-pear php-memcache php-cli php-devel && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-zookeeper-${php_zookeeper_version}.el6.x86_64.rpm" && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-${php_protobuf_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-zookeeper-${php_zookeeper_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-${php_protobuf_version}.el6.x86_64.rpm" && \
   yum clean all
 
 # Percona Client
