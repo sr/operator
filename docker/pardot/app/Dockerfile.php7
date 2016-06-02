@@ -69,5 +69,8 @@ ADD apache.pem /etc/httpd/conf/apache.pem
 ADD php.ini /etc/php.d/90-pardot.ini
 ADD supervisord.conf /etc/supervisord.conf
 
+RUN mkdir -p /app
+WORKDIR /app
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
