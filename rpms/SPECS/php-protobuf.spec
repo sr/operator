@@ -7,7 +7,7 @@
 Summary:       PHP module for protobufs
 Name:          php-%{modname}
 Version:       0.2.0
-Release:       1%{?dist}
+Release:       1.pardot%{?dist}
 License:       BSD
 Group:         Development/Languages
 URL:           https://github.com/allegro/php-protobuf
