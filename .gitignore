@@ -7,10 +7,10 @@
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
 /src/pull_agent/.dev_settings.yml
-/bin/
+/bin/*
 /pkg/
-!/bin/build
-!/bin/deploy
 .DS_Store
 *.tfstate.backup
 coverage
+!/bin/deploy
+!/bin/cibuild
