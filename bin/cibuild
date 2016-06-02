@@ -5,4 +5,4 @@ set -euo pipefail
 PATH="$(dirname "$0")/../src/build:$PATH"
 export PATH
 
-exec build "${CI_PLAN}"
+exec build "${CI_PLAN_NAME}"
