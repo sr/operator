@@ -72,5 +72,5 @@ ADD supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /app
 WORKDIR /app
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/docker/entrypoint.sh"]
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
