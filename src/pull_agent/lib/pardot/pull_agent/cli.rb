@@ -30,6 +30,15 @@ module Pardot
         end
       end
 
+      def checkin_chef
+        response = Canoe.latest_chef_deploy
+
+        if response.deploy?
+          deploy = ChefDeployment.new(response.deploy)
+          deploy.perform
+        end
+      end
+
       def checkin
         request = Canoe.latest_deploy(environment)
         Logger.context[:deploy_id] = request.id

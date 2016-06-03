@@ -1,0 +1,28 @@
+class ChefCheckinRequest
+  Checkout = Struct.new(:sha1, :branch, :last_modified)
+
+  def self.from_hash(request)
+    checkout = request.fetch("checkout")
+    mtime = Integer(checkout.fetch("mtime"))
+
+    new(
+      request.fetch("environment"),
+      Checkout.new(
+        checkout.fetch("sha1"),
+        checkout.fetch("branch"),
+        Time.at(mtime)
+      )
+    )
+  end
+
+  def initialize(environment, checkout)
+    @environment = environment
+    @checkout = checkout
+  end
+
+  attr_reader :environment, :checkout
+
+  def older_than?(max_age)
+    @checkout.last_modified - Time.now > max_age
+  end
+end

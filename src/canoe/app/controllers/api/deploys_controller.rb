@@ -10,6 +10,15 @@ class Api::DeploysController < Api::Controller
       .limit(10)
   end
 
+  def chef_checkin
+    config = ChefDeliveryConfig.new
+    delivery = ChefDelivery.new(config)
+    parsed = JSON.parse(response.body.read)
+    request = ChefCheckinRequest.from_hash(parsed)
+    response = deliver.checkin(request)
+    render json: response
+  end
+
   def latest
     if @deploy = current_target.last_deploy_for(current_project.name)
       @results = params[:server].present? ? @deploy.results.for_server_hostnames(params[:server]) : @deploy.results
@@ -43,6 +52,4 @@ class Api::DeploysController < Api::Controller
 
     render json: {success: true}
   end
-
-  private
 end
