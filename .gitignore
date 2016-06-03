@@ -12,6 +12,6 @@
 .DS_Store
 *.tfstate.backup
 coverage
-!/bin/build
-!/bin/cleanjira
+!/bin/cibuild
+!/bin/dailyjob
 !/bin/deploy
