@@ -88,6 +88,8 @@
 #   hubot rogerroger - What's your vector, Victor? Huh? you have clearance, Clarence. What?
 #   hubot abs - ET and BWare
 #   hubot pieces - Pieces (and murica!)
+#   hubot trolledum8 - rekt
+#   hubot rekt - trolledum8
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -102,6 +104,12 @@ module.exports = (robot) ->
 
   robot.respond /parker$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
+
+  robot.respond /rekt$/i, (msg) ->
+    msg.send "http://media2.giphy.com/media/12kwNiP8SSIUus/giphy.gif"
+
+  robot.respond /trolledum8$/i, (msg) ->
+    msg.send "http://media2.giphy.com/media/12kwNiP8SSIUus/giphy.gif"
 
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
