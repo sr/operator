@@ -72,13 +72,8 @@ func run() error {
 		Issues []jira.Issue
 	}
 	var results response
-	r, err := client.Do(req, &results)
-	if err != nil {
-		s, e := ioutil.ReadAll(r.Body)
-		if e != nil {
-			return e
-		}
-		return fmt.Errorf("request failed. body: %s", string(s))
+	if _, err = client.Do(req, &results); err != nil {
+		return err
 	}
 	for _, issue := range results.Issues {
 		fmt.Printf("%s %s %s\n",
