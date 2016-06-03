@@ -98,6 +98,9 @@ case "$project" in
                 build-gem-pull_agent
         }
         ;;
+    privet)
+        true
+        ;;
     rubylib)
         build-ruby "rubylib"
         ;;
