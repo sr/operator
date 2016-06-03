@@ -66,10 +66,6 @@ case "$project" in
         build-ruby "$project"
         test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
         ;;
-    github\.com*|chatops)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
-            make -f etc/mk/golang.mk
-        ;;
     explorer)
         build-ruby "$project"
         test -n "$CI" && {
@@ -80,6 +76,10 @@ case "$project" in
             # Prepare the tarball and upload it to Artifactory
             docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
+        ;;
+    golang)
+        docker run --rm -w /go -v "$(pwd):/go" build/build \
+            make -f etc/mk/golang.mk
         ;;
     pull_agent)
         build-ruby "$project"
@@ -101,7 +101,7 @@ case "$project" in
     rubylib)
         build-ruby "rubylib"
         ;;
-    build|shell)
+    shell)
         docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
         docker run --rm -v "$(pwd):/data" \
             build/shellcheck \
