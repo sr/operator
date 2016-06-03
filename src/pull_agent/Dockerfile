@@ -13,6 +13,7 @@ RUN \
 RUN mkdir /pull-agent /var/lock/pull-agent && \
   touch /var/log/cron.log
 WORKDIR /pull-agent
+
 ENV RUBYGEM_VERSION 1
 ADD Gemfile /pull-agent/Gemfile
 ADD pardot_pull-agent.gemspec /pull-agent/pardot_pull-agent.gemspec
