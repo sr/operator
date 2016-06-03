@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-. etc/build/env
-
 PATH="$(dirname "$0")/../src/build:$PATH"
 export PATH
-
-exec build "${1:-"$CI_PLAN_NAME"}"
+exec build "$1"
