@@ -26,5 +26,5 @@ export PATH
 jiracleaner \
     -project BREAD \
     -username breadbot \
-    -password "$BREADBOT_PASSWORD" \
+    -password "$bamboo_BREADBOT_PASSWORD" \
     -apply
