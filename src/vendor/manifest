@@ -18,6 +18,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/andygrunwald/go-jira",
+			"repository": "https://github.com/andygrunwald/go-jira",
+			"vcs": "git",
+			"revision": "0821e0283a513e927e454fca0b6e05ac6e5bab8a",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/buildkite/go-buildkite/buildkite",
 			"repository": "https://github.com/buildkite/go-buildkite",
 			"vcs": "git",
@@ -151,6 +159,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/google/go-github",
+			"repository": "https://github.com/google/go-github",
+			"vcs": "git",
+			"revision": "7ec4e45f77474b3a7b7d9b7ef233a0cc8339ddf3",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/google/go-querystring/query",
 			"repository": "https://github.com/google/go-querystring",
 			"vcs": "git",
@@ -265,6 +281,15 @@
 			"revision": "15a92f04224710098b562f3c5e20a200b6490609",
 			"branch": "master",
 			"path": "/cobra",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/ssh/terminal",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "5bcd134fee4dd1475da17714aac19c0aa0142e2f",
+			"branch": "master",
+			"path": "/ssh/terminal",
 			"notests": true
 		},
 		{
