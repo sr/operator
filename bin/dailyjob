@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
+#/ Usage: dailyjob
+#/ Script gets run daily via Bamboo. See https://bamboo.dev.pardot.com/browse/BREAD-DJ
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 docker build -f etc/docker/Dockerfile.build -t build/build .
 
+# Compile jiracleaner program within a container
 : ${TMPDIR:="/tmp"}
 : ${GOOS:="linux"}
 tmpdir="$(mktemp -d "buildXXXXX")"
@@ -19,5 +22,9 @@ docker run --rm \
 PATH="$(pwd)/bin:$PATH"
 export PATH
 
-jiracleaner -project BREAD -username breadbot -password "$BREADBOT_PASSWORD" \
+# Close stale JIRA tickets
+jiracleaner \
+    -project BREAD \
+    -username breadbot \
+    -password "$BREADBOT_PASSWORD" \
     -apply
