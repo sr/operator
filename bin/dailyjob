@@ -23,8 +23,9 @@ PATH="$(pwd)/bin:$PATH"
 export PATH
 
 # Close stale JIRA tickets
-jiracleaner \
-    -project BREAD \
-    -username breadbot \
-    -password "$bamboo_BREADBOT_PASSWORD" \
-    -apply
+# TODO(sr) Re-enable once https://jira.dev.pardot.com/browse/BREAD-963 is done
+# jiracleaner \
+#     -project BREAD \
+#     -username breadbot \
+#     -password "$bamboo_BREADBOT_PASSWORD" \
+#     -apply
