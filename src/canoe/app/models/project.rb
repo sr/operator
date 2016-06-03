@@ -80,6 +80,10 @@ class Project < ActiveRecord::Base
     if bamboo_project
       conditions << {"@bambooProject" => {"$eq"    => bamboo_project}}
       conditions << {"@bambooPlan"    => {"$match" => "#{bamboo_plan}*"}} if bamboo_plan.present?
+
+      if name == "explorer"
+        conditions << {"@bambooJob" => {"$eq" => "EX"}}
+      end
     end
 
     if include_untested_builds
