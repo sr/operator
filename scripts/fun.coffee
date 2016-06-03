@@ -106,10 +106,10 @@ module.exports = (robot) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
 
   robot.respond /rekt$/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
+    msg.send "http://media2.giphy.com/media/12kwNiP8SSIUus/giphy.gif"
 
   robot.respond /trolledum8$/i, (msg) ->
-    msg.send ""
+    msg.send "http://media2.giphy.com/media/12kwNiP8SSIUus/giphy.gif"
 
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
