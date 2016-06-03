@@ -11,6 +11,7 @@ module Pardot
         result = call_api(environment, "GET", "/api/targets/#{environment.canoe_target}/deploys/latest", repo_name: environment.payload.id, server: ShellHelper.hostname)
 
         json = JSON.parse(result.body)
+        Logger.log(:warn, json) unless json["id"]
         Deploy.from_hash(json)
       end
 

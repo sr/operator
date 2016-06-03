@@ -1,6 +1,6 @@
 class GithubComparison
-  def initialize(repo_name, sha_a, sha_b)
-    @repo_name = repo_name
+  def initialize(repository, sha_a, sha_b)
+    @repository = repository
     @sha_a = sha_a
     @sha_b = sha_b
 
@@ -36,6 +36,6 @@ class GithubComparison
   end
 
   def commits
-    Octokit.compare(@repo_name, @sha_a, @sha_b).commits
+    Octokit.compare(@repository, @sha_a, @sha_b).commits
   end
 end

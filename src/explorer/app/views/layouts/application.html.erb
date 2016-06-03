@@ -19,7 +19,7 @@
       </button>
       <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class:" img-responsive logo"%></a>
       <%= image_tag "explorer_logo.png", class: "explorer_logo" %>
-      <span class="title">Pardot Explorer</span>
+      <span class="title"></span>
       <% if current_user %>
         <ul class="nav navbar-nav navbar-right">
           <li>
@@ -36,7 +36,7 @@
       <ul class="nav nav-stacked">
         <li class="li-label"><span>Database</span></li>
         <li>
-          <a href="/queries"><i class="fa fa-globe"></i>Global</a>
+          <a href="/queries/new"><i class="fa fa-globe"></i>Global</a>
         </li>
         <li>
           <a href="/accounts"><i class="fa fa-cloud"></i>Account</a>

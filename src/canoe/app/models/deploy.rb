@@ -25,7 +25,7 @@ class Deploy < ActiveRecord::Base
   def log_path
     @_log_path ||= \
       begin
-        filename = "#{self.deploy_target.name}_#{self.repo_name}_#{self.id}.log"
+        filename = "#{self.deploy_target.name}_#{self.project_name}_#{self.id}.log"
         Rails.root.join('log', filename).to_s
       end
   end
@@ -86,9 +86,9 @@ class Deploy < ActiveRecord::Base
     Hipchat.notify_deploy_cancelled(self)
   end
 
-  # TODO Replace the repo_name column with repo_id
-  def repo
-    Repo.find_by_name(repo_name)
+  # TODO Replace the project_name column with project_id
+  def project
+    Project.find_by_name(project_name)
   end
 
   def check_completed_status!

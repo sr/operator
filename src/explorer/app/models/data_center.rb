@@ -17,6 +17,7 @@ class DataCenter
 
   ENGINEERING_ROLE = 7
   DALLAS = "dfw".freeze
+  LOCAL = "local".freeze
   SEATTLE = "phx".freeze
 
   def initialize(name, user, config)
@@ -24,7 +25,7 @@ class DataCenter
     @user = user
     @config = config
 
-    if ![DALLAS, SEATTLE].include?(name)
+    if ![DALLAS, LOCAL, SEATTLE].include?(name)
       raise NotFound, name
     end
   end

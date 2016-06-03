@@ -10,15 +10,15 @@ module CanoeHelper
 
   # ----------------------------------------------------------------------
   # ACTIVE X
-  def active_repo(repo = nil)
-    current_repo_name = current_repo && current_repo.name
-    repo_name = repo && repo.name
+  def active_project(project = nil)
+    current_project_name = current_project && current_project.name
+    project_name = project && project.name
 
-    current_repo_name == repo_name ? 'class="active"'.html_safe : ''
+    current_project_name == project_name ? 'class="active"'.html_safe : ''
   end
 
   def active_target(target_name="")
-    if !current_repo && current_target && \
+    if !current_project && current_target && \
         current_target.name.downcase == target_name.downcase
       'class="active"'.html_safe
     else
@@ -97,7 +97,7 @@ module CanoeHelper
       %(program:pull-agent),
       %(message:"deploy_id=#{deploy.id}")
     ]
-    query << %(host:#{host}) if host
+    query << %(host:#{host}*) if host
     qs = CGI.escape(query.join(" AND ")).gsub('+', '%20')
 
     "https://logs-#{datacenter}.pardot.com/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),index:'logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'#{qs}')),sort:!('@timestamp',desc))"

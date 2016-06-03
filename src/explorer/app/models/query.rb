@@ -35,7 +35,7 @@ class Query
   end
 
   def assert_valid
-    if !@user.is_a?(AuthUser)
+    if !@user.is_a?(User)
       raise ExecutionRefused, "invalid user: #{@user.inspect}"
     end
 

@@ -1,9 +1,9 @@
 <ul class="nav nav-tabs">
   <li <%= 'class="active"'.html_safe unless @show_full_logs %>>
-    <%= link_to "Partial Log", repo_deploy_path(current_repo.name, current_deploy.id, params.slice(:watching)) %>
+    <%= link_to "Partial Log", project_deploy_path(current_project.name, current_deploy.id, params.slice(:watching)) %>
   </li>
   <li <%= 'class="active"'.html_safe if @show_full_logs %>>
-    <%= link_to "Full Log", repo_deploy_path(current_repo.name, current_deploy.id, params.slice(:watching).merge(show_full: "1")) %>
+    <%= link_to "Full Log", project_deploy_path(current_project.name, current_deploy.id, params.slice(:watching).merge(show_full: "1")) %>
   </li>
 </ul>
 <br>

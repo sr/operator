@@ -10,7 +10,7 @@ class GlobalAccountsCollection
   end
 
   def all
-    @database.execute(default_query).map do |result|
+    @database.execute("#{default_query} LIMIT 100").map do |result|
       GlobalAccount.new(result)
     end
   end

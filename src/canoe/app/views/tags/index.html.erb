@@ -12,14 +12,14 @@
     <% @tags.each do |tag| %>
       <li>
         <h4>
-          <a href="<%= select_target_repo_deploys_path(current_repo.name, what: "tag", what_details: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
+          <a href="<%= select_target_project_deploys_path(current_project.name, what: "tag", what_details: tag.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
           &nbsp;
           <%= deploy_type_icon("tag") %> <%= tag.name %>
           &nbsp;
-          <a href="<%= current_repo.tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
+          <a href="<%= current_project.tag_url(tag) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
         </h4>
         <p>
-          <small class="muted">commit: <a href="<%= current_repo.commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= sha_span(tag.commit.sha) %></a></small>
+          <small class="muted">commit: <a href="<%= current_project.commit_url(tag.commit) %>" title="<%= tag.commit.sha %>"><%= sha_span(tag.commit.sha) %></a></small>
         </p>
         <hr>
       </li>

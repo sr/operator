@@ -1,5 +1,5 @@
 class DeploysController < ApplicationController
-  before_filter :require_repo
+  before_filter :require_project
   before_filter :require_target, only: [:new, :create, :index]
   before_filter :require_deploy, only: [:show, :complete, :cancel, :force_to_complete]
   before_filter :require_deploy_acl_satisfied, only: [:new, :create, :index, :show, :complete, :cancel, :force_to_complete]
@@ -8,7 +8,7 @@ class DeploysController < ApplicationController
 
   def index
     all_deploys = current_target.deploys
-      .where(repo_name: current_repo.name)
+      .where(project_name: current_project.name)
       .reverse_chronological
 
     @total_deploys = all_deploys.count
@@ -27,9 +27,9 @@ class DeploysController < ApplicationController
 
   def new
     if @prov_deploy = build_provisional_deploy
-      @previous_deploy = current_target.last_successful_deploy_for(current_repo.name)
+      @previous_deploy = current_target.last_successful_deploy_for(current_project.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
-      @server_hostnames = current_target.servers(repo: current_repo).enabled.pluck(:hostname).sort
+      @server_hostnames = current_target.servers(project: current_project).enabled.pluck(:hostname).sort
 
       @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
     else
@@ -53,7 +53,7 @@ class DeploysController < ApplicationController
       deploy_response = deploy!(prov_deploy)
       if !deploy_response[:error] && deploy_response[:deploy]
         the_deploy = deploy_response[:deploy]
-        redirect_to repo_deploy_path(current_repo.name, the_deploy.id, watching: "1")
+        redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
       else
         render_deploy_error(deploy_response)
       end
@@ -64,7 +64,7 @@ class DeploysController < ApplicationController
 
   def force_to_complete
     deploy_workflow_for(current_deploy).fail_deploy_on_initiated_servers
-    redirect_to repo_deploy_path(current_repo.name, current_deploy.id, watching: "1")
+    redirect_to project_deploy_path(current_project.name, current_deploy.id, watching: "1")
   end
 
   def pick_new_restart_servers
@@ -74,27 +74,27 @@ class DeploysController < ApplicationController
 
   def complete
     current_deploy.complete! if current_deploy
-    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+    redirect_to project_deploy_path(current_project.name, current_deploy.id)
   end
 
   def cancel
     deploy_workflow_for(current_deploy).fail_deploy_on_incomplete_servers
     current_deploy.cancel!
-    redirect_to repo_deploy_path(current_repo.name, current_deploy.id)
+    redirect_to project_deploy_path(current_project.name, current_deploy.id)
   end
 
   private
   def require_no_active_deploy
-    unless current_target.active_deploy(current_repo).nil?
+    unless current_target.active_deploy(current_project).nil?
       flash[:notice] = "There is currently a deploy in progress."
       redirect_to :back
     end
   end
 
   def require_no_active_lock
-    unless current_target.user_can_deploy?(current_repo, current_user)
-      flash[:alert] = "The current target and repository are locked by another user."
-      redirect_to repo_url(current_repo)
+    unless current_target.user_can_deploy?(current_project, current_user)
+      flash[:alert] = "The current target and project are locked by another user."
+      redirect_to project_url(current_project)
     end
   end
 
@@ -104,7 +104,7 @@ class DeploysController < ApplicationController
     end
 
     compare = GithubComparison.new(
-      current_repo.full_name,
+      current_project.repository,
       item1.sha,
       item2.sha,
     )
@@ -118,7 +118,7 @@ class DeploysController < ApplicationController
   def render_deploy_error(deploy_response)
     # missing pieces
     missing_error_codes = \
-      [DEPLOYLOGIC_ERROR_NO_REPO, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
+      [DEPLOYLOGIC_ERROR_NO_PROJECT, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
     if missing_error_codes.include?(deploy_response[:reason])
       flash[:notice] = "We did not have everything needed to deploy. Try again."
       redirect_to :back
