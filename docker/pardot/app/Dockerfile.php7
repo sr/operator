@@ -11,7 +11,11 @@ ARG php_zookeeper_version=0.3.0-1.pardot
 ARG php_protobuf_version=0.2.0-1.pardot
 ARG artifactory_host
 
-RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
+  ln -sf /var/lib/rmux/rmux-master.sock /tmp/rmux-master.sock && \
+  ln -sf /var/lib/rmux/rmux-slave.sock /tmp/rmux-slave.sock && \
+  ln -sf /var/lib/rmux/rmux-rules-master.sock /tmp/rmux-rules-master.sock && \
+  ln -sf /var/lib/rmux/rmux-rules-slave.sock /tmp/rmux-rules-slave.sock
 
 RUN yum install -y epel-release && \
   yum install -y \

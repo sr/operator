@@ -10,7 +10,11 @@ ARG git_version=2.7.4-1
 ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
 ARG artifactory_host
 
-RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
+  ln -sf /var/lib/rmux/rmux-master.sock /tmp/rmux-master.sock && \
+  ln -sf /var/lib/rmux/rmux-slave.sock /tmp/rmux-slave.sock && \
+  ln -sf /var/lib/rmux/rmux-rules-master.sock /tmp/rmux-rules-master.sock && \
+  ln -sf /var/lib/rmux/rmux-rules-slave.sock /tmp/rmux-rules-slave.sock
 
 RUN yum install -y epel-release && \
   yum install -y \
