@@ -14,4 +14,8 @@ module ApplicationHelper
   def table_columns
     @query.connection.columns(@query.extract_table_name(@ast)).map(&:name)
   end
+
+  def audit_log_url
+    "https://logs-#{Rails.application.config.x.datacenter}.pardot.com/app/kibana#/discover/Explorer-Audit-Log"
+  end
 end
