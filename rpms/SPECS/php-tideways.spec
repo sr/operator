@@ -6,7 +6,7 @@
 Summary:  PHP profiler extension - Tideways a modern XHPROF alterative
 Name:   php-%{modname}
 Version:  4.0.4
-Release:  1%{?dist}
+Release:  2%{?dist}
 Group:    Development/Languages
 License:  Apache License
 URL:    https://github.com/tideways/php-profiler-extension
