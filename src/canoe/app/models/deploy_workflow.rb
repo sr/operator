@@ -46,11 +46,15 @@ class DeployWorkflow
     @deploy.deploy_restart_servers.each_with_index do |restart, i|
       old_restart_result = @deploy.results.for_server(restart.server)
       unless old_restart_result.completed?
-        possible_servers = @deploy.results.completed.shuffle
-        restart_server = possible_servers[possible_servers.index{|s| s.datacenter == restart.server.datacenter}]
-        @deploy.deploy_restart_servers[i].server_id = restart_server.id
-        @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
-        old_restart_result.update_attribute(:stage, "completed")
+        possible_servers = @deploy.results.completed.map(&:server).shuffle
+        unless possible_servers.empty?
+          restart_server = possible_servers[possible_servers.index{|s| s.datacenter == restart.server.datacenter}]
+          # This could be refactored to use the restart_servers :through association directly,
+          # but I can't figure out how to set the datacenter column through ActiveRecord in the relational table
+          @deploy.deploy_restart_servers[i].update_attribute(:server_id, restart_server.id)
+          @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
+          old_restart_result.update_attribute(:stage, "completed")
+        end
       end
     end
   end

@@ -150,7 +150,7 @@
     <%- if !current_deploy.completed? && current_deploy.sync_done? %>
       <tr>
         <td>
-          <%= form_tag pick_new_restart_server_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to pick new restart servers?"} do %>
+          <%= form_tag pick_new_restart_servers_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to pick new restart servers?"} do %>
             <%= button_tag type: "submit", class: "btn btn-warning" do %>
               <%= content_tag :i, "", class: "icon-fast-forward" %>
               PICK ANOTHER RESTART SERVER

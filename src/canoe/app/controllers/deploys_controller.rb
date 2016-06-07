@@ -69,7 +69,7 @@ class DeploysController < ApplicationController
 
   def pick_new_restart_servers
     deploy_workflow_for(current_deploy).pick_new_restart_servers
-    redirect_to repo_deploy_path(current_repo.name, current_deploy.id, watching: "1")
+    redirect_to project_deploy_path(current_project.name, current_deploy.id, watching: "1")
   end
 
   def complete

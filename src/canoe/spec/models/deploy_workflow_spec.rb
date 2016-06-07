@@ -185,4 +185,18 @@ RSpec.describe DeployWorkflow do
       expect(deploy.completed?).to be_truthy
     end
   end
+
+  describe "#pick_new_restart_servers" do
+    it "picks a new restart server" do
+      restart_server, other_server = FactoryGirl.create_list(:server, 2)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
+
+      workflow.notify_action_successful(server: restart_server, action: "deploy")
+      workflow.notify_action_successful(server: other_server, action: "deploy")
+
+      expect(workflow.next_action_for(server: restart_server)).to eq("restart")
+      workflow.pick_new_restart_servers
+      expect(workflow.next_action_for(server: restart_server)).to eq(nil)
+    end
+  end
 end
