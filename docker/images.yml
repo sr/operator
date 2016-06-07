@@ -21,6 +21,8 @@ images:
     build: pardot/redis
   docker.dev.pardot.com/base/pardot/rmux:
     build: pardot/rmux
+  docker.dev.pardot.com/base/pardot/proxy:
+    build: pardot/proxy
 
   # Pardot/java-services
   docker.dev.pardot.com/base/java-services/app:
