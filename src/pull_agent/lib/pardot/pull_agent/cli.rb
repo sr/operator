@@ -51,7 +51,7 @@ module Pardot
 
         env = {
           "GIT_DIR" => git_dir.to_s,
-          "GIT_WORK_TREE" => payload.repo_path,
+          "GIT_WORK_TREE" => payload.repo_path
         }
 
         branch = ShellHelper.execute([env, "git", "rev-parse", "--abbrev-ref", "HEAD"])
