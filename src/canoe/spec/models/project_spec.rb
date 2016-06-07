@@ -32,7 +32,7 @@ RSpec.describe Project do
         expect(builds[0].build_number).to eq(1234)
       end
 
-      it "searches for artifacts restricted to the specified bamboo project, plan" do
+      it "searches for artifacts restricted to the specified bamboo project, plan, job" do
         project.update_attributes!(bamboo_job: "JOB")
         allow(Artifactory.client).to receive(:post)
           .with("/api/search/aql", %r({"@bambooProject":{"\$eq":"PDT"}},{"@bambooPlan":{"\$match":"PPANT\*"}},{"@bambooJob":{"\$eq":"JOB"}}), anything)
