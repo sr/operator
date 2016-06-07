@@ -106,8 +106,4 @@ class Project < ActiveRecord::Base
     aql << %(.sort({"$desc": ["created"]}))
     aql
   end
-
-  def build_artifact_url_from_hash(hash)
-    Artifactory.client.build_uri(:get, "/" + ["api", "storage", hash["repo"], hash["path"], hash["name"]].join("/")).to_s
-  end
 end
