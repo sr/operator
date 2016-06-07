@@ -14,10 +14,10 @@ class ChefCheckinResponse
 
   attr_reader :action, :deploy
 
-  def to_json
-    {
-      "action" => @action,
-      "deploy" => @deploy
-    }
+  def to_json(_)
+    JSON.dump(
+      action: @action,
+      deploy: @deploy
+    )
   end
 end

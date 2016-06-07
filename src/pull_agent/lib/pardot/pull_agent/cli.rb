@@ -30,16 +30,11 @@ module Pardot
         end
       end
 
-      def checkin_chef
-        response = Canoe.latest_chef_deploy
-
-        if response.deploy?
-          deploy = ChefDeployment.new(response.deploy)
-          deploy.apply
-        end
-      end
-
       def checkin
+        if environment.payload.id == :chef
+          return checkin_chef
+        end
+
         request = Canoe.latest_deploy(environment)
         Logger.context[:deploy_id] = request.id
 
@@ -47,6 +42,42 @@ module Pardot
           client_action(request)
         else
           Logger.log(:debug, "The deploy does not apply to this server")
+        end
+      end
+
+      def checkin_chef
+        payload = environment.payload
+        git_dir = Pathname(payload.repo_path).join(".git")
+
+        env = {
+          "GIT_DIR" => git_dir.to_s,
+          "GIT_WORK_TREE" => payload.repo_path,
+        }
+
+        branch = ShellHelper.execute([env, "git", "rev-parse", "--abbrev-ref", "HEAD"])
+        if !$?.success?
+          fail "unable to retrieve current branch: #{branch.inspect}"
+        end
+
+        sha = ShellHelper.execute([env, "git", "rev-parse", "HEAD"])
+        if !$?.success?
+          fail "unable to retrieve current SHA1: #{sha.inspect}"
+        end
+
+        payload = {
+          environment: environment.name,
+          checkout: {
+            sha1: sha,
+            branch: branch,
+            mtime: Integer(git_dir.join("HEAD").mtime)
+          }
+        }
+
+        request = {payload: JSON.dump(payload)}
+        response = Canoe.chef_checkin(environment, request)
+
+        if response.code != "200"
+          fail "Checkin request failed: #{response.code} - #{response.body}"
         end
       end
 

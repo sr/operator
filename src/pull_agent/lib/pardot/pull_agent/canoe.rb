@@ -14,7 +14,13 @@ module Pardot
         Deploy.from_hash(json)
       end
 
-      def self.latest_chef_deploy
+      def self.chef_checkin(environment, request)
+        response = call_api(
+          environment,
+          "POST",
+          "/api/chef/checkin",
+          request
+        )
       end
 
       def self.call_api(environment, method, path, params = {})

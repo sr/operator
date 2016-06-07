@@ -54,6 +54,8 @@ Rails.application.routes.draw do
     end
   end
 
+  post "/api/chef/checkin", to: "api/chef_deploys#checkin"
+
   get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"
 end

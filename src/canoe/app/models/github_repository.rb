@@ -10,13 +10,7 @@ class GithubRepository
   end
 
   def current_build(branch)
-    statuses = Octokit.combined_statuses(@name, branch)
-
-    if statuses.empty?
-      return GithubBuild.new(nil, "failure")
-    end
-
-    status = statuses.first
+    status = @client.combined_status(@name, branch)
     Build.new(status[:sha], status[:state])
   end
 
@@ -26,14 +20,14 @@ class GithubRepository
       sha: current_build.sha,
       task: @config.deploy_task_name
     }
-    deploys = Octokit.deployments(@repo_name, options)
+    deploys = @client.deployments(@repo_name, options)
 
     if deploys.empty?
       return GithubDeploy.new(request.environment, nil, nil)
     end
 
     deploy = deploys[0]
-    statuses = Octokit.list_deployment_statuses(deploy[:url])
+    statuses = @client.list_deployment_statuses(deploy[:url])
 
     if statuses.empty?
       return Deploy.new(deploy[:environment], "pending", deploy[:sha])
@@ -53,7 +47,7 @@ class GithubRepository
       task: task
     }
 
-    deploy = Octokit.create_deployment(@name, build.sha, options)
+    deploy = @client.create_deployment(@name, build.sha, options)
 
     if deploy[:url].blank?
       raise Error, "unable to create deploy"
@@ -62,7 +56,7 @@ class GithubRepository
     # TODO(sr) Return a Deploy object here
     Response.new(
       true,
-      Octokit.create_deployment_status(deploy[:url], "pending"),
+      @client.create_deployment_status(deploy[:url], "pending"),
     )
   end
 end

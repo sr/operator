@@ -1,14 +1,10 @@
 class ChefDeliveryConfig
   def enabled_in?(environment)
-    false
-  end
-
-  def enabled_in?(environment)
-    %w[phx].include?(environment)
+    %w[dev].include?(environment)
   end
 
   def repo_name
-    "Pardot/chef"
+    ENV["CANOE_CHEF_REPO"] || "Pardot/chef"
   end
 
   def deploy_task_name
@@ -28,8 +24,8 @@ class ChefDeliveryConfig
   end
 
   def github_repo
-    GithubRepository.new(
-      Octokit::Client.new(access_token: github_token),
+    @github_repo ||= GithubRepository.new(
+      Octokit::Client.new(login: "simon-rozet", password: github_token),
       repo_name
     )
   end
@@ -46,7 +42,7 @@ class ChefDeliveryConfig
   private
 
   def github_token
-    "TODO"
+    ENV["CANOE_CHEF_GITHUB_TOKEN"]
   end
 
   def chat_token
