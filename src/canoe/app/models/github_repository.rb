@@ -53,7 +53,6 @@ class GithubRepository
       raise Error, "unable to create deploy"
     end
 
-    # TODO(sr) Return a Deploy object here
     Response.new(
       true,
       @client.create_deployment_status(deploy[:url], "pending"),
