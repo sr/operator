@@ -31,6 +31,29 @@ RSpec.describe Project do
         expect(builds.length).to eq(1)
         expect(builds[0].build_number).to eq(1234)
       end
+
+      it "searches for artifacts restricted to the specified bamboo project, plan" do
+        project.update_attributes!(bamboo_job: "JOB")
+        allow(Artifactory.client).to receive(:post)
+          .with("/api/search/aql", %r({"@bambooProject":{"\$eq":"PDT"}},{"@bambooPlan":{"\$match":"PPANT\*"}},{"@bambooJob":{"\$eq":"JOB"}}), anything)
+          .and_return("results" => [
+            {
+              "repo" => "pd-canoe",
+              "path" => "PDT/PPANT",
+              "name" => "build1234.tar.gz",
+              "properties" => [
+                {"key" => "gitBranch", "value" => "master"},
+                {"key" => "buildNumber", "value" => "1234"},
+                {"key" => "gitSha", "value" => "abc123"},
+                {"key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00"},
+              ]
+            }
+          ])
+
+        builds = project.builds(branch: "master")
+        expect(builds.length).to eq(1)
+        expect(builds[0].build_number).to eq(1234)
+      end
     end
   end
 end
