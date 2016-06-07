@@ -1,0 +1,6 @@
+**/.terraform/
+**/plan.out
+**/*.tfstate
+**/*.tfstate.backup
+**/*.tfvars
+/artifactory.env
