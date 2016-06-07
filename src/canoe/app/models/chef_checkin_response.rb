@@ -12,7 +12,7 @@ class ChefCheckinResponse
     @deploy = deploy
   end
 
-  attr_reader :action
+  attr_reader :action, :deploy
 
   def to_json
     {

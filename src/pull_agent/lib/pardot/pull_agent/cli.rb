@@ -35,7 +35,7 @@ module Pardot
 
         if response.deploy?
           deploy = ChefDeployment.new(response.deploy)
-          deploy.perform
+          deploy.apply
         end
       end
 

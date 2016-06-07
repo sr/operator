@@ -8,24 +8,33 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if request.checkout_sha1 == current_deploy.sha1
-      return ChefCheckinResponse.noop
-    end
-
-    if current_build.red?
+    if current_build.state != "success"
       return ChefCheckinResponse.noop
     end
 
     if request.checkout_branch != @config.master_branch
       if request.checkout_older_than?(@config.max_lock_age)
-        notification.at_lock_age_limit(request.checkout)
+        notifier.at_lock_age_limit(request.checkout)
       end
 
       return ChefCheckinResponse.noop
     end
 
-    deploy = GitHubDeployment.new(github, @config.repo_name)
-    response = deploy.create
+    deploy = repo.current_deploy(request.environment, current_build.sha)
+
+    if %w[success pending].include?(deploy.state)
+      return ChefCheckinResponse.noop
+    end
+
+    if deploy.sha == request.checkout_sha
+      return ChefCheckinResponse.noop
+    end
+
+    response = repo.create_pending_deploy(
+      request.environment,
+      @config.deploy_task_name,
+      current_build
+    )
 
     if response.success?
       return ChefCheckinResponse.deploy(response.deploy)
@@ -35,42 +44,27 @@ class ChefDelivery
     return ChefCheckinResponse.noop
   end
 
-  def deployment_started(request)
-    deploy = ChefGitHubDeploy.new(github, @config.repo_name)
-    deploy.start(request.deploy_id)
-    notification.deploy_started(request.deploy)
+  def deploy_started(request)
+    repo.start_deployment(request.deploy_url)
+    notifier.deploy_started(request.deploy)
   end
 
-  def deployment_completed(request)
-    deploy = GitHubDeploy.new(github, @config.repo_name)
-    deploy.complete(request.deploy_id)
-    notification.deploy_started(request.deploy)
+  def deploy_completed(request)
+    repo.complete_deployment(request.deploy_url)
+    notifier.deploy_completed(request.deploy)
   end
 
   private
 
-  def notification
-    @notifier ||= ChefDeliveryNotification.new(
-      @config.chat_token,
-      @config.chat_room_id,
-      @config.repo_name,
-      @config.master_branch,
-    )
+  def notifier
+    @notifier ||= @config.notifier
   end
 
-  def github
-    @github ||= Octokit::Client.new(access_token: @config.github_token)
+  def repo
+    @repo ||= @config.github_repo
   end
 
   def current_build
-    @current_build ||= fetch_current_build
-  end
-
-  def current_deploy
-    @current_deploy ||= fetch_current_deploy
-  end
-
-  def fetch_current_build
-    response = Octokit.combined_statuses(@repo_name, @master_branch)
+    @current_build ||= repo.current_build(@config.master_branch)
   end
 end

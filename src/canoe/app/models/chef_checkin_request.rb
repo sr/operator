@@ -22,7 +22,15 @@ class ChefCheckinRequest
 
   attr_reader :environment, :checkout
 
-  def older_than?(max_age)
-    @checkout.last_modified - Time.now > max_age
+  def checkout_sha
+    @checkout.sha1
+  end
+
+  def checkout_branch
+    @checkout.branch
+  end
+
+  def checkout_older_than?(max_age)
+    (Time.now - @checkout.last_modified) > max_age
   end
 end
