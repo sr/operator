@@ -81,7 +81,7 @@ class Project < ActiveRecord::Base
       conditions << {"@bambooProject" => {"$eq"    => bamboo_project}}
       conditions << {"@bambooPlan"    => {"$match" => "#{bamboo_plan}*"}} if bamboo_plan.present?
 
-      if bamboo_job
+      if bamboo_job.present?
         conditions << {"@bambooJob" => {"$eq" => bamboo_job}}
       end
     end
