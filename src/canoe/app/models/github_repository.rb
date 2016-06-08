@@ -1,7 +1,7 @@
 class GithubRepository
   class Error < StandardError; end
 
-  Build = Struct.new(:sha, :state)
+  Build = Struct.new(:sha, :state, :url)
   Deploy = Struct.new(:environment, :sha, :state)
 
   def initialize(client, name)
@@ -11,7 +11,7 @@ class GithubRepository
 
   def current_build(branch)
     status = @client.combined_status(@name, branch)
-    Build.new(status[:sha], status[:state])
+    Build.new(status[:sha], status[:state], status[:statuses].first[:target_url])
   end
 
   def current_deploy(environment, sha)

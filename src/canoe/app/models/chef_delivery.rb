@@ -14,7 +14,7 @@ class ChefDelivery
 
     if request.checkout_branch != @config.master_branch
       if request.checkout_older_than?(@config.max_lock_age)
-        notification.at_lock_age_limit(request.checkout)
+        notification.at_lock_age_limit(request.checkout, current_build)
       end
 
       return ChefCheckinResponse.noop
