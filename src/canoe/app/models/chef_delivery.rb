@@ -55,14 +55,9 @@ class ChefDelivery
     return ChefCheckinResponse.noop
   end
 
-  def deploy_started(request)
-    repo.start_deployment(request.deploy_url)
-    notification.deploy_started(request.deploy)
-  end
-
-  def deploy_completed(request)
-    repo.complete_deployment(request.deploy_url)
-    notification.deploy_completed(request.deploy)
+  def complete_deploy(deploy)
+    # TODO(sr) repo.complete_deployment(request.deploy_url)
+    notification.deploy_completed(deploy)
   end
 
   private

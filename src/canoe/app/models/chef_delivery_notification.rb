@@ -1,5 +1,6 @@
 class ChefDeliveryNotification
   YELLOW = "yellow"
+  GREEN = "green"
 
   def initialize(notifier, github_url, repo_name, room_id)
     @notifier = notifier
@@ -10,7 +11,7 @@ class ChefDeliveryNotification
   end
 
   def at_lock_age_limit(checkout, build)
-    message = "chef build #{link_to(build)} not deployed to production " \
+    message = "chef/master #{link_to(build)} not deployed to production " \
       "because branch #{link_to(checkout.branch)} is checked out on " \
       "<code>#{chef_server}</code>"
 
@@ -21,6 +22,8 @@ class ChefDeliveryNotification
   end
 
   def deploy_completed(deploy)
+    message = "chef/master #{link_to(deploy)} deployed to production"
+    @notifier.notify_room(@room_id, message, GREEN)
   end
 
   private
@@ -36,6 +39,9 @@ class ChefDeliveryNotification
       # TODO(sr) Use the GitHub build ID instead of this hack?
       build_id = object.url.split("-").last
       %Q(<a href="#{object.url}">##{build_id}</a>)
+    when GithubRepository::Deploy
+      # TODO(sr) Link to the deploy's build
+      %Q(<a href="https://boom">#52</a>)
     when String
       %Q(<a href="#{@github_url}/#{@repo}/compare/#{object}">#{object}</a>)
     else

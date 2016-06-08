@@ -15,10 +15,19 @@ module Pardot
       end
 
       def self.chef_checkin(environment, request)
-        response = call_api(
+        call_api(
           environment,
           "POST",
           "/api/chef/checkin",
+          request
+        )
+      end
+
+      def self.complete_chef_deploy(environment, request)
+        call_api(
+          environment,
+          "POST",
+          "/api/chef/complete_deploy",
           request
         )
       end

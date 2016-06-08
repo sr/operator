@@ -79,6 +79,17 @@ module Pardot
         if response.code != "200"
           fail "Checkin request failed: #{response.code} - #{response.body}"
         end
+
+        payload = JSON.parse(response.body)
+        result = ChefDeploy.new(payload.fetch("deploy")).apply(env)
+
+        payload = {
+          deploy: payload.fetch("deploy"),
+          error: !result.success,
+          message: result.message
+        }
+        request = {payload: JSON.dump(payload)}
+        Canoe.complete_chef_deploy(environment, request)
       end
 
       private

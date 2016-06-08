@@ -113,4 +113,17 @@ RSpec.describe ChefDelivery do
   end
 
   pending "TODO if current is already deployed but deploy failed"
+
+  it "notifies of completed deployment" do
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    request = ChefCheckinRequest.new("testing", checkout)
+    @repo.current_build = build_build(state: "success")
+    @repo.current_deploy = GithubRepository::Deploy.none
+    response = @delivery.checkin(request)
+    deploy = JSON.parse(response.deploy.to_json(true))
+    response = @delivery.complete_deploy(deploy.update(state: "success"))
+    assert_equal 1, @config.notifier.messages.size
+    message = @config.notifier.messages.pop
+    assert_equal "boom", message.message
+  end
 end
