@@ -42,6 +42,22 @@ class UserQueryTest < ActiveSupport::TestCase
     end
   end
 
+  test "execute unexpiring access" do
+    authorize_access(@user.datacenter, 1)
+    query = @user.account_query("SELECT * FROM object_audit", 1)
+    results = query.execute
+    row = results.first
+    assert_equal 1, row[:id]
+  end
+
+  test "execute access expiring tomorrow" do
+    authorize_access(@user.datacenter, 1, nil, 'NOW() + INTERVAL 1 DAY')
+    query = @user.account_query("SELECT * FROM object_audit", 1)
+    results = query.execute
+    row = results.first
+    assert_equal 1, row[:id]
+  end
+
   test "global query audit log" do
     query = @user.global_query("SELECT 1 FROM global_account")
     query.execute
