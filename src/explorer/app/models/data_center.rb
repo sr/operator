@@ -62,7 +62,7 @@ class DataCenter
   def access_authorized?(account_id)
     query = <<-SQL.freeze
       SELECT id FROM global_account_access
-      WHERE role = ? AND account_id = ? AND expires_at > NOW()
+      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
       LIMIT 1
     SQL
     results = global.execute(query, [ENGINEERING_ROLE, account_id])

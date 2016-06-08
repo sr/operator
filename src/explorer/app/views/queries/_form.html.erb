@@ -16,8 +16,9 @@
   </div>
   <div class="viewoption" <%= active?(current_view, Query::UI, 'style="display:none;"') %>>
     <%= text_area_tag(:sql, query.executable_query.sql, rows: 10, cols: 80) %>
+    <%= submit_tag "Run Query" %>
   </div>
-  <%= submit_tag "Run Query" %>
+
   <div class="viewoption" <%= active?(current_view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
       <% query.database_tables.each do |table| %>
