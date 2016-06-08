@@ -87,7 +87,10 @@ class Hipchat
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_form_data(body)
 
-      http.request(request) if Rails.env.production?
+      if Rails.env.production? || ENV["CANOE_HIPCHAT_ENABLED"].present?
+        http.request(request)
+      end
+
       Instrumentation.log(at: "hipchat", room: room, msg: msg)
     end
 
