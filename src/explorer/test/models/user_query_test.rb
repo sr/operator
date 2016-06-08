@@ -57,7 +57,7 @@ class UserQueryTest < ActiveSupport::TestCase
     authorize_access(@user.datacenter, 1)
     query = @user.account_query("SELECT 1 FROM account", 1)
     query.execute
-    assert log = Instrumentation::Logging.entries.pop
+    assert Instrumentation::Logging.entries.pop
   end
 
   test "global tables" do
