@@ -14,12 +14,6 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal "pardot_shard1", query.database_name
   end
 
-  test "execute_csv" do
-    query = @user.global_query("SELECT * FROM global_account")
-    csv = query.execute_csv
-    assert csv.starts_with?("id,sfdc_org_id,sfdc_connector_username")
-  end
-
   test "execute" do
     authorize_access(@user.datacenter, 1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
@@ -51,7 +45,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "execute access expiring tomorrow" do
-    authorize_access(@user.datacenter, 1, nil, 'NOW() + INTERVAL 1 DAY')
+    authorize_access(@user.datacenter, 1, nil, 1.minute.ago.end_of_day.to_s(:db))
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute
     row = results.first
