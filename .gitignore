@@ -4,10 +4,10 @@
 /src/**/.bundle
 /src/**/vendor/gems
 /src/explorer/config/pi/*.php
-/src/rubylib/Gemfile.lock
-/src/pull_agent/Gemfile.lock
-/src/terraform/*.tfvars
 /src/pull_agent/.dev_settings.yml
+/src/pull_agent/Gemfile.lock
+/src/rubylib/Gemfile.lock
+/src/terraform/*.tfvars
 /bin/*
 /pkg/
 .DS_Store
