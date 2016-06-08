@@ -4,6 +4,12 @@ class ChefDelivery
   end
 
   def checkin(request)
+    Instrumentation.log(
+      at: "chef.checkin",
+      branch: request.checkout_branch,
+      sha: request.checkout_sha
+    )
+
     if !@config.enabled_in?(request.environment)
       return ChefCheckinResponse.noop
     end
