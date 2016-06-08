@@ -5,14 +5,20 @@ class FakeGithubRepository
     @current_build
   end
 
-  def current_deploy(environment, sha)
+  def current_deploy(environment, branch, deploy_task)
     @current_deploy
   end
 
-  def create_pending_deploy(environment, task, build)
+  def create_pending_deploy(environment, task, build, branch)
     GithubRepository::Response.new(
       true,
-      GithubRepository::Deploy.new(environment, build.sha, "pending")
+      GithubRepository::Deploy.new(
+        url: "http://github.com/#{build.sha}",
+        environment: environment,
+        branch: branch,
+        sha: build.sha,
+        state: GithubRepository::PENDING
+      )
     )
   end
 end

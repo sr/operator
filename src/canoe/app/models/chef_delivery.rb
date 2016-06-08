@@ -26,7 +26,11 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    deploy = repo.current_deploy(request.environment, current_build.sha)
+    deploy = repo.current_deploy(
+      request.environment,
+      @config.master_branch,
+      @config.deploy_task_name
+    )
 
     if %w[success pending].include?(deploy.state)
       return ChefCheckinResponse.noop
@@ -39,7 +43,8 @@ class ChefDelivery
     response = repo.create_pending_deploy(
       request.environment,
       @config.deploy_task_name,
-      current_build
+      current_build,
+      @config.master_branch,
     )
 
     if response.success?

@@ -7,6 +7,26 @@ RSpec.describe ChefDelivery do
     @delivery = ChefDelivery.new(@config)
   end
 
+  def build_build(attributes={})
+    defaults = {
+      url: "https://github.com/builds/1",
+      sha: "sha1",
+      state: "success"
+    }
+    GithubRepository::Build.new(defaults.merge(attributes))
+  end
+
+  def build_deploy(attributes={})
+    defaults = {
+      url: "https://github.com/deploys/1",
+      environment: "testing",
+      branch: "master",
+      sha: "sha1",
+      state: "success"
+    }
+    GithubRepository::Deploy.new(defaults.merge(attributes))
+  end
+
   test "noops if chef delivery is disabled in current environment" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("dfw", checkout)
@@ -17,7 +37,7 @@ RSpec.describe ChefDelivery do
   it "noops if there is no available build" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    @repo.current_build = GithubRepository::Build.new(nil, nil, nil)
+    @repo.current_build = GithubRepository::Build.none
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -25,8 +45,7 @@ RSpec.describe ChefDelivery do
   it "noops if the build is red" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = ChefDelivery::GithubRepository::Build.new("sha1", "failure", "http")
-    @repo.current_build = build
+    @repo.current_build = build_build(state: "failure")
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -34,8 +53,7 @@ RSpec.describe ChefDelivery do
   it "noops if the build is pending" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = ChefDelivery::GithubRepository::Build.new("sha1", "pending", "http")
-    @repo.current_build = build
+    @repo.current_build = build_build(state: "pending")
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -43,8 +61,7 @@ RSpec.describe ChefDelivery do
   it "noops if non-master branch has been checked out for less than an hour" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "boom", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = ChefDelivery::GithubRepository::Build.new("sha1", "green")
-    @repo.current_build = build
+    @repo.current_build = build_build
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
     assert_equal 0, @config.notifier.messages.size
@@ -53,8 +70,7 @@ RSpec.describe ChefDelivery do
   it "noops and notifies if non-master branch has been checked out for more than an hour" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "boom", 2.hours.ago)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = ChefDelivery::GithubRepository::Build.new("sha1", "success", "http")
-    @repo.current_build = build
+    @repo.current_build = build_build
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
@@ -65,10 +81,8 @@ RSpec.describe ChefDelivery do
   it "deploys if there is no deploy available" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = GithubRepository::Build.new("sha1", "success", "http")
-    deploy = GithubRepository::Deploy.new(request.environment, nil, nil)
-    @repo.current_build = build
-    @repo.current_deploy = deploy
+    @repo.current_build = build_build(state: "success")
+    @repo.current_deploy = GithubRepository::Deploy.none
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
     deploy = response.deploy
@@ -83,10 +97,8 @@ RSpec.describe ChefDelivery do
   it "noops if current deploy is pending" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = GithubRepository::Build.new("sha1", "success", "http")
-    deploy = GithubRepository::Deploy.new(request.environment, build.sha, "pending")
-    @repo.current_build = build
-    @repo.current_deploy = deploy
+    @repo.current_build = build_build
+    @repo.current_deploy = build_deploy(state: GithubRepository::PENDING)
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -94,10 +106,8 @@ RSpec.describe ChefDelivery do
   test "noops if current sha1 is already deployed" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
-    build = ChefDelivery::GithubRepository::Build.new("sha1", "success", "http")
-    deploy = ChefDelivery::GithubRepository::Deploy.new(request.environment, build.sha, "success")
-    @repo.current_build = build
-    @repo.current_deploy = deploy
+    @repo.current_build = build_build(sha: "sha1")
+    @repo.current_deploy = build_deploy(sha: "sha1")
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
