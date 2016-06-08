@@ -30,13 +30,18 @@ class ChefDeliveryConfig
     )
   end
 
+  def chat_room_id
+    ENV["CANOE_CHEF_CHAT_ROOM_ID"] || 6 # Ops
+  end
+
+  class HipchatNotifier
+    def self.notify_room(room_id, message)
+      Hipchat.notify_room(room_id, message, false)
+    end
+  end
+
   def notifier
-    ChefDeliveryNotification.new(
-      chat_token,
-      chat_room_id,
-      repo_name,
-      master_branch,
-    )
+    @notifier ||= HipchatNotifier
   end
 
   private
@@ -47,9 +52,5 @@ class ChefDeliveryConfig
 
   def chat_token
     "TODO"
-  end
-
-  def chat_room_id
-    6 # Ops
   end
 end

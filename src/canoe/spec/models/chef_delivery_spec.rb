@@ -59,7 +59,7 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert_equal "boom", msg
+    assert_equal "boom", msg.message
   end
 
   it "deploys if there is no deploy available" do

@@ -10,6 +10,6 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
   end
 
   def notifier
-    @notifier ||= FakeChefDeliveryNotifier.new
+    @notifier ||= FakeHipchatNotifier.new
   end
 end

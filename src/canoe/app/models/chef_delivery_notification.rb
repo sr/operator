@@ -1,9 +1,14 @@
 class ChefDeliveryNotification
-  def initialize(github_url, room_id, repo, master)
+  def initialize(notifier, github_url, repo_name, room_id)
+    @notifier = notifier
     @github_url = github_url
-    @room_id = room
-    @repo = repo
-    @master = master
+    @repo = repo_name
+    @room = room_id
+    @room_id = room_id
+  end
+
+  def at_lock_age_limit(checkout)
+    @notifier.notify_room(@room_id, "boom")
   end
 
   def deploy_started(deploy)
@@ -15,10 +20,7 @@ class ChefDeliveryNotification
   private
 
   def compare_url(branch)
-    "#{@github_url}/#{@repo}/compare/#{@master}...#{branch}"
-  end
-
-  def notify(message)
-    Hipchat.notify_room(@room, message)
+    return "TODO"
+    # TODO(sr) "#{@github_url}/#{@repo}/compare/#{@master}...#{branch}"
   end
 end

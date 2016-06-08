@@ -14,7 +14,7 @@ class ChefDelivery
 
     if request.checkout_branch != @config.master_branch
       if request.checkout_older_than?(@config.max_lock_age)
-        notifier.at_lock_age_limit(request.checkout)
+        notification.at_lock_age_limit(request.checkout)
       end
 
       return ChefCheckinResponse.noop
@@ -46,18 +46,23 @@ class ChefDelivery
 
   def deploy_started(request)
     repo.start_deployment(request.deploy_url)
-    notifier.deploy_started(request.deploy)
+    notification.deploy_started(request.deploy)
   end
 
   def deploy_completed(request)
     repo.complete_deployment(request.deploy_url)
-    notifier.deploy_completed(request.deploy)
+    notification.deploy_completed(request.deploy)
   end
 
   private
 
-  def notifier
-    @notifier ||= @config.notifier
+  def notification
+    @notification ||= ChefDeliveryNotification.new(
+      @config.notifier,
+      "https://git.dev.pardot.com",
+      @config.repo_name,
+      @config.chat_room_id
+    )
   end
 
   def repo
