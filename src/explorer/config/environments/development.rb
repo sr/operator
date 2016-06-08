@@ -1,6 +1,6 @@
 Rails.application.configure do
   # Allow web-console within Docker.
-  config.web_console.whitelisted_ips = '10.0.2.0/24'
+  config.web_console.whitelisted_ips = "10.0.2.0/24"
 
   # Temporary workaround for file loading not working correctly in a container.
   config.reload_classes_only_on_change = false
