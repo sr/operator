@@ -26,9 +26,9 @@ module Canoe
 
     def escape(str)
       str.gsub("*", '\2A')
-        .gsub("(", '\28')
-        .gsub(")", '\29')
-        .gsub("\x00", '\00')
+         .gsub("(", '\28')
+         .gsub(")", '\29')
+         .gsub("\x00", '\00')
     end
 
     def extract_uid_from_dn(dn)

@@ -38,9 +38,9 @@ class UserQuery < ActiveRecord::Base
     results = execute
     CSV.generate(headers: true) do |csv|
       csv << results.fields
-      results.each { |r|
+      results.each do |r|
         csv << r.values
-      }
+      end
     end
   end
 
