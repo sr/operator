@@ -25,7 +25,10 @@ class ChefDeliveryConfig
 
   def github_repo
     @github_repo ||= GithubRepository.new(
-      Octokit::Client.new(login: "simon-rozet", password: github_token),
+      Octokit::Client.new(
+        api_endpoint: "#{Project::GITHUB_URL}/api/v3",
+        access_token: github_token
+      ),
       repo_name
     )
   end
