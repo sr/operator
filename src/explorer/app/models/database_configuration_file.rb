@@ -38,7 +38,7 @@ class DatabaseConfigurationFile
       when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
         globals.fetch(datacenter)
       else
-        raise DataCenterNotFound.new(datacenter)
+        raise DataCenterNotFound, datacenter
       end
 
     DatabaseConfiguration.new(config.fetch(1), auth)

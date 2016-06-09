@@ -5,6 +5,6 @@ class WelcomeController < ApplicationController
   end
 
   def boomtown
-    fail "boomtown"
+    raise "boomtown"
   end
 end

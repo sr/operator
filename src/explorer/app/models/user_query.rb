@@ -34,16 +34,6 @@ class UserQuery < ActiveRecord::Base
     database.execute(executable_query.sql)
   end
 
-  def execute_csv
-    results = execute
-    CSV.generate(headers: true) do |csv|
-      csv << results.fields
-      results.each { |r|
-        csv << r.values
-      }
-    end
-  end
-
   def database_tables
     database.tables
   end

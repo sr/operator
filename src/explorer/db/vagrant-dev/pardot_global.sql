@@ -461,6 +461,7 @@ CREATE TABLE `global_account_access` (
 
 LOCK TABLES `global_account_access` WRITE;
 /*!40000 ALTER TABLE `global_account_access` DISABLE KEYS */;
+INSERT INTO `global_account_access` VALUES (1,1,7,1,'2007-08-15 09:42:51',NULL),(2,2,7,1,'2007-08-15 09:42:51',NULL);
 /*!40000 ALTER TABLE `global_account_access` ENABLE KEYS */;
 UNLOCK TABLES;
 
