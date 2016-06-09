@@ -6,8 +6,7 @@ class Api::ChefDeploysController < Api::Controller
   end
 
   def complete_deploy
-    deploy = payload.fetch(:deploy)
-    request = GithubRepository::Deploy.new(deploy)
+    request = ChefCompleteDeployRequest.from_hash(payload)
     response = delivery.complete_deploy(request)
     render json: response
   end

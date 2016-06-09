@@ -1,6 +1,7 @@
 class ChefDeliveryNotification
-  YELLOW = "yellow"
-  GREEN = "green"
+  YELLOW = "yellow".freeze
+  GREEN = "green".freeze
+  RED = "red".freeze
 
   def initialize(notifier, github_url, repo_name, room_id)
     @notifier = notifier
@@ -18,12 +19,17 @@ class ChefDeliveryNotification
     @notifier.notify_room(@room_id, message, YELLOW)
   end
 
-  def deploy_started(deploy)
-  end
+  def deploy_completed(deploy, success, error_message)
+    if success
+      color = GREEN
+      message = "chef/master #{link_to(deploy)} successfully deployed to production"
+    else
+      color = RED
+      message = "chef/master #{link_to(deploy)} failed to deploy to production" \
+        "<br/><pre>#{error_message}</pre>"
+    end
 
-  def deploy_completed(deploy)
-    message = "chef/master #{link_to(deploy)} deployed to production"
-    @notifier.notify_room(@room_id, message, GREEN)
+    @notifier.notify_room(@room_id, message, color)
   end
 
   private

@@ -19,7 +19,7 @@ module Pardot
           "deploy"
         ])
         if !$?.success?
-          return error("Deploy command failed: #{output.inspect}")
+          return error(output)
         end
 
         Response.new(true, "")

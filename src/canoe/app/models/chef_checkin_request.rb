@@ -1,5 +1,5 @@
 class ChefCheckinRequest
-  Checkout = Struct.new(:sha1, :branch, :last_modified)
+  Checkout = Struct.new(:sha, :branch, :last_modified)
 
   def self.from_hash(request)
     checkout = request.fetch("checkout")
@@ -8,7 +8,7 @@ class ChefCheckinRequest
     new(
       request.fetch("environment"),
       Checkout.new(
-        checkout.fetch("sha1"),
+        checkout.fetch("sha"),
         checkout.fetch("branch"),
         Time.at(mtime)
       )
@@ -23,7 +23,7 @@ class ChefCheckinRequest
   attr_reader :environment, :checkout
 
   def checkout_sha
-    @checkout.sha1
+    @checkout.sha
   end
 
   def checkout_branch
