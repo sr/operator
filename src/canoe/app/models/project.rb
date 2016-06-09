@@ -81,8 +81,8 @@ class Project < ActiveRecord::Base
       conditions << {"@bambooProject" => {"$eq"    => bamboo_project}}
       conditions << {"@bambooPlan"    => {"$match" => "#{bamboo_plan}*"}} if bamboo_plan.present?
 
-      if name == "explorer"
-        conditions << {"@bambooJob" => {"$eq" => "EX"}}
+      if bamboo_job.present?
+        conditions << {"@bambooJob" => {"$eq" => bamboo_job}}
       end
     end
 
@@ -105,9 +105,5 @@ class Project < ActiveRecord::Base
     aql << %(.include("property.*"))
     aql << %(.sort({"$desc": ["created"]}))
     aql
-  end
-
-  def build_artifact_url_from_hash(hash)
-    Artifactory.client.build_uri(:get, "/" + ["api", "storage", hash["repo"], hash["path"], hash["name"]].join("/")).to_s
   end
 end

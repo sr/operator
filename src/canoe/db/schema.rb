@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160601132921) do
+ActiveRecord::Schema.define(version: 20160607150900) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -115,6 +115,7 @@ ActiveRecord::Schema.define(version: 20160601132921) do
     t.string "bamboo_project", limit: 255
     t.string "bamboo_plan",    limit: 255
     t.string "repository",     limit: 255, null: false
+    t.string "bamboo_job",     limit: 255
   end
 
   add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
