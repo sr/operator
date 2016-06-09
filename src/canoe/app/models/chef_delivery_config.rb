@@ -23,10 +23,14 @@ class ChefDeliveryConfig
     ["Style and Lint Checks"]
   end
 
+  def github_url
+    Project::GITHUB_URL
+  end
+
   def github_repo
     @github_repo ||= GithubRepository.new(
       Octokit::Client.new(
-        api_endpoint: "#{Project::GITHUB_URL}/api/v3",
+        api_endpoint: "#{github_url}/api/v3",
         access_token: github_token
       ),
       repo_name

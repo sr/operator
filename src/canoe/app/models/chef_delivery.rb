@@ -76,7 +76,7 @@ class ChefDelivery
   def notification
     @notification ||= ChefDeliveryNotification.new(
       @config.notifier,
-      "https://git.dev.pardot.com",
+      @config.github_url,
       @config.repo_name,
       @config.chat_room_id
     )
