@@ -20,8 +20,6 @@ class Api::ChefDeploysController < Api::Controller
   end
 
   def delivery
-    @delivery ||= ChefDelivery.new(
-      ChefDeliveryConfig.new
-    )
+    @delivery ||= ChefDelivery.new(ChefDeliveryConfig.new)
   end
 end
