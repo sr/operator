@@ -23,6 +23,8 @@ images:
     build: pardot/rmux
   docker.dev.pardot.com/base/pardot/proxyout:
     build: pardot/proxyout
+  docker.dev.pardot.com/base/pardot/kafka:
+    build: pardot/kafka
 
   # Pardot/java-services
   docker.dev.pardot.com/base/java-services/app:
