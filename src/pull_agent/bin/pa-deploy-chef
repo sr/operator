@@ -78,6 +78,7 @@ case "$action" in
         export GIT_WORK_TREE GIT_DIR
 
         git checkout "$branch" 2>&1
+        git pull origin "$branch" 2>&1
         git reset --hard "$sha" 2>&1
 
         knife pd sync 2>&1
