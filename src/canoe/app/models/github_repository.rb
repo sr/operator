@@ -126,4 +126,16 @@ class GithubRepository
       )
     )
   end
+
+  CompleteResponse = Struct.new(:success?, :error)
+
+  def complete_deploy(deploy_url, status)
+    status = @client.create_deployment_status(deploy[:url], status)
+
+    if status[:url].blank?
+      return CompleteResponse.new(false, status[:message])
+    end
+
+    CompleteResponse.new(true, nil)
+  end
 end

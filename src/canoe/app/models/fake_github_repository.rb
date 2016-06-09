@@ -1,5 +1,5 @@
 class FakeGithubRepository
-  attr_writer :current_build, :current_deploy
+  attr_writer :current_build, :current_deploy, :complete_deploy
 
   def current_build(branch)
     @current_build
@@ -20,5 +20,13 @@ class FakeGithubRepository
         state: GithubRepository::PENDING
       )
     )
+  end
+
+  def complete_deploy(deploy_url, status)
+    if @complete_deploy
+      return @complete_deploy
+    end
+
+    GithubRepository::CompleteResponse.new(true, nil)
   end
 end

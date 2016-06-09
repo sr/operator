@@ -56,8 +56,15 @@ class ChefDelivery
   end
 
   def complete_deploy(request)
-    # TODO(sr) repo.complete_deployment(request.deploy_url, request.success?)
-    notification.deploy_completed(request.deploy, request.success?, request.error)
+    status = request.success? ? "success" : "failure"
+    response = repo.complete_deploy(request.deploy_url, status)
+
+    if response.success?
+      notification.deploy_completed(request.deploy, request.success?, request.error)
+    else
+      error = "Could not update GitHub deployment: #{response.error}"
+      notification.deploy_completed(request.deploy, false, error)
+    end
   end
 
   private

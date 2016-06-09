@@ -128,4 +128,15 @@ RSpec.describe ChefDelivery do
     assert message.message.include?("failed to deploy")
     assert message.message.include?("boomtown")
   end
+
+  it "notifies if unable to update github deployment" do
+    request = ChefCompleteDeployRequest.new(build_deploy, nil)
+    @repo.complete_deploy = GithubRepository::CompleteResponse.new(false, "boomtown github")
+    response = @delivery.complete_deploy(request)
+    assert_equal 1, @config.notifier.messages.size
+    message = @config.notifier.messages.pop
+    assert message.message.include?("failed to deploy")
+    assert message.message.include?("update GitHub deployment")
+    assert message.message.include?("boomtown github")
+  end
 end
