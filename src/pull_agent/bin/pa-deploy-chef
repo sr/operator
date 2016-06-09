@@ -4,7 +4,7 @@ set -euo pipefail
 
 : "${PROGRAM:="$(basename "$0")"}"
 
-print_usage() {
+print_help() {
     grep ^#/ <"$0" |cut -c4-
 }
 
