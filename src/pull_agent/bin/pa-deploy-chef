@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#/ Usage: pa-deploy-chef [-d chef-dir] [-b git-branch] [-s git-sha] <action>
+set -euo pipefail
+
+: "${PROGRAM:="$(basename "$0")"}"
+
+print_usage() {
+    grep ^#/ <"$0" |cut -c4-
+}
+
+branch=""
+chefdir=""
+sha=""
+while getopts d:b:s: arg
+do
+    case "$arg" in
+        b)
+            branch="$OPTARG"
+            ;;
+        d)
+            chefdir="$OPTARG"
+            ;;
+        s)
+            sha="$OPTARG"
+            ;;
+        ?)
+            print_help
+            exit 2
+            ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+action="${1:-""}"
+case "$action" in
+    -h|--help)
+        print_help
+        exit 2
+        ;;
+    status)
+        if [ -z "$chefdir" ]
+        then
+            echo "$PROGRAM: required flag missing: -d <chef-dir>"
+            exit 1
+        fi
+
+        GIT_WORK_TREE="$chefdir"
+        GIT_DIR="$GIT_WORK_TREE/.git"
+        export GIT_WORK_TREE GIT_DIR
+
+        printf "{\"sha\": \"%s\", \"branch\": \"%s\", \"mtime\": \"%s\"}\n" \
+            "$(git rev-parse HEAD)" \
+            "$(git rev-parse --abbrev-ref HEAD)" \
+            "$(stat -f "%m" "$GIT_DIR/HEAD")"
+        ;;
+    deploy)
+        if [ -z "$chefdir" ]
+        then
+            echo "$PROGRAM: required flag missing: -d <chef-dir>"
+            exit 1
+        fi
+
+        if [ -z "$branch" ]
+        then
+            echo "$PROGRAM: required flag missing: -b <git-branch>"
+            exit 1
+        fi
+
+        if [ -z "$sha" ]
+        then
+            echo "$PROGRAM: required flag missing: -s <git-sha>"
+            exit 1
+        fi
+
+        GIT_WORK_TREE="$chefdir"
+        GIT_DIR="$GIT_WORK_TREE/.git"
+        export GIT_WORK_TREE GIT_DIR
+
+        git checkout "$branch" 2>&1
+        git reset --hard "$sha" 2>&1
+
+        knife pd sync 2>&1
+        ;;
+    *)
+        echo "$PROGRAM: unsupported action: $action"
+        exit 2
+        ;;
+esac

@@ -3,25 +3,23 @@ module Pardot
     class ChefDeploy
       Response = Struct.new(:success, :message)
 
-      def initialize(deploy)
+      def initialize(script, checkout_path, deploy)
+        @script = script
+        @checkout_path = checkout_path
         @deploy = deploy
       end
 
-      def apply(env)
+      def apply
         # TODO(sr) Move this to a script and capture both stdin and stdout
-        output = ShellHelper.execute([env, "git", "checkout", @deploy["branch"]])
+        output = ShellHelper.execute([
+          @script,
+          "-d", @checkout_path.to_s,
+          "-b", @deploy["branch"],
+          "-s", @deploy["sha"],
+          "deploy"
+        ])
         if !$?.success?
-          return error("unable to checkout branch #{@deploy["branch"]}: #{output.inspect}")
-        end
-
-        output = ShellHelper.execute([env, "git", "reset", "--hard", @deploy["sha"]])
-        if !$?.success?
-          return error("unable to checkout SHA1 #{@deploy["sha"]}: #{output.inspect}")
-        end
-
-        output = ShellHelper.execute([env, "echo", "knife-sync"])
-        if !$?.success?
-          return error("unable to run knife: #{output.inspect}")
+          return error("Deploy command failed: #{output.inspect}")
         end
 
         Response.new(true, "")
@@ -34,9 +32,6 @@ module Pardot
 
       def error(message)
         Response.new(false, message)
-      end
-
-      def directory
       end
     end
   end

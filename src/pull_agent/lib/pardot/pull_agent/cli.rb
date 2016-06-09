@@ -47,30 +47,19 @@ module Pardot
 
       def checkin_chef
         payload = environment.payload
-        git_dir = Pathname(payload.repo_path).join(".git")
+        repo_path = Pathname(payload.repo_path)
+        script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
-        env = {
-          "GIT_DIR" => git_dir.to_s,
-          "GIT_WORK_TREE" => payload.repo_path
-        }
-
-        branch = ShellHelper.execute([env, "git", "rev-parse", "--abbrev-ref", "HEAD"])
+        output = ShellHelper.execute([script, "-d", repo_path.to_s, "status"])
         if !$?.success?
-          fail "unable to retrieve current branch: #{branch.inspect}"
+          fail "unable to retrieve status of checkout: #{output.inspect}"
         end
 
-        sha = ShellHelper.execute([env, "git", "rev-parse", "HEAD"])
-        if !$?.success?
-          fail "unable to retrieve current SHA1: #{sha.inspect}"
-        end
+        checkout = JSON.parse(output)
 
         payload = {
           environment: environment.name,
-          checkout: {
-            sha1: sha,
-            branch: branch,
-            mtime: Integer(git_dir.join("HEAD").mtime)
-          }
+          checkout: JSON.parse(output)
         }
 
         request = {payload: JSON.dump(payload)}
@@ -81,7 +70,7 @@ module Pardot
         end
 
         payload = JSON.parse(response.body)
-        result = ChefDeploy.new(payload.fetch("deploy")).apply(env)
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply
 
         payload = {
           deploy: payload.fetch("deploy"),
