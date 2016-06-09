@@ -9,6 +9,7 @@ namespace :canoe do
       project.icon = 'search'
       project.bamboo_project = 'BREAD'
       project.bamboo_plan = 'BREAD'
+      project.bamboo_job = 'EX'
       project.repository = 'Pardot/bread'
     }.save!
 
