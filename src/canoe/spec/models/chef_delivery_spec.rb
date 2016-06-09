@@ -27,7 +27,7 @@ RSpec.describe ChefDelivery do
     GithubRepository::Deploy.new(defaults.merge(attributes))
   end
 
-  test "noops if chef delivery is disabled in current environment" do
+  it "noops if chef delivery is disabled in current environment" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("dfw", checkout)
     response = @delivery.checkin(request)
@@ -101,7 +101,7 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
   end
 
-  test "noops if current sha1 is already deployed" do
+  it "noops if current sha1 is already deployed" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(sha: "sha1")
