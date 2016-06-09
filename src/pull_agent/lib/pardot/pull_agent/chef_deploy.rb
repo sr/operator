@@ -10,7 +10,6 @@ module Pardot
       end
 
       def apply
-        # TODO(sr) Move this to a script and capture both stdin and stdout
         output = ShellHelper.execute([
           @script,
           "-d", @checkout_path.to_s,
