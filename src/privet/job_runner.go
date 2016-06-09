@@ -148,6 +148,7 @@ func (r *JobRunner) invokeUnits(units []string) (*CommandResult, error) {
 	args := []string{path}
 	args = append(args, units...)
 
+	log.Printf("invoking units: %v", units)
 	cmd := &exec.Cmd{
 		Path:   path,
 		Args:   args,
@@ -169,6 +170,7 @@ func (r *JobRunner) invokeUnits(units []string) (*CommandResult, error) {
 		return nil, err
 	}
 
+	log.Printf("finished units %v, exited with %v", units, exitCode)
 	return &CommandResult{
 		ExitCode: int32(exitCode),
 		Output:   buf.Bytes(),
