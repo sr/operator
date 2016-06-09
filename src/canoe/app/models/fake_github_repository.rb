@@ -17,7 +17,7 @@ class FakeGithubRepository
         environment: environment,
         branch: branch,
         sha: build.sha,
-        state: GithubRepository::PENDING
+        state: ChefDelivery::PENDING
       )
     )
   end

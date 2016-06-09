@@ -1,4 +1,8 @@
 class ChefDelivery
+  SUCCESS = "success".freeze
+  FAILURE = "failure".freeze
+  PENDING = "pending".freeze
+
   def initialize(config)
     @config = config
   end
@@ -14,7 +18,7 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if current_build.state != "success"
+    if current_build.state != SUCCESS
       return ChefCheckinResponse.noop
     end
 
@@ -32,7 +36,7 @@ class ChefDelivery
       @config.deploy_task_name
     )
 
-    if %w[success pending].include?(deploy.state)
+    if [SUCCESS, PENDING].include?(deploy.state)
       return ChefCheckinResponse.noop
     end
 
@@ -56,7 +60,7 @@ class ChefDelivery
   end
 
   def complete_deploy(request)
-    status = request.success? ? "success" : "failure"
+    status = request.success? ? SUCCESS : FAILURE
     response = repo.complete_deploy(request.deploy_url, status)
 
     if response.success?

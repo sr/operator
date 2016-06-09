@@ -41,8 +41,6 @@ class GithubRepository
     end
   end
 
-  PENDING = "pending".freeze
-
   def initialize(client, name)
     @client = client
     @name = name
@@ -80,7 +78,7 @@ class GithubRepository
         environment: deploy[:environment],
         branch: branch,
         sha: deploy[:sha],
-        state: PENDING
+        state: ChefDelivery::PENDING
       )
     end
 
@@ -110,7 +108,7 @@ class GithubRepository
       raise Error, "unable to create deploy: #{deploy.inspect}"
     end
 
-    status = @client.create_deployment_status(deploy[:url], PENDING)
+    status = @client.create_deployment_status(deploy[:url], ChefDelivery::PENDING)
     if status[:url].blank?
       raise Error, "unable to create deploy status: #{status.inspect}"
     end
