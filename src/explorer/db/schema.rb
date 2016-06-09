@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160517134536) do
+ActiveRecord::Schema.define(version: 20160609180928) do
 
   create_table "user_queries", force: :cascade do |t|
     t.integer  "account_id", limit: 4
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20160517134536) do
     t.string   "uid",        limit: 255,   null: false
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
+    t.string   "group",      limit: 255
   end
 
   add_index "users", ["email"], name: "email", unique: true, using: :btree

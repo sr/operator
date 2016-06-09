@@ -25,17 +25,25 @@ class User < ActiveRecord::Base
 
   def access_authorized?
     if Rails.env.development?
-      return true
+      return save
     end
 
     if new_record?
       return false
     end
 
-    groups = Rails.application.config.x.authorized_ldap_groups
+    full_access = Rails.application.config.x.full_access_ldap_group
+    restricted_access = Rails.application.config.x.restricted_access_ldap_group
     auth = Canoe::LDAPAuthorizer.new
-
-    auth.user_is_member_of_any_group?(uid, groups)
+    if auth.user_is_member_of_any_group?(uid, full_access)
+      group = 'full_access'
+      save
+    elsif auth.user_is_member_of_any_group?(uid, restricted_access)
+      group = 'restricted_access'
+      save
+    else
+      false
+    end
   end
 
   def datacenter
