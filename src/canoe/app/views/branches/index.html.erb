@@ -1,6 +1,6 @@
 <h1>
-  <%= content_tag :i, "", class: "icon-#{current_repo.icon}" %>
-  <%= current_repo.name.capitalize %>
+  <%= content_tag :i, "", class: "icon-#{current_project.icon}" %>
+  <%= current_project.name.capitalize %>
 </h1>
 
 <h2 class="steps-count">Step 2 of 4</h2>
@@ -17,18 +17,14 @@
     <% @branches.each do |branch| %>
       <li>
         <h4>
-          <%- if current_repo.deploys_via_artifacts? %>
-            <%= link_to "Ship This", repo_branch_builds_path(current_repo, branch.name), class: "btn btn-primary btn-xs btn-success deploy-button" %>
-          <%- else %>
-            <a href="<%= select_target_repo_deploys_path(current_repo.name, what: "branch", what_details: branch.name) %>" class="btn btn-primary btn-xs btn-success deploy-button">Ship This</a>
-          <%- end %>
+          <%= link_to "Ship This", project_branch_builds_path(current_project, branch.name), class: "btn btn-primary btn-xs btn-success deploy-button" %>
 
           &nbsp;
           <%= deploy_type_icon("branch") %> <%= branch.name %>
           &nbsp;
-          <a href="<%= current_repo.branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
+          <a href="<%= current_project.branch_url(branch) %>" class="text-muted" title="view on github"><i class="icon-github-sign"></i></a>
         </h4>
-        <small class="muted">commit: <a href="<%= current_repo.commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
+        <small class="muted">commit: <a href="<%= current_project.commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
         <hr>
       </li>
     <% end %>

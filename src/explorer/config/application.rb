@@ -14,10 +14,16 @@ module Explorer
     config.time_zone = "Eastern Time (US & Canada)"
     config.active_record.schema_format = :ruby
 
-    if Rails.env.test?
-      config.instrumentation.log_format = Instrumentation::LOG_NOOP
-    else
-      config.instrumentation.log_format = Instrumentation::LOG_LOGSTASH
+    config.instrumentation.log_format = if Rails.env.test?
+                                          Instrumentation::LOG_NOOP
+                                        else
+                                          Instrumentation::LOG_LOGSTASH
+                                        end
+
+    config.middleware.use Pinglish do |ping|
+      ping.check :db do
+        Integer(User.count)
+      end
     end
 
     initializer "explorer_app" do

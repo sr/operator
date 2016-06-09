@@ -39,7 +39,7 @@
     <nav role="navigation">
       <ul class="nav nav-stacked links">
         <%= content_tag :li do %>
-          <%= link_to repos_path, class: current_page?(controller: "repos", action: "index") ? "active" : "" do %>
+          <%= link_to projects_path, class: current_page?(controller: "projects", action: "index") ? "active" : "" do %>
             <%= content_tag :i, "", class: "icon-home" %>
             Home
           <%- end %>

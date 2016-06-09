@@ -1,104 +1,92 @@
 # Font awesome icons - http://fontawesome.io/3.2.1/icons/
 
 namespace :canoe do
-  desc 'Create repos for deployment'
-  task :create_repos => :environment do
+  desc 'Create projects for deployment'
+  task :create_projects => :environment do
     next if Rails.env.test?
 
-    Repo.find_or_initialize_by(name: 'explorer').tap { |repo|
-      repo.icon = 'search'
-      repo.supports_branch_deploy = true
-      repo.deploys_via_artifacts = true
-      repo.bamboo_project = 'BREAD'
-      repo.bamboo_plan = 'BREAD'
+    Project.find_or_initialize_by(name: 'explorer').tap { |project|
+      project.icon = 'search'
+      project.bamboo_project = 'BREAD'
+      project.bamboo_plan = 'BREAD'
+      project.repository = 'Pardot/bread'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'pardot').tap { |repo|
-      repo.icon = 'cloud'
-      repo.supports_branch_deploy = true
-      repo.deploys_via_artifacts = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'PPANT'
+    Project.find_or_initialize_by(name: 'pardot').tap { |project|
+      project.icon = 'cloud'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'PPANT'
+      project.repository = 'Pardot/pardot'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'pithumbs').tap { |repo|
-      repo.icon = 'thumbs-up'
-      repo.supports_branch_deploy = true
-      repo.deploys_via_artifacts = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'PTHMBS'
+    Project.find_or_initialize_by(name: 'pithumbs').tap { |project|
+      project.icon = 'thumbs-up'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'PTHMBS'
+      project.repository = 'Pardot/pithumbs'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'realtime-frontend').tap { |repo|
-      repo.icon = 'bullhorn'
-      repo.supports_branch_deploy = false
-      repo.deploys_via_artifacts = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'RTF'
+    Project.find_or_initialize_by(name: 'realtime-frontend').tap { |project|
+      project.icon = 'bullhorn'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'RTF'
+      project.repository = 'Pardot/realtime-frontend'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'workflow-stats').tap { |repo|
-      repo.icon = 'fighter-jet'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'WFST'
+    Project.find_or_initialize_by(name: 'workflow-stats').tap { |project|
+      project.icon = 'fighter-jet'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'WFST'
+      project.repository = 'Pardot/workflow-stats'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'murdoc').tap { |repo|
-      repo.icon = 'bolt'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'MDOC'
+    Project.find_or_initialize_by(name: 'murdoc').tap { |project|
+      project.icon = 'bolt'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'MDOC'
+      project.repository = 'Pardot/murdoc'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'chef').tap { |repo|
-      repo.icon = 'food'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = false
-      repo.bamboo_project = 'BREAD'
-      repo.bamboo_plan = 'CHEF'
+    Project.find_or_initialize_by(name: 'chef').tap { |project|
+      project.icon = 'food'
+      project.bamboo_project = 'BREAD'
+      project.bamboo_plan = 'CHEF'
+      project.repository = 'Pardot/chef'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'repfix').tap { |repo|
-      repo.icon = 'wrench'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = false
-      repo.bamboo_project = 'BREAD'
-      repo.bamboo_plan = 'REPFIX'
+    Project.find_or_initialize_by(name: 'repfix').tap { |project|
+      project.icon = 'wrench'
+      project.bamboo_project = 'BREAD'
+      project.bamboo_plan = 'REPFIX'
+      project.repository = 'Pardot/repfix'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'internal-api').tap { |repo|
-      repo.icon = 'building'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = false
-      repo.bamboo_project = 'BREAD'
-      repo.bamboo_plan = 'INTAPI'
+    Project.find_or_initialize_by(name: 'internal-api').tap { |project|
+      project.icon = 'building'
+      project.bamboo_project = 'BREAD'
+      project.bamboo_plan = 'INTAPI'
+      project.repository = 'Pardot/internal-api'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'blue-mesh').tap { |repo|
-      repo.icon = 'th'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = true
-      repo.bamboo_project = 'PDT'
-      repo.bamboo_plan = 'BLUMSH'
+    Project.find_or_initialize_by(name: 'blue-mesh').tap { |project|
+      project.icon = 'th'
+      project.bamboo_project = 'PDT'
+      project.bamboo_plan = 'BLUMSH'
+      project.repository = 'Pardot/blue-mesh'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'mesh').tap { |repo|
-      repo.icon = 'th-large'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = true
-      repo.bamboo_project = 'BREAD'
-      repo.bamboo_plan = 'MESH'
+    Project.find_or_initialize_by(name: 'mesh').tap { |project|
+      project.icon = 'th-large'
+      project.bamboo_project = 'BREAD'
+      project.bamboo_plan = 'MESH'
+      project.repository = 'Pardot/mesh'
     }.save!
 
-    Repo.find_or_initialize_by(name: 'ansible').tap { |repo|
-      repo.icon = 'signal'
-      repo.deploys_via_artifacts = true
-      repo.supports_branch_deploy = true
-      repo.bamboo_project = 'SRE'
-      repo.bamboo_plan = 'ANSBL'
+    Project.find_or_initialize_by(name: 'ansible').tap { |project|
+      project.icon = 'signal'
+      project.bamboo_project = 'SRE'
+      project.bamboo_plan = 'ANSBL'
+      project.repository = 'Pardot/ansible'
     }.save!
   end
 
@@ -110,7 +98,7 @@ namespace :canoe do
     when 'development'
       DeployTarget.find_or_initialize_by(name: 'test').save!
       DeployScenario.find_or_create_by(
-        repo: Repo.find_or_create_by(name: 'pardot'),
+        project: Project.find_or_create_by(name: 'pardot'),
         server: Server.find_or_create_by(hostname: 'local-1'),
         deploy_target: DeployTarget.find_or_create_by(name: 'dev')
       )
@@ -137,11 +125,11 @@ namespace :canoe do
     case Rails.env
     when 'production'
       # Until we coordinate with the Security team to make more granular groups,
-      # require 'releasebox' for all production deployments in all repos
+      # require 'releasebox' for all production deployments in all projects
       production_targets = DeployTarget.where(name: ["production", "production_dfw", "production_phx"])
-      Repo.find_each do |repo|
+      Project.find_each do |project|
         production_targets.each do |target|
-          DeployACLEntry.find_or_initialize_by(repo_id: repo.id, deploy_target_id: target.id).tap { |entry|
+          DeployACLEntry.find_or_initialize_by(project_id: project.id, deploy_target_id: target.id).tap { |entry|
             entry.acl_type = "ldap_group"
             entry.value = ["releasebox"]
           }.save!

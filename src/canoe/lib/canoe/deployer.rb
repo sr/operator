@@ -1,19 +1,19 @@
 module Canoe
   class Deployer
-    def deploy(target:, user:, repo:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
-      servers = target.servers(repo: repo).enabled
+    def deploy(target:, user:, project:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
+      servers = target.servers(project: project).enabled
       if server_hostnames
         servers = servers.where(hostname: server_hostnames)
       end
 
       # REFACTOR: An exception might be more appropriate -@alindeman
       # Last guard against a duplicate deploy
-      return nil if target.active_deploy(repo).present?
+      return nil if target.active_deploy(project).present?
 
       deploy = target.transaction do
         target.deploys.create!(
           auth_user: user,
-          repo_name: repo.name,
+          project_name: project.name,
           what: what,
           what_details: what_details,
           completed: false,
@@ -28,7 +28,7 @@ module Canoe
         }
       end
 
-      target.lock!(repo, user) if lock
+      target.lock!(project, user) if lock
 
       deploy
     end

@@ -3,7 +3,7 @@
   <% if @watching %>
     <i class="icon-eye-open"></i> Watching deploy of
   <% end %>
-  <%= current_deploy.repo_name.capitalize %> :
+  <%= current_deploy.project_name.capitalize %> :
   <%= print_deploy_what(current_deploy) %>
   to <%= current_deploy.deploy_target.name.capitalize %>
 </p>
@@ -21,7 +21,7 @@
     What <%= current_deploy.completed? ? 'changed' : 'is changing' %>?
   </strong>
   &nbsp;&nbsp;
-  <a href="<%= current_repo.diff_url(@previous_deploy, current_deploy) %>">
+  <a href="<%= current_project.diff_url(@previous_deploy, current_deploy) %>">
     <% if @previous_deploy %>
       <%= print_deploy_what @previous_deploy %>
     <% else %>
@@ -120,7 +120,7 @@
     <%- if current_deploy.completed? %>
       <tr>
         <td>
-          <%= link_to select_target_repo_deploys_path(current_repo.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
+          <%= link_to select_target_project_deploys_path(current_project.name, artifact_url: current_deploy.artifact_url, what: current_deploy.what, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
 
             <i class="icon-train2"></i> REDEPLOY
           <%- end %>
@@ -131,10 +131,10 @@
         </td>
       </tr>
     <%- end %>
-    <%- unless current_deploy.completed? %>
+    <%- unless current_deploy.completed? || current_deploy.sync_done? %>
       <tr>
         <td>
-          <%= form_tag force_to_complete_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
+          <%= form_tag force_to_complete_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
             <%= button_tag type: "submit", class: "btn btn-warning" do %>
               <%= content_tag :i, "", class: "icon-fast-forward" %>
               FORCE TO COMPLETE
@@ -147,10 +147,26 @@
         </td>
       </tr>
     <%- end %>
+    <%- if !current_deploy.completed? && current_deploy.sync_done? %>
+      <tr>
+        <td>
+          <%= form_tag pick_new_restart_servers_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to pick new restart servers?"} do %>
+            <%= button_tag type: "submit", class: "btn btn-warning" do %>
+              <%= content_tag :i, "", class: "icon-fast-forward" %>
+              PICK ANOTHER RESTART SERVER
+            <%- end %>
+          <%- end %>
+        </td>
+        <td>Yes</td>
+        <td>
+          Picks new restart servers for those datacenters that haven't finished. This is a good option if the deploy is currently hanging on restart. There may be a problem with the current restart server.
+        </td>
+      </tr>
+    <%- end %>
     <%- unless current_deploy.completed? %>
       <tr>
         <td>
-          <%= form_tag cancel_repo_deploy_path(current_repo.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
+          <%= form_tag cancel_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to cancel this deploy?"} do %>
             <button type="submit" class="btn btn-danger"><i class="icon-remove-sign"></i> STOP</button>
           <%- end %>
         </td>

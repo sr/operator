@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#/ Usage: build [--help] [--ci] [--all] [<project...>]
+#/ Usage: build [--help] [<project>]
 #/ Build program for the BREAD team repository.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -18,105 +18,28 @@ usage() {
     exit 1
 }
 
-cimode=false
-buildall=false
-projects=""
+project=""
 while [ $# -gt 0 ]
 do
     case "$1" in
         -h|--help)
             usage
             ;;
-        --ci)
-            cimode=true
-            shift
-            ;;
-        --all)
-            buildall=true
-            shift
-            ;;
         *)
-            projects="$projects $1"
+            project="$1"
             shift
             ;;
     esac
 done
 
-printf "===> Build ci=%s buildall=%s projects=%s\n" \
-    "$cimode" "$buildall" "$projects" 2>&1
-
-# In CI mode (enabled on Bamboo by default) this analyzes the diff to figure
-# out what project(s) need(s) building. A projects is defined as a subdirectory
-# of the src/ directory.
-if $cimode
-then
-    branch="${bamboo_planRepository_branch:-"$(git rev-parse --abbrev-ref HEAD)"}"
-    sha1a="${bamboo_repository_previous_revision_number:-""}"
-    sha1b="${bamboo_repository_revision_number:-"HEAD"}"
-
-    # It is unclear when this can happen as of yet so we just bail out if it
-    # does for now. If this is a topic branch build, compare the list of
-    # changed files against the remote master branch.
-    if [ "$branch" = "master" ] && [ -z "$sha1a" ]
-    then
-        echo "Unable to build master branch without a base SHA1" 2>&1
-        exit 1
-    elif [ -z "$sha1a" ]
-    then sha1a="$(git rev-parse origin/master)"
-    fi
-
-    printf "===> CI mode HEAD=%s branch=%s sha1a=%s sha1b=%s\n" \
-        "$(git rev-parse HEAD)" \
-        "$branch" \
-        "$sha1a" \
-        "$sha1b" 2>&1
-
-    # If the two SHA1s are identical it most likely means this is a restarted
-    # build, in which case a full build is triggered. Otherwise this analyzes
-    # the list of files that were modified between the last build and this one.
-    if test "$sha1a" = "$sha1b"
-    then buildall=true
-    else
-        for path in $(git diff --name-only "${sha1a}..${sha1b}")
-        do
-            # Trigger a complete rebuild if bin/build or any of the build
-            # scripts were modified. This is a rather radical and simplistic
-            # heuristic but it is better to err on the safe side and build too
-            # much than too little.
-            treename="$(echo "$path" | cut -d/ -f1)"
-            projectname="$(echo "$path" | cut -d/ -f2)"
-            if [ "$treename" != "src" ] || [ "$projectname" = "build" ]
-            then
-                buildall=true
-                break
-            fi
-
-            # Collect all projects that were modified in this change set.
-            seen=false
-            for i in $projects
-            do test "$i" = "$projectname" && seen=true
-            done
-            if ! $seen
-            then projects="${projects}${projectname} "
-            fi
-        done
-    fi
-fi
-
-# Build all projects if --all was given.
-if $buildall
-then projects="$(find src -type d -mindepth 1 -maxdepth 1 | cut -d/ -f2 | sort)"
-fi
-
 # Bail out in case there is nothing to build. This typically does should not
 # happen during normal usage and is therefore considered an error.
-test -z "$projects"  && {
-    echo "Nothing to build." 2>&1
+test -z "$project"  && {
+    echo "build: Nothing to build." 2>&1
     exit 1
 }
 
-echo "===> Projects scheduled to be built:$(echo "$projects" | tr "\n" " ")" 2>&1
-
+# Workaround docker networking bug
 docker-hack-restart
 
 # HACK: Override Artifactory host name on CI machines to workaround this:
@@ -136,87 +59,80 @@ then docker build --pull -f etc/docker/Dockerfile.build -t build/build .
 else docker build -f etc/docker/Dockerfile.build -t build/build .
 fi
 
-# Iterate over all selected projects, either explicitly or because of CI mode,
-# and execute the build commands in sequence.
-for project in $projects
-do
-    docker-hack-restart
+echo "===> Building ${project}..." 2>&1
 
-    echo "===> Building ${project}..." 2>&1
+case "$project" in
+    canoe)
+        build-ruby "$project"
+        test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
+        ;;
+    explorer)
+        build-ruby "$project"
+        test -n "$CI" && {
+            # Build a tarball from the app container built above
+            tarball="$(tarball-build-ruby "explorer_app")"
+            trap 'rm -f $tarball' EXIT
 
-    case "$project" in
-        canoe)
-            build-ruby "$project"
-            test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
-            ;;
-        github\.com*|chatops)
-            docker run --rm -w /go -v "$(pwd):/go" build/build \
-                make -f etc/mk/golang.mk
-            ;;
-        privet)
-            docker run --rm -w /go -v "$(pwd):/go" build/build \
-                make -f etc/mk/golang.mk
+            # Prepare the tarball and upload it to Artifactory
+            docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+        }
+        ;;
+    golang)
+        docker run --rm -w /go -v "$(pwd):/go" build/build \
+            make -f etc/mk/golang.mk
+        ;;
+    pull_agent)
+        build-ruby "$project"
 
-            test -n "$CI" && {
-                cd "bin"
-                tarball="$(tarball-build "privet")"
-                docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-            }
-            ;;
-        explorer)
-            build-ruby "$project"
-            test -n "$CI" && {
-                # Build a tarball from the app container built above
-                tarball="$(tarball-build-ruby "explorer_app")"
-                trap 'rm -f $tarball' EXIT
-
-                # Prepare the tarball and upload it to Artifactory
-                docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-            }
-            ;;
-        pull_agent)
-            build-ruby "$project"
-
-            # Build the gem and push it to Artifactory on CI.
-            test -n "$CI" && {
-                docker run --rm \
-                    -v "$(pwd):/data" \
-                    -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
-                    -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
-                    -e "CI_BRANCH=$CI_BRANCH" \
-                    -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
-                    -e "CI_PLAN=$CI_PLAN" \
-                    -e "DEBUG=$DEBUG" \
-                    build/build \
-                    build-gem-pull_agent
-            }
-            ;;
-        rubylib)
-            build-ruby "rubylib"
-            ;;
-        build|shell)
-            docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
-            docker run --rm -v "$(pwd):/data" \
-                build/shellcheck \
-                find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +
-            ;;
-        teampass)
-            docker build -f src/teampass/Dockerfile src/teampass
-            ;;
-        terraform)
-            docker run --rm -v "$(pwd):/data" \
+        # Build the gem and push it to Artifactory on CI.
+        test -n "$CI" && {
+            docker run --rm \
+                -v "$(pwd):/data" \
+                -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
+                -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
+                -e "CI_BRANCH=$CI_BRANCH" \
+                -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+                -e "CI_PLAN=$CI_PLAN" \
+                -e "DEBUG=$DEBUG" \
                 build/build \
-                make -C src/terraform validate
-            ;;
-        # TODO(sr) Decide what to do about vendored Go code. I think building
-        # it might be worthwhile still, just not with the same level of
-        # attention as for our own code, so no linting etc.
-        vendor)
-            true
-            ;;
-        *)
-            echo "No build rule defined for project \"$project\"." 2>&1
-            exit 1
-            ;;
-    esac
-done
+                build-gem-pull_agent
+        }
+        ;;
+    privet)
+        docker run --rm -w /go -v "$(pwd):/go" build/build \
+              make -f etc/mk/golang.mk
+
+        test -n "$CI" && {
+          cd "bin"
+          tarball="$(tarball-build "privet")"
+          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+        }
+        ;;
+    rubylib)
+        build-ruby "rubylib"
+        ;;
+    shell)
+        docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
+        docker run --rm -v "$(pwd):/data" \
+            build/shellcheck \
+            find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +
+        ;;
+    teampass)
+        docker build -f src/teampass/Dockerfile src/teampass
+        ;;
+    terraform)
+        docker run --rm -v "$(pwd):/data" \
+            build/build \
+            make -C src/terraform validate
+        ;;
+    # TODO(sr) Decide what to do about vendored Go code. I think building
+    # it might be worthwhile still, just not with the same level of
+    # attention as for our own code, so no linting etc.
+    vendor)
+        true
+        ;;
+    *)
+        echo "No build rule defined for project \"$project\"." 2>&1
+        exit 1
+        ;;
+esac

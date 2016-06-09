@@ -1,12 +1,12 @@
-<% if account.present? %>
+<% if query.for_account? %>
 <div id="account_id">
-    <span>Account: <%= account.descriptive_name %></span>
+  <span>Account: <%= query.account_name %></span>
 </div>
 <% end %>
+
 <%= form_tag "/queries" do -%>
-  <%= hidden_field_tag :database, database_name %>
-  <% if account.present? %>
-    <%= hidden_field_tag :account_id, account.id %>
+  <% if query.for_account? %>
+    <%= hidden_field_tag :account_id, query.account_id %>
   <% end %>
   <%= hidden_field_tag :is_limited %>
   <%= hidden_field_tag :view, current_view %>
@@ -15,12 +15,13 @@
     <button type="button" class="btn btn-default<%= active?(current_view, Query::UI) %>" data-val="<%= Query::UI %>">Pretty UI View</button>
   </div>
   <div class="viewoption" <%= active?(current_view, Query::UI, 'style="display:none;"') %>>
-    <%= text_area_tag(:sql, sql_query.sql, rows: 10, cols: 80) %>
+    <%= text_area_tag(:sql, query.executable_query.sql, rows: 10, cols: 80) %>
+    <%= submit_tag "Run Query" %>
   </div>
-  <%= submit_tag "Run Query" %>
+
   <div class="viewoption" <%= active?(current_view, Query::SQL, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
-      <% tables.each do |table| %>
+      <% query.database_tables.each do |table| %>
         <tr>
           <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
         </tr>
@@ -29,12 +30,13 @@
   </div>
 <% end %>
 
+<!-- TODO(sr) Bring this back -->
 <% if false %>
   <div id="error_explanation">
-    <h2><%= pluralize(@query.errors.count, "error") %> prohibited this query from being executed:</h2>
+    <h2><%= pluralize(query.errors.count, "error") %> prohibited this query from being executed:</h2>
 
     <ul>
-    <% @query.errors.full_messages.each do |message| %>
+    <% query.errors.full_messages.each do |message| %>
       <li><%= message %></li>
     <% end %>
     </ul>

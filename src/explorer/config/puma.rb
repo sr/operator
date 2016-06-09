@@ -8,7 +8,7 @@ rackup      DefaultRackup
 port        ENV.fetch("PORT", 4000)
 environment ENV.fetch("RACK_ENV", "development")
 
-log = File.expand_path("../../log/#{ENV.fetch("RACK_ENV")}.log", __FILE__)
+log = File.expand_path("../../log/#{ENV.fetch('RACK_ENV')}.log", __FILE__)
 stdout_redirect log, log, true
 
 on_worker_boot do

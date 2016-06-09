@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
-  resources :repos, param: :name, only: [:index, :show] do
+  resources :projects, param: :name, only: [:index, :show] do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
@@ -17,12 +17,13 @@ Rails.application.routes.draw do
     resources :deploys, only: [:new, :create, :show] do
       get :select_target, on: :collection
       post :force_to_complete, on: :member
+      post :pick_new_restart_servers, on: :member
       post :cancel, on: :member
     end
   end
 
   resources :targets, param: :name, only: [:show] do
-    resources :repos, param: :name, only: [] do
+    resources :projects, param: :name, only: [] do
       resources :deploys, only: [:index]
 
       post :lock, on: :member
@@ -36,7 +37,7 @@ Rails.application.routes.draw do
     post "deploy/:id/completed_server" => "deploys#completed_server"
 
     resources :targets, param: :name, only: [] do
-      resources :repos, param: :name, only: [] do
+      resources :projects, param: :name, only: [] do
         resources :deploys, only: [:index]
       end
 
@@ -47,12 +48,13 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :repos, param: :name, only: [] do
+    resources :projects, param: :name, only: [] do
       resources :branches, param: :name, constraints: {name: /.*/}, only: [] do
         resources :builds, only: [:index]
       end
     end
   end
 
-  root to: "repos#index"
+  get "/_boomtown", to: "projects#boomtown"
+  root to: "projects#index"
 end
