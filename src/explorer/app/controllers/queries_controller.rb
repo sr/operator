@@ -28,9 +28,6 @@ class QueriesController < ApplicationController
           results: query.execute
         }
       end
-      format.csv do
-        render text: query.execute_csv
-      end
     end
   end
 

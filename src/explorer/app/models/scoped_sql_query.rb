@@ -1,5 +1,5 @@
 class ScopedSQLQuery
-  ACCOUNT_TABLE = "account"
+  ACCOUNT_TABLE = "account".freeze
 
   def initialize(ast, account_id)
     @ast = ast
@@ -25,7 +25,7 @@ class ScopedSQLQuery
 
     if where.search_condition.is_a?(SQLParser::Statement::And)
       return where.search_condition.left.to_sql == condition.to_sql ||
-        where.search_condition.right.to_sql == condition.to_sql
+             where.search_condition.right.to_sql == condition.to_sql
     end
 
     where.search_condition.to_sql == condition.to_sql
@@ -59,14 +59,13 @@ class ScopedSQLQuery
       SQLParser::Statement::Column.new("account_id")
     end
   end
-  
+
   # TODO(sr) Make this more robust and handle more than basic queries
   def table_name
-    @ast.query_expression.
-      table_expression.
-      from_clause.
-      tables[0].
-      name
+    @ast.query_expression
+      .table_expression
+      .from_clause
+      .tables[0]
+      .name
   end
 end
-
