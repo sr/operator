@@ -175,7 +175,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  byebug
+  byebug (~> 9.0)
   coffee-rails (~> 4.0)
   foreman (= 0.78.0)
   jquery-rails
