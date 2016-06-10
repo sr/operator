@@ -27,7 +27,6 @@ module Explorer
     end
 
     initializer "explorer_app" do
-      config.x.database_config = DatabaseConfigurationFile.load
       config.x.datacenter = ENV.fetch("EXPLORER_DATACENTER")
       config.x.restricted_access_ldap_group = 'explorer_support'
       config.x.full_access_ldap_group = 'explorer_full'

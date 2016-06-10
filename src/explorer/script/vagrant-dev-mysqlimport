@@ -14,7 +14,7 @@ for dbname in pardot_global pardot_shard1 pardot_shard2
 do
     dump="db/vagrant-dev/${dbname}.sql"
     echo "==> Importing $dump into database $dbname"
-    mysqladmin -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+    mysqladmin -h "${DATABASE_HOST-localhost}" -P "${DATABASE_PORT-3306}" \
         create "$dbname" 2>/dev/null || true
-    mysql -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
+    mysql -u root -h "${DATABASE_HOST-localhost}" -P "${DATABASE_PORT-3306}" "$dbname" < "$dump"
 done
