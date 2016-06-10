@@ -2,6 +2,7 @@
 /src/**/log/*.log
 /src/**/tmp
 /src/**/.bundle
+/src/**/.byebug_history
 /src/**/vendor/gems
 /src/explorer/config/pi/*.php
 /src/pull_agent/.dev_settings.yml
