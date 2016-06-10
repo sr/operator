@@ -40,8 +40,7 @@ class User < ActiveRecord::Base
 
   def datacenter
     datacenter = Rails.application.config.x.datacenter
-    config = Rails.application.config.x.database_config
 
-    DataCenter.new(datacenter, self, config)
+    DataCenter.new(datacenter, self, DatabaseConfigurationFile.load)
   end
 end

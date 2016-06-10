@@ -40,7 +40,6 @@ class DatabaseConfigurationFile
       else
         raise DataCenterNotFound, datacenter
       end
-
     DatabaseConfiguration.new(config.fetch(1), auth)
   end
 
