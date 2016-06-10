@@ -13,9 +13,9 @@ on_worker_boot do
   # See: https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server#on-worker-boot
   ActiveRecord::Base.establish_connection
 
-  # Start a debugger on port 4001 in development
+  # Start a debugger in development
   if Rails.env.development?
     require "byebug/core"
-    Byebug.start_server "localhost", 4001
+    Byebug.start_server "localhost", 4040
   end
 end
