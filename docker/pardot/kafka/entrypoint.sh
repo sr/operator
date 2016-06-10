@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eumo pipefail
+set -euo pipefail
 
 # KAFKA_TOPICS="topic1 topic2"
 KAFKA_TOPICS="${KAFKA_TOPICS-}"
@@ -9,6 +9,8 @@ KAFKA_TOPICS_CMD="/opt/kafka/current/bin/kafka-topics.sh --zookeeper=localhost:2
 program="${1-}"
 if [ "$program" = "supervisord" ] && [ ! -e "/opt/kafka/DOCKER-SETUP" ]; then
   "$@" &
+  pid="$!"
+  trap "kill -TERM ${pid}" SIGTERM
 
   # Wait for the list of topics to come back successfully
   ${KAFKA_TOPICS_CMD} --list
@@ -25,7 +27,7 @@ if [ "$program" = "supervisord" ] && [ ! -e "/opt/kafka/DOCKER-SETUP" ]; then
   fi
 
   touch "/opt/kafka/DOCKER-SETUP"
-  fg %1
+  wait "$pid"
 else
   exec "$@"
 fi
