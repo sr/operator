@@ -19,6 +19,6 @@ on_worker_boot do
   # Start a debugger in development
   if Rails.env.development?
     require "byebug/core"
-    Byebug.start_server "localhost", 4041
+    Byebug.start_server "localhost", 4040
   end
 end
