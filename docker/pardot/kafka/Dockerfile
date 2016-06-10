@@ -24,7 +24,9 @@ RUN mkdir -p /opt/kafka-data && \
   chown kafka:kafka /opt/zookeeper
 
 COPY supervisord.conf /etc/supervisord.conf
+COPY entrypoint.sh /entrypoint.sh
 
 VOLUME ["/opt/kafka-data", "/opt/zookeeper"]
 EXPOSE 2181 9092
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
