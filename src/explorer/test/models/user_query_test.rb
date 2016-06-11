@@ -6,16 +6,16 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "database_name" do
-    authorize_access(@user.datacenter, 1)
-    query = @user.queries.new(raw_sql: "SELECT 1")
+    authorize_access(@user, 1)
+    query = @user.global_query("SELECT 1")
     assert_equal "pardot_global", query.database_name
 
-    query = @user.queries.new(raw_sql: "SELECT 1", account_id: 1)
+    query = @user.account_query("SELECT 1", 1)
     assert_equal "pardot_shard1", query.database_name
   end
 
   test "execute" do
-    authorize_access(@user.datacenter, 1)
+    authorize_access(@user, 1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute
     row = results.first
@@ -37,7 +37,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "execute unexpiring access" do
-    authorize_access(@user.datacenter, 1)
+    authorize_access(@user, 1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute
     row = results.first
@@ -45,7 +45,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "execute access expiring tomorrow" do
-    authorize_access(@user.datacenter, 1, nil, 1.minute.ago.end_of_day.to_s(:db))
+    authorize_access(@user, 1, nil, 1.minute.ago.end_of_day.to_s(:db))
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute
     row = results.first
@@ -64,7 +64,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "account query audit log" do
-    authorize_access(@user.datacenter, 1)
+    authorize_access(@user, 1)
     query = @user.account_query("SELECT 1 FROM account", 1)
     query.execute
     assert Instrumentation::Logging.entries.pop
@@ -78,7 +78,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "account tables" do
-    authorize_access(@user.datacenter, 2)
+    authorize_access(@user, 2)
     query = @user.account_query("SELECT 1 FROM job", 2)
     tables = query.database_tables
     assert tables.include?("campaign_source_stats")

@@ -29,6 +29,10 @@ class Database
 
   private
 
+  def connection
+    @connection ||= establish_connection
+  end
+
   def activerecord_connection
     @activerecord_connection ||=
       ActiveRecord::ConnectionAdapters::Mysql2Adapter.new(
@@ -37,10 +41,6 @@ class Database
         nil,
         {}
       )
-  end
-
-  def connection
-    @connection ||= establish_connection
   end
 
   def establish_connection

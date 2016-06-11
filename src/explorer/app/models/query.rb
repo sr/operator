@@ -12,7 +12,7 @@ class Query
     end
   end
 
-  def initialize(database, connection, user, sql)
+  def initialize(database, connection, sql)
     @database = database
     @connection = connection
     @user = user

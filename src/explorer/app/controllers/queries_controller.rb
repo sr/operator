@@ -18,7 +18,7 @@ class QueriesController < ApplicationController
   end
 
   def show
-    query = UserQuery.find(params[:id])
+    query = UserQuery.find(params[:id]).secured(current_user)
 
     rate_limit =
       if Rails.env.development? && params[:rate_limited].present?
@@ -27,13 +27,20 @@ class QueriesController < ApplicationController
         current_user.rate_limit
       end
 
+    results =
+      if rate_limit.exceeded?
+        query.blank
+      else
+        query.execute
+      end
+
     respond_to do |format|
       format.html do
         render :show, locals: {
           current_view: params[:view] || Query::SQL,
           query: query,
           rate_limit: rate_limit,
-          results: query.execute
+          results: results
         }
       end
     end

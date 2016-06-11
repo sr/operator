@@ -20,9 +20,9 @@ class DataCenter
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
 
-  def initialize(name, user, config)
-    @name = name
+  def initialize(user, name, config)
     @user = user
+    @name = name
     @config = config
 
     if ![DALLAS, LOCAL, SEATTLE].include?(name)

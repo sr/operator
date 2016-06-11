@@ -12,15 +12,11 @@ class User < ActiveRecord::Base
   end
 
   def account_query(sql, account_id)
-    queries.create!(raw_sql: sql, account_id: account_id)
+    queries.create!(raw_sql: sql, account_id: account_id).secured(self)
   end
 
   def global_query(sql)
-    queries.create!(raw_sql: sql)
-  end
-
-  def global_accounts
-    datacenter.accounts
+    queries.create!(raw_sql: sql).secured(self)
   end
 
   def access_authorized?
@@ -39,12 +35,18 @@ class User < ActiveRecord::Base
   end
 
   def rate_limit
-    RateLimit.new(self)
+    @rate_limit ||= UserRateLimit.new(
+      self,
+      Rails.application.config.x.rate_limit_time_window,
+      Rails.application.config.x.rate_limit_max,
+    )
   end
 
   def datacenter
-    datacenter = Rails.application.config.x.datacenter
-
-    DataCenter.new(datacenter, self, DatabaseConfigurationFile.load)
+    @datacenter ||= DataCenter.new(
+      @user,
+      Rails.application.config.x.datacenter,
+      DatabaseConfigurationFile.load
+    )
   end
 end
