@@ -1,4 +1,4 @@
-class RateLimit
+class UserRateLimit
   def initialize(user)
     @user = user
   end
