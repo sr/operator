@@ -20,11 +20,19 @@ class QueriesController < ApplicationController
   def show
     query = UserQuery.find(params[:id])
 
+    rate_limit =
+      if Rails.env.development? && params[:rate_limited].present?
+        FakeRateLimit.new
+      else
+        current_user.rate_limit
+      end
+
     respond_to do |format|
       format.html do
         render :show, locals: {
           current_view: params[:view] || Query::SQL,
           query: query,
+          rate_limit: rate_limit,
           results: query.execute
         }
       end
