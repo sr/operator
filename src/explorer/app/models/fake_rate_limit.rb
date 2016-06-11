@@ -3,6 +3,9 @@ class FakeRateLimit
     true
   end
 
+  def record_transaction
+  end
+
   def resets_in
     3.minutes
   end
@@ -11,7 +14,7 @@ class FakeRateLimit
     15.minutes
   end
 
-  def max_queries
+  def max
     10
   end
 end

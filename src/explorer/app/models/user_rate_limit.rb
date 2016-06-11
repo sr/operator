@@ -1,23 +1,49 @@
 class UserRateLimit
-  def initialize(user)
+  def initialize(user, period, max)
     @user = user
+    @period = Integer(period)
+    @max = Integer(max)
   end
 
-  def max
-    10
+  attr_reader :max
+
+  def exceeded?(now = nil)
+    now ||= Time.current
+
+    if @user.rate_limit_expires_at.nil?
+      return false
+    end
+
+    if now >= @user.rate_limit_expires_at
+      return false
+    end
+
+    @user.rate_limit_transactions_count > @max
   end
 
-  def exceeded?
+  def record_transaction(now = nil)
+    now ||= Time.current
+
+    if @user.rate_limit_expires_at.nil? || Time.current >= @user.rate_limit_expires_at
+      @user.rate_limit_expires_at = Time.current + @period
+      @user.rate_limit_transactions_count = 0
+    end
+
+    @user.increment(:rate_limit_transactions_count)
+    @user.save!
   end
 
-  def query_count
-    Integer(@user.query_count)
+  def resets_in(now = nil)
+    now ||= Time.current
+
+    if @user.rate_limit_expires_at.nil?
+      return @period
+    end
+
+    @user.rate_limit_expires_at - now
   end
 
-  def reset
-    @user.update_attributes!(
-      last_query_at: nil,
-      query_count: nil
-    )
+  def transactions_count
+    Integer(@user.rate_limit_transactions_count)
   end
 end
