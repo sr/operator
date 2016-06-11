@@ -1,5 +1,3 @@
-require "csv"
-
 class UserQuery < ActiveRecord::Base
   class Error < StandardError
   end
