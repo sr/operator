@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe DeployWorkflow do
-  let(:repo) { FactoryGirl.create(:repo) }
-  let(:deploy) { FactoryGirl.create(:deploy, completed: false, repo_name: repo.name) }
+  let(:project) { FactoryGirl.create(:project) }
+  let(:deploy) { FactoryGirl.create(:deploy, completed: false, project_name: project.name) }
 
   context "initiating a deploy" do
     it "creates a deploy result for each server, initially setting them to stage: initiated" do
@@ -64,7 +64,7 @@ RSpec.describe DeployWorkflow do
   end
 
   context "deployed -> completed" do
-    it "moves the restart server to the completed stage after it reports a successful restart" do
+    it "moves the restart server to the completed stage after it projectrts a successful restart" do
       servers = FactoryGirl.create_list(:server, 3)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
 
@@ -183,6 +183,20 @@ RSpec.describe DeployWorkflow do
 
       expect(workflow.next_action_for(server: restart_server)).to eq(nil)
       expect(deploy.completed?).to be_truthy
+    end
+  end
+
+  describe "#pick_new_restart_servers" do
+    it "picks a new restart server" do
+      restart_server, other_server = FactoryGirl.create_list(:server, 2)
+      workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
+
+      workflow.notify_action_successful(server: restart_server, action: "deploy")
+      workflow.notify_action_successful(server: other_server, action: "deploy")
+
+      expect(workflow.next_action_for(server: restart_server)).to eq("restart")
+      workflow.pick_new_restart_servers
+      expect(workflow.next_action_for(server: restart_server)).to eq(nil)
     end
   end
 end

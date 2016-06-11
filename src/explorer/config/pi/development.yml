@@ -2,51 +2,27 @@
 globals:
   global:
     local:
-      pifunctional:
-        host: localhost
+      1:
+        host: mysql
         role: master
-        database: pardot_global_functional
-        username: $1:gf9sLJieUDuIiL/GVgH3z/uvuEVMzljNXZixw2SJC1o=:qUGA6jULh5WgZKSKhg636OMLe9I08Ueun1Tsc6GrfW4=
-        password: $1:wZIySl8/mOmQgYs5tuIKFnouWAIi3WO+ohaxWz8WFG0=:iBQ5zZ9f0xgUpCI8dhWCjQ4yLgPuFr4uTZkjt9WtNoQ=
-  qwerly:
-    local:
-      pifunctional:
-        host: localhost
-        role: master
-        database: pardot_qwerly_functional
-        username: $1:XoYV4feJ0Ry4gVC5P3lOv1kL1QpfLWv7yrbURvsN/w4=:oBmNmfm1jLiXlnNYW1U2Ntj0/nz0dkGFSwBNybE69cg=
-        password: $1:YOmlePO/chzP5IBiUSp2klzuBV1XnUUQ5c0tmGS9mAQ=:9bnWULybTMM8Hoenpr26KDs40daKqAfNDmj2CQL3RzA=
-  social:
-    local:
-      pifunctional:
-        host: localhost
-        role: master
-        database: pardot_social_functional
-        username: $1:X3/+fDQWW5KRTN6NVu3XHTfOBgHVx2ARkZfTjrmLt8s=:br8FAgmSERy3pF/AaoGDG6zFsRHAh9s8E+w2yoqtwIY=
-        password: $1:I6+viak93pTMo9e1iADYqaVXfSzMrZtoh1HSSmQ2aNQ=:g5GG7xhRO01Byjn1N4mxzsLESadP9foBHaq5y3LQ9zg=
-  whois:
-    local:
-      pifunctional:
-        host: localhost
-        role: master
-        database: pardot_whois_functional
-        username: $1:PmQwhp13JOp8E5dSNRwjU4mqhW73OVkTToojzoOo4b4=:mlEVrux9h+Yq40FziV33FmkgkaJ6KjzbGL2KiC7m6PM=
-        password: $1:+qpGUcSJsMEm9RoB8t5x9fazmZUVp7BSA/JhweJa6bA=:FfFGG7wpwg3BLLyHtAZ3joMiBBk6NV+4L6j5lrjs048=
+        database: pardot_global
+        username: root
+        password:
 shards:
   1:
     local:
-      pifunctional:
-        host: localhost
+      1:
+        host: mysql
         role: master
-        database: pardot_shard1_functional
-        username: $1:sMC0uv8YxScXykrRbeLxlopKaVUWquSMk4eZbzJQ/Ho=:PRc8zQjMQVc3/jYLkJQjef9BS2tkVCWf5KQZ/zdtZNg=
-        password: $1:RUTWSbxYoixpSGHOA252F08r/inXqvx9oGBNbqfmI68=:cAnId/BLVeZJgPeGB8DHOlUkGrVIRXH94dsbowtgLQ4=
+        database: pardot_shard1
+        username: root
+        password:
   2:
     local:
-      pifunctional:
-        host: localhost
+      1:
+        host: mysql
         role: master
-        database: pardot_shard2_functional
-        username: $1:ckuhCPONQwJuJ1DY+xZxtmVs15qMa+I8mzJ5QdjmmKs=:rZSLWOPQU1YChSc7VmgX+AK34PS6iRKwbt4KZ2Ejl+I=
-        password: $1:ry3OBGgbvZ/kptjdTpkP9ykgxzz7SLrkkF3STQvlYxo=:PfX/F6hc6ZRNuqCpHhmZ7pHno9lSh2wnskOl5WHsksE=
+        database: pardot_shard2
+        username: root
+        password:
 ...

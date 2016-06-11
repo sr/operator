@@ -2,6 +2,16 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
 
+  rescue_from Exception do |exception|
+    Instrumentation.log_exception(exception)
+
+    if !Rails.env.development?
+      render file: "public/500.html", layout: false, status: 500
+    else
+      raise exception
+    end
+  end
+
   around_action :log_context
 
   protected
@@ -51,7 +61,7 @@ class ApplicationController < ActionController::Base
 
     created_at = session[:created_at]
     if created_at && Time.zone.at(created_at) >= Rails.application.config.x.session_ttl.ago
-      return AuthUser.find_by_id(session[:user_id])
+      return User.find_by_id(session[:user_id])
     end
 
     session.destroy

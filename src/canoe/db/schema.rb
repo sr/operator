@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160301215553) do
+ActiveRecord::Schema.define(version: 20160607150900) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20160301215553) do
   add_index "auth_users", ["uid"], name: "index_auth_users_on_uid", unique: true, using: :btree
 
   create_table "deploy_acl_entries", force: :cascade do |t|
-    t.integer  "repo_id",          limit: 4,     null: false
+    t.integer  "project_id",       limit: 4,     null: false
     t.integer  "deploy_target_id", limit: 4,     null: false
     t.string   "acl_type",         limit: 255,   null: false
     t.text     "value",            limit: 65535, null: false
@@ -33,8 +33,8 @@ ActiveRecord::Schema.define(version: 20160301215553) do
     t.datetime "updated_at",                     null: false
   end
 
-  add_index "deploy_acl_entries", ["deploy_target_id", "repo_id"], name: "index_deploy_acl_entries_on_deploy_target_id_and_repo_id", unique: true, using: :btree
-  add_index "deploy_acl_entries", ["repo_id"], name: "index_deploy_acl_entries_on_repo_id", using: :btree
+  add_index "deploy_acl_entries", ["deploy_target_id", "project_id"], name: "index_deploy_acl_entries_on_deploy_target_id_and_project_id", unique: true, using: :btree
+  add_index "deploy_acl_entries", ["project_id"], name: "index_deploy_acl_entries_on_project_id", using: :btree
 
   create_table "deploy_restart_servers", force: :cascade do |t|
     t.integer  "deploy_id",  limit: 4,   null: false
@@ -57,12 +57,12 @@ ActiveRecord::Schema.define(version: 20160301215553) do
   add_index "deploy_results", ["server_id", "deploy_id"], name: "index_deploy_results_on_server_id_and_deploy_id", unique: true, using: :btree
 
   create_table "deploy_scenarios", force: :cascade do |t|
-    t.integer "repo_id",          limit: 4, null: false
+    t.integer "project_id",       limit: 4, null: false
     t.integer "server_id",        limit: 4, null: false
     t.integer "deploy_target_id", limit: 4, null: false
   end
 
-  add_index "deploy_scenarios", ["repo_id", "deploy_target_id", "server_id"], name: "index_deploy_scenarios_on_repo_deploy_server_ids", unique: true, using: :btree
+  add_index "deploy_scenarios", ["project_id", "deploy_target_id", "server_id"], name: "index_deploy_scenarios_on_repo_deploy_server_ids", unique: true, using: :btree
 
   create_table "deploy_targets", force: :cascade do |t|
     t.string   "name",            limit: 255
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(version: 20160301215553) do
   create_table "deploys", force: :cascade do |t|
     t.integer  "deploy_target_id",  limit: 4
     t.integer  "auth_user_id",      limit: 4
-    t.string   "repo_name",         limit: 255
+    t.string   "project_name",      limit: 255
     t.string   "what",              limit: 255
     t.string   "what_details",      limit: 255
     t.boolean  "completed",                       default: false
@@ -104,21 +104,21 @@ ActiveRecord::Schema.define(version: 20160301215553) do
     t.integer  "auth_user_id",     limit: 4, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "repo_id",          limit: 4, null: false
+    t.integer  "project_id",       limit: 4, null: false
   end
 
-  add_index "locks", ["deploy_target_id", "repo_id"], name: "index_locks_on_deploy_target_id_and_repo_id", unique: true, using: :btree
+  add_index "locks", ["deploy_target_id", "project_id"], name: "index_locks_on_deploy_target_id_and_project_id", unique: true, using: :btree
 
-  create_table "repos", force: :cascade do |t|
-    t.string  "name",                   limit: 255,                 null: false
-    t.string  "icon",                   limit: 255,                 null: false
-    t.boolean "supports_branch_deploy",             default: false, null: false
-    t.boolean "deploys_via_artifacts",              default: false, null: false
-    t.string  "bamboo_project",         limit: 255
-    t.string  "bamboo_plan",            limit: 255
+  create_table "projects", force: :cascade do |t|
+    t.string "name",           limit: 255, null: false
+    t.string "icon",           limit: 255, null: false
+    t.string "bamboo_project", limit: 255
+    t.string "bamboo_plan",    limit: 255
+    t.string "repository",     limit: 255, null: false
+    t.string "bamboo_job",     limit: 255
   end
 
-  add_index "repos", ["name"], name: "index_repos_on_name", unique: true, using: :btree
+  add_index "projects", ["name"], name: "index_projects_on_name", unique: true, using: :btree
 
   create_table "server_taggings", force: :cascade do |t|
     t.integer  "server_id",     limit: 4, null: false

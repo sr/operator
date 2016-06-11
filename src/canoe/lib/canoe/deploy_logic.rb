@@ -1,9 +1,9 @@
 module Canoe
   # TODO: Break this out into something that doesn't have to be mixed into a
   # controller to work correctly. Specifically, we need to break the
-  # dependencies on `current_repo`, `current_target`, and `params`. -@alindeman
+  # dependencies on `current_project`, `current_target`, and `params`. -@alindeman
   module DeployLogic
-    DEPLOYLOGIC_ERROR_NO_REPO   = 1
+    DEPLOYLOGIC_ERROR_NO_PROJECT   = 1
     DEPLOYLOGIC_ERROR_NO_TARGET = 2
     DEPLOYLOGIC_ERROR_NO_WHAT   = 3
     DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY = 4
@@ -12,15 +12,15 @@ module Canoe
 
     # ----------------------------------------------------------------------
     def deploy!(prov_deploy)
-      # require a repo and target
-      return { error: true, reason: DEPLOYLOGIC_ERROR_NO_REPO   } if !current_repo
+      # require a project and target
+      return { error: true, reason: DEPLOYLOGIC_ERROR_NO_PROJECT   } if !current_project
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
       # confirm user can deploy
-      if !current_target.user_can_deploy?(current_repo, current_user)
+      if !current_target.user_can_deploy?(current_project, current_user)
         return { error: true, reason: DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY }
       end
       # confirm again there is no active deploy
-      if !current_target.active_deploy(current_repo).nil?
+      if !current_target.active_deploy(current_project).nil?
         return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
@@ -36,7 +36,7 @@ module Canoe
       the_deploy = deployer.deploy(
         target: current_target,
         user: current_user,
-        repo: current_repo,
+        project: current_project,
         what: prov_deploy.what,
         what_details: prov_deploy.what_details,
         sha: prov_deploy.sha,

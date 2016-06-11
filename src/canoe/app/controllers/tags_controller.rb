@@ -1,12 +1,12 @@
 class TagsController < ApplicationController
-  before_filter :require_repo
+  before_filter :require_project
 
   def index
-    @tags = current_repo.tags
+    @tags = current_project.tags
   end
 
   def latest
-    tag = current_repo.latest_tag
-    @latest_tag = current_repo.tag(tag.name)
+    tag = current_project.latest_tag
+    @latest_tag = current_project.tag(tag.name)
   end
 end

@@ -10,8 +10,8 @@ export RACK_ENV
 # Race condition when starting up multiple containers
 # So wait for mysql in docker composer
 # https://github.com/docker/compose/issues/374
-test -n "$DATABASE_HOST" &&
-  while ! nc -w 1 "$DATABASE_HOST" "$DATABASE_PORT" 1>/dev/null 2>/dev/null
+test -n "${DATABASE_HOST-localhost}" &&
+  while ! nc -w 1 "${DATABASE_HOST-localhost}" "${DATABASE_PORT-3306}" 1>/dev/null 2>/dev/null
   do
     echo "Waiting for MySQL"
     sleep 1

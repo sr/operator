@@ -1,7 +1,7 @@
 json.id deploy.id
 json.target deploy.deploy_target.name
 json.user deploy.auth_user.email
-json.repo deploy.repo_name
+json.project deploy.project_name
 json.what deploy.what
 json.what_details deploy.what_details
 json.options deploy.options || {}

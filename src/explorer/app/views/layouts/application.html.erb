@@ -9,10 +9,26 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <header role="banner">
+  <header class="navbar navbar-default navbar-fixed-top" role="banner">
     <div class="navbar-header">
-        <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class: "img-responsive" %></a>
-        <span class="title">Pardot Explorer</span>
+      <button class="navbar-toggle" type="button" data-toggle="collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="/" class="navbar-brand"><%= image_tag "logo.png", alt: "Pardot", class:" img-responsive logo"%></a>
+      <%= image_tag "explorer_logo.png", class: "explorer_logo" %>
+      <span class="title"></span>
+      <% if current_user %>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <%= link_to sessions_path, data: {method: "delete"} do %>
+              <i class="icon-signout" title="logout"></i>
+            <%- end %>
+          </li>
+        </ul>
+      <% end %>
     </div>
   </header>
   <aside role="navigation">
@@ -20,13 +36,13 @@
       <ul class="nav nav-stacked">
         <li class="li-label"><span>Database</span></li>
         <li>
-          <a href="/queries"><i class="fa fa-globe"></i>Global</a>
+          <a href="/queries/new"><i class="fa fa-globe"></i>Global</a>
         </li>
         <li>
           <a href="/accounts"><i class="fa fa-cloud"></i>Account</a>
         </li>
         <li class="newsection">
-          <%= link_to "Access Log", "https://logs.pardot.com/?q=TODO(sr)" %>
+          <%= link_to "Audit Log", audit_log_url %>
         </li>
       </ul>
     </nav>
