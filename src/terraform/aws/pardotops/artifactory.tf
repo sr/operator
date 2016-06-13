@@ -119,6 +119,13 @@ resource "aws_elb" "artifactory_ops_elb" {
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
   }
 
+  listener {
+    lb_port = 80
+    lb_protocol = "http"
+    instance_port = 80
+    instance_protocol = "http"
+  }
+
   health_check {
     healthy_threshold = 4
     unhealthy_threshold = 2
