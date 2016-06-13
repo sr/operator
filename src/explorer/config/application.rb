@@ -30,7 +30,7 @@ module Explorer
       config.x.datacenter = ENV.fetch("EXPLORER_DATACENTER")
       config.x.authorized_ldap_groups = Array(ENV.fetch("EXPLORER_AUTHORIZED_LDAP_GROUPS").split(","))
       config.x.session_ttl = Integer(ENV.fetch("EXPLORER_SESSION_TTL")).minutes
-      config.x.rate_limit_time_window = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_TIME_WINDOW")).minutes
+      config.x.rate_limit_period = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_PERIOD")).minutes
       config.x.rate_limit_max = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_MAX"))
     end
   end

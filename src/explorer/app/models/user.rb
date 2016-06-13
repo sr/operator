@@ -38,7 +38,7 @@ class User < ActiveRecord::Base
   def rate_limit
     @rate_limit ||= UserRateLimit.new(
       self,
-      Rails.application.config.x.rate_limit_time_window,
+      Rails.application.config.x.rate_limit_period,
       Rails.application.config.x.rate_limit_max,
     )
   end
