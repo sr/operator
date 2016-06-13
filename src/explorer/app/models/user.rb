@@ -19,10 +19,6 @@ class User < ActiveRecord::Base
     queries.create!(raw_sql: sql).secured(self)
   end
 
-  def global_accounts
-    datacenter.accounts
-  end
-
   def access_authorized?
     if Rails.env.development?
       return true
@@ -43,13 +39,6 @@ class User < ActiveRecord::Base
       self,
       Rails.application.config.x.rate_limit_time_window,
       Rails.application.config.x.rate_limit_max,
-    )
-  end
-
-  def datacenter
-    @datacenter ||= DataCenter.new(
-      Rails.application.config.x.datacenter,
-      DatabaseConfigurationFile.load
     )
   end
 end
