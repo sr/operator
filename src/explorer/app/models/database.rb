@@ -23,8 +23,8 @@ class Database
   end
 
   def execute(sql, params = [])
-    query = Query.new(self, connection, @user, sql)
-    query.execute(params)
+    query = Query.new(self, connection, sql)
+    query.execute(@user, params)
   end
 
   private

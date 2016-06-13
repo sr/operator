@@ -5,7 +5,7 @@ class UserRateLimit
     @max = Integer(max)
   end
 
-  attr_reader :max
+  attr_reader :max, :period
 
   def exceeded?(now = nil)
     now ||= Time.current

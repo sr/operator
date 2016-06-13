@@ -19,6 +19,10 @@ class User < ActiveRecord::Base
     queries.create!(raw_sql: sql).secured(self)
   end
 
+  def global_accounts
+    datacenter.accounts
+  end
+
   def access_authorized?
     if Rails.env.development?
       return true
@@ -44,7 +48,7 @@ class User < ActiveRecord::Base
 
   def datacenter
     @datacenter ||= DataCenter.new(
-      @user,
+      self,
       Rails.application.config.x.datacenter,
       DatabaseConfigurationFile.load
     )
