@@ -30,7 +30,7 @@ module ActiveSupport
       connection.query("DELETE FROM global_account_access")
     end
 
-    def authorize_access(user, account_id, role = nil, expires_at = nil)
+    def authorize_access(account_id, role = nil, expires_at = nil)
       role ||= DataCenter::ENGINEERING_ROLE
 
       database = DataCenter.new(
