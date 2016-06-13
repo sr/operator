@@ -4,7 +4,7 @@ class ChefDeliveryConfig
   end
 
   def repo_name
-    ENV["CANOE_CHEF_REPO"] || "Pardot/chef"
+    ENV.fetch("CANOE_CHEF_REPO", "Pardot/chef")
   end
 
   def deploy_task_name
@@ -38,7 +38,7 @@ class ChefDeliveryConfig
   end
 
   def chat_room_id
-    ENV["CANOE_CHEF_CHAT_ROOM_ID"] || 6 # Ops
+    Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", 6))
   end
 
   class HipchatNotifier
@@ -54,10 +54,6 @@ class ChefDeliveryConfig
   private
 
   def github_token
-    ENV["CANOE_CHEF_GITHUB_TOKEN"]
-  end
-
-  def chat_token
-    "TODO"
+    ENV.fetch("GITHUB_PASSWORD")
   end
 end
