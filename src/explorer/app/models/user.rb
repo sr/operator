@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
   has_many :queries, class_name: "UserQuery", foreign_key: :user_id
+  FULL_ACCESS = "full_access".freeze
+  RESTRICTED_ACCESS = "restricted_access".freeze
 
   # TODO(sr) Add unit test for this
   def self.find_or_create_by_omniauth(auth_hash)
@@ -25,10 +27,10 @@ class User < ActiveRecord::Base
     restricted_access = Rails.application.config.x.restricted_access_ldap_group
     auth = Canoe::LDAPAuthorizer.new
     if auth.user_is_member_of_any_group?(uid, full_access)
-      @group = "full_access"
+      @group = FULL_ACCESS
       save
     elsif auth.user_is_member_of_any_group?(uid, restricted_access)
-      @group = "restricted_access"
+      @group = RESTRICTED_ACCESS
       save
     else
       false

@@ -97,7 +97,7 @@ class UserQuery < ActiveRecord::Base
   end
 
   def access_authorized?(account_id)
-    return true if user.group == "explorer-full"
+    return true if user.group == User::FULL_ACCESS
 
     query = <<-SQL.freeze
       SELECT id FROM global_account_access
