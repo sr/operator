@@ -20,8 +20,7 @@ class DataCenter
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
 
-  def initialize(user, name, config)
-    @user = user
+  def initialize(name, config)
     @name = name
     @config = config
 
@@ -35,7 +34,7 @@ class DataCenter
   def global
     config = @config.global(@name)
 
-    Database.new(@user, config)
+    Database.new(config)
   end
 
   def shard_for(account_id)
@@ -46,7 +45,7 @@ class DataCenter
     account = find_account(account_id)
     config = @config.shard(@name, account.shard_id)
 
-    Database.new(@user, config)
+    Database.new(config)
   end
 
   def find_account(account_id)

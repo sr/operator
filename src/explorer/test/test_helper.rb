@@ -34,7 +34,6 @@ module ActiveSupport
       role ||= DataCenter::ENGINEERING_ROLE
 
       database = DataCenter.new(
-        user,
         Rails.application.config.x.datacenter,
         DatabaseConfigurationFile.load
       )

@@ -34,7 +34,13 @@ class SecuredUserQuery
   end
 
   def execute
-    database.execute(executable_query.sql)
+    if @user.rate_limit.at_limit?
+      raise UserQuery::RateLimited, @user
+    end
+    audit_log
+    results = database.execute(executable_query.sql)
+    @user.rate_limit.record_transaction
+    results
   end
 
   def executable_query
@@ -67,9 +73,18 @@ class SecuredUserQuery
 
   def datacenter
     DataCenter.new(
-      @user,
       Rails.application.config.x.datacenter,
       DatabaseConfigurationFile.load
     )
+  end
+
+  def audit_log
+    data = {
+      hostname: database.hostname,
+      database: database.name,
+      query: executable_query.sql,
+      user_email: @user.email
+    }
+    Instrumentation.log(data)
   end
 end

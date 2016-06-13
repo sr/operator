@@ -7,7 +7,7 @@ class UserRateLimit
 
   attr_reader :max, :period
 
-  def exceeded?(now = nil)
+  def at_limit?(now = nil)
     now ||= Time.current
 
     if @user.rate_limit_expires_at.nil?
@@ -18,7 +18,7 @@ class UserRateLimit
       return false
     end
 
-    @user.rate_limit_transactions_count > @max
+    @user.rate_limit_transactions_count >= @max
   end
 
   def record_transaction(now = nil)

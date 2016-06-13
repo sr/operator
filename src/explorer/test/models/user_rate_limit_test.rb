@@ -5,19 +5,19 @@ class UserRateLimitTest < ActiveSupport::TestCase
     @user = create_user
   end
 
-  test "exceeded?" do
+  test "at_limit?" do
     limit = UserRateLimit.new(@user, 10.minutes, 5)
-    assert_equal false, limit.exceeded?
+    assert_equal false, limit.at_limit?
 
-    5.times do
+    4.times do
       limit.record_transaction
     end
-    assert_equal false, limit.exceeded?
 
+    assert_equal false, limit.at_limit?
     limit.record_transaction
+    assert_equal true, limit.at_limit?
 
-    assert_equal true, limit.exceeded?
-    assert_equal false, limit.exceeded?(20.minutes.from_now)
+    assert_equal false, limit.at_limit?(20.minutes.from_now)
   end
 
   test "record_transaction" do

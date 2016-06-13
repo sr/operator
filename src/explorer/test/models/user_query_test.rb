@@ -60,7 +60,6 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal "pardot_global", log[:database]
     assert_equal "SELECT 1 FROM `global_account` LIMIT 10", log[:query]
     assert_equal @user.email, log[:user_email]
-    assert_equal [], log[:params]
   end
 
   test "account query audit log" do
@@ -86,25 +85,17 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "rate limiting" do
-    assert_equal false, @user.rate_limit.exceeded?
-    assert_equal 0, @user.rate_limit.query_count
-    assert_nil @user.rate_limit.last_query_at
+    begin
+      old_val = Rails.application.config.x.rate_limit_max = 2
 
-    datacenter = @user.datacenter
-    datacenter.global.execute("SELECT 1")
+      @user.global_query("SELECT 1").execute
+      @user.global_query("SELECT 1").execute
 
-    assert_equal false, @user.rate_limit.exceeded?
-    assert_equal 1, @user.rate_limit.query_count
-    assert_not_nil @user.rate_limit.last_query_at
-
-    @user.rate_limit.reset
-
-    @user.rate_limit.max.times do
-      datacenter.global.execute("SELECT 1")
-    end
-
-    assert_raise(Query::RateLimitExceeded) do
-      datacenter.global.execute("SELECT 1")
+      assert_raises(UserQuery::RateLimited) do
+        @user.global_query("SELECT 1").execute
+      end
+    ensure
+      Rails.application.config.x.rate_limit_max = old_val
     end
   end
 end

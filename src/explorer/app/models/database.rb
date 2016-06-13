@@ -2,11 +2,7 @@ class Database
   GLOBAL = "global".freeze
   SHARD = "shard".freeze
 
-  class QueryError < StandardError
-  end
-
-  def initialize(user, config)
-    @user = user
+  def initialize(config)
     @config = config
   end
 
@@ -23,8 +19,8 @@ class Database
   end
 
   def execute(sql, params = [])
-    query = Query.new(self, connection, sql)
-    query.execute(@user, params)
+    statement = connection.prepare(sql)
+    statement.execute(*params)
   end
 
   private
