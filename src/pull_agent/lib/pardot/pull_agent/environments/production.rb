@@ -3,7 +3,7 @@ module Pardot
     module Environments
       class Production < Base
         include SalesEdgeEnvModule
-        GRAPHITE_HOST = "10.107.195.209".freeze
+        GRAPHITE_HOST = "10.247.178.234".freeze
         GRAPHITE_PORT = "2003".freeze
 
         restart_task :add_graphite_annotation, only: :pardot
