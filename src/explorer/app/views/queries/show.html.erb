@@ -3,6 +3,13 @@
     query: query
   }
 %>
+<%- if params[:rate_limited].present? || rate_limit.exceeded? %>
+<p>
+Sorry but you have reached the limit of <%= rate_limit.max %> queries in
+the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
+<%= distance_of_time_in_words(rate_limit.resets_in) %> before refreshing.
+</p>
+<%- end %>
 <p>
 <pre><%= query.executable_query.sql %></pre>
 </p>
