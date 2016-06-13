@@ -20,6 +20,14 @@ class DataCenter
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
 
+  # Returns the current Datacenter based on the Rails configuration.
+  def self.current
+    @datacenter ||= DataCenter.new(
+      Rails.application.config.x.datacenter,
+      DatabaseConfigurationFile.load
+    )
+  end
+
   def initialize(name, config)
     @name = name
     @config = config

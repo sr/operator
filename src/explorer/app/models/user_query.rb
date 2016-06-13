@@ -7,7 +7,9 @@ class UserQuery < ActiveRecord::Base
     end
   end
 
-  def secured(current_user)
-    SecuredUserQuery.new(current_user, self)
+  # Returns a query that can be executed by the given user. Execution is rate
+  # limited and written to an audit log.
+  def executable(current_user)
+    ExecutableUserQuery.new(current_user, self)
   end
 end

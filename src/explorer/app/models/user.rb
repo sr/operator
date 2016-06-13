@@ -11,14 +11,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def account_query(sql, account_id)
-    queries.create!(raw_sql: sql, account_id: account_id).secured(self)
-  end
-
-  def global_query(sql)
-    queries.create!(raw_sql: sql).secured(self)
-  end
-
+  # Returns true if this user is authorized to use Explorer, false otherwise.
   def access_authorized?
     if Rails.env.development?
       return true
@@ -32,6 +25,14 @@ class User < ActiveRecord::Base
     auth = Canoe::LDAPAuthorizer.new
 
     auth.user_is_member_of_any_group?(uid, groups)
+  end
+
+  def account_query(sql, account_id)
+    queries.create!(raw_sql: sql, account_id: account_id).executable(self)
+  end
+
+  def global_query(sql)
+    queries.create!(raw_sql: sql).executable(self)
   end
 
   def rate_limit

@@ -28,13 +28,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def datacenter
-    @datacenter ||= DataCenter.new(
-      Rails.application.config.x.datacenter,
-      DatabaseConfigurationFile.load
-    )
-  end
-
   private
 
   def append_info_to_payload(payload)

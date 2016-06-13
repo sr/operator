@@ -11,7 +11,7 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
 </p>
 <%- end %>
 <p>
-<pre><%= query.executable_query.sql %></pre>
+<pre><%= query.parsed.sql %></pre>
 </p>
 <div>
   <table class="table table-striped">

@@ -1,4 +1,4 @@
-class SecuredUserQuery
+class ExecutableUserQuery
   class Error < StandardError
   end
 
@@ -9,20 +9,20 @@ class SecuredUserQuery
     @query = query
   end
 
-  def account_id
-    @query.account_id
-  end
-
   # Returns true if this query is scoped to an account, false otherwise.
   def for_account?
     account_id.present?
   end
 
-  ResultSet = Struct.new(:fields)
+  def account_id
+    @query.account_id
+  end
+
+  BlankResultSet = Struct.new(:fields).new([])
 
   # Returns an empty result set.
   def blank
-    ResultSet.new([])
+    BlankResultSet
   end
 
   def account_name
@@ -37,13 +37,15 @@ class SecuredUserQuery
     if @user.rate_limit.at_limit?
       raise UserQuery::RateLimited, @user
     end
+
     audit_log
-    results = database.execute(executable_query.sql)
+
+    results = database.execute(parsed.sql)
     @user.rate_limit.record_transaction
     results
   end
 
-  def executable_query
+  def parsed
     sql_query = SQLQuery.parse(@query.raw_sql).limit(DEFAULT_LIMIT)
 
     if !for_account?
@@ -53,6 +55,7 @@ class SecuredUserQuery
     sql_query.scope_to(account_id)
   end
 
+  # Returns an Array of tables present in the database.
   def database_tables
     database.tables
   end
@@ -65,24 +68,17 @@ class SecuredUserQuery
 
   def database
     if for_account?
-      datacenter.shard_for(account_id)
+      DataCenter.current.shard_for(account_id)
     else
-      datacenter.global
+      DataCenter.current.global
     end
-  end
-
-  def datacenter
-    DataCenter.new(
-      Rails.application.config.x.datacenter,
-      DatabaseConfigurationFile.load
-    )
   end
 
   def audit_log
     data = {
       hostname: database.hostname,
       database: database.name,
-      query: executable_query.sql,
+      query: parsed.sql,
       user_email: @user.email
     }
     Instrumentation.log(data)
