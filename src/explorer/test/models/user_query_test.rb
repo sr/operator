@@ -17,14 +17,14 @@ class UserQueryTest < ActiveSupport::TestCase
   test "execute" do
     authorize_access(@user, 1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
-    results = query.execute
+    results = query.execute(@user)
     row = results.first
     assert_equal 1, row[:id]
     assert_equal 1, row[:account_id]
     assert_equal "Account", row[:object_type]
 
     query = @user.global_query("SELECT * FROM global_account WHERE id = 1")
-    results = query.execute
+    results = query.execute(@user)
     row = results.first
     assert_equal 1, row[:id]
   end
@@ -32,14 +32,14 @@ class UserQueryTest < ActiveSupport::TestCase
   test "execute unauthorized access" do
     query = @user.account_query("SELECT * FROM job", 1)
     assert_raise(DataCenter::UnauthorizedAccountAccess) do
-      query.execute
+      query.execute(@user)
     end
   end
 
   test "execute unexpiring access" do
     authorize_access(@user, 1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
-    results = query.execute
+    results = query.execute(@user)
     row = results.first
     assert_equal 1, row[:id]
   end
@@ -47,14 +47,14 @@ class UserQueryTest < ActiveSupport::TestCase
   test "execute access expiring tomorrow" do
     authorize_access(@user, 1, nil, 1.minute.ago.end_of_day.to_s(:db))
     query = @user.account_query("SELECT * FROM object_audit", 1)
-    results = query.execute
+    results = query.execute(@user)
     row = results.first
     assert_equal 1, row[:id]
   end
 
   test "global query audit log" do
     query = @user.global_query("SELECT 1 FROM global_account")
-    query.execute
+    query.execute(@user)
     assert log = Instrumentation::Logging.entries.pop
     assert_equal "mysql", log[:hostname]
     assert_equal "pardot_global", log[:database]
@@ -65,7 +65,7 @@ class UserQueryTest < ActiveSupport::TestCase
   test "account query audit log" do
     authorize_access(@user, 1)
     query = @user.account_query("SELECT 1 FROM account", 1)
-    query.execute
+    query.execute(@user)
     assert Instrumentation::Logging.entries.pop
   end
 
@@ -88,11 +88,11 @@ class UserQueryTest < ActiveSupport::TestCase
     begin
       old_val = Rails.application.config.x.rate_limit_max = 2
 
-      @user.global_query("SELECT 1").execute
-      @user.global_query("SELECT 1").execute
+      @user.global_query("SELECT 1").execute(@user)
+      @user.global_query("SELECT 1").execute(@user)
 
       assert_raises(UserQuery::RateLimited) do
-        @user.global_query("SELECT 1").execute
+        @user.global_query("SELECT 1").execute(@user)
       end
     ensure
       Rails.application.config.x.rate_limit_max = old_val

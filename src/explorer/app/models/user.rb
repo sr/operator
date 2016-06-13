@@ -28,11 +28,11 @@ class User < ActiveRecord::Base
   end
 
   def account_query(sql, account_id)
-    queries.create!(raw_sql: sql, account_id: account_id).executable(self)
+    queries.create!(raw_sql: sql, account_id: account_id)
   end
 
   def global_query(sql)
-    queries.create!(raw_sql: sql).executable(self)
+    queries.create!(raw_sql: sql)
   end
 
   def rate_limit

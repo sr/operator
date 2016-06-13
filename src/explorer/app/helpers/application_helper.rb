@@ -8,7 +8,7 @@ module ApplicationHelper
   end
 
   def current_view
-    params[:view] || Query::SQL
+    params[:view] || sql_view
   end
 
   def table_columns
