@@ -20,9 +20,16 @@ class DataCenter
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
 
-  def initialize(name, user, config)
+  # Returns the current Datacenter based on the Rails configuration.
+  def self.current
+    @datacenter ||= DataCenter.new(
+      Rails.application.config.x.datacenter,
+      DatabaseConfigurationFile.load
+    )
+  end
+
+  def initialize(name, config)
     @name = name
-    @user = user
     @config = config
 
     if ![DALLAS, LOCAL, SEATTLE].include?(name)
@@ -35,7 +42,7 @@ class DataCenter
   def global
     config = @config.global(@name)
 
-    Database.new(@user, config)
+    Database.new(config)
   end
 
   def shard_for(account_id)
@@ -46,7 +53,7 @@ class DataCenter
     account = find_account(account_id)
     config = @config.shard(@name, account.shard_id)
 
-    Database.new(@user, config)
+    Database.new(config)
   end
 
   def find_account(account_id)

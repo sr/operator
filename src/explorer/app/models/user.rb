@@ -11,18 +11,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def account_query(sql, account_id)
-    queries.create!(raw_sql: sql, account_id: account_id)
-  end
-
-  def global_query(sql)
-    queries.create!(raw_sql: sql)
-  end
-
-  def global_accounts
-    datacenter.accounts
-  end
-
+  # Returns true if this user is authorized to use Explorer, false otherwise.
   def access_authorized?
     if Rails.env.development?
       return save
@@ -46,9 +35,19 @@ class User < ActiveRecord::Base
     end
   end
 
-  def datacenter
-    datacenter = Rails.application.config.x.datacenter
+  def account_query(sql, account_id)
+    queries.create!(raw_sql: sql, account_id: account_id)
+  end
 
-    DataCenter.new(datacenter, self, DatabaseConfigurationFile.load)
+  def global_query(sql)
+    queries.create!(raw_sql: sql)
+  end
+
+  def rate_limit
+    @rate_limit ||= UserRateLimit.new(
+      self,
+      Rails.application.config.x.rate_limit_period,
+      Rails.application.config.x.rate_limit_max,
+    )
   end
 end

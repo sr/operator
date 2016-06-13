@@ -31,6 +31,8 @@ module Explorer
       config.x.restricted_access_ldap_group = 'explorer_support'
       config.x.full_access_ldap_group = 'explorer_full'
       config.x.session_ttl = Integer(ENV.fetch("EXPLORER_SESSION_TTL")).minutes
+      config.x.rate_limit_period = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_PERIOD")).minutes
+      config.x.rate_limit_max = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_MAX"))
     end
   end
 end
