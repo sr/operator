@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
+  around_action :log_context
 
   rescue_from Exception do |exception|
     Instrumentation.log_exception(exception)
@@ -12,7 +13,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  around_action :log_context
+  def sql_view
+    "SQL".freeze
+  end
+  helper_method :sql_view
+
+  def ui_view
+    "UI".freeze
+  end
+  helper_method :ui_view
 
   protected
 

@@ -20,22 +20,39 @@ class QueriesController < ApplicationController
   def show
     query = UserQuery.find(params[:id])
 
+    rate_limit =
+      if Rails.env.development? && params[:rate_limited].present?
+        FakeRateLimit.new
+      else
+        current_user.rate_limit
+      end
+
+    results =
+      if rate_limit.at_limit?
+        query.blank
+      else
+        query.execute(current_user)
+      end
+
     respond_to do |format|
       format.html do
         render :show, locals: {
-          current_view: params[:view] || Query::SQL,
+          current_view: params[:view] || sql_view,
           query: query,
-          results: query.execute
+          rate_limit: rate_limit,
+          results: results
         }
       end
     end
   end
 
   def create
-    query = current_user.queries.create!(
-      account_id: params[:account_id],
-      raw_sql: params[:sql]
-    )
+    query =
+      if params[:account_id].present?
+        current_user.account_query(params[:sql], params[:account_id])
+      else
+        current_user.global_query(params[:sql])
+      end
 
     redirect_to "/queries/#{query.id}"
   end
