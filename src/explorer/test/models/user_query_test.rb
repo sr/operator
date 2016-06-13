@@ -31,9 +31,17 @@ class UserQueryTest < ActiveSupport::TestCase
 
   test "execute unauthorized access" do
     query = @user.account_query("SELECT * FROM job", 1)
-    assert_raise(DataCenter::UnauthorizedAccountAccess) do
+    assert_raise(UserQuery::UnauthorizedAccountAccess) do
       query.execute(@user)
     end
+  end
+
+  test "execute account query from pardot-full account" do
+    @user.update_attribute(:group, 'explorer-full')
+    query = @user.account_query("SELECT * FROM object_audit", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal 1, row[:id]
   end
 
   test "execute unexpiring access" do

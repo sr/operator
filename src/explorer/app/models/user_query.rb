@@ -1,12 +1,23 @@
 class UserQuery < ActiveRecord::Base
   DEFAULT_LIMIT = 10
+  SUPPORT_ROLE = 9
 
-  belongs_to :user, foreign_key: :user_id
+  belongs_to :user
 
   class RateLimited < StandardError
     def initialize(user)
       super "user #{user.email} rate limited"
     end
+  end
+
+  class UnauthorizedAccountAccess < StandardError
+    def initialize(account_id)
+      @account_id = account_id
+
+      super "access to account #{account_id.inspect} is not authorized"
+    end
+
+    attr_reader :account_id
   end
 
   BlankResultSet = Struct.new(:fields).new([])
@@ -76,9 +87,24 @@ class UserQuery < ActiveRecord::Base
 
   def database
     if for_account?
+      if !access_authorized?(account_id)
+        raise UnauthorizedAccountAccess, account_id
+      end
       DataCenter.current.shard_for(account_id)
     else
       DataCenter.current.global
     end
+  end
+
+  def access_authorized?(account_id)
+    return true if user.group == 'explorer-full'
+
+    query = <<-SQL.freeze
+      SELECT id FROM global_account_access
+      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
+      LIMIT 1
+    SQL
+    results = DataCenter.current.global.execute(query, [SUPPORT_ROLE, account_id])
+    results.size == 1
   end
 end

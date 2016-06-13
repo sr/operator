@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
   # Returns true if this user is authorized to use Explorer, false otherwise.
   def access_authorized?
     if Rails.env.development?
-      return save
+      return true
     end
 
     if new_record?

@@ -1,5 +1,5 @@
 class QueriesController < ApplicationController
-  rescue_from DataCenter::UnauthorizedAccountAccess do |e|
+  rescue_from UserQuery::UnauthorizedAccountAccess do |e|
     message = "Please request engineering access to account #{e.account_id}."
     flash[:error] = message
     redirect_to "/accounts"
