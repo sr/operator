@@ -1,5 +1,5 @@
 class FakeRateLimit
-  def exceeded?
+  def at_limit?
     true
   end
 
