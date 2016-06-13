@@ -29,7 +29,7 @@ class UserRateLimitTest < ActiveSupport::TestCase
 
     limit.record_transaction(now)
 
-    assert_in_delta 5.minutes, limit.resets_in(now + 5.minutes)
+    assert_equal 5.minutes, limit.resets_in(now + 5.minutes)
     assert_equal 1, limit.transactions_count
   end
 end

@@ -24,8 +24,8 @@ class UserRateLimit
   def record_transaction(now = nil)
     now ||= Time.current
 
-    if @user.rate_limit_expires_at.nil? || Time.current >= @user.rate_limit_expires_at
-      @user.rate_limit_expires_at = Time.current + @period
+    if @user.rate_limit_expires_at.nil? || now >= @user.rate_limit_expires_at
+      @user.rate_limit_expires_at = now + @period
       @user.rate_limit_transactions_count = 0
     end
 
