@@ -33,11 +33,7 @@ module ActiveSupport
     def authorize_access(account_id, role = nil, expires_at = nil)
       role ||= DataCenter::ENGINEERING_ROLE
 
-      database = DataCenter.new(
-        Rails.application.config.x.datacenter,
-        DatabaseConfigurationFile.load
-      )
-      database.global.execute(<<-SQL, [role, account_id, expires_at])
+      DataCenter.current.global.execute(<<-SQL, [role, account_id, expires_at])
         INSERT INTO global_account_access (role, account_id, created_by, expires_at)
         VALUES (?, ?, 1, ?)
       SQL
