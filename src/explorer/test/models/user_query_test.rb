@@ -37,7 +37,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "execute account query from pardot-full account" do
-    @user.update_attribute(:group, 'explorer-full')
+    @user.update_attribute(:group, "explorer-full")
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute(@user)
     row = results.first

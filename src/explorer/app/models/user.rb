@@ -25,10 +25,10 @@ class User < ActiveRecord::Base
     restricted_access = Rails.application.config.x.restricted_access_ldap_group
     auth = Canoe::LDAPAuthorizer.new
     if auth.user_is_member_of_any_group?(uid, full_access)
-      group = 'full_access'
+      @group = "full_access"
       save
     elsif auth.user_is_member_of_any_group?(uid, restricted_access)
-      group = 'restricted_access'
+      @group = "restricted_access"
       save
     else
       false

@@ -28,8 +28,8 @@ module Explorer
 
     initializer "explorer_app" do
       config.x.datacenter = ENV.fetch("EXPLORER_DATACENTER")
-      config.x.restricted_access_ldap_group = 'explorer-support'
-      config.x.full_access_ldap_group = 'explorer-full'
+      config.x.restricted_access_ldap_group = "explorer-support"
+      config.x.full_access_ldap_group = "explorer-full"
       config.x.session_ttl = Integer(ENV.fetch("EXPLORER_SESSION_TTL")).minutes
       config.x.rate_limit_period = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_PERIOD")).minutes
       config.x.rate_limit_max = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_MAX"))
