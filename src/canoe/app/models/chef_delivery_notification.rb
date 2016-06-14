@@ -37,7 +37,6 @@ class ChefDeliveryNotification
   def link_to(object)
     case object
     when GithubRepository::Build
-      # TODO(sr) Use the GitHub build ID instead of this hack?
       build_id = object.url.split("-").last
       %Q(<a href="#{object.url}">##{build_id}</a>)
     when ChefDeploy

@@ -110,8 +110,6 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
   end
 
-  pending "TODO(sr) current build is already deployed but the deploy failed"
-
   it "notifies of successful deployment" do
     deploy = create_current_deploy(state: ChefDelivery::PENDING)
     request = ChefCompleteDeployRequest.new(deploy, nil)
