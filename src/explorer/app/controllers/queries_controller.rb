@@ -14,7 +14,7 @@ class QueriesController < ApplicationController
   end
 
   def show
-    query = UserQuery.find(params[:id]) 
+    query = UserQuery.find(params[:id])
 
     rate_limit =
       if Rails.env.development? && params[:rate_limited].present?
@@ -27,7 +27,7 @@ class QueriesController < ApplicationController
       if rate_limit.at_limit?
         query.blank
       else
-        query.execute(current_user, session)
+        query.execute(current_user)
       end
 
     respond_to do |format|
