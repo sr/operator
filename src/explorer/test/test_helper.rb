@@ -30,10 +30,10 @@ module ActiveSupport
       connection.query("DELETE FROM global_account_access")
     end
 
-    def authorize_access(datacenter, account_id, role = nil, expires_at = nil)
+    def authorize_access(account_id, role = nil, expires_at = nil)
       role ||= DataCenter::ENGINEERING_ROLE
-      database = datacenter.global
-      database.execute(<<-SQL, [role, account_id, expires_at])
+
+      DataCenter.current.global.execute(<<-SQL, [role, account_id, expires_at])
         INSERT INTO global_account_access (role, account_id, created_by, expires_at)
         VALUES (?, ?, 1, ?)
       SQL

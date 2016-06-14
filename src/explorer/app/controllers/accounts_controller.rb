@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
   def index
-    render locals: { accounts: current_user.global_accounts }
+    render locals: { accounts: DataCenter.current.accounts }
   end
 end
