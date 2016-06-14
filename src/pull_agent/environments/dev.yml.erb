@@ -19,7 +19,7 @@
 
 :repos:
   :chef:
-    :repo_path: /Users/srozet/Documents/chef
+    :repo_path: <%= ENV.fetch("PULL_AGENT_CHEF_DIR", File.expand_path("../../../../chef", __FILE__)) %>
   :pardot:
     :repo_path: <%= destinations_path %>/pardot
   :node_modules:
