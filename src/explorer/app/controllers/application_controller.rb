@@ -91,8 +91,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   # Returns true if this user is authorized to use Explorer, false otherwise.
   def access_authorized?
     if Rails.env.development?

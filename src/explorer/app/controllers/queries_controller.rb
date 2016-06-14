@@ -1,9 +1,5 @@
 class QueriesController < ApplicationController
-  rescue_from UserQuery::UnauthorizedAccountAccess do |e|
-    message = "Please request engineering access to account #{e.account_id}."
-    flash[:error] = message
-    redirect_to "/accounts"
-  end
+  before_filter :check_account_access
 
   def new
     query = current_user.queries.new(
@@ -13,7 +9,6 @@ class QueriesController < ApplicationController
 
     render "_form", locals: {
       query: query,
-      database_tables: query.database_tables(session),
       raw_sql: raw_sql_query
     }
   end
@@ -40,7 +35,6 @@ class QueriesController < ApplicationController
         render :show, locals: {
           current_view: params[:view] || sql_view,
           query: query,
-          database_tables: query.database_tables(session),
           rate_limit: rate_limit,
           results: results
         }
@@ -60,6 +54,27 @@ class QueriesController < ApplicationController
   end
 
   private
+
+  def check_account_access
+    if params.has_key?(:account_id) && !account_access?
+      message = "Please request engineering access to account #{params[:account_id]}."
+      flash[:error] = message
+      redirect_to "/accounts"
+    end
+  end
+
+  def account_access?
+    return true if session[:group] == User::FULL_ACCESS
+
+    query = <<-SQL.freeze
+      SELECT id FROM global_account_access
+      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
+      LIMIT 1
+    SQL
+
+    results = DataCenter.current.global.execute(query, [Rails.application.config.x.support_role, params[:account_id]])
+    results.size == 1
+  end
 
   def raw_sql_query
     if params[:sql].present?

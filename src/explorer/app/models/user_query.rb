@@ -29,23 +29,20 @@ class UserQuery < ActiveRecord::Base
   # Returns a Mysql2::Result with the result of executing the query against the
   # appropriate database. Execution is accounted against the given user's rate
   # limit and the query is written to an audit log.
-  def execute(current_user, session)
+  def execute(current_user)
     if current_user.rate_limit.at_limit?
       raise UserQuery::RateLimited, current_user
     end
-    if session.nil?
-      raise ArgumentError, "session is missing"
-    end
 
     data = {
-      hostname: database(session).hostname,
-      database: database(session).name,
+      hostname: database.hostname,
+      database: database.name,
       query: parsed.sql,
       user_email: current_user.email
     }
     Instrumentation.log(data)
 
-    results = database(session).execute(parsed.sql)
+    results = database.execute(parsed.sql)
     current_user.rate_limit.record_transaction
     results
   end
@@ -65,8 +62,8 @@ class UserQuery < ActiveRecord::Base
   end
 
   # Returns an Array of tables present in the database.
-  def database_tables(session)
-    database(session).tables
+  def database_tables
+    database.tables
   end
 
   # Returns the parsed SQL query with the account_id condition added if this
@@ -83,9 +80,8 @@ class UserQuery < ActiveRecord::Base
 
   private
 
-  def database(session)
+  def database
     if for_account?
-      raise(UnauthorizedAccountAccess, account_id) if !DataCenter.current.access_authorized?(account_id, session)
       DataCenter.current.shard_for(account_id)
     else
       DataCenter.current.global
