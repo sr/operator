@@ -11,7 +11,7 @@ class ChefDeliveryNotification
     @room_id = room_id
   end
 
-  def at_lock_age_limit(checkout, build)
+  def at_lock_age_limit(chef_server, checkout, build)
     message = "chef/master #{link_to(build)} not deployed to production " \
       "because branch #{link_to(checkout.branch)} is checked out on " \
       "<code>#{chef_server}</code>"
@@ -33,11 +33,6 @@ class ChefDeliveryNotification
   end
 
   private
-
-  # TODO(sr) Configure this somewhere else?
-  def chef_server
-    "pardot0-chef1-1-dfw.ops.sfdc.net"
-  end
 
   def link_to(object)
     case object

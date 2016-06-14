@@ -59,6 +59,7 @@ module Pardot
 
         payload = {
           environment: environment.name,
+          hostname: ShellHelper.hostname,
           checkout: JSON.parse(output)
         }
 

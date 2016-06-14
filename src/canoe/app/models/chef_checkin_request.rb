@@ -6,6 +6,7 @@ class ChefCheckinRequest
 
     new(
       request.fetch("environment"),
+      request.fetch("hostname"),
       Checkout.new(
         checkout.fetch("sha"),
         checkout.fetch("branch")
@@ -13,12 +14,13 @@ class ChefCheckinRequest
     )
   end
 
-  def initialize(environment, checkout)
+  def initialize(environment, hostname, checkout)
     @environment = environment
+    @hostname = hostname
     @checkout = checkout
   end
 
-  attr_reader :environment, :checkout
+  attr_reader :hostname, :environment, :checkout
 
   def checkout_sha
     @checkout.sha
