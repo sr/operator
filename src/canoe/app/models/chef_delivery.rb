@@ -27,7 +27,7 @@ class ChefDelivery
     end
 
     if request.checkout_branch != @config.master_branch
-      if (Time.current - current_build.updated_at) > @config.max_lock_age
+      if (current_build.updated_at - Time.current) > @config.max_lock_age
         notification.at_lock_age_limit(
           request.hostname,
           request.checkout,
