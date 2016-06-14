@@ -5,5 +5,5 @@ ENV["ARTIFACTORY_USERNAME"] = "my_ldap_username"
 ENV["ARTIFACTORY_API_KEY"] = "my_encrypted_artifactory_password"
 
 ENV["CANOE_CHEF_CHAT_ROOM_ID"] ||= "882" # BREAD Testing
-ENV["CANOE_CHEF_REPO"] ||= "chef-rozet/chef"
-ENV["CANOE_HIPCHAT_ENABLED"] = "1"
+ENV["CANOE_CHEF_REPO"] ||= "Pardot/chef"
+ENV["CANOE_HIPCHAT_ENABLED"] ||= "false"

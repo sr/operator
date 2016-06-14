@@ -87,7 +87,7 @@ class Hipchat
       request = Net::HTTP::Post.new(uri.request_uri)
       request.set_form_data(body)
 
-      if Rails.env.production? || ENV["CANOE_HIPCHAT_ENABLED"].present?
+      if Rails.env.production? || ENV["CANOE_HIPCHAT_ENABLED"].to_s == "true"
         http.request(request)
       end
 
