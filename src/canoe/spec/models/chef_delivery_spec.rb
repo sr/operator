@@ -11,7 +11,8 @@ RSpec.describe ChefDelivery do
     defaults = {
       url: "https://github.com/builds/1",
       sha: "sha1",
-      state: ChefDelivery::SUCCESS
+      state: ChefDelivery::SUCCESS,
+      updated_at: Time.current
     }
     GithubRepository::Build.new(defaults.merge(attributes))
   end
@@ -28,14 +29,14 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if chef delivery is disabled in current environment" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("dfw", checkout)
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
 
   it "noops if there is no available build" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = GithubRepository::Build.none
     response = @delivery.checkin(request)
@@ -43,7 +44,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if the build is red" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(state: ChefDelivery::FAILURE)
     response = @delivery.checkin(request)
@@ -51,7 +52,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if the build is pending" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(state: ChefDelivery::PENDING)
     response = @delivery.checkin(request)
@@ -59,7 +60,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if non-master branch has been checked out for less than an hour" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build
     response = @delivery.checkin(request)
@@ -68,9 +69,9 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops and notifies if non-master branch has been checked out for more than an hour" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom", 2.hours.ago)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
     request = ChefCheckinRequest.new("testing", checkout)
-    @repo.current_build = build_build
+    @repo.current_build = build_build(updated_at: 90.minutes.ago)
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
@@ -79,7 +80,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "deploys if there is no deploy available" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(state: ChefDelivery::SUCCESS)
     @repo.current_deploy = GithubRepository::Deploy.none
@@ -91,7 +92,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if current deploy is pending" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build
     create_current_deploy(state: ChefDelivery::PENDING)
@@ -100,7 +101,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops if current sha1 is already deployed" do
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(sha: "sha1")
     create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")

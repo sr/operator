@@ -14,7 +14,8 @@ class ChefDelivery
     Instrumentation.log(
       at: "chef.checkin",
       branch: request.checkout_branch,
-      sha: request.checkout_sha
+      sha: request.checkout_sha,
+      current_build: current_build.to_json
     )
 
     if !@config.enabled_in?(request.environment)
@@ -26,7 +27,7 @@ class ChefDelivery
     end
 
     if request.checkout_branch != @config.master_branch
-      if request.checkout_older_than?(@config.max_lock_age)
+      if (Time.current - current_build.updated_at) > @config.max_lock_age
         notification.at_lock_age_limit(request.checkout, current_build)
       end
 

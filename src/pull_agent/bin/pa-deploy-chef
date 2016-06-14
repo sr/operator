@@ -49,10 +49,9 @@ case "$action" in
         GIT_DIR="$GIT_WORK_TREE/.git"
         export GIT_WORK_TREE GIT_DIR
 
-        printf "{\"sha\": \"%s\", \"branch\": \"%s\", \"mtime\": \"%s\"}\n" \
+        printf "{\"sha\": \"%s\", \"branch\": \"%s\"}\n" \
             "$(git rev-parse HEAD)" \
-            "$(git rev-parse --abbrev-ref HEAD)" \
-            "$(stat -f "%m" "$GIT_DIR/HEAD")"
+            "$(git rev-parse --abbrev-ref HEAD)"
         ;;
     deploy)
         if [ -z "$chefdir" ]
