@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe ChefDelivery do
   before(:each) do
-    @repo = FakeGithubRepository.new
+    @repo = GithubRepository::Fake.new
     @config = FakeChefDeliveryConfig.new(@repo)
     @delivery = ChefDelivery.new(@config)
   end
@@ -84,7 +84,6 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", "chef1", checkout)
     @repo.current_build = build_build(state: ChefDelivery::SUCCESS)
-    @repo.current_deploy = GithubRepository::Deploy.none
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
     deploy = response.deploy

@@ -1,6 +1,4 @@
 class GithubRepository
-  class Error < StandardError; end
-
   class Build
     def self.none
       new(url: nil, sha: nil, state: nil, updated_at: nil)
@@ -16,29 +14,11 @@ class GithubRepository
     attr_reader :url, :sha, :state, :updated_at
   end
 
-  class Deploy
-    def self.none
-      new(url: nil, environment: nil, branch: nil, sha: nil, state: nil)
-    end
+  class Fake
+    attr_writer :current_build
 
-    def initialize(attributes={})
-      @url = attributes.fetch(:url)
-      @environment = attributes.fetch(:environment)
-      @branch = attributes.fetch(:branch)
-      @sha = attributes.fetch(:sha)
-      @state = attributes.fetch(:state)
-    end
-
-    attr_reader :url, :environment, :branch, :sha, :state
-
-    def to_json(_)
-      JSON.dump(
-        url: @url,
-        environment: @environment,
-        branch: @branch,
-        sha: @sha,
-        state: @state
-      )
+    def current_build(branch)
+      @current_build
     end
   end
 
@@ -57,6 +37,4 @@ class GithubRepository
       updated_at: status[:statuses].first[:updated_at]
     )
   end
-
-  Response = Struct.new(:success?, :deploy)
 end
