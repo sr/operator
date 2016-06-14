@@ -1,6 +1,6 @@
 class ChefCompleteDeployRequest
   def self.from_hash(request)
-    deploy = GithubRepository::Deploy.new(request.fetch(:deploy))
+    deploy = ChefDeploy.new(request.fetch(:deploy))
 
     new(deploy, request.fetch(:message, false))
   end

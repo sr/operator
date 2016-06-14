@@ -70,8 +70,12 @@ module Pardot
         end
 
         payload = JSON.parse(response.body)
-        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply
 
+        if payload.fetch("action") != "deploy"
+          return
+        end
+
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply
         payload = {
           deploy: payload.fetch("deploy"),
           error: !result.success,
