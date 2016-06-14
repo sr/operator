@@ -6,7 +6,11 @@ class ChefDeploy < ActiveRecord::Base
   ]
 
   def self.create_pending(environment, branch, build)
-    # TODO(sr) Refuse to create deploy for non-green build
+    if build.state != ChefDelivery::SUCCESS
+      raise ChefDelivery::Error,
+        "can not create deploy for non-successful build: #{build.inspect}"
+    end
+
     create!(
       branch: branch,
       build_url: build.url,
