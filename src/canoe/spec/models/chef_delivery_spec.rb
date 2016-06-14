@@ -16,15 +16,15 @@ RSpec.describe ChefDelivery do
     GithubRepository::Build.new(defaults.merge(attributes))
   end
 
-  def build_deploy(attributes={})
+  def create_current_deploy(attributes={})
     defaults = {
-      url: "https://github.com/deploys/1",
-      environment: "testing",
       branch: "master",
+      build_url: "https://github/builds/1",
+      environment: "testing",
       sha: "sha1",
       state: ChefDelivery::SUCCESS
     }
-    GithubRepository::Deploy.new(defaults.merge(attributes))
+    ChefDeploy.create!(defaults.merge(attributes))
   end
 
   it "noops if chef delivery is disabled in current environment" do
@@ -90,13 +90,11 @@ RSpec.describe ChefDelivery do
     assert_equal "testing", deploy.environment
   end
 
-  pending "TODO(sr) noop and notifies if the deploy could not be created"
-
   it "noops if current deploy is pending" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build
-    @repo.current_deploy = build_deploy(state: ChefDelivery::PENDING)
+    create_current_deploy(state: ChefDelivery::PENDING)
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -105,7 +103,7 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master", Time.now)
     request = ChefCheckinRequest.new("testing", checkout)
     @repo.current_build = build_build(sha: "sha1")
-    @repo.current_deploy = build_deploy(sha: "sha1")
+    create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -113,7 +111,8 @@ RSpec.describe ChefDelivery do
   pending "TODO(sr) current build is already deployed but the deploy failed"
 
   it "notifies of successful deployment" do
-    request = ChefCompleteDeployRequest.new(build_deploy, nil)
+    deploy = create_current_deploy(state: ChefDelivery::PENDING)
+    request = ChefCompleteDeployRequest.new(deploy, nil)
     response = @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     message = @config.notifier.messages.pop
@@ -121,22 +120,12 @@ RSpec.describe ChefDelivery do
   end
 
   it "notifies of failed deployment" do
-    request = ChefCompleteDeployRequest.new(build_deploy, "boomtown")
+    deploy = create_current_deploy(state: ChefDelivery::PENDING)
+    request = ChefCompleteDeployRequest.new(deploy, "boomtown")
     response = @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     message = @config.notifier.messages.pop
     assert message.message.include?("failed to deploy")
     assert message.message.include?("boomtown")
-  end
-
-  it "notifies if unable to update github deployment" do
-    request = ChefCompleteDeployRequest.new(build_deploy, nil)
-    @repo.complete_deploy = GithubRepository::CompleteResponse.new(false, "boomtown github")
-    response = @delivery.complete_deploy(request)
-    assert_equal 1, @config.notifier.messages.size
-    message = @config.notifier.messages.pop
-    assert message.message.include?("failed to deploy")
-    assert message.message.include?("update GitHub deployment")
-    assert message.message.include?("boomtown github")
   end
 end

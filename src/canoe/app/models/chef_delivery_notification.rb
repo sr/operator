@@ -45,9 +45,9 @@ class ChefDeliveryNotification
       # TODO(sr) Use the GitHub build ID instead of this hack?
       build_id = object.url.split("-").last
       %Q(<a href="#{object.url}">##{build_id}</a>)
-    when GithubRepository::Deploy
-      # TODO(sr) Link to the deploy's build
-      %Q(<a href="https://boom">#52</a>)
+    when ChefDeploy
+      build_id = object.build_url.split("-").last
+      %Q(<a href="#{object.build_url}">##{build_id}</a>)
     when String
       %Q(<a href="#{@github_url}/#{@repo}/compare/#{object}">#{object}</a>)
     else

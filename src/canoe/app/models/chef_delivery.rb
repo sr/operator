@@ -3,6 +3,9 @@ class ChefDelivery
   FAILURE = "failure".freeze
   PENDING = "pending".freeze
 
+  class Error < StandardError
+  end
+
   def initialize(config)
     @config = config
   end
@@ -30,11 +33,7 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    deploy = repo.current_deploy(
-      request.environment,
-      @config.master_branch,
-      @config.deploy_task_name
-    )
+    deploy = ChefDeploy.find_current(request.environment, @config.master_branch)
 
     if [SUCCESS, PENDING].include?(deploy.state)
       return ChefCheckinResponse.noop
@@ -44,31 +43,19 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    response = repo.create_pending_deploy(
+    deploy = ChefDeploy.create_pending(
       request.environment,
-      @config.deploy_task_name,
-      current_build,
       @config.master_branch,
+      current_build,
     )
 
-    if response.success?
-      return ChefCheckinResponse.deploy(response.deploy)
-    end
-
-    # TODO(sr) Log error
-    return ChefCheckinResponse.noop
+    return ChefCheckinResponse.deploy(deploy)
   end
 
   def complete_deploy(request)
     status = request.success? ? SUCCESS : FAILURE
-    response = repo.complete_deploy(request.deploy_url, status)
-
-    if response.success?
-      notification.deploy_completed(request.deploy, request.success?, request.error)
-    else
-      error = "Could not update GitHub deployment: #{response.error}"
-      notification.deploy_completed(request.deploy, false, error)
-    end
+    ChefDeploy.complete(request.deploy_id, status)
+    notification.deploy_completed(request.deploy, request.success?, request.error)
   end
 
   private

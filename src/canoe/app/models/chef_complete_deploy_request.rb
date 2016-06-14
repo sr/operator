@@ -12,8 +12,8 @@ class ChefCompleteDeployRequest
 
   attr_reader :deploy, :error
 
-  def deploy_url
-    @deploy.url
+  def deploy_id
+    @deploy.id
   end
 
   def success?
