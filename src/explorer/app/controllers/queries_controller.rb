@@ -13,12 +13,13 @@ class QueriesController < ApplicationController
 
     render "_form", locals: {
       query: query,
+      database_tables: query.database_tables(session),
       raw_sql: raw_sql_query
     }
   end
 
   def show
-    query = UserQuery.find(params[:id])
+    query = UserQuery.find(params[:id]) 
 
     rate_limit =
       if Rails.env.development? && params[:rate_limited].present?
@@ -31,7 +32,7 @@ class QueriesController < ApplicationController
       if rate_limit.at_limit?
         query.blank
       else
-        query.execute(current_user)
+        query.execute(current_user, session)
       end
 
     respond_to do |format|
@@ -39,6 +40,7 @@ class QueriesController < ApplicationController
         render :show, locals: {
           current_view: params[:view] || sql_view,
           query: query,
+          database_tables: query.database_tables(session),
           rate_limit: rate_limit,
           results: results
         }

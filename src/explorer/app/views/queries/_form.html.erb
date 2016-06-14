@@ -21,7 +21,7 @@
 
   <div class="viewoption" <%= active?(current_view, sql_view, 'style="display:none;"') %>>
     <table class="table table-striped scrollable">
-      <% query.database_tables.each do |table| %>
+      <% database_tables.each do |table| %>
         <tr>
           <td class="filterable-cell"><a href="#" class="account_helper"><%= table %></a></td>
         </tr>

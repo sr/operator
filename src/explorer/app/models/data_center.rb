@@ -8,6 +8,7 @@ class DataCenter
   DALLAS = "dfw".freeze
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
+  SUPPORT_ROLE = 9
 
   # Returns the current Datacenter based on the Rails configuration.
   def self.current
@@ -48,6 +49,19 @@ class DataCenter
   def accounts
     global_accounts.all
   end
+
+  def access_authorized?(account_id, session)
+    return true if session[:group] == User::FULL_ACCESS
+
+    query = <<-SQL.freeze
+      SELECT id FROM global_account_access
+      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
+      LIMIT 1
+    SQL
+    results = global.execute(query, [SUPPORT_ROLE, account_id])
+    results.size == 1
+  end
+
 
   private
 

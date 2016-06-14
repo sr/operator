@@ -31,7 +31,7 @@ module ActiveSupport
     end
 
     def authorize_access(account_id, role = nil, expires_at = nil)
-      role ||= UserQuery::SUPPORT_ROLE
+      role ||= DataCenter::SUPPORT_ROLE
 
       DataCenter.current.global.execute(<<-SQL, [role, account_id, expires_at])
         INSERT INTO global_account_access (role, account_id, created_by, expires_at)

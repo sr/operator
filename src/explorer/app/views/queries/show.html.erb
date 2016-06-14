@@ -1,6 +1,7 @@
 <%=
   render partial: 'form', locals: {
-    query: query
+    query: query,
+    database_tables: database_tables
   }
 %>
 <%- if params[:rate_limited].present? || rate_limit.at_limit? %>

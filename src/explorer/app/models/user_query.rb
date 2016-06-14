@@ -1,6 +1,5 @@
 class UserQuery < ActiveRecord::Base
   DEFAULT_LIMIT = 10
-  SUPPORT_ROLE = 9
 
   belongs_to :user
 
@@ -30,20 +29,23 @@ class UserQuery < ActiveRecord::Base
   # Returns a Mysql2::Result with the result of executing the query against the
   # appropriate database. Execution is accounted against the given user's rate
   # limit and the query is written to an audit log.
-  def execute(current_user)
+  def execute(current_user, session)
     if current_user.rate_limit.at_limit?
       raise UserQuery::RateLimited, current_user
     end
+    if session.nil?
+      raise ArgumentError, "session is missing"
+    end
 
     data = {
-      hostname: database.hostname,
-      database: database.name,
+      hostname: database(session).hostname,
+      database: database(session).name,
       query: parsed.sql,
       user_email: current_user.email
     }
     Instrumentation.log(data)
 
-    results = database.execute(parsed.sql)
+    results = database(session).execute(parsed.sql)
     current_user.rate_limit.record_transaction
     results
   end
@@ -62,13 +64,9 @@ class UserQuery < ActiveRecord::Base
     DataCenter.current.find_account(account_id).descriptive_name
   end
 
-  def database_name
-    database.name
-  end
-
   # Returns an Array of tables present in the database.
-  def database_tables
-    database.tables
+  def database_tables(session)
+    database(session).tables
   end
 
   # Returns the parsed SQL query with the account_id condition added if this
@@ -85,26 +83,12 @@ class UserQuery < ActiveRecord::Base
 
   private
 
-  def database
+  def database(session)
     if for_account?
-      if !access_authorized?(account_id)
-        raise UnauthorizedAccountAccess, account_id
-      end
+      raise(UnauthorizedAccountAccess, account_id) if !DataCenter.current.access_authorized?(account_id, session)
       DataCenter.current.shard_for(account_id)
     else
       DataCenter.current.global
     end
-  end
-
-  def access_authorized?(account_id)
-    return true if user.group == User::FULL_ACCESS
-
-    query = <<-SQL.freeze
-      SELECT id FROM global_account_access
-      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
-      LIMIT 1
-    SQL
-    results = DataCenter.current.global.execute(query, [SUPPORT_ROLE, account_id])
-    results.size == 1
   end
 end

@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
       return redirect_to oauth_path
     end
 
-    unless current_user.access_authorized?
+    unless access_authorized?
       return redirect_to "/auth/unauthorized"
     end
   end
@@ -88,6 +88,33 @@ class ApplicationController < ActionController::Base
     when "development" then "/auth/developer"
     when "test" then "/auth/developer"
     else "/auth/ldap"
+    end
+  end
+
+  private
+
+  # Returns true if this user is authorized to use Explorer, false otherwise.
+  def access_authorized?
+    if Rails.env.development?
+      #session[:group] = User::FULL_ACCESS
+      return true
+    end
+
+    if current_user.new_record?
+      return false
+    end
+
+    full_access = Rails.application.config.x.full_access_ldap_group
+    restricted_access = Rails.application.config.x.restricted_access_ldap_group
+    auth = Canoe::LDAPAuthorizer.new
+    if auth.user_is_member_of_any_group?(current_user.uid, full_access)
+      session[:group] = User::FULL_ACCESS
+      true
+    elsif auth.user_is_member_of_any_group?(current_user.uid, restricted_access)
+      session[:group] = User::RESTRICTED_ACCESS
+      true
+    else
+      false
     end
   end
 end
