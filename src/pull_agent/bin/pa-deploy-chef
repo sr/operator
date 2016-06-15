@@ -85,11 +85,11 @@ case "$action" in
 
         BUNDLE_GEMFILE="$chefdir/Gemfile"
         export BUNDLE_GEMFILE
-        bundle config \
+        bundler config \
             "$PULL_AGENT_BUNDLER_SOURCE" \
             "$PULL_AGENT_BUNDLER_CREDENTIALS"
-        bundle install --deployment
-        bundle exec knife pd sync 2>&1
+        bundler install --deployment
+        bundler exec knife pd sync 2>&1
         ;;
     *)
         echo "$PROGRAM: unsupported action: $action"

@@ -1,7 +1,6 @@
 module Pardot
   module PullAgent
     class ChefDeploy
-
       Response = Struct.new(:success, :message)
 
       def initialize(script, checkout_path, deploy)

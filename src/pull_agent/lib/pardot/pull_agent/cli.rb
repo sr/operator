@@ -53,6 +53,7 @@ module Pardot
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
         env = {
+          "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}",
           "PULL_AGENT_BUNDLER_SOURCE" => GEM_SRC,
           "PULL_AGENT_BUNDLER_CREDENTIALS" => format("%s:%s",
             environment.artifactory_user,
