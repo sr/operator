@@ -32,10 +32,6 @@ class ChefDeliveryConfig
     1.hour
   end
 
-  def required_successful_contexts
-    ["Style and Lint Checks"]
-  end
-
   def github_url
     Project::GITHUB_URL
   end
