@@ -44,7 +44,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.4.0)
+    addressable (2.3.8)
     arel (6.0.3)
     artifactory (2.3.2)
     autoprefixer-rails (6.3.6)
