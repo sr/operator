@@ -45,12 +45,21 @@ module Pardot
         end
       end
 
+      GEM_SRC = "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
+
       def checkin_chef
         payload = environment.payload
         repo_path = Pathname(payload.repo_path)
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
-        output = ShellHelper.execute([script, "-d", repo_path.to_s, "status"])
+        env = {
+          "PULL_AGENT_BUNDLER_SOURCE" => GEM_SRC,
+          "PULL_AGENT_BUNDLER_CREDENTIALS" => format("%s:%s",
+            environment.artifactory_user,
+            environment.artifactory_token
+          )
+        }
+        output = ShellHelper.execute([env, script, "-d", repo_path.to_s, "status"])
         if !$?.success?
           fail "unable to retrieve status of checkout: #{output.inspect}"
         end
@@ -76,7 +85,7 @@ module Pardot
           return
         end
 
-        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env)
         payload = {
           deploy: payload.fetch("deploy"),
           error: !result.success,

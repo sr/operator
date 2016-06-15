@@ -1,6 +1,7 @@
 module Pardot
   module PullAgent
     class ChefDeploy
+
       Response = Struct.new(:success, :message)
 
       def initialize(script, checkout_path, deploy)
@@ -9,8 +10,9 @@ module Pardot
         @deploy = deploy
       end
 
-      def apply
+      def apply(env)
         output = ShellHelper.execute([
+          env,
           @script,
           "-d", @checkout_path.to_s,
           "-b", @deploy["branch"],

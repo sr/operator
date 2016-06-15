@@ -3,6 +3,8 @@
 set -euo pipefail
 
 : "${PROGRAM:="$(basename "$0")"}"
+: $PULL_AGENT_BUNDLER_SOURCE
+: $PULL_AGENT_BUNDLER_CREDENTIALS
 
 print_help() {
     grep ^#/ <"$0" |cut -c4-
@@ -76,11 +78,18 @@ case "$action" in
         GIT_DIR="$GIT_WORK_TREE/.git"
         export GIT_WORK_TREE GIT_DIR
 
+        git fetch origin
         git checkout "$branch" 2>&1
         git pull origin "$branch" 2>&1
         git reset --hard "$sha" 2>&1
 
-        knife pd sync 2>&1
+        BUNDLE_GEMFILE="$chefdir/Gemfile"
+        export BUNDLE_GEMFILE
+        bundle config \
+            "$PULL_AGENT_BUNDLER_SOURCE" \
+            "$PULL_AGENT_BUNDLER_CREDENTIALS"
+        bundle install --deployment
+        bundle exec knife pd sync 2>&1
         ;;
     *)
         echo "$PROGRAM: unsupported action: $action"
