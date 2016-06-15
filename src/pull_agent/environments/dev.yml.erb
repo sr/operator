@@ -11,7 +11,7 @@
 ---
 <% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
 
-:canoe_url: <%= ENV["CANOE_URL"] || "http://canoe:4000" %>
+:canoe_url: <%= ENV.fetch("CANOE_URL", "http://canoe:4000") %>
 :canoe_target: "dev"
 :canoe_api_token: canoe123
 
