@@ -231,20 +231,6 @@ resource "aws_db_subnet_group" "pardot_ci" {
   ]
 }
 
-# VPC Peering with tools_egress
-
-resource "aws_vpc_peering_connection" "pardot_ci_peer_tools_egress" {
-  peer_owner_id = "010094454891" # pardot-atlassian
-  peer_vpc_id = "vpc-b64769d2" # tools_egress
-  vpc_id = "${aws_vpc.pardot_ci.id}"
-}
-
-resource "aws_route" "pardot_ci_route_tools_egress" {
-  route_table_id = "${aws_vpc.pardot_ci.main_route_table_id}"
-  destination_cidr_block = "172.29.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_peer_tools_egress.id}"
-}
-
 # Bastion host
 
 resource "aws_security_group" "pardot_ci_bastion" {
@@ -292,25 +278,4 @@ resource "aws_instance" "pardot_ci_bastion" {
 resource "aws_eip" "pardot_ci_bastion" {
   vpc = true
   instance = "${aws_instance.pardot_ci_bastion.id}"
-}
-
-resource "aws_instance" "pardot_ci_bastion_2" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "t2.small"
-  key_name = "pardot_ci"
-  subnet_id = "${aws_subnet.pardot_ci_us_east_1d_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.pardot_ci_bastion.id}"]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = "20"
-    delete_on_termination = false
-  }
-  tags {
-    Name = "pardot0-bastion1-2-ue1"
-  }
-}
-
-resource "aws_eip" "pardot_ci_bastion_2" {
-  vpc = true
-  instance = "${aws_instance.pardot_ci_bastion_2.id}"
 }
