@@ -2,13 +2,10 @@ require "test_helper"
 
 class DataCenterTest < ActiveSupport::TestCase
   setup do
-    @datacenter = DataCenter.new(
-      Rails.application.config.x.datacenter,
-      DatabaseConfigurationFile.load
-    )
+    @datacenter = DataCenter.current
   end
 
-  test "account authorized not authorized by fixtures" do
+  test "account not authorized by fixtures" do
     assert_not @datacenter.account_access_enabled?(1)
   end
 

@@ -3,7 +3,6 @@ require "test_helper"
 class UserQueryTest < ActiveSupport::TestCase
   setup do
     @user = create_user
-    @session = {}
   end
 
   test "execute" do
