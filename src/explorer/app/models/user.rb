@@ -19,28 +19,11 @@ class User < ActiveRecord::Base
     queries.create!(raw_sql: sql)
   end
 
-  def global_accounts
-    datacenter.accounts
-  end
-
-  def access_authorized?
-    if Rails.env.development?
-      return true
-    end
-
-    if new_record?
-      return false
-    end
-
-    groups = Rails.application.config.x.authorized_ldap_groups
-    auth = Canoe::LDAPAuthorizer.new
-
-    auth.user_is_member_of_any_group?(uid, groups)
-  end
-
-  def datacenter
-    datacenter = Rails.application.config.x.datacenter
-
-    DataCenter.new(datacenter, self, DatabaseConfigurationFile.load)
+  def rate_limit
+    @rate_limit ||= UserRateLimit.new(
+      self,
+      Rails.application.config.x.rate_limit_period,
+      Rails.application.config.x.rate_limit_max,
+    )
   end
 end

@@ -63,9 +63,9 @@ class ScopedSQLQuery
   # TODO(sr) Make this more robust and handle more than basic queries
   def table_name
     @ast.query_expression
-      .table_expression
-      .from_clause
-      .tables[0]
-      .name
+        .table_expression
+        .from_clause
+        .tables[0]
+        .name
   end
 end

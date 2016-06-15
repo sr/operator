@@ -8,9 +8,7 @@ Rails.application.routes.draw do
   get "/auth/unauthorized", to: "sessions#unauthorized"
 
   get "/accounts", to: "accounts#index"
-  get "/queries/new", to: "queries#new"
-  get "/queries/:id", to: "queries#show"
-  post "/queries", to: "queries#create"
+  resources :queries, only: [:new, :show, :create]
 
   get "/_boomtown", to: "welcome#boomtown"
   root "welcome#index"

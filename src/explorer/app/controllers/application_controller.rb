@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :require_oauth_authentication
+  around_action :log_context
 
   rescue_from Exception do |exception|
     Instrumentation.log_exception(exception)
@@ -12,7 +13,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  around_action :log_context
+  def sql_view
+    "SQL".freeze
+  end
+  helper_method :sql_view
+
+  def ui_view
+    "UI".freeze
+  end
+  helper_method :ui_view
 
   protected
 
@@ -43,7 +52,7 @@ class ApplicationController < ActionController::Base
       return redirect_to oauth_path
     end
 
-    unless current_user.access_authorized?
+    unless access_authorized?
       return redirect_to "/auth/unauthorized"
     end
   end
@@ -79,6 +88,31 @@ class ApplicationController < ActionController::Base
     when "development" then "/auth/developer"
     when "test" then "/auth/developer"
     else "/auth/ldap"
+    end
+  end
+
+  # Returns true if this user is authorized to use Explorer, false otherwise.
+  def access_authorized?
+    full_access = Rails.application.config.x.full_access_ldap_group
+    restricted_access = Rails.application.config.x.restricted_access_ldap_group
+    if Rails.env.development?
+      session[:group] = full_access
+      return true
+    end
+
+    if current_user.new_record?
+      return false
+    end
+
+    auth = Canoe::LDAPAuthorizer.new
+    if auth.user_is_member_of_any_group?(current_user.uid, full_access)
+      session[:group] = full_access
+      true
+    elsif auth.user_is_member_of_any_group?(current_user.uid, restricted_access)
+      session[:group] = restricted_access
+      true
+    else
+      false
     end
   end
 end
