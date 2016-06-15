@@ -64,16 +64,8 @@ class QueriesController < ApplicationController
   end
 
   def account_access?
-    return true if session[:group] == User::FULL_ACCESS
-
-    query = <<-SQL.freeze
-      SELECT id FROM global_account_access
-      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
-      LIMIT 1
-    SQL
-
-    results = DataCenter.current.global.execute(query, [Rails.application.config.x.support_role, params[:account_id]])
-    results.size == 1
+    return true if session[:group] == Rails.application.config.x.full_access_ldap_group
+    account_access_enabled?(params[:account_id])
   end
 
   def raw_sql_query

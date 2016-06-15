@@ -1,7 +1,5 @@
 class User < ActiveRecord::Base
   has_many :queries, class_name: "UserQuery", foreign_key: :user_id
-  FULL_ACCESS = "full_access".freeze
-  RESTRICTED_ACCESS = "restricted_access".freeze
 
   # TODO(sr) Add unit test for this
   def self.find_or_create_by_omniauth(auth_hash)

@@ -49,6 +49,17 @@ class DataCenter
     global_accounts.all
   end
 
+  def account_access_enabled?(account_id)
+    query = <<-SQL.freeze
+      SELECT id FROM global_account_access
+      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
+      LIMIT 1
+    SQL
+
+    results = global.execute(query, [Rails.application.config.x.support_role, account_id])
+    results.size == 1
+  end
+
   private
 
   def global_accounts

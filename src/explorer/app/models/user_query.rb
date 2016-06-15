@@ -9,16 +9,6 @@ class UserQuery < ActiveRecord::Base
     end
   end
 
-  class UnauthorizedAccountAccess < StandardError
-    def initialize(account_id)
-      @account_id = account_id
-
-      super "access to account #{account_id.inspect} is not authorized"
-    end
-
-    attr_reader :account_id
-  end
-
   BlankResultSet = Struct.new(:fields).new([])
 
   # Returns an empty result set.

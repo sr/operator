@@ -93,8 +93,10 @@ class ApplicationController < ActionController::Base
 
   # Returns true if this user is authorized to use Explorer, false otherwise.
   def access_authorized?
+    full_access = Rails.application.config.x.full_access_ldap_group
+    restricted_access = Rails.application.config.x.restricted_access_ldap_group
     if Rails.env.development?
-      #session[:group] = User::FULL_ACCESS
+      session[:group] = full_access
       return true
     end
 
@@ -102,14 +104,12 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-    full_access = Rails.application.config.x.full_access_ldap_group
-    restricted_access = Rails.application.config.x.restricted_access_ldap_group
     auth = Canoe::LDAPAuthorizer.new
     if auth.user_is_member_of_any_group?(current_user.uid, full_access)
-      session[:group] = User::FULL_ACCESS
+      session[:group] = full_access
       true
     elsif auth.user_is_member_of_any_group?(current_user.uid, restricted_access)
-      session[:group] = User::RESTRICTED_ACCESS
+      session[:group] = restricted_access
       true
     else
       false
