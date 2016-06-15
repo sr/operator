@@ -1,4 +1,8 @@
 class ChefDeliveryConfig
+  AWS = "pardot0-chef1-1-ue1.aws"
+  BREAD_TESTING_ROOM = 882
+  OPS_ROOM = 6
+
   def enabled_in?(environment)
     %w[dev].include?(environment)
   end
@@ -37,8 +41,13 @@ class ChefDeliveryConfig
     )
   end
 
-  def chat_room_id
-    Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", 6))
+  def chat_room_id(hostname)
+    case hostname
+    when AWS
+      BREAD_TESTING_ROOM
+    else
+      Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", OPS_ROOM))
+    end
   end
 
   class HipchatNotifier

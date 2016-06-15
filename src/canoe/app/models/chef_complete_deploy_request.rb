@@ -1,11 +1,14 @@
 class ChefCompleteDeployRequest
   def self.from_hash(request)
-    deploy = ChefDeploy.new(request.fetch(:deploy))
-
-    new(deploy, request.fetch(:message, false))
+    new(
+      request.fetch(:hostname),
+      ChefDeploy.new(request.fetch(:deploy))
+      request.fetch(:message, false)
+    )
   end
 
-  def initialize(deploy, error)
+  def initialize(hostname, deploy, error)
+    @hostname = hostname
     @deploy = deploy
     @error = error
   end

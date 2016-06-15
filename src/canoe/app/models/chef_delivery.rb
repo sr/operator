@@ -29,6 +29,7 @@ class ChefDelivery
     if request.checkout_branch != @config.master_branch
       if (current_build.updated_at - Time.current) > @config.max_lock_age
         notification.at_lock_age_limit(
+          @config.chat_room_id(request.hostname),
           request.hostname,
           request.checkout,
           current_build
@@ -60,7 +61,12 @@ class ChefDelivery
   def complete_deploy(request)
     status = request.success? ? SUCCESS : FAILURE
     ChefDeploy.complete(request.deploy_id, status)
-    notification.deploy_completed(request.deploy, request.success?, request.error)
+    notification.deploy_completed(
+      @config.chat_room_id(request.hostname),
+      request.deploy,
+      request.success?,
+      request.error
+    )
   end
 
   private
@@ -69,8 +75,7 @@ class ChefDelivery
     @notification ||= ChefDeliveryNotification.new(
       @config.notifier,
       @config.github_url,
-      @config.repo_name,
-      @config.chat_room_id
+      @config.repo_name
     )
   end
 

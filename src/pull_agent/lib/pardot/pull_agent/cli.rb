@@ -88,6 +88,7 @@ module Pardot
 
         result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env)
         payload = {
+          hostname: ShellHelper.hostname,
           deploy: payload.fetch("deploy"),
           error: !result.success,
           message: result.message
