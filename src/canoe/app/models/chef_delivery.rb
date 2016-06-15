@@ -18,7 +18,7 @@ class ChefDelivery
       current_build: current_build.to_json
     )
 
-    if !@config.enabled_in?(request.hostname, request.environment)
+    if !@config.enabled_in?(request.environment, request.hostname)
       return ChefCheckinResponse.noop
     end
 
