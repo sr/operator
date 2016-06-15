@@ -111,6 +111,7 @@ class Chef
       end
 
       def preflight_checks
+        return true
         vdir = File.join(Dir.pwd, 'vendor')
         if vendor_dir != vdir
           ui.confirm("vendor directory (#{vendor_dir}) is different than standard one(#{vdir}), continue?")
