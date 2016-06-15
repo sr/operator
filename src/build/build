@@ -59,6 +59,21 @@ then docker build --pull -f etc/docker/Dockerfile.build -t build/build .
 else docker build -f etc/docker/Dockerfile.build -t build/build .
 fi
 
+build_rubygem() {
+    docker run --rm \
+        -v "$(pwd):/data" \
+        -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
+        -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
+        -e "CI_BRANCH=$CI_BRANCH" \
+        -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+        -e "CI_PLAN=$CI_PLAN" \
+        -e "DEBUG=$DEBUG" \
+        build/build \
+        build-rubygem \
+        "$1" \
+        "$2"
+}
+
 echo "===> Building ${project}..." 2>&1
 
 case "$project" in
@@ -84,35 +99,15 @@ case "$project" in
     pd-sync-chef)
         build-ruby --no-lint "$project"
 
-        test -n "$CI" && {
-            docker run --rm \
-                -v "$(pwd):/data" \
-                -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
-                -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
-                -e "CI_BRANCH=$CI_BRANCH" \
-                -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
-                -e "CI_PLAN=$CI_PLAN" \
-                -e "DEBUG=$DEBUG" \
-                build/build \
-                build-rubygem \
-                    "pardot_pd_sync" \
-                    "src/pd-sync-chef/pardot_pd_sync.gemspec"
-        }
+        test -n "$CI" &&
+        build_rubygem "pardot_pd_sync" "src/pd-sync-chef/pardot_pd_sync.gemspec"
         ;;
     pull_agent)
         build-ruby "$project"
 
         test -n "$CI" && {
-            docker run --rm \
-                -v "$(pwd):/data" \
-                -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
-                -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
-                -e "CI_BRANCH=$CI_BRANCH" \
-                -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
-                -e "CI_PLAN=$CI_PLAN" \
-                -e "DEBUG=$DEBUG" \
-                build/build \
-                build-gem-pull_agent
+            build_rubygem "pardot_pull-agent" \
+                "src/pull_agent/pardot_pull-agent.gemspec"
         }
         ;;
     privet)
