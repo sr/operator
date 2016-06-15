@@ -24,10 +24,6 @@ class ChefDeliveryConfig
     ENV.fetch("CANOE_CHEF_REPO", "Pardot/chef")
   end
 
-  def deploy_task_name
-    "knife pd sync"
-  end
-
   def master_branch
     "master"
   end
