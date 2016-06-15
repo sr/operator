@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(version: 20160611151703) do
     t.string   "uid",                           limit: 255,               null: false
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
-    t.string   "group",                         limit: 255
     t.integer  "rate_limit_transactions_count", limit: 4,     default: 0, null: false
     t.datetime "rate_limit_expires_at"
   end
