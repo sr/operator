@@ -83,11 +83,23 @@ case "$project" in
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
+
+        test -n "$CI" && {
+            docker run --rm \
+                -v "$(pwd):/data" \
+                -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
+                -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
+                -e "CI_BRANCH=$CI_BRANCH" \
+                -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+                -e "CI_PLAN=$CI_PLAN" \
+                -e "DEBUG=$DEBUG" \
+                build/build \
+                build-rubygem "src/pd-sync-chef/pardot_pd_sync.gemspec"
+        }
         ;;
     pull_agent)
         build-ruby "$project"
 
-        # Build the gem and push it to Artifactory on CI.
         test -n "$CI" && {
             docker run --rm \
                 -v "$(pwd):/data" \
