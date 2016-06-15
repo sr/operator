@@ -94,7 +94,9 @@ case "$project" in
                 -e "CI_PLAN=$CI_PLAN" \
                 -e "DEBUG=$DEBUG" \
                 build/build \
-                build-rubygem "src/pd-sync-chef/pardot_pd_sync.gemspec"
+                build-rubygem \
+                    "pardot_pd_sync" \
+                    "src/pd-sync-chef/pardot_pd_sync.gemspec"
         }
         ;;
     pull_agent)
