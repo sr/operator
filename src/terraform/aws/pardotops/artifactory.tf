@@ -33,9 +33,37 @@ resource "aws_security_group" "artifactory_elb_secgroup" {
 
   ingress {
     from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+
+  ingress {
+    from_port = 80
     to_port = 80
     protocol = "tcp"
     cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "artifactory_mysql_secgroup" {
+  name = "artifactory_mysql_secgroup"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "mysql"
+    security_groups = [
+      "${aws_security_group.artifactory_instance_secgroup.id}"
+    ]
   }
 
   ingress {
