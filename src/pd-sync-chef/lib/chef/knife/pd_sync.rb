@@ -70,6 +70,12 @@ class Chef
         boolean:      true,
         default:      false
 
+      option :skip_berkshelf,
+        long:         '--skip-berkshelf',
+        describe:     'Skip Berkshelf installation step"
+        boolean:      true,
+        default:      false
+
       def run
         @altered_cookbooks = nil
         if config[:restore]
@@ -95,7 +101,8 @@ class Chef
         end
         sync = PagerDuty::ChefServer::Sync.new(
           vendor_dir: vendor_dir,
-          why_run: config[:why_run]
+          why_run: config[:why_run],
+          skip_berkshelf: config[:skip_berkshelf]
           )
         begin
           @altered_cookbooks = sync.run

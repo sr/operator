@@ -39,6 +39,7 @@ module PagerDuty
         @cookbook_dir =  opts[:vendor_dir]
         @why_run = opts[:why_run]
         @ui = opts[:ui] || Chef::Knife.ui
+        @skip_berkshelf = opts[:skip_berkshelf]
         if File.exist?(ignore_file)
           @ignore_patterns = File.read(ignore_file).lines.map{|l| File.join(chef_repo_dir, l).strip}
         else
@@ -48,7 +49,9 @@ module PagerDuty
       end
 
       def run
-        berkshelf_install
+        if !@skip_berkshelf
+          berkshelf_install
+        end
         sync_cookbooks
         upload_databags
         upload_environments
