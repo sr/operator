@@ -64,4 +64,4 @@ export RUBYGEM_VERSION
 # Build the gem and push it to Artifactory
 cd "$(dirname "$gemspec")"
 gem build "$(basename "$gemspec")"
-gem push "$(basename "$gemspec")-${gemversion}.gem"
+gem push "$(basename "$gemspec")-${RUBYGEM_VERSION}.gem"
