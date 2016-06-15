@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 require "pardot/pull_agent"
 
-if v = ENV["PULL_AGENT_LOCKFILE"]
-  LOCKFILE = v.freeze
-else
-  LOCKFILE = "/var/lock/pull-agent/deploy.lock".freeze
-end
+default_lockfile = "/var/lock/pull-agent/deploy.lock"
+LOCKFILE = ENV.fetch("PULL_AGENT_LOCKFILE", default_lockfile)
 
 proxy_selector = Pardot::PullAgent::ProxySelector.new
 proxy_selector.configure_random_proxy
