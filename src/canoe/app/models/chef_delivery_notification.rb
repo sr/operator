@@ -3,11 +3,10 @@ class ChefDeliveryNotification
   GREEN = "green".freeze
   RED = "red".freeze
 
-  def initialize(notifier, github_url, repo_name, room_id)
+  def initialize(notifier, github_url, repo_name)
     @notifier = notifier
     @github_url = github_url
     @repo = repo_name
-    @room = room_id
   end
 
   def at_lock_age_limit(room_id, chef_server, checkout, build)

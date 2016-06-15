@@ -2,7 +2,7 @@ class ChefCompleteDeployRequest
   def self.from_hash(request)
     new(
       request.fetch(:hostname),
-      ChefDeploy.new(request.fetch(:deploy))
+      ChefDeploy.new(request.fetch(:deploy)),
       request.fetch(:message, false)
     )
   end
@@ -13,7 +13,7 @@ class ChefCompleteDeployRequest
     @error = error
   end
 
-  attr_reader :deploy, :error
+  attr_reader :hostname, :deploy, :error
 
   def deploy_id
     @deploy.id
