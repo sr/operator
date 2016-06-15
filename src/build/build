@@ -81,6 +81,9 @@ case "$project" in
         docker run --rm -w /go -v "$(pwd):/go" build/build \
             make -f etc/mk/golang.mk
         ;;
+    pd-sync-chef)
+        true
+        ;;
     pull_agent)
         build-ruby "$project"
 
