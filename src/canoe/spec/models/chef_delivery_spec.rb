@@ -87,6 +87,15 @@ RSpec.describe ChefDelivery do
     assert msg.message.include?("pardot0-chef1")
   end
 
+  it "noops and doesn't notify if non-master branch has been checkout for less than an hour" do
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
+    request = ChefCheckinRequest.new("testing", "pardot0-chef1", checkout)
+    @repo.current_build = build_build(updated_at: 30.minutes.ago)
+    response = @delivery.checkin(request)
+    assert_equal "noop", response.action
+    assert_equal 0, @config.notifier.messages.size
+  end
+
   it "deploys if there is no deploy available" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", "chef1", checkout)

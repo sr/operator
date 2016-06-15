@@ -27,7 +27,7 @@ class ChefDelivery
     end
 
     if request.checkout_branch != @config.master_branch
-      if (current_build.updated_at - Time.current) > @config.max_lock_age
+      if (Time.current - current_build.updated_at) > @config.max_lock_age
         notification.at_lock_age_limit(
           @config.chat_room_id(request.hostname),
           request.hostname,
