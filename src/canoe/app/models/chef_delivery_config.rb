@@ -56,8 +56,4 @@ class ChefDeliveryConfig
   def github_token
     ENV.fetch("GITHUB_PASSWORD")
   end
-
-  def chef_server
-    ENV.fetch("CANOE_CHEF_SERVER", "pardot0-chef1-1-dfw.ops.sfdc.net")
-  end
 end
