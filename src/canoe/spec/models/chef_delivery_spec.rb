@@ -35,6 +35,13 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
   end
 
+  it "noops if chef delivery isn't enabled for the host" do
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
+    request = ChefCheckinRequest.new("dfw", "disabled", checkout)
+    response = @delivery.checkin(request)
+    assert_equal "noop", response.action
+  end
+
   it "noops if there is no available build" do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new("testing", "chef1", checkout)

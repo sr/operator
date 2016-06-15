@@ -1,10 +1,23 @@
 class ChefDeliveryConfig
+  PRODUCTION = "production"
+  DEV = "dev"
+
   AWS = "pardot0-chef1-1-ue1.aws"
+  DFW = "pardot0-chef1-1-dfw"
+  PHX = "pardot0-chef1-1-phx"
+
   BREAD_TESTING_ROOM = 882
   OPS_ROOM = 6
 
-  def enabled_in?(environment)
-    %w[dev].include?(environment)
+  def enabled_in?(environment, hostname)
+    case environment
+    when DEV
+      true
+    when PRODUCTION
+      [AWS].include?(hostname)
+    else
+      false
+    end
   end
 
   def repo_name

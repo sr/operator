@@ -5,8 +5,8 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
 
   attr_reader :github_repo
 
-  def enabled_in?(environment)
-    %w[testing].include?(environment)
+  def enabled_in?(environment, hostname)
+    %w[testing].include?(environment) && hostname != "disabled"
   end
 
   def notifier
