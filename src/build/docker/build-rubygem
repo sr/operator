@@ -33,14 +33,15 @@ fi
 test -n "$DEBUG" && set -x
 
 # Configure RubyGems for pushing to our Artifactory repository
-gemhost="${ARTIFACTORY_URL}/api/gems/${ARTIFACTORY_REPO_GEM_LOCAL}"
+RUBYGEMS_HOST="${ARTIFACTORY_URL}/api/gems/${ARTIFACTORY_REPO_GEM_LOCAL}"
 test -d "${HOME}/.gem" || mkdir "${HOME}/.gem"
 set +x
 curl -s -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" \
-    "${gemhost}/api/v1/api_key.yaml" \
+    "${RUBYGEMS_HOST}/api/v1/api_key.yaml" \
     > "${HOME}/.gem/credentials"
 chmod 600 "${HOME}/.gem/credentials"
 test -n "$DEBUG" && set -x
+export RUBYGEMS_HOST
 
 # Determine gem version. Bamboo does not provide a build number that is global
 # accross branches. So we use the build number only when building the master
