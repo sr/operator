@@ -17,8 +17,6 @@ message Request {
 message Call {
 	string service = 1;
 	string method = 2;
-	string input_type = 3;
-	string output_type = 4;
 	Error error = 5;
 	google.protobuf.Duration duration = 6;
 }

@@ -87,6 +87,18 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				PackageName: file.GetPackage(),
 				ImportPath:  importPath,
 			}
+			if m, ok := messagesByName[service.GetName()+"Config"]; ok {
+				services[j].Config = make([]Setting, len(m.Field))
+				for i, f := range m.Field {
+					services[j].Config[i] = Setting{
+						Name:        f.GetName(),
+						Description: "",
+						Required:    true,
+					}
+				}
+			} else {
+				services[j].Config = make([]Setting, 0)
+			}
 			for k, method := range service.Method {
 				inputName := strings.Split(method.GetInputType(), ".")[2]
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
