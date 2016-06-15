@@ -1,7 +1,7 @@
 class UserQuery < ActiveRecord::Base
   DEFAULT_LIMIT = 10
 
-  belongs_to :user, foreign_key: :user_id
+  belongs_to :user
 
   class RateLimited < StandardError
     def initialize(user)
@@ -49,10 +49,6 @@ class UserQuery < ActiveRecord::Base
     end
 
     DataCenter.current.find_account(account_id).descriptive_name
-  end
-
-  def database_name
-    database.name
   end
 
   # Returns an Array of tables present in the database.
