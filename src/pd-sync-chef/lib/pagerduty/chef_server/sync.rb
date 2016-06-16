@@ -40,6 +40,7 @@ module PagerDuty
         @why_run = opts[:why_run]
         @ui = opts[:ui] || Chef::Knife.ui
         @skip_berkshelf = opts[:skip_berkshelf]
+        @environment_file = opts[:environment_file]
         if File.exist?(ignore_file)
           @ignore_patterns = File.read(ignore_file).lines.map{|l| File.join(chef_repo_dir, l).strip}
         else
@@ -54,7 +55,11 @@ module PagerDuty
         end
         sync_cookbooks
         upload_databags
-        upload_environments
+        if !@environment_file.nil?
+          upload_environment(@environment_file)
+        else
+          upload_environments
+        end
         upload_roles
       end
 

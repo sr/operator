@@ -61,6 +61,12 @@ module PagerDuty
         end
       end
 
+      def upload_environment(path)
+        converge_by "Create environment from #{path}" do
+          knife Chef::Knife::EnvironmentFromFile, path
+        end
+      end
+
       def upload_roles
         Dir[role_dir+'/*'].each do |path|
           if File.directory?(path)

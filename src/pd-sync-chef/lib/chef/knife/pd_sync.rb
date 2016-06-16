@@ -76,6 +76,11 @@ class Chef
         boolean:      true,
         default:      false
 
+      option :environment_file,
+        long:         '--environment-file FILE',
+        describe:     'Single environment file to upload, instead of the whole environments/ directory',
+        proc:         nil
+
       def run
         @altered_cookbooks = nil
         if config[:restore]
@@ -102,7 +107,8 @@ class Chef
         sync = PagerDuty::ChefServer::Sync.new(
           vendor_dir: vendor_dir,
           why_run: config[:why_run],
-          skip_berkshelf: config[:skip_berkshelf]
+          skip_berkshelf: config[:skip_berkshelf],
+          environment_file: config[:environment_file]
           )
         begin
           @altered_cookbooks = sync.run
