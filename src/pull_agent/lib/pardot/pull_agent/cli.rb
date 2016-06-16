@@ -45,20 +45,13 @@ module Pardot
         end
       end
 
-      GEM_SRC = "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
-
       def checkin_chef
         payload = environment.payload
         repo_path = Pathname(payload.repo_path)
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
         env = {
-          "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}",
-          "PULL_AGENT_BUNDLER_SOURCE" => GEM_SRC,
-          "PULL_AGENT_BUNDLER_CREDENTIALS" => format("%s:%s",
-            environment.artifactory_user,
-            environment.artifactory_token
-          )
+          "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}"
         }
         output = ShellHelper.execute([env, script, "-d", repo_path.to_s, "status"])
         if !$?.success?
