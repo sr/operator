@@ -120,7 +120,7 @@ module PagerDuty
         ui.info(ui.color('updating data bags in batch mode', :yellow))
         existing_databags = Chef::DataBag.list.keys
         Dir[databag_dir+'/*'].each do |db_path|
-          if File.directory?(path)
+          if File.directory?(db_path)
             next
           end
 
