@@ -28,14 +28,19 @@ module.exports = (robot) ->
     else if secondloc == 'chatty' || secondloc == 'Chatty'
       msg.send "!one does not simply get to Chatty"
       return
-    else if secondloc == 'alcohol' || secondloc == 'beer' || secondloc == 'drink'
+    else if secondloc == 'alcohol' || secondloc == 'beer' || secondloc == 'drink' || secondloc == 'shot'
       msg.send "A couple seconds, depending on how close you are to the nearest fridge. (beer)"
       return
 
     firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
+    curdate = new Date()
+    estimate_type = "optimistic"
+    if curdate.getHours() > 14 && curdate.getHours() < 19
+      estimate_type = "pessimistic"
+
     msg.http("https://maps.googleapis.com/maps/api/distancematrix/json")
-       .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4', traffic_model: "best_guess"})
+       .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4', traffic_model: "#{estimate_type}"})
        .header('Accept', 'application/json')
        .get() (err, res, body) ->
           if err
