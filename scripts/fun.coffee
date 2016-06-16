@@ -90,9 +90,9 @@
 #   hubot pieces - Pieces (and murica!)
 #   hubot trolledum8 - rekt
 #   hubot rekt - trolledum8
-#   hubot traffic - returns image of traffic in Atlanta
-#   hubot traffic (location) - returns image of traffic in provided location
-#   hubot traveltime (location) - returns current travel time to a provided location from the office
+#   hubot traffic - returns image of current traffic conditions in Atlanta
+#   hubot traffic (location) - returns image of current traffic conditions in the provided location
+#   hubot traveltime (location) - returns current travel time to the provided location from the office
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
