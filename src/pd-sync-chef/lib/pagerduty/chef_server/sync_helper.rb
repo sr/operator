@@ -69,7 +69,7 @@ module PagerDuty
 
       def upload_roles
         Dir[role_dir+'/*'].each do |path|
-          if File.directory?(path)
+          if File.directory?(path) || File.extname(path) != ".rb"
             next
           end
 
