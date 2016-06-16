@@ -14,7 +14,7 @@ if [ -d "test" ]; then
     find test -type f -name "*.rb" -print0 |
     xargs -0 bundler exec ruby -Ilib
 elif [ -d "spec" ]; then
-    bundle exec rspec spec
+    bundler exec rspec spec
 else
     echo "WARN: No test suite detected." 2>&1
 fi
