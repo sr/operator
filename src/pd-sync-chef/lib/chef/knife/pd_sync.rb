@@ -83,6 +83,9 @@ class Chef
 
       def run
         @altered_cookbooks = nil
+        if config[:environment_file] && !File.exists?(config[:environment_file])
+          fail "Environment file does not exist: #{config[:environment_file].inspect}"
+        end
         if config[:restore]
           ui.warn 'pd sync will delete and reupload all cookbooks!'
           plugin = Chef::Knife::CookbookBulkDelete.new
