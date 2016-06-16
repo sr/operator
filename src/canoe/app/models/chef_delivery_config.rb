@@ -6,7 +6,7 @@ class ChefDeliveryConfig
   DFW = "pardot0-chef1-1-dfw"
   PHX = "pardot0-chef1-1-phx"
 
-  BREAD_TESTING_ROOM = 882
+  BREAD_ROOM = 42
   OPS_ROOM = 6
 
   def enabled_in?(environment, hostname)
@@ -49,7 +49,7 @@ class ChefDeliveryConfig
   def chat_room_id(hostname)
     case hostname
     when AWS
-      BREAD_TESTING_ROOM
+      BREAD_ROOM
     else
       Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", OPS_ROOM))
     end
