@@ -5,9 +5,7 @@
 #   "moment": "^2.10.3"
 #
 # Commands:
-#   hubot time in <location> - Ask hubot for a time in a location
-#   hubot <time> in <location> - Convert a given time to a given location, e.g. "1pm in Sydney"
-#   hubot <time> from <location> to <location> - Convert a given time between 2 locations
+#   hubot time <location> - Ask hubot for a time in a location
 #   hubot set timezone offset to <offset> - Set the default timezone offset, can be hours or minutes
 #
 # Notes:
@@ -82,7 +80,7 @@ convertTime = (res, timestamp, fromLocation, toLocation) ->
         res.send("I can't find the time at #{location}.")
       else
         localTimestamp = (utcTimestamp + result.dstOffset + result.rawOffset) * 1000
-        res.send("In #{result.formattedAddress}, it is currently #{formatTime(localTimestamp)}")
+        res.send("In #{result.formattedAddress}, it is currently #{formatTime(localTimestamp)}.")
 
   if fromLocation
     getTimezoneInfo res, timestamp, fromLocation, (err, result) ->
