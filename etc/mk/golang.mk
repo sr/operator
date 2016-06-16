@@ -7,11 +7,15 @@ INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
 PACKAGES = $(shell go list privet/... chatops/...)
+TOOLS = $(shell go list golang.org/x/tools/cmd/...)
 
 all: fmt lint unused vet interfacer errcheck install
 
 install:
 	go install -race -v $(PACKAGES)
+
+install-tools:
+	go install -v $(TOOLS)
 
 fmt:
 	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
