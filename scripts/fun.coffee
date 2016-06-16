@@ -90,9 +90,6 @@
 #   hubot pieces - Pieces (and murica!)
 #   hubot trolledum8 - rekt
 #   hubot rekt - trolledum8
-#   hubot traffic - returns image of current traffic conditions in Atlanta
-#   hubot traffic (location) - returns image of current traffic conditions in the provided location
-#   hubot traveltime (location) - returns current travel time to the provided location from the office
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -817,31 +814,6 @@ module.exports = (robot) ->
   robot.respond /winning$/i, (msg) ->
     imageMe msg, "Charlie Sheen winning", (url) ->
       msg.send "#{url}"
-
-  robot.respond /!traffic$/i, (msg) ->
-  	msg.send "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=Atlanta,+GA&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow"
-
-  robot.respond /!traffic\s+(.*)$/i, (msg) ->
-  	location = encodeURI(msg.match[1])
-  	trafficimg = "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=#{location}&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow"
-  	msg.send trafficimg
-
-  robot.respond /!traveltime\s+(.*)$/i, (msg) ->
-  	secondloc = msg.match[1]
-  	firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
-
-  	msg.http("https://maps.googleapis.com/maps/api/distancematrix/json")
-  		 .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: ''})
-  		 .header('Accept', 'application/json')
-  		 .get() (err, res, body) ->
-  				if err
-        		msg.send "Error: #{err}"
-  				data = JSON.parse body
-  				if data.error_message
-  					msg.send "Error: #{data.error_message}"
-  				duration = if data.rows[0].elements[0].duration_in_traffic then data.rows[0].elements[0].duration_in_traffic.text else data.rows[0].elements[0].duration.text
-  				msg.send "From #{data.origin_addresses[0]} to #{data.destination_addresses[0]}, it will take #{duration}"
-
 
   imageMe = (msg, query, cb) ->
 #    msg.http('http://ajax.googleapis.com/ajax/services/search/images')
