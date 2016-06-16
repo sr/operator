@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#/ Usage: pa-deploy-chef [-d chef-dir] [-b git-branch] [-s git-sha] <action>
+#/ Usage: pa-deploy-chef [-d chef-dir] [-b git-branch] [-s git-sha] [-f chef-env-file] <action>
 set -euo pipefail
 
 : "${PROGRAM:="$(basename "$0")"}"
@@ -10,8 +10,9 @@ print_help() {
 
 branch=""
 chefdir=""
+chefenvfile=""
 sha=""
-while getopts d:b:s: arg
+while getopts d:b:f:s: arg
 do
     case "$arg" in
         b)
@@ -19,6 +20,9 @@ do
             ;;
         d)
             chefdir="$OPTARG"
+            ;;
+        f)
+            chefenvfile="$OPTARG"
             ;;
         s)
             sha="$OPTARG"
@@ -72,6 +76,12 @@ case "$action" in
             exit 1
         fi
 
+        if [ -z "$chefenvfile" ]
+        then
+            echo "$PROGRAM: required flag missing: -f <chef-env-file>"
+            exit 1
+        fi
+
         GIT_WORK_TREE="$chefdir"
         GIT_DIR="$GIT_WORK_TREE/.git"
         export GIT_WORK_TREE GIT_DIR
@@ -81,7 +91,11 @@ case "$action" in
         git pull origin "$branch" 2>&1
         git reset --hard "$sha" 2>&1
 
-        knife pd sync 2>&1
+        cd "$chefdir"
+        knife pd sync \
+            --skip-berkshelf \
+            --environment-file "$chefenvfile" \
+            2>&1
         ;;
     *)
         echo "$PROGRAM: unsupported action: $action"
