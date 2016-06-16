@@ -7,4 +7,8 @@ class WelcomeController < ApplicationController
   def boomtown
     raise "boomtown"
   end
+
+  def version
+    render layout: false
+  end
 end
