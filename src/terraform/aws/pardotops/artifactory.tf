@@ -27,6 +27,35 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 }
 
+resource "aws_security_group" "artifactory_ci_instance_secgroup" {
+  name = "artifactory_instance_secgroup"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
+
+  # SSH from bastion
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_bastion.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "artifactory_elb_secgroup" {
   name = "artifactory_elb_secgroup"
   vpc_id = "${aws_vpc.internal_apps.id}"
@@ -71,6 +100,13 @@ resource "aws_security_group" "artifactory_mysql_secgroup" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    cidr_blocks = ["${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"]
   }
 
   egress {
@@ -123,6 +159,28 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
 resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
   vpc = true
   instance = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
+}
+
+resource "aws_instance" "pardot0-artifactory1-3-ue1" {
+  ami = "${var.centos_6_hvm_ebs_ami}"
+  instance_type = "m4.xlarge"
+  key_name = "internal_apps"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
+  vpc_security_group_ids = ["${aws_security_group.pardot_ci_bastion.id}","${aws_security_group.artifactory_ci_instance_secgroup.id}"]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "2047"
+    delete_on_termination = false
+  }
+  tags {
+    Name = "pardot0-artifactory1-3-ue1"
+    terraform = "true"
+  }
+}
+
+resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
+  vpc = true
+  instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
 }
 
 resource "aws_elb" "artifactory_ops_elb" {
