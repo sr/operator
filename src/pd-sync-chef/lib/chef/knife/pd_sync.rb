@@ -72,7 +72,7 @@ class Chef
 
       option :skip_berkshelf,
         long:         '--skip-berkshelf',
-        describe:     'Skip Berkshelf installation step"
+        describe:     'Skip Berkshelf installation step',
         boolean:      true,
         default:      false
 
