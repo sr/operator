@@ -9,15 +9,15 @@
 #
 
 module.exports = (robot) ->
-  robot.respond /!traffic$/i, (msg) ->
+  robot.respond /traffic$/i, (msg) ->
     msg.send "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=Atlanta,+GA&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
 
-  robot.respond /!traffic\s+(.*)$/i, (msg) ->
+  robot.respond /traffic\s+(.*)$/i, (msg) ->
     location = encodeURI(msg.match[1])
     trafficimg = "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=#{location}&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
     msg.send trafficimg
 
-  robot.respond /!traveltime\s+(.*)$/i, (msg) ->
+  robot.respond /traveltime\s+(.*)$/i, (msg) ->
     secondloc = msg.match[1]
     firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
