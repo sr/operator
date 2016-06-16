@@ -1,5 +1,5 @@
 class WelcomeController < ApplicationController
-  skip_before_action :require_oauth_authentication, only: :boomtown
+  skip_before_action :require_oauth_authentication, only: [:boomtown, :version]
 
   def index
   end
@@ -9,6 +9,6 @@ class WelcomeController < ApplicationController
   end
 
   def version
-    render layout: false
+    render plain: Rails.application.config.x.build_version
   end
 end
