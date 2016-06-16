@@ -72,13 +72,13 @@ class Chef
 
       option :skip_berkshelf,
         long:         '--skip-berkshelf',
-        describe:     'Skip Berkshelf installation step',
+        description:  'Skip Berkshelf installation step',
         boolean:      true,
         default:      false
 
       option :environment_file,
         long:         '--environment-file FILE',
-        describe:     'Single environment file to upload, instead of the whole environments/ directory',
+        description:  'Single environment file to upload, instead of the whole environments/ directory',
         proc:         nil
 
       def run
