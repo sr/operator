@@ -1,9 +1,5 @@
 class QueriesController < ApplicationController
-  rescue_from DataCenter::UnauthorizedAccountAccess do |e|
-    message = "Please request engineering access to account #{e.account_id}."
-    flash[:error] = message
-    redirect_to "/accounts"
-  end
+  before_filter :check_account_access
 
   def new
     query = current_user.queries.new(
@@ -58,6 +54,19 @@ class QueriesController < ApplicationController
   end
 
   private
+
+  def check_account_access
+    if params.has_key?(:account_id) && !account_access?
+      message = "Please request engineering access to account #{params[:account_id]}."
+      flash[:error] = message
+      redirect_to "/accounts"
+    end
+  end
+
+  def account_access?
+    return true if session[:group] == Rails.application.config.x.full_access_ldap_group
+    DataCenter.current.account_access_enabled?(params[:account_id])
+  end
 
   def raw_sql_query
     if params[:sql].present?

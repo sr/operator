@@ -5,17 +5,7 @@ class UserQueryTest < ActiveSupport::TestCase
     @user = create_user
   end
 
-  test "database_name" do
-    authorize_access(1)
-    query = @user.global_query("SELECT 1")
-    assert_equal "pardot_global", query.database_name
-
-    query = @user.account_query("SELECT 1", 1)
-    assert_equal "pardot_shard1", query.database_name
-  end
-
   test "execute" do
-    authorize_access(1)
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute(@user)
     row = results.first
@@ -24,29 +14,6 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal "Account", row[:object_type]
 
     query = @user.global_query("SELECT * FROM global_account WHERE id = 1")
-    results = query.execute(@user)
-    row = results.first
-    assert_equal 1, row[:id]
-  end
-
-  test "execute unauthorized access" do
-    query = @user.account_query("SELECT * FROM job", 1)
-    assert_raise(DataCenter::UnauthorizedAccountAccess) do
-      query.execute(@user)
-    end
-  end
-
-  test "execute unexpiring access" do
-    authorize_access(1)
-    query = @user.account_query("SELECT * FROM object_audit", 1)
-    results = query.execute(@user)
-    row = results.first
-    assert_equal 1, row[:id]
-  end
-
-  test "execute access expiring tomorrow" do
-    authorize_access(1, nil, 1.minute.ago.end_of_day.to_s(:db))
-    query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute(@user)
     row = results.first
     assert_equal 1, row[:id]
@@ -63,7 +30,6 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "account query audit log" do
-    authorize_access(1)
     query = @user.account_query("SELECT 1 FROM account", 1)
     query.execute(@user)
     assert Instrumentation::Logging.entries.pop
@@ -77,7 +43,6 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "account tables" do
-    authorize_access(2)
     query = @user.account_query("SELECT 1 FROM job", 2)
     tables = query.database_tables
     assert tables.include?("campaign_source_stats")
