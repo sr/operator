@@ -47,7 +47,6 @@ module PagerDuty
         File.join(chef_repo_dir, 'environments')
       end
 
-
       def data_bag_from_file(name, path)
         converge_by "Create data bag #{name} from #{path}" do
           knife Chef::Knife::DataBagFromFile, name, path
@@ -64,6 +63,10 @@ module PagerDuty
 
       def upload_roles
         Dir[role_dir+'/*'].each do |path|
+          if File.directory?(path)
+            next
+          end
+
           converge_by "Create role from #{path}" do
             knife Chef::Knife::RoleFromFile, path
           end
@@ -111,6 +114,10 @@ module PagerDuty
         ui.info(ui.color('updating data bags in batch mode', :yellow))
         existing_databags = Chef::DataBag.list.keys
         Dir[databag_dir+'/*'].each do |db_path|
+          if File.directory?(path)
+            next
+          end
+
           if ignored?(db_path)
             ui.info(ui.color("Ignored:", :magenta) + db_path)
             next
