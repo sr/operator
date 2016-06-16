@@ -35,7 +35,7 @@ module.exports = (robot) ->
     firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
     curdate = new Date()
-    estimate_type = "optimistic"
+    estimate_type = "best_guess"
     if curdate.getHours() > 14 && curdate.getHours() < 19
       estimate_type = "pessimistic"
 
