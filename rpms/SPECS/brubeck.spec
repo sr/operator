@@ -1,8 +1,8 @@
-%global brubeck_git_revision 15e00f105dc68d9a08c50b190a45cc3b43e5265b
+%global brubeck_git_revision 5d139a44206813640151cf0af17d32ee9ac41a60
 
 Name: brubeck
 Version: 1.0.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A Statsd-compatible metrics aggregator
 Group: Applications/Internet
 License: MIT
