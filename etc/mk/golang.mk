@@ -6,15 +6,15 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell go list ./src/... | grep -v -E '^vendor|chatoops' | sort -r)
+PACKAGES = $(shell go list privet/... chatops/...)
 
-all: fmt lint unused vet errcheck interfacer install
+all: fmt lint unused vet interfacer errcheck install
 
 install:
 	go install -race -v $(PACKAGES)
 
 fmt:
-	@ for file in $$(find src -name '*.go' | grep -v -E '^src/vendor|\.pb\.go$$'); do \
+	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
 			out="$$($(GOFMT) -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
@@ -23,20 +23,26 @@ fmt:
 			if [ -n "$$out" ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
-			fi \
+			fi; \
 	  done
 
 lint: $(GOLINT)
-	@ for file in $$(find src -name '*.go' | grep -v -E '^src/vendor|\-gen\.go$$|\.pb\.go$$'); do \
-			out="$$($< $$file | grep -v 'should have comment')"; \
-			if [ -n "$$out" ]; then \
-				echo "lint: $$out"; \
-				exit 1; \
-			fi \
-	  done
+		@	for pkg in $(PACKAGES); do \
+				out="$$($< $$pkg | grep -v -E 'should have comment|\.pb\.go|\-gen\.go')"; \
+				if [ -n "$$out" ]; then \
+					echo "lint: $$out"; \
+					exit 1; \
+				fi; \
+			done
 
 unused: $(UNUSED)
-	$< -fields $(shell go list ./src/... | grep -v -E '^vendor|chatoops' | sort -r)
+	@ for pkg in $(PACKAGES); do \
+			$< -fields $$pkg; \
+			if [ $$? -ne 0 ]; then \
+				fail=true; \
+			fi; \
+		done; \
+		test $$fail && exit 1; true
 
 vet:
 	@ for pkg in $(PACKAGES); do \
@@ -45,8 +51,8 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
+			out="$$($< $$pkg)"; \
+			if [ -n "$$out" ]; then \
 				fail=true; \
 			fi; \
 	  done; \
@@ -62,20 +68,23 @@ interfacer: $(INTERFACER)
 	  test $$fail && exit 1; true
 
 $(ERRCHECK):
-	$(GO) install vendor/github.com/kisielk/errcheck
+	$(GO) install -v github.com/kisielk/errcheck
 
 $(GOLINT):
-	$(GO) install vendor/github.com/golang/lint/golint
+	$(GO) install -v github.com/golang/lint/golint
 
 $(INTERFACER):
-	$(GO) install vendor/github.com/mvdan/interfacer/cmd/interfacer
+	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install vendor/honnef.co/go/unused/cmd/unused
+	$(GO) install -v honnef.co/go/unused/cmd/unused
 
 .PHONY: \
 	all \
+	errcheck \
 	fmt \
+	install \
+	interfacer \
 	lint \
-	vet \
-	errcheck
+	unused \
+	vet
