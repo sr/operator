@@ -13,16 +13,29 @@ module.exports = (robot) ->
     msg.send "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=Atlanta,+GA&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
 
   robot.respond /traffic\s+(.*)$/i, (msg) ->
-    location = encodeURI(msg.match[1])
-    trafficimg = "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=#{location}&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
-    msg.send trafficimg
+    location = msg.match[1]
+    if location == 'Pardot' || location == 'the office'
+      msg.send "Look outside! (troll)"
+    else
+      trafficimg = "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=#{encodeURI(location)}&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
+      msg.send trafficimg
 
   robot.respond /traveltime\s+(.*)$/i, (msg) ->
     secondloc = msg.match[1]
+    if secondloc == 'Pardot' || secondloc == 'the office' || secondloc == '950 East Paces Ferry Road, Atlanta, GA'
+      msg.send "You're probably already here...(stare)"
+      return
+    else if secondloc == 'chatty' || secondloc == 'Chatty'
+      msg.send "!one does not simply get to Chatty"
+      return
+    else if secondloc == 'alcohol' || secondloc == 'beer' || secondloc == 'drink'
+      msg.send "A couple seconds, depending on how close you are to the nearest fridge. (beer)"
+      return
+
     firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
     msg.http("https://maps.googleapis.com/maps/api/distancematrix/json")
-       .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: ''})
+       .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4', traffic_model: "best_guess"})
        .header('Accept', 'application/json')
        .get() (err, res, body) ->
           if err
@@ -32,8 +45,8 @@ module.exports = (robot) ->
             msg.send "Error: #{data.error_message}"
           duration = if data?.rows[0]?.elements[0]?.duration_in_traffic then data?.rows[0]?.elements[0]?.duration_in_traffic?.text else data?.rows[0]?.elements[0]?.duration?.text
           if duration == null
-            msg.send "Unable to retrieve travel time to #{secondloc}"
+            msg.send "Unable to retrieve travel time to #{secondloc}. (sadpanda)"
           else if typeof duration is 'undefined'
-            msg.send "There is no route between #{secondloc} and the office."
+            msg.send "There is no driving route between #{secondloc} and the office. (sadpanda)"
           else
-            msg.send "To get to #{data.destination_addresses[0]} from the office, it will take #{duration}."
+            msg.send "To get to #{data.destination_addresses[0]} from the office, it will take #{duration}. (drivinginmytruck)"
