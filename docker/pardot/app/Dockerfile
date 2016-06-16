@@ -39,7 +39,8 @@ RUN yum install -y httpd mod_ssl && \
   yum --enablerepo=remi-php55 install -y \
     php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring \
     php-zip php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache \
-    php-tidy php-pear php-memcache php-cli php-devel && \
+    php-tidy php-pear php-memcache php-cli php-devel php-pecl-xdebug && \
+  rm -f /etc/php.d/*xdebug.ini && \
   yum clean all
 
 # PHP 5.5 compatible build of Protobuf
