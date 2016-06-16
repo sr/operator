@@ -77,7 +77,7 @@ convertTime = (res, timestamp, fromLocation, toLocation) ->
   sendLocalTime = (utcTimestamp, location) ->
     getTimezoneInfo res, utcTimestamp, location, (err, result) ->
       if (err)
-        res.send("I can't find the time at #{location}.")
+        res.send("I can't find the time at #{location}. (sadpanda)")
       else
         localTimestamp = (utcTimestamp + result.dstOffset + result.rawOffset) * 1000
         res.send("In #{result.formattedAddress}, it is currently #{formatTime(localTimestamp)}.")
@@ -85,7 +85,7 @@ convertTime = (res, timestamp, fromLocation, toLocation) ->
   if fromLocation
     getTimezoneInfo res, timestamp, fromLocation, (err, result) ->
       if (err)
-        res.send("I can't find the time at #{fromLocation}.")
+        res.send("I can't find the time at #{fromLocation}. (sadpanda)")
       else
         utcTimestamp = timestamp - result.dstOffset - result.rawOffset
         sendLocalTime(utcTimestamp, toLocation)
