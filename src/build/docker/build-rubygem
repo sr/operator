@@ -1,14 +1,34 @@
 #!/usr/bin/env bash
-#/ Usage: build-gem-pull_agent
-#/ Build the pardot_pull-agent Ruby gem and push it to Artifactory. This is
-#/ typically only invoked on the CI server. Requires the /etc/env/artifactoryenv
-#/ file to be readable and to contain the hostname and authentication credentials
-#/ of the Artifactory server.
+#/ Usage: build-rubygem <gem-name> <gem-spec>
+#/ Build the Ruby Gem as described by the given <gemspec> and push it to our
+#/ internal gem server on Artifactory. This is typically only invoked on the CI
+#/ server. Requires the /etc/env/artifactoryenv file to be readable and to
+#/ contain the hostname and authentication credentials of the Artifactory server.
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
 
 . etc/build/env
 
+# Print usage and exit if gemspec argument is missing.
+gemname="${1:-""}"
+gemspec="${2:-""}"
+if [ -z "$gemname" ] || [ -z "gemspec" ]
+then
+    grep ^#/ <"$0" |cut -c4-
+    exit 2
+fi
+
+# Declare required environment variables.
+: $HOME
+: $ARTIFACTORY_URL
+: $ARTIFACTORY_USERNAME
+: $ARTIFACTORY_PASSWORD
+: $ARTIFACTORY_REPO_GEM_LOCAL
+: $CI_PLAN
+: $CI_BRANCH
+: $CI_BUILD_NUMBER
+
+# Enable tracing if DEBUG is set.
 : "${DEBUG:=""}"
 test -n "$DEBUG" && set -x
 
@@ -43,9 +63,8 @@ then RUBYGEM_VERSION="$((CI_BUILD_NUMBER))"
 else RUBYGEM_VERSION="0.${CI_PLAN}.${CI_BUILD_NUMBER}"
 fi
 export RUBYGEM_VERSION
-printf "Gem version: %s\n" "$RUBYGEM_VERSION"
 
 # Build the gem and push it to Artifactory
-cd src/pull_agent
-gem build pardot_pull-agent.gemspec
-gem push "pardot_pull-agent-${RUBYGEM_VERSION}.gem"
+cd "$(dirname "$gemspec")"
+gem build "$(basename "$gemspec")"
+gem push "${gemname}-${RUBYGEM_VERSION}.gem"

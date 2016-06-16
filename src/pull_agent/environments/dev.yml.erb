@@ -11,12 +11,15 @@
 ---
 <% sync_dir = File.expand_path(File.dirname(File.dirname(__FILE__))) %>
 
-:canoe_url: "http://canoe:4000"
+:canoe_url: <%= ENV.fetch("CANOE_URL", "http://canoe:4000") %>
 :canoe_target: "dev"
+:canoe_api_token: canoe123
 
 <% destinations_path = "#{sync_dir}/test_destinations" %>
 
 :repos:
+  :chef:
+    :repo_path: <%= ENV.fetch("PULL_AGENT_CHEF_DIR", File.expand_path("../../../../chef", __FILE__)) %>
   :pardot:
     :repo_path: <%= destinations_path %>/pardot
   :node_modules:

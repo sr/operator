@@ -15,6 +15,24 @@ module Pardot
         Deploy.from_hash(json)
       end
 
+      def self.chef_checkin(environment, request)
+        call_api(
+          environment,
+          "POST",
+          "/api/chef/checkin",
+          request
+        )
+      end
+
+      def self.complete_chef_deploy(environment, request)
+        call_api(
+          environment,
+          "POST",
+          "/api/chef/complete_deploy",
+          request
+        )
+      end
+
       def self.call_api(environment, method, path, params = {})
         canoe_url = URI(environment.canoe_url)
         Net::HTTP.start(canoe_url.host, canoe_url.port, :ENV, use_ssl: (canoe_url.scheme == "https")) do |http|
