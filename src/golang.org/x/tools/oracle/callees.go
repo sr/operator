@@ -243,7 +243,7 @@ func (r *calleesTypesResult) toSerial(res *serial.Result, fset *token.FileSet) {
 		Desc: "static function call",
 	}
 	j.Callees = []*serial.CalleesItem{
-		&serial.CalleesItem{
+		{
 			Name: r.callee.FullName(),
 			Pos:  fset.Position(r.callee.Pos()).String(),
 		},
