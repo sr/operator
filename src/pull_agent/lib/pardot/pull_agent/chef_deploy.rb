@@ -6,7 +6,8 @@ module Pardot
       CHEF_ENVIRONMENT_FILE = {
         "dfw" => "environments/dfw/production.rb",
         "phx" => "environments/phx/production.rb",
-        "ue1.aws" => "environments/aws/production.rb"
+        "ue1.aws" => "environments/aws/production.rb",
+        "dev" => "environments/dev.rb"
       }
 
       def initialize(script, checkout_path, deploy)
@@ -17,7 +18,14 @@ module Pardot
 
       def apply(env)
         hostname = ShellHelper.hostname
-        datacenter = hostname.split("-")[3]
+
+        datacenter =
+          if hostname.end_with?("ltm1.internal.salesforce.com")
+            "dev"
+          else
+            hostname.split("-")[3]
+          end
+
         if !datacenter
           return Response.new(false, "Unable to determine datacenter from hostname: #{hostname.inspect}")
         end
