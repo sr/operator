@@ -1,4 +1,4 @@
-class DataCenter
+class Datacenter
   class NotFound < StandardError
     def initialize(name)
       super "datacenter not found: #{name.inspect}"
@@ -11,7 +11,7 @@ class DataCenter
 
   # Returns the current Datacenter based on the Rails configuration.
   def self.current
-    @datacenter ||= DataCenter.new(
+    @datacenter ||= Datacenter.new(
       Rails.application.config.x.datacenter,
       DatabaseConfigurationFile.load
     )

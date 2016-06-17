@@ -48,7 +48,7 @@ class UserQuery < ActiveRecord::Base
       raise "query is not scoped to an account"
     end
 
-    DataCenter.current.find_account(account_id).descriptive_name
+    Datacenter.current.find_account(account_id).descriptive_name
   end
 
   # Returns an Array of tables present in the database.
@@ -72,9 +72,9 @@ class UserQuery < ActiveRecord::Base
 
   def database
     if for_account?
-      DataCenter.current.shard_for(account_id)
+      Datacenter.current.shard_for(account_id)
     else
-      DataCenter.current.global
+      Datacenter.current.global
     end
   end
 end

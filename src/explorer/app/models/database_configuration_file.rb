@@ -8,7 +8,7 @@ class DatabaseConfigurationFile
     end
   end
 
-  class DataCenterNotFound < Error
+  class DatacenterNotFound < Error
     def initialize(datacenter, shard_id = nil)
       if shard_id
         super "config for shard #{shard_id.inspect} in datacenter #{datacenter.inspect} not found"
@@ -35,10 +35,10 @@ class DatabaseConfigurationFile
   def global(datacenter)
     config =
       case datacenter
-      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
+      when Datacenter::DALLAS, Datacenter::SEATTLE, DataCenter::LOCAL
         globals.fetch(datacenter)
       else
-        raise DataCenterNotFound, datacenter
+        raise DatacenterNotFound, datacenter
       end
     DatabaseConfiguration.new(config.fetch(1), auth)
   end
@@ -52,10 +52,10 @@ class DatabaseConfigurationFile
 
     config =
       case datacenter
-      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
+      when Datacenter::DALLAS, Datacenter::SEATTLE, DataCenter::LOCAL
         shard.fetch(datacenter)
       else
-        raise DataCenterNotFound.new(datacenter, id)
+        raise DatacenterNotFound.new(datacenter, id)
       end
     DatabaseConfiguration.new(config.fetch(1), auth)
   end
