@@ -1,8 +1,8 @@
 # Description
 #   A hubot script returning the time until the next MARTA train to Lenox station given a direction.
 # Commands
-#   hubot north - returns time until next northbound train
-#   hubot south - returns time until next southbound train
+#   hubot train north - returns time until next northbound train
+#   hubot train south - returns time until next southbound train
 # Author:
 #   Jake Swanson (https://github.com/jakswa/hubot-marta)
 #   Akshay Easwaran <aeaswaran@salesforce.com> (who modified this to focus only on the Lenox station)
