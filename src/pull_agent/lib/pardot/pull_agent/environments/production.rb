@@ -10,6 +10,7 @@ module Pardot
         restart_task :restart_redis_jobs, only: :pardot
         restart_task :restart_old_style_jobs, only: :pardot
         restart_task :restart_autojobs, only: :pardot
+        restart_task :restart_explorer, only: :explorer
 
         after_deploy :restart_pithumbs_service, only: :pithumbs
 
