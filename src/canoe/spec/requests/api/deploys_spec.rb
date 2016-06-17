@@ -58,7 +58,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
         it "lists the servers used for deployment" do
           server = FactoryGirl.create(:server)
 
-          FactoryGirl.create(:deploy,
+          deploy = FactoryGirl.create(:deploy,
             project_name: @project.name,
             deploy_target: @target,
             specified_servers: "localhost,#{server.hostname}",
