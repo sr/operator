@@ -77,7 +77,7 @@ module Pardot
 
         if response.code != "200"
           Instrumentation.error(at: "checkin-request", code: response.code,
-            body: response.body)
+            body: response.body[0..100])
           return
         end
 
