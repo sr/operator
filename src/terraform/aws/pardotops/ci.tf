@@ -279,3 +279,9 @@ resource "aws_eip" "pardot_ci_bastion" {
   vpc = true
   instance = "${aws_instance.pardot_ci_bastion.id}"
 }
+
+resource "aws_vpc_peering_connection" "pardot_atlassian_tools_and_pardot_ci_vpc_peering" {
+  peer_owner_id = "010094454891" # pardot-atlassian
+  peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
+  vpc_id = "${aws_vpc.pardot_ci.id}"
+}
