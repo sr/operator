@@ -8,6 +8,9 @@ module Instrumentation
   # No-op log formatter, that returns the log data unmodified as a Ruby hash
   LOG_NOOP = :noop
 
+  DEBUG = "debug".freeze
+  ERROR = "error".freeze
+
   autoload :Logging, "instrumentation/logging"
   autoload :RequestId, "instrumentation/request_id"
 
@@ -25,8 +28,12 @@ module Instrumentation
     Logging.log(data, &block)
   end
 
-  def error(code, data, &block)
-    log(data.merge(level: "error", error: code), &block)
+  def debug(data, &block)
+    log(data.merge(level: DEBUG), &block)
+  end
+
+  def error(data, &block)
+    log(data.merge(level: ERROR), &block)
   end
 
   def log_exception(exception, data = {})
