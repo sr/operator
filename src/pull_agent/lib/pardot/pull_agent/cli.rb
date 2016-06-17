@@ -31,6 +31,10 @@ module Pardot
       end
 
       def checkin
+        if environment.payload.id == :chef
+          return checkin_chef
+        end
+
         request = Canoe.latest_deploy(environment)
         Logger.context[:deploy_id] = request.id
 
@@ -39,6 +43,51 @@ module Pardot
         else
           Logger.log(:debug, "The deploy does not apply to this server")
         end
+      end
+
+      def checkin_chef
+        payload = environment.payload
+        repo_path = Pathname(payload.repo_path)
+        script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
+
+        env = {
+          "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}"
+        }
+        output = ShellHelper.execute([env, script, "-d", repo_path.to_s, "status"])
+        if !$?.success?
+          fail "unable to retrieve status of checkout: #{output.inspect}"
+        end
+
+        checkout = JSON.parse(output)
+
+        payload = {
+          environment: environment.name,
+          hostname: ShellHelper.hostname,
+          checkout: JSON.parse(output)
+        }
+
+        request = {payload: JSON.dump(payload)}
+        response = Canoe.chef_checkin(environment, request)
+
+        if response.code != "200"
+          fail "Checkin request failed: #{response.code} - #{response.body}"
+        end
+
+        payload = JSON.parse(response.body)
+
+        if payload.fetch("action") != "deploy"
+          return
+        end
+
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env)
+        payload = {
+          hostname: ShellHelper.hostname,
+          deploy: payload.fetch("deploy"),
+          error: !result.success,
+          message: result.message
+        }
+        request = {payload: JSON.dump(payload)}
+        Canoe.complete_chef_deploy(environment, request)
       end
 
       private

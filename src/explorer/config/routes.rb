@@ -11,5 +11,6 @@ Rails.application.routes.draw do
   resources :queries, only: [:new, :show, :create]
 
   get "/_boomtown", to: "welcome#boomtown"
+  get "/version", to: "welcome#version"
   root "welcome#index"
 end

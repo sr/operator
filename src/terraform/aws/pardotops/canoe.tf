@@ -33,7 +33,7 @@ EOF
 
 resource "aws_elb" "canoe_production" {
   name = "canoe-production"
-  security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
+  security_groups = ["${aws_security_group.internal_apps_canoe_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
@@ -112,6 +112,59 @@ resource "aws_db_instance" "canoe_production" {
 
 resource "aws_ecs_cluster" "canoe_production" {
   name = "canoe_production"
+}
+
+resource "aws_security_group" "internal_apps_canoe_http_lb" {
+  name = "internal_apps_canoe_http_lb"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
+      "50.22.140.200/32"    # tools-s1.dev
+    ]
+    security_groups = [
+      "${aws_security_group.internal_apps_chef_server.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
+      "50.22.140.200/32"    # tools-s1.dev
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group" "canoe_app_production" {
