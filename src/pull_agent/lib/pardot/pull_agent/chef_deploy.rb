@@ -42,7 +42,7 @@ module Pardot
 
         Response.new(true, "")
       rescue Exception
-        Logger.log(:err, "Chef Deploy failed: #{$!.class.inspect} - #{$!.message.inspect}")
+        Logger.log(:err, "Chef Deploy failed: #{$!.class.inspect} - #{$!.message.inspect}\n\n #{$!.backtrace.join("\n")}")
         Response.new(false, "#{$!.class} - #{$!.message}")
       end
 
