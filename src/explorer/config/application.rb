@@ -38,6 +38,7 @@ module Explorer
         File.readlines("build.version").first
       rescue Errno::ENOENT
         Instrumentation.log_exception($!)
+        ""
       end
     end
   end
