@@ -77,4 +77,4 @@ module.exports = (robot) ->
         next_arrival = moment().add(parseInt(train.WAITING_SECONDS),'seconds')
         msg.send "(marta): Next #{direction}bound train #{arrival_text} at #{capitalize(train.STATION).replace('station','')}#{next_arrival.fromNow()}."
       else
-        msg.send "(marta): No trains found headed #{dir} towards #{capitalize(dest)} to or from Lenox. (sadpanda)"
+        msg.send "(marta): No trains found headed #{dir} towards #{capitalize(dest)}. (sadpanda)"
