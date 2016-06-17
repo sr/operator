@@ -8,11 +8,11 @@ module PaginationHelper
   end
 
   def page_button(page_number, link)
-    css_class = (current_page == page_number) ? 'active' : ''
+    css_class = (current_page == page_number) ? "active" : ""
     link_address = link_plus_page_param(link, page_number)
-    onclick_action = (current_page==page_number ? 'return false;' : '')
+    onclick_action = (current_page == page_number ? "return false;" : "")
 
-    output  = "<li class='#{css_class}'>"
+    output = "<li class='#{css_class}'>"
     output << "<a href='#{link_address}' onclick='#{onclick_action}'>#{page_number}</a>"
     output << "</li>"
 
@@ -45,19 +45,19 @@ module PaginationHelper
 
   def link_plus_page_param(url, page_num)
     link_address = url
-    if link_address =~ /\?/
-      link_address += "&page=#{page_num}"
-    else
-      link_address += "?page=#{page_num}"
-    end
+    link_address += if link_address =~ /\?/
+                      "&page=#{page_num}"
+                    else
+                      "?page=#{page_num}"
+                    end
     link_address
   end
 
   def link_minus_page_param(url)
     if url =~ /page\=(\d*)/
-      url.gsub!(/page\=(\d*)/,"")
-      url.gsub!(/\&\&/,"") # take care of any double &'s now
-      url.gsub!(/\?$/,"") # take care of any dangling ?
+      url.gsub!(/page\=(\d*)/, "")
+      url.gsub!(/\&\&/, "") # take care of any double &'s now
+      url.gsub!(/\?$/, "") # take care of any dangling ?
       url
     else # no page param found
       url

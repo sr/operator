@@ -133,22 +133,22 @@ class ApplicationController < ActionController::Base
 
   def require_project
     return if current_project
-    raise ActiveRecord::RecordNotFound.new("no project found")
+    raise ActiveRecord::RecordNotFound, "no project found"
   end
 
   def require_target
     return if current_target
-    raise ActiveRecord::RecordNotFound.new("no target found")
+    raise ActiveRecord::RecordNotFound, "no target found"
   end
 
   def require_deploy
     return if current_deploy
-    raise ActiveRecord::RecordNotFound.new("no deploy found")
+    raise ActiveRecord::RecordNotFound, "no deploy found"
   end
 
   def require_result
     return if current_result
-    raise ActiveRecord::RecordNotFound.new("no result found")
+    raise ActiveRecord::RecordNotFound, "no result found"
   end
 
   def require_deploy_acl_satisfied
@@ -164,8 +164,7 @@ class ApplicationController < ActionController::Base
         Instrumentation.error("unauthorized-deploy",
           current_user: current_user.uid,
           project: current_project.name,
-          target: current_target.name,
-        )
+          target: current_target.name)
         render template: "application/not_authorized_for_deploy", status: :unauthorized
         false
       else

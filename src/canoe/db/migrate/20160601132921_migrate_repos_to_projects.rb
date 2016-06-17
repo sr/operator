@@ -5,12 +5,12 @@ class MigrateReposToProjects < ActiveRecord::Migration
     remove_column :projects, :deploys_via_artifacts
     remove_column :projects, :supports_branch_deploy
 
-    projectModel = Class.new(ActiveRecord::Base) do
+    project_model = Class.new(ActiveRecord::Base) do
       self.table_name = "projects"
     end
 
-    projectModel.reset_column_information
-    projectModel.find_each do |project|
+    project_model.reset_column_information
+    project_model.find_each do |project|
       project.repository = "Pardot/#{project.name}"
       project.save!
     end

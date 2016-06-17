@@ -4,5 +4,4 @@ class AddLockableStateToDeployTarget < ActiveRecord::Migration
       t.boolean  :lockable, default: false
     end
   end
-
 end

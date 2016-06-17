@@ -55,7 +55,7 @@ module Pardot
         }
         output = ShellHelper.execute([env, script, "-d", repo_path.to_s, "status"])
         if !$?.success?
-          fail "unable to retrieve status of checkout: #{output.inspect}"
+          raise "unable to retrieve status of checkout: #{output.inspect}"
         end
 
         payload = {
@@ -64,11 +64,11 @@ module Pardot
           checkout: JSON.parse(output)
         }
 
-        request = {payload: JSON.dump(payload)}
+        request = { payload: JSON.dump(payload) }
         response = Canoe.chef_checkin(environment, request)
 
         if response.code != "200"
-          fail "Checkin request failed: #{response.code} - #{response.body}"
+          raise "Checkin request failed: #{response.code} - #{response.body}"
         end
 
         payload = JSON.parse(response.body)
@@ -84,7 +84,7 @@ module Pardot
           error: !result.success,
           message: result.message
         }
-        request = {payload: JSON.dump(payload)}
+        request = { payload: JSON.dump(payload) }
         Canoe.complete_chef_deploy(environment, request)
       end
 

@@ -4,7 +4,7 @@ class GithubRepository
       new(url: nil, sha: nil, state: nil, updated_at: nil)
     end
 
-    def initialize(attributes={})
+    def initialize(attributes = {})
       @url = attributes.fetch(:url)
       @sha = attributes.fetch(:sha)
       @state = attributes.fetch(:state)
@@ -17,7 +17,7 @@ class GithubRepository
   class Fake
     attr_writer :current_build
 
-    def current_build(branch)
+    def current_build(_branch)
       @current_build
     end
   end

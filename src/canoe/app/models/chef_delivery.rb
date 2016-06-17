@@ -55,7 +55,7 @@ class ChefDelivery
       current_build,
     )
 
-    return ChefCheckinResponse.deploy(deploy)
+    ChefCheckinResponse.deploy(deploy)
   end
 
   def complete_deploy(request)

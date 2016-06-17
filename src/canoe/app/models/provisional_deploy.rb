@@ -86,7 +86,7 @@ class ProvisionalDeploy
     @project.name
   end
 
-  def is_valid?
+  def valid?
     @sha.present?
   end
 

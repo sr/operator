@@ -6,9 +6,8 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     @project = FactoryGirl.create(:project,
       name: "pardot",
       bamboo_project: "PDT",
-      bamboo_plan: "PPANT",
-    )
-    @server = FactoryGirl.create(:server, hostname: "app-s1.example")
+      bamboo_plan: "PPANT"),
+               @server = FactoryGirl.create(:server, hostname: "app-s1.example")
     @server.deploy_scenarios.create!(deploy_target: @deploy_target, project: @project)
 
     allow(Octokit).to receive(:branch)
@@ -17,18 +16,18 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
 
     allow(Artifactory.client).to receive(:post)
       .and_return("results" => [
-        {
-          "repo" => "pd-canoe",
-          "path" => "PDT/PPANT",
-          "name" => "build1234.tar.gz",
-          "properties" => [
-            {"key" => "gitBranch", "value" => "master"},
-            {"key" => "buildNumber", "value" => "1234"},
-            {"key" => "gitSha", "value" => "abc123"},
-            {"key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00"},
-          ]
-        },
-      ])
+                    {
+                      "repo" => "pd-canoe",
+                      "path" => "PDT/PPANT",
+                      "name" => "build1234.tar.gz",
+                      "properties" => [
+                        { "key" => "gitBranch", "value" => "master" },
+                        { "key" => "buildNumber", "value" => "1234" },
+                        { "key" => "gitSha", "value" => "abc123" },
+                        { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
+                      ]
+                    }
+                  ])
 
     allow(Artifactory.client).to receive(:get)
       .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, properties: nil)
@@ -39,7 +38,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
           "gitBranch"      => ["master"],
           "buildNumber"    => ["1234"],
           "gitSha"         => ["abc123"],
-          "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"],
+          "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"]
         },
       )
   end

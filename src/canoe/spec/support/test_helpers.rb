@@ -13,7 +13,7 @@ module TestHelpers
     expect(json_response.keys).not_to include("error")
   end
 
-  def assert_json_error_response(message_match=//)
+  def assert_json_error_response(message_match = //)
     expect(response).not_to be_ok
     expect(json_response["error"]).to be_truthy
     expect(json_response["message"]).to match(message_match)
@@ -27,15 +27,15 @@ module TestHelpers
 
   # ---------------------------------------------------------------------
   def api_get(url)
-    get url, { user_email: "sveader@salesforce.com" }, { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
+    get url, { user_email: "sveader@salesforce.com" }, "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"]
   end
 
-  def api_post(url, params={})
+  def api_post(url, params = {})
     post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), {}
   end
 
-  def api_put(url, params={})
-    put url, { user_email: "sveader@salesforce.com" }.merge(params), { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
+  def api_put(url, params = {})
+    put url, { user_email: "sveader@salesforce.com" }.merge(params), "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"]
   end
 
   # ---------------------------------------------------------------------
@@ -54,7 +54,7 @@ module TestHelpers
     { user_id: 2 } # returned
   end
 
-  def define_deploy_mock(id, &block)
+  def define_deploy_mock(id)
     deploy_mock = Deploy.new(id: id)
     allow(Deploy).to receive(:find_by_id).with(id).and_return(deploy_mock)
 
