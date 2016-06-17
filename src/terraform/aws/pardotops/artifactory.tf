@@ -28,7 +28,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
 }
 
 resource "aws_security_group" "artifactory_ci_instance_secgroup" {
-  name = "artifactory_instance_secgroup"
+  name = "artifactory_ci_instance_secgroup"
   vpc_id = "${aws_vpc.pardot_ci.id}"
 
   # SSH from bastion
@@ -84,7 +84,7 @@ resource "aws_security_group" "artifactory_elb_secgroup" {
 
 resource "aws_security_group" "artifactory_ci_elb_secgroup" {
   name = "artifactory_ci_elb_secgroup"
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
     from_port = 443
@@ -148,7 +148,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   instance_type = "m4.xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.internal_apps_bastion.id}", "${aws_security_group.internal_apps_bastion.id}"]
+  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -170,7 +170,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   instance_type = "m4.xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.internal_apps_bastion.id}","${aws_security_group.artifactory_instance_secgroup.id}"]
+  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -192,7 +192,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   instance_type = "m4.xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.pardot_ci_bastion.id}","${aws_security_group.artifactory_ci_instance_secgroup.id}"]
+  vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -482,8 +482,8 @@ resource "aws_route_table_association" "artifactory_integration_us_east_1e_dmz" 
 }
 
 resource "aws_security_group" "artifactory_integration_mysql_ingress" {
-  name = "artifactory_integration_dc_only_http_lb"
-  description = "Allow HTTP/HTTPS from SFDC datacenters only"
+  name = "artifactory_integration_mysql_ingress"
+  description = "Allow mysql from artifactory instances only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
