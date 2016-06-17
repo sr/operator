@@ -140,6 +140,25 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
     ]
   }
 
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
+      "50.22.140.200/32"    # tools-s1.dev
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
