@@ -40,4 +40,8 @@ class ChefDeploy < ActiveRecord::Base
 
     deploy.update!(state: status)
   end
+
+  def to_json(*)
+    attributes.to_json
+  end
 end
