@@ -24,15 +24,9 @@ class UserQuery < ActiveRecord::Base
       raise UserQuery::RateLimited, current_user
     end
 
-    data = {
-      hostname: database.hostname,
-      database: database.name,
-      query: parsed.sql,
-      user_email: current_user.email
-    }
-    Instrumentation.log(data)
-
-    results = database.execute(parsed.sql)
+    results = Instrumentation.context(user_email: current_user.email) do
+      database.execute(parsed.sql)
+    end
     current_user.rate_limit.record_transaction
     results
   end

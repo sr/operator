@@ -5,7 +5,7 @@ require "rails/test_help"
 module ActiveSupport
   class TestCase
     setup do
-      Instrumentation::Logging.reset
+      reset_logger
       reset_account_access(Datacenter::DALLAS)
     end
 
@@ -22,6 +22,10 @@ module ActiveSupport
 
     def reset_account_access(datacenter)
       Datacenter.current.global.execute("DELETE FROM global_account_access")
+    end
+
+    def reset_logger
+      Instrumentation::Logging.reset
     end
 
     def authorize_access(account_id, role = nil, expires_at = nil)

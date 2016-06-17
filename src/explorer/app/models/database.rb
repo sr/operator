@@ -20,7 +20,6 @@ class Database
 
   def execute(sql, params = [])
     Instrumentation.log(
-      level: "info",
       database: name,
       hostname: hostname,
       query: sql,

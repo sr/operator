@@ -21,6 +21,7 @@ class UserQueryTest < ActiveSupport::TestCase
 
   test "global query audit log" do
     query = @user.global_query("SELECT 1 FROM global_account")
+    reset_logger
     query.execute(@user)
     assert log = Instrumentation::Logging.entries.pop
     assert log.key?(:hostname), "audit log has no hostname key"
