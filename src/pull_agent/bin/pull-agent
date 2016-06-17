@@ -12,7 +12,9 @@ cli.parse_arguments!
 environment = cli.environment
 
 # Wait a random number of seconds, since cron can't be set by second
-sleep(rand * 60) unless environment.dev?
+if !environment.dev? && ENV.key?("PULL_AGENT_NO_SLEEP")
+  sleep(rand * 60)
+end
 
 # TODO(sr) Remove this and setup a real end-to-end test that hits a Canoe server
 if environment.dev? && ENV["PULL_AGENT_ENV"] == "test"
