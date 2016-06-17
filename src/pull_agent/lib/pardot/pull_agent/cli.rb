@@ -46,6 +46,8 @@ module Pardot
       end
 
       def checkin_chef
+        Instrumentation.setup("pull_agent", environment.name)
+
         payload = environment.payload
         repo_path = Pathname(payload.repo_path)
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
@@ -53,9 +55,13 @@ module Pardot
         env = {
           "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}"
         }
-        output = ShellHelper.execute([env, script, "-d", repo_path.to_s, "status"])
+
+        command = [script, "-d", repo_path.to_s, "status"]
+        output = ShellHelper.execute([env] + command)
         if !$?.success?
-          fail "unable to retrieve status of checkout: #{output.inspect}"
+          Instrumentation.error(at: "checkin-status", command: command,
+            output: output)
+          return
         end
 
         checkout = JSON.parse(output)
@@ -70,7 +76,9 @@ module Pardot
         response = Canoe.chef_checkin(environment, request)
 
         if response.code != "200"
-          fail "Checkin request failed: #{response.code} - #{response.body}"
+          Instrumentation.error(at: "checkin-request", code: response.code,
+            body: response.body)
+          return
         end
 
         payload = JSON.parse(response.body)
@@ -87,6 +95,7 @@ module Pardot
           message: result.message
         }
         request = {payload: JSON.dump(payload)}
+        Instrumentation.debug(at: "deploy-complete", request: request)
         Canoe.complete_chef_deploy(environment, request)
       end
 

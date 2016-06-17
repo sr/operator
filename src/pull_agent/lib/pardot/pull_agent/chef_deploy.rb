@@ -35,23 +35,25 @@ module Pardot
           return Response.new(false, "Unable to determine location of chef environment file for datacenter: #{datacenter.inspect}")
         end
 
-        output = ShellHelper.execute([
-          env,
+        command = [
           @script,
           "-d", @checkout_path.to_s,
           "-b", @deploy["branch"],
           "-s", @deploy["sha"],
           "-f", chef_environment_file,
           "deploy"
-        ])
+        ]
+        Instrumentation.debug(at: "chef-deploy", hostname: hostname,
+          datacenter: datacenter, command: command)
+
+        output = ShellHelper.execute([env] + command)
         if !$?.success?
-          Logger.log(:err, "chef deployed failed: #{output}")
           return error(output)
         end
 
         Response.new(true, "")
       rescue Exception
-        Logger.log(:err, "Chef Deploy failed: #{$!.class.inspect} - #{$!.message.inspect}\n\n #{$!.backtrace.join("\n")}")
+        Instrumentation.log_exception($!, at: "chef-deploy")
         Response.new(false, "#{$!.class} - #{$!.message}")
       end
 
