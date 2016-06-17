@@ -16,6 +16,9 @@ Gem::Specification.new do |s|
   s.files += Dir.glob("lib/**/*")
   s.executables = ["pull-agent", "pa-deploy-chef"]
   s.add_dependency "artifactory", "~>2.3"
+  s.add_dependency "lograge", "0.3.6"
+  s.add_dependency "logstash-event", "1.2.02"
+  s.add_dependency "scrolls", "0.3.8"
   s.add_dependency "redis", "~>3.3"
   s.add_development_dependency "byebug", "~>8.2"
   s.add_development_dependency "rake", "~>10.4"
