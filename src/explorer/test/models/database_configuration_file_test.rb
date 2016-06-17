@@ -6,7 +6,7 @@ class DatabaseConfigurationFileTest < ActiveSupport::TestCase
   end
 
   test "global" do
-    config = @config.global(DataCenter::DALLAS)
+    config = @config.global(DataCenter::LOCAL)
     assert_equal "mysql", config.hostname
     assert_equal "pardot_global", config.name
     assert_equal "root", config.username

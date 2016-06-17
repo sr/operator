@@ -19,9 +19,9 @@ class DatabaseConfigurationFile
   end
 
   def self.load
-    configfile = Rails.root.join("config", "pi", "#{Rails.env}.yml")
-
-    config = YAML.load_file(configfile)
+    config_file = Rails.root.join("config", "pi", "#{Rails.env}.yml")
+    erb = ERB.new(config_file.read)
+    config = YAML.load(erb.result)
     auth = Rails.application.config.database_configuration
 
     new(config, auth)

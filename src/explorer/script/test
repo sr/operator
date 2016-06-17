@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# script/test: Run test suite for application. Optionallly pass in a path to an
-#              individual test file to run a single test.
-set -eu
+# Usage: script/test [--clean] [<test-file>]
+# Run test suite for application. Optionallly pass in a path to an individual
+# test file to run a single test.
+set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+: "${CI:=""}"
 : "${DEBUG:=""}"
 [ -z "$DEBUG" ] || set -x
 
@@ -14,7 +16,11 @@ RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
 export RACK_ENV RAILS_ENV RACK_ROOT
 
 script/setup
-script/vagrant-dev-mysqlimport
+
+if test -n "$CI"
+then script/vagrant-dev-mysqlimport --force
+else script/vagrant-dev-mysqlimport
+fi
 
 echo "===> Running tests..."
 

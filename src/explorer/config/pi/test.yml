@@ -3,18 +3,27 @@ globals:
   global:
     dfw:
       1:
-        host: mysql
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
         database: pardot_global
-        username: boom
-        password: town
+    local:
+      1:
+        host: mysql
+        port: 3306
+        username: root
+        password:
+        database: pardot_global
 shards:
   1:
     dfw:
       1:
-        host: mysql
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
         database: pardot_shard1
-        username: boom
-        password: town
     phx:
       1:
         host: mysql
@@ -24,10 +33,11 @@ shards:
   2:
     dfw:
       1:
-        host: mysql
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
         database: pardot_shard1
-        username: boom
-        password: town
     phx:
       1:
         host: mysql

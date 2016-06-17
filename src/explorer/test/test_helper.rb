@@ -21,13 +21,7 @@ module ActiveSupport
     end
 
     def reset_account_access(datacenter)
-      config = DatabaseConfigurationFile.load.global(datacenter)
-      connection = Mysql2::Client.new(
-        host: config.hostname,
-        username: config.username,
-        database: config.name
-      )
-      connection.query("DELETE FROM global_account_access")
+      DataCenter.current.global.execute("DELETE FROM global_account_access")
     end
 
     def authorize_access(account_id, role = nil, expires_at = nil)
