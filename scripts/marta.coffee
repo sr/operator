@@ -1,8 +1,8 @@
 # Description
 #   A hubot script returning the time until the next MARTA train to Lenox station given a direction.
 # Commands
-#   hubot north - returns time until next northbound train
-#   hubot south - returns time until next southbound train
+#   hubot train north - returns time until next northbound train
+#   hubot train south - returns time until next southbound train
 # Author:
 #   Jake Swanson (https://github.com/jakswa/hubot-marta)
 #   Akshay Easwaran <aeaswaran@salesforce.com> (who modified this to focus only on the Lenox station)
@@ -50,7 +50,7 @@ module.exports = (robot) ->
       msg.send '(nyantrain)'
       return
     else if msg.match[1].toLowerCase() == 'west' || msg.match[1].toLowerCase() == 'east' || msg.match[1].toLowerCase() == 'southeast' || msg.match[1].toLowerCase() == 'northeast' || msg.match[1].toLowerCase() == 'southwest' || msg.match[1].toLowerCase() == 'northwest'
-      msg.send "(marta): There are no trains going #{msg.match[1]} to or from Lenox. (sadpanda)"
+      msg.send "(marta) There are no trains going #{msg.match[1]} to or from Lenox. (sadpanda)"
       return
 
     getArrivals (err)->
@@ -75,6 +75,6 @@ module.exports = (robot) ->
         arrival_text = "started boarding" if train.WAITING_TIME == 'Boarding'
         direction = dirMap[train.DIRECTION]
         next_arrival = moment().add(parseInt(train.WAITING_SECONDS),'seconds')
-        msg.send "(marta): Next #{direction}bound train #{arrival_text} at #{capitalize(train.STATION).replace('station','')}#{next_arrival.fromNow()}."
+        msg.send "(marta) Next #{direction}bound train #{arrival_text} at #{capitalize(train.STATION).replace('station','')}#{next_arrival.fromNow()}."
       else
-        msg.send "(marta): No trains found headed #{dir} towards #{capitalize(dest)} to or from Lenox. (sadpanda)"
+        msg.send "(marta) No trains found headed #{dir} towards #{capitalize(dest)}. (sadpanda)"
