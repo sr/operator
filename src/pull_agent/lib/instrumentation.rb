@@ -55,6 +55,8 @@ module Instrumentation
     :setup,
     :context,
     :log,
+    :error,
+    :debug,
     :log_exception,
     :error,
     :request_id,
