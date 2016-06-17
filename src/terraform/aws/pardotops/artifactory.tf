@@ -490,23 +490,9 @@ resource "aws_security_group" "artifactory_integration_mysql_ingress" {
     from_port = 3306
     to_port = 3306
     protocol = "mysql"
-    cidr_blocks = [
-      "${aws_subnet.pardot_ci_us_east_1a.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1a_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1e.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1e_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1c.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1c_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1d.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1d_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1a.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1a_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1e.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1e_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1c.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1c_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1d.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1d_dmz.cidr_block}",
+    security_groups = [
+      "${aws_security_group.artifactory_ci_instance_secgroup.id}",
+      "${aws_security_group.artifactory_instance_secgroup.id}"
     ]
   }
 
