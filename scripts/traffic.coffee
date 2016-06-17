@@ -1,8 +1,7 @@
 # Description
-#   A hubot script returning you the traffic time from the office to a given address, view current Atlanta traffic, or view current traffic in a given city.
+#   A hubot script returning you the traffic time from the office to a given address or view current Atlanta traffic.
 # Commands
 #   hubot traffic - returns image of current traffic conditions in Atlanta
-#   hubot traffic <location> - returns image of current traffic conditions in the provided location
 #   hubot traveltime <location> - returns current travel time to the provided location from the office
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
@@ -10,15 +9,7 @@
 
 module.exports = (robot) ->
   robot.respond /traffic$/i, (msg) ->
-    msg.send "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=Atlanta,+GA&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
-
-  robot.respond /traffic\s+(.*)$/i, (msg) ->
-    location = msg.match[1]
-    if location == 'Pardot' || location == 'the office'
-      msg.send "Look outside! (troll)"
-    else
-      trafficimg = "http://www.mapquestapi.com/staticmap/v4/getplacemap?key=Dc5YTA5AT2FgWvGmzsdPgivGbh4VEjuI&location=#{encodeURI(location)}&size=400,400&type=map&zoom=10&imagetype=png&scalebar=false&traffic=flow.png"
-      msg.send trafficimg
+    msg.send "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
 
   robot.respond /traveltime\s+(.*)$/i, (msg) ->
     secondloc = msg.match[1]
