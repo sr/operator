@@ -45,6 +45,7 @@ module Pardot
           "deploy"
         ])
         if !$?.success?
+          Logger.log(:err, "chef deployed failed: #{output}")
           return error(output)
         end
 
