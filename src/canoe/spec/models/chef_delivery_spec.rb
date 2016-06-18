@@ -147,7 +147,7 @@ RSpec.describe ChefDelivery do
 
   it "notifies of successful deployment" do
     deploy = create_current_deploy(state: ChefDelivery::PENDING)
-    request = ChefCompleteDeployRequest.new("chef1", deploy, nil)
+    request = ChefCompleteDeployRequest.new(deploy.id, true, nil)
     response = @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     message = @config.notifier.messages.pop
@@ -156,7 +156,7 @@ RSpec.describe ChefDelivery do
 
   it "notifies of failed deployment" do
     deploy = create_current_deploy(state: ChefDelivery::PENDING)
-    request = ChefCompleteDeployRequest.new("chef1", deploy, "boomtown")
+    request = ChefCompleteDeployRequest.new(deploy.id, false, "boomtown")
     response = @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
