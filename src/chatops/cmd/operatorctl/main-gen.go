@@ -51,8 +51,14 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "list-builds",
 					Synopsis: `List up to 10 most recent BREAD builds.`,
-					Flags:    []*flag.Flag{},
+					Flags: []*flag.Flag{
+						{
+							Name:  "plan",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
+						plan := ctx.Flags.String("plan", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -66,6 +72,7 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&bread.ListBuildsRequest{
 								Source: ctx.Source,
+								Plan:   *plan,
 							},
 						)
 						if err != nil {

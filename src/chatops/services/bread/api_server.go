@@ -17,6 +17,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+const defaultPlan = "BREAD-BREAD"
+
 type apiServer struct {
 	ecs       *ecs.ECS
 	ecr       *ecr.ECR
@@ -67,7 +69,13 @@ func (s *apiServer) ListApps(ctx context.Context, in *ListAppsRequest) (*ListApp
 }
 
 func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*ListBuildsResponse, error) {
-	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s", s.bambooURL, "BREAD-BREAD"))
+	var plan string
+	if in.Plan == "" {
+		plan = defaultPlan
+	} else {
+		plan = in.Plan
+	}
+	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s", s.bambooURL, plan))
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,7 @@
 //
 // Commands:
 //   hubot bread list-apps  - Undocumented.
-//   hubot bread list-builds  - List up to 10 most recent BREAD builds.
+//   hubot bread list-builds  [plan=value] - List up to 10 most recent BREAD builds.
 //   hubot bread ecs-deploy  [app=value] [build=value] - Undocumented.
 //
 // Configuration:

@@ -32,6 +32,7 @@ message ListAppsResponse {
 
 message ListBuildsRequest {
   operator.Source source = 1;
+  string plan = 2;
 }
 
 message ListBuildsResponse {
