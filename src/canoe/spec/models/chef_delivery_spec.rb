@@ -106,18 +106,13 @@ RSpec.describe ChefDelivery do
     assert_equal 0, @config.notifier.messages.size
   end
 
-  it "deploys if there is no deploy available" do
+  it "noops if there is no build available" do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(state: ChefDelivery::SUCCESS)
+    @repo.current_build = GithubRepository::Build.none
     response = @delivery.checkin(request)
-    assert_equal "deploy", response.action
-    deploy = response.deploy
-    assert_equal "sha1", deploy.sha
-    assert_equal "test", deploy.datacenter
-    assert_equal "production", deploy.environment
-    assert_equal "pardot0-chef1", deploy.hostname
+    assert_equal "noop", response.action
   end
 
   it "noops if current deploy is pending" do
@@ -138,6 +133,16 @@ RSpec.describe ChefDelivery do
     create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
+  end
+
+  it "deploys if the current deploy is successful but differs from current build" do
+    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
+    request = ChefCheckinRequest.new(server, checkout)
+    @repo.current_build = build_build(sha: "sha2")
+    create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
   end
 
   it "notifies of successful deployment" do

@@ -43,21 +43,21 @@ class ChefDelivery
 
     deploy = ChefDeploy.find_current(request.server.datacenter)
 
-    if [SUCCESS, PENDING].include?(deploy.state)
+    if deploy.state == PENDING
       return ChefCheckinResponse.noop
     end
 
-    if deploy.sha == request.checkout_sha
+    if request.checkout_sha == current_build.sha
       return ChefCheckinResponse.noop
     end
 
-    deploy = ChefDeploy.create_pending(
+    new_deploy = ChefDeploy.create_pending(
       request.server,
       @config.master_branch,
       current_build
     )
 
-    return ChefCheckinResponse.deploy(deploy)
+    return ChefCheckinResponse.deploy(new_deploy)
   end
 
   def complete_deploy(request)
