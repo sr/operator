@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "operator.proto";
+
+package bread;
+
+service Bread {
+  option (operator.name) = "bread";
+
+  rpc EcsDeploy(EcsDeployRequest) returns (EcsDeployResponse);
+}
+
+message BreadConfig {
+}
+
+message EcsDeployRequest {
+  operator.Source source = 1;
+}
+
+message EcsDeployResponse {
+  operator.Output output = 1;
+}

@@ -9,6 +9,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"chatops/services/bread"
 	"chatops/services/ping"
 )
 
@@ -16,12 +17,24 @@ func buildOperatorServer(
 	server *grpc.Server,
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
+	breadConfig := &bread.BreadConfig{}
 	pingerConfig := &pinger.PingerConfig{}
 	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return services, err
 	}
 	errs := make(map[string][]string)
+	if len(errs["bread"]) != 0 {
+		services["bread"] = errors.New("required flag(s) missing: " + strings.Join(errs["bread"], ", "))
+	} else {
+		breadServer, err := bread.NewAPIServer(breadConfig)
+		if err != nil {
+			services["bread"] = err
+		} else {
+			bread.RegisterBreadServer(server, breadServer)
+			services["bread"] = nil
+		}
+	}
 	if len(errs["pinger"]) != 0 {
 		services["pinger"] = errors.New("required flag(s) missing: " + strings.Join(errs["pinger"], ", "))
 	} else {
