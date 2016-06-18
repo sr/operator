@@ -48,7 +48,7 @@ module Pardot
       def checkin_chef
         Instrumentation.setup("pull_agent", environment.name)
 
-        hostname = ShellHelper.full_hostname
+        hostname = ShellHelper.hostname
         payload = environment.payload
         repo_path = Pathname(payload.repo_path)
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
@@ -105,7 +105,7 @@ module Pardot
           return
         end
 
-        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env)
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy"), datacenter).apply(env)
         payload = {
           server: {
             datacenter: datacenter,
