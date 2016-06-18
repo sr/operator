@@ -1,0 +1,16 @@
+#!/bin/sh
+#/ Usage: . etc/shrc
+#/ Setup the shell environment for working with the BREAD repo.
+
+if [ -z "$BREAD" ]
+then echo "BREAD environment variable not set." 2>&1
+elif [ ! -d "$BREAD" ]
+then echo "BREAD point to a directory that does not exists: $BREAD" 2>&1
+else
+  GOPATH="$BREAD"
+  PATH="$GOPATH/bin:$PATH"
+  CDPATH="$GOPATH/src"
+  export GOPATH PATH CDPATH
+fi
+
+true
