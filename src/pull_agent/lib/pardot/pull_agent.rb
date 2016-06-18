@@ -11,6 +11,7 @@ require "redis"
 
 require "pardot/pull_agent/build_version"
 require "pardot/pull_agent/canoe"
+require "pardot/pull_agent/chef_deploy"
 require "pardot/pull_agent/cli"
 require "pardot/pull_agent/conductor"
 require "pardot/pull_agent/core_ext/extract_options"

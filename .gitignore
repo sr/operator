@@ -5,6 +5,7 @@
 /src/**/.byebug_history
 /src/**/vendor/gems
 /src/explorer/config/pi/*.php
+/src/pd-sync-chef/Gemfile.lock
 /src/pull_agent/.dev_settings.yml
 /src/pull_agent/Gemfile.lock
 /src/rubylib/Gemfile.lock
