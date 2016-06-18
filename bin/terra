@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-#/ Usage: terra [--help] <action> <account>
-#/ Supported actions: plan, apply, validate.
+#/ Usage: terra [--help] [arguments...]
+#/        terra plan <account>
+#/        terra apply <account>
+#/        terra vendor <version>
+#/        terra validation
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -10,34 +13,50 @@ print_help() {
     grep ^#/ <"$0" |cut -c4-
 }
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" -eq 0 ]
+then
     print_help
     exit 2
 fi
 
 action="${1:-""}"
-account="${2:-""}"
+arg1="${2:-""}"
 
 case "$action" in
     apply|plan|validate)
+        if [ -z "$arg1" ]; then
+            printf "%s: required argument missing: account\n" "$PROGRAM" 2>&1
+            exit 1
+        fi
         ;;
-    -h|--help)
-        print_help
-        exit 2
+    vendor)
+        if [ -z "$arg1" ]; then
+            printf "%s: required argument missing: version\n" "$PROGRAM" 2>&1
+            exit 1
+        fi
         ;;
     *)
-        printf "${PROGRAM}: unsupported action: %s\n" "$action" 2>&1
-        exit 1
+        print_help
         ;;
 esac
 
-if [ -z "$account" ]; then
-    print_help
-    exit 2
+if [ "$action" = "vendor" ]; then
+    archiveurl="https://github.com/hashicorp/terraform/archive/v$arg1.tar.gz"
+    archivedir="$(mktemp -d "terraformXXX")"
+    vendordir="src/github.com/hashicorp/terraform"
+    trap 'rm -rf $archivedir' EXIT
+
+    rm -rf "$vendordir"
+    mkdir -p "src/github.com/hashicorp"
+    curl -fsSL "$archiveurl" | tar -xvz -C "$archivedir"
+    mv "${archivedir}/terraform-${arg1}" "$vendordir"
+
+    echo "Vendor terraform version $arg1 to $vendordir" 2>&1
+    exit 0
 fi
 
-if ! test -d "src/terraform/$account"; then
-    printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
+if ! test -d "src/terraform/$arg1"; then
+    printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$arg1" 2>&1
     exit 1
 fi
 
@@ -55,7 +74,7 @@ if ! test -f "$tfvars"; then
     exit 1
 fi
 
-TERRAFORM_DIR="$account"
+TERRAFORM_DIR="$arg1"
 TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
 TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
