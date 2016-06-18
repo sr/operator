@@ -36,8 +36,8 @@ if [ -z "$account" ]; then
     exit 2
 fi
 
-if ! test -d "src/terraform/aws/$account"; then
-    printf "%s: aws/%s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
+if ! test -d "src/terraform/$account"; then
+    printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
     exit 1
 fi
 
@@ -55,7 +55,7 @@ if ! test -f "$tfvars"; then
     exit 1
 fi
 
-TERRAFORM_DIR="aws/$account"
+TERRAFORM_DIR="$account"
 TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
 TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
