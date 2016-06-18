@@ -73,8 +73,11 @@ module Pardot
         output = ShellHelper.execute([env] + command)
 
         if !$?.success?
-          Instrumentation.error(at: "checkin-status", command: command,
-            output: output)
+          Instrumentation.error(
+            at: "checkin-status",
+            command: command,
+            output: output
+          )
           return
         end
 
@@ -93,8 +96,11 @@ module Pardot
         response = Canoe.chef_checkin(environment, request)
 
         if response.code != "200"
-          Instrumentation.error(at: "checkin-request", code: response.code,
-            body: response.body[0..100])
+          Instrumentation.error(
+            fn: "checkin_chef",
+            code: response.code,
+            body: response.body[0..100]
+          )
           return
         end
 
@@ -105,11 +111,12 @@ module Pardot
           return
         end
 
-        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env, datacenter, hostname)
+        deploy = payload.fetch("deploy")
+        result = ChefDeploy.new(script, repo_path, payload).apply(env, datacenter, hostname)
         payload = {
-          deploy_id: payload.fetch("deploy"),
+          deploy_id: deploy.fetch("id"),
           success: result.success,
-          message: result.message
+          error_message: result.message
         }
         request = {payload: JSON.dump(payload)}
 
@@ -117,7 +124,12 @@ module Pardot
         response = Canoe.complete_chef_deploy(environment, request)
 
         if response.code != "200"
-          Instrumentation.error(fn: "chef_checkin", complete: "error", code: response.code, body: body[0..100])
+          Instrumentation.error(
+            fn: "chef_checkin",
+            complete: "error",
+            code: response.code,
+            body: response.body[0..100]
+          )
         end
       end
 
