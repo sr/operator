@@ -49,6 +49,32 @@ var cmd = operator.NewCommand(
 					},
 				},
 				{
+					Name:     "list-builds",
+					Synopsis: `List up to 10 most recent BREAD builds.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := bread.NewBreadClient(conn)
+						response, err := client.ListBuilds(
+							context.Background(),
+							&bread.ListBuildsRequest{
+								Source: ctx.Source,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+				{
 					Name:     "ecs-deploy",
 					Synopsis: `Undocumented.`,
 					Flags: []*flag.Flag{

@@ -22,6 +22,9 @@ func buildOperatorServer(
 	flags.StringVar(&breadConfig.AwsRegion, "bread-AwsRegion", "", "")
 	flags.StringVar(&breadConfig.CanoeEcsService, "bread-CanoeEcsService", "", "")
 	flags.StringVar(&breadConfig.DeployTimeout, "bread-DeployTimeout", "", "")
+	flags.StringVar(&breadConfig.BambooUsername, "bread-BambooUsername", "", "")
+	flags.StringVar(&breadConfig.BambooPassword, "bread-BambooPassword", "", "")
+	flags.StringVar(&breadConfig.BambooUrl, "bread-BambooUrl", "", "")
 	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return services, err
@@ -35,6 +38,15 @@ func buildOperatorServer(
 	}
 	if breadConfig.DeployTimeout == "" {
 		errs["bread"] = append(errs["bread"], "DeployTimeout")
+	}
+	if breadConfig.BambooUsername == "" {
+		errs["bread"] = append(errs["bread"], "BambooUsername")
+	}
+	if breadConfig.BambooPassword == "" {
+		errs["bread"] = append(errs["bread"], "BambooPassword")
+	}
+	if breadConfig.BambooUrl == "" {
+		errs["bread"] = append(errs["bread"], "BambooUrl")
 	}
 	if len(errs["bread"]) != 0 {
 		services["bread"] = errors.New("required flag(s) missing: " + strings.Join(errs["bread"], ", "))

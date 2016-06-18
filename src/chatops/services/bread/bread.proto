@@ -8,6 +8,8 @@ service Bread {
   option (operator.name) = "bread";
 
   rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
+  // List up to 10 most recent BREAD builds.
+  rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
   rpc EcsDeploy(EcsDeployRequest) returns (EcsDeployResponse);
 }
 
@@ -15,6 +17,9 @@ message BreadConfig {
   string AwsRegion = 1;
   string CanoeEcsService = 3;
   string DeployTimeout = 4;
+  string BambooUsername = 5;
+  string BambooPassword = 6;
+  string BambooUrl = 7;
 }
 
 message ListAppsRequest {
@@ -22,6 +27,14 @@ message ListAppsRequest {
 }
 
 message ListAppsResponse {
+  operator.Output output = 1;
+}
+
+message ListBuildsRequest {
+  operator.Source source = 1;
+}
+
+message ListBuildsResponse {
   operator.Output output = 1;
 }
 

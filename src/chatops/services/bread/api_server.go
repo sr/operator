@@ -1,10 +1,14 @@
 package bread
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
@@ -14,10 +18,12 @@ import (
 )
 
 type apiServer struct {
-	ecs    *ecs.ECS
-	ecr    *ecr.ECR
-	apps   map[string]string
-	ecsSvc string
+	ecs       *ecs.ECS
+	ecr       *ecr.ECR
+	bamboo    *http.Client
+	bambooURL *url.URL
+	apps      map[string]string
+	ecsSvc    string
 }
 
 type parsedImg struct {
@@ -30,6 +36,8 @@ type parsedImg struct {
 func newAPIServer(
 	ecs *ecs.ECS,
 	ecr *ecr.ECR,
+	bamboo *http.Client,
+	bambooURL *url.URL,
 	apps map[string]string,
 	ecsSvc string,
 	_ int,
@@ -37,6 +45,8 @@ func newAPIServer(
 	return &apiServer{
 		ecs,
 		ecr,
+		bamboo,
+		bambooURL,
 		apps,
 		ecsSvc,
 	}, nil
@@ -52,6 +62,51 @@ func (s *apiServer) ListApps(ctx context.Context, in *ListAppsRequest) (*ListApp
 	return &ListAppsResponse{
 		Output: &operator.Output{
 			PlainText: fmt.Sprintf("deployable apps: %s", strings.Join(apps, ", ")),
+		},
+	}, nil
+}
+
+func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*ListBuildsResponse, error) {
+	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s", s.bambooURL, "BREAD-BREAD"))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("bamboo request failed with status %d", resp.StatusCode)
+	}
+	var data struct {
+		Results struct {
+			Result []struct {
+				LifeCycleState string `json:"lifeCycleState"`
+				Key            string `json:"key"`
+			} `json:"result"`
+		} `json:"results"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	var (
+		out bytes.Buffer
+		w   tabwriter.Writer
+	)
+	w.Init(&out, 0, 4, 1, '\t', 0)
+	fmt.Fprintf(&w, "%s\t%s\t%s\n", "ID", "STATUS", "URL")
+	for _, build := range data.Results.Result {
+		fmt.Fprintf(
+			&w,
+			"%s\t%s\t%s\n",
+			build.Key,
+			build.LifeCycleState,
+			fmt.Sprintf("%s/%s", s.bambooURL, build.Key),
+		)
+	}
+	if err := w.Flush(); err != nil {
+		return nil, err
+	}
+	return &ListBuildsResponse{
+		Output: &operator.Output{
+			PlainText: out.String(),
 		},
 	}, nil
 }
