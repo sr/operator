@@ -553,8 +553,6 @@ resource "aws_db_instance" "snapshot" {
 	security_group_names = ["default"]
 	backup_retention_period = 1
 
-	publicly_accessible = true
-
 	parameter_group_name = "default.mysql5.6"
 
 	skip_final_snapshot = false
@@ -580,7 +578,6 @@ resource "aws_db_instance" "no_snapshot" {
 	instance_class = "db.t1.micro"
 	name = "baz"
 	password = "barbarbarbar"
-	publicly_accessible = true
 	username = "foo"
     security_group_names = ["default"]
 	backup_retention_period = 1
