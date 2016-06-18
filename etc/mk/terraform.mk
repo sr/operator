@@ -1,45 +1,45 @@
+SHELL = bash
+
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
 
 TERRAFORM ?= $(GOBIN)/terraform
 TERRAFORM_SRC = $(shell find $(GOPATH)/src/github.com/hashicorp/terraform -type f)
 
+TERRAFORM_OPTS ?=
+TERRAFORM_DIR ?= aws/pardotops
+TERRAFORM_PLAN ?= $(TERRAFORM_DIR)/plan.out
+TERRAFORM_VAR_FILE ?= terraform.tfvars
+
 ARTIFACTORY_USERNAME ?=
 ARTIFACTORY_PASSWORD ?=
-
-DIR ?= aws/pardotops
-
-ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-TERRAFORM_VAR_FILE := $(ROOT_DIR)/terraform.tfvars
-TERRAFORM_OPTS ?=
 
 -include artifactory.env
 ARTIFACTORY_URL := https://artifactory.dev.pardot.com/artifactory
 ARTIFACTORY_REPO := pd-terraform
 
 .PHONY: artifactory-remote-state
-artifactory-remote-state: $(TERRAFORM) $(DIR)
-	cd $(DIR) && \
+artifactory-remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
 	$< remote config \
 		-backend=artifactory \
 		-backend-config="username=$(ARTIFACTORY_USERNAME)" \
 		-backend-config="password=$(ARTIFACTORY_ENCRYPTED_PASSWORD)" \
 		-backend-config="url=$(ARTIFACTORY_URL)" \
 		-backend-config="repo=$(ARTIFACTORY_REPO)" \
-		-backend-config="subpath=$(DIR)"
+		-backend-config="subpath=$(TERRAFORM_DIR)"
 
 .PHONY: plan
-plan: $(TERRAFORM) artifactory-remote-state validate
-	cd $(DIR) && $< plan -out plan.out -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
+plan: $(TERRAFORM) $(TERRAFORM_DIR) artifactory-remote-state validate
+	cd $(TERRAFORM_DIR) && $< plan -out $(TERRAFORM_PLAN) -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
 
 .PHONY: apply
-apply: $(TERRAFORM) artifactory-remote-state $(DIR)/plan.out
-	cd $(DIR) && $< apply $(TERRAFORM_OPTS) plan.out
-	cd $(DIR) && rm -f plan.out
+apply: $(TERRAFORM) $(TERRAFORM_PLAN) artifactory-remote-state
+	cd $(TERRAFORM_DIR) && $< apply $(TERRAFORM_OPTS) $(TERRAFORM_PLAN)
+	rm -f $(TERRAFORM_PLAN)
 
 .PHONY: refresh
 refresh: $(TERRAFORM) artifactory-remote-state
-	cd $(DIR) && $< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
+	$< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS) $(TERRAFORM_DIR)
 
 .PHONY: validate
 validate: $(TERRAFORM)

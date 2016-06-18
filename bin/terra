@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#/ Usage: terra [--help] <action> <account>
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+: "${PROGRAM:="$(basename "$0")"}"
+
+print_help() {
+    grep ^#/ <"$0" |cut -c4-
+}
+
+if [ "$#" -eq 0 ]; then
+    print_help
+    exit 2
+fi
+
+action="${1:-""}"
+account="${2:-""}"
+
+case "$action" in
+    apply|plan|validate)
+        ;;
+    -h|--help)
+        echo help
+        exit 2
+        ;;
+    *)
+        printf "${PROGRAM}: invalid action: %s\n" "$action" 2>&1
+        exit 1
+        ;;
+esac
+
+if [ -z "$account" ]; then
+    print_help
+    exit 2
+fi
+
+if ! test -d "src/terraform/aws/$account"; then
+    printf "%s: aws/%s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
+    exit 1
+fi
+
+artifactoryenv="src/terraform/artifactory.env"
+if ! test -f "$artifactoryenv"; then
+    printf "%s: file %s is required. Please see %s.sample for an example.\n" \
+        "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
+    exit 1
+fi
+
+tfvars="src/terraform/terraform.tfvars"
+if ! test -f "$tfvars"; then
+    printf "%s: file %s is required. Please see %s.sample for an example.\n" \
+        "$PROGRAM" "$tfvars" "$tfvars" 2>&1
+    exit 1
+fi
+
+TERRAFORM_DIR="aws/$account"
+TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
+TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
+export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
+
+cd src/terraform &&
+make -f ../../etc/mk/terraform.mk "$action"
