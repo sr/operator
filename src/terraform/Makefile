@@ -2,8 +2,6 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 
 TERRAFORM ?= $(GOBIN)/terraform
-TERRAFORM_PROVIDER_AWS ?= $(GOBIN)/terraform-provider-aws
-TERRAFORM_PROVIDER_TEMPLATE ?= $(GOBIN)/terraform-provider-template
 TERRAFORM_SRC = $(shell find $(GOPATH)/src/github.com/hashicorp/terraform -type f)
 
 ARTIFACTORY_USERNAME ?=
@@ -49,11 +47,3 @@ validate: $(TERRAFORM)
 
 $(TERRAFORM): $(TERRAFORM_SRC)
 	$(GO) install github.com/hashicorp/terraform
-
-$(TERRAFORM_PROVIDER_AWS): $(TERRAFORM_SRC)
-	$(GO) install github.com/hashicorp/terraform/builtin/bins/provider-aws
-	mv $(GOPATH)/bin/provider-aws $@
-
-$(TERRAFORM_PROVIDER_TEMPLATE): $(TERRAFORM_SRC)
-	$(GO) install github.com/hashicorp/terraform/builtin/bins/provider-template
-	mv $(GOPATH)/bin/provider-template $@
