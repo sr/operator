@@ -18,8 +18,19 @@ ARTIFACTORY_PASSWORD ?=
 ARTIFACTORY_URL := https://artifactory.dev.pardot.com/artifactory
 ARTIFACTORY_REPO := pd-terraform
 
-.PHONY: artifactory-remote-state
-artifactory-remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
+apply: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_PLAN) remote-state
+	cd $(TERRAFORM_DIR) && \
+		$< apply $(TERRAFORM_OPTS) $(TERRAFORM_PLAN)
+	rm -f $(TERRAFORM_PLAN)
+
+plan: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
+	cd $(TERRAFORM_DIR) && \
+		$< plan -out $(TERRAFORM_PLAN) -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
+
+refresh: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_VAR_FILE) remote-state
+	$< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS) $(TERRAFORM_DIR)
+
+remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
 	$< remote config \
 		-backend=artifactory \
 		-backend-config="username=$(ARTIFACTORY_USERNAME)" \
@@ -28,22 +39,16 @@ artifactory-remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
 		-backend-config="repo=$(ARTIFACTORY_REPO)" \
 		-backend-config="subpath=$(TERRAFORM_DIR)"
 
-.PHONY: plan
-plan: $(TERRAFORM) $(TERRAFORM_DIR) artifactory-remote-state validate
-	cd $(TERRAFORM_DIR) && $< plan -out $(TERRAFORM_PLAN) -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
-
-.PHONY: apply
-apply: $(TERRAFORM) $(TERRAFORM_PLAN) artifactory-remote-state
-	cd $(TERRAFORM_DIR) && $< apply $(TERRAFORM_OPTS) $(TERRAFORM_PLAN)
-	rm -f $(TERRAFORM_PLAN)
-
-.PHONY: refresh
-refresh: $(TERRAFORM) artifactory-remote-state
-	$< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS) $(TERRAFORM_DIR)
-
-.PHONY: validate
 validate: $(TERRAFORM)
-	find . -type d -mindepth 2 -not -name '.terraform' -print0 | xargs -0 -n1 $< validate
+	find . -type d -mindepth 2 -not -name '.terraform' -print0 | \
+		xargs -0 -n1 $< validate
 
 $(TERRAFORM): $(TERRAFORM_SRC)
 	$(GO) install github.com/hashicorp/terraform
+
+.PHONY: \
+	apply \
+	plan \
+	remote-state \
+	refresh \
+	validate

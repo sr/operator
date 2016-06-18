@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #/ Usage: terra [--help] <action> <account>
+#/ Supported actions: plan, apply, validate.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -21,11 +22,11 @@ case "$action" in
     apply|plan|validate)
         ;;
     -h|--help)
-        echo help
+        print_help
         exit 2
         ;;
     *)
-        printf "${PROGRAM}: invalid action: %s\n" "$action" 2>&1
+        printf "${PROGRAM}: unsupported action: %s\n" "$action" 2>&1
         exit 1
         ;;
 esac
