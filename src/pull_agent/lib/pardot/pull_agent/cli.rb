@@ -112,7 +112,7 @@ module Pardot
         end
 
         deploy = payload.fetch("deploy")
-        result = ChefDeploy.new(script, repo_path, payload).apply(env, datacenter, hostname)
+        result = ChefDeploy.new(script, repo_path, deploy).apply(env, datacenter, hostname)
         payload = {
           deploy_id: deploy.fetch("id"),
           success: result.success,
