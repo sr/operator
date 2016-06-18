@@ -116,7 +116,7 @@ module Pardot
           message: result.message
         }
         request = {payload: JSON.dump(payload)}
-        Instrumentation.debug(at: "deploy-complete", request: request)
+        Instrumentation.debug(at: "deploy-complete", payload: payload)
         Canoe.complete_chef_deploy(environment, request)
       end
 
