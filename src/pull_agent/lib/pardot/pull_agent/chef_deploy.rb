@@ -17,19 +17,6 @@ module Pardot
       end
 
       def apply(env)
-        hostname = ShellHelper.hostname
-
-        datacenter =
-          if hostname.end_with?("ltm1.internal.salesforce.com")
-            "dev"
-          else
-            hostname.split("-")[3]
-          end
-
-        if !datacenter
-          return Response.new(false, "Unable to determine datacenter from hostname: #{hostname.inspect}")
-        end
-
         chef_environment_file = CHEF_ENVIRONMENT_FILE[datacenter]
         if !chef_environment_file
           return Response.new(false, "Unable to determine location of chef environment file for datacenter: #{datacenter.inspect}")

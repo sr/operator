@@ -6,6 +6,8 @@ class ChefDelivery
   class Error < StandardError
   end
 
+  Server = Struct.new(:datacenter, :environment, :hostname)
+
   def initialize(config)
     @config = config
   end
@@ -18,7 +20,7 @@ class ChefDelivery
       current_build: current_build.to_json
     )
 
-    if !@config.enabled_in?(request.environment, request.hostname)
+    if !@config.enabled?(request.server)
       return ChefCheckinResponse.noop
     end
 
@@ -29,8 +31,8 @@ class ChefDelivery
     if request.checkout_branch != @config.master_branch
       if (Time.current - current_build.updated_at) > @config.max_lock_age
         notification.at_lock_age_limit(
-          @config.chat_room_id(request.hostname),
-          request.hostname,
+          @config.chat_room_id(request.server),
+          request.server,
           request.checkout,
           current_build
         )
@@ -39,7 +41,7 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    deploy = ChefDeploy.find_current(request.environment, @config.master_branch)
+    deploy = ChefDeploy.find_current(request.server.datacenter)
 
     if [SUCCESS, PENDING].include?(deploy.state)
       return ChefCheckinResponse.noop
@@ -50,9 +52,9 @@ class ChefDelivery
     end
 
     deploy = ChefDeploy.create_pending(
-      request.environment,
+      request.server,
       @config.master_branch,
-      current_build,
+      current_build
     )
 
     return ChefCheckinResponse.deploy(deploy)
@@ -60,11 +62,10 @@ class ChefDelivery
 
   def complete_deploy(request)
     status = request.success? ? SUCCESS : FAILURE
-    ChefDeploy.complete(request.deploy_id, status)
+    deploy = ChefDeploy.complete(request.deploy_id, status)
     notification.deploy_completed(
-      @config.chat_room_id(request.hostname),
-      request.deploy,
-      request.success?,
+      @config.chat_room_id(deploy.server),
+      deploy,
       request.error
     )
   end

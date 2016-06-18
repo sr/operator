@@ -3,10 +3,14 @@ class ChefCheckinRequest
 
   def self.from_hash(request)
     checkout = request.fetch("checkout")
+    server = request.fetch("server")
 
     new(
-      request.fetch("environment"),
-      request.fetch("hostname"),
+      ChefDelivery::Server.new(
+        server.fetch("datacenter"),
+        server.fetch("environment"),
+        server.fetch("hostname")
+      ),
       Checkout.new(
         checkout.fetch("sha"),
         checkout.fetch("branch")
@@ -14,13 +18,20 @@ class ChefCheckinRequest
     )
   end
 
-  def initialize(environment, hostname, checkout)
-    @environment = environment
-    @hostname = hostname
+  def initialize(server, checkout)
+    @server = server
     @checkout = checkout
   end
 
-  attr_reader :hostname, :environment, :checkout
+  attr_reader :checkout, :server
+
+  def environment
+    @server.environment
+  end
+
+  def hostname
+    @server.hostname
+  end
 
   def checkout_sha
     @checkout.sha

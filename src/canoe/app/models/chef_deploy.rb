@@ -5,7 +5,7 @@ class ChefDeploy < ActiveRecord::Base
     ChefDelivery::FAILURE
   ]
 
-  def self.create_pending(environment, branch, build)
+  def self.create_pending(server, branch, build)
     if build.state != ChefDelivery::SUCCESS
       raise ChefDelivery::Error,
         "can not create deploy for non-successful build: #{build.inspect}"
@@ -14,15 +14,16 @@ class ChefDeploy < ActiveRecord::Base
     create!(
       branch: branch,
       build_url: build.url,
-      environment: environment,
+      environment: server.environment,
+      datacenter: server.datacenter,
+      hostname: server.hostname,
       sha: build.sha,
       state: ChefDelivery::PENDING
     )
   end
 
-  def self.find_current(environment, branch)
-    conditions = {environment: environment, branch: branch}
-    deploys = where(conditions).order("id DESC")
+  def self.find_current(datacenter)
+    deploys = where(datacenter: datacenter).order("id DESC")
 
     if deploys.empty?
       return ChefDeploy.new
@@ -39,6 +40,19 @@ class ChefDeploy < ActiveRecord::Base
     end
 
     deploy.update!(state: status)
+    deploy
+  end
+
+  def successful?
+    state == ChefDelivery::SUCCESS
+  end
+
+  def build_id
+    build_url.split("-").last
+  end
+
+  def server
+    ChefDelivery::Server.new(datacenter, environment, hostname)
   end
 
   def to_json(*)

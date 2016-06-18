@@ -1,20 +1,17 @@
 class ChefDeliveryConfig
   PRODUCTION = "production"
   DEV = "dev"
-
-  AWS = "pardot0-chef1-1-ue1.aws"
-  DFW = "pardot0-chef1-1-dfw"
-  PHX = "pardot0-chef1-1-phx"
+  AWS = "ue1.aws"
 
   BREAD_ROOM = 42
   OPS_ROOM = 6
 
-  def enabled_in?(environment, hostname)
-    case environment
+  def enabled?(server)
+    case server.environment
     when DEV
       true
     when PRODUCTION
-      [AWS].include?(hostname)
+      server.datacenter == AWS
     else
       false
     end
@@ -46,8 +43,8 @@ class ChefDeliveryConfig
     )
   end
 
-  def chat_room_id(hostname)
-    case hostname
+  def chat_room_id(server)
+    case server.datacenter
     when AWS
       BREAD_ROOM
     else

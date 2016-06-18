@@ -5,8 +5,10 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
 
   attr_reader :github_repo
 
-  def enabled_in?(environment, hostname)
-    %w[testing].include?(environment) && hostname != "disabled"
+  def enabled?(server)
+    server.datacenter == "test" &&
+      server.environment != "disabled" &&
+      server.hostname != "disabled"
   end
 
   class FakeHipchatNotifier

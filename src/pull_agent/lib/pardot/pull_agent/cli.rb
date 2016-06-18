@@ -48,9 +48,22 @@ module Pardot
       def checkin_chef
         Instrumentation.setup("pull_agent", environment.name)
 
+        hostname = ShellHelper.full_hostname
         payload = environment.payload
         repo_path = Pathname(payload.repo_path)
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
+
+        datacenter =
+          if environment.name == "dev"
+            "local"
+          else
+            hostname.split("-")[3]
+          end
+
+        if !datacenter
+          Instrumentation.error(at: "load-chef-env", hostname: hostname)
+          return
+        end
 
         env = {
           "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}"
@@ -58,6 +71,7 @@ module Pardot
 
         command = [script, "-d", repo_path.to_s, "status"]
         output = ShellHelper.execute([env] + command)
+
         if !$?.success?
           Instrumentation.error(at: "checkin-status", command: command,
             output: output)
@@ -67,8 +81,11 @@ module Pardot
         checkout = JSON.parse(output)
 
         payload = {
-          environment: environment.name,
-          hostname: ShellHelper.hostname,
+          server: {
+            datacenter: datacenter,
+            environment: environment.name,
+            hostname: hostname
+          },
           checkout: JSON.parse(output)
         }
 
@@ -84,12 +101,16 @@ module Pardot
         payload = JSON.parse(response.body)
 
         if payload.fetch("action") != "deploy"
+          Instrumentation.debug(at: "checkin-request", action: "noop")
           return
         end
 
         result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env)
         payload = {
-          hostname: ShellHelper.hostname,
+          server: {
+            datacenter: datacenter,
+            hostname: hostname
+          },
           deploy: payload.fetch("deploy"),
           error: !result.success,
           message: result.message
