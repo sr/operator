@@ -61,12 +61,12 @@ class ChefDelivery
   end
 
   def complete_deploy(request)
-    status = request.success? ? SUCCESS : FAILURE
+    status = request.success ? SUCCESS : FAILURE
     deploy = ChefDeploy.complete(request.deploy_id, status)
     notification.deploy_completed(
       @config.chat_room_id(deploy.server),
       deploy,
-      request.error
+      request.error_message
     )
   end
 

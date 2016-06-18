@@ -105,14 +105,10 @@ module Pardot
           return
         end
 
-        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy"), datacenter).apply(env)
+        result = ChefDeploy.new(script, repo_path, payload.fetch("deploy")).apply(env, datacenter, hostname)
         payload = {
-          server: {
-            datacenter: datacenter,
-            hostname: hostname
-          },
-          deploy: payload.fetch("deploy"),
-          error: !result.success,
+          deploy_id: payload.fetch("deploy"),
+          success: result.success,
           message: result.message
         }
         request = {payload: JSON.dump(payload)}

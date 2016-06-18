@@ -16,7 +16,7 @@ module Pardot
         @deploy = deploy
       end
 
-      def apply(env, datacenter)
+      def apply(env, datacenter, hostname)
         chef_environment_file = CHEF_ENVIRONMENT_FILE[datacenter]
         if !chef_environment_file
           return Response.new(false, "Unable to determine location of chef environment file for datacenter: #{datacenter.inspect}")
