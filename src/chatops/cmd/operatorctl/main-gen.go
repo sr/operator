@@ -23,10 +23,47 @@ var cmd = operator.NewCommand(
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "ecs-deploy",
+					Name:     "list-apps",
 					Synopsis: `Undocumented.`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := bread.NewBreadClient(conn)
+						response, err := client.ListApps(
+							context.Background(),
+							&bread.ListAppsRequest{
+								Source: ctx.Source,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+				{
+					Name:     "ecs-deploy",
+					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "app",
+							Usage: "Undocumented.",
+						},
+						{
+							Name:  "build",
+							Usage: "Undocumented.",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						app := ctx.Flags.String("app", "", "")
+						build := ctx.Flags.String("build", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -40,6 +77,8 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&bread.EcsDeployRequest{
 								Source: ctx.Source,
+								App:    *app,
+								Build:  *build,
 							},
 						)
 						if err != nil {
@@ -93,7 +132,7 @@ func main() {
 			panic(err)
 		}
 	} else {
-		if _, err := io.WriteString(os.Stdout, output); err != nil {
+		if _, err := io.WriteString(os.Stdout, output+"\n"); err != nil {
 			panic(err)
 		}
 	}

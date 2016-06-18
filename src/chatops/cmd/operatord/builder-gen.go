@@ -19,11 +19,23 @@ func buildOperatorServer(
 ) (map[string]error, error) {
 	breadConfig := &bread.BreadConfig{}
 	pingerConfig := &pinger.PingerConfig{}
+	flags.StringVar(&breadConfig.AwsRegion, "bread-AwsRegion", "", "")
+	flags.StringVar(&breadConfig.CanoeEcsService, "bread-CanoeEcsService", "", "")
+	flags.StringVar(&breadConfig.DeployTimeout, "bread-DeployTimeout", "", "")
 	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return services, err
 	}
 	errs := make(map[string][]string)
+	if breadConfig.AwsRegion == "" {
+		errs["bread"] = append(errs["bread"], "AwsRegion")
+	}
+	if breadConfig.CanoeEcsService == "" {
+		errs["bread"] = append(errs["bread"], "CanoeEcsService")
+	}
+	if breadConfig.DeployTimeout == "" {
+		errs["bread"] = append(errs["bread"], "DeployTimeout")
+	}
 	if len(errs["bread"]) != 0 {
 		services["bread"] = errors.New("required flag(s) missing: " + strings.Join(errs["bread"], ", "))
 	} else {

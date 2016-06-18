@@ -7,14 +7,28 @@ package bread;
 service Bread {
   option (operator.name) = "bread";
 
+  rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
   rpc EcsDeploy(EcsDeployRequest) returns (EcsDeployResponse);
 }
 
 message BreadConfig {
+  string AwsRegion = 1;
+  string CanoeEcsService = 3;
+  string DeployTimeout = 4;
+}
+
+message ListAppsRequest {
+  operator.Source source = 1;
+}
+
+message ListAppsResponse {
+  operator.Output output = 1;
 }
 
 message EcsDeployRequest {
   operator.Source source = 1;
+  string app = 2;
+  string build = 3;
 }
 
 message EcsDeployResponse {
