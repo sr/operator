@@ -112,8 +112,13 @@ module Pardot
           message: result.message
         }
         request = {payload: JSON.dump(payload)}
-        Instrumentation.debug(at: "deploy-complete", payload: payload)
-        Canoe.complete_chef_deploy(environment, request)
+
+        Instrumentation.debug(fn: "chef_checkin", completed: payload)
+        response = Canoe.complete_chef_deploy(environment, request)
+
+        if response.code != "200"
+          Instrumentation.error(fn: "chef_checkin", complete: "error", code: response.code, body: body[0..100])
+        end
       end
 
       private
