@@ -9,10 +9,13 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint unused vet interfacer errcheck install
+all: fmt lint vet errcheck install interfacer unused
 
 install:
 	$(GO) install -race -v ./...
+
+clean:
+	$(GO) clean -i ./...
 
 install-tools:
 	$(GO) install -v $(TOOLS)
@@ -40,18 +43,10 @@ lint: $(GOLINT)
 			done
 
 unused: $(UNUSED)
-	@ for pkg in $(PACKAGES); do \
-			$< -fields $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-		done; \
-		test $$fail && exit 1; true
+	$< $(PACKAGES)
 
 vet:
-	@ for pkg in $(PACKAGES); do \
-			$(GO) vet $$pkg; \
-	  done
+	$(GO) vet $(PACKAGES)
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
@@ -64,13 +59,7 @@ errcheck: $(ERRCHECK)
 	  test $$fail && exit 1; true
 
 interfacer: $(INTERFACER)
-	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-	  done; \
-	  test $$fail && exit 1; true
+	$< $(PACKAGES)
 
 $(ERRCHECK):
 	$(GO) install -v github.com/kisielk/errcheck
