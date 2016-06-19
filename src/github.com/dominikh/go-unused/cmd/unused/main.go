@@ -1,4 +1,4 @@
-package main // import "honnef.co/go/unused/cmd/unused"
+package main
 
 import (
 	"flag"
@@ -11,8 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"honnef.co/go/unused"
-
+	"github.com/dominikh/go-unused"
 	"github.com/kisielk/gotool"
 )
 

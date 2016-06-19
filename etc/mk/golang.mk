@@ -85,7 +85,7 @@ $(INTERFACER):
 	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install -v honnef.co/go/unused/cmd/unused
+	$(GO) install -v github.com/dominikh/go-unused/cmd
 
 .PHONY: \
 	all \

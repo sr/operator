@@ -1,4 +1,4 @@
-package unused // import "honnef.co/go/unused"
+package unused
 
 import (
 	"fmt"
