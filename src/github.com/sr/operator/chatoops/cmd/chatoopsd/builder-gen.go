@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/sr/operator/chatoops/services/buildkite"
-	"github.com/sr/operator/chatoops/services/gcloud"
 	"github.com/sr/operator/chatoops/services/papertrail"
 )
 
@@ -19,16 +18,8 @@ func buildOperatorServer(
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
 	buildkiteConfig := &buildkite.BuildkiteServiceConfig{}
-	gcloudConfig := &gcloud.GcloudServiceConfig{}
 	papertrailConfig := &papertrail.PapertrailServiceConfig{}
 	flags.StringVar(&buildkiteConfig.ApiToken, "buildkite-api_token", "", "")
-	flags.StringVar(&gcloudConfig.ProjectId, "gcloud-project_id", "", "")
-	flags.StringVar(&gcloudConfig.DefaultZone, "gcloud-default_zone", "", "")
-	flags.StringVar(&gcloudConfig.DefaultNetwork, "gcloud-default_network", "", "")
-	flags.StringVar(&gcloudConfig.DefaultImage, "gcloud-default_image", "", "")
-	flags.StringVar(&gcloudConfig.DefaultMachineType, "gcloud-default_machine_type", "", "")
-	flags.StringVar(&gcloudConfig.ServiceAccountEmail, "gcloud-service_account_email", "", "")
-	flags.StringVar(&gcloudConfig.StartupScript, "gcloud-startup_script", "", "")
 	flags.StringVar(&papertrailConfig.ApiKey, "papertrail-api_key", "", "")
 	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
@@ -37,27 +28,6 @@ func buildOperatorServer(
 	errs := make(map[string][]string)
 	if buildkiteConfig.ApiToken == "" {
 		errs["buildkite"] = append(errs["buildkite"], "api_token")
-	}
-	if gcloudConfig.ProjectId == "" {
-		errs["gcloud"] = append(errs["gcloud"], "project_id")
-	}
-	if gcloudConfig.DefaultZone == "" {
-		errs["gcloud"] = append(errs["gcloud"], "default_zone")
-	}
-	if gcloudConfig.DefaultNetwork == "" {
-		errs["gcloud"] = append(errs["gcloud"], "default_network")
-	}
-	if gcloudConfig.DefaultImage == "" {
-		errs["gcloud"] = append(errs["gcloud"], "default_image")
-	}
-	if gcloudConfig.DefaultMachineType == "" {
-		errs["gcloud"] = append(errs["gcloud"], "default_machine_type")
-	}
-	if gcloudConfig.ServiceAccountEmail == "" {
-		errs["gcloud"] = append(errs["gcloud"], "service_account_email")
-	}
-	if gcloudConfig.StartupScript == "" {
-		errs["gcloud"] = append(errs["gcloud"], "startup_script")
 	}
 	if papertrailConfig.ApiKey == "" {
 		errs["papertrail"] = append(errs["papertrail"], "api_key")
@@ -71,17 +41,6 @@ func buildOperatorServer(
 		} else {
 			buildkite.RegisterBuildkiteServiceServer(server, buildkiteServer)
 			services["buildkite"] = nil
-		}
-	}
-	if len(errs["gcloud"]) != 0 {
-		services["gcloud"] = errors.New("required flag(s) missing: " + strings.Join(errs["gcloud"], ", "))
-	} else {
-		gcloudServer, err := gcloud.NewAPIServer(gcloudConfig)
-		if err != nil {
-			services["gcloud"] = err
-		} else {
-			gcloud.RegisterGcloudServiceServer(server, gcloudServer)
-			services["gcloud"] = nil
 		}
 	}
 	if len(errs["papertrail"]) != 0 {

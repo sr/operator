@@ -9,7 +9,6 @@ import (
 
 	"github.com/sr/operator"
 	buildkite "github.com/sr/operator/chatoops/services/buildkite"
-	gcloud "github.com/sr/operator/chatoops/services/gcloud"
 	papertrail "github.com/sr/operator/chatoops/services/papertrail"
 	"golang.org/x/net/context"
 )
@@ -84,111 +83,6 @@ var cmd = operator.NewCommand(
 							&buildkite.ListBuildsRequest{
 								Source:      ctx.Source,
 								ProjectSlug: *project_slug,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-			},
-		},
-
-		{
-			Name:     "gcloud",
-			Synopsis: `Undocumented.`,
-			Methods: []operator.MethodCommand{
-				{
-					Name:     "create-dev-instance",
-					Synopsis: `Provision a development instance using the configured image.`,
-					Flags:    []*flag.Flag{},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := gcloud.NewGcloudServiceClient(conn)
-						response, err := client.CreateDevInstance(
-							context.Background(),
-							&gcloud.CreateDevInstanceRequest{
-								Source: ctx.Source,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-				{
-					Name:     "list-instances",
-					Synopsis: `List all instances under the configured project.`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "project-id",
-							Usage: "Undocumented.",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						project_id := ctx.Flags.String("project-id", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := gcloud.NewGcloudServiceClient(conn)
-						response, err := client.ListInstances(
-							context.Background(),
-							&gcloud.ListInstancesRequest{
-								Source:    ctx.Source,
-								ProjectId: *project_id,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-				{
-					Name:     "stop",
-					Synopsis: `Stop a running instance.`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "instance",
-							Usage: "Undocumented.",
-						},
-						{
-							Name:  "zone",
-							Usage: "Undocumented.",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						instance := ctx.Flags.String("instance", "", "")
-						zone := ctx.Flags.String("zone", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := gcloud.NewGcloudServiceClient(conn)
-						response, err := client.Stop(
-							context.Background(),
-							&gcloud.StopRequest{
-								Source:   ctx.Source,
-								Instance: *instance,
-								Zone:     *zone,
 							},
 						)
 						if err != nil {
