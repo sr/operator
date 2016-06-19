@@ -1,7 +1,8 @@
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
-GOFMT ?= gofmt
+GOFMT ?= $(shell which gofmt)
 GOLINT ?= $(GOBIN)/golint
+DEADLEAVES ?= $(GOBIN)/deadleaves
 ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
@@ -9,7 +10,7 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint vet errcheck install interfacer unused
+all: deadleaves fmt lint vet errcheck install interfacer unused
 
 install:
 	$(GO) install -race -v ./...
@@ -20,9 +21,16 @@ clean:
 install-tools:
 	$(GO) install -v $(TOOLS)
 
-fmt:
+deadleaves: $(DEADLEAVES)
+	@ out="$$($< | grep -v github.com/docker/go-units)"; \
+		if [ -n "$$out" ]; then \
+			echo "$$out"; \
+			exit 1; \
+		fi
+
+fmt: $(GOFMT)
 	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
-			out="$$($(GOFMT) -s -d $$file)"; \
+			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
@@ -60,6 +68,9 @@ errcheck: $(ERRCHECK)
 
 interfacer: $(INTERFACER)
 	$< $(PACKAGES)
+
+$(DEADLEAVES):
+	$(GO) install -v github.com/nf/deadleaves
 
 $(ERRCHECK):
 	$(GO) install -v github.com/kisielk/errcheck
