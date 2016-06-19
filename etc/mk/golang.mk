@@ -9,13 +9,10 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint unused vet interfacer errcheck install build
+all: fmt lint unused vet interfacer errcheck install
 
 install:
-	$(GO) install -race -v $(PACKAGES)
-
-build:
-	$(GO) build ./...
+	$(GO) install -race -v ./...
 
 install-tools:
 	$(GO) install -v $(TOOLS)
