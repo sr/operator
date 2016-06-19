@@ -218,7 +218,7 @@ func connectIRC(service *pubsub.Service, argv []string) {
 			if pos == -1 {
 				continue
 			}
-			privMsg := line[pos+len(privMark) : len(line)]
+			privMsg := line[pos+len(privMark):]
 			pubsubMessage := &pubsub.PubsubMessage{
 				Data: base64.StdEncoding.EncodeToString([]byte(privMsg)),
 			}

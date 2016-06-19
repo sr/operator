@@ -203,7 +203,7 @@ func TestMapToAnyArray(t *testing.T) {
 		{
 			s: schema{
 				MapToAnyArray: map[string][]interface{}{
-					"a": []interface{}{2, "b"},
+					"a": {2, "b"},
 				},
 			},
 			want: `{"maptoanyarray":{"a":[2, "b"]}}`,
@@ -219,7 +219,7 @@ func TestMapToAnyArray(t *testing.T) {
 		{
 			s: schema{
 				MapToAnyArray: map[string][]interface{}{
-					"a": []interface{}{nil},
+					"a": {nil},
 				},
 			},
 			want: `{"maptoanyarray":{"a":[null]}}`,
@@ -240,7 +240,7 @@ func TestMapToAnyArray(t *testing.T) {
 		{
 			s: schema{
 				MapToAnyArray: map[string][]interface{}{
-					"a": []interface{}{2, "b"},
+					"a": {2, "b"},
 				},
 				ForceSendFields: []string{"MapToAnyArray"},
 			},
