@@ -6,16 +6,19 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell go list privet/... chatops/...)
-TOOLS = $(shell go list golang.org/x/tools/cmd/...)
+PACKAGES = $(shell $(GO) list privet/... chatops/...)
+TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint unused vet interfacer errcheck install
+all: fmt lint unused vet interfacer errcheck install build
 
 install:
-	go install -race -v $(PACKAGES)
+	$(GO) install -race -v $(PACKAGES)
+
+build:
+	$(GO) build ./...
 
 install-tools:
-	go install -v $(TOOLS)
+	$(GO) install -v $(TOOLS)
 
 fmt:
 	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
@@ -50,7 +53,7 @@ unused: $(UNUSED)
 
 vet:
 	@ for pkg in $(PACKAGES); do \
-			go vet $$pkg; \
+			$(GO) vet $$pkg; \
 	  done
 
 errcheck: $(ERRCHECK)
@@ -86,6 +89,7 @@ $(UNUSED):
 
 .PHONY: \
 	all \
+	build \
 	errcheck \
 	fmt \
 	install \
