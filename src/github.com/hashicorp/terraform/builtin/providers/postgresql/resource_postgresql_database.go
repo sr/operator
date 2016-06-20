@@ -17,12 +17,12 @@ func resourcePostgresqlDatabase() *schema.Resource {
 		Delete: resourcePostgresqlDatabaseDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"owner": &schema.Schema{
+			"owner": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,

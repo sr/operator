@@ -41,7 +41,7 @@ func (t *AddOutputOrphanTransformer) Transform(g *Graph) error {
 	// Go over all the outputs. If we don't have a graph node for it,
 	// create it. It doesn't need to depend on anything, since its just
 	// setting it empty.
-	for k, _ := range state.Outputs {
+	for k := range state.Outputs {
 		if _, ok := found[k]; ok {
 			continue
 		}

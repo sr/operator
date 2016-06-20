@@ -75,7 +75,7 @@ func TestRender(t *testing.T) {
 		r.Test(t, r.TestCase{
 			Providers: testProviders,
 			Steps: []r.TestStep{
-				r.TestStep{
+				{
 					Config: tt.ResourceBlock,
 					Check: r.ComposeTestCheckFunc(
 						r.TestCheckResourceAttr("template_cloudinit_config.foo", "rendered", tt.Expected),
@@ -90,14 +90,14 @@ func TestCloudConfig_update(t *testing.T) {
 	r.Test(t, r.TestCase{
 		Providers: testProviders,
 		Steps: []r.TestStep{
-			r.TestStep{
+			{
 				Config: testCloudInitConfig_basic,
 				Check: r.ComposeTestCheckFunc(
 					r.TestCheckResourceAttr("template_cloudinit_config.config", "rendered", testCloudInitConfig_basic_expected),
 				),
 			},
 
-			r.TestStep{
+			{
 				Config: testCloudInitConfig_update,
 				Check: r.ComposeTestCheckFunc(
 					r.TestCheckResourceAttr("template_cloudinit_config.config", "rendered", testCloudInitConfig_update_expected),

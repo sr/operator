@@ -18,7 +18,7 @@ func TestAccDockerImage_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccDockerImageDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccDockerImageConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr("docker_image.foo", "latest", contentDigestRegexp),
@@ -34,7 +34,7 @@ func TestAccDockerImage_private(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccDockerImageDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAddDockerPrivateImageConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr("docker_image.foobar", "latest", contentDigestRegexp),
@@ -63,7 +63,7 @@ func TestAccDockerImage_destroy(t *testing.T) {
 			return nil
 		},
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccDockerImageKeepLocallyConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr("docker_image.foobarzoo", "latest", contentDigestRegexp),

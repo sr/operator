@@ -70,8 +70,8 @@ func validateArmStorageBlobSize(v interface{}, k string) (ws []string, errors []
 func validateArmStorageBlobType(v interface{}, k string) (ws []string, errors []error) {
 	value := strings.ToLower(v.(string))
 	validTypes := map[string]struct{}{
-		"blob": struct{}{},
-		"page": struct{}{},
+		"blob": {},
+		"page": {},
 	}
 
 	if _, ok := validTypes[value]; !ok {

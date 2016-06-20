@@ -19,7 +19,7 @@ func TestAccAWSCustomerGateway_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckCustomerGatewayDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCustomerGatewayConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCustomerGateway(
@@ -27,7 +27,7 @@ func TestAccAWSCustomerGateway_basic(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCustomerGatewayConfigUpdateTags,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCustomerGateway(
@@ -35,7 +35,7 @@ func TestAccAWSCustomerGateway_basic(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCustomerGatewayConfigForceReplace,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCustomerGateway(

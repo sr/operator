@@ -22,7 +22,7 @@ func TestAccAWSBeanstalkEnv_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBeanstalkEnvDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkEnvConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tfenvtest", &app),
@@ -41,7 +41,7 @@ func TestAccAWSBeanstalkEnv_tier(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBeanstalkEnvDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkWorkerEnvConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvTier("aws_elastic_beanstalk_environment.tfenvtest", &app),
@@ -65,7 +65,7 @@ func TestAccAWSBeanstalkEnv_outputs(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBeanstalkEnvDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkEnvConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tfenvtest", &app),
@@ -93,7 +93,7 @@ func TestAccAWSBeanstalkEnv_cname_prefix(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBeanstalkEnvDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkEnvCnamePrefixConfig(cnamePrefix),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tfenvtest", &app),
@@ -113,7 +113,7 @@ func TestAccAWSBeanstalkEnv_config(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBeanstalkEnvDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkConfigTemplate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tftest", &app),
@@ -121,7 +121,7 @@ func TestAccAWSBeanstalkEnv_config(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkConfigTemplateUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tftest", &app),
@@ -129,7 +129,7 @@ func TestAccAWSBeanstalkEnv_config(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: testAccBeanstalkConfigTemplateUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBeanstalkEnvExists("aws_elastic_beanstalk_environment.tftest", &app),

@@ -28,25 +28,25 @@ var ExpectedToken = &Token{
 // ExpectedServiceCatalog is the service catalog that should be parsed from TokenCreationResponse.
 var ExpectedServiceCatalog = &ServiceCatalog{
 	Entries: []CatalogEntry{
-		CatalogEntry{
+		{
 			Name: "inscrutablewalrus",
 			Type: "something",
 			Endpoints: []Endpoint{
-				Endpoint{
+				{
 					PublicURL: "http://something0:1234/v2/",
 					Region:    "region0",
 				},
-				Endpoint{
+				{
 					PublicURL: "http://something1:1234/v2/",
 					Region:    "region1",
 				},
 			},
 		},
-		CatalogEntry{
+		{
 			Name: "arbitrarypenguin",
 			Type: "else",
 			Endpoints: []Endpoint{
-				Endpoint{
+				{
 					PublicURL: "http://else0:4321/v3/",
 					Region:    "region0",
 				},

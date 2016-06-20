@@ -20,7 +20,7 @@ func TestAccTritonMachine_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTritonMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -43,7 +43,7 @@ func TestAccTritonMachine_nic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTritonMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -68,7 +68,7 @@ func TestAccTritonMachine_addnic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTritonMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: without,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -79,7 +79,7 @@ func TestAccTritonMachine_addnic(t *testing.T) {
 					testCheckTritonMachineHasNoFabric("triton_machine.test", "triton_fabric.test"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: with,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -201,7 +201,7 @@ func TestAccTritonMachine_firewall(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTritonMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: enabled_config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -209,7 +209,7 @@ func TestAccTritonMachine_firewall(t *testing.T) {
 						"triton_machine.test", "firewall_enabled", "true"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: disabled_config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -217,7 +217,7 @@ func TestAccTritonMachine_firewall(t *testing.T) {
 						"triton_machine.test", "firewall_enabled", "false"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: enabled_config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
@@ -239,13 +239,13 @@ func TestAccTritonMachine_metadata(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckTritonMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: basic,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: add_metadata,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckTritonMachineExists("triton_machine.test"),

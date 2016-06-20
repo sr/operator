@@ -17,42 +17,42 @@ func resourceCloudStackSecondaryIPAddress() *schema.Resource {
 		Delete: resourceCloudStackSecondaryIPAddressDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `ip_address` field instead",
 			},
 
-			"nic_id": &schema.Schema{
+			"nic_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"nicid": &schema.Schema{
+			"nicid": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `nic_id` field instead",
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine": &schema.Schema{
+			"virtual_machine": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,

@@ -24,7 +24,7 @@ func TestAccAWSKinesisStream_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),
@@ -47,7 +47,7 @@ func TestAccAWSKinesisStream_shardCount(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),
@@ -57,7 +57,7 @@ func TestAccAWSKinesisStream_shardCount(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: updateConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),
@@ -83,7 +83,7 @@ func TestAccAWSKinesisStream_retentionPeriod(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),
@@ -93,7 +93,7 @@ func TestAccAWSKinesisStream_retentionPeriod(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: updateConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),
@@ -103,7 +103,7 @@ func TestAccAWSKinesisStream_retentionPeriod(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: decreaseConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisStreamExists("aws_kinesis_stream.test_stream", &stream),

@@ -21,7 +21,7 @@ func TestAccAWSAutoscalingLifecycleHook_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAutoscalingLifecycleHookDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSAutoscalingLifecycleHookConfig(resourceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLifecycleHookExists("aws_autoscaling_lifecycle_hook.foobar", &hook),
@@ -43,7 +43,7 @@ func TestAccAWSAutoscalingLifecycleHook_omitDefaultResult(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAutoscalingLifecycleHookDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSAutoscalingLifecycleHookConfig_omitDefaultResult(acctest.RandString(10)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLifecycleHookExists("aws_autoscaling_lifecycle_hook.foobar", &hook),

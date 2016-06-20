@@ -787,7 +787,7 @@ func (m *ModuleState) IsRoot() bool {
 // represent the state of resources that are orphans.
 func (m *ModuleState) Orphans(c *config.Config) []string {
 	keys := make(map[string]struct{})
-	for k, _ := range m.Resources {
+	for k := range m.Resources {
 		keys[k] = struct{}{}
 	}
 
@@ -795,7 +795,7 @@ func (m *ModuleState) Orphans(c *config.Config) []string {
 		for _, r := range c.Resources {
 			delete(keys, r.Id())
 
-			for k, _ := range keys {
+			for k := range keys {
 				if strings.HasPrefix(k, r.Id()+".") {
 					delete(keys, k)
 				}
@@ -804,7 +804,7 @@ func (m *ModuleState) Orphans(c *config.Config) []string {
 	}
 
 	result := make([]string, 0, len(keys))
-	for k, _ := range keys {
+	for k := range keys {
 		result = append(result, k)
 	}
 
@@ -818,7 +818,7 @@ func (m *ModuleState) View(id string) *ModuleState {
 	}
 
 	r := m.deepcopy()
-	for k, _ := range r.Resources {
+	for k := range r.Resources {
 		if id == k || strings.HasPrefix(k, id+".") {
 			continue
 		}
@@ -894,7 +894,7 @@ func (m *ModuleState) String() string {
 	}
 
 	names := make([]string, 0, len(m.Resources))
-	for name, _ := range m.Resources {
+	for name := range m.Resources {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -930,7 +930,7 @@ func (m *ModuleState) String() string {
 			attributes = rs.Primary.Attributes
 		}
 		attrKeys := make([]string, 0, len(attributes))
-		for ak, _ := range attributes {
+		for ak := range attributes {
 			if ak == "id" {
 				continue
 			}
@@ -964,7 +964,7 @@ func (m *ModuleState) String() string {
 		buf.WriteString("\nOutputs:\n\n")
 
 		ks := make([]string, 0, len(m.Outputs))
-		for k, _ := range m.Outputs {
+		for k := range m.Outputs {
 			ks = append(ks, k)
 		}
 		sort.Strings(ks)
@@ -978,7 +978,7 @@ func (m *ModuleState) String() string {
 				buf.WriteString(fmt.Sprintf("%s = %s\n", k, vTyped))
 			case map[string]interface{}:
 				var mapKeys []string
-				for key, _ := range vTyped {
+				for key := range vTyped {
 					mapKeys = append(mapKeys, key)
 				}
 				sort.Strings(mapKeys)
@@ -1406,7 +1406,7 @@ func (i *InstanceState) String() string {
 
 	attributes := i.Attributes
 	attrKeys := make([]string, 0, len(attributes))
-	for ak, _ := range attributes {
+	for ak := range attributes {
 		if ak == "id" {
 			continue
 		}

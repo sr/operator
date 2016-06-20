@@ -70,7 +70,7 @@ func modulesStr(ms []*Module) string {
 		result += fmt.Sprintf("%s\n", m.Id())
 
 		ks := make([]string, 0, len(m.RawConfig.Raw))
-		for k, _ := range m.RawConfig.Raw {
+		for k := range m.RawConfig.Raw {
 			ks = append(ks, k)
 		}
 		sort.Strings(ks)
@@ -140,7 +140,7 @@ func providerConfigsStr(pcs []*ProviderConfig) string {
 		result += fmt.Sprintf("%s\n", n)
 
 		keys := make([]string, 0, len(pc.RawConfig.Raw))
-		for k, _ := range pc.RawConfig.Raw {
+		for k := range pc.RawConfig.Raw {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
@@ -195,7 +195,7 @@ func resourcesStr(rs []*Resource) string {
 			r.RawCount.Value())
 
 		ks := make([]string, 0, len(r.RawConfig.Raw))
-		for k, _ := range r.RawConfig.Raw {
+		for k := range r.RawConfig.Raw {
 			ks = append(ks, k)
 		}
 		sort.Strings(ks)
@@ -210,7 +210,7 @@ func resourcesStr(rs []*Resource) string {
 				result += fmt.Sprintf("    %s\n", p.Type)
 
 				ks := make([]string, 0, len(p.RawConfig.Raw))
-				for k, _ := range p.RawConfig.Raw {
+				for k := range p.RawConfig.Raw {
 					ks = append(ks, k)
 				}
 				sort.Strings(ks)
@@ -232,7 +232,7 @@ func resourcesStr(rs []*Resource) string {
 			result += fmt.Sprintf("  vars\n")
 
 			ks := make([]string, 0, len(r.RawConfig.Variables))
-			for k, _ := range r.RawConfig.Variables {
+			for k := range r.RawConfig.Variables {
 				ks = append(ks, k)
 			}
 			sort.Strings(ks)

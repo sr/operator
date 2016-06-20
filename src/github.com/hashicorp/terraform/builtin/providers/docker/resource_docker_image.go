@@ -12,22 +12,22 @@ func resourceDockerImage() *schema.Resource {
 		Delete: resourceDockerImageDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"keep_updated": &schema.Schema{
+			"keep_updated": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"latest": &schema.Schema{
+			"latest": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"keep_locally": &schema.Schema{
+			"keep_locally": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},

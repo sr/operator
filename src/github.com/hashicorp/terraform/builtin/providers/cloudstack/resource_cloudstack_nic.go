@@ -17,42 +17,42 @@ func resourceCloudStackNIC() *schema.Resource {
 		Delete: resourceCloudStackNICDelete,
 
 		Schema: map[string]*schema.Schema{
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"network": &schema.Schema{
+			"network": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `network_id` field instead",
 			},
 
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `ip_address` field instead",
 			},
 
-			"virtual_machine_id": &schema.Schema{
+			"virtual_machine_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine": &schema.Schema{
+			"virtual_machine": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,

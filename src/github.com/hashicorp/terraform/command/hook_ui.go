@@ -85,7 +85,7 @@ func (h *UiHook) PreApply(
 	// determine the longest key so that we can align them all.
 	keyLen := 0
 	keys := make([]string, 0, len(d.Attributes))
-	for key, _ := range d.Attributes {
+	for key := range d.Attributes {
 		// Skip the ID since we do that specially
 		if key == "id" {
 			continue

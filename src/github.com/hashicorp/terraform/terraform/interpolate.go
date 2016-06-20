@@ -592,7 +592,7 @@ func (i *Interpolater) interpolateComplexTypeAttribute(
 
 		keys := make([]string, 0)
 		listElementKey := regexp.MustCompile("^" + resourceID + "\\.[0-9]+$")
-		for id, _ := range attributes {
+		for id := range attributes {
 			if listElementKey.MatchString(id) {
 				keys = append(keys, id)
 			}

@@ -20,7 +20,7 @@ func resourceAwsEfsFileSystem() *schema.Resource {
 		Delete: resourceAwsEfsFileSystemDelete,
 
 		Schema: map[string]*schema.Schema{
-			"reference_name": &schema.Schema{
+			"reference_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

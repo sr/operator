@@ -206,7 +206,7 @@ func (d *ModuleDiff) String() string {
 	}
 
 	names := make([]string, 0, len(d.Resources))
-	for name, _ := range d.Resources {
+	for name := range d.Resources {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -231,7 +231,7 @@ func (d *ModuleDiff) String() string {
 
 		keyLen := 0
 		keys := make([]string, 0, len(rdiff.Attributes))
-		for key, _ := range rdiff.Attributes {
+		for key := range rdiff.Attributes {
 			if key == "id" {
 				continue
 			}
@@ -403,17 +403,17 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 	// same attributes. To start, build up the check map to be all the keys.
 	checkOld := make(map[string]struct{})
 	checkNew := make(map[string]struct{})
-	for k, _ := range d.Attributes {
+	for k := range d.Attributes {
 		checkOld[k] = struct{}{}
 	}
-	for k, _ := range d2.Attributes {
+	for k := range d2.Attributes {
 		checkNew[k] = struct{}{}
 	}
 
 	// Make an ordered list so we are sure the approximated hashes are left
 	// to process at the end of the loop
 	keys := make([]string, 0, len(d.Attributes))
-	for k, _ := range d.Attributes {
+	for k := range d.Attributes {
 		keys = append(keys, k)
 	}
 	sort.StringSlice(keys).Sort()
@@ -456,7 +456,7 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 				if err != nil {
 					return false, fmt.Sprintf("regexp failed to compile; err: %#v", err)
 				}
-				for k2, _ := range checkNew {
+				for k2 := range checkNew {
 					if re.MatchString(k2) {
 						delete(checkNew, k2)
 
@@ -464,7 +464,7 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 							// This is a computed list or set, so remove any keys with this
 							// prefix from the check list.
 							prefix := k2[:len(k2)-1]
-							for k2, _ := range checkNew {
+							for k2 := range checkNew {
 								if strings.HasPrefix(k2, prefix) {
 									delete(checkNew, k2)
 								}
@@ -501,12 +501,12 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 			// This is a computed list or set, so remove any keys with this
 			// prefix from the check list.
 			kprefix := k[:len(k)-1]
-			for k2, _ := range checkOld {
+			for k2 := range checkOld {
 				if strings.HasPrefix(k2, kprefix) {
 					delete(checkOld, k2)
 				}
 			}
-			for k2, _ := range checkNew {
+			for k2 := range checkNew {
 				if strings.HasPrefix(k2, kprefix) {
 					delete(checkNew, k2)
 				}
@@ -519,7 +519,7 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 	// Check for leftover attributes
 	if len(checkNew) > 0 {
 		extras := make([]string, 0, len(checkNew))
-		for attr, _ := range checkNew {
+		for attr := range checkNew {
 			extras = append(extras, attr)
 		}
 		return false,
