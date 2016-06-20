@@ -17,6 +17,10 @@ service BuildkiteService {
 	rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
 }
 
+message BuildkiteServiceConfig {
+	string api_token = 1;
+}
+
 message StatusRequest {
   operator.Source source = 1;
 
