@@ -1,7 +1,7 @@
 class ChefDeliveryConfig
-  PRODUCTION = "production"
-  DEV = "dev"
-  AWS = "ue1.aws"
+  PRODUCTION = "production".freeze
+  DEV = "dev".freeze
+  AWS = "ue1.aws".freeze
 
   BREAD_ROOM = 42
   OPS_ROOM = 6

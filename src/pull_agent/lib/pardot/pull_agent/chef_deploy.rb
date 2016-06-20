@@ -7,7 +7,7 @@ module Pardot
         "dfw" => "environments/dfw/production.rb",
         "phx" => "environments/phx/production.rb",
         "ue1.aws" => "environments/aws/production.rb",
-        "local" => "none",
+        "local" => "none"
       }.freeze
 
       def initialize(script, checkout_path, deploy)

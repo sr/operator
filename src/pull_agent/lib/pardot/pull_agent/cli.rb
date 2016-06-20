@@ -46,9 +46,7 @@ module Pardot
       end
 
       def checkin_chef
-        Instrumentation.setup("pull-agent", environment.name, {
-          log_stream: Logger
-        })
+        Instrumentation.setup("pull-agent", environment.name, log_stream: Logger)
 
         hostname = ShellHelper.hostname
         payload = environment.payload
@@ -118,7 +116,7 @@ module Pardot
           success: result.success,
           error_message: result.message
         }
-        request = {payload: JSON.dump(payload)}
+        request = { payload: JSON.dump(payload) }
 
         Instrumentation.debug(fn: "chef_checkin", completed: payload)
         response = Canoe.complete_chef_deploy(environment, request)

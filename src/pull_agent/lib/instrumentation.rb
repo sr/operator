@@ -32,7 +32,7 @@ module Instrumentation
         end
       end
 
-    Logging.setup(log_stream, log_format, {app: app_name, env: env_name})
+    Logging.setup(log_stream, log_format, app: app_name, env: env_name)
   end
 
   def context(data, &block)
