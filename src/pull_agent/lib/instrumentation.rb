@@ -8,16 +8,31 @@ module Instrumentation
   # No-op log formatter, that returns the log data unmodified as a Ruby hash
   LOG_NOOP = :noop
 
+  SYSLOG = "syslog".freeze
+
   DEBUG = "debug".freeze
   ERROR = "error".freeze
 
   autoload :Logging, "instrumentation/logging"
   autoload :RequestId, "instrumentation/request_id"
 
-  def setup(app_name, env, options = {})
+  def setup(app_name, env_name, options = {})
     log_format = options.fetch(:log_format, LOG_LOGFMT)
+    log_stream =
+      case options[:log_stream]
+      when :fake
+        FakeStream.new
+      when :syslog
+        SYSLOG
+      else
+        if options[:log_stream].respond_to?(:puts)
+          options[:log_stream]
+        else
+          STDOUT
+        end
+      end
 
-    Logging.setup(app_name, env, log_format)
+    Logging.setup(log_stream, log_format, {app: app_name, env: env_name})
   end
 
   def context(data, &block)

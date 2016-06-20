@@ -9,23 +9,8 @@ module Instrumentation
       end
     end
 
-    def setup(app_name, env_name, format)
-      stream =
-        case env_name
-        when "test"
-          FakeStream.new
-        else
-          STDOUT
-        end
-
-      Scrolls.init(
-        stream: stream,
-        exceptions: "single",
-        global_context: {
-          app: app_name,
-          env: env_name
-        }
-      )
+    def setup(stream, format, context)
+      Scrolls.init(stream: stream, exceptions: "single", global_context: context)
 
       case format
       when LOG_NOOP

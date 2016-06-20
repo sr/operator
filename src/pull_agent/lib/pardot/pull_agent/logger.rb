@@ -53,6 +53,17 @@ module Pardot
           Syslog.log(PRIORITIES.fetch(our_priority), message)
         end
       end
+
+      # Make this compatible with Instrumentation::Logger
+      def self.puts(data)
+        Syslog.open("pull-agent") do
+          Syslog.log(Syslog::LOG_ERR, data)
+        end
+      end
+
+      def self.sync=(_)
+        self
+      end
     end
   end
 end
