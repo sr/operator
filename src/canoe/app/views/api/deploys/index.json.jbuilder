@@ -1,1 +1,1 @@
-json.array! @deploys, partial: 'deploy', as: :deploy
+json.array! @deploys, partial: "deploy", as: :deploy

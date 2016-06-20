@@ -1,25 +1,36 @@
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
-GOFMT ?= gofmt
+GOFMT ?= $(shell which gofmt)
 GOLINT ?= $(GOBIN)/golint
+DEADLEAVES ?= $(GOBIN)/deadleaves
 ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell go list privet/... chatops/...)
-TOOLS = $(shell go list golang.org/x/tools/cmd/...)
+PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
+TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint unused vet interfacer errcheck install
+all: deadleaves fmt lint vet errcheck install interfacer unused
 
 install:
-	go install -race -v $(PACKAGES)
+	$(GO) install -race -v ./...
+
+clean:
+	$(GO) clean -i ./...
 
 install-tools:
-	go install -v $(TOOLS)
+	$(GO) install -v $(TOOLS)
 
-fmt:
+deadleaves: $(DEADLEAVES)
+	@ out="$$($< | grep -v github.com/docker/go-units)"; \
+		if [ -n "$$out" ]; then \
+			echo "$$out"; \
+			exit 1; \
+		fi
+
+fmt: $(GOFMT)
 	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
-			out="$$($(GOFMT) -s -d $$file)"; \
+			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
@@ -40,36 +51,26 @@ lint: $(GOLINT)
 			done
 
 unused: $(UNUSED)
-	@ for pkg in $(PACKAGES); do \
-			$< -fields $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-		done; \
-		test $$fail && exit 1; true
+	$< $(PACKAGES)
 
 vet:
-	@ for pkg in $(PACKAGES); do \
-			go vet $$pkg; \
-	  done
+	$(GO) vet $(PACKAGES)
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
 			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
 			if [ -n "$$out" ]; then \
+				echo "$$out"; \
 				fail=true; \
 			fi; \
 	  done; \
 	  test $$fail && exit 1; true
 
 interfacer: $(INTERFACER)
-	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-	  done; \
-	  test $$fail && exit 1; true
+	$< $(PACKAGES)
+
+$(DEADLEAVES):
+	$(GO) install -v github.com/nf/deadleaves
 
 $(ERRCHECK):
 	$(GO) install -v github.com/kisielk/errcheck
@@ -81,10 +82,11 @@ $(INTERFACER):
 	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install -v honnef.co/go/unused/cmd/unused
+	$(GO) install -v github.com/dominikh/go-unused/cmd
 
 .PHONY: \
 	all \
+	build \
 	errcheck \
 	fmt \
 	install \

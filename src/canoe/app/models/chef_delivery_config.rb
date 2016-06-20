@@ -1,10 +1,10 @@
 class ChefDeliveryConfig
-  PRODUCTION = "production"
-  DEV = "dev"
+  PRODUCTION = "production".freeze
+  DEV = "dev".freeze
 
-  AWS = "pardot0-chef1-1-ue1.aws"
-  DFW = "pardot0-chef1-1-dfw"
-  PHX = "pardot0-chef1-1-phx"
+  AWS = "pardot0-chef1-1-ue1.aws".freeze
+  DFW = "pardot0-chef1-1-dfw".freeze
+  PHX = "pardot0-chef1-1-phx".freeze
 
   BREAD_ROOM = 42
   OPS_ROOM = 6

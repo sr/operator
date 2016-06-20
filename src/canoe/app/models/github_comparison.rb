@@ -29,9 +29,9 @@ class GithubComparison
   def authors
     commits.collect do |commit|
       commit.author ||
-      commit.committer ||
-      commit.commit.author ||
-      commit.commit.committer
+        commit.committer ||
+        commit.commit.author ||
+        commit.commit.committer
     end
   end
 
