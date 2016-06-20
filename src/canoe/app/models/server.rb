@@ -14,7 +14,7 @@ class Server < ActiveRecord::Base
   has_many :server_tags, through: :server_taggings
 
   def self.for_project(project)
-    joins(:projects).where(projects: {id: project.id})
+    joins(:projects).where(projects: { id: project.id })
   end
 
   def server_tag_names=(tag_names)
@@ -29,9 +29,9 @@ class Server < ActiveRecord::Base
 
   def datacenter
     case hostname
-      when /-dfw$/ then :dfw
-      when /-phx$/ then :phx
-      else :sl
+    when /-dfw$/ then :dfw
+    when /-phx$/ then :phx
+    else :sl
     end
   end
 end

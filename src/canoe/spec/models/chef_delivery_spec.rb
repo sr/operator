@@ -7,7 +7,7 @@ RSpec.describe ChefDelivery do
     @delivery = ChefDelivery.new(@config)
   end
 
-  def build_build(attributes={})
+  def build_build(attributes = {})
     defaults = {
       url: "https://github.com/builds/1",
       sha: "sha1",
@@ -17,7 +17,7 @@ RSpec.describe ChefDelivery do
     GithubRepository::Build.new(defaults.merge(attributes))
   end
 
-  def create_current_deploy(attributes={})
+  def create_current_deploy(attributes = {})
     defaults = {
       branch: "master",
       build_url: "https://github/builds/1",
@@ -148,7 +148,7 @@ RSpec.describe ChefDelivery do
   it "notifies of successful deployment" do
     deploy = create_current_deploy(state: ChefDelivery::PENDING)
     request = ChefCompleteDeployRequest.new(deploy.id, true, nil)
-    response = @delivery.complete_deploy(request)
+    @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     message = @config.notifier.messages.pop
     assert message.message.include?("successfully deployed")
@@ -157,7 +157,7 @@ RSpec.describe ChefDelivery do
   it "notifies of failed deployment" do
     deploy = create_current_deploy(state: ChefDelivery::PENDING)
     request = ChefCompleteDeployRequest.new(deploy.id, false, "boomtown")
-    response = @delivery.complete_deploy(request)
+    @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
     assert msg.message.include?("failed to deploy")

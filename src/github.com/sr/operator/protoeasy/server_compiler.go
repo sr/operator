@@ -34,8 +34,9 @@ func (c *serverCompiler) Compile(dirPath string, outDirPath string, compileOptio
 	}
 	for _, command := range commands {
 		cmd := exec.Command(command.Arg[0], command.Arg[1:]...)
-		if err := cmd.Run(); err != nil {
-			return nil, err
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			return nil, fmt.Errorf("command failed: %v. output: %s", err, string(out))
 		}
 	}
 	return commands, nil

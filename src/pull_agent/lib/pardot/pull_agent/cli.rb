@@ -81,8 +81,6 @@ module Pardot
           return
         end
 
-        checkout = JSON.parse(output)
-
         payload = {
           server: {
             datacenter: datacenter,
@@ -92,7 +90,7 @@ module Pardot
           checkout: JSON.parse(output)
         }
 
-        request = {payload: JSON.dump(payload)}
+        request = { payload: JSON.dump(payload) }
         response = Canoe.chef_checkin(environment, request)
 
         if response.code != "200"

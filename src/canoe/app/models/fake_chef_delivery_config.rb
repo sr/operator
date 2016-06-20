@@ -20,7 +20,7 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
 
     Message = Struct.new(:room_id, :message)
 
-    def notify_room(room_id, message, color = nil)
+    def notify_room(room_id, message, _color = nil)
       @messages << Message.new(room_id, message)
     end
   end

@@ -8,7 +8,7 @@ module Pardot
         "phx" => "environments/phx/production.rb",
         "ue1.aws" => "environments/aws/production.rb",
         "dev" => "environments/dev.rb"
-      }
+      }.freeze
 
       def initialize(script, checkout_path, deploy)
         @script = script
@@ -16,6 +16,7 @@ module Pardot
         @deploy = deploy
       end
 
+      # rubocop:disable Lint/RescueException
       def apply(env, datacenter, hostname)
         chef_environment_file = CHEF_ENVIRONMENT_FILE[datacenter]
         if !chef_environment_file

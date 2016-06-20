@@ -11,34 +11,45 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	program  = "operatord"
-	protocol = "tcp"
-)
-
-var (
-	listenAddr string
-)
-
-func main() {
-	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", program, err)
-		os.Exit(1)
-	}
-}
-
-func run() error {
-	flag.StringVar(&listenAddr, "listen", "localhost:3000", "Listening address of the server")
-	flag.Parse()
-	server := grpc.NewServer()
+func run(builder operator.ServerBuilder) error {
+	config := &operator.Config{}
+	flags := flag.CommandLine
+	flags.StringVar(&config.Address, "listen-addr", operator.DefaultAddress, "Listen address of the operator server")
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
 	authorizer := chatops.NewLDAPAuthorizer()
-	registerServices(server, logger, instrumenter, authorizer)
-	listener, err := net.Listen(protocol, listenAddr)
+	interceptor := operator.NewInterceptor(instrumenter, authorizer)
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
+	msg := &operator.ServerStartupNotice{Protocol: "tcp"}
+	services, err := builder(server, flags)
 	if err != nil {
 		return err
 	}
-	logger.Info(&operator.ServerStartupNotice{Address: listenAddr, Protocol: protocol})
+	for svc, err := range services {
+		if err != nil {
+			logger.Error(&operator.ServiceStartupError{
+				Service: &operator.Service{Name: svc},
+				Message: err.Error(),
+			})
+		} else {
+			msg.Services = append(msg.Services, &operator.Service{Name: svc})
+		}
+	}
+	msg.Address = config.Address
+	if config.Address == "" {
+		return fmt.Errorf("required -listen-addr flag is missing")
+	}
+	listener, err := net.Listen("tcp", config.Address)
+	if err != nil {
+		return err
+	}
+	logger.Info(msg)
 	return server.Serve(listener)
+}
+
+func main() {
+	if err := run(buildOperatorServer); err != nil {
+		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
+		os.Exit(1)
+	}
 }

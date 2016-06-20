@@ -39,11 +39,11 @@ class ChefDeliveryNotification
     case object
     when GithubRepository::Build
       build_id = object.url.split("-").last
-      %Q(<a href="#{object.url}">##{build_id}</a>)
+      %(<a href="#{object.url}">##{build_id}</a>)
     when ChefDeploy
-      %Q(<a href="#{object.build_url}">##{object.build_id}</a>)
+      %(<a href="#{object.build_url}">##{build_id}</a>)
     when String
-      %Q(<a href="#{@github_url}/#{@repo}/compare/#{object}">#{object}</a>)
+      %(<a href="#{@github_url}/#{@repo}/compare/#{object}">#{object}</a>)
     else
       raise ArgumentError, "unable to link to #{object.inspect}"
     end

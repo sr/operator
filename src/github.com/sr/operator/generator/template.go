@@ -23,8 +23,8 @@ var funcMap = template.FuncMap{
 }
 
 func camelCase(s string) string {
-	// TODO handle more than ID
-	return strings.Replace(snaker.SnakeToCamel(s), "ID", "Id", 1)
+	// TODO(sr) The horror
+	return strings.Replace(strings.Replace(snaker.SnakeToCamel(s), "ID", "Id", 1), "API", "Api", 1)
 }
 
 func dasherize(s string) string {

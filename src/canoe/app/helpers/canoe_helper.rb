@@ -1,4 +1,4 @@
-require 'cgi'
+require "cgi"
 
 module CanoeHelper
   def protocol_for_includes
@@ -14,12 +14,12 @@ module CanoeHelper
     current_project_name = current_project && current_project.name
     project_name = project && project.name
 
-    current_project_name == project_name ? 'class="active"'.html_safe : ''
+    current_project_name == project_name ? 'class="active"'.html_safe : ""
   end
 
-  def active_target(target_name="")
+  def active_target(target_name = "")
     if !current_project && current_target && \
-        current_target.name.downcase == target_name.downcase
+       current_target.name.casecmp(target_name.downcase).zero?
       'class="active"'.html_safe
     else
       ""
@@ -43,7 +43,7 @@ module CanoeHelper
   end
 
   def sha_span(sha)
-    "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0,8]}...</span>".html_safe
+    "<span title='#{sha}' class='js-sha-expand' data-sha='#{sha}'>#{sha[0, 8]}...</span>".html_safe
   end
 
   # ----------------------------------------------------------------------
@@ -81,7 +81,7 @@ module CanoeHelper
       "#{minutes} minute#{minutes == 1 ? '' : 's'}"
     else
       hours = minutes / 60.0
-      "#{"%0.1f" % hours} hour#{hours == 1 ? '' : 's'}"
+      "#{'%0.1f' % hours} hour#{hours == 1 ? '' : 's'}"
     end
   end
 
@@ -98,7 +98,7 @@ module CanoeHelper
       %(message:"deploy_id=#{deploy.id}")
     ]
     query << %(host:#{host}*) if host
-    qs = CGI.escape(query.join(" AND ")).gsub('+', '%20')
+    qs = CGI.escape(query.join(" AND ")).gsub("+", "%20")
 
     "https://logs-#{datacenter}.pardot.com/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),index:'logstash-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'#{qs}')),sort:!('@timestamp',desc))"
   end
