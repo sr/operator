@@ -79,9 +79,9 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("jira search request failed with status %s", resp.StatusCode)
+		return fmt.Errorf("jira search request failed with status %d", resp.StatusCode)
 	}
 	type response struct {
 		Issues []struct {
