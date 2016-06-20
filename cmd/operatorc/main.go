@@ -66,7 +66,7 @@ func run() error {
 		options.OperatorServer = true
 		options.OperatorServerOut = serverOutDir
 	}
-	compiler := protoeasy.DefaultClientCompiler
+	compiler := protoeasy.DefaultCompiler
 	commands, err := compiler.Compile(inputDirPath, outDirPath, options)
 	if err != nil {
 		return err
