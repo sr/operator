@@ -11,7 +11,7 @@ module Canoe
       return nil if target.active_deploy(project).present?
 
       deploy = target.transaction do
-        target.deploys.create!(
+        new_deploy = target.deploys.create!(
           auth_user: user,
           project_name: project.name,
           what: what,
@@ -23,9 +23,9 @@ module Canoe
           artifact_url: artifact_url,
           options_validator: options_validator,
           options: options,
-        ).tap { |deploy|
-          DeployWorkflow.initiate(deploy: deploy, servers: servers)
-        }
+        )
+        DeployWorkflow.initiate(deploy: new_deploy, servers: servers)
+        new_deploy
       end
 
       target.lock!(project, user) if lock

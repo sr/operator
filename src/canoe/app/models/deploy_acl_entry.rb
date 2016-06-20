@@ -1,13 +1,13 @@
 class DeployACLEntry < ActiveRecord::Base
-  ACL_TYPES = ["ldap_group"]
+  ACL_TYPES = ["ldap_group"].freeze
 
   validates :project_id,
     presence: true,
-    uniqueness: {scope: [:deploy_target_id]}
+    uniqueness: { scope: [:deploy_target_id] }
   validates :deploy_target_id, presence: true
   validates :acl_type,
     presence: true,
-    inclusion: {in: ACL_TYPES}
+    inclusion: { in: ACL_TYPES }
   validates :value, presence: true
 
   serialize :value, JSON
@@ -30,8 +30,9 @@ class DeployACLEntry < ActiveRecord::Base
   end
 
   private
+
   def ldap_group_authorized?(user)
-    group_cns = self.value
+    group_cns = value
     ldap_authorizer.user_is_member_of_any_group?(user.uid, group_cns)
   end
 

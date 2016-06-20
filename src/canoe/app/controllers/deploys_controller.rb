@@ -18,7 +18,9 @@ class DeploysController < ApplicationController
   end
 
   def select_target
-    if @prov_deploy = build_provisional_deploy
+    @prov_deploy = build_provisional_deploy
+
+    if @prov_deploy
       @targets = DeployTarget.enabled.order(:production, :name)
     else
       render_invalid_provisional_deploy
@@ -26,7 +28,9 @@ class DeploysController < ApplicationController
   end
 
   def new
-    if @prov_deploy = build_provisional_deploy
+    @prov_deploy = build_provisional_deploy
+
+    if @prov_deploy
       @previous_deploy = current_target.last_successful_deploy_for(current_project.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
       @server_hostnames = current_target.servers(project: current_project).enabled.pluck(:hostname).sort
@@ -49,7 +53,9 @@ class DeploysController < ApplicationController
   end
 
   def create
-    if prov_deploy = build_provisional_deploy
+    prov_deploy = build_provisional_deploy
+
+    if prov_deploy
       deploy_response = deploy!(prov_deploy)
       if !deploy_response[:error] && deploy_response[:deploy]
         the_deploy = deploy_response[:deploy]
@@ -84,6 +90,7 @@ class DeploysController < ApplicationController
   end
 
   private
+
   def require_no_active_deploy
     unless current_target.active_deploy(current_project).nil?
       flash[:notice] = "There is currently a deploy in progress."

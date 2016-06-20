@@ -11,12 +11,12 @@ RSpec.describe "/api/deploy" do
 
     describe "with authentication" do
       it "updates the deploy result record for the server" do
-        project = FactoryGirl.create(:project) # TODO Remove this when we've added an association btw Deploy & Project
+        project = FactoryGirl.create(:project) # TODO: Remove this when we've added an association btw Deploy & Project
         server = FactoryGirl.create(:server)
         deploy = FactoryGirl.create(:deploy, project_name: project.name)
         result = deploy.results.create!(server: server)
 
-        api_post "/api/deploy/#{deploy.id}/completed_server", { server: server.hostname }
+        api_post "/api/deploy/#{deploy.id}/completed_server", server: server.hostname
         assert_nonerror_response
 
         result.reload

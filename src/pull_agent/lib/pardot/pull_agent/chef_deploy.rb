@@ -7,7 +7,7 @@ module Pardot
         "dfw" => "environments/dfw/production.rb",
         "phx" => "environments/phx/production.rb",
         "ue1.aws" => "environments/aws/production.rb"
-      }
+      }.freeze
 
       def initialize(script, checkout_path, deploy)
         @script = script
@@ -15,6 +15,7 @@ module Pardot
         @deploy = deploy
       end
 
+      # rubocop:disable Lint/RescueException
       def apply(env)
         hostname = ShellHelper.hostname
         datacenter = hostname.split("-")[3]
