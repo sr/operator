@@ -17,23 +17,23 @@ func resourceAwsVpcEndpoint() *schema.Resource {
 		Update: resourceAwsVPCEndpointUpdate,
 		Delete: resourceAwsVPCEndpointDelete,
 		Schema: map[string]*schema.Schema{
-			"policy": &schema.Schema{
+			"policy": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Computed:  true,
 				StateFunc: normalizeJson,
 			},
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"service_name": &schema.Schema{
+			"service_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"route_table_ids": &schema.Schema{
+			"route_table_ids": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

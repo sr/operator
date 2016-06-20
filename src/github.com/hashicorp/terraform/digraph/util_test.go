@@ -214,12 +214,12 @@ y -> z`)
 	}
 
 	expected := map[string]struct{}{
-		"a": struct{}{},
-		"b": struct{}{},
-		"c": struct{}{},
-		"d": struct{}{},
-		"e": struct{}{},
-		"f": struct{}{},
+		"a": {},
+		"b": {},
+		"c": {},
+		"d": {},
+		"e": {},
+		"f": {},
 	}
 	out := map[string]struct{}{}
 	for _, n := range unreached {

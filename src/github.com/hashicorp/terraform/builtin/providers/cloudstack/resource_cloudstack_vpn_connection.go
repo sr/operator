@@ -17,28 +17,28 @@ func resourceCloudStackVPNConnection() *schema.Resource {
 		Delete: resourceCloudStackVPNConnectionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"customer_gateway_id": &schema.Schema{
+			"customer_gateway_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"customergatewayid": &schema.Schema{
+			"customergatewayid": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `customer_gateway_id` field instead",
 			},
 
-			"vpn_gateway_id": &schema.Schema{
+			"vpn_gateway_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"vpngatewayid": &schema.Schema{
+			"vpngatewayid": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,

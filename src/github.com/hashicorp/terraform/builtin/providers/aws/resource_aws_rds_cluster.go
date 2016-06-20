@@ -23,7 +23,7 @@ func resourceAwsRDSCluster() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"availability_zones": &schema.Schema{
+			"availability_zones": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -32,14 +32,14 @@ func resourceAwsRDSCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"cluster_identifier": &schema.Schema{
+			"cluster_identifier": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRdsId,
 			},
 
-			"cluster_members": &schema.Schema{
+			"cluster_members": {
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -47,14 +47,14 @@ func resourceAwsRDSCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"database_name": &schema.Schema{
+			"database_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"db_subnet_group_name": &schema.Schema{
+			"db_subnet_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -64,37 +64,37 @@ func resourceAwsRDSCluster() *schema.Resource {
 			// TODO: remove parameter_group_name
 			// See https://github.com/hashicorp/terraform/issues/7046
 			// Likely need migration to remove from state
-			"parameter_group_name": &schema.Schema{
+			"parameter_group_name": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				Computed:   true,
 				Deprecated: "Use db_cluster_parameter_group_name instead. This attribute will be removed in a future version",
 			},
 
-			"db_cluster_parameter_group_name": &schema.Schema{
+			"db_cluster_parameter_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"endpoint": &schema.Schema{
+			"endpoint": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"engine": &schema.Schema{
+			"engine": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"storage_encrypted": &schema.Schema{
+			"storage_encrypted": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"final_snapshot_identifier": &schema.Schema{
+			"final_snapshot_identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -113,24 +113,24 @@ func resourceAwsRDSCluster() *schema.Resource {
 				},
 			},
 
-			"skip_final_snapshot": &schema.Schema{
+			"skip_final_snapshot": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"master_username": &schema.Schema{
+			"master_username": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"master_password": &schema.Schema{
+			"master_password": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"port": &schema.Schema{
+			"port": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -139,13 +139,13 @@ func resourceAwsRDSCluster() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.DBInstance.Modifying.html
-			"apply_immediately": &schema.Schema{
+			"apply_immediately": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"vpc_security_group_ids": &schema.Schema{
+			"vpc_security_group_ids": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -153,13 +153,13 @@ func resourceAwsRDSCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"preferred_backup_window": &schema.Schema{
+			"preferred_backup_window": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"preferred_maintenance_window": &schema.Schema{
+			"preferred_maintenance_window": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -171,7 +171,7 @@ func resourceAwsRDSCluster() *schema.Resource {
 				},
 			},
 
-			"backup_retention_period": &schema.Schema{
+			"backup_retention_period": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,

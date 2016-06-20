@@ -51,7 +51,7 @@ func TestAccNetworkingV2Port_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckNetworkingV2PortDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccNetworkingV2Port_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNetworkingV2SubnetExists(t, "openstack_networking_subnet_v2.foo", &subnet),
@@ -98,7 +98,7 @@ func TestAccNetworkingV2Port_noip(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckNetworkingV2PortDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccNetworkingV2Port_noip,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNetworkingV2SubnetExists(t, "openstack_networking_subnet_v2.foo", &subnet),

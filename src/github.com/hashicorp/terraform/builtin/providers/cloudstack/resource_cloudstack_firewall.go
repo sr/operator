@@ -21,14 +21,14 @@ func resourceCloudStackFirewall() *schema.Resource {
 		Delete: resourceCloudStackFirewallDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"ipaddress"},
 			},
 
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
@@ -36,55 +36,55 @@ func resourceCloudStackFirewall() *schema.Resource {
 				ConflictsWith: []string{"ip_address_id"},
 			},
 
-			"managed": &schema.Schema{
+			"managed": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"rule": &schema.Schema{
+			"rule": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cidr_list": &schema.Schema{
+						"cidr_list": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"source_cidr": &schema.Schema{
+						"source_cidr": {
 							Type:       schema.TypeString,
 							Optional:   true,
 							Deprecated: "Please use the `cidr_list` field instead",
 						},
 
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"icmp_type": &schema.Schema{
+						"icmp_type": {
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"icmp_code": &schema.Schema{
+						"icmp_code": {
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ports": &schema.Schema{
+						"ports": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"uuids": &schema.Schema{
+						"uuids": {
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
@@ -92,7 +92,7 @@ func resourceCloudStackFirewall() *schema.Resource {
 				},
 			},
 
-			"parallelism": &schema.Schema{
+			"parallelism": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,

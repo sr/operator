@@ -21,45 +21,45 @@ func resourceCloudStackInstance() *schema.Resource {
 		Delete: resourceCloudStackInstanceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"display_name": &schema.Schema{
+			"display_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"service_offering": &schema.Schema{
+			"service_offering": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"network": &schema.Schema{
+			"network": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `network_id` field instead",
 			},
 
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				Computed:   true,
@@ -67,13 +67,13 @@ func resourceCloudStackInstance() *schema.Resource {
 				Deprecated: "Please use the `ip_address` field instead",
 			},
 
-			"template": &schema.Schema{
+			"template": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"affinity_group_ids": &schema.Schema{
+			"affinity_group_ids": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -81,24 +81,24 @@ func resourceCloudStackInstance() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"project": &schema.Schema{
+			"project": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"keypair": &schema.Schema{
+			"keypair": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"user_data": &schema.Schema{
+			"user_data": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -113,13 +113,13 @@ func resourceCloudStackInstance() *schema.Resource {
 				},
 			},
 
-			"expunge": &schema.Schema{
+			"expunge": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

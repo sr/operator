@@ -126,7 +126,7 @@ type EvalVariableBlock struct {
 // TODO: test
 func (n *EvalVariableBlock) Eval(ctx EvalContext) (interface{}, error) {
 	// Clear out the existing mapping
-	for k, _ := range n.VariableValues {
+	for k := range n.VariableValues {
 		delete(n.VariableValues, k)
 	}
 
@@ -153,7 +153,7 @@ func (n *EvalVariableBlock) Eval(ctx EvalContext) (interface{}, error) {
 
 		return nil, fmt.Errorf("Variable value for %s is not a string, list or map type", k)
 	}
-	for k, _ := range rc.Raw {
+	for k := range rc.Raw {
 		if _, ok := n.VariableValues[k]; !ok {
 			n.VariableValues[k] = config.UnknownVariableValue
 		}

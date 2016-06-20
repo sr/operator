@@ -100,7 +100,7 @@ func (t *DestroyTransformer) Transform(g *Graph) error {
 
 	// Go through the nodes we added and determine if they depend
 	// on any nodes with a destroy node. If so, depend on that instead.
-	for n, _ := range nodeToCn {
+	for n := range nodeToCn {
 		for _, downRaw := range g.DownEdges(n).List() {
 			target := downRaw.(dag.Vertex)
 			cn2, ok := target.(GraphNodeDestroyable)

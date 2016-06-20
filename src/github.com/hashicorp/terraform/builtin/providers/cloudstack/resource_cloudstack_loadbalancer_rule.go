@@ -18,63 +18,63 @@ func resourceCloudStackLoadBalancerRule() *schema.Resource {
 		Delete: resourceCloudStackLoadBalancerRuleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"ip_address_id": &schema.Schema{
+			"ip_address_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `ip_address_id` field instead",
 			},
 
-			"network_id": &schema.Schema{
+			"network_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"network": &schema.Schema{
+			"network": {
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use the `network_id` field instead",
 			},
 
-			"algorithm": &schema.Schema{
+			"algorithm": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"private_port": &schema.Schema{
+			"private_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_port": &schema.Schema{
+			"public_port": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"member_ids": &schema.Schema{
+			"member_ids": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				ForceNew:      true,
@@ -82,7 +82,7 @@ func resourceCloudStackLoadBalancerRule() *schema.Resource {
 				ConflictsWith: []string{"members"},
 			},
 
-			"members": &schema.Schema{
+			"members": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				ForceNew:      true,

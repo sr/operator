@@ -18,62 +18,62 @@ func resourceComputeTargetPool() *schema.Resource {
 		Update: resourceComputeTargetPoolUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"backup_pool": &schema.Schema{
+			"backup_pool": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"failover_ratio": &schema.Schema{
+			"failover_ratio": {
 				Type:     schema.TypeFloat,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"health_checks": &schema.Schema{
+			"health_checks": {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"instances": &schema.Schema{
+			"instances": {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"project": &schema.Schema{
+			"project": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": &schema.Schema{
+			"region": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": &schema.Schema{
+			"self_link": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"session_affinity": &schema.Schema{
+			"session_affinity": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

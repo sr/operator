@@ -16,25 +16,25 @@ func resourceArmDnsZone() *schema.Resource {
 		Delete: resourceArmDnsZoneDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"resource_group_name": &schema.Schema{
+			"resource_group_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"number_of_record_sets": &schema.Schema{
+			"number_of_record_sets": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"max_number_of_record_sets": &schema.Schema{
+			"max_number_of_record_sets": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

@@ -84,18 +84,18 @@ func smcUserVariables(c *config.Config, vs map[string]string) []error {
 			required[v.Name] = struct{}{}
 		}
 	}
-	for k, _ := range vs {
+	for k := range vs {
 		delete(required, k)
 	}
 	if len(required) > 0 {
-		for k, _ := range required {
+		for k := range required {
 			errs = append(errs, fmt.Errorf(
 				"Required variable not set: %s", k))
 		}
 	}
 
 	// Check that types match up
-	for k, _ := range vs {
+	for k := range vs {
 		v, ok := cvs[k]
 		if !ok {
 			continue

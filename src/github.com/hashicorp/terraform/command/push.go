@@ -180,7 +180,7 @@ func (c *PushCommand) Run(args []string) int {
 
 	// Output to the user the variables that will be uploaded
 	var setVars []string
-	for k, _ := range ctx.Variables() {
+	for k := range ctx.Variables() {
 		if _, ok := overwriteMap[k]; !ok {
 			if _, ok := atlasVars[k]; ok {
 				// Atlas variable not within override, so it came from Atlas

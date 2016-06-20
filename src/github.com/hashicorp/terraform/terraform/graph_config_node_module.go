@@ -90,7 +90,7 @@ func (n *GraphNodeConfigModule) ProvidedBy() []string {
 	// Turn the map into a string. This makes sure that the list is
 	// de-dupped since we could be going over potentially many resources.
 	result := make([]string, 0, len(providers))
-	for p, _ := range providers {
+	for p := range providers {
 		result = append(result, p)
 	}
 

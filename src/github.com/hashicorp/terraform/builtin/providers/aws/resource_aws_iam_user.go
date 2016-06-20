@@ -19,7 +19,7 @@ func resourceAwsIamUser() *schema.Resource {
 		Delete: resourceAwsIamUserDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -31,15 +31,15 @@ func resourceAwsIamUser() *schema.Resource {
 				and inefficient. Still, there are other reasons one might want
 				the UniqueID, so we can make it available.
 			*/
-			"unique_id": &schema.Schema{
+			"unique_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"path": &schema.Schema{
+			"path": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",

@@ -23,7 +23,7 @@ func resourceFile() *schema.Resource {
 		Read:   resourceFileRead,
 
 		Schema: map[string]*schema.Schema{
-			"template": &schema.Schema{
+			"template": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Contents of the template",
@@ -31,7 +31,7 @@ func resourceFile() *schema.Resource {
 				ConflictsWith: []string{"filename"},
 				ValidateFunc:  validateTemplateAttribute,
 			},
-			"filename": &schema.Schema{
+			"filename": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "file to read template from",
@@ -54,14 +54,14 @@ func resourceFile() *schema.Resource {
 				Deprecated:    "Use the 'template' attribute instead.",
 				ConflictsWith: []string{"template"},
 			},
-			"vars": &schema.Schema{
+			"vars": {
 				Type:        schema.TypeMap,
 				Optional:    true,
 				Default:     make(map[string]interface{}),
 				Description: "variables to substitute",
 				ForceNew:    true,
 			},
-			"rendered": &schema.Schema{
+			"rendered": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "rendered template",

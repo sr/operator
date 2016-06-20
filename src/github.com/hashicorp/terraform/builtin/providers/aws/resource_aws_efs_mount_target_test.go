@@ -18,7 +18,7 @@ func TestAccAWSEFSMountTarget_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckEfsMountTargetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSEFSMountTargetConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckEfsMountTarget(
@@ -26,7 +26,7 @@ func TestAccAWSEFSMountTarget_basic(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSEFSMountTargetConfigModified,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckEfsMountTarget(

@@ -68,7 +68,7 @@ func TestAccAzureRMRouteTable_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMRouteTableDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMRouteTableExists("azurerm_route_table.test"),
@@ -89,7 +89,7 @@ func TestAccAzureRMRouteTable_withTags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMRouteTableDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMRouteTableExists("azurerm_route_table.test"),
@@ -102,7 +102,7 @@ func TestAccAzureRMRouteTable_withTags(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMRouteTableExists("azurerm_route_table.test"),
@@ -127,7 +127,7 @@ func TestAccAzureRMRouteTable_multipleRoutes(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMRouteTableDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMRouteTableExists("azurerm_route_table.test"),
@@ -136,7 +136,7 @@ func TestAccAzureRMRouteTable_multipleRoutes(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMRouteTableExists("azurerm_route_table.test"),

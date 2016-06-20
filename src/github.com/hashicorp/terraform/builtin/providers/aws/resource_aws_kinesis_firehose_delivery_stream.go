@@ -21,13 +21,13 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 		Delete: resourceAwsKinesisFirehoseDeliveryStreamDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"destination": &schema.Schema{
+			"destination": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -37,52 +37,52 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 				},
 			},
 
-			"role_arn": &schema.Schema{
+			"role_arn": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"s3_bucket_arn": &schema.Schema{
+			"s3_bucket_arn": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"s3_prefix": &schema.Schema{
+			"s3_prefix": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"s3_buffer_size": &schema.Schema{
+			"s3_buffer_size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  5,
 			},
 
-			"s3_buffer_interval": &schema.Schema{
+			"s3_buffer_interval": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  300,
 			},
 
-			"s3_data_compression": &schema.Schema{
+			"s3_data_compression": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "UNCOMPRESSED",
 			},
 
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"version_id": &schema.Schema{
+			"version_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"destination_id": &schema.Schema{
+			"destination_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

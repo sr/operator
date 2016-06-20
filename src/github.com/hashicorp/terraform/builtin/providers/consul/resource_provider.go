@@ -12,17 +12,17 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"datacenter": &schema.Schema{
+			"datacenter": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"address": &schema.Schema{
+			"address": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"scheme": &schema.Schema{
+			"scheme": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},

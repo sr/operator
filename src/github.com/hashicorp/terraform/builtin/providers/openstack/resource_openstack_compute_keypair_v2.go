@@ -15,18 +15,18 @@ func resourceComputeKeypairV2() *schema.Resource {
 		Delete: resourceComputeKeypairV2Delete,
 
 		Schema: map[string]*schema.Schema{
-			"region": &schema.Schema{
+			"region": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"public_key": &schema.Schema{
+			"public_key": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

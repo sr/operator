@@ -20,13 +20,13 @@ func resourceAwsVpnGateway() *schema.Resource {
 		Delete: resourceAwsVpnGatewayDelete,
 
 		Schema: map[string]*schema.Schema{
-			"availability_zone": &schema.Schema{
+			"availability_zone": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},

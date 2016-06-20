@@ -18,13 +18,13 @@ func TestAccAWSSQSQueue_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSSQSQueueDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSSQSConfigWithDefaults,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSQSExistsWithDefaults("aws_sqs_queue.queue-with-defaults"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSSQSConfigWithOverrides,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSQSExistsWithOverrides("aws_sqs_queue.queue-with-overrides"),
@@ -40,7 +40,7 @@ func TestAccAWSSQSQueue_redrivePolicy(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSSQSQueueDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSSQSConfigWithRedrive(acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSQSExistsWithDefaults("aws_sqs_queue.my_dead_letter_queue"),
@@ -57,7 +57,7 @@ func TestAccAWSSQSQueue_Policybasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSSQSQueueDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSSQSConfig_PolicyFormat,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSQSExistsWithOverrides("aws_sqs_queue.test-email-events"),

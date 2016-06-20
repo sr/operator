@@ -16,23 +16,23 @@ func resourcePostgresqlRole() *schema.Resource {
 		Delete: resourcePostgresqlRoleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"login": &schema.Schema{
+			"login": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
 				Default:  false,
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"encrypted": &schema.Schema{
+			"encrypted": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,

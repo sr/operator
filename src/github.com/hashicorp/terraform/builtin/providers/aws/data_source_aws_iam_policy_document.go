@@ -24,20 +24,20 @@ func dataSourceAwsIamPolicyDocument() *schema.Resource {
 		Read: dataSourceAwsIamPolicyDocumentRead,
 
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"statement": &schema.Schema{
+			"statement": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
+						"id": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"effect": &schema.Schema{
+						"effect": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "Allow",
@@ -48,20 +48,20 @@ func dataSourceAwsIamPolicyDocument() *schema.Resource {
 						"not_resources":  setOfString,
 						"principals":     dataSourceAwsIamPolicyPrincipalSchema(),
 						"not_principals": dataSourceAwsIamPolicyPrincipalSchema(),
-						"condition": &schema.Schema{
+						"condition": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"test": &schema.Schema{
+									"test": {
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"variable": &schema.Schema{
+									"variable": {
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"values": &schema.Schema{
+									"values": {
 										Type:     schema.TypeSet,
 										Required: true,
 										Elem: &schema.Schema{
@@ -74,7 +74,7 @@ func dataSourceAwsIamPolicyDocument() *schema.Resource {
 					},
 				},
 			},
-			"json": &schema.Schema{
+			"json": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -193,11 +193,11 @@ func dataSourceAwsIamPolicyPrincipalSchema() *schema.Schema {
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"type": &schema.Schema{
+				"type": {
 					Type:     schema.TypeString,
 					Required: true,
 				},
-				"identifiers": &schema.Schema{
+				"identifiers": {
 					Type:     schema.TypeSet,
 					Required: true,
 					Elem: &schema.Schema{

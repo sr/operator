@@ -21,7 +21,7 @@ func TestAccAWSIAMServerCertificate_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckIAMServerCertificateDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccIAMServerCertConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCertExists("aws_iam_server_certificate.test_cert", &cert),
@@ -40,7 +40,7 @@ func TestAccAWSIAMServerCertificate_name_prefix(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckIAMServerCertificateDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccIAMServerCertConfig_random,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCertExists("aws_iam_server_certificate.test_cert", &cert),
@@ -73,7 +73,7 @@ func TestAccAWSIAMServerCertificate_disappears(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckIAMServerCertificateDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccIAMServerCertConfig_random,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCertExists("aws_iam_server_certificate.test_cert", &cert),

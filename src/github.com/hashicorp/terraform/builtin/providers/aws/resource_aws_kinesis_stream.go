@@ -20,19 +20,19 @@ func resourceAwsKinesisStream() *schema.Resource {
 		Delete: resourceAwsKinesisStreamDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"shard_count": &schema.Schema{
+			"shard_count": {
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"retention_period": &schema.Schema{
+			"retention_period": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  24,
@@ -46,7 +46,7 @@ func resourceAwsKinesisStream() *schema.Resource {
 				},
 			},
 
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

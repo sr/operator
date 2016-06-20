@@ -14,12 +14,12 @@ import (
 // ExpectedListInfo is the result expected from a call to `List` when full
 // info is requested.
 var ExpectedListInfo = []Container{
-	Container{
+	{
 		Count: 0,
 		Bytes: 0,
 		Name:  "janeausten",
 	},
-	Container{
+	{
 		Count: 1,
 		Bytes: 14,
 		Name:  "marktwain",

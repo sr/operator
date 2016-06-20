@@ -27,7 +27,7 @@ func TestAccAWSDBInstance_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSDBInstanceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.bar", &v),
@@ -64,7 +64,7 @@ func TestAccAWSDBInstance_kmsKey(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.bar", &v),
@@ -85,7 +85,7 @@ func TestAccAWSDBInstance_optionGroup(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSDBInstanceConfigWithOptionGroup,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.bar", &v),
@@ -106,7 +106,7 @@ func TestAccAWSDBInstanceReplica(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccReplicaInstanceConfig(rand.New(rand.NewSource(time.Now().UnixNano())).Int()),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.bar", &s),
@@ -128,7 +128,7 @@ func TestAccAWSDBInstanceSnapshot(t *testing.T) {
 		// created, and subequently deletes it
 		CheckDestroy: testAccCheckAWSDBInstanceSnapshot,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccSnapshotInstanceConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.snapshot", &snap),
@@ -146,7 +146,7 @@ func TestAccAWSDBInstanceNoSnapshot(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceNoSnapshot,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccNoSnapshotInstanceConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.no_snapshot", &nosnap),
@@ -164,7 +164,7 @@ func TestAccAWSDBInstance_enhancedMonitoring(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceNoSnapshot,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccSnapshotInstanceConfig_enhancedMonitoring,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists("aws_db_instance.enhanced_monitoring", &dbInstance),

@@ -19,53 +19,53 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 		Delete: resourceAwsRDSClusterInstanceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"identifier": &schema.Schema{
+			"identifier": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRdsId,
 			},
 
-			"db_subnet_group_name": &schema.Schema{
+			"db_subnet_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"writer": &schema.Schema{
+			"writer": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 
-			"cluster_identifier": &schema.Schema{
+			"cluster_identifier": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"endpoint": &schema.Schema{
+			"endpoint": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"port": &schema.Schema{
+			"port": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"publicly_accessible": &schema.Schema{
+			"publicly_accessible": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"instance_class": &schema.Schema{
+			"instance_class": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"db_parameter_group_name": &schema.Schema{
+			"db_parameter_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -74,7 +74,7 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.DBInstance.Modifying.html
-			"apply_immediately": &schema.Schema{
+			"apply_immediately": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,

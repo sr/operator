@@ -16,7 +16,7 @@ func dataSourceAwsAvailabilityZones() *schema.Resource {
 		Read: dataSourceAwsAvailabilityZonesRead,
 
 		Schema: map[string]*schema.Schema{
-			"names": &schema.Schema{
+			"names": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

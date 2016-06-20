@@ -23,25 +23,25 @@ func resourceAwsDbSubnetGroup() *schema.Resource {
 		Delete: resourceAwsDbSubnetGroupDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateSubnetGroupName,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"subnet_ids": &schema.Schema{
+			"subnet_ids": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

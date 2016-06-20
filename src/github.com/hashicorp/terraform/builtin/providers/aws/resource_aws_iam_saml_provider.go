@@ -17,20 +17,20 @@ func resourceAwsIamSamlProvider() *schema.Resource {
 		Delete: resourceAwsIamSamlProviderDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"valid_until": &schema.Schema{
+			"valid_until": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"saml_metadata_document": &schema.Schema{
+			"saml_metadata_document": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
