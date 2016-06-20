@@ -135,7 +135,7 @@ case "$project" in
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
             build/build \
-            make -C src/terraform validate
+            terra validate
         ;;
     # TODO(sr) Decide what to do about vendored Go code. I think building
     # it might be worthwhile still, just not with the same level of
