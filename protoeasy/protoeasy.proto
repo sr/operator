@@ -78,24 +78,3 @@ message CompileOptions {
 message Command {
   repeated string arg = 1;
 }
-
-message CompileInfo {
-  repeated Command command = 1;
-  uint64 input_size_bytes = 2;
-  uint64 output_size_bytes = 3;
-  google.protobuf.Duration duration = 4;
-}
-
-message CompileRequest {
-  bytes tar = 1;
-  CompileOptions compile_options = 2;
-}
-
-message CompileResponse {
-  bytes tar = 1;
-  CompileInfo compile_info = 2;
-}
-
-service API {
-  rpc Compile(CompileRequest) returns (CompileResponse) {}
-}

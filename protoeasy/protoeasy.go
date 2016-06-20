@@ -21,22 +21,7 @@ import (
 )
 
 var (
-	//DefaultServerCompiler is the default Compiler for a server.
-	DefaultServerCompiler = NewServerCompiler(CompilerOptions{})
-	// DefaultAPIServer is the default API Server.
-	DefaultAPIServer = NewAPIServer(DefaultServerCompiler, APIServerOptions{})
-	// DefaultClientCompiler is the default Compiler for a client.
-	DefaultClientCompiler = NewClientCompiler(
-		NewLocalAPIClient(
-			NewAPIServer(
-				DefaultServerCompiler,
-				APIServerOptions{
-					NoLogging: true,
-				},
-			),
-		),
-		CompilerOptions{},
-	)
+	DefaultCompiler = NewCompiler(CompilerOptions{})
 	// DefaultDescriptorSetFileName is the default descriptor set file name.
 	DefaultDescriptorSetFileName = "descriptor-set.pb"
 )
@@ -51,29 +36,8 @@ type Compiler interface {
 // CompilerOptions are options for a Compiler.
 type CompilerOptions struct{}
 
-// NewServerCompiler returns a new server Compiler.
-func NewServerCompiler(options CompilerOptions) Compiler {
-	return newServerCompiler(options)
-}
-
-// APIServerOptions are options for an APIServer.
-type APIServerOptions struct {
-	NoLogging bool
-}
-
-// NewAPIServer returns a new APIServer for the given Compiler.
-func NewAPIServer(compiler Compiler, options APIServerOptions) APIServer {
-	return newAPIServer(compiler, options)
-}
-
-// NewLocalAPIClient returns a new APIClient that calls the APIServer directly.
-func NewLocalAPIClient(apiServer APIServer) APIClient {
-	return newLocalAPIClient(apiServer)
-}
-
-// NewClientCompiler returns a new client Compiler for the given APIClient.
-func NewClientCompiler(apiClient APIClient, options CompilerOptions) Compiler {
-	return newClientCompiler(apiClient, options)
+func NewCompiler(options CompilerOptions) Compiler {
+	return newCompiler(options)
 }
 
 // GoPluginTypeSimpleValueOf returns the GoPluginType for the simple value.
