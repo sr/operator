@@ -55,7 +55,7 @@ func run() error {
 	case "plan":
 		color = "gray"
 		message = fmt.Sprintf(
-			"%s is planing <code>terraform/%s</code> with <code>%s</code>",
+			"%s is planning terraform changes on branch <code>%s</code> with <code>%s</code>",
 			whoami.Username,
 			*gitBranch,
 			*terraformVersion,
@@ -63,7 +63,7 @@ func run() error {
 	case "apply":
 		color = "yellow"
 		message = fmt.Sprintf(
-			"%s is deploying <code>terraform/%s</code> with <code>%s</code>",
+			"%s is deploying terraform branch <code>%s</code> with <code>%s</code>",
 			whoami.Username,
 			*gitBranch,
 			*terraformVersion,
