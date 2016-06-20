@@ -7,7 +7,7 @@ class Datacenter
 
   DALLAS = "dfw".freeze
   LOCAL = "local".freeze
-  SEATTLE = "phx".freeze
+  PHOENIX = "phx".freeze
 
   # Returns the current Datacenter based on the Rails configuration.
   def self.current
@@ -21,7 +21,7 @@ class Datacenter
     @name = name
     @config = config
 
-    if ![DALLAS, LOCAL, SEATTLE].include?(name)
+    if ![DALLAS, LOCAL, PHOENIX].include?(name)
       raise NotFound, name
     end
   end

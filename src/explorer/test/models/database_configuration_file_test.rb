@@ -18,14 +18,14 @@ class DatabaseConfigurationFileTest < ActiveSupport::TestCase
   end
 
   test "shard" do
-    config = @config.shard(Datacenter::SEATTLE, 1)
+    config = @config.shard(Datacenter::PHOENIX, 1)
     assert_equal "mysql", config.hostname
     assert_equal "pardot_shard1", config.name
     assert_equal "root", config.username
     assert_nil config.password
 
     assert_raise(DatabaseConfigurationFile::ShardNotFound) do
-      @config.shard(Datacenter::SEATTLE, 4)
+      @config.shard(Datacenter::PHOENIX, 4)
     end
 
     assert_raise(DatabaseConfigurationFile::DatacenterNotFound) do
