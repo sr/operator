@@ -91,4 +91,5 @@ breadsignal -terraform "$action" \
     -terraform-version "$(terraform version)" \
     -branch "$(git rev-parse --abbrev-ref HEAD)" \
     -testing=false
-make -f ../../etc/mk/terraform.mk "$action"
+make -f ../../etc/mk/terraform.mk "$action" |
+grep -vi password
