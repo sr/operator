@@ -4,13 +4,6 @@ Package protoeasy is intended to make using protoc simpler.
 Protoeasy compiles all protocol buffer files in a directory/subdirectories,
 taking care of all include directories, takes care of gRPC compilation,
 and take care of package import modifiers for Golang.
-
-Protoeasy also provides a client/server model where compilation is delegated
-to a server process meant to be run in a Docker container. This allows you
-to not have to install protoc, gRPC, and associated protoc plugins on your
-local development machine.
-
-See the README.md file for more details.
 */
 package protoeasy
 
