@@ -43,6 +43,4 @@ class Api::DeploysController < Api::Controller
 
     render json: {success: true}
   end
-
-  private
 end

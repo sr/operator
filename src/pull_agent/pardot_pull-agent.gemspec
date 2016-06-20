@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.files += ["README.md"]
   s.files += Dir.glob("environments/*")
   s.files += Dir.glob("lib/**/*")
-  s.executables = ["pull-agent"]
+  s.executables = ["pull-agent", "pa-deploy-chef"]
   s.add_dependency "artifactory", "~>2.3"
   s.add_dependency "redis", "~>3.3"
   s.add_development_dependency "byebug", "~>8.2"

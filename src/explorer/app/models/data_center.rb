@@ -5,17 +5,6 @@ class DataCenter
     end
   end
 
-  class UnauthorizedAccountAccess < StandardError
-    def initialize(account_id)
-      @account_id = account_id
-
-      super "access to account #{account_id.inspect} is not authorized"
-    end
-
-    attr_reader :account_id
-  end
-
-  ENGINEERING_ROLE = 7
   DALLAS = "dfw".freeze
   LOCAL = "local".freeze
   SEATTLE = "phx".freeze
@@ -46,10 +35,6 @@ class DataCenter
   end
 
   def shard_for(account_id)
-    if !access_authorized?(account_id)
-      raise UnauthorizedAccountAccess, account_id
-    end
-
     account = find_account(account_id)
     config = @config.shard(@name, account.shard_id)
 
@@ -64,17 +49,18 @@ class DataCenter
     global_accounts.all
   end
 
-  private
-
-  def access_authorized?(account_id)
+  def account_access_enabled?(account_id)
     query = <<-SQL.freeze
       SELECT id FROM global_account_access
       WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
       LIMIT 1
     SQL
-    results = global.execute(query, [ENGINEERING_ROLE, account_id])
+
+    results = global.execute(query, [Rails.application.config.x.support_role, account_id])
     results.size == 1
   end
+
+  private
 
   def global_accounts
     @global_accounts ||= GlobalAccountsCollection.new(global)

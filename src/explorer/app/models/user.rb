@@ -11,22 +11,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  # Returns true if this user is authorized to use Explorer, false otherwise.
-  def access_authorized?
-    if Rails.env.development?
-      return true
-    end
-
-    if new_record?
-      return false
-    end
-
-    groups = Rails.application.config.x.authorized_ldap_groups
-    auth = Canoe::LDAPAuthorizer.new
-
-    auth.user_is_member_of_any_group?(uid, groups)
-  end
-
   def account_query(sql, account_id)
     queries.create!(raw_sql: sql, account_id: account_id)
   end

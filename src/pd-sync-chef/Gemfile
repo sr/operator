@@ -1,0 +1,2 @@
+source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
+gemspec name: "pardot_pd_sync"
