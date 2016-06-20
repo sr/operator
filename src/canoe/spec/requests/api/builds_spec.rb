@@ -16,18 +16,18 @@ RSpec.describe "/api/projects/:project_name/branches/:branch_name/builds" do
     it "returns the latest builds for the given project and branch" do
       allow(Artifactory.client).to receive(:post)
         .and_return("results" => [
-                      {
-                        "repo" => "pd-canoe",
-                        "path" => "PDT/PPANT",
-                        "name" => "build1234.tar.gz",
-                        "properties" => [
-                          { "key" => "gitBranch", "value" => "master" },
-                          { "key" => "buildNumber", "value" => "1234" },
-                          { "key" => "gitSha", "value" => "bcd234" },
-                          { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
-                        ]
-                      }
-                    ])
+        {
+          "repo" => "pd-canoe",
+          "path" => "PDT/PPANT",
+          "name" => "build1234.tar.gz",
+          "properties" => [
+            { "key" => "gitBranch", "value" => "master" },
+            { "key" => "buildNumber", "value" => "1234" },
+            { "key" => "gitSha", "value" => "bcd234" },
+            { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
+          ]
+        }
+      ])
 
       api_get "/api/projects/#{@project.name}/branches/master/builds"
       expect(json_response.length).to eq(1)

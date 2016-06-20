@@ -164,7 +164,8 @@ class ApplicationController < ActionController::Base
         Instrumentation.error("unauthorized-deploy",
           current_user: current_user.uid,
           project: current_project.name,
-          target: current_target.name)
+          target: current_target.name
+        )
         render template: "application/not_authorized_for_deploy", status: :unauthorized
         false
       else

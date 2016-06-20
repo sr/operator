@@ -51,11 +51,11 @@ module CanoeHelper
   def print_deploy_what(deploy)
     output = deploy_type_icon(deploy.what)
     output += " "
-    output += if deploy.commit?
-                sha_span(deploy.what_details)
-              else
-                deploy.what_details
-              end
+    if deploy.commit?
+      output += sha_span(deploy.what_details)
+    else
+      output += deploy.what_details
+    end
 
     if deploy.build_number
       output += " "

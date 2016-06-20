@@ -17,18 +17,18 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
 
     allow(Artifactory.client).to receive(:post)
       .and_return("results" => [
-                    {
-                      "repo" => "pd-canoe",
-                      "path" => "PDT/PPANT",
-                      "name" => "build1234.tar.gz",
-                      "properties" => [
-                        { "key" => "gitBranch", "value" => "master" },
-                        { "key" => "buildNumber", "value" => "1234" },
-                        { "key" => "gitSha", "value" => "abc123" },
-                        { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
-                      ]
-                    }
-                  ])
+        {
+          "repo" => "pd-canoe",
+          "path" => "PDT/PPANT",
+          "name" => "build1234.tar.gz",
+          "properties" => [
+            { "key" => "gitBranch", "value" => "master" },
+            { "key" => "buildNumber", "value" => "1234" },
+            { "key" => "gitSha", "value" => "abc123" },
+            { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
+          ]
+        }
+      ])
 
     allow(Artifactory.client).to receive(:get)
       .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, properties: nil)
