@@ -57,7 +57,7 @@ module Pardot
       # Make this compatible with Instrumentation::Logger
       def self.puts(data)
         Syslog.open("pull-agent") do
-          Syslog.log(Syslog::LOG_ERR, data)
+          Syslog.log(Syslog::LOG_INFO, data)
         end
       end
 
