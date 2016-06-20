@@ -6,7 +6,7 @@ module ActiveSupport
   class TestCase
     setup do
       reset_logger
-      reset_account_access(Datacenter::DALLAS)
+      reset_account_access
     end
 
     protected
@@ -20,7 +20,7 @@ module ActiveSupport
       User.create!(default_attributes.merge(attributes))
     end
 
-    def reset_account_access(datacenter)
+    def reset_account_access
       Datacenter.current.global.execute("DELETE FROM global_account_access")
     end
 
