@@ -8,16 +8,24 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 : "${PROGRAM:="$(basename "$0")"}"
+: "${HIPCHAT_TOKEN:=""}"
 
 print_help() {
     grep ^#/ <"$0" |cut -c4-
 }
 
-if [ "$#" -eq 0 ]
-then
+if [ "$#" -eq 0 ]; then
     print_help
     exit 2
 fi
+
+if [ -z "$HIPCHAT_TOKEN" ]; then
+    printf "%s: required environment variable missing: HIPCHAT_TOKEN\n" "$PROGRAM" 2>&1
+    echo "Please find it on https://secrets.ops.pardot.com (search for TODO)" \
+        "and add it to your shell environment." 2>&1
+    exit 1
+fi
+
 
 action="${1:-""}"
 arg1="${2:-""}"
