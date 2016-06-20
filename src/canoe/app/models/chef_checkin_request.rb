@@ -25,14 +25,6 @@ class ChefCheckinRequest
 
   attr_reader :checkout, :server
 
-  def environment
-    @server.environment
-  end
-
-  def hostname
-    @server.hostname
-  end
-
   def checkout_sha
     @checkout.sha
   end
