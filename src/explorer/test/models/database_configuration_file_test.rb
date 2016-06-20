@@ -6,9 +6,9 @@ class DatabaseConfigurationFileTest < ActiveSupport::TestCase
   end
 
   test "global" do
-    config = @config.global(Datacenter::LOCAL)
+    config = @config.global(Datacenter::DALLAS)
     assert_equal "mysql", config.hostname
-    assert_equal "pardot_global", config.name
+    assert_equal "pardot_global_secondary", config.name
     assert_equal "root", config.username
     assert_nil config.password
 
@@ -25,11 +25,14 @@ class DatabaseConfigurationFileTest < ActiveSupport::TestCase
     assert_nil config.password
 
     assert_raise(DatabaseConfigurationFile::ShardNotFound) do
-      @config.shard(Datacenter::SEATTLE, 3)
+      @config.shard(Datacenter::SEATTLE, 4)
     end
 
     assert_raise(DatabaseConfigurationFile::DatacenterNotFound) do
       @config.shard("brussels", 1)
     end
+
+    shard = @config.shard(Datacenter::DALLAS, 2)
+    assert_equal "secondary", shard.name
   end
 end

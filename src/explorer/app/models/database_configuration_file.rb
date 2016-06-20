@@ -18,6 +18,9 @@ class DatabaseConfigurationFile
     end
   end
 
+  PRIMARY = 1.freeze
+  SECONDARY = 2.freeze
+
   def self.load
     config_file = Rails.root.join("config", "pi", "#{Rails.env}.yml")
     erb = ERB.new(config_file.read)
@@ -40,7 +43,7 @@ class DatabaseConfigurationFile
       else
         raise DatacenterNotFound, datacenter
       end
-    DatabaseConfiguration.new(config.fetch(1), auth)
+    DatabaseConfiguration.new(config.fetch(SECONDARY), auth)
   end
 
   def shard(datacenter, id)
@@ -57,7 +60,7 @@ class DatabaseConfigurationFile
       else
         raise DatacenterNotFound.new(datacenter, id)
       end
-    DatabaseConfiguration.new(config.fetch(1), auth)
+    DatabaseConfiguration.new(config.fetch(SECONDARY), auth)
   end
 
   private

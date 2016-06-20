@@ -3,11 +3,17 @@ globals:
   global:
     dfw:
       1:
-        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
-        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
-        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        host: mysql
+        port: 3306
+        username: root
         password:
         database: pardot_global
+      2:
+        host: mysql
+        port: 3306
+        username: root
+        password:
+        database: pardot_global_secondary
     local:
       1:
         host: mysql
@@ -15,33 +21,63 @@ globals:
         username: root
         password:
         database: pardot_global
+      2:
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
+        database: pardot_global
 shards:
   1:
-    dfw:
+    phx:
+      1:
+        host: mysql
+        username: boom
+        password: town
+        database: pardot_shard1
+      2:
+        host: mysql
+        username: boom
+        password: town
+        database: pardot_shard1
+    local:
       1:
         host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
         port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
         username: <%= ENV.fetch("DATABASE_USER", "root") %>
         password:
         database: pardot_shard1
-    phx:
-      1:
-        host: mysql
+      2:
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
         database: pardot_shard1
-        username: boom
-        password: town
   2:
-    dfw:
+    local:
       1:
         host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
         port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
         username: <%= ENV.fetch("DATABASE_USER", "root") %>
         password:
-        database: pardot_shard1
-    phx:
+        database: pardot_shard2
+      2:
+        host: <%= ENV.fetch("DATABASE_HOST", "mysql") %>
+        port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
+        username: <%= ENV.fetch("DATABASE_USER", "root") %>
+        password:
+        database: pardot_shard2
+    dfw:
       1:
         host: mysql
-        database: pardot_shard1
-        username: boom
-        password: town
+        port: 3306
+        username: user
+        password:
+        database: primary
+      2:
+        host: mysql
+        port: 3306
+        username: user
+        password:
+        database: secondary
 ...
