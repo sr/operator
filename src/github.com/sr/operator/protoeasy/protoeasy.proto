@@ -69,8 +69,10 @@ message CompileOptions {
   string operator_cmd_out = 111;
   bool operator_hubot = 120;
   string operator_hubot_out = 121;
-  bool operator_server = 130;
-  string operator_server_out = 131;
+  bool operator_local = 130;
+  string operator_local_out = 131;
+  bool operator_server = 140;
+  string operator_server_out = 141;
 }
 
 message Command {

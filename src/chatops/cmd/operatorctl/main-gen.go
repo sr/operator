@@ -2,14 +2,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
 
-	pinger "chatops/ping"
+	pinger "chatops/services/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 const programName = "operator"
@@ -24,15 +24,16 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "ping",
 					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
-						conn, err := dial(ctx.Address)
+						conn, err := ctx.GetConn()
 						if err != nil {
 							return "", err
 						}
-						defer func() { _ = conn.Close() }()
+						defer conn.Close()
 						client := pinger.NewPingerClient(conn)
 						response, err := client.Ping(
 							context.Background(),
@@ -63,12 +64,4 @@ func main() {
 		}
 	}
 	os.Exit(status)
-}
-
-func dial(address string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
 }

@@ -318,6 +318,10 @@ module Pardot
           restart_puma("/var/run/repfix/puma.pid")
         end
 
+        def restart_explorer
+          restart_puma("/var/run/explorer/puma.pid")
+        end
+
         def link_explorer_shared_files
           link_shared_files(
             "shared/.envvars_#{name}.rb" => ".envvars_#{name}.rb",

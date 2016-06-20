@@ -21,7 +21,7 @@ module Canoe
         return false
       end
 
-      result["memberuid"].include?(user_uid)
+      result["memberuid"].include?(user_uid) || result["uniqueMember"].include?("uid=#{user_uid},ou=People,dc=pardot,dc=com")
     end
 
     def escape(str)

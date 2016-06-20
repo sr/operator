@@ -22,6 +22,7 @@ module Pardot
         after_deploy :deploy_topology, only: :murdoc
 
         after_deploy :link_explorer_shared_files, only: :explorer
+        after_deploy :restart_explorer, only: :explorer
 
         after_deploy :link_repfix_shared_files, only: :repfix
         after_deploy :restart_repfix_service, only: :repfix
