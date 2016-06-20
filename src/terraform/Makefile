@@ -2,7 +2,6 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 
 TERRAFORM ?= $(GOBIN)/terraform
-TERRAFORM_SRC = $(shell find $(GOPATH)/src/github.com/hashicorp/terraform -type f)
 
 ARTIFACTORY_USERNAME ?=
 ARTIFACTORY_PASSWORD ?=
@@ -45,5 +44,6 @@ refresh: $(TERRAFORM) artifactory-remote-state
 validate: $(TERRAFORM)
 	find . -type d -mindepth 2 -not -name '.terraform' -print0 | xargs -0 -n1 $< validate
 
-$(TERRAFORM): $(TERRAFORM_SRC)
-	$(GO) install github.com/hashicorp/terraform
+.PHONY: $(TERRAFORM)
+$(TERRAFORM):
+	@ $(GO) install -v github.com/hashicorp/terraform
