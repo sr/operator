@@ -229,7 +229,7 @@ module Pardot
             else
               Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
-              storm = Storm.new(deploy.options["topology"], deploy.options["topo_env"],  jarfile)
+              storm = Storm.new(deploy.options["topology"], deploy.options["topo_env"], jarfile)
               storm.load
               Logger.log(:info, "Topology Deployment Complete!")
             end
@@ -316,6 +316,10 @@ module Pardot
 
         def restart_repfix_service
           restart_puma("/var/run/repfix/puma.pid")
+        end
+
+        def restart_explorer
+          restart_puma("/var/run/explorer/puma.pid")
         end
 
         def link_explorer_shared_files

@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
-    resources :branches, param: :name, constraints: {name: /.*/}, only: [:index] do
+    resources :branches, param: :name, constraints: { name: /.*/ }, only: [:index] do
       resources :builds, only: [:index]
     end
 
@@ -32,7 +32,7 @@ Rails.application.routes.draw do
   end
   resources :servers, only: [:index, :new, :create, :edit, :update]
 
-  namespace :api, defaults: {format: "json"} do
+  namespace :api, defaults: { format: "json" } do
     # legacy
     post "deploy/:id/completed_server" => "deploys#completed_server"
 
@@ -42,14 +42,14 @@ Rails.application.routes.draw do
       end
 
       resources :deploys, only: [:show] do
-        resources :results, param: :hostname, constraints: {hostname: /.*/}, only: [:update]
+        resources :results, param: :hostname, constraints: { hostname: /.*/ }, only: [:update]
         get :latest, on: :collection
         post :completed_server, on: :member
       end
     end
 
     resources :projects, param: :name, only: [] do
-      resources :branches, param: :name, constraints: {name: /.*/}, only: [] do
+      resources :branches, param: :name, constraints: { name: /.*/ }, only: [] do
         resources :builds, only: [:index]
       end
     end

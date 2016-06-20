@@ -3,7 +3,7 @@ set -eu
 exec rubocop \
   --config "etc/rubocop.yml" \
   --format "emacs" \
-  --fail-level "E" \
+  --fail-level "C" \
   --rails \
   --display-style-guide \
   --display-cop-names \

@@ -34,6 +34,12 @@ module Explorer
       config.x.session_ttl = Integer(ENV.fetch("EXPLORER_SESSION_TTL")).minutes
       config.x.rate_limit_period = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_PERIOD")).minutes
       config.x.rate_limit_max = Integer(ENV.fetch("EXPLORER_RATE_LIMIT_MAX"))
+      config.x.build_version = begin
+        File.readlines("build.version").first
+      rescue Errno::ENOENT
+        Instrumentation.log_exception($!)
+        ""
+      end
     end
   end
 end

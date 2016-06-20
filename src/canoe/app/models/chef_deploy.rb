@@ -21,7 +21,7 @@ class ChefDeploy < ActiveRecord::Base
   end
 
   def self.find_current(environment, branch)
-    conditions = {environment: environment, branch: branch}
+    conditions = { environment: environment, branch: branch }
     deploys = where(conditions).order("id DESC")
 
     if deploys.empty?

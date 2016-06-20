@@ -37,6 +37,13 @@ type Service struct {
 	PackageName string
 	ImportPath  string
 	Methods     []*Method
+	Config      []Setting
+}
+
+type Setting struct {
+	Name        string
+	Required    bool
+	Description string
 }
 
 type Method struct {

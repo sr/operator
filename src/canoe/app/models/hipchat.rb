@@ -2,67 +2,68 @@ require "uri"
 require "net/http"
 
 class Hipchat
-  SUPPORT_ROOM = "support"
-  ENG_ROOM     = "engineering"
+  SUPPORT_ROOM = "support".freeze
+  ENG_ROOM     = "engineering".freeze
 
   class << self
     def notify_deploy_start(deploy)
       return if Rails.env.development?
 
       server_count = deploy.all_servers.size
-      if server_count > 3
-        server_msg = "#{server_count} servers"
-      else
-        server_msg = deploy.all_servers.join(', ')
-      end
+      server_msg =
+        if server_count > 3
+          "#{server_count} servers"
+        else
+          deploy.all_servers.join(", ")
+        end
 
-      msg = "#{deploy.auth_user.email} just began syncing #{build_link(deploy, false)}" + \
+      msg = "#{deploy.auth_user.email} just began syncing #{build_link(deploy, false)}" \
             " to #{deploy.deploy_target.name.capitalize}"
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
-      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
-            "just began syncing #{deploy.project_name.capitalize} to " + \
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
+            "just began syncing #{deploy.project_name.capitalize} to " \
             "#{build_link(deploy)} [#{server_msg}]"
 
       previous_deploy = deploy.deploy_target.previous_deploy(deploy)
-      msg += "<br>GitHub Diff: <a href='#{deploy.project.diff_url(previous_deploy, deploy)}'>" + \
-            "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" + \
-            "</a>" if previous_deploy
+      msg += "<br>GitHub Diff: <a href='#{deploy.project.diff_url(previous_deploy, deploy)}'>" \
+             "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" \
+             "</a>" if previous_deploy
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_complete(deploy)
       return if Rails.env.development?
 
-      msg = "#{deploy.auth_user.email} just finished syncing #{build_link(deploy, false)} to " + \
-            "#{deploy.deploy_target.name.capitalize}"
+      msg = "#{deploy.auth_user.email} just finished syncing #{build_link(deploy, false)} to " \
+        "#{deploy.deploy_target.name.capitalize}"
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
 
-      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " + \
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
             "just finished syncing #{deploy.project_name.capitalize} to #{build_link(deploy)}"
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_cancelled(deploy)
-      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " + \
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " \
             "CANCELLED syncing #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
       notify_room(SUPPORT_ROOM, msg, deploy.deploy_target.production?) if Rails.env.production? || Rails.env.test?
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?)
     end
 
     def notify_deploy_failed_servers(failed_hosts)
-      msg = "#{deploy.deploy_target.name.capitalize}: Unable to fully sync to the " + \
+      msg = "#{deploy.deploy_target.name.capitalize}: Unable to fully sync to the " \
             "following hosts: " + failed_hosts.sort.join(", ")
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?, "red")
     end
 
     def notify_untested_deploy(deploy)
-      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " + \
+      msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " \
             "an UNTESTED deploy of #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
       notify_room(ENG_ROOM, msg, deploy.deploy_target.production?, "red")
     end
 
-    def notify_room(room, msg, production, color=nil)
+    def notify_room(room, msg, production, color = nil)
       hipchat_host = "hipchat.dev.pardot.com"
       uri = URI.parse("https://#{hipchat_host}/v1/rooms/message")
 
@@ -71,13 +72,13 @@ class Hipchat
       end
 
       body = {
-        :format         => "json",
-        :auth_token     => "62b38be68d7593e4da865dcff0c2db",
-        :room_id        => room,
-        :from           => "Canoe",
-        :color          => color,
-        :message_format => "html",
-        :message        => msg,
+        format: "json",
+        auth_token: "62b38be68d7593e4da865dcff0c2db",
+        room_id: room,
+        from: "Canoe",
+        color: color,
+        message_format: "html",
+        message: msg
       }
       # NOTE: from name has to be between 1-15 characters
 
