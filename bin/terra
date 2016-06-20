@@ -3,7 +3,7 @@
 #/        terra plan <account>
 #/        terra apply <account>
 #/        terra vendor <version>
-#/        terra validation
+#/        terra validate
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -41,7 +41,8 @@ case "$action" in
 esac
 
 if [ "$action" = "vendor" ]; then
-    archiveurl="https://github.com/hashicorp/terraform/archive/v$arg1.tar.gz"
+    version="$arg1"
+    archiveurl="https://github.com/hashicorp/terraform/archive/v${version}.tar.gz"
     archivedir="$(mktemp -d "terraformXXX")"
     vendordir="src/github.com/hashicorp/terraform"
     trap 'rm -rf $archivedir' EXIT
@@ -51,12 +52,13 @@ if [ "$action" = "vendor" ]; then
     curl -fsSL "$archiveurl" | tar -xvz -C "$archivedir"
     mv "${archivedir}/terraform-${arg1}" "$vendordir"
 
-    echo "Vendor terraform version $arg1 to $vendordir" 2>&1
+    echo "Vendored terraform version ${version} to $vendordir" 2>&1
     exit 0
 fi
 
-if ! test -d "src/terraform/$arg1"; then
-    printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$arg1" 2>&1
+account="$arg1"
+if ! test -d "src/terraform/${account}"; then
+    printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
     exit 1
 fi
 
@@ -74,7 +76,7 @@ if ! test -f "$tfvars"; then
     exit 1
 fi
 
-TERRAFORM_DIR="$arg1"
+TERRAFORM_DIR="$account"
 TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
 TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
