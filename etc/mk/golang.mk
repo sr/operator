@@ -45,8 +45,9 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
 				fail=true; \
 			fi; \
 	  done; \

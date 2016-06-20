@@ -1,7 +1,6 @@
 package main
 
 import (
-	"chatops"
 	"flag"
 	"fmt"
 	"net"
@@ -11,13 +10,19 @@ import (
 	"google.golang.org/grpc"
 )
 
+type noopAuthorizer struct{}
+
+func (a noopAuthorizer) Authorize(*operator.Request) error {
+	return nil
+}
+
 func run(builder operator.ServerBuilder) error {
 	config := &operator.Config{}
 	flags := flag.CommandLine
 	flags.StringVar(&config.Address, "listen-addr", operator.DefaultAddress, "Listen address of the operator server")
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
-	authorizer := chatops.NewLDAPAuthorizer()
+	authorizer := noopAuthorizer{}
 	interceptor := operator.NewInterceptor(instrumenter, authorizer)
 	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 	msg := &operator.ServerStartupNotice{Protocol: "tcp"}

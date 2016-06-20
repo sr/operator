@@ -9,13 +9,22 @@ import (
 )
 
 const (
-	executable = "protoc-gen-operatord"
-	filename   = "builder-gen.go"
+	programName = "protoc-gen-operatorlocal"
+	// TODO(sr) Parameterize this.
+	filename = "chatoopslocal-gen.go"
+	pkgname  = "chatoopslocal"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
-	if err := builderTemplate.Execute(&buffer, descriptor); err != nil {
+	data := struct {
+		*generator.Descriptor
+		LocalPackageName string
+	}{
+		descriptor,
+		pkgname,
+	}
+	if err := clientTemplate.Execute(&buffer, data); err != nil {
 		return nil, err
 	}
 	return []*generator.File{
@@ -28,7 +37,7 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 
 func main() {
 	if err := generator.Compile(os.Stdin, os.Stdout, generate); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", executable, err)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", programName, err)
 		os.Exit(1)
 	}
 }

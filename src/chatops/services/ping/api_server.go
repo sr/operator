@@ -6,7 +6,7 @@ import (
 )
 
 type apiServer struct {
-	config *Env
+	config *PingerConfig
 }
 
 func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
