@@ -81,7 +81,7 @@ TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
 TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
 
-GIT_DIR="$BREAD/.git"
+GIT_DIR="$(pwd)/.git"
 export GIT_DIR
 branch="$(git rev-parse --abbrev-ref HEAD)"
 
