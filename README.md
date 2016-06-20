@@ -5,10 +5,11 @@ documentation: <https://confluence.dev.pardot.com/display/PTechops/BREAD+Ops>
 
 ## Setup
 
-For working with this repository we highly recommend adding the fellowing to
-your `.bashrc`:
+We highly recommend adding the fellowing to your `.bashrc` for working with
+this repository:
 
 ```shell
+# Replace with the path of the bread repo on your machine.
 BREAD="$HOME/Documents/bread"
 test -f "$BREAD/etc/shrc" && source "$BREAD/etc/shrc"
 ```

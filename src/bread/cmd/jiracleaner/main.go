@@ -1,15 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/andygrunwald/go-jira"
 	"github.com/google/go-github/github"
 )
 
@@ -48,14 +50,14 @@ func run() error {
 	flag.StringVar(&password, "password", "", "JIRA password")
 	flag.IntVar(&transitionID, "transition-id", defaultTransitionID, "Transition ID for closing stale tickets")
 	flag.Parse()
-	if username == "" || password == "" {
-		return errors.New("required flag missing: username, password")
+	if username == "" {
+		return errors.New("required flag missing: username")
+	}
+	if password == "" {
+		return errors.New("required flag missing: password")
 	}
 	transport := github.BasicAuthTransport{Username: username, Password: password}
-	client, err := jira.NewClient(transport.Client(), jiraURL)
-	if err != nil {
-		return err
-	}
+	client := transport.Client()
 	now := time.Now()
 	cutOff := now.Add(-maxAge)
 	data := struct {
@@ -67,12 +69,32 @@ func run() error {
 		[]string{"id", "key", "created", "updated", "summary"},
 		100,
 	}
-	req, _ := client.NewRequest("POST", "/rest/api/2/search", &data)
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	req, _ := http.NewRequest("POST", jiraURL+"/rest/api/2/search", bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("jira search request failed with status %d", resp.StatusCode)
+	}
 	type response struct {
-		Issues []jira.Issue
+		Issues []struct {
+			ID     string `json:"id"`
+			Key    string `json:"key"`
+			Fields struct {
+				Updated string `json:"updated"`
+				Summary string `json:"summary"`
+			} `json:"fields"`
+		}
 	}
 	var results response
-	if _, err = client.Do(req, &results); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
 		return err
 	}
 	for _, issue := range results.Issues {
@@ -82,7 +104,7 @@ func run() error {
 			issue.Fields.Summary,
 		)
 		if apply {
-			req, err := client.NewRequest("POST", "/rest/api/2/issue/"+issue.ID+"/transitions", nil)
+			req, err := http.NewRequest("POST", "/rest/api/2/issue/"+issue.ID+"/transitions", nil)
 			if err != nil {
 				return err
 			}
@@ -105,7 +127,7 @@ func run() error {
 					"id": "%d"
 				}
 			}`, comment, transitionID)))
-			if r, err := client.Do(req, nil); err != nil {
+			if r, err := client.Do(req); err != nil {
 				s, e := ioutil.ReadAll(r.Body)
 				if e != nil {
 					return e

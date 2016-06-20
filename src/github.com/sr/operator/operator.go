@@ -1,16 +1,24 @@
 package operator
 
 import (
+	"errors"
 	"flag"
+	"strings"
 	"time"
+
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"go.pedge.io/env"
 )
 
+const DefaultAddress = "localhost:9000"
+
+var ErrInvalidRequest = errors.New("invalid rpc request")
+
 type Authorizer interface {
-	Authorize(*Source) error
+	Authorize(*Request) error
 }
 
 type Instrumenter interface {
@@ -22,8 +30,14 @@ type Logger interface {
 	Error(proto.Message)
 }
 
+type Sourcer interface {
+	GetSource() *Source
+}
+
+type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
+
 type Config struct {
-	Address string `env:"PORT,default=:3000"`
+	Address string
 }
 
 type Command struct {
@@ -47,6 +61,7 @@ type ServiceCommand struct {
 type MethodCommand struct {
 	Name     string
 	Synopsis string
+	Flags    []*flag.Flag
 	Run      func(*CommandContext) (string, error)
 }
 
@@ -62,34 +77,40 @@ func NewInstrumenter(logger Logger) Instrumenter {
 	return newInstrumenter(logger)
 }
 
-func NewRequest(
-	source *Source,
-	serviceName string,
-	methodName string,
-	inputType string,
-	outputType string,
-	err error,
-	start time.Time,
-) *Request {
-	call := &Call{
-		Service:    serviceName,
-		Method:     methodName,
-		InputType:  inputType,
-		OutputType: outputType,
-		Duration:   ptypes.DurationProto(time.Since(start)),
+func NewInterceptor(
+	instrumenter Instrumenter,
+	authorizer Authorizer,
+) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		in interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		sourcer, ok := in.(Sourcer)
+		if !ok || sourcer.GetSource() == nil {
+			return nil, ErrInvalidRequest
+		}
+		s := strings.Split(info.FullMethod, "/")
+		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
+			return nil, ErrInvalidRequest
+		}
+		request := &Request{
+			Source: sourcer.GetSource(),
+			Call:   &Call{Service: s[1], Method: s[2]},
+		}
+		if err := authorizer.Authorize(request); err != nil {
+			return nil, err
+		}
+		start := time.Now()
+		response, err := handler(ctx, in)
+		if err != nil {
+			request.Call.Error = &Error{Message: err.Error()}
+		}
+		request.Call.Duration = ptypes.DurationProto(time.Since(start))
+		instrumenter.Instrument(request)
+		return response, err
 	}
-	if err != nil {
-		call.Error = &Error{Message: err.Error()}
-	}
-	return &Request{Source: source, Call: call}
-}
-
-func NewConfigFromEnv() (*Config, error) {
-	config := &Config{}
-	if err := env.Populate(config); err != nil {
-		return nil, err
-	}
-	return config, nil
 }
 
 func NewArgumentRequiredError(argument string) error {
