@@ -18,8 +18,8 @@ class DatabaseConfigurationFile
     end
   end
 
-  PRIMARY = 1.freeze
-  SECONDARY = 2.freeze
+  PRIMARY = 1
+  SECONDARY = 2
 
   def self.load
     config_file = Rails.root.join("config", "pi", "#{Rails.env}.yml")
