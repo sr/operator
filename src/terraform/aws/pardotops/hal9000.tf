@@ -35,7 +35,7 @@ resource "aws_elasticache_cluster" "hal9000_production" {
   cluster_id = "hal9000-production"
   engine = "redis"
   engine_version = "2.8.24"
-  maintenance_window = "mon:15:00-mon:16:00"
+  maintenance_window = "Tue:00:00-Tue:04:00"
   node_type = "cache.t2.small"
   num_cache_nodes = 1
   parameter_group_name = "default.redis2.8"
