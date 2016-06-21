@@ -85,14 +85,15 @@ RSpec.describe ChefDelivery do
 
   it "noops and notifies if non-master branch has been checked out for more than an hour" do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "mybranch")
     request = ChefCheckinRequest.new(server, checkout)
     @repo.current_build = build_build(updated_at: 90.minutes.ago)
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("not deployed")
+    assert msg.message.include?("could not be deployed")
+    assert msg.message.include?("mybranch")
     assert msg.message.include?("pardot0-chef1")
   end
 
