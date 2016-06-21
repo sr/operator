@@ -14,15 +14,14 @@ built around a few opinions on how to do that:
 - There is at least one alternative client with the exact same feature set. This
   ensures that the chat bot is not a SPOF.
 
-Checkout the [chatoops](/chatoops) directory for a complete example. It
-demonstrates how to describe and implement an automation server and generate
-[Hubot][] scripts and commond-line client.
+Checkout the [chatoops][] project for a complete example. It demonstrates how to
+describe and implement an automation server and generate [Hubot][] scripts and
+commond-line client.
 
 **DISCLAIMER:** I have not used this in production yet. Consider this is a early
 preview release. Ping @sr on Twitter or [open an issue][i] if you have any
 question or feedback.
 
-[protobuf]: https://developers.google.com/protocol-buffers/docs/proto3#services
 [Hubot]: https://github.com/
-[gRPC]: http://www.grpc.io/
+[chatoops]: https://github.com/sr/repo/tree/master/src/sr/chatoops
 [i]: https://github.com/sr/operator/issues/new

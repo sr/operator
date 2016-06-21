@@ -78,6 +78,9 @@ $(OPERATORD_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORD)
 	$(OPERATORC) --import-path $(IMPORTPATH) \
 		--server-out $(shell dirname $(OPERATORD_GEN_SRC)) $(SVC_DIR)
 
+$(PROTOC_GEN_GO):
+	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
+
 $(PROTOC_GEN_OPERATORCTL):
 	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorctl
 
@@ -89,9 +92,6 @@ $(PROTOC_GEN_OPERATORHUBOT):
 
 $(PROTOC_GEN_OPERATORLOCAL):
 	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorlocal
-
-$(PROTOC_GEN_GO):
-	$(GO) install -v vendor/github.com/golang/protobuf/protoc-gen-go
 
 .PHONY: \
 	build \
