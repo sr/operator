@@ -62,7 +62,7 @@ module Pardot
           end
 
         if !datacenter
-          Instrumentation.error(at: "load-chef-env", hostname: hostname)
+          Instrumentation.error(at: "chef", hostname: hostname)
           return
         end
 
@@ -75,7 +75,7 @@ module Pardot
 
         if !$?.success?
           Instrumentation.error(
-            at: "checkin-status",
+            at: "chef",
             command: command,
             output: output
           )
@@ -96,7 +96,7 @@ module Pardot
 
         if response.code != "200"
           Instrumentation.error(
-            fn: "checkin_chef",
+            at: "chef",
             code: response.code,
             body: response.body[0..100]
           )
@@ -106,7 +106,7 @@ module Pardot
         payload = JSON.parse(response.body)
 
         if payload.fetch("action") != "deploy"
-          Instrumentation.debug(at: "checkin-request", action: "noop")
+          Instrumentation.debug(at: "chef", action: "noop")
           return
         end
 
@@ -119,12 +119,12 @@ module Pardot
         }
         request = { payload: JSON.dump(payload) }
 
-        Instrumentation.debug(fn: "chef_checkin", completed: payload)
+        Instrumentation.debug(at: "chef", completed: payload)
         response = Canoe.complete_chef_deploy(environment, request)
 
         if response.code != "200"
           Instrumentation.error(
-            fn: "chef_checkin",
+            at: "chef",
             complete: "error",
             code: response.code,
             body: response.body[0..100]

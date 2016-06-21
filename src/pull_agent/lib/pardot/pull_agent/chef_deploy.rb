@@ -31,8 +31,13 @@ module Pardot
           "-f", chef_environment_file,
           "deploy"
         ]
-        Instrumentation.debug(at: "chef-deploy", hostname: hostname,
-          datacenter: datacenter, command: command)
+        log = {
+          at: "chef",
+          hostname: hostname,
+          datacenter: datacenter,
+          command: command
+        }
+        Instrumentation.debug(log)
 
         output = ShellHelper.execute([env] + command)
         if !$?.success?
