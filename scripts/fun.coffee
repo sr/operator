@@ -100,6 +100,7 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/64/Jn0SCSfycNWUgpQ/Blake.jpg",
       "https://hipchat.dev.pardot.com/files/1/65/31Iel1Qje2560I0/Blake_braid.jpg",
       "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
+      "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
 
   robot.respond /parker$/i, (msg) ->
