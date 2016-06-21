@@ -133,7 +133,7 @@ case "$project" in
         docker build -f src/teampass/Dockerfile src/teampass
         ;;
     terraform)
-        docker run --rm -v "$(pwd):/data" \
+        docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
             build/build \
             make -C src/terraform validate
         ;;
