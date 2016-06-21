@@ -9,9 +9,22 @@ UNUSED = $(GOBIN)/unused
 PACKAGES ?= $(shell go list ./...)
 SRC ?= $(shell find . -name '*.go' | sort)
 
-all: fmt lint vet errcheck interfacer unused install
+all: deps fmt lint vet errcheck interfacer unused install
 
 ci: clean all
+
+deps:
+	$(GO) get \
+		github.com/acsellers/inflections \
+		github.com/golang/protobuf/proto \
+		github.com/golang/protobuf/ptypes/duration \
+		github.com/golang/protobuf/ptypes/timestamp \
+		github.com/kr/text \
+		github.com/matttproud/golang_protobuf_extensions/pbutil \
+		github.com/satori/go.uuid \
+		github.com/serenize/snaker \
+		google.golang.org/grpc \
+		golang.org/x/net/context
 
 clean:
 	$(GO) clean -i $(PACKAGES)
