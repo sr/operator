@@ -46,6 +46,7 @@ module Pardot
       end
 
       def checkin_chef
+        ENV["LOG_LEVEL"] = 7
         Instrumentation.setup("pull-agent", environment.name, log_stream: Logger)
 
         hostname = ShellHelper.hostname
