@@ -63,8 +63,8 @@ func newGoPlugin(options *CompileOptions) plugin {
 	return newBaseGoPlugin(
 		options,
 		options.GoRelOut,
-		options.GoPluginType.SimpleString(),
-		GoPluginType_GO_PLUGIN_TYPE_GO.SimpleString(),
+		options.GoPluginType,
+		GoPluginTypeGo,
 		defaultGoModifierOptions,
 		options.GoNoDefaultModifiers,
 		options.GoModifiers,
@@ -81,8 +81,8 @@ func newGogoPlugin(options *CompileOptions) plugin {
 	return newBaseGoPlugin(
 		options,
 		options.GogoRelOut,
-		options.GogoPluginType.SimpleString(),
-		GogoPluginType_GOGO_PLUGIN_TYPE_GOGOFAST.SimpleString(),
+		options.GogoPluginType,
+		GogoPluginTypeGoGoFast,
 		defaultGogoModifierOptions,
 		options.GogoNoDefaultModifiers,
 		options.GogoModifiers,
@@ -149,7 +149,7 @@ func newBaseGoPlugin(
 	if options == nil {
 		options = &CompileOptions{}
 	}
-	if pluginType == "none" {
+	if pluginType == "" {
 		pluginType = defaultPluginType
 	}
 	if options.NoDefaultIncludes {
