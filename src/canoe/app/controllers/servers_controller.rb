@@ -30,11 +30,12 @@ class ServersController < ApplicationController
   end
 
   private
+
   def server_params
     params.require(:server).permit(
       :hostname, :enabled,
-      :server_tag_names => [],
-      :deploy_scenarios_attributes => [:id, :deploy_target_id, :project_id, :_destroy]
+      server_tag_names: [],
+      deploy_scenarios_attributes: [:id, :deploy_target_id, :project_id, :_destroy]
     )
   end
 

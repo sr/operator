@@ -25,8 +25,6 @@ class Project < ActiveRecord::Base
     ref = Octokit.ref(repository, "tags/#{name}")
     if ref
       Octokit.tag(repository, ref.object.sha)
-    else
-      nil
     end
   end
 
@@ -50,19 +48,19 @@ class Project < ActiveRecord::Base
   def tag_url(tag)
     "#{GITHUB_URL}/#{repository}/releases/tag/#{tag.name}"
   end
-  
+
   def branch_url(branch)
     "#{GITHUB_URL}/#{repository}/tree/#{branch.name}"
   end
-  
+
   def commit_url(commit)
     "#{GITHUB_URL}/#{repository}/commits/#{commit.sha}"
   end
-  
+
   def sha_url(sha)
     "#{GITHUB_URL}/#{repository}/commits/#{sha}"
   end
-  
+
   def diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
     "#{GITHUB_URL}/#{repository}/compare/#{deploy1.sha}...#{deploy2.sha}"
@@ -72,17 +70,17 @@ class Project < ActiveRecord::Base
 
   def build_aql_query(branch:, include_untested_builds:)
     conditions = [
-      {"repo"       => {"$eq"    => ARTIFACTORY_REPO}},
-      {"@gitRepo"   => {"$match" => "*/#{repository}.git"}},
-      {"@gitBranch" => {"$eq"    => branch}},
+      { "repo"       => { "$eq"    => ARTIFACTORY_REPO } },
+      { "@gitRepo"   => { "$match" => "*/#{repository}.git" } },
+      { "@gitBranch" => { "$eq"    => branch } },
     ]
 
     if bamboo_project
-      conditions << {"@bambooProject" => {"$eq"    => bamboo_project}}
-      conditions << {"@bambooPlan"    => {"$match" => "#{bamboo_plan}*"}} if bamboo_plan.present?
+      conditions << { "@bambooProject" => { "$eq"    => bamboo_project } }
+      conditions << { "@bambooPlan"    => { "$match" => "#{bamboo_plan}*" } } if bamboo_plan.present?
 
       if bamboo_job.present?
-        conditions << {"@bambooJob" => {"$eq" => bamboo_job}}
+        conditions << { "@bambooJob" => { "$eq" => bamboo_job } }
       end
     end
 
@@ -93,12 +91,12 @@ class Project < ActiveRecord::Base
       # only that have been created in the past hour.
       conditions << {
         "$or" => [
-          {"@passedCI" => {"$eq" => "true"}},
-          {"created"   => {"$gt" => 1.hour.ago.iso8601}},
+          { "@passedCI" => { "$eq" => "true" } },
+          { "created"   => { "$gt" => 1.hour.ago.iso8601 } },
         ]
       }
     else
-      conditions << {"@passedCI" => {"$eq" => "true"}}
+      conditions << { "@passedCI" => { "$eq" => "true" } }
     end
 
     aql = %(items.find(#{JSON.dump("$and" => conditions)}))

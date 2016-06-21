@@ -19,9 +19,9 @@ class DeployWorkflow
   def notify_action_successful(server:, action:)
     result = require_result_for(server: server)
     case [result.stage, action]
-    when ["initiated", "deploy"]
+    when %w[initiated deploy]
       notify_action_deploy_successful(result: result)
-    when ["deployed", "restart"]
+    when %w[deployed restart]
       notify_action_restart_successful(result: result)
     else
       raise TransitionError, "No transition from #{result.stage} via action #{action} for server #{server.hostname}"
@@ -45,17 +45,15 @@ class DeployWorkflow
   def pick_new_restart_servers
     @deploy.deploy_restart_servers.each_with_index do |restart, i|
       old_restart_result = @deploy.results.for_server(restart.server)
-      unless old_restart_result.completed?
-        possible_servers = @deploy.results.completed.map(&:server).shuffle
-        unless possible_servers.empty?
-          restart_server = possible_servers[possible_servers.index{|s| s.datacenter == restart.server.datacenter}]
-          # This could be refactored to use the restart_servers :through association directly,
-          # but I can't figure out how to set the datacenter column through ActiveRecord in the relational table
-          @deploy.deploy_restart_servers[i].update_attribute(:server_id, restart_server.id)
-          @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
-          old_restart_result.update_attribute(:stage, "completed")
-        end
-      end
+      next if old_restart_result.completed?
+      possible_servers = @deploy.results.completed.map(&:server).shuffle
+      next if possible_servers.empty?
+      restart_server = possible_servers[possible_servers.index { |s| s.datacenter == restart.server.datacenter }]
+      # This could be refactored to use the restart_servers :through association directly,
+      # but I can't figure out how to set the datacenter column through ActiveRecord in the relational table
+      @deploy.deploy_restart_servers[i].update_attribute(:server_id, restart_server.id)
+      @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
+      old_restart_result.update_attribute(:stage, "completed")
     end
   end
 
@@ -67,12 +65,11 @@ class DeployWorkflow
       "deploy"
     elsif @deploy.restart_servers.include?(server) && @deploy.results.initiated.empty?
       "restart"
-    else
-      nil
     end
   end
 
   private
+
   def require_result_for(server:)
     @deploy.results.for_server(server).tap do |result|
       raise ArgumentError, "No deploy result found for #{server} in #{deploy}" unless result

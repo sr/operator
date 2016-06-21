@@ -1,61 +1,112 @@
 inherit_from: rubocop_todo.yml
-Lint/UnusedMethodArgument:
+
+Lint/AssignmentInCondition:
   Enabled: true
-  Severity: error
+Lint/CircularArgumentReference:
+  Enabled: true
+Lint/EndAlignment:
+  Enabled: true
 Lint/HandleExceptions:
   Enabled: true
-  Severity: error
+Lint/ShadowingOuterLocalVariable:
+  Enabled: true
+Lint/UnusedMethodArgument:
+  Enabled: true
+Lint/UselessAssignment:
+  Enabled: true
+
+Metrics/ParameterLists:
+  Enabled: true
+  Max: 4
+  CountKeywordArgs: true
+
+Rails/TimeZone:
+  Enabled: true
 Rails/Delegate:
+  Enabled: false
+
+Style/AlignHash:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
-Style/TrailingCommaInLiteral:
+Style/ClassAndModuleChildren:
   Enabled: true
-  Severity: error
+Style/ClosingParenthesisIndentation:
+  Enabled: false
+Style/ConditionalAssignment:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
 Style/DoubleNegation:
   Enabled: true
-  Severity: error
-Style/Documentation:
+Style/FormatString:
+  Enabled: true
+Style/FrozenStringLiteralComment:
   Enabled: false
 Style/GuardClause:
   Enabled: false
+Style/IdenticalConditionalBranches:
+  Enabled: true
 Style/IfUnlessModifier:
   Enabled: false
+Style/IndentArray:
+  Enabled: false
+Style/IndentHash:
+  Enabled: false
+Style/IndentationConsistency:
+  Enabled: true
+Style/MultilineBlockChain:
+  Enabled: false
+Style/MultilineMethodCallBraceLayout:
+  Enabled: false
+Style/MultilineMethodCallIndentation:
+  Enabled: false
+Style/NegatedIf:
+  Enabled: false
+Style/Next:
+  Enabled: true
+Style/PercentLiteralDelimiters:
+  Enabled: true
+  PreferredDelimiters:
+    '%w': '[]'
+    '%W': '[]'
+Style/RedundantSelf:
+  Enabled: true
+Style/RegexpLiteral:
+  Enabled: true
+  AllowInnerSlashes: true
 Style/Send:
   Enabled: true
-  Severity: error
+Style/SignalException:
+  EnforcedStyle: only_raise
+  Enabled: true
+Style/SpaceAroundEqualsInParameterDefault:
+  Enabled: true
+Style/SpaceInsideBlockBraces:
+  Enabled: true
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: true
 Style/SpecialGlobalVars:
   Enabled: false
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
-  Severity: error
 Style/TrailingCommaInArguments:
   Enabled: false
-Style/NegatedIf:
-  Enabled: false
+Style/TrailingCommaInLiteral:
+  Enabled: true
+Style/TrailingWhitespace:
+  Enabled: true
+Style/VariableName:
+  Enabled: true
 Style/WordArray:
   Enabled: true
   EnforcedStyle: percent
-  Severity: error
-Style/PercentLiteralDelimiters:
-  Enabled: true
-  Severity: error
-  PreferredDelimiters:
-    '%w': '[]'
-    '%W': '[]'
-Style/MultilineBlockChain:
-  Enabled: false
-Style/RegexpLiteral:
-  Enabled: true
-  AllowInnerSlashes: true
-Style/SignalException:
-  EnforcedStyle: only_raise
-  Enabled: true
+
 AllCops:
+  TargetRubyVersion: 2.3
   Exclude:
     - "src/**/bin/*"
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
     - "src/**/vendor/gems/**/*"
-    - "src/canoe/**/*"

@@ -6,7 +6,7 @@ class CreateTargetJob < ActiveRecord::Migration
       t.string  :job_name
       t.string  :command
       t.string  :process_id
-      t.boolean :completed, :default => false
+      t.boolean :completed, default: false
       t.timestamps
     end
     add_index :target_jobs, :deploy_target_id

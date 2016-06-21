@@ -8,7 +8,7 @@ RSpec.describe DeployWorkflow do
     it "creates a deploy result for each server, initially setting them to stage: initiated" do
       servers = FactoryGirl.create_list(:server, 3)
 
-      workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers)
+      DeployWorkflow.initiate(deploy: deploy, servers: servers)
       expect(deploy.results.length).to eq(3)
     end
   end
@@ -52,7 +52,7 @@ RSpec.describe DeployWorkflow do
       server1 = servers.first
       workflow.notify_action_successful(server: server1, action: "deploy")
       expect(deploy.results.for_server(server1).stage).to eq("deployed")
-      
+
       server2 = servers[1]
       workflow.notify_action_successful(server: server2, action: "deploy")
       expect(deploy.results.for_server(server2).stage).to eq("completed")
@@ -93,9 +93,9 @@ RSpec.describe DeployWorkflow do
       server = FactoryGirl.create(:server)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
 
-      expect {
+      expect do
         workflow.notify_action_successful(server: server, action: "restart")
-      }.to raise_error(DeployWorkflow::TransitionError)
+      end.to raise_error(DeployWorkflow::TransitionError)
     end
   end
 

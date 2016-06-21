@@ -4,5 +4,4 @@ class AddCancelFlagToDeploy < ActiveRecord::Migration
       t.boolean  :canceled, default: false
     end
   end
-
 end
