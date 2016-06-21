@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const defaultDescriptorSetFileName = "descriptor-set.pb"
+
 // plugin is an individual flag provider for a specific language.
 type plugin interface {
 	// Flags gets the protoc flags for the plugin.
@@ -247,7 +249,7 @@ func (p *descriptorSetPlugin) Flags(protoSpec *protoSpec, relDirPath string, out
 	}
 	fileName := p.options.DescriptorSetFileName
 	if fileName == "" {
-		fileName = DefaultDescriptorSetFileName
+		fileName = defaultDescriptorSetFileName
 	}
 	args := []string{fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(outDirPath, fileName))}
 	if p.options.DescriptorSetIncludeImports {
