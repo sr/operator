@@ -10,10 +10,10 @@ class ChefDeliveryNotification
   end
 
   def at_lock_age_limit(room_id, server, checkout, build)
-    message = "chef/master #{link_to(build)} not deployed to "\
+    message = "chef/master #{link_to(build)} could not be deployed to "\
       "#{server.datacenter}/#{server.environment} because branch " \
-      "#{link_to(checkout.branch)} is checked out on " \
-      "<code>#{server.hostname}</code>"
+      "#{link_to(checkout.branch)} has been checked out on " \
+      "<code>#{server.hostname}</code> for more than an hour"
 
     @notifier.notify_room(room_id, message, YELLOW)
   end
