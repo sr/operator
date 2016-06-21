@@ -6,15 +6,15 @@ import (
 	"path/filepath"
 )
 
-type serverCompiler struct {
+type compiler struct {
 	options CompilerOptions
 }
 
-func newServerCompiler(options CompilerOptions) *serverCompiler {
-	return &serverCompiler{options}
+func newCompiler(options CompilerOptions) *compiler {
+	return &compiler{options}
 }
 
-func (c *serverCompiler) Compile(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error) {
+func (c *compiler) Compile(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error) {
 	var err error
 	dirPath, err = filepath.Abs(dirPath)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *serverCompiler) Compile(dirPath string, outDirPath string, compileOptio
 	return commands, nil
 }
 
-func (c *serverCompiler) commands(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error) {
+func (c *compiler) commands(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error) {
 	// getPlugins in plugins.go
 	plugins := getPlugins(compileOptions)
 	protoSpec, err := getProtoSpec(dirPath, compileOptions.ExcludePattern)

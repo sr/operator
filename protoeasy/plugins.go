@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const defaultDescriptorSetFileName = "descriptor-set.pb"
+
 // plugin is an individual flag provider for a specific language.
 type plugin interface {
 	// Flags gets the protoc flags for the plugin.
@@ -61,8 +63,8 @@ func newGoPlugin(options *CompileOptions) plugin {
 	return newBaseGoPlugin(
 		options,
 		options.GoRelOut,
-		options.GoPluginType.SimpleString(),
-		GoPluginType_GO_PLUGIN_TYPE_GO.SimpleString(),
+		options.GoPluginType,
+		GoPluginTypeGo,
 		defaultGoModifierOptions,
 		options.GoNoDefaultModifiers,
 		options.GoModifiers,
@@ -79,8 +81,8 @@ func newGogoPlugin(options *CompileOptions) plugin {
 	return newBaseGoPlugin(
 		options,
 		options.GogoRelOut,
-		options.GogoPluginType.SimpleString(),
-		GogoPluginType_GOGO_PLUGIN_TYPE_GOGOFAST.SimpleString(),
+		options.GogoPluginType,
+		GogoPluginTypeGoGoFast,
 		defaultGogoModifierOptions,
 		options.GogoNoDefaultModifiers,
 		options.GogoModifiers,
@@ -147,7 +149,7 @@ func newBaseGoPlugin(
 	if options == nil {
 		options = &CompileOptions{}
 	}
-	if pluginType == "none" {
+	if pluginType == "" {
 		pluginType = defaultPluginType
 	}
 	if options.NoDefaultIncludes {
@@ -247,7 +249,7 @@ func (p *descriptorSetPlugin) Flags(protoSpec *protoSpec, relDirPath string, out
 	}
 	fileName := p.options.DescriptorSetFileName
 	if fileName == "" {
-		fileName = DefaultDescriptorSetFileName
+		fileName = defaultDescriptorSetFileName
 	}
 	args := []string{fmt.Sprintf("--descriptor_set_out=%s", filepath.Join(outDirPath, fileName))}
 	if p.options.DescriptorSetIncludeImports {
