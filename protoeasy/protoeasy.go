@@ -7,12 +7,6 @@ and take care of package import modifiers for Golang.
 */
 package protoeasy
 
-var (
-	DefaultCompiler = NewCompiler(CompilerOptions{})
-	// DefaultDescriptorSetFileName is the default descriptor set file name.
-	DefaultDescriptorSetFileName = "descriptor-set.pb"
-)
-
 type CompileOptions struct {
 	Grpc                        bool
 	GrpcGateway                 bool
