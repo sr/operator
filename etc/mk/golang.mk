@@ -22,7 +22,7 @@ install-tools:
 	$(GO) install -v $(TOOLS)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< | grep -v github.com/docker/go-units)"; \
+	@ out="$$($<)"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
