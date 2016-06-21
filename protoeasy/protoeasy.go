@@ -7,6 +7,18 @@ and take care of package import modifiers for Golang.
 */
 package protoeasy
 
+const (
+	GoPluginTypeNone   = "none"
+	GoPluginTypeGo     = "go"
+	GoPluginTypeGoFast = "gofast"
+
+	GogoPluginType           = "none"
+	GogoPluginTypeGoGo       = "gogo"
+	GogoPluginTypeGoGoFast   = "gogofast"
+	GogoPluginTypeGoGoFaster = "gogofaster"
+	GogoPluginTypeGoGoSlick  = "gogoslick"
+)
+
 type CompileOptions struct {
 	Grpc                        bool
 	GrpcGateway                 bool
@@ -18,13 +30,13 @@ type CompileOptions struct {
 	Csharp                      bool
 	CsharpRelOut                string
 	Go                          bool
-	GoPluginType                GoPluginType
+	GoPluginType                string
 	GoRelOut                    string
 	GoImportPath                string
 	GoNoDefaultModifiers        bool
 	GoModifiers                 map[string]string
 	Gogo                        bool
-	GogoPluginType              GogoPluginType
+	GogoPluginType              string
 	GogoRelOut                  string
 	GogoImportPath              string
 	GogoNoDefaultModifiers      bool
