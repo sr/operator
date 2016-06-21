@@ -7,16 +7,65 @@ and take care of package import modifiers for Golang.
 */
 package protoeasy
 
-import (
-	"strconv"
-	"strings"
-)
-
 var (
 	DefaultCompiler = NewCompiler(CompilerOptions{})
 	// DefaultDescriptorSetFileName is the default descriptor set file name.
 	DefaultDescriptorSetFileName = "descriptor-set.pb"
 )
+
+type CompileOptions struct {
+	Grpc                        bool
+	GrpcGateway                 bool
+	NoDefaultIncludes           bool
+	ExcludePattern              []string
+	RelContext                  string
+	Cpp                         bool
+	CppRelOut                   string
+	Csharp                      bool
+	CsharpRelOut                string
+	Go                          bool
+	GoPluginType                GoPluginType
+	GoRelOut                    string
+	GoImportPath                string
+	GoNoDefaultModifiers        bool
+	GoModifiers                 map[string]string
+	Gogo                        bool
+	GogoPluginType              GogoPluginType
+	GogoRelOut                  string
+	GogoImportPath              string
+	GogoNoDefaultModifiers      bool
+	GogoModifiers               map[string]string
+	Objc                        bool
+	ObjcRelOut                  string
+	Python                      bool
+	PythonRelOut                string
+	Ruby                        bool
+	RubyRelOut                  string
+	DescriptorSet               bool
+	DescriptorSetRelOut         string
+	DescriptorSetFileName       string
+	DescriptorSetIncludeImports bool
+	Letmegrpc                   bool
+	LetmegrpcRelOut             string
+	LetmegrpcImportPath         string
+	LetmegrpcNoDefaultModifiers bool
+	LetmegrpcModifiers          map[string]string
+	OperatorCmd                 bool
+	OperatorCmdOut              string
+	OperatorHubot               bool
+	OperatorHubotOut            string
+	OperatorLocal               bool
+	OperatorLocalOut            string
+	OperatorServer              bool
+	OperatorServerOut           string
+}
+
+type Command struct {
+	Arg []string
+}
+
+// CompilerOptions are options for a Compiler.
+type CompilerOptions struct{}
 
 // Compiler compiles protocol buffer files.
 type Compiler interface {
@@ -25,27 +74,6 @@ type Compiler interface {
 	Compile(dirPath string, outDirPath string, compileOptions *CompileOptions) ([]*Command, error)
 }
 
-// CompilerOptions are options for a Compiler.
-type CompilerOptions struct{}
-
 func NewCompiler(options CompilerOptions) Compiler {
 	return newCompiler(options)
-}
-
-// SimpleString returns the simple value for the GoPluginType.
-func (x GoPluginType) SimpleString() string {
-	s, ok := GoPluginType_name[int32(x)]
-	if !ok {
-		return strconv.Itoa(int(x))
-	}
-	return strings.TrimPrefix(strings.ToLower(s), "go_plugin_type_")
-}
-
-// SimpleString returns the simple value for the GogoPluginType.
-func (x GogoPluginType) SimpleString() string {
-	s, ok := GogoPluginType_name[int32(x)]
-	if !ok {
-		return strconv.Itoa(int(x))
-	}
-	return strings.TrimPrefix(strings.ToLower(s), "gogo_plugin_type_")
 }
