@@ -11,6 +11,7 @@ RSpec.describe ChefDelivery do
     defaults = {
       url: "https://github.com/builds/1",
       sha: "sha1",
+      branch: "master",
       state: ChefDelivery::SUCCESS,
       updated_at: Time.current
     }
@@ -73,38 +74,38 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
   end
 
-  it "noops if non-master branch has been checked out for less than an hour" do
+  it "noops if the build is not for the master branch" do
     server = ChefDelivery::Server.new("test", "production", "chef1")
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build
+    @repo.current_build = build_build(
+      branch: "this-is-fine-dot-jpg",
+      state: ChefDelivery::PENDING
+    )
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
-    assert_equal 0, @config.notifier.messages.size
   end
 
-  it "noops and notifies if non-master branch has been checked out for more than an hour" do
+  it "noops and notifies once every 30 minutes if non-master branch is checked out" do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "mybranch")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(updated_at: 90.minutes.ago)
-    response = @delivery.checkin(request)
+    @repo.current_build = build_build
+    response = @delivery.checkin(request, Time.current)
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
     assert msg.message.include?("could not be deployed")
     assert msg.message.include?("mybranch")
     assert msg.message.include?("pardot0-chef1")
-  end
 
-  it "noops and doesn't notify if non-master branch has been checkout for less than an hour" do
-    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "boom")
-    request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(updated_at: 30.minutes.ago)
-    response = @delivery.checkin(request)
-    assert_equal "noop", response.action
+    response = @delivery.checkin(request, Time.current + 15.minutes)
     assert_equal 0, @config.notifier.messages.size
+    assert_equal "noop", response.action
+
+    response = @delivery.checkin(request, Time.current + 40.minutes)
+    assert_equal 1, @config.notifier.messages.size
+    assert_equal "noop", response.action
   end
 
   it "noops if there is no build available" do
@@ -136,12 +137,11 @@ RSpec.describe ChefDelivery do
     assert_equal "noop", response.action
   end
 
-  it "deploys if the current deploy is successful but differs from current build" do
+  it "deploys if the checkout differs from the current build" do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     @repo.current_build = build_build(sha: "sha2")
-    create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
   end

@@ -26,7 +26,7 @@ class ChefDeliveryConfig
   end
 
   def max_lock_age
-    1.hour
+    30.minutes
   end
 
   def github_url

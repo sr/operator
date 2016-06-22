@@ -2,6 +2,8 @@ class ChefDelivery
   SUCCESS = "success".freeze
   FAILURE = "failure".freeze
   PENDING = "pending".freeze
+  LOCKED  = "locked".freeze
+  NONE = "none".freeze
 
   class Error < StandardError
   end
@@ -12,9 +14,11 @@ class ChefDelivery
     @config = config
   end
 
-  def checkin(request)
+  def checkin(request, now = nil)
+    now ||= Time.current
+
     Instrumentation.log(
-      at: "chef.checkin",
+      at: "chef",
       branch: request.checkout_branch,
       sha: request.checkout_sha,
       current_build: current_build.to_json
@@ -28,36 +32,37 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if request.checkout_branch != @config.master_branch
-      if (Time.current - current_build.updated_at) > @config.max_lock_age
-        notification.at_lock_age_limit(
-          @config.chat_room_id(request.server),
-          request.server,
-          request.checkout,
-          current_build
-        )
-      end
-
+    if current_build.branch != @config.master_branch
       return ChefCheckinResponse.noop
     end
 
-    deploy = ChefDeploy.find_current(request.server.datacenter)
+    if request.checkout_sha == current_build.sha &&
+      request.checkout_branch == current_build.branch
+      return ChefCheckinResponse.noop
+    end
+
+    deploy = ChefDeploy.find_or_init_current(request.server, current_build)
 
     if deploy.state == PENDING
       return ChefCheckinResponse.noop
     end
 
-    if request.checkout_sha == current_build.sha
+    if request.checkout_branch != current_build.branch
+      deploy.lock(
+        notification,
+        @config.chat_room_id(request.server),
+        @config.max_lock_age,
+        request,
+        now
+      )
       return ChefCheckinResponse.noop
     end
 
-    new_deploy = ChefDeploy.create_pending(
-      request.server,
-      @config.master_branch,
-      current_build
-    )
+    if request.checkout_sha == deploy.sha
+      return ChefCheckinResponse.noop
+    end
 
-    ChefCheckinResponse.deploy(new_deploy)
+    ChefCheckinResponse.deploy(deploy.start)
   end
 
   def complete_deploy(request)
