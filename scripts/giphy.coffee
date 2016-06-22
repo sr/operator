@@ -8,8 +8,8 @@
 #   hubot gif me <query> - returns a pg gif from giphy 
 
 giphy =
-  api_key: 'dc6zaTOxFJmzC' #<- testing api key
-  #api_key: process.env.HUBOT_GIPHY_API_KEY
+  #api_key: 'dc6zaTOxFJmzC' #<- testing api key
+  api_key: process.env.HUBOT_GIPHY_API_KEY
   url: 'http://api.giphy.com/v1/gifs/search'
 
 module.exports = (robot) ->
