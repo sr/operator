@@ -87,10 +87,11 @@ RSpec.describe ChefDelivery do
   end
 
   it "noops and notifies once every 30 minutes if non-master branch is checked out" do
+    create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha^^^")
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "mybranch")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build
+    @repo.current_build = build_build(sha: "deadbeef")
     response = @delivery.checkin(request, Time.current)
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
@@ -142,6 +143,22 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     @repo.current_build = build_build(sha: "sha2")
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+  end
+
+  it "deploys the same build twice" do
+    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
+    request = ChefCheckinRequest.new(server, checkout)
+    @repo.current_build = build_build(sha: "sha1^^")
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+    request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
+    @delivery.complete_deploy(request)
+
+    checkout = ChefCheckinRequest::Checkout.new("sha1~100", "master")
+    request = ChefCheckinRequest.new(server, checkout)
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
   end

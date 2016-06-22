@@ -68,6 +68,19 @@ class ChefDeploy < ActiveRecord::Base
     self
   end
 
+  def redeploy
+    new_deploy = ChefDeploy.new(
+      branch: branch,
+      build_url: build_url,
+      environment: environment,
+      datacenter: datacenter,
+      hostname: hostname,
+      sha: sha,
+      state: ChefDelivery::NONE
+    )
+    new_deploy.start
+  end
+
   def successful?
     state == ChefDelivery::SUCCESS
   end
@@ -82,7 +95,7 @@ class ChefDeploy < ActiveRecord::Base
       branch: branch,
       sha: sha,
       state: nil,
-      updated_at: nil,
+      updated_at: nil
     )
   end
 

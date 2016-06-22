@@ -36,14 +36,14 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if request.checkout_sha == current_build.sha &&
-       request.checkout_branch == current_build.branch
-      return ChefCheckinResponse.noop
-    end
-
     deploy = ChefDeploy.find_or_init_current(request.server, current_build)
 
     if deploy.state == PENDING
+      return ChefCheckinResponse.noop
+    end
+
+    if request.checkout_sha == current_build.sha &&
+       request.checkout_branch == current_build.branch
       return ChefCheckinResponse.noop
     end
 
@@ -58,11 +58,19 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
+    if deploy.state == NONE
+      return ChefCheckinResponse.deploy(deploy.start)
+    end
+
     if request.checkout_sha == deploy.sha
       return ChefCheckinResponse.noop
     end
 
-    ChefCheckinResponse.deploy(deploy.start)
+    if deploy.successful?
+      ChefCheckinResponse.deploy(deploy.redeploy)
+    else
+      ChefCheckinResponse.deploy(deploy.start)
+    end
   end
 
   def complete_deploy(request)
