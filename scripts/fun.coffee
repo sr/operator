@@ -35,6 +35,7 @@
 #   hubot blakem - blakem
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
+#   hubot excuse - Objectively respond with a classic programming excuse
 #   hubot blame <person> - Objectively make it THEIR fault
 #   hubot praise <person> - Objectively make it THEIR win!
 #   hubot miniTinny - Get Tiny Tinny
@@ -505,6 +506,19 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/282/7QJbcMToMrhk7ZR/2016-03-30%2016_31_37.gif"
     ]
     msg.send msg.random waffleses
+
+  robot.respond /excuse$/i, (msg) ->
+    url = 'http://pe-api.herokuapp.com/'
+    robot.http(url)
+      .get() (error, response, body) ->
+        if error
+          msg.send "Programming Excuses server failed to respond: #{error}"
+        else
+          payload = JSON.parse(body)
+          if payload.message
+            msg.send payload.message
+          else
+            msg.send "It probably won\'t happen again"
 
   robot.respond /blame\s+(.*)$/i, (msg) ->
     target = msg.match[1]
