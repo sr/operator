@@ -2,23 +2,29 @@ class ChefDelivery
   SUCCESS = "success".freeze
   FAILURE = "failure".freeze
   PENDING = "pending".freeze
+  LOCKED  = "locked".freeze
+  NONE = "none".freeze
 
   class Error < StandardError
   end
+
+  Server = Struct.new(:datacenter, :environment, :hostname)
 
   def initialize(config)
     @config = config
   end
 
-  def checkin(request)
+  def checkin(request, now = nil)
+    now ||= Time.current
+
     Instrumentation.log(
-      at: "chef.checkin",
+      at: "chef",
       branch: request.checkout_branch,
       sha: request.checkout_sha,
       current_build: current_build.to_json
     )
 
-    if !@config.enabled_in?(request.environment, request.hostname)
+    if !@config.enabled?(request.server)
       return ChefCheckinResponse.noop
     end
 
@@ -26,46 +32,54 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if request.checkout_branch != @config.master_branch
-      if (Time.current - current_build.updated_at) > @config.max_lock_age
-        notification.at_lock_age_limit(
-          @config.chat_room_id(request.hostname),
-          request.hostname,
-          request.checkout,
-          current_build
-        )
-      end
-
+    if current_build.branch != @config.master_branch
       return ChefCheckinResponse.noop
     end
 
-    deploy = ChefDeploy.find_current(request.environment, @config.master_branch)
+    deploy = ChefDeploy.find_or_init_current(request.server, current_build)
 
-    if [SUCCESS, PENDING].include?(deploy.state)
+    if deploy.state == PENDING
       return ChefCheckinResponse.noop
     end
 
-    if deploy.sha == request.checkout_sha
+    if request.checkout_sha == current_build.sha &&
+       request.checkout_branch == current_build.branch
       return ChefCheckinResponse.noop
     end
 
-    deploy = ChefDeploy.create_pending(
-      request.environment,
-      @config.master_branch,
-      current_build,
-    )
+    if request.checkout_branch != current_build.branch
+      deploy.lock(
+        notification,
+        @config.chat_room_id(request.server),
+        @config.max_lock_age,
+        request,
+        now
+      )
+      return ChefCheckinResponse.noop
+    end
 
-    ChefCheckinResponse.deploy(deploy)
+    if deploy.state == NONE
+      return ChefCheckinResponse.deploy(deploy.start)
+    end
+
+    if request.checkout_sha == deploy.sha
+      return ChefCheckinResponse.noop
+    end
+
+    if deploy.successful?
+      ChefCheckinResponse.deploy(deploy.redeploy)
+    else
+      ChefCheckinResponse.deploy(deploy.start)
+    end
   end
 
   def complete_deploy(request)
-    status = request.success? ? SUCCESS : FAILURE
-    ChefDeploy.complete(request.deploy_id, status)
+    status = request.success ? SUCCESS : FAILURE
+    deploy = ChefDeploy.complete(request.deploy_id, status)
     notification.deploy_completed(
-      @config.chat_room_id(request.hostname),
-      request.deploy,
-      request.success?,
-      request.error
+      @config.chat_room_id(deploy.server),
+      deploy,
+      request.error_message
     )
   end
 

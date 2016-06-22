@@ -22,7 +22,7 @@ install-tools:
 	$(GO) install -v $(TOOLS)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($<)"; \
+	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
