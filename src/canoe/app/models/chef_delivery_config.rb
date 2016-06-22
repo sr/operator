@@ -2,6 +2,7 @@ class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
   AWS = "ue1.aws".freeze
+  ENABLED = [AWS].freeze
 
   BREAD_ROOM = 42
   OPS_ROOM = 6
@@ -11,7 +12,7 @@ class ChefDeliveryConfig
     when DEV
       true
     when PRODUCTION
-      server.datacenter == AWS
+      ENABLED.include?(server.datacenter)
     else
       false
     end
