@@ -147,12 +147,16 @@ RSpec.describe ChefDelivery do
   end
 
   it "notifies of successful deployment" do
-    deploy = create_current_deploy(state: ChefDelivery::PENDING)
+    deploy = create_current_deploy(
+      state: ChefDelivery::PENDING,
+      build_url: "https://BREAD-9000"
+    )
     request = ChefCompleteDeployRequest.new(deploy.id, true, nil)
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
-    message = @config.notifier.messages.pop
-    assert message.message.include?("successfully deployed")
+    msg = @config.notifier.messages.pop
+    assert msg.message.include?("successfully deployed")
+    assert msg.message.include?("#9000")
   end
 
   it "notifies of failed deployment" do
