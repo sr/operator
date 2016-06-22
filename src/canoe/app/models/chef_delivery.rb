@@ -37,7 +37,7 @@ class ChefDelivery
     end
 
     if request.checkout_sha == current_build.sha &&
-      request.checkout_branch == current_build.branch
+       request.checkout_branch == current_build.branch
       return ChefCheckinResponse.noop
     end
 

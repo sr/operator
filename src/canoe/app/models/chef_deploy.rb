@@ -40,6 +40,8 @@ class ChefDeploy < ActiveRecord::Base
     deploy
   end
 
+  # TODO(sr) rubocop:disable Metrics/ParameterLists
+  # rubocop:disable Metrics/ParameterLists
   def lock(notifier, room_id, max_lock_age, request, now)
     self.state = ChefDelivery::LOCKED
 
@@ -59,7 +61,7 @@ class ChefDeploy < ActiveRecord::Base
 
   def start
     if ![ChefDelivery::NONE, ChefDelivery::LOCKED].include?(state)
-      raise ChefDelivery::Error, "bad start state transition: #{self.inspect}"
+      raise ChefDelivery::Error, "bad start state transition: #{inspect}"
     end
 
     update!(state: ChefDelivery::PENDING)
