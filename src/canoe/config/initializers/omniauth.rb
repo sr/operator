@@ -1,3 +1,5 @@
+OmniAuth.config.logger = Rails.logger
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   if Rails.env.production?
     OmniAuth.config.full_host = "https://canoe.dev.pardot.com"

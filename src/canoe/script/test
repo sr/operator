@@ -1,12 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # script/test: Run test suite for application. Optionallly pass in a path to an
 #              individual test file to run a single test.
 
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "$0")/.."
+
+: "${DEBUG:=""}"
+: "${RAILS_ENV:=""}"
+: "${RACK_ENV:=""}"
 
 [ -z "$DEBUG" ] || set -x
 
@@ -25,14 +29,15 @@ else
   # own from a `development` environment.
   export RAILS_ENV="test" RACK_ENV="test"
 
-  script/update
+  (bin/rake db:create || true) >/dev/null 2>&1
+  bin/rake db:migrate >/dev/null 2>&1
 fi
 
 echo "===> Running tests..."
 
-if [ -n "$1" ]; then
+if [ -n "${1:-""}" ]; then
   # pass arguments to test call. This is useful for calling a single test.
-  bin/rspec "$1"
+  bin/rspec "${1:-""}"
 else
   bin/rspec
 fi

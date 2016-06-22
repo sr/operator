@@ -1,2 +1,2 @@
 #!/bin/sh
-exec bundle exec rake
+exec bundler exec rake

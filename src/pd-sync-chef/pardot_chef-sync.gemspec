@@ -5,7 +5,7 @@ end
 
 # coding: utf-8
 Gem::Specification.new do |spec|
-  spec.name          = 'pardot_pd_sync'
+  spec.name          = 'pardot_chef-sync'
   spec.version       = version
   spec.authors       = ["https://confluence.dev.pardot.com/display/PTechops/BREAD+Ops"]
   spec.email         = "pd-bread@salesforce.com"

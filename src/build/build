@@ -100,7 +100,7 @@ case "$project" in
         build-ruby --no-lint "$project"
 
         test -n "$CI" &&
-        build_rubygem "pardot_pd_sync" "src/pd-sync-chef/pardot_pd_sync.gemspec"
+        build_rubygem "pardot_chef-sync" "src/pd-sync-chef/pardot_chef-sync.gemspec"
         ;;
     pull_agent)
         build-ruby "$project"
