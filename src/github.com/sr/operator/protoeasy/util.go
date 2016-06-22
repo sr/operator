@@ -1,18 +1,9 @@
 package protoeasy
 
 import (
-	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/docker/docker/pkg/archive"
-	"github.com/sr/operator/protolog"
-)
-
-const (
-	tarCompression = archive.Gzip
 )
 
 // protoSpec specifies the absolute directory path being used as a base
@@ -123,37 +114,6 @@ func filePathMatches(filePath string, excludeFilePatterns []string) (bool, error
 	return false, nil
 }
 
-func tar(dirPath string, includeFiles []string) (retVal []byte, retErr error) {
-	readCloser, err := archive.TarWithOptions(
-		dirPath,
-		&archive.TarOptions{
-			IncludeFiles: includeFiles,
-			Compression:  tarCompression,
-			NoLchown:     true,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := readCloser.Close(); err != nil && retErr == nil {
-			retErr = err
-		}
-	}()
-	return ioutil.ReadAll(readCloser)
-}
-
-func untar(value []byte, dirPath string) error {
-	return archive.Untar(
-		bytes.NewReader(value),
-		dirPath,
-		&archive.TarOptions{
-			Compression: tarCompression,
-			NoLchown:    true,
-		},
-	)
-}
-
 func getGoPath() (string, error) {
 	goPath := os.Getenv("GOPATH")
 	if goPath == "" {
@@ -161,7 +121,6 @@ func getGoPath() (string, error) {
 	}
 	split := strings.Split(goPath, ":")
 	if len(split) > 1 {
-		protolog.DefaultLogger.Infof("protoeasy: GOPATH %s has multiple directories, using first directory %s", goPath, split[0])
 		return split[0], nil
 	}
 	return goPath, nil
