@@ -32,4 +32,4 @@ module.exports = (robot) ->
           catch e
             msg.send "Bad Response: #{e}"
         else 
-            msg.send "Error: #{e}"
+          msg.send "Error: #{e}"
