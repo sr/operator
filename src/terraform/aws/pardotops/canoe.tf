@@ -100,7 +100,7 @@ resource "aws_db_instance" "canoe_production" {
   name = "canoe_production"
   username = "canoe"
   password = "WeGDb6pjqgayjMSnnm7U"
-  maintenance_window = "Mon:20:00-Mon:23:00"
+  maintenance_window = "Tue:00:00-Tue:04:00"
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
