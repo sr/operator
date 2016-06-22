@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160617230608) do
+ActiveRecord::Schema.define(version: 20160622112051) do
 
   create_table "auth_users", force: :cascade do |t|
     t.string   "email",      limit: 255
@@ -25,15 +25,16 @@ ActiveRecord::Schema.define(version: 20160617230608) do
   add_index "auth_users", ["uid"], name: "index_auth_users_on_uid", unique: true, using: :btree
 
   create_table "chef_deploys", force: :cascade do |t|
-    t.string   "branch",      limit: 255,   null: false
-    t.string   "build_url",   limit: 255,   null: false
-    t.string   "environment", limit: 255,   null: false
-    t.string   "sha",         limit: 255,   null: false
-    t.string   "state",       limit: 255,   null: false
+    t.string   "branch",           limit: 255,   null: false
+    t.string   "build_url",        limit: 255,   null: false
+    t.string   "environment",      limit: 255,   null: false
+    t.string   "sha",              limit: 255,   null: false
+    t.string   "state",            limit: 255,   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "datacenter",  limit: 65535, null: false
-    t.text     "hostname",    limit: 65535, null: false
+    t.text     "datacenter",       limit: 65535, null: false
+    t.text     "hostname",         limit: 65535, null: false
+    t.datetime "last_notified_at"
   end
 
   create_table "deploy_acl_entries", force: :cascade do |t|
