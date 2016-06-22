@@ -804,7 +804,7 @@ module.exports = (robot) ->
   robot.respond /kawaii bomb( (\d+))?$/i, (msg) ->
     count = msg.match[2] || 3
     for i in [1..count]
-      Me msg, "kawaii", (url) ->
+      imageMe msg, "kawaii", (url) ->
         msg.send "#{url}"
 
   robot.respond /corgi(\sme)?$/i, (msg) ->
