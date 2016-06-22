@@ -19,7 +19,8 @@ RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
 RUN yum install -y epel-release && \
   yum install -y \
     font-config supervisor less which openssh-clients redis bzip2 make \
-    unzip xz gcc file libicu openssl nc java-1.7.0-openjdk && \
+    unzip xz gcc file libicu openssl nc && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.el6.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.el6.x86_64.rpm" && \
