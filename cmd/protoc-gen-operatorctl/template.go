@@ -27,7 +27,7 @@ var cmd = operator.NewCommand(
 	[]operator.ServiceCommand{
 {{- range .Services}}
 		{
-{{- $serviceName := .Name }}
+{{- $serviceName := .PackageName }}
 {{- $serviceFullName := .FullName }}
 			Name:     "{{ $serviceName }}",
 			Synopsis: `+"`"+`{{ .Description }}`+"`"+`,
