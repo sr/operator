@@ -22,7 +22,13 @@ SVC_SRC ?= $(shell find $(SVC_DIR) -type f -name "*.proto" -o -name "*.go")
 
 IMPORTPATH ?= github.com/sr/operator/chatoops/services
 
-build: $(OPERATORD_GEN_SRC) $(OPERATORCTL_GEN_SRC) build-hubot
+generate: $(OPERATORC)
+	$< \
+		-import-path $(IMPORTPATH) \
+		-cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) \
+		-server-out $(shell dirname $(OPERATORD_GEN_SRC)) \
+		-hubot-out $(HUBOT_SCRIPTS_DIR) \
+		$(SVC_DIR)
 
 clean:
 	go clean -i ./...
@@ -40,10 +46,6 @@ dev-run: $(OPERATORD_GEN_SRC)
 install: $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC)
 	$(GO) install -v ./$$(dirname $(OPERATORCTL_GEN_SRC)) \
 		./$$(dirname $(OPERATORD_GEN_SRC))
-
-build-hubot: $(SVC_SRC) $(OPERATORC) $(PROTOC_GEN_OPERATORHUBOT)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--hubot-out $(HUBOT_SCRIPTS_DIR) $(SVC_DIR)
 
 hubot-dev: docker-build-hubot
 	@ touch .hubot_history
@@ -69,14 +71,6 @@ $(OPERATORCTL): $(OPERATORCTL_GEN_SRC)
 
 $(OPERATORD): $(OPERATORD_SRC)
 	$(GO) install -v ./cmd/$$(basename $(OPERATORD))
-
-$(OPERATORCTL_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORCTL)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) $(SVC_DIR)
-
-$(OPERATORD_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORD)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--server-out $(shell dirname $(OPERATORD_GEN_SRC)) $(SVC_DIR)
 
 $(PROTOC_GEN_GO):
 	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
