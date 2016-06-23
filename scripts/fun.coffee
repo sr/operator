@@ -507,13 +507,12 @@ module.exports = (robot) ->
     ]
     msg.send msg.random waffleses
 
-  robot.respond /excuse(\sme)?(\s+(.*))?$/i, (msg) ->
+  robot.respond /excuse(\sme)?(?:\s+(.*))?$/i, (msg) ->
     url = 'http://pe-api.herokuapp.com/'
     if msg.match[1]
       msg.send "Oh, did you fart? (disapproval)"
       return
-    if msg.match[3]
-      target = msg.match[3]
+    target = msg.match[2]
     robot.http(url)
       .get() (error, res, body) ->
         if error
@@ -522,7 +521,7 @@ module.exports = (robot) ->
           payload = JSON.parse(body)
           response = if payload.message then payload.message else "It probably won't happen again (shrug)"
           if target
-            rand =  msg.random [0..3]
+            rand = Math.floor(Math.random() * 4);
             if rand is 0 
               msg.send "I recall #{target} saying, \"#{response}\""
             else if rand is 1
