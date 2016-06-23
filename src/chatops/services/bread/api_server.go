@@ -30,7 +30,7 @@ type apiServer struct {
 
 type parsedImg struct {
 	host       string
-	registryId string
+	registryID string
 	repo       string
 	tag        string
 }
@@ -79,7 +79,7 @@ func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*Lis
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("bamboo request failed with status %d", resp.StatusCode)
 	}
@@ -161,7 +161,7 @@ OuterLoop:
 			&ecr.ListImagesInput{
 				MaxResults:     aws.Int64(100),
 				NextToken:      nextToken,
-				RegistryId:     aws.String(curImg.registryId),
+				RegistryId:     aws.String(curImg.registryID),
 				RepositoryName: aws.String(curImg.repo),
 			},
 		)
@@ -224,7 +224,7 @@ func parseImage(img string) (*parsedImg, error) {
 	path := strings.Split(u.Path, ":")
 	return &parsedImg{
 		host:       u.Host,
-		registryId: host[0],
+		registryID: host[0],
 		repo:       path[0][1:],
 		tag:        path[1],
 	}, nil
