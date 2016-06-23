@@ -1,4 +1,4 @@
-class DataCenter
+class Datacenter
   class NotFound < StandardError
     def initialize(name)
       super "datacenter not found: #{name.inspect}"
@@ -7,11 +7,11 @@ class DataCenter
 
   DALLAS = "dfw".freeze
   LOCAL = "local".freeze
-  SEATTLE = "phx".freeze
+  PHOENIX = "phx".freeze
 
   # Returns the current Datacenter based on the Rails configuration.
   def self.current
-    @datacenter ||= DataCenter.new(
+    @datacenter ||= Datacenter.new(
       Rails.application.config.x.datacenter,
       DatabaseConfigurationFile.load
     )
@@ -21,7 +21,7 @@ class DataCenter
     @name = name
     @config = config
 
-    if ![DALLAS, LOCAL, SEATTLE].include?(name)
+    if ![DALLAS, LOCAL, PHOENIX].include?(name)
       raise NotFound, name
     end
   end

@@ -24,15 +24,9 @@ class UserQuery < ActiveRecord::Base
       raise UserQuery::RateLimited, current_user
     end
 
-    data = {
-      hostname: database.hostname,
-      database: database.name,
-      query: parsed.sql,
-      user_email: current_user.email
-    }
-    Instrumentation.log(data)
-
-    results = database.execute(parsed.sql)
+    results = Instrumentation.context(user_email: current_user.email) do
+      database.execute(parsed.sql)
+    end
     current_user.rate_limit.record_transaction
     results
   end
@@ -48,7 +42,7 @@ class UserQuery < ActiveRecord::Base
       raise "query is not scoped to an account"
     end
 
-    DataCenter.current.find_account(account_id).descriptive_name
+    Datacenter.current.find_account(account_id).descriptive_name
   end
 
   # Returns an Array of tables present in the database.
@@ -72,9 +66,9 @@ class UserQuery < ActiveRecord::Base
 
   def database
     if for_account?
-      DataCenter.current.shard_for(account_id)
+      Datacenter.current.shard_for(account_id)
     else
-      DataCenter.current.global
+      Datacenter.current.global
     end
   end
 end
