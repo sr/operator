@@ -72,7 +72,7 @@ module.exports = (robot) ->
               color: "red"
             })
           else 
-            html = "<a>No major traffic incidents in Atlanta! <\a><img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=#{imageUrl}>"
+            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=#{imageUrl}>"
             msg.hipchatNotify("#{html}", {
               notify: false,
               color: "green"
