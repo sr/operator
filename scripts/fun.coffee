@@ -521,7 +521,7 @@ module.exports = (robot) ->
           payload = JSON.parse(body)
           response = if payload.message then payload.message else "It probably won't happen again (shrug)"
           if target
-            rand = Math.floor(Math.random() * 4);
+            rand = Math.floor(Math.random() * 4)
             if rand is 0 
               msg.send "I recall #{target} saying, \"#{response}\""
             else if rand is 1
