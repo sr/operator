@@ -734,6 +734,22 @@ module.exports = (robot) ->
     ]
     msg.send msg.random TLDRS
 
+  robot.respond /sysadmin$/i, (msg) -> 
+    sysadmins=[
+      'http://i.imgur.com/V5FpuGB.jpg',
+      'http://i.imgur.com/7zkAZld.jpg',
+      'http://i.imgur.com/1QxEnDK.jpg',
+      'http://i.imgur.com/ZahKqeH.jpg',
+      'http://i.imgur.com/9xhmLjw.jpg',
+      'http://i.imgur.com/l2mEYwX.jpg',
+      'http://i.imgur.com/8Ezom3u.jpg',
+      'http://i.imgur.com/dLrz9D4.jpg',
+      'http://i.imgur.com/nOV5HZz.jpg',
+      'http://i.imgur.com/xEkdnNp.jpg',
+      'http://i.imgur.com/qjYCPWj.jpg',
+    ]
+    msg.send msg.random sysadmins
+
   robot.hear /over 9000$/i, (msg) ->
     msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
 
