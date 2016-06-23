@@ -62,17 +62,18 @@ module.exports = (robot) ->
                 description += ")"           
 
                 if url
-                  incidentStr += "<a href=\"#{url}\">#{description}</a>\n" 
+                  incidentStr += "<a name=\"Google Maps Traffic Report\" href=\"#{url}\">#{description}</a><br>" 
                 else 
                   incidentStr += "#{description}\n"
 
           if incidentStr is not ''
-            msg.hipchatNotify("#{incidentStr}#{imageUrl}", {
+            msg.hipchatNotify("#{incidentStr}<img src=#{imageUrl}>", {
               notify: false,
               color: "red"
             })
           else 
-            msg.hipchatNotify("No major traffic incidents in Atlanta! (buttrock)\n#{imageUrl}", {
+            html = "<a>No major traffic incidents in Atlanta!<\a><img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif"><br><img src=#{imageUrl}>"
+            msg.hipchatNotify("#{html}", {
               notify: false,
               color: "green"
             })
