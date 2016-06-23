@@ -9,7 +9,75 @@
 
 module.exports = (robot) ->
   robot.respond /traffic$/i, (msg) ->
-    msg.send "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
+    bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
+    
+    # traffice image
+    imageUrl = "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=#{bingkey}"
+    
+    # traffic descriptions
+    url  = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.5,-84.6,34.15,-84.1"
+    msg.http(url)
+      .query({
+        severity: "1,2,3,4",
+        output: 'json',  
+        key: "#{bingkey}"})
+      .get() (err, res, body) ->
+        if err
+          msg.send "#{imageUrl}"
+          return
+        data = JSON.parse body
+        if data?.resourceSets[0]?.resources?
+          incidents = data.resourceSets[0].resources
+          incidentStr = ''
+          for i in [0..incidents.length - 1]
+            if incidents[i]
+              incident = incidents[i]
+              if incident.verified and incident.description
+                if incident?.point?.coordinates
+                  lat = incident.point.coordinates[0]
+                  lon = incident.point.coordinates[1]
+                  url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
+         
+                type = switch incident.type
+                         when 1 then "Accident"
+                         when 2 then "Congestion"
+                         when 3 then "Disabled Vehicle"
+                         when 4 then "Mass Transit"
+                         when 5 then "Miscellaneous"
+                         when 6 then "Other News"
+                         when 7 then "Planned Event"
+                         when 8 then "Road Hazard"
+                         when 9 then "Construction"
+                         when 10 then "Alert"
+                         when 11 then "Weather"
+                         else "Unknown"
+                lane = if incident.lane is not "" then incident.lane else null
+                
+                description = incident.description
+                description += " (#{type}"
+                if lane
+                  description += ", Lane: #{lane}"
+                if incident.roadClosed
+                  description += ", Road is closed"
+                description += ")"           
+
+                if url
+                  incidentStr += "<a href=\"#{url}\">#{description}</a>\n" 
+                else 
+                  incidentStr += "#{description}\n"
+
+          if incidentStr is not ''
+            msg.hipchatNotify("#{incidentStr}#{imageUrl}", {
+              notify: false,
+              color: "red"
+            })
+          else 
+            msg.hipchatNotify("No major traffic incidents in Atlanta! (buttrock)\n#{imageUrl}", {
+              notify: false,
+              color: "green"
+            })
+        else
+          msg.send "#{imageUrl}"
 
   robot.respond /traveltime\s+(.*)$/i, (msg) ->
     secondloc = msg.match[1]
