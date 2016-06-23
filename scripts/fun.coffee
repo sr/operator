@@ -532,10 +532,8 @@ module.exports = (robot) ->
               msg.send "/quote#{response}"
             else if rand is 3
               msg.send "\"#{response}\" - #{target}"
-          else if response
-            msg.send response
           else
-            msg.send "It probably won't happen again (shrug)"
+            msg.send response
 
   robot.respond /blame\s+(.*)$/i, (msg) ->
     target = msg.match[1]
