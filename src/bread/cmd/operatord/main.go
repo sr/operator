@@ -1,7 +1,7 @@
 package main
 
 import (
-	"chatops"
+	"bread"
 	"flag"
 	"fmt"
 	"net"
@@ -17,7 +17,7 @@ func run(builder operator.ServerBuilder) error {
 	flags.StringVar(&config.Address, "listen-addr", operator.DefaultAddress, "Listen address of the operator server")
 	logger := operator.NewLogger()
 	instrumenter := operator.NewInstrumenter(logger)
-	authorizer := chatops.NewLDAPAuthorizer()
+	authorizer := bread.NewLDAPAuthorizer()
 	interceptor := operator.NewInterceptor(instrumenter, authorizer)
 	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 	msg := &operator.ServerStartupNotice{Protocol: "tcp"}
