@@ -18,8 +18,7 @@ module.exports = (robot) ->
     url  = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.5,-84.6,34.15,-84.1"
     msg.http(url)
       .query({
-        severity: "3,4",
-        output: 'json',  
+        severity: "2,3,4",
         key: "#{bingkey}"})
       .get() (err, res, body) ->
         if err
@@ -32,25 +31,21 @@ module.exports = (robot) ->
           for i in [0..incidents.length - 1]
             if incidents[i]
               incident = incidents[i]
-              if incident.verified and incident.description
-                if incident?.point?.coordinates
-                  lat = incident.point.coordinates[0]
-                  lon = incident.point.coordinates[1]
-                  url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
-         
-                type = switch incident.type
-                         when 1 then "Accident"
-                         when 2 then "Congestion"
-                         when 3 then "Disabled Vehicle"
-                         when 4 then "Mass Transit"
-                         when 5 then "Miscellaneous"
-                         when 6 then "Other News"
-                         when 7 then "Planned Event"
-                         when 8 then "Road Hazard"
-                         when 9 then "Construction"
-                         when 10 then "Alert"
-                         when 11 then "Weather"
+              if incident.verified && description != "" 
+                type = switch
+                         when incident.type is 1 then "Accident"
+                         when incident.type is 2 then "Congestion"
+                         when incident.type is 3 then "Disabled Vehicle"
+                         when incident.type is 4 then "Mass Transit"
+                         when incident.type is 5 then "Miscellaneous"
+                         when incident.type is 6 then "Other News"
+                         when incident.type is 7 then "Planned Event"
+                         when incident.type is 8 then "Road Hazard"
+                         when incident.type is 9 then "Construction"
+                         when incident.type is 10 then "Alert"
+                         when incident.type is 11 then "Weather"
                          else "Unknown"
+                
                 lane = if incident.lane is not "" then incident.lane else null
                 
                 description = incident.description
@@ -61,18 +56,22 @@ module.exports = (robot) ->
                   description += ", Road is closed"
                 description += ")"           
 
-                if url
-                  incidentStr += "<a href=\"#{url}\">#{description}</a>\n" 
+                if incident?.point?.coordinates
+                  lat = incident.point.coordinates[0]
+                  lon = incident.point.coordinates[1]
+                  url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
+                  incidentStr += "<a name=\"Google Maps Traffic Report\" href=\"#{url}\">#{description}</a><br>" 
                 else 
-                  incidentStr += "#{description}\n"
+                  incidentStr += "#{description}<br>"
 
-          if incidentStr is not ''
-            msg.hipchatNotify("#{incidentStr}#{imageUrl}", {
+          if incidentStr != ''
+            msg.hipchatNotify("#{incidentStr}<img src=\"#{imageUrl}\">", {
               notify: false,
               color: "red"
             })
           else 
-            msg.hipchatNotify("No major traffic incidents in Atlanta! (buttrock)\n#{imageUrl}", {
+            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=\"#{imageUrl}\">"
+            msg.hipchatNotify("#{html}", {
               notify: false,
               color: "green"
             })
