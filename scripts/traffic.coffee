@@ -64,7 +64,7 @@ module.exports = (robot) ->
                 if url
                   incidentStr += "<a name=\"Google Maps Traffic Report\" href=\"#{url}\">#{description}</a><br>" 
                 else 
-                  incidentStr += "#{description}\n"
+                  incidentStr += "#{description}<br>"
 
           if incidentStr is not ''
             msg.hipchatNotify("#{incidentStr}<img src=\"#{imageUrl}\">", {
@@ -72,7 +72,7 @@ module.exports = (robot) ->
               color: "red"
             })
           else 
-            html = "No major traffic incidents in Atlanta! <img src=\"https$://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=\"#{imageUrl}\">"
+            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=\"#{imageUrl}\">"
             msg.hipchatNotify("#{html}", {
               notify: false,
               color: "green"
