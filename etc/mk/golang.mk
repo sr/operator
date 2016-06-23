@@ -10,12 +10,12 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-OPERATOR_IMPORT_PATH ?= chatops/services
+OPERATOR_IMPORT_PATH ?= bread/svc
 OPERATORD ?= $(GOPATH)/bin/operatord
 OPERATORCTL ?= $(GOPATH)/bin/operatorctl
 OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
 OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
-SVC_DIR ?= $(GOPATH)/src/chatops/services
+SVC_DIR ?= $(GOPATH)/src/bread/svc
 HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/chatops/hubot/scripts
 
 include $(GOPATH)/src/github.com/sr/operator/operator.mk

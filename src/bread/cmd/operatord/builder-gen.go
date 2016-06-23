@@ -9,8 +9,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"chatops/services/bread"
-	"chatops/services/ping"
+	"bread/svc/bread"
+	"bread/svc/ping"
 )
 
 func buildOperatorServer(

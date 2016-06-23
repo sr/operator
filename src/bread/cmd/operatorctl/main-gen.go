@@ -7,8 +7,8 @@ import (
 	"io"
 	"os"
 
-	bread "chatops/services/bread"
-	pinger "chatops/services/ping"
+	bread "bread/svc/bread"
+	pinger "bread/svc/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
