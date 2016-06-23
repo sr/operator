@@ -35,7 +35,7 @@
 #   hubot blakem - blakem
 #   hubot superkyle - superkyle
 #   hubot makeitrain - make it rain
-#   hubot excuse - Objectively respond with a classic programming excuse
+#   hubot excuse (person) - Objectively respond with a classic programming excuse
 #   hubot blame <person> - Objectively make it THEIR fault
 #   hubot praise <person> - Objectively make it THEIR win!
 #   hubot miniTinny - Get Tiny Tinny
@@ -507,18 +507,35 @@ module.exports = (robot) ->
     ]
     msg.send msg.random waffleses
 
-  robot.respond /excuse$/i, (msg) ->
+  robot.respond /excuse(\sme)?(\s+(.*))?$/i, (msg) ->
     url = 'http://pe-api.herokuapp.com/'
+    if msg.match[1]
+      msg.send "Oh, did you fart? (disapproval)"
+      return
+    if msg.match[3]
+      target = msg.match[3]
     robot.http(url)
-      .get() (error, response, body) ->
+      .get() (error, res, body) ->
         if error
           msg.send "Programming Excuses server failed to respond: #{error}"
         else
           payload = JSON.parse(body)
-          if payload.message
-            msg.send payload.message
+          response = if payload.message then payload.message else "It probably won't happen again (shrug)"
+          if target
+            rand =  msg.random [0..3]
+            if rand is 0 
+              msg.send "I recall #{target} saying, \"#{response}\""
+            else if rand is 1
+              msg.send "#{target} keeps saying, \"#{response}\", but we all know it's a lie."
+            else if rand is 2              
+              msg.send "To quote #{target} precisely:"
+              msg.send "/quote#{response}"
+            else if rand is 3
+              msg.send "\"#{response}\" - #{target}"
+          else if response
+            msg.send response
           else
-            msg.send "It probably won\'t happen again"
+            msg.send "It probably won't happen again (shrug)"
 
   robot.respond /blame\s+(.*)$/i, (msg) ->
     target = msg.match[1]
