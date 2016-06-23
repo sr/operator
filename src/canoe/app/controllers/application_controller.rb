@@ -127,7 +127,7 @@ class ApplicationController < ActionController::Base
   helper_method :all_targets
 
   def all_projects
-    @all_projects ||= Project.order(:name)
+    @all_projects ||= Project.order(:name).where("name != ?", "chef")
   end
   helper_method :all_projects
 
