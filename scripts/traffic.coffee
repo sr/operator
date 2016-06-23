@@ -18,7 +18,7 @@ module.exports = (robot) ->
     url  = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.5,-84.6,34.15,-84.1"
     msg.http(url)
       .query({
-        severity: "1,2,3,4",
+        severity: "3,4",
         output: 'json',  
         key: "#{bingkey}"})
       .get() (err, res, body) ->
