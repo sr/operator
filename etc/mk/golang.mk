@@ -10,12 +10,24 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: deadleaves fmt lint vet errcheck install interfacer unused
+OPERATOR_IMPORT_PATH ?= chatops/services
+OPERATORD ?= $(GOPATH)/bin/operatord
+OPERATORCTL ?= $(GOPATH)/bin/operatorctl
+OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
+OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
+SVC_DIR ?= $(GOPATH)/src/chatops/services
+HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/chatops/hubot/scripts
+
+include $(GOPATH)/src/github.com/sr/operator/operator.mk
+
+all: deadleaves fmt lint vet install errcheck interfacer unused
+
+generate: operator-generate
 
 install:
 	$(GO) install -race -v ./...
 
-clean:
+clean: operator-clean
 	$(GO) clean -i ./...
 
 install-tools:
