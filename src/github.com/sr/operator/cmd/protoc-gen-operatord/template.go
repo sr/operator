@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 
 {{range .Services}}
-	"{{.ImportPath}}"
+	{{.PackageName}} "{{.ImportPath}}"
 {{- end}}
 )
 
@@ -24,10 +24,10 @@ func buildOperatorServer(
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
 {{- range .Services}}
-	{{.Name}}Config := &{{.PackageName}}.{{.FullName}}Config{}
+	{{.PackageName}}Config := &{{.PackageName}}.{{.FullName}}Config{}
 {{- end}}
 {{- range .Services}}
-	{{- $serviceName := .Name }}
+	{{- $serviceName := .PackageName }}
 	{{- range .Config}}
 	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
 	{{- end}}
@@ -38,7 +38,7 @@ func buildOperatorServer(
 	}
 	errs := make(map[string][]string)
 {{- range .Services}}
-	{{- $serviceName := .Name }}
+	{{- $serviceName := .PackageName }}
 	{{- range .Config}}
 	if {{$serviceName}}Config.{{camelCase .Name}} == "" {
 		errs["{{$serviceName}}"] = append(errs["{{$serviceName}}"], "{{.Name}}")
@@ -49,11 +49,11 @@ func buildOperatorServer(
 	if len(errs["{{.Name}}"]) != 0 {
 		services["{{.Name}}"] = errors.New("required flag(s) missing: "+strings.Join(errs["{{.Name}}"], ", "))
 	} else {
-		{{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Config)
+		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer({{.PackageName}}Config)
 		if err != nil {
 			services["{{.Name}}"] = err
 		} else {
-			{{.Name}}.Register{{camelCase .FullName}}Server(server, {{.Name}}Server)
+			{{.PackageName}}.Register{{camelCase .FullName}}Server(server, {{.PackageName}}Server)
 			services["{{.Name}}"] = nil
 		}
 	}

@@ -2,10 +2,12 @@ syntax = "proto3";
 
 import "operator.proto";
 
-package pinger;
+package ping;
+
+option go_package = "breadping";
 
 service Pinger {
-  option (operator.name) = "pinger";
+  option (operator.name) = "ping";
 
   rpc Ping(PingRequest) returns (PingResponse);
 }

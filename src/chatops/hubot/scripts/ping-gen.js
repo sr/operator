@@ -2,7 +2,7 @@
 //  Undocumented.
 //
 // Commands:
-//   hubot pinger ping  - Undocumented.
+//   hubot ping ping  - Undocumented.
 //
 // Configuration:
 //   OPERATORD_ADDRESS
@@ -11,16 +11,16 @@ var path = require("path"),
 	protobuf = require("protobufjs");
 
 var protodir = path.resolve(__dirname + "/../proto"),
-	proto = protobuf.loadProtoFile({root: protodir, file: "pinger.proto"})
+	proto = protobuf.loadProtoFile({root: protodir, file: "ping.proto"})
 	operator = proto.build("operator"),
-	pinger = grpc.loadObject(proto.ns).pinger;
+	ping = grpc.loadObject(proto.ns).ping;
 
 var address = process.env.OPERATORD_ADDRESS,
-	client = new pinger.Pinger(address, grpc.Credentials.createInsecure());
+	client = new ping.Pinger(address, grpc.Credentials.createInsecure());
 
 module.exports = function(robot) {
 
-	robot.respond(/pinger ping(.*)/, function(msg) {
+	robot.respond(/ping ping(.*)/, function(msg) {
 		var input = {},
 			ref = msg.match[1].split(" ");
 		input.source = {

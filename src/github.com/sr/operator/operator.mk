@@ -20,46 +20,28 @@ HUBOT_SCRIPTS_DIR ?= hubot/scripts
 SVC_DIR ?= services
 SVC_SRC ?= $(shell find $(SVC_DIR) -type f -name "*.proto" -o -name "*.go")
 
-IMPORTPATH ?= github.com/sr/operator/chatoops/services
+OPERATOR_IMPORT_PATH ?= github.com/sr/operator/chatoops/services
 
-build: $(OPERATORD_GEN_SRC) $(OPERATORCTL_GEN_SRC) build-hubot
+operator-generate: $(OPERATORC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD) $(PROTOC_GEN_OPERATORHUBOT)
+	$< \
+		-import-path $(OPERATOR_IMPORT_PATH) \
+		-cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) \
+		-server-out $(shell dirname $(OPERATORD_GEN_SRC)) \
+		-hubot-out $(HUBOT_SCRIPTS_DIR) \
+		$(SVC_DIR)
 
-clean:
+operator-clean:
 	go clean -i ./...
 	rm -f $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC) $(OPERATORHUBOT_GEN_SRC)
 
-dev: dev-run
+operator-dev: dev-run
 	$(WATCHMAN_MAKE) -p '$(SVC_DIR)/**/*.go' '$(SVC_DIR)/**/*.proto' \
 		'cmd/$$(basename $(OPERATORD))/*.go' -t dev-run
 
-dev-run: $(OPERATORD_GEN_SRC)
+operator-dev-run: $(OPERATORD_GEN_SRC)
 	pkill $$(basename $(OPERATORD)) || true
 	$(GO) install -v ./$$(dirname $(OPERATORD_GEN_SRC))
 	$$(basename $(OPERATORD)) &
-
-install: $(OPERATORCTL_GEN_SRC) $(OPERATORD_GEN_SRC)
-	$(GO) install -v ./$$(dirname $(OPERATORCTL_GEN_SRC)) \
-		./$$(dirname $(OPERATORD_GEN_SRC))
-
-build-hubot: $(SVC_SRC) $(OPERATORC) $(PROTOC_GEN_OPERATORHUBOT)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--hubot-out $(HUBOT_SCRIPTS_DIR) $(SVC_DIR)
-
-hubot-dev: docker-build-hubot
-	@ touch .hubot_history
-	cp ../operator.proto services/**/*.proto hubot/proto/
-	$(DOCKER) run --rm --name chatoops-hubot -it --net=host \
-		-v $(shell pwd)/hubot/proto:/hubot/proto:ro \
-		-v $(shell pwd)/hubot/scripts:/hubot/scripts:ro \
-		-v $(shell pwd)/.hubot_history:/hubot/.hubot_history \
-		-e OPERATORD_ADDRESS=$(OPERATORD_ADDRESS) \
-		chatoops/hubot -d -a shell -l /
-
-docker-build-hubot: etc/docker/Dockerfile.hubot
-	$(DOCKER) build -f $< -t chatoops/hubot .
-
-docker-build-operatorc: etc/docker/Dockerfile.operatorc
-	$(DOCKER) build -f $< -t chatoops/operatorc .
 
 $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/operatorc
@@ -69,14 +51,6 @@ $(OPERATORCTL): $(OPERATORCTL_GEN_SRC)
 
 $(OPERATORD): $(OPERATORD_SRC)
 	$(GO) install -v ./cmd/$$(basename $(OPERATORD))
-
-$(OPERATORCTL_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORCTL)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) $(SVC_DIR)
-
-$(OPERATORD_GEN_SRC): $(OPERATORC) $(SVC_SRC) $(PROTOC_GEN_OPERATORD)
-	$(OPERATORC) --import-path $(IMPORTPATH) \
-		--server-out $(shell dirname $(OPERATORD_GEN_SRC)) $(SVC_DIR)
 
 $(PROTOC_GEN_GO):
 	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
