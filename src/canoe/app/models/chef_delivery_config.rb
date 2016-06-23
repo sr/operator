@@ -2,6 +2,7 @@ class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
   AWS = "ue1.aws".freeze
+  PHX = "phx".freeze
   ENABLED = [AWS, PHX].freeze
 
   BREAD_ROOM = 42
