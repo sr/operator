@@ -9,7 +9,7 @@ class GlobalAccount < ActiveRecord::Base
   self.table_name = "global_account"
   self.inheritance_column = "rails_type"
 
-  def descriptive_name
+  def to_s
     "#{company} #{shard_id}/#{id}"
   end
 end

@@ -42,7 +42,7 @@ class UserQuery < ActiveRecord::Base
       raise "query is not scoped to an account"
     end
 
-    GlobalAccount.find(account_id).descriptive_name
+    GlobalAccount.find(account_id).to_s
   end
 
   # Returns an Array of tables present in the database.
