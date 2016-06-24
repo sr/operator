@@ -34,34 +34,15 @@ class Datacenter
     Database.new(config)
   end
 
+  def global_config
+    @config.global(@name)
+  end
+
   def shard_for(account_id)
-    account = find_account(account_id)
+    account = GlobalAccount.find(account_id)
     config = @config.shard(@name, account.shard_id)
 
     Database.new(config)
-  end
-
-  def find_account(account_id)
-    begin
-      id = Integer(account_id)
-    rescue TypeError
-      raise ArgumentError, "invalid account id: #{id.inspect}"
-    end
-
-    sql_query = "#{default_accounts_query} WHERE id = ? LIMIT 1"
-    results = global.execute(sql_query, [id])
-
-    if results.count.zero?
-      raise StandardError, "global_account id=#{id.inspect} not found"
-    end
-
-    GlobalAccount.new(results.first)
-  end
-
-  def accounts
-    global.execute("#{default_accounts_query} LIMIT 100").map do |result|
-      GlobalAccount.new(result)
-    end
   end
 
   def account_access_enabled?(account_id)
@@ -73,15 +54,5 @@ class Datacenter
 
     results = global.execute(query, [Rails.application.config.x.support_role, account_id])
     results.size == 1
-  end
-
-  private
-
-  def global_accounts
-    @global_accounts ||= GlobalAccountsCollection.new(global)
-  end
-
-  def default_accounts_query
-    "SELECT id, shard_id, company FROM global_account"
   end
 end
