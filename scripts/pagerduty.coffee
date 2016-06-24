@@ -29,7 +29,7 @@
 _ = require "underscore"
 async = require "async"
 moment = require "moment-timezone"
-shellquote = require "shell-quote"
+shellquote = require "../lib/shellquote"
 PagerDuty = require "../lib/pagerduty"
 HumanDuration = require "../lib/human_duration"
 
