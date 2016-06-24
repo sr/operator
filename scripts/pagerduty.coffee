@@ -20,8 +20,8 @@
 #   hubot pager resolve - Resolves all incidents assigned to you
 #   hubot pager resolve <number> [number...] - Resolves the specified incidents
 #   hubot pager policies - Returns a list of escalation policies
-#   hubot pager trigger <policy> <message> - Triggers a page, assigned to the specified escalation policy
-#   hubot pager trigger <name> <message> - Triggers a page, assigned to the specified person
+#   hubot pager trigger "<policy>" <message> - Triggers a page, assigned to the specified escalation policy
+#   hubot pager trigger "<name>" <message> - Triggers a page, assigned to the specified person
 #
 # Author:
 #   alindeman
@@ -29,6 +29,7 @@
 _ = require "underscore"
 async = require "async"
 moment = require "moment-timezone"
+shellquote = require "shell-quote"
 PagerDuty = require "../lib/pagerduty"
 HumanDuration = require "../lib/human_duration"
 
@@ -339,9 +340,12 @@ module.exports = (robot) ->
               msg.reply "😬 I couldn't find any schedule that matched '#{scheduleName}'. Try running !oncall to see a list of schedules."
 
   if serviceApiKey = process.env.HUBOT_PAGERDUTY_SERVICE_API_KEY
-    robot.respond /pager\s+(?:trigger|send|alert)\s+(\S+)\s+(.+)$/i, (msg) ->
-      policyOrUser = msg.match[1]
-      alertMessage = msg.match[2]
+    robot.respond /pager\s+(?:trigger|send|alert)\s+(.+)$/i, (msg) ->
+      args = shellquote.parse(msg.match[1])
+      return if args.length < 2
+
+      policyOrUser = args.shift()
+      alertMessage = args.join(" ")
       withPagerDutyUserIdOrDefault msg.message.user.email_address, (err, userId) ->
         if err?
           msg.reply "Something went wrong: #{err}"
@@ -355,16 +359,23 @@ module.exports = (robot) ->
                   msg.reply "Something else wrong: #{err}"
                 else
                   msg.reply "I triggered your alert. Give me a few seconds to assign it to the correct place."
-                  setTimeout () ->
+
+                  retries = 10
+                  assignIncident = ->
                     updateIncidents {
                       query: {incident_key: event.incident_key},
                       parameters: {escalation_policy: result.policy?.id, assigned_to_user: result.user?.id},
                       requesterId: userId,
                     }, (err) ->
                       if err?
-                        msg.reply "Something else wrong: #{err}"
+                        retries = retries - 1
+                        if retries >= 0
+                          setTimeout(assignIncident, 1000)
+                        else
+                          msg.reply "Something went wrong: #{err}"
                       else
                         msg.reply "I assigned your alert to #{(result.policy || result.user)?.name}."
-                  , 5000
+
+                  setTimeout(assignIncident, 5000)
             else
               msg.reply "😬 I couldn't find any escalation policy or user that matched '#{policyOrUser}'. Try running !pager escalations to see a list of escalation policies."
