@@ -13,9 +13,9 @@ WORKDIR /app
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
 COPY vendor/cache /app/vendor/cache
-RUN bundle install --local
+RUN bundler install --local
 
 ADD . /app
-RUN bundle exec rake assets:precompile
+RUN bundler exec rake assets:precompile
 
 CMD ["script/server"]

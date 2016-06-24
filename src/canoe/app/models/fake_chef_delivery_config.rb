@@ -5,8 +5,10 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
 
   attr_reader :github_repo
 
-  def enabled_in?(environment, hostname)
-    %w[testing].include?(environment) && hostname != "disabled"
+  def enabled?(server)
+    server.datacenter == "test" &&
+      server.environment != "disabled" &&
+      server.hostname != "disabled"
   end
 
   class FakeHipchatNotifier
@@ -18,7 +20,7 @@ class FakeChefDeliveryConfig < ChefDeliveryConfig
 
     Message = Struct.new(:room_id, :message)
 
-    def notify_room(room_id, message, color = nil)
+    def notify_room(room_id, message, _color = nil)
       @messages << Message.new(room_id, message)
     end
   end

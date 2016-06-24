@@ -47,11 +47,22 @@ module Pardot
         context_str = context.to_s
         message = "[#{context_str}] #{message}" unless context_str.empty?
 
-        puts format("[%{priority}] %{message}", priority: our_priority, message: message) unless ENV["CRON"]
+        Kernel.puts format("[%{priority}] %{message}", priority: our_priority, message: message) unless ENV["CRON"]
 
         Syslog.open("pull-agent") do
           Syslog.log(PRIORITIES.fetch(our_priority), message)
         end
+      end
+
+      # Make this compatible with Instrumentation::Logger
+      def self.puts(data)
+        Syslog.open("pull-agent") do
+          Syslog.log(Syslog::LOG_INFO, data)
+        end
+      end
+
+      def self.sync=(_)
+        self
       end
     end
   end

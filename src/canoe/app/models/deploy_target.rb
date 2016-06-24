@@ -11,24 +11,25 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def last_deploy_for(project_name)
-    self.deploys
+    deploys
       .where(project_name: project_name)
       .order(id: :desc)
       .first
   end
 
   def last_successful_deploy_for(project_name)
-    self.deploys
+    deploys
       .where(
         project_name: project_name,
         completed: true,
-        canceled:  false)
+        canceled:  false
+      )
       .order(id: :desc)
       .first
   end
 
   def previous_deploy(deploy)
-    self.deploys
+    deploys
       .where(project_name: deploy.project_name)
       .where("id < ?", deploy.id)
       .order(id: :desc)
@@ -36,11 +37,12 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def previous_successful_deploy(deploy)
-    self.deploys
+    deploys
       .where(
         project_name: deploy.project_name,
         completed: true,
-        canceled:  false)
+        canceled:  false
+      )
       .where("id < ?", deploy.id)
       .order(id: :desc)
       .first
@@ -53,7 +55,7 @@ class DeployTarget < ActiveRecord::Base
   end
 
   def most_recent_deploy(project)
-    self.deploys
+    deploys
       .where(project_name: project.name)
       .order(id: :desc)
       .first
@@ -63,7 +65,7 @@ class DeployTarget < ActiveRecord::Base
     locks.find_or_create_by!(project: project, auth_user: user)
   end
 
-  def unlock!(project, user)
+  def unlock!(project, _user)
     locks.where(project: project).destroy_all
   end
 
@@ -80,6 +82,6 @@ class DeployTarget < ActiveRecord::Base
   def servers(project:)
     Server
       .joins(:deploy_scenarios)
-      .where(deploy_scenarios: {deploy_target_id: id, project_id: project.id})
+      .where(deploy_scenarios: { deploy_target_id: id, project_id: project.id })
   end
 end

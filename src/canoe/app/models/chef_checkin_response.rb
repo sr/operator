@@ -1,10 +1,10 @@
 class ChefCheckinResponse
   def self.noop
-    return new("noop", nil)
+    new("noop", nil)
   end
 
   def self.deploy(deploy)
-    return new("deploy", deploy)
+    new("deploy", deploy)
   end
 
   def initialize(action, deploy)

@@ -7,6 +7,7 @@ require "socket"
 require "yaml"
 
 require "artifactory"
+require "instrumentation"
 require "redis"
 
 require "pardot/pull_agent/build_version"

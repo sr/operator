@@ -19,6 +19,12 @@ class Database
   end
 
   def execute(sql, params = [])
+    Instrumentation.log(
+      database: name,
+      hostname: hostname,
+      query: sql,
+      params: params
+    )
     statement = connection.prepare(sql)
     statement.execute(*params)
   end

@@ -3,7 +3,7 @@ module Canoe
   # controller to work correctly. Specifically, we need to break the
   # dependencies on `current_project`, `current_target`, and `params`. -@alindeman
   module DeployLogic
-    DEPLOYLOGIC_ERROR_NO_PROJECT   = 1
+    DEPLOYLOGIC_ERROR_NO_PROJECT = 1
     DEPLOYLOGIC_ERROR_NO_TARGET = 2
     DEPLOYLOGIC_ERROR_NO_WHAT   = 3
     DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY = 4
@@ -13,7 +13,7 @@ module Canoe
     # ----------------------------------------------------------------------
     def deploy!(prov_deploy)
       # require a project and target
-      return { error: true, reason: DEPLOYLOGIC_ERROR_NO_PROJECT   } if !current_project
+      return { error: true, reason: DEPLOYLOGIC_ERROR_NO_PROJECT } if !current_project
       return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
       # confirm user can deploy
       if !current_target.user_can_deploy?(current_project, current_user)
@@ -27,7 +27,7 @@ module Canoe
       # validate that what we are deploying was included and is a real thing
       if prov_deploy.nil?
         return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT }
-      elsif !prov_deploy.is_valid?
+      elsif !prov_deploy.valid?
         return { error: true,
                  reason: DEPLOYLOGIC_ERROR_INVALID_WHAT,
                  what: prov_deploy.what }
@@ -66,6 +66,7 @@ module Canoe
     end
 
     private
+
     def deployer
       @deployer ||= Canoe::Deployer.new
     end

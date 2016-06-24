@@ -100,7 +100,7 @@ resource "aws_db_instance" "canoe_production" {
   name = "canoe_production"
   username = "canoe"
   password = "WeGDb6pjqgayjMSnnm7U"
-  maintenance_window = "Mon:20:00-Mon:23:00"
+  maintenance_window = "Tue:00:00-Tue:04:00"
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
@@ -133,7 +133,8 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
       "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-      "50.22.140.200/32"    # tools-s1.dev
+      "50.22.140.200/32",   # tools-s1.dev
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32"
     ]
     security_groups = [
       "${aws_security_group.internal_apps_chef_server.id}"

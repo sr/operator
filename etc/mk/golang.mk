@@ -1,21 +1,36 @@
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
-GOFMT ?= gofmt
+GOFMT ?= $(shell which gofmt)
 GOLINT ?= $(GOBIN)/golint
+DEADLEAVES ?= $(GOBIN)/deadleaves
 ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell go list ./src/... | grep -v -E '^vendor|chatoops' | sort -r)
+PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
+TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: fmt lint unused vet errcheck interfacer install
+all: deadleaves fmt lint vet errcheck install interfacer unused
 
 install:
-	go install -race -v $(PACKAGES)
+	$(GO) install -race -v ./...
 
-fmt:
-	@ for file in $$(find src -name '*.go' | grep -v -E '^src/vendor|\.pb\.go$$'); do \
-			out="$$($(GOFMT) -s -d $$file)"; \
+clean:
+	$(GO) clean -i ./...
+
+install-tools:
+	$(GO) install -v $(TOOLS)
+
+deadleaves: $(DEADLEAVES)
+	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
+		if [ -n "$$out" ]; then \
+			echo "$$out"; \
+			exit 1; \
+		fi
+
+fmt: $(GOFMT)
+	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
+			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
@@ -23,59 +38,59 @@ fmt:
 			if [ -n "$$out" ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
-			fi \
+			fi; \
 	  done
 
 lint: $(GOLINT)
-	@ for file in $$(find src -name '*.go' | grep -v -E '^src/vendor|\-gen\.go$$|\.pb\.go$$'); do \
-			out="$$($< $$file | grep -v 'should have comment')"; \
-			if [ -n "$$out" ]; then \
-				echo "lint: $$out"; \
-				exit 1; \
-			fi \
-	  done
+		@	for pkg in $(PACKAGES); do \
+				out="$$($< $$pkg | grep -v -E 'should have comment|\.pb\.go|\-gen\.go')"; \
+				if [ -n "$$out" ]; then \
+					echo "lint: $$out"; \
+					exit 1; \
+				fi; \
+			done
 
 unused: $(UNUSED)
-	$< -fields $(shell go list ./src/... | grep -v -E '^vendor|chatoops' | sort -r)
+	$< $(PACKAGES)
 
 vet:
-	@ for pkg in $(PACKAGES); do \
-			go vet $$pkg; \
-	  done
+	$(GO) vet $(PACKAGES)
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
 				fail=true; \
 			fi; \
 	  done; \
 	  test $$fail && exit 1; true
 
 interfacer: $(INTERFACER)
-	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-	  done; \
-	  test $$fail && exit 1; true
+	$< $(PACKAGES)
+
+$(DEADLEAVES):
+	$(GO) install -v github.com/nf/deadleaves
 
 $(ERRCHECK):
-	$(GO) install vendor/github.com/kisielk/errcheck
+	$(GO) install -v github.com/kisielk/errcheck
 
 $(GOLINT):
-	$(GO) install vendor/github.com/golang/lint/golint
+	$(GO) install -v github.com/golang/lint/golint
 
 $(INTERFACER):
-	$(GO) install vendor/github.com/mvdan/interfacer/cmd/interfacer
+	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install vendor/honnef.co/go/unused/cmd/unused
+	$(GO) install -v github.com/dominikh/go-unused/cmd
 
 .PHONY: \
 	all \
+	build \
+	errcheck \
 	fmt \
+	install \
+	interfacer \
 	lint \
-	vet \
-	errcheck
+	unused \
+	vet

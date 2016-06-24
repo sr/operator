@@ -11,6 +11,7 @@ class BuildsController < ApplicationController
   end
 
   private
+
   def current_branch
     @current_branch ||= current_project.branch(params[:branch_name])
   end

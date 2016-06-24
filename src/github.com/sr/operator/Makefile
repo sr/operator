@@ -2,19 +2,38 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 GOFMT ?= gofmt
 GOLINT ?= $(GOBIN)/golint
-ERRCHECK ?= $(GOBIN)/errcheck
-PACKAGES = $(shell go list ./... | grep -v -E '^vendor' | sort -r)
+ERRCHECK = $(GOBIN)/errcheck
+INTERFACER = $(GOBIN)/interfacer
+UNUSED = $(GOBIN)/unused
 
-all: deps fmt lint vet errcheck deps install
+PACKAGES ?= $(shell go list ./...)
+SRC ?= $(shell find . -name '*.go' | sort)
+
+all: deps fmt lint vet errcheck interfacer unused install
+
+ci: clean all
 
 deps:
-	go get -d ./...
+	$(GO) get \
+		github.com/acsellers/inflections \
+		github.com/golang/protobuf/proto \
+		github.com/golang/protobuf/ptypes/duration \
+		github.com/golang/protobuf/ptypes/timestamp \
+		github.com/kr/text \
+		github.com/matttproud/golang_protobuf_extensions/pbutil \
+		github.com/satori/go.uuid \
+		github.com/serenize/snaker \
+		google.golang.org/grpc \
+		golang.org/x/net/context
+
+clean:
+	$(GO) clean -i $(PACKAGES)
 
 install:
-	go install -v $(PACKAGES)
+	go install -race -v $(PACKAGES)
 
 fmt:
-	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|\.pb\.go$$'); do \
+	@ for file in $(SRC); do \
 			out="$$($(GOFMT) -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
@@ -23,28 +42,17 @@ fmt:
 			if [ -n "$$out" ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
-			fi \
+			fi; \
 	  done
 
 lint: $(GOLINT)
-	@ for file in $$(find . -name '*.go' | grep -v -E '^./vendor|\-gen\.go$$|^./github.com/sr/protolog|\.pb\.go$$'); do \
-			out="$$($< $$file | grep -v 'should have comment')"; \
-			if [ -n "$$out" ]; then \
-				echo "lint: $$out"; \
-				exit 1; \
-			fi \
-	  done
-
-vet:
-	@ for pkg in $(PACKAGES); do \
-			out="$$($(GO) vet $$pkg)"; \
-			if [ $$? -ne 0 ]; then \
-				exit 1; \
-			fi; \
-			if [ -n "$$out" ]; then \
-				exit 1; \
-			fi \
-	  done
+		@	for pkg in $(PACKAGES); do \
+				out="$$($< $$pkg | grep -v -E 'should have comment|\.pb\.go|\-gen\.go')"; \
+				if [ -n "$$out" ]; then \
+					echo "lint: $$out"; \
+					exit 1; \
+				fi; \
+			done
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
@@ -55,17 +63,47 @@ errcheck: $(ERRCHECK)
 	  done; \
 	  test $$fail && exit 1; true
 
+interfacer: $(INTERFACER)
+	@ for pkg in $(PACKAGES); do \
+			$< $$pkg; \
+			if [ $$? -ne 0 ]; then \
+				fail=true; \
+			fi; \
+	  done; \
+	  test $$fail && exit 1; true
+
+unused: $(UNUSED)
+	@ for pkg in $(PACKAGES); do \
+			$< -fields $$pkg; \
+			if [ $$? -ne 0 ]; then \
+				fail=true; \
+			fi; \
+		done; \
+		test $$fail && exit 1; true
+
+vet:
+	@ $(GO) vet $(PACKAGES)
+
 $(ERRCHECK):
-	$(GO) get github.com/kisielk/errcheck
+	$(GO) get -v github.com/kisielk/errcheck
 
 $(GOLINT):
-	$(GO) get github.com/golang/lint/golint
+	$(GO) get -v github.com/golang/lint/golint
+
+$(INTERFACER):
+	$(GO) get -v github.com/mvdan/interfacer/cmd/interfacer
+
+$(UNUSED):
+	$(GO) get -v honnef.co/go/unused/cmd/unused
 
 .PHONY: \
 	all \
-	install \
-	deps \
+	ci \
+	clean \
+	errcheck \
 	fmt \
+	install \
+	interfacer \
 	lint \
-	vet \
-	errcheck
+	unused \
+	vet

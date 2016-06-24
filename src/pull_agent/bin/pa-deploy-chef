@@ -92,10 +92,16 @@ case "$action" in
         git reset --hard "$sha" 2>&1
 
         cd "$chefdir"
-        knife pd sync \
-            --skip-berkshelf \
-            --environment-file "$chefenvfile" \
-            2>&1
+        if [ "$chefenvfile" = "none" ]
+        then
+            echo "flag -f set to none. skipping 'knife pd sync'" 2>&1
+            exit 1
+        else
+            knife pd sync \
+                --skip-berkshelf \
+                --environment-file "$chefenvfile" \
+                2>&1
+        fi
         ;;
     *)
         echo "$PROGRAM: unsupported action: $action"
