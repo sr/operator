@@ -220,6 +220,93 @@ resource "aws_security_group" "pardot_ci_dc_only_http_lb" {
   }
 }
 
+resource "aws_security_group" "pardot_ci_elasticbamboo" {
+  name = "pardot_ci_elasticbamboo"
+  description = "communications to/from bamboo server and between build machines"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
+
+  ingress {
+    from_port = 46593
+    to_port = 46593
+    protocol = "tcp"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
+    ]
+  }
+
+  ingress {
+    from_port = 26224
+    to_port = 26224
+    protocol = "tcp"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
+    ]
+  }
+
+  ingress {
+    from_port = 2377
+    to_port = 2377
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 4789
+    to_port = 4789
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 4789
+    to_port = 4789
+    protocol = "udp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 7946
+    to_port = 7946
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 7946
+    to_port = 7946
+    protocol = "udp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 14232
+    to_port = 14232
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_db_subnet_group" "pardot_ci" {
   name = "pardot_ci"
   description = "Pardot CI DB Subnet"

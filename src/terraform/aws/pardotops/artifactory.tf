@@ -90,14 +90,14 @@ resource "aws_security_group" "artifactory_ci_elb_secgroup" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.artifactory_integration.cidr_block}"]
+    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
   }
 
   ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.artifactory_integration.cidr_block}"]
+    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
   }
 
   egress {
@@ -145,10 +145,11 @@ resource "aws_security_group" "artifactory_mysql_secgroup" {
 
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "m4.xlarge"
+  instance_type = "c4.2xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -167,10 +168,11 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "m4.xlarge"
+  instance_type = "c4.2xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -189,10 +191,11 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "m4.xlarge"
+  instance_type = "c4.2xlarge"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
+  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
