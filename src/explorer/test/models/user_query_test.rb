@@ -21,9 +21,10 @@ class UserQueryTest < ActiveSupport::TestCase
 
   test "global query audit log" do
     query = @user.global_query("SELECT 1 FROM global_account")
+    reset_logger
     query.execute(@user)
     assert log = Instrumentation::Logging.entries.pop
-    assert_equal "mysql", log[:hostname]
+    assert log.key?(:hostname), "audit log has no hostname key"
     assert_equal "pardot_global", log[:database]
     assert_equal "SELECT 1 FROM `global_account` LIMIT 10", log[:query]
     assert_equal @user.email, log[:user_email]

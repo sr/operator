@@ -18,7 +18,7 @@ module Instrumentation
       config.app_middleware.insert_after ::ActionDispatch::RequestId, \
         Instrumentation::RequestId::RackMiddleware
 
-      config.lograge.enabled = !Rails.env.test?
+      config.lograge.enabled = true
 
       if config.instrumentation.log_format == Instrumentation::LOG_LOGSTASH
         config.lograge.formatter = Lograge::Formatters::Logstash.new

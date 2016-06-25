@@ -6,7 +6,8 @@ module Pardot
       CHEF_ENVIRONMENT_FILE = {
         "dfw" => "environments/dfw/production.rb",
         "phx" => "environments/phx/production.rb",
-        "ue1.aws" => "environments/aws/production.rb"
+        "ue1.aws" => "environments/aws/production.rb",
+        "local" => "none"
       }.freeze
 
       def initialize(script, checkout_path, deploy)
@@ -16,34 +17,36 @@ module Pardot
       end
 
       # rubocop:disable Lint/RescueException
-      def apply(env)
-        hostname = ShellHelper.hostname
-        datacenter = hostname.split("-")[3]
-        if !datacenter
-          return Response.new(false, "Unable to determine datacenter from hostname: #{hostname.inspect}")
-        end
-
+      def apply(env, datacenter, hostname)
         chef_environment_file = CHEF_ENVIRONMENT_FILE[datacenter]
         if !chef_environment_file
           return Response.new(false, "Unable to determine location of chef environment file for datacenter: #{datacenter.inspect}")
         end
 
-        output = ShellHelper.execute([
-          env,
+        command = [
           @script,
           "-d", @checkout_path.to_s,
           "-b", @deploy["branch"],
           "-s", @deploy["sha"],
           "-f", chef_environment_file,
           "deploy"
-        ])
+        ]
+        log = {
+          at: "chef",
+          hostname: hostname,
+          datacenter: datacenter,
+          command: command
+        }
+        Instrumentation.debug(log)
+
+        output = ShellHelper.execute([env] + command)
         if !$?.success?
           return error(output)
         end
 
         Response.new(true, "")
       rescue Exception
-        Logger.log(:err, "Chef Deploy failed: #{$!.class.inspect} - #{$!.message.inspect}")
+        Instrumentation.log_exception($!, at: "chef-deploy")
         Response.new(false, "#{$!.class} - #{$!.message}")
       end
 
