@@ -58,7 +58,7 @@ then
     docker-compose -p "$project" -f "$config" build --pull
     # TODO(sr) Remove the sleep test...
     docker-compose -p "$project" -f "$config" run app sleep 30
-    docker-compose -p "$project" -f "$config" run app script/test
+    docker-compose -p "$project" -f "$config" run -e CI=1 app script/test
 # Otherwise just build it as a normal Ruby library
 else
     docker run --rm -v "$(pwd):/data" build/build build-ruby-lib "$dir"

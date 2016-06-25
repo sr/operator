@@ -37,7 +37,9 @@ module Explorer
       config.x.build_version = begin
         File.readlines("build.version").first
       rescue Errno::ENOENT
-        Instrumentation.log_exception($!)
+        if !Rails.env.development?
+          Instrumentation.log_exception($!)
+        end
         ""
       end
     end

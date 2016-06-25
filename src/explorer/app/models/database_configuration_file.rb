@@ -8,7 +8,7 @@ class DatabaseConfigurationFile
     end
   end
 
-  class DataCenterNotFound < Error
+  class DatacenterNotFound < Error
     def initialize(datacenter, shard_id = nil)
       if shard_id
         super "config for shard #{shard_id.inspect} in datacenter #{datacenter.inspect} not found"
@@ -18,10 +18,13 @@ class DatabaseConfigurationFile
     end
   end
 
-  def self.load
-    configfile = Rails.root.join("config", "pi", "#{Rails.env}.yml")
+  PRIMARY = 1
+  SECONDARY = 2
 
-    config = YAML.load_file(configfile)
+  def self.load
+    config_file = Rails.root.join("config", "pi", "#{Rails.env}.yml")
+    erb = ERB.new(config_file.read)
+    config = YAML.load(erb.result)
     auth = Rails.application.config.database_configuration
 
     new(config, auth)
@@ -35,12 +38,12 @@ class DatabaseConfigurationFile
   def global(datacenter)
     config =
       case datacenter
-      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
+      when Datacenter::DALLAS, Datacenter::PHOENIX, Datacenter::LOCAL
         globals.fetch(datacenter)
       else
-        raise DataCenterNotFound, datacenter
+        raise DatacenterNotFound, datacenter
       end
-    DatabaseConfiguration.new(config.fetch(1), auth)
+    DatabaseConfiguration.new(config.fetch(SECONDARY), auth)
   end
 
   def shard(datacenter, id)
@@ -52,12 +55,12 @@ class DatabaseConfigurationFile
 
     config =
       case datacenter
-      when DataCenter::DALLAS, DataCenter::SEATTLE, DataCenter::LOCAL
+      when Datacenter::DALLAS, Datacenter::PHOENIX, Datacenter::LOCAL
         shard.fetch(datacenter)
       else
-        raise DataCenterNotFound.new(datacenter, id)
+        raise DatacenterNotFound.new(datacenter, id)
       end
-    DatabaseConfiguration.new(config.fetch(1), auth)
+    DatabaseConfiguration.new(config.fetch(SECONDARY), auth)
   end
 
   private

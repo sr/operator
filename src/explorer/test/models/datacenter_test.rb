@@ -1,8 +1,8 @@
 require "test_helper"
 
-class DataCenterTest < ActiveSupport::TestCase
+class DatacenterTest < ActiveSupport::TestCase
   setup do
-    @datacenter = DataCenter.current
+    @datacenter = Datacenter.current
   end
 
   test "account not authorized by fixtures" do
