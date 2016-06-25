@@ -2,7 +2,7 @@
 #   A hubot script returning you the traffic time from the office to a given address or view current Atlanta traffic.
 # Commands
 #   hubot traffic - returns image of current traffic conditions in Atlanta
-#   hubot traveltime <location> - returns current travel time to the provided location from the office
+#   hubot traveltime (at <departure_time>) (to) <location> - returns travel time to location from the office, default departure time is now
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
 #
@@ -78,8 +78,12 @@ module.exports = (robot) ->
         else
           msg.send "#{imageUrl}"
 
-  robot.respond /traveltime\s+(.*)$/i, (msg) ->
-    secondloc = msg.match[1]
+  robot.respond /traveltime(?:\s+at\s*(?:the\s*)?(\d{1,2}|sol|c|speed\s*of\s*light|warp\s*speed)(?::(\d{2}))?(pm|am)?)?(?:\s*to)?\s+(.*)$/i, (msg) ->
+    if not msg.match[4]
+      return
+
+    secondloc = msg.match[4]
+
     if secondloc == 'Pardot' || secondloc == 'the office' || secondloc == '950 East Paces Ferry Road, Atlanta, GA'
       msg.send "You're probably already here...(stare)"
       return
@@ -90,26 +94,72 @@ module.exports = (robot) ->
       msg.send "A couple seconds, depending on how close you are to the nearest fridge. (beer)"
       return
 
-    firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
+    sol  = msg.match[1] and isNaN(msg.match[1])
+    hour = if not sol and msg.match[1] then msg.match[1]
+    min  = msg.match[2]
+    ampm = if msg.match[3] then msg.match[3] else 'pm'
 
     curdate = new Date()
-    estimate_type = "best_guess"
-    if curdate.getHours() > 14 && curdate.getHours() < 19
-      estimate_type = "pessimistic"
+    depdate = new Date()
+    if hour
+      hour = (hour % 12) + (if ampm is 'pm' then 12 else 0)
+      min  = if min then min % 60 else 0
+      depdate.setHours(hour)
+      depdate.setMinutes(min)
+
+    if depdate > curdate
+      departure = depdate.getTime()
+      departurereply = "#{depdate.toLocaleString('en-US',
+        {hour: 'numeric', minute: 'numeric'})}"
+    else
+      departure = curdate.getTime()
+
+    firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
     msg.http("https://maps.googleapis.com/maps/api/distancematrix/json")
-       .query({origins: "#{firstloc}", destinations: "#{secondloc}", mode: "driving", departure_time: "now", key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4', traffic_model: "#{estimate_type}"})
+       .query({
+          origins: "#{firstloc}",
+          destinations: "#{secondloc}",
+          mode: 'driving',
+          departure_time: "#{departure}",
+          key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4',
+          traffic_model: 'best_guess'})
        .header('Accept', 'application/json')
        .get() (err, res, body) ->
           if err
             msg.send "Error: #{err}"
+            return
+
           data = JSON.parse body
           if data.error_message
             msg.send "Error: #{data.error_message}"
-          duration = if data?.rows[0]?.elements[0]?.duration_in_traffic then data?.rows[0]?.elements[0]?.duration_in_traffic?.text else data?.rows[0]?.elements[0]?.duration?.text
+            return
+
+          disttext = data?.rows[0]?.elements[0]?.distance?.text
+          distance = data?.rows[0]?.elements[0]?.distance?.value
+
+          if data?.rows[0]?.elements[0]?.duration_in_traffic
+            duration = data?.rows[0]?.elements[0]?.duration_in_traffic?.text
+            duration = data?.rows[0]?.elements[0]?.duration?.text
+          if sol and typeof duration isnt 'undefined'
+            solconst = 299792458
+            # calculate time from speed of light
+            duration = distance / solconst
+            duration = "#{duration}".substring(0,7)
+
           if duration == null
             msg.send "Unable to retrieve travel time to #{secondloc}. (sadpanda)"
           else if typeof duration is 'undefined'
-            msg.send "There is no driving route between #{secondloc} and the office. (sadpanda)"
+            msg.send "There is no #{if sol then '(lightning)' else 'driving'} route between #{secondloc} and the office. (sadpanda)"
           else
-            msg.send "To get to #{data.destination_addresses[0]} from the office, it will take #{duration}. (drivinginmytruck)"
+            reply = 'To get to '
+            reply += "#{data.destination_addresses[0]} from the office"
+            reply += if sol then " (#{disttext}) at the speed of light (fastparrot)" else ''
+            reply += if departurereply and not sol then ", leaving at #{departurereply}" else ''
+            reply += ", it will take #{duration}"
+            reply += if sol then " seconds. (lightning)" else ". (drivinginmytruck)"
+            if not sol
+              start = data.origin_addresses[0].replace(/\s/g, '+')
+              end = data.destination_addresses[0].replace(/\s/g, '+')
+              reply += "\nMap Link https://www.google.com/maps/dir/#{start}/#{end}"
+            msg.send reply
