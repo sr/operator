@@ -1,8 +1,8 @@
 class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
-  AWS = "ue1.aws".freeze
-  PHX = "phx".freeze
+  AWS = "pardot0-chef1-1-ue1.aws".freeze
+  PHX = "pardot0-chef1-1-phx".freeze
   ENABLED = [AWS, PHX].freeze
 
   BREAD_ROOM = 42
@@ -13,7 +13,7 @@ class ChefDeliveryConfig
     when DEV
       true
     when PRODUCTION
-      ENABLED.include?(server.datacenter)
+      ENABLED.include?(server.hostname)
     else
       false
     end
