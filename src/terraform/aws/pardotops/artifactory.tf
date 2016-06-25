@@ -149,7 +149,6 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -172,7 +171,6 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -195,7 +193,6 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
-  sriov-net-support = 'simple'
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"

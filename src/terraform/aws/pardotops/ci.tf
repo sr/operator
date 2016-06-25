@@ -249,8 +249,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 2377
     to_port = 2377
     protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
@@ -258,8 +259,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 4789
     to_port = 4789
     protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
@@ -267,8 +269,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 4789
     to_port = 4789
     protocol = "udp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
@@ -276,8 +279,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 7946
     to_port = 7946
     protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
@@ -285,8 +289,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 7946
     to_port = 7946
     protocol = "udp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
@@ -294,8 +299,9 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
     from_port = 14232
     to_port = 14232
     protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_elasticbamboo.id}"
+    cidr_blocks = [
+      "52.0.51.79/32",  # bamboo (external)
+      "172.31.8.244/32" # bamboo (internal)
     ]
   }
 
