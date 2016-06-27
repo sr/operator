@@ -56,32 +56,6 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   }
 }
 
-resource "aws_security_group" "artifactory_ci_elb_secgroup" {
-  name = "artifactory_ci_elb_secgroup"
-  vpc_id = "${aws_vpc.pardot_ci.id}"
-
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
