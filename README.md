@@ -11,7 +11,7 @@ Parbot is built on the [hubot](http://hubot.github.com) framework.
 Install `node` and `npm`. If you're on OS X and use Homebrew, this is basically:
 
 ```
-brew install nodejs npm
+brew install node4-lts
 ```
 
 Install `mysql`:
