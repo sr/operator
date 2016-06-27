@@ -364,7 +364,8 @@ resource "aws_instance" "pardot_ci_bastion" {
     delete_on_termination = false
   }
   tags {
-    Name = "pardot0-bastion1-1-ue1"
+    Name = "pardot0-cibastion1-1-ue1"
+    terraform = true
   }
 }
 
