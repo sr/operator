@@ -449,10 +449,8 @@ resource "aws_security_group" "artifactory_integration_mysql_ingress" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.artifactory_ci_instance_secgroup.id}",
-      "${aws_security_group.artifactory_instance_secgroup.id}"
-    ]
+    security_groups = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+    cidr_blocks = ["${aws_subnet.artifactory_integration_us_east_1c_dmz.cidr_block}"]
   }
 
   egress {
