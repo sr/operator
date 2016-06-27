@@ -1,5 +1,6 @@
 FROM docker.dev.pardot.com/base/centos:6
 
+ARG dist=el6
 ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
@@ -7,7 +8,9 @@ ARG parallel_version=20160322
 ARG phantomjs_version=2.0-1
 ARG libzookeeper_version=3.4.6-1.pardot
 ARG git_version=2.7.4-1
+ARG php_version=5.5.36-1
 ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
+ARG php_packages="php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache php-tidy php-pear php-cli php-devel"
 ARG artifactory_host
 
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
@@ -21,9 +24,9 @@ RUN yum install -y epel-release && \
     font-config supervisor less which openssh-clients redis bzip2 make \
     unzip xz gcc file libicu openssl nc && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
-  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.el6.x86_64.rpm" && \
-  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.el6.x86_64.rpm" && \
-  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.el6.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.${dist}.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.${dist}.x86_64.rpm" && \
+  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm" && \
   yum clean all
 
 # Parallel
@@ -37,10 +40,14 @@ RUN cd /tmp && \
 # PHP
 RUN yum install -y httpd mod_ssl && \
   rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && \
-  yum --enablerepo=remi-php55 install -y \
-    php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring \
-    php-zip php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache \
-    php-tidy php-pear php-memcache php-cli php-devel php-pecl-xdebug && \
+  for package in ${php_packages}; do \
+    yum --enablerepo=remi-php55 install -y "${package}-${php_version}.${dist}.remi"; \
+  done && \
+  yum --enablerepo=remi-php55 install -y "php-pecl-memcache-3.0.8-2.${dist}.remi.5.5" && \
+  yum --enablerepo=remi-php55 install -y "php-pecl-jsonc-1.3.10-1.${dist}.remi.5.5" && \
+  yum --enablerepo=remi-php55 install -y "php-pecl-jsonc-devel-1.3.10-1.${dist}.remi.5.5" && \
+  yum --enablerepo=remi-php55 install -y "php-pecl-zip-1.13.2-1.${dist}.remi.5.5" && \
+  yum --enablerepo=remi-php55 install -y "php-pecl-xdebug-2.4.0-1.${dist}.remi.5.5" && \
   rm -f /etc/php.d/*xdebug.ini && \
   yum clean all
 
