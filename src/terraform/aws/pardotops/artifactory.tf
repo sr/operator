@@ -56,32 +56,6 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   }
 }
 
-resource "aws_security_group" "artifactory_elb_secgroup" {
-  name = "artifactory_elb_secgroup"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "artifactory_ci_elb_secgroup" {
   name = "artifactory_ci_elb_secgroup"
   vpc_id = "${aws_vpc.pardot_ci.id}"
@@ -117,7 +91,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-1-ue1"
@@ -139,7 +113,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-2-ue1"
@@ -161,7 +135,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-3-ue1"
@@ -176,7 +150,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 
 resource "aws_elb" "artifactory_ops_elb" {
   name = "artifactory-elb"
-  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}", "${aws_security_group.artifactory_elb_secgroup.id}"]
+  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
@@ -414,8 +388,26 @@ resource "aws_security_group" "artifactory_integration_mysql_ingress" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    security_groups = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-    cidr_blocks = ["${aws_subnet.artifactory_integration_us_east_1c_dmz.cidr_block}"]
+    cidr_blocks = [
+      "${aws_subnet.artifactory_integration_us_east_1a.cidr_block}",
+      "${aws_subnet.artifactory_integration_us_east_1a_dmz.cidr_block}",
+      "${aws_subnet.artifactory_integration_us_east_1c.cidr_block}",
+      "${aws_subnet.artifactory_integration_us_east_1c_dmz.cidr_block}",
+      "${aws_subnet.artifactory_integration_us_east_1d.cidr_block}",
+      "${aws_subnet.artifactory_integration_us_east_1d_dmz.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1a.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1a_dmz.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1c.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1c_dmz.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1d.cidr_block}",
+      "${aws_subnet.pardot_ci_us_east_1d_dmz.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1a.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1a_dmz.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1c.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1c_dmz.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1d.cidr_block}",
+      "${aws_subnet.internal_apps_us_east_1d_dmz.cidr_block}"
+    ]
   }
 
   egress {
