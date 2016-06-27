@@ -56,32 +56,6 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   }
 }
 
-resource "aws_security_group" "artifactory_elb_secgroup" {
-  name = "artifactory_elb_secgroup"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "artifactory_ci_elb_secgroup" {
   name = "artifactory_ci_elb_secgroup"
   vpc_id = "${aws_vpc.pardot_ci.id}"
@@ -176,7 +150,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 
 resource "aws_elb" "artifactory_ops_elb" {
   name = "artifactory-elb"
-  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}", "${aws_security_group.artifactory_elb_secgroup.id}"]
+  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
@@ -338,32 +312,36 @@ resource "aws_subnet" "artifactory_integration_us_east_1e_dmz" {
   map_public_ip_on_launch = true
 }
 
-resource "aws_internet_gateway" "artifactory_integration_internet_gw" {
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
-}
+////
+//// COMMENT / UNCOMMENT TO TOGGLE GATEWAYS FOR ARTIFACTORY INTEGRATION VPC
+////
 
-resource "aws_eip" "artifactory_integration_nat_gw" {
-  vpc = true
-}
-
-resource "aws_nat_gateway" "artifactory_integration_nat_gw" {
-  allocation_id = "${aws_eip.artifactory_integration_nat_gw.id}"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
-}
-
-resource "aws_route" "artifactory_integration_route" {
-  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = "${aws_nat_gateway.artifactory_integration_nat_gw.id}"
-}
-
-resource "aws_route_table" "artifactory_integration_route_dmz" {
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.artifactory_integration_internet_gw.id}"
-  }
-}
+//resource "aws_internet_gateway" "artifactory_integration_internet_gw" {
+//  vpc_id = "${aws_vpc.artifactory_integration.id}"
+//}
+//
+//resource "aws_eip" "artifactory_integration_nat_gw" {
+//  vpc = true
+//}
+//
+//resource "aws_nat_gateway" "artifactory_integration_nat_gw" {
+//  allocation_id = "${aws_eip.artifactory_integration_nat_gw.id}"
+//  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+//}
+//
+//resource "aws_route" "artifactory_integration_route" {
+//  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
+//  destination_cidr_block = "0.0.0.0/0"
+//  nat_gateway_id = "${aws_nat_gateway.artifactory_integration_nat_gw.id}"
+//}
+//
+//resource "aws_route_table" "artifactory_integration_route_dmz" {
+//  vpc_id = "${aws_vpc.artifactory_integration.id}"
+//  route {
+//    cidr_block = "0.0.0.0/0"
+//    gateway_id = "${aws_internet_gateway.artifactory_integration_internet_gw.id}"
+//  }
+//}
 
 resource "aws_route_table_association" "artifactory_integration_us_east_1a" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
