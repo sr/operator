@@ -6,7 +6,7 @@
 Summary:	A module for PHP applications that use the SOAP protocol
 Name:		php-%{modname}
 Version:	%{phpver}
-Release:	1.pardot%{?dist}
+Release:	2.pardot%{?dist}
 Group:		Development/Languages
 License:	PHP
 URL:		http://www.php.net/
