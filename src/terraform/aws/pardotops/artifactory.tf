@@ -91,7 +91,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-1-ue1"
@@ -113,7 +113,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-2-ue1"
@@ -135,7 +135,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     Name = "pardot0-artifactory1-3-ue1"
