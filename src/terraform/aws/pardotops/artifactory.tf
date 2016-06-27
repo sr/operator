@@ -312,6 +312,33 @@ resource "aws_subnet" "artifactory_integration_us_east_1e_dmz" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_internet_gateway" "artifactory_integration_internet_gw" {
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+}
+
+resource "aws_eip" "artifactory_integration_nat_gw" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "artifactory_integration_nat_gw" {
+  allocation_id = "${aws_eip.artifactory_integration_nat_gw.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+}
+
+resource "aws_route" "artifactory_integration_route" {
+  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = "${aws_nat_gateway.artifactory_integration_nat_gw.id}"
+}
+
+resource "aws_route_table" "artifactory_integration_route_dmz" {
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.artifactory_integration_internet_gw.id}"
+  }
+}
+
 resource "aws_route_table_association" "artifactory_integration_us_east_1a" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
