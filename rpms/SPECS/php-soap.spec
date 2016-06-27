@@ -15,7 +15,8 @@ Patch0:		https://gist.githubusercontent.com/ksmiley/ab028f36e1545450f6746ba305c6
 Patch1:		https://gist.githubusercontent.com/ksmiley/134da749ba0510ae2c3526076259623a/raw/7f71d68cd7f0ce5039e32976a0866f6fe6ad4599/php-soap-decodebug.patch
 Requires:	php-common%{?_isa} = %{version}
 BuildRequires:	libxml2-devel
-BuildRequires:	php-devel = %{version}
+BuildRequires:	php-devel%{?_isa} = %{version}
+BuildRequires:	php-json%{?_isa} = %{version}
 BuildRoot:	%{_tmppath}/%name-root
 
 %description
