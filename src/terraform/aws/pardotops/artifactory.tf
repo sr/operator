@@ -274,7 +274,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
 }
 
 resource "aws_vpc" "artifactory_integration" {
-cidr_block = "172.28.0.0/16"
+cidr_block = "172.28.0.0/24"
   enable_dns_support = true
   enable_dns_hostnames = true
   tags {
@@ -285,56 +285,56 @@ cidr_block = "172.28.0.0/16"
 resource "aws_subnet" "artifactory_integration_us_east_1a" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.28.0.0/19"
+  cidr_block = "172.28.0.0/27"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1c" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.28.32.0/19"
+  cidr_block = "172.28.32.0/27"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1d" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.28.64.0/19"
+  cidr_block = "172.28.64.0/27"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1e" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.28.96.0/19"
+  cidr_block = "172.28.96.0/27"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1a_dmz" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.28.128.0/19"
+  cidr_block = "172.28.128.0/27"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1c_dmz" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.28.160.0/19"
+  cidr_block = "172.28.160.0/27"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1d_dmz" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.28.192.0/19"
+  cidr_block = "172.28.192.0/27"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1e_dmz" {
   vpc_id = "${aws_vpc.artifactory_integration.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.28.224.0/19"
+  cidr_block = "172.28.224.0/27"
   map_public_ip_on_launch = true
 }
 
