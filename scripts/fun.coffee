@@ -16,7 +16,6 @@
 #   hubot bread - developers HATE them! Operations guys find ONE EASY TRICK to write code!
 #   hubot puppies - Get puppies
 #   hubot beyonce - Get charisma
-#   hubot visualstudio - Get lawlz
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
 #   hubot catbongos - Like, far out, man...
