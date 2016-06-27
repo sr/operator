@@ -10,7 +10,7 @@ ARG libzookeeper_version=3.4.6-1.pardot
 ARG git_version=2.7.4-1
 # https://git.dev.pardot.com/Pardot/chef/blob/master/cookbooks/pardot_php70/attributes/default.rb
 ARG php_version=7.0.7-1
-ARG php_packages="php php-json php-common php-cli php-devel php-mcrypt php-mbstring php-pdo php-xml php-xmlrpc php-imap php-gd php-tidy php-bcmath php-intl php-opcache php-mysql php-mysqlnd php-process"
+ARG php_packages="php-json php-common php-cli php-devel php php-mcrypt php-mbstring php-pdo php-xml php-xmlrpc php-imap php-gd php-tidy php-bcmath php-intl php-opcache php-mysqlnd php-process"
 ARG artifactory_host
 
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
@@ -22,7 +22,7 @@ RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
 RUN yum install -y epel-release && \
   yum install -y \
     font-config supervisor less which openssh-clients redis bzip2 make \
-    unzip xz gcc file libicu openssl nc && \
+    unzip xz gcc file libicu openssl nc yum-versionlock && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.${dist}.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.${dist}.x86_64.rpm" && \
@@ -38,10 +38,12 @@ RUN cd /tmp && \
   rm -rf parallel-${parallel_version}
 
 # PHP
+COPY remi-php70.repo remi-safe.repo /etc/yum.repos.d/
 RUN yum install -y httpd mod_ssl && \
-  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && \
+  sed -i'' "s/artifactory\.dev\.pardot\.com/${artifactory_host}/" /etc/yum.repos.d/remi-php70.repo && \
   for package in ${php_packages}; do \
     yum --enablerepo=remi-php70 install -y "${package}-${php_version}.${dist}.remi"; \
+    yum versionlock "${package}"; \
   done && \
   yum --enablerepo=remi-php70 install -y "php-pear-1.10.1-4.${dist}.remi" && \
   yum --enablerepo=remi-php70 install -y "php-pecl-memcache-3.0.9-0.4.20160311git4991c2f.${dist}.remi.7.0" && \
@@ -50,7 +52,7 @@ RUN yum install -y httpd mod_ssl && \
   yum --enablerepo=remi-php70 install -y "php-pecl-xdebug-2.4.0-1.${dist}.remi.7.0" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-soap-7.0.7-1.pardot.${dist}.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-zookeeper-0.3.0-1.pardot.${dist}.x86_64.rpm" && \
-  rpm -Uvh --nodeps "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-0.2.0-1.pardot.${dist}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-0.2.0-2.pardot.${dist}.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-pecl-encryption-gnupg-2.0.0-1.${dist}.x86_64.rpm" && \
   pear install --onlyreqdeps "Crypt_HMAC" && \
   pear install --onlyreqdeps "Net_Curl" && \
