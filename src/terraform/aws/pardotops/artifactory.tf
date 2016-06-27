@@ -108,41 +108,6 @@ resource "aws_security_group" "artifactory_ci_elb_secgroup" {
   }
 }
 
-resource "aws_security_group" "artifactory_mysql_secgroup" {
-  name = "artifactory_mysql_secgroup"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-
-  ingress {
-    from_port = 3306
-    to_port = 3306
-    protocol = "mysql"
-    security_groups = [
-      "${aws_security_group.artifactory_instance_secgroup.id}"
-    ]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
-  }
-
-  ingress {
-    from_port = 3306
-    to_port = 3306
-    protocol = "tcp"
-    cidr_blocks = ["${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
