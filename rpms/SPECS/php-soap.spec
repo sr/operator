@@ -1,5 +1,5 @@
 %define modname soap
-%define phpver 7.0.7
+%define phpver 7.0.8
 %define soname %{modname}.so
 %define inifile 20-%{modname}.ini
 
