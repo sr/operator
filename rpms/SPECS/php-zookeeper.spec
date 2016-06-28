@@ -1,25 +1,26 @@
 %define modname zookeeper
-%define phpver 7.0
+%define phpver 7.0.8
+%define srcver 0.3.0
 %define soname %{modname}.so
 %define inifile 20-%{modname}.ini
 
 Summary:	PHP extension for interfacing with Apache ZooKeeper
 Name:		php-%{modname}
-Version:	0.3.0
+Version:	%{phpver}
 Release:	1.pardot%{?dist}
 Group:		Development/Languages
 License:	PHP License
 URL:		https://github.com/mikemfrank/php-zookeeper
-Source0:    https://github.com/mikemfrank/php-zookeeper/archive/v0.3.0.tar.gz
+Source0:    https://github.com/mikemfrank/php-zookeeper/archive/v%{srcver}.tar.gz
 BuildRequires: libzookeeper-devel
-BuildRequires: php-cli >= %{phpver}
-BuildRequires: php-devel >= %{phpver}
+BuildRequires: php-cli%{?_isa} = %{version}
+BuildRequires: php-devel%{?_isa} = %{version}
 
 %description
 This extension provides API for communicating with ZooKeeper service.
 
 %prep
-%setup -q
+%setup -q -n php-%{modname}-%{srcver}
 
 %build
 phpize

@@ -1,24 +1,25 @@
 %define modname tideways
-%define phpver 7.0
+%define phpver 7.0.8
+%define srcver 4.0.5
 %define soname %{modname}.so
 %define inifile 20-%{modname}.ini
 
 Summary:  PHP profiler extension - Tideways a modern XHPROF alterative
 Name:   php-%{modname}
-Version:  4.0.4
-Release:  2%{?dist}
+Version:  %{phpver}
+Release:  1.pardot%{?dist}
 Group:    Development/Languages
 License:  Apache License
 URL:    https://github.com/tideways/php-profiler-extension
-Source0:    https://github.com/tideways/php-profiler-extension/archive/v4.0.4.zip
-BuildRequires: php-cli >= %{phpver}
-BuildRequires: php-devel >= %{phpver}
+Source0:    https://github.com/tideways/php-profiler-extension/archive/v%{srcver}.zip
+BuildRequires: php-cli%{?_isa} = %{version}
+BuildRequires: php-devel%{?_isa} = %{version}
 
 %description
 This extension provides Tideways - a modern XHPROF alterative
 
 %prep
-%setup -q -n php-profiler-extension-%{version}
+%setup -q -n php-profiler-extension-%{srcver}
 
 %build
 phpize

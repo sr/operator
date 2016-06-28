@@ -1,19 +1,19 @@
 %define modname protobuf
-%define phpver 7.0
+%define phpver 7.0.8
 %define soname %{modname}.so
 %define inifile 20-%{modname}.ini
 %define repoversion php7
 
 Summary:       PHP module for protobufs
 Name:          php-%{modname}
-Version:       0.2.0
-Release:       2.pardot%{?dist}
+Version:       %{phpver}
+Release:       1.pardot%{?dist}
 License:       BSD
 Group:         Development/Languages
 URL:           https://github.com/allegro/php-protobuf
 Source0:       https://github.com/pd-aray/php-protobuf/archive/%{repoversion}.tar.gz
-BuildRequires: php-cli >= %{phpver}
-BuildRequires: php-devel >= %{phpver}
+BuildRequires: php-cli%{?_isa} = %{version}
+BuildRequires: php-devel%{?_isa} = %{version}
 
 %description
 https://github.com/allegro/php-protobuf
