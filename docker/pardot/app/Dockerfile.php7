@@ -50,7 +50,7 @@ RUN yum install -y httpd mod_ssl && \
   yum --enablerepo=remi-php70 install -y "php-pecl-igbinary-1.2.2-0.1.20151217git2b7c703.${dist}.remi.7.0" && \
   yum --enablerepo=remi-php70 install -y "php-pecl-zip-1.13.3-1.${dist}.remi.7.0" && \
   yum --enablerepo=remi-php70 install -y "php-pecl-xdebug-2.4.0-1.${dist}.remi.7.0" && \
-  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-soap-7.0.7-1.pardot.${dist}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-soap-7.0.7-2.pardot.${dist}.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-zookeeper-0.3.0-1.pardot.${dist}.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-0.2.0-2.pardot.${dist}.x86_64.rpm" && \
   rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-pecl-encryption-gnupg-2.0.0-1.${dist}.x86_64.rpm" && \
