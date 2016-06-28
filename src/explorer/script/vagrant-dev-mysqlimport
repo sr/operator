@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
-set -eu
+#/ Usage: vagrant-dev-mysqlimport [--force]
+set -euo pipefail
+
 cd "$(dirname "$0")/.."
 
 : "${RAILS_ENV:="development"}"
+: "${DATABASE_HOST:="localhost"}"
+: "${DATABASE_PORT:="3306"}"
+
+force=false
+if [ "${1:-""}" = "--force" ]
+then force=true
+fi
 
 if [ "$RAILS_ENV" != "development" ] && [ "$RAILS_ENV" != "test" ]
 then
@@ -13,8 +22,19 @@ fi
 for dbname in pardot_global pardot_shard1 pardot_shard2
 do
     dump="db/vagrant-dev/${dbname}.sql"
-    echo "==> Importing $dump into database $dbname"
-    mysqladmin -h "${DATABASE_HOST-localhost}" -P "${DATABASE_PORT-3306}" \
-        create "$dbname" 2>/dev/null || true
-    mysql -u root -h "${DATABASE_HOST-localhost}" -P "${DATABASE_PORT-3306}" "$dbname" < "$dump"
+
+    if $force; then
+        mysqladmin -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+            -f drop "$dbname" >/dev/null 2>&1 || true
+        mysqladmin -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+            -f create "$dbname"
+        echo "==> Importing $dump into database $dbname"
+        mysql -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
+    else
+        mysqladmin -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
+            -f create "$dbname" >/dev/null 2>&1 && {
+            echo "==> Importing $dump into database $dbname"
+            mysql -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
+        } || true
+    fi
 done

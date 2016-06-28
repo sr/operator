@@ -1,8 +1,12 @@
 class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
+
   AWS = "ue1.aws".freeze
-  ENABLED = [AWS, DFW].freeze
+  DFW = "dfw".freeze
+  PHX = "phx".freeze
+
+  ENABLED = [AWS, PHX, DFW].freeze
 
   BREAD_ROOM = 42
   OPS_ROOM = 6
