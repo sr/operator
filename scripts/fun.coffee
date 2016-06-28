@@ -41,6 +41,7 @@
 #   hubot tbone - Get Tuberculosis. Once.
 #   hubot bestfriends - Get Friends
 #   hubot its happening - Get Ron Paul
+#   hubot master is open - LET'ER RIP
 #   hubot situation - Belinda Wong Situation
 #   hubot engage - . M A K E . I T . S O .
 #   hubot picard - for when you're feeling frisky!
@@ -150,6 +151,9 @@ module.exports = (robot) ->
 
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
+
+  robot.respond /master(\s)?is(\s)?open$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/5/lNYLdAaKwuoNK8I/master_open_4.jpg"
 
   robot.respond /capital(\s)?idea$/i, (msg) ->
     msg.send "http://i.imgur.com/8aVB7x0.png"
