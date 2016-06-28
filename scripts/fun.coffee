@@ -153,7 +153,14 @@ module.exports = (robot) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
 
   robot.respond /master(\s)?is(\s)?open$/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/5/lNYLdAaKwuoNK8I/master_open_4.jpg"
+    opens = [
+      "https://hipchat.dev.pardot.com/files/1/5/lNYLdAaKwuoNK8I/master_open_4.jpg",
+      "https://hipchat.dev.pardot.com/files/1/5/W7PDxo7w6PCeYEd/master_open_2.jpg",
+      "https://hipchat.dev.pardot.com/files/1/5/feQJ6xBH72ROnFm/master_open_5.jpg",
+      "https://hipchat.dev.pardot.com/files/1/5/kF39KN4eqcehAW9/master_open_1.jpg",
+      "https://hipchat.dev.pardot.com/files/1/5/b8dAgHlHnapHPdy/master_open_3.jpg"
+    ]
+    msg.send msg.random opens 
 
   robot.respond /capital(\s)?idea$/i, (msg) ->
     msg.send "http://i.imgur.com/8aVB7x0.png"
