@@ -161,7 +161,10 @@ module.exports = (robot) ->
     msg.send "https://hipchat.dev.pardot.com/files/1%2F62%2FrPK7cHsJFVD7cUr%2FIMG_1642%20%282%29.JPG"
 
   robot.respond /pieces$/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/260/YB1QIGT1uFmyaLy/upload.png"
+    msg.send msg.random [
+    	"https://hipchat.dev.pardot.com/files/1/260/YB1QIGT1uFmyaLy/upload.png",
+    	"https://dl.dropboxusercontent.com/u/2103751/rhys-meme.png"
+    ]
 
   robot.respond /bees$/i, (msg) ->
     bees = [
