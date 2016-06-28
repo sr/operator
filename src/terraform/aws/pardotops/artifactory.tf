@@ -13,6 +13,15 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.internal_apps.cidr_block}"
+    ]
+  }
+
+  ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
@@ -38,6 +47,15 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.pardot_ci_bastion.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.pardot_ci.cidr_block}"
     ]
   }
 
