@@ -105,6 +105,7 @@ func run() error {
 		)
 		if apply {
 			req, err := http.NewRequest("POST", jiraURL+"/rest/api/2/issue/"+issue.ID+"/transitions", nil)
+			req.Header.Set("Content-Type", "application/json")
 			if err != nil {
 				return err
 			}
