@@ -13,6 +13,16 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.internal_apps_bastion.public_ip}/32",
+      "${aws_instance.internal_apps_bastion_2.public_ip}/32"
+    ]
+  }
+
+  ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
@@ -51,6 +61,15 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   }
 
   ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.pardot_ci_bastion.public_ip}/32"
+    ]
+  }
+
+  ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
@@ -75,7 +94,7 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
 }
 
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
@@ -97,7 +116,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 }
 
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
@@ -119,7 +138,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 }
 
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
