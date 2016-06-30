@@ -6,7 +6,9 @@ import (
 )
 
 func TestRetrieveEnvVars(t *testing.T) {
-	os.Setenv("FOO", "bar")
+	if err := os.Setenv("FOO", "bar"); err != nil {
+		t.Fatal(err)
+	}
 	result := retrieveEnvVars([]string{"FOO", "NOTHINGTOSEEHERE"})
 
 	if len(result) != 2 {

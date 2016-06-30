@@ -6,11 +6,11 @@ import (
 )
 
 func TestUnitParserHappyPath(t *testing.T) {
-	unitsAsJson := []string{
+	unitsAsJSON := []string{
 		`{"data": "unit1", "expected_runtime_in_seconds": 4.24}`,
 		`{"data": "unit2", "expected_runtime_in_seconds": 10.9}`,
 	}
-	reader := strings.NewReader(strings.Join(unitsAsJson, "\n"))
+	reader := strings.NewReader(strings.Join(unitsAsJSON, "\n"))
 
 	parser := NewUnitParser(reader)
 	unit, err := parser.Next()
