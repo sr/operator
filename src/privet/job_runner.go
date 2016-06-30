@@ -97,13 +97,18 @@ func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 		return true, err
 	}
 
-	unitResult, err := r.invokeUnits(popUnitsResp.Units)
+	unitsData := make([]string, 0, len(popUnitsResp.Units))
+	for _, unit := range popUnitsResp.Units {
+		unitsData = append(unitsData, unit.Data)
+	}
+
+	unitResult, err := r.invokeUnits(unitsData)
 	if err != nil {
 		// TODO: We've now claimed units we'll never complete.
 		return false, err
 	}
 
-	additionalResultsPresent, additionalResult, err := r.captureAdditionalResults(popUnitsResp.Units)
+	additionalResultsPresent, additionalResult, err := r.captureAdditionalResults(unitsData)
 	if err != nil {
 		// TODO: We've now claimed units we'll never complete.
 		return false, err
@@ -142,16 +147,14 @@ func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 	}
 }
 
-func (r *JobRunner) invokeUnits(units []string) (*CommandResult, error) {
+func (r *JobRunner) invokeUnits(unitsData []string) (*CommandResult, error) {
 	buf := new(bytes.Buffer)
 	path := filepath.Join(r.privetDir, "runner-run-units")
-	args := []string{path}
-	args = append(args, units...)
 
-	log.Printf("invoking units: %v", units)
+	log.Printf("invoking units: %v", unitsData)
 	cmd := &exec.Cmd{
 		Path:   path,
-		Args:   args,
+		Args:   append([]string{path}, unitsData...),
 		Stdin:  nil,
 		Stdout: buf,
 		Stderr: buf,
@@ -170,14 +173,14 @@ func (r *JobRunner) invokeUnits(units []string) (*CommandResult, error) {
 		return nil, err
 	}
 
-	log.Printf("finished units %v, exited with %v", units, exitCode)
+	log.Printf("finished units %v, exited with %v", unitsData, exitCode)
 	return &CommandResult{
 		ExitCode: int32(exitCode),
 		Output:   buf.Bytes(),
 	}, nil
 }
 
-func (r *JobRunner) captureAdditionalResults(units []string) (bool, *CommandResult, error) {
+func (r *JobRunner) captureAdditionalResults(unitsData []string) (bool, *CommandResult, error) {
 	path := filepath.Join(r.privetDir, "runner-additional-results")
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {

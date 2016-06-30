@@ -19,8 +19,8 @@ type JobMaster struct {
 	privetDir       string
 	exitCode        int
 	unitsLock       sync.Mutex
-	units           []string
-	unitsInProgress map[string]bool
+	units           []*Unit
+	unitsInProgress map[*Unit]bool
 }
 
 type JobMasterQueueStats struct {
@@ -47,13 +47,19 @@ func (m *JobMaster) EnqueueUnits() error {
 		return err
 	}
 
-	m.units = []string{}
-	for _, unit := range strings.Split(buf.String(), "\n") {
-		if len(unit) > 0 {
+	unitParser := NewUnitParser(buf)
+	m.units = []*Unit{}
+	for {
+		unit, err := unitParser.Next()
+		if err != nil {
+			return err
+		} else if unit != nil {
 			m.units = append(m.units, unit)
+		} else {
+			break
 		}
 	}
-	m.unitsInProgress = make(map[string]bool)
+	m.unitsInProgress = make(map[*Unit]bool)
 
 	return nil
 }
@@ -67,11 +73,11 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 		maxUnits = len(m.units)
 	}
 
-	var units []string
+	var units []*Unit
 	if len(m.units) > 0 {
 		units, m.units = m.units[0:maxUnits], m.units[maxUnits:]
 	} else {
-		units = []string{}
+		units = []*Unit{}
 	}
 
 	for _, unit := range units {
@@ -135,10 +141,15 @@ func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletio
 		m.unitsLock.Unlock()
 	}()
 
+	unitsData := make([]string, 0, len(completionRequest.Units))
+	for _, unit := range completionRequest.Units {
+		unitsData = append(unitsData, unit.Data)
+	}
+
 	env := []string{
 		fmt.Sprintf("PRIVET_RUNNER_ID=%s", completionRequest.RunnerId),
 		fmt.Sprintf("PRIVET_RESULT_ID=%s", completionRequest.ResultId),
-		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(completionRequest.Units, "\n")),
+		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(unitsData, "\n")),
 	}
 
 	unitResultFile, err := ioutil.TempFile("", "privet")
