@@ -22,6 +22,7 @@ const (
 
 type JobRunner struct {
 	ApproximateBatchDurationInSeconds float64
+	EnvVars                           []string
 
 	runnerID        string
 	privetDir       string
@@ -76,9 +77,9 @@ func (r *JobRunner) runOptionalHook(hook string) error {
 		Stdin:  nil,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
-		Env: []string{
+		Env: append(retrieveEnvVars(r.EnvVars), []string{
 			fmt.Sprintf("PRIVET_RUNNER_ID=%s", r.runnerID),
-		},
+		}...),
 	}
 
 	return cmd.Run()
@@ -158,9 +159,9 @@ func (r *JobRunner) invokeUnits(unitsData []string) (*CommandResult, error) {
 		Stdin:  nil,
 		Stdout: buf,
 		Stderr: buf,
-		Env: []string{
+		Env: append(retrieveEnvVars(r.EnvVars), []string{
 			fmt.Sprintf("PRIVET_RUNNER_ID=%s", r.runnerID),
-		},
+		}...),
 	}
 
 	err := cmd.Run()
@@ -193,9 +194,9 @@ func (r *JobRunner) captureAdditionalResults(unitsData []string) (bool, *Command
 		Stdin:  nil,
 		Stdout: buf,
 		Stderr: buf,
-		Env: []string{
+		Env: append(retrieveEnvVars(r.EnvVars), []string{
 			fmt.Sprintf("PRIVET_RUNNER_ID=%s", r.runnerID),
-		},
+		}...),
 	}
 
 	err = cmd.Run()

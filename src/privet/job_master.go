@@ -21,6 +21,8 @@ const (
 )
 
 type JobMaster struct {
+	EnvVars []string
+
 	privetDir       string
 	exitCode        int
 	unitsLock       sync.Mutex
@@ -44,6 +46,7 @@ func (m *JobMaster) EnqueueUnits() error {
 	buf := new(bytes.Buffer)
 	cmd := &exec.Cmd{
 		Path:   filepath.Join(m.privetDir, "units"),
+		Env:    retrieveEnvVars(m.EnvVars),
 		Stdin:  nil,
 		Stdout: buf,
 	}
@@ -142,11 +145,11 @@ func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletio
 		unitsData = append(unitsData, unit.Data)
 	}
 
-	env := []string{
+	env := append(retrieveEnvVars(m.EnvVars), []string{
 		fmt.Sprintf("PRIVET_RUNNER_ID=%s", completionRequest.RunnerId),
 		fmt.Sprintf("PRIVET_RESULT_ID=%s", completionRequest.ResultId),
 		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(unitsData, "\n")),
-	}
+	}...)
 
 	unitResultFile, err := ioutil.TempFile("", "privet")
 	if err != nil {
