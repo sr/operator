@@ -30,6 +30,10 @@ RUN \
   && \
     chmod +x /usr/bin/jfrog \
   && \
+    mkdir -p ~/.jfrog/security \
+  && \
+    cp /etc/pki/tls/certs/ca-bundle.crt ~/.jfrog/security \
+  && \
     gem install \
       --no-ri --no-rdoc \
       --source "${RUBYGEMS_SOURCE}" \
