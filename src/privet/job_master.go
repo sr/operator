@@ -11,16 +11,23 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"golang.org/x/net/context"
 )
 
+const (
+	JobMasterApproximateDurationPerPop = 1 * time.Minute
+)
+
 type JobMaster struct {
+	EnvVars []string
+
 	privetDir       string
 	exitCode        int
 	unitsLock       sync.Mutex
-	units           []string
-	unitsInProgress map[string]bool
+	unitQueue       *UnitQueue
+	unitsInProgress map[*Unit]bool
 }
 
 type JobMasterQueueStats struct {
@@ -39,6 +46,7 @@ func (m *JobMaster) EnqueueUnits() error {
 	buf := new(bytes.Buffer)
 	cmd := &exec.Cmd{
 		Path:   filepath.Join(m.privetDir, "units"),
+		Env:    retrieveEnvVars(m.EnvVars),
 		Stdin:  nil,
 		Stdout: buf,
 	}
@@ -47,13 +55,19 @@ func (m *JobMaster) EnqueueUnits() error {
 		return err
 	}
 
-	m.units = []string{}
-	for _, unit := range strings.Split(buf.String(), "\n") {
-		if len(unit) > 0 {
-			m.units = append(m.units, unit)
+	unitParser := NewUnitParser(buf)
+	m.unitQueue = NewUnitQueue()
+	for {
+		unit, err := unitParser.Next()
+		if err != nil {
+			return err
+		} else if unit != nil {
+			m.unitQueue.Enqueue(unit)
+		} else {
+			break
 		}
 	}
-	m.unitsInProgress = make(map[string]bool)
+	m.unitsInProgress = make(map[*Unit]bool)
 
 	return nil
 }
@@ -62,18 +76,8 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 	m.unitsLock.Lock()
 	defer m.unitsLock.Unlock()
 
-	maxUnits := int(req.UnitsRequested)
-	if maxUnits > len(m.units) {
-		maxUnits = len(m.units)
-	}
-
-	var units []string
-	if len(m.units) > 0 {
-		units, m.units = m.units[0:maxUnits], m.units[maxUnits:]
-	} else {
-		units = []string{}
-	}
-
+	approximateDuration := time.Duration(req.ApproximateBatchDurationInSeconds) * time.Second
+	units := m.unitQueue.Dequeue(approximateDuration)
 	for _, unit := range units {
 		m.unitsInProgress[unit] = true
 	}
@@ -87,7 +91,7 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 func (m *JobMaster) ReportUnitsCompletion(ctx context.Context, req *ReportUnitsCompletionRequest) (*ReportUnitsCompletionResponse, error) {
 	m.noticeExitCode(req.UnitResult.ExitCode)
 	m.noticeExitCode(req.AdditionalResult.ExitCode)
-	// TODO: Make this more of a queue. Or put the request on a channel?
+	// TODO: Make this more of a queue so it happens async. Or put the request on a channel?
 	go m.invokeReceiveResults(req)
 
 	return &ReportUnitsCompletionResponse{}, nil
@@ -103,17 +107,18 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 }
 
 func (m *JobMaster) QueueStats() JobMasterQueueStats {
-	m.unitsLock.Lock()
-	defer m.unitsLock.Unlock()
-
 	return JobMasterQueueStats{
-		UnitsInQueue:    len(m.units),
-		UnitsInProgress: len(m.unitsInProgress),
+		UnitsInQueue:    m.QueueLength(),
+		UnitsInProgress: m.NumUnitsInProgress(),
 	}
 }
-func (m *JobMaster) QueueLength() int {
 
-	return len(m.units)
+func (m *JobMaster) QueueLength() int {
+	return m.unitQueue.Size()
+}
+
+func (m *JobMaster) NumUnitsInProgress() int {
+	return len(m.unitsInProgress)
 }
 
 func (m *JobMaster) ExitCode() int {
@@ -135,11 +140,16 @@ func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletio
 		m.unitsLock.Unlock()
 	}()
 
-	env := []string{
+	unitsData := make([]string, 0, len(completionRequest.Units))
+	for _, unit := range completionRequest.Units {
+		unitsData = append(unitsData, unit.Data)
+	}
+
+	env := append(retrieveEnvVars(m.EnvVars), []string{
 		fmt.Sprintf("PRIVET_RUNNER_ID=%s", completionRequest.RunnerId),
 		fmt.Sprintf("PRIVET_RESULT_ID=%s", completionRequest.ResultId),
-		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(completionRequest.Units, "\n")),
-	}
+		fmt.Sprintf("PRIVET_UNITS=%s", strings.Join(unitsData, "\n")),
+	}...)
 
 	unitResultFile, err := ioutil.TempFile("", "privet")
 	if err != nil {
