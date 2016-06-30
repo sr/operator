@@ -58,7 +58,7 @@ $ ./units
 ```
 
 The fields in a Unit are:
-* `data`: Arbitrary string that will be passed as an argument to `runner-run-units` (described later). In the most common case, this is the name of a test file that needs to be run.
+* `data`: Arbitrary string that will be passed as an argument to `runner-run-units` (described later). In the most common case, this is the name of a test file that needs to be run. **Must be unique.**
 * `expected_runtime_in_seconds` (optional): If present, Privet will attempt to group tests into uniformally sized chunks in an attempt to create an even runtime.
 
 ### runner-hook-startup (optional)
