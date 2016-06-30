@@ -107,17 +107,20 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 }
 
 func (m *JobMaster) QueueStats() JobMasterQueueStats {
+	m.unitsLock.Lock()
+	defer m.unitsLock.Unlock()
+
 	return JobMasterQueueStats{
-		UnitsInQueue:    m.QueueLength(),
-		UnitsInProgress: m.NumUnitsInProgress(),
+		UnitsInQueue:    m.queueLength(),
+		UnitsInProgress: m.numUnitsInProgress(),
 	}
 }
 
-func (m *JobMaster) QueueLength() int {
+func (m *JobMaster) queueLength() int {
 	return m.unitQueue.Size()
 }
 
-func (m *JobMaster) NumUnitsInProgress() int {
+func (m *JobMaster) numUnitsInProgress() int {
 	return len(m.unitDataInProgress)
 }
 
