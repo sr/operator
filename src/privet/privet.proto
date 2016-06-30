@@ -19,7 +19,7 @@ message CommandResult {
 
 message PopUnitsRequest {
   string runner_id = 1;
-  int32 units_requested = 2;
+  double approximate_batch_duration_in_seconds = 2;
 }
 
 message PopUnitsResponse {

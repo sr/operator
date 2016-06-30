@@ -21,7 +21,7 @@ const (
 )
 
 type JobRunner struct {
-	BatchUnits int32
+	ApproximateBatchDurationInSeconds float64
 
 	runnerID        string
 	privetDir       string
@@ -31,7 +31,7 @@ type JobRunner struct {
 
 func NewJobRunner(privetDir string, masterClient JobMasterClient) *JobRunner {
 	runner := &JobRunner{
-		BatchUnits: 1,
+		ApproximateBatchDurationInSeconds: 0,
 
 		privetDir:       privetDir,
 		masterClient:    masterClient,
@@ -86,8 +86,8 @@ func (r *JobRunner) runOptionalHook(hook string) error {
 
 func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 	popUnitsReq := &PopUnitsRequest{
-		RunnerId:       r.runnerID,
-		UnitsRequested: r.BatchUnits,
+		RunnerId: r.runnerID,
+		ApproximateBatchDurationInSeconds: r.ApproximateBatchDurationInSeconds,
 	}
 
 	popUnitsResp, err := r.masterClient.PopUnits(context.Background(), popUnitsReq)

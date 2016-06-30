@@ -11,15 +11,20 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"golang.org/x/net/context"
+)
+
+const (
+	JobMasterApproximateDurationPerPop = 1 * time.Minute
 )
 
 type JobMaster struct {
 	privetDir       string
 	exitCode        int
 	unitsLock       sync.Mutex
-	units           []*Unit
+	unitQueue       *UnitQueue
 	unitsInProgress map[*Unit]bool
 }
 
@@ -48,13 +53,13 @@ func (m *JobMaster) EnqueueUnits() error {
 	}
 
 	unitParser := NewUnitParser(buf)
-	m.units = []*Unit{}
+	m.unitQueue = NewUnitQueue()
 	for {
 		unit, err := unitParser.Next()
 		if err != nil {
 			return err
 		} else if unit != nil {
-			m.units = append(m.units, unit)
+			m.unitQueue.Enqueue(unit)
 		} else {
 			break
 		}
@@ -68,18 +73,8 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 	m.unitsLock.Lock()
 	defer m.unitsLock.Unlock()
 
-	maxUnits := int(req.UnitsRequested)
-	if maxUnits > len(m.units) {
-		maxUnits = len(m.units)
-	}
-
-	var units []*Unit
-	if len(m.units) > 0 {
-		units, m.units = m.units[0:maxUnits], m.units[maxUnits:]
-	} else {
-		units = []*Unit{}
-	}
-
+	approximateDuration := time.Duration(req.ApproximateBatchDurationInSeconds) * time.Second
+	units := m.unitQueue.Dequeue(approximateDuration)
 	for _, unit := range units {
 		m.unitsInProgress[unit] = true
 	}
@@ -93,7 +88,7 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 func (m *JobMaster) ReportUnitsCompletion(ctx context.Context, req *ReportUnitsCompletionRequest) (*ReportUnitsCompletionResponse, error) {
 	m.noticeExitCode(req.UnitResult.ExitCode)
 	m.noticeExitCode(req.AdditionalResult.ExitCode)
-	// TODO: Make this more of a queue. Or put the request on a channel?
+	// TODO: Make this more of a queue so it happens async. Or put the request on a channel?
 	go m.invokeReceiveResults(req)
 
 	return &ReportUnitsCompletionResponse{}, nil
@@ -109,17 +104,18 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 }
 
 func (m *JobMaster) QueueStats() JobMasterQueueStats {
-	m.unitsLock.Lock()
-	defer m.unitsLock.Unlock()
-
 	return JobMasterQueueStats{
-		UnitsInQueue:    len(m.units),
-		UnitsInProgress: len(m.unitsInProgress),
+		UnitsInQueue:    m.QueueLength(),
+		UnitsInProgress: m.NumUnitsInProgress(),
 	}
 }
-func (m *JobMaster) QueueLength() int {
 
-	return len(m.units)
+func (m *JobMaster) QueueLength() int {
+	return m.unitQueue.Size()
+}
+
+func (m *JobMaster) NumUnitsInProgress() int {
+	return len(m.unitsInProgress)
 }
 
 func (m *JobMaster) ExitCode() int {

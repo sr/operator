@@ -14,18 +14,18 @@ import (
 )
 
 var (
-	bindAddress    string
-	connectAddress string
-	privetDir      string
-	batchUnits     int
-	timeout        int
+	bindAddress                       string
+	connectAddress                    string
+	privetDir                         string
+	approximateBatchDurationInSeconds float64
+	timeout                           int
 )
 
 func main() {
 	flag.StringVar(&bindAddress, "bind", "", "The address:port to bind as a server")
 	flag.StringVar(&connectAddress, "connect", "", "The address:port to connect as a client")
 	flag.StringVar(&privetDir, "privet-dir", "./test/privet", "Path to where privet scripts reside")
-	flag.IntVar(&batchUnits, "batch-units", 1, "Run multiple units at a time. Must be supported by the `run-units` script")
+	flag.Float64Var(&approximateBatchDurationInSeconds, "approximate-batch-duration", 0, "Run multiple units at a time, totaling approximately this number of seconds. If zero (default), only one test will be run per invocation of runner-run-units.")
 	flag.IntVar(&timeout, "timeout", 3600, "Number of seconds before the process will exit, assuming there is a hung test run")
 	flag.Parse()
 
@@ -66,7 +66,7 @@ func main() {
 
 		masterClient := privet.NewJobMasterClient(conn)
 		jobRunner := privet.NewJobRunner(privetDir, masterClient)
-		jobRunner.BatchUnits = int32(batchUnits)
+		jobRunner.ApproximateBatchDurationInSeconds = approximateBatchDurationInSeconds
 
 		if err = jobRunner.RunStartupHook(); err != nil {
 			log.Fatalf("error running startup hook: %v", err)
