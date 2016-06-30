@@ -23,11 +23,11 @@ const (
 type JobMaster struct {
 	EnvVars []string
 
-	privetDir       string
-	exitCode        int
-	unitsLock       sync.Mutex
-	unitQueue       *UnitQueue
-	unitsInProgress map[*Unit]bool
+	privetDir          string
+	exitCode           int
+	unitsLock          sync.Mutex
+	unitQueue          *UnitQueue
+	unitDataInProgress map[string]bool
 }
 
 type JobMasterQueueStats struct {
@@ -67,7 +67,7 @@ func (m *JobMaster) EnqueueUnits() error {
 			break
 		}
 	}
-	m.unitsInProgress = make(map[*Unit]bool)
+	m.unitDataInProgress = make(map[string]bool)
 
 	return nil
 }
@@ -79,7 +79,7 @@ func (m *JobMaster) PopUnits(ctx context.Context, req *PopUnitsRequest) (*PopUni
 	approximateDuration := time.Duration(req.ApproximateBatchDurationInSeconds) * time.Second
 	units := m.unitQueue.Dequeue(approximateDuration)
 	for _, unit := range units {
-		m.unitsInProgress[unit] = true
+		m.unitDataInProgress[unit.Data] = true
 	}
 
 	resp := &PopUnitsResponse{
@@ -107,18 +107,21 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 }
 
 func (m *JobMaster) QueueStats() JobMasterQueueStats {
+	m.unitsLock.Lock()
+	defer m.unitsLock.Unlock()
+
 	return JobMasterQueueStats{
-		UnitsInQueue:    m.QueueLength(),
-		UnitsInProgress: m.NumUnitsInProgress(),
+		UnitsInQueue:    m.queueLength(),
+		UnitsInProgress: m.numUnitsInProgress(),
 	}
 }
 
-func (m *JobMaster) QueueLength() int {
+func (m *JobMaster) queueLength() int {
 	return m.unitQueue.Size()
 }
 
-func (m *JobMaster) NumUnitsInProgress() int {
-	return len(m.unitsInProgress)
+func (m *JobMaster) numUnitsInProgress() int {
+	return len(m.unitDataInProgress)
 }
 
 func (m *JobMaster) ExitCode() int {
@@ -135,7 +138,7 @@ func (m *JobMaster) invokeReceiveResults(completionRequest *ReportUnitsCompletio
 	defer func() {
 		m.unitsLock.Lock()
 		for _, unit := range completionRequest.Units {
-			delete(m.unitsInProgress, unit)
+			delete(m.unitDataInProgress, unit.Data)
 		}
 		m.unitsLock.Unlock()
 	}()
