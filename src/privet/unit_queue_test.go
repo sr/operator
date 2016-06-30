@@ -7,9 +7,9 @@ import (
 
 func TestUnitQueueAssumesExpectedRuntimeAsOneSecondIfAbsent(t *testing.T) {
 	unitQueue := NewUnitQueueWithUnits([]*Unit{
-		&Unit{Data: "unit1"},
-		&Unit{Data: "unit2"},
-		&Unit{Data: "unit3"},
+		{Data: "unit1"},
+		{Data: "unit2"},
+		{Data: "unit3"},
 	})
 
 	units := unitQueue.Dequeue(1 * time.Second)
@@ -29,9 +29,9 @@ func TestUnitQueueAssumesExpectedRuntimeAsOneSecondIfAbsent(t *testing.T) {
 
 func TestUnitQueueAttemptsToPackageTestsIntoEqualSizedChunksWithoutGoingOver(t *testing.T) {
 	unitQueue := NewUnitQueueWithUnits([]*Unit{
-		&Unit{Data: "unit1", ExpectedRuntimeInSeconds: 1},
-		&Unit{Data: "unit2", ExpectedRuntimeInSeconds: 2},
-		&Unit{Data: "unit3", ExpectedRuntimeInSeconds: 5},
+		{Data: "unit1", ExpectedRuntimeInSeconds: 1},
+		{Data: "unit2", ExpectedRuntimeInSeconds: 2},
+		{Data: "unit3", ExpectedRuntimeInSeconds: 5},
 	})
 
 	units := unitQueue.Dequeue(5 * time.Second)
