@@ -19,7 +19,7 @@ services:
     links:
       - mysql
   mysql:
-    image: mysql:5.5
+    image: docker.dev.pardot.com/base/percona-server:5.5
     expose:
       - "3306"
     environment:
