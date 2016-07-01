@@ -10,6 +10,13 @@ module Pardot
         "local" => "none"
       }.freeze
 
+      CHEF_NODES_DIR = {
+        "dfw" => "nodes/dfw",
+        "phx" => "nodes/phx",
+        "ue1.aws" => "nodes/aws",
+        "local" => "none"
+      }
+
       def initialize(script, checkout_path, deploy)
         @script = script
         @checkout_path = checkout_path
@@ -23,12 +30,18 @@ module Pardot
           return Response.new(false, "Unable to determine location of chef environment file for datacenter: #{datacenter.inspect}")
         end
 
+        nodes_dir = CHEF_NODES_DIR[datacenter]
+        if !nodes_dir
+          return Response.new(false, "Unable to determine location of chef nodes directory for datacenter: #{datacenter.inspect}")
+        end
+
         command = [
           @script,
           "-d", @checkout_path.to_s,
           "-b", @deploy["branch"],
           "-s", @deploy["sha"],
           "-f", chef_environment_file,
+          "-n", nodes_dir,
           "deploy"
         ]
         log = {
