@@ -79,6 +79,20 @@ module PagerDuty
         end
       end
 
+      def upload_nodes
+        Dir[@nodes_dir+'/*'].each do |path|
+          ext = File.extname(path)
+
+          if File.directory?(path) || ![".json", ".rb"].include?(ext)
+            next
+          end
+
+          converge_by "Uploade node from #{path}" do
+            knife Chef::Knife::NodeFromFile, path
+          end
+        end
+      end
+
       def upload_all_cookbooks
         converge_by 'Upload all cookbooks' do
           knife(Chef::Knife::CookbookUpload) do |config|
