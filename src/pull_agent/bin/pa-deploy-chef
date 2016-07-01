@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#/ Usage: pa-deploy-chef [-d chef-dir] [-b git-branch] [-s git-sha] [-f chef-env-file] <action>
+#/ Usage: pa-deploy-chef [-d chef-dir] [-b git-branch] [-s git-sha] [-f chef-env-file] [-n nodes-dir] <action>
 set -euo pipefail
 
 : "${PROGRAM:="$(basename "$0")"}"
@@ -11,8 +11,9 @@ print_help() {
 branch=""
 chefdir=""
 chefenvfile=""
+nodesdir=""
 sha=""
-while getopts d:b:f:s: arg
+while getopts d:b:f:s:n: arg
 do
     case "$arg" in
         b)
@@ -26,6 +27,9 @@ do
             ;;
         s)
             sha="$OPTARG"
+            ;;
+        n)
+            nodesdir="$OPTARG"
             ;;
         ?)
             print_help
@@ -82,6 +86,12 @@ case "$action" in
             exit 1
         fi
 
+        if [ -z "$nodesdir" ]
+        then
+            echo "$PROGRAM: required flag missing: -n <nodes-dir>"
+            exit 1
+        fi
+
         GIT_WORK_TREE="$chefdir"
         GIT_DIR="$GIT_WORK_TREE/.git"
         export GIT_WORK_TREE GIT_DIR
@@ -100,6 +110,7 @@ case "$action" in
             knife pd sync \
                 --skip-berkshelf \
                 --environment-file "$chefenvfile" \
+                --nodes-dir "$nodesdir"
                 2>&1
         fi
         ;;
