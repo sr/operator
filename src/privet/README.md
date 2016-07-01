@@ -45,17 +45,21 @@ Privet will set environment variables that can be used by the scripts:
 
 ### units
 
-The `units` script is responsible for splitting the test suite into units that can be farmed out to workers. `units` must print one 'unit' per line, separated by `\n`. Each unit will be passed to the `run-units` script on job workers (described later).
+The `units` script is responsible for splitting the test suite into units that can be farmed out to workers. `units` must print one 'unit' per line, serialized as JSON, separated by `\n`. Each unit name will be passed to the `runner-run-units` script on job workers (described later).
 
-In the simple case, `units` could return each test file, if that is the unit of granularity you want. It could also return something more complicated, like a line of JSON, if `run-units` would later know how to parse that.
+In the simple case, `units` could return each test file, if that is the unit of granularity you want.
 
 Example:
 
 ```
 $ ./units
-test/FooTest.php
-test/BarTest.php
+{"data": "test/FooTest.php", "expected_runtime_in_seconds": 1.2}
+{"data": "test/BarTest.php", "expected_runtime_in_seconds": 0.1}
 ```
+
+The fields in a Unit are:
+* `data`: Arbitrary string that will be passed as an argument to `runner-run-units` (described later). In the most common case, this is the name of a test file that needs to be run. **Must be unique.**
+* `expected_runtime_in_seconds` (optional): If present, Privet will attempt to group tests into uniformally sized chunks in an attempt to create an even runtime.
 
 ### runner-hook-startup (optional)
 

@@ -2,5 +2,5 @@
 set -euo pipefail
 
 for i in $(seq 1 10); do
-  echo "file$i"
+  echo "{\"data\": \"file${i}\", \"expected_runtime_in_seconds\": ${i}}"
 done
