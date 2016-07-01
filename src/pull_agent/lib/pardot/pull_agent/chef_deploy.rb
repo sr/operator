@@ -15,7 +15,7 @@ module Pardot
         "phx" => "nodes/phx",
         "ue1.aws" => "nodes/aws",
         "local" => "none"
-      }
+      }.freeze
 
       def initialize(script, checkout_path, deploy)
         @script = script
