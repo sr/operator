@@ -109,8 +109,8 @@ module.exports = (robot) ->
 
     if depdate > curdate
       departure = depdate.getTime()
-      departurereply = "#{depdate.toLocaleString('en-US',
-        {hour: 'numeric', minute: 'numeric'})}"
+      departurereply = depdate.toLocaleTimeString('en-US',
+        {hour: 'numeric', minute: 'numeric'})
     else
       departure = curdate.getTime()
 
