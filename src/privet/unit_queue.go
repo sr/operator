@@ -3,7 +3,8 @@ package privet
 import "time"
 
 type UnitQueue struct {
-	units []*Unit
+	queuesBySuite map[string][]*Unit
+	size          int
 }
 
 func NewUnitQueue() *UnitQueue {
@@ -11,21 +12,35 @@ func NewUnitQueue() *UnitQueue {
 }
 
 func NewUnitQueueWithUnits(units []*Unit) *UnitQueue {
-	return &UnitQueue{
-		units: units,
+	queue := &UnitQueue{
+		queuesBySuite: make(map[string][]*Unit),
+		size:          0,
 	}
+
+	for _, unit := range units {
+		queue.Enqueue(unit)
+	}
+
+	return queue
 }
 
 func (q *UnitQueue) Enqueue(unit *Unit) {
-	q.units = append(q.units, unit)
+	suiteQueue, ok := q.queuesBySuite[unit.Suite]
+	if !ok {
+		suiteQueue = []*Unit{}
+		q.queuesBySuite[unit.Suite] = suiteQueue
+	}
+
+	q.queuesBySuite[unit.Suite] = append(suiteQueue, unit)
+	q.size++
 }
 
 func (q *UnitQueue) Size() int {
-	return len(q.units)
+	return q.size
 }
 
 func (q *UnitQueue) IsEmpty() bool {
-	return len(q.units) <= 0
+	return q.size <= 0
 }
 
 // Dequeue returns a list of Units that will take approximately
@@ -34,10 +49,23 @@ func (q *UnitQueue) IsEmpty() bool {
 // single duration is larger than approximateDuration. Otherwise, it will always
 // keep the total duration under approximateDuration.
 func (q *UnitQueue) Dequeue(approximateDuration time.Duration) []*Unit {
+	if len(q.queuesBySuite) <= 0 {
+		return []*Unit{}
+	}
+
+	// Grab any ol' suite. We just need to find the first suite that still has
+	// units to run.
+	var suite string
+	for key := range q.queuesBySuite {
+		suite = key
+		break
+	}
+
 	totalApproximateDuration := 0 * time.Second
+	queue := q.queuesBySuite[suite]
 	units := []*Unit{}
-	for !q.IsEmpty() {
-		unit := q.units[0]
+	for len(queue) > 0 {
+		unit := queue[0]
 		var expectedRuntimeDuration time.Duration
 		if unit.ExpectedRuntimeInSeconds > 0 {
 			expectedRuntimeDuration = time.Duration(unit.ExpectedRuntimeInSeconds) * time.Second
@@ -48,7 +76,7 @@ func (q *UnitQueue) Dequeue(approximateDuration time.Duration) []*Unit {
 		newTotalApproximateDuration := totalApproximateDuration + expectedRuntimeDuration
 		if len(units) == 0 || newTotalApproximateDuration <= approximateDuration {
 			units = append(units, unit)
-			q.units = q.units[1:] // shift
+			queue = queue[1:] // shift
 			totalApproximateDuration = newTotalApproximateDuration
 		} else {
 			// Adding this unit would cause us to go over the approximateDuration,
@@ -57,5 +85,14 @@ func (q *UnitQueue) Dequeue(approximateDuration time.Duration) []*Unit {
 		}
 	}
 
+	// If the suite queue has emptied out completely, remove it as a key;
+	// otherwise, update the head pointer
+	if len(queue) == 0 {
+		delete(q.queuesBySuite, suite)
+	} else {
+		q.queuesBySuite[suite] = queue
+	}
+
+	q.size -= len(units)
 	return units
 }

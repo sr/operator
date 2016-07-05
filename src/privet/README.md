@@ -53,12 +53,13 @@ Example:
 
 ```
 $ ./units
-{"data": "test/FooTest.php", "expected_runtime_in_seconds": 1.2}
-{"data": "test/BarTest.php", "expected_runtime_in_seconds": 0.1}
+{"data": "test/FooTest.php", "suite": "foo", "expected_runtime_in_seconds": 1.2}
+{"data": "test/BarTest.php", "suite": "bar", "expected_runtime_in_seconds": 0.1}
 ```
 
 The fields in a Unit are:
 * `data`: Arbitrary string that will be passed as an argument to `runner-run-units` (described later). In the most common case, this is the name of a test file that needs to be run. **Must be unique.**
+* `suite` (optional): If specified, Privet will only run units with the same value for `suite` together. This can be used, for example, to make sure that unit tests are never run in tandem with functional tests, to avoid tainting the environment.
 * `expected_runtime_in_seconds` (optional): If present, Privet will attempt to group tests into uniformally sized chunks in an attempt to create an even runtime.
 
 ### runner-hook-startup (optional)

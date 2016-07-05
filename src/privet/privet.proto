@@ -10,6 +10,7 @@ service JobMaster {
 message Unit {
   string data = 1;
   double expected_runtime_in_seconds = 2;
+  string suite = 3;
 }
 
 message CommandResult {
