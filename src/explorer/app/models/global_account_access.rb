@@ -1,4 +1,4 @@
-class GlobalAccount < ActiveRecord::Base
+class GlobalAccountAccess < ActiveRecord::Base
   establish_connection(
     adapter:  "mysql2",
     host:     Datacenter.current_global_config.hostname,
@@ -6,10 +6,10 @@ class GlobalAccount < ActiveRecord::Base
     password: Datacenter.current_global_config.password,
     database: Datacenter.current_global_config.name
   )
-  self.table_name = "global_account"
-  self.inheritance_column = nil
+  self.table_name = "global_account_access"
 
-  def to_s
-    "#{company} #{shard_id}/#{id}"
+  def self.authorized?(account_id)
+    where(role: Rails.application.config.x.support_role, account_id: account_id)
+      .where("expires_at IS NULL OR expires_at > NOW()").count > 0
   end
 end
