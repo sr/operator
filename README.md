@@ -138,3 +138,26 @@ extension as a double quoted string to the `hubot-scripts.json` file in this
 repo.
 
 [hubot-scripts]: https://github.com/github/hubot-scripts
+
+### Running Quotes DB Locally
+
+Start up the mysql instance inside the parbot directory
+
+```
+mysql.server start
+```
+
+If you don't see the `parbot_development` database in mysql try editing `DATABASE_URL` in `.env` to:
+
+```
+DATABASE_URL="mysql://root:@localhost/parbot_development?socketPath=/tmp/mysql.sock&multipleStatements=true"
+```
+
+Then update and migrate:
+
+```
+script/update
+script/migrate
+```
+
+
