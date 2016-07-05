@@ -139,8 +139,10 @@ module.exports = (robot) ->
           distance = data?.rows[0]?.elements[0]?.distance?.value
 
           if data?.rows[0]?.elements[0]?.duration_in_traffic
+            # get duration in traffic if available
             duration = data?.rows[0]?.elements[0]?.duration_in_traffic?.text
             duration = data?.rows[0]?.elements[0]?.duration?.text
+
           if sol and typeof duration isnt 'undefined'
             solconst = 299792458
             # calculate time from speed of light
@@ -152,14 +154,30 @@ module.exports = (robot) ->
           else if typeof duration is 'undefined'
             msg.send "There is no #{if sol then '(lightning)' else 'driving'} route between #{secondloc} and the office. (sadpanda)"
           else
+            # create google maps direction url
+            start = data.origin_addresses[0].replace(/\s/g, '+')
+            end = data.destination_addresses[0].replace(/\s/g, '+')
+            dirurl = "https://www.google.com/maps/dir/#{start}/#{end}"
+
+            # build up reply message
             reply = 'To get to '
+
+            reply += "<a name=\"Google Maps Directions\" href=\"#{dirurl}\">"
             reply += "#{data.destination_addresses[0]} from the office"
-            reply += if sol then " (#{disttext}) at the speed of light (fastparrot)" else ''
-            reply += if departurereply and not sol then ", leaving at #{departurereply}" else ''
-            reply += ", it will take #{duration}"
-            reply += if sol then " seconds. (lightning)" else ". (drivinginmytruck)"
-            if not sol
-              start = data.origin_addresses[0].replace(/\s/g, '+')
-              end = data.destination_addresses[0].replace(/\s/g, '+')
-              reply += "\nMap Link https://www.google.com/maps/dir/#{start}/#{end}"
-            msg.send reply
+            reply += "</a>"
+
+            if sol
+              reply += " (#{disttext}) at the speed of light "
+              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/fastparrot-1462906216.gif\">"
+              reply += " it will take #{duration} seconds. "
+              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/lightning-1448383433.png\">"
+            else
+              reply += if departurereply then ", leaving at #{departurereply}" else ''
+              reply += ", it will take #{duration}. "
+              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/drivinginmytruck-1452626743.png\">"
+
+            msg.hipchatNotify("#{reply}", {
+              notify: false,
+              color: "yellow"
+            })
+
