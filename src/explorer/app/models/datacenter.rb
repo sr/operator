@@ -17,6 +17,10 @@ class Datacenter
     )
   end
 
+  def self.current_global_config
+    current.__send__(:global_config)
+  end
+
   def initialize(name, config)
     @name = name
     @config = config
@@ -34,10 +38,6 @@ class Datacenter
     Database.new(config)
   end
 
-  def global_config
-    @config.global(@name)
-  end
-
   def shard_for(account_id)
     account = GlobalAccount.find(account_id)
     config = @config.shard(@name, account.shard_id)
@@ -45,14 +45,9 @@ class Datacenter
     Database.new(config)
   end
 
-  def account_access_enabled?(account_id)
-    query = <<-SQL.freeze
-      SELECT id FROM global_account_access
-      WHERE role = ? AND account_id = ? AND (expires_at IS NULL OR expires_at > NOW())
-      LIMIT 1
-    SQL
+  private
 
-    results = global.execute(query, [Rails.application.config.x.support_role, account_id])
-    results.size == 1
+  def global_config
+    @config.global(@name)
   end
 end
