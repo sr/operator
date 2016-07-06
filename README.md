@@ -160,4 +160,33 @@ script/update
 script/migrate
 ```
 
+### Running Your Local Parbot in Hipchat
 
+These are the environemt variables you will need to set as exports in `script/server`
+
+```
+export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
+export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
+export HUBOT_HIPCHAT_JID="<your JabberId>"
+export HUBOT_HIPCHAT_PASSWORD="<your password>"
+export HUBOT_HIPCHAT_ROOMS="<JabberId of rooms you want the bot to join>"
+export HUBOT_HIPCHAT_TOKEN="<hipchat token>"
+```
+
+You can find your JabberId and Room JabberIds here: https://hipchat.dev.pardot.com/account/xmpp
+
+Make sure the room JabberIds end with `@conf.btf.hipchat.com`.
+Most of the bots are tested in `1_bottest@conf.btf.hipchat.com` the Bot Testing Lab
+
+You can get a hipchat token from here: https://hipchat.dev.pardot.com/account/api .
+You will need to create your own token and you'll probably want to allow all the scopes.
+
+Then after all those are setup you should be able to run it locally with
+
+```
+script/server --adapter hipchat
+```
+
+Keep in mind that your local bot will be represented by you in hipchat.
+You will not be able to call functions on yourself.
+You may want to use the `!echo <args>` function of Parbot so that Parbot will echo out your commands and then your local bot will respond.
