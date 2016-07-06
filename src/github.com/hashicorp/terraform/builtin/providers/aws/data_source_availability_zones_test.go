@@ -52,7 +52,7 @@ func testAccCheckAwsAvailabilityZonesMeta(n string) resource.TestCheckFunc {
 }
 
 func testAccCheckAwsAvailabilityZonesBuildAvailable(attrs map[string]string) ([]string, error) {
-	v, ok := attrs["names.#"]
+	v, ok := attrs["instance.#"]
 	if !ok {
 		return nil, fmt.Errorf("Available AZ list is missing")
 	}
@@ -65,7 +65,7 @@ func testAccCheckAwsAvailabilityZonesBuildAvailable(attrs map[string]string) ([]
 	}
 	zones := make([]string, qty)
 	for n := range zones {
-		zone, ok := attrs["names."+strconv.Itoa(n)]
+		zone, ok := attrs["instance."+strconv.Itoa(n)]
 		if !ok {
 			return nil, fmt.Errorf("AZ list corrupt, this is definitely a bug")
 		}

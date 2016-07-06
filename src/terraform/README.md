@@ -37,7 +37,7 @@ vim terraform.tfvars # fill in the things you need
 Generally you want to first run Terraform in plan mode. It'll tell you what it _would_ do you if you applied the plan:
 
 ```bash
-make plan DIR=aws/pardotops
+terra plan aws/pardotops
 ```
 
 ## Applying
@@ -45,5 +45,7 @@ make plan DIR=aws/pardotops
 When your plan looks good, apply it:
 
 ```bash
-make apply DIR=aws/pardotops
+terra apply aws/pardotops
 ```
+
+Checkout `terra --help` for other available commands.

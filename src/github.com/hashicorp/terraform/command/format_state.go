@@ -111,7 +111,7 @@ func formatStateModuleExpand(
 		}
 
 		taintStr := ""
-		if rs.Primary != nil && rs.Primary.Tainted {
+		if rs.Primary.Tainted {
 			taintStr = " (tainted)"
 		}
 
