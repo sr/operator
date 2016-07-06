@@ -104,6 +104,9 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
 
+  robot.respond /dumpsterfire$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/162/71ixUc3gH6lnWLC/upload.png"
+
   robot.respond /parker$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/22/OLA4jR5fndLrjPt/i%27m%20so%20sorry%20parker.gif"
 
