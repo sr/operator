@@ -60,7 +60,7 @@ class ChefDeploy < ActiveRecord::Base
   end
 
   def start
-    if ![ChefDelivery::NONE, ChefDelivery::LOCKED].include?(state)
+    if ![ChefDelivery::NONE, ChefDelivery::LOCKED, ChefDelivery::FAILURE].include?(state)
       raise ChefDelivery::Error, "bad start state transition: #{inspect}"
     end
 
