@@ -1,4 +1,5 @@
 *.sync.tmp
+/etc/secrets
 /src/**/log/*.log
 /src/**/tmp
 /src/**/.bundle
