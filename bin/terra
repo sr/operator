@@ -32,8 +32,8 @@ case "$action" in
 
         if [ -z "$HIPCHAT_TOKEN" ]; then
             printf "%s: required environment variable missing: HIPCHAT_TOKEN\n" "$PROGRAM" 2>&1
-            echo "Please find it on https://secrets.ops.pardot.com (search for TODO)" \
-                "and add it to your shell environment." 2>&1
+            printf "Please create one here and it to the shell environment: %s\n" \
+                "https://hipchat.dev.pardot.com/account/api" 2>&1
             exit 1
         fi
 
