@@ -1,6 +1,9 @@
 package bread
 
-import "github.com/sr/operator"
+import (
+	"github.com/sr/operator"
+	"google.golang.org/grpc"
+)
 
 const (
 	HipchatHost = "https://hipchat.dev.pardot.com"
@@ -8,6 +11,13 @@ const (
 	PublicRoom  = 42  // Build & Automate
 )
 
-func NewLDAPAuthorizer() operator.Authorizer {
-	return &ldapAuthorizer{}
+func NewOperatorServer(logger operator.Logger) *grpc.Server {
+	return grpc.NewServer(
+		grpc.UnaryInterceptor(
+			operator.NewInterceptor(
+				operator.NewInstrumenter(logger),
+				newLDAPAuthorizer(),
+			),
+		),
+	)
 }
