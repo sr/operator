@@ -29,40 +29,7 @@ module.exports = (robot) ->
           incidents = data.resourceSets[0].resources
           incidentStr = ''
           for i in [0..incidents.length - 1]
-            if incidents[i]
-              incident = incidents[i]
-              if incident.verified && description != "" 
-                type = switch
-                         when incident.type is 1 then "Accident"
-                         when incident.type is 2 then "Congestion"
-                         when incident.type is 3 then "Disabled Vehicle"
-                         when incident.type is 4 then "Mass Transit"
-                         when incident.type is 5 then "Miscellaneous"
-                         when incident.type is 6 then "Other News"
-                         when incident.type is 7 then "Planned Event"
-                         when incident.type is 8 then "Road Hazard"
-                         when incident.type is 9 then "Construction"
-                         when incident.type is 10 then "Alert"
-                         when incident.type is 11 then "Weather"
-                         else "Unknown"
-                
-                lane = if incident.lane is not "" then incident.lane else null
-                
-                description = incident.description
-                description += " (#{type}"
-                if lane
-                  description += ", Lane: #{lane}"
-                if incident.roadClosed
-                  description += ", Road is closed"
-                description += ")"           
-
-                if incident?.point?.coordinates
-                  lat = incident.point.coordinates[0]
-                  lon = incident.point.coordinates[1]
-                  url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
-                  incidentStr += "<a name=\"Google Maps Traffic Report\" href=\"#{url}\">#{description}</a><br>" 
-                else 
-                  incidentStr += "#{description}<br>"
+            incidentStr += getIncidentDescription(incidents[i]) 
 
           if incidentStr != ''
             msg.hipchatNotify("#{incidentStr}<img src=\"#{imageUrl}\">", {
@@ -77,6 +44,49 @@ module.exports = (robot) ->
             })
         else
           msg.send "#{imageUrl}"
+
+  getIncidentDescription = (incident) ->
+    # check all requirements for this method
+    if not incident or 
+       not incident.verified or 
+       not incident.description or
+       incident.description == ""
+      return ''
+
+    type = switch incident.type
+      when 1 then "Accident"
+      when 2 then "Congestion"
+      when 3 then "Disabled Vehicle"
+      when 4 then "Mass Transit"
+      when 5 then "Miscellaneous"
+      when 6 then "Other News"
+      when 7 then "Planned Event"
+      when 8 then "Road Hazard"
+      when 9 then "Construction"
+      when 10 then "Alert"
+      when 11 then "Weather"
+      else "Unknown"
+                    
+    description = incident.description
+    
+    # add extra info in parentheses
+    search = description.search "#{type}"
+    info = if search == -1 then "#{type}" else ''
+    if incident.lane and incident.lane != "" 
+      info += if info == '' then "Lane: #{incident.lane}" else ", Lane: #{incident.lane}"
+    if incident.roadClosed
+      info += if info == '' then "Road is closed" else ", Road is closed"
+    description += if info != '' then " (#{info})" else '' 
+    
+    # link to a google maps traffic view if available
+    if incident?.point?.coordinates
+      lat = incident.point.coordinates[0]
+      lon = incident.point.coordinates[1]
+      url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
+      return "<a title=\"Google Maps Traffic Overview\" href=\"#{url}\">#{description}</a><br>" 
+    else 
+      return "#{description}<br>"
+
 
   robot.respond /traveltime(?:\s+at\s*(?:the\s*)?(\d{1,2}|sol|c|speed\s*of\s*light|warp\s*speed)(?::(\d{2}))?(pm|am)?)?(?:\s*to)?\s+(.*)$/i, (msg) ->
     if not msg.match[4]
