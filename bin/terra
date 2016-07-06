@@ -70,6 +70,7 @@ case "$action" in
         breadsignal -terraform "$action" \
             -terraform-version "$(terraform version)" \
             -branch "$(git rev-parse --abbrev-ref HEAD)" \
+            -terraform-path "${account}" \
             -testing=false
         make -f ../../etc/mk/terraform.mk "$action" |
         grep -vi password
