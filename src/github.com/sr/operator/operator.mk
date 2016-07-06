@@ -22,7 +22,7 @@ SVC_SRC ?= $(shell find $(SVC_DIR) -type f -name "*.proto" -o -name "*.go")
 
 OPERATOR_IMPORT_PATH ?= github.com/sr/operator/chatoops/services
 
-operator-generate: $(OPERATORC)
+operator-generate: $(OPERATORC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD) $(PROTOC_GEN_OPERATORHUBOT)
 	$< \
 		-import-path $(OPERATOR_IMPORT_PATH) \
 		-cmd-out $(shell dirname $(OPERATORCTL_GEN_SRC)) \
