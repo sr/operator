@@ -98,7 +98,7 @@ case "$project" in
 
         test -n "$CI" && {
           cd "bin"
-          CI_JOB="privet"
+          CI_JOB="PRIV"
           export CI_JOB
           tarball="$(tarball-build "privet")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
