@@ -1,7 +1,7 @@
 # Description
 #   A hubot script returning you the traffic time from the office to a given address or view current Atlanta traffic.
 # Commands
-#   hubot traffic - returns image of current traffic conditions in Atlanta
+#   hubot traffic (map|incidents) - returns current traffic conditions in Atlanta
 #   hubot traveltime (at <departure_time>) (to) <location> - returns travel time to location from the office, default departure time is now
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
@@ -10,14 +10,26 @@
 moment = require('moment')
 
 module.exports = (robot) ->
-  robot.respond /traffic$/i, (msg) ->
+  robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
+
+    # determines if it should just show the map or just show the incidents
+    # default is to show both
+    mode = msg.match[1] ? ''
+
     bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
-    
+
     # traffice image
     imageUrl = "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=#{bingkey}"
+    if mode is 'map'
+      html = "<img src=\"#{imageUrl}\">"
+      msg.hipchatNotify("#{html}", {
+        notify: false,
+        color: "yellow"
+      })
+      return
     
     # traffic descriptions
-    url  = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.5,-84.6,34.15,-84.1"
+    url = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.45,-84.70,34.11,-83.91"
     msg.http(url)
       .query({
         severity: "2,3,4",
@@ -33,19 +45,29 @@ module.exports = (robot) ->
           for i in [0..incidents.length - 1]
             incidentStr += getIncidentDescription(incidents[i]) 
 
-          if incidentStr != ''
-            msg.hipchatNotify("#{incidentStr}<img src=\"#{imageUrl}\">", {
-              notify: false,
-              color: "red"
-            })
-          else 
-            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=\"#{imageUrl}\">"
-            msg.hipchatNotify("#{html}", {
-              notify: false,
-              color: "green"
-            })
+          msg.send JSON.stringify data
+
+          html = ''
+          if incidentStr isnt ''
+            html = "#{incidentStr}"
+            color = 'red'
+          else
+            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\">"
+            color = 'green'
+          if mode isnt 'incidents'
+            html += "<br><img src=\"#{imageUrl}\">"
+
+          msg.hipchatNotify("#{html}", {
+            notify: false,
+            color: "#{color}"
+          })
+
         else
-          msg.send "#{imageUrl}"
+          html = "<img src=\"#{imageUrl}\">"
+          msg.hipchatNotify("#{html}", {
+            notify: false,
+            color: "yellow"
+          })
 
   getIncidentDescription = (incident) ->
     # check all requirements for this method
