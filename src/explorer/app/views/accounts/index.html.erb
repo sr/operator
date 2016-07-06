@@ -8,6 +8,11 @@
 </div>
 <% end %>
 
+<%= form_tag(accounts_path, method: :get, enforce_utf8: false, ) do %>
+  <%= label_tag(:q, "Search for:") %>
+  <%= text_field_tag(:q, params[:q]) %>
+  <%= submit_tag("Search", name: nil) %>
+<% end %>
 <p>
 <ul>
 <% accounts.each do |account| %>
