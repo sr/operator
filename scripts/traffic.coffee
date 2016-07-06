@@ -7,6 +7,8 @@
 #   Akshay Easwaran <aeaswaran@salesforce.com>
 #
 
+moment = require('moment')
+
 module.exports = (robot) ->
   robot.respond /traffic$/i, (msg) ->
     bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
@@ -109,8 +111,7 @@ module.exports = (robot) ->
 
     if depdate > curdate
       departure = depdate.getTime()
-      departurereply = depdate.toLocaleTimeString('en-US',
-        {hour: 'numeric', minute: 'numeric'})
+      departurereply = moment(depdate).format("h:mm A")
     else
       departure = curdate.getTime()
 
