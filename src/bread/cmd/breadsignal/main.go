@@ -23,6 +23,7 @@ func main() {
 func run() error {
 	terraformAction := flag.String("terraform", "", "Notify the BREAD team of a terraform actions (either plan or apply)")
 	terraformVersion := flag.String("terraform-version", "", "Installed terraform version")
+	terraformPath := flag.String("terraform-path", "", "the path being acted upon")
 	gitBranch := flag.String("branch", "unknown", "Checked out BREAD repo branch")
 	testing := flag.Bool("testing", true, "Send all notifications to the BREAD Testing room when true")
 	flag.Parse()
@@ -50,16 +51,18 @@ func run() error {
 	case "plan":
 		color = "gray"
 		message = fmt.Sprintf(
-			"planning terraform changes on branch <code>%s</code> with <code>%s</code>",
+			"planning terraform changes on branch <code>%s</code> with <code>%s</code> to terraform path <code>%s</code>",
 			*gitBranch,
 			*terraformVersion,
+			*terraformPath,
 		)
 	case "apply":
 		color = "yellow"
 		message = fmt.Sprintf(
-			"deploying terraform branch <code>%s</code> with <code>%s</code>",
+			"deploying terraform branch <code>%s</code> with <code>%s</code> to terraform path <code>%s</code>",
 			*gitBranch,
 			*terraformVersion,
+			*terraformPath,
 		)
 	default:
 		return nil
