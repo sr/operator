@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/user"
 )
 
 func main() {
@@ -37,10 +36,6 @@ func run() error {
 	if !ok {
 		return errors.New("required environment variable missing: HIPCHAT_TOKEN")
 	}
-	whoami, err := user.Current()
-	if err != nil {
-		return err
-	}
 	var (
 		color   string
 		message string
@@ -55,16 +50,14 @@ func run() error {
 	case "plan":
 		color = "gray"
 		message = fmt.Sprintf(
-			"%s is planning terraform changes on branch <code>%s</code> with <code>%s</code>",
-			whoami.Username,
+			"planning terraform changes on branch <code>%s</code> with <code>%s</code>",
 			*gitBranch,
 			*terraformVersion,
 		)
 	case "apply":
 		color = "yellow"
 		message = fmt.Sprintf(
-			"%s is deploying terraform branch <code>%s</code> with <code>%s</code>",
-			whoami.Username,
+			"deploying terraform branch <code>%s</code> with <code>%s</code>",
 			*gitBranch,
 			*terraformVersion,
 		)
