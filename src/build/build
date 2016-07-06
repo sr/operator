@@ -138,12 +138,6 @@ case "$project" in
             build/build \
             terra validate
         ;;
-    # TODO(sr) Decide what to do about vendored Go code. I think building
-    # it might be worthwhile still, just not with the same level of
-    # attention as for our own code, so no linting etc.
-    vendor)
-        true
-        ;;
     *)
         echo "No build rule defined for project \"$project\"." 2>&1
         exit 1
