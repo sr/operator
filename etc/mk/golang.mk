@@ -13,7 +13,7 @@ TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 all: deadleaves fmt lint vet errcheck install interfacer unused
 
 install:
-	$(GO) install -race -v ./...
+	$(GO) install -race -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
 
 clean:
 	$(GO) clean -i ./...
