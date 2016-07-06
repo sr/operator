@@ -40,7 +40,6 @@ type Dashboard struct {
 	Title             string             `json:"title"`
 	Graphs            []Graph            `json:"graphs"`
 	TemplateVariables []TemplateVariable `json:"template_variables,omitempty"`
-	ReadOnly          bool               `json:"read_only"`
 }
 
 // DashboardLite represents a user created dashboard. This is the mini

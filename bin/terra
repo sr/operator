@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#/ Usage: terra [--help] [arguments...]
+#/        terra plan <account>
+#/        terra apply <account>
+#/        terra vendor <version>
+#/        terra validate
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+: "${PROGRAM:="$(basename "$0")"}"
+: "${HIPCHAT_TOKEN:=""}"
+
+print_help() {
+    grep ^#/ <"$0" |cut -c4-
+}
+
+if [ "$#" -eq 0 ]; then
+    print_help
+    exit 2
+fi
+
+action="${1:-""}"
+arg1="${2:-""}"
+
+case "$action" in
+    apply|plan)
+        account="$arg1"
+        if [ -z "$account" ]; then
+            printf "%s: required argument missing: account\n" "$PROGRAM" 2>&1
+            exit 1
+        fi
+
+        if [ -z "$HIPCHAT_TOKEN" ]; then
+            printf "%s: required environment variable missing: HIPCHAT_TOKEN\n" "$PROGRAM" 2>&1
+            printf "Please create one here and it to the shell environment: %s\n" \
+                "https://hipchat.dev.pardot.com/account/api" 2>&1
+            exit 1
+        fi
+
+        if ! test -d "src/terraform/${account}"; then
+            printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
+            exit 1
+        fi
+
+        artifactoryenv="src/terraform/artifactory.env"
+        if ! test -f "$artifactoryenv"; then
+            printf "%s: file %s is required. Please see %s.sample for an example.\n" \
+                "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
+            exit 1
+        fi
+
+        tfvars="src/terraform/terraform.tfvars"
+        if ! test -f "$tfvars"; then
+            printf "%s: file %s is required. Please see %s.sample for an example.\n" \
+                "$PROGRAM" "$tfvars" "$tfvars" 2>&1
+            exit 1
+        fi
+
+        TERRAFORM_DIR="$account"
+        TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
+        TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
+        export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
+
+        GIT_DIR="$(pwd)/.git"
+        export GIT_DIR
+        branch="$(git rev-parse --abbrev-ref HEAD)"
+
+        cd src/terraform
+        go install bread/cmd/breadsignal
+        breadsignal -terraform "$action" \
+            -terraform-version "$(terraform version)" \
+            -branch "$(git rev-parse --abbrev-ref HEAD)" \
+            -testing=false
+        make -f ../../etc/mk/terraform.mk "$action" |
+        grep -vi password
+        ;;
+    validate)
+        cd src/terraform && make -f ../../etc/mk/terraform.mk validate
+        exit 0
+        ;;
+    vendor)
+        if [ -z "$arg1" ]; then
+            printf "%s: required argument missing: version\n" "$PROGRAM" 2>&1
+            exit 1
+        fi
+
+        version="$arg1"
+        archiveurl="https://github.com/hashicorp/terraform/archive/v${version}.tar.gz"
+        archivedir="$(mktemp -d "terraformXXX")"
+        vendordir="src/github.com/hashicorp/terraform"
+        trap 'rm -rf $archivedir' EXIT
+
+        rm -rf "$vendordir"
+        mkdir -p "src/github.com/hashicorp"
+        curl -fsSL "$archiveurl" | tar -xvz -C "$archivedir"
+        mv "${archivedir}/terraform-${arg1}" "$vendordir"
+
+        echo "Vendored terraform version ${version} to $vendordir" 2>&1
+        exit 0
+        ;;
+    *)
+        print_help
+        exit 2
+        ;;
+esac

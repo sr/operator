@@ -104,7 +104,8 @@ func run() error {
 			issue.Fields.Summary,
 		)
 		if apply {
-			req, err := http.NewRequest("POST", "/rest/api/2/issue/"+issue.ID+"/transitions", nil)
+			req, err := http.NewRequest("POST", jiraURL+"/rest/api/2/issue/"+issue.ID+"/transitions", nil)
+			req.Header.Set("Content-Type", "application/json")
 			if err != nil {
 				return err
 			}
@@ -127,12 +128,8 @@ func run() error {
 					"id": "%d"
 				}
 			}`, comment, transitionID)))
-			if r, err := client.Do(req); err != nil {
-				s, e := ioutil.ReadAll(r.Body)
-				if e != nil {
-					return e
-				}
-				return fmt.Errorf("failed to close issue. body: %s", string(s))
+			if _, err := client.Do(req); err != nil {
+				return fmt.Errorf("failed to close issue: %v", err)
 			}
 		}
 	}
