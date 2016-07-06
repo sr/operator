@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "operator.proto";
+
+option go_package = "breaddeploy";
+
+package deploy;
+
+service Deploy {
+  option (operator.name) = "deploy";
+
+  rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
+  rpc Trigger(TriggerRequest) returns (TriggerResponse);
+}
+
+message DeployConfig {
+  string AwsRegion = 1;
+  string CanoeEcsService = 2;
+  string DeployTimeout = 3;
+}
+
+message ListAppsRequest {
+  operator.Source source = 1;
+}
+
+message ListAppsResponse {
+  operator.Output output = 1;
+}
+
+message TriggerRequest {
+  operator.Source source = 1;
+  string app = 2;
+  string build = 3;
+}
+
+message TriggerResponse {
+  operator.Output output = 1;
+}

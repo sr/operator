@@ -7,8 +7,9 @@ import (
 	"io"
 	"os"
 
-	bread "bread/svc/bread"
-	pinger "bread/svc/ping"
+	bamboo "bread/bamboo"
+	deploy "bread/deploy"
+	pinger "bread/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -19,38 +20,12 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "bread",
+			Name:     "ci",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "list-apps",
-					Synopsis: `Undocumented.`,
-					Flags:    []*flag.Flag{},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := bread.NewBreadClient(conn)
-						response, err := client.ListApps(
-							context.Background(),
-							&bread.ListAppsRequest{
-								Source: ctx.Source,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-				{
 					Name:     "list-builds",
-					Synopsis: `List up to 10 most recent BREAD builds.`,
+					Synopsis: `Undocumented.`,
 					Flags: []*flag.Flag{
 						{
 							Name:  "plan",
@@ -67,10 +42,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := bread.NewBreadClient(conn)
+						client := ci.NewBambooClient(conn)
 						response, err := client.ListBuilds(
 							context.Background(),
-							&bread.ListBuildsRequest{
+							&ci.ListBuildsRequest{
 								Source: ctx.Source,
 								Plan:   *plan,
 							},
@@ -81,8 +56,41 @@ var cmd = operator.NewCommand(
 						return response.Output.PlainText, nil
 					},
 				},
+			},
+		},
+
+		{
+			Name:     "deploy",
+			Synopsis: `Undocumented.`,
+			Methods: []operator.MethodCommand{
 				{
-					Name:     "ecs-deploy",
+					Name:     "list-apps",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := deploy.NewDeployClient(conn)
+						response, err := client.ListApps(
+							context.Background(),
+							&deploy.ListAppsRequest{
+								Source: ctx.Source,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return response.Output.PlainText, nil
+					},
+				},
+				{
+					Name:     "trigger",
 					Synopsis: `Undocumented.`,
 					Flags: []*flag.Flag{
 						{
@@ -105,10 +113,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := bread.NewBreadClient(conn)
-						response, err := client.EcsDeploy(
+						client := deploy.NewDeployClient(conn)
+						response, err := client.Trigger(
 							context.Background(),
-							&bread.EcsDeployRequest{
+							&deploy.TriggerRequest{
 								Source: ctx.Source,
 								App:    *app,
 								Build:  *build,

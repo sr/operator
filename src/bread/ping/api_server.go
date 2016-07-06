@@ -1,4 +1,4 @@
-package pinger
+package breadpinger
 
 import (
 	"github.com/sr/operator"

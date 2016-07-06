@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "operator.proto";
+
+option go_package = "breadbamboo";
+
+package bamboo;
+
+service Bamboo {
+  option (operator.name) = "ci";
+
+  rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
+}
+
+message BambooConfig {
+  string BambooUsername = 5;
+  string BambooPassword = 6;
+  string BambooUrl = 7;
+}
+
+message ListBuildsRequest {
+  operator.Source source = 1;
+  string plan = 2;
+}
+
+message ListBuildsResponse {
+  operator.Output output = 1;
+}

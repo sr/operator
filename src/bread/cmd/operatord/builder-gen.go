@@ -9,54 +9,67 @@ import (
 
 	"google.golang.org/grpc"
 
-	"bread/svc/bread"
-	"bread/svc/ping"
+	bamboo "bread/bamboo"
+	deploy "bread/deploy"
+	pinger "bread/ping"
 )
 
 func buildOperatorServer(
 	server *grpc.Server,
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
-	breadConfig := &bread.BreadConfig{}
+	ciConfig := &bamboo.BambooConfig{}
+	deployConfig := &deploy.DeployConfig{}
 	pingerConfig := &pinger.PingerConfig{}
-	flags.StringVar(&breadConfig.AwsRegion, "bread-AwsRegion", "", "")
-	flags.StringVar(&breadConfig.CanoeEcsService, "bread-CanoeEcsService", "", "")
-	flags.StringVar(&breadConfig.DeployTimeout, "bread-DeployTimeout", "", "")
-	flags.StringVar(&breadConfig.BambooUsername, "bread-BambooUsername", "", "")
-	flags.StringVar(&breadConfig.BambooPassword, "bread-BambooPassword", "", "")
-	flags.StringVar(&breadConfig.BambooUrl, "bread-BambooUrl", "", "")
+	flags.StringVar(&ciConfig.BambooUsername, "ci-BambooUsername", "", "")
+	flags.StringVar(&ciConfig.BambooPassword, "ci-BambooPassword", "", "")
+	flags.StringVar(&ciConfig.BambooUrl, "ci-BambooUrl", "", "")
+	flags.StringVar(&deployConfig.AwsRegion, "deploy-AwsRegion", "", "")
+	flags.StringVar(&deployConfig.CanoeEcsService, "deploy-CanoeEcsService", "", "")
+	flags.StringVar(&deployConfig.DeployTimeout, "deploy-DeployTimeout", "", "")
 	services := make(map[string]error)
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return services, err
 	}
 	errs := make(map[string][]string)
-	if breadConfig.AwsRegion == "" {
-		errs["bread"] = append(errs["bread"], "AwsRegion")
+	if ciConfig.BambooUsername == "" {
+		errs["ci"] = append(errs["ci"], "BambooUsername")
 	}
-	if breadConfig.CanoeEcsService == "" {
-		errs["bread"] = append(errs["bread"], "CanoeEcsService")
+	if ciConfig.BambooPassword == "" {
+		errs["ci"] = append(errs["ci"], "BambooPassword")
 	}
-	if breadConfig.DeployTimeout == "" {
-		errs["bread"] = append(errs["bread"], "DeployTimeout")
+	if ciConfig.BambooUrl == "" {
+		errs["ci"] = append(errs["ci"], "BambooUrl")
 	}
-	if breadConfig.BambooUsername == "" {
-		errs["bread"] = append(errs["bread"], "BambooUsername")
+	if deployConfig.AwsRegion == "" {
+		errs["deploy"] = append(errs["deploy"], "AwsRegion")
 	}
-	if breadConfig.BambooPassword == "" {
-		errs["bread"] = append(errs["bread"], "BambooPassword")
+	if deployConfig.CanoeEcsService == "" {
+		errs["deploy"] = append(errs["deploy"], "CanoeEcsService")
 	}
-	if breadConfig.BambooUrl == "" {
-		errs["bread"] = append(errs["bread"], "BambooUrl")
+	if deployConfig.DeployTimeout == "" {
+		errs["deploy"] = append(errs["deploy"], "DeployTimeout")
 	}
-	if len(errs["bread"]) != 0 {
-		services["bread"] = errors.New("required flag(s) missing: " + strings.Join(errs["bread"], ", "))
+	if len(errs["ci"]) != 0 {
+		services["ci"] = errors.New("required flag(s) missing: " + strings.Join(errs["ci"], ", "))
 	} else {
-		breadServer, err := bread.NewAPIServer(breadConfig)
+		ciServer, err := bamboo.NewAPIServer(ciConfig)
 		if err != nil {
-			services["bread"] = err
+			services["ci"] = err
 		} else {
-			bread.RegisterBreadServer(server, breadServer)
-			services["bread"] = nil
+			bamboo.RegisterBambooServer(server, ciServer)
+			services["ci"] = nil
+		}
+	}
+	if len(errs["deploy"]) != 0 {
+		services["deploy"] = errors.New("required flag(s) missing: " + strings.Join(errs["deploy"], ", "))
+	} else {
+		deployServer, err := deploy.NewAPIServer(deployConfig)
+		if err != nil {
+			services["deploy"] = err
+		} else {
+			deploy.RegisterDeployServer(server, deployServer)
+			services["deploy"] = nil
 		}
 	}
 	if len(errs["pinger"]) != 0 {

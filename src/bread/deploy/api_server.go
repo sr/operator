@@ -1,14 +1,10 @@
-package bread
+package breaddeploy
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
@@ -20,12 +16,10 @@ import (
 const defaultPlan = "BREAD-BREAD"
 
 type apiServer struct {
-	ecs       *ecs.ECS
-	ecr       *ecr.ECR
-	bamboo    *http.Client
-	bambooURL *url.URL
-	apps      map[string]string
-	ecsSvc    string
+	ecs    *ecs.ECS
+	ecr    *ecr.ECR
+	apps   map[string]string
+	ecsSvc string
 }
 
 type parsedImg struct {
@@ -38,8 +32,6 @@ type parsedImg struct {
 func newAPIServer(
 	ecs *ecs.ECS,
 	ecr *ecr.ECR,
-	bamboo *http.Client,
-	bambooURL *url.URL,
 	apps map[string]string,
 	ecsSvc string,
 	_ int,
@@ -47,8 +39,6 @@ func newAPIServer(
 	return &apiServer{
 		ecs,
 		ecr,
-		bamboo,
-		bambooURL,
 		apps,
 		ecsSvc,
 	}, nil
@@ -68,58 +58,7 @@ func (s *apiServer) ListApps(ctx context.Context, in *ListAppsRequest) (*ListApp
 	}, nil
 }
 
-func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*ListBuildsResponse, error) {
-	var plan string
-	if in.Plan == "" {
-		plan = defaultPlan
-	} else {
-		plan = in.Plan
-	}
-	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s", s.bambooURL, plan))
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("bamboo request failed with status %d", resp.StatusCode)
-	}
-	var data struct {
-		Results struct {
-			Result []struct {
-				LifeCycleState string `json:"lifeCycleState"`
-				Key            string `json:"key"`
-			} `json:"result"`
-		} `json:"results"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	var (
-		out bytes.Buffer
-		w   tabwriter.Writer
-	)
-	w.Init(&out, 0, 4, 1, '\t', 0)
-	fmt.Fprintf(&w, "%s\t%s\t%s\n", "ID", "STATUS", "URL")
-	for _, build := range data.Results.Result {
-		fmt.Fprintf(
-			&w,
-			"%s\t%s\t%s\n",
-			build.Key,
-			build.LifeCycleState,
-			fmt.Sprintf("%s/%s", s.bambooURL, build.Key),
-		)
-	}
-	if err := w.Flush(); err != nil {
-		return nil, err
-	}
-	return &ListBuildsResponse{
-		Output: &operator.Output{
-			PlainText: out.String(),
-		},
-	}, nil
-}
-
-func (s *apiServer) EcsDeploy(ctx context.Context, in *EcsDeployRequest) (*EcsDeployResponse, error) {
+func (s *apiServer) Trigger(ctx context.Context, in *TriggerRequest) (*TriggerResponse, error) {
 	var cluster string
 	cluster, ok := s.apps[in.App]
 	if !ok {
@@ -207,7 +146,7 @@ OuterLoop:
 	if err != nil {
 		return nil, err
 	}
-	return &EcsDeployResponse{
+	return &TriggerResponse{
 		Output: &operator.Output{
 			PlainText: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
 		},
