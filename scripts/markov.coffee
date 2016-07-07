@@ -9,6 +9,7 @@
 #
 # Commands:
 #   hubot markov <text> - Generates text from the Markov model using a key found in <text>
+#   hubot reseedmarkov  - Reseed the markov object
 #
 # Author:
 #   Kelvin Chen
@@ -16,8 +17,13 @@
 Markov = require '../lib/markov'
 
 module.exports = (robot) ->
-	client = new Markov()
+  client = new Markov()
 
-	robot.respond /markov\s+(.*)$/i, (res) ->
-		client.generate res.match[1], (err, text) ->
-			res.send(text) if not err
+  robot.respond /markov\s+(.*)$/i, (res) ->
+    client.generateResponse(res.match[1])
+      .then (txt) -> res.send(txt)
+      .catch () -> res.send('An error has occured (sadpanda)')
+
+  robot.respond /reseedmarkov/i, (res) ->
+    client.reseed()
+    res.send 'Markov chain reseeded!'
