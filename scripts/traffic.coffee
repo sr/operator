@@ -8,8 +8,11 @@
 #
 
 moment = require('moment')
+scopedHttpClient = require "scoped-http-client"
+BING_KEY = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
 
 module.exports = (robot) ->
+
   robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
 
     # determines if it should just show the map or just show the incidents
@@ -19,24 +22,45 @@ module.exports = (robot) ->
     # if they just call incidents they probably want to see all of them
     severity = if mode is 'incidents' then '1,2,3,4' else '2,3,4'
 
-    bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
+    imageHost = "http://dev.virtualearth.net"
+    imagePath = "/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=325,325&mapLayer=TrafficFlow&format=png&key=#{BING_KEY}"
 
-    # traffice image
-    imageUrl = "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=#{bingkey}"
-    if mode is 'map'
-      html = "<img src=\"#{imageUrl}\">"
-      msg.hipchatNotify("#{html}", {
-        notify: false,
-        color: "yellow"
-      })
-      return
-    
+    if mode isnt 'map'
+      sendTrafficIncidents(severity, msg)
+    if mode isnt 'incidents'
+      shareImage(imageHost, imagePath, msg)
+  
+  # share the traffic image!
+  shareImage = (host, path, msg) ->
+    renderImage host, path, (err, buff) ->
+      if err
+        msg.send "Something went wrong"
+      else
+        title = "AtlantaTraffic#{moment(new Date()).format("h:mma")}.png"
+        msg.hipchatShareFile "#{title}", "image/png", buff, ''
+
+  # create a buffer for the image content
+  renderImage = (host, path, cb) ->
+    client = scopedHttpClient.create(host)
+    req = client.path(path)
+      .get (err, req) ->
+        if err?
+          cb(err, null) if cb
+        else
+          req.on "response", (res) ->
+            chunks = []
+            res.on "data", (chunk) -> chunks.push(chunk)
+            res.on "end", -> cb(null, Buffer.concat(chunks)) if cb
+          req.end()
+
+  # sends just the traffic incidents to hipchat
+  sendTrafficIncidents = (severity, msg) ->
     # traffic descriptions
     url = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.45,-84.70,34.11,-83.91"
     msg.http(url)
       .query({
         severity: "#{severity}",
-        key: "#{bingkey}"})
+        key: "#{BING_KEY}"})
       .get() (err, res, body) ->
         if err
           msg.send "Error: #{err}"
@@ -55,23 +79,14 @@ module.exports = (robot) ->
           else
             html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\">"
             color = 'green'
-          if mode isnt 'incidents'
-            html += "<br><img src=\"#{imageUrl}\">"
 
           msg.hipchatNotify("#{html}", {
             notify: false,
             color: "#{color}"
           })
-
-        else if mode isnt 'incidents'
-          html = "<img src=\"#{imageUrl}\">"
-          msg.hipchatNotify("#{html}", {
-            notify: false,
-            color: "yellow"
-          })
         else
-          msg.send "Not able to parse JSON"
-
+          msg.send "Not able to parse JSON for traffic incidents"
+ 
   getIncidentDescription = (incident) ->
     # check all requirements for this method
     if not incident or 

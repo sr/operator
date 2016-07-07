@@ -73,6 +73,35 @@ class Hipchat
           catch err
             cb(err, null) if cb
 
+  roomShareFile: (id, name, contentType, body, message, cb) ->
+    boundary = "boundaryb01de47883263ba880ae8e"
+
+    chunks = []
+    chunks.push(new Buffer("--#{boundary}\r\n"))
+    chunks.push(new Buffer("Content-Type: application/json; charset=UTF-8\r\n"))
+    chunks.push(new Buffer("Content-Disposition: attachment; name=\"metadata\"\r\n\r\n"))
+    chunks.push(new Buffer(JSON.stringify(message: message)))
+
+    chunks.push(new Buffer("\r\n--#{boundary}\r\n"))
+    chunks.push(new Buffer("Content-Type: #{contentType}\r\n"))
+    chunks.push(new Buffer("Content-Disposition: attachment; name=\"file\"; filename=\"#{name.replace('"', '\\"')}\"\r\n\r\n"))
+    chunks.push(body)
+    chunks.push(new Buffer("\r\n--#{boundary}--\r\n"))
+
+    requestBody = Buffer.concat(chunks)
+
+    @client.path("/v2/room/#{id}/share/file")
+      .header("content-type", "multipart/related; boundary=#{boundary}")
+      .post (err, req) ->
+        if err?
+          cb(err, null) if cb
+        else
+          req.on "response", (res) ->
+            chunks = []
+            res.on "data", (chunk) -> chunks.push(chunk)
+            res.on "end", -> cb(null, Buffer.concat(chunks)) if cb
+          req.end(requestBody)
+
 class JidMapping
   BRAIN_KEY = "hipchat-jid-mapping"
 
@@ -141,6 +170,16 @@ module.exports = (robot) ->
     else
       robot.send roomJid, text
 
+  hipchatRoomShareFile = (robot, roomJid, name, contentType, body, message, cb) ->
+    if roomId = mapping.get(roomJid)
+      hipchat.roomShareFile roomId, name, contentType, body, message, cb
+    else
+      console.log "Couldn't find ID mapping for #{roomJid}, falling back to normal message"
+      robot.send name
+      robot.send message
+      # robot.send doesn't offer a callback, so invoke it immediately (sadpanda)
+      cb(null) if cb
+
   robot.listenerMiddleware (context, next, done) ->
     # Adds the hipchatNotify function to the msg object in listeners
     context.response.hipchatNotify = (text, options) ->
@@ -149,5 +188,9 @@ module.exports = (robot) ->
     # Adds the hipchatNotifyRoom function to the msg object in listeners
     context.response.hipchatNotifyRoom = (roomJid, text, options) ->
       hipchatRoomNotify(robot, roomJid, text, options)
+
+    # Adds the hipchatShareFile function to the msg object in listeners
+    context.response.hipchatShareFile = (name, contentType, body, message, cb = null) ->
+      hipchatRoomShareFile(robot, context.response.envelope?.user?.reply_to, name, contentType, body, message, cb)
 
     next(done)
