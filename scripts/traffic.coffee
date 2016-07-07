@@ -16,6 +16,9 @@ module.exports = (robot) ->
     # default is to show both
     mode = msg.match[1] ? ''
 
+    # if they just call incidents they probably want to see all of them
+    severity = if mode is 'incidents' then '1,2,3,4' else '2,3,4'
+
     bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
 
     # traffice image
@@ -32,11 +35,11 @@ module.exports = (robot) ->
     url = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.45,-84.70,34.11,-83.91"
     msg.http(url)
       .query({
-        severity: "2,3,4",
+        severity: "#{severity}",
         key: "#{bingkey}"})
       .get() (err, res, body) ->
         if err
-          msg.send "#{imageUrl}"
+          msg.send "Error: #{err}"
           return
         data = JSON.parse body
         if data?.resourceSets[0]?.resources?
@@ -44,8 +47,6 @@ module.exports = (robot) ->
           incidentStr = ''
           for i in [0..incidents.length - 1]
             incidentStr += getIncidentDescription(incidents[i]) 
-
-          msg.send JSON.stringify data
 
           html = ''
           if incidentStr isnt ''
@@ -62,12 +63,14 @@ module.exports = (robot) ->
             color: "#{color}"
           })
 
-        else
+        else if mode isnt 'incidents'
           html = "<img src=\"#{imageUrl}\">"
           msg.hipchatNotify("#{html}", {
             notify: false,
             color: "yellow"
           })
+        else
+          msg.send "Not able to parse JSON"
 
   getIncidentDescription = (incident) ->
     # check all requirements for this method
