@@ -4,4 +4,4 @@ node_modules
 *.sqlite3
 .idea
 .idea/*
-script/server
+script/secrets.sh

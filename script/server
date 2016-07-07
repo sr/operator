@@ -10,13 +10,6 @@ export HUBOT_YUBIKEY_API_ID=24689
 export HUBOT_PAGERDUTY_SUBDOMAIN="pardot"
 export HUBOT_PAGERDUTY_SERVICES="PXVMR39,P0VDMCH"
 
-# uncomment these below to run your local bot in hipchat
-# checkout the README for more info
-# export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
-# export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
-# export HUBOT_HIPCHAT_JID="<your JabberId>"
-# export HUBOT_HIPCHAT_PASSWORD="<your password>"
-# export HUBOT_HIPCHAT_ROOMS="1_bottest@conf.btf.hipchat.com"
-# export HUBOT_HIPCHAT_TOKEN="<hipchat token>"
+test -f "$dir/script/secrets.sh" && source "$dir/script/secrets.sh"
 
 exec bin/hubot --alias '!' --disable-httpd "$@"
