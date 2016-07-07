@@ -257,7 +257,8 @@ module.exports = (robot) ->
       'http://66.media.tumblr.com/623a9bec56d41b46a81087a79eb3249c/tumblr_n5rkv3kyLU1tc0bnlo1_500.gif',
       'http://66.media.tumblr.com/595159f392d6497fe1224f3d4c59d961/tumblr_n6dobgl6wT1tc0bnlo1_500.gif',
       'http://66.media.tumblr.com/acfc022d906c10767278adc4b0bd0cb7/tumblr_n5q1wbEP1R1tc0bnlo1_500.gif',
-      'http://66.media.tumblr.com/95847806383c203e238b6cc88447ca06/tumblr_n5q3e7v3rl1tc0bnlo1_500.gif'
+      'http://66.media.tumblr.com/95847806383c203e238b6cc88447ca06/tumblr_n5q3e7v3rl1tc0bnlo1_500.gif',
+      'http://imgur.com/BWn4JhM'
     ]
     msg.send msg.random baguette
 
