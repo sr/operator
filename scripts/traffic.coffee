@@ -152,6 +152,7 @@ module.exports = (robot) ->
           if data?.rows[0]?.elements[0]?.duration_in_traffic
             # get duration in traffic if available
             duration = data?.rows[0]?.elements[0]?.duration_in_traffic?.text
+          else
             duration = data?.rows[0]?.elements[0]?.duration?.text
 
           if sol and typeof duration isnt 'undefined'
