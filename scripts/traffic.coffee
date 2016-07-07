@@ -1,30 +1,69 @@
 # Description
 #   A hubot script returning you the traffic time from the office to a given address or view current Atlanta traffic.
 # Commands
-#   hubot traffic - returns image of current traffic conditions in Atlanta
+#   hubot traffic (map|incidents) - returns current traffic conditions in Atlanta
 #   hubot traveltime (at <departure_time>) (to) <location> - returns travel time to location from the office, default departure time is now
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
 #
 
 moment = require('moment')
+scopedHttpClient = require "scoped-http-client"
+BING_KEY = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
 
 module.exports = (robot) ->
-  robot.respond /traffic$/i, (msg) ->
-    bingkey = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
-    
-    # traffice image
-    imageUrl = "http://dev.virtualearth.net/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=400,400&mapLayer=TrafficFlow&format=png&key=#{bingkey}"
-    
+
+  robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
+
+    # determines if it should just show the map or just show the incidents
+    # default is to show both
+    mode = msg.match[1] ? ''
+
+    # if they just call incidents they probably want to see all of them
+    severity = if mode is 'incidents' then '1,2,3,4' else '2,3,4'
+
+    imageHost = "http://dev.virtualearth.net"
+    imagePath = "/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=325,325&mapLayer=TrafficFlow&format=png&key=#{BING_KEY}"
+
+    if mode isnt 'map'
+      sendTrafficIncidents(severity, msg)
+    if mode isnt 'incidents'
+      shareImage(imageHost, imagePath, msg)
+  
+  # share the traffic image!
+  shareImage = (host, path, msg) ->
+    renderImage host, path, (err, buff) ->
+      if err
+        msg.send "Something went wrong"
+      else
+        title = "AtlantaTraffic#{moment(new Date()).format("h:mma")}.png"
+        msg.hipchatShareFile "#{title}", "image/png", buff, ''
+
+  # create a buffer for the image content
+  renderImage = (host, path, cb) ->
+    client = scopedHttpClient.create(host)
+    req = client.path(path)
+      .get (err, req) ->
+        if err?
+          cb(err, null) if cb
+        else
+          req.on "response", (res) ->
+            chunks = []
+            res.on "data", (chunk) -> chunks.push(chunk)
+            res.on "end", -> cb(null, Buffer.concat(chunks)) if cb
+          req.end()
+
+  # sends just the traffic incidents to hipchat
+  sendTrafficIncidents = (severity, msg) ->
     # traffic descriptions
-    url  = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.5,-84.6,34.15,-84.1"
+    url = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.45,-84.70,34.11,-83.91"
     msg.http(url)
       .query({
-        severity: "2,3,4",
-        key: "#{bingkey}"})
+        severity: "#{severity}",
+        key: "#{BING_KEY}"})
       .get() (err, res, body) ->
         if err
-          msg.send "#{imageUrl}"
+          msg.send "Error: #{err}"
           return
         data = JSON.parse body
         if data?.resourceSets[0]?.resources?
@@ -33,20 +72,21 @@ module.exports = (robot) ->
           for i in [0..incidents.length - 1]
             incidentStr += getIncidentDescription(incidents[i]) 
 
-          if incidentStr != ''
-            msg.hipchatNotify("#{incidentStr}<img src=\"#{imageUrl}\">", {
-              notify: false,
-              color: "red"
-            })
-          else 
-            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><img src=\"#{imageUrl}\">"
-            msg.hipchatNotify("#{html}", {
-              notify: false,
-              color: "green"
-            })
-        else
-          msg.send "#{imageUrl}"
+          html = ''
+          if incidentStr isnt ''
+            html = "#{incidentStr}"
+            color = 'red'
+          else
+            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\">"
+            color = 'green'
 
+          msg.hipchatNotify("#{html}", {
+            notify: false,
+            color: "#{color}"
+          })
+        else
+          msg.send "Not able to parse JSON for traffic incidents"
+ 
   getIncidentDescription = (incident) ->
     # check all requirements for this method
     if not incident or 
@@ -72,12 +112,15 @@ module.exports = (robot) ->
     description = incident.description
     
     # add extra info in parentheses
+    # don'r re-add type if it's already contained in description
     search = description.search "#{type}"
     info = if search == -1 then "#{type}" else ''
     if incident.lane and incident.lane != "" 
       info += if info == '' then "Lane: #{incident.lane}" else ", Lane: #{incident.lane}"
     if incident.roadClosed
       info += if info == '' then "Road is closed" else ", Road is closed"
+    if incident.severity
+      info += if info == '' then "Sev#{incident.severity}" else ", Sev#{incident.severity}"
     description += if info != '' then " (#{info})" else '' 
     
     # link to a google maps traffic view if available
