@@ -112,12 +112,15 @@ module.exports = (robot) ->
     description = incident.description
     
     # add extra info in parentheses
+    # don'r re-add type if it's already contained in description
     search = description.search "#{type}"
     info = if search == -1 then "#{type}" else ''
     if incident.lane and incident.lane != "" 
       info += if info == '' then "Lane: #{incident.lane}" else ", Lane: #{incident.lane}"
     if incident.roadClosed
       info += if info == '' then "Road is closed" else ", Road is closed"
+    if incident.severity
+      info += if info == '' then "Sev#{incident.severity}" else ", Sev#{incident.severity}"
     description += if info != '' then " (#{info})" else '' 
     
     # link to a google maps traffic view if available
