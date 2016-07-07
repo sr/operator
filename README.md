@@ -162,8 +162,8 @@ script/migrate
 
 ### Running Your Local Parbot in Hipchat
 
-These are the environemt variables you will need to set as exports in `script/server`.
-Make sure to add this to your .gitignore or else it will reveal your password to the world!
+These are the environemt variables you will need to set as exports in `script/secrets.sh`.
+This file should be added to your `.gitignore`, don't reveal it!
 
 ```
 export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
