@@ -118,9 +118,6 @@ case "$project" in
                 "src/pull_agent/pardot_pull-agent.gemspec"
         }
         ;;
-    privet)
-        true
-        ;;
     rubylib)
         build-ruby "rubylib"
         ;;
