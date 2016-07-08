@@ -9,7 +9,11 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.pardot_ci_bastion.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
     ]
   }
 
@@ -18,7 +22,11 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.pardot_ci_bastion.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
     ]
   }
 
@@ -27,7 +35,11 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 9683
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_eip.pardot_ci_bastion.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
     ]
   }
 
