@@ -23,7 +23,6 @@ module.exports = (robot) ->
         safeSearch: "moderate"
         type: "video"
         q: query
-        rating: "pg"
         key: GOOGLE_API_KEY
       .get() (err, res, body) ->
         if not err
