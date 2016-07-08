@@ -15,6 +15,10 @@ class SQLQueryTest < ActiveSupport::TestCase
     assert_equal "SELECT * FROM `global_agency` LIMIT 1", query.sql
   end
 
+  test "string" do
+    assert parse("SELECT * FROM global_agency WHERE `global_agency`.`name` = 'ACEDS'")
+  end
+
   test "select_all?" do
     assert !parse("SELECT id FROM table").select_all?
     assert parse("SELECT * FROM table").select_all?
@@ -41,15 +45,5 @@ class SQLQueryTest < ActiveSupport::TestCase
     query = parse("SELECT * FROM `account` WHERE `account`.`id` = 42 AND `boom` = 1")
     query.scope_to(42)
     assert_equal "SELECT * FROM `account` WHERE (`account`.`id` = 42 AND `boom` = 1)", query.sql
-  end
-
-  test "only backticks work as quotes" do
-    assert_raises(SQLQuery::ParseError) do
-      parse("SELECT \"email_ip_id\" FROM `account` WHERE `id` = 1 LIMIT 10")
-    end
-
-    assert_raises(SQLQuery::ParseError) do
-      parse("SELECT 'email_ip_id' FROM `account` WHERE `id` = 1 LIMIT 10")
-    end
   end
 end

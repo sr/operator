@@ -64,10 +64,10 @@ class SQLParser::Parser < Racc::Parser
          action { [:date_string, Date.parse(text)] }
 
       when (text = @ss.scan(/\'/i))
-         action { state = :STRS;  [:quote, text] }
+         action { @state = :STRS;  [:quote, text] }
 
       when (text = @ss.scan(/\"/i))
-         action { state = :STRD;  [:quote, text] }
+         action { @state = :STRD;  [:quote, text] }
 
       when (text = @ss.scan(/[0-9]+/i))
          action { [:unsigned_integer, text.to_i] }
@@ -263,10 +263,10 @@ class SQLParser::Parser < Racc::Parser
     when :STRS
       case
       when (text = @ss.scan(/\'/i))
-         action { state = nil;    [:quote, text] }
+         action { @state = nil;    [:quote, text] }
 
       when (text = @ss.scan(/.*(?=\')/i))
-         action {                 [:character_string_literal, text.gsub("''", "'")] }
+         action {                  [:character_string_literal, text.gsub("''", "'")] }
 
       else
         text = @ss.string[@ss.pos .. -1]
@@ -276,10 +276,10 @@ class SQLParser::Parser < Racc::Parser
     when :STRD
       case
       when (text = @ss.scan(/\"/i))
-         action { state = nil;    [:quote, text] }
+         action { @state = nil;    [:quote, text] }
 
       when (text = @ss.scan(/.*(?=\")/i))
-         action {                 [:character_string_literal, text.gsub('""', '"')] }
+         action {                  [:character_string_literal, text.gsub('""', '"')] }
 
       else
         text = @ss.string[@ss.pos .. -1]
