@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/janSF/sql-parser
-  revision: 90f0c36ca4ff3f98a95f9fc74f47ebc619192ca1
+  revision: 59b18f1879211546979f08c2fecfde278e610c12
   specs:
     sql-parser (0.0.3)
-      racc
+      racc (~> 1.4)
 
 PATH
   remote: vendor/cache/rubylib

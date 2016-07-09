@@ -95,6 +95,14 @@ case "$project" in
     golang)
         docker run --rm -w /go -v "$(pwd):/go" build/build \
             make -f etc/mk/golang.mk
+
+        test -n "$CI" && {
+          cd "bin"
+          CI_JOB="PRIV"
+          export CI_JOB
+          tarball="$(tarball-build "privet")"
+          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+        }
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
@@ -108,16 +116,6 @@ case "$project" in
         test -n "$CI" && {
             build_rubygem "pardot_pull-agent" \
                 "src/pull_agent/pardot_pull-agent.gemspec"
-        }
-        ;;
-    privet)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
-              make -f etc/mk/golang.mk
-
-        test -n "$CI" && {
-          cd "bin"
-          tarball="$(tarball-build "privet")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
         ;;
     rubylib)
@@ -136,12 +134,6 @@ case "$project" in
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
             build/build \
             terra validate
-        ;;
-    # TODO(sr) Decide what to do about vendored Go code. I think building
-    # it might be worthwhile still, just not with the same level of
-    # attention as for our own code, so no linting etc.
-    vendor)
-        true
         ;;
     *)
         echo "No build rule defined for project \"$project\"." 2>&1

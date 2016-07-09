@@ -226,6 +226,15 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_eip.pardot_ci_bastion.public_ip}/32"
+    ]
+  }
+
+  ingress {
     from_port = 46593
     to_port = 46593
     protocol = "tcp"

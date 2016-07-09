@@ -34,6 +34,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.pardot_ci_bastion.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
       "52.3.83.197/32",     # 2.git.dev.pardot.com
@@ -48,6 +52,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.pardot_ci_bastion.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
+      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
       "52.3.83.197/32",     # 2.git.dev.pardot.com

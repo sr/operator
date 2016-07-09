@@ -20,12 +20,15 @@ HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/chatops/hubot/scripts
 
 include $(GOPATH)/src/github.com/sr/operator/operator.mk
 
-all: deadleaves fmt lint vet install errcheck interfacer unused
+all: deadleaves fmt lint vet test install errcheck interfacer unused
 
 generate: operator-generate
 
 install:
-	$(GO) install -race -v ./...
+	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
+
+test:
+	$(GO) test -race $(PACKAGES)
 
 clean: operator-clean
 	$(GO) clean -i ./...
