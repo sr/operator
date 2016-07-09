@@ -18,12 +18,12 @@ func buildOperatorServer(
 	server *grpc.Server,
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
-	ciConfig := &bamboo.BambooConfig{}
+	bambooConfig := &bamboo.BambooConfig{}
 	deployConfig := &deploy.DeployConfig{}
 	pingerConfig := &pinger.PingerConfig{}
-	flags.StringVar(&ciConfig.BambooUsername, "ci-BambooUsername", "", "")
-	flags.StringVar(&ciConfig.BambooPassword, "ci-BambooPassword", "", "")
-	flags.StringVar(&ciConfig.BambooUrl, "ci-BambooUrl", "", "")
+	flags.StringVar(&bambooConfig.BambooUsername, "bamboo-BambooUsername", "", "")
+	flags.StringVar(&bambooConfig.BambooPassword, "bamboo-BambooPassword", "", "")
+	flags.StringVar(&bambooConfig.BambooUrl, "bamboo-BambooUrl", "", "")
 	flags.StringVar(&deployConfig.AwsRegion, "deploy-AwsRegion", "", "")
 	flags.StringVar(&deployConfig.CanoeEcsService, "deploy-CanoeEcsService", "", "")
 	flags.StringVar(&deployConfig.DeployTimeout, "deploy-DeployTimeout", "", "")
@@ -32,14 +32,14 @@ func buildOperatorServer(
 		return services, err
 	}
 	errs := make(map[string][]string)
-	if ciConfig.BambooUsername == "" {
-		errs["ci"] = append(errs["ci"], "BambooUsername")
+	if bambooConfig.BambooUsername == "" {
+		errs["bamboo"] = append(errs["bamboo"], "BambooUsername")
 	}
-	if ciConfig.BambooPassword == "" {
-		errs["ci"] = append(errs["ci"], "BambooPassword")
+	if bambooConfig.BambooPassword == "" {
+		errs["bamboo"] = append(errs["bamboo"], "BambooPassword")
 	}
-	if ciConfig.BambooUrl == "" {
-		errs["ci"] = append(errs["ci"], "BambooUrl")
+	if bambooConfig.BambooUrl == "" {
+		errs["bamboo"] = append(errs["bamboo"], "BambooUrl")
 	}
 	if deployConfig.AwsRegion == "" {
 		errs["deploy"] = append(errs["deploy"], "AwsRegion")
@@ -53,11 +53,11 @@ func buildOperatorServer(
 	if len(errs["ci"]) != 0 {
 		services["ci"] = errors.New("required flag(s) missing: " + strings.Join(errs["ci"], ", "))
 	} else {
-		ciServer, err := bamboo.NewAPIServer(ciConfig)
+		bambooServer, err := bamboo.NewAPIServer(bambooConfig)
 		if err != nil {
 			services["ci"] = err
 		} else {
-			bamboo.RegisterBambooServer(server, ciServer)
+			bamboo.RegisterBambooServer(server, bambooServer)
 			services["ci"] = nil
 		}
 	}
