@@ -1,5 +1,5 @@
 resource "aws_vpc" "pardot_ci" {
-  cidr_block = "172.29.0.0/16"
+  cidr_block = "172.27.0.0/16"
   enable_dns_support = true
   enable_dns_hostnames = true
   tags {
@@ -10,56 +10,56 @@ resource "aws_vpc" "pardot_ci" {
 resource "aws_subnet" "pardot_ci_us_east_1a" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.29.0.0/19"
+  cidr_block = "172.27.0.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1c" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.29.32.0/19"
+  cidr_block = "172.27.32.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1d" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.29.64.0/19"
+  cidr_block = "172.27.64.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1e" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.29.96.0/19"
+  cidr_block = "172.27.96.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1a_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.29.128.0/19"
+  cidr_block = "172.27.128.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1c_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.29.160.0/19"
+  cidr_block = "172.27.160.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1d_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.29.192.0/19"
+  cidr_block = "172.27.192.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1e_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.29.224.0/19"
+  cidr_block = "172.27.224.0/19"
   map_public_ip_on_launch = true
 }
 
@@ -387,4 +387,12 @@ resource "aws_vpc_peering_connection" "pardot_atlassian_tools_and_pardot_ci_vpc_
   peer_owner_id = "010094454891" # pardot-atlassian
   peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
   vpc_id = "${aws_vpc.pardot_ci.id}"
+}
+
+resource "aws_route_table" "interal_apps_pardot_ci_to_pardot_atlassian" {
+  vpc_id = "${aws_vpc.pardot_ci.id}"
+  route {
+    cidr_block = "172.31.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
+  }
 }
