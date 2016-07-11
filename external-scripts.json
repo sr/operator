@@ -7,5 +7,6 @@
   "hubot-schedule",
   "hubot-twitter-stream",
   "hubot-yubikey-invalidation",
-  "hubot-frinkiac"
+  "hubot-frinkiac",
+  "hubot-youtube"
 ]
