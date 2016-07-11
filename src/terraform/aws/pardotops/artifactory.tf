@@ -1,16 +1,6 @@
 resource "aws_security_group" "artifactory_instance_secgroup" {
   name = "artifactory_instance_secgroup"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-
-  # SSH from bastion
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}"
-    ]
-  }
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
     from_port = 22
@@ -27,6 +17,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
+      "${aws_vpc.pardot_ci.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}"
     ]
   }
@@ -35,7 +26,10 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+    cidr_blocks = [
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}"
+    ]
   }
 
   egress {
@@ -46,26 +40,26 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 }
 
-resource "aws_security_group" "artifactory_ci_instance_secgroup" {
-  name = "artifactory_ci_instance_secgroup"
-  vpc_id = "${aws_vpc.pardot_ci.id}"
-
-  # SSH from bastion
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_bastion.id}"
-    ]
-  }
+resource "aws_security_group" "artifactory_http_lb" {
+  name = "internal_apps_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC VPN only"
+  vpc_id = "${aws_vpc.internal_apps.id}"
 
   ingress {
-    from_port = 22
-    to_port = 22
+    from_port = 80
+    to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_instance.pardot_ci_bastion.public_ip}/32"
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
     ]
   }
 
@@ -74,15 +68,18 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.pardot_ci.cidr_block}"
+      "204.14.236.0/24",    # aloha-east
+      "204.14.239.0/24",    # aloha-west
+      "62.17.146.140/30",   # aloha-emea
+      "62.17.146.144/28",   # aloha-emea
+      "62.17.146.160/27",   # aloha-emea
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
+      "50.22.140.200/32"    # tools-s1.dev
     ]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
   }
 
   egress {
@@ -93,12 +90,57 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   }
 }
 
+resource "aws_security_group" "artifactory_dc_only_http_lb" {
+  name = "internal_apps_dc_only_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC datacenters only"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "173.192.141.222/32", # tools-s1 (prodbot)
+      "208.43.203.134/32",  # email-d1 (replication check)
+      "174.37.191.2/32",    # proxy.dev
+      "169.45.0.88/32",     # squid-d4
+      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
+      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
-  instance_type = "c4.2xlarge"
+  instance_type = "c4.4xlarge"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -117,10 +159,14 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
-  instance_type = "c4.2xlarge"
+  instance_type = "c4.4xlarge"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -139,10 +185,14 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
-  instance_type = "c4.2xlarge"
+  instance_type = "c4.4xlarge"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
   root_block_device {
     volume_type = "gp2"
     volume_size = "2047"
@@ -161,7 +211,10 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 
 resource "aws_elb" "artifactory_ops_elb" {
   name = "artifactory-elb"
-  security_groups = ["${aws_security_group.internal_apps_dc_only_http_lb.id}"]
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
@@ -405,19 +458,7 @@ resource "aws_security_group" "artifactory_integration_mysql_ingress" {
       "${aws_subnet.artifactory_integration_us_east_1c.cidr_block}",
       "${aws_subnet.artifactory_integration_us_east_1c_dmz.cidr_block}",
       "${aws_subnet.artifactory_integration_us_east_1d.cidr_block}",
-      "${aws_subnet.artifactory_integration_us_east_1d_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1a.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1a_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1c.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1c_dmz.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1d.cidr_block}",
-      "${aws_subnet.pardot_ci_us_east_1d_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1a.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1a_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1c.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1c_dmz.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1d.cidr_block}",
-      "${aws_subnet.internal_apps_us_east_1d_dmz.cidr_block}"
+      "${aws_subnet.artifactory_integration_us_east_1d_dmz.cidr_block}"
     ]
   }
 
