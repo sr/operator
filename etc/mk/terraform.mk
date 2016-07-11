@@ -27,11 +27,11 @@ plan: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
 	cd $(TERRAFORM_DIR) && \
 		$< plan -out $(TERRAFORM_PLAN) -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
 
-pull: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
+pull: $(TERRAFORM) $(TERRAFORM_DIR)
 	cd $(TERRAFORM_DIR) && \
 		$< remote pull $(TERRAFORM_OPTS)
 
-push: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
+push: $(TERRAFORM) $(TERRAFORM_DIR)
 	cd $(TERRAFORM_DIR) && \
 		$< remote push $(TERRAFORM_OPTS)
 
