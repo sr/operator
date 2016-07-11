@@ -17,6 +17,10 @@ class GlobalSetting < ActiveRecord::Base
     # SERVER_SETTING_2 = 2;
     # SERVER_SETTING_1_ONLY = 3;
     # SERVER_SETTING_2_ONLY = 4;
+
+    # The idea is to run Pardot Explorer on the secondary database, so the opposite of what the main
+    # app runs on. The exception is if a db is put in no-failover mode, in which case Pardot Explorer
+    # will run on the primary.
     case db_state
     when nil, 0, 1, 4
       2
