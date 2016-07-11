@@ -15,7 +15,7 @@ class Database
   end
 
   def tables
-    activerecord_connection.tables
+    activerecord_connection.data_sources
   end
 
   def execute(sql, params = [])
@@ -41,19 +41,23 @@ class Database
         connection,
         nil,
         nil,
-        {}
+        connection_config
       )
   end
 
   def establish_connection
-    connection = Mysql2::Client.new(
+    connection = Mysql2::Client.new(connection_config)
+    connection.query_options[:symbolize_keys] = true
+    connection
+  end
+
+  def connection_config
+    {
       host: @config.hostname,
       port: @config.port,
       username: @config.username,
       password: @config.password,
       database: @config.name
-    )
-    connection.query_options[:symbolize_keys] = true
-    connection
+    }
   end
 end

@@ -1,5 +1,5 @@
 class QueriesController < ApplicationController
-  before_filter :check_account_access
+  before_action :check_account_access
 
   def new
     query = current_user.queries.new(
