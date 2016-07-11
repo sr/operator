@@ -30,6 +30,17 @@ class Datacenter
     end
   end
 
+  def symfony_name
+    case name
+    when DALLAS
+      "prod-s"
+    when PHOENIX
+      "prod"
+    else
+      "prod-s"
+    end
+  end
+
   attr_reader :name
 
   def global
