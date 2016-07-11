@@ -9,8 +9,11 @@ cd "$dir"
 export HUBOT_YUBIKEY_API_ID=24689
 export HUBOT_PAGERDUTY_SUBDOMAIN="pardot"
 export HUBOT_PAGERDUTY_SERVICES="PXVMR39,P0VDMCH"
+export HUBOT_YOUTUBE_API_KEY="AIzaSyCuiCcMIpCNlk6h6EYl_iB0iGpoYsyBUIM"
+export BING_API_KEY="AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
+export GOOGLE_API_KEY="AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4"
 
 # checkout the README and add a secrets.sh file to connect to hipchat
 test -f "$dir/script/secrets.sh" && source "$dir/script/secrets.sh"
 
-exec bin/hubot --alias '!' --disable-httpd "$@"
+exec bin/hubot --alias '~' --disable-httpd "$@"

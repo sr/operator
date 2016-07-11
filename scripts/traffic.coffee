@@ -9,11 +9,13 @@
 
 moment = require('moment')
 scopedHttpClient = require "scoped-http-client"
-BING_KEY = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
 
 module.exports = (robot) ->
 
   robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
+    if not process.env.BING_API_KEY
+      msg.send "Must configure BING_API_KEY environment variable."
+      return
 
     # determines if it should just show the map or just show the incidents
     # default is to show both
@@ -23,7 +25,7 @@ module.exports = (robot) ->
     severity = if mode is 'incidents' then '1,2,3,4' else '2,3,4'
 
     imageHost = "http://dev.virtualearth.net"
-    imagePath = "/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=325,325&mapLayer=TrafficFlow&format=png&key=#{BING_KEY}"
+    imagePath = "/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=325,325&mapLayer=TrafficFlow&format=png&key=#{process.env.BING_API_KEY}"
 
     if mode isnt 'map'
       sendTrafficIncidents(severity, msg)
@@ -60,7 +62,7 @@ module.exports = (robot) ->
     msg.http(url)
       .query({
         severity: "#{severity}",
-        key: "#{BING_KEY}"})
+        key: "#{process.env.BING_API_KEY}"})
       .get() (err, res, body) ->
         if err
           msg.send "Error: #{err}"
@@ -137,6 +139,10 @@ module.exports = (robot) ->
     if not msg.match[4]
       return
 
+    if not process.env.GOOGLE_API_KEY
+      msg.send "Must configure GOOGLE_API_KEY environment variable."
+      return
+
     secondloc = msg.match[4]
 
     if secondloc == 'Pardot' || secondloc == 'the office' || secondloc == '950 East Paces Ferry Road, Atlanta, GA'
@@ -176,7 +182,7 @@ module.exports = (robot) ->
           destinations: "#{secondloc}",
           mode: 'driving',
           departure_time: "#{departure}",
-          key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4',
+          key: process.env.GOOGLE_API_KEY,
           traffic_model: 'best_guess'})
        .header('Accept', 'application/json')
        .get() (err, res, body) ->
