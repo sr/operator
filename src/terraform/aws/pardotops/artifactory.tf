@@ -41,9 +41,9 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
 }
 
 resource "aws_security_group" "artifactory_http_lb" {
-  name = "internal_apps_http_lb"
+  name = "artifactory_http_lb"
   description = "Allow HTTP/HTTPS from SFDC VPN only"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
     from_port = 80
@@ -91,9 +91,9 @@ resource "aws_security_group" "artifactory_http_lb" {
 }
 
 resource "aws_security_group" "artifactory_dc_only_http_lb" {
-  name = "internal_apps_dc_only_http_lb"
+  name = "artifactory_dc_only_http_lb"
   description = "Allow HTTP/HTTPS from SFDC datacenters only"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
     from_port = 80
@@ -209,22 +209,26 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
   instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
 }
 
-resource "aws_elb" "artifactory_ops_elb" {
-  name = "artifactory-elb"
+resource "aws_elb" "artifactory_public_elb" {
+  name = "artifactory-public-elb"
   security_groups = [
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
   subnets = [
-    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1e_dmz.id}"
+    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
   ]
   cross_zone_load_balancing = true
   connection_draining = true
   connection_draining_timeout = 30
-  instances = ["${aws_instance.pardot0-artifactory1-1-ue1.id}","${aws_instance.pardot0-artifactory1-2-ue1.id}"]
+  instances = [
+    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+  ]
 
   listener {
     lb_port = 443
