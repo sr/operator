@@ -16,4 +16,4 @@ export GOOGLE_API_KEY="AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4"
 # checkout the README and add a secrets.sh file to connect to hipchat
 test -f "$dir/script/secrets.sh" && source "$dir/script/secrets.sh"
 
-exec bin/hubot --alias '~' --disable-httpd "$@"
+exec bin/hubot --alias '!' --disable-httpd "$@"
