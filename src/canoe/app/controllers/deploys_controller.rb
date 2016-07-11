@@ -1,10 +1,10 @@
 class DeploysController < ApplicationController
-  before_filter :require_project
-  before_filter :require_target, only: [:new, :create, :index]
-  before_filter :require_deploy, only: [:show, :complete, :cancel, :force_to_complete]
-  before_filter :require_deploy_acl_satisfied, only: [:new, :create, :index, :show, :complete, :cancel, :force_to_complete]
-  before_filter :require_no_active_deploy, only: [:new, :create]
-  before_filter :require_no_active_lock, only: [:new, :create]
+  before_action :require_project
+  before_action :require_target, only: [:new, :create, :index]
+  before_action :require_deploy, only: [:show, :complete, :cancel, :force_to_complete]
+  before_action :require_deploy_acl_satisfied, only: [:new, :create, :index, :show, :complete, :cancel, :force_to_complete]
+  before_action :require_no_active_deploy, only: [:new, :create]
+  before_action :require_no_active_lock, only: [:new, :create]
 
   def index
     all_deploys = current_target.deploys
