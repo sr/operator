@@ -48,17 +48,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
 
 resource "aws_security_group" "artifactory_ci_instance_secgroup" {
   name = "artifactory_ci_instance_secgroup"
-  vpc_id = "${aws_vpc.pardot_ci.id}"
-
-  # SSH from bastion
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.pardot_ci_bastion.id}"
-    ]
-  }
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
     from_port = 22
@@ -74,7 +64,8 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.pardot_ci.cidr_block}"
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}"
     ]
   }
 
@@ -82,7 +73,10 @@ resource "aws_security_group" "artifactory_ci_instance_secgroup" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = ["${aws_vpc.pardot_ci.cidr_block}"]
+    cidr_blocks = [
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}"
+    ]
   }
 
   egress {
@@ -141,7 +135,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
   root_block_device {
     volume_type = "gp2"
