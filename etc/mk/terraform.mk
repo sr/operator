@@ -33,6 +33,7 @@ pull: $(TERRAFORM) $(TERRAFORM_DIR)
 
 push: $(TERRAFORM) $(TERRAFORM_DIR)
 	cd $(TERRAFORM_DIR) && \
+	    cp .terraform/terraform.tfstate .terraform/terraform.tfstate.`date +%Y%m%d%H%M%S` && \
 		$< remote push $(TERRAFORM_OPTS)
 
 refresh: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_VAR_FILE) remote-state
