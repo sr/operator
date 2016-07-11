@@ -33,11 +33,11 @@ class Datacenter
   def symfony_name
     case name
     when DALLAS
-      'prod-s'
+      "prod-s"
     when PHOENIX
-      'prod'
+      "prod"
     else
-      'prod-s'
+      "prod-s"
     end
   end
 
