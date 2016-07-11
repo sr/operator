@@ -133,7 +133,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
-  instance_type = "c4.2xlarge"
+  instance_type = "c4.4xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.artifactory_ci_instance_secgroup.id}"]
