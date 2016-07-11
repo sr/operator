@@ -322,19 +322,7 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
   }
 }
 
-resource "aws_db_subnet_group" "pardot_ci" {
-  name = "pardot_ci"
-  description = "Pardot CI DB Subnet"
-  subnet_ids = [
-    "${aws_subnet.pardot_ci_us_east_1a.id}",
-    "${aws_subnet.pardot_ci_us_east_1c.id}",
-    "${aws_subnet.pardot_ci_us_east_1d.id}",
-    "${aws_subnet.pardot_ci_us_east_1e.id}"
-  ]
-}
-
 # Bastion host
-
 resource "aws_security_group" "pardot_ci_bastion" {
   name = "pardot_ci_bastion"
   description = "Bastion host, allows SSH from SFDC VPNs"
