@@ -19,7 +19,7 @@ latest_build.rb --repo=pd-canoe --project=BREAD --plan=BREAD --job=GOL -d
 tar -xvzf BREAD-GOL*.tar.gz jiracleaner
 
 # Close stale JIRA tickets
-jiracleaner \
+./jiracleaner \
     -project BREAD \
     -username breadbot \
     -password "$bamboo_BREADBOT_PASSWORD" \
