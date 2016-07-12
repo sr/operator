@@ -27,6 +27,8 @@ class GlobalSetting < ActiveRecord::Base
       1
     when nil, SERVER_SETTING_DEFAULT, SERVER_SETTING_1, SERVER_SETTING_2_ONLY
       2
+    else
+      raise "Unexpected db_state value: #{db_state.inspect}"
     end
   end
 end
