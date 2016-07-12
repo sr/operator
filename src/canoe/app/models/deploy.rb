@@ -1,7 +1,7 @@
 require "deployable"
 require "json_schema"
 
-class Deploy < ActiveRecord::Base
+class Deploy < ApplicationRecord
   include Deployable
 
   belongs_to :deploy_target

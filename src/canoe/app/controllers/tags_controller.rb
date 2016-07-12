@@ -1,5 +1,5 @@
 class TagsController < ApplicationController
-  before_filter :require_project
+  before_action :require_project
 
   def index
     @tags = current_project.tags

@@ -1,4 +1,4 @@
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   ARTIFACTORY_REPO = "pd-canoe".freeze
   GITHUB_URL = "https://git.dev.pardot.com".freeze
 

@@ -1,11 +1,5 @@
-class GlobalSetting < ActiveRecord::Base
-  establish_connection(
-    adapter:  "mysql2",
-    host:     Datacenter.current_global_config.hostname,
-    username: Datacenter.current_global_config.username,
-    password: Datacenter.current_global_config.password,
-    database: Datacenter.current_global_config.name
-  )
+class GlobalSetting < ApplicationRecord
+  establish_connection(Datacenter.current_activerecord_config)
   self.table_name = "global_setting"
 
   # primary shard db enumeration

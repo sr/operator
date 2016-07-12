@@ -1,8 +1,8 @@
 module Api
   class DeploysController < Controller
-    before_filter :require_project, only: [:index, :latest]
-    before_filter :require_target, only: [:index, :latest]
-    before_filter :require_deploy, only: [:show, :completed_server]
+    before_action :require_project, only: [:index, :latest]
+    before_action :require_target, only: [:index, :latest]
+    before_action :require_deploy, only: [:show, :completed_server]
 
     def index
       @deploys = current_target.deploys

@@ -17,8 +17,17 @@ class Datacenter
     )
   end
 
-  def self.current_global_config
-    current.__send__(:global_config)
+  # Returns a connection Hash for connecting to the global database using
+  # ActiveRecord's establish_connection method
+  def self.current_activerecord_config
+    {
+      adapter:  "mysql2",
+      host: current.global_config.hostname,
+      port: current.global_config.port,
+      username: current.global_config.username,
+      password: current.global_config.password,
+      database: current.global_config.name
+    }
   end
 
   def initialize(name, config)
@@ -55,8 +64,6 @@ class Datacenter
 
     Database.new(config)
   end
-
-  private
 
   def global_config
     @config.global(@name)

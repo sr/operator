@@ -1,4 +1,4 @@
-class ChefDeploy < ActiveRecord::Base
+class ChefDeploy < ApplicationRecord
   validates_inclusion_of :state, in: [
     ChefDelivery::LOCKED,
     ChefDelivery::PENDING,

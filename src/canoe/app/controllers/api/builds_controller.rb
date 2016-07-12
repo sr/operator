@@ -1,6 +1,6 @@
 module Api
   class BuildsController < Controller
-    before_filter :require_project, only: [:index]
+    before_action :require_project, only: [:index]
 
     def index
       @builds = current_project.builds(

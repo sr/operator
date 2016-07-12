@@ -1,7 +1,7 @@
 module Api
   class Controller < ApplicationController
-    skip_before_filter :require_oauth_authentication
-    before_filter :require_api_authentication
+    skip_before_action :require_oauth_authentication
+    before_action :require_api_authentication
 
     private
 

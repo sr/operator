@@ -1,14 +1,14 @@
 module Api
   class ResultsController < Controller
-    before_filter :require_target
-    before_filter :require_deploy
-    before_filter :require_result
+    before_action :require_target
+    before_action :require_deploy
+    before_action :require_result
 
     def update
       workflow = DeployWorkflow.new(deploy: current_deploy)
       if params[:success].to_s == "true"
         workflow.notify_action_successful(server: current_result.server, action: request.request_parameters[:action])
-        render status: 303, nothing: true, location: api_target_deploy_url(current_target, current_deploy)
+        head 303, location: api_target_deploy_url(current_target, current_deploy)
       else
         render status: 500, json: { error: "not implemented" }
       end
