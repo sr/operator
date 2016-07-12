@@ -23,6 +23,7 @@ class Datacenter
     {
       adapter:  "mysql2",
       host: current.global_config.hostname,
+      port: current.global_config.port,
       username: current.global_config.username,
       password: current.global_config.password,
       database: current.global_config.name
