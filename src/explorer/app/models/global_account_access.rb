@@ -1,11 +1,5 @@
 class GlobalAccountAccess < ActiveRecord::Base
-  establish_connection(
-    adapter:  "mysql2",
-    host:     Datacenter.current_global_config.hostname,
-    username: Datacenter.current_global_config.username,
-    password: Datacenter.current_global_config.password,
-    database: Datacenter.current_global_config.name
-  )
+  establish_connection(Datacenter.current_activerecord_config)
   self.table_name = "global_account_access"
 
   def self.authorized?(account_id)
