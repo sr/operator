@@ -88,6 +88,10 @@ resource "aws_route_table" "internal_apps_route_dmz" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.internal_apps_internet_gw.id}"
   }
+  route {
+    cidr_block = "172.28.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
+  }
 }
 
 resource "aws_route_table_association" "internal_apps_us_east_1a" {
