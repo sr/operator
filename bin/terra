@@ -2,8 +2,11 @@
 #/ Usage: terra [--help] [arguments...]
 #/        terra plan <account>
 #/        terra apply <account>
+#/        terra pull <account>
+#/        terra push <account>
 #/        terra vendor <version>
 #/        terra validate
+
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -23,7 +26,7 @@ action="${1:-""}"
 arg1="${2:-""}"
 
 case "$action" in
-    apply|plan)
+    apply|plan|pull|push)
         account="$arg1"
         if [ -z "$account" ]; then
             printf "%s: required argument missing: account\n" "$PROGRAM" 2>&1
@@ -67,11 +70,13 @@ case "$action" in
 
         cd src/terraform
         go install bread/cmd/breadsignal
-        breadsignal -terraform "$action" \
-            -terraform-version "$(terraform version)" \
-            -branch "$(git rev-parse --abbrev-ref HEAD)" \
-            -terraform-path "${account}" \
-            -testing=false
+        if [ "$action" != "pull" ]; then
+          breadsignal -terraform "$action" \
+              -terraform-version "$(terraform version)" \
+              -branch "$(git rev-parse --abbrev-ref HEAD)" \
+              -terraform-path "${account}" \
+              -testing=false
+        fi
         make -f ../../etc/mk/terraform.mk "$action" |
         grep -vi password
         ;;
