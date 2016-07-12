@@ -384,5 +384,3 @@ resource "aws_vpc_peering_connection" "pardot_atlassian_tools_and_pardot_ci_vpc_
   peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
   vpc_id = "${aws_vpc.pardot_ci.id}"
 }
-
-
