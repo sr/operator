@@ -418,6 +418,18 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
   }
 }
 
+resource "aws_route" {
+  destination_cidr_block = "172.27.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_route_table.pardot_ci_route_dmz.id}"
+}
+
+resource "aws_route" {
+  destination_cidr_block = "172.30.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_route_table.pardot_ci_route_dmz.id}"
+}
+
 resource "aws_route_table_association" "artifactory_integration_us_east_1a" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
