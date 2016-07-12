@@ -1,4 +1,4 @@
-class UserQuery < ActiveRecord::Base
+class UserQuery < ApplicationRecord
   DEFAULT_LIMIT = 10
 
   belongs_to :user

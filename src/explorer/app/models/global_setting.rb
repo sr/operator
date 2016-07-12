@@ -1,4 +1,4 @@
-class GlobalSetting < ActiveRecord::Base
+class GlobalSetting < ApplicationRecord
   establish_connection(Datacenter.current_activerecord_config)
   self.table_name = "global_setting"
 

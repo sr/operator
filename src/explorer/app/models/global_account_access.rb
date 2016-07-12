@@ -1,4 +1,4 @@
-class GlobalAccountAccess < ActiveRecord::Base
+class GlobalAccountAccess < ApplicationRecord
   establish_connection(Datacenter.current_activerecord_config)
   self.table_name = "global_account_access"
 
