@@ -97,7 +97,7 @@ resource "aws_route_table" "internal_apps_route_dmz" {
 resource "aws_route" "internal_apps_to_artifactory_integration" {
   destination_cidr_block = "172.28.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
-  route_table_id = "${aws_route_table.internal_apps_route_dmz.id}"
+  route_table_id = "${aws_vpc.internal_apps.main_route_table_id}"
 }
 
 resource "aws_route_table_association" "internal_apps_us_east_1a" {
