@@ -98,13 +98,13 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
   }
 }
 
-resource "aws_route" {
+resource "aws_route" "pardot_ci_to_atlassian_tools" {
   destination_cidr_block = "172.31.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
   route_table_id = "${aws_route_table.pardot_ci_route_dmz.id}"
 }
 
-resource "aws_route" {
+resource "aws_route" "pardot_ci_to_artifactory_integration" {
   destination_cidr_block = "172.28.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
   route_table_id = "${aws_route_table.pardot_ci_route_dmz.id}"
