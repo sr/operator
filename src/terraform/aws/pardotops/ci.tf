@@ -88,6 +88,14 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.pardot_ci_internet_gw.id}"
   }
+  route {
+    cidr_block = "172.31.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
+  }
+  route {
+    cidr_block = "172.28.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  }
 }
 
 resource "aws_route_table_association" "pardot_ci_us_east_1a" {
@@ -375,12 +383,4 @@ resource "aws_vpc_peering_connection" "pardot_atlassian_tools_and_pardot_ci_vpc_
   peer_owner_id = "010094454891" # pardot-atlassian
   peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
   vpc_id = "${aws_vpc.pardot_ci.id}"
-}
-
-resource "aws_route_table" "interal_apps_pardot_ci_to_pardot_atlassian" {
-  vpc_id = "${aws_vpc.pardot_ci.id}"
-  route {
-    cidr_block = "172.31.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
-  }
 }
