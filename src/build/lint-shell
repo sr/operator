@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eu
+
+file bin/* | grep -E "bash script|POSIX shell" | cut -d: -f1 |
+while read f; do
+    shellcheck "$f"
+done
+
+find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +

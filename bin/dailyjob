@@ -4,6 +4,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# This is normally set in Bamboo and contains the JIRA password of the bot user
+: "${bamboo_BREADBOT_PASSWORD:-""}"
+
 # Add artifactory utilities to our PATH
 : "${BAMBOO_CONFIG_REPO:="$(pwd)/bamboo-configuration"}"
 test -d "$BAMBOO_CONFIG_REPO/bin/artifactory" || {
