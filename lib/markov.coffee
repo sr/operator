@@ -1,3 +1,4 @@
+Promise = require 'bluebird'
 db = require './db'
 markov = require 'markov'
 

@@ -6,6 +6,7 @@
   "description": "Pardot's useful, but not production-critical chatbot",
   "dependencies": {
     "async": "^1.4.2",
+    "bluebird": "https://registry.npmjs.org/bluebird/-/bluebird-2.10.2.tgz",
     "db-migrate": "^0.9.25",
     "dotenv": "^1.2.0",
     "each-cons": "^1.0.0",
