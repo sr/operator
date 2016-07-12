@@ -15,6 +15,10 @@ require "sprockets/railtie"
 require "pinglish"
 require "instrumentation"
 
+require "canoe/deployer"
+require "canoe/deploy_logic"
+require "canoe/ldap_authorizer"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
