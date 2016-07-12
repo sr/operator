@@ -86,7 +86,7 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.pardot_ci_internet_gw.id}"
+    gateway_id = "${aws_inter56655656585777874net_gateway.pardot_ci_internet_gw.id}"
   }
   route {
     cidr_block = "172.31.0.0/16"
