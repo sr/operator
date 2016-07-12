@@ -82,7 +82,6 @@ resource "aws_route" "pardot_ci_route" {
   nat_gateway_id = "${aws_nat_gateway.pardot_ci_nat_gw.id}"
 }
 
-
 resource "aws_route_table" "pardot_ci_route_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   route {
