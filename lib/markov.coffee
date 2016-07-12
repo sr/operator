@@ -21,6 +21,7 @@ class Markov
       Markov.getSeed().then (seed) =>
         @markov = markov()
         @markov.seed seed, () => resolve(@markov)
+      .catch () -> throw new Error 'Fail to seed Markov object'
 
   reseed: () ->
     @markov = null
@@ -28,6 +29,7 @@ class Markov
   generateResponse: (text) ->
     @getSeededMarkov().then (m) ->
       m.respond(text, 50).join(' ')
+    .catch () -> 'An error has occured (sadpanda)'
 
 
 module.exports = exports = Markov

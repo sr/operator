@@ -22,7 +22,6 @@ module.exports = (robot) ->
   robot.respond /markov\s+(.*)$/i, (res) ->
     client.generateResponse(res.match[1])
       .then (txt) -> res.send(txt)
-      .catch () -> res.send('An error has occured (sadpanda)')
 
   robot.respond /reseedmarkov/i, (res) ->
     client.reseed()
