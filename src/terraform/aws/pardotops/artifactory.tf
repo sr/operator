@@ -136,8 +136,8 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   instance_type = "c4.4xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-  security_groups = [
+  vpc_security_group_ids = [
+    "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
@@ -162,8 +162,8 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   instance_type = "c4.4xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-  security_groups = [
+  vpc_security_group_ids = [
+    "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
@@ -188,8 +188,8 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   instance_type = "c4.4xlarge"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.artifactory_instance_secgroup.id}"]
-  security_groups = [
+  vpc_security_group_ids = [
+    "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
