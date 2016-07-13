@@ -33,15 +33,20 @@ eval "$(aws ecr get-login)"
 set -x
 
 case "$project" in
-  canoe)
-    AWS_ECR_REPO="$CANOE_ECR_REPO"
-    AWS_ECS_CLUSTER="$CANOE_ECS_CLUSTER"
-    AWS_ECS_SERVICE="$CANOE_ECS_SERVICE"
-    ;;
-  *)
-    echo "Unable to deploy project: \"$project\"" 2>&1
-    exit 1
-  ;;
+    canoe)
+        AWS_ECR_REPO="$CANOE_ECR_REPO"
+        AWS_ECS_CLUSTER="$CANOE_ECS_CLUSTER"
+        AWS_ECS_SERVICE="$CANOE_ECS_SERVICE"
+        ;;
+    hal9000)
+        AWS_ECR_REPO="364709603225.dkr.ecr.us-east-1.amazonaws.com/hal9000"
+        AWS_ECS_CLUSTER="hal9000_production"
+        AWS_ECS_SERVICE="hal9000"
+        ;;
+    *)
+        echo "Unable to deploy project: \"$project\"" 2>&1
+        exit 1
+        ;;
 esac
 
 PATH="$(dirname "$0")/vendor:$PATH"
