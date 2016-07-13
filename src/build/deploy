@@ -39,7 +39,7 @@ case "$project" in
         AWS_ECS_SERVICE="$CANOE_ECS_SERVICE"
         ;;
     hal9000)
-        AWS_ECR_REPO="364709603225.dkr.ecr.us-east-1.amazonaws.com/hal9000"
+        AWS_ECR_REPO="$HAL9000_ECR_REPO"
         AWS_ECS_CLUSTER="hal9000_production"
         AWS_ECS_SERVICE="hal9000"
         ;;
