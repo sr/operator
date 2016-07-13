@@ -120,7 +120,9 @@ module.exports = (robot) ->
     if incident.roadClosed
       info += if info == '' then "Road is closed" else ", Road is closed"
     if incident.severity
-      info += if info == '' then "Sev#{incident.severity}" else ", Sev#{incident.severity}"
+      # 4 -> 0, 3 -> 1, 2 -> 2, 1 -> 3
+      sev = 2 - (incident.severity - 2)
+      info += if info == '' then "Sev#{sev}" else ", Sev#{sev}"
     description += if info != '' then " (#{info})" else '' 
     
     # link to a google maps traffic view if available

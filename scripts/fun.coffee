@@ -51,6 +51,7 @@
 #   hubot tl;dr - Totally didn't read it
 #   hubot dickbutt (me) - Get what you think you're gonna get
 #   hubot chatty (me) - Got chatty?
+#   hubot don'ttouchdoge - Don't touch doge!
 #   hubot doge (me) - Such wow
 #   hubot doge bomb <count> - Many awesome
 #   hubot corgi (me) - It's dangerous to go alone. Take this.
@@ -781,6 +782,9 @@ module.exports = (robot) ->
   robot.respond /chatty(\sme)?$/i, (msg) ->
     imageMe msg, "chatty salesforce", (url) ->
       msg.send "#{url}"
+
+  robot.respond /(?:(please|pls),?\s*)?(don(?:')?t|do not)\s*(touch|pet|scratch|mess with)\s*doge(?:!*)?(.*)?$/i, (msg) ->
+     msg.send "http://media3.giphy.com/media/jUSrFvui8Pfpe/giphy.gif"
 
   robot.respond /doge(\sme)?$/i, (msg) ->
     imageMe msg, "doge", (url) ->
