@@ -67,7 +67,7 @@ resource "aws_instance" "internal_apps_chef_server" {
     delete_on_termination = false
   }
   tags {
-    Name = "pardot0-chef1-1-ue1"
+    Name = "pardot0-chef1-1-ue1",
     terraform = true
   }
 }
