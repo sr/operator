@@ -105,6 +105,9 @@ case "$project" in
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
         ;;
+    hal9000)
+        true
+        ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
 
