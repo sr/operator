@@ -47,7 +47,7 @@ resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
     "Resource": "*",
     "Condition": {
       "StringEquals": {
-        "ec2:Vpc": "arn:aws:ec2:us-east-1:364709603225:vpc/vpc-e0fd7187"
+        "ec2:Vpc": "arn:aws:ec2:us-east-1:${var.pardotops_account_number}:vpc/${aws_vpc.pardot_ci.id}"
       }
     }
   },
@@ -59,13 +59,13 @@ resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
        "ec2:StopInstances",
        "ec2:StartInstances"
     ],
-    Resource": "arn:aws:ec2:us-east-1:364709603225:instance/*",
+    Resource": "arn:aws:ec2:us-east-1:${var.pardotops_account_number}:instance/*",
     Condition": {
       "StringEquals": {
         "ec2:ResourceTag/Name": "bam::bamboo.dev.pardot.com::bamboo"
       },
       "StringEquals": {
-        "ec2:Vpc": "arn:aws:ec2:us-east-1:364709603225:vpc/vpc-e0fd7187"
+        "ec2:Vpc": "arn:aws:ec2:us-east-1:${var.pardotops_account_number}:vpc/${aws_vpc.pardot_ci.id}"
       }
   }
   ]

@@ -238,7 +238,7 @@ resource "aws_elb" "artifactory_public_elb" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/ops.pardot.com"
   }
 
   listener {
@@ -276,8 +276,8 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Sid": "allow artifactory sysacct",
       "Effect": "Allow",
       "Principal": {
-      "AWS": "arn:aws:iam::364709603225:user/artifactorysyscct",
-      "AWS": "arn:aws:iam::364709603225:group/Operations"
+      "AWS": "arn:aws:iam::${var.pardotops_account_number}:user/${aws_iam_user.artifactory_sysacct.name}",
+      "AWS": "arn:aws:iam::${var.pardotops_account_number}:group/Operations"
       },
       "Action": "s3:*",
       "Resource": [
@@ -508,13 +508,13 @@ resource "aws_db_subnet_group" "artifactory_integration" {
   ]
 }
 resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "364709603225" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}" # pardotops
   peer_vpc_id = "${aws_vpc.internal_apps.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 
 resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "364709603225" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}" # pardotops
   peer_vpc_id = "${aws_vpc.pardot_ci.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
