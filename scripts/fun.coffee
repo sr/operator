@@ -18,6 +18,7 @@
 #   hubot beyonce - Get charisma
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
+#   hubot css - get a css window
 #   hubot catbongos - Like, far out, man...
 #   hubot cookiecakes - They see me roooolllin'.... They hungryyyyy....
 #   hubot headdesk - Get headdesk.gif
@@ -570,7 +571,6 @@ module.exports = (robot) ->
 
   robot.respond /praise\s+(.*)$/i, (msg) ->
     target = msg.match[1]
-
     compliments = [
       "#{target} is a pillar of virtue",
       "#{target} has swagger for days",
@@ -587,8 +587,14 @@ module.exports = (robot) ->
       "#{target} is streets ahead!",
       "#{target} is bonafide"
     ]
-
     msg.send msg.random compliments
+
+  robot.respond /css$/i, (msg) ->
+    css = [
+      'http://i.imgur.com/lLhBzQ3.jpg'
+    ]
+    msg.send msg.random css 
+
 
   robot.respond /chikin$/i, (msg) ->
     chikins = [
@@ -598,7 +604,6 @@ module.exports = (robot) ->
       'chee CHAH chee CHAH chee CHAH',
       'cookoo KATCHA cookoo KATCHA'
     ]
-
     msg.send msg.random chikins
 
   robot.respond /hater$/i, (msg) ->
