@@ -108,8 +108,8 @@ case "$project" in
     hal9000)
         build-ruby "$project"
         test -n "$CI" && {
-            echo "Pushing image to ${CANOE_ECR_REPO}..." 2>&1
-            docker-push "hal9000_app" "$CANOE_ECR_REPO"
+            echo "Pushing image to ${HAL9000_ECR_REPO}..." 2>&1
+            docker-push "hal9000_app" "$HAL9000_ECR_REPO"
         }
         ;;
     pd-sync-chef)
