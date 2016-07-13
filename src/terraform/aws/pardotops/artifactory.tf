@@ -134,6 +134,7 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.4xlarge"
+  private_ip="172.28.0.138"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
   vpc_security_group_ids = [
@@ -160,6 +161,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.4xlarge"
+  private_ip="172.28.0.209"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
   vpc_security_group_ids = [
@@ -186,6 +188,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.4xlarge"
+  private_ip="172.28.0.182"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
   vpc_security_group_ids = [
@@ -405,6 +408,26 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.artifactory_integration_internet_gw.id}"
   }
+  route {
+    cidr_block = "172.27.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  }
+  route {
+    cidr_block = "172.30.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
+  }
+}
+
+resource "aws_route" "artifactory_integration_to_pardot_ci" {
+  destination_cidr_block = "172.27.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
+}
+
+resource "aws_route" "artifactory_integration_to_internal_apps" {
+  destination_cidr_block = "172.30.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
 }
 
 resource "aws_route_table_association" "artifactory_integration_us_east_1a" {

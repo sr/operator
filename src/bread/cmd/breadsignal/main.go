@@ -64,6 +64,14 @@ func run() error {
 			*terraformVersion,
 			*terraformPath,
 		)
+	case "push":
+		color = "red"
+		message = fmt.Sprintf(
+			"pushing terraform remote configuration from branch <code>%s</code> with <code>%s</code> to terraform path <code>%s</code>",
+			*gitBranch,
+			*terraformVersion,
+			*terraformPath,
+		)
 	default:
 		return nil
 	}
