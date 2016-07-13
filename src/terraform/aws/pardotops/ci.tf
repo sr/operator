@@ -42,9 +42,7 @@ resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
       "ec2:ModifyInstanceAttribute",
       "ec2:ReleaseAddress",
       "ec2:RequestSpotInstances",
-      "ec2:RunInstances",
-      "s3:GetObject",
-      "s3:ListBucket"
+      "ec2:RunInstances"
     ],
     "Resource": "*",
     "Condition": {
