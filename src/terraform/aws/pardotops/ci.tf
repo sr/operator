@@ -1,3 +1,27 @@
+resource "aws_iam_user" "bamboo_sysacct" {
+  name = "bamboo_sysacct"
+}
+
+//resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
+//  name = "test"
+//  user = "${aws_iam_user.bamboo_sysacct.name}"
+//  policy = <<EOF
+//{
+//  "Version": "2012-10-17",
+//  "Statement": [{
+//    "Effect": "Allow",
+//    "Action": "ec2:RunInstances",
+//    "Resource": "arn:aws:ec2:region:account:subnet/*",
+//    "Condition": {
+//      "StringEquals": {
+//        "ec2:Vpc": "arn:aws:ec2:region:account:vpc/vpc-1a2b3c4d"
+//      }
+//    }
+//  }]
+//}
+//EOF
+//}
+
 resource "aws_vpc" "pardot_ci" {
   cidr_block = "172.27.0.0/16"
   enable_dns_support = true
@@ -373,7 +397,7 @@ resource "aws_instance" "pardot_ci_bastion" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.small"
   key_name = "pardot_ci"
-  subnet_id = "${aws_subnet.pardot_ci_us_east_1a_dmz.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.pardot_ci_bastion.id}"]
   root_block_device {
     volume_type = "gp2"
