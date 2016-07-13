@@ -991,7 +991,7 @@ module.exports = (robot) ->
 
   ensureImageExtension = (url) ->
     ext = url.split('.').pop()
-    if /(png|jpe?g)/i.test(ext)
+    if /(png|jpe?g|gifv)/i.test(ext)
       url
     else if /(gif)/i.test(ext)
       "#{url}v"
