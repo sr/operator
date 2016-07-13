@@ -8,6 +8,7 @@
 #   None
 #
 # Commands:
+#   hubot gif <query> - returns a relevant .gifv to the query
 #   hubot aggablagblag - agga blag blag
 #   hubot casey - Get casey
 #   hubot meeks - Get meeks
@@ -52,6 +53,7 @@
 #   hubot tl;dr - Totally didn't read it
 #   hubot dickbutt (me) - Get what you think you're gonna get
 #   hubot chatty (me) - Got chatty?
+#   hubot don'ttouchdoge - Don't touch doge!
 #   hubot doge (me) - Such wow
 #   hubot doge bomb <count> - Many awesome
 #   hubot corgi (me) - It's dangerous to go alone. Take this.
@@ -787,6 +789,9 @@ module.exports = (robot) ->
     imageMe msg, "chatty salesforce", (url) ->
       msg.send "#{url}"
 
+  robot.respond /(?:(please|pls),?\s*)?(don(?:')?t|do not)\s*(touch|pet|scratch|mess with)\s*doge(?:!*)?(.*)?$/i, (msg) ->
+     msg.send "http://media3.giphy.com/media/jUSrFvui8Pfpe/giphy.gif"
+
   robot.respond /doge(\sme)?$/i, (msg) ->
     imageMe msg, "doge", (url) ->
       msg.send "#{url}"
@@ -883,6 +888,37 @@ module.exports = (robot) ->
     imageMe msg, "Charlie Sheen winning", (url) ->
       msg.send "#{url}"
 
+  robot.respond /(?:gif|giphy)(?: me)? (.*)/i, (msg) ->
+    gifMe msg, msg.match[1], (url) ->
+      msg.send "#{url}"
+
+  gifMe = (msg, query, cb) ->
+    googleCseId = "006277482686057757140:iilj71y0d0u" #<-- free, 100searches a day
+    googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw" #<-- free, 100searches a day
+    q =
+      q: query,
+      searchType:'image',
+      siteSearch: 'i.imgur.com',
+      fileType: 'gif'
+      num: 10,
+      safe:'medium',
+      fields:'items(link)',
+      cx: googleCseId,
+      key: googleApiKey
+    url = 'https://www.googleapis.com/customsearch/v1'
+    msg.http(url)
+      .query(q)
+      .get() (err, res, body) ->
+        if err
+          msg.send "Encountered an error :( #{err}"
+          return
+        response = JSON.parse(body)
+        if response?.items
+          image = msg.random response.items
+          cb ensureImageExtension image.link
+        else
+          msg.send "I couldn't find any results for that search (sadpanda)"
+
   imageMe = (msg, query, cb) ->
 #    msg.http('http://ajax.googleapis.com/ajax/services/search/images')
 #    .query(v: "1.0", rsz: '8', q: query)
@@ -960,7 +996,9 @@ module.exports = (robot) ->
 
   ensureImageExtension = (url) ->
     ext = url.split('.').pop()
-    if /(png|jpe?g|gif)/i.test(ext)
+    if /(png|jpe?g|gifv)/i.test(ext)
       url
+    else if /(gif)/i.test(ext)
+      "#{url}v"
     else
       "#{url}#.png"
