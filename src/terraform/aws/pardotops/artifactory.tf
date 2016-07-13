@@ -262,7 +262,7 @@ resource "aws_elb" "artifactory_public_elb" {
 }
 
 resource "aws_iam_user" "artifactory_sysacct" {
-  name = "artifactorysyscct"
+  name = "artifactorysysacct"
 }
 
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
@@ -276,8 +276,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Sid": "allow artifactory sysacct",
       "Effect": "Allow",
       "Principal": {
-      "AWS": "arn:aws:iam::${var.pardotops_account_number}:user/${aws_iam_user.artifactory_sysacct.name}",
-      "AWS": "arn:aws:iam::${var.pardotops_account_number}:group/Operations"
+        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
       },
       "Action": "s3:*",
       "Resource": [
@@ -290,7 +289,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "AES256"
@@ -302,7 +301,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
       "Condition": {
         "Null": {
           "s3:x-amz-server-side-encryption": "true"
