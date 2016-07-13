@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 
 gem "lita", "4.7.0"
 gem "lita-hipchat", "3.0.2"

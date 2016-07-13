@@ -14,7 +14,7 @@ PATH
       zabbixapi (~> 2.4, >= 2.4.6)
 
 GEM
-  remote: https://rubygems.org/
+  remote: https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/
   specs:
     diff-lcs (1.2.5)
     faraday (0.9.2)
@@ -81,4 +81,4 @@ DEPENDENCIES
   rspec (~> 3.4, >= 3.4.0)
 
 BUNDLED WITH
-   1.11.2
+   1.12.0
