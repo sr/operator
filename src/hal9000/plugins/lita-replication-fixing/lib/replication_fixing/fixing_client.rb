@@ -15,7 +15,7 @@ module ReplicationFixing
       @fixing_status_client = fixing_status_client
       @log = log
 
-      @repfix = Faraday.new(url: @repfix_url, ssl: {verify: true}) do |faraday|
+      @repfix = Faraday.new(url: @repfix_url, ssl: { verify: true }) do |faraday|
         faraday.request :url_encoded
         faraday.adapter Faraday.default_adapter
       end
@@ -69,7 +69,7 @@ module ReplicationFixing
 
     def fix(shard:, user: "system")
       result = status(shard_or_hostname: shard)
-      if result.kind_of?(FixableErrorOccurring)
+      if result.is_a?(FixableErrorOccurring)
         execute_fix(shard: shard, user: user)
       else
         result
@@ -102,6 +102,7 @@ module ReplicationFixing
     end
 
     private
+
     def execute_fix(shard:, user:)
       response = @repfix.post("/replication/fix/#{shard.prefix}/#{shard.shard_id}", user: user)
       if response.status == 200

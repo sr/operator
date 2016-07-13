@@ -11,16 +11,16 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     it "attempts to fix the error and notifies the ops room" do
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/1")
         .and_return(
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+          { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+          body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
         )
       fix_request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       response = http.post("/replication/errors", URI.encode_www_form(
-        "hostname"         => "pardot0-dbshard1-1-dfw",
-        "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
-      ), {'Content-Type' => 'application/x-www-form-urlencoded'})
+                                                    "hostname"         => "pardot0-dbshard1-1-dfw",
+                                                    "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
+      ), "Content-Type" => "application/x-www-form-urlencoded")
 
       expect(response.status).to eq(201)
       expect(fix_request).to have_been_made
@@ -30,24 +30,24 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     it "notifies the ops-replication room with a sanitized error messages" do
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/1")
         .and_return(
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+          { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+          body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
         )
       stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
 
       response = http.post("/replication/errors", URI.encode_www_form(
-        "hostname"         => "pardot0-dbshard1-1-dfw",
-        "error"            => "Replication is broken",
-        "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
-      ), {'Content-Type' => 'application/x-www-form-urlencoded'})
+                                                    "hostname"         => "pardot0-dbshard1-1-dfw",
+                                                    "error"            => "Replication is broken",
+                                                    "mysql_last_error" => "Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')"
+      ), "Content-Type" => "application/x-www-form-urlencoded")
 
       expect(replies[0]).to eq("pardot0-dbshard1-1-dfw: Replication is broken")
       expect(replies[1]).to eq("pardot0-dbshard1-1-dfw: Query: 'INSERT INTO foo VALUES ([REDACTED], '1', '1.2')")
     end
 
     it "responds with HTTP 400 if hostname is missing" do
-      response = http.post("/replication/errors", URI.encode_www_form({}), {'Content-Type' => 'application/x-www-form-urlencoded'})
+      response = http.post("/replication/errors", URI.encode_www_form({}), "Content-Type" => "application/x-www-form-urlencoded")
       expect(response.status).to eq(400)
     end
   end
@@ -81,8 +81,8 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     it "attempts to fix the shard" do
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/11")
         .and_return(
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+          { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+          body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
         )
       request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/db/11")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
@@ -95,8 +95,8 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     it "attempts to fix the whoisdb shard" do
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/whoisdb/1")
         .and_return(
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+          { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+          body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
         )
       request = stub_request(:post, "https://repfix-dfw.pardot.com/replication/fix/whoisdb/1")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
@@ -109,8 +109,8 @@ describe Lita::Handlers::ReplicationFixing, lita_handler: true do
     it "attempts to fix the shard in PHX" do
       stub_request(:get, "https://repfix-phx.pardot.com/replication/fixes/for/db/11")
         .and_return(
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-          {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+          { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+          body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
         )
       request = stub_request(:post, "https://repfix-phx.pardot.com/replication/fix/db/11")
         .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))

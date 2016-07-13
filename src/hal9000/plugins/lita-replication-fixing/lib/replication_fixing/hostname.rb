@@ -40,6 +40,7 @@ module ReplicationFixing
     end
 
     private
+
     def parse_hostname
       if /\Apardot0-(?<type>dbshard|whoisdb)(?<cluster_id>\d+)-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname
         prefix = \

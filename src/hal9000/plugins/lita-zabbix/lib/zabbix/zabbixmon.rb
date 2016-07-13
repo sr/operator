@@ -1,17 +1,16 @@
-require 'securerandom'
+require "securerandom"
 
 module Zabbix
   class Zabbixmon
-
-    MONITOR_NAME = "zabbixmon"
-    MONITOR_SHORTHAND = "zbxmon"
-    INCIDENT_KEY = "#{MONITOR_NAME}-%s"
-    ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)"
-    ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception"
-    ZABBIX_ITEM_NOT_FOUND = "HAL9000 failed to find the payload via the API"
-    ZBXMON_KEY = "Zabbix_status"
+    MONITOR_NAME = "zabbixmon".freeze
+    MONITOR_SHORTHAND = "zbxmon".freeze
+    INCIDENT_KEY = "#{MONITOR_NAME}-%s".freeze
+    ERR_NON_200_HTTP_CODE = "HAL9000 HTTP'd Zabbix, but the host failed to respond to an HTTP request with the appropriate status code (! HTTP 200)".freeze
+    ERR_ZBX_CLIENT_EXCEPTION = "HAL9000 attempted to use the ZabbixApi client, but an exception was thrown/handled: exception".freeze
+    ZABBIX_ITEM_NOT_FOUND = "HAL9000 failed to find the payload via the API".freeze
+    ZBXMON_KEY = "Zabbix_status".freeze
     ZBXMON_PAYLOAD_LENGTH = 20
-    
+
     def initialize(redis:, zbx_client:, log:, zbx_username:, zbx_password:, datacenter:)
       @redis = redis
       @client = zbx_client
@@ -29,11 +28,11 @@ module Zabbix
     def monitor(url, num_retries = 5, retry_interval_seconds = 5, timeout_seconds = 30)
       retry_attempt_iterator = 0
       retry_sz = "attempt #{(retry_attempt_iterator + 1)} / #{num_retries}"
-      payload = "#{SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH)}" # make a per-use random string
+      payload = SecureRandom.urlsafe_base64(ZBXMON_PAYLOAD_LENGTH).to_s # make a per-use random string
       monitor_success = false
       insert_payload(payload, url, timeout_seconds)
 
-      while (retry_attempt_iterator < num_retries) && (@hard_failure.nil?) && (!monitor_success) do
+      while (retry_attempt_iterator < num_retries) && @hard_failure.nil? && !monitor_success
         # the state reported back from this loop is important! soft_fail = keep trying; hard_fail = stop and notify
         sleep retry_interval_seconds
         @log.debug("[#{monitor_name}] searching for #{payload} via API...")
@@ -47,7 +46,7 @@ module Zabbix
         @log.debug("[#{monitor_name}] successfully retrieved payload (#{retry_sz})")
         @hard_failure = nil
       else
-        @hard_failure ||= @soft_failures.to_a.join('; ')
+        @hard_failure ||= @soft_failures.to_a.join("; ")
         @log.error("[#{monitor_name}] has hard failed: #{@hard_failure}")
       end
     end
@@ -57,6 +56,7 @@ module Zabbix
     end
 
     private
+
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
       payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter),
@@ -75,18 +75,18 @@ module Zabbix
         success = false
         zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
-        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e))
-        @soft_failures.add("#{ERR_ZBX_CLIENT_EXCEPTION}".gsub('%exception%', e).gsub(@zbx_password, '**************'))
+        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", e))
+        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", e).gsub(@zbx_password, "**************"))
       end
       if zbx_items
-        if zbx_items.length > 0  # success case
+        if !zbx_items.empty? # success case
           @log.debug("[#{monitor_name}] successfully observed #{payload} from Zabbix-#{@datacenter}")
           success = true
         else # fail case
-          @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
+          @soft_failures.add(ZABBIX_ITEM_NOT_FOUND.to_s)
         end
       else # fail case
-        @soft_failures.add("#{ZABBIX_ITEM_NOT_FOUND}")
+        @soft_failures.add(ZABBIX_ITEM_NOT_FOUND.to_s)
       end
       @log.error("[#{monitor_name}] zbx_items=#{zbx_items}") unless success
       success
@@ -95,8 +95,8 @@ module Zabbix
     def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI url
-      unless ENV['http_proxy'].nil?
-        @proxy_uri = URI.parse(ENV['http_proxy'])
+      unless ENV["http_proxy"].nil?
+        @proxy_uri = URI.parse(ENV["http_proxy"])
         @proxy_host = @proxy_uri.host
         @proxy_port = @proxy_uri.port
         @proxy_user, @proxy_pass = @proxy_uri.userinfo.split(/:/) if @proxy_uri.userinfo
@@ -105,7 +105,7 @@ module Zabbix
       http = Net::HTTP.new(uri.host, uri.port) if @proxy_uri.nil?
       http = Net::HTTP.Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(uri.host, uri.port) unless @proxy_uri.nil?
 
-      if uri.scheme == 'https'
+      if uri.scheme == "https"
         http.use_ssl = true
         # http.verify_mode = OpenSSL::SSL::VERIFY_NONE # uncomment to not-verify https
       end

@@ -2,7 +2,7 @@ require "thread"
 
 module Zabbix
   class MaintenanceSupervisor
-    REDIS_NAMESPACE = "maintenance_supervisor"
+    REDIS_NAMESPACE = "maintenance_supervisor".freeze
 
     GLOBAL_MUTEX = Mutex.new
 
@@ -46,8 +46,8 @@ module Zabbix
     end
 
     def run_expirations(now: Time.now)
-      expired = @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i <= now.to_i }.keys
-      expired.select { |hostname|
+      expired = @redis.hgetall(redis_expirations_key).select { |_k, v| v.to_i <= now.to_i }.keys
+      expired.select do |hostname|
         begin
           host = @client.get_host(hostname)
           stop_maintenance(host: host)
@@ -63,7 +63,7 @@ module Zabbix
           @log.error("Error while removing host from maintenance: #{e}")
           false
         end
-      }
+      end
     end
 
     private

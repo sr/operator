@@ -10,13 +10,13 @@ module ReplicationFixing
     let(:fixing_status_client) { FixingStatusClient.new("dfw", Lita.redis) }
     let(:logger) { Logger.new("/dev/null") }
 
-    subject(:fixing_client) {
+    subject(:fixing_client) do
       FixingClient.new(
         repfix_url: "https://repfix.example",
         fixing_status_client: fixing_status_client,
         log: logger,
       )
-    }
+    end
 
     describe "#fix" do
       it "returns an error if repfix returns an error" do
@@ -42,7 +42,7 @@ module ReplicationFixing
       it "resets the status of the fixing if the error is no longer being fixed" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
-          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => {"active" => false}))
+          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => { "active" => false }))
 
         fixing_status_client.set_active(shard: hostname, active: true)
         expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
@@ -67,7 +67,7 @@ module ReplicationFixing
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
-          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true}))
+          .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }))
 
         fixing_client.fix(shard: hostname)
         expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
@@ -99,8 +99,8 @@ module ReplicationFixing
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(
-            {body: JSON.dump("is_erroring" => true, "is_fixable" => true)},
-            {body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => {"active" => true})},
+            { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
+            body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
           )
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))

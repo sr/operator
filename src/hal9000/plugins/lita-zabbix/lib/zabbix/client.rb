@@ -5,7 +5,7 @@ module Zabbix
     HostNotFound = Class.new(StandardError)
     MaintenanceGroupDoesNotExist = Class.new(StandardError)
 
-    MAINTENANCE_GROUP_NAME = "zMaintenance"
+    MAINTENANCE_GROUP_NAME = "zMaintenance".freeze
 
     def initialize(url:, user:, password:)
       @client = ZabbixApi.connect(
@@ -22,7 +22,7 @@ module Zabbix
       @client.hosts.update(
         host: host["host"],
         hostid: host["hostid"],
-        groups: group_ids.map { |id| {"groupid" => id} },
+        groups: group_ids.map { |id| { "groupid" => id } },
       )
     end
 
@@ -33,7 +33,7 @@ module Zabbix
       @client.hosts.update(
         host: host["host"],
         hostid: host["hostid"],
-        groups: group_ids.map { |id| {"groupid" => id} },
+        groups: group_ids.map { |id| { "groupid" => id } },
       )
     end
 
@@ -45,11 +45,11 @@ module Zabbix
           selectGroups: "extend",
           filter: {
             host: hostname
-          },
+          }
         },
-      ).first.tap { |host|
+      ).first.tap do |host|
         raise HostNotFound if host.nil?
-      }
+      end
     end
 
     def search_hosts(host_glob)
@@ -59,22 +59,23 @@ module Zabbix
           output: "extend",
           selectGroups: "extend",
           search: {
-            host: host_glob,
+            host: host_glob
           },
-          searchWildcardsEnabled: 1,
+          searchWildcardsEnabled: 1
         }
       )
     end
 
     def get_item_by_name_and_lastvalue(name, lastvalue)
-      @client.items.get(name: name, lastvalue: lastvalue) unless (name.nil? || lastvalue.nil?)
+      @client.items.get(name: name, lastvalue: lastvalue) unless name.nil? || lastvalue.nil?
     end
 
     private
+
     def maintenance_group_id
-      @client.hostgroups.get_id(name: MAINTENANCE_GROUP_NAME).tap { |group_id|
+      @client.hostgroups.get_id(name: MAINTENANCE_GROUP_NAME).tap do |group_id|
         raise MaintenanceGroupDoesNotExist, "Could not find ID for hostgroup #{MAINTENANCE_GROUP_NAME}" if group_id.nil?
-      }.to_s
+      end.to_s
     end
   end
 end

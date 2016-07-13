@@ -32,6 +32,7 @@ module ReplicationFixing
     end
 
     private
+
     def incident_key(shard_or_hostname)
       ["replication-error", shard_or_hostname.to_s].join("/")
     end

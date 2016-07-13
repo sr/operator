@@ -1,8 +1,8 @@
 module ReplicationFixing
   class IgnoreClient
-    IGNORE_ALL_KEY = "ignore:all"
-    IGNORE_SHARD_NAMESPACE = "ignore:shard"
-    IGNORE_SKIPPED_ERRORS_COUNT_KEY = "ignore:skipped_errors_count"
+    IGNORE_ALL_KEY = "ignore:all".freeze
+    IGNORE_SHARD_NAMESPACE = "ignore:shard".freeze
+    IGNORE_SKIPPED_ERRORS_COUNT_KEY = "ignore:skipped_errors_count".freeze
 
     def initialize(datacenter, redis)
       @datacenter = datacenter

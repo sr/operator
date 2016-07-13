@@ -2,7 +2,7 @@ require "replication_fixing/shard"
 
 module ReplicationFixing
   class FixingStatusClient
-    SHARD_NAMESPACE = "fixing_status"
+    SHARD_NAMESPACE = "fixing_status".freeze
 
     # Status keys expire after 10 minutes. The assumption is that if we haven't
     # touched the key in 10 minutes, the errors have subsided. In the future,
@@ -48,12 +48,12 @@ module ReplicationFixing
     end
 
     def current_fixes
-      @redis.keys([SHARD_NAMESPACE, @datacenter, "*"].join(":")).sort.map { |key|
+      @redis.keys([SHARD_NAMESPACE, @datacenter, "*"].join(":")).sort.map do |key|
         _, datacenter, prefix, shard_id = key.split(":")
 
         shard = Shard.new(prefix, shard_id.to_i, datacenter)
         status(shard: shard)
-      }.select { |s| s.fixing? }
+      end.select(&:fixing?)
     end
   end
 end

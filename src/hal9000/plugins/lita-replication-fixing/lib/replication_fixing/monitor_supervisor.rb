@@ -30,7 +30,7 @@ module ReplicationFixing
   end
 
   class MonitorSupervisor
-    MONITOR_NAMESPACE = "monitor_supervisor"
+    MONITOR_NAMESPACE = "monitor_supervisor".freeze
 
     def initialize(redis:, fixing_client:)
       @redis = redis
@@ -52,6 +52,7 @@ module ReplicationFixing
     end
 
     private
+
     # Loops every tick seconds waiting for replication to be fixed
     def run_monitor(monitor)
       key = build_key(monitor)
@@ -66,7 +67,7 @@ module ReplicationFixing
         result = @fixing_client.status(shard_or_hostname: monitor.shard)
         monitor.signal_tick(result)
 
-        if result.kind_of?(FixingClient::NoErrorDetected)
+        if result.is_a?(FixingClient::NoErrorDetected)
           monitor.signal_replication_fixed
           break
         end
@@ -76,6 +77,7 @@ module ReplicationFixing
     end
 
     private
+
     def build_key(monitor)
       [MONITOR_NAMESPACE, monitor.shard.to_s].join(":")
     end

@@ -5,19 +5,19 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
 
   before do
     registry.config.handlers.zabbix.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
-    registry.config.handlers.zabbix.zabbix_monitor_payload_url= "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
+    registry.config.handlers.zabbix.zabbix_monitor_payload_url = "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
     registry.config.handlers.zabbix.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
     registry.config.handlers.zabbix.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
-    registry.config.handlers.zabbix.pager = 'pagerduty'
-    registry.config.handlers.zabbix.zabbix_password = 'abc123'
+    registry.config.handlers.zabbix.pager = "pagerduty"
+    registry.config.handlers.zabbix.zabbix_password = "abc123"
   end
 
   describe "!zabbix maintenance start" do
     it "puts the host in maintenance for the specified time" do
       stub_api_version
       stub_user_login
-      stub_host_get(result: [{"hostid": "12345", "host": "pardot0-fake1-1-dfw.ops.sfdc.net", "groups":[{"groupid": "1234"}]}])
-      stub_hostgroup_get(result: [{"name": "zMaintenance", "groupid": "99999"}])
+      stub_host_get(result: [{ "hostid": "12345", "host": "pardot0-fake1-1-dfw.ops.sfdc.net", "groups": [{ "groupid": "1234" }] }])
+      stub_hostgroup_get(result: [{ "name": "zMaintenance", "groupid": "99999" }])
       stub_host_update
 
       send_command("zabbix maintenance start pardot0-fake1-1-dfw* until=+20min")
@@ -29,8 +29,8 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
     it "brings the host out of maintenance mode" do
       stub_api_version
       stub_user_login
-      stub_host_get(result: [{"hostid": "12345", "host": "pardot0-fake1-1-dfw.ops.sfdc.net", "groups":[{"groupid": "1234"}]}])
-      stub_hostgroup_get(result: [{"name": "zMaintenance", "groupid": "99999"}])
+      stub_host_get(result: [{ "hostid": "12345", "host": "pardot0-fake1-1-dfw.ops.sfdc.net", "groups": [{ "groupid": "1234" }] }])
+      stub_hostgroup_get(result: [{ "name": "zMaintenance", "groupid": "99999" }])
       stub_host_update
 
       send_command("zabbix maintenance stop pardot0-fake1-1-dfw*")
@@ -80,7 +80,7 @@ describe Lita::Handlers::Zabbix, lita_handler: true do
       stub_api_version
       stub_user_login
       stub_insert_payload
-      stub_item_get(result: [ { fake_item_key: "fake item value" } ] )
+      stub_item_get(result: [{ fake_item_key: "fake item value" }])
       send_command("zabbix monitor run dfw")
       expect(replies.last).to match(/^.*is confirmed alive*$/)
     end

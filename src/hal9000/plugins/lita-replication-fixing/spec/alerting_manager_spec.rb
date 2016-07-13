@@ -50,7 +50,7 @@ module ReplicationFixing
 
     describe "#notify_fixing_a_long_while" do
       it "sends a page" do
-        twenty_minutes_ago = Time.now - 20*60
+        twenty_minutes_ago = Time.now - 20 * 60
 
         manager.notify_fixing_a_long_while(shard: hostname.shard, started_at: twenty_minutes_ago)
 

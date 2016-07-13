@@ -20,7 +20,7 @@ Lita.configure do |config|
     "1_350@chat.btf.hipchat.com", # Simon Rozet
   ]
 
-  config.robot.adapter = (ENV.fetch("LITA_ADAPTER", "shell")).to_sym
+  config.robot.adapter = ENV.fetch("LITA_ADAPTER", "shell").to_sym
 
   config.http.host = "0.0.0.0"
   config.http.port = 8080
@@ -39,7 +39,7 @@ Lita.configure do |config|
     "1_ops@conf.btf.hipchat.com",
     "1_project_terminus@conf.btf.hipchat.com",
     "1_engineering@conf.btf.hipchat.com",
-    "1_bottest@conf.btf.hipchat.com",
+    "1_bottest@conf.btf.hipchat.com"
   ]
   config.adapters.hipchat.debug = true
 
@@ -52,7 +52,7 @@ Lita.configure do |config|
   config.handlers.zabbix.status_room = "1_ops@conf.btf.hipchat.com"
 
   # Set the datacenters
-  #config.handlers.zabbix.datacenters = ['dfw','phx']
+  # config.handlers.zabbix.datacenters = ['dfw','phx']
 
   # Zabbix Setup
   config.handlers.zabbix.zabbix_user = ENV.fetch("ZABBIX_USER", "")
@@ -63,7 +63,7 @@ Lita.configure do |config|
   config.handlers.zabbix.monitor_interval_seconds = 60
   config.handlers.zabbix.monitor_retries = 5
   config.handlers.zabbix.monitor_retry_interval_seconds = 5
-  config.handlers.zabbix.monitor_http_timeout_seconds =  30
+  config.handlers.zabbix.monitor_http_timeout_seconds = 30
 
   ## Example: Set options for the Redis connection.
   config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")

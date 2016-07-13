@@ -2,7 +2,7 @@ require "thread"
 
 module Zabbix
   class MonitorSupervisor
-    REDIS_NAMESPACE = "monitor_supervisor"
+    REDIS_NAMESPACE = "monitor_supervisor".freeze
 
     GLOBAL_MUTEX = Mutex.new
 
@@ -41,8 +41,8 @@ module Zabbix
     end
 
     def run_expirations(now: Time.now)
-      expired_monitors = @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i <= now.to_i }.keys
-      expired_monitors.select { |monitorname|
+      expired_monitors = @redis.hgetall(redis_expirations_key).select { |_k, v| v.to_i <= now.to_i }.keys
+      expired_monitors.select do |monitorname|
         begin
           unpause_monitor(monitorname: monitorname)
 
@@ -57,12 +57,11 @@ module Zabbix
           @log.error("Error unpausing monitor #{monitorname}: #{e}")
           false
         end
-      }
+      end
     end
 
-
     def get_paused_monitors(now: Time.now)
-      @redis.hgetall(redis_expirations_key).select { |k, v| v.to_i > now.to_i }.keys
+      @redis.hgetall(redis_expirations_key).select { |_k, v| v.to_i > now.to_i }.keys
     end
 
     private
@@ -76,12 +75,12 @@ module Zabbix
         begin
           loop do
             expirations = \
-            begin
-              run_expirations
-            rescue => e
-              @log.error("Error while running expirations: #{e}")
-              []
-            end
+              begin
+                run_expirations
+              rescue => e
+                @log.error("Error while running expirations: #{e}")
+                []
+              end
 
             expirations.each { |monitorname| notify_monitor_unpaused(monitorname) }
             sleep 60

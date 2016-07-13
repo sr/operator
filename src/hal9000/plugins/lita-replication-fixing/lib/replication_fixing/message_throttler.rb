@@ -1,6 +1,6 @@
 module ReplicationFixing
   class MessageThrottler
-    THROTTLER_NAMESPACE = "throttler"
+    THROTTLER_NAMESPACE = "throttler".freeze
 
     def initialize(robot:, redis:, ttl: 300)
       @robot = robot
@@ -12,7 +12,7 @@ module ReplicationFixing
       if room = target.room
         key = [THROTTLER_NAMESPACE, target.room.to_s, message].join(":")
         unless @redis.exists(key)
-          set, _ = @redis.multi do
+          set, = @redis.multi do
             @redis.setnx(key, "")
             @redis.expire(key, @ttl)
           end
