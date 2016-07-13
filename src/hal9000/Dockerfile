@@ -1,9 +1,6 @@
 FROM docker.dev.pardot.com/base/ruby:2.3.0
 ENV LANG C.UTF-8
 
-RUN mkdir /app
-WORKDIR /app
-
 ENV BUNDLE_APP_CONFIG=
 
 COPY plugins/lita-replication-fixing/*.gemspec plugins/lita-replication-fixing/Gemfile* /app/plugins/lita-replication-fixing/

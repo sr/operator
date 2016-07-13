@@ -13,7 +13,7 @@ devenv compose up
 In another shell, connect to the bot:
 
 ```bash
-devenv compose run -e LITA_ADAPTER=shell bot
+devenv compose run -e LITA_ADAPTER=shell app
 ```
 
 You should be connect to an interactive session with Hal9000:
@@ -33,10 +33,10 @@ Hal: help - Lists help information for terms and command the robot will respond 
 ### Tests
 
 ```bash
-devenv compose run bot make test
+devenv compose run app make test
 
 # Or a specific plugin test
-devenv compose run bot make test-plugin-lita-replication-fixing
+devenv compose run app make test-plugin-lita-replication-fixing
 ```
 
 ### Handlers
@@ -49,7 +49,7 @@ Create the handler:
 
 ```bash
 # Creates a handler named replication-fixing
-devenv compose run bot lita handler replication-fixing
+devenv compose run app lita handler replication-fixing
 mv lita-replication-fixing/ plugins/
 ```
 
