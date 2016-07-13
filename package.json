@@ -6,6 +6,7 @@
   "description": "Pardot's useful, but not production-critical chatbot",
   "dependencies": {
     "async": "^1.4.2",
+    "bluebird": "https://registry.npmjs.org/bluebird/-/bluebird-2.10.2.tgz",
     "db-migrate": "^0.9.25",
     "dotenv": "^1.2.0",
     "each-cons": "^1.0.0",
@@ -24,6 +25,7 @@
     "hubot-twitter-stream": "0.0.4",
     "hubot-youtube": "^1.0.2",
     "hubot-yubikey-invalidation": "0.0.3",
+    "markov": "0.0.7",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.0",
     "mysql": "^2.9.0",
