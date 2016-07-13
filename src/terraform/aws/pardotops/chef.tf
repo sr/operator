@@ -68,5 +68,6 @@ resource "aws_instance" "internal_apps_chef_server" {
   }
   tags {
     Name = "pardot0-chef1-1-ue1"
+    terraform = true
   }
 }

@@ -238,7 +238,7 @@ resource "aws_elb" "artifactory_public_elb" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/ops.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/ops.pardot.com"
   }
 
   listener {
@@ -268,54 +268,54 @@ resource "aws_iam_user" "artifactory_sysacct" {
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
   bucket = "artifactory_s3_filestore"
   acl = "private"
-
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "allow artifactory sysacct",
+      "Effect": "Allow",
+      "Principal": {
+      "AWS": "arn:aws:iam::${var.pardotops_account_number}:user/${aws_iam_user.artifactory_sysacct.name}",
+      "AWS": "arn:aws:iam::${var.pardotops_account_number}:group/Operations"
+      },
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::artifactory_s3_filestore",
+        "arn:aws:s3:::artifactory_s3_filestore/*"
+      ]
+    },
+    {
+      "Sid": "DenyIncorrectEncryptionHeader",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnEncryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Condition": {
+        "Null": {
+          "s3:x-amz-server-side-encryption": "true"
+        }
+      }
+    }
+  ]
+}
+EOF
   tags {
     Name = "artifactory_s3_filestore"
     terraform = "true"
   }
-
-//  policy = <<EOF{
-//    "Version": "2012-10-17",
-//    "Statement": [
-//      {
-//        "Sid": "allow artifactory sysacct",
-//        "Effect": "Allow",
-//        "Principal": {
-//        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
-//        },
-//        "Action": "s3:*",
-//        "Resource": [
-//          "arn:aws:s3:::artifactory_s3_filestore",
-//          "arn:aws:s3:::artifactory_s3_filestore/*"
-//        ]
-//      },
-//      {
-//        "Sid": "DenyIncorrectEncryptionHeader",
-//        "Effect": "Deny",
-//        "Principal": "*",
-//        "Action": "s3:PutObject",
-//        "Resource": "arn:aws:s3:::YourBucket/*",
-//        "Condition": {
-//          "StringNotEquals": {
-//            "s3:x-amz-server-side-encryption": "AES256"
-//          }
-//        }
-//      },
-//      {
-//        "Sid": "DenyUnEncryptedObjectUploads",
-//        "Effect": "Deny",
-//        "Principal": "*",
-//        "Action": "s3:PutObject",
-//        "Resource": "arn:aws:s3:::YourBucket/*",
-//        "Condition": {
-//          "Null": {
-//            "s3:x-amz-server-side-encryption": "true"
-//          }
-//        }
-//      }
-//    ]
-//  }
-//EOF
 }
 
 resource "aws_vpc" "artifactory_integration" {
@@ -508,13 +508,13 @@ resource "aws_db_subnet_group" "artifactory_integration" {
   ]
 }
 resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "364709603225" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}" # pardotops
   peer_vpc_id = "${aws_vpc.internal_apps.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 
 resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "364709603225" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}" # pardotops
   peer_vpc_id = "${aws_vpc.pardot_ci.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
