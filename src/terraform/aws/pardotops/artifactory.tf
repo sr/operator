@@ -268,54 +268,54 @@ resource "aws_iam_user" "artifactory_sysacct" {
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
   bucket = "artifactory_s3_filestore"
   acl = "private"
-
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "allow artifactory sysacct",
+      "Effect": "Allow",
+      "Principal": {
+      "AWS": "arn:aws:iam::364709603225:user/artifactorysyscct",
+      "AWS": "arn:aws:iam::364709603225:group/Operations"
+      },
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::artifactory_s3_filestore",
+        "arn:aws:s3:::artifactory_s3_filestore/*"
+      ]
+    },
+    {
+      "Sid": "DenyIncorrectEncryptionHeader",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnEncryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::YourBucket/*",
+      "Condition": {
+        "Null": {
+          "s3:x-amz-server-side-encryption": "true"
+        }
+      }
+    }
+  ]
+}
+EOF
   tags {
     Name = "artifactory_s3_filestore"
     terraform = "true"
   }
-
-//  policy = <<EOF{
-//    "Version": "2012-10-17",
-//    "Statement": [
-//      {
-//        "Sid": "allow artifactory sysacct",
-//        "Effect": "Allow",
-//        "Principal": {
-//        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
-//        },
-//        "Action": "s3:*",
-//        "Resource": [
-//          "arn:aws:s3:::artifactory_s3_filestore",
-//          "arn:aws:s3:::artifactory_s3_filestore/*"
-//        ]
-//      },
-//      {
-//        "Sid": "DenyIncorrectEncryptionHeader",
-//        "Effect": "Deny",
-//        "Principal": "*",
-//        "Action": "s3:PutObject",
-//        "Resource": "arn:aws:s3:::YourBucket/*",
-//        "Condition": {
-//          "StringNotEquals": {
-//            "s3:x-amz-server-side-encryption": "AES256"
-//          }
-//        }
-//      },
-//      {
-//        "Sid": "DenyUnEncryptedObjectUploads",
-//        "Effect": "Deny",
-//        "Principal": "*",
-//        "Action": "s3:PutObject",
-//        "Resource": "arn:aws:s3:::YourBucket/*",
-//        "Condition": {
-//          "Null": {
-//            "s3:x-amz-server-side-encryption": "true"
-//          }
-//        }
-//      }
-//    ]
-//  }
-//EOF
 }
 
 resource "aws_vpc" "artifactory_integration" {
