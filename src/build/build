@@ -105,6 +105,13 @@ case "$project" in
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
         ;;
+    hal9000)
+        build-ruby "$project"
+        test -n "$CI" && {
+            echo "Pushing image to ${CANOE_ECR_REPO}..." 2>&1
+            docker-push "hal9000_app" "$CANOE_ECR_REPO"
+        }
+        ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
 
