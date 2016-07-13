@@ -19,7 +19,7 @@ class Markov
     # Otherwise create a new markov object
     new Promise (resolve, reject) =>
       Markov.getSeed().then (seed) =>
-        @markov = markov()
+        @markov = markov(4)
         @markov.seed seed, () => resolve(@markov)
       .catch () -> throw new Error 'Fail to seed Markov object'
 
