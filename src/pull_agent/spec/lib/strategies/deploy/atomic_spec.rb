@@ -19,6 +19,7 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
 
         strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
+        expect(File.exist?("#{tempdir}/releases/A/build.version"))
       end
     end
 

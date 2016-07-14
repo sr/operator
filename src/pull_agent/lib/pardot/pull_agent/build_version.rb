@@ -31,6 +31,10 @@ module Pardot
       def to_s
         ["build#{build_number}", sha, artifact_url].join("\n")
       end
+
+      def save_to_file(filename)
+        File.write(filename, "#{to_s}\n")
+      end
     end
   end
 end
