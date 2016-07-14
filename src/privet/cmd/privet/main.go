@@ -21,6 +21,7 @@ var (
 	approximateBatchDurationInSeconds float64
 	envVars                           string
 	timeout                           int
+	overlookStartupHookFailure        bool
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 	flag.Float64Var(&approximateBatchDurationInSeconds, "approximate-batch-duration", 0, "Run multiple units at a time, totaling approximately this number of seconds. If zero (default), only one test will be run per invocation of runner-run-units.")
 	flag.StringVar(&envVars, "env-vars", "", "Space-separated list of environment variables that will be forwarded on to any child processes run in the privet-dir")
 	flag.IntVar(&timeout, "timeout", 3600, "Number of seconds before the process will exit, assuming there is a hung test run")
+	flag.BoolVar(&overlookStartupHookFailure, "overlook-startup-hook-failure", false, "If true, Privet will exit with status 0 if a startup hook fails. No tests will be run, but the failure will be essentially ignored")
 	flag.Parse()
 
 	envVarsList := strings.Split(envVars, " ")
@@ -75,7 +77,12 @@ func main() {
 		jobRunner.ApproximateBatchDurationInSeconds = approximateBatchDurationInSeconds
 
 		if err = jobRunner.RunStartupHook(); err != nil {
-			log.Fatalf("error running startup hook: %v", err)
+			log.Printf("error running startup hook: %v", err)
+			if overlookStartupHookFailure {
+				os.Exit(0)
+			} else {
+				os.Exit(1)
+			}
 		}
 
 		for {
