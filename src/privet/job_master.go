@@ -16,10 +16,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-const (
-	JobMasterApproximateDurationPerPop = 1 * time.Minute
-)
-
 type JobMaster struct {
 	EnvVars []string
 
