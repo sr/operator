@@ -33,7 +33,7 @@ module Pardot
       end
 
       def save_to_file(filename)
-        File.write(filename, "#{to_s}\n")
+        File.write(filename, "#{self}\n")
       end
     end
   end

@@ -20,6 +20,5 @@ describe Pardot::PullAgent::BuildVersion do
       tmpfile.flush
       expect(tmpfile.read).to eq(build_version_contents)
     end
-
   end
 end
