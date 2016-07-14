@@ -313,7 +313,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
 EOF
   tags {
     Name = "artifactory_s3_filestore"
-    terraform = "true"
+    terraform = true
   }
 }
 
