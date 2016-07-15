@@ -1,4 +1,4 @@
-class ServerTag < ActiveRecord::Base
+class ServerTag < ApplicationRecord
   has_many :server_taggings, dependent: :destroy
   has_many :servers, through: :server_taggings
 

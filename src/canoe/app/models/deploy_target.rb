@@ -1,4 +1,4 @@
-class DeployTarget < ActiveRecord::Base
+class DeployTarget < ApplicationRecord
   # validations, uniqueness, etc
   has_many :deploys
   has_many :locks

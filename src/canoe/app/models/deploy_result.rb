@@ -1,4 +1,4 @@
-class DeployResult < ActiveRecord::Base
+class DeployResult < ApplicationRecord
   belongs_to :deploy
   belongs_to :server
 

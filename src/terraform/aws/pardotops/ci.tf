@@ -1,5 +1,73 @@
+resource "aws_iam_user" "bamboo_sysacct" {
+  name = "bamboo_sysacct"
+}
+
+resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
+  name = "BambooServerSysAcct"
+  user = "${aws_iam_user.bamboo_sysacct.name}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BambooAllowedAllInVPC",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RequestSpot*",
+        "ec2:CancelSpot*",
+        "ec2:AllocateAddress",
+        "ec2:AssociateAddress",
+        "ec2:AttachVolume",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CancelSpotInstanceRequests",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateVolume",
+        "ec2:DeleteVolume",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInstances",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeVpcs",
+        "ec2:GetConsoleOutput",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:RequestSpotInstances",
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:StopInstances",
+        "ec2:StartInstances"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:Vpc": "arn:aws:ec2:us-east-1:${var.pardotops_account_number}:vpc/${aws_vpc.pardot_ci.id}"
+        }
+      }
+    },
+    {
+      "Sid": "BambooNonVPC",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "ec2:DescribeSubnets",
+        "ec2:CreateKeyPair",
+        "ec2:CreateTags",
+        "ec2:DescribeImages",
+        "ec2:DescribeKeyPairs",
+        "ec2:DescribeRegions",
+        "ec2:DescribeSpotInstanceRequests",
+        "ec2:DescribeSpotPriceHistory",
+        "ec2:ReleaseAddress"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_vpc" "pardot_ci" {
-  cidr_block = "172.29.0.0/16"
+  cidr_block = "172.27.0.0/16"
   enable_dns_support = true
   enable_dns_hostnames = true
   tags {
@@ -10,56 +78,56 @@ resource "aws_vpc" "pardot_ci" {
 resource "aws_subnet" "pardot_ci_us_east_1a" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.29.0.0/19"
+  cidr_block = "172.27.0.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1c" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.29.32.0/19"
+  cidr_block = "172.27.32.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1d" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.29.64.0/19"
+  cidr_block = "172.27.64.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1e" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.29.96.0/19"
+  cidr_block = "172.27.96.0/19"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1a_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1a"
-  cidr_block = "172.29.128.0/19"
+  cidr_block = "172.27.128.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1c_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1c"
-  cidr_block = "172.29.160.0/19"
+  cidr_block = "172.27.160.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1d_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1d"
-  cidr_block = "172.29.192.0/19"
+  cidr_block = "172.27.192.0/19"
   map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "pardot_ci_us_east_1e_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
   availability_zone = "us-east-1e"
-  cidr_block = "172.29.224.0/19"
+  cidr_block = "172.27.224.0/19"
   map_public_ip_on_launch = true
 }
 
@@ -88,6 +156,26 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.pardot_ci_internet_gw.id}"
   }
+  route {
+    cidr_block = "172.31.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
+  }
+  route {
+    cidr_block = "172.28.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  }
+}
+
+resource "aws_route" "pardot_ci_to_atlassian_tools" {
+  destination_cidr_block = "172.31.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_atlassian_tools_and_pardot_ci_vpc_peering.id}"
+  route_table_id = "${aws_vpc.pardot_ci.main_route_table_id}"
+}
+
+resource "aws_route" "pardot_ci_to_artifactory_integration" {
+  destination_cidr_block = "172.28.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_vpc.pardot_ci.main_route_table_id}"
 }
 
 resource "aws_route_table_association" "pardot_ci_us_east_1a" {
@@ -322,19 +410,7 @@ resource "aws_security_group" "pardot_ci_elasticbamboo" {
   }
 }
 
-resource "aws_db_subnet_group" "pardot_ci" {
-  name = "pardot_ci"
-  description = "Pardot CI DB Subnet"
-  subnet_ids = [
-    "${aws_subnet.pardot_ci_us_east_1a.id}",
-    "${aws_subnet.pardot_ci_us_east_1c.id}",
-    "${aws_subnet.pardot_ci_us_east_1d.id}",
-    "${aws_subnet.pardot_ci_us_east_1e.id}"
-  ]
-}
-
 # Bastion host
-
 resource "aws_security_group" "pardot_ci_bastion" {
   name = "pardot_ci_bastion"
   description = "Bastion host, allows SSH from SFDC VPNs"
@@ -365,7 +441,7 @@ resource "aws_instance" "pardot_ci_bastion" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.small"
   key_name = "pardot_ci"
-  subnet_id = "${aws_subnet.pardot_ci_us_east_1a_dmz.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1c_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.pardot_ci_bastion.id}"]
   root_block_device {
     volume_type = "gp2"

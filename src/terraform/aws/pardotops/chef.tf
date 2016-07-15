@@ -10,10 +10,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_eip.pardot_ci_bastion.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -23,10 +20,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_eip.pardot_ci_bastion.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -36,10 +30,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_eip.pardot_ci_bastion.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32"
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -77,5 +68,6 @@ resource "aws_instance" "internal_apps_chef_server" {
   }
   tags {
     Name = "pardot0-chef1-1-ue1"
+    terraform = true
   }
 }

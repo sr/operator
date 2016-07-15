@@ -1,5 +1,5 @@
 class BranchesController < ApplicationController
-  before_filter :require_project
+  before_action :require_project
 
   def index
     @branches = current_project.branches
