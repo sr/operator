@@ -131,7 +131,8 @@ case "$project" in
         ;;
     shell)
         docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
-        docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" build/shellcheck lint-shell
+        docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" \
+            build/shellcheck lint-shell
         ;;
     teampass)
         docker build -f src/teampass/Dockerfile src/teampass
