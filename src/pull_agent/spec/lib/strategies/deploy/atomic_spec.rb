@@ -19,6 +19,15 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
 
         strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
         expect(File.readlink("#{tempdir}/current")).to eq("#{tempdir}/releases/A")
+      end
+    end
+
+    it "should deploy and write out a build.version file" do
+      Tempfile.create("empty.tar.gz") do |f|
+        f.write(empty_tar_gz_contents)
+        f.flush
+
+        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
         expect(File.exist?("#{tempdir}/releases/A/build.version"))
       end
     end
