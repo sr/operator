@@ -32,5 +32,11 @@ Vagrant.configure(2) do |config|
     REDHAT_RELEASE=$(awk '{ print $3 }' /etc/redhat-release | cut -d. -f1)
     rpm -Uvh "http://rpms.famillecollet.com/enterprise/remi-release-${REDHAT_RELEASE}.rpm"
     yum-config-manager --enable remi-php70
+
+    echo "[pardot_stacki]" > /etc/yum.repos.d/pardot_stacki.repo
+    echo "name=Pardot Stacki repo" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "baseurl=https://artifactory.dev.pardot.com/artifactory/pd-stacki/" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "enabled=1" >> /etc/yum.repos.d/pardot_stacki.repo
+    echo "gpgcheck=0" >> /etc/yum.repos.d/pardot_stacki.repo
   SHELL
 end
