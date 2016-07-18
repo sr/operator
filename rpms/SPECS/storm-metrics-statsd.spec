@@ -2,7 +2,7 @@
 
 Name: storm-metrics-statsd
 Version: 1.0.0.SNAPSHOT
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Storm plugin for reporting metrics to statsd
 Group: Applications/Internet
 License: Apache License v2.0
