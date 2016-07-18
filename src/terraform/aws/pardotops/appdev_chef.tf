@@ -56,7 +56,7 @@ resource "aws_instance" "appdev_chef_server" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
-  private_ip = "172.26.192.255"
+  private_ip = "172.26.64.254"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   vpc_security_group_ids = [
     "${aws_security_group.appdev_chef_server.id}"
