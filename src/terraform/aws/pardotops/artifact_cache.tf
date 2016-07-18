@@ -96,7 +96,7 @@ resource "aws_elb" "artifact_cache_lb" {
 
 resource "aws_instance" "artifact_cache_server_1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "c4.xlarge"
+  instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   root_block_device {
@@ -111,7 +111,7 @@ resource "aws_instance" "artifact_cache_server_1" {
 }
 resource "aws_instance" "artifact_cache_server_2" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "c4.xlarge"
+  instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   root_block_device {
@@ -126,7 +126,7 @@ resource "aws_instance" "artifact_cache_server_2" {
 }
 resource "aws_instance" "artifact_cache_server_3" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "c4.xlarge"
+  instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   root_block_device {
@@ -141,7 +141,7 @@ resource "aws_instance" "artifact_cache_server_3" {
 }
 resource "aws_instance" "artifact_cache_server_4" {
   ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "c4.xlarge"
+  instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1e.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   root_block_device {
