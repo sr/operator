@@ -1,6 +1,6 @@
 module Pardot
   module PullAgent
-    Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions, :created_at, :options) do
+    Deploy = Struct.new(:id, :what, :what_details, :build_number, :artifact_url, :server_actions, :created_at, :sha, :options) do
       def self.from_hash(hash)
         new(
           hash["id"],
@@ -10,6 +10,7 @@ module Pardot
           hash["artifact_url"],
           hash["servers"],
           hash["created_at"],
+          hash["sha"],
           hash["options"]
         )
       end
