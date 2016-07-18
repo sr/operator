@@ -1,5 +1,5 @@
 resource "aws_security_group" "artifact_cache_http_lb" {
-  name = "artifactory_http_lb"
+  name = "artifact_cache_http_lb"
   description = "Allow HTTP/HTTPS from SFDC VPN only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
