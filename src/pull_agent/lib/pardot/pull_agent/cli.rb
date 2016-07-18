@@ -133,8 +133,8 @@ module Pardot
       end
 
       def self.knife(args)
-        if args.size < 1
-          raise ArgumentError, "environment argument is required"
+        if args.size < 2
+          raise ArgumentError, "Usage: pull-agent-knife <environment> <command...>"
         end
 
         env_name = args.shift
