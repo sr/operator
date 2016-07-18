@@ -415,6 +415,10 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     cidr_block = "172.30.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
   }
+  route {
+    cidr_block = "172.26.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
+  }
 }
 
 resource "aws_route" "artifactory_integration_to_pardot_ci" {
@@ -507,13 +511,13 @@ resource "aws_db_subnet_group" "artifactory_integration" {
   ]
 }
 resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "${var.pardotops_account_number}" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}"
   peer_vpc_id = "${aws_vpc.internal_apps.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 
 resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "${var.pardotops_account_number}" # pardotops
+  peer_owner_id = "${var.pardotops_account_number}"
   peer_vpc_id = "${aws_vpc.pardot_ci.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
