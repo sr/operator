@@ -22,6 +22,16 @@ describe Pardot::PullAgent::Strategies::Deploy::Atomic do
       end
     end
 
+    it "should deploy and write out a build.version file" do
+      Tempfile.create("empty.tar.gz") do |f|
+        f.write(empty_tar_gz_contents)
+        f.flush
+
+        strategy.deploy(f.path, Pardot::PullAgent::Deploy.new)
+        expect(File.exist?("#{tempdir}/releases/A/build.version"))
+      end
+    end
+
     it "should deploy and link to the first choice when current_link points to neither A nor B" do
       Tempfile.create("empty.tar.gz") do |f|
         f.write(empty_tar_gz_contents)
