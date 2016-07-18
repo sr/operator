@@ -150,8 +150,8 @@ resource "aws_route_table_association" "appdev_us_east_1e_dmz" {
   route_table_id = "${aws_route_table.appdev_route_dmz.id}"
 }
 
-resource "aws_security_group" "appdev_default" {
-  name = "appdev_default"
+resource "aws_security_group" "appdev_bastion_access" {
+  name = "appdev_bastion_access"
   description = "Allow SSH from bastion on public and private interfaces"
   vpc_id = "${aws_vpc.appdev.id}"
 
