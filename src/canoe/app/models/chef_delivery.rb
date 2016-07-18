@@ -84,6 +84,10 @@ class ChefDelivery
   end
 
   def knife(request)
+    if request.command[0] == "help"
+      return
+    end
+
     if request.command[0, 3] == %w[node from file]
       return
     end
