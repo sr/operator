@@ -73,7 +73,7 @@ case "$action" in
         if [ "$action" != "pull" ]; then
           breadsignal -terraform "$action" \
               -terraform-version "$(terraform version)" \
-              -branch "$(git rev-parse --abbrev-ref HEAD)" \
+              -branch "$branch" \
               -terraform-path "${account}" \
               -testing=false
         fi
