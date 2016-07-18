@@ -3,11 +3,6 @@ resource "aws_security_group" "appdev_ldap_server" {
   description = "Allow LDAP and LDAPS inside appdev VPC"
   vpc_id = "${aws_vpc.appdev.id}"
 
-  # We run LDAP over port 443 to allow SFDC datacenters to connect to us, since
-  # only 80, 443, and 25 are allowed outbound.
-  #
-  # LDAPS is run on port 443.
-
   ingress {
     from_port = 389
     to_port = 389

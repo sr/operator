@@ -238,7 +238,7 @@ resource "aws_instance" "appdev_bastion" {
   }
   tags {
     terraform = "true"
-    Name = "pardot0-appdevbastion1-1-ue1"
+    Name = "pardot2-bastion1-1-ue1"
   }
 }
 
