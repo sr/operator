@@ -8,8 +8,7 @@ resource "aws_security_group" "appdev_ldap_server" {
     to_port = 389
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_vpc.appdev.cidr_block}"
     ]
   }
   ingress {
@@ -17,8 +16,7 @@ resource "aws_security_group" "appdev_ldap_server" {
     to_port = 636
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_vpc.appdev.cidr_block}"
     ]
   }
 
