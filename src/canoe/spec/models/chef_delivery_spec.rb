@@ -212,4 +212,12 @@ RSpec.describe ChefDelivery do
     @delivery.knife(request)
     assert_equal 0, @config.notifier.messages.size
   end
+
+  it "ignores 'knife pd sync' command" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[pd sync]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
 end
