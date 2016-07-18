@@ -84,6 +84,10 @@ class ChefDelivery
   end
 
   def knife(request)
+    if request.command[0,3] == ["node", "from", "file"]
+      return
+    end
+
     notification.knife_command(
       @config.chat_room_id(request.server),
       request.server,
