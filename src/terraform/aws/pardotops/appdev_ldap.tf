@@ -26,7 +26,7 @@ resource "aws_security_group" "appdev_ldap_server" {
     to_port = 22
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.appdev_default.id}"
+      "${aws_security_group.appdev_bastion_access.id}"
     ]
   }
 
@@ -42,7 +42,7 @@ resource "aws_instance" "appdev_ldap_host" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
-  private_ip = "172.26.192.255"
+  private_ip = "172.26.192.254"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   vpc_security_group_ids = [
     "${aws_security_group.appdev_ldap_server.id}"
