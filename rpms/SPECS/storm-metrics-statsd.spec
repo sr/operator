@@ -11,7 +11,6 @@ Source0: https://github.com/jegeiger/storm-metrics-statsd/archive/master.tar.gz
 BuildArch: noarch
 BuildRequires: jdk
 BuildRequires: curl
-Requires: storm = 0.10.0
 BuildRoot: %{_tmppath}/%name-root
 
 %description
