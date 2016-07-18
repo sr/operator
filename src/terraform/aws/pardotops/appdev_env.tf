@@ -75,7 +75,7 @@ resource "aws_security_group" "appdev_apphost" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
+      "${aws_vpc.appdev.cidr_block}"
     ]
   }
 
