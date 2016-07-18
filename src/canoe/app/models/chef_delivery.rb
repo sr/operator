@@ -83,6 +83,14 @@ class ChefDelivery
     )
   end
 
+  def knife(request)
+    notification.knife_command(
+      @config.chat_room_id(request.server),
+      request.server,
+      request.command
+    )
+  end
+
   private
 
   def notification

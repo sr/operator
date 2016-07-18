@@ -33,6 +33,14 @@ class ChefDeliveryNotification
     @notifier.notify_room(room_id, message, color)
   end
 
+  def knife_command(room_id, server, command)
+    message = "knife command executed in " \
+      "#{server.datacenter}/#{server.environment}: <br/>" \
+      "<code>#{command.join(" ")}</code>"
+
+    @notifier.notify_room(room_id, message, YELLOW)
+  end
+
   private
 
   def link_to(object)
