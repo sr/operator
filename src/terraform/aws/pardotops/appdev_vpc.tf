@@ -152,7 +152,7 @@ resource "aws_route_table_association" "appdev_us_east_1e_dmz" {
 
 resource "aws_security_group" "appdev_default" {
   name = "appdev_default"
-  description = "Allow SSH from bastion"
+  description = "Allow SSH from bastion on public and private interfaces"
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
@@ -161,6 +161,15 @@ resource "aws_security_group" "appdev_default" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_instance.appdev_bastion.public_ip}/32"
+    ]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_vpn_ssh.id}"
     ]
   }
 

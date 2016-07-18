@@ -75,7 +75,7 @@ resource "aws_security_group" "appdev_apphost" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}"
+      "${aws_vpc.appdev.cidr_block}",
     ]
   }
 
@@ -85,6 +85,16 @@ resource "aws_security_group" "appdev_apphost" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
+  # allow health check from ELBs
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
     ]
   }
 
@@ -119,7 +129,7 @@ resource "aws_security_group" "appdev_dbhost" {
 }
 
 resource "aws_elb" "appdev_app_elb" {
-  name = "${var.environment_appdev["env_name"]}_app_elb"
+  name = "${var.environment_appdev["env_name"]}-app-elb"
   security_groups = [
     "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
   ]
@@ -132,7 +142,7 @@ resource "aws_elb" "appdev_app_elb" {
   cross_zone_load_balancing = true
   connection_draining = true
   connection_draining_timeout = 30
-  instance = "${element(aws_instance.appdev_app1.*.id, count.index)}"
+  instances = ["${element(aws_instance.appdev_app1.*.id, count.index)}"]
 
   listener {
     lb_port = 443

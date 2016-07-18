@@ -28,7 +28,7 @@ resource "aws_security_group" "appdev_ldap_server" {
     to_port = 22
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.appdev_bastion.id}"
+      "${aws_security_group.appdev_default.id}"
     ]
   }
 
