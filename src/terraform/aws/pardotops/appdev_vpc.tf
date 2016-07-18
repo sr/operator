@@ -152,7 +152,29 @@ resource "aws_route_table_association" "appdev_us_east_1e_dmz" {
 
 resource "aws_security_group" "appdev_default" {
   name = "appdev_default"
-  description = "Allow HTTP/HTTPS from SFDC VPN and SSH from appdev bastion"
+  description = "Allow SSH from bastion"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.appdev_bastion.public_ip}/32"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
+  name = "appdev_sfdc_vpn_http_https"
+  description = "Allow HTTP/HTTPS traffic from SFDC VPN"
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
@@ -181,15 +203,6 @@ resource "aws_security_group" "appdev_default" {
     ]
   }
 
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.appdev_bastion.id}"
-    ]
-  }
-
   egress {
     from_port = 0
     to_port = 0
@@ -198,10 +211,9 @@ resource "aws_security_group" "appdev_default" {
   }
 }
 
-# Bastion host
-resource "aws_security_group" "appdev_bastion" {
-  name = "appdev_bastion"
-  description = "Bastion host, allows SSH from SFDC VPNs"
+resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
+  name = "appdev_sfdc_vpn_ssh"
+  description = "Allow SSH traffic from SFDC VPN"
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
@@ -230,7 +242,7 @@ resource "aws_instance" "appdev_bastion" {
   instance_type = "t2.small"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
-  vpc_security_group_ids = ["${aws_security_group.appdev_bastion.id}"]
+  vpc_security_group_ids = ["${aws_security_group.appdev_sfdc_vpn_ssh.id}"]
   root_block_device {
     volume_type = "gp2"
     volume_size = "20"

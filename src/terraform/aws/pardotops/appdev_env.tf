@@ -1,9 +1,6 @@
-//// App.dev environment clone template
+//// App.dev environment
 //// managed by pd-bread@salesforce.com
 
-////
-//// CONFIGURATION
-////
 
 variable "environment_appdev" {
   type = "map"
@@ -39,20 +36,21 @@ variable "environment_appdev" {
   }
 }
 
-////
-//// INFRASTRUCTURE
-////
 
 ////
-//// TEMPLATE: replace "lbl" w/ "servicename" and adjust instance_type upward if necessary
+//// TEMPLATES
 ////
+//
+//// EC2 INSTANCE: replace "lbl" w/ "servicename", edit secgroups accordingly, and adjust instance_type upward if necessary
 //resource "aws_instance" "appdev_lbl1" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_ebs_ami}"
 //  instance_type = "${var.environment_appdev["app_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  security_groups = [
-//    "${aws_security_group.appdev_default.id}"
+//    "${aws_security_group.appdev_default.id}",
+//    "${aws_security_group.appdev_dbhost.id}",
+//    "${aws_security_group.appdev_apphost.id}"
 //  ]
 //  tags {
 //    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index}-${var.environment_appdev["dc_id"]}"
@@ -60,30 +58,124 @@ variable "environment_appdev" {
 //  }
 //}
 //
+//// EC2 ELASTIC IP: replace "lbl" w/ "servicename"
 //resource "aws_eip" "appdev_lbl1" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  instance = "${element(aws_instance.appdev_lbl1.*.id, count.index)}"
 //  vpc = true
 //}
 
+resource "aws_security_group" "appdev_apphost" {
+  name = "appdev_apphost"
+  description = "Allow HTTP/HTTPS traffic from appdev vpc"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "appdev_dbhost" {
+  name = "appdev_dbhost"
+  description = "Allow MYSQL traffic from appdev apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_apphost.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_elb" "appdev_app_elb" {
+  name = "${var.environment_appdev["env_name"]}_app_elb"
+  security_groups = [
+    "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
+  ]
+  subnets = [
+    "${aws_subnet.appdev_us_east_1a.id}",
+    "${aws_subnet.appdev_us_east_1c.id}",
+    "${aws_subnet.appdev_us_east_1d.id}",
+    "${aws_subnet.appdev_us_east_1e.id}"
+  ]
+  cross_zone_load_balancing = true
+  connection_draining = true
+  connection_draining_timeout = 30
+  instance = "${element(aws_instance.appdev_app1.*.id, count.index)}"
+
+  listener {
+    lb_port = 443
+    lb_protocol = "https"
+    instance_port = 80
+    instance_protocol = "http"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com"
+  }
+
+  listener {
+    lb_port = 80
+    lb_protocol = "http"
+    instance_port = 80
+    instance_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 4
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "HTTP:80/home/ping"
+    interval = 5
+  }
+
+  tags {
+    Name = "appdev_public_elb"
+  }
+}
+
 resource "aws_instance" "appdev_globaldb1" {
   count = "${var.environment_appdev["num_globaldb1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_globaldb1" {
-  count = "${var.environment_appdev["num_globaldb1_hosts"]}"
-  instance = "${element(aws_instance.appdev_globaldb1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_dbshard1" {
@@ -92,18 +184,14 @@ resource "aws_instance" "appdev_dbshard1" {
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_dbshard1" {
-  count = "${var.environment_appdev["num_dbshard1_hosts"]}"
-  instance = "${element(aws_instance.appdev_dbshard1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_app1" {
@@ -112,18 +200,13 @@ resource "aws_instance" "appdev_app1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_app1" {
-  count = "${var.environment_appdev["num_app1_hosts"]}"
-  instance = "${element(aws_instance.appdev_app1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_job1" {
@@ -132,18 +215,13 @@ resource "aws_instance" "appdev_job1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-job1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_job1" {
-  count = "${var.environment_appdev["num_job1_hosts"]}"
-  instance = "${element(aws_instance.appdev_job1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_jobbackup1" {
@@ -152,18 +230,13 @@ resource "aws_instance" "appdev_jobbackup1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-jobbackup1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_jobbackup1" {
-  count = "${var.environment_appdev["num_jobbackup1_hosts"]}"
-  instance = "${element(aws_instance.appdev_jobbackup1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_thumbs1" {
@@ -172,18 +245,13 @@ resource "aws_instance" "appdev_thumbs1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_thumbs1" {
-  count = "${var.environment_appdev["num_thumbs1_hosts"]}"
-  instance = "${element(aws_instance.appdev_thumbs1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_redisjob1" {
@@ -192,18 +260,13 @@ resource "aws_instance" "appdev_redisjob1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_redisjob1" {
-  count = "${var.environment_appdev["num_redisjob1_hosts"]}"
-  instance = "${element(aws_instance.appdev_redisjob1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_jobmanager1" {
@@ -212,18 +275,13 @@ resource "aws_instance" "appdev_jobmanager1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_jobmanager1" {
-  count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
-  instance = "${element(aws_instance.appdev_jobmanager1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_push1" {
@@ -232,18 +290,13 @@ resource "aws_instance" "appdev_push1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_push1" {
-  count = "${var.environment_appdev["num_push1_hosts"]}"
-  instance = "${element(aws_instance.appdev_push1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_provisioning1" {
@@ -252,18 +305,13 @@ resource "aws_instance" "appdev_provisioning1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_provisioning1" {
-  count = "${var.environment_appdev["num_provisioning1_hosts"]}"
-  instance = "${element(aws_instance.appdev_provisioning1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_rabbit1" {
@@ -272,18 +320,13 @@ resource "aws_instance" "appdev_rabbit1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_rabbit1" {
-  count = "${var.environment_appdev["num_rabbit1_hosts"]}"
-  instance = "${element(aws_instance.appdev_rabbit1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_redisrules1" {
@@ -292,18 +335,13 @@ resource "aws_instance" "appdev_redisrules1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_redisrules1" {
-  count = "${var.environment_appdev["num_redisrules1_hosts"]}"
-  instance = "${element(aws_instance.appdev_redisrules1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_autojob1" {
@@ -312,18 +350,13 @@ resource "aws_instance" "appdev_autojob1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_autojob1" {
-  count = "${var.environment_appdev["num_autojob1_hosts"]}"
-  instance = "${element(aws_instance.appdev_autojob1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_storm1" {
@@ -332,18 +365,13 @@ resource "aws_instance" "appdev_storm1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_storm1" {
-  count = "${var.environment_appdev["num_storm1_hosts"]}"
-  instance = "${element(aws_instance.appdev_storm1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_kafka1" {
@@ -352,18 +380,13 @@ resource "aws_instance" "appdev_kafka1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_kafka1" {
-  count = "${var.environment_appdev["num_kafka1_hosts"]}"
-  instance = "${element(aws_instance.appdev_kafka1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_zkkafka1" {
@@ -372,19 +395,13 @@ resource "aws_instance" "appdev_zkkafka1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-
-resource "aws_eip" "appdev_zkkafka1" {
-  count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
-  instance = "${element(aws_instance.appdev_zkkafka1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_pubsub1" {
@@ -393,18 +410,13 @@ resource "aws_instance" "appdev_pubsub1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_pubsub1" {
-  count = "${var.environment_appdev["num_pubsub1_hosts"]}"
-  instance = "${element(aws_instance.appdev_pubsub1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_zkstorm1" {
@@ -413,18 +425,13 @@ resource "aws_instance" "appdev_zkstorm1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_zkstorm1" {
-  count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
-  instance = "${element(aws_instance.appdev_zkstorm1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_nimbus1" {
@@ -433,18 +440,13 @@ resource "aws_instance" "appdev_nimbus1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_nimbus1" {
-  count = "${var.environment_appdev["num_nimbus1_hosts"]}"
-  instance = "${element(aws_instance.appdev_nimbus1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_appcache1" {
@@ -453,18 +455,13 @@ resource "aws_instance" "appdev_appcache1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_appcache1" {
-  count = "${var.environment_appdev["num_appcache1_hosts"]}"
-  instance = "${element(aws_instance.appdev_appcache1.*.id, count.index)}"
-  vpc = true
 }
 
 resource "aws_instance" "appdev_discovery1" {
@@ -473,16 +470,11 @@ resource "aws_instance" "appdev_discovery1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
   security_groups = [
-    "${aws_security_group.appdev_default.id}"
+    "${aws_security_group.appdev_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-}
-
-resource "aws_eip" "appdev_discovery1" {
-  count = "${var.environment_appdev["num_discovery1_hosts"]}"
-  instance = "${element(aws_instance.appdev_discovery1.*.id, count.index)}"
-  vpc = true
 }
