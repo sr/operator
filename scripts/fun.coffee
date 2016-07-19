@@ -904,12 +904,10 @@ module.exports = (robot) ->
 
     if sites.length > 0
       query += " ("
-      for i in [0..sites.length - 1]
-        query += "site:#{sites[i]}"
-        if i isnt sites.length - 1
-          query += " OR "
+      query += sites.join " OR "
       query += ")"
 
+    console.log query
     q =
       q: query,
       searchType:'image',
