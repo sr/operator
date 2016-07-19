@@ -47,8 +47,8 @@ variable "environment_appdev" {
 //  ami = "${var.centos_6_hvm_ebs_ami}"
 //  instance_type = "${var.environment_appdev["app_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
-//  security_groups = [
-//    "${aws_security_group.appdev_default.id}",
+//  vpc_security_group_ids = [
+//    "${aws_security_group.appdev_vpc_default.id}",
 //    "${aws_security_group.appdev_dbhost.id}",
 //    "${aws_security_group.appdev_apphost.id}"
 //  ]
@@ -149,7 +149,7 @@ resource "aws_elb" "appdev_app_elb" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
 
   listener {
@@ -176,9 +176,9 @@ resource "aws_instance" "appdev_globaldb1" {
   count = "${var.environment_appdev["num_globaldb1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
     "${aws_security_group.appdev_dbhost.id}"
   ]
@@ -192,9 +192,9 @@ resource "aws_instance" "appdev_dbshard1" {
   count = "${var.environment_appdev["num_dbshard1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
     "${aws_security_group.appdev_dbhost.id}"
   ]
@@ -208,9 +208,9 @@ resource "aws_instance" "appdev_app1" {
   count = "${var.environment_appdev["num_app1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -223,9 +223,9 @@ resource "aws_instance" "appdev_job1" {
   count = "${var.environment_appdev["num_job1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -238,9 +238,9 @@ resource "aws_instance" "appdev_jobbackup1" {
   count = "${var.environment_appdev["num_jobbackup1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -253,9 +253,9 @@ resource "aws_instance" "appdev_thumbs1" {
   count = "${var.environment_appdev["num_thumbs1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -268,9 +268,9 @@ resource "aws_instance" "appdev_redisjob1" {
   count = "${var.environment_appdev["num_redisjob1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -283,9 +283,9 @@ resource "aws_instance" "appdev_jobmanager1" {
   count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -298,9 +298,9 @@ resource "aws_instance" "appdev_push1" {
   count = "${var.environment_appdev["num_push1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -313,9 +313,9 @@ resource "aws_instance" "appdev_provisioning1" {
   count = "${var.environment_appdev["num_provisioning1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -328,9 +328,9 @@ resource "aws_instance" "appdev_rabbit1" {
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -343,9 +343,9 @@ resource "aws_instance" "appdev_redisrules1" {
   count = "${var.environment_appdev["num_redisrules1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -358,9 +358,9 @@ resource "aws_instance" "appdev_autojob1" {
   count = "${var.environment_appdev["num_autojob1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -373,9 +373,9 @@ resource "aws_instance" "appdev_storm1" {
   count = "${var.environment_appdev["num_storm1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -388,9 +388,9 @@ resource "aws_instance" "appdev_kafka1" {
   count = "${var.environment_appdev["num_kafka1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -403,9 +403,9 @@ resource "aws_instance" "appdev_zkkafka1" {
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -418,9 +418,9 @@ resource "aws_instance" "appdev_pubsub1" {
   count = "${var.environment_appdev["num_pubsub1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -433,9 +433,9 @@ resource "aws_instance" "appdev_zkstorm1" {
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -448,9 +448,9 @@ resource "aws_instance" "appdev_nimbus1" {
   count = "${var.environment_appdev["num_nimbus1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -463,9 +463,9 @@ resource "aws_instance" "appdev_appcache1" {
   count = "${var.environment_appdev["num_appcache1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -478,9 +478,9 @@ resource "aws_instance" "appdev_discovery1" {
   count = "${var.environment_appdev["num_discovery1_hosts"]}"
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}}"
-  security_groups = [
-    "${aws_security_group.appdev_default.id}",
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {

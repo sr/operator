@@ -29,25 +29,26 @@ plan: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
 
 pull: $(TERRAFORM) $(TERRAFORM_DIR)
 	cd $(TERRAFORM_DIR) && \
-	    cp .terraform/terraform.tfstate .terraform/terraform.tfstate.$(date +%Y%m%d%H%M%S) && \
+		cp .terraform/terraform.tfstate .terraform/terraform.tfstate.$(shell date +%Y%m%d%H%M%S); \
 		$< remote pull $(TERRAFORM_OPTS)
 
 push: $(TERRAFORM) $(TERRAFORM_DIR)
 	cd $(TERRAFORM_DIR) && \
-	    cp .terraform/terraform.tfstate .terraform/terraform.tfstate.$(date +%Y%m%d%H%M%S) && \
+		cp .terraform/terraform.tfstate .terraform/terraform.tfstate.$(shell date +%Y%m%d%H%M%S); \
 		$< remote push $(TERRAFORM_OPTS)
 
 refresh: $(TERRAFORM) $(TERRAFORM_DIR) $(TERRAFORM_VAR_FILE) remote-state
 	$< refresh -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS) $(TERRAFORM_DIR)
 
 remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
-	$< remote config \
-		-backend=artifactory \
-		-backend-config="username=$(ARTIFACTORY_USERNAME)" \
-		-backend-config="password=$(ARTIFACTORY_ENCRYPTED_PASSWORD)" \
-		-backend-config="url=$(ARTIFACTORY_URL)" \
-		-backend-config="repo=$(ARTIFACTORY_REPO)" \
-		-backend-config="subpath=$(TERRAFORM_DIR)"
+	cd $(TERRAFORM_DIR) && \
+		$< remote config \
+			-backend=artifactory \
+			-backend-config="username=$(ARTIFACTORY_USERNAME)" \
+			-backend-config="password=$(ARTIFACTORY_ENCRYPTED_PASSWORD)" \
+			-backend-config="url=$(ARTIFACTORY_URL)" \
+			-backend-config="repo=$(ARTIFACTORY_REPO)" \
+			-backend-config="subpath=$(TERRAFORM_DIR)"
 
 validate: $(TERRAFORM)
 	find . -type d -mindepth 2 -not -name '.terraform' -print0 | \
