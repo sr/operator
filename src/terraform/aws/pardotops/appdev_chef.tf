@@ -40,7 +40,7 @@ resource "aws_security_group" "appdev_chef_server" {
     to_port = 22
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.appdev_bastion_access.id}"
+      "${aws_security_group.appdev_vpc_default.id}"
     ]
   }
 
