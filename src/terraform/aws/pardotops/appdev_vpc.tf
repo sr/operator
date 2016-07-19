@@ -13,7 +13,7 @@ resource "aws_subnet" "appdev_us_east_1a" {
   cidr_block = "172.26.0.0/19"
   map_public_ip_on_launch = false
   tags = {
-    name = "appdev_us_east_1a"
+    Name = "appdev_us_east_1a"
   }
 }
 
@@ -23,7 +23,7 @@ resource "aws_subnet" "appdev_us_east_1c" {
   cidr_block = "172.26.32.0/19"
   map_public_ip_on_launch = false
   tags = {
-    name = "appdev_us_east_1c"
+    Name = "appdev_us_east_1c"
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_subnet" "appdev_us_east_1d" {
   cidr_block = "172.26.64.0/19"
   map_public_ip_on_launch = false
   tags = {
-    name = "appdev_us_east_1d"
+    Name = "appdev_us_east_1d"
   }
 }
 
@@ -43,7 +43,7 @@ resource "aws_subnet" "appdev_us_east_1e" {
   cidr_block = "172.26.96.0/19"
   map_public_ip_on_launch = false
   tags = {
-    name = "appdev_us_east_1e"
+    Name = "appdev_us_east_1e"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_subnet" "appdev_us_east_1a_dmz" {
   cidr_block = "172.26.128.0/19"
   map_public_ip_on_launch = true
   tags = {
-    name = "appdev_us_east_1a_dmz"
+    Name = "appdev_us_east_1a_dmz"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_subnet" "appdev_us_east_1c_dmz" {
   cidr_block = "172.26.160.0/19"
   map_public_ip_on_launch = true
   tags = {
-    name = "appdev_us_east_1c_dmz"
+    Name = "appdev_us_east_1c_dmz"
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_subnet" "appdev_us_east_1d_dmz" {
   cidr_block = "172.26.192.0/19"
   map_public_ip_on_launch = true
   tags = {
-    name = "appdev_us_east_1d_dmz"
+    Name = "appdev_us_east_1d_dmz"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_subnet" "appdev_us_east_1e_dmz" {
   cidr_block = "172.26.224.0/19"
   map_public_ip_on_launch = true
   tags = {
-    name = "appdev_us_east_1e_dmz"
+    Name = "appdev_us_east_1e_dmz"
   }
 }
 
