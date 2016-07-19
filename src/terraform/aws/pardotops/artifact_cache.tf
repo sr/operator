@@ -99,6 +99,7 @@ resource "aws_instance" "artifact_cache_server_1" {
   instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
+  key_name = "internal_apps"
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -114,6 +115,7 @@ resource "aws_instance" "artifact_cache_server_2" {
   instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
+  key_name = "internal_apps"
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -129,6 +131,7 @@ resource "aws_instance" "artifact_cache_server_3" {
   instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
+  key_name = "internal_apps"
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -144,6 +147,7 @@ resource "aws_instance" "artifact_cache_server_4" {
   instance_type = "c4.2xlarge"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1e.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
+  key_name = "internal_apps"
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
