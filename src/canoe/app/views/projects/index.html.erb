@@ -7,7 +7,7 @@
 <div class="projects-index-grid">
   <ul class="projects-index-list">
     <%- @projects.each do |project| %>
-      <%= link_to project do %>
+      <%= link_to project_branch_builds_path(project, "master") do %>
         <li>
           <span class="icon">
             <%= content_tag :i, "", class: "icon-#{project.icon}" %>
