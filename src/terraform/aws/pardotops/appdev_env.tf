@@ -9,6 +9,8 @@ variable "environment_appdev" {
     env_name = "appdev"
     pardot_env_id = "pardot2"
     dc_id = "ue1"
+    dyn_zone = "pardot.com"
+    dyn_subdomain = ".ops"
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
@@ -63,6 +65,17 @@ variable "environment_appdev" {
 //  instance = "${element(aws_instance.appdev_lbl1.*.id, count.index)}"
 //  vpc = true
 //}
+//
+// DYN A-RECORD: replace "lbl" w/ "servicename"
+//resource "dyn_record" "appdev_lbl1_arecord" {
+//  count = "${var.environment_appdev["num_lbl1_hosts"]}"
+//  zone = "${var.environment_appdev["dyn_zone"]}"
+//  name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+//  value = "${element(aws_instance.appdev_lbl1.*.private_ip, count.index)}"
+//  type = "A"
+//  ttl = 900
+//}
+
 
 resource "aws_security_group" "appdev_apphost" {
   name = "appdev_apphost"
@@ -188,6 +201,15 @@ resource "aws_instance" "appdev_globaldb1" {
   }
 }
 
+resource "dyn_record" "appdev_globaldb1_arecord" {
+  count = "${var.environment_appdev["num_globaldb1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_globaldb1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_dbshard1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_dbshard1_hosts"]}"
@@ -203,6 +225,15 @@ resource "aws_instance" "appdev_dbshard1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_dbshard1_arecord" {
+  count = "${var.environment_appdev["num_dbshard1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_dbshard1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_app1" {
@@ -221,6 +252,15 @@ resource "aws_instance" "appdev_app1" {
   }
 }
 
+resource "dyn_record" "appdev_app1_arecord" {
+  count = "${var.environment_appdev["num_app1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_app1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_thumbs1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_thumbs1_hosts"]}"
@@ -235,6 +275,15 @@ resource "aws_instance" "appdev_thumbs1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_thumbs1_arecord" {
+  count = "${var.environment_appdev["num_thumbs1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_thumbs1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_redisjob1" {
@@ -253,6 +302,15 @@ resource "aws_instance" "appdev_redisjob1" {
   }
 }
 
+resource "dyn_record" "appdev_redisjob1_arecord" {
+  count = "${var.environment_appdev["num_redisjob1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_redisjob1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_jobmanager1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
@@ -267,6 +325,15 @@ resource "aws_instance" "appdev_jobmanager1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_jobmanager1_arecord" {
+  count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_jobmanager1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_push1" {
@@ -285,6 +352,15 @@ resource "aws_instance" "appdev_push1" {
   }
 }
 
+resource "dyn_record" "appdev_push1_arecord" {
+  count = "${var.environment_appdev["num_push1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_push1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_provisioning1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_provisioning1_hosts"]}"
@@ -299,6 +375,15 @@ resource "aws_instance" "appdev_provisioning1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_provisioning1_arecord" {
+  count = "${var.environment_appdev["num_provisioning1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_provisioning1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_rabbit1" {
@@ -317,6 +402,15 @@ resource "aws_instance" "appdev_rabbit1" {
   }
 }
 
+resource "dyn_record" "appdev_rabbit1_arecord" {
+  count = "${var.environment_appdev["num_rabbit1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_rabbit1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_redisrules1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_redisrules1_hosts"]}"
@@ -331,6 +425,15 @@ resource "aws_instance" "appdev_redisrules1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_redisrules1_arecord" {
+  count = "${var.environment_appdev["num_redisrules1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_redisrules1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_autojob1" {
@@ -349,6 +452,15 @@ resource "aws_instance" "appdev_autojob1" {
   }
 }
 
+resource "dyn_record" "appdev_autojob1_arecord" {
+  count = "${var.environment_appdev["num_autojob1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_autojob1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_storm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_storm1_hosts"]}"
@@ -363,6 +475,15 @@ resource "aws_instance" "appdev_storm1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_storm1_arecord" {
+  count = "${var.environment_appdev["num_storm1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_storm1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_kafka1" {
@@ -381,6 +502,15 @@ resource "aws_instance" "appdev_kafka1" {
   }
 }
 
+resource "dyn_record" "appdev_kafka1_arecord" {
+  count = "${var.environment_appdev["num_kafka1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_kafka1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_zkkafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
@@ -395,6 +525,15 @@ resource "aws_instance" "appdev_zkkafka1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_zkkafka1_arecord" {
+  count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_zkkafka1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_pubsub1" {
@@ -413,6 +552,15 @@ resource "aws_instance" "appdev_pubsub1" {
   }
 }
 
+resource "dyn_record" "appdev_pubsub1_arecord" {
+  count = "${var.environment_appdev["num_pubsub1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_pubsub1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_zkstorm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
@@ -427,6 +575,15 @@ resource "aws_instance" "appdev_zkstorm1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_zkstorm1_arecord" {
+  count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_zkstorm1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_nimbus1" {
@@ -445,6 +602,15 @@ resource "aws_instance" "appdev_nimbus1" {
   }
 }
 
+resource "dyn_record" "appdev_nimbus1_arecord" {
+  count = "${var.environment_appdev["num_nimbus1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_nimbus1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_appcache1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_appcache1_hosts"]}"
@@ -461,6 +627,15 @@ resource "aws_instance" "appdev_appcache1" {
   }
 }
 
+resource "dyn_record" "appdev_appcache1_arecord" {
+  count = "${var.environment_appdev["num_appcache1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_appcache1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_discovery1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_discovery1_hosts"]}"
@@ -475,4 +650,13 @@ resource "aws_instance" "appdev_discovery1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "dyn_record" "appdev_discovery1_arecord" {
+  count = "${var.environment_appdev["num_discovery1_hosts"]}"
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index + 1}-${var.environment_appdev["dc_id"]}${var.environment_appdev["dyn_subdomain"]}"
+  value = "${element(aws_instance.appdev_discovery1.*.private_ip, count.index)}"
+  type = "A"
+  ttl = "900"
 }

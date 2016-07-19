@@ -6,3 +6,7 @@ pardotqe_secret_access_key = ""
 
 pardotatlassian_access_key_id = ""
 pardotatlassian_secret_access_key = ""
+
+dyn_customer_name = ""
+dyn_user_name = ""
+dyn_password = ""
