@@ -72,3 +72,11 @@ resource "aws_instance" "appdev_chef_server" {
     terraform = true
   }
 }
+
+resource "dyn_record" "appdev_chef1_arecord" {
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "pardot2-chef1-1-ue1.ops"
+  value = "${aws_instance.appdev_chef_server.private_ip}"
+  type = "A"
+  ttl = "900"
+}

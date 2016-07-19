@@ -63,3 +63,11 @@ resource "aws_eip" "appdev_ldap_host_eip" {
   vpc = true
   instance = "${aws_instance.appdev_ldap_host.id}"
 }
+
+resource "dyn_record" "appdev_auth1_arecord" {
+  zone = "${var.environment_appdev["dyn_zone"]}"
+  name = "pardot2-auth1-1-ue1.ops"
+  value = "${aws_instance.appdev_ldap_host.public_ip}"
+  type = "A"
+  ttl = "900"
+}
