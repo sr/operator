@@ -1,5 +1,6 @@
 class ChefDeliveryNotification
   YELLOW = "yellow".freeze
+  GRAY = "gray".freeze
   GREEN = "green".freeze
   RED = "red".freeze
 
@@ -38,7 +39,7 @@ class ChefDeliveryNotification
       "#{server.datacenter}/#{server.environment}: <br/>" \
       "<code>knife #{command.join(" ")}</code>"
 
-    @notifier.notify_room(room_id, message, YELLOW)
+    @notifier.notify_room(room_id, message, GRAY)
   end
 
   private
