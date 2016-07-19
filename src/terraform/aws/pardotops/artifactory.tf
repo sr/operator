@@ -427,6 +427,12 @@ resource "aws_route" "artifactory_integration_to_pardot_ci" {
   route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
 }
 
+resource "aws_route" "artifactory_integration_to_legacy_pardot_ci" {
+  destination_cidr_block = "192.168.128.0/22"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.legacy_pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
+}
+
 resource "aws_route" "artifactory_integration_to_internal_apps" {
   destination_cidr_block = "172.30.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
@@ -519,5 +525,12 @@ resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration
 resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
   peer_owner_id = "${var.pardotops_account_number}"
   peer_vpc_id = "${aws_vpc.pardot_ci.id}"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+}
+
+# Temporary peering with legacy pardot-ci account
+resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integration_vpc_peering" {
+  peer_owner_id = "096113534078"
+  peer_vpc_id = "vpc-4d96a928"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
