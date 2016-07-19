@@ -10,6 +10,14 @@ HAL9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv)
 devenv compose up
 ```
 
+* If you get an error like this while running locally:
+
+```bash
+ERROR: Service 'app' failed to build: Get https://docker.dev.pardot.com/v2/base/ruby/manifests/2.3.0: unauthorized: BAD_CREDENTIAL
+```
+
+* You may need to checkout [this confluence article](https://confluence.dev.pardot.com/display/PTechops/Using+the+Docker+Registry+locally)
+
 In another shell, connect to the bot:
 
 ```bash
@@ -49,7 +57,7 @@ Create the handler:
 
 ```bash
 # Creates a handler named replication-fixing
-devenv compose run app lita handler replication-fixing
+devenv compose run app bundler exec lita handler replication-fixing
 mv lita-replication-fixing/ plugins/
 ```
 
