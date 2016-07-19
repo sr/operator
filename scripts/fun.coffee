@@ -910,7 +910,6 @@ module.exports = (robot) ->
           query += " OR "
       query += ")"
 
-    console.log "Querying: #{query}"
     q =
       q: query,
       searchType:'image',
@@ -931,7 +930,6 @@ module.exports = (robot) ->
           image = msg.random response.items
           cb ensureImageExtension image.link
         else
-          console.log JSON.stringify response
           msg.send "I couldn't find any results for that search (sadpanda)"
 
   imageMe = (msg, query, cb) ->
