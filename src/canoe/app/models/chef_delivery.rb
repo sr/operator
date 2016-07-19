@@ -92,6 +92,10 @@ class ChefDelivery
       return
     end
 
+    if request.command[0] == "search"
+      return
+    end
+
     if request.command[0, 2] == %w[pd sync]
       return
     end
