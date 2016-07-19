@@ -34,6 +34,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
       "${aws_eip.pardot_ci_bastion.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
@@ -52,6 +54,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
       "${aws_eip.pardot_ci_bastion.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
