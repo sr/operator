@@ -24,21 +24,22 @@ module Lita
 
       def commit(response)
         commit = response.match_data["sha"]
-        project = response.match_data["project"] | "pardot"
+        project = response.match_data["project"] || "pardot"
         msg = "https://git.dev.pardot.com/Pardot/" + project + "/commit/" + commit
-        response.send_message(@status_room, msg)
+        robot.send_message(@status_room, msg)
       end
 
       def diff(response)
         sha1 = response.match_data["sha1"].gsub('/', ';')
-        sha2 = response.match_data["sha2"] | null
+        sha2 = response.match_data["sha2"] || nil
 
         if sha2
           diff = sha1 + "..." + sha2.gsub('/', ';')
         else
           diff = sha1
+        end
         msg = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
-        response.send_message(@status_room, msg)
+        robot.send_message(@status_room, msg)
       end
 
       Lita.register_handler(self)
