@@ -1,4 +1,10 @@
 PATH
+  remote: plugins/lita-commit
+  specs:
+    lita-commit (0.1.0)
+      lita (>= 4.7)
+
+PATH
   remote: plugins/lita-replication-fixing
   specs:
     lita-replication-fixing (0.1.0)
@@ -75,10 +81,11 @@ PLATFORMS
 
 DEPENDENCIES
   lita (= 4.7.0)
+  lita-commit!
   lita-hipchat (= 3.0.2)
   lita-replication-fixing!
   lita-zabbix!
   rspec (~> 3.4, >= 3.4.0)
 
 BUNDLED WITH
-   1.12.0
+   1.12.1
