@@ -43,6 +43,13 @@ resource "aws_security_group" "artifact_cache_server" {
       "${aws_security_group.artifact_cache_http_lb.id}"
     ]
   }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_elb" "artifact_cache_lb" {
