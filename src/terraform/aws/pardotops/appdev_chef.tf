@@ -59,7 +59,8 @@ resource "aws_instance" "appdev_chef_server" {
   private_ip = "172.26.64.254"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   vpc_security_group_ids = [
-    "${aws_security_group.appdev_chef_server.id}"
+    "${aws_security_group.appdev_chef_server.id}",
+    "${aws_security_group.appdev_vpc_default.id}"
   ]
   root_block_device {
     volume_type = "gp2"
