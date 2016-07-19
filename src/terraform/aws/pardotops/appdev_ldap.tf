@@ -45,7 +45,8 @@ resource "aws_instance" "appdev_ldap_host" {
   private_ip = "172.26.192.254"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   vpc_security_group_ids = [
-    "${aws_security_group.appdev_ldap_server.id}"
+    "${aws_security_group.appdev_ldap_server.id}",
+    "${aws_security_group.appdev_vpc_default.id}"
   ]
   root_block_device {
     volume_type = "gp2"
