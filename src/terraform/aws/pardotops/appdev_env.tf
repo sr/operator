@@ -15,10 +15,8 @@ variable "environment_appdev" {
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
     num_app1_hosts = 2
-    num_job1_hosts = 1
-    num_jobbackup1_hosts = 1
     num_thumbs1_hosts = 1
-    num_redisjob1_hosts = 1
+    num_redisjob1_hosts = 2
     num_jobmanager1_hosts = 2
     num_push1_hosts = 2
     num_provisioning1_hosts = 1
@@ -219,38 +217,6 @@ resource "aws_instance" "appdev_app1" {
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
-    terraform = "true"
-  }
-}
-
-resource "aws_instance" "appdev_job1" {
-  key_name = "internal_apps"
-  count = "${var.environment_appdev["num_job1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
-  vpc_security_group_ids = [
-    "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
-  ]
-  tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-job1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
-    terraform = "true"
-  }
-}
-
-resource "aws_instance" "appdev_jobbackup1" {
-  key_name = "internal_apps"
-  count = "${var.environment_appdev["num_jobbackup1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
-  instance_type = "${var.environment_appdev["job_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
-  vpc_security_group_ids = [
-    "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
-  ]
-  tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-jobbackup1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
