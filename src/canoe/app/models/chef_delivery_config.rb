@@ -23,14 +23,7 @@ class ChefDeliveryConfig
   end
 
   def knife_notifications_enabled?(server)
-    case server.environment
-    when DEV
-      true
-    when PRODUCTION
-      server.datacenter == AWS
-    else
-      false
-    end
+    true
   end
 
   def repo_name
