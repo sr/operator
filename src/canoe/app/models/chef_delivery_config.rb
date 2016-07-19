@@ -22,6 +22,17 @@ class ChefDeliveryConfig
     end
   end
 
+  def knife_notifications_enabled?(server)
+    case server.environment
+    when DEV
+      true
+    when PRODUCTION
+      server.datacenter == AWS
+    else
+      false
+    end
+  end
+
   def repo_name
     ENV.fetch("CANOE_CHEF_REPO", "Pardot/chef")
   end

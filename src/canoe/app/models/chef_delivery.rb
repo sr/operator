@@ -84,6 +84,10 @@ class ChefDelivery
   end
 
   def knife(request)
+    if !@config.knife_notifications_enabled?(request.server)
+      return
+    end
+
     if request.command[0] == "help"
       return
     end

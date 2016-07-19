@@ -220,4 +220,12 @@ RSpec.describe ChefDelivery do
     @delivery.knife(request)
     assert_equal 0, @config.notifier.messages.size
   end
+
+  it "obeys the knife_notifications_enabled feature flag" do
+    server = ChefDelivery::Server.new("disabled", "prd", "chef1")
+    command = %w[environment from file boomtown.rb]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
 end
