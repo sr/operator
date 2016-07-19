@@ -895,14 +895,28 @@ module.exports = (robot) ->
   gifMe = (msg, query, cb) ->
     googleCseId = "006277482686057757140:iilj71y0d0u" #<-- free, 100searches a day
     googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw" #<-- free, 100searches a day
+ 
+    sites = [
+      "i.imgur.com",
+      "reactiongifs.com",
+      "media.giphy.com"
+    ]
+
+    if sites.length > 0
+      query += " ("
+      for i in [0..sites.length - 1]
+        query += "site:#{sites[i]}"
+        if i isnt sites.length - 1
+          query += " OR "
+      query += ")"
+
+    console.log "Querying: #{query}"
     q =
       q: query,
       searchType:'image',
-      siteSearch: 'i.imgur.com',
-      fileType: 'gif'
-      num: 10,
-      safe:'medium',
-      fields:'items(link)',
+      fileType:'gif'
+      num: 7,
+      safe:'high',
       cx: googleCseId,
       key: googleApiKey
     url = 'https://www.googleapis.com/customsearch/v1'
@@ -917,6 +931,7 @@ module.exports = (robot) ->
           image = msg.random response.items
           cb ensureImageExtension image.link
         else
+          console.log JSON.stringify response
           msg.send "I couldn't find any results for that search (sadpanda)"
 
   imageMe = (msg, query, cb) ->
@@ -994,11 +1009,14 @@ module.exports = (robot) ->
         else
           msg.send "Sorry, I found no results for '#{query}'\n\n [Response: #{body}]."
 
-  ensureImageExtension = (url) ->
-    ext = url.split('.').pop()
-    if /(png|jpe?g|gifv)/i.test(ext)
-      url
-    else if /(gif)/i.test(ext)
-      "#{url}v"
-    else
-      "#{url}#.png"
+   ensureImageExtension = (url) ->
+     chunks = url.split('.')
+     ext = chunks.pop()
+     if /(png|jpe?g|gif$)/i.test(ext)
+       return url
+     else if /(gifv$)/i.test(ext)
+       chunks.push('gif')
+       gifUrl = chunks.join('.')
+       return gifUrl
+     else
+       return "#{url}#.png"
