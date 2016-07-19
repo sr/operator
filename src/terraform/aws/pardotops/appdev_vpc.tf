@@ -12,6 +12,9 @@ resource "aws_subnet" "appdev_us_east_1a" {
   availability_zone = "us-east-1a"
   cidr_block = "172.26.0.0/19"
   map_public_ip_on_launch = false
+  tags = {
+    name = "appdev_us_east_1a"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1c" {
@@ -19,6 +22,9 @@ resource "aws_subnet" "appdev_us_east_1c" {
   availability_zone = "us-east-1c"
   cidr_block = "172.26.32.0/19"
   map_public_ip_on_launch = false
+  tags = {
+    name = "appdev_us_east_1c"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1d" {
@@ -26,6 +32,9 @@ resource "aws_subnet" "appdev_us_east_1d" {
   availability_zone = "us-east-1d"
   cidr_block = "172.26.64.0/19"
   map_public_ip_on_launch = false
+  tags = {
+    name = "appdev_us_east_1d"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1e" {
@@ -33,6 +42,9 @@ resource "aws_subnet" "appdev_us_east_1e" {
   availability_zone = "us-east-1e"
   cidr_block = "172.26.96.0/19"
   map_public_ip_on_launch = false
+  tags = {
+    name = "appdev_us_east_1e"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1a_dmz" {
@@ -40,6 +52,9 @@ resource "aws_subnet" "appdev_us_east_1a_dmz" {
   availability_zone = "us-east-1a"
   cidr_block = "172.26.128.0/19"
   map_public_ip_on_launch = true
+  tags = {
+    name = "appdev_us_east_1a_dmz"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1c_dmz" {
@@ -47,6 +62,9 @@ resource "aws_subnet" "appdev_us_east_1c_dmz" {
   availability_zone = "us-east-1c"
   cidr_block = "172.26.160.0/19"
   map_public_ip_on_launch = true
+  tags = {
+    name = "appdev_us_east_1c_dmz"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1d_dmz" {
@@ -54,6 +72,9 @@ resource "aws_subnet" "appdev_us_east_1d_dmz" {
   availability_zone = "us-east-1d"
   cidr_block = "172.26.192.0/19"
   map_public_ip_on_launch = true
+  tags = {
+    name = "appdev_us_east_1d_dmz"
+  }
 }
 
 resource "aws_subnet" "appdev_us_east_1e_dmz" {
@@ -61,6 +82,9 @@ resource "aws_subnet" "appdev_us_east_1e_dmz" {
   availability_zone = "us-east-1e"
   cidr_block = "172.26.224.0/19"
   map_public_ip_on_launch = true
+  tags = {
+    name = "appdev_us_east_1e_dmz"
+  }
 }
 
 resource "aws_internet_gateway" "appdev_internet_gw" {
@@ -160,7 +184,8 @@ resource "aws_security_group" "appdev_vpc_default" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_instance.appdev_bastion.public_ip}/32"
+      "${aws_instance.appdev_bastion.public_ip}/32",
+      "${aws_instance.appdev_bastion.private_ip}/32"
     ]
   }
 
@@ -252,6 +277,7 @@ resource "aws_instance" "appdev_bastion" {
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.appdev_sfdc_vpn_ssh.id}"]
+  private_ip = "172.26.220.43"
   root_block_device {
     volume_type = "gp2"
     volume_size = "20"
@@ -265,7 +291,7 @@ resource "aws_instance" "appdev_bastion" {
 
 resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" {
   peer_owner_id = "010094454891" # pardot-atlassian
-  peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
+  peer_vpc_id = "vpc-c35928a6"   # atlassian tools VPC
   vpc_id = "${aws_vpc.appdev.id}"
 }
 

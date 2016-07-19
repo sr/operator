@@ -53,7 +53,7 @@ variable "environment_appdev" {
 //    "${aws_security_group.appdev_apphost.id}"
 //  ]
 //  tags {
-//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index}-${var.environment_appdev["dc_id"]}"
+//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
 //    terraform = "true"
 //  }
 //}
@@ -183,7 +183,7 @@ resource "aws_instance" "appdev_globaldb1" {
     "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -199,7 +199,7 @@ resource "aws_instance" "appdev_dbshard1" {
     "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -214,7 +214,7 @@ resource "aws_instance" "appdev_app1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -229,7 +229,7 @@ resource "aws_instance" "appdev_job1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-job1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-job1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -244,7 +244,7 @@ resource "aws_instance" "appdev_jobbackup1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-jobbackup1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-jobbackup1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -259,7 +259,7 @@ resource "aws_instance" "appdev_thumbs1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -274,7 +274,7 @@ resource "aws_instance" "appdev_redisjob1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -289,7 +289,7 @@ resource "aws_instance" "appdev_jobmanager1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -304,7 +304,7 @@ resource "aws_instance" "appdev_push1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -319,7 +319,7 @@ resource "aws_instance" "appdev_provisioning1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -334,7 +334,7 @@ resource "aws_instance" "appdev_rabbit1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -349,7 +349,7 @@ resource "aws_instance" "appdev_redisrules1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -364,7 +364,7 @@ resource "aws_instance" "appdev_autojob1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -379,7 +379,7 @@ resource "aws_instance" "appdev_storm1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -394,7 +394,7 @@ resource "aws_instance" "appdev_kafka1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -409,7 +409,7 @@ resource "aws_instance" "appdev_zkkafka1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -424,7 +424,7 @@ resource "aws_instance" "appdev_pubsub1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -439,7 +439,7 @@ resource "aws_instance" "appdev_zkstorm1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -454,7 +454,7 @@ resource "aws_instance" "appdev_nimbus1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -469,7 +469,7 @@ resource "aws_instance" "appdev_appcache1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
@@ -484,7 +484,7 @@ resource "aws_instance" "appdev_discovery1" {
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
