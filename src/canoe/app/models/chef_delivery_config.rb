@@ -22,7 +22,7 @@ class ChefDeliveryConfig
     end
   end
 
-  def knife_notifications_enabled?(server)
+  def knife_notifications_enabled?(_server)
     true
   end
 
