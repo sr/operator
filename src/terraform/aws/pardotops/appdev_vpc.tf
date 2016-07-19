@@ -291,7 +291,7 @@ resource "aws_instance" "appdev_bastion" {
 
 resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" {
   peer_owner_id = "010094454891" # pardot-atlassian
-  peer_vpc_id = "vpc-c35928a6"   # atlassian tools VPC
+  peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
   vpc_id = "${aws_vpc.appdev.id}"
 }
 
