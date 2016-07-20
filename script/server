@@ -1,8 +1,11 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -eu
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 cd "$dir"
+
+: "${HUBOT_ALIAS:="!"}"
+: "${HUBOT_NAME:="Parbot"}"
 
 # No secrets here, please.
 # Secrets are configured in AWS ECS. Ping the bread team for help.
@@ -13,4 +16,4 @@ export HUBOT_PAGERDUTY_SERVICES="PXVMR39,P0VDMCH"
 # checkout the README and add a secrets.sh file to connect to hipchat
 test -f "$dir/script/secrets.sh" && source "$dir/script/secrets.sh"
 
-exec bin/hubot --alias '!' --disable-httpd "$@"
+exec bin/hubot --name "$HUBOT_NAME" --alias "$HUBOT_ALIAS" --disable-httpd "$@"
