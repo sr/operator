@@ -37,6 +37,17 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.appdev.cidr_block}"
     ]
+    self = "true"
+  }
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.artifactory_dc_only_http_lb.id}",
+      "${aws_security_group.artifactory_http_lb.id}"
+    ]
   }
 
   egress {
@@ -138,10 +149,10 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
 }
 
 
-resource "aws_instance" "pardot0-artifactory1" {
-  count = "${var.num_afy_hosts}"
+resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami}"
   instance_type = "c4.4xlarge"
+  private_ip="172.28.0.138"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
   vpc_security_group_ids = [
@@ -155,31 +166,120 @@ resource "aws_instance" "pardot0-artifactory1" {
     delete_on_termination = true
   }
   tags {
-    Name = "pardot0-artifactory1-${count.index + 1}-ue1"
+    Name = "pardot0-artifactory1-1-ue1"
     terraform = "true"
   }
 }
 
-resource "aws_eip" "pardot0-artifactory1_elasticip" {
-  count = "${var.num_afy_hosts}"
+resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
   vpc = true
-  instance = "${element(aws_instance.pardot0-artifactory1.*.id, count.index)}"
+  instance = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
 }
 
-resource "dyn_record" "pardot0-artifactory1_arecord" {
-  count = "${var.num_afy_hosts}"
+resource "dyn_record" "pardot0-artifactory1-1-ue1_arecord" {
+  count = "3"
   zone = "pardot.com"
-  name = "pardot0-artifactory1-${count.index + 1}-ue1.ops"
-  value = "${element(aws_instance.pardot0-artifactory1.*.public_ip, count.index)}"
+  name = "pardot0-artifactory1-1-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-1-ue1.public_ip}"
   type = "A"
   ttl = 900
 }
 
-resource "dyn_record" "pardot0-artifactory-internal1_arecord" {
-  count = "${var.num_afy_hosts}"
+resource "dyn_record" "pardot0-artifactory-internal1-1-ue1_arecord" {
+  count = "3"
   zone = "pardot.com"
-  name = "pardot0-artifactory-internal1-${count.index + 1}-ue1.ops"
-  value = "${element(aws_instance.pardot0-artifactory1.*.private_ip, count.index)}"
+  name = "pardot0-artifactory-internal1-1-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-1-ue1.private_ip}"
+  type = "A"
+  ttl = 900
+}
+
+resource "aws_instance" "pardot0-artifactory1-2-ue1" {
+  ami = "${var.centos_7_hvm_ebs_ami}"
+  instance_type = "c4.4xlarge"
+  private_ip="172.28.0.209"
+  key_name = "internal_apps"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.artifactory_instance_secgroup.id}",
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "2047"
+    delete_on_termination = true
+  }
+  tags {
+    Name = "pardot0-artifactory1-2-ue1"
+    terraform = "true"
+  }
+}
+
+resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
+  vpc = true
+  instance = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
+}
+
+resource "dyn_record" "pardot0-artifactory1-2-ue1_arecord" {
+  count = "3"
+  zone = "pardot.com"
+  name = "pardot0-artifactory1-2-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-2-ue1.public_ip}"
+  type = "A"
+  ttl = 900
+}
+
+resource "dyn_record" "pardot0-artifactory-internal1-2-ue1_arecord" {
+  count = "3"
+  zone = "pardot.com"
+  name = "pardot0-artifactory-internal1-2-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-2-ue1.private_ip}"
+  type = "A"
+  ttl = 900
+}
+
+resource "aws_instance" "pardot0-artifactory1-3-ue1" {
+  ami = "${var.centos_7_hvm_ebs_ami}"
+  instance_type = "c4.4xlarge"
+  private_ip="172.28.0.182"
+  key_name = "internal_apps"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  vpc_security_group_ids = [
+    "${aws_security_group.artifactory_instance_secgroup.id}",
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "2047"
+    delete_on_termination = true
+  }
+  tags {
+    Name = "pardot0-artifactory1-3-ue1"
+    terraform = "true"
+  }
+}
+
+resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
+  vpc = true
+  instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+}
+
+resource "dyn_record" "pardot0-artifactory1-3-ue1_arecord" {
+  count = "3"
+  zone = "pardot.com"
+  name = "pardot0-artifactory1-3-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-3-ue1.public_ip}"
+  type = "A"
+  ttl = 900
+}
+
+resource "dyn_record" "pardot0-artifactory-internal1-3-ue1_arecord" {
+  count = "3"
+  zone = "pardot.com"
+  name = "pardot0-artifactory-internal1-3-ue1.ops"
+  value = "${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"
   type = "A"
   ttl = 900
 }
@@ -199,7 +299,11 @@ resource "aws_elb" "artifactory_public_elb" {
   cross_zone_load_balancing = true
   connection_draining = true
   connection_draining_timeout = 30
-  instances = ["${element(aws_instance.pardot0-artifactory1.*.id, count.index)}"]
+  instances = [
+    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+  ]
 
   listener {
     lb_port = 443
@@ -244,7 +348,11 @@ resource "aws_elb" "artifactory_private_elb" {
   cross_zone_load_balancing = true
   connection_draining = true
   connection_draining_timeout = 30
-  instances = ["${element(aws_instance.pardot0-artifactory1.*.id, count.index)}"]
+  instances = [
+    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
+    "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+  ]
 
   listener {
     lb_port = 443
