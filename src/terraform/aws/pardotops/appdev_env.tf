@@ -83,21 +83,10 @@ resource "aws_security_group" "appdev_apphost" {
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}"
-    ]
-  }
-
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}"
-    ]
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
   }
 
   # allow health check from ELBs

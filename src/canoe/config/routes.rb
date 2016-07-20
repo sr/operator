@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
-  resources :projects, param: :name, only: [:index, :show] do
+  resources :projects, param: :name, only: [:index] do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end

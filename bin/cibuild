@@ -2,4 +2,4 @@
 set -euo pipefail
 PATH="$(dirname "$0")/../src/build:$PATH"
 export PATH
-exec build "$1"
+exec build "$@"

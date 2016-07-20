@@ -7,9 +7,6 @@ class ProjectsController < ApplicationController
     @projects = all_projects
   end
 
-  def show
-  end
-
   def lock
     current_target.lock!(current_project, current_user)
     redirect_to target_url(current_target), notice: "Lock acquired"

@@ -220,4 +220,12 @@ RSpec.describe ChefDelivery do
     @delivery.knife(request)
     assert_equal 0, @config.notifier.messages.size
   end
+
+  it "ignores 'knife search' commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[search hi andy]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
 end
