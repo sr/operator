@@ -2,7 +2,7 @@
 
 Name: storm-metrics-statsd
 Version: 1.0.0.SNAPSHOT
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Storm plugin for reporting metrics to statsd
 Group: Applications/Internet
 License: Apache License v2.0
@@ -27,15 +27,18 @@ rm maven.tar.gz
 %build
 export JAVA_HOME="/usr/java/jdk1.7.0_79"
 ../apache-maven-%{maven_version}/bin/mvn clean package -DskipTests
+../apache-maven-%{maven_version}/bin/mvn org.apache.maven.plugins:maven-dependency-plugin:2.7:copy-dependencies -DincludeArtifactIds=java-statsd-client
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -m 0755 -d $RPM_BUILD_ROOT/opt/storm/current/lib
+install -m 0755 target/dependency/java-statsd-client-2.0.0.jar $RPM_BUILD_ROOT/opt/storm/current/lib/java-statsd-client-2.0.0.jar
 install -m 0755 target/storm-metrics-statsd-1.0.0-SNAPSHOT.jar $RPM_BUILD_ROOT/opt/storm/current/lib/storm-metrics-statsd.jar
 
 %files
 %defattr(-,storm,storm,-)
 /opt/storm/current/lib/storm-metrics-statsd.jar
+/opt/storm/current/lib/java-statsd-client-2.0.0.jar
 
 %pre
 # Check if custom group 'storm' exists. If not, create it.
