@@ -76,7 +76,6 @@ resource "aws_security_group" "appdev_apphost" {
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}"
     ]
-    self = true
   }
 
   ingress {
