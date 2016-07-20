@@ -46,7 +46,7 @@ case "$project" in
     parbot)
         AWS_ECR_REPO="$PARBOT_ECR_REPO"
         AWS_ECS_CLUSTER="parbot_production"
-        AWS_ECR_SERVICE="parbot"
+        AWS_ECS_SERVICE="parbot"
         ;;
     *)
         echo "Unable to deploy project: \"$project\"" 2>&1
