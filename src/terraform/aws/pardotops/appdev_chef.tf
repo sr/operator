@@ -73,10 +73,10 @@ resource "aws_instance" "appdev_chef_server" {
   }
 }
 
-resource "dyn_record" "appdev_chef1_arecord" {
-  zone = "${var.environment_appdev["dyn_zone"]}"
-  name = "pardot2-chef1-1-ue1.ops"
-  value = "${aws_instance.appdev_chef_server.private_ip}"
+resource "aws_route53_record" "appdev_chef1_arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot2-chef1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot2-chef1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = "900"
 }

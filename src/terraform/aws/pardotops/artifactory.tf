@@ -176,20 +176,18 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
   instance = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
 }
 
-resource "dyn_record" "pardot0-artifactory1-1-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory1-1-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-1-ue1.public_ip}"
+resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
 
-resource "dyn_record" "pardot0-artifactory-internal1-1-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory-internal1-1-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-1-ue1.private_ip}"
+resource "aws_route53_record" "pardot0-artifactory-internal1-1-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory-internal1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory-internal1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
@@ -221,20 +219,18 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
   instance = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
 }
 
-resource "dyn_record" "pardot0-artifactory1-2-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory1-2-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-2-ue1.public_ip}"
+resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
 
-resource "dyn_record" "pardot0-artifactory-internal1-2-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory-internal1-2-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-2-ue1.private_ip}"
+resource "aws_route53_record" "pardot0-artifactory-internal1-2-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory-internal1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory-internal1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
@@ -266,20 +262,18 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
   instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
 }
 
-resource "dyn_record" "pardot0-artifactory1-3-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory1-3-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-3-ue1.public_ip}"
+resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
 
-resource "dyn_record" "pardot0-artifactory-internal1-3-ue1_arecord" {
-  count = "3"
-  zone = "pardot.com"
-  name = "pardot0-artifactory-internal1-3-ue1.ops"
-  value = "${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"
+resource "aws_route53_record" "pardot0-artifactory-internal1-3-ue1_arecord" {
+  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot0-artifactory-internal1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot0-artifactory-internal1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"]
   type = "A"
   ttl = 900
 }
@@ -659,16 +653,16 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 
 
 //// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
-//resource "dyn_record" "artifactory_dev_pardot_com_cname" {
-//  zone = "pardot.com"
+//resource "aws_route53_record" "artifactory_dev_pardot_com_cname" {
+//zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
 //  name = "artifactory.dev"
 //  value = "${aws_elb.artifactory_public_elb.dns_name}"
 //  type = "CNAME"
 //  ttl = "900"
 //}
 //
-//resource "dyn_record" "artifactory_internal_dev_pardot_com_cname" {
-//  zone = "pardot.com"
+//resource "aws_route53_record" "artifactory_internal_dev_pardot_com_cname" {
+//zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
 //  name = "artifactory-internal.dev"
 //  value = "${aws_elb.artifactory_private_elb.dns_name}"
 //  type = "CNAME"
