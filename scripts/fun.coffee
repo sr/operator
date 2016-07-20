@@ -896,14 +896,25 @@ module.exports = (robot) ->
   gifMe = (msg, query, cb) ->
     googleCseId = process.env.HUBOT_GOOGLE_CSE_ID
     googleApiKey = process.env.HUBOT_GOOGLE_API_KEY
+ 
+    sites = [
+      "i.imgur.com",
+      "reactiongifs.com",
+      "media.giphy.com"
+    ]
+
+    if sites.length > 0
+      query += " ("
+      query += sites.join " OR "
+      query += ")"
+
+    console.log query
     q =
       q: query,
       searchType:'image',
-      siteSearch: 'i.imgur.com',
-      fileType: 'gif'
-      num: 10,
-      safe:'medium',
-      fields:'items(link)',
+      fileType:'gif'
+      num: 7,
+      safe:'high',
       cx: googleCseId,
       key: googleApiKey
     url = 'https://www.googleapis.com/customsearch/v1'
@@ -995,11 +1006,14 @@ module.exports = (robot) ->
         else
           msg.send "Sorry, I found no results for '#{query}'\n\n [Response: #{body}]."
 
-  ensureImageExtension = (url) ->
-    ext = url.split('.').pop()
-    if /(png|jpe?g|gifv)/i.test(ext)
-      url
-    else if /(gif)/i.test(ext)
-      "#{url}v"
-    else
-      "#{url}#.png"
+   ensureImageExtension = (url) ->
+     chunks = url.split('.')
+     ext = chunks.pop()
+     if /(png|jpe?g|gif$)/i.test(ext)
+       return url
+     else if /(gifv$)/i.test(ext)
+       chunks.push('gif')
+       gifUrl = chunks.join('.')
+       return gifUrl
+     else
+       return "#{url}#.png"
