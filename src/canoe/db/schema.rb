@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160622112051) do
+ActiveRecord::Schema.define(version: 20160720181847) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -114,12 +114,13 @@ ActiveRecord::Schema.define(version: 20160622112051) do
   end
 
   create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "name",           null: false
-    t.string "icon",           null: false
-    t.string "bamboo_project"
-    t.string "bamboo_plan"
-    t.string "repository",     null: false
-    t.string "bamboo_job"
+    t.string  "name",                               null: false
+    t.string  "icon",                               null: false
+    t.string  "bamboo_project"
+    t.string  "bamboo_plan"
+    t.string  "repository",                         null: false
+    t.string  "bamboo_job"
+    t.boolean "all_servers_default", default: true
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
