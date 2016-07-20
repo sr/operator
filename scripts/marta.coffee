@@ -1,14 +1,19 @@
 # Description
 #   A hubot script returning the time until the next MARTA train to Lenox station given a direction.
+#
+# Configuration:
+#   HUBOT_MARTA_API_KEY
+#
 # Commands
 #   hubot train north - returns time until next northbound train
 #   hubot train south - returns time until next southbound train
+#
 # Author:
 #   Jake Swanson (https://github.com/jakswa/hubot-marta)
 #   Akshay Easwaran <aeaswaran@salesforce.com> (who modified this to focus only on the Lenox station)
 #
 
-marta_api_key = 'c9b3c882-0cf1-4859-8a9e-6be3fcb01bf8'
+marta_api_key = process.env.HUBOT_MARTA_API_KEY
 marta_trains_url = 'http://developer.itsmarta.com/RealtimeTrain/RestServiceNextTrain/GetRealtimeArrivals?apiKey='
 
 request = require('request')

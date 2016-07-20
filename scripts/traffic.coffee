@@ -1,15 +1,20 @@
 # Description
 #   A hubot script returning you the traffic time from the office to a given address or view current Atlanta traffic.
+#
+# Configuration
+#   HUBOT_BING_API_KEY
+#   HUBOT_TRAFFIC_GOOGLE_API_KEY
+#
 # Commands
 #   hubot traffic (map|incidents) - returns current traffic conditions in Atlanta
 #   hubot traveltime (at <departure_time>) (to) <location> - returns travel time to location from the office, default departure time is now
+#
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
-#
 
 moment = require('moment')
 scopedHttpClient = require "scoped-http-client"
-BING_KEY = "AlyNrLtoFkBueO0BAhC05RMpMHjo4SjsenGNPvFTbhfsUqFLmArnl32AEiy_tP_r"
+BING_KEY = process.env.HUBOT_BING_API_KEY
 
 module.exports = (robot) ->
 
@@ -178,7 +183,7 @@ module.exports = (robot) ->
           destinations: "#{secondloc}",
           mode: 'driving',
           departure_time: "#{departure}",
-          key: 'AIzaSyB3YTBlgcu_Wupl0_ifRnM9zsaVR7uTPg4',
+          key: process.env.HUBOT_TRAFFIC_GOOGLE_API_KEY,
           traffic_model: 'best_guess'})
        .header('Accept', 'application/json')
        .get() (err, res, body) ->
