@@ -64,7 +64,7 @@ variable "environment_appdev" {
 //  vpc = true
 //}
 //
-// route53 A-RECORD: replace "lbl" w/ "servicename"
+//// route53 A-RECORD: replace "lbl" w/ "servicename"
 //resource "aws_route53_record" "appdev_lbl1_arecord" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
@@ -141,7 +141,7 @@ resource "aws_elb" "appdev_app_elb" {
   cross_zone_load_balancing = true
   connection_draining = true
   connection_draining_timeout = 30
-  instances = ["${element(aws_instance.appdev_app1.*.id, count.index)}"]
+  instances = ["${aws_instance.appdev_app1.*.id}"]
 
   listener {
     lb_port = 443
