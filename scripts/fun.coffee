@@ -5,7 +5,8 @@
 #   None
 #
 # Configuration:
-#   None
+#   HUBOT_GOOGLE_CSE_ID
+#   HUBOT_GOOGLE_API_KEY
 #
 # Commands:
 #   hubot gif <query> - returns a relevant .gifv to the query
@@ -893,8 +894,8 @@ module.exports = (robot) ->
       msg.send "#{url}"
 
   gifMe = (msg, query, cb) ->
-    googleCseId = "006277482686057757140:iilj71y0d0u" #<-- free, 100searches a day
-    googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw" #<-- free, 100searches a day
+    googleCseId = process.env.HUBOT_GOOGLE_CSE_ID
+    googleApiKey = process.env.HUBOT_GOOGLE_API_KEY
     q =
       q: query,
       searchType:'image',
@@ -931,13 +932,13 @@ module.exports = (robot) ->
 #imageMe = (msg, query, animated, faces, cb) ->
 #    cb = animated if typeof animated == 'function'
 #    cb = faces if typeof faces == 'function'
-    googleCseId = "006277482686057757140:iilj71y0d0u" #<-- free, 100searches a day
+    googleCseId = process.env.HUBOT_GOOGLE_CSE_ID
     if googleCseId
   # Using Google Custom Search API
-      googleApiKey = "AIzaSyCb72sJ7O8wqZC77RCXIbUM72iPKo1eFgw" #<-- free, 100searches a day
+      googleApiKey = process.env.HUBOT_GOOGLE_API_KEY
       if !googleApiKey
-        msg.robot.logger.error "Missing environment variable HUBOT_GOOGLE_CSE_KEY"
-        msg.send "Missing server environment variable HUBOT_GOOGLE_CSE_KEY."
+        msg.robot.logger.error "Missing environment variable HUBOT_GOOGLE_API_KEY"
+        msg.send "Missing server environment variable HUBOT_GOOGLE_API_KEY."
         return
       q =
         q: query,
