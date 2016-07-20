@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20160622112051) do
 
-  create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
     t.string   "name"
     t.string   "uid",        null: false
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["uid"], name: "index_auth_users_on_uid", unique: true, using: :btree
   end
 
-  create_table "chef_deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "chef_deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "branch",                         null: false
     t.string   "build_url",                      null: false
     t.string   "environment",                    null: false
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.datetime "last_notified_at"
   end
 
-  create_table "deploy_acl_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploy_acl_entries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "project_id",                     null: false
     t.integer  "deploy_target_id",               null: false
     t.string   "acl_type",                       null: false
@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["project_id"], name: "index_deploy_acl_entries_on_project_id", using: :btree
   end
 
-  create_table "deploy_restart_servers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploy_restart_servers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "deploy_id",  null: false
     t.integer  "server_id"
     t.string   "datacenter", null: false
@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["deploy_id"], name: "index_deploy_restart_servers_on_deploy_id", using: :btree
   end
 
-  create_table "deploy_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploy_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "server_id",                                     null: false
     t.integer "deploy_id",                                     null: false
     t.string  "stage",                   default: "initiated", null: false
@@ -64,14 +64,14 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["server_id", "deploy_id"], name: "index_deploy_results_on_server_id_and_deploy_id", unique: true, using: :btree
   end
 
-  create_table "deploy_scenarios", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploy_scenarios", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "project_id",       null: false
     t.integer "server_id",        null: false
     t.integer "deploy_target_id", null: false
     t.index ["project_id", "deploy_target_id", "server_id"], name: "index_deploy_scenarios_on_repo_deploy_server_ids", unique: true, using: :btree
   end
 
-  create_table "deploy_targets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploy_targets", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
     t.integer  "locking_user_id"
     t.datetime "created_at"
@@ -82,7 +82,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["name"], name: "index_deploy_targets_on_name", using: :btree
   end
 
-  create_table "deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "deploy_target_id"
     t.integer  "auth_user_id"
     t.string   "project_name"
@@ -104,7 +104,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
   end
 
-  create_table "locks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "locks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "deploy_target_id", null: false
     t.integer  "auth_user_id",     null: false
     t.datetime "created_at"
@@ -113,7 +113,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["deploy_target_id", "project_id"], name: "index_locks_on_deploy_target_id_and_project_id", unique: true, using: :btree
   end
 
-  create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name",           null: false
     t.string "icon",           null: false
     t.string "bamboo_project"
@@ -123,7 +123,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
-  create_table "server_taggings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "server_taggings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "server_id",     null: false
     t.integer  "server_tag_id", null: false
     t.datetime "created_at",    null: false
@@ -132,14 +132,14 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["server_tag_id"], name: "index_server_taggings_on_server_tag_id", using: :btree
   end
 
-  create_table "server_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "server_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name",       null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_server_tags_on_name", unique: true, using: :btree
   end
 
-  create_table "servers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "servers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "hostname",                                   null: false
     t.boolean  "enabled",    default: true,                  null: false
     t.datetime "created_at", default: '2016-01-21 14:59:58', null: false
@@ -147,7 +147,7 @@ ActiveRecord::Schema.define(version: 20160622112051) do
     t.index ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
   end
 
-  create_table "target_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "target_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "deploy_target_id"
     t.integer  "auth_user_id"
     t.string   "job_name"
