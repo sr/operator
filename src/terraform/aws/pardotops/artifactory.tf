@@ -550,7 +550,7 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 
 
 
-//// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM
+//// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
 //resource "dyn_record" "artifactory_dev_pardot_com_cname" {
 //  zone = "pardot.com"
 //  name = "artifactory.dev"
@@ -559,7 +559,7 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 //  ttl = "900"
 //}
 //
-//resource "dyn_record" "artifactory_dev_pardot_com_cname" {
+//resource "dyn_record" "artifactory_internal_dev_pardot_com_cname" {
 //  zone = "pardot.com"
 //  name = "artifactory-internal.dev"
 //  value = "${aws_elb.artifactory_private_elb.dns_name}"
