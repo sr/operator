@@ -7,12 +7,24 @@
 
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
-
-  <div class="well well-sm">
-    <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
-      <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
-      <%= label_tag :include_untested_builds, "Include Untested Builds?" %>
-    <%- end %>
+  <div class="row">
+    <div class="col-md-2 col-md-offset-6" style="font-size: 1.5em;">
+      Test Plans
+    </div>
+  </div>
+  <div class="row">
+    <div class="well well-sm col-md-3" style="margin-left: 15px; margin-right: -15px;">
+      <%= form_tag request.path, method: "get", class: "form form-inline", id: "  include-untested-build-form" do |f| %>
+        <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
+        <%= label_tag :include_untested_builds, "Include Untested PPANT Builds?" %>
+      <%- end %>
+    </div>
+    <div class="col-md-1 col-md-offset-1"><label>PPANT</label></div>
+    <div class="col-md-1"><label>PHP7</label></div>
+    <div class="col-md-1"><label>WebDriver</label></div>
+    <div class="col-md-1"><label>Salesforce Integration</label></div>
+    <div class="col-md-1"><label>AB Combinatorial</label></div>
+    <div class="col-md-1"><label>List Combinatorial</label></div>
   </div>
 
   <%- if @builds.empty? %>
@@ -23,20 +35,42 @@
     <ul class="list-unstyled deploy-list">
       <% @builds.each do |build| %>
         <li>
-          <h4>
-            <%= link_to "Ship This", select_target_project_deploys_path(current_project, artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success deploy-button" %>
-            &nbsp;
-            <%= deploy_type_icon("build") %> build<%= build.build_number %>
-            <%- if !build.passed_ci? %>
-              <span class="label label-danger">Untested</span>
-            <%- end %>
-          </h4>
-          <small class="muted">
-            commit:
-            <%= link_to current_project.sha_url(build.sha), title: build.sha do %>
-              <%= sha_span(build.sha)  %>
-            <%- end %>
-          </small>
+          <div class="row">
+            <div class="col-md-3">
+              <h4>
+                <%= link_to "Ship This", select_target_project_deploys_path(current_project,    artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success   deploy-button" %>
+                &nbsp;
+                <%= deploy_type_icon("build") %> build<%= build.build_number %>
+                <%- if !build.passed_ci? %>
+                  <span class="label label-danger">Untested</span>
+                <%- end %>
+              </h4>
+              <small class="muted">
+                commit:
+                <%= link_to current_project.sha_url(build.sha), title: build.sha do %>
+                  <%= sha_span(build.sha)  %>
+                <%- end %>
+              </small>
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
+            </div>
+            <div class="col-md-1">
+              <h3><i class="icon-circle" style="color: #d9534f"></i></h3>
+            </div>
+            <div class="col-md-1">
+              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
+            </div>
+            <div class="col-md-1">
+              <h3><i class="icon-circle" style="color: #d9534f"></i></h3>
+            </div>
+            <div class="col-md-1">
+              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
+            </div>
+            <div class="col-md-1">
+              <h3><i class="icon-circle" title="No run" style="color: #ddd"></i></h3>
+            </div>
+          </div>
           <hr>
         </li>
       <% end %>
