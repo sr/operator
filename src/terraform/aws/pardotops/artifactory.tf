@@ -304,7 +304,7 @@ resource "aws_elb" "artifactory_public_elb" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/ops.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
 
   listener {
@@ -353,7 +353,7 @@ resource "aws_elb" "artifactory_private_elb" {
     lb_protocol = "https"
     instance_port = 80
     instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/ops.pardot.com"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
 
   listener {
@@ -654,17 +654,17 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 
 //// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
 //resource "aws_route53_record" "artifactory_dev_pardot_com_cname" {
-//zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
-//  name = "artifactory.dev"
-//  value = "${aws_elb.artifactory_public_elb.dns_name}"
+//  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+//  name = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
+//  records = ["${aws_elb.artifactory_public_elb.dns_name}"]
 //  type = "CNAME"
 //  ttl = "900"
 //}
 //
 //resource "aws_route53_record" "artifactory_internal_dev_pardot_com_cname" {
-//zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
-//  name = "artifactory-internal.dev"
-//  value = "${aws_elb.artifactory_private_elb.dns_name}"
+//  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+//  name = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
+//  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
 //  type = "CNAME"
 //  ttl = "900"
 //}
