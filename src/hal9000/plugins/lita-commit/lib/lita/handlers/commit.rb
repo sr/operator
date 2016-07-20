@@ -1,7 +1,6 @@
 module Lita
   module Handlers
     class Commit < Handler
-
       # config: hal9000's "home room"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
@@ -35,8 +34,8 @@ module Lita
 
       def diff(response)
         sha2 = response.match_data["sha2"] || nil
-        diff = response.match_data["sha1"].gsub('/', ';')
-        diff += sha2 ? "..." + sha2.gsub('/', ';') : ''
+        diff = response.match_data["sha1"].tr("/", ";")
+        diff += sha2 ? "..." + sha2.tr("/", ";") : ''
 
         msg = "Diff: #{diff}"
         url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
