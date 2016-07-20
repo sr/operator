@@ -150,7 +150,7 @@ resource "aws_db_instance" "parbot_production" {
   storage_type = "standard"
   name = "parbot_production"
   username = "parbot"
-  password = "fahcoh9eeJ0OhcieL5iariidoaPooch7nei6Chai6oofaeJeeW"
+  password = "eixaibi8Mepuenom8aoH9Ahh9Fooj5foma0cohge"
   maintenance_window = "Tue:00:00-Tue:04:00"
   multi_az = true
   publicly_accessible = false
