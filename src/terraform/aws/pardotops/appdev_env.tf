@@ -70,22 +70,22 @@ resource "aws_security_group" "appdev_apphost" {
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    security_groups= [
-      "${self}"
-    ]
-  }
-
-  ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}"
     ]
+    self = true
   }
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
+  }
+
 
   ingress {
     from_port = 443
