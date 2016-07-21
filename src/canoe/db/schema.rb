@@ -120,7 +120,7 @@ ActiveRecord::Schema.define(version: 20160720181847) do
     t.string  "bamboo_plan"
     t.string  "repository",                         null: false
     t.string  "bamboo_job"
-    t.boolean "all_servers_default", default: true
+    t.boolean "all_servers_default", default: true, null: false
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
