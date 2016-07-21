@@ -1,25 +1,11 @@
 Name: phantomjs
-Version: 2.0
+Version: 2.1.1
 Release: 1%{?dist}
 Summary: Scriptable Headless WebKit
 Group: Applications/Internet
 License: BSD
 URL: https://github.com/ariya/phantomjs
-Source0: https://github.com/ariya/phantomjs/archive/%{version}.tar.gz
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: make
-BuildRequires: flex
-BuildRequires: bison
-BuildRequires: gperf
-BuildRequires: ruby
-BuildRequires: openssl-devel
-BuildRequires: freetype-devel
-BuildRequires: fontconfig-devel
-BuildRequires: libicu-devel
-BuildRequires: sqlite-devel
-BuildRequires: libpng-devel
-BuildRequires: libjpeg-devel
+Source0: https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-%{version}-linux-x86_64.tar.bz2
 Requires: openssl
 Requires: freetype
 Requires: fontconfig
@@ -33,10 +19,9 @@ BuildRoot: %{_tmppath}/%name-root
 Scriptable Headless WebKit
 
 %prep
-%setup -q -n phantomjs-%{version}
+%setup -q -n phantomjs-%{version}-linux-x86_64
 
 %build
-./build.sh --confirm
 
 %install
 rm -rf $RPM_BUILD_ROOT
