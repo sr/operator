@@ -107,10 +107,13 @@ case "$project" in
         ;;
     hal9000)
         build-ruby "$project"
-        test -n "$CI" && {
-            echo "Pushing image to ${HAL9000_ECR_REPO}..." 2>&1
-            docker-push "hal9000_app" "$HAL9000_ECR_REPO"
-        }
+
+        if [ -n "$CI" ]; then
+            repo="$DOCKER_REPO/build/hal9000/app:$(docker-image-tag)"
+            echo "Pushing image to ${repo}..." 2>&1
+            docker tag "hal9000_app" "$repo"
+            docker push "$repo"
+        fi
         ;;
     parbot)
         parbotdir="${PARBOT_DIR:-""}"

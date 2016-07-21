@@ -56,6 +56,8 @@ export AWS_PROFILE AWS_DEFAULT_REGION
 : "${HAL9000_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/hal9000"}"
 : "${PARBOT_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/parbot"}"
 
+: "${DOCKER_REPO:="docker.dev.pardot.com"}"
+
 test -d "/etc/docker" && {
     DOCKER_CONFIG="/etc/docker"
     export DOCKER_CONFIG
