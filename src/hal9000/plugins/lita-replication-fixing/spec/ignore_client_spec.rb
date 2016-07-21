@@ -47,9 +47,7 @@ module ReplicationFixing
     end
 
     describe '#skipped_errors_count' do
-      message = "returns the number of errors skipped while a global" /
-                " ignore is in effect"
-      it message.to_s do
+      it "returns the number of errors skipped while a global ignore is in effect" do
         client = IgnoreClient.new("dfw", Lita.redis)
 
         client.ignore_all
