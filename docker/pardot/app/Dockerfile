@@ -8,9 +8,9 @@ ARG parallel_version=20160322
 ARG phantomjs_version=2.1.1-1
 ARG libzookeeper_version=3.4.6-1.pardot
 ARG git_version=2.7.4-1
-ARG php_version=5.5.36-1
-ARG php_protobuf_revision=a6c74a9f0324c56809aa05eaa321267d60055017
-ARG php_packages="php php-mcrypt php-mysql php-bcmath php-dom php-process php-mbstring php-intl php-soap php-xml php-xmlrpc php-gd php-pdo php-opcache php-tidy php-pear php-cli php-devel"
+# https://git.dev.pardot.com/Pardot/chef/blob/master/cookbooks/pardot_php70/attributes/default.rb
+ARG php_version=7.0.8-1
+ARG php_packages="php-json php-common php-cli php-devel php php-mcrypt php-mbstring php-pdo php-xml php-xmlrpc php-imap php-gd php-tidy php-bcmath php-intl php-opcache php-mysqlnd php-process"
 ARG artifactory_host
 
 RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
@@ -22,7 +22,7 @@ RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
 RUN yum install -y epel-release && \
   yum install -y \
     font-config supervisor less which openssh-clients redis bzip2 make \
-    unzip xz gcc file libicu openssl nc && \
+    unzip xz gcc file libicu openssl nc yum-versionlock && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.${dist}.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.${dist}.x86_64.rpm" && \
@@ -38,34 +38,26 @@ RUN cd /tmp && \
   rm -rf parallel-${parallel_version}
 
 # PHP
+COPY remi-php70.repo remi-safe.repo /etc/yum.repos.d/
 RUN yum install -y httpd mod_ssl && \
-  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-6.rpm && \
+  sed -i'' "s/artifactory\.dev\.pardot\.com/${artifactory_host}/" /etc/yum.repos.d/remi-php70.repo && \
   for package in ${php_packages}; do \
-    yum --enablerepo=remi-php55 install -y "${package}-${php_version}.${dist}.remi"; \
+    yum --enablerepo=remi-php70 install -y "${package}-${php_version}.${dist}.remi"; \
+    yum versionlock "${package}"; \
   done && \
-  yum --enablerepo=remi-php55 install -y "php-pecl-memcache-3.0.8-2.${dist}.remi.5.5" && \
-  yum --enablerepo=remi-php55 install -y "php-pecl-jsonc-1.3.10-1.${dist}.remi.5.5" && \
-  yum --enablerepo=remi-php55 install -y "php-pecl-jsonc-devel-1.3.10-1.${dist}.remi.5.5" && \
-  yum --enablerepo=remi-php55 install -y "php-pecl-zip-1.13.2-1.${dist}.remi.5.5" && \
-  yum --enablerepo=remi-php55 install -y "php-pecl-xdebug-2.4.0-1.${dist}.remi.5.5" && \
+  yum --enablerepo=remi-php70 install -y "php-pear-1.10.1-4.${dist}.remi" && \
+  yum --enablerepo=remi-php70 install -y "php-pecl-memcache-3.0.9-0.4.20160311git4991c2f.${dist}.remi.7.0" && \
+  yum --enablerepo=remi-php70 install -y "php-pecl-igbinary-1.2.2-0.1.20151217git2b7c703.${dist}.remi.7.0" && \
+  yum --enablerepo=remi-php70 install -y "php-pecl-zip-1.13.3-1.${dist}.remi.7.0" && \
+  yum --enablerepo=remi-php70 install -y "php-pecl-xdebug-2.4.0-1.${dist}.remi.7.0" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-soap-7.0.8-2.pardot.${dist}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-zookeeper-7.0.8-1.pardot.${dist}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-protobuf-7.0.8-1.pardot.${dist}.x86_64.rpm" && \
+  rpm -Uvh "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/php-pecl-encryption-gnupg-7.0.8-1.pardot.${dist}.x86_64.rpm" && \
+  pear install --onlyreqdeps "Crypt_HMAC" && \
+  pear install --onlyreqdeps "Net_Curl" && \
   rm -f /etc/php.d/*xdebug.ini && \
   yum clean all
-
-# PHP 5.5 compatible build of Protobuf
-RUN cd /tmp && \
-  git clone https://github.com/pd-aray/php-protobuf && \
-  cd php-protobuf && \
-  git checkout ${php_protobuf_revision} && \
-  phpize && \
-  ./configure && \
-  make install && \
-  echo 'extension=protobuf.so' > /etc/php.d/20-protobuf.ini && \
-  cd /tmp && \
-  rm -rf php-protobuf
-
-# PECL extensions
-RUN yes '' | pecl install zookeeper-beta && \
-  echo 'extension=zookeeper.so' > /etc/php.d/20-zookeeper.ini
 
 # Percona Client
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
