@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #/ Usage: build [--help] <app>
-#/ Deploy a BREAD app projects to ECS.
+#/ Deploy a BREAD app to ECS.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+
+. etc/build/env
 
 app="${1:-}"
 if [ "$#" -ne 1 ] || [ "$app" = "--help" ] || [ -z "$app" ]; then
