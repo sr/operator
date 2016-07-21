@@ -26,8 +26,8 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.pardot_ci.cidr_block}",
-      "172.31.0.0/16",
-      "192.168.128.0/22"
+      "172.31.0.0/16", # pardot-atlassian: default vpc
+      "192.168.128.0/22" # pardot-ci: default vpc
     ]
   }
 
@@ -40,8 +40,8 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.pardot_ci.cidr_block}",
-      "172.31.0.0/16",
-      "192.168.128.0/22"
+      "172.31.0.0/16", # pardot-atlassian: default vpc
+      "192.168.128.0/22" # pardot-ci: default vpc
     ]
   }
 
@@ -160,8 +160,8 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.pardot_ci.cidr_block}",
-      "172.31.0.0/16",
-      "192.168.128.0/22"
+      "172.31.0.0/16", # pardot-atlassian: default vpc
+      "192.168.128.0/22" # pardot-ci: default vpc
     ]
   }
 
@@ -174,8 +174,8 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.pardot_ci.cidr_block}",
-      "172.31.0.0/16",
-      "192.168.128.0/22"
+      "172.31.0.0/16", # pardot-atlassian: default vpc
+      "192.168.128.0/22" # pardot-ci: default vpc
     ]
   }
 
