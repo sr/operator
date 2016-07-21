@@ -54,8 +54,7 @@ func main() {
 
 		go func(master *privet.JobMaster) {
 			for {
-				queueStats := master.QueueStats()
-				if queueStats.UnitsInQueue == 0 && queueStats.UnitsInProgress == 0 {
+				if master.IsWorkFullyCompleted() {
 					os.Exit(master.ExitCode())
 				}
 				time.Sleep(1 * time.Second)
@@ -77,13 +76,26 @@ func main() {
 		jobRunner.EnvVars = envVarsList
 		jobRunner.ApproximateBatchDurationInSeconds = approximateBatchDurationInSeconds
 
-		if err = jobRunner.RunStartupHook(); err != nil {
-			log.Printf("error running startup hook: %v", err)
-			if overlookStartupHookFailure {
-				os.Exit(0)
-			} else {
-				os.Exit(1)
+		startupErrCh := make(chan error)
+		go func() {
+			startupErrCh <- jobRunner.RunStartupHook()
+		}()
+		queueEmptyCh := make(chan bool)
+		go jobRunner.NotifyQueueEmpty(queueEmptyCh)
+
+		select {
+		case err = <-startupErrCh:
+			if err != nil {
+				log.Printf("error running startup hook: %v", err)
+				if overlookStartupHookFailure {
+					os.Exit(0)
+				} else {
+					os.Exit(1)
+				}
 			}
+		case <-queueEmptyCh:
+			log.Printf("queue became empty, exiting")
+			os.Exit(0)
 		}
 
 		firstIteration := true
@@ -118,7 +130,9 @@ func main() {
 			log.Fatalf("error running startup hook: %v", err)
 		}
 
-		if !success {
+		if success {
+			os.Exit(0)
+		} else {
 			os.Exit(1)
 		}
 	} else {
