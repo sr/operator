@@ -3,12 +3,7 @@
   <%= current_project.name.capitalize %>
 </h1>
 
-<h2 class="steps-count">Step 1 of 3</h2>
-<br>
-
-<p class="lead muted">
-  Select the <%= deploy_type_icon("branch") %> <strong>branch</strong> that you wish to ship.
-</p>
+<h2 class="steps-count" style="border-bottom: none;">Step 1 of 3</h2>
 
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
