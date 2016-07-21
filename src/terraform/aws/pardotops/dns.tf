@@ -32,7 +32,7 @@ resource "aws_route53_zone" "dev_pardot_com" {
 }
 
 resource "aws_route53_zone" "ops_pardot_com" {
-  name = "dev.pardot.com"
+  name = "ops.pardot.com"
   comment = "Managed by Terraform. Subdomain of pardot.com hosted in Dyn."
 }
 
