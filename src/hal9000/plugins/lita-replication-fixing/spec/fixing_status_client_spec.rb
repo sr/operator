@@ -22,9 +22,7 @@ module ReplicationFixing
         client.set_active(shard: shard, active: true)
 
         expect(client.status(shard: shard).fixing?).to be_truthy
-        expect(
-          client.status(shard: shard).started_at.to_i
-        ).to be_within(1).of(Time.now.to_i)
+        expect(client.status(shard: shard).started_at.to_i).to be_within(1).of(Time.now.to_i)
       end
     end
 

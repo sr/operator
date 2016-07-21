@@ -42,25 +42,13 @@ module ReplicationFixing
 
     describe "equality" do
       it "tests for equality" do
-        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eq(
-          Hostname.new("pardot0-dbshard1-1-dfw")
-        )
-        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eql(
-          Hostname.new("pardot0-dbshard1-1-dfw")
-        )
-        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).to eq(
-          Hostname.new("pardot0-dbshard1-1-dfw").hash
-        )
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eq(Hostname.new("pardot0-dbshard1-1-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).to eql(Hostname.new("pardot0-dbshard1-1-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).to eq(Hostname.new("pardot0-dbshard1-1-dfw").hash)
 
-        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eq(
-          Hostname.new("pardot0-dbshard1-2-dfw")
-        )
-        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eql(
-          Hostname.new("pardot0-dbshard1-2-dfw")
-        )
-        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).not_to eq(
-          Hostname.new("pardot0-dbshard1-2-dfw").hash
-        )
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eq(Hostname.new("pardot0-dbshard1-2-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw")).not_to eql(Hostname.new("pardot0-dbshard1-2-dfw"))
+        expect(Hostname.new("pardot0-dbshard1-1-dfw").hash).not_to eq(Hostname.new("pardot0-dbshard1-2-dfw").hash)
       end
     end
   end

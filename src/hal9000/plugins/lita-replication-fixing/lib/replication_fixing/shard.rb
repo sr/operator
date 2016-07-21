@@ -14,17 +14,11 @@ module ReplicationFixing
     end
 
     def ==(other)
-      other.is_a?(Shard) && (
-        prefix == other.prefix && shard_id == other.shard_id &&
-          datacenter == other.datacenter
-      )
+      other.is_a?(Shard) && (prefix == other.prefix && shard_id == other.shard_id && datacenter == other.datacenter)
     end
 
     def eql?(other)
-      other.is_a?(Shard) && (
-        prefix == other.prefix && shard_id == other.shard_id &&
-          datacenter == other.datacenter
-      )
+      other.is_a?(Shard) && (prefix == other.prefix && shard_id == other.shard_id && datacenter == other.datacenter)
     end
 
     def hash

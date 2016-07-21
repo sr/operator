@@ -20,8 +20,7 @@ module ReplicationFixing
     end
 
     subject(:supervisor) do
-      MonitorSupervisor.new(redis: Lita.redis,
-                            fixing_client: fixing_client)
+      MonitorSupervisor.new(redis: Lita.redis, fixing_client: fixing_client)
     end
 
     describe '#start_exclusive_monitor' do
@@ -32,8 +31,7 @@ module ReplicationFixing
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/2")
           .and_return(
             { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
-            { body: JSON.dump("is_erroring" => true, "is_fixable" => true,
-                              "fix" => { "active" => true }) },
+            { body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }) },
             body: JSON.dump("is_erroring" => false)
           )
 
@@ -66,11 +64,9 @@ module ReplicationFixing
       end
 
       it "doesn't start a new monitor if one already exists" do
-        stub_request(:get, "https://repfix.example/replication/" /
-          "fixes/for/db/1/dfw")
+        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dfw")
           .and_return(
-            { body: JSON.dump("is_erroring" => true, "is_fixable" => true,
-                              "fix" => { "active" => true }) },
+            { body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }) },
             body: JSON.dump("is_erroring" => false)
           )
 

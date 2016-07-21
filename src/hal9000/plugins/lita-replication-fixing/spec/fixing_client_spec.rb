@@ -40,14 +40,13 @@ module ReplicationFixing
         expect(result.status).to eq("is_erroring" => true, "is_fixable" => false)
       end
 
-      it "resets the status of the fixing if the error is no longer " \
-         "being fixed" do
+      it "resets the status of the fixing if the error is no longer being fixed" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => false, "fix" => { "active" => false }))
 
         fixing_status_client.set_active(shard: hostname, active: true)
-        expect(fixing_status_client.status(shard: hostname).fixing?).tobe_truthy
+        expect(fixing_status_client.status(shard: hostname).fixing?).to be_truthy
         expect(fixing_status_client.status(shard: hostname).started_at).to be
 
         fixing_client.fix(shard: hostname)
@@ -102,9 +101,7 @@ module ReplicationFixing
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(
             { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
-            body: JSON.dump("is_erroring" => true,
-                            "is_fixable" => true,
-                            "fix" => { "active" => true })
+            body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true })
           )
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
