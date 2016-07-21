@@ -27,7 +27,7 @@ module Lita
       http.post "/replication/errors", :create_replication_error
 
       # http://rubular.com/r/Aos770vcM3
-      route /^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?(?:\s+(?<minutes>\d+))?/i, :create_ignore, command: true, help: {
+      route "/^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?(?:\s+(?<minutes>\d+))?/i", :create_ignore, command: true, help: {
         "ignore SHARD_ID" => "Ignores db-SHARD_ID for 15 minutes in the default datacenter",
         "ignore PREFIX-SHARD_ID" => "Ignores PREFIX-SHARD_ID for 15 minutes (PREFIX is, e.g., db or whoisdb)",
         "ignore PREFIX-SHARD_ID-DATACENTER" => "Ignores PREFIX-SHARD_ID-DATACENTER for 15 minutes (PREFIX is, e.g., db or whoisdb)",
@@ -36,43 +36,43 @@ module Lita
         "ignore PREFIX-SHARD_ID-DATACENTER MINUTES" => "Ignores PREFIX-SHARD_ID-DATACENTER for MINUTES minutes"
       }
 
-      route /^resetignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :reset_ignore, command: true, help: {
+      route "/^resetignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i", :reset_ignore, command: true, help: {
         "resetignore SHARD_ID" => "Stops ignoring db-SHARD_ID in the default datacenter",
         "resetignore PREFIX-SHARD_ID" => "Stops ignoring PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
         "resetignore PREFIX-SHARD_ID-DATACENTER" => "Stops ignoring PREFIX-SHARD_ID-DATACENTER (PREFIX is, e.g., db or whoisdb)"
       }
 
       # http://rubular.com/r/oud5IU1fji
-      route /^fix\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :create_fix, command: true, help: {
+      route "/^fix\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i", :create_fix, command: true, help: {
         "fix SHARD_ID" => "Attempts to fix db-SHARD_ID in the default datacenter",
         "fix PREFIX-SHARD_ID" => "Attempts to fix PREFIX-SHARD_ID in the default datacenter (PREFIX is, e.g., db or whoisdb)",
         "fix PREFIX-SHARD_ID-DATACENTER" => "Attempts to fix PREFIX-SHARD_ID-DATACENTER"
       }
 
-      route /^cancelfix\s+(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/, :cancel_fix, command: true, help: {
+      route "/^cancelfix\s+(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/", :cancel_fix, command: true, help: {
         "cancelfix SHARD_ID" => "Cancels the fix for SHARD_ID in the default datacenter",
         "cancelfix SHARD_ID-DATACENTER" => "Cancels the fix for SHARD_ID-DATACENTER"
       }
 
-      route /^current(?:auto)?fixes/i, :current_fixes, command: true, help: {
+      route "/^current(?:auto)?fixes/i", :current_fixes, command: true, help: {
         "currentfixes" => "Lists ongoing replication fixes"
       }
 
-      route /^stopfixing/i, :stop_fixing, command: true, help: {
+      route "/^stopfixing/i", :stop_fixing, command: true, help: {
         "stopfixing" => "Globally pauses fixing of replication errors"
       }
 
-      route /^startfixing(?:\s+(?<datacenter>\S+))?/i, :start_fixing, command: true, help: {
+      route "/^startfixing(?:\s+(?<datacenter>\S+))?/i", :start_fixing, command: true, help: {
         "startfixing" => "Globally starts fixing of replication errors in the default datacenter",
         "startfixing DATACENTER" => "Globally starts fixing of replication errors in DATACENTER"
       }
 
-      route /^checkfixing(?:\s+(?<datacenter>\S+))?/i, :check_fixing, command: true, help: {
+      route "/^checkfixing(?:\s+(?<datacenter>\S+))?/i", :check_fixing, command: true, help: {
         "checkfixing" => "Reports whether fixing is globally enabled or disabled in the default datacenter",
         "checkfixing DATACENTER" => "Reports whether fixing is globally enabled or disabled in DATACENTER"
       }
 
-      route /^status\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i, :status, command: true, help: {
+      route "/^status\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?/i", :status, command: true, help: {
         "status SHARD_ID" => "Reports the status of db-SHARD_ID in the default datacenter",
         "status PREFIX-SHARD_ID" => "Reports the status of PREFIX-SHARD_ID (PREFIX is, e.g., db or whoisdb)",
         "status PREFIX-SHARD_ID-DATACENTER" => "Reports the status of PREFIX-SHARD_ID-DATACENTER"

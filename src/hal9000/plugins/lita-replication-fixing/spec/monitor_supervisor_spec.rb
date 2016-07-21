@@ -3,6 +3,7 @@ require "thread"
 require "replication_fixing/shard"
 require "replication_fixing/monitor_supervisor"
 
+# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe MonitorSupervisor do
     include Lita::RSpec
@@ -14,13 +15,16 @@ module ReplicationFixing
       FixingClient.new(
         repfix_url: "https://repfix.example",
         fixing_status_client: fixing_status_client,
-        log: logger,
+        log: logger
       )
     end
 
-    subject(:supervisor) { MonitorSupervisor.new(redis: Lita.redis, fixing_client: fixing_client) }
+    subject(:supervisor) do
+      MonitorSupervisor.new(redis: Lita.redis,
+                            fixing_client: fixing_client)
+    end
 
-    describe "#start_exclusive_monitor" do
+    describe '#start_exclusive_monitor' do
       it "monitors the host every <tick> seconds, until it is fixed" do
         # 1) Fixable error
         # 2) Fix active
@@ -28,8 +32,9 @@ module ReplicationFixing
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/2")
           .and_return(
             { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
-            { body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }) },
-            body: JSON.dump("is_erroring" => false),
+            { body: JSON.dump("is_erroring" => true, "is_fixable" => true,
+                              "fix" => { "active" => true }) },
+            body: JSON.dump("is_erroring" => false)
           )
 
         mutex = Mutex.new
@@ -61,10 +66,12 @@ module ReplicationFixing
       end
 
       it "doesn't start a new monitor if one already exists" do
-        stub_request(:get, "https://repfix.example/replication/fixes/for/db/1/dfw")
+        stub_request(:get, "https://repfix.example/replication/" /
+          "fixes/for/db/1/dfw")
           .and_return(
-            { body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }) },
-            body: JSON.dump("is_erroring" => false),
+            { body: JSON.dump("is_erroring" => true, "is_fixable" => true,
+                              "fix" => { "active" => true }) },
+            body: JSON.dump("is_erroring" => false)
           )
 
         mutex = Mutex.new

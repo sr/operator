@@ -1,4 +1,5 @@
 module ReplicationFixing
+  # Add top-level class documentation comment here.
   class Shard
     attr_reader :prefix, :shard_id, :datacenter
 
@@ -13,14 +14,16 @@ module ReplicationFixing
     end
 
     def ==(other)
-      Shard === other && (
-        prefix == other.prefix && shard_id == other.shard_id && datacenter == other.datacenter
+      other.is_a?(Shard) && (
+        prefix == other.prefix && shard_id == other.shard_id &&
+          datacenter == other.datacenter
       )
     end
 
     def eql?(other)
-      Shard === other && (
-        prefix == other.prefix && shard_id == other.shard_id && datacenter == other.datacenter
+      other.is_a?(Shard) && (
+        prefix == other.prefix && shard_id == other.shard_id &&
+          datacenter == other.datacenter
       )
     end
 

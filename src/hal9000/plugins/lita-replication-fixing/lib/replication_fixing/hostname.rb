@@ -1,6 +1,7 @@
 require "replication_fixing/shard"
 
 module ReplicationFixing
+  # Add top-level class documentation comment here.
   class Hostname
     MalformedHostname = Class.new(StandardError)
 
@@ -16,11 +17,11 @@ module ReplicationFixing
     end
 
     def ==(other)
-      Hostname === other && hostname == other.hostname
+      other.is_a?(Hostname) && hostname == other.hostname
     end
 
     def eql?(other)
-      Hostname === other && hostname == other.hostname
+      other.is_a?(Hostname) && hostname == other.hostname
     end
 
     def hash
@@ -42,7 +43,8 @@ module ReplicationFixing
     private
 
     def parse_hostname
-      if /\Apardot0-(?<type>dbshard|whoisdb)(?<cluster_id>\d+)-(?<shard_id>\d+)-(?<datacenter>[^-]+)\z/ =~ @hostname
+      if /\Apardot0-(?<type>dbshard|whoisdb)(?<cluster_id>\d+)-(?<shard_id>\d+)
+          -(?<datacenter>[^-]+)\z/x =~ @hostname
         prefix = \
           case type
           when "whoisdb"

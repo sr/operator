@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.summary       = "Replication fixing client"
   spec.metadata      = { "lita_plugin_type" => "handler" }
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(/^(test|spec|features)/)
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "lita", ">= 4.7"

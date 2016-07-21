@@ -1,4 +1,5 @@
 module ReplicationFixing
+  # Add top-level class documentation comment here.
   class IgnoreClient
     IGNORE_ALL_KEY = "ignore:all".freeze
     IGNORE_SHARD_NAMESPACE = "ignore:shard".freeze
@@ -12,7 +13,8 @@ module ReplicationFixing
     def ignoring?(shard)
       if @redis.exists(IGNORE_ALL_KEY)
         :all
-      elsif @redis.exists([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":"))
+      elsif @redis.exists([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix,
+                           shard.shard_id].join(":"))
         :shard
       else
         false
@@ -24,11 +26,13 @@ module ReplicationFixing
     end
 
     def ignore(shard, expire: 600)
-      @redis.setex([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":"), expire, "")
+      @redis.setex([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix,
+                    shard.shard_id].join(":"), expire, "")
     end
 
     def reset_ignore(shard)
-      @redis.del([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix, shard.shard_id].join(":"))
+      @redis.del([IGNORE_SHARD_NAMESPACE, @datacenter, shard.prefix,
+                  shard.shard_id].join(":"))
     end
 
     def ignore_all

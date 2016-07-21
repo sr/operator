@@ -39,13 +39,14 @@ module ReplicationFixing
 
     def start_exclusive_monitor(monitor)
       key = build_key(monitor)
-      success = !!@redis.eval(%(
+      redis_eval = @redis.eval(%(
         if redis.call('exists', KEYS[1]) == 0 then
           return redis.call('setex', KEYS[1], #{monitor.tick.ceil}, '')
         else
           return nil
         end
       ), keys: [key])
+      success = redis_eval ? true : false
 
       Thread.new { run_monitor(monitor) } if success
       success

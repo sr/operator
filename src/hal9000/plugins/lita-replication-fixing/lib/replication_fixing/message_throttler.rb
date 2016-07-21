@@ -9,7 +9,7 @@ module ReplicationFixing
     end
 
     def send_message(target, message)
-      if room = target.room
+      if room == target.room
         key = [THROTTLER_NAMESPACE, target.room.to_s, message].join(":")
         unless @redis.exists(key)
           set, = @redis.multi do
