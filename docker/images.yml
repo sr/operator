@@ -12,9 +12,6 @@ images:
     build: ruby/2.3.0
 
   # Pardot/pardot base images
-  docker.dev.pardot.com/base/pardot/app-php7:
-    build: pardot/app
-    file: pardot/app/Dockerfile.php7
   docker.dev.pardot.com/base/pardot/app:
     build: pardot/app
   docker.dev.pardot.com/base/pardot/redis:
