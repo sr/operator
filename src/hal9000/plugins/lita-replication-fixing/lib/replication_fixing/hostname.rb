@@ -1,7 +1,6 @@
 require "replication_fixing/shard"
 
 module ReplicationFixing
-  # Add top-level class documentation comment here.
   class Hostname
     MalformedHostname = Class.new(StandardError)
 

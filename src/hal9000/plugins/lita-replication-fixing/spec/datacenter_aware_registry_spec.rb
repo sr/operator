@@ -1,7 +1,6 @@
 require "spec_helper"
 require "replication_fixing/datacenter_aware_registry"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   describe DatacenterAwareRegistry do
     describe '#register' do

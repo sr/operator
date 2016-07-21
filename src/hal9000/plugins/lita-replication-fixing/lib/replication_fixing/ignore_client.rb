@@ -1,5 +1,4 @@
 module ReplicationFixing
-  # Add top-level class documentation comment here.
   class IgnoreClient
     IGNORE_ALL_KEY = "ignore:all".freeze
     IGNORE_SHARD_NAMESPACE = "ignore:shard".freeze

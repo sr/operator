@@ -1,7 +1,6 @@
 require "spec_helper"
 require "replication_fixing/hostname"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe Hostname do
     describe '#shard' do

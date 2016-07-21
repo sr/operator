@@ -1,5 +1,4 @@
 module ReplicationFixing
-  # Add top-level class documentation comment here.
   class DatacenterAwareRegistry
     NoSuchDatacenter = Class.new(StandardError)
 

@@ -3,7 +3,6 @@ require "thread"
 require "replication_fixing/shard"
 require "replication_fixing/monitor_supervisor"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe MonitorSupervisor do
     include Lita::RSpec

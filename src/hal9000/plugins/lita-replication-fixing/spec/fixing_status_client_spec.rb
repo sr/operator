@@ -2,7 +2,6 @@ require "spec_helper"
 require "replication_fixing/shard"
 require "replication_fixing/fixing_status_client"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe FixingStatusClient do
     include Lita::RSpec

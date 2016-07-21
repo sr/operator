@@ -1,5 +1,4 @@
 module ReplicationFixing
-  # Add top-level class documentation comment here.
   class Shard
     attr_reader :prefix, :shard_id, :datacenter
 

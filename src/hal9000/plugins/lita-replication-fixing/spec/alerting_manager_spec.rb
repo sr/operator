@@ -3,7 +3,6 @@ require "replication_fixing/alerting_manager"
 require "replication_fixing/test_pager"
 require "replication_fixing/hostname"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe AlertingManager do
     let(:hostname) { Hostname.new("pardot0-dbshard1-1-dfw") }

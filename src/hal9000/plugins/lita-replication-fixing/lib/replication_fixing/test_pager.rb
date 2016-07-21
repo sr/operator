@@ -1,5 +1,4 @@
 module ReplicationFixing
-  # Add top-level class documentation comment here.
   class TestPager
     attr_reader :incidents
 

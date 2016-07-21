@@ -3,7 +3,6 @@ require "replication_fixing/fixing_client"
 require "replication_fixing/shard"
 require "replication_fixing/hostname"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe FixingClient do
     include Lita::RSpec

@@ -2,7 +2,6 @@
 require "spec_helper"
 require "replication_fixing/replication_error_sanitizer"
 
-# Add top-level class documentation comment here.
 module ReplicationFixing
   RSpec.describe ReplicationErrorSanitizer do
     subject(:sanitizer) { ReplicationErrorSanitizer.new }
