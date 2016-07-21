@@ -18,27 +18,31 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_vpc.pardot_ci.cidr_block}",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.appdev.cidr_block}"
-    ]
-    self = "true"
-  }
-
-  ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.pardot_ci.cidr_block}",
+      "${aws_vpc.appdev.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.appdev.cidr_block}"
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "172.31.0.0/16",
+      "192.168.128.0/22"
     ]
-    self = "true"
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "172.31.0.0/16",
+      "192.168.128.0/22"
+    ]
   }
 
   ingress {
@@ -118,7 +122,6 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
       "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-
     ]
   }
 
@@ -156,7 +159,9 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}"
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "172.31.0.0/16",
+      "192.168.128.0/22"
     ]
   }
 
@@ -168,7 +173,9 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}"
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "172.31.0.0/16",
+      "192.168.128.0/22"
     ]
   }
 
@@ -679,8 +686,6 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
   peer_vpc_id = "vpc-4d96a928"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
-
-
 
 //// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
 //resource "aws_route53_record" "artifactory_dev_pardot_com_cname" {
