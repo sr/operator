@@ -147,7 +147,7 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
   }
 }
 resource "aws_security_group" "artifactory_internal_elb_secgroup" {
-  name = "artifactory_dc_only_http_lb"
+  name = "artifactory_internal_elb_secgroup"
   description = "Allow HTTP/HTTPS from SFDC datacenters only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
