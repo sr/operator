@@ -86,6 +86,10 @@ class ProvisionalDeploy
     @project.name
   end
 
+  def show_single_servers?
+    !@project.all_servers_default
+  end
+
   def valid?
     @sha.present?
   end
