@@ -147,7 +147,7 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
   }
 }
 resource "aws_security_group" "artifactory_internal_elb_secgroup" {
-  name = "artifactory_dc_only_http_lb"
+  name = "artifactory_internal_elb_secgroup"
   description = "Allow HTTP/HTTPS from SFDC datacenters only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
@@ -215,7 +215,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-1-ue1.public_ip}"]
   type = "A"
@@ -223,7 +223,7 @@ resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory-internal1-1-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory-internal1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-1-ue1.private_ip}"]
   type = "A"
@@ -257,7 +257,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-2-ue1.public_ip}"]
   type = "A"
@@ -265,7 +265,7 @@ resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory-internal1-2-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory-internal1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-2-ue1.private_ip}"]
   type = "A"
@@ -299,7 +299,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-3-ue1.public_ip}"]
   type = "A"
@@ -307,7 +307,7 @@ resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory-internal1-3-ue1_arecord" {
-  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory-internal1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"]
   type = "A"
@@ -689,7 +689,7 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 
 //// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
 //resource "aws_route53_record" "artifactory_dev_pardot_com_cname" {
-//  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
 //  name = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
 //  records = ["${aws_elb.artifactory_public_elb.dns_name}"]
 //  type = "CNAME"
@@ -697,7 +697,7 @@ resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integrat
 //}
 //
 //resource "aws_route53_record" "artifactory_internal_dev_pardot_com_cname" {
-//  zone_id = "#{aws_route53_zone.dev_pardot_com.zone_id}"
+//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
 //  name = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
 //  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
 //  type = "CNAME"
