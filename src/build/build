@@ -79,7 +79,7 @@ echo "===> Building ${project}..." 2>&1
 case "$project" in
     canoe)
         build-ruby "$project"
-        test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
+        test -n "$CI" && docker-push "$project"
         ;;
     explorer)
         build-ruby "$project"
@@ -107,13 +107,7 @@ case "$project" in
         ;;
     hal9000)
         build-ruby "$project"
-
-        if [ -n "$CI" ]; then
-            repo="$DOCKER_REPO/build/hal9000/app:$(docker-image-tag)"
-            echo "Pushing image to ${repo}..." 2>&1
-            docker tag "hal9000_app" "$repo"
-            docker push "$repo"
-        fi
+        test -n "$CI" && docker-push "$project"
         ;;
     parbot)
         parbotdir="${PARBOT_DIR:-""}"
@@ -127,10 +121,7 @@ case "$project" in
         cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
         docker build -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
 
-        if [ -n "$CI" ]; then
-            echo "Pushing image to ${PARBOT_ECR_REPO}..." 2>&1
-            docker-push "parbot_app" "$PARBOT_ECR_REPO"
-        fi
+        test -n "$CI" && docker-push "$project"
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
