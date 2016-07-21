@@ -12,6 +12,9 @@ import (
 	"syscall"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+
 	"golang.org/x/net/context"
 )
 
@@ -84,6 +87,26 @@ func (r *JobRunner) runOptionalHook(hook string) error {
 	}
 
 	return cmd.Run()
+}
+
+// NotifyQueueEmpty closes ch when the queue is determined to be empty
+func (r *JobRunner) NotifyQueueEmpty(ch chan<- bool) {
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), JobRunnerClientTimeout)
+		queueStats, err := r.masterClient.GetQueueStatistics(ctx, &QueueStatisticsRequest{})
+		cancel()
+
+		if err != nil && grpc.Code(err) == codes.DeadlineExceeded {
+			// In all liklihood, the Privet master has shut down completely because
+			// the queue is empty.
+			close(ch)
+			break
+		} else if queueStats.UnitsInQueue == 0 {
+			close(ch)
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
 }
 
 func (r *JobRunner) PopUnits() ([]*Unit, error) {
