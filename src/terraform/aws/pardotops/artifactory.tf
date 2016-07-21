@@ -26,6 +26,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_vpc.appdev.cidr_block}"
     ]
+    self = "true"
   }
 
   ingress {
@@ -46,7 +47,8 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.artifactory_dc_only_http_lb.id}",
-      "${aws_security_group.artifactory_http_lb.id}"
+      "${aws_security_group.artifactory_http_lb.id}",
+      "${aws_security_group.artifactory_internal_elb_secgroup.id}"
     ]
   }
 
@@ -73,12 +75,9 @@ resource "aws_security_group" "artifactory_http_lb" {
       "62.17.146.140/30",   # aloha-emea
       "62.17.146.144/28",   # aloha-emea
       "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+      "174.37.191.2/32"     # proxy.dev
     ]
+    self = "true"
   }
 
   ingress {
@@ -91,11 +90,7 @@ resource "aws_security_group" "artifactory_http_lb" {
       "62.17.146.140/30",   # aloha-emea
       "62.17.146.144/28",   # aloha-emea
       "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
       "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
       "50.22.140.200/32"    # tools-s1.dev
     ]
   }
@@ -123,6 +118,7 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
       "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
+
     ]
   }
 
@@ -147,6 +143,42 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+resource "aws_security_group" "artifactory_internal_elb_secgroup" {
+  name = "artifactory_dc_only_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC datacenters only"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot_ci.cidr_block}"
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot_ci.cidr_block}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
@@ -157,7 +189,6 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
   root_block_device {
@@ -200,7 +231,6 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
   root_block_device {
@@ -243,7 +273,6 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
   ]
   root_block_device {
@@ -331,8 +360,9 @@ resource "aws_elb" "artifactory_private_elb" {
   internal = true
   name = "artifactory-private-elb"
   security_groups = [
-    "${aws_security_group.artifactory_instance_secgroup.id}"
+    "${aws_security_group.artifactory_internal_elb_secgroup.id}"
   ]
+
   subnets = [
     "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
     "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",

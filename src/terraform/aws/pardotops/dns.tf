@@ -160,352 +160,352 @@ resource "aws_route53_record" "confluence_dev_pardot_com_TXTrecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "confluence.${aws_route53_zone.dev_pardot_com.name}"
   records = ["v=spf1 mx a include:amazonses.com ~all"]
-type = "TXT"
-ttl = "900"
+  type = "TXT"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "crowd_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "crowd.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.42.123"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "crowd.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.42.123"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "crowd_dev_pardot_com_TXTrecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "crowd.${aws_route53_zone.dev_pardot_com.name}"
-records = ["v=spf1 mx a include:amazonses.com ~all"]
-type = "TXT"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "crowd.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["v=spf1 mx a include:amazonses.com ~all"]
+  type = "TXT"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "docker_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "docker.${aws_route53_zone.dev_pardot_com.name}"
-records = ["artifactory.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "docker.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["artifactory.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "docker-internal_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "docker-internal.${aws_route53_zone.dev_pardot_com.name}"
-records = ["artifactory-internal.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "docker-internal.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["artifactory-internal.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
-records = ["172.31.57.89"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["172.31.57.89"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "go_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "go.${aws_route53_zone.dev_pardot_com.name}"
-records = ["lba-s1.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "go.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["lba-s1.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "grafana-dfw_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "grafana-dfw.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-dfw.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "grafana-dfw.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-dfw.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "grafana-phx_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "grafana-phx.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-phx.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "grafana-phx.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-phx.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "graphite_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "graphite.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.2"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "graphite.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.2"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "graphite-dfw_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "graphite-dfw.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-dfw.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "graphite-dfw.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-dfw.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "graphite-phx_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "graphite-phx.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-phx.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "graphite-phx.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-phx.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "hal9000_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "hal9000.${aws_route53_zone.dev_pardot_com.name}"
-records = ["hal9000-production-1569842332.us-east-1.elb.amazonaws.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "hal9000.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["hal9000-production-1569842332.us-east-1.elb.amazonaws.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.35.223"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.35.223"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_TXTrecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
-records = ["v=spf1 mx a include:amazonses.com ~all"]
-type = "TXT"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["v=spf1 mx a include:amazonses.com ~all"]
+  type = "TXT"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "id_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "id.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.8.208.137"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "id.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.8.208.137"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "jira_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "jira.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.34.28"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "jira.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.34.28"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "jira_dev_pardot_com_TXTrecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "jira.${aws_route53_zone.dev_pardot_com.name}"
-records = ["v=spf1 mx a include:amazonses.com ~all"]
-type = "TXT"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "jira.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["v=spf1 mx a include:amazonses.com ~all"]
+  type = "TXT"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "jobs_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "jobs.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.5.130.6"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "jobs.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.5.130.6"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "jump_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "jump.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.2"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "jump.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.2"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "lb-s1_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "lb-s1.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.14"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "lb-s1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.14"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "lba-s1_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "lba-s1.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.6"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "lba-s1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.6"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "ldap_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "ldap.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.216.152"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "ldap.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.216.152"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "logs_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "logs.${aws_route53_zone.dev_pardot_com.name}"
-records = ["jump.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "logs.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["jump.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "logs-dfw_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "logs-dfw.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-dfw.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "logs-dfw.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-dfw.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "logs-phx_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "logs-phx.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-phx.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "logs-phx.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-phx.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "migration_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "migration.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.2"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "migration.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.2"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "pandafood_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "pandafood.${aws_route53_zone.dev_pardot_com.name}"
-records = ["ec2-52-70-118-212.compute-1.amazonaws.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pandafood.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["ec2-52-70-118-212.compute-1.amazonaws.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "pd-zbx-pxy_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "pd-zbx-pxy.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.237.0"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pd-zbx-pxy.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.237.0"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "preview_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "preview.${aws_route53_zone.dev_pardot_com.name}"
-records = ["app.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "preview.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["app.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "provisioning_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "provisioning.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.22"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "provisioning.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.22"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "push_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "push.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.4", "174.37.191.5"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "push.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.4", "174.37.191.5"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "push-s1_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "push-s1.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.4"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "push-s1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.4"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "push-s2_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "push-s2.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.5"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "push-s2.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.5"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "qetunnel_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "qetunnel.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.0.121.112"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "qetunnel.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.121.112"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "rabbit_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "rabbit.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.2"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "rabbit.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.2"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "seyren_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "seyren.${aws_route53_zone.dev_pardot_com.name}"
-records = ["jump.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "seyren.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["jump.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "stash_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "stash.${aws_route53_zone.dev_pardot_com.name}"
-records = ["52.5.210.41"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "stash.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.5.210.41"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "thumb-s1_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "thumb-s1.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.29"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "thumb-s1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["174.37.191.29"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "thumbnail-s1_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "thumbnail-s1.${aws_route53_zone.dev_pardot_com.name}"
-records = ["174.37.191.3"]
-type = "A"
-ttl = "900"
+ zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+ name = "thumbnail-s1.${aws_route53_zone.dev_pardot_com.name}"
+ records = ["174.37.191.3"]
+ type = "A"
+ ttl = "900"
 }
 
 resource "aws_route53_record" "tools-dfw_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "tools-dfw.${aws_route53_zone.dev_pardot_com.name}"
-records = ["136.147.104.46"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "tools-dfw.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["136.147.104.46"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "tools-phx_dev_pardot_com_Arecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "tools-phx.${aws_route53_zone.dev_pardot_com.name}"
-records = ["136.147.96.46"]
-type = "A"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "tools-phx.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["136.147.96.46"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "zabbix-dfw_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "zabbix-dfw.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-dfw.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "zabbix-dfw.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-dfw.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "zabbix-phx_dev_pardot_com_CNAMErecord" {
-zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-name = "zabbix-phx.${aws_route53_zone.dev_pardot_com.name}"
-records = ["tools-phx.dev.pardot.com."]
-type = "CNAME"
-ttl = "900"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "zabbix-phx.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["tools-phx.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "dev_pardot_com_TXTrecord" {
