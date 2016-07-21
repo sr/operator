@@ -108,6 +108,54 @@ resource "aws_route53_record" "awstools_dev_pardot_com_Arecord" {
   ttl = "900"
 }
 
+resource "aws_route53_record" "bamboo_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.0.51.79"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "bamboo_dev_pardot_com_TXTrecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["v=spf1 mx a include:amazonses.com ~all"]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "amazonses_bamboo_dev_pardot_com_TXTrecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "_amazonses_bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["iikqS8gW4E1ceNzqQqTyLCxvuY1MZb5+kJZp/fqvxB8="]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "3y57xkxsmwsmtqkf25zl6hzldkxqdegs_domainkey_bamboo_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "3y57xkxsmwsmtqkf25zl6hzldkxqdegs._domainkey.bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["3y57xkxsmwsmtqkf25zl6hzldkxqdegs.dkim.amazonses.com."]
+  type = "CNAME"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "2fdyawtj4aey2pyxj74c7o3wvx6zb62w_domainkey_bamboo_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "2fdyawtj4aey2pyxj74c7o3wvx6zb62w._domainkey.bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["2fdyawtj4aey2pyxj74c7o3wvx6zb62w.dkim.amazonses.com."]
+  type = "CNAME"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "e7l7trjgcjj66i2b4ja3yughhara3sum_domainkey_bamboo_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "e7l7trjgcjj66i2b4ja3yughhara3sum._domainkey.bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["e7l7trjgcjj66i2b4ja3yughhara3sum.dkim.amazonses.com."]
+  type = "CNAME"
+  ttl = "900"
+}
+
 resource "aws_route53_record" "bots_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "bots.${aws_route53_zone.dev_pardot_com.name}"
@@ -193,6 +241,46 @@ resource "aws_route53_record" "docker-internal_dev_pardot_com_CNAMErecord" {
   name = "docker-internal.${aws_route53_zone.dev_pardot_com.name}"
   records = ["artifactory-internal.dev.pardot.com."]
   type = "CNAME"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "git_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "git.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["1.git.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "60"
+}
+
+resource "aws_route53_record" "1_git_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "1.git.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.4.132.69"]
+  type = "A"
+  ttl = "60"
+}
+
+resource "aws_route53_record" "2_git_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "2.git.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.3.83.197"]
+  type = "A"
+  ttl = "60"
+}
+
+resource "aws_route53_record" "backups_git_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "backups.git.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["54.85.203.23"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "reply_git_dev_pardot_com_MXrecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "reply.git.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["10 git.dev.pardot.com."]
+  type = "MX"
   ttl = "900"
 }
 
