@@ -1,0 +1,1 @@
+FROM teampass/teampass:2.1.25.2
