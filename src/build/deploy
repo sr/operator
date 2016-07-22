@@ -16,7 +16,7 @@ cluster=
 service=
 image=
 case "$app" in
-    canoe|hal9000|parbot)
+    canoe|hal9000|parbot|teampass)
         cluster="${app}_production"
         service="$app"
         image="$DOCKER_REPO_BREAD/$app/app:$(docker-image-tag)"

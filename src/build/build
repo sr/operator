@@ -146,7 +146,8 @@ case "$project" in
             build/shellcheck lint-shell
         ;;
     teampass)
-        docker build -f src/teampass/Dockerfile src/teampass
+        docker build -f src/teampass/Dockerfile -t teampass_app src/teampass
+        test -n "$CI" && docker-push "$project"
         ;;
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
