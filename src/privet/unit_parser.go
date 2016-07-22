@@ -23,11 +23,8 @@ func (p *UnitParser) Next() (*Unit, error) {
 	var unit Unit
 
 	if !p.s.Scan() {
-		// EOF
-		return nil, nil
-	}
-	if err := p.s.Err(); err != nil {
-		return nil, err
+		// Either an error or EOF (note p.s.Err() is nil in the case of EOF)
+		return nil, p.s.Err()
 	}
 
 	line := p.s.Bytes()
