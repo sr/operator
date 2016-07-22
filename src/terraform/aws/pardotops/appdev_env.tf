@@ -408,6 +408,7 @@ resource "aws_instance" "appdev_jobmanager1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -437,6 +438,7 @@ resource "aws_instance" "appdev_push1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -466,6 +468,7 @@ resource "aws_instance" "appdev_provisioning1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -495,6 +498,7 @@ resource "aws_instance" "appdev_rabbit1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -524,6 +528,7 @@ resource "aws_instance" "appdev_redisrules1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -553,6 +558,7 @@ resource "aws_instance" "appdev_autojob1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -582,6 +588,7 @@ resource "aws_instance" "appdev_storm1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -611,6 +618,7 @@ resource "aws_instance" "appdev_kafka1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -640,6 +648,7 @@ resource "aws_instance" "appdev_zkkafka1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -669,6 +678,7 @@ resource "aws_instance" "appdev_pubsub1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -698,6 +708,7 @@ resource "aws_instance" "appdev_zkstorm1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -727,6 +738,7 @@ resource "aws_instance" "appdev_nimbus1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -756,6 +768,7 @@ resource "aws_instance" "appdev_appcache1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
@@ -785,6 +798,7 @@ resource "aws_instance" "appdev_discovery1" {
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
   ]
   tags {
