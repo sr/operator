@@ -72,7 +72,7 @@
         <input type="checkbox" name="lock"> Lock
       </label>
       <label>
-        <%= check_box_tag(:servers, 1, @prov_deploy.show_single_servers?, class: "js-servers-toggle", :'data-divname' => "deploy-servers") %>
+        <%= check_box_tag(:servers, "on", @prov_deploy.show_single_servers?, class: "js-servers-toggle", :'data-divname' => "deploy-servers") %>
         Specify Server(s)
       </label>
     </div>
