@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "hal9000" {
-  name = "hal9000"
-}
-
 resource "aws_elasticache_subnet_group" "hal9000_production" {
   name = "hal9000-production"
   description = "hal9000 production"
