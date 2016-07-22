@@ -1,6 +1,2 @@
-FROM docker.dev.pardot.com/base/centos:7
+FROM node:0.10
 ARG artifactory_host
-RUN \
-    yum -y install epel-release \
-  && \
-    yum install -y nodejs-0.10.30 npm
