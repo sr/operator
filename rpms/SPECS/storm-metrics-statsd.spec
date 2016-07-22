@@ -1,13 +1,14 @@
 %define maven_version 3.3.9
+%define srcver 1.1.0
 
 Name: storm-metrics-statsd
-Version: 1.0.0.SNAPSHOT
-Release: 3%{?dist}
+Version: %{srcver}
+Release: 4%{?dist}
 Summary: Storm plugin for reporting metrics to statsd
 Group: Applications/Internet
 License: Apache License v2.0
 URL: https://github.com/jegeiger/storm-metrics-statsd
-Source0: https://github.com/jegeiger/storm-metrics-statsd/archive/master.tar.gz
+Source0: https://github.com/jegeiger/storm-metrics-statsd/archive/v%{srcver}.tar.gz
 BuildArch: noarch
 BuildRequires: jdk
 BuildRequires: curl
@@ -22,7 +23,7 @@ curl -o maven.tar.gz "http://apache.osuosl.org/maven/maven-3/%{maven_version}/bi
 tar -xvzf maven.tar.gz
 rm maven.tar.gz
 
-%setup -q -n storm-metrics-statsd-master
+%setup -q -n storm-metrics-statsd-%{srcver}
 
 %build
 export JAVA_HOME="/usr/java/jdk1.7.0_79"
@@ -33,7 +34,7 @@ export JAVA_HOME="/usr/java/jdk1.7.0_79"
 rm -rf $RPM_BUILD_ROOT
 install -m 0755 -d $RPM_BUILD_ROOT/opt/storm/current/lib
 install -m 0755 target/dependency/java-statsd-client-2.0.0.jar $RPM_BUILD_ROOT/opt/storm/current/lib/java-statsd-client-2.0.0.jar
-install -m 0755 target/storm-metrics-statsd-1.0.0-SNAPSHOT.jar $RPM_BUILD_ROOT/opt/storm/current/lib/storm-metrics-statsd.jar
+install -m 0755 target/storm-metrics-statsd-%{srcver}.jar $RPM_BUILD_ROOT/opt/storm/current/lib/storm-metrics-statsd.jar
 
 %files
 %defattr(-,storm,storm,-)
