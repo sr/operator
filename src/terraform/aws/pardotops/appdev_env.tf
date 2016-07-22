@@ -12,6 +12,7 @@ variable "environment_appdev" {
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
+    db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
     num_app1_hosts = 2
@@ -243,7 +244,7 @@ resource "aws_instance" "appdev_globaldb1" {
     delete_on_termination = "true"
   }
   ebs_block_device {
-    device_name = "/dev/xvdf"
+    device_name = "${var.environment_appdev["db_volume_devive_name"]"
     volume_size = "gp2"
     volume_size = "512"
     delete_on_termination = "true"
@@ -281,7 +282,7 @@ resource "aws_instance" "appdev_dbshard1" {
     delete_on_termination = "true"
   }
   ebs_block_device {
-    device_name = "/dev/xvdf"
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_size = "gp2"
     volume_size = "512"
     delete_on_termination = "true"
