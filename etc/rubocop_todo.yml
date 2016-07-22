@@ -19,6 +19,9 @@ Lint/AssignmentInCondition:
   Exclude:
     - 'src/canoe/app/controllers/application_controller.rb'
     - 'src/canoe/app/models/deploy_target.rb'
+    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/message_throttler.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/maintenance_supervisor.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
 
 # Offense count: 18
 Lint/AmbiguousRegexpLiteral:
@@ -115,3 +118,27 @@ Style/TrailingCommaInLiteral:
   Exclude:
     - 'src/canoe/app/models/project.rb'
     - 'src/canoe/app/models/provisional_deploy.rb'
+
+# Offense count: 6
+# Cop supports --auto-correct.
+# Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/test_pager.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/human_time.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/test_pager.rb'
+    - 'src/hal9000/plugins/lita-zabbix/spec/helpers/zabbix_test_helpers.rb'
+
+# Offense count: 5
+Lint/UselessAssignment:
+  Exclude:
+    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/message_throttler.rb'
+    - 'src/hal9000/plugins/lita-replication-fixing/spec/lita/handlers/replication_fixing_spec.rb'
+    - 'src/hal9000/plugins/lita-replication-fixing/spec/monitor_supervisor_spec.rb'
+    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/zabbixmon.rb'
+
+# Offense count: 1
+Lint/UselessAccessModifier:
+  Exclude:
+    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/monitor_supervisor.rb'
