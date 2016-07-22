@@ -46,9 +46,9 @@ images:
     build: bread/bread
   docker.dev.pardot.com/base/bread/node:10
     build: bread/node
-  docker.dev.pardot.com/base/bread/teampass:
+  docker.dev.pardot.com/base/bread/teampass:2.1.25.2:
     build: bread/teampass
-  docker.dev.pardot.com/base/bread/ubuntu:
+  docker.dev.pardot.com/base/bread/ubuntu:wily:
     build: bread/ubuntu
 
   # password.pardot.com
