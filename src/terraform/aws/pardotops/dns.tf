@@ -598,7 +598,7 @@ resource "aws_route53_record" "zabbix-phx_dev_pardot_com_CNAMErecord" {
 
 resource "aws_route53_record" "dev_pardot_com_TXTrecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "@"
+  name = "dev.pardot.com"
   records = ["AvX35K2Ai6jcJ0TzFESkdw56z8AGQhKgTkGnmCc55j0="]
   type = "TXT"
   ttl = "900"
