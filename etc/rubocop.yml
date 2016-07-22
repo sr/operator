@@ -96,7 +96,7 @@ Style/SpecialGlobalVars:
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
-  ConsistentQuotesInMultiline: false
+  ConsistentQuotesInMultiline: true
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes

@@ -159,7 +159,7 @@ module Lita
             else
               error = body["error"].to_s
               unless error.empty?
-                robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
+                robot.send_message(@replication_room, "#{hostname}: #{body['error']}")
               end
 
               mysql_last_error = body["mysql_last_error"].to_s
@@ -175,7 +175,7 @@ module Lita
               case result
               when ::ReplicationFixing::FixingClient::NoErrorDetected
                 # This generally means there was an error, but it's not a replication statement issue
-                @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
+                @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body['error']}")
               else
                 reply_with_fix_result(shard: shard, result: result)
                 ensure_monitoring(shard: shard)
@@ -282,7 +282,7 @@ module Lita
       def current_fixes(response)
         fixes = config.datacenters.flat_map { |datacenter| @fixing_status_clients.for_datacenter(datacenter).current_fixes }
         if !fixes.empty?
-          response.reply_with_mention("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(", ")}")
+          response.reply_with_mention("I'm currently fixing: #{fixes.map { |f| f.shard.to_s }.join(', ')}")
         else
           response.reply_with_mention("I'm not fixing anything right now")
         end
@@ -343,7 +343,7 @@ module Lita
           lines << "status for #{shard}"
           lines << "[fix in progress]" if result.is_a?(::ReplicationFixing::FixingClient::FixInProgress)
           status.fetch("hosts", []).each do |host|
-            line = "* #{host["host"]}: #{host["lag"]} seconds behind"
+            line = "* #{host['host']}: #{host['lag']} seconds behind"
             line << " [erroring]" if host["is_erroring"]
             line << " [fixable]" if host["is_fixable"]
             lines << line
