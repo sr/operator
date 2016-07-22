@@ -9,8 +9,9 @@ ENV PATH="/usr/local/maven/bin:$PATH" \
   JAVA_HOME=/usr/java/jdk1.7.0_79
 
 RUN yum install -y epel-release && \
-  yum install -y supervisor which less rsync nmap && \
+  yum install -y supervisor python-pip python-devel gcc which less rsync nmap && \
   yum install -y "https://${artifactory_host}/artifactory/pd-tarball/jdk/jdk-${jdk_version}-linux-x64.rpm" && \
+  pip install supervisor_checks && \
   yum clean all
 
 COPY datastax.repo /etc/yum.repos.d/datastax.repo
