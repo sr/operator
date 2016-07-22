@@ -6,7 +6,7 @@ module ReplicationFixing
   RSpec.describe ReplicationErrorSanitizer do
     subject(:sanitizer) { ReplicationErrorSanitizer.new }
 
-    describe '#sanitize' do
+    describe "#sanitize" do
       it "redacts strings that are not identifiers or numbers" do
         error = %(Query: 'INSERT INTO foo VALUES ('foo@example.com', '1', '1.2')')
         redacted = sanitizer.sanitize(error)
