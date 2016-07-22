@@ -48,6 +48,8 @@ images:
     build: bread/node
   docker.dev.pardot.com/base/bread/teampass:
     build: bread/teampass
+  docker.dev.pardot.com/base/bread/ubuntu:
+    build: bread/ubuntu
 
   # password.pardot.com
   docker.dev.pardot.com/base/pwm:1.7.1:
