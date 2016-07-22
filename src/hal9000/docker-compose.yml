@@ -1,7 +1,7 @@
 version: "2"
 services:
   redis:
-    image: redis:3.0.7
+    image: docker.dev.pardot.com/base/pardot/redis
     expose:
       - "6379"
   app:

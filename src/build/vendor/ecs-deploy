@@ -179,15 +179,15 @@ fi
 # - image
 # - tag
 # If a group is missing it will be an empty string
-imageRegex="^([a-zA-Z0-9.\-]+):?([0-9]+)?/([a-zA-Z0-9\-]+)/?([a-zA-Z0-9\-]+)?:?([a-zA-Z0-9\.\-]+)?$"
+imageRegex="^([a-zA-Z0-9.\-]+)/([a-zA-Z0-9\-]+)/?([a-zA-Z0-9\-]+)/?([a-zA-Z0-9\-]+)/?([a-zA-Z0-9\-]+):?([a-zA-Z0-9\.\-]+)?$"
 
 if [[ $IMAGE =~ $imageRegex ]]; then
   # Define variables from matching groups
   domain=${BASH_REMATCH[1]}
-  port=${BASH_REMATCH[2]}
-  repo=${BASH_REMATCH[3]}
-  img=${BASH_REMATCH[4]}
-  tag=${BASH_REMATCH[5]}
+  port=
+  repo="${BASH_REMATCH[2]}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}"
+  img=${BASH_REMATCH[5]}
+  tag=${BASH_REMATCH[6]}
 
   # Validate what we received to make sure we have the pieces needed
   if [[ "x$domain" == "x" ]]; then
