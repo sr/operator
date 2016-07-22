@@ -1,4 +1,4 @@
-FROM ubuntu:wily
+FROM docker.dev.pardot.com/base/bread/ubuntu
 VOLUME ["/data"]
 WORKDIR "/data"
 RUN \
