@@ -9,7 +9,8 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -18,7 +19,8 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -27,7 +29,8 @@ resource "aws_security_group" "internal_apps_chef_server" {
     to_port = 9683
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}"
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
 
@@ -65,5 +68,6 @@ resource "aws_instance" "internal_apps_chef_server" {
   }
   tags {
     Name = "pardot0-chef1-1-ue1"
+    terraform = true
   }
 }

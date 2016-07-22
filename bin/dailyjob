@@ -4,28 +4,26 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-docker build -f etc/docker/Dockerfile.build -t build/build .
+# This is normally set in Bamboo and contains the JIRA password of the bot user
+: "${bamboo_BREADBOT_PASSWORD:-""}"
 
-# Compile jiracleaner program within a container
-: ${TMPDIR:="/tmp"}
-: ${GOOS:="linux"}
-tmpdir="$(mktemp -d "buildXXXXX")"
-trap 'rm -rf $tmpdir' EXIT
-docker run --rm \
-    -v "$(pwd):/go:ro" \
-    -v "$(pwd)/${tmpdir}:/tmp" \
-    -e "GOOS=${GOOS}" \
-    -e "CGO_ENABLED=0" \
-    build/build \
-    go build -a -tags netgo -ldflags "-w" -o /tmp/jiracleaner bread/cmd/jiracleaner
-    mv "${tmpdir}/jiracleaner" "$(pwd)/bin/jiracleaner"
-PATH="$(pwd)/bin:$PATH"
+# Add artifactory utilities to our PATH
+: "${BAMBOO_CONFIG_REPO:="$(pwd)/bamboo-configuration"}"
+test -d "$BAMBOO_CONFIG_REPO/bin/artifactory" || {
+    echo "dailyjob: Checkout of the Pardot/bamboo-configuration repo not" \
+        "not found at $BAMBOO_CONFIG_REPO" 2>&1
+    exit 1
+}
+PATH="$BAMBOO_CONFIG_REPO/bin/artifactory:$PATH"
 export PATH
 
+rm -f BREAD-GOL*.tar.gz jiracleaner
+latest_build.rb --repo=pd-canoe --project=BREAD --plan=BREAD --job=GOL -d
+tar -xvzf BREAD-GOL*.tar.gz jiracleaner
+
 # Close stale JIRA tickets
-# TODO(sr) Re-enable once https://jira.dev.pardot.com/browse/BREAD-963 is done
-# jiracleaner \
-#     -project BREAD \
-#     -username breadbot \
-#     -password "$bamboo_BREADBOT_PASSWORD" \
-#     -apply
+./jiracleaner \
+    -project BREAD \
+    -username breadbot \
+    -password "$bamboo_BREADBOT_PASSWORD" \
+    -apply

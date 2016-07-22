@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.files += ["README.md"]
   s.files += Dir.glob("environments/*")
   s.files += Dir.glob("lib/**/*")
-  s.executables = ["pull-agent", "pa-deploy-chef"]
+  s.executables = ["pull-agent", "pull-agent-knife", "pa-deploy-chef"]
   s.add_dependency "artifactory", "~>2.3"
   s.add_dependency "logstash-event", "1.2.02"
   s.add_dependency "scrolls", "0.3.8"

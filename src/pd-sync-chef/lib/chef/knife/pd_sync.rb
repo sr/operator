@@ -54,6 +54,7 @@ class Chef
         Chef::Knife::DataBagFromFile.load_deps
         Chef::Knife::EnvironmentFromFile.load_deps
         Chef::Knife::RoleFromFile.load_deps
+        Chef::Knife::NodeFromFile.load_deps
       end
 
       option :restore,
@@ -79,6 +80,11 @@ class Chef
       option :environment_file,
         long:         '--environment-file FILE',
         description:  'Single environment file to upload, instead of the whole environments/ directory',
+        proc:         nil
+
+      option :nodes_dir,
+        long:         '--nodes-dir DIR',
+        description:  'Directory of node files to upload',
         proc:         nil
 
       def run
@@ -111,7 +117,8 @@ class Chef
           vendor_dir: vendor_dir,
           why_run: config[:why_run],
           skip_berkshelf: config[:skip_berkshelf],
-          environment_file: config[:environment_file]
+          environment_file: config[:environment_file],
+          nodes_dir: config[:nodes_dir]
           )
         begin
           @altered_cookbooks = sync.run

@@ -27,15 +27,15 @@ module TestHelpers
 
   # ---------------------------------------------------------------------
   def api_get(url)
-    get url, { user_email: "sveader@salesforce.com" }, "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"]
+    get url, params: { user_email: "sveader@salesforce.com" }, env: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
   end
 
   def api_post(url, params = {})
-    post url, { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), {}
+    post url, params: { api_token: ENV["API_AUTH_TOKEN"], user_email: "sveader@salesforce.com" }.merge(params), env: {}
   end
 
   def api_put(url, params = {})
-    put url, { user_email: "sveader@salesforce.com" }.merge(params), "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"]
+    put url, params: { user_email: "sveader@salesforce.com" }.merge(params), env: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
   end
 
   # ---------------------------------------------------------------------

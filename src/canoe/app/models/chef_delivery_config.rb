@@ -1,9 +1,12 @@
 class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
+
   AWS = "ue1.aws".freeze
+  DFW = "dfw".freeze
   PHX = "phx".freeze
-  ENABLED = [AWS, PHX].freeze
+
+  ENABLED = [AWS, PHX, DFW].freeze
 
   BREAD_ROOM = 42
   OPS_ROOM = 6
@@ -17,6 +20,10 @@ class ChefDeliveryConfig
     else
       false
     end
+  end
+
+  def knife_notifications_enabled?(_server)
+    true
   end
 
   def repo_name

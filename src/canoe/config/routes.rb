@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
 
-  resources :projects, param: :name, only: [:index, :show] do
+  resources :projects, param: :name, only: [:index] do
     resources :tags, param: :name, only: [:index] do
       get :latest, on: :collection
     end
@@ -57,6 +57,7 @@ Rails.application.routes.draw do
 
   post "/api/chef/checkin", to: "api/chef_deploys#checkin"
   post "/api/chef/complete_deploy", to: "api/chef_deploys#complete_deploy"
+  post "/api/chef/knife", to: "api/chef_deploys#knife"
 
   get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"

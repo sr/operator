@@ -1,5 +1,7 @@
 class AccountsController < ApplicationController
   def index
-    render locals: { accounts: GlobalAccount.paginate(page: params[:page]) }
+    structure = GlobalAccount.arel_table
+    accounts = GlobalAccount.where(structure[:company].matches("%#{params[:q]}%")).paginate(page: params[:page])
+    render locals: { accounts: accounts }
   end
 end

@@ -60,7 +60,7 @@ class DatabaseConfigurationFile
       else
         raise DatacenterNotFound.new(datacenter, id)
       end
-    DatabaseConfiguration.new(config.fetch(SECONDARY), auth)
+    DatabaseConfiguration.new(config.fetch(GlobalSetting.secondary_db_id(id)), auth)
   end
 
   private

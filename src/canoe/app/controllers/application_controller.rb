@@ -8,9 +8,9 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :null_session
 
-  before_filter :require_oauth_authentication
+  before_action :require_oauth_authentication
 
-  around_filter :log_context
+  around_action :log_context
 
   rescue_from Exception do |exception|
     if !Rails.env.development?

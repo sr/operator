@@ -95,6 +95,39 @@ case "$project" in
     golang)
         docker run --rm -w /go -v "$(pwd):/go" build/build \
             make -f etc/mk/golang.mk
+
+        test -n "$CI" && {
+          cd "bin"
+          tarball="$(tarball-build "jiracleaner")"
+          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          export CI_JOB="PRIV"
+          tarball="$(tarball-build "privet")"
+          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+        }
+        ;;
+    hal9000)
+        build-ruby "$project"
+        test -n "$CI" && {
+            echo "Pushing image to ${HAL9000_ECR_REPO}..." 2>&1
+            docker-push "hal9000_app" "$HAL9000_ECR_REPO"
+        }
+        ;;
+    parbot)
+        parbotdir="${PARBOT_DIR:-""}"
+        echo "$parbotdir"
+        if [ -z "$parbotdir" ] || [ ! -d "$parbotdir" ]; then
+            echo "PARBOT_DIR not set or directory does not exists" 2>&1
+            exit 1
+        fi
+
+        trap 'rm -f $parbotdir/Dockerfile' EXIT
+        cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
+        docker build -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
+
+        if [ -n "$CI" ]; then
+            echo "Pushing image to ${PARBOT_ECR_REPO}..." 2>&1
+            docker-push "parbot_app" "$PARBOT_ECR_REPO"
+        fi
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
@@ -110,24 +143,13 @@ case "$project" in
                 "src/pull_agent/pardot_pull-agent.gemspec"
         }
         ;;
-    privet)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
-              make -f etc/mk/golang.mk
-
-        test -n "$CI" && {
-          cd "bin"
-          tarball="$(tarball-build "privet")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-        }
-        ;;
     rubylib)
         build-ruby "rubylib"
         ;;
     shell)
         docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
-        docker run --rm -v "$(pwd):/data" \
-            build/shellcheck \
-            find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +
+        docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" \
+            build/shellcheck lint-shell
         ;;
     teampass)
         docker build -f src/teampass/Dockerfile src/teampass
@@ -135,13 +157,7 @@ case "$project" in
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
             build/build \
-            make -C src/terraform validate
-        ;;
-    # TODO(sr) Decide what to do about vendored Go code. I think building
-    # it might be worthwhile still, just not with the same level of
-    # attention as for our own code, so no linting etc.
-    vendor)
-        true
+            terra validate
         ;;
     *)
         echo "No build rule defined for project \"$project\"." 2>&1

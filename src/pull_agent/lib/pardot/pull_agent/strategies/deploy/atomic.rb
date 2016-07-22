@@ -3,7 +3,7 @@ module Pardot
     module Strategies
       module Deploy
         class Atomic < Base
-          def deploy(artifact_path, _deploy)
+          def deploy(artifact_path, deploy)
             deploy_path = determine_next_deploy_path
             if deploy_path.nil?
               Logger.log(:error, "Unable to determine deploy path")
@@ -12,6 +12,7 @@ module Pardot
 
             extract_artifact(deploy_path, artifact_path).tap do |success|
               if success
+                add_build_version(deploy, deploy_path)
                 move_current_link(deploy_path)
               end
             end
@@ -43,6 +44,11 @@ module Pardot
           end
 
           private
+
+          def add_build_version(deploy, deploy_path)
+            v = BuildVersion.new(deploy.build_number, deploy.sha, deploy.artifact_url)
+            v.save_to_file(File.join(deploy_path, "build.version"))
+          end
 
           def current_link_pointed_at
             if File.symlink?(environment.payload.current_link)

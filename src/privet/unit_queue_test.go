@@ -48,3 +48,46 @@ func TestUnitQueueAttemptsToPackageTestsIntoEqualSizedChunksWithoutGoingOver(t *
 		t.Fatalf("expected queue to be empty, but was not")
 	}
 }
+
+func TestUnitQueueReturnsSingleItemOverRuntime(t *testing.T) {
+	unitQueue := NewUnitQueueWithUnits([]*Unit{
+		{Data: "unit1", ExpectedRuntimeInSeconds: 99},
+		{Data: "unit2", ExpectedRuntimeInSeconds: 1},
+		{Data: "unit3", ExpectedRuntimeInSeconds: 2},
+	})
+
+	units := unitQueue.Dequeue(4 * time.Second)
+	if len(units) != 1 {
+		t.Fatalf("expected to dequeue 1 units, but got %v", units)
+	}
+
+	units = unitQueue.Dequeue(4 * time.Second)
+	if len(units) != 2 {
+		t.Fatalf("expected to dequeue 2 units, but got %v", units)
+	}
+
+	if !unitQueue.IsEmpty() {
+		t.Fatalf("expected queue to be empty, but was not")
+	}
+}
+
+func TestUnitQueueOnlyGroupsUnitsWithTheSameSuiteIdentifier(t *testing.T) {
+	unitQueue := NewUnitQueueWithUnits([]*Unit{
+		{Data: "unit1", Suite: "one", ExpectedRuntimeInSeconds: 1},
+		{Data: "unit2", Suite: "two", ExpectedRuntimeInSeconds: 2},
+	})
+
+	units := unitQueue.Dequeue(5 * time.Second)
+	if len(units) != 1 {
+		t.Fatalf("expected to dequeue 1 units, but got %v", units)
+	}
+
+	units = unitQueue.Dequeue(5 * time.Second)
+	if len(units) != 1 {
+		t.Fatalf("expected to dequeue 1 units, but got %v", units)
+	}
+
+	if !unitQueue.IsEmpty() {
+		t.Fatalf("expected queue to be empty, but was not")
+	}
+}

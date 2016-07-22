@@ -12,4 +12,13 @@ describe Pardot::PullAgent::BuildVersion do
       expect(build_version.artifact_url).to eq("https://artifactory.example/build1234.tar.gz")
     end
   end
+
+  it "saves a build.version file to disk" do
+    v = Pardot::PullAgent::BuildVersion.new(1234, "bfa9aac", "https://artifactory.example/build1234.tar.gz")
+    Tempfile.open("build.version") do |tmpfile|
+      v.save_to_file(tmpfile)
+      tmpfile.flush
+      expect(tmpfile.read).to eq(build_version_contents)
+    end
+  end
 end

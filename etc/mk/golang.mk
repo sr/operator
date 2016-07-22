@@ -10,10 +10,13 @@ UNUSED = $(GOBIN)/unused
 PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: deadleaves fmt lint vet errcheck install interfacer unused
+all: deadleaves fmt lint vet errcheck test install interfacer unused
 
 install:
-	$(GO) install -race -v ./...
+	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
+
+test:
+	$(GO) test -race $(PACKAGES)
 
 clean:
 	$(GO) clean -i ./...

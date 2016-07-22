@@ -39,14 +39,14 @@ class UserQueryTest < ActiveSupport::TestCase
   test "global tables" do
     query = @user.global_query("SELECT 1 FROM job")
     tables = query.database_tables
-    assert tables.include?("global_account")
+    assert_includes tables, "global_account"
     assert_equal 42, tables.size
   end
 
   test "account tables" do
     query = @user.account_query("SELECT 1 FROM job", 2)
     tables = query.database_tables
-    assert tables.include?("campaign_source_stats")
+    assert_includes tables, "campaign_source_stats"
     assert_equal 347, tables.size
   end
 

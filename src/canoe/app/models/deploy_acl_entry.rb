@@ -1,4 +1,4 @@
-class DeployACLEntry < ActiveRecord::Base
+class DeployACLEntry < ApplicationRecord
   ACL_TYPES = ["ldap_group"].freeze
 
   validates :project_id,

@@ -83,6 +83,38 @@ class ChefDelivery
     )
   end
 
+  def knife(request)
+    if !@config.knife_notifications_enabled?(request.server)
+      return
+    end
+
+    if request.command[0] == "help"
+      return
+    end
+
+    if request.command[0] == "search"
+      return
+    end
+
+    if request.command[0, 2] == %w[node show]
+      return
+    end
+
+    if request.command[0, 2] == %w[pd sync]
+      return
+    end
+
+    if request.command[0, 3] == %w[node from file]
+      return
+    end
+
+    notification.knife_command(
+      @config.chat_room_id(request.server),
+      request.server,
+      request.command
+    )
+  end
+
   private
 
   def notification

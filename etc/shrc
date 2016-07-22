@@ -10,7 +10,10 @@ else
   GOPATH="$BREAD"
   PATH="$GOPATH/bin:$PATH"
   CDPATH="$GOPATH/src"
-  export GOPATH PATH CDPATH
+  export BREAD GOPATH PATH CDPATH
 fi
+
+test -f "$BREAD/etc/secrets" &&
+source "$BREAD/etc/secrets"
 
 true
