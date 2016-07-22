@@ -44,7 +44,7 @@ images:
   # Pardot/bread base images
   docker.dev.pardot.com/base/bread/bread:
     build: bread/bread
-  docker.dev.pardot.com/base/bread/node:10
+  docker.dev.pardot.com/base/bread/node:0.10:
     build: bread/node
   docker.dev.pardot.com/base/bread/teampass:2.1.25.2:
     build: bread/teampass
