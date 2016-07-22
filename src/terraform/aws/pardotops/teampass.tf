@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "teampass" {
-  name = "teampass"
-}
-
 resource "aws_elb" "teampass" {
   name = "teampass"
   security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]

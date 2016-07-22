@@ -1,4 +1,4 @@
-FROM node:0.10
+FROM docker.dev.pardot.com/base/bread/node:0.10
 MAINTAINER pd-bread@salesforce.com
 RUN apt-get update \
   && \

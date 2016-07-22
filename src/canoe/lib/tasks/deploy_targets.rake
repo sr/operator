@@ -46,6 +46,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "MDOC"
       project.repository = "Pardot/murdoc"
+      project.all_servers_default = false
     end.save!
 
     Project.find_or_initialize_by(name: "chef").tap do |project|

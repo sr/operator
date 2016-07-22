@@ -12,6 +12,7 @@ variable "environment_appdev" {
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
+    db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
     num_app1_hosts = 2
@@ -39,13 +40,72 @@ variable "environment_appdev" {
 //// TEMPLATES
 ////
 //
-//// EC2 INSTANCE: replace "lbl" w/ "servicename", edit secgroups accordingly, and adjust instance_type upward if necessary
+//// EC2 DB INSTANCE: replace "lbl" w/ "servicename"
 //resource "aws_instance" "appdev_lbl1" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_ebs_ami}"
-//  instance_type = "${var.environment_appdev["app_instance_type}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
+//  ebs_optimized = "true"
+//  root_block_device {
+//    volume_size = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = "true"
+//  }
+//  ebs_block_device {
+//    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+//    volume_size = "gp2"
+//    volume_size = "512"
+//    delete_on_termination = "true"
+//  }
+//  vpc_security_group_ids = [
+//    "${aws_security_group.appdev_vpc_default.id}",
+//    "${aws_security_group.appdev_dbhost.id}",
+//    "${aws_security_group.appdev_apphost.id}"
+//  ]
+//  tags {
+//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+//    terraform = "true"
+//  }
+//}
+//
+//// EC2 APP INSTANCE: replace "lbl" w/ "servicename"
+//resource "aws_instance" "appdev_lbl1" {
+//  key_name = "internal_apps"
+//  count = "${var.environment_appdev["num_lbl1_hosts"]}"
+//  ami = "${var.centos_6_hvm_ebs_ami}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
+//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  root_block_device {
+//    volume_size = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = "true"
+//  }
+//  vpc_security_group_ids = [
+//    "${aws_security_group.appdev_vpc_default.id}",
+//    "${aws_security_group.appdev_dbhost.id}",
+//    "${aws_security_group.appdev_apphost.id}"
+//  ]
+//  tags {
+//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+//    terraform = "true"
+//  }
+//}
+//
+//// EC2 JOB INSTANCE: replace "lbl" w/ "servicename"
+//resource "aws_instance" "appdev_lbl1" {
+//  key_name = "internal_apps"
+//  count = "${var.environment_appdev["num_lbl1_hosts"]}"
+//  ami = "${var.centos_6_hvm_ebs_ami}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
+//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  ebs_optimized = "true"
+//  root_block_device {
+//    volume_size = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = "true"
+//  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
 //    "${aws_security_group.appdev_dbhost.id}",
@@ -64,7 +124,7 @@ variable "environment_appdev" {
 //  vpc = true
 //}
 //
-//// route53 A-RECORD: replace "lbl" w/ "servicename"
+//// ROUTE53 A-RECORD: replace "lbl" w/ "servicename"
 //resource "aws_route53_record" "appdev_lbl1_arecord" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
@@ -177,6 +237,18 @@ resource "aws_instance" "appdev_globaldb1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_size = "gp2"
+    volume_size = "512"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
@@ -203,6 +275,18 @@ resource "aws_instance" "appdev_dbshard1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_size = "gp2"
+    volume_size = "512"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
@@ -229,6 +313,11 @@ resource "aws_instance" "appdev_app1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -254,6 +343,11 @@ resource "aws_instance" "appdev_thumbs1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -279,6 +373,11 @@ resource "aws_instance" "appdev_redisjob1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -304,6 +403,11 @@ resource "aws_instance" "appdev_jobmanager1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -329,6 +433,11 @@ resource "aws_instance" "appdev_push1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -354,6 +463,11 @@ resource "aws_instance" "appdev_provisioning1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -379,6 +493,11 @@ resource "aws_instance" "appdev_rabbit1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -404,6 +523,11 @@ resource "aws_instance" "appdev_redisrules1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -429,6 +553,11 @@ resource "aws_instance" "appdev_autojob1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -454,6 +583,11 @@ resource "aws_instance" "appdev_storm1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -479,6 +613,11 @@ resource "aws_instance" "appdev_kafka1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -504,6 +643,11 @@ resource "aws_instance" "appdev_zkkafka1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -529,6 +673,11 @@ resource "aws_instance" "appdev_pubsub1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -554,6 +703,11 @@ resource "aws_instance" "appdev_zkstorm1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -579,6 +733,11 @@ resource "aws_instance" "appdev_nimbus1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -604,6 +763,11 @@ resource "aws_instance" "appdev_appcache1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -629,6 +793,11 @@ resource "aws_instance" "appdev_discovery1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_size = "gp2"
+    volume_size = "50"
+    delete_on_termination = "true"
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
