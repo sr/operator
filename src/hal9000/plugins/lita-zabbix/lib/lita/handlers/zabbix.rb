@@ -151,9 +151,9 @@ module Lita
       end
 
       def monitor_info(response)
-        msg = "Datacenters: #{config.datacenters.join(',')}"
-        msg += "\nActive Monitors: #{config.active_monitors.join(',')}"
-        msg += "\nPaging Monitors: #{config.paging_monitors.join(',')}"
+        msg = "Datacenters: #{config.datacenters.join(",")}"
+        msg += "\nActive Monitors: #{config.active_monitors.join(",")}"
+        msg += "\nPaging Monitors: #{config.paging_monitors.join(",")}"
         msg += "\nMonitor Hipchat-Notify: #{config.monitor_hipchat_notify}"
         msg += "\nMonitor Interval (seconds): #{config.monitor_interval_seconds}"
         msg += "\nRetries: #{config.monitor_retries}"
@@ -185,7 +185,7 @@ module Lita
             begin
               HumanTime.parse(options["until"])
             rescue ArgumentError
-              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options['until']}")
+              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
             end
           else
             Time.now + 3600
@@ -227,7 +227,7 @@ module Lita
             begin
               HumanTime.parse(options["until"])
             rescue ArgumentError
-              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options['until']}")
+              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
             end
           else
             Time.now + 3600
@@ -356,7 +356,7 @@ module Lita
         if @clients.key?(datacenter)
           true
         else
-          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(', ')}")
+          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(", ")}")
           false
         end
       end
