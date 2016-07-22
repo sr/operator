@@ -17,6 +17,7 @@ class SQLQueryTest < ActiveSupport::TestCase
 
   test "string" do
     assert parse("SELECT * FROM global_agency WHERE `global_agency`.`name` = 'ACEDS'")
+    assert parse("SELECT * FROM `global_setting` WHERE `global_setting`.`setting_key` = 'shard43' LIMIT 10")
   end
 
   test "select_all?" do

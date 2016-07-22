@@ -1,5 +1,5 @@
 # Server represents a server where code is deployed for a given target.
-class Server < ActiveRecord::Base
+class Server < ApplicationRecord
   validates :hostname, presence: true, uniqueness: true
   attr_readonly :hostname
 

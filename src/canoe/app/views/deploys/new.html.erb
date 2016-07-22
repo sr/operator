@@ -3,7 +3,7 @@
   <%= current_project.name.capitalize %>
 </h1>
 
-<h2 class="steps-count">Step 4 of 4</h2>
+<h2 class="steps-count">Step 3 of 3</h2>
 <h3>This is what you want to deploy, right?</h3>
 <%= content_tag :div, class: ["alert", current_target.production? ? "alert-danger" : "alert-info"].compact do %>
   <p class="lead">
@@ -72,11 +72,12 @@
         <input type="checkbox" name="lock"> Lock
       </label>
       <label>
-        <input type="checkbox" name="servers" class="js-servers-toggle" data-divname="deploy-servers"> Specify Server(s)
+        <%= check_box_tag(:servers, "on", @prov_deploy.show_single_servers?, class: "js-servers-toggle", :'data-divname' => "deploy-servers") %>
+        Specify Server(s)
       </label>
     </div>
 
-    <div id="deploy-servers" style="display: none;">
+    <div id="deploy-servers" style="<%= @prov_deploy.show_single_servers? ? "" : "display: none;" %>">
       <div class="well well-sm">
         <legend>Tags</legend>
 

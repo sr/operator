@@ -1,4 +1,4 @@
-class AddUserQueriesTable < ActiveRecord::Migration
+class AddUserQueriesTable < ActiveRecord::Migration[4.2]
   def up
     execute <<-SQL
       CREATE TABLE user_queries (

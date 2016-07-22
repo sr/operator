@@ -33,6 +33,15 @@ module Pardot
         )
       end
 
+      def self.knife(environment, request)
+        call_api(
+          environment,
+          "POST",
+          "/api/chef/knife",
+          request
+        )
+      end
+
       def self.call_api(environment, method, path, params = {})
         canoe_url = URI(environment.canoe_url)
         Net::HTTP.start(canoe_url.host, canoe_url.port, :ENV, use_ssl: (canoe_url.scheme == "https")) do |http|

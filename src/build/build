@@ -79,7 +79,7 @@ echo "===> Building ${project}..." 2>&1
 case "$project" in
     canoe)
         build-ruby "$project"
-        test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
+        test -n "$CI" && docker-push "$project"
         ;;
     explorer)
         build-ruby "$project"
@@ -98,11 +98,30 @@ case "$project" in
 
         test -n "$CI" && {
           cd "bin"
-          CI_JOB="PRIV"
-          export CI_JOB
+          tarball="$(tarball-build "jiracleaner")"
+          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
+        ;;
+    hal9000)
+        build-ruby "$project"
+        test -n "$CI" && docker-push "$project"
+        ;;
+    parbot)
+        parbotdir="${PARBOT_DIR:-""}"
+        echo "$parbotdir"
+        if [ -z "$parbotdir" ] || [ ! -d "$parbotdir" ]; then
+            echo "PARBOT_DIR not set or directory does not exists" 2>&1
+            exit 1
+        fi
+
+        trap 'rm -f $parbotdir/Dockerfile' EXIT
+        cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
+        docker build -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
+
+        test -n "$CI" && docker-push "$project"
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
@@ -123,12 +142,12 @@ case "$project" in
         ;;
     shell)
         docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
-        docker run --rm -v "$(pwd):/data" \
-            build/shellcheck \
-            find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +
+        docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" \
+            build/shellcheck lint-shell
         ;;
     teampass)
-        docker build -f src/teampass/Dockerfile src/teampass
+        docker build -f src/teampass/Dockerfile -t teampass_app src/teampass
+        test -n "$CI" && docker-push "$project"
         ;;
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \

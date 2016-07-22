@@ -1,5 +1,5 @@
 class BuildsController < ApplicationController
-  before_filter :require_project
+  before_action :require_project
 
   def index
     @include_untested_builds = (params[:include_untested_builds] == "1")

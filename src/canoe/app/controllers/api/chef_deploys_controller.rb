@@ -12,6 +12,12 @@ module Api
       render json: response
     end
 
+    def knife
+      request = KnifeRequest.from_hash(payload)
+      delivery.knife(request)
+      head 200
+    end
+
     private
 
     def payload

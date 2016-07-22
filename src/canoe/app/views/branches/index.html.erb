@@ -3,12 +3,7 @@
   <%= current_project.name.capitalize %>
 </h1>
 
-<h2 class="steps-count">Step 2 of 4</h2>
-<br>
-
-<p class="lead muted">
-  Select the <%= deploy_type_icon("branch") %> <strong>branch</strong> that you wish to ship.
-</p>
+<h2 class="steps-count" style="border-bottom: none;">Step 1 of 3</h2>
 
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
@@ -17,7 +12,7 @@
     <% @branches.each do |branch| %>
       <li>
         <h4>
-          <%= link_to "Ship This", project_branch_builds_path(current_project, branch.name), class: "btn btn-primary btn-xs btn-success deploy-button" %>
+          <%= link_to "This branch", project_branch_builds_path(current_project, branch.name), class: "btn btn-primary btn-xs btn-success deploy-button" %>
 
           &nbsp;
           <%= deploy_type_icon("branch") %> <%= branch.name %>
@@ -26,6 +21,11 @@
         </h4>
         <small class="muted">commit: <a href="<%= current_project.commit_url(branch.commit) %>" title="<%= branch.commit.sha %>"><%= sha_span(branch.commit.sha) %></a></small>
         <hr>
+      </li>
+    <% end %>
+    <% if @branches.empty? %>
+      <li>
+        <p class="well">No branches found.</p>
       </li>
     <% end %>
   </ul>

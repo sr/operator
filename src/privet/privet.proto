@@ -5,6 +5,7 @@ package privet;
 service JobMaster {
   rpc PopUnits (PopUnitsRequest) returns (PopUnitsResponse) {}
   rpc ReportUnitsCompletion (ReportUnitsCompletionRequest) returns (ReportUnitsCompletionResponse) {}
+  rpc GetQueueStatistics (QueueStatisticsRequest) returns (QueueStatisticsResponse) {}
 }
 
 message Unit {
@@ -37,4 +38,12 @@ message ReportUnitsCompletionRequest {
 }
 
 message ReportUnitsCompletionResponse {
+}
+
+message QueueStatisticsRequest {
+}
+
+message QueueStatisticsResponse {
+  int32 units_in_queue = 1;
+  int32 units_in_progress = 2;
 }

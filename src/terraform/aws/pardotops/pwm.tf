@@ -121,3 +121,11 @@ resource "aws_autoscaling_group" "pwm_production" {
     create_before_destroy = true
   }
 }
+
+resource "aws_route53_record" "password_ops_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.ops_pardot_com.zone_id}"
+  name = "password.${aws_route53_zone.ops_pardot_com.name}"
+  records = ["${aws_elb.pwm_production.dns_name}"]
+  type = "CNAME"
+  ttl = "900"
+}
