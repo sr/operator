@@ -68,7 +68,7 @@ class SQLQueryTest < ActiveSupport::TestCase
   end
 
   test "Function calls" do
-    input = 'select prospect_id from piListxProspect where (listx_id=1 or listx_id=2) and account_id=1 and is_mailable=1 order by rand() limit 10'
+    input = "select prospect_id from piListxProspect where (listx_id=1 or listx_id=2) and account_id=1 and is_mailable=1 order by rand() limit 10"
     expect = "SELECT `prospect_id` FROM `piListxProspect` WHERE (((`listx_id` = 1 OR `listx_id` = 2) AND `account_id` = 1) AND `is_mailable` = 1) ORDER BY rand() ASC LIMIT 10"
     assert_equal expect, parse(input).sql
   end
