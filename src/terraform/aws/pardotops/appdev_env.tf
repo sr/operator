@@ -49,13 +49,13 @@ variable "environment_appdev" {
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_size = "gp2"
-//    volume_size = "100"
+//    volume_size = "50"
 //    delete_on_termination = "true"
 //  }
 //  ebs_block_device {
 //    device_name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}_ebs"
 //    volume_size = "gp2"
-//    volume_size = "1024"
+//    volume_size = "512"
 //    delete_on_termination = "true"
 //  }
 //  vpc_security_group_ids = [
@@ -78,7 +78,7 @@ variable "environment_appdev" {
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  root_block_device {
 //    volume_size = "gp2"
-//    volume_size = "100"
+//    volume_size = "50"
 //    delete_on_termination = "true"
 //  }
 //  vpc_security_group_ids = [
@@ -102,7 +102,7 @@ variable "environment_appdev" {
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_size = "gp2"
-//    volume_size = "100"
+//    volume_size = "50"
 //    delete_on_termination = "true"
 //  }
 //  vpc_security_group_ids = [
@@ -239,13 +239,13 @@ resource "aws_instance" "appdev_globaldb1" {
   ebs_optimized = "true"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   ebs_block_device {
     device_name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}_ebs"
     volume_size = "gp2"
-    volume_size = "1024"
+    volume_size = "512"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -277,13 +277,13 @@ resource "aws_instance" "appdev_dbshard1" {
   ebs_optimized = "true"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   ebs_block_device {
     device_name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}_ebs"
     volume_size = "gp2"
-    volume_size = "1024"
+    volume_size = "512"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -314,7 +314,7 @@ resource "aws_instance" "appdev_app1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -344,7 +344,7 @@ resource "aws_instance" "appdev_thumbs1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -374,7 +374,7 @@ resource "aws_instance" "appdev_redisjob1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -404,7 +404,7 @@ resource "aws_instance" "appdev_jobmanager1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -433,7 +433,7 @@ resource "aws_instance" "appdev_push1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -462,7 +462,7 @@ resource "aws_instance" "appdev_provisioning1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -491,7 +491,7 @@ resource "aws_instance" "appdev_rabbit1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -520,7 +520,7 @@ resource "aws_instance" "appdev_redisrules1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -549,7 +549,7 @@ resource "aws_instance" "appdev_autojob1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -578,7 +578,7 @@ resource "aws_instance" "appdev_storm1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -607,7 +607,7 @@ resource "aws_instance" "appdev_kafka1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -636,7 +636,7 @@ resource "aws_instance" "appdev_zkkafka1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -665,7 +665,7 @@ resource "aws_instance" "appdev_pubsub1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -694,7 +694,7 @@ resource "aws_instance" "appdev_zkstorm1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -723,7 +723,7 @@ resource "aws_instance" "appdev_nimbus1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -752,7 +752,7 @@ resource "aws_instance" "appdev_appcache1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
@@ -781,7 +781,7 @@ resource "aws_instance" "appdev_discovery1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_size = "gp2"
-    volume_size = "100"
+    volume_size = "50"
     delete_on_termination = "true"
   }
   vpc_security_group_ids = [
