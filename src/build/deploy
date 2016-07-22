@@ -17,7 +17,11 @@ service=
 image=
 case "$app" in
     canoe|hal9000|parbot|teampass)
-        cluster="${app}_production"
+        if [ "$app" = "teampass" ]; then
+            cluster="$app"
+        else
+            cluster="${app}_production"
+        fi
         service="$app"
         image="$DOCKER_REPO_BREAD/$app/app:$(docker-image-tag)"
         ;;
