@@ -40,6 +40,10 @@ Style/Documentation:
   Enabled: false
 Style/DoubleNegation:
   Enabled: true
+Style/FileName:
+  Enabled: true
+  # snake case except for lita plugins
+  Regex: !ruby/regexp '/^(?:lita-[\da-z_.?!-]+|[\da-z_.?!]+)$/'
 Style/FormatString:
   Enabled: true
 Style/FrozenStringLiteralComment:

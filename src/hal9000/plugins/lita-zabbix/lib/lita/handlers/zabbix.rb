@@ -185,7 +185,7 @@ module Lita
             begin
               HumanTime.parse(options["until"])
             rescue ArgumentError
-              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
+              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options['until']}")
             end
           else
             Time.now + 3600
@@ -227,7 +227,7 @@ module Lita
             begin
               HumanTime.parse(options["until"])
             rescue ArgumentError
-              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options["until"]}")
+              response.reply_with_mention("Sorry, I couldn't parse this duration: #{options['until']}")
             end
           else
             Time.now + 3600
@@ -356,7 +356,7 @@ module Lita
         if @clients.key?(datacenter)
           true
         else
-          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(", ")}")
+          response.reply_with_mention("Sorry, there is no datacenter named #{datacenter}. Try #{@clients.keys.join(', ')}")
           false
         end
       end
