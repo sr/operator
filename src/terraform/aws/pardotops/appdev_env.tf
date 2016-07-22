@@ -54,7 +54,7 @@ variable "environment_appdev" {
 //    delete_on_termination = "true"
 //  }
 //  ebs_block_device {
-//    device_name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}_ebs"
+//    device_name = "${var.environment_appdev["db_volume_device_name"]}"
 //    volume_size = "gp2"
 //    volume_size = "512"
 //    delete_on_termination = "true"
@@ -244,7 +244,7 @@ resource "aws_instance" "appdev_globaldb1" {
     delete_on_termination = "true"
   }
   ebs_block_device {
-    device_name = "${var.environment_appdev["db_volume_devive_name"]"
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_size = "gp2"
     volume_size = "512"
     delete_on_termination = "true"
