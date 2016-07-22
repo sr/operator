@@ -1,4 +1,4 @@
-FROM docker.dev.pardot.com/base/bread/teampass
+FROM docker.dev.pardot.com/base/bread/teampass:2.1.25.2
 # You'll need to update docker-entrypoint.sh if this version is changed
 
 COPY docker-entrypoint.sh /
