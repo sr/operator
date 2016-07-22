@@ -47,6 +47,8 @@ Rails/TimeZone:
     - 'src/canoe/app/controllers/application_controller.rb'
     - 'src/canoe/app/helpers/canoe_helper.rb'
     - 'src/canoe/app/models/provisional_deploy.rb'
+    - 'src/hal9000/plugins/lita-replication-fixing/*'
+    - 'src/hal9000/plugins/lita-zabbix/*'
 
 # Offense count: 1
 # Cop supports --auto-correct.
