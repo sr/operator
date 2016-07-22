@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "teampass" {
-  name = "teampass"
-}
-
 resource "aws_elb" "teampass" {
   name = "teampass"
   security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
@@ -162,4 +158,12 @@ resource "aws_db_instance" "teampass" {
   storage_encrypted = true
   backup_retention_period = 5
   apply_immediately = true
+}
+
+resource "aws_route53_record" "secrets_ops_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.ops_pardot_com.zone_id}"
+  name = "secrets.${aws_route53_zone.ops_pardot_com.name}"
+  records = ["${aws_elb.teampass.dns_name}"]
+  type = "CNAME"
+  ttl = "900"
 }

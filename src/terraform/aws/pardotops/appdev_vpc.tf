@@ -289,6 +289,14 @@ resource "aws_instance" "appdev_bastion" {
   }
 }
 
+resource "aws_route53_record" "appdev_bastion_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "pardot2-bastion1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["54.226.27.145"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" {
   peer_owner_id = "010094454891" # pardot-atlassian
   peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC

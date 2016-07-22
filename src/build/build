@@ -79,7 +79,7 @@ echo "===> Building ${project}..." 2>&1
 case "$project" in
     canoe)
         build-ruby "$project"
-        test -n "$CI" && docker-push "canoe_app" "$CANOE_ECR_REPO"
+        test -n "$CI" && docker-push "$project"
         ;;
     explorer)
         build-ruby "$project"
@@ -107,10 +107,7 @@ case "$project" in
         ;;
     hal9000)
         build-ruby "$project"
-        test -n "$CI" && {
-            echo "Pushing image to ${HAL9000_ECR_REPO}..." 2>&1
-            docker-push "hal9000_app" "$HAL9000_ECR_REPO"
-        }
+        test -n "$CI" && docker-push "$project"
         ;;
     parbot)
         parbotdir="${PARBOT_DIR:-""}"
@@ -124,10 +121,7 @@ case "$project" in
         cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
         docker build -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
 
-        if [ -n "$CI" ]; then
-            echo "Pushing image to ${PARBOT_ECR_REPO}..." 2>&1
-            docker-push "parbot_app" "$PARBOT_ECR_REPO"
-        fi
+        test -n "$CI" && docker-push "$project"
         ;;
     pd-sync-chef)
         build-ruby --no-lint "$project"
@@ -152,7 +146,8 @@ case "$project" in
             build/shellcheck lint-shell
         ;;
     teampass)
-        docker build -f src/teampass/Dockerfile src/teampass
+        docker build -f src/teampass/Dockerfile -t teampass_app src/teampass
+        test -n "$CI" && docker-push "$project"
         ;;
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \

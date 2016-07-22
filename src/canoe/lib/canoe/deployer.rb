@@ -1,9 +1,12 @@
 module Canoe
   class Deployer
     def deploy(target:, user:, project:, what:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
-      servers = target.servers(project: project).enabled
-      if server_hostnames
-        servers = servers.where(hostname: server_hostnames)
+      if server_hostnames && !server_hostnames.empty?
+        servers = target.servers(project: project).enabled.where(hostname: server_hostnames)
+      elsif project.all_servers_default
+        servers = target.servers(project: project).enabled
+      else
+        servers = []
       end
 
       # REFACTOR: An exception might be more appropriate -@alindeman
