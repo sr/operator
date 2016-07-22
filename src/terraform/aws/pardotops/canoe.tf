@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "canoe" {
-  name = "canoe"
-}
-
 resource "aws_elb" "canoe_production" {
   name = "canoe-production"
   security_groups = ["${aws_security_group.internal_apps_canoe_http_lb.id}"]
