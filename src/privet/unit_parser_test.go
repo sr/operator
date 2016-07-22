@@ -43,3 +43,57 @@ func TestUnitParserHappyPath(t *testing.T) {
 		t.Errorf("expected unit to be nil when there are no more units, but got %v", unit)
 	}
 }
+
+func TestUnitParserScannerError(t *testing.T) {
+	// from the bufio src
+	// https://github.com/golang/go/blob/master/src/bufio/scan.go#L74
+	maxBufferSize := 65536
+
+	absurdlyLongUnits := []string{
+		`{"data": "verylon` + strings.Repeat("g", maxBufferSize+1) + `"}`,
+		`{"data": "toolon` + strings.Repeat("g", maxBufferSize+1) + `"}`,
+	}
+
+	reader := strings.NewReader(strings.Join(absurdlyLongUnits, "\n"))
+
+	parser := NewUnitParser(reader)
+
+	unit, err := parser.Next()
+
+	if err == nil {
+		t.Errorf("expected an error, ErrTooLong, from the Scanner")
+	}
+
+	if unit != nil {
+		t.Errorf("expected unit to be nil when an error occurs, but got %v", unit)
+	}
+}
+
+func TestUnitParserMarshalError(t *testing.T) {
+	unitsAsBadJSON := []string{
+		`{"data": "badseperator", "expected_runtime_in_seconds"=4.24}`,
+		`{"data": "unclosed", "expected_runtime_in_seconds": 10.9`,
+	}
+
+	reader := strings.NewReader(strings.Join(unitsAsBadJSON, "\n"))
+
+	parser := NewUnitParser(reader)
+
+	unit, err := parser.Next()
+	if err == nil {
+		t.Error("expected an error, invalid character after object key, from Marshal")
+	}
+
+	if unit != nil {
+		t.Errorf("expected unit to be nil when an error occurs, but got %v", unit)
+	}
+
+	unit, err = parser.Next()
+	if err == nil {
+		t.Error("expected an error, unexpected end of JSON input, from Marshal")
+	}
+
+	if unit != nil {
+		t.Errorf("expected unit to be nil when an error occurs, but got %v", unit)
+	}
+}

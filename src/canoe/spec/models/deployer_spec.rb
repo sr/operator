@@ -49,6 +49,23 @@ RSpec.describe Canoe::Deployer do
 
         expect(deploy.results.count).to eq 0
       end
+
+      it "single server specified out of all servers" do
+        second_server = FactoryGirl.create(:deploy_scenario, project: deploy_scenario.project, deploy_target: deploy_scenario.deploy_target)
+
+        deploy = deployer.deploy(
+          user: user,
+          what: prov_deploy.what,
+          what_details: prov_deploy.what_details,
+          sha: prov_deploy.sha,
+          passed_ci: prov_deploy.passed_ci,
+          target: deploy_scenario.deploy_target,
+          project: deploy_scenario.project,
+          server_hostnames: second_server.server.hostname
+        )
+
+        expect(deploy.results.count).to eq 1
+      end
     end
   end
 end
