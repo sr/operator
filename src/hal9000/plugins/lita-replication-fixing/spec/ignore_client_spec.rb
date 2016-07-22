@@ -6,7 +6,7 @@ module ReplicationFixing
   RSpec.describe IgnoreClient do
     include Lita::RSpec
 
-    describe '#ignoring?' do
+    describe "#ignoring?" do
       it "returns truthy if ignoring all of the keys" do
         client = IgnoreClient.new("dfw", Lita.redis)
 
@@ -31,7 +31,7 @@ module ReplicationFixing
       end
     end
 
-    describe '#reset_ignore' do
+    describe "#reset_ignore" do
       it "cancels the ignore for a given shard" do
         client = IgnoreClient.new("dfw", Lita.redis)
 
@@ -45,7 +45,7 @@ module ReplicationFixing
       end
     end
 
-    describe '#skipped_errors_count' do
+    describe "#skipped_errors_count" do
       it "returns the number of errors skipped while a global ignore is in effect" do
         client = IgnoreClient.new("dfw", Lita.redis)
 

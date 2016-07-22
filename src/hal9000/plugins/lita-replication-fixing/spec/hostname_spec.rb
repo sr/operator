@@ -3,7 +3,7 @@ require "replication_fixing/hostname"
 
 module ReplicationFixing
   RSpec.describe Hostname do
-    describe '#shard' do
+    describe "#shard" do
       it "returns whoisdb for whois servers" do
         expect(Hostname.new("pardot0-whoisdb1-1-dfw").prefix).to eq("whoisdb")
       end
@@ -21,7 +21,7 @@ module ReplicationFixing
       end
     end
 
-    describe '#cluster_id' do
+    describe "#cluster_id" do
       it "returns the cluster ID for DFW and PHX servers" do
         expect(Hostname.new("pardot0-dbshard1-1-dfw").cluster_id).to eq(1)
         expect(Hostname.new("pardot0-dbshard1-1-phx").cluster_id).to eq(1)
@@ -30,7 +30,7 @@ module ReplicationFixing
       end
     end
 
-    describe '#datacenter' do
+    describe "#datacenter" do
       it "parses DFW and PHX servers" do
         expect(Hostname.new("pardot0-dbshard1-88-dfw").datacenter).to eq("dfw")
         expect(Hostname.new("pardot0-dbshard1-89-phx").datacenter).to eq("phx")

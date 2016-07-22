@@ -44,7 +44,7 @@ module ZabbixTestHelpers
 
   def stub_page_pagerduty(url: /.*events\.pagerduty\.com\/generic\/.*\/create_event\.json.*/, result: [])
     stub_request(:post, url)
-        .with(body: '{"incident_key":"zabbixmon-test","description":"This is a test of the ZabbixMon pager. Please dismiss and ignore.","service_key":null,"event_type":"trigger"}',
+        .with(body: "{\"incident_key\":\"zabbixmon-test\",\"description\":\"This is a test of the ZabbixMon pager. Please dismiss and ignore.\",\"service_key\":null,\"event_type\":\"trigger\"}",
              headers: { "Accept" => "*/*", "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3" })
         .to_return(status: 200, body: "", headers: {})
   end

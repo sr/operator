@@ -3,7 +3,7 @@ require "replication_fixing/datacenter_aware_registry"
 
 module ReplicationFixing
   describe DatacenterAwareRegistry do
-    describe '#register' do
+    describe "#register" do
       it "registers a client for the given datacenter" do
         dfw = Object.new
 

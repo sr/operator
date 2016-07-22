@@ -6,7 +6,7 @@ module ReplicationFixing
   RSpec.describe FixingStatusClient do
     include Lita::RSpec
 
-    describe '#status' do
+    describe "#status" do
       it "returns a status with fixing? == false if no fixing is going on" do
         client = FixingStatusClient.new("dfw", Lita.redis)
 
@@ -25,7 +25,7 @@ module ReplicationFixing
       end
     end
 
-    describe '#reset' do
+    describe "#reset" do
       it "deletes the status" do
         client = FixingStatusClient.new("dfw", Lita.redis)
 
@@ -40,7 +40,7 @@ module ReplicationFixing
     end
   end
 
-  describe '#current_fixes' do
+  describe "#current_fixes" do
     it "lists all of the shards currently being fixed" do
       shard11 = Shard.new("db", 11, "dfw")
       shard12 = Shard.new("db", 12, "dfw")

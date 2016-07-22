@@ -14,11 +14,11 @@ module ReplicationFixing
       FixingClient.new(
         repfix_url: "https://repfix.example",
         fixing_status_client: fixing_status_client,
-        log: logger
+        log: logger,
       )
     end
 
-    describe '#fix' do
+    describe "#fix" do
       it "returns an error if repfix returns an error" do
         hostname = Hostname.new("pardot0-dbshard1-11-dfw")
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
@@ -100,7 +100,7 @@ module ReplicationFixing
         stub_request(:get, "https://repfix.example/replication/fixes/for/db/11/1")
           .and_return(
             { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
-            body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true })
+            body: JSON.dump("is_erroring" => true, "is_fixable" => true, "fix" => { "active" => true }),
           )
         stub_request(:post, "https://repfix.example/replication/fix/db/11")
           .and_return(body: JSON.dump("is_erroring" => true, "is_fixable" => true))
@@ -111,12 +111,12 @@ module ReplicationFixing
       end
     end
 
-    describe '#cancel' do
+    describe "#cancel" do
       it "cancels the fix" do
         shard = Shard.new("db", 11, "dfw")
 
         request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
-                  .and_return(body: JSON.dump("is_canceled" => true, "message" => "All fixes canceled"))
+          .and_return(body: JSON.dump("is_canceled" => true, "message" => "All fixes canceled"))
 
         result = fixing_client.cancel(shard: shard)
         expect(result).to be_kind_of(FixingClient::CancelResult)
@@ -130,7 +130,7 @@ module ReplicationFixing
         shard = Shard.new("db", 11, "dfw")
 
         request = stub_request(:post, "https://repfix.example/replication/fixes/cancel/11")
-                  .and_return(status: 500, body: "")
+          .and_return(status: 500, body: "")
 
         result = fixing_client.cancel(shard: shard)
         expect(result).to be_kind_of(FixingClient::CancelResult)

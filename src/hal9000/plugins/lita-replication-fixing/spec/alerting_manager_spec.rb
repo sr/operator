@@ -11,7 +11,7 @@ module ReplicationFixing
 
     subject(:manager) { AlertingManager.new(pager: pager, log: log) }
 
-    describe '#ingest_fix_result' do
+    describe "#ingest_fix_result" do
       it "pages when there is an error checking fixability" do
         pending "Not sure this is a good idea yet. We need to figure out what generally causes these alerts first"
 
@@ -41,14 +41,14 @@ module ReplicationFixing
       end
     end
 
-    describe '#notify_replication_disabled_by_many_errors' do
+    describe "#notify_replication_disabled_by_many_errors" do
       it "sends a page" do
         manager.notify_replication_disabled_but_many_errors
         expect(pager.incidents[0]).to match(/replication fixing is disabled, but many errors are still occurring/)
       end
     end
 
-    describe '#notify_fixing_a_long_while' do
+    describe "#notify_fixing_a_long_while" do
       it "sends a page" do
         twenty_minutes_ago = Time.now - 20 * 60
 
