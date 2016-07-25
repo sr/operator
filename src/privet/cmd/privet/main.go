@@ -127,7 +127,7 @@ func main() {
 		}
 
 		if err = jobRunner.RunCleanupHook(); err != nil {
-			log.Fatalf("error running startup hook: %v", err)
+			log.Fatalf("error running cleanup hook: %v", err)
 		}
 
 		if success {
