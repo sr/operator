@@ -49,15 +49,15 @@ variable "environment_appdev" {
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  ebs_optimized = "true"
 //  root_block_device {
-//    volume_size = "gp2"
+//    volume_type = "gp2"
 //    volume_size = "50"
-//    delete_on_termination = "true"
+//    delete_on_termination = true
 //  }
 //  ebs_block_device {
 //    device_name = "${var.environment_appdev["db_volume_device_name"]}"
-//    volume_size = "gp2"
+//    volume_type = "gp2"
 //    volume_size = "512"
-//    delete_on_termination = "true"
+//    delete_on_termination = true
 //  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
@@ -78,9 +78,9 @@ variable "environment_appdev" {
 //  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  root_block_device {
-//    volume_size = "gp2"
+//    volume_type = "gp2"
 //    volume_size = "50"
-//    delete_on_termination = "true"
+//    delete_on_termination = true
 //  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
@@ -102,9 +102,9 @@ variable "environment_appdev" {
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  ebs_optimized = "true"
 //  root_block_device {
-//    volume_size = "gp2"
+//    volume_type = "gp2"
 //    volume_size = "50"
-//    delete_on_termination = "true"
+//    delete_on_termination = true
 //  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
@@ -239,15 +239,15 @@ resource "aws_instance" "appdev_globaldb1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   ebs_block_device {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -277,15 +277,15 @@ resource "aws_instance" "appdev_dbshard1" {
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   ebs_block_device {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -314,9 +314,9 @@ resource "aws_instance" "appdev_app1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -344,10 +344,11 @@ resource "aws_instance" "appdev_thumbs1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
+
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -374,9 +375,9 @@ resource "aws_instance" "appdev_redisjob1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -404,9 +405,9 @@ resource "aws_instance" "appdev_jobmanager1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -434,9 +435,9 @@ resource "aws_instance" "appdev_push1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -464,9 +465,9 @@ resource "aws_instance" "appdev_provisioning1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -494,9 +495,9 @@ resource "aws_instance" "appdev_rabbit1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -524,9 +525,9 @@ resource "aws_instance" "appdev_redisrules1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -554,9 +555,9 @@ resource "aws_instance" "appdev_autojob1" {
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -584,9 +585,9 @@ resource "aws_instance" "appdev_storm1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -614,9 +615,9 @@ resource "aws_instance" "appdev_kafka1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -644,9 +645,9 @@ resource "aws_instance" "appdev_zkkafka1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -674,9 +675,9 @@ resource "aws_instance" "appdev_pubsub1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -704,9 +705,9 @@ resource "aws_instance" "appdev_zkstorm1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -734,9 +735,9 @@ resource "aws_instance" "appdev_nimbus1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -764,9 +765,9 @@ resource "aws_instance" "appdev_appcache1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -794,9 +795,9 @@ resource "aws_instance" "appdev_discovery1" {
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
-    volume_size = "gp2"
+    volume_type = "gp2"
     volume_size = "50"
-    delete_on_termination = "true"
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
