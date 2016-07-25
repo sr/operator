@@ -293,7 +293,7 @@ resource "aws_instance" "appdev_dbshard1" {
     "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
