@@ -281,7 +281,7 @@ resource "aws_instance" "appdev_bastion" {
   root_block_device {
     volume_type = "gp2"
     volume_size = "20"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   tags {
     terraform = "true"
