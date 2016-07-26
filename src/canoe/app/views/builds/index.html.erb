@@ -19,12 +19,9 @@
         <%= label_tag :include_untested_builds, "Include Untested PPANT Builds?" %>
       <%- end %>
     </div>
-    <div class="col-md-1 col-md-offset-1"><label>PPANT</label></div>
-    <div class="col-md-1"><label>PHP7</label></div>
-    <div class="col-md-1"><label>WebDriver</label></div>
-    <div class="col-md-1"><label>Salesforce Integration</label></div>
-    <div class="col-md-1"><label>AB Combinatorial</label></div>
-    <div class="col-md-1"><label>List Combinatorial</label></div>
+    <% @test_list.values.each_index do |test_name, i| %>
+      <div class="col-md-1<% " col-md-offset-1" if i == 0 %>"><label><% test_name %></label></div>
+    <% end %>
   </div>
 
   <%- if @builds.empty? %>
@@ -52,24 +49,11 @@
                 <%- end %>
               </small>
             </div>
-            <div class="col-md-1 col-md-offset-1">
-              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
-            </div>
-            <div class="col-md-1">
-              <h3><i class="icon-circle" style="color: #d9534f"></i></h3>
-            </div>
-            <div class="col-md-1">
-              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
-            </div>
-            <div class="col-md-1">
-              <h3><i class="icon-circle" style="color: #d9534f"></i></h3>
-            </div>
-            <div class="col-md-1">
-              <h3><i class="icon-check-sign" style="color: #5cb85c"></i></h3>
-            </div>
-            <div class="col-md-1">
-              <h3><i class="icon-circle" title="No run" style="color: #ddd"></i></h3>
-            </div>
+            <% @test_list.keys.each_index do |test, i| %>
+              <div class="col-md-1<% " col-md-offset-1" if i == 0 %>">
+                <%= render partial: "streetlight", locals: {state: build.options[:meta_data]["ciJob[#{test}]"]} %>
+              </div>
+            <% end %>
           </div>
           <hr>
         </li>

@@ -51,7 +51,7 @@ class ProvisionalDeploy
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
       created_at: Time.parse(properties["buildTimeStamp"]),
       options_validator: options_validator,
-      options: {}
+      options: {meta_data: properties}
     )
   end
 
