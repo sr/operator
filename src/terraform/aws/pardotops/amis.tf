@@ -11,5 +11,5 @@ variable "centos_7_hvm_ebs_ami" {
 }
 
 variable "centos_6_hvm_50gb_chefdev_ami" {
-  default = "ami-74b72263"
+  default = "ami-c1af3ad6" #prev: ami-74b72263
 }
