@@ -289,10 +289,15 @@ resource "aws_instance" "appdev_bastion" {
   }
 }
 
+resource "aws_eip" "appdev_bastion_eip" {
+  vpc = true
+  instance = "${aws_instance.appdev_bastion.id}"
+}
+
 resource "aws_route53_record" "appdev_bastion_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot2-bastion1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["54.226.27.145"]
+  records = ["${aws_instance.appdev_bastion.public_ip}"]
   type = "A"
   ttl = "900"
 }
