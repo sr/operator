@@ -44,7 +44,7 @@ variable "environment_appdev" {
 //resource "aws_instance" "appdev_lbl1" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
-//  ami = "${var.centos_6_hvm_ebs_ami}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  ebs_optimized = "true"
@@ -57,7 +57,7 @@ variable "environment_appdev" {
 //    device_name = "${var.environment_appdev["db_volume_device_name"]}"
 //    volume_type = "gp2"
 //    volume_size = "512"
-//    delete_on_termination = false
+//    delete_on_termination = true
 //  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
@@ -74,7 +74,7 @@ variable "environment_appdev" {
 //resource "aws_instance" "appdev_lbl1" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
-//  ami = "${var.centos_6_hvm_ebs_ami}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  root_block_device {
@@ -97,7 +97,7 @@ variable "environment_appdev" {
 //resource "aws_instance" "appdev_lbl1" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
-//  ami = "${var.centos_6_hvm_ebs_ami}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
 //  ebs_optimized = "true"
@@ -234,7 +234,7 @@ resource "aws_elb" "appdev_app_elb" {
 resource "aws_instance" "appdev_globaldb1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_globaldb1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
@@ -247,7 +247,7 @@ resource "aws_instance" "appdev_globaldb1" {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -272,7 +272,7 @@ resource "aws_route53_record" "appdev_globaldb1_arecord" {
 resource "aws_instance" "appdev_dbshard1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_dbshard1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
@@ -285,7 +285,7 @@ resource "aws_instance" "appdev_dbshard1" {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -310,7 +310,7 @@ resource "aws_route53_record" "appdev_dbshard1_arecord" {
 resource "aws_instance" "appdev_app1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_app1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -340,7 +340,7 @@ resource "aws_route53_record" "appdev_app1_arecord" {
 resource "aws_instance" "appdev_thumbs1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_thumbs1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -371,7 +371,7 @@ resource "aws_route53_record" "appdev_thumbs1_arecord" {
 resource "aws_instance" "appdev_redisjob1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_redisjob1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -401,7 +401,7 @@ resource "aws_route53_record" "appdev_redisjob1_arecord" {
 resource "aws_instance" "appdev_jobmanager1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -431,7 +431,7 @@ resource "aws_route53_record" "appdev_jobmanager1_arecord" {
 resource "aws_instance" "appdev_push1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_push1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -461,7 +461,7 @@ resource "aws_route53_record" "appdev_push1_arecord" {
 resource "aws_instance" "appdev_provisioning1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_provisioning1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -491,7 +491,7 @@ resource "aws_route53_record" "appdev_provisioning1_arecord" {
 resource "aws_instance" "appdev_rabbit1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -521,7 +521,7 @@ resource "aws_route53_record" "appdev_rabbit1_arecord" {
 resource "aws_instance" "appdev_redisrules1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_redisrules1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -551,7 +551,7 @@ resource "aws_route53_record" "appdev_redisrules1_arecord" {
 resource "aws_instance" "appdev_autojob1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_autojob1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -581,7 +581,7 @@ resource "aws_route53_record" "appdev_autojob1_arecord" {
 resource "aws_instance" "appdev_storm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_storm1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -611,7 +611,7 @@ resource "aws_route53_record" "appdev_storm1_arecord" {
 resource "aws_instance" "appdev_kafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_kafka1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -641,7 +641,7 @@ resource "aws_route53_record" "appdev_kafka1_arecord" {
 resource "aws_instance" "appdev_zkkafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -671,7 +671,7 @@ resource "aws_route53_record" "appdev_zkkafka1_arecord" {
 resource "aws_instance" "appdev_pubsub1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_pubsub1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -701,7 +701,7 @@ resource "aws_route53_record" "appdev_pubsub1_arecord" {
 resource "aws_instance" "appdev_zkstorm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -731,7 +731,7 @@ resource "aws_route53_record" "appdev_zkstorm1_arecord" {
 resource "aws_instance" "appdev_nimbus1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_nimbus1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -761,7 +761,7 @@ resource "aws_route53_record" "appdev_nimbus1_arecord" {
 resource "aws_instance" "appdev_appcache1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_appcache1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
@@ -791,7 +791,7 @@ resource "aws_route53_record" "appdev_appcache1_arecord" {
 resource "aws_instance" "appdev_discovery1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_discovery1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
