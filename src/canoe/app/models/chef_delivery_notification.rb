@@ -1,5 +1,6 @@
 class ChefDeliveryNotification
   YELLOW = "yellow".freeze
+  GRAY = "gray".freeze
   GREEN = "green".freeze
   RED = "red".freeze
 
@@ -31,6 +32,14 @@ class ChefDeliveryNotification
     end
 
     @notifier.notify_room(room_id, message, color)
+  end
+
+  def knife_command(room_id, server, command)
+    message = "knife command executed in " \
+      "#{server.datacenter}/#{server.environment}: <br/>" \
+      "<code>knife #{command.join(" ")}</code>"
+
+    @notifier.notify_room(room_id, message, GRAY)
   end
 
   private

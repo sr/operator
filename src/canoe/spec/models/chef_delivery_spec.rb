@@ -185,4 +185,55 @@ RSpec.describe ChefDelivery do
     assert msg.message.include?("failed to deploy")
     assert msg.message.include?("boomtown")
   end
+
+  it "notifies of executed knife commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[environment from file fail.rb]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 1, @config.notifier.messages.size
+    msg = @config.notifier.messages.pop
+    assert_includes msg.message, "dfw/dev"
+    assert_includes msg.message, "knife #{command.join(" ")}"
+  end
+
+  it "ignores 'knife node from file' commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[node from file nodes/aws/node.json]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
+
+  it "ignores knife help commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[help list]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
+
+  it "ignores 'knife pd sync' command" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[pd sync]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
+
+  it "ignores 'knife search' commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[search hi andy]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
+
+  it "ignores 'knife node show' commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[node show pardot0-redisjob1-22-phx.ops.sfdc.net]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
 end

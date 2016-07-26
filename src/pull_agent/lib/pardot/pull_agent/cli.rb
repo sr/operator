@@ -132,6 +132,35 @@ module Pardot
         end
       end
 
+      def self.knife(args)
+        if args.size < 2
+          raise ArgumentError, "Usage: pull-agent-knife <environment> <command...>"
+        end
+
+        env_name = args.shift
+        environment = Environments.build(env_name.downcase)
+        hostname = ShellHelper.hostname
+        datacenter =
+          if environment.name == "dev"
+            "local"
+          else
+            hostname.split("-")[3]
+          end
+
+        request = {
+          payload: JSON.dump(
+            command: args,
+            server: {
+              datacenter: datacenter,
+              environment: environment.name,
+              hostname: hostname
+            }
+          )
+        }
+
+        Canoe.knife(environment, request)
+      end
+
       private
 
       def client_action(request)

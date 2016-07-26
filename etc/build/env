@@ -49,11 +49,7 @@ export AWS_PROFILE AWS_DEFAULT_REGION
 : "${CI_BUILD_NUMBER:="$BAMBOO_BUILD_NUMBER"}"
 : "${CI_BRANCH:="$BAMBOO_REPO_BRANCH_NAME"}"
 
-: "${CANOE_ECS_CLUSTER:="canoe_production"}"
-: "${CANOE_ECS_SERVICE:="canoe"}"
-: "${CANOE_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/canoe"}"
-
-: "${HAL9000_ECR_REPO:="364709603225.dkr.ecr.us-east-1.amazonaws.com/hal9000"}"
+: "${DOCKER_REPO_BREAD:="docker.dev.pardot.com/build/bread"}"
 
 test -d "/etc/docker" && {
     DOCKER_CONFIG="/etc/docker"

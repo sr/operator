@@ -21,14 +21,9 @@ type JobMaster struct {
 
 	privetDir          string
 	exitCode           int
-	unitsLock          sync.Mutex
+	unitsLock          sync.RWMutex
 	unitQueue          *UnitQueue
 	unitDataInProgress map[string]bool
-}
-
-type JobMasterQueueStats struct {
-	UnitsInQueue    int
-	UnitsInProgress int
 }
 
 func NewJobMaster(privetDir string) *JobMaster {
@@ -102,14 +97,21 @@ func (m *JobMaster) noticeExitCode(exitCode int32) {
 	}
 }
 
-func (m *JobMaster) QueueStats() JobMasterQueueStats {
-	m.unitsLock.Lock()
-	defer m.unitsLock.Unlock()
+func (m *JobMaster) IsWorkFullyCompleted() bool {
+	m.unitsLock.RLock()
+	defer m.unitsLock.RUnlock()
 
-	return JobMasterQueueStats{
-		UnitsInQueue:    m.queueLength(),
-		UnitsInProgress: m.numUnitsInProgress(),
-	}
+	return m.queueLength() == 0 && m.numUnitsInProgress() == 0
+}
+
+func (m *JobMaster) GetQueueStatistics(ctx context.Context, req *QueueStatisticsRequest) (*QueueStatisticsResponse, error) {
+	m.unitsLock.RLock()
+	defer m.unitsLock.RUnlock()
+
+	return &QueueStatisticsResponse{
+		UnitsInQueue:    int32(m.queueLength()),
+		UnitsInProgress: int32(m.numUnitsInProgress()),
+	}, nil
 }
 
 func (m *JobMaster) queueLength() int {

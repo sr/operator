@@ -22,6 +22,10 @@ class ChefDeliveryConfig
     end
   end
 
+  def knife_notifications_enabled?(_server)
+    true
+  end
+
   def repo_name
     ENV.fetch("CANOE_CHEF_REPO", "Pardot/chef")
   end

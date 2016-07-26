@@ -12,12 +12,16 @@ import (
 	"syscall"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+
 	"golang.org/x/net/context"
 )
 
 const (
-	JobRunnerRetries    = 10
-	JobRunnerRetryDelay = 2 * time.Second
+	JobRunnerRetries       = 4
+	JobRunnerRetryDelay    = 2 * time.Second
+	JobRunnerClientTimeout = 10 * time.Second
 )
 
 type JobRunner struct {
@@ -62,7 +66,7 @@ func (r *JobRunner) RunStartupHook() error {
 }
 
 func (r *JobRunner) RunCleanupHook() error {
-	return r.runOptionalHook("runner-hook-Cleanup")
+	return r.runOptionalHook("runner-hook-cleanup")
 }
 
 func (r *JobRunner) runOptionalHook(hook string) error {
@@ -85,34 +89,58 @@ func (r *JobRunner) runOptionalHook(hook string) error {
 	return cmd.Run()
 }
 
-func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
+// NotifyQueueEmpty closes ch when the queue is determined to be empty
+func (r *JobRunner) NotifyQueueEmpty(ch chan<- bool) {
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), JobRunnerClientTimeout)
+		queueStats, err := r.masterClient.GetQueueStatistics(ctx, &QueueStatisticsRequest{})
+		cancel()
+
+		if err != nil && grpc.Code(err) == codes.DeadlineExceeded {
+			// In all liklihood, the Privet master has shut down completely because
+			// the queue is empty.
+			close(ch)
+			break
+		} else if queueStats.UnitsInQueue == 0 {
+			close(ch)
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func (r *JobRunner) PopUnits() ([]*Unit, error) {
 	popUnitsReq := &PopUnitsRequest{
 		RunnerId: r.runnerID,
 		ApproximateBatchDurationInSeconds: r.ApproximateBatchDurationInSeconds,
 	}
 
-	popUnitsResp, err := r.masterClient.PopUnits(context.Background(), popUnitsReq)
-	if err != nil {
-		return false, err
-	} else if len(popUnitsResp.Units) == 0 {
-		return true, err
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), JobRunnerClientTimeout)
+	defer cancel()
+	popUnitsResp, err := r.masterClient.PopUnits(ctx, popUnitsReq)
 
-	unitsData := make([]string, 0, len(popUnitsResp.Units))
-	for _, unit := range popUnitsResp.Units {
+	if err != nil {
+		return nil, err
+	}
+	return popUnitsResp.Units, nil
+}
+
+func (r *JobRunner) RunUnits(units []*Unit) error {
+	unitsData := make([]string, 0, len(units))
+	for _, unit := range units {
 		unitsData = append(unitsData, unit.Data)
 	}
 
 	unitResult, err := r.invokeUnits(unitsData)
 	if err != nil {
 		// TODO: We've now claimed units we'll never complete.
-		return false, err
+		return err
 	}
 
 	additionalResultsPresent, additionalResult, err := r.captureAdditionalResults(unitsData)
 	if err != nil {
 		// TODO: We've now claimed units we'll never complete.
-		return false, err
+		return err
 	} else if !additionalResultsPresent {
 		// We can't send a null value back over grpc
 		additionalResult = &CommandResult{
@@ -125,7 +153,7 @@ func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 	completionReq := &ReportUnitsCompletionRequest{
 		RunnerId:                r.runnerID,
 		ResultId:                fmt.Sprintf("%s:%d", r.runnerID, r.currentResultID),
-		Units:                   popUnitsResp.Units,
+		Units:                   units,
 		UnitResult:              unitResult,
 		AdditionalResultPresent: additionalResultsPresent,
 		AdditionalResult:        additionalResult,
@@ -133,17 +161,20 @@ func (r *JobRunner) PopAndRunUnits() (done bool, err error) {
 
 	retries := JobRunnerRetries
 	for {
-		_, err = r.masterClient.ReportUnitsCompletion(context.Background(), completionReq)
+		ctx, cancel := context.WithTimeout(context.Background(), JobRunnerClientTimeout)
+		_, err = r.masterClient.ReportUnitsCompletion(ctx, completionReq)
+		cancel()
+
 		if err != nil {
 			retries = retries - 1
 			if retries > 0 {
 				log.Printf("got error, retrying after delay: %v", err)
 				time.Sleep(JobRunnerRetryDelay)
 			} else {
-				return false, err
+				return err
 			}
 		} else {
-			return false, err
+			return err
 		}
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"privet"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 var (
@@ -53,8 +54,7 @@ func main() {
 
 		go func(master *privet.JobMaster) {
 			for {
-				queueStats := master.QueueStats()
-				if queueStats.UnitsInQueue == 0 && queueStats.UnitsInProgress == 0 {
+				if master.IsWorkFullyCompleted() {
 					os.Exit(master.ExitCode())
 				}
 				time.Sleep(1 * time.Second)
@@ -76,27 +76,64 @@ func main() {
 		jobRunner.EnvVars = envVarsList
 		jobRunner.ApproximateBatchDurationInSeconds = approximateBatchDurationInSeconds
 
-		if err = jobRunner.RunStartupHook(); err != nil {
-			log.Printf("error running startup hook: %v", err)
-			if overlookStartupHookFailure {
-				os.Exit(0)
-			} else {
-				os.Exit(1)
+		startupErrCh := make(chan error)
+		go func() {
+			startupErrCh <- jobRunner.RunStartupHook()
+		}()
+		queueEmptyCh := make(chan bool)
+		go jobRunner.NotifyQueueEmpty(queueEmptyCh)
+
+		select {
+		case err = <-startupErrCh:
+			if err != nil {
+				log.Printf("error running startup hook: %v", err)
+				if overlookStartupHookFailure {
+					os.Exit(0)
+				} else {
+					os.Exit(1)
+				}
 			}
+		case <-queueEmptyCh:
+			log.Printf("queue became empty, exiting")
+			os.Exit(0)
 		}
 
+		firstIteration := true
+		success := true
 		for {
-			done, err := jobRunner.PopAndRunUnits()
-
+			units, err := jobRunner.PopUnits()
 			if err != nil {
-				log.Fatalf("error running units: %v", err)
-			} else if done {
+				// If this is the first iteration and the exit code is a
+				// DeadlineExceeded, it's likely that an anomalous startup hook run took
+				// so long that other Privet workers have completed all of the work and
+				// the Privet master has shut down. We allow this as a special case.
+				if !firstIteration || grpc.Code(err) != codes.DeadlineExceeded {
+					log.Printf("error fetching units: %v", err)
+					success = false
+				}
+				break
+			} else if len(units) <= 0 {
 				break
 			}
+
+			err = jobRunner.RunUnits(units)
+			if err != nil {
+				log.Printf("error running units: %v", err)
+				success = false
+				break
+			}
+
+			firstIteration = false
 		}
 
 		if err = jobRunner.RunCleanupHook(); err != nil {
-			log.Fatalf("error running startup hook: %v", err)
+			log.Fatalf("error running cleanup hook: %v", err)
+		}
+
+		if success {
+			os.Exit(0)
+		} else {
+			os.Exit(1)
 		}
 	} else {
 		fmt.Fprintf(os.Stderr, "-bind or -connect must be specified\n")

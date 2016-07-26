@@ -1,50 +1,32 @@
 #!/usr/bin/env bash
-#/ Usage: build [--help] <project>
-#/ Deploy BREAD team projects.
+#/ Usage: build [--help] <app>
+#/ Deploy a BREAD app to ECS.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-project="${1:-}"
-if [ "$#" -ne 1 ] || [ "$project" = "--help" ] || [ -z "$project" ]
-then
+. etc/build/env
+
+app="${1:-}"
+if [ "$#" -ne 1 ] || [ "$app" = "--help" ] || [ -z "$app" ]; then
     grep ^#/ <"$0" |cut -c4-
     exit 1
 fi
 
-# Bring in configuration settings (AWS_DEFAULT_REGION etc)
-. etc/build/env
-
-awscredentials="/etc/aws/credentials"
-if ! test -f "$awscredentials"
-then
-  echo "$awscredentials file is missing." 2>&1
-  exit 1
-fi
-
-# On CI machines DOCKER_CONFIG is set to a directory that is not writable by
-# the current user. This temporarily resets it to the normal location under
-# the $HOME directory.
-export DOCKER_CONFIG=~/.docker
-
-mkdir -p ~/.aws
-cp /etc/aws/credentials ~/.aws/credentials
-set +x
-eval "$(aws ecr get-login)"
-set -x
-
-case "$project" in
-    canoe)
-        AWS_ECR_REPO="$CANOE_ECR_REPO"
-        AWS_ECS_CLUSTER="$CANOE_ECS_CLUSTER"
-        AWS_ECS_SERVICE="$CANOE_ECS_SERVICE"
-        ;;
-    hal9000)
-        AWS_ECR_REPO="$HAL9000_ECR_REPO"
-        AWS_ECS_CLUSTER="hal9000_production"
-        AWS_ECS_SERVICE="hal9000"
+cluster=
+service=
+image=
+case "$app" in
+    canoe|hal9000|parbot|teampass)
+        if [ "$app" = "teampass" ]; then
+            cluster="$app"
+        else
+            cluster="${app}_production"
+        fi
+        service="$app"
+        image="$DOCKER_REPO_BREAD/$app/app:$(docker-image-tag)"
         ;;
     *)
-        echo "Unable to deploy project: \"$project\"" 2>&1
+        echo "Unable to deploy app: \"$app\"" 2>&1
         exit 1
         ;;
 esac
@@ -52,9 +34,8 @@ esac
 PATH="$(dirname "$0")/vendor:$PATH"
 export PATH
 
-# shellcheck disable=SC2154
 ecs-deploy \
-  --cluster "$AWS_ECS_CLUSTER" \
-  --timeout 180 \
-  --service-name "$AWS_ECS_SERVICE" \
-  --image "${AWS_ECR_REPO}:$(docker-image-tag)"
+    --cluster "$cluster" \
+    --timeout 180 \
+    --service-name "$service" \
+    --image "$image"

@@ -69,7 +69,7 @@ case "$action" in
         branch="$(git rev-parse --abbrev-ref HEAD)"
 
         cd src/terraform
-        go install bread/cmd/breadsignal
+        go install bread/cmd/breadsignal github.com/hashicorp/terraform
         if [ "$action" != "pull" ]; then
           breadsignal -terraform "$action" \
               -terraform-version "$(terraform version)" \
