@@ -680,7 +680,8 @@ module.exports = (robot) ->
   robot.respond /kyle$/i, (msg) ->
     msg.send msg.random [
       "https://hipchat.dev.pardot.com/files/1/282/eYuVJnFMlUJAqnw/2015-10-15%2016_37_09.gif",
-      "https://hipchat.dev.pardot.com/files/1/65/sWAGNmuFsb4TOjt/Kyle%20Gets%20Weird.gif"
+      "https://hipchat.dev.pardot.com/files/1/65/sWAGNmuFsb4TOjt/Kyle%20Gets%20Weird.gif",
+      "http://i.imgur.com/DdEEkOw.gifv"
     ]
 
   robot.respond /superkyle$/i, (msg) ->
