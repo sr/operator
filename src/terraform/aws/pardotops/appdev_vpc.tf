@@ -184,7 +184,7 @@ resource "aws_security_group" "appdev_vpc_default" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_instance.appdev_bastion.public_ip}/32",
+      "${aws_eip.appdev_bastion_eip.public_ip}/32",
       "${aws_instance.appdev_bastion.private_ip}/32"
     ]
   }
@@ -297,7 +297,7 @@ resource "aws_eip" "appdev_bastion_eip" {
 resource "aws_route53_record" "appdev_bastion_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot2-bastion1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_bastion.public_ip}"]
+  records = ["${aws_eip.appdev_bastion_eip.public_ip}"]
   type = "A"
   ttl = "900"
 }
