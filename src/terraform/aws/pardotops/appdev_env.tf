@@ -57,7 +57,7 @@ variable "environment_appdev" {
 //    device_name = "${var.environment_appdev["db_volume_device_name"]}"
 //    volume_type = "gp2"
 //    volume_size = "512"
-//    delete_on_termination = false
+//    delete_on_termination = true
 //  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
@@ -247,7 +247,7 @@ resource "aws_instance" "appdev_globaldb1" {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
@@ -285,7 +285,7 @@ resource "aws_instance" "appdev_dbshard1" {
     device_name = "${var.environment_appdev["db_volume_device_name"]}"
     volume_type = "gp2"
     volume_size = "512"
-    delete_on_termination = false
+    delete_on_termination = true
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
