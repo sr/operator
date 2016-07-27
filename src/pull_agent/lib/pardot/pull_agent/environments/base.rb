@@ -154,11 +154,11 @@ module Pardot
         # common hooks
 
         def notify_begin_kibana(deploy)
-          Logger.log(:info, "Started fetch of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
+          Logger.log(:info, "Started fetch of #{deploy.branch}/#{deploy.build_number} (#{deploy.artifact_url})")
         end
 
         def notify_complete_kibana(deploy)
-          Logger.log(:info, "Finished deploy of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
+          Logger.log(:info, "Finished deploy of #{deploy.branch}/#{deploy.build_number} (#{deploy.artifact_url})")
         end
 
         def notify_complete_canoe(deploy)
