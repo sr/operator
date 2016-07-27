@@ -34,9 +34,9 @@ module Lita
       end
 
       def diff(response)
-        sha2 = response.match_data["sha2"] || nil
+        sha2 = response.match_data["sha2"]
         diff = response.match_data["sha1"].tr("/", ";")
-        diff += sha2 ? "..." + sha2.tr("/", ";") : ""
+        diff += "..." + sha2.tr("/", ";") if sha2
 
         # msg = "Diff: #{diff}"
         url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
