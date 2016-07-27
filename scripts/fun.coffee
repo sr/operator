@@ -899,9 +899,9 @@ module.exports = (robot) ->
     googleApiKey = process.env.HUBOT_GOOGLE_API_KEY
  
     sites = [
-      "i.imgur.com",
-      "reactiongifs.com",
-      "media.giphy.com"
+      "site:i.imgur.com",
+      "site:reactiongifs.com",
+      "site:giphy.com"
     ]
 
     if sites.length > 0
