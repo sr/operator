@@ -25,9 +25,10 @@ module Lita
         sha = response.match_data["sha"]
         project = response.match_data["project"] || "pardot"
 
-        msg = "Commit: #{project} - #{sha}"
+        # TODO: figure out a way to post html using hipchat room notification
+        # msg = "Commit: #{project} - #{sha}"
         url = "https://git.dev.pardot.com/Pardot/" + project + "/commit/" + sha
-        html = "<a href=\"#{url}\">#{msg}</a>"
+        # html = "<a href=\"#{url}\">#{msg}</a>"
 
         robot.send_message(@status_room, url)
       end
@@ -37,9 +38,9 @@ module Lita
         diff = response.match_data["sha1"].tr("/", ";")
         diff += sha2 ? "..." + sha2.tr("/", ";") : ""
 
-        msg = "Diff: #{diff}"
+        # msg = "Diff: #{diff}"
         url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
-        html = "<a href=\"#{url}\">#{msg}</a>"
+        # html = "<a href=\"#{url}\">#{msg}</a>"
 
         robot.send_message(@status_room, url)
       end
