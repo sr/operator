@@ -59,7 +59,6 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     expect(deploys.length).to eq(1)
     expect(deploys[0].auth_user.email).to eq("joe.syncmaster@salesforce.com")
     expect(deploys[0].project_name).to eq(@project.name)
-    expect(deploys[0].what).to eq("branch")
     expect(deploys[0].what_details).to eq("master")
     expect(deploys[0].build_number).to eq(1234)
     expect(deploys[0].specified_servers).to eq(nil)

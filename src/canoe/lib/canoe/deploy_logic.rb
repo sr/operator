@@ -5,9 +5,9 @@ module Canoe
   module DeployLogic
     DEPLOYLOGIC_ERROR_NO_PROJECT = 1
     DEPLOYLOGIC_ERROR_NO_TARGET = 2
-    DEPLOYLOGIC_ERROR_NO_WHAT   = 3
+    DEPLOYLOGIC_ERROR_NO_DEPLOY = 3
     DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY = 4
-    DEPLOYLOGIC_ERROR_INVALID_WHAT = 5
+    DEPLOYLOGIC_ERROR_INVALID_SHA = 5
     DEPLOYLOGIC_ERROR_DUPLICATE = 6
 
     # ----------------------------------------------------------------------
@@ -24,20 +24,19 @@ module Canoe
         return { error: true, reason: DEPLOYLOGIC_ERROR_DUPLICATE }
       end
 
-      # validate that what we are deploying was included and is a real thing
+      # validate that provisional deploy was included and is a real thing
       if prov_deploy.nil?
-        return { error: true, reason: DEPLOYLOGIC_ERROR_NO_WHAT }
+        return { error: true, reason: DEPLOYLOGIC_ERROR_NO_DEPLOY }
       elsif !prov_deploy.valid?
         return { error: true,
-                 reason: DEPLOYLOGIC_ERROR_INVALID_WHAT,
-                 what: prov_deploy.what }
+                 reason: DEPLOYLOGIC_ERROR_INVALID_SHA,
+                 what: prov_deploy.sha }
       end
 
       the_deploy = deployer.deploy(
         target: current_target,
         user: current_user,
         project: current_project,
-        what: prov_deploy.what,
         what_details: prov_deploy.what_details,
         sha: prov_deploy.sha,
         build_number: prov_deploy.build_number,

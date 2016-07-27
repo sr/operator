@@ -125,15 +125,15 @@ class DeploysController < ApplicationController
   def render_deploy_error(deploy_response)
     # missing pieces
     missing_error_codes = \
-      [DEPLOYLOGIC_ERROR_NO_PROJECT, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_WHAT]
+      [DEPLOYLOGIC_ERROR_NO_PROJECT, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_DEPLOY]
     if missing_error_codes.include?(deploy_response[:reason])
       flash[:notice] = "We did not have everything needed to deploy. Try again."
       redirect_to :back
     end
 
     # check for invalid
-    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_WHAT
-      flash[:notice] = "Sorry, it appears you specified an unknown #{deploy_response[:what]}."
+    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_SHA
+      flash[:notice] = "Sorry, it appears you specified an unknown artifact."
       redirect_to :back
     end
 

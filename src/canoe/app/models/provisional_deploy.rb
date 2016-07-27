@@ -1,9 +1,7 @@
-require "deployable"
 require "base64"
 require "json"
 
 class ProvisionalDeploy
-  include Deployable
 
   attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
@@ -44,7 +42,6 @@ class ProvisionalDeploy
     new(
       project: project,
       artifact_url: artifact_url,
-      what: "branch",
       what_details: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
@@ -59,7 +56,6 @@ class ProvisionalDeploy
     new(
       project: project,
       artifact_url: deploy.artifact_url,
-      what: deploy.what,
       what_details: deploy.what_details,
       build_number: deploy.build_number,
       sha: deploy.sha,
@@ -69,10 +65,9 @@ class ProvisionalDeploy
     )
   end
 
-  def initialize(project:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
+  def initialize(project:, artifact_url:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
     @project = project
     @artifact_url = artifact_url
-    @what = what
     @what_details = what_details
     @build_number = build_number
     @sha = sha

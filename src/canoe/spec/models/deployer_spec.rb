@@ -9,7 +9,6 @@ RSpec.describe Canoe::Deployer do
         ProvisionalDeploy.new(
           project: deploy_scenario.project,
           artifact_url: "https://dev.pardot.com/123",
-          what: "commit",
           what_details: "abc123",
           build_number: 1234,
           sha: "abc123",
@@ -21,7 +20,6 @@ RSpec.describe Canoe::Deployer do
       it "no servers are specified but we want to default to all servers" do
         deploy = deployer.deploy(
           user: user,
-          what: prov_deploy.what,
           what_details: prov_deploy.what_details,
           sha: prov_deploy.sha,
           passed_ci: prov_deploy.passed_ci,
@@ -38,7 +36,6 @@ RSpec.describe Canoe::Deployer do
         new_deploy_scenario = FactoryGirl.create(:deploy_scenario, project: not_all_servers)
         deploy = deployer.deploy(
           user: user,
-          what: prov_deploy.what,
           what_details: prov_deploy.what_details,
           sha: prov_deploy.sha,
           passed_ci: prov_deploy.passed_ci,
@@ -55,7 +52,6 @@ RSpec.describe Canoe::Deployer do
 
         deploy = deployer.deploy(
           user: user,
-          what: prov_deploy.what,
           what_details: prov_deploy.what_details,
           sha: prov_deploy.sha,
           passed_ci: prov_deploy.passed_ci,
