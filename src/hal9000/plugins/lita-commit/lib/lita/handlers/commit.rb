@@ -1,9 +1,6 @@
 module Lita
   module Handlers
     class Commit < Handler
-      # config: hal9000's "home room"
-      config :status_room, default: "1_ops@conf.btf.hipchat.com"
-
       # The <project> group is optional in this regex, the commit method
       # will default the project to 'pardot' if no <project> is provided
       route /^commit(?:\s+(?<project>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
@@ -16,15 +13,6 @@ module Lita
         "diff <sha1> <sha2>" => "Responds with the compare url for the Pardot repo"
       }
 
-      def initialize(robot)
-        super
-        @status_room = ::Lita::Source.new(room: config.status_room)
-      end
-
-      on(:connected) do
-        robot.join(config.status_room)
-      end
-
       def commit(response)
         sha = response.match_data["sha"]
         project = response.match_data["project"] || "pardot"
@@ -34,7 +22,7 @@ module Lita
         url = "https://git.dev.pardot.com/Pardot/" + project + "/commit/" + sha
         # html = "<a href=\"#{url}\">#{msg}</a>"
 
-        robot.send_message(@status_room, url)
+        response.reply(url)
       end
 
       def diff(response)
@@ -46,7 +34,7 @@ module Lita
         url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
         # html = "<a href=\"#{url}\">#{msg}</a>"
 
-        robot.send_message(@status_room, url)
+        response.reply(url)
       end
 
       Lita.register_handler(self)
