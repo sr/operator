@@ -29,19 +29,19 @@ module Lita
         url = "https://git.dev.pardot.com/Pardot/" + project + "/commit/" + sha
         html = "<a href=\"#{url}\">#{msg}</a>"
 
-        robot.send_message(@status_room, html)
+        robot.send_message(@status_room, url)
       end
 
       def diff(response)
         sha2 = response.match_data["sha2"] || nil
         diff = response.match_data["sha1"].tr("/", ";")
-        diff += sha2 ? "..." + sha2.tr("/", ";") : ''
+        diff += sha2 ? "..." + sha2.tr("/", ";") : ""
 
         msg = "Diff: #{diff}"
         url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
         html = "<a href=\"#{url}\">#{msg}</a>"
 
-        robot.send_message(@status_room, html)
+        robot.send_message(@status_room, url)
       end
 
       Lita.register_handler(self)
