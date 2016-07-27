@@ -227,7 +227,7 @@ module Pardot
             if jarfile.nil? || jarfile == ""
               Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
             else
-              Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
+              Logger.log(:info, "Topology Deployment Param: #{deploy.options["topology"]}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
               storm = Storm.new(deploy.options["topology"], deploy.options["topo_env"], jarfile)
               storm.load
