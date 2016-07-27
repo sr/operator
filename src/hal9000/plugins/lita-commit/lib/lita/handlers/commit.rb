@@ -4,10 +4,14 @@ module Lita
       # config: hal9000's "home room"
       config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
+      # The <project> group is optional in this regex, the commit method
+      # will default the project to 'pardot' if no <project> is provided
       route /^commit(?:\s+(?<project>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
         "commit (project)? <commit sha>" => "Responds with the commit url for any repo, defaults to pardot"
       }
 
+      # The <sha2> group is optional in this regex. The diff method will
+      # default to comparing just <sha1> to master if no <sha2> provided
       route /^diff\s+(?<sha1>[^\s]+)(?:\s+(?<sha2>[^\s]+))?$/i, :diff, command: true, help: {
         "diff <sha1> <sha2>" => "Responds with the compare url for the Pardot repo"
       }
