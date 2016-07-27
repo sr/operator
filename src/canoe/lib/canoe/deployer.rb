@@ -1,6 +1,6 @@
 module Canoe
   class Deployer
-    def deploy(target:, user:, project:, what_details:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
+    def deploy(target:, user:, project:, branch:, sha:, passed_ci:, build_number: nil, artifact_url: nil, lock: false, server_hostnames: nil, options_validator: nil, options: {})
       if server_hostnames && !server_hostnames.empty?
         servers = target.servers(project: project).enabled.where(hostname: server_hostnames)
       elsif project.all_servers_default
@@ -17,7 +17,7 @@ module Canoe
         new_deploy = target.deploys.create!(
           auth_user: user,
           project_name: project.name,
-          what_details: what_details,
+          branch: branch,
           completed: false,
           sha: sha,
           passed_ci: passed_ci,

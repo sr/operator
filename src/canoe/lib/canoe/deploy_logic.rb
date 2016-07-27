@@ -37,7 +37,7 @@ module Canoe
         target: current_target,
         user: current_user,
         project: current_project,
-        what_details: prov_deploy.what_details,
+        branch: prov_deploy.branch,
         sha: prov_deploy.sha,
         build_number: prov_deploy.build_number,
         artifact_url: prov_deploy.artifact_url,

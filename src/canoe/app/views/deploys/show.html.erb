@@ -120,7 +120,7 @@
     <%- if current_deploy.completed? %>
       <tr>
         <td>
-          <%= link_to select_target_project_deploys_path(current_project.name, artifact_url: current_deploy.artifact_url, what_details: current_deploy.what_details), class: "btn btn-primary btn-info deploy-button" do %>
+          <%= link_to select_target_project_deploys_path(current_project.name, artifact_url: current_deploy.artifact_url, branch: current_deploy.branch), class: "btn btn-primary btn-info deploy-button" do %>
 
             <i class="icon-train2"></i> REDEPLOY
           <%- end %>

@@ -51,7 +51,7 @@ module CanoeHelper
   def print_deploy_what(deploy)
     output = deploy_type_icon("branch")
     output += " "
-    output += deploy.what_details
+    output += deploy.branch
 
     if deploy.build_number
       output += " "

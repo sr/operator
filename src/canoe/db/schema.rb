@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160727182846) do
+ActiveRecord::Schema.define(version: 20160727183818) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -86,7 +86,7 @@ ActiveRecord::Schema.define(version: 20160727182846) do
     t.integer  "deploy_target_id"
     t.integer  "auth_user_id"
     t.string   "project_name"
-    t.string   "what_details"
+    t.string   "branch"
     t.boolean  "completed",                       default: false
     t.datetime "created_at"
     t.datetime "updated_at"

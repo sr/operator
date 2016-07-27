@@ -3,7 +3,7 @@ json.target deploy.deploy_target.name
 json.user deploy.auth_user.email
 json.project deploy.project_name
 json.what "branch"
-json.what_details deploy.what_details
+json.branch deploy.branch
 json.options deploy.options || {}
 json.build_number deploy.build_number
 if local_assigns[:results]

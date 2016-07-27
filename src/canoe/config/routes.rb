@@ -7,9 +7,6 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "sessions#failure"
 
   resources :projects, param: :name, only: [:index] do
-    resources :tags, param: :name, only: [:index] do
-      get :latest, on: :collection
-    end
     resources :branches, param: :name, constraints: { name: /.*/ }, only: [:index] do
       resources :builds, only: [:index]
     end
