@@ -2,7 +2,6 @@ require "base64"
 require "json"
 
 class ProvisionalDeploy
-
   attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
 

@@ -29,7 +29,7 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # HTML Helpers
   def deploy_type_icon(type)
-    content_tag :i, "", class: "icon-code-fork"
+    content_tag :i, "", class: deploy_icon_class(type)
   end
 
   def deploy_icon_class(type)
@@ -37,7 +37,7 @@ module CanoeHelper
     when "build" then "icon-archive"
     when "tag" then "icon-tag"
     when "branch-master" then "icon-code"
-    when "branch" then 
+    when "branch" then "icon-code-fork"
     else ""
     end
   end
