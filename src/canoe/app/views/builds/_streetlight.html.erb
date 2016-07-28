@@ -1,9 +1,13 @@
 <h3>
-  <% case state %>
-  <% when :true #green %>
-    <i class="icon-check-sign" style="color: #5cb85c"></i>
-  <% when :false #red %>
-    <i class="icon-circle" style="color: #d9534f"></i>
+  <% if state %>
+    <%= link_to build_url do %>
+      <% case state %>
+      <% when "true" #green %>
+        <i class="icon-check-sign" style="color: #5cb85c"></i>
+      <% when "false" #red %>
+        <i class="icon-circle" style="color: #d9534f"></i>
+      <% end %>
+    <% end %>
   <% else #gray %>
     <i class="icon-circle" title="No run" style="color: #ddd"></i>
   <% end %>
