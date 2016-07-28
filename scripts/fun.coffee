@@ -1022,7 +1022,7 @@ module.exports = (robot) ->
     return ensureGiphyExtension(gifUrl)
 
   ensureGiphyExtension = (url) ->
-    if not "#{url}".includes "giphy.com"
+    if not /(.*)giphy.com(.*)/i.test(url)
       return url
     chunks = url.split('/')
     end = chunks.pop()
