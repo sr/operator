@@ -1,39 +1,37 @@
 module Lita
   module Handlers
     class Commit < Handler
-      # The <project> group is optional in this regex, the commit method
-      # will default the project to 'pardot' if no <project> is provided
-      route /^commit(?:\s+(?<project>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
-        "commit (project)? <commit sha>" => "Responds with the commit url for any repo, defaults to pardot"
+      DEFAULT_REPO = "pardot".freeze
+      DEFAULT_BRANCH = "master".freeze
+
+      # The <repo> group is optional in this regex, the commit method
+      # will set the default repo to 'pardot' if no <repo> is provided
+      route /^commit(?:\s+(?<repo>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
+        "commit (repo)? <commit sha>" => "Responds with the commit url for the given params, repo defaults to pardot"
       }
 
-      # The <sha2> group is optional in this regex. The diff method will
-      # default to comparing just <sha1> to master if no <sha2> provided
-      route /^diff\s+(?<sha1>[^\s]+)(?:\s+(?<sha2>[^\s]+))?$/i, :diff, command: true, help: {
-        "diff <sha1> <sha2>" => "Responds with the compare url for the Pardot repo"
+      # The <sha1> and <repo> groups are optional in this regex. The diff method will
+      # default to comparing just <sha2> to pardot master if no <sha1> provided
+      route /^diff(?<repo>[a-z0-9]+)?(?:\s+(?<sha1>[^\s]+))?\s+(?<sha2>[^\s]+)$/i, :diff, command: true, help: {
+        "diff(repo) (sha1) <sha2>" => "Responds with the compare url for the given params, repo defaults to pardot"
       }
 
       def commit(response)
         sha = response.match_data["sha"]
-        project = response.match_data["project"] || "pardot"
+        repo = response.match_data["repo"] || DEFAULT_REPO
 
-        # TODO: figure out a way to post html using hipchat room notification
-        # msg = "Commit: #{project} - #{sha}"
-        url = "https://git.dev.pardot.com/Pardot/" + project + "/commit/" + sha
-        # html = "<a href=\"#{url}\">#{msg}</a>"
-
+        # TODO: create a Hipchat Handler object to push room notifications to send html
+        url = "https://git.dev.pardot.com/Pardot/#{repo}/commit/#{sha}"
         response.reply(url)
       end
 
       def diff(response)
+        repo = response.match_data["repo"] || DEFAULT_REPO
+        sha1 = response.match_data["sha1"] || DEFAULT_BRANCH
         sha2 = response.match_data["sha2"]
-        diff = response.match_data["sha1"].tr("/", ";")
-        diff += "..." + sha2.tr("/", ";") if sha2
 
-        # msg = "Diff: #{diff}"
-        url = "https://git.dev.pardot.com/Pardot/pardot/compare/" + diff + "?w=1"
-        # html = "<a href=\"#{url}\">#{msg}</a>"
-
+        diff = "#{sha1}...#{sha2}"
+        url = "https://git.dev.pardot.com/Pardot/#{repo}/compare/#{diff}?w=1"
         response.reply(url)
       end
 
