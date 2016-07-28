@@ -1,14 +1,14 @@
 <h3>
   <% if state %>
-    <%= link_to build_url do %>
+    <%= link_to build_url, class: "streetlight" do %>
       <% case state %>
       <% when "true" #green %>
-        <i class="icon-check-sign" style="color: #5cb85c"></i>
+        <i class="icon-check-sign"></i>
       <% when "false" #red %>
-        <i class="icon-circle" style="color: #d9534f"></i>
+        <i class="icon-circle"></i>
       <% end %>
     <% end %>
   <% else #gray %>
-    <i class="icon-circle" title="No run" style="color: #ddd"></i>
+    <i class="icon-circle gray" title="No run"></i>
   <% end %>
 </h3>
