@@ -39,7 +39,7 @@ resource "aws_security_group" "appdev_ldap_server" {
 }
 
 resource "aws_instance" "appdev_ldap_host" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
   private_ip = "172.26.192.254"
@@ -50,7 +50,7 @@ resource "aws_instance" "appdev_ldap_host" {
   ]
   root_block_device {
     volume_type = "gp2"
-    volume_size = "40"
+    volume_size = "50"
     delete_on_termination = false
   }
   tags {
