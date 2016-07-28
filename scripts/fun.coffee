@@ -926,7 +926,9 @@ module.exports = (robot) ->
           msg.send "Encountered an error :( #{err}"
           return
         response = JSON.parse(body)
-        if response?.items
+        if response?.error
+          msg.send "Encountered an error :( #{response.error.message}"
+        else if response?.items
           image = msg.random response.items
           cb ensureImageExtension image.link
         else
@@ -1007,14 +1009,26 @@ module.exports = (robot) ->
         else
           msg.send "Sorry, I found no results for '#{query}'\n\n [Response: #{body}]."
 
-   ensureImageExtension = (url) ->
-     chunks = url.split('.')
-     ext = chunks.pop()
-     if /(png|jpe?g|gif$)/i.test(ext)
-       return url
-     else if /(gifv$)/i.test(ext)
-       chunks.push('gif')
-       gifUrl = chunks.join('.')
-       return gifUrl
-     else
-       return "#{url}#.png"
+  ensureImageExtension = (url) ->
+    chunks = url.split('.')
+    ext = chunks.pop()
+    if /(png|jpe?g|gif$)/i.test(ext)
+      gifUrl = url
+    else if /(gifv$)/i.test(ext)
+      chunks.push('gif')
+      gifUrl = chunks.join('.')
+    else
+      gifUrl = "#{url}#.png"
+    return ensureGiphyExtension(gifUrl)
+
+  ensureGiphyExtension = (url) ->
+    if not url.includes "giphy.com"
+      return url
+    chunks = url.split('/')
+    end = chunks.pop()
+    console.log url
+    if not /^(giphy.gif)$/i.test(end)
+      chunks.push "giphy.gif"
+      return chunks.join('/')
+    else
+      return url
