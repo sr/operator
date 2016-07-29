@@ -29,14 +29,13 @@ module.exports = (robot) ->
   canoe = new Canoe(process.env.HUBOT_CANOE_HOST, process.env.HUBOT_CANOE_API_TOKEN)
 
   robot.respond /doc(?:s)?\s*(.*)?/i, (msg) ->
-    conf = "https://confluence.dev.pardot.com"
+    conf = "https://confluence.dev.pardot.com/"
+    resp = "Confluence"
     if msg.match[1]
-      conf += "/dosearchsite.action?queryString=#{msg.match[1]}"
-      resp = "<a href=\"#{conf}\">Confluence Search Results</a>"
-    else
-      conf += "/dashboard.action"
-      resp = "<a href=\"#{conf}\">Confluence</a>"
-    msg.hipchatNotify(resp, {color: "gray"})
+      conf += "dosearchsite.action?queryString=#{msg.match[1]}"
+      resp += " Search Results"
+    html = "<a href=\"#{conf}\">#{resp}</a>"
+    msg.hipchatNotify(html, {color: "gray"})
 
   robot.respond /last(?:releases?|syncs?)(?:\s+(\d+))?$/i, (msg) ->
     number = _.min([10, parseInt(msg.match[1] || "1")])
