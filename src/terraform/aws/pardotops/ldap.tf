@@ -142,6 +142,14 @@ resource "aws_eip" "internal_apps_ldap_master" {
   instance = "${aws_instance.internal_apps_ldap_master.id}"
 }
 
+resource "aws_route53_record" "internal_apps_ldap_master_Arecord" {
+  zone_id = "${aws_route53_zone.ops_pardot_com.zone_id}"
+  name = "pardot0-auth1-1-ue1.ops.pardot.com"
+  records = ["${aws_eip.appdev_ldap_host_eip.public_ip}"]
+  ttl = "900"
+  type = "A"
+}
+
 resource "aws_instance" "internal_apps_ldap_replica" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
