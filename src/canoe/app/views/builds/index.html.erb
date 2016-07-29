@@ -51,8 +51,7 @@
             </div>
             <% @test_list.keys.each_with_index do |test, i| %>
               <div class="col-md-1<%= " col-md-offset-1" if i == 0 %>">
-                <% key = (test == :PPANT) ? "passedCI" : "ciJob[#{test}]" %>
-                <%= render partial: "streetlight", locals: {state: build.options[:meta_data][key], build_url: build.options[:meta_data]["ciJobUrl[#{test}]"]} %>
+                <%= render partial: "streetlight", locals: streetlight_locals(build, test) %>
               </div>
             <% end %>
           </div>
