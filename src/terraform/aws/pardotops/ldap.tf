@@ -145,7 +145,7 @@ resource "aws_eip" "internal_apps_ldap_master" {
 resource "aws_route53_record" "internal_apps_ldap_master_Arecord" {
   zone_id = "${aws_route53_zone.ops_pardot_com.zone_id}"
   name = "pardot0-auth1-1-ue1.ops.pardot.com"
-  records = ["${aws_eip.appdev_ldap_host_eip.public_ip}"]
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
   ttl = "900"
   type = "A"
 }
