@@ -8,6 +8,14 @@ This README is not a substitute for the [Terraform docs](https://www.terraform.i
 
 This repository supports multiple "plans". Generally there is a plan per "thing" that has its own authentication mechanism. For instance, each AWS account should have a separate plan. That way, someone who has access to pardotops but not to pardot-ci can still effectively use this repository.
 
+## 'Terra' Setup
+
+add these to your ~/.bash_profile or ~/.bashrc
+```bash
+export GOPATH="<base bread repo checkout path>"
+export PATH=$GOPATH/bin:$PATH
+```
+
 ## Authentication
 
 ### Artifactory
