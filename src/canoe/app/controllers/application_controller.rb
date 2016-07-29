@@ -176,11 +176,11 @@ class ApplicationController < ActionController::Base
 
   def build_provisional_deploy
     if params[:artifact_url]
-      ProvisionalDeploy.from_artifact_url(current_project, params[:artifact_url])
+      Build.from_artifact_url(current_project, params[:artifact_url])
     elsif params[:what] == "tag"
-      ProvisionalDeploy.from_tag(current_project, params[:what_details])
+      Build.from_tag(current_project, params[:what_details])
     elsif params[:what] == "branch"
-      ProvisionalDeploy.from_branch(current_project, params[:what_details])
+      Build.from_branch(current_project, params[:what_details])
     end
   end
 

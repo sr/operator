@@ -8,13 +8,6 @@ class BuildsController < ApplicationController
       branch: params[:branch_name],
       include_untested_builds: @include_untested_builds,
     )
-    @test_list = {
-      PPANT: "PPANT",
-      WT: "WebDriver",
-      TSIT: "Salesforce Integration",
-      PPANTCLONE666: "AB Combinatorial",
-      PPANTCLONE6666: "List Combinatorial"
-    }
   end
 
   private
