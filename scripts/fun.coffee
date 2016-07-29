@@ -538,7 +538,7 @@ module.exports = (robot) ->
       msg.send "Oh, did you fart? (disapproval)"
       return
     target = msg.match[2]
-    robot.http(url)
+    msg.http(url)
       .get() (error, res, body) ->
         if error
           msg.send "Programming Excuses server failed to respond: #{error}"
