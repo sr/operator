@@ -34,10 +34,10 @@ class Build
       begin
         properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
       rescue JSON::ParseError
-        Instrumentation.log_exception($!, {
+        Instrumentation.log_exception($!,
           at: "Build",
-          fn: "from_artifact_url_and_properties",
-        })
+          fn: "from_artifact_url_and_properties"
+        )
         nil
       end
 
@@ -49,7 +49,7 @@ class Build
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
-      created_at: Time.parse(properties["buildTimeStamp"]),
+      created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
       options_validator: options_validator,
       options: { meta_data: properties }
     )
