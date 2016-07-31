@@ -72,3 +72,11 @@ resource "aws_instance" "appdev_chef_server" {
     terraform = true
   }
 }
+
+resource "aws_route53_record" "appdev_chef1_arecord" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-chef1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.appdev_chef_server.private_ip}"]
+  type = "A"
+  ttl = "900"
+}

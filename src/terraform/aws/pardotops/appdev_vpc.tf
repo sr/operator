@@ -1,3 +1,9 @@
+resource "aws_route53_zone" "appdev_aws_pardot_com_hosted_zone" {
+  name = "aws.pardot.com"
+  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.appdev.id} Only. Hosted solely in AWS."
+  vpc_id = "${aws_vpc.appdev.id}"
+}
+
 resource "aws_vpc" "appdev" {
   cidr_block = "172.26.0.0/16"
   enable_dns_support = true
