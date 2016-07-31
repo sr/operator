@@ -64,11 +64,3 @@ resource "aws_eip" "appdev_ldap_host_eip" {
   instance = "${aws_instance.appdev_ldap_host.id}"
 }
 
-resource "aws_route53_record" "appdev_auth1_arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "pardot2-auth1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_eip.appdev_ldap_host_eip.public_ip}"]
-  ttl = "900"
-  type = "A"
-}
-
