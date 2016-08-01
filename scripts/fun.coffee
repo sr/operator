@@ -557,8 +557,8 @@ module.exports = (robot) ->
           else
             msg.send response
 
-  robot.respond /blame\s+(.*)$/i, (msg) ->
-    target = msg.match[1]
+  robot.respond /blame\s*(.*)?$/i, (msg) ->
+    target = msg.match[1] || "@ian"
 
     blames = [
       "#{target} is responsible!",
