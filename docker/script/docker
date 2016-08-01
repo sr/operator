@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-if [ "$(uname)" = "Darwin" ]; then
+if false && [ "$(uname)" = "Darwin" ]; then
   DOCKER="/usr/local/bin/devenv docker"
 else
   DOCKER="docker"
