@@ -278,7 +278,7 @@ resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
 }
 
 resource "aws_instance" "appdev_bastion" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
@@ -287,7 +287,7 @@ resource "aws_instance" "appdev_bastion" {
   associate_public_ip_address = false
   root_block_device {
     volume_type = "gp2"
-    volume_size = "20"
+    volume_size = "50"
     delete_on_termination = true
   }
   tags {
