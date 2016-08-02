@@ -20,7 +20,7 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "ci",
+			Name:     "bamboo",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -42,10 +42,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ci.NewBambooClient(conn)
+						client := bamboo.NewBambooClient(conn)
 						response, err := client.ListBuilds(
 							context.Background(),
-							&ci.ListBuildsRequest{
+							&bamboo.ListBuildsRequest{
 								Source: ctx.Source,
 								Plan:   *plan,
 							},
