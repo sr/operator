@@ -3,16 +3,14 @@ describe Pardot::PullAgent::Deploy do
     it "constructs a deploy object from its hash representation" do
       json = {
         "id"            => 445,
-        "what"          => "branch",
-        "what_details"  => "master",
+        "branch"        => "master",
         "artifact_url"  => "https://artifact.example/build1234.tar.gz",
         "servers"       => { "server1.example" => { "action" => nil }, "server2.example" => { "action" => "deploy" } }
       }
 
       deploy = Pardot::PullAgent::Deploy.from_hash(json)
       expect(deploy.id).to eq(json["id"])
-      expect(deploy.what).to eq(json["what"])
-      expect(deploy.what_details).to eq(json["what_details"])
+      expect(deploy.branch).to eq(json["branch"])
       expect(deploy.artifact_url).to eq(json["artifact_url"])
       expect(deploy.server_actions).to eq(json["servers"])
     end

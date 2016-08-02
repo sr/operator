@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :deploy do
-    what "branch"
-    what_details "master"
+    branch "master"
     sha "abc123"
     completed true
     project_name "pardot"
