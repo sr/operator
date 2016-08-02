@@ -1,9 +1,6 @@
-require "deployable"
 require "json_schema"
 
 class Deploy < ApplicationRecord
-  include Deployable
-
   belongs_to :deploy_target
   belongs_to :auth_user
   has_many :restart_servers, class_name: Server, through: :deploy_restart_servers, source: :server

@@ -49,13 +49,9 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # PRINT
   def print_deploy_what(deploy)
-    output = deploy_type_icon(deploy.what)
+    output = deploy_type_icon("branch")
     output += " "
-    if deploy.commit?
-      output += sha_span(deploy.what_details)
-    else
-      output += deploy.what_details
-    end
+    output += deploy.branch
 
     if deploy.build_number
       output += " "

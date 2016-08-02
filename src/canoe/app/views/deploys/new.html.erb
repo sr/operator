@@ -51,12 +51,7 @@
       id: "deploy-form",
       role: "form" do %>
 
-    <%- if @prov_deploy.artifact_url.present? %>
-      <%= hidden_field_tag "artifact_url", @prov_deploy.artifact_url %>
-    <%- else %>
-      <%= hidden_field_tag "what", @prov_deploy.what %>
-      <%= hidden_field_tag "what_details", @prov_deploy.what_details %>
-    <%- end %>
+    <%= hidden_field_tag "artifact_url", @prov_deploy.artifact_url %>
     <%= hidden_field_tag "target_name", current_target.name %>
 
     <%- if @prov_deploy.options_validator.present? %>
