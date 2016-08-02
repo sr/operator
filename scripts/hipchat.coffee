@@ -22,6 +22,8 @@ async = require "async"
 
 class Hipchat
   constructor: (@host, @token) ->
+    if not @host or @host is '' or not @token or @token is ''
+      console.log "Invalid host or token for hipchat object"
     @client = scopedHttpClient.create("https://#{@host}")
       .query("auth_token", @token)
 
@@ -112,6 +114,7 @@ class JidMapping
     @brain.get(BRAIN_KEY)[jid]
 
   set: (jid, id) ->
+    console.log "Setting jid: #{jid} to api_id: #{id}"
     @_ensureBrainInitialized()
     @brain.get(BRAIN_KEY)[jid] = id
 
@@ -123,6 +126,7 @@ class JidMapping
     @brain.set(BRAIN_KEY, {}) unless @brain.get(BRAIN_KEY)?
 
   updateMappings: (cb) ->
+    console.log "Actually updating mappings"
     @hipchat.rooms (err, resp) =>
       if err?
         console.log err
@@ -168,6 +172,7 @@ module.exports = (robot) ->
     if roomId = mapping.get(roomJid)
       hipchat.notifyRoom roomId, _.extend({}, options || {}, message: text)
     else
+      console.log "Couldn't find JID mapping"
       robot.send roomJid, text
 
   hipchatRoomShareFile = (robot, roomJid, name, contentType, body, message, cb) ->

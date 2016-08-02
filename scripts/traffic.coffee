@@ -19,13 +19,16 @@ BING_KEY = process.env.HUBOT_BING_API_KEY
 module.exports = (robot) ->
 
   robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
+    if not BING_KEY or BING_KEY is ''
+      msg.send "Missing Hubot configuration HUBOT_BING_API_KEY"
+      return
 
     # determines if it should just show the map or just show the incidents
     # default is to show both
     mode = msg.match[1] ? ''
 
-    # if they just call incidents they probably want to see all of them
-    severity = if mode is 'incidents' then '1,2,3,4' else '2,3,4'
+    # incident severity levels
+    severity = '1,2,3,4'
 
     imageHost = "http://dev.virtualearth.net"
     imagePath = "/REST/V1/Imagery/Map/Road/33.7490%2C%20-84.3880/9?mapSize=325,325&mapLayer=TrafficFlow&format=png&key=#{BING_KEY}"
@@ -73,9 +76,22 @@ module.exports = (robot) ->
         data = JSON.parse body
         if data?.resourceSets[0]?.resources?
           incidents = data.resourceSets[0].resources
-          incidentStr = ''
+
+          incidentArr = []
           for i in [0..incidents.length - 1]
-            incidentStr += getIncidentDescription(incidents[i]) 
+            incidentArr.push getIncidentDescription(incidents[i])
+
+          incidentArr = incidentArr.sort (arg1, arg2) ->
+            if arg1.sev < arg2.sev
+              -1
+            else if arg1.sev is arg2.sev
+              0
+            else
+              1
+
+          incidentStr = ''
+          for i in [0..incidentArr.length - 1]
+            incidentStr += incidentArr[i].string
 
           html = ''
           if incidentStr isnt ''
@@ -124,21 +140,27 @@ module.exports = (robot) ->
       info += if info == '' then "Lane: #{incident.lane}" else ", Lane: #{incident.lane}"
     if incident.roadClosed
       info += if info == '' then "Road is closed" else ", Road is closed"
+    description += if info != '' then " (#{info})" else ''
+
     if incident.severity
       # 4 -> 0, 3 -> 1, 2 -> 2, 1 -> 3
       sev = 2 - (incident.severity - 2)
-      info += if info == '' then "Sev#{sev}" else ", Sev#{sev}"
-    description += if info != '' then " (#{info})" else '' 
+    else
+      sev = 4
+    description = "Sev#{sev}: " + description
+
+    obj = {}
+    obj.sev = sev
     
     # link to a google maps traffic view if available
     if incident?.point?.coordinates
       lat = incident.point.coordinates[0]
       lon = incident.point.coordinates[1]
       url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
-      return "<a title=\"Google Maps Traffic Overview\" href=\"#{url}\">#{description}</a><br>" 
+      obj.string = "<a title=\"Google Maps Traffic Overview\" href=\"#{url}\">#{description}</a><br>"
     else 
-      return "#{description}<br>"
-
+      obj.string = "#{description}<br>"
+    return obj
 
   robot.respond /traveltime(?:\s+at\s*(?:the\s*)?(\d{1,2}|sol|c|speed\s*of\s*light|warp\s*speed)(?::(\d{2}))?(pm|am)?)?(?:\s*to)?\s+(.*)$/i, (msg) ->
     if not msg.match[4]
