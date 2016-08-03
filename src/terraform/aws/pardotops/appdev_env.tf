@@ -53,6 +53,11 @@ variable "appdev_dbshard1_ips" {
   }
 }
 
+variable "appdev_whoisdb1_ips" {
+  default = {
+    "0" = "172.26.66.54"
+  }
+}
 
 ////
 //// TEMPLATES
@@ -883,6 +888,7 @@ resource "aws_instance" "appdev_whoisdb1" {
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
