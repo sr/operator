@@ -15,6 +15,7 @@ variable "environment_appdev" {
     db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
+    num_whoisdb1_hosts = 1
     num_app1_hosts = 2
     num_thumbs1_hosts = 1
     num_redisjob1_hosts = 2
@@ -33,6 +34,22 @@ variable "environment_appdev" {
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
     num_proxyout1_hosts = 1
+  }
+}
+
+variable "appdev_globaldb1_ips" {
+  default = {
+    "0" = "172.26.80.125"
+    "1" = "172.26.81.47"
+  }
+}
+
+variable "appdev_dbshard1_ips" {
+  default = {
+    "0" = "172.26.92.23"
+    "1" = "172.26.93.40"
+    "2" = "172.26.75.74"
+    "3" = "172.26.69.79"
   }
 }
 
@@ -248,6 +265,7 @@ resource "aws_instance" "appdev_globaldb1" {
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
+  private_ip = "${lookup(var.appdev_globaldb1_ips,count.index)}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
@@ -286,6 +304,7 @@ resource "aws_instance" "appdev_dbshard1" {
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
+  private_ip = "${lookup(var.appdev_dbshard1_ips,count.index)}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
@@ -854,6 +873,36 @@ resource "aws_route53_record" "appdev_proxyout1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${element(aws_instance.appdev_proxyout1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_whoisdb1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_whoisdb1_arecord" {
+  count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_whoisdb1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
