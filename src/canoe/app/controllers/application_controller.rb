@@ -175,7 +175,7 @@ class ApplicationController < ActionController::Base
   end
 
   def build_provisional_deploy
-    ProvisionalDeploy.from_artifact_url(current_project, params[:artifact_url])
+    Build.from_artifact_url(current_project, params[:artifact_url])
   end
 
   def deploy_workflow_for(deploy)
