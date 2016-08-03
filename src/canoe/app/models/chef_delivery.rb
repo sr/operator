@@ -100,6 +100,10 @@ class ChefDelivery
       return
     end
 
+    if request.command[0, 2] == %w[node list]
+      return
+    end
+
     if request.command[0, 2] == %w[pd sync]
       return
     end

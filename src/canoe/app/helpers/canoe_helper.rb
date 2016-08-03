@@ -49,13 +49,9 @@ module CanoeHelper
   # ----------------------------------------------------------------------
   # PRINT
   def print_deploy_what(deploy)
-    output = deploy_type_icon(deploy.what)
+    output = deploy_type_icon("branch")
     output += " "
-    if deploy.commit?
-      output += sha_span(deploy.what_details)
-    else
-      output += deploy.what_details
-    end
+    output += deploy.branch
 
     if deploy.build_number
       output += " "
@@ -76,12 +72,12 @@ module CanoeHelper
     minutes = (time_delta / 60).round
     if minutes < 1
       seconds = time_delta.round
-      "#{seconds} second#{seconds == 1 ? '' : 's'}"
+      "#{seconds} second#{seconds == 1 ? "" : "s"}"
     elsif minutes < 60
-      "#{minutes} minute#{minutes == 1 ? '' : 's'}"
+      "#{minutes} minute#{minutes == 1 ? "" : "s"}"
     else
       hours = minutes / 60.0
-      "#{'%0.1f' % hours} hour#{hours == 1 ? '' : 's'}"
+      "#{"%0.1f" % hours} hour#{hours == 1 ? "" : "s"}"
     end
   end
 

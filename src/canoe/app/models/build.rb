@@ -1,11 +1,8 @@
-require "deployable"
 require "base64"
 require "json"
 
 class Build
-  include Deployable
-
-  attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
+  attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
 
   def self.from_artifact_url(project, artifact_url)
@@ -44,8 +41,7 @@ class Build
     new(
       project: project,
       artifact_url: artifact_url,
-      what: "branch",
-      what_details: properties["gitBranch"],
+      branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
@@ -59,8 +55,7 @@ class Build
     new(
       project: project,
       artifact_url: deploy.artifact_url,
-      what: deploy.what,
-      what_details: deploy.what_details,
+      branch: deploy.branch,
       build_number: deploy.build_number,
       sha: deploy.sha,
       passed_ci: deploy.passed_ci,
@@ -69,11 +64,10 @@ class Build
     )
   end
 
-  def initialize(project:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
+  def initialize(project:, artifact_url:, branch:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
     @project = project
     @artifact_url = artifact_url
-    @what = what
-    @what_details = what_details
+    @branch = branch
     @build_number = build_number
     @sha = sha
     @passed_ci = passed_ci

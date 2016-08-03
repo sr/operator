@@ -126,8 +126,16 @@ resource "aws_route53_record" "bamboo_dev_pardot_com_TXTrecord" {
 
 resource "aws_route53_record" "amazonses_bamboo_dev_pardot_com_TXTrecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "_amazonses_bamboo.${aws_route53_zone.dev_pardot_com.name}"
+  name = "_amazonses.bamboo.${aws_route53_zone.dev_pardot_com.name}"
   records = ["iikqS8gW4E1ceNzqQqTyLCxvuY1MZb5+kJZp/fqvxB8="]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "amazonses_confluence_dev_pardot_com_TXTrecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "_amazonses.confluence.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["lDTrhfHFMA7gXvE8VeZU4rdqeGCzej85PAu90elY5KI="]
   type = "TXT"
   ttl = "900"
 }

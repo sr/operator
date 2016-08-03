@@ -39,7 +39,7 @@ resource "aws_security_group" "appdev_ldap_server" {
 }
 
 resource "aws_instance" "appdev_ldap_host" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami_LDAP_AUTH_HOST_ONLY}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
   private_ip = "172.26.192.254"
@@ -50,7 +50,7 @@ resource "aws_instance" "appdev_ldap_host" {
   ]
   root_block_device {
     volume_type = "gp2"
-    volume_size = "40"
+    volume_size = "50"
     delete_on_termination = false
   }
   tags {
@@ -64,11 +64,18 @@ resource "aws_eip" "appdev_ldap_host_eip" {
   instance = "${aws_instance.appdev_ldap_host.id}"
 }
 
-resource "aws_route53_record" "appdev_auth1_arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "pardot2-auth1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_ldap_host.public_ip}"]
+resource "aws_route53_record" "appdev_internal_apps_ldap_master_Arecord" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
   ttl = "900"
   type = "A"
 }
 
+resource "aws_route53_record" "appdev_auth1_arecord" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-auth1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_eip.appdev_ldap_host_eip.private_ip}"]
+  ttl = "900"
+  type = "A"
+}

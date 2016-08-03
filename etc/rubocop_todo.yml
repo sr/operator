@@ -8,6 +8,8 @@ Metrics/LineLength:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
 
@@ -24,8 +26,7 @@ Lint/AssignmentInCondition:
 # Offense count: 18
 Lint/AmbiguousRegexpLiteral:
   Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/lita/handlers/replication_fixing.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
+    - 'src/hal9000/plugins/lita-*/lib/lita/handlers/*.rb'
 
 # Offense count: 1
 Lint/CircularArgumentReference:
@@ -40,10 +41,6 @@ Metrics/ParameterLists:
     - 'src/canoe/lib/canoe/deployer.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/zabbixmon.rb'
-
-Metrics/ModuleLength:
-  Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/spec/fixing_client_spec.rb'
 
 # Offense count: 3
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -61,12 +58,6 @@ Rails/TimeZone:
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/maintenance_supervisor.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
 
-# Offense count: 4
-Style/CaseEquality:
-  Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/hostname.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/shard.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, SingleLineConditionsOnly.
@@ -81,7 +72,6 @@ Style/DoubleNegation:
     - 'src/canoe/app/models/build.rb'
     - 'src/canoe/config/application.rb'
     - 'src/canoe/lib/canoe/ldap_authorizer.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/monitor_supervisor.rb'
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -89,14 +79,6 @@ Style/DoubleNegation:
 Style/FormatString:
   Exclude:
     - 'src/canoe/app/helpers/canoe_helper.rb'
-
-# Offense count: 2
-# Configuration parameters: ExpectMatchingDefinition, Regex, IgnoreExecutableScripts.
-Style/FileName:
-  Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/lita-replication-fixing.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/lita-zabbix.rb'
-
 
 # Offense count: 2
 Style/IdenticalConditionalBranches:
@@ -111,22 +93,12 @@ Style/RegexpLiteral:
   Exclude:
     - 'src/canoe/spec/features/user_deploys_pardot_project_from_artifactory_spec.rb'
     - 'src/canoe/spec/support/test_helpers.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lita-replication-fixing.gemspec'
-    - 'src/hal9000/plugins/lita-replication-fixing/spec/lita/handlers/replication_fixing_spec.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lita-zabbix.gemspec'
 
 # Offense count: 36
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
 # SupportedStyles: space, no_space
 Style/SpaceInsideHashLiteralBraces:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiteralsInInterpolation:
   Enabled: false
 
 # Offense count: 3
