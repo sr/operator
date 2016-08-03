@@ -1,14 +1,33 @@
 package config
 
 import (
+	"flag"
+	"io/ioutil"
+	"log"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform/helper/logging"
 )
 
 // This is the directory where our test fixtures are.
 const fixtureDir = "./test-fixtures"
+
+func TestMain(m *testing.M) {
+	flag.Parse()
+	if testing.Verbose() {
+		// if we're verbose, use the logging requested by TF_LOG
+		logging.SetOutput()
+	} else {
+		// otherwise silence all logs
+		log.SetOutput(ioutil.Discard)
+	}
+
+	os.Exit(m.Run())
+}
 
 func TestConfigCopy(t *testing.T) {
 	c := testConfig(t, "copy-basic")
@@ -478,10 +497,10 @@ func TestNameRegexp(t *testing.T) {
 
 func TestProviderConfigName(t *testing.T) {
 	pcs := []*ProviderConfig{
-		{Name: "aw"},
-		{Name: "aws"},
-		{Name: "a"},
-		{Name: "gce_"},
+		&ProviderConfig{Name: "aw"},
+		&ProviderConfig{Name: "aws"},
+		&ProviderConfig{Name: "a"},
+		&ProviderConfig{Name: "gce_"},
 	}
 
 	n := ProviderConfigName("aws_instance", pcs)

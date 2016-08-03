@@ -18,37 +18,37 @@ func resourceArmSearchService() *schema.Resource {
 		Delete: resourceArmSearchServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: azureRMNormalizeLocation,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"sku": {
+			"sku": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"replica_count": {
+			"replica_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"partition_count": {
+			"partition_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,

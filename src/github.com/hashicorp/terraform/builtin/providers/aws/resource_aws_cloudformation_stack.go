@@ -22,68 +22,68 @@ func resourceAwsCloudFormationStack() *schema.Resource {
 		Delete: resourceAwsCloudFormationStackDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"template_body": {
+			"template_body": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Computed:  true,
 				StateFunc: normalizeJson,
 			},
-			"template_url": {
+			"template_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"capabilities": {
+			"capabilities": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"disable_rollback": {
+			"disable_rollback": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
-			"notification_arns": {
+			"notification_arns": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"on_failure": {
+			"on_failure": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"parameters": {
+			"parameters": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Computed: true,
 			},
-			"outputs": {
+			"outputs": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},
-			"policy_body": {
+			"policy_body": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Computed:  true,
 				StateFunc: normalizeJson,
 			},
-			"policy_url": {
+			"policy_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"timeout_in_minutes": {
+			"timeout_in_minutes": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 			},
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,

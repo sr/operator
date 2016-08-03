@@ -40,7 +40,11 @@ func migrateVSphereVirtualMachineStateV0toV1(is *terraform.InstanceState) (*terr
 		is.Attributes["skip_customization"] = "false"
 	}
 
-	for k := range is.Attributes {
+	if is.Attributes["enable_disk_uuid"] == "" {
+		is.Attributes["enable_disk_uuid"] = "false"
+	}
+
+	for k, _ := range is.Attributes {
 		if strings.HasPrefix(k, "disk.") && strings.HasSuffix(k, ".size") {
 			diskParts := strings.Split(k, ".")
 			if len(diskParts) != 3 {

@@ -18,35 +18,35 @@ func resourceComputeTargetHttpProxy() *schema.Resource {
 		Update: resourceComputeTargetHttpProxyUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"url_map": {
+			"url_map": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

@@ -13,52 +13,52 @@ import (
 
 func TestParseTaskDefinition(t *testing.T) {
 	cases := map[string]map[string]interface{}{
-		"invalid": {
+		"invalid": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"invalidWithColon:": {
+		"invalidWithColon:": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"1234": {
+		"1234": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"invalid:aaa": {
+		"invalid:aaa": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"invalid=family:1": {
+		"invalid=family:1": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"invalid:name:1": {
+		"invalid:name:1": map[string]interface{}{
 			"family":   "",
 			"revision": "",
 			"isValid":  false,
 		},
-		"valid:1": {
+		"valid:1": map[string]interface{}{
 			"family":   "valid",
 			"revision": "1",
 			"isValid":  true,
 		},
-		"abc12-def:54": {
+		"abc12-def:54": map[string]interface{}{
 			"family":   "abc12-def",
 			"revision": "54",
 			"isValid":  true,
 		},
-		"lorem_ip-sum:123": {
+		"lorem_ip-sum:123": map[string]interface{}{
 			"family":   "lorem_ip-sum",
 			"revision": "123",
 			"isValid":  true,
 		},
-		"lorem-ipsum:1": {
+		"lorem-ipsum:1": map[string]interface{}{
 			"family":   "lorem-ipsum",
 			"revision": "1",
 			"isValid":  true,
@@ -89,14 +89,14 @@ func TestAccAWSEcsServiceWithARN(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsService,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.mongo"),
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceModified,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.mongo"),
@@ -112,14 +112,14 @@ func TestAccAWSEcsServiceWithFamilyAndRevision(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithFamilyAndRevision,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.jenkins"),
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithFamilyAndRevisionModified,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.jenkins"),
@@ -141,7 +141,7 @@ func TestAccAWSEcsServiceWithRenamedCluster(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithRenamedCluster,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.ghost"),
@@ -150,7 +150,7 @@ func TestAccAWSEcsServiceWithRenamedCluster(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithRenamedClusterModified,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.ghost"),
@@ -168,7 +168,7 @@ func TestAccAWSEcsService_withIamRole(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsService_withIamRole,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.ghost"),
@@ -184,7 +184,7 @@ func TestAccAWSEcsService_withDeploymentValues(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithDeploymentValues,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.mongo"),
@@ -205,13 +205,13 @@ func TestAccAWSEcsService_withLbChanges(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsService_withLbChanges,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.with_lb_changes"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsService_withLbChanges_modified,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.with_lb_changes"),
@@ -229,7 +229,7 @@ func TestAccAWSEcsService_withEcsClusterName(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSEcsServiceWithEcsClusterName,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists("aws_ecs_service.jenkins"),

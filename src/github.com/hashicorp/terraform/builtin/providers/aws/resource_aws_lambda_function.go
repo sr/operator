@@ -24,96 +24,103 @@ func resourceAwsLambdaFunction() *schema.Resource {
 		Update: resourceAwsLambdaFunctionUpdate,
 		Delete: resourceAwsLambdaFunctionDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				d.Set("function_name", d.Id())
+				return []*schema.ResourceData{d}, nil
+			},
+		},
+
 		Schema: map[string]*schema.Schema{
-			"filename": {
+			"filename": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"s3_bucket", "s3_key", "s3_object_version"},
 			},
-			"s3_bucket": {
+			"s3_bucket": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"filename"},
 			},
-			"s3_key": {
+			"s3_key": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"filename"},
 			},
-			"s3_object_version": {
+			"s3_object_version": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"filename"},
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"function_name": {
+			"function_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"handler": {
+			"handler": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"memory_size": {
+			"memory_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  128,
 			},
-			"role": {
+			"role": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"runtime": {
+			"runtime": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "nodejs",
 			},
-			"timeout": {
+			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  3,
 			},
-			"vpc_config": {
+			"vpc_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"subnet_ids": {
+						"subnet_ids": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
-						"security_group_ids": {
+						"security_group_ids": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
-						"vpc_id": {
+						"vpc_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"last_modified": {
+			"last_modified": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"source_code_hash": {
+			"source_code_hash": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -230,7 +237,7 @@ func resourceAwsLambdaFunctionRead(d *schema.ResourceData, meta interface{}) err
 
 	getFunctionOutput, err := conn.GetFunction(params)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == "ResourceNotFoundException" {
+		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == "ResourceNotFoundException" && !d.IsNewResource() {
 			d.SetId("")
 			return nil
 		}

@@ -20,23 +20,23 @@ func resourceNetworkingRouterInterfaceV2() *schema.Resource {
 		Delete: resourceNetworkingRouterInterfaceV2Delete,
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"router_id": {
+			"router_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"port_id": {
+			"port_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

@@ -17,29 +17,29 @@ func resourceChefEnvironment() *schema.Resource {
 		Delete: DeleteEnvironment,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
-			"default_attributes_json": {
+			"default_attributes_json": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Default:   "{}",
 				StateFunc: jsonStateFunc,
 			},
-			"override_attributes_json": {
+			"override_attributes_json": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Default:   "{}",
 				StateFunc: jsonStateFunc,
 			},
-			"cookbook_constraints": {
+			"cookbook_constraints": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Elem: &schema.Schema{

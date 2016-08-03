@@ -23,42 +23,42 @@ func resourceSoftLayerVirtualGuest() *schema.Resource {
 		Delete: resourceSoftLayerVirtualGuestDelete,
 		Exists: resourceSoftLayerVirtualGuestExists,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"domain": {
+			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"hourly_billing": {
+			"hourly_billing": &schema.Schema{
 				Type:     schema.TypeBool,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"private_network_only": {
+			"private_network_only": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cpu": {
+			"cpu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				// TODO: This fields for now requires recreation, because currently for some reason SoftLayer resets "dedicated_acct_host_only"
@@ -67,7 +67,7 @@ func resourceSoftLayerVirtualGuest() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"ram": {
+			"ram": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -85,71 +85,71 @@ func resourceSoftLayerVirtualGuest() *schema.Resource {
 				},
 			},
 
-			"dedicated_acct_host_only": {
+			"dedicated_acct_host_only": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"frontend_vlan_id": {
+			"frontend_vlan_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"backend_vlan_id": {
+			"backend_vlan_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"disks": {
+			"disks": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 
-			"public_network_speed": {
+			"public_network_speed": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1000,
 			},
 
-			"ipv4_address": {
+			"ipv4_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ipv4_address_private": {
+			"ipv4_address_private": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ssh_keys": {
+			"ssh_keys": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"local_disk": {
+			"local_disk": &schema.Schema{
 				Type:     schema.TypeBool,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"post_install_script_uri": {
+			"post_install_script_uri": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  nil,
 				ForceNew: true,
 			},
 
-			"block_device_template_group_gid": {
+			"block_device_template_group_gid": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -257,7 +257,7 @@ func resourceSoftLayerVirtualGuestCreate(d *schema.ResourceData, meta interface{
 
 	if userData, ok := d.GetOk("user_data"); ok {
 		opts.UserData = []datatypes.UserData{
-			{
+			datatypes.UserData{
 				Value: userData.(string),
 			},
 		}

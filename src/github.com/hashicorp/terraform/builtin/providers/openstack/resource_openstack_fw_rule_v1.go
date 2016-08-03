@@ -15,57 +15,60 @@ func resourceFWRuleV1() *schema.Resource {
 		Read:   resourceFWRuleV1Read,
 		Update: resourceFWRuleV1Update,
 		Delete: resourceFWRuleV1Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"action": {
+			"action": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"ip_version": {
+			"ip_version": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  4,
 			},
-			"source_ip_address": {
+			"source_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"destination_ip_address": {
+			"destination_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"source_port": {
+			"source_port": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"destination_port": {
+			"destination_port": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -123,14 +126,14 @@ func resourceFWRuleV1Read(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	rule, err := rules.Get(networkingClient, d.Id()).Extract()
-
 	if err != nil {
 		return CheckDeleted(d, err, "FW rule")
 	}
 
+	log.Printf("[DEBUG] Read OpenStack Firewall Rule %s: %#v", d.Id(), rule)
+
 	d.Set("protocol", rule.Protocol)
 	d.Set("action", rule.Action)
-
 	d.Set("name", rule.Name)
 	d.Set("description", rule.Description)
 	d.Set("ip_version", rule.IPVersion)

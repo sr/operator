@@ -18,14 +18,14 @@ func TestStateAdd(t *testing.T) {
 			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
 						},
 					},
 
-					"test_instance.bar": {
+					"test_instance.bar": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -37,17 +37,17 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -66,14 +66,14 @@ func TestStateAdd(t *testing.T) {
 			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
 						},
 					},
 
-					"test_instance.bar": {
+					"test_instance.bar": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -85,17 +85,17 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo", "bar"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -114,7 +114,7 @@ func TestStateAdd(t *testing.T) {
 			&ModuleState{
 				Path: rootModulePath,
 				Outputs: map[string]*OutputState{
-					"foo": {
+					"foo": &OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "bar",
@@ -122,14 +122,14 @@ func TestStateAdd(t *testing.T) {
 				},
 				Dependencies: []string{"foo"},
 				Resources: map[string]*ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
 						},
 					},
 
-					"test_instance.bar": {
+					"test_instance.bar": &ResourceState{
 						Type: "test_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -141,10 +141,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Outputs: map[string]*OutputState{
-							"foo": {
+							"foo": &OutputState{
 								Type:      "string",
 								Sensitive: false,
 								Value:     "bar",
@@ -152,14 +152,14 @@ func TestStateAdd(t *testing.T) {
 						},
 						Dependencies: []string{"foo"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -178,10 +178,10 @@ func TestStateAdd(t *testing.T) {
 			&ModuleState{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"test_instance.baz": {
+							"test_instance.baz": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -208,10 +208,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.foo": {
+							"aws_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -239,10 +239,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.foo": {
+							"aws_instance.foo": &ResourceState{
 								Type:         "test_instance",
 								Provider:     "foo",
 								Dependencies: []string{"bar"},
@@ -271,10 +271,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.foo": {
+							"aws_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID:      "foo",
@@ -300,10 +300,10 @@ func TestStateAdd(t *testing.T) {
 
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.foo": {
+							"aws_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -330,10 +330,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.bar": {
+							"aws_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -356,10 +356,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.baz": {
+							"aws_instance.baz": &ResourceState{
 								Type: "aws_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -382,10 +382,10 @@ func TestStateAdd(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"aws_instance.bar": {
+							"aws_instance.bar": &ResourceState{
 								Type: "aws_instance",
 								Primary: &InstanceState{
 									ID: "foo",

@@ -17,29 +17,29 @@ func resourceChefRole() *schema.Resource {
 		Delete: DeleteRole,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
-			"default_attributes_json": {
+			"default_attributes_json": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Default:   "{}",
 				StateFunc: jsonStateFunc,
 			},
-			"override_attributes_json": {
+			"override_attributes_json": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Default:   "{}",
 				StateFunc: jsonStateFunc,
 			},
-			"run_list": {
+			"run_list": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Schema{

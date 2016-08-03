@@ -20,7 +20,7 @@ func resourceComputeBackendService() *schema.Resource {
 		Delete: resourceComputeBackendServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -35,44 +35,44 @@ func resourceComputeBackendService() *schema.Resource {
 				},
 			},
 
-			"health_checks": {
+			"health_checks": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Required: true,
 				Set:      schema.HashString,
 			},
 
-			"backend": {
+			"backend": &schema.Schema{
 				Type: schema.TypeSet,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"group": {
+						"group": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"balancing_mode": {
+						"balancing_mode": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "UTILIZATION",
 						},
-						"capacity_scaler": {
+						"capacity_scaler": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 							Default:  1,
 						},
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"max_rate": {
+						"max_rate": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"max_rate_per_instance": {
+						"max_rate_per_instance": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 						},
-						"max_utilization": {
+						"max_utilization": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 							Default:  0.8,
@@ -83,46 +83,46 @@ func resourceComputeBackendService() *schema.Resource {
 				Set:      resourceGoogleComputeBackendServiceBackendHash,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"port_name": {
+			"port_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"timeout_sec": {
+			"timeout_sec": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,

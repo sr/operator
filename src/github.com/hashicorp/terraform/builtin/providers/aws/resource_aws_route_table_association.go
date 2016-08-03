@@ -3,10 +3,12 @@ package aws
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -18,13 +20,13 @@ func resourceAwsRouteTableAssociation() *schema.Resource {
 		Delete: resourceAwsRouteTableAssociationDelete,
 
 		Schema: map[string]*schema.Schema{
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"route_table_id": {
+			"route_table_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -40,11 +42,25 @@ func resourceAwsRouteTableAssociationCreate(d *schema.ResourceData, meta interfa
 		d.Get("subnet_id").(string),
 		d.Get("route_table_id").(string))
 
-	resp, err := conn.AssociateRouteTable(&ec2.AssociateRouteTableInput{
+	associationOpts := ec2.AssociateRouteTableInput{
 		RouteTableId: aws.String(d.Get("route_table_id").(string)),
 		SubnetId:     aws.String(d.Get("subnet_id").(string)),
-	})
+	}
 
+	var resp *ec2.AssociateRouteTableOutput
+	var err error
+	err = resource.Retry(2*time.Minute, func() *resource.RetryError {
+		resp, err = conn.AssociateRouteTable(&associationOpts)
+		if err != nil {
+			if awsErr, ok := err.(awserr.Error); ok {
+				if awsErr.Code() == "InvalidRouteTableID.NotFound" {
+					return resource.RetryableError(awsErr)
+				}
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}

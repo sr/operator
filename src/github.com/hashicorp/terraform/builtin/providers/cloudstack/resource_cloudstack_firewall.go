@@ -1,7 +1,6 @@
 package cloudstack
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -21,70 +20,55 @@ func resourceCloudStackFirewall() *schema.Resource {
 		Delete: resourceCloudStackFirewallDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				ConflictsWith: []string{"ipaddress"},
+			"ip_address_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 
-			"ipaddress": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				Deprecated:    "Please use the `ip_address_id` field instead",
-				ConflictsWith: []string{"ip_address_id"},
-			},
-
-			"managed": {
+			"managed": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"rule": {
+			"rule": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cidr_list": {
+						"cidr_list": &schema.Schema{
 							Type:     schema.TypeSet,
-							Optional: true,
+							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"source_cidr": {
-							Type:       schema.TypeString,
-							Optional:   true,
-							Deprecated: "Please use the `cidr_list` field instead",
-						},
-
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"icmp_type": {
+						"icmp_type": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"icmp_code": {
+						"icmp_code": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ports": {
+						"ports": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"uuids": {
+						"uuids": &schema.Schema{
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
@@ -92,7 +76,7 @@ func resourceCloudStackFirewall() *schema.Resource {
 				},
 			},
 
-			"parallelism": {
+			"parallelism": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,
@@ -102,29 +86,13 @@ func resourceCloudStackFirewall() *schema.Resource {
 }
 
 func resourceCloudStackFirewallCreate(d *schema.ResourceData, meta interface{}) error {
-	cs := meta.(*cloudstack.CloudStackClient)
-
 	// Make sure all required parameters are there
 	if err := verifyFirewallParams(d); err != nil {
 		return err
 	}
 
-	ipaddress, ok := d.GetOk("ip_address_id")
-	if !ok {
-		ipaddress, ok = d.GetOk("ipaddress")
-	}
-	if !ok {
-		return errors.New("Either `ip_address_id` or [deprecated] `ipaddress` must be provided.")
-	}
-
-	// Retrieve the ipaddress ID
-	ipaddressid, e := retrieveID(cs, "ip_address", ipaddress.(string))
-	if e != nil {
-		return e.Error()
-	}
-
 	// We need to set this upfront in order to be able to save a partial state
-	d.SetId(ipaddressid)
+	d.SetId(d.Get("ip_address_id").(string))
 
 	// Create all rules that are configured
 	if nrs := d.Get("rule").(*schema.Set); nrs.Len() > 0 {
@@ -143,11 +111,7 @@ func resourceCloudStackFirewallCreate(d *schema.ResourceData, meta interface{}) 
 
 	return resourceCloudStackFirewallRead(d, meta)
 }
-func createFirewallRules(
-	d *schema.ResourceData,
-	meta interface{},
-	rules *schema.Set,
-	nrs *schema.Set) error {
+func createFirewallRules(d *schema.ResourceData, meta interface{}, rules *schema.Set, nrs *schema.Set) error {
 	var errs *multierror.Error
 
 	var wg sync.WaitGroup
@@ -183,10 +147,7 @@ func createFirewallRules(
 	return errs.ErrorOrNil()
 }
 
-func createFirewallRule(
-	d *schema.ResourceData,
-	meta interface{},
-	rule map[string]interface{}) error {
+func createFirewallRule(d *schema.ResourceData, meta interface{}, rule map[string]interface{}) error {
 	cs := meta.(*cloudstack.CloudStackClient)
 	uuids := rule["uuids"].(map[string]interface{})
 
@@ -199,7 +160,11 @@ func createFirewallRule(
 	p := cs.Firewall.NewCreateFirewallRuleParams(d.Id(), rule["protocol"].(string))
 
 	// Set the CIDR list
-	p.SetCidrlist(retrieveCidrList(rule))
+	var cidrList []string
+	for _, cidr := range rule["cidr_list"].(*schema.Set).List() {
+		cidrList = append(cidrList, cidr.(string))
+	}
+	p.SetCidrlist(cidrList)
 
 	// If the protocol is ICMP set the needed ICMP parameters
 	if rule["protocol"].(string) == "icmp" {
@@ -308,11 +273,17 @@ func resourceCloudStackFirewallRead(d *schema.ResourceData, meta interface{}) er
 				// Delete the known rule so only unknown rules remain in the ruleMap
 				delete(ruleMap, id.(string))
 
+				// Create a set with all CIDR's
+				cidrs := &schema.Set{F: schema.HashString}
+				for _, cidr := range strings.Split(r.Cidrlist, ",") {
+					cidrs.Add(cidr)
+				}
+
 				// Update the values
 				rule["protocol"] = r.Protocol
 				rule["icmp_type"] = r.Icmptype
 				rule["icmp_code"] = r.Icmpcode
-				setCidrList(rule, r.Cidrlist)
+				rule["cidr_list"] = cidrs
 				rules.Add(rule)
 			}
 
@@ -340,9 +311,15 @@ func resourceCloudStackFirewallRead(d *schema.ResourceData, meta interface{}) er
 						// Delete the known rule so only unknown rules remain in the ruleMap
 						delete(ruleMap, id.(string))
 
+						// Create a set with all CIDR's
+						cidrs := &schema.Set{F: schema.HashString}
+						for _, cidr := range strings.Split(r.Cidrlist, ",") {
+							cidrs.Add(cidr)
+						}
+
 						// Update the values
 						rule["protocol"] = r.Protocol
-						setCidrList(rule, r.Cidrlist)
+						rule["cidr_list"] = cidrs
 						ports.Add(port)
 					}
 
@@ -452,11 +429,7 @@ func resourceCloudStackFirewallDelete(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func deleteFirewallRules(
-	d *schema.ResourceData,
-	meta interface{},
-	rules *schema.Set,
-	ors *schema.Set) error {
+func deleteFirewallRules(d *schema.ResourceData, meta interface{}, rules *schema.Set, ors *schema.Set) error {
 	var errs *multierror.Error
 
 	var wg sync.WaitGroup
@@ -492,16 +465,13 @@ func deleteFirewallRules(
 	return errs.ErrorOrNil()
 }
 
-func deleteFirewallRule(
-	d *schema.ResourceData,
-	meta interface{},
-	rule map[string]interface{}) error {
+func deleteFirewallRule(d *schema.ResourceData, meta interface{}, rule map[string]interface{}) error {
 	cs := meta.(*cloudstack.CloudStackClient)
 	uuids := rule["uuids"].(map[string]interface{})
 
 	for k, id := range uuids {
 		// We don't care about the count here, so just continue
-		if k == "#" {
+		if k == "%" {
 			continue
 		}
 
@@ -543,17 +513,6 @@ func verifyFirewallParams(d *schema.ResourceData) error {
 }
 
 func verifyFirewallRuleParams(d *schema.ResourceData, rule map[string]interface{}) error {
-	cidrList := rule["cidr_list"].(*schema.Set)
-	sourceCidr := rule["source_cidr"].(string)
-	if cidrList.Len() == 0 && sourceCidr == "" {
-		return fmt.Errorf(
-			"Parameter cidr_list is a required parameter")
-	}
-	if cidrList.Len() > 0 && sourceCidr != "" {
-		return fmt.Errorf(
-			"Parameter source_cidr is deprecated and cannot be used together with cidr_list")
-	}
-
 	protocol := rule["protocol"].(string)
 	if protocol != "tcp" && protocol != "udp" && protocol != "icmp" {
 		return fmt.Errorf(

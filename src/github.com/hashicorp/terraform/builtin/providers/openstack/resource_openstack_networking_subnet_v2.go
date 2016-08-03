@@ -18,93 +18,96 @@ func resourceNetworkingSubnetV2() *schema.Resource {
 		Read:   resourceNetworkingSubnetV2Read,
 		Update: resourceNetworkingSubnetV2Update,
 		Delete: resourceNetworkingSubnetV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"network_id": {
+			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"cidr": {
+			"cidr": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"allocation_pools": {
+			"allocation_pools": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"start": {
+						"start": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"end": {
+						"end": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 					},
 				},
 			},
-			"gateway_ip": {
+			"gateway_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 			},
-			"no_gateway": {
+			"no_gateway": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
 			},
-			"ip_version": {
+			"ip_version": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  4,
 				ForceNew: true,
 			},
-			"enable_dhcp": {
+			"enable_dhcp": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
 				Default:  true,
 			},
-			"dns_nameservers": {
+			"dns_nameservers": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"host_routes": {
+			"host_routes": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"destination_cidr": {
+						"destination_cidr": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"next_hop": {
+						"next_hop": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -190,6 +193,8 @@ func resourceNetworkingSubnetV2Read(d *schema.ResourceData, meta interface{}) er
 	d.Set("gateway_ip", s.GatewayIP)
 	d.Set("dns_nameservers", s.DNSNameservers)
 	d.Set("host_routes", s.HostRoutes)
+	d.Set("enable_dhcp", s.EnableDHCP)
+	d.Set("network_id", s.NetworkID)
 
 	return nil
 }

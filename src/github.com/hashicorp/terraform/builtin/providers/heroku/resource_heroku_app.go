@@ -90,25 +90,25 @@ func resourceHerokuApp() *schema.Resource {
 		Delete: resourceHerokuAppDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"stack": {
+			"stack": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"config_vars": {
+			"config_vars": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Schema{
@@ -116,43 +116,43 @@ func resourceHerokuApp() *schema.Resource {
 				},
 			},
 
-			"all_config_vars": {
+			"all_config_vars": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},
 
-			"git_url": {
+			"git_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"web_url": {
+			"web_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"heroku_hostname": {
+			"heroku_hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"organization": {
+			"organization": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"locked": {
+						"locked": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"personal": {
+						"personal": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
@@ -287,7 +287,7 @@ func resourceHerokuAppRead(d *schema.ResourceData, meta interface{}) error {
 	configVars := make(map[string]string)
 	care := make(map[string]struct{})
 	for _, v := range d.Get("config_vars").([]interface{}) {
-		for k := range v.(map[string]interface{}) {
+		for k, _ := range v.(map[string]interface{}) {
 			care[k] = struct{}{}
 		}
 	}
@@ -421,7 +421,7 @@ func updateConfigVars(
 
 	for _, v := range o {
 		if v != nil {
-			for k := range v.(map[string]interface{}) {
+			for k, _ := range v.(map[string]interface{}) {
 				vars[k] = nil
 			}
 		}

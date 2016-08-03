@@ -17,55 +17,58 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 		Read:   resourceAwsRDSClusterInstanceRead,
 		Update: resourceAwsRDSClusterInstanceUpdate,
 		Delete: resourceAwsRDSClusterInstanceDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"identifier": {
+			"identifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRdsId,
 			},
 
-			"db_subnet_group_name": {
+			"db_subnet_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"writer": {
+			"writer": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 
-			"cluster_identifier": {
+			"cluster_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"publicly_accessible": {
+			"publicly_accessible": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"instance_class": {
+			"instance_class": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"db_parameter_group_name": {
+			"db_parameter_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -74,10 +77,24 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.DBInstance.Modifying.html
-			"apply_immediately": {
+			"apply_immediately": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
+			},
+
+			"kms_key_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+			},
+
+			"storage_encrypted": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+				ForceNew: true,
 			},
 
 			"tags": tagsSchema(),
@@ -185,9 +202,13 @@ func resourceAwsRDSClusterInstanceRead(d *schema.ResourceData, meta interface{})
 	}
 
 	d.Set("publicly_accessible", db.PubliclyAccessible)
+	d.Set("cluster_identifier", db.DBClusterIdentifier)
+	d.Set("instance_class", db.DBInstanceClass)
+	d.Set("identifier", db.DBInstanceIdentifier)
+	d.Set("storage_encrypted", db.StorageEncrypted)
 
 	if len(db.DBParameterGroups) > 0 {
-		d.Set("parameter_group_name", db.DBParameterGroups[0].DBParameterGroupName)
+		d.Set("db_parameter_group_name", db.DBParameterGroups[0].DBParameterGroupName)
 	}
 
 	// Fetch and save tags

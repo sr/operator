@@ -23,26 +23,26 @@ func resourceAwsSubnet() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cidr_block": {
+			"cidr_block": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"map_public_ip_on_launch": {
+			"map_public_ip_on_launch": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,

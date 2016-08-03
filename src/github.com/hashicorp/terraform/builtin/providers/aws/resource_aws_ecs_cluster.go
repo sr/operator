@@ -19,7 +19,7 @@ func resourceAwsEcsCluster() *schema.Resource {
 		Delete: resourceAwsEcsClusterDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

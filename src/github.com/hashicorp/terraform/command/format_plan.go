@@ -66,7 +66,7 @@ func formatPlanModuleExpand(
 	// We want to output the resources in sorted order to make things
 	// easier to scan through, so get all the resource names and sort them.
 	names := make([]string, 0, len(m.Resources))
-	for name := range m.Resources {
+	for name, _ := range m.Resources {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -77,6 +77,8 @@ func formatPlanModuleExpand(
 		if rdiff.Empty() {
 			continue
 		}
+
+		dataSource := strings.HasPrefix(name, "data.")
 
 		if moduleName != "" {
 			name = moduleName + "." + name
@@ -103,7 +105,7 @@ func formatPlanModuleExpand(
 			// Unfortunately by the time we get here we only have the name
 			// to work with, so we need to cheat and exploit knowledge of the
 			// naming scheme for data resources.
-			if strings.HasPrefix(name, "data.") {
+			if dataSource {
 				symbol = "<="
 				color = "cyan"
 			}
@@ -125,7 +127,7 @@ func formatPlanModuleExpand(
 		// determine the longest key so that we can align them all.
 		keyLen := 0
 		keys := make([]string, 0, len(rdiff.Attributes))
-		for key := range rdiff.Attributes {
+		for key, _ := range rdiff.Attributes {
 			// Skip the ID since we do that specially
 			if key == "id" {
 				continue

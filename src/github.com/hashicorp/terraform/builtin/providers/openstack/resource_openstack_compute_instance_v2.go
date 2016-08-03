@@ -18,6 +18,7 @@ import (
 	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/keypairs"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/schedulerhints"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/secgroups"
+	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/startstop"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/tenantnetworks"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/extensions/volumeattach"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/flavors"
@@ -34,49 +35,49 @@ func resourceComputeInstanceV2() *schema.Resource {
 		Delete: resourceComputeInstanceV2Delete,
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"image_name": {
+			"image_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"flavor_id": {
+			"flavor_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
 				Computed:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_FLAVOR_ID", nil),
 			},
-			"flavor_name": {
+			"flavor_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
 				Computed:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_FLAVOR_NAME", nil),
 			},
-			"floating_ip": {
+			"floating_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -91,7 +92,7 @@ func resourceComputeInstanceV2() *schema.Resource {
 					}
 				},
 			},
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
@@ -99,58 +100,58 @@ func resourceComputeInstanceV2() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"fixed_ip_v4": {
+						"fixed_ip_v4": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"fixed_ip_v6": {
+						"fixed_ip_v6": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"floating_ip": {
+						"floating_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"mac": {
+						"mac": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"access_network": {
+						"access_network": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
@@ -158,75 +159,75 @@ func resourceComputeInstanceV2() *schema.Resource {
 					},
 				},
 			},
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: false,
 			},
-			"config_drive": {
+			"config_drive": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
-			"admin_pass": {
+			"admin_pass": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"access_ip_v4": {
-				Type:     schema.TypeString,
-				Computed: true,
-				Optional: true,
-				ForceNew: false,
-			},
-			"access_ip_v6": {
+			"access_ip_v4": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 				ForceNew: false,
 			},
-			"key_pair": {
+			"access_ip_v6": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+				ForceNew: false,
+			},
+			"key_pair": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"block_device": {
+			"block_device": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"source_type": {
+						"source_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"destination_type": {
+						"destination_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"boot_index": {
+						"boot_index": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
 							ForceNew: true,
 						},
-						"guest_format": {
+						"guest_format": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -234,22 +235,22 @@ func resourceComputeInstanceV2() *schema.Resource {
 					},
 				},
 			},
-			"volume": {
+			"volume": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"volume_id": {
+						"volume_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"device": {
+						"device": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -258,40 +259,40 @@ func resourceComputeInstanceV2() *schema.Resource {
 				},
 				Set: resourceComputeVolumeAttachmentHash,
 			},
-			"scheduler_hints": {
+			"scheduler_hints": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"group": {
+						"group": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"different_host": {
+						"different_host": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"same_host": {
+						"same_host": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"query": {
+						"query": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"target_cell": {
+						"target_cell": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"build_near_host_ip": {
+						"build_near_host_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -300,23 +301,28 @@ func resourceComputeInstanceV2() *schema.Resource {
 				},
 				Set: resourceComputeSchedulerHintsHash,
 			},
-			"personality": {
+			"personality": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"file": {
+						"file": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"content": {
+						"content": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 					},
 				},
 				Set: resourceComputeInstancePersonalityHash,
+			},
+			"stop_before_destroy": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 		},
 	}
@@ -616,28 +622,28 @@ func resourceComputeInstanceV2Update(d *schema.ResourceData, meta interface{}) e
 
 		for _, g := range secgroupsToRemove.List() {
 			err := secgroups.RemoveServerFromGroup(computeClient, d.Id(), g.(string)).ExtractErr()
-			if err != nil {
+			if err != nil && err.Error() != "EOF" {
 				errCode, ok := err.(*gophercloud.UnexpectedResponseCodeError)
 				if !ok {
-					return fmt.Errorf("Error removing security group from OpenStack server (%s): %s", d.Id(), err)
+					return fmt.Errorf("Error removing security group (%s) from OpenStack server (%s): %s", g, d.Id(), err)
 				}
 				if errCode.Actual == 404 {
 					continue
 				} else {
-					return fmt.Errorf("Error removing security group from OpenStack server (%s): %s", d.Id(), err)
+					return fmt.Errorf("Error removing security group (%s) from OpenStack server (%s): %s", g, d.Id(), err)
 				}
 			} else {
-				log.Printf("[DEBUG] Removed security group (%s) from instance (%s)", g.(string), d.Id())
+				log.Printf("[DEBUG] Removed security group (%s) from instance (%s)", g, d.Id())
 			}
-		}
-		for _, g := range secgroupsToAdd.List() {
-			err := secgroups.AddServerToGroup(computeClient, d.Id(), g.(string)).ExtractErr()
-			if err != nil {
-				return fmt.Errorf("Error adding security group to OpenStack server (%s): %s", d.Id(), err)
-			}
-			log.Printf("[DEBUG] Added security group (%s) to instance (%s)", g.(string), d.Id())
 		}
 
+		for _, g := range secgroupsToAdd.List() {
+			err := secgroups.AddServerToGroup(computeClient, d.Id(), g.(string)).ExtractErr()
+			if err != nil && err.Error() != "EOF" {
+				return fmt.Errorf("Error adding security group (%s) to OpenStack server (%s): %s", g, d.Id(), err)
+			}
+			log.Printf("[DEBUG] Added security group (%s) to instance (%s)", g, d.Id())
+		}
 	}
 
 	if d.HasChange("admin_pass") {
@@ -808,6 +814,27 @@ func resourceComputeInstanceV2Delete(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error creating OpenStack compute client: %s", err)
 	}
 
+	if d.Get("stop_before_destroy").(bool) {
+		err = startstop.Stop(computeClient, d.Id()).ExtractErr()
+		if err != nil {
+			log.Printf("[WARN] Error stopping OpenStack instance: %s", err)
+		} else {
+			stopStateConf := &resource.StateChangeConf{
+				Pending:    []string{"ACTIVE"},
+				Target:     []string{"SHUTOFF"},
+				Refresh:    ServerV2StateRefreshFunc(computeClient, d.Id()),
+				Timeout:    3 * time.Minute,
+				Delay:      10 * time.Second,
+				MinTimeout: 3 * time.Second,
+			}
+			log.Printf("[DEBUG] Waiting for instance (%s) to stop", d.Id())
+			_, err = stopStateConf.WaitForState()
+			if err != nil {
+				log.Printf("[WARN] Error waiting for instance (%s) to stop: %s, proceeding to delete", d.Id(), err)
+			}
+		}
+	}
+
 	err = servers.Delete(computeClient, d.Id()).ExtractErr()
 	if err != nil {
 		return fmt.Errorf("Error deleting OpenStack server: %s", err)
@@ -817,7 +844,7 @@ func resourceComputeInstanceV2Delete(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Waiting for instance (%s) to delete", d.Id())
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"ACTIVE"},
+		Pending:    []string{"ACTIVE", "SHUTOFF"},
 		Target:     []string{"DELETED"},
 		Refresh:    ServerV2StateRefreshFunc(computeClient, d.Id()),
 		Timeout:    30 * time.Minute,
@@ -1409,12 +1436,25 @@ func getVolumeAttachments(computeClient *gophercloud.ServiceClient, d *schema.Re
 		return err
 	}
 
-	vols := make([]map[string]interface{}, len(attachments))
-	for i, attachment := range attachments {
-		vols[i] = make(map[string]interface{})
-		vols[i]["id"] = attachment.ID
-		vols[i]["volume_id"] = attachment.VolumeID
-		vols[i]["device"] = attachment.Device
+	var vols []map[string]interface{}
+	for _, attachment := range attachments {
+		// ignore the volume if it is attached as a root device
+		rootDevFound := false
+		for _, rootDev := range []string{"/dev/vda", "/dev/xda", "/dev/sda", "/dev/xvda"} {
+			if attachment.Device == rootDev {
+				rootDevFound = true
+			}
+		}
+
+		if rootDevFound {
+			continue
+		}
+
+		vol := make(map[string]interface{})
+		vol["id"] = attachment.ID
+		vol["volume_id"] = attachment.VolumeID
+		vol["device"] = attachment.Device
+		vols = append(vols, vol)
 	}
 	log.Printf("[INFO] Volume attachments: %v", vols)
 	d.Set("volume", vols)

@@ -19,35 +19,35 @@ func resourceDynRecord() *schema.Resource {
 		Delete: resourceDynRecordDelete,
 
 		Schema: map[string]*schema.Schema{
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"fqdn": {
+			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"value": {
+			"value": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "0", // 0 means use zone default

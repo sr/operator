@@ -15,32 +15,12 @@ import (
 func TestAccBlockStorageV2Volume_basic(t *testing.T) {
 	var volume volumes.Volume
 
-	var testAccBlockStorageV2Volume_basic = fmt.Sprintf(`
-		resource "openstack_blockstorage_volume_v2" "volume_1" {
-			name = "volume_1"
-			description = "first test volume"
-			metadata {
-				foo = "bar"
-			}
-			size = 1
-		}`)
-
-	var testAccBlockStorageV2Volume_update = fmt.Sprintf(`
-		resource "openstack_blockstorage_volume_v2" "volume_1" {
-			name = "volume_1-updated"
-			description = "first test volume"
-			metadata {
-				foo = "bar"
-			}
-			size = 1
-		}`)
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBlockStorageV2VolumeDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV2Volume_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBlockStorageV2VolumeExists(t, "openstack_blockstorage_volume_v2.volume_1", &volume),
@@ -48,7 +28,7 @@ func TestAccBlockStorageV2Volume_basic(t *testing.T) {
 					testAccCheckBlockStorageV2VolumeMetadata(&volume, "foo", "bar"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV2Volume_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBlockStorageV2VolumeExists(t, "openstack_blockstorage_volume_v2.volume_1", &volume),
@@ -76,7 +56,7 @@ func TestAccBlockStorageV2Volume_bootable(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBlockStorageV2VolumeDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV2Volume_bootable,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBlockStorageV2VolumeExists(t, "openstack_blockstorage_volume_v2.volume_1", &volume),
@@ -186,3 +166,23 @@ func testAccCheckBlockStorageV2VolumeMetadata(
 		return fmt.Errorf("Metadata not found: %s", k)
 	}
 }
+
+var testAccBlockStorageV2Volume_basic = fmt.Sprintf(`
+	resource "openstack_blockstorage_volume_v2" "volume_1" {
+		name = "volume_1"
+		description = "first test volume"
+		metadata {
+			foo = "bar"
+		}
+		size = 1
+	}`)
+
+var testAccBlockStorageV2Volume_update = fmt.Sprintf(`
+	resource "openstack_blockstorage_volume_v2" "volume_1" {
+		name = "volume_1-updated"
+		description = "first test volume"
+		metadata {
+			foo = "bar"
+		}
+		size = 1
+	}`)

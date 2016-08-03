@@ -30,19 +30,22 @@ func resourceAwsSnsTopic() *schema.Resource {
 		Read:   resourceAwsSnsTopicRead,
 		Update: resourceAwsSnsTopicUpdate,
 		Delete: resourceAwsSnsTopicDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"display_name": {
+			"display_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"policy": {
+			"policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -62,12 +65,12 @@ func resourceAwsSnsTopic() *schema.Resource {
 					return value
 				},
 			},
-			"delivery_policy": {
+			"delivery_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -102,7 +105,7 @@ func resourceAwsSnsTopicCreate(d *schema.ResourceData, meta interface{}) error {
 func resourceAwsSnsTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 	r := *resourceAwsSnsTopic()
 
-	for k := range r.Schema {
+	for k, _ := range r.Schema {
 		if attrKey, ok := SNSAttributeMap[k]; ok {
 			if d.HasChange(k) {
 				log.Printf("[DEBUG] Updating %s", attrKey)

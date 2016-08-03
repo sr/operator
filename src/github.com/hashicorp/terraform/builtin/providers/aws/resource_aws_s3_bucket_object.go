@@ -24,62 +24,62 @@ func resourceAwsS3BucketObject() *schema.Resource {
 		Delete: resourceAwsS3BucketObjectDelete,
 
 		Schema: map[string]*schema.Schema{
-			"bucket": {
+			"bucket": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cache_control": {
+			"cache_control": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"content_disposition": {
+			"content_disposition": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"content_encoding": {
+			"content_encoding": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"content_language": {
+			"content_language": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"content_type": {
+			"content_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"key": {
+			"key": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"source": {
+			"source": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"content"},
 			},
 
-			"content": {
+			"content": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"source"},
 			},
 
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"etag": {
+			"etag": &schema.Schema{
 				Type: schema.TypeString,
 				// This will conflict with SSE-C and SSE-KMS encryption and multi-part upload
 				// if/when it's actually implemented. The Etag then won't match raw-file MD5.
@@ -88,7 +88,7 @@ func resourceAwsS3BucketObject() *schema.Resource {
 				Computed: true,
 			},
 
-			"version_id": {
+			"version_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

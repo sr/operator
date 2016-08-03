@@ -2,7 +2,6 @@ package atlas
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -14,7 +13,7 @@ func TestAccArtifact_basic(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccArtifact_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckArtifactState("name", "hashicorp/tf-provider-test"),
@@ -29,7 +28,7 @@ func TestAccArtifact_metadata(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccArtifact_metadata,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckArtifactState("name", "hashicorp/tf-provider-test"),
@@ -46,7 +45,7 @@ func TestAccArtifact_metadataSet(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccArtifact_metadataSet,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckArtifactState("name", "hashicorp/tf-provider-test"),
@@ -63,7 +62,7 @@ func TestAccArtifact_buildLatest(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccArtifact_buildLatest,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckArtifactState("name", "hashicorp/tf-provider-test"),
@@ -78,7 +77,7 @@ func TestAccArtifact_versionAny(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccArtifact_versionAny,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckArtifactState("name", "hashicorp/tf-provider-test"),
@@ -106,21 +105,6 @@ func testAccCheckArtifactState(key, value string) resource.TestCheckFunc {
 		}
 
 		return nil
-	}
-}
-
-func TestCleanMetadata(t *testing.T) {
-	in := map[string]string{
-		"region.us-east-1": "in",
-		"what is	this?": "out",
-	}
-	exp := map[string]string{
-		"region-us-east-1": "in",
-		"what-is-this-":    "out",
-	}
-	out := cleanMetadata(in)
-	if !reflect.DeepEqual(out, exp) {
-		t.Fatalf("bad: %#v", out)
 	}
 }
 

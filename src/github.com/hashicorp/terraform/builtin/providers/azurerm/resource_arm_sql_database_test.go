@@ -51,7 +51,7 @@ func TestAccAzureRMSqlDatabase_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMSqlDatabaseDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMSqlDatabaseExists("azurerm_sql_database.test"),
@@ -71,7 +71,7 @@ func TestAccAzureRMSqlDatabase_withTags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMSqlDatabaseDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMSqlDatabaseExists("azurerm_sql_database.test"),
@@ -80,7 +80,7 @@ func TestAccAzureRMSqlDatabase_withTags(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMSqlDatabaseExists("azurerm_sql_database.test"),

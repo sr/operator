@@ -20,56 +20,56 @@ func resourceAzureDataDisk() *schema.Resource {
 		Delete: resourceAzureDataDiskDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"label": {
+			"label": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"lun": {
+			"lun": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"caching": {
+			"caching": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "None",
 			},
 
-			"storage_service_name": {
+			"storage_service_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"media_link": {
+			"media_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"source_media_link": {
+			"source_media_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine": {
+			"virtual_machine": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},

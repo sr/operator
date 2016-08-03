@@ -18,39 +18,39 @@ func resourceAwsApiGatewayAuthorizer() *schema.Resource {
 		Delete: resourceAwsApiGatewayAuthorizerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"authorizer_uri": {
+			"authorizer_uri": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"identity_source": {
+			"identity_source": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "method.request.header.Authorization",
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"rest_api_id": {
+			"rest_api_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "TOKEN",
 			},
-			"authorizer_credentials": {
+			"authorizer_credentials": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"authorizer_result_ttl_in_seconds": {
+			"authorizer_result_ttl_in_seconds": &schema.Schema{
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validateIntegerInRange(0, 3600),
 			},
-			"identity_validation_expression": {
+			"identity_validation_expression": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

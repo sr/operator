@@ -19,13 +19,13 @@ func TestAccAWSKmsKey_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSKmsKeyDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSKmsKey,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSKmsKeyExists("aws_kms_key.foo", &keyBefore),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSKmsKey_removedPolicy,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSKmsKeyExists("aws_kms_key.foo", &keyAfter),
@@ -43,7 +43,7 @@ func TestAccAWSKmsKey_isEnabled(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSKmsKeyDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSKmsKey_enabledRotation,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSKmsKeyExists("aws_kms_key.bar", &key1),
@@ -52,7 +52,7 @@ func TestAccAWSKmsKey_isEnabled(t *testing.T) {
 					resource.TestCheckResourceAttr("aws_kms_key.bar", "enable_key_rotation", "true"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSKmsKey_disabled,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSKmsKeyExists("aws_kms_key.bar", &key2),
@@ -61,7 +61,7 @@ func TestAccAWSKmsKey_isEnabled(t *testing.T) {
 					resource.TestCheckResourceAttr("aws_kms_key.bar", "enable_key_rotation", "false"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSKmsKey_enabled,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSKmsKeyExists("aws_kms_key.bar", &key3),

@@ -13,7 +13,7 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"account_file": {
+			"account_file": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				DefaultFunc:  schema.EnvDefaultFunc("GOOGLE_ACCOUNT_FILE", nil),
@@ -21,7 +21,7 @@ func Provider() terraform.ResourceProvider {
 				Deprecated:   "Use the credentials field instead",
 			},
 
-			"credentials": {
+			"credentials": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{
@@ -32,7 +32,7 @@ func Provider() terraform.ResourceProvider {
 				ValidateFunc: validateCredentials,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{
@@ -42,7 +42,7 @@ func Provider() terraform.ResourceProvider {
 				}, nil),
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{

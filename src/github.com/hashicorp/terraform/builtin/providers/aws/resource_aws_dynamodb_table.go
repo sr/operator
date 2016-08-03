@@ -34,45 +34,48 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 		Read:   resourceAwsDynamoDbTableRead,
 		Update: resourceAwsDynamoDbTableUpdate,
 		Delete: resourceAwsDynamoDbTableDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"hash_key": {
+			"hash_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"range_key": {
+			"range_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"write_capacity": {
+			"write_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"read_capacity": {
+			"read_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"attribute": {
+			"attribute": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -85,25 +88,25 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 					return hashcode.String(buf.String())
 				},
 			},
-			"local_secondary_index": {
+			"local_secondary_index": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"range_key": {
+						"range_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"projection_type": {
+						"projection_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"non_key_attributes": {
+						"non_key_attributes": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -117,36 +120,36 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 					return hashcode.String(buf.String())
 				},
 			},
-			"global_secondary_index": {
+			"global_secondary_index": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"write_capacity": {
+						"write_capacity": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"read_capacity": {
+						"read_capacity": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"hash_key": {
+						"hash_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"range_key": {
+						"range_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"projection_type": {
+						"projection_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"non_key_attributes": {
+						"non_key_attributes": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -163,12 +166,12 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 					return hashcode.String(buf.String())
 				},
 			},
-			"stream_enabled": {
+			"stream_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
-			"stream_view_type": {
+			"stream_view_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -178,7 +181,7 @@ func resourceAwsDynamoDbTable() *schema.Resource {
 				},
 				ValidateFunc: validateStreamViewType,
 			},
-			"stream_arn": {
+			"stream_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -200,7 +203,7 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 
 	hash_key_name := d.Get("hash_key").(string)
 	keyschema := []*dynamodb.KeySchemaElement{
-		{
+		&dynamodb.KeySchemaElement{
 			AttributeName: aws.String(hash_key_name),
 			KeyType:       aws.String("HASH"),
 		},
@@ -257,11 +260,11 @@ func resourceAwsDynamoDbTableCreate(d *schema.ResourceData, meta interface{}) er
 			localSecondaryIndexes = append(localSecondaryIndexes, &dynamodb.LocalSecondaryIndex{
 				IndexName: aws.String(lsi["name"].(string)),
 				KeySchema: []*dynamodb.KeySchemaElement{
-					{
+					&dynamodb.KeySchemaElement{
 						AttributeName: aws.String(hash_key_name),
 						KeyType:       aws.String("HASH"),
 					},
-					{
+					&dynamodb.KeySchemaElement{
 						AttributeName: aws.String(lsi["range_key"].(string)),
 						KeyType:       aws.String("RANGE"),
 					},
@@ -601,6 +604,44 @@ func resourceAwsDynamoDbTableRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("attribute", attributes)
+	d.Set("name", table.TableName)
+
+	for _, attribute := range table.KeySchema {
+		if *attribute.KeyType == "HASH" {
+			d.Set("hash_key", attribute.AttributeName)
+		}
+
+		if *attribute.KeyType == "RANGE" {
+			d.Set("range_key", attribute.AttributeName)
+		}
+	}
+
+	lsiList := make([]map[string]interface{}, 0, len(table.LocalSecondaryIndexes))
+	for _, lsiObject := range table.LocalSecondaryIndexes {
+		lsi := map[string]interface{}{
+			"name":            *lsiObject.IndexName,
+			"projection_type": *lsiObject.Projection.ProjectionType,
+		}
+
+		for _, attribute := range lsiObject.KeySchema {
+
+			if *attribute.KeyType == "RANGE" {
+				lsi["range_key"] = *attribute.AttributeName
+			}
+		}
+		nkaList := make([]string, len(lsiObject.Projection.NonKeyAttributes))
+		for _, nka := range lsiObject.Projection.NonKeyAttributes {
+			nkaList = append(nkaList, *nka)
+		}
+		lsi["non_key_attributes"] = nkaList
+
+		lsiList = append(lsiList, lsi)
+	}
+
+	err = d.Set("local_secondary_index", lsiList)
+	if err != nil {
+		return err
+	}
 
 	gsiList := make([]map[string]interface{}, 0, len(table.GlobalSecondaryIndexes))
 	for _, gsiObject := range table.GlobalSecondaryIndexes {
@@ -713,7 +754,7 @@ func createGSIFromData(data *map[string]interface{}) dynamodb.GlobalSecondaryInd
 	readCapacity := (*data)["read_capacity"].(int)
 
 	key_schema := []*dynamodb.KeySchemaElement{
-		{
+		&dynamodb.KeySchemaElement{
 			AttributeName: aws.String((*data)["hash_key"].(string)),
 			KeyType:       aws.String("HASH"),
 		},

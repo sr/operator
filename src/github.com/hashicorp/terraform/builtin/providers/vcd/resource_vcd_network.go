@@ -20,77 +20,77 @@ func resourceVcdNetwork() *schema.Resource {
 		Delete: resourceVcdNetworkDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"fence_mode": {
+			"fence_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "natRouted",
 			},
 
-			"edge_gateway": {
+			"edge_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"netmask": {
+			"netmask": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "255.255.255.0",
 			},
 
-			"gateway": {
+			"gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"dns1": {
+			"dns1": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "8.8.8.8",
 			},
 
-			"dns2": {
+			"dns2": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "8.8.4.4",
 			},
 
-			"dns_suffix": {
+			"dns_suffix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"href": {
+			"href": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"dhcp_pool": {
+			"dhcp_pool": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"start_address": {
+						"start_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"end_address": {
+						"end_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -98,18 +98,18 @@ func resourceVcdNetwork() *schema.Resource {
 				},
 				Set: resourceVcdNetworkIPAddressHash,
 			},
-			"static_ip_pool": {
+			"static_ip_pool": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"start_address": {
+						"start_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"end_address": {
+						"end_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},

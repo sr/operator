@@ -10,33 +10,33 @@ func resourceAwsOpsworksHaproxyLayer() *schema.Resource {
 		DefaultLayerName: "HAProxy",
 
 		Attributes: map[string]*opsworksLayerTypeAttribute{
-			"stats_enabled": {
+			"stats_enabled": &opsworksLayerTypeAttribute{
 				AttrName: "EnableHaproxyStats",
 				Type:     schema.TypeBool,
 				Default:  true,
 			},
-			"stats_url": {
+			"stats_url": &opsworksLayerTypeAttribute{
 				AttrName: "HaproxyStatsUrl",
 				Type:     schema.TypeString,
 				Default:  "/haproxy?stats",
 			},
-			"stats_user": {
+			"stats_user": &opsworksLayerTypeAttribute{
 				AttrName: "HaproxyStatsUser",
 				Type:     schema.TypeString,
 				Default:  "opsworks",
 			},
-			"stats_password": {
+			"stats_password": &opsworksLayerTypeAttribute{
 				AttrName:  "HaproxyStatsPassword",
 				Type:      schema.TypeString,
 				WriteOnly: true,
 				Required:  true,
 			},
-			"healthcheck_url": {
+			"healthcheck_url": &opsworksLayerTypeAttribute{
 				AttrName: "HaproxyHealthCheckUrl",
 				Type:     schema.TypeString,
 				Default:  "/",
 			},
-			"healthcheck_method": {
+			"healthcheck_method": &opsworksLayerTypeAttribute{
 				AttrName: "HaproxyHealthCheckMethod",
 				Type:     schema.TypeString,
 				Default:  "OPTIONS",

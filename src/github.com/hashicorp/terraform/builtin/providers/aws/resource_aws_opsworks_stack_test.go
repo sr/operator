@@ -24,9 +24,9 @@ func TestAccAWSOpsworksStackNoVpc(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAwsOpsworksStackDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAwsOpsworksStackConfigNoVpcCreate(stackName),
-				Check:  testAccAwsOpsworksStackCheckResourceAttrsCreate("us-east-1c", stackName),
+				Check:  testAccAwsOpsworksStackCheckResourceAttrsCreate("us-east-1a", stackName),
 			},
 			// resource.TestStep{
 			// 	Config: testAccAWSOpsworksStackConfigNoVpcUpdate(stackName),
@@ -43,11 +43,11 @@ func TestAccAWSOpsworksStackVpc(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAwsOpsworksStackDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAwsOpsworksStackConfigVpcCreate(stackName),
 				Check:  testAccAwsOpsworksStackCheckResourceAttrsCreate("us-west-2a", stackName),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSOpsworksStackConfigVpcUpdate(stackName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccAwsOpsworksStackCheckResourceAttrsUpdate("us-west-2a", stackName),
@@ -236,7 +236,7 @@ resource "aws_opsworks_stack" "tf-acc" {
   region = "us-east-1"
   service_role_arn = "${aws_iam_role.opsworks_service.arn}"
   default_instance_profile_arn = "${aws_iam_instance_profile.opsworks_instance.arn}"
-  default_availability_zone = "us-east-1c"
+  default_availability_zone = "us-east-1a"
   default_os = "Amazon Linux 2014.09"
   default_root_device_type = "ebs"
   custom_json = "{\"key\": \"value\"}"
@@ -317,7 +317,7 @@ resource "aws_opsworks_stack" "tf-acc" {
   region = "us-east-1"
   service_role_arn = "${aws_iam_role.opsworks_service.arn}"
   default_instance_profile_arn = "${aws_iam_instance_profile.opsworks_instance.arn}"
-  default_availability_zone = "us-east-1c"
+  default_availability_zone = "us-east-1a"
   default_os = "Amazon Linux 2014.09"
   default_root_device_type = "ebs"
   custom_json = "{\"key\": \"value\"}"

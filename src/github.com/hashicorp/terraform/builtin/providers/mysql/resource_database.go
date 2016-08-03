@@ -21,19 +21,19 @@ func resourceDatabase() *schema.Resource {
 		Delete: DeleteDatabase,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"default_character_set": {
+			"default_character_set": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "utf8",
 			},
 
-			"default_collation": {
+			"default_collation": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "utf8_general_ci",

@@ -17,103 +17,103 @@ func resourceArmSqlDatabase() *schema.Resource {
 		Delete: resourceArmSqlDatabaseDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: azureRMNormalizeLocation,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"server_name": {
+			"server_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"create_mode": {
+			"create_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Default",
 			},
 
-			"source_database_id": {
+			"source_database_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"restore_point_in_time": {
+			"restore_point_in_time": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"edition": {
+			"edition": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateArmSqlDatabaseEdition,
 			},
 
-			"collation": {
+			"collation": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"max_size_bytes": {
+			"max_size_bytes": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"requested_service_objective_id": {
+			"requested_service_objective_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"requested_service_objective_name": {
+			"requested_service_objective_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"source_database_deletion_date": {
+			"source_database_deletion_date": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"elastic_pool_name": {
+			"elastic_pool_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"encryption": {
+			"encryption": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"creation_date": {
+			"creation_date": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"default_secondary_location": {
+			"default_secondary_location": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

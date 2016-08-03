@@ -14,12 +14,12 @@ func resourceGithubMembership() *schema.Resource {
 		Delete: resourceGithubMembershipDelete,
 
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"role": {
+			"role": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateValueFunc([]string{"member", "admin"}),

@@ -18,13 +18,13 @@ func TestFastlyServiceV1_FlattenGzips(t *testing.T) {
 	}{
 		{
 			remote: []*gofastly.Gzip{
-				{
+				&gofastly.Gzip{
 					Name:       "somegzip",
 					Extensions: "css",
 				},
 			},
 			local: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"name":       "somegzip",
 					"extensions": schema.NewSet(schema.HashString, []interface{}{"css"}),
 				},
@@ -32,24 +32,24 @@ func TestFastlyServiceV1_FlattenGzips(t *testing.T) {
 		},
 		{
 			remote: []*gofastly.Gzip{
-				{
+				&gofastly.Gzip{
 					Name:         "somegzip",
 					Extensions:   "css json js",
 					ContentTypes: "text/html",
 				},
-				{
+				&gofastly.Gzip{
 					Name:         "someothergzip",
 					Extensions:   "css js",
 					ContentTypes: "text/html text/xml",
 				},
 			},
 			local: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"name":          "somegzip",
 					"extensions":    schema.NewSet(schema.HashString, []interface{}{"css", "json", "js"}),
 					"content_types": schema.NewSet(schema.HashString, []interface{}{"text/html"}),
 				},
-				{
+				map[string]interface{}{
 					"name":          "someothergzip",
 					"extensions":    schema.NewSet(schema.HashString, []interface{}{"css", "js"}),
 					"content_types": schema.NewSet(schema.HashString, []interface{}{"text/html", "text/xml"}),
@@ -111,7 +111,7 @@ func TestAccFastlyServiceV1_gzips_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckServiceV1Destroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccServiceV1GzipsConfig(name, domainName1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckServiceV1Exists("fastly_service_v1.foo", &service),
@@ -131,7 +131,7 @@ func TestAccFastlyServiceV1_gzips_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccServiceV1GzipsConfig_update(name, domainName1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckServiceV1Exists("fastly_service_v1.foo", &service),

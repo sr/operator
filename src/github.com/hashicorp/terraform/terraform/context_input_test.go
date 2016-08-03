@@ -18,9 +18,13 @@ func TestContext2Input(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
-			"foo":            "us-west-2",
-			"amis.us-east-1": "override",
+		Variables: map[string]interface{}{
+			"foo": "us-west-2",
+			"amis": []map[string]interface{}{
+				map[string]interface{}{
+					"us-east-1": "override",
+				},
+			},
 		},
 		UIInput: input,
 	})
@@ -46,6 +50,27 @@ func TestContext2Input(t *testing.T) {
 	expected := strings.TrimSpace(testTerraformInputVarsStr)
 	if actual != expected {
 		t.Fatalf("expected:\n%s\ngot:\n%s", expected, actual)
+	}
+}
+
+func TestContext2Input_moduleComputedOutputElement(t *testing.T) {
+	m := testModule(t, "input-module-computed-output-element")
+	p := testProvider("aws")
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	p.InputFn = func(i UIInput, c *ResourceConfig) (*ResourceConfig, error) {
+		return c, nil
+	}
+
+	if err := ctx.Input(InputModeStd); err != nil {
+		t.Fatalf("err: %s", err)
 	}
 }
 
@@ -247,7 +272,7 @@ func TestContext2Input_providerOnly(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "us-west-2",
 		},
 		UIInput: input,
@@ -302,7 +327,7 @@ func TestContext2Input_providerVars(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "bar",
 		},
 		UIInput: input,
@@ -379,7 +404,7 @@ func TestContext2Input_varOnly(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "us-west-2",
 		},
 		UIInput: input,
@@ -434,7 +459,7 @@ func TestContext2Input_varOnlyUnset(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "foovalue",
 		},
 		UIInput: input,
@@ -476,7 +501,7 @@ func TestContext2Input_varWithDefault(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{},
+		Variables: map[string]interface{}{},
 		UIInput:   input,
 	})
 
@@ -522,16 +547,16 @@ func TestContext2Input_varPartiallyComputed(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "foovalue",
 		},
 		UIInput: input,
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.foo": {
+						"aws_instance.foo": &ResourceState{
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "i-abc123",
@@ -542,10 +567,10 @@ func TestContext2Input_varPartiallyComputed(t *testing.T) {
 						},
 					},
 				},
-				{
+				&ModuleState{
 					Path: append(rootModulePath, "child"),
 					Resources: map[string]*ResourceState{
-						"aws_instance.mod": {
+						"aws_instance.mod": &ResourceState{
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "i-bcd345",

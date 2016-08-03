@@ -9,21 +9,21 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"customer_name": {
+			"customer_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DYN_CUSTOMER_NAME", nil),
 				Description: "A Dyn customer name.",
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DYN_USERNAME", nil),
 				Description: "A Dyn username.",
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DYN_PASSWORD", nil),

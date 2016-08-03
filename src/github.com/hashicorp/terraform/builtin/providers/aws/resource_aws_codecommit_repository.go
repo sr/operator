@@ -17,7 +17,7 @@ func resourceAwsCodeCommitRepository() *schema.Resource {
 		Delete: resourceAwsCodeCommitRepositoryDelete,
 
 		Schema: map[string]*schema.Schema{
-			"repository_name": {
+			"repository_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -31,7 +31,7 @@ func resourceAwsCodeCommitRepository() *schema.Resource {
 				},
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -44,27 +44,27 @@ func resourceAwsCodeCommitRepository() *schema.Resource {
 				},
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"repository_id": {
+			"repository_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"clone_url_http": {
+			"clone_url_http": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"clone_url_ssh": {
+			"clone_url_ssh": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"default_branch": {
+			"default_branch": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

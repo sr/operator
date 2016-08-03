@@ -1,7 +1,6 @@
 package cloudstack
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -17,21 +16,13 @@ func resourceCloudStackVPNGateway() *schema.Resource {
 		Delete: resourceCloudStackVPNGatewayDelete,
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Required: true,
 				ForceNew: true,
 			},
 
-			"vpc": {
-				Type:       schema.TypeString,
-				Optional:   true,
-				ForceNew:   true,
-				Deprecated: "Please use the `vpc_id` field instead",
-			},
-
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -42,21 +33,7 @@ func resourceCloudStackVPNGateway() *schema.Resource {
 func resourceCloudStackVPNGatewayCreate(d *schema.ResourceData, meta interface{}) error {
 	cs := meta.(*cloudstack.CloudStackClient)
 
-	vpc, ok := d.GetOk("vpc_id")
-	if !ok {
-		vpc, ok = d.GetOk("vpc")
-	}
-	if !ok {
-		return errors.New("Either `vpc_id` or [deprecated] `vpc` must be provided.")
-	}
-
-	// Retrieve the VPC ID
-	vpcid, e := retrieveID(cs, "vpc", vpc.(string))
-	if e != nil {
-		return e.Error()
-	}
-
-	// Create a new parameter struct
+	vpcid := d.Get("vpc_id").(string)
 	p := cs.VPN.NewCreateVpnGatewayParams(vpcid)
 
 	// Create the new VPN Gateway

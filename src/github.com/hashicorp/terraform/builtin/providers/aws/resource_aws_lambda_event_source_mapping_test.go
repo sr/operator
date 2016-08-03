@@ -20,14 +20,14 @@ func TestAccAWSLambdaEventSourceMapping_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckLambdaEventSourceMappingDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSLambdaEventSourceMappingConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsLambdaEventSourceMappingExists("aws_lambda_event_source_mapping.lambda_event_source_mapping_test", &conf),
 					testAccCheckAWSLambdaEventSourceMappingAttributes(&conf),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSLambdaEventSourceMappingConfigUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsLambdaEventSourceMappingExists("aws_lambda_event_source_mapping.lambda_event_source_mapping_test", &conf),

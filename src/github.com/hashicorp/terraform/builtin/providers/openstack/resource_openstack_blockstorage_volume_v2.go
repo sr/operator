@@ -20,86 +20,89 @@ func resourceBlockStorageVolumeV2() *schema.Resource {
 		Read:   resourceBlockStorageVolumeV2Read,
 		Update: resourceBlockStorageVolumeV2Update,
 		Delete: resourceBlockStorageVolumeV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 			},
-			"snapshot_id": {
+			"snapshot_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"source_vol_id": {
+			"source_vol_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"volume_type": {
+			"volume_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"consistency_group_id": {
+			"consistency_group_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"source_replica": {
+			"source_replica": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"attachment": {
+			"attachment": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"instance_id": {
+						"instance_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"device": {
+						"device": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -189,17 +192,15 @@ func resourceBlockStorageVolumeV2Read(d *schema.ResourceData, meta interface{}) 
 	d.Set("volume_type", v.VolumeType)
 	d.Set("metadata", v.Metadata)
 
-	if len(v.Attachments) > 0 {
-		attachments := make([]map[string]interface{}, len(v.Attachments))
-		for i, attachment := range v.Attachments {
-			attachments[i] = make(map[string]interface{})
-			attachments[i]["id"] = attachment["id"]
-			attachments[i]["instance_id"] = attachment["server_id"]
-			attachments[i]["device"] = attachment["device"]
-			log.Printf("[DEBUG] attachment: %v", attachment)
-		}
-		d.Set("attachment", attachments)
+	attachments := make([]map[string]interface{}, len(v.Attachments))
+	for i, attachment := range v.Attachments {
+		attachments[i] = make(map[string]interface{})
+		attachments[i]["id"] = attachment["id"]
+		attachments[i]["instance_id"] = attachment["server_id"]
+		attachments[i]["device"] = attachment["device"]
+		log.Printf("[DEBUG] attachment: %v", attachment)
 	}
+	d.Set("attachment", attachments)
 
 	return nil
 }

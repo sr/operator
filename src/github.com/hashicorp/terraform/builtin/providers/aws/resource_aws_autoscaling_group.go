@@ -26,7 +26,7 @@ func resourceAwsAutoscalingGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -42,57 +42,57 @@ func resourceAwsAutoscalingGroup() *schema.Resource {
 				},
 			},
 
-			"launch_configuration": {
+			"launch_configuration": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"desired_capacity": {
+			"desired_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"min_elb_capacity": {
+			"min_elb_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"min_size": {
+			"min_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 
-			"max_size": {
+			"max_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 
-			"default_cooldown": {
+			"default_cooldown": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"force_delete": {
+			"force_delete": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"health_check_grace_period": {
+			"health_check_grace_period": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  300,
 			},
 
-			"health_check_type": {
+			"health_check_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"availability_zones": {
+			"availability_zones": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -100,19 +100,19 @@ func resourceAwsAutoscalingGroup() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"placement_group": {
+			"placement_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"load_balancers": {
+			"load_balancers": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"vpc_zone_identifier": {
+			"vpc_zone_identifier": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -120,13 +120,13 @@ func resourceAwsAutoscalingGroup() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"termination_policies": {
+			"termination_policies": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"wait_for_capacity_timeout": {
+			"wait_for_capacity_timeout": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "10m",
@@ -145,22 +145,28 @@ func resourceAwsAutoscalingGroup() *schema.Resource {
 				},
 			},
 
-			"wait_for_elb_capacity": {
+			"wait_for_elb_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"enabled_metrics": {
+			"enabled_metrics": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"metrics_granularity": {
+			"metrics_granularity": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "1Minute",
+			},
+
+			"protect_from_scale_in": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 
 			"tag": autoscalingTagsSchema(),
@@ -185,6 +191,7 @@ func resourceAwsAutoscalingGroupCreate(d *schema.ResourceData, meta interface{})
 	autoScalingGroupOpts.LaunchConfigurationName = aws.String(d.Get("launch_configuration").(string))
 	autoScalingGroupOpts.MinSize = aws.Int64(int64(d.Get("min_size").(int)))
 	autoScalingGroupOpts.MaxSize = aws.Int64(int64(d.Get("max_size").(int)))
+	autoScalingGroupOpts.NewInstancesProtectedFromScaleIn = aws.Bool(d.Get("protect_from_scale_in").(bool))
 
 	// Availability Zones are optional if VPC Zone Identifer(s) are specified
 	if v, ok := d.GetOk("availability_zones"); ok && v.(*schema.Set).Len() > 0 {
@@ -278,6 +285,7 @@ func resourceAwsAutoscalingGroupRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", g.AutoScalingGroupName)
 	d.Set("tag", autoscalingTagDescriptionsToSlice(g.Tags))
 	d.Set("vpc_zone_identifier", strings.Split(*g.VPCZoneIdentifier, ","))
+	d.Set("protect_from_scale_in", g.NewInstancesProtectedFromScaleIn)
 
 	// If no termination polices are explicitly configured and the upstream state
 	// is only using the "Default" policy, clear the state to make it consistent
@@ -306,6 +314,8 @@ func resourceAwsAutoscalingGroupUpdate(d *schema.ResourceData, meta interface{})
 	opts := autoscaling.UpdateAutoScalingGroupInput{
 		AutoScalingGroupName: aws.String(d.Id()),
 	}
+
+	opts.NewInstancesProtectedFromScaleIn = aws.Bool(d.Get("protect_from_scale_in").(bool))
 
 	if d.HasChange("default_cooldown") {
 		opts.DefaultCooldown = aws.Int64(int64(d.Get("default_cooldown").(int)))
@@ -602,6 +612,7 @@ func updateASGMetricsCollection(d *schema.ResourceData, conn *autoscaling.AutoSc
 		props := &autoscaling.EnableMetricsCollectionInput{
 			AutoScalingGroupName: aws.String(d.Id()),
 			Metrics:              expandStringList(enabledMetrics.List()),
+			Granularity:          aws.String(d.Get("metrics_granularity").(string)),
 		}
 
 		_, err := conn.EnableMetricsCollection(props)

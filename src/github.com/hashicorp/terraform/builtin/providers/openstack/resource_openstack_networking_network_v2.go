@@ -19,32 +19,35 @@ func resourceNetworkingNetworkV2() *schema.Resource {
 		Read:   resourceNetworkingNetworkV2Read,
 		Update: resourceNetworkingNetworkV2Update,
 		Delete: resourceNetworkingNetworkV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"admin_state_up": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: false,
-				Computed: true,
-			},
-			"shared": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 			},
-			"tenant_id": {
+			"shared": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: false,
+				Computed: true,
+			},
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

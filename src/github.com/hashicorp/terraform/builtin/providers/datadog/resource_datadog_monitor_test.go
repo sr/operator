@@ -17,7 +17,7 @@ func TestAccDatadogMonitor_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDatadogMonitorDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckDatadogMonitorConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatadogMonitorExists("datadog_monitor.foo"),
@@ -55,7 +55,7 @@ func TestAccDatadogMonitor_Updated(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDatadogMonitorDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckDatadogMonitorConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatadogMonitorExists("datadog_monitor.foo"),
@@ -91,7 +91,7 @@ func TestAccDatadogMonitor_Updated(t *testing.T) {
 						"datadog_monitor.foo", "locked", "false"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccCheckDatadogMonitorConfigUpdated,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatadogMonitorExists("datadog_monitor.foo"),
@@ -141,7 +141,7 @@ func TestAccDatadogMonitor_TrimWhitespace(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDatadogMonitorDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckDatadogMonitorConfigWhitespace,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDatadogMonitorExists("datadog_monitor.foo"),

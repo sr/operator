@@ -101,34 +101,34 @@ func resourceUltraDNSRecord() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			// Required
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"rdata": {
+			"rdata": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			// Optional
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "3600",
 			},
 			// Computed
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

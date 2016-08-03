@@ -26,43 +26,45 @@ func resourceAwsRoute53Zone() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"comment": {
+			"comment": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"vpc_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+			"vpc_id": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"delegation_set_id"},
 			},
 
-			"vpc_region": {
+			"vpc_region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"zone_id": {
+			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"delegation_set_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+			"delegation_set_id": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"vpc_id"},
 			},
 
-			"name_servers": {
+			"name_servers": &schema.Schema{
 				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,

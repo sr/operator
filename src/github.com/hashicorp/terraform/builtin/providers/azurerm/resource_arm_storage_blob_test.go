@@ -25,15 +25,15 @@ func TestResourceAzureRMStorageBlobType_validation(t *testing.T) {
 			ErrCount: 0,
 		},
 		{
-			Value:    "blob",
+			Value:    "block",
 			ErrCount: 0,
 		},
 		{
-			Value:    "BLOB",
+			Value:    "BLOCK",
 			ErrCount: 0,
 		},
 		{
-			Value:    "Blob",
+			Value:    "Block",
 			ErrCount: 0,
 		},
 	}
@@ -93,7 +93,7 @@ func TestAccAzureRMStorageBlob_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMStorageBlobDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMStorageBlobExists("azurerm_storage_blob.test"),

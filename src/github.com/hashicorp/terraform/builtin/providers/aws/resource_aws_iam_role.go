@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"regexp"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -20,17 +21,17 @@ func resourceAwsIamRole() *schema.Resource {
 		Delete: resourceAwsIamRoleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"unique_id": {
+			"unique_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -51,7 +52,7 @@ func resourceAwsIamRole() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -70,14 +71,14 @@ func resourceAwsIamRole() *schema.Resource {
 				},
 			},
 
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
 
-			"assume_role_policy": {
+			"assume_role_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -103,7 +104,17 @@ func resourceAwsIamRoleCreate(d *schema.ResourceData, meta interface{}) error {
 		AssumeRolePolicyDocument: aws.String(d.Get("assume_role_policy").(string)),
 	}
 
-	createResp, err := iamconn.CreateRole(request)
+	var createResp *iam.CreateRoleOutput
+	err := resource.Retry(10*time.Second, func() *resource.RetryError {
+		var err error
+		createResp, err = iamconn.CreateRole(request)
+		// IAM roles can take ~10 seconds to propagate in AWS:
+		// http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#launch-instance-with-role-console
+		if isAWSErr(err, "MalformedPolicyDocument", "Invalid principal in policy") {
+			return resource.RetryableError(err)
+		}
+		return resource.NonRetryableError(err)
+	})
 	if err != nil {
 		return fmt.Errorf("Error creating IAM Role %s: %s", name, err)
 	}

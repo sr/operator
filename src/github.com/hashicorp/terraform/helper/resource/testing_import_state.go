@@ -46,7 +46,7 @@ func testStepImportState(
 		Module: mod,
 
 		Targets: []*terraform.ImportTarget{
-			{
+			&terraform.ImportTarget{
 				Addr: step.ResourceName,
 				ID:   importId,
 			},
@@ -90,17 +90,23 @@ func testStepImportState(
 			}
 
 			// Compare their attributes
-			actual := r.Primary.Attributes
-			expected := oldR.Primary.Attributes
+			actual := make(map[string]string)
+			for k, v := range r.Primary.Attributes {
+				actual[k] = v
+			}
+			expected := make(map[string]string)
+			for k, v := range oldR.Primary.Attributes {
+				expected[k] = v
+			}
 
 			// Remove fields we're ignoring
 			for _, v := range step.ImportStateVerifyIgnore {
-				for k := range actual {
+				for k, _ := range actual {
 					if strings.HasPrefix(k, v) {
 						delete(actual, k)
 					}
 				}
-				for k := range expected {
+				for k, _ := range expected {
 					if strings.HasPrefix(k, v) {
 						delete(expected, k)
 					}

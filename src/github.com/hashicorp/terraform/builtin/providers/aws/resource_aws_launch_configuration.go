@@ -29,7 +29,7 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -46,7 +46,7 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -62,32 +62,32 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				},
 			},
 
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"instance_type": {
+			"instance_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"iam_instance_profile": {
+			"iam_instance_profile": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"key_name": {
+			"key_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -102,7 +102,7 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				},
 			},
 
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -110,87 +110,101 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"associate_public_ip_address": {
+			"vpc_classic_link_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+
+			"vpc_classic_link_security_groups": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
+
+			"associate_public_ip_address": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  false,
 			},
 
-			"spot_price": {
+			"spot_price": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ebs_optimized": {
+			"ebs_optimized": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"placement_tenancy": {
+			"placement_tenancy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"enable_monitoring": {
+			"enable_monitoring": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  true,
 			},
 
-			"ebs_block_device": {
+			"ebs_block_device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 							ForceNew: true,
 						},
 
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"snapshot_id": {
+						"snapshot_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_type": {
+						"volume_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"encrypted": {
+						"encrypted": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Computed: true,
@@ -207,18 +221,18 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				},
 			},
 
-			"ephemeral_block_device": {
+			"ephemeral_block_device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"virtual_name": {
+						"virtual_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -233,7 +247,7 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 				},
 			},
 
-			"root_block_device": {
+			"root_block_device": &schema.Schema{
 				// TODO: This is a set because we don't support singleton
 				//       sub-resources today. We'll enforce that the set only ever has
 				//       length zero or one below. When TF gains support for
@@ -246,28 +260,28 @@ func resourceAwsLaunchConfiguration() *schema.Resource {
 					// Termination flag on the block device mapping entry for the root
 					// device volume." - bit.ly/ec2bdmap
 					Schema: map[string]*schema.Schema{
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 							ForceNew: true,
 						},
 
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_type": {
+						"volume_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -325,6 +339,16 @@ func resourceAwsLaunchConfigurationCreate(d *schema.ResourceData, meta interface
 
 	if v, ok := d.GetOk("security_groups"); ok {
 		createLaunchConfigurationOpts.SecurityGroups = expandStringList(
+			v.(*schema.Set).List(),
+		)
+	}
+
+	if v, ok := d.GetOk("vpc_classic_link_id"); ok {
+		createLaunchConfigurationOpts.ClassicLinkVPCId = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("vpc_classic_link_security_groups"); ok {
+		createLaunchConfigurationOpts.ClassicLinkVPCSecurityGroups = expandStringList(
 			v.(*schema.Set).List(),
 		)
 	}
@@ -518,6 +542,9 @@ func resourceAwsLaunchConfigurationRead(d *schema.ResourceData, meta interface{}
 	d.Set("spot_price", lc.SpotPrice)
 	d.Set("enable_monitoring", lc.InstanceMonitoring.Enabled)
 	d.Set("security_groups", lc.SecurityGroups)
+
+	d.Set("vpc_classic_link_id", lc.ClassicLinkVPCId)
+	d.Set("vpc_classic_link_security_groups", lc.ClassicLinkVPCSecurityGroups)
 
 	if err := readLCBlockDevices(d, lc, ec2conn); err != nil {
 		return err

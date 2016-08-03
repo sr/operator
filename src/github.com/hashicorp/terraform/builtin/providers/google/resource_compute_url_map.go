@@ -18,44 +18,44 @@ func resourceComputeUrlMap() *schema.Resource {
 		Delete: resourceComputeUrlMapDelete,
 
 		Schema: map[string]*schema.Schema{
-			"default_service": {
+			"default_service": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"host_rule": {
+			"host_rule": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"hosts": {
+						"hosts": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 
-						"path_matcher": {
+						"path_matcher": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -63,43 +63,43 @@ func resourceComputeUrlMap() *schema.Resource {
 				},
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"path_matcher": {
+			"path_matcher": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"default_service": {
+						"default_service": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"path_rule": {
+						"path_rule": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"paths": {
+									"paths": &schema.Schema{
 										Type:     schema.TypeList,
 										Required: true,
 										Elem:     &schema.Schema{Type: schema.TypeString},
 									},
 
-									"service": {
+									"service": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
@@ -110,38 +110,38 @@ func resourceComputeUrlMap() *schema.Resource {
 				},
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"test": {
+			"test": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"host": {
+						"host": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"path": {
+						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"service": {
+						"service": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -515,7 +515,7 @@ func resourceComputeUrlMapUpdate(d *schema.ResourceData, meta interface{}) error
 					}
 
 					/* Now add in the brand new entries */
-					for host := range _oldHostsSet {
+					for host, _ := range _oldHostsSet {
 						hostRule.Hosts = append(hostRule.Hosts, host)
 					}
 

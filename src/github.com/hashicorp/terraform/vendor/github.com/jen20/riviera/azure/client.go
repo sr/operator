@@ -35,7 +35,7 @@ func NewClient(creds *AzureResourceManagerCredentials) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) SetRequestLoggingHook(hook func(*log.Logger, *http.Request, int)) {
+func (c *Client) SetRequestLoggingHook(hook func (*log.Logger, *http.Request, int)) {
 	c.httpClient.RequestLogHook = hook
 }
 

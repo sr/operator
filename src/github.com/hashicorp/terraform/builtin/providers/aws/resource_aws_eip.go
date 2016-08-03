@@ -24,50 +24,50 @@ func resourceAwsEip() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"vpc": {
+			"vpc": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"instance": {
+			"instance": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"network_interface": {
+			"network_interface": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"allocation_id": {
+			"allocation_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"association_id": {
+			"association_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"domain": {
+			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"private_ip": {
+			"private_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"associate_with_private_ip": {
+			"associate_with_private_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -208,8 +208,20 @@ func resourceAwsEipUpdate(d *schema.ResourceData, meta interface{}) error {
 			}
 		}
 
-		log.Printf("[DEBUG] EIP associate configuration: %#v (domain: %v)", assocOpts, domain)
-		_, err := ec2conn.AssociateAddress(assocOpts)
+		log.Printf("[DEBUG] EIP associate configuration: %s (domain: %s)", assocOpts, domain)
+
+		err := resource.Retry(1*time.Minute, func() *resource.RetryError {
+			_, err := ec2conn.AssociateAddress(assocOpts)
+			if err != nil {
+				if awsErr, ok := err.(awserr.Error); ok {
+					if awsErr.Code() == "InvalidAllocationID.NotFound" {
+						return resource.RetryableError(awsErr)
+					}
+				}
+				return resource.NonRetryableError(err)
+			}
+			return nil
+		})
 		if err != nil {
 			// Prevent saving instance if association failed
 			// e.g. missing internet gateway in VPC

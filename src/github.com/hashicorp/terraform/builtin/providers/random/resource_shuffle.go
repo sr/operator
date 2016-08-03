@@ -11,19 +11,19 @@ func resourceShuffle() *schema.Resource {
 		Delete: stubDelete,
 
 		Schema: map[string]*schema.Schema{
-			"keepers": {
+			"keepers": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"seed": {
+			"seed": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"input": {
+			"input": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
@@ -32,7 +32,7 @@ func resourceShuffle() *schema.Resource {
 				},
 			},
 
-			"result": {
+			"result": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Schema{
@@ -40,7 +40,7 @@ func resourceShuffle() *schema.Resource {
 				},
 			},
 
-			"result_count": {
+			"result_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,

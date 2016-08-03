@@ -23,18 +23,18 @@ func resourceHerokuAddon() *schema.Resource {
 		Delete: resourceHerokuAddonDelete,
 
 		Schema: map[string]*schema.Schema{
-			"app": {
+			"app": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"plan": {
+			"plan": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"config": {
+			"config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -43,12 +43,12 @@ func resourceHerokuAddon() *schema.Resource {
 				},
 			},
 
-			"provider_id": {
+			"provider_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"config_vars": {
+			"config_vars": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Schema{

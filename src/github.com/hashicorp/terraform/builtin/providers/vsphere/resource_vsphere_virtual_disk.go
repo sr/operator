@@ -30,19 +30,19 @@ func resourceVSphereVirtualDisk() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			// Size in GB
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true, //TODO Can this be optional (resize)?
 			},
 
-			"vmdk_path": {
+			"vmdk_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true, //TODO Can this be optional (move)?
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -57,7 +57,7 @@ func resourceVSphereVirtualDisk() *schema.Resource {
 				},
 			},
 
-			"adapter_type": {
+			"adapter_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -72,13 +72,13 @@ func resourceVSphereVirtualDisk() *schema.Resource {
 				},
 			},
 
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"datastore": {
+			"datastore": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -173,7 +173,12 @@ func resourceVSphereVirtualDiskRead(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		log.Printf("[DEBUG] resourceVSphereVirtualDiskRead - stat failed on: %v", vDisk.vmdkPath)
 		d.SetId("")
-		return err
+
+		_, ok := err.(object.DatastoreNoSuchFileError)
+		if !ok {
+			return err
+		}
+		return nil
 	}
 	fileInfo = fileInfo.GetFileInfo()
 	log.Printf("[DEBUG] resourceVSphereVirtualDiskRead - fileinfo: %#v", fileInfo)

@@ -24,7 +24,7 @@ func resourceAwsRoute53HealthCheck() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -32,57 +32,57 @@ func resourceAwsRoute53HealthCheck() *schema.Resource {
 					return strings.ToUpper(val.(string))
 				},
 			},
-			"failure_threshold": {
+			"failure_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"request_interval": {
+			"request_interval": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true, // todo this should be updateable but the awslabs route53 service doesnt have the ability
 			},
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"fqdn": {
+			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"invert_healthcheck": {
+			"invert_healthcheck": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"resource_path": {
+			"resource_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"search_string": {
+			"search_string": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"measure_latency": {
+			"measure_latency": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"child_healthchecks": {
+			"child_healthchecks": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 				Set:      schema.HashString,
 			},
-			"child_health_threshold": {
+			"child_health_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {

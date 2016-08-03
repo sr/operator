@@ -26,67 +26,67 @@ func resourceAwsEcsService() *schema.Resource {
 		Delete: resourceAwsEcsServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cluster": {
+			"cluster": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"task_definition": {
+			"task_definition": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"desired_count": {
+			"desired_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"iam_role": {
+			"iam_role": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
 
-			"deployment_maximum_percent": {
+			"deployment_maximum_percent": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  200,
 			},
 
-			"deployment_minimum_healthy_percent": {
+			"deployment_minimum_healthy_percent": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  100,
 			},
 
-			"load_balancer": {
+			"load_balancer": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"elb_name": {
+						"elb_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"container_name": {
+						"container_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"container_port": {
+						"container_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: true,

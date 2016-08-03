@@ -18,49 +18,52 @@ func resourceNetworkingSecGroupRuleV2() *schema.Resource {
 		Create: resourceNetworkingSecGroupRuleV2Create,
 		Read:   resourceNetworkingSecGroupRuleV2Read,
 		Delete: resourceNetworkingSecGroupRuleV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"direction": {
+			"direction": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"ethertype": {
+			"ethertype": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"port_range_min": {
+			"port_range_min": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"port_range_max": {
+			"port_range_max": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"remote_group_id": {
+			"remote_group_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"remote_ip_prefix": {
+			"remote_ip_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -69,12 +72,12 @@ func resourceNetworkingSecGroupRuleV2() *schema.Resource {
 					return strings.ToLower(v.(string))
 				},
 			},
-			"security_group_id": {
+			"security_group_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -143,11 +146,14 @@ func resourceNetworkingSecGroupRuleV2Read(d *schema.ResourceData, meta interface
 		return CheckDeleted(d, err, "OpenStack Security Group Rule")
 	}
 
+	d.Set("direction", security_group_rule.Direction)
+	d.Set("ethertype", security_group_rule.EtherType)
 	d.Set("protocol", security_group_rule.Protocol)
 	d.Set("port_range_min", security_group_rule.PortRangeMin)
 	d.Set("port_range_max", security_group_rule.PortRangeMax)
 	d.Set("remote_group_id", security_group_rule.RemoteGroupID)
 	d.Set("remote_ip_prefix", security_group_rule.RemoteIPPrefix)
+	d.Set("security_group_id", security_group_rule.SecGroupID)
 	d.Set("tenant_id", security_group_rule.TenantID)
 	return nil
 }

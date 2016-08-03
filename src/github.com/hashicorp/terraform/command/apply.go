@@ -251,7 +251,7 @@ func (c *ApplyCommand) Run(args []string) int {
 	}
 
 	if !c.Destroy {
-		if outputs := outputsAsString(state, ctx.Module().Config().Outputs, true); outputs != "" {
+		if outputs := outputsAsString(state, terraform.RootModulePath, ctx.Module().Config().Outputs, true); outputs != "" {
 			c.Ui.Output(c.Colorize().Color(outputs))
 		}
 	}
@@ -377,12 +377,12 @@ Options:
 	return strings.TrimSpace(helpText)
 }
 
-func outputsAsString(state *terraform.State, schema []*config.Output, includeHeader bool) string {
+func outputsAsString(state *terraform.State, modPath []string, schema []*config.Output, includeHeader bool) string {
 	if state == nil {
 		return ""
 	}
 
-	outputs := state.RootModule().Outputs
+	outputs := state.ModuleByPath(modPath).Outputs
 	outputBuf := new(bytes.Buffer)
 	if len(outputs) > 0 {
 		schemaMap := make(map[string]*config.Output)
@@ -399,7 +399,7 @@ func outputsAsString(state *terraform.State, schema []*config.Output, includeHea
 		// Output the outputs in alphabetical order
 		keyLen := 0
 		ks := make([]string, 0, len(outputs))
-		for key := range outputs {
+		for key, _ := range outputs {
 			ks = append(ks, key)
 			if len(key) > keyLen {
 				keyLen = len(key)

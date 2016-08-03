@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/efs"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -19,21 +20,25 @@ func resourceAwsEfsMountTarget() *schema.Resource {
 		Update: resourceAwsEfsMountTargetUpdate,
 		Delete: resourceAwsEfsMountTargetDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
-			"file_system_id": {
+			"file_system_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
@@ -41,13 +46,17 @@ func resourceAwsEfsMountTarget() *schema.Resource {
 				Optional: true,
 			},
 
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_interface_id": {
+			"network_interface_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"dns_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -163,7 +172,31 @@ func resourceAwsEfsMountTargetRead(d *schema.ResourceData, meta interface{}) err
 
 	d.Set("security_groups", schema.NewSet(schema.HashString, flattenStringList(sgResp.SecurityGroups)))
 
+	// DNS name per http://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-cmd-dns-name.html
+	az, err := getAzFromSubnetId(*mt.SubnetId, meta.(*AWSClient).ec2conn)
+	if err != nil {
+		return fmt.Errorf("Failed getting AZ from subnet ID (%s): %s", *mt.SubnetId, err)
+	}
+	region := meta.(*AWSClient).region
+	d.Set("dns_name", fmt.Sprintf("%s.%s.efs.%s.amazonaws.com", az, *mt.FileSystemId, region))
+
 	return nil
+}
+
+func getAzFromSubnetId(subnetId string, conn *ec2.EC2) (string, error) {
+	input := ec2.DescribeSubnetsInput{
+		SubnetIds: []*string{aws.String(subnetId)},
+	}
+	out, err := conn.DescribeSubnets(&input)
+	if err != nil {
+		return "", err
+	}
+
+	if len(out.Subnets) != 1 {
+		return "", fmt.Errorf("Expected exactly 1 subnet returned for %q", subnetId)
+	}
+
+	return *out.Subnets[0].AvailabilityZone, nil
 }
 
 func resourceAwsEfsMountTargetDelete(d *schema.ResourceData, meta interface{}) error {

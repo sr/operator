@@ -16,7 +16,6 @@ type ProjectService interface {
 type projectsRoot struct {
 	Projects []Project `json:"projects"`
 }
-
 // Project represents a Packet project
 type Project struct {
 	ID      string   `json:"id"`
@@ -28,7 +27,6 @@ type Project struct {
 	SSHKeys []SSHKey `json:"ssh_keys,omitempty"`
 	URL     string   `json:"href,omitempty"`
 }
-
 func (p Project) String() string {
 	return Stringify(p)
 }
@@ -38,7 +36,6 @@ type ProjectCreateRequest struct {
 	Name          string `json:"name"`
 	PaymentMethod string `json:"payment_method,omitempty"`
 }
-
 func (p ProjectCreateRequest) String() string {
 	return Stringify(p)
 }
@@ -49,7 +46,6 @@ type ProjectUpdateRequest struct {
 	Name          string `json:"name,omitempty"`
 	PaymentMethod string `json:"payment_method,omitempty"`
 }
-
 func (p ProjectUpdateRequest) String() string {
 	return Stringify(p)
 }

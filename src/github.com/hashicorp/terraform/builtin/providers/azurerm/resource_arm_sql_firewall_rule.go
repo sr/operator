@@ -15,32 +15,35 @@ func resourceArmSqlFirewallRule() *schema.Resource {
 		Read:   resourceArmSqlFirewallRuleRead,
 		Update: resourceArmSqlFirewallRuleCreate,
 		Delete: resourceArmSqlFirewallRuleDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"server_name": {
+			"server_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"start_ip_address": {
+			"start_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"end_ip_address": {
+			"end_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -109,6 +112,7 @@ func resourceArmSqlFirewallRuleRead(d *schema.ResourceData, meta interface{}) er
 
 	resp := readResponse.Parsed.(*sql.GetFirewallRuleResponse)
 
+	d.Set("name", resp.Name)
 	d.Set("start_ip_address", resp.StartIPAddress)
 	d.Set("end_ip_address", resp.EndIPAddress)
 

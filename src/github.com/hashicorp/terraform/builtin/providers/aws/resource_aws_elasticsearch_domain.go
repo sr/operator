@@ -21,17 +21,17 @@ func resourceAwsElasticSearchDomain() *schema.Resource {
 		Delete: resourceAwsElasticSearchDomainDelete,
 
 		Schema: map[string]*schema.Schema{
-			"access_policies": {
+			"access_policies": &schema.Schema{
 				Type:      schema.TypeString,
 				StateFunc: normalizeJson,
 				Optional:  true,
 			},
-			"advanced_options": {
+			"advanced_options": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Computed: true,
 			},
-			"domain_name": {
+			"domain_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -44,85 +44,85 @@ func resourceAwsElasticSearchDomain() *schema.Resource {
 					return
 				},
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"domain_id": {
+			"domain_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ebs_options": {
+			"ebs_options": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ebs_enabled": {
+						"ebs_enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 						},
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"volume_type": {
+						"volume_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"cluster_config": {
+			"cluster_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"dedicated_master_count": {
+						"dedicated_master_count": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"dedicated_master_enabled": {
+						"dedicated_master_enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
 						},
-						"dedicated_master_type": {
+						"dedicated_master_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"instance_count": {
+						"instance_count": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Default:  1,
 						},
-						"instance_type": {
+						"instance_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "m3.medium.elasticsearch",
 						},
-						"zone_awareness_enabled": {
+						"zone_awareness_enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"snapshot_options": {
+			"snapshot_options": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"automated_snapshot_start_hour": {
+						"automated_snapshot_start_hour": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},

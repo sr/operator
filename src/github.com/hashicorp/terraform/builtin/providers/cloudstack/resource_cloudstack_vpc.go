@@ -17,48 +17,49 @@ func resourceCloudStackVPC() *schema.Resource {
 		Delete: resourceCloudStackVPCDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"display_text": {
+			"display_text": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"cidr": {
+			"cidr": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vpc_offering": {
+			"vpc_offering": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_domain": {
+			"network_domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				ForceNew: true,
 			},
 
-			"source_nat_ip": {
+			"source_nat_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -171,11 +172,9 @@ func resourceCloudStackVPCRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if l.Count != 1 {
-		return fmt.Errorf("Unexpected number (%d) of source NAT IPs returned", l.Count)
+	if l.Count == 1 {
+		d.Set("source_nat_ip", l.PublicIpAddresses[0].Ipaddress)
 	}
-
-	d.Set("source_nat_ip", l.PublicIpAddresses[0].Ipaddress)
 
 	return nil
 }

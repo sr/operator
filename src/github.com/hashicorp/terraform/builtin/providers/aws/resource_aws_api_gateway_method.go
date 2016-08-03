@@ -21,43 +21,43 @@ func resourceAwsApiGatewayMethod() *schema.Resource {
 		Delete: resourceAwsApiGatewayMethodDelete,
 
 		Schema: map[string]*schema.Schema{
-			"rest_api_id": {
+			"rest_api_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"resource_id": {
+			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"http_method": {
+			"http_method": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateHTTPMethod,
 			},
 
-			"authorization": {
+			"authorization": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"api_key_required": {
+			"api_key_required": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"request_models": {
+			"request_models": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Elem:     schema.TypeString,
 			},
 
-			"request_parameters_in_json": {
+			"request_parameters_in_json": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

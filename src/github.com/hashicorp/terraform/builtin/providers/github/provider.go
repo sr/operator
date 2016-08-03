@@ -11,19 +11,19 @@ func Provider() terraform.ResourceProvider {
 	// The actual provider
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"token": {
+			"token": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITHUB_TOKEN", nil),
 				Description: descriptions["token"],
 			},
-			"organization": {
+			"organization": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITHUB_ORGANIZATION", nil),
 				Description: descriptions["organization"],
 			},
-			"base_url": {
+			"base_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITHUB_BASE_URL", ""),

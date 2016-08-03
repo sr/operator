@@ -74,7 +74,7 @@ func TestAccAWSRoute53Zone_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckRoute53ZoneDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRoute53ZoneConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRoute53ZoneExists("aws_route53_zone.main", &zone),
@@ -96,7 +96,7 @@ func TestAccAWSRoute53Zone_updateComment(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckRoute53ZoneDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRoute53ZoneConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRoute53ZoneExists("aws_route53_zone.main", &zone),
@@ -107,7 +107,7 @@ func TestAccAWSRoute53Zone_updateComment(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccRoute53ZoneConfigUpdateComment,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRoute53ZoneExists("aws_route53_zone.main", &zone),
@@ -129,7 +129,7 @@ func TestAccAWSRoute53Zone_private_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckRoute53ZoneDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRoute53PrivateZoneConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRoute53ZoneExists("aws_route53_zone.main", &zone),
@@ -160,7 +160,7 @@ func TestAccAWSRoute53Zone_private_region(t *testing.T) {
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRoute53ZoneDestroyWithProviders(&providers),
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRoute53PrivateZoneRegionConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRoute53ZoneExistsWithProviders("aws_route53_zone.main", &zone, &providers),

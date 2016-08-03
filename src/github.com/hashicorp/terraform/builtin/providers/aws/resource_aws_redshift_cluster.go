@@ -20,44 +20,47 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 		Read:   resourceAwsRedshiftClusterRead,
 		Update: resourceAwsRedshiftClusterUpdate,
 		Delete: resourceAwsRedshiftClusterDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceAwsRedshiftClusterImport,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"database_name": {
+			"database_name": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateRedshiftClusterDbName,
 			},
 
-			"cluster_identifier": {
+			"cluster_identifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRedshiftClusterIdentifier,
 			},
-			"cluster_type": {
+			"cluster_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"node_type": {
+			"node_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"master_username": {
+			"master_username": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateRedshiftClusterMasterUsername,
 			},
 
-			"master_password": {
+			"master_password": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"cluster_security_groups": {
+			"cluster_security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -65,7 +68,7 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"vpc_security_group_ids": {
+			"vpc_security_group_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -73,20 +76,20 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"cluster_subnet_group_name": {
+			"cluster_subnet_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"preferred_maintenance_window": {
+			"preferred_maintenance_window": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -98,13 +101,13 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 				},
 			},
 
-			"cluster_parameter_group_name": {
+			"cluster_parameter_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"automated_snapshot_retention_period": {
+			"automated_snapshot_retention_period": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
@@ -118,85 +121,85 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 				},
 			},
 
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  5439,
 			},
 
-			"cluster_version": {
+			"cluster_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "1.0",
 			},
 
-			"allow_version_upgrade": {
+			"allow_version_upgrade": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"number_of_nodes": {
+			"number_of_nodes": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
 			},
 
-			"publicly_accessible": {
+			"publicly_accessible": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"encrypted": {
+			"encrypted": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"elastic_ip": {
+			"elastic_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"final_snapshot_identifier": {
+			"final_snapshot_identifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateRedshiftClusterFinalSnapshotIdentifier,
 			},
 
-			"skip_final_snapshot": {
+			"skip_final_snapshot": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"cluster_public_key": {
+			"cluster_public_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"cluster_revision_number": {
+			"cluster_revision_number": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"iam_roles": {
+			"iam_roles": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -204,9 +207,36 @@ func resourceAwsRedshiftCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
+			"enable_logging": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+
+			"bucket_name": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"s3_key_prefix": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"tags": tagsSchema(),
 		},
 	}
+}
+
+func resourceAwsRedshiftClusterImport(
+	d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	// Neither skip_final_snapshot nor final_snapshot_identifier can be fetched
+	// from any API call, so we need to default skip_final_snapshot to true so
+	// that final_snapshot_identifier is not required
+	d.Set("skip_final_snapshot", true)
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceAwsRedshiftClusterCreate(d *schema.ResourceData, meta interface{}) error {
@@ -298,6 +328,16 @@ func resourceAwsRedshiftClusterCreate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("[WARN] Error waiting for Redshift Cluster state to be \"available\": %s", err)
 	}
 
+	if _, ok := d.GetOk("enable_logging"); ok {
+
+		loggingErr := enableRedshiftClusterLogging(d, conn)
+		if loggingErr != nil {
+			log.Printf("[ERROR] Error Enabling Logging on Redshift Cluster: %s", err)
+			return loggingErr
+		}
+
+	}
+
 	return resourceAwsRedshiftClusterRead(d, meta)
 }
 
@@ -334,7 +374,22 @@ func resourceAwsRedshiftClusterRead(d *schema.ResourceData, meta interface{}) er
 		return nil
 	}
 
+	log.Printf("[INFO] Reading Redshift Cluster Logging Status: %s", d.Id())
+	loggingStatus, loggingErr := conn.DescribeLoggingStatus(&redshift.DescribeLoggingStatusInput{
+		ClusterIdentifier: aws.String(d.Id()),
+	})
+
+	if loggingErr != nil {
+		return loggingErr
+	}
+
+	d.Set("master_username", rsc.MasterUsername)
+	d.Set("node_type", rsc.NodeType)
+	d.Set("allow_version_upgrade", rsc.AllowVersionUpgrade)
 	d.Set("database_name", rsc.DBName)
+	d.Set("cluster_identifier", rsc.ClusterIdentifier)
+	d.Set("cluster_version", rsc.ClusterVersion)
+
 	d.Set("cluster_subnet_group_name", rsc.ClusterSubnetGroupName)
 	d.Set("availability_zone", rsc.AvailabilityZone)
 	d.Set("encrypted", rsc.Encrypted)
@@ -346,6 +401,7 @@ func resourceAwsRedshiftClusterRead(d *schema.ResourceData, meta interface{}) er
 		if rsc.Endpoint.Port != nil {
 			endpoint = fmt.Sprintf("%s:%d", endpoint, *rsc.Endpoint.Port)
 		}
+		d.Set("port", rsc.Endpoint.Port)
 		d.Set("endpoint", endpoint)
 	}
 	d.Set("cluster_parameter_group_name", rsc.ClusterParameterGroups[0].ParameterGroupName)
@@ -354,6 +410,8 @@ func resourceAwsRedshiftClusterRead(d *schema.ResourceData, meta interface{}) er
 	} else {
 		d.Set("cluster_type", "single-node")
 	}
+	d.Set("number_of_nodes", rsc.NumberOfNodes)
+	d.Set("publicly_accessible", rsc.PubliclyAccessible)
 
 	var vpcg []string
 	for _, g := range rsc.VpcSecurityGroups {
@@ -382,6 +440,10 @@ func resourceAwsRedshiftClusterRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("cluster_public_key", rsc.ClusterPublicKey)
 	d.Set("cluster_revision_number", rsc.ClusterRevisionNumber)
 	d.Set("tags", tagsToMapRedshift(rsc.Tags))
+
+	d.Set("bucket_name", loggingStatus.BucketName)
+	d.Set("enable_logging", loggingStatus.LoggingEnabled)
+	d.Set("s3_key_prefix", loggingStatus.S3KeyPrefix)
 
 	return nil
 }
@@ -532,9 +594,54 @@ func resourceAwsRedshiftClusterUpdate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 
+	if d.HasChange("enable_logging") || d.HasChange("bucket_name") || d.HasChange("s3_key_prefix") {
+		var loggingErr error
+		if _, ok := d.GetOk("enable_logging"); ok {
+
+			log.Printf("[INFO] Enabling Logging for Redshift Cluster %q", d.Id())
+			loggingErr = enableRedshiftClusterLogging(d, conn)
+			if loggingErr != nil {
+				return loggingErr
+			}
+		} else {
+
+			log.Printf("[INFO] Disabling Logging for Redshift Cluster %q", d.Id())
+			_, loggingErr = conn.DisableLogging(&redshift.DisableLoggingInput{
+				ClusterIdentifier: aws.String(d.Id()),
+			})
+			if loggingErr != nil {
+				return loggingErr
+			}
+		}
+
+		d.SetPartial("enable_logging")
+	}
+
 	d.Partial(false)
 
 	return resourceAwsRedshiftClusterRead(d, meta)
+}
+
+func enableRedshiftClusterLogging(d *schema.ResourceData, conn *redshift.Redshift) error {
+	if _, ok := d.GetOk("bucket_name"); !ok {
+		return fmt.Errorf("bucket_name must be set when enabling logging for Redshift Clusters")
+	}
+
+	params := &redshift.EnableLoggingInput{
+		ClusterIdentifier: aws.String(d.Id()),
+		BucketName:        aws.String(d.Get("bucket_name").(string)),
+	}
+
+	if v, ok := d.GetOk("s3_key_prefix"); ok {
+		params.S3KeyPrefix = aws.String(v.(string))
+	}
+
+	_, loggingErr := conn.EnableLogging(params)
+	if loggingErr != nil {
+		log.Printf("[ERROR] Error Enabling Logging on Redshift Cluster: %s", loggingErr)
+		return loggingErr
+	}
+	return nil
 }
 
 func resourceAwsRedshiftClusterDelete(d *schema.ResourceData, meta interface{}) error {
@@ -548,7 +655,7 @@ func resourceAwsRedshiftClusterDelete(d *schema.ResourceData, meta interface{}) 
 	skipFinalSnapshot := d.Get("skip_final_snapshot").(bool)
 	deleteOpts.SkipFinalClusterSnapshot = aws.Bool(skipFinalSnapshot)
 
-	if !skipFinalSnapshot {
+	if skipFinalSnapshot == false {
 		if name, present := d.GetOk("final_snapshot_identifier"); present {
 			deleteOpts.FinalClusterSnapshotIdentifier = aws.String(name.(string))
 		} else {

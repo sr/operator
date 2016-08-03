@@ -18,12 +18,12 @@ func resourceAwsIamGroupPolicyAttachment() *schema.Resource {
 		Delete: resourceAwsIamGroupPolicyAttachmentDelete,
 
 		Schema: map[string]*schema.Schema{
-			"group": {
+			"group": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"policy_arn": {
+			"policy_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

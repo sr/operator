@@ -179,11 +179,11 @@ func mockCloudFlareEnv() *httptest.Server {
 // Stub out the two CloudFlare API routes that will be called
 func mockEndpoints() []*endpoint {
 	return []*endpoint{
-		{
+		&endpoint{
 			BasePath: "/zones",
 			Body:     zoneResponse,
 		},
-		{
+		&endpoint{
 			BasePath: "/zones/1234567890/dns_records",
 			Body:     dnsResponse,
 		},

@@ -263,10 +263,10 @@ func TestContext2Validate_moduleProviderInheritOrphan(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: []string{"root", "child"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.bar": {
+						"aws_instance.bar": &ResourceState{
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -307,7 +307,7 @@ func TestContext2Validate_moduleProviderVar(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"provider_var": "bar",
 		},
 	})
@@ -353,10 +353,10 @@ func TestContext2Validate_orphans(t *testing.T) {
 	m := testModule(t, "validate-good")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -646,10 +646,10 @@ func TestContext2Validate_tainted(t *testing.T) {
 	m := testModule(t, "validate-good")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID:      "bar",
@@ -698,7 +698,7 @@ func TestContext2Validate_targetedDestroy(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo": resourceState("aws_instance", "i-bcd345"),
@@ -732,7 +732,7 @@ func TestContext2Validate_varRefFilled(t *testing.T) {
 		Providers: map[string]ResourceProviderFactory{
 			"aws": testProviderFuncFixed(p),
 		},
-		Variables: map[string]string{
+		Variables: map[string]interface{}{
 			"foo": "bar",
 		},
 	})

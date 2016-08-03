@@ -19,22 +19,25 @@ func resourceAwsRedshiftSubnetGroup() *schema.Resource {
 		Read:   resourceAwsRedshiftSubnetGroupRead,
 		Update: resourceAwsRedshiftSubnetGroupUpdate,
 		Delete: resourceAwsRedshiftSubnetGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateRedshiftSubnetGroupName,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"subnet_ids": {
+			"subnet_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

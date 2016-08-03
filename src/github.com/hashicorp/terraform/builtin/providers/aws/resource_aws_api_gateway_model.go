@@ -20,29 +20,29 @@ func resourceAwsApiGatewayModel() *schema.Resource {
 		Delete: resourceAwsApiGatewayModelDelete,
 
 		Schema: map[string]*schema.Schema{
-			"rest_api_id": {
+			"rest_api_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"schema": {
+			"schema": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"content_type": {
+			"content_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

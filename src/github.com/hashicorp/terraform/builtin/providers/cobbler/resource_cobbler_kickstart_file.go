@@ -16,13 +16,13 @@ func resourceKickstartFile() *schema.Resource {
 		Delete: resourceKickstartFileDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"body": {
+			"body": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},

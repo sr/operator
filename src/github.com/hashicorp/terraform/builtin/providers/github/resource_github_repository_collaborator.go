@@ -13,17 +13,17 @@ func resourceGithubRepositoryCollaborator() *schema.Resource {
 		Delete: resourceGithubRepositoryCollaboratorDelete,
 
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"repository": {
+			"repository": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"permission": {
+			"permission": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,

@@ -16,7 +16,7 @@ func TestAccPostgresqlDatabase_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPostgresqlDatabaseDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccPostgresqlDatabaseConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckPostgresqlDatabaseExists("postgresql_database.mydb", "myrole"),
@@ -37,7 +37,7 @@ func TestAccPostgresqlDatabase_DefaultOwner(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckPostgresqlDatabaseDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccPostgresqlDatabaseConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckPostgresqlDatabaseExists("postgresql_database.mydb_default_owner", ""),

@@ -20,7 +20,7 @@ func TestAccAWSLBCookieStickinessPolicy_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckLBCookieStickinessPolicyDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccLBCookieStickinessPolicyConfig(lbName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLBCookieStickinessPolicy(
@@ -29,7 +29,7 @@ func TestAccAWSLBCookieStickinessPolicy_basic(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccLBCookieStickinessPolicyConfigUpdate(lbName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLBCookieStickinessPolicy(
@@ -100,6 +100,53 @@ func testAccCheckLBCookieStickinessPolicy(elbResource string, policyResource str
 
 		return nil
 	}
+}
+
+func TestAccCheckLBCookieStickinessPolicy_drift(t *testing.T) {
+	lbName := fmt.Sprintf("tf-test-lb-%s", acctest.RandString(5))
+
+	// We only want to remove the reference to the policy from the listner,
+	// beacause that's all that can be done via the console.
+	removePolicy := func() {
+		conn := testAccProvider.Meta().(*AWSClient).elbconn
+
+		setLoadBalancerOpts := &elb.SetLoadBalancerPoliciesOfListenerInput{
+			LoadBalancerName: aws.String(lbName),
+			LoadBalancerPort: aws.Int64(80),
+			PolicyNames:      []*string{},
+		}
+
+		if _, err := conn.SetLoadBalancerPoliciesOfListener(setLoadBalancerOpts); err != nil {
+			t.Fatalf("Error removing LBCookieStickinessPolicy: %s", err)
+		}
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckLBCookieStickinessPolicyDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccLBCookieStickinessPolicyConfig(lbName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckLBCookieStickinessPolicy(
+						"aws_elb.lb",
+						"aws_lb_cookie_stickiness_policy.foo",
+					),
+				),
+			},
+			resource.TestStep{
+				PreConfig: removePolicy,
+				Config:    testAccLBCookieStickinessPolicyConfig(lbName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckLBCookieStickinessPolicy(
+						"aws_elb.lb",
+						"aws_lb_cookie_stickiness_policy.foo",
+					),
+				),
+			},
+		},
+	})
 }
 
 func testAccLBCookieStickinessPolicyConfig(rName string) string {

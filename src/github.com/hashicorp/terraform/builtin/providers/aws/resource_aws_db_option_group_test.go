@@ -21,7 +21,7 @@ func TestAccAWSDBOptionGroup_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBOptionGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupBasicConfig(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -29,6 +29,21 @@ func TestAccAWSDBOptionGroup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"aws_db_option_group.bar", "name", rName),
 				),
+			},
+		},
+	})
+}
+
+func TestAccAWSDBOptionGroup_basicDestroyWithInstance(t *testing.T) {
+	rName := fmt.Sprintf("option-group-test-terraform-%s", acctest.RandString(5))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSDBOptionGroupDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccAWSDBOptionGroupBasicDestroyConfig(rName),
 			},
 		},
 	})
@@ -43,7 +58,7 @@ func TestAccAWSDBOptionGroup_OptionSettings(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBOptionGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupOptionSettings(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -55,7 +70,7 @@ func TestAccAWSDBOptionGroup_OptionSettings(t *testing.T) {
 						"aws_db_option_group.bar", "option.961211605.option_settings.129825347.value", "UTC"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupOptionSettings_update(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -80,7 +95,7 @@ func TestAccAWSDBOptionGroup_sqlServerOptionsUpdate(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBOptionGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupSqlServerEEOptions(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -89,7 +104,7 @@ func TestAccAWSDBOptionGroup_sqlServerOptionsUpdate(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupSqlServerEEOptions_update(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -112,7 +127,7 @@ func TestAccAWSDBOptionGroup_multipleOptions(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBOptionGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSDBOptionGroupMultipleOptions(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBOptionGroupExists("aws_db_option_group.bar", &v),
@@ -250,6 +265,37 @@ func testAccCheckAWSDBOptionGroupDestroy(s *terraform.State) error {
 
 func testAccAWSDBOptionGroupBasicConfig(r string) string {
 	return fmt.Sprintf(`
+resource "aws_db_option_group" "bar" {
+  name                     = "%s"
+  option_group_description = "Test option group for terraform"
+  engine_name              = "mysql"
+  major_engine_version     = "5.6"
+}
+`, r)
+}
+
+func testAccAWSDBOptionGroupBasicDestroyConfig(r string) string {
+	return fmt.Sprintf(`
+resource "aws_db_instance" "bar" {
+	allocated_storage = 10
+	engine = "MySQL"
+	engine_version = "5.6.21"
+	instance_class = "db.t2.micro"
+	name = "baz"
+	password = "barbarbarbar"
+	username = "foo"
+
+
+	# Maintenance Window is stored in lower case in the API, though not strictly
+	# documented. Terraform will downcase this to match (as opposed to throw a
+	# validation error).
+	maintenance_window = "Fri:09:00-Fri:09:30"
+
+	backup_retention_period = 0
+
+	option_group_name = "${aws_db_option_group.bar.name}"
+}
+
 resource "aws_db_option_group" "bar" {
   name                     = "%s"
   option_group_description = "Test option group for terraform"

@@ -37,7 +37,7 @@ func TestState(t *testing.T, s interface{}) {
 		current.Modules = append(current.Modules, &terraform.ModuleState{
 			Path: []string{"root"},
 			Outputs: map[string]*terraform.OutputState{
-				"bar": {
+				"bar": &terraform.OutputState{
 					Type:      "string",
 					Sensitive: false,
 					Value:     "baz",
@@ -96,10 +96,10 @@ func TestState(t *testing.T, s interface{}) {
 		currentCopy := *current
 		current = &currentCopy
 		current.Modules = []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root", "somewhere"},
 				Outputs: map[string]*terraform.OutputState{
-					"serialCheck": {
+					"serialCheck": &terraform.OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "true",
@@ -118,9 +118,11 @@ func TestState(t *testing.T, s interface{}) {
 			t.Fatalf("bad: expected %d, got %d", serial, reader.State().Serial)
 		}
 
-		// Check that State() returns a copy
-		reader.State().Serial++
-		if reflect.DeepEqual(reader.State(), current) {
+		// Check that State() returns a copy by modifying the copy and comparing
+		// to the current state.
+		stateCopy := reader.State()
+		stateCopy.Serial++
+		if reflect.DeepEqual(stateCopy, current) {
 			t.Fatal("State() should return a copy")
 		}
 	}
@@ -131,10 +133,10 @@ func TestState(t *testing.T, s interface{}) {
 func TestStateInitial() *terraform.State {
 	initial := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root", "child"},
 				Outputs: map[string]*terraform.OutputState{
-					"foo": {
+					"foo": &terraform.OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "bar",

@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -26,7 +27,7 @@ func TestAccAWSCodeDeployDeploymentGroup_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSCodeDeployDeploymentGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroup(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo", &group),
@@ -47,7 +48,7 @@ func TestAccAWSCodeDeployDeploymentGroup_basic(t *testing.T) {
 						"aws_codedeploy_deployment_group.foo", "ec2_tag_filter.2916377465.value", "filtervalue"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroupModified(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo", &group),
@@ -82,7 +83,7 @@ func TestAccAWSCodeDeployDeploymentGroup_onPremiseTag(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSCodeDeployDeploymentGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroupOnPremiseTags(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo", &group),
@@ -107,6 +108,27 @@ func TestAccAWSCodeDeployDeploymentGroup_onPremiseTag(t *testing.T) {
 	})
 }
 
+func TestAccAWSCodeDeployDeploymentGroup_disappears(t *testing.T) {
+	var group codedeploy.DeploymentGroupInfo
+	rName := acctest.RandString(5)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSCodeDeployDeploymentGroupDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccAWSCodeDeployDeploymentGroup(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo", &group),
+					testAccAWSCodeDeployDeploymentGroupDisappears(&group),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
 func TestAccAWSCodeDeployDeploymentGroup_triggerConfiguration_basic(t *testing.T) {
 	var group codedeploy.DeploymentGroupInfo
 
@@ -117,7 +139,7 @@ func TestAccAWSCodeDeployDeploymentGroup_triggerConfiguration_basic(t *testing.T
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSCodeDeployDeploymentGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroup_triggerConfiguration_create(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo_group", &group),
@@ -130,7 +152,7 @@ func TestAccAWSCodeDeployDeploymentGroup_triggerConfiguration_basic(t *testing.T
 					}),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroup_triggerConfiguration_update(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo_group", &group),
@@ -158,7 +180,7 @@ func TestAccAWSCodeDeployDeploymentGroup_triggerConfiguration_multiple(t *testin
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSCodeDeployDeploymentGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroup_triggerConfiguration_createMultiple(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo_group", &group),
@@ -176,7 +198,7 @@ func TestAccAWSCodeDeployDeploymentGroup_triggerConfiguration_multiple(t *testin
 						regexp.MustCompile("^arn:aws:sns:[^:]+:[0-9]{12}:bar-topic-"+rName+"$")),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSCodeDeployDeploymentGroup_triggerConfiguration_updateMultiple(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSCodeDeployDeploymentGroupExists("aws_codedeploy_deployment_group.foo_group", &group),
@@ -272,7 +294,7 @@ func TestBuildTriggerConfigs(t *testing.T) {
 	}
 
 	expected := []*codedeploy.TriggerConfig{
-		{
+		&codedeploy.TriggerConfig{
 			TriggerEvents: []*string{
 				aws.String("DeploymentFailure"),
 			},
@@ -291,7 +313,7 @@ func TestBuildTriggerConfigs(t *testing.T) {
 
 func TestTriggerConfigsToMap(t *testing.T) {
 	input := []*codedeploy.TriggerConfig{
-		{
+		&codedeploy.TriggerConfig{
 			TriggerEvents: []*string{
 				aws.String("DeploymentFailure"),
 				aws.String("InstanceFailure"),
@@ -405,6 +427,36 @@ func testAccCheckAWSCodeDeployDeploymentGroupDestroy(s *terraform.State) error {
 	}
 
 	return nil
+}
+
+func testAccAWSCodeDeployDeploymentGroupDisappears(group *codedeploy.DeploymentGroupInfo) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*AWSClient).codedeployconn
+		opts := &codedeploy.DeleteDeploymentGroupInput{
+			ApplicationName:     group.ApplicationName,
+			DeploymentGroupName: group.DeploymentGroupName,
+		}
+		if _, err := conn.DeleteDeploymentGroup(opts); err != nil {
+			return err
+		}
+		return resource.Retry(40*time.Minute, func() *resource.RetryError {
+			opts := &codedeploy.GetDeploymentGroupInput{
+				ApplicationName:     group.ApplicationName,
+				DeploymentGroupName: group.DeploymentGroupName,
+			}
+			_, err := conn.GetDeploymentGroup(opts)
+			if err != nil {
+				codedeploy, ok := err.(awserr.Error)
+				if ok && codedeploy.Code() == "DeploymentGroupDoesNotExistException" {
+					return nil
+				}
+				return resource.NonRetryableError(
+					fmt.Errorf("Error retrieving CodeDeploy Deployment Group: %s", err))
+			}
+			return resource.RetryableError(fmt.Errorf(
+				"Waiting for CodeDeploy Deployment Group: %v", group.DeploymentGroupName))
+		})
+	}
 }
 
 func testAccCheckAWSCodeDeployDeploymentGroupExists(name string, group *codedeploy.DeploymentGroupInfo) resource.TestCheckFunc {

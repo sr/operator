@@ -18,23 +18,23 @@ func resourceCLCPublicIP() *schema.Resource {
 		Update: resourceCLCPublicIPUpdate,
 		Delete: resourceCLCPublicIPDelete,
 		Schema: map[string]*schema.Schema{
-			"server_id": {
+			"server_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"internal_ip_address": {
+			"internal_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				Default:  nil,
 			},
-			"ports": {
+			"ports": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeMap},
 			},
-			"source_restrictions": {
+			"source_restrictions": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeMap},

@@ -14,44 +14,44 @@ func resourcePubsubSubscription() *schema.Resource {
 		Delete: resourcePubsubSubscriptionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"topic": {
+			"topic": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"ack_deadline_seconds": {
+			"ack_deadline_seconds": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"push_config": {
+			"push_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"attributes": {
+						"attributes": &schema.Schema{
 							Type:     schema.TypeMap,
 							Optional: true,
 							ForceNew: true,
 							Elem:     schema.TypeString,
 						},
 
-						"push_endpoint": {
+						"push_endpoint": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,

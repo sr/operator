@@ -16,7 +16,7 @@ func TestAccAWSAvailabilityZones_basic(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckAwsAvailabilityZonesConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsAvailabilityZonesMeta("data.aws_availability_zones.availability_zones"),
@@ -52,7 +52,7 @@ func testAccCheckAwsAvailabilityZonesMeta(n string) resource.TestCheckFunc {
 }
 
 func testAccCheckAwsAvailabilityZonesBuildAvailable(attrs map[string]string) ([]string, error) {
-	v, ok := attrs["instance.#"]
+	v, ok := attrs["names.#"]
 	if !ok {
 		return nil, fmt.Errorf("Available AZ list is missing")
 	}
@@ -65,7 +65,7 @@ func testAccCheckAwsAvailabilityZonesBuildAvailable(attrs map[string]string) ([]
 	}
 	zones := make([]string, qty)
 	for n := range zones {
-		zone, ok := attrs["instance."+strconv.Itoa(n)]
+		zone, ok := attrs["names."+strconv.Itoa(n)]
 		if !ok {
 			return nil, fmt.Errorf("AZ list corrupt, this is definitely a bug")
 		}

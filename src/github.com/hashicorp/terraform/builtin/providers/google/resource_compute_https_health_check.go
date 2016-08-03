@@ -17,64 +17,64 @@ func resourceComputeHttpsHealthCheck() *schema.Resource {
 		Update: resourceComputeHttpsHealthCheckUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"check_interval_sec": {
+			"check_interval_sec": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  5,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"healthy_threshold": {
+			"healthy_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,
 			},
 
-			"host": {
+			"host": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  443,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"request_path": {
+			"request_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"timeout_sec": {
+			"timeout_sec": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  5,
 			},
 
-			"unhealthy_threshold": {
+			"unhealthy_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,

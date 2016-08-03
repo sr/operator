@@ -21,14 +21,14 @@ func TestAccComputeBackendService_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeBackendServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeBackendService_basic(serviceName, checkName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeBackendServiceExists(
 						"google_compute_backend_service.foobar", &svc),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccComputeBackendService_basicModified(
 					serviceName, checkName, extraCheckName),
 				Check: resource.ComposeTestCheckFunc(
@@ -52,7 +52,7 @@ func TestAccComputeBackendService_withBackend(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeBackendServiceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeBackendService_withBackend(
 					serviceName, igName, itName, checkName),
 				Check: resource.ComposeTestCheckFunc(

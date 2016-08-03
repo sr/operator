@@ -17,26 +17,33 @@ func resourceCloudStackStaticNAT() *schema.Resource {
 		Delete: resourceCloudStackStaticNATDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": {
+			"ip_address_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_id": {
+			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine_id": {
+			"virtual_machine_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vm_guest_ip": {
+			"vm_guest_ip": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
+			},
+
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -77,7 +84,10 @@ func resourceCloudStackStaticNATExists(d *schema.ResourceData, meta interface{})
 	cs := meta.(*cloudstack.CloudStackClient)
 
 	// Get the IP address details
-	ip, count, err := cs.Address.GetPublicIpAddressByID(d.Id())
+	ip, count, err := cs.Address.GetPublicIpAddressByID(
+		d.Id(),
+		cloudstack.WithProject(d.Get("project").(string)),
+	)
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -94,7 +104,10 @@ func resourceCloudStackStaticNATRead(d *schema.ResourceData, meta interface{}) e
 	cs := meta.(*cloudstack.CloudStackClient)
 
 	// Get the IP address details
-	ip, count, err := cs.Address.GetPublicIpAddressByID(d.Id())
+	ip, count, err := cs.Address.GetPublicIpAddressByID(
+		d.Id(),
+		cloudstack.WithProject(d.Get("project").(string)),
+	)
 	if err != nil {
 		if count == 0 {
 			log.Printf("[DEBUG] IP address with ID %s no longer exists", d.Id())
@@ -114,6 +127,8 @@ func resourceCloudStackStaticNATRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("network_id", ip.Associatednetworkid)
 	d.Set("virtual_machine_id", ip.Virtualmachineid)
 	d.Set("vm_guest_ip", ip.Vmipaddress)
+
+	setValueOrID(d, "project", ip.Project, ip.Projectid)
 
 	return nil
 }

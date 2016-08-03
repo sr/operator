@@ -20,41 +20,41 @@ func resourceNetworkingRouterV2() *schema.Resource {
 		Delete: resourceNetworkingRouterV2Delete,
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"admin_state_up": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 			},
-			"distributed": {
+			"distributed": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"external_gateway": {
+			"external_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"value_specs": {
+			"value_specs": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,

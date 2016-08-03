@@ -30,7 +30,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 		SchemaVersion: 2,
 		MigrateState:  resourceAwsRoute53RecordMigrateState,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -40,18 +40,18 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"fqdn": {
+			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone_id": {
+			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -64,41 +64,41 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:          schema.TypeInt,
 				Optional:      true,
 				ConflictsWith: []string{"alias"},
 			},
 
-			"weight": {
+			"weight": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Removed:  "Now implemented as weighted_routing_policy; Please see https://www.terraform.io/docs/providers/aws/r/route53_record.html",
 			},
 
-			"set_identifier": {
+			"set_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"alias": {
+			"alias": &schema.Schema{
 				Type:          schema.TypeSet,
 				Optional:      true,
 				ConflictsWith: []string{"records", "ttl"},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"zone_id": {
+						"zone_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"evaluate_target_health": {
+						"evaluate_target_health": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 						},
@@ -107,13 +107,13 @@ func resourceAwsRoute53Record() *schema.Resource {
 				Set: resourceAwsRoute53AliasRecordHash,
 			},
 
-			"failover": { // PRIMARY | SECONDARY
+			"failover": &schema.Schema{ // PRIMARY | SECONDARY
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "Now implemented as failover_routing_policy; see docs",
 			},
 
-			"failover_routing_policy": {
+			"failover_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -123,7 +123,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -138,7 +138,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"latency_routing_policy": {
+			"latency_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -148,7 +148,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"region": {
+						"region": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -156,7 +156,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"geolocation_routing_policy": { // AWS Geolocation
+			"geolocation_routing_policy": &schema.Schema{ // AWS Geolocation
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -166,15 +166,15 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"continent": {
+						"continent": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"country": {
+						"country": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"subdivision": {
+						"subdivision": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -182,7 +182,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"weighted_routing_policy": {
+			"weighted_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -192,7 +192,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"weight": {
+						"weight": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -200,12 +200,12 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"health_check_id": { // ID of health check
+			"health_check_id": &schema.Schema{ // ID of health check
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"records": {
+			"records": &schema.Schema{
 				Type:          schema.TypeSet,
 				ConflictsWith: []string{"alias"},
 				Elem:          &schema.Schema{Type: schema.TypeString},
@@ -254,7 +254,7 @@ func resourceAwsRoute53RecordCreate(d *schema.ResourceData, meta interface{}) er
 	changeBatch := &route53.ChangeBatch{
 		Comment: aws.String("Managed by Terraform"),
 		Changes: []*route53.Change{
-			{
+			&route53.Change{
 				Action:            aws.String("UPSERT"),
 				ResourceRecordSet: rec,
 			},
@@ -504,7 +504,7 @@ func resourceAwsRoute53RecordDelete(d *schema.ResourceData, meta interface{}) er
 	changeBatch := &route53.ChangeBatch{
 		Comment: aws.String("Deleted by Terraform"),
 		Changes: []*route53.Change{
-			{
+			&route53.Change{
 				Action:            aws.String("DELETE"),
 				ResourceRecordSet: rec,
 			},
@@ -695,7 +695,11 @@ func expandRecordName(name, zone string) string {
 	rn := strings.ToLower(strings.TrimSuffix(name, "."))
 	zone = strings.TrimSuffix(zone, ".")
 	if !strings.HasSuffix(rn, zone) {
-		rn = strings.Join([]string{name, zone}, ".")
+		if len(name) == 0 {
+			rn = zone
+		} else {
+			rn = strings.Join([]string{name, zone}, ".")
+		}
 	}
 	return rn
 }

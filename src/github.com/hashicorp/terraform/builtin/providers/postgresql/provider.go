@@ -11,31 +11,31 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"host": {
+			"host": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("POSTGRESQL_HOST", nil),
 				Description: "The postgresql server address",
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Default:     5432,
 				Description: "The postgresql server port",
 			},
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("POSTGRESQL_USERNAME", nil),
 				Description: "Username for postgresql server connection",
 			},
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("POSTGRESQL_PASSWORD", nil),
 				Description: "Password for postgresql server connection",
 			},
-			"ssl_mode": {
+			"ssl_mode": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "prefer",

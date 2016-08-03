@@ -37,7 +37,7 @@ func TestAccAWSVpnGateway_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckVpnGatewayDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists(
@@ -45,7 +45,7 @@ func TestAccAWSVpnGateway_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfigChangeVPC,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists(
@@ -83,7 +83,7 @@ func TestAccAWSVpnGateway_reattach(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckVpnGatewayDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists(
@@ -91,7 +91,7 @@ func TestAccAWSVpnGateway_reattach(t *testing.T) {
 					genTestStateFunc("attached"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfigDetach,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists(
@@ -99,7 +99,7 @@ func TestAccAWSVpnGateway_reattach(t *testing.T) {
 					genTestStateFunc("detached"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists(
@@ -130,12 +130,12 @@ func TestAccAWSVpnGateway_delete(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckVpnGatewayDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpnGatewayConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists("aws_vpn_gateway.foo", &vpnGateway)),
 			},
-			{
+			resource.TestStep{
 				Config: testAccNoVpnGatewayConfig,
 				Check:  resource.ComposeTestCheckFunc(testDeleted("aws_vpn_gateway.foo")),
 			},
@@ -152,7 +152,7 @@ func TestAccAWSVpnGateway_tags(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckVpnGatewayDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckVpnGatewayConfigTags,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists("aws_vpn_gateway.foo", &v),
@@ -160,7 +160,7 @@ func TestAccAWSVpnGateway_tags(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccCheckVpnGatewayConfigTagsUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpnGatewayExists("aws_vpn_gateway.foo", &v),

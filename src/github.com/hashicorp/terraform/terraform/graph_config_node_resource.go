@@ -291,7 +291,7 @@ func (n *GraphNodeConfigResource) Noop(opts *NoopOpts) bool {
 
 	// Go through the diff and if there are any with our name on it, keep us
 	found := false
-	for k := range opts.ModDiff.Resources {
+	for k, _ := range opts.ModDiff.Resources {
 		if strings.HasPrefix(k, prefix) {
 			log.Printf("[DEBUG] Diff has %s, resource is not a noop", k)
 			found = true
@@ -485,7 +485,7 @@ func (n *graphNodeResourceDestroy) destroyInclude(
 	if d != nil {
 		for k, v := range d.Resources {
 			match := k == prefix || strings.HasPrefix(k, prefix+".")
-			if match && v.Destroy {
+			if match && v.GetDestroy() {
 				return true
 			}
 		}

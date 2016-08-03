@@ -18,13 +18,13 @@ func TestAccNetworkingV2Router_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckNetworkingV2RouterDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccNetworkingV2Router_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNetworkingV2RouterExists(t, "openstack_networking_router_v2.foo", &router),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccNetworkingV2Router_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("openstack_networking_router_v2.foo", "name", "router_2"),

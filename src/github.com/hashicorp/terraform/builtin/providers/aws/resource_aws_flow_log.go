@@ -20,40 +20,40 @@ func resourceAwsFlowLog() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"iam_role_arn": {
+			"iam_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"log_group_name": {
+			"log_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"subnet_id", "eni_id"},
 			},
 
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"eni_id", "vpc_id"},
 			},
 
-			"eni_id": {
+			"eni_id": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"subnet_id", "vpc_id"},
 			},
 
-			"traffic_type": {
+			"traffic_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

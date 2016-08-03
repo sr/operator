@@ -19,7 +19,7 @@ func TestAccAWSAPIGatewayMethod_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAPIGatewayMethodDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSAPIGatewayMethodConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAPIGatewayMethodExists("aws_api_gateway_method.test", &conf),
@@ -33,7 +33,7 @@ func TestAccAWSAPIGatewayMethod_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSAPIGatewayMethodConfigUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAPIGatewayMethodExists("aws_api_gateway_method.test", &conf),

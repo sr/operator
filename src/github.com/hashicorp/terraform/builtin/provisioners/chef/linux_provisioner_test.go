@@ -220,6 +220,7 @@ func TestResourceProvider_linuxCreateConfigFiles(t *testing.T) {
 				"run_list":               []interface{}{"cookbook::recipe"},
 				"secret_key_path":        "test-fixtures/encrypted_data_bag_secret",
 				"server_url":             "https://chef.local",
+				"ssl_verify_mode":        "verify_none",
 				"validation_client_name": "validator",
 				"validation_key_path":    "test-fixtures/validator.pem",
 			}),
@@ -239,16 +240,16 @@ func TestResourceProvider_linuxCreateConfigFiles(t *testing.T) {
 		"Attributes": {
 			Config: testConfig(t, map[string]interface{}{
 				"attributes": []map[string]interface{}{
-					{
+					map[string]interface{}{
 						"key1": []map[string]interface{}{
-							{
+							map[string]interface{}{
 								"subkey1": []map[string]interface{}{
-									{
+									map[string]interface{}{
 										"subkey2a": []interface{}{
 											"val1", "val2", "val3",
 										},
 										"subkey2b": []map[string]interface{}{
-											{
+											map[string]interface{}{
 												"subkey3": "value3",
 											},
 										},
@@ -340,20 +341,15 @@ chef_server_url         "https://chef.local"
 validation_client_name  "validator"
 node_name               "nodename1"
 
-
-
-
 http_proxy          "http://proxy.local"
 ENV['http_proxy'] = "http://proxy.local"
 ENV['HTTP_PROXY'] = "http://proxy.local"
-
-
 
 https_proxy          "https://proxy.local"
 ENV['https_proxy'] = "https://proxy.local"
 ENV['HTTPS_PROXY'] = "https://proxy.local"
 
-
-
 no_proxy          "http://local.local,https://local.local"
-ENV['no_proxy'] = "http://local.local,https://local.local"`
+ENV['no_proxy'] = "http://local.local,https://local.local"
+
+ssl_verify_mode  :verify_none`

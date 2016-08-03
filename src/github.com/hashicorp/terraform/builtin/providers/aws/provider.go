@@ -18,42 +18,42 @@ func Provider() terraform.ResourceProvider {
 	// The actual provider
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"access_key": {
+			"access_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["access_key"],
 			},
 
-			"secret_key": {
+			"secret_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["secret_key"],
 			},
 
-			"profile": {
+			"profile": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["profile"],
 			},
 
-			"shared_credentials_file": {
+			"shared_credentials_file": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["shared_credentials_file"],
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["token"],
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{
@@ -64,14 +64,14 @@ func Provider() terraform.ResourceProvider {
 				InputDefault: "us-east-1",
 			},
 
-			"max_retries": {
+			"max_retries": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Default:     11,
 				Description: descriptions["max_retries"],
 			},
 
-			"allowed_account_ids": {
+			"allowed_account_ids": &schema.Schema{
 				Type:          schema.TypeSet,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				Optional:      true,
@@ -79,7 +79,7 @@ func Provider() terraform.ResourceProvider {
 				Set:           schema.HashString,
 			},
 
-			"forbidden_account_ids": {
+			"forbidden_account_ids": &schema.Schema{
 				Type:          schema.TypeSet,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				Optional:      true,
@@ -87,14 +87,14 @@ func Provider() terraform.ResourceProvider {
 				Set:           schema.HashString,
 			},
 
-			"dynamodb_endpoint": {
+			"dynamodb_endpoint": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
 				Description: descriptions["dynamodb_endpoint"],
 			},
 
-			"kinesis_endpoint": {
+			"kinesis_endpoint": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
@@ -102,7 +102,7 @@ func Provider() terraform.ResourceProvider {
 			},
 			"endpoints": endpointsSchema(),
 
-			"insecure": {
+			"insecure": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
@@ -111,16 +111,18 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"aws_ami":                 dataSourceAwsAmi(),
-			"aws_availability_zones":  dataSourceAwsAvailabilityZones(),
-			"aws_iam_policy_document": dataSourceAwsIamPolicyDocument(),
-			"aws_s3_bucket_object":    dataSourceAwsS3BucketObject(),
+			"aws_ami":                      dataSourceAwsAmi(),
+			"aws_availability_zones":       dataSourceAwsAvailabilityZones(),
+			"aws_iam_policy_document":      dataSourceAwsIamPolicyDocument(),
+			"aws_s3_bucket_object":         dataSourceAwsS3BucketObject(),
+			"aws_ecs_container_definition": dataSourceAwsEcsContainerDefinition(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"aws_ami":                                      resourceAwsAmi(),
 			"aws_ami_copy":                                 resourceAwsAmiCopy(),
 			"aws_ami_from_instance":                        resourceAwsAmiFromInstance(),
+			"aws_ami_launch_permission":                    resourceAwsAmiLaunchPermission(),
 			"aws_api_gateway_account":                      resourceAwsApiGatewayAccount(),
 			"aws_api_gateway_api_key":                      resourceAwsApiGatewayApiKey(),
 			"aws_api_gateway_authorizer":                   resourceAwsApiGatewayAuthorizer(),
@@ -133,6 +135,8 @@ func Provider() terraform.ResourceProvider {
 			"aws_api_gateway_resource":                     resourceAwsApiGatewayResource(),
 			"aws_api_gateway_rest_api":                     resourceAwsApiGatewayRestApi(),
 			"aws_app_cookie_stickiness_policy":             resourceAwsAppCookieStickinessPolicy(),
+			"aws_appautoscaling_target":                    resourceAwsAppautoscalingTarget(),
+			"aws_appautoscaling_policy":                    resourceAwsAppautoscalingPolicy(),
 			"aws_autoscaling_group":                        resourceAwsAutoscalingGroup(),
 			"aws_autoscaling_notification":                 resourceAwsAutoscalingNotification(),
 			"aws_autoscaling_policy":                       resourceAwsAutoscalingPolicy(),
@@ -234,6 +238,8 @@ func Provider() terraform.ResourceProvider {
 			"aws_opsworks_ganglia_layer":                   resourceAwsOpsworksGangliaLayer(),
 			"aws_opsworks_custom_layer":                    resourceAwsOpsworksCustomLayer(),
 			"aws_opsworks_instance":                        resourceAwsOpsworksInstance(),
+			"aws_opsworks_user_profile":                    resourceAwsOpsworksUserProfile(),
+			"aws_opsworks_permission":                      resourceAwsOpsworksPermission(),
 			"aws_placement_group":                          resourceAwsPlacementGroup(),
 			"aws_proxy_protocol_policy":                    resourceAwsProxyProtocolPolicy(),
 			"aws_rds_cluster":                              resourceAwsRDSCluster(),
@@ -251,12 +257,18 @@ func Provider() terraform.ResourceProvider {
 			"aws_route":                                    resourceAwsRoute(),
 			"aws_route_table":                              resourceAwsRouteTable(),
 			"aws_route_table_association":                  resourceAwsRouteTableAssociation(),
+			"aws_ses_active_receipt_rule_set":              resourceAwsSesActiveReceiptRuleSet(),
+			"aws_ses_receipt_filter":                       resourceAwsSesReceiptFilter(),
+			"aws_ses_receipt_rule":                         resourceAwsSesReceiptRule(),
+			"aws_ses_receipt_rule_set":                     resourceAwsSesReceiptRuleSet(),
 			"aws_s3_bucket":                                resourceAwsS3Bucket(),
 			"aws_s3_bucket_object":                         resourceAwsS3BucketObject(),
 			"aws_s3_bucket_notification":                   resourceAwsS3BucketNotification(),
 			"aws_security_group":                           resourceAwsSecurityGroup(),
 			"aws_security_group_rule":                      resourceAwsSecurityGroupRule(),
+			"aws_simpledb_domain":                          resourceAwsSimpleDBDomain(),
 			"aws_spot_instance_request":                    resourceAwsSpotInstanceRequest(),
+			"aws_spot_fleet_request":                       resourceAwsSpotFleetRequest(),
 			"aws_sqs_queue":                                resourceAwsSqsQueue(),
 			"aws_sns_topic":                                resourceAwsSnsTopic(),
 			"aws_sns_topic_subscription":                   resourceAwsSnsTopicSubscription(),
@@ -361,21 +373,21 @@ func endpointsSchema() *schema.Schema {
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"iam": {
+				"iam": &schema.Schema{
 					Type:        schema.TypeString,
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["iam_endpoint"],
 				},
 
-				"ec2": {
+				"ec2": &schema.Schema{
 					Type:        schema.TypeString,
 					Optional:    true,
 					Default:     "",
 					Description: descriptions["ec2_endpoint"],
 				},
 
-				"elb": {
+				"elb": &schema.Schema{
 					Type:        schema.TypeString,
 					Optional:    true,
 					Default:     "",

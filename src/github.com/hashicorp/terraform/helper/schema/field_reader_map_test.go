@@ -49,8 +49,8 @@ func TestMapFieldReader(t *testing.T) {
 func TestMapFieldReader_extra(t *testing.T) {
 	r := &MapFieldReader{
 		Schema: map[string]*Schema{
-			"mapDel":   {Type: TypeMap},
-			"mapEmpty": {Type: TypeMap},
+			"mapDel":   &Schema{Type: TypeMap},
+			"mapEmpty": &Schema{Type: TypeMap},
 		},
 
 		Map: BasicMapReader(map[string]string{

@@ -249,7 +249,7 @@ func (c *CLI) init() {
 		c.commandTree.Walk(walkFn)
 
 		// Insert any that we're missing
-		for k := range toInsert {
+		for k, _ := range toInsert {
 			var f CommandFactory = func() (Command, error) {
 				return &MockCommand{
 					HelpText:  "This command is accessed by using one of the subcommands below.",
@@ -294,7 +294,7 @@ func (c *CLI) commandHelp(command Command) {
 		// Get the matching keys
 		subcommands := c.helpCommands(c.Subcommand())
 		keys := make([]string, 0, len(subcommands))
-		for k := range subcommands {
+		for k, _ := range subcommands {
 			keys = append(keys, k)
 		}
 

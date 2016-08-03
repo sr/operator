@@ -18,40 +18,43 @@ func resourceLBMemberV1() *schema.Resource {
 		Read:   resourceLBMemberV1Read,
 		Update: resourceLBMemberV1Update,
 		Delete: resourceLBMemberV1Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"pool_id": {
+			"pool_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
-			"weight": {
+			"weight": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"admin_state_up": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
@@ -128,6 +131,9 @@ func resourceLBMemberV1Read(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Retreived OpenStack LB member %s: %+v", d.Id(), m)
 
+	d.Set("address", m.Address)
+	d.Set("pool_id", m.PoolID)
+	d.Set("port", m.ProtocolPort)
 	d.Set("weight", m.Weight)
 	d.Set("admin_state_up", m.AdminStateUp)
 

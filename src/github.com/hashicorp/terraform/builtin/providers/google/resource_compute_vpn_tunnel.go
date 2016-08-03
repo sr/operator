@@ -21,50 +21,50 @@ func resourceComputeVpnTunnel() *schema.Resource {
 		Delete: resourceComputeVpnTunnelDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"peer_ip": {
+			"peer_ip": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validatePeerAddr,
 			},
 
-			"shared_secret": {
+			"shared_secret": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"target_vpn_gateway": {
+			"target_vpn_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"detailed_status": {
+			"detailed_status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ike_version": {
+			"ike_version": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,
 				ForceNew: true,
 			},
 
-			"local_traffic_selector": {
+			"local_traffic_selector": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -72,19 +72,19 @@ func resourceComputeVpnTunnel() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

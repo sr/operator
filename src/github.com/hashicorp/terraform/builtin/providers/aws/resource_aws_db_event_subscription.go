@@ -19,23 +19,23 @@ func resourceAwsDbEventSubscription() *schema.Resource {
 		Update: resourceAwsDbEventSubscriptionUpdate,
 		Delete: resourceAwsDbEventSubscriptionDelete,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateDbEventSubscriptionName,
 			},
-			"sns_topic": {
+			"sns_topic": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"event_categories": {
+			"event_categories": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"source_ids": {
+			"source_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -44,16 +44,16 @@ func resourceAwsDbEventSubscription() *schema.Resource {
 				// ValidateFunc: validateDbEventSubscriptionSourceIds,
 				// requires source_type to be set, does not seem to be a way to validate this
 			},
-			"source_type": {
+			"source_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"customer_aws_id": {
+			"customer_aws_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

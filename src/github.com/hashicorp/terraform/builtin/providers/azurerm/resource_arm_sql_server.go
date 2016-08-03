@@ -17,41 +17,41 @@ func resourceArmSqlServer() *schema.Resource {
 		Delete: resourceArmSqlServerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: azureRMNormalizeLocation,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"version": {
+			"version": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"administrator_login": {
+			"administrator_login": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"administrator_login_password": {
+			"administrator_login_password": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"fully_qualified_domain_name": {
+			"fully_qualified_domain_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

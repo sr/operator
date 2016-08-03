@@ -18,17 +18,17 @@ func autoscalingTagsSchema() *schema.Schema {
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"key": {
+				"key": &schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 				},
 
-				"value": {
+				"value": &schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 				},
 
-				"propagate_at_launch": {
+				"propagate_at_launch": &schema.Schema{
 					Type:     schema.TypeBool,
 					Required: true,
 				},

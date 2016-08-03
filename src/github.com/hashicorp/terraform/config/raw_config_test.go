@@ -43,7 +43,7 @@ func TestRawConfig(t *testing.T) {
 	}
 
 	vars := map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: "baz",
 			Type:  ast.TypeString,
 		},
@@ -76,7 +76,7 @@ func TestRawConfig_double(t *testing.T) {
 	}
 
 	vars := map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: "baz",
 			Type:  ast.TypeString,
 		},
@@ -95,7 +95,7 @@ func TestRawConfig_double(t *testing.T) {
 	}
 
 	vars = map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: "what",
 			Type:  ast.TypeString,
 		},
@@ -159,11 +159,11 @@ func TestRawConfig_merge(t *testing.T) {
 
 	{
 		vars := map[string]ast.Variable{
-			"var.foo": {
+			"var.foo": ast.Variable{
 				Value: "foovalue",
 				Type:  ast.TypeString,
 			},
-			"var.bar": {
+			"var.bar": ast.Variable{
 				Value: "nope",
 				Type:  ast.TypeString,
 			},
@@ -185,11 +185,11 @@ func TestRawConfig_merge(t *testing.T) {
 
 	{
 		vars := map[string]ast.Variable{
-			"var.bar": {
+			"var.bar": ast.Variable{
 				Value: "barvalue",
 				Type:  ast.TypeString,
 			},
-			"var.baz": {
+			"var.baz": ast.Variable{
 				Value: UnknownVariableValue,
 				Type:  ast.TypeString,
 			},
@@ -248,7 +248,7 @@ func TestRawConfig_unknown(t *testing.T) {
 	}
 
 	vars := map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: UnknownVariableValue,
 			Type:  ast.TypeString,
 		},
@@ -281,7 +281,7 @@ func TestRawConfig_unknownPartial(t *testing.T) {
 	}
 
 	vars := map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: UnknownVariableValue,
 			Type:  ast.TypeString,
 		},
@@ -324,7 +324,7 @@ func TestRawConfigValue(t *testing.T) {
 	}
 
 	vars := map[string]ast.Variable{
-		"var.bar": {
+		"var.bar": ast.Variable{
 			Value: "baz",
 			Type:  ast.TypeString,
 		},

@@ -22,34 +22,37 @@ func resourceAwsDbInstance() *schema.Resource {
 		Read:   resourceAwsDbInstanceRead,
 		Update: resourceAwsDbInstanceUpdate,
 		Delete: resourceAwsDbInstanceDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceAwsDbInstanceImport,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				Sensitive: true,
 			},
 
-			"engine": {
+			"engine": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -60,38 +63,38 @@ func resourceAwsDbInstance() *schema.Resource {
 				},
 			},
 
-			"engine_version": {
+			"engine_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"character_set_name": {
+			"character_set_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"storage_encrypted": {
+			"storage_encrypted": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"allocated_storage": {
+			"allocated_storage": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"storage_type": {
+			"storage_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"identifier": {
+			"identifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -99,42 +102,42 @@ func resourceAwsDbInstance() *schema.Resource {
 				ValidateFunc: validateRdsId,
 			},
 
-			"instance_class": {
+			"instance_class": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"backup_retention_period": {
+			"backup_retention_period": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"backup_window": {
+			"backup_window": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"iops": {
+			"iops": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"license_model": {
+			"license_model": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"maintenance_window": {
+			"maintenance_window": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -147,26 +150,25 @@ func resourceAwsDbInstance() *schema.Resource {
 				},
 			},
 
-			"multi_az": {
+			"multi_az": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
-				ForceNew: true,
 			},
 
-			"publicly_accessible": {
+			"publicly_accessible": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"vpc_security_group_ids": {
+			"vpc_security_group_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -174,14 +176,14 @@ func resourceAwsDbInstance() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"security_group_names": {
+			"security_group_names": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"final_snapshot_identifier": {
+			"final_snapshot_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -200,42 +202,42 @@ func resourceAwsDbInstance() *schema.Resource {
 				},
 			},
 
-			"skip_final_snapshot": {
+			"skip_final_snapshot": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"copy_tags_to_snapshot": {
+			"copy_tags_to_snapshot": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"db_subnet_group_name": {
+			"db_subnet_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"parameter_group_name": {
+			"parameter_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"status": {
+			"status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -243,61 +245,61 @@ func resourceAwsDbInstance() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.DBInstance.Modifying.html
-			"apply_immediately": {
+			"apply_immediately": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"replicate_source_db": {
+			"replicate_source_db": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"replicas": {
+			"replicas": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"snapshot_identifier": {
+			"snapshot_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: false,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"auto_minor_version_upgrade": {
+			"auto_minor_version_upgrade": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"allow_major_version_upgrade": {
+			"allow_major_version_upgrade": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: false,
 				Optional: true,
 			},
 
-			"monitoring_role_arn": {
+			"monitoring_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"monitoring_interval": {
+			"monitoring_interval": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 			},
 
-			"option_group_name": {
+			"option_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -633,10 +635,12 @@ func resourceAwsDbInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", v.DBName)
+	d.Set("identifier", v.DBInstanceIdentifier)
 	d.Set("username", v.MasterUsername)
 	d.Set("engine", v.Engine)
 	d.Set("engine_version", v.EngineVersion)
 	d.Set("allocated_storage", v.AllocatedStorage)
+	d.Set("iops", v.Iops)
 	d.Set("copy_tags_to_snapshot", v.CopyTagsToSnapshot)
 	d.Set("auto_minor_version_upgrade", v.AutoMinorVersionUpgrade)
 	d.Set("storage_type", v.StorageType)
@@ -649,6 +653,7 @@ func resourceAwsDbInstanceRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("publicly_accessible", v.PubliclyAccessible)
 	d.Set("multi_az", v.MultiAZ)
 	d.Set("kms_key_id", v.KmsKeyId)
+	d.Set("port", v.DbInstancePort)
 	if v.DBSubnetGroup != nil {
 		d.Set("db_subnet_group_name", v.DBSubnetGroup.DBSubnetGroupName)
 	}
@@ -755,7 +760,7 @@ func resourceAwsDbInstanceDelete(d *schema.ResourceData, meta interface{}) error
 	skipFinalSnapshot := d.Get("skip_final_snapshot").(bool)
 	opts.SkipFinalSnapshot = aws.Bool(skipFinalSnapshot)
 
-	if !skipFinalSnapshot {
+	if skipFinalSnapshot == false {
 		if name, present := d.GetOk("final_snapshot_identifier"); present {
 			opts.FinalDBSnapshotIdentifier = aws.String(name.(string))
 		} else {
@@ -798,8 +803,10 @@ func resourceAwsDbInstanceUpdate(d *schema.ResourceData, meta interface{}) error
 	d.SetPartial("apply_immediately")
 
 	requestUpdate := false
-	if d.HasChange("allocated_storage") {
+	if d.HasChange("allocated_storage") || d.HasChange("iops") {
 		d.SetPartial("allocated_storage")
+		d.SetPartial("iops")
+		req.Iops = aws.Int64(int64(d.Get("iops").(int)))
 		req.AllocatedStorage = aws.Int64(int64(d.Get("allocated_storage").(int)))
 		requestUpdate = true
 	}
@@ -831,11 +838,6 @@ func resourceAwsDbInstanceUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("engine_version") {
 		d.SetPartial("engine_version")
 		req.EngineVersion = aws.String(d.Get("engine_version").(string))
-		requestUpdate = true
-	}
-	if d.HasChange("iops") {
-		d.SetPartial("iops")
-		req.Iops = aws.Int64(int64(d.Get("iops").(int)))
 		requestUpdate = true
 	}
 	if d.HasChange("backup_window") {
@@ -918,12 +920,36 @@ func resourceAwsDbInstanceUpdate(d *schema.ResourceData, meta interface{}) error
 		requestUpdate = true
 	}
 
-	log.Printf("[DEBUG] Send DB Instance Modification request: %#v", requestUpdate)
+	if d.HasChange("port") {
+		d.SetPartial("port")
+		req.DBPortNumber = aws.Int64(int64(d.Get("port").(int)))
+		requestUpdate = true
+	}
+
+	log.Printf("[DEBUG] Send DB Instance Modification request: %t", requestUpdate)
 	if requestUpdate {
-		log.Printf("[DEBUG] DB Instance Modification request: %#v", req)
+		log.Printf("[DEBUG] DB Instance Modification request: %s", req)
 		_, err := conn.ModifyDBInstance(req)
 		if err != nil {
 			return fmt.Errorf("Error modifying DB Instance %s: %s", d.Id(), err)
+		}
+
+		log.Println("[INFO] Waiting for DB Instance to be available")
+
+		stateConf := &resource.StateChangeConf{
+			Pending: []string{"creating", "backing-up", "modifying", "resetting-master-credentials",
+				"maintenance", "renaming", "rebooting", "upgrading"},
+			Target:     []string{"available"},
+			Refresh:    resourceAwsDbInstanceStateRefreshFunc(d, meta),
+			Timeout:    80 * time.Minute,
+			MinTimeout: 10 * time.Second,
+			Delay:      30 * time.Second, // Wait 30 secs before starting
+		}
+
+		// Wait, catching any errors
+		_, dbStateErr := stateConf.WaitForState()
+		if dbStateErr != nil {
+			return dbStateErr
 		}
 	}
 
@@ -992,6 +1018,15 @@ func resourceAwsDbInstanceRetrieve(
 	}
 
 	return resp.DBInstances[0], nil
+}
+
+func resourceAwsDbInstanceImport(
+	d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	// Neither skip_final_snapshot nor final_snapshot_identifier can be fetched
+	// from any API call, so we need to default skip_final_snapshot to true so
+	// that final_snapshot_identifier is not required
+	d.Set("skip_final_snapshot", true)
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceAwsDbInstanceStateRefreshFunc(

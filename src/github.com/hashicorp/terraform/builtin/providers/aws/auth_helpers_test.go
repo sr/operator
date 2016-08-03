@@ -51,7 +51,7 @@ func TestAWSGetAccountId_shouldBeValid_EC2RoleHasPriority(t *testing.T) {
 	defer awsTs()
 
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{200, iamResponse_GetUser_valid, "text/xml"},
 		},
@@ -72,7 +72,7 @@ func TestAWSGetAccountId_shouldBeValid_EC2RoleHasPriority(t *testing.T) {
 
 func TestAWSGetAccountId_shouldBeValid_fromIamUser(t *testing.T) {
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{200, iamResponse_GetUser_valid, "text/xml"},
 		},
@@ -94,11 +94,11 @@ func TestAWSGetAccountId_shouldBeValid_fromIamUser(t *testing.T) {
 
 func TestAWSGetAccountId_shouldBeValid_fromGetCallerIdentity(t *testing.T) {
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{403, iamResponse_GetUser_unauthorized, "text/xml"},
 		},
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetCallerIdentity&Version=2011-06-15"},
 			Response: &iamResponse{200, stsResponse_GetCallerIdentity_valid, "text/xml"},
 		},
@@ -119,15 +119,15 @@ func TestAWSGetAccountId_shouldBeValid_fromGetCallerIdentity(t *testing.T) {
 
 func TestAWSGetAccountId_shouldBeValid_fromIamListRoles(t *testing.T) {
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{403, iamResponse_GetUser_unauthorized, "text/xml"},
 		},
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetCallerIdentity&Version=2011-06-15"},
 			Response: &iamResponse{403, stsResponse_GetCallerIdentity_unauthorized, "text/xml"},
 		},
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=ListRoles&MaxItems=1&Version=2010-05-08"},
 			Response: &iamResponse{200, iamResponse_ListRoles_valid, "text/xml"},
 		},
@@ -148,11 +148,11 @@ func TestAWSGetAccountId_shouldBeValid_fromIamListRoles(t *testing.T) {
 
 func TestAWSGetAccountId_shouldBeValid_federatedRole(t *testing.T) {
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{400, iamResponse_GetUser_federatedFailure, "text/xml"},
 		},
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=ListRoles&MaxItems=1&Version=2010-05-08"},
 			Response: &iamResponse{200, iamResponse_ListRoles_valid, "text/xml"},
 		},
@@ -173,11 +173,11 @@ func TestAWSGetAccountId_shouldBeValid_federatedRole(t *testing.T) {
 
 func TestAWSGetAccountId_shouldError_unauthorizedFromIam(t *testing.T) {
 	iamEndpoints := []*iamEndpoint{
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=GetUser&Version=2010-05-08"},
 			Response: &iamResponse{403, iamResponse_GetUser_unauthorized, "text/xml"},
 		},
-		{
+		&iamEndpoint{
 			Request:  &iamRequest{"POST", "/", "Action=ListRoles&MaxItems=1&Version=2010-05-08"},
 			Response: &iamResponse{403, iamResponse_ListRoles_unauthorized, "text/xml"},
 		},

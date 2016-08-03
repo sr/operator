@@ -23,7 +23,7 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 		Delete: resourceAwsElasticacheClusterDelete,
 
 		Schema: map[string]*schema.Schema{
-			"cluster_id": {
+			"cluster_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -35,39 +35,39 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 				},
 				ValidateFunc: validateElastiCacheClusterId,
 			},
-			"configuration_endpoint": {
+			"configuration_endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"engine": {
+			"engine": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"node_type": {
+			"node_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"num_cache_nodes": {
+			"num_cache_nodes": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"parameter_group_name": {
+			"parameter_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
-			"engine_version": {
+			"engine_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"maintenance_window": {
+			"maintenance_window": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -77,13 +77,13 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 					return strings.ToLower(val.(string))
 				},
 			},
-			"subnet_group_name": {
+			"subnet_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
-			"security_group_names": {
+			"security_group_names": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -91,7 +91,7 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"security_group_ids": {
+			"security_group_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -99,31 +99,31 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 			// Exported Attributes
-			"cache_nodes": {
+			"cache_nodes": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"availability_zone": {
+						"availability_zone": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"notification_topic_arn": {
+			"notification_topic_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -133,7 +133,7 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 			//
 			// See also:
 			// https://github.com/aws/aws-sdk-go/blob/4862a174f7fc92fb523fc39e68f00b87d91d2c3d/service/elasticache/api.go#L2079
-			"snapshot_arns": {
+			"snapshot_arns": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -141,13 +141,13 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"snapshot_window": {
+			"snapshot_window": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"snapshot_retention_limit": {
+			"snapshot_retention_limit": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -160,21 +160,21 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 				},
 			},
 
-			"az_mode": {
+			"az_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"availability_zones": {
+			"availability_zones": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -187,7 +187,7 @@ func resourceAwsElasticacheCluster() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonElastiCache/latest/APIReference/API_ModifyCacheCluster.html
-			"apply_immediately": {
+			"apply_immediately": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,

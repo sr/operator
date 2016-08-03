@@ -51,27 +51,30 @@ func resourceAwsVpnConnection() *schema.Resource {
 		Read:   resourceAwsVpnConnectionRead,
 		Update: resourceAwsVpnConnectionUpdate,
 		Delete: resourceAwsVpnConnectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"vpn_gateway_id": {
+			"vpn_gateway_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"customer_gateway_id": {
+			"customer_gateway_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"static_routes_only": {
+			"static_routes_only": &schema.Schema{
 				Type:     schema.TypeBool,
 				Required: true,
 				ForceNew: true,
@@ -80,51 +83,51 @@ func resourceAwsVpnConnection() *schema.Resource {
 			"tags": tagsSchema(),
 
 			// Begin read only attributes
-			"customer_gateway_configuration": {
+			"customer_gateway_configuration": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 			},
 
-			"tunnel1_address": {
+			"tunnel1_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"tunnel1_preshared_key": {
+			"tunnel1_preshared_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"tunnel2_address": {
+			"tunnel2_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"tunnel2_preshared_key": {
+			"tunnel2_preshared_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"routes": {
+			"routes": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"destination_cidr_block": {
+						"destination_cidr_block": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
 						},
 
-						"source": {
+						"source": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
 						},
 
-						"state": {
+						"state": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
@@ -141,37 +144,37 @@ func resourceAwsVpnConnection() *schema.Resource {
 				},
 			},
 
-			"vgw_telemetry": {
+			"vgw_telemetry": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"accepted_route_count": {
+						"accepted_route_count": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 							Optional: true,
 						},
 
-						"last_status_change": {
+						"last_status_change": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
 						},
 
-						"outside_ip_address": {
+						"outside_ip_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
 						},
 
-						"status": {
+						"status": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,
 						},
 
-						"status_message": {
+						"status_message": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 							Optional: true,

@@ -22,74 +22,78 @@ func resourceLBPoolV1() *schema.Resource {
 		Read:   resourceLBPoolV1Read,
 		Update: resourceLBPoolV1Update,
 		Delete: resourceLBPoolV1Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"lb_method": {
+			"lb_method": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"lb_provider": {
+			"lb_provider": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"member": {
-				Type:     schema.TypeSet,
-				Optional: true,
+			"member": &schema.Schema{
+				Type:       schema.TypeSet,
+				Deprecated: "Use openstack_lb_member_v1 instead. This attribute will be removed in a future version.",
+				Optional:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"region": {
+						"region": &schema.Schema{
 							Type:        schema.TypeString,
 							Required:    true,
 							ForceNew:    true,
 							DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 						},
-						"tenant_id": {
+						"tenant_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: true,
 						},
-						"admin_state_up": {
+						"admin_state_up": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 							ForceNew: false,
@@ -98,7 +102,7 @@ func resourceLBPoolV1() *schema.Resource {
 				},
 				Set: resourceLBMemberV1Hash,
 			},
-			"monitor_ids": {
+			"monitor_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
@@ -297,6 +301,19 @@ func resourceLBPoolV1Delete(d *schema.ResourceData, meta interface{}) error {
 	networkingClient, err := config.networkingV2Client(d.Get("region").(string))
 	if err != nil {
 		return fmt.Errorf("Error creating OpenStack networking client: %s", err)
+	}
+
+	// Make sure all monitors are disassociated first
+	if v, ok := d.GetOk("monitor_ids"); ok {
+		if monitorIDList, ok := v.([]interface{}); ok {
+			for _, monitorID := range monitorIDList {
+				mID := monitorID.(string)
+				log.Printf("[DEBUG] Attempting to disassociate monitor %s from pool %s", mID, d.Id())
+				if res := pools.DisassociateMonitor(networkingClient, d.Id(), mID); res.Err != nil {
+					return fmt.Errorf("Error disassociating monitor %s from pool %s: %s", mID, d.Id(), err)
+				}
+			}
+		}
 	}
 
 	stateConf := &resource.StateChangeConf{

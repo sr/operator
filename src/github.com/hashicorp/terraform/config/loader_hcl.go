@@ -19,13 +19,13 @@ type hclConfigurable struct {
 
 func (t *hclConfigurable) Config() (*Config, error) {
 	validKeys := map[string]struct{}{
-		"atlas":    {},
-		"data":     {},
-		"module":   {},
-		"output":   {},
-		"provider": {},
-		"resource": {},
-		"variable": {},
+		"atlas":    struct{}{},
+		"data":     struct{}{},
+		"module":   struct{}{},
+		"output":   struct{}{},
+		"provider": struct{}{},
+		"resource": struct{}{},
+		"variable": struct{}{},
 	}
 
 	type hclVariable struct {

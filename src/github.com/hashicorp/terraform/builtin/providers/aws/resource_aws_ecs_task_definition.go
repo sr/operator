@@ -20,23 +20,23 @@ func resourceAwsEcsTaskDefinition() *schema.Resource {
 		Delete: resourceAwsEcsTaskDefinitionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"family": {
+			"family": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"revision": {
+			"revision": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"container_definitions": {
+			"container_definitions": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -46,18 +46,24 @@ func resourceAwsEcsTaskDefinition() *schema.Resource {
 				},
 			},
 
-			"volume": {
+			"task_role_arn": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+
+			"volume": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"host_path": {
+						"host_path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -81,6 +87,10 @@ func resourceAwsEcsTaskDefinitionCreate(d *schema.ResourceData, meta interface{}
 	input := ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: definitions,
 		Family:               aws.String(d.Get("family").(string)),
+	}
+
+	if v, ok := d.GetOk("task_role_arn"); ok {
+		input.TaskRoleArn = aws.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("volume"); ok {
@@ -127,6 +137,7 @@ func resourceAwsEcsTaskDefinitionRead(d *schema.ResourceData, meta interface{}) 
 	d.Set("family", *taskDefinition.Family)
 	d.Set("revision", *taskDefinition.Revision)
 	d.Set("container_definitions", taskDefinition.ContainerDefinitions)
+	d.Set("task_role_arn", taskDefinition.TaskRoleArn)
 	d.Set("volumes", flattenEcsVolumes(taskDefinition.Volumes))
 
 	return nil

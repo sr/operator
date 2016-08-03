@@ -16,19 +16,23 @@ const (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"token": {
+			"token": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("ATLAS_TOKEN", nil),
 				Description: descriptions["token"],
 			},
 
-			"address": {
+			"address": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("ATLAS_ADDRESS", defaultAtlasServer),
 				Description: descriptions["address"],
 			},
+		},
+
+		DataSourcesMap: map[string]*schema.Resource{
+			"atlas_artifact": dataSourceAtlasArtifact(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -48,6 +52,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			return nil, err
 		}
 	}
+	client.DefaultHeader.Set(terraform.VersionHeader, terraform.VersionString())
 	client.Token = d.Get("token").(string)
 
 	return client, nil

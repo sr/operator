@@ -85,7 +85,7 @@ func TestAccFastlyServiceV1_headers_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckServiceV1Destroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccServiceV1HeadersConfig(name, domainName1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckServiceV1Exists("fastly_service_v1.foo", &service),
@@ -97,7 +97,7 @@ func TestAccFastlyServiceV1_headers_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccServiceV1HeadersConfig_update(name, domainName1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckServiceV1Exists("fastly_service_v1.foo", &service),
@@ -181,10 +181,11 @@ resource "fastly_service_v1" "foo" {
   }
 
   header {
-    destination = "http.Server"
-    type        = "cache"
-    action      = "delete"
-    name        = "remove s3 server"
+    destination   = "http.Server"
+    type          = "cache"
+    action        = "delete"
+    name          = "remove s3 server"
+    ignore_if_set = "true"
   }
 
   force_destroy = true

@@ -18,19 +18,19 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLC_USERNAME", nil),
 				Description: "Your CLC username",
 			},
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLC_PASSWORD", nil),
 				Description: "Your CLC password",
 			},
-			"account": {
+			"account": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLC_ACCOUNT", ""),

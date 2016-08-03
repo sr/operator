@@ -18,49 +18,52 @@ func resourceNetworkingPortV2() *schema.Resource {
 		Read:   resourceNetworkingPortV2Read,
 		Update: resourceNetworkingPortV2Update,
 		Delete: resourceNetworkingPortV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"network_id": {
+			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"admin_state_up": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 			},
-			"mac_address": {
+			"mac_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"device_owner": {
+			"device_owner": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"security_group_ids": {
+			"security_group_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
@@ -68,24 +71,24 @@ func resourceNetworkingPortV2() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"device_id": {
+			"device_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"fixed_ip": {
+			"fixed_ip": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: false,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"subnet_id": {
+						"subnet_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"ip_address": {
+						"ip_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,

@@ -10,7 +10,7 @@ func resourceAwsOpsworksMemcachedLayer() *schema.Resource {
 		DefaultLayerName: "Memcached",
 
 		Attributes: map[string]*opsworksLayerTypeAttribute{
-			"allocated_memory": {
+			"allocated_memory": &opsworksLayerTypeAttribute{
 				AttrName: "MemcachedMemory",
 				Type:     schema.TypeInt,
 				Default:  512,

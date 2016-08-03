@@ -17,30 +17,30 @@ func resourceCloudStackSSHKeyPair() *schema.Resource {
 		Delete: resourceCloudStackSSHKeyPairDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_key": {
+			"public_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"private_key": {
+			"private_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

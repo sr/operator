@@ -19,14 +19,17 @@ func resourceAwsElasticBeanstalkApplication() *schema.Resource {
 		Read:   resourceAwsElasticBeanstalkApplicationRead,
 		Update: resourceAwsElasticBeanstalkApplicationUpdate,
 		Delete: resourceAwsElasticBeanstalkApplicationDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
@@ -94,6 +97,7 @@ func resourceAwsElasticBeanstalkApplicationRead(d *schema.ResourceData, meta int
 		return err
 	}
 
+	d.Set("name", a.ApplicationName)
 	d.Set("description", a.Description)
 	return nil
 }

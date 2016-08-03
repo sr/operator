@@ -10,14 +10,14 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"host": {
+			"host": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DOCKER_HOST", "unix:///var/run/docker.sock"),
 				Description: "The Docker daemon address",
 			},
 
-			"cert_path": {
+			"cert_path": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("DOCKER_CERT_PATH", ""),
@@ -30,6 +30,10 @@ func Provider() terraform.ResourceProvider {
 			"docker_image":     resourceDockerImage(),
 			"docker_network":   resourceDockerNetwork(),
 			"docker_volume":    resourceDockerVolume(),
+		},
+
+		DataSourcesMap: map[string]*schema.Resource{
+			"docker_registry_image": dataSourceDockerRegistryImage(),
 		},
 
 		ConfigureFunc: providerConfigure,

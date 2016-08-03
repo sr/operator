@@ -18,50 +18,50 @@ func resourceCloudFlareRecord() *schema.Resource {
 		SchemaVersion: 1,
 		MigrateState:  resourceCloudFlareRecordMigrateState,
 		Schema: map[string]*schema.Schema{
-			"domain": {
+			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"value": {
+			"value": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
 
-			"priority": {
+			"priority": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"proxied": {
+			"proxied": &schema.Schema{
 				Default:  false,
 				Optional: true,
 				Type:     schema.TypeBool,
 			},
 
-			"zone_id": {
+			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

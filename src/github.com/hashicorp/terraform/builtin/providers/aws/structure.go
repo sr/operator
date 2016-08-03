@@ -21,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticbeanstalk"
 	elasticsearch "github.com/aws/aws-sdk-go/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go/service/elb"
+	"github.com/aws/aws-sdk-go/service/kinesis"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/redshift"
@@ -205,6 +206,13 @@ func expandIPPerms(
 			list := raw.([]interface{})
 			for _, v := range list {
 				perm.IpRanges = append(perm.IpRanges, &ec2.IpRange{CidrIp: aws.String(v.(string))})
+			}
+		}
+
+		if raw, ok := m["prefix_list_ids"]; ok {
+			list := raw.([]interface{})
+			for _, v := range list {
+				perm.PrefixListIds = append(perm.PrefixListIds, &ec2.PrefixListId{PrefixListId: aws.String(v.(string))})
 			}
 		}
 
@@ -720,7 +728,9 @@ func expandPrivateIPAddresses(ips []interface{}) []*ec2.PrivateIpAddressSpecific
 //Flattens network interface attachment into a map[string]interface
 func flattenAttachment(a *ec2.NetworkInterfaceAttachment) map[string]interface{} {
 	att := make(map[string]interface{})
-	att["instance"] = *a.InstanceId
+	if a.InstanceId != nil {
+		att["instance"] = *a.InstanceId
+	}
 	att["device_index"] = *a.DeviceIndex
 	att["attachment_id"] = *a.AttachmentId
 	return att
@@ -996,6 +1006,30 @@ func flattenAsgEnabledMetrics(list []*autoscaling.EnabledMetric) []string {
 	return strs
 }
 
+func flattenKinesisShardLevelMetrics(list []*kinesis.EnhancedMetrics) []string {
+	if len(list) == 0 {
+		return []string{}
+	}
+	strs := make([]string, 0, len(list[0].ShardLevelMetrics))
+	for _, s := range list[0].ShardLevelMetrics {
+		strs = append(strs, *s)
+	}
+	return strs
+}
+
+func flattenApiGatewayStageKeys(keys []*string) []map[string]interface{} {
+	stageKeys := make([]map[string]interface{}, 0, len(keys))
+	for _, o := range keys {
+		key := make(map[string]interface{})
+		parts := strings.Split(*o, "/")
+		key["stage_name"] = parts[1]
+		key["rest_api_id"] = parts[0]
+
+		stageKeys = append(stageKeys, key)
+	}
+	return stageKeys
+}
+
 func expandApiGatewayStageKeys(d *schema.ResourceData) []*apigateway.StageKey {
 	var stageKeys []*apigateway.StageKey
 
@@ -1020,7 +1054,7 @@ func expandApiGatewayRequestResponseModelOperations(d *schema.ResourceData, key 
 	oldModelMap := oldModels.(map[string]interface{})
 	newModelMap := newModels.(map[string]interface{})
 
-	for k := range oldModelMap {
+	for k, _ := range oldModelMap {
 		operation := apigateway.PatchOperation{
 			Op:   aws.String("remove"),
 			Path: aws.String(fmt.Sprintf("/%s/%s", prefix, strings.Replace(k, "/", "~1", -1))),
@@ -1038,7 +1072,7 @@ func expandApiGatewayRequestResponseModelOperations(d *schema.ResourceData, key 
 
 	for nK, nV := range newModelMap {
 		exists := false
-		for k := range oldModelMap {
+		for k, _ := range oldModelMap {
 			if k == nK {
 				exists = true
 			}
@@ -1073,7 +1107,7 @@ func expandApiGatewayMethodParametersJSONOperations(d *schema.ResourceData, key 
 		return operations, err
 	}
 
-	for k := range oldParametersMap {
+	for k, _ := range oldParametersMap {
 		operation := apigateway.PatchOperation{
 			Op:   aws.String("remove"),
 			Path: aws.String(fmt.Sprintf("/%s/%s", prefix, k)),
@@ -1091,7 +1125,7 @@ func expandApiGatewayMethodParametersJSONOperations(d *schema.ResourceData, key 
 
 	for nK, nV := range newParametersMap {
 		exists := false
-		for k := range oldParametersMap {
+		for k, _ := range oldParametersMap {
 			if k == nK {
 				exists = true
 			}

@@ -207,17 +207,17 @@ func TestBuiltinGraphBuilder_multiLevelModule(t *testing.T) {
 func TestBuiltinGraphBuilder_orphanDeps(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
 						},
 					},
 
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type:         "aws_instance",
 						Dependencies: []string{"aws_instance.foo"},
 						Primary: &InstanceState{

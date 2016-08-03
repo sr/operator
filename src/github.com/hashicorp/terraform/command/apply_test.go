@@ -222,7 +222,7 @@ func TestApply_error(t *testing.T) {
 		*terraform.ResourceConfig) (*terraform.InstanceDiff, error) {
 		return &terraform.InstanceDiff{
 			Attributes: map[string]*terraform.ResourceAttrDiff{
-				"ami": {
+				"ami": &terraform.ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -602,10 +602,10 @@ func TestApply_planVars(t *testing.T) {
 func TestApply_refresh(t *testing.T) {
 	originalState := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root"},
 				Resources: map[string]*terraform.ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",
@@ -701,7 +701,7 @@ func TestApply_shutdown(t *testing.T) {
 		*terraform.ResourceConfig) (*terraform.InstanceDiff, error) {
 		return &terraform.InstanceDiff{
 			Attributes: map[string]*terraform.ResourceAttrDiff{
-				"ami": {
+				"ami": &terraform.ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -771,10 +771,10 @@ func TestApply_shutdown(t *testing.T) {
 func TestApply_state(t *testing.T) {
 	originalState := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root"},
 				Resources: map[string]*terraform.ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",
@@ -790,7 +790,7 @@ func TestApply_state(t *testing.T) {
 	p := testProvider()
 	p.DiffReturn = &terraform.InstanceDiff{
 		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"ami": {
+			"ami": &terraform.ResourceAttrDiff{
 				New: "bar",
 			},
 		},
@@ -1168,10 +1168,10 @@ func TestApply_varFileDefaultJSON(t *testing.T) {
 func TestApply_backup(t *testing.T) {
 	originalState := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root"},
 				Resources: map[string]*terraform.ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",
@@ -1188,7 +1188,7 @@ func TestApply_backup(t *testing.T) {
 	p := testProvider()
 	p.DiffReturn = &terraform.InstanceDiff{
 		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"ami": {
+			"ami": &terraform.ResourceAttrDiff{
 				New: "bar",
 			},
 		},
@@ -1257,7 +1257,7 @@ func TestApply_disableBackup(t *testing.T) {
 	p := testProvider()
 	p.DiffReturn = &terraform.InstanceDiff{
 		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"ami": {
+			"ami": &terraform.ResourceAttrDiff{
 				New: "bar",
 			},
 		},
@@ -1323,6 +1323,59 @@ func TestApply_disableBackup(t *testing.T) {
 	_, err = os.Stat("-")
 	if err == nil || !os.IsNotExist(err) {
 		t.Fatalf("backup should not exist")
+	}
+}
+
+// -state-out wasn't taking effect when a plan is supplied. GH-7264
+func TestApply_stateOutWithPlan(t *testing.T) {
+	p := testProvider()
+	ui := new(cli.MockUi)
+
+	tmpDir := testTempDir(t)
+	defer os.RemoveAll(tmpDir)
+
+	statePath := filepath.Join(tmpDir, "state.tfstate")
+	planPath := filepath.Join(tmpDir, "terraform.tfplan")
+
+	args := []string{
+		"-state", statePath,
+		"-out", planPath,
+		testFixturePath("plan"),
+	}
+
+	// Run plan first to get a current plan file
+	pc := &PlanCommand{
+		Meta: Meta{
+			ContextOpts: testCtxConfig(p),
+			Ui:          ui,
+		},
+	}
+	if code := pc.Run(args); code != 0 {
+		t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
+	}
+
+	// now run apply with the generated plan
+	stateOutPath := filepath.Join(tmpDir, "state-new.tfstate")
+
+	args = []string{
+		"-state", statePath,
+		"-state-out", stateOutPath,
+		planPath,
+	}
+
+	ac := &ApplyCommand{
+		Meta: Meta{
+			ContextOpts: testCtxConfig(p),
+			Ui:          ui,
+		},
+	}
+	if code := ac.Run(args); code != 0 {
+		t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
+	}
+
+	// now make sure we wrote out our new state
+	if _, err := os.Stat(stateOutPath); err != nil {
+		t.Fatalf("missing new state file: %s", err)
 	}
 }
 

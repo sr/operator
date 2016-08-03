@@ -20,18 +20,18 @@ func resourceAzureLocalNetworkConnection() *schema.Resource {
 		Delete: resourceAzureLocalNetworkConnectionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["name"],
 			},
-			"vpn_gateway_address": {
+			"vpn_gateway_address": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: parameterDescriptions["vpn_gateway_address"],
 			},
-			"address_space_prefixes": {
+			"address_space_prefixes": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Schema{

@@ -20,41 +20,44 @@ func resourceAwsCloudWatchEventRule() *schema.Resource {
 		Read:   resourceAwsCloudWatchEventRuleRead,
 		Update: resourceAwsCloudWatchEventRuleUpdate,
 		Delete: resourceAwsCloudWatchEventRuleDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateCloudWatchEventRuleName,
 			},
-			"schedule_expression": {
+			"schedule_expression": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(256),
 			},
-			"event_pattern": {
+			"event_pattern": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(2048),
 				StateFunc:    normalizeJson,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(512),
 			},
-			"role_arn": {
+			"role_arn": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(1600),
 			},
-			"is_enabled": {
+			"is_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -154,10 +157,8 @@ func resourceAwsCloudWatchEventRuleUpdate(d *schema.ResourceData, meta interface
 	log.Printf("[DEBUG] Updating CloudWatch Event Rule: %s", input)
 
 	// IAM Roles take some time to propagate
-	var out *events.PutRuleOutput
 	err := resource.Retry(30*time.Second, func() *resource.RetryError {
-		var err error
-		out, err = conn.PutRule(input)
+		_, err := conn.PutRule(input)
 		pattern := regexp.MustCompile("cannot be assumed by principal '[a-z]+\\.amazonaws\\.com'\\.$")
 		if err != nil {
 			if awsErr, ok := err.(awserr.Error); ok {

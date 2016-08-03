@@ -21,43 +21,47 @@ func resourceAwsRDSClusterParameterGroup() *schema.Resource {
 		Read:   resourceAwsRDSClusterParameterGroupRead,
 		Update: resourceAwsRDSClusterParameterGroupUpdate,
 		Delete: resourceAwsRDSClusterParameterGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateDbParamGroupName,
 			},
-			"family": {
+			"family": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "Managed by Terraform",
 			},
-			"parameter": {
+			"parameter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"apply_method": {
+						"apply_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "immediate",

@@ -15,62 +15,65 @@ func resourceAwsCloudTrail() *schema.Resource {
 		Read:   resourceAwsCloudTrailRead,
 		Update: resourceAwsCloudTrailUpdate,
 		Delete: resourceAwsCloudTrailDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"enable_logging": {
+			"enable_logging": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"s3_bucket_name": {
+			"s3_bucket_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"s3_key_prefix": {
+			"s3_key_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"cloud_watch_logs_role_arn": {
+			"cloud_watch_logs_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"cloud_watch_logs_group_arn": {
+			"cloud_watch_logs_group_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"include_global_service_events": {
+			"include_global_service_events": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"is_multi_region_trail": {
+			"is_multi_region_trail": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"sns_topic_name": {
+			"sns_topic_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enable_log_file_validation": {
+			"enable_log_file_validation": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"home_region": {
+			"home_region": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -136,10 +139,9 @@ func resourceAwsCloudTrailCreate(d *schema.ResourceData, meta interface{}) error
 func resourceAwsCloudTrailRead(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).cloudtrailconn
 
-	name := d.Get("name").(string)
 	input := cloudtrail.DescribeTrailsInput{
 		TrailNameList: []*string{
-			aws.String(name),
+			aws.String(d.Id()),
 		},
 	}
 	resp, err := conn.DescribeTrails(&input)
@@ -157,7 +159,7 @@ func resourceAwsCloudTrailRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if trail == nil {
-		log.Printf("[WARN] CloudTrail (%s) not found", name)
+		log.Printf("[WARN] CloudTrail (%s) not found", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -215,7 +217,7 @@ func resourceAwsCloudTrailUpdate(d *schema.ResourceData, meta interface{}) error
 	conn := meta.(*AWSClient).cloudtrailconn
 
 	input := cloudtrail.UpdateTrailInput{
-		Name: aws.String(d.Get("name").(string)),
+		Name: aws.String(d.Id()),
 	}
 
 	if d.HasChange("s3_bucket_name") {
@@ -274,11 +276,10 @@ func resourceAwsCloudTrailUpdate(d *schema.ResourceData, meta interface{}) error
 
 func resourceAwsCloudTrailDelete(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).cloudtrailconn
-	name := d.Get("name").(string)
 
-	log.Printf("[DEBUG] Deleting CloudTrail: %q", name)
+	log.Printf("[DEBUG] Deleting CloudTrail: %q", d.Id())
 	_, err := conn.DeleteTrail(&cloudtrail.DeleteTrailInput{
-		Name: aws.String(name),
+		Name: aws.String(d.Id()),
 	})
 
 	return err

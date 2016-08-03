@@ -29,7 +29,7 @@ func TestAccBlockStorageV1Volume_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckBlockStorageV1VolumeDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV1Volume_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBlockStorageV1VolumeExists(t, "openstack_blockstorage_volume_v1.volume_1", &volume),
@@ -37,14 +37,14 @@ func TestAccBlockStorageV1Volume_basic(t *testing.T) {
 					testAccCheckBlockStorageV1VolumeMetadata(&volume, "foo", "bar"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV1Volume_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("openstack_blockstorage_volume_v1.volume_1", "name", "tf-test-volume-updated"),
 					testAccCheckBlockStorageV1VolumeMetadata(&volume, "foo", "bar"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccBlockStorageV1Volume_bootable,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("openstack_blockstorage_volume_v1.volume_1", "name", "tf-test-volume-bootable"),
@@ -156,24 +156,20 @@ func testAccCheckBlockStorageV1VolumeMetadata(
 
 var testAccBlockStorageV1Volume_basic = fmt.Sprintf(`
 	resource "openstack_blockstorage_volume_v1" "volume_1" {
-		region = "%s"
 		name = "tf-test-volume"
 		description = "first test volume"
 		metadata{
 			foo = "bar"
 		}
 		size = 1
-	}`,
-	OS_REGION_NAME)
+	}`)
 
 var testAccBlockStorageV1Volume_update = fmt.Sprintf(`
 	resource "openstack_blockstorage_volume_v1" "volume_1" {
-		region = "%s"
 		name = "tf-test-volume-updated"
 		description = "first test volume"
 		metadata{
 			foo = "bar"
 		}
 		size = 1
-	}`,
-	OS_REGION_NAME)
+	}`)

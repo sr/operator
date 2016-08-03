@@ -22,35 +22,35 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 		Delete: resourceAwsIAMServerCertificateDelete,
 
 		Schema: map[string]*schema.Schema{
-			"certificate_body": {
+			"certificate_body": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"certificate_chain": {
+			"certificate_chain": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
 
-			"private_key": {
+			"private_key": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -66,7 +66,7 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -80,7 +80,7 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 				},
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

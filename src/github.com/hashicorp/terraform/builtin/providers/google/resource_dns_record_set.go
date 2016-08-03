@@ -17,19 +17,19 @@ func resourceDnsRecordSet() *schema.Resource {
 		Delete: resourceDnsRecordSetDelete,
 
 		Schema: map[string]*schema.Schema{
-			"managed_zone": {
+			"managed_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"rrdatas": {
+			"rrdatas": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
@@ -38,19 +38,19 @@ func resourceDnsRecordSet() *schema.Resource {
 				},
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -74,7 +74,7 @@ func resourceDnsRecordSetCreate(d *schema.ResourceData, meta interface{}) error 
 	// Build the change
 	chg := &dns.Change{
 		Additions: []*dns.ResourceRecordSet{
-			{
+			&dns.ResourceRecordSet{
 				Name:    d.Get("name").(string),
 				Type:    d.Get("type").(string),
 				Ttl:     int64(d.Get("ttl").(int)),
@@ -172,7 +172,7 @@ func resourceDnsRecordSetDelete(d *schema.ResourceData, meta interface{}) error 
 	// Build the change
 	chg := &dns.Change{
 		Deletions: []*dns.ResourceRecordSet{
-			{
+			&dns.ResourceRecordSet{
 				Name:    d.Get("name").(string),
 				Type:    d.Get("type").(string),
 				Ttl:     int64(d.Get("ttl").(int)),

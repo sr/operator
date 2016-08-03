@@ -18,29 +18,32 @@ func resourceAwsVpcPeeringConnection() *schema.Resource {
 		Read:   resourceAwsVPCPeeringRead,
 		Update: resourceAwsVPCPeeringUpdate,
 		Delete: resourceAwsVPCPeeringDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"peer_owner_id": {
+			"peer_owner_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("AWS_ACCOUNT_ID", nil),
 			},
-			"peer_vpc_id": {
+			"peer_vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"auto_accept": {
+			"auto_accept": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"accept_status": {
+			"accept_status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -105,7 +108,7 @@ func resourceAwsVPCPeeringRead(d *schema.ResourceData, meta interface{}) error {
 	// connection is gone. Destruction isn't allowed, and it eventually
 	// just "falls off" the console. See GH-2322
 	if pc.Status != nil {
-		if *pc.Status.Code == "failed" || *pc.Status.Code == "deleted" {
+		if *pc.Status.Code == "failed" || *pc.Status.Code == "deleted" || *pc.Status.Code == "rejected" || *pc.Status.Code == "deleting" || *pc.Status.Code == "expired" {
 			log.Printf("[DEBUG] VPC Peering Connect (%s) in state (%s), removing", d.Id(), *pc.Status.Code)
 			d.SetId("")
 			return nil

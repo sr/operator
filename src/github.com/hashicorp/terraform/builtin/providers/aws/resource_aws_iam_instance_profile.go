@@ -20,22 +20,22 @@ func resourceAwsIamInstanceProfile() *schema.Resource {
 		Delete: resourceAwsIamInstanceProfileDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"create_date": {
+			"create_date": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"unique_id": {
+			"unique_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -56,7 +56,7 @@ func resourceAwsIamInstanceProfile() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -75,14 +75,14 @@ func resourceAwsIamInstanceProfile() *schema.Resource {
 				},
 			},
 
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
 
-			"roles": {
+			"roles": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

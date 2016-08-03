@@ -18,79 +18,82 @@ func resourceLBVipV1() *schema.Resource {
 		Read:   resourceLBVipV1Read,
 		Update: resourceLBVipV1Update,
 		Delete: resourceLBVipV1Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
-			"pool_id": {
+			"pool_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: false,
 			},
-			"persistence": {
+			"persistence": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: false,
 			},
-			"conn_limit": {
+			"conn_limit": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 				ForceNew: false,
 			},
-			"port_id": {
+			"port_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				ForceNew: false,
 			},
-			"floating_ip": {
+			"floating_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"admin_state_up": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -181,6 +184,16 @@ func resourceLBVipV1Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("description", p.Description)
 	d.Set("conn_limit", p.ConnLimit)
 	d.Set("admin_state_up", p.AdminStateUp)
+
+	// Set the persistence method being used
+	persistence := make(map[string]interface{})
+	if p.Persistence.Type != "" {
+		persistence["type"] = p.Persistence.Type
+	}
+	if p.Persistence.CookieName != "" {
+		persistence["cookie_name"] = p.Persistence.CookieName
+	}
+	d.Set("persistence", persistence)
 
 	return nil
 }

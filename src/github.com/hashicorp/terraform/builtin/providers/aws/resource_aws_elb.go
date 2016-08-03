@@ -27,7 +27,7 @@ func resourceAwsElb() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -35,20 +35,20 @@ func resourceAwsElb() *schema.Resource {
 				ValidateFunc: validateElbName,
 			},
 
-			"internal": {
+			"internal": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"cross_zone_load_balancing": {
+			"cross_zone_load_balancing": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"availability_zones": {
+			"availability_zones": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -56,7 +56,7 @@ func resourceAwsElb() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"instances": {
+			"instances": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -64,7 +64,7 @@ func resourceAwsElb() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -72,18 +72,18 @@ func resourceAwsElb() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"source_security_group": {
+			"source_security_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"source_security_group_id": {
+			"source_security_group_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"subnets": {
+			"subnets": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -91,39 +91,39 @@ func resourceAwsElb() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"idle_timeout": {
+			"idle_timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  60,
 			},
 
-			"connection_draining": {
+			"connection_draining": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"connection_draining_timeout": {
+			"connection_draining_timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  300,
 			},
 
-			"access_logs": {
+			"access_logs": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"interval": {
+						"interval": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Default:  60,
 						},
-						"bucket": {
+						"bucket": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"bucket_prefix": {
+						"bucket_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -131,32 +131,32 @@ func resourceAwsElb() *schema.Resource {
 				},
 			},
 
-			"listener": {
+			"listener": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"instance_port": {
+						"instance_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"instance_protocol": {
+						"instance_protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"lb_port": {
+						"lb_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"lb_protocol": {
+						"lb_protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"ssl_certificate_id": {
+						"ssl_certificate_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -165,33 +165,34 @@ func resourceAwsElb() *schema.Resource {
 				Set: resourceAwsElbListenerHash,
 			},
 
-			"health_check": {
+			"health_check": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
+				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"healthy_threshold": {
+						"healthy_threshold": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"unhealthy_threshold": {
+						"unhealthy_threshold": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"target": {
+						"target": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"interval": {
+						"interval": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"timeout": {
+						"timeout": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -199,12 +200,12 @@ func resourceAwsElb() *schema.Resource {
 				},
 			},
 
-			"dns_name": {
+			"dns_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"zone_id": {
+			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -335,10 +336,15 @@ func resourceAwsElbRead(d *schema.ResourceData, meta interface{}) error {
 
 	lb := describeResp.LoadBalancerDescriptions[0]
 
-	d.Set("name", *lb.LoadBalancerName)
-	d.Set("dns_name", *lb.DNSName)
-	d.Set("zone_id", *lb.CanonicalHostedZoneNameID)
-	d.Set("internal", *lb.Scheme == "internal")
+	d.Set("name", lb.LoadBalancerName)
+	d.Set("dns_name", lb.DNSName)
+	d.Set("zone_id", lb.CanonicalHostedZoneNameID)
+
+	var scheme bool
+	if lb.Scheme != nil {
+		scheme = *lb.Scheme == "internal"
+	}
+	d.Set("internal", scheme)
 	d.Set("availability_zones", flattenStringList(lb.AvailabilityZones))
 	d.Set("instances", flattenInstances(lb.Instances))
 	d.Set("listener", flattenListeners(lb.ListenerDescriptions))
@@ -590,9 +596,7 @@ func resourceAwsElbUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("health_check") {
 		hc := d.Get("health_check").([]interface{})
-		if len(hc) > 1 {
-			return fmt.Errorf("Only one health check per ELB is supported")
-		} else if len(hc) > 0 {
+		if len(hc) > 0 {
 			check := hc[0].(map[string]interface{})
 			configureHealthCheckOpts := elb.ConfigureHealthCheckInput{
 				LoadBalancerName: aws.String(d.Id()),

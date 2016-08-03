@@ -18,19 +18,19 @@ func resourceHerokuDrain() *schema.Resource {
 		Delete: resourceHerokuDrainDelete,
 
 		Schema: map[string]*schema.Schema{
-			"url": {
+			"url": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"app": {
+			"app": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

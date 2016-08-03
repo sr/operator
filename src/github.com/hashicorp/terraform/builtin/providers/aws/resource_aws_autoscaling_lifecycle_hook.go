@@ -21,37 +21,37 @@ func resourceAwsAutoscalingLifecycleHook() *schema.Resource {
 		Delete: resourceAwsAutoscalingLifecycleHookDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"autoscaling_group_name": {
+			"autoscaling_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"default_result": {
+			"default_result": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"heartbeat_timeout": {
+			"heartbeat_timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"lifecycle_transition": {
+			"lifecycle_transition": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"notification_metadata": {
+			"notification_metadata": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"notification_target_arn": {
+			"notification_target_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"role_arn": {
+			"role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

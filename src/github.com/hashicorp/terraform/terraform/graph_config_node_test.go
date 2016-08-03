@@ -96,8 +96,8 @@ func TestGraphNodeConfigResource_ProvisionedBy(t *testing.T) {
 		Resource: &config.Resource{
 			Type: "aws_instance",
 			Provisioners: []*config.Provisioner{
-				{Type: "foo"},
-				{Type: "bar"},
+				&config.Provisioner{Type: "foo"},
+				&config.Provisioner{Type: "bar"},
 			},
 		},
 	}

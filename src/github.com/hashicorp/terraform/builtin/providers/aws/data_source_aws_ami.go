@@ -18,24 +18,24 @@ func dataSourceAwsAmi() *schema.Resource {
 		Read: dataSourceAwsAmiRead,
 
 		Schema: map[string]*schema.Schema{
-			"executable_users": {
+			"executable_users": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"filter": {
+			"filter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": {
+						"values": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -43,153 +43,153 @@ func dataSourceAwsAmi() *schema.Resource {
 					},
 				},
 			},
-			"most_recent": {
+			"most_recent": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
-			"owners": {
+			"owners": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			// Computed values.
-			"architecture": {
+			"architecture": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"creation_date": {
+			"creation_date": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"hypervisor": {
+			"hypervisor": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_location": {
+			"image_location": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_owner_alias": {
+			"image_owner_alias": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_type": {
+			"image_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"kernel_id": {
+			"kernel_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"owner_id": {
+			"owner_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"platform": {
+			"platform": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"public": {
+			"public": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"ramdisk_id": {
+			"ramdisk_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"root_device_name": {
+			"root_device_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"root_device_type": {
+			"root_device_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"sriov_net_support": {
+			"sriov_net_support": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"state": {
+			"state": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"virtualization_type": {
+			"virtualization_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			// Complex computed values
-			"block_device_mappings": {
+			"block_device_mappings": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiBlockDeviceMappingHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"no_device": {
+						"no_device": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"virtual_name": {
+						"virtual_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"ebs": {
+						"ebs": &schema.Schema{
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"product_codes": {
+			"product_codes": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiProductCodesHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"product_code_id": {
+						"product_code_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"product_code_type": {
+						"product_code_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"state_reason": {
+			"state_reason": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiTagsHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},

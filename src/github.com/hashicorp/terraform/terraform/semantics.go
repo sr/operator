@@ -69,7 +69,7 @@ func (*SemanticCheckModulesExist) Check(g *dag.Graph, v dag.Vertex) error {
 
 // smcUserVariables does all the semantic checks to verify that the
 // variables given satisfy the configuration itself.
-func smcUserVariables(c *config.Config, vs map[string]string) []error {
+func smcUserVariables(c *config.Config, vs map[string]interface{}) []error {
 	var errs []error
 
 	cvs := make(map[string]*config.Variable)
@@ -84,27 +84,53 @@ func smcUserVariables(c *config.Config, vs map[string]string) []error {
 			required[v.Name] = struct{}{}
 		}
 	}
-	for k := range vs {
+	for k, _ := range vs {
 		delete(required, k)
 	}
 	if len(required) > 0 {
-		for k := range required {
+		for k, _ := range required {
 			errs = append(errs, fmt.Errorf(
 				"Required variable not set: %s", k))
 		}
 	}
 
 	// Check that types match up
-	for k := range vs {
-		v, ok := cvs[k]
+	for name, proposedValue := range vs {
+		schema, ok := cvs[name]
 		if !ok {
 			continue
 		}
 
-		if v.Type() != config.VariableTypeString {
-			errs = append(errs, fmt.Errorf(
-				"%s: cannot assign string value to map type",
-				k))
+		declaredType := schema.Type()
+
+		switch declaredType {
+		case config.VariableTypeString:
+			switch proposedValue.(type) {
+			case string:
+				continue
+			default:
+				errs = append(errs, fmt.Errorf("variable %s should be type %s, got %s",
+					name, declaredType.Printable(), hclTypeName(proposedValue)))
+			}
+		case config.VariableTypeMap:
+			switch proposedValue.(type) {
+			case map[string]interface{}:
+				continue
+			default:
+				errs = append(errs, fmt.Errorf("variable %s should be type %s, got %s",
+					name, declaredType.Printable(), hclTypeName(proposedValue)))
+			}
+		case config.VariableTypeList:
+			switch proposedValue.(type) {
+			case []interface{}:
+				continue
+			default:
+				errs = append(errs, fmt.Errorf("variable %s should be type %s, got %s",
+					name, declaredType.Printable(), hclTypeName(proposedValue)))
+			}
+		default:
+			errs = append(errs, fmt.Errorf("variable %s should be type %s, got %s",
+				name, declaredType.Printable(), hclTypeName(proposedValue)))
 		}
 	}
 

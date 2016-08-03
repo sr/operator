@@ -25,7 +25,7 @@ func resourceAwsRouteTable() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -33,45 +33,45 @@ func resourceAwsRouteTable() *schema.Resource {
 
 			"tags": tagsSchema(),
 
-			"propagating_vgws": {
+			"propagating_vgws": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"route": {
+			"route": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cidr_block": {
+						"cidr_block": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"gateway_id": {
+						"gateway_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"instance_id": {
+						"instance_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"nat_gateway_id": {
+						"nat_gateway_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"vpc_peering_connection_id": {
+						"vpc_peering_connection_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"network_interface_id": {
+						"network_interface_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -301,7 +301,19 @@ func resourceAwsRouteTableUpdate(d *schema.ResourceData, meta interface{}) error
 			}
 
 			log.Printf("[INFO] Creating route for %s: %#v", d.Id(), opts)
-			if _, err := conn.CreateRoute(&opts); err != nil {
+			err := resource.Retry(1*time.Minute, func() *resource.RetryError {
+				_, err := conn.CreateRoute(&opts)
+				if err != nil {
+					if awsErr, ok := err.(awserr.Error); ok {
+						if awsErr.Code() == "InvalidRouteTableID.NotFound" {
+							return resource.RetryableError(awsErr)
+						}
+					}
+					return resource.NonRetryableError(err)
+				}
+				return nil
+			})
+			if err != nil {
 				return err
 			}
 

@@ -76,14 +76,14 @@ func generateSubjectKeyID(pub crypto.PublicKey) ([]byte, error) {
 
 func resourceCertificateCommonSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"validity_period_hours": {
+		"validity_period_hours": &schema.Schema{
 			Type:        schema.TypeInt,
 			Required:    true,
 			Description: "Number of hours that the certificate will remain valid for",
 			ForceNew:    true,
 		},
 
-		"early_renewal_hours": {
+		"early_renewal_hours": &schema.Schema{
 			Type:        schema.TypeInt,
 			Optional:    true,
 			Default:     0,
@@ -91,14 +91,14 @@ func resourceCertificateCommonSchema() map[string]*schema.Schema {
 			ForceNew:    true,
 		},
 
-		"is_ca_certificate": {
+		"is_ca_certificate": &schema.Schema{
 			Type:        schema.TypeBool,
 			Optional:    true,
 			Description: "Whether the generated certificate will be usable as a CA certificate",
 			ForceNew:    true,
 		},
 
-		"allowed_uses": {
+		"allowed_uses": &schema.Schema{
 			Type:        schema.TypeList,
 			Required:    true,
 			Description: "Uses that are allowed for the certificate",
@@ -108,17 +108,17 @@ func resourceCertificateCommonSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"cert_pem": {
+		"cert_pem": &schema.Schema{
 			Type:     schema.TypeString,
 			Computed: true,
 		},
 
-		"validity_start_time": {
+		"validity_start_time": &schema.Schema{
 			Type:     schema.TypeString,
 			Computed: true,
 		},
 
-		"validity_end_time": {
+		"validity_end_time": &schema.Schema{
 			Type:     schema.TypeString,
 			Computed: true,
 		},

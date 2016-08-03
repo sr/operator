@@ -18,40 +18,40 @@ func resourceComputeTargetHttpsProxy() *schema.Resource {
 		Update: resourceComputeTargetHttpsProxyUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"ssl_certificates": {
+			"ssl_certificates": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"url_map": {
+			"url_map": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -169,7 +169,7 @@ func resourceComputeTargetHttpsProxyUpdate(d *schema.ResourceData, meta interfac
 		}
 
 		// Add fresh certificates
-		for k := range _newMap {
+		for k, _ := range _newMap {
 			sslCertificates = append(sslCertificates, k)
 		}
 

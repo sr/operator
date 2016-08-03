@@ -13,17 +13,17 @@ func resourceGithubTeamRepository() *schema.Resource {
 		Delete: resourceGithubTeamRepositoryDelete,
 
 		Schema: map[string]*schema.Schema{
-			"team_id": {
+			"team_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"repository": {
+			"repository": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"permission": {
+			"permission": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "pull",

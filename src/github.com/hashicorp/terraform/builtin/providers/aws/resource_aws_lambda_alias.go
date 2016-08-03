@@ -17,19 +17,19 @@ func resourceAwsLambdaAlias() *schema.Resource {
 		Delete: resourceAwsLambdaAliasDelete,
 
 		Schema: map[string]*schema.Schema{
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"function_name": {
+			"function_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"function_version": {
+			"function_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},

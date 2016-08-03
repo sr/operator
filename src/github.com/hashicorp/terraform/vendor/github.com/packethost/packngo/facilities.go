@@ -1,4 +1,4 @@
-package packngo
+package packngo 
 
 const facilityBasePath = "/facilities"
 
@@ -13,14 +13,13 @@ type facilityRoot struct {
 
 // Facility represents a Packet facility
 type Facility struct {
-	ID       string   `json:"id"`
-	Name     string   `json:"name,omitempty"`
-	Code     string   `json:"code,omitempty"`
-	Features []string `json:"features,omitempty"`
-	Address  *Address `json:"address,omitempty"`
-	URL      string   `json:"href,omitempty"`
+	ID        string   `json:"id"`
+	Name      string   `json:"name,omitempty"`
+	Code      string   `json:"code,omitempty"`
+	Features  []string `json:"features,omitempty"`
+	Address   *Address `json:"address,omitempty"`
+  URL       string   `json:"href,omitempty"`
 }
-
 func (f Facility) String() string {
 	return Stringify(f)
 }
@@ -29,10 +28,10 @@ func (f Facility) String() string {
 type Address struct {
 	ID string `json:"id,omitempty"`
 }
-
 func (a Address) String() string {
 	return Stringify(a)
 }
+
 
 // FacilityServiceOp implements FacilityService
 type FacilityServiceOp struct {

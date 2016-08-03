@@ -21,42 +21,42 @@ func resourceAwsApiGatewayIntegrationResponse() *schema.Resource {
 		Delete: resourceAwsApiGatewayIntegrationResponseDelete,
 
 		Schema: map[string]*schema.Schema{
-			"rest_api_id": {
+			"rest_api_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"resource_id": {
+			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"http_method": {
+			"http_method": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateHTTPMethod,
 			},
 
-			"status_code": {
+			"status_code": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"selection_pattern": {
+			"selection_pattern": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"response_templates": {
+			"response_templates": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Elem:     schema.TypeString,
 			},
 
-			"response_parameters_in_json": {
+			"response_parameters_in_json": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

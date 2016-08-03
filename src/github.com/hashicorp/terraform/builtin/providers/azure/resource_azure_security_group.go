@@ -15,20 +15,20 @@ func resourceAzureSecurityGroup() *schema.Resource {
 		Delete: resourceAzureSecurityGroupDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"label": {
+			"label": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,

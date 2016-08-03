@@ -10,13 +10,13 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRAFANA_URL", nil),
 				Description: "URL of the root of the target Grafana server.",
 			},
-			"auth": {
+			"auth": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRAFANA_AUTH", nil),

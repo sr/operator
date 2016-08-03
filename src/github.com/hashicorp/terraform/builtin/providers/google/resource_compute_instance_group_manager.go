@@ -19,56 +19,56 @@ func resourceComputeInstanceGroupManager() *schema.Resource {
 		Delete: resourceComputeInstanceGroupManagerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"base_instance_name": {
+			"base_instance_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"instance_template": {
+			"instance_template": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"zone": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"zone": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"instance_group": {
+			"instance_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"named_port": {
+			"named_port": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -76,31 +76,31 @@ func resourceComputeInstanceGroupManager() *schema.Resource {
 				},
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"update_strategy": {
+			"update_strategy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "RESTART",
 			},
 
-			"target_pools": {
+			"target_pools": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"target_size": {
+			"target_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 				Optional: true,

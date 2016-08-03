@@ -19,131 +19,131 @@ func resourceSqlDatabaseInstance() *schema.Resource {
 		Delete: resourceSqlDatabaseInstanceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"settings": {
+			"settings": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"version": {
+						"version": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"tier": {
+						"tier": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"activation_policy": {
+						"activation_policy": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"authorized_gae_applications": {
+						"authorized_gae_applications": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"backup_configuration": {
+						"backup_configuration": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"binary_log_enabled": {
+									"binary_log_enabled": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
-									"enabled": {
+									"enabled": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
-									"start_time": {
+									"start_time": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"crash_safe_replication": {
+						"crash_safe_replication": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
-						"database_flags": {
+						"database_flags": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"value": {
+									"value": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
-									"name": {
+									"name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"ip_configuration": {
+						"ip_configuration": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"authorized_networks": {
+									"authorized_networks": &schema.Schema{
 										Type:     schema.TypeList,
 										Optional: true,
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
-												"expiration_time": {
+												"expiration_time": &schema.Schema{
 													Type:     schema.TypeString,
 													Optional: true,
 												},
-												"name": {
+												"name": &schema.Schema{
 													Type:     schema.TypeString,
 													Optional: true,
 												},
-												"value": {
+												"value": &schema.Schema{
 													Type:     schema.TypeString,
 													Optional: true,
 												},
 											},
 										},
 									},
-									"ipv4_enabled": {
+									"ipv4_enabled": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
-									"require_ssl": {
+									"require_ssl": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"location_preference": {
+						"location_preference": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"follow_gae_application": {
+									"follow_gae_application": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
-									"zone": {
+									"zone": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"pricing_plan": {
+						"pricing_plan": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"replication_type": {
+						"replication_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -151,23 +151,23 @@ func resourceSqlDatabaseInstance() *schema.Resource {
 				},
 			},
 
-			"database_version": {
+			"database_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "MYSQL_5_5",
 				ForceNew: true,
 			},
 
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ip_address": {
+						"ip_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"time_to_retire": {
+						"time_to_retire": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -176,76 +176,76 @@ func resourceSqlDatabaseInstance() *schema.Resource {
 				},
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"master_instance_name": {
+			"master_instance_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"replica_configuration": {
+			"replica_configuration": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ca_certificate": {
+						"ca_certificate": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"client_certificate": {
+						"client_certificate": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"client_key": {
+						"client_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"connect_retry_interval": {
+						"connect_retry_interval": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"dump_file_path": {
+						"dump_file_path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"master_heartbeat_period": {
+						"master_heartbeat_period": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"password": {
+						"password": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"ssl_cipher": {
+						"ssl_cipher": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"username": {
+						"username": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"verify_server_certificate": {
+						"verify_server_certificate": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							ForceNew: true,
@@ -254,7 +254,7 @@ func resourceSqlDatabaseInstance() *schema.Resource {
 				},
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

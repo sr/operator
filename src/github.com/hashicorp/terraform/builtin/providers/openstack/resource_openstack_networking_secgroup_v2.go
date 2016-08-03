@@ -17,26 +17,29 @@ func resourceNetworkingSecGroupV2() *schema.Resource {
 		Create: resourceNetworkingSecGroupV2Create,
 		Read:   resourceNetworkingSecGroupV2Read,
 		Delete: resourceNetworkingSecGroupV2Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -91,6 +94,7 @@ func resourceNetworkingSecGroupV2Read(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("description", security_group.Description)
 	d.Set("tenant_id", security_group.TenantID)
+	d.Set("name", security_group.Name)
 	return nil
 }
 

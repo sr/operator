@@ -9,12 +9,11 @@ type EmailService interface {
 
 // Email represents a user's email address
 type Email struct {
-	ID      string `json:"id"`
-	Address string `json:"address"`
-	Default bool   `json:"default,omitempty"`
-	URL     string `json:"href,omitempty"`
+	ID           string    `json:"id"`
+	Address      string    `json:"address"`
+  Default      bool      `json:"default,omitempty"`
+	URL          string    `json:"href,omitempty"`
 }
-
 func (e Email) String() string {
 	return Stringify(e)
 }
@@ -24,7 +23,7 @@ type EmailServiceOp struct {
 	client *Client
 }
 
-// Get retrieves an email by id
+// Get retrieves an email by id 
 func (s *EmailServiceOp) Get(emailID string) (*Email, *Response, error) {
 	req, err := s.client.NewRequest("GET", emailBasePath, nil)
 	if err != nil {

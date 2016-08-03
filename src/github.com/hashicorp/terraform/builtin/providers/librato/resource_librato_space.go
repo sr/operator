@@ -19,12 +19,12 @@ func resourceLibratoSpace() *schema.Resource {
 		Delete: resourceLibratoSpaceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

@@ -77,7 +77,7 @@ func migrateExpandIPPerm(attrs map[string]string) (*ec2.IpPermission, error) {
 		perm.UserIdGroupPairs = make([]*ec2.UserIdGroupPair, len(groups))
 		// build string list of group name/ids
 		var gl []string
-		for k := range groups {
+		for k, _ := range groups {
 			gl = append(gl, k)
 		}
 

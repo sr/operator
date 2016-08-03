@@ -10,17 +10,17 @@ func resourceAwsOpsworksGangliaLayer() *schema.Resource {
 		DefaultLayerName: "Ganglia",
 
 		Attributes: map[string]*opsworksLayerTypeAttribute{
-			"url": {
+			"url": &opsworksLayerTypeAttribute{
 				AttrName: "GangliaUrl",
 				Type:     schema.TypeString,
 				Default:  "/ganglia",
 			},
-			"username": {
+			"username": &opsworksLayerTypeAttribute{
 				AttrName: "GangliaUser",
 				Type:     schema.TypeString,
 				Default:  "opsworks",
 			},
-			"password": {
+			"password": &opsworksLayerTypeAttribute{
 				AttrName:  "GangliaPassword",
 				Type:      schema.TypeString,
 				Required:  true,

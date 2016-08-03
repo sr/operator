@@ -11,10 +11,10 @@ import (
 func TestStateShow(t *testing.T) {
 	state := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root"},
 				Resources: map[string]*terraform.ResourceState{
-					"test_instance.foo": {
+					"test_instance.foo": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",
@@ -59,10 +59,10 @@ func TestStateShow(t *testing.T) {
 func TestStateShow_multi(t *testing.T) {
 	state := &terraform.State{
 		Modules: []*terraform.ModuleState{
-			{
+			&terraform.ModuleState{
 				Path: []string{"root"},
 				Resources: map[string]*terraform.ResourceState{
-					"test_instance.foo.0": {
+					"test_instance.foo.0": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",
@@ -72,7 +72,7 @@ func TestStateShow_multi(t *testing.T) {
 							},
 						},
 					},
-					"test_instance.foo.1": {
+					"test_instance.foo.1": &terraform.ResourceState{
 						Type: "test_instance",
 						Primary: &terraform.InstanceState{
 							ID: "bar",

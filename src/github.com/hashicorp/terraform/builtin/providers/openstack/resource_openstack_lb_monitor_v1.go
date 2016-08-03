@@ -19,56 +19,59 @@ func resourceLBMonitorV1() *schema.Resource {
 		Read:   resourceLBMonitorV1Read,
 		Update: resourceLBMonitorV1Update,
 		Delete: resourceLBMonitorV1Delete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"delay": {
+			"delay": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: false,
 			},
-			"timeout": {
+			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: false,
 			},
-			"max_retries": {
+			"max_retries": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: false,
 			},
-			"url_path": {
+			"url_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"http_method": {
+			"http_method": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"expected_codes": {
+			"expected_codes": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"admin_state_up": {
+			"admin_state_up": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,

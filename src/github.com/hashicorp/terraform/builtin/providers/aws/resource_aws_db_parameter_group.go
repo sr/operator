@@ -23,43 +23,47 @@ func resourceAwsDbParameterGroup() *schema.Resource {
 		Read:   resourceAwsDbParameterGroupRead,
 		Update: resourceAwsDbParameterGroupUpdate,
 		Delete: resourceAwsDbParameterGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateDbParamGroupName,
 			},
-			"family": {
+			"family": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "Managed by Terraform",
 			},
-			"parameter": {
+			"parameter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"apply_method": {
+						"apply_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "immediate",
@@ -197,18 +201,29 @@ func resourceAwsDbParameterGroupUpdate(d *schema.ResourceData, meta interface{})
 		}
 
 		if len(parameters) > 0 {
-			modifyOpts := rds.ModifyDBParameterGroupInput{
-				DBParameterGroupName: aws.String(d.Get("name").(string)),
-				Parameters:           parameters,
-			}
+			// We can only modify 20 parameters at a time, so walk them until
+			// we've got them all.
+			maxParams := 20
+			for parameters != nil {
+				paramsToModify := make([]*rds.Parameter, 0)
+				if len(parameters) <= maxParams {
+					paramsToModify, parameters = parameters[:], nil
+				} else {
+					paramsToModify, parameters = parameters[:maxParams], parameters[maxParams:]
+				}
+				modifyOpts := rds.ModifyDBParameterGroupInput{
+					DBParameterGroupName: aws.String(d.Get("name").(string)),
+					Parameters:           paramsToModify,
+				}
 
-			log.Printf("[DEBUG] Modify DB Parameter Group: %s", modifyOpts)
-			_, err = rdsconn.ModifyDBParameterGroup(&modifyOpts)
-			if err != nil {
-				return fmt.Errorf("Error modifying DB Parameter Group: %s", err)
+				log.Printf("[DEBUG] Modify DB Parameter Group: %s", modifyOpts)
+				_, err = rdsconn.ModifyDBParameterGroup(&modifyOpts)
+				if err != nil {
+					return fmt.Errorf("Error modifying DB Parameter Group: %s", err)
+				}
 			}
+			d.SetPartial("parameter")
 		}
-		d.SetPartial("parameter")
 	}
 
 	if arn, err := buildRDSPGARN(d, meta); err == nil {

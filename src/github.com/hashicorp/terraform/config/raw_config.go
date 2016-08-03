@@ -93,6 +93,8 @@ func (r *RawConfig) Value() interface{} {
 // structure will always successfully decode into its ultimate
 // structure using something like mapstructure.
 func (r *RawConfig) Config() map[string]interface{} {
+	r.lock.Lock()
+	defer r.lock.Unlock()
 	return r.config
 }
 
@@ -182,7 +184,7 @@ func (r *RawConfig) Merge(other *RawConfig) *RawConfig {
 	}
 
 	result.unknownKeys = make([]string, 0, len(unknownKeys))
-	for k := range unknownKeys {
+	for k, _ := range unknownKeys {
 		result.unknownKeys = append(result.unknownKeys, k)
 	}
 
