@@ -15,7 +15,7 @@ variable "environment_appdev" {
     db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
-    num_whoisdb1_hosts = 1
+    num_whoisdb1_hosts = 2
     num_app1_hosts = 2
     num_thumbs1_hosts = 1
     num_redisjob1_hosts = 2
@@ -56,6 +56,7 @@ variable "appdev_dbshard1_ips" {
 variable "appdev_whoisdb1_ips" {
   default = {
     "0" = "172.26.66.54"
+    "1" = "172.26.66.55"
   }
 }
 
@@ -886,17 +887,25 @@ resource "aws_instance" "appdev_whoisdb1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
   private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
     delete_on_termination = true
   }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_type = "gp2"
+    volume_size = "512"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
