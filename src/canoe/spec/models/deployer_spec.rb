@@ -6,7 +6,7 @@ RSpec.describe Canoe::Deployer do
       let(:deployer) { Canoe::Deployer.new }
       let(:deploy_scenario) { FactoryGirl.create(:deploy_scenario) }
       let(:prov_deploy) do
-        ProvisionalDeploy.new(
+        Build.new(
           project: deploy_scenario.project,
           artifact_url: "https://dev.pardot.com/123",
           branch: "abc123",
