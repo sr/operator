@@ -17,57 +17,57 @@ func resourceComputeForwardingRule() *schema.Resource {
 		Update: resourceComputeForwardingRuleUpdate,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"target": &schema.Schema{
+			"target": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ip_address": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
-			},
-
-			"ip_protocol": &schema.Schema{
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"port_range": &schema.Schema{
+			"ip_protocol": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+
+			"port_range": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": &schema.Schema{
+			"project": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": &schema.Schema{
+			"region": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": &schema.Schema{
+			"self_link": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

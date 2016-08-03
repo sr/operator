@@ -24,7 +24,7 @@ func TestAccAWSCloudFrontDistribution_S3Origin(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionS3Config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCloudFrontDistributionExistence(
@@ -52,7 +52,7 @@ func TestAccAWSCloudFrontDistribution_customOrigin(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionCustomConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCloudFrontDistributionExistence(
@@ -75,7 +75,7 @@ func TestAccAWSCloudFrontDistribution_multiOrigin(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionMultiOriginConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCloudFrontDistributionExistence(
@@ -98,7 +98,7 @@ func TestAccAWSCloudFrontDistribution_noOptionalItemsConfig(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionNoOptionalItemsConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCloudFrontDistributionExistence(
@@ -116,7 +116,7 @@ func TestAccAWSCloudFrontDistribution_noCustomErrorResponseConfig(t *testing.T) 
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionNoCustomErroResponseInfo,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCloudFrontDistributionExistence(

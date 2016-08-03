@@ -22,7 +22,7 @@ func TestAccAzureRMTrafficManagerProfile_weighted(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMTrafficManagerProfileDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMTrafficManagerProfileExists("azurerm_traffic_manager_profile.test"),
@@ -45,7 +45,7 @@ func TestAccAzureRMTrafficManagerProfile_performance(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMTrafficManagerProfileDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMTrafficManagerProfileExists("azurerm_traffic_manager_profile.test"),
@@ -68,7 +68,7 @@ func TestAccAzureRMTrafficManagerProfile_priority(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMTrafficManagerProfileDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMTrafficManagerProfileExists("azurerm_traffic_manager_profile.test"),
@@ -90,7 +90,7 @@ func TestAccAzureRMTrafficManagerProfile_withTags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMTrafficManagerProfileDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMTrafficManagerProfileExists("azurerm_traffic_manager_profile.test"),
@@ -103,7 +103,7 @@ func TestAccAzureRMTrafficManagerProfile_withTags(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMTrafficManagerProfileExists("azurerm_traffic_manager_profile.test"),

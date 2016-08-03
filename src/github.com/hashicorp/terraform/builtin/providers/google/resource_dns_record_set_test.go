@@ -16,7 +16,7 @@ func TestAccDnsRecordSet_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDnsRecordSetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccDnsRecordSet_basic(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDnsRecordSetExists(

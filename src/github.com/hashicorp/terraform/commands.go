@@ -36,7 +36,7 @@ func init() {
 	}
 
 	PlumbingCommands = map[string]struct{}{
-		"state": struct{}{}, // includes all subcommands
+		"state": {}, // includes all subcommands
 	}
 
 	Commands = map[string]cli.CommandFactory{

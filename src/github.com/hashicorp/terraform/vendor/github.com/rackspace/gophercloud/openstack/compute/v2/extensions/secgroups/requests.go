@@ -238,7 +238,7 @@ func DeleteRule(client *gophercloud.ServiceClient, id string) gophercloud.ErrRes
 
 func actionMap(prefix, groupName string) map[string]map[string]string {
 	return map[string]map[string]string{
-		prefix + "SecurityGroup": map[string]string{"name": groupName},
+		prefix + "SecurityGroup": {"name": groupName},
 	}
 }
 

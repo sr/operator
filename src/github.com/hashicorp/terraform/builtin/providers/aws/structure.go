@@ -1054,7 +1054,7 @@ func expandApiGatewayRequestResponseModelOperations(d *schema.ResourceData, key 
 	oldModelMap := oldModels.(map[string]interface{})
 	newModelMap := newModels.(map[string]interface{})
 
-	for k, _ := range oldModelMap {
+	for k := range oldModelMap {
 		operation := apigateway.PatchOperation{
 			Op:   aws.String("remove"),
 			Path: aws.String(fmt.Sprintf("/%s/%s", prefix, strings.Replace(k, "/", "~1", -1))),
@@ -1072,7 +1072,7 @@ func expandApiGatewayRequestResponseModelOperations(d *schema.ResourceData, key 
 
 	for nK, nV := range newModelMap {
 		exists := false
-		for k, _ := range oldModelMap {
+		for k := range oldModelMap {
 			if k == nK {
 				exists = true
 			}
@@ -1107,7 +1107,7 @@ func expandApiGatewayMethodParametersJSONOperations(d *schema.ResourceData, key 
 		return operations, err
 	}
 
-	for k, _ := range oldParametersMap {
+	for k := range oldParametersMap {
 		operation := apigateway.PatchOperation{
 			Op:   aws.String("remove"),
 			Path: aws.String(fmt.Sprintf("/%s/%s", prefix, k)),
@@ -1125,7 +1125,7 @@ func expandApiGatewayMethodParametersJSONOperations(d *schema.ResourceData, key 
 
 	for nK, nV := range newParametersMap {
 		exists := false
-		for k, _ := range oldParametersMap {
+		for k := range oldParametersMap {
 			if k == nK {
 				exists = true
 			}

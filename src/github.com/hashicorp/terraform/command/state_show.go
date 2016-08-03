@@ -54,7 +54,7 @@ func (c *StateShowCommand) Run(args []string) int {
 
 	// Sort the keys
 	keys := make([]string, 0, len(is.Attributes))
-	for k, _ := range is.Attributes {
+	for k := range is.Attributes {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)

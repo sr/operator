@@ -21,7 +21,7 @@ func TestContext2Input(t *testing.T) {
 		Variables: map[string]interface{}{
 			"foo": "us-west-2",
 			"amis": []map[string]interface{}{
-				map[string]interface{}{
+				{
 					"us-east-1": "override",
 				},
 			},
@@ -553,10 +553,10 @@ func TestContext2Input_varPartiallyComputed(t *testing.T) {
 		UIInput: input,
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.foo": &ResourceState{
+						"aws_instance.foo": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "i-abc123",
@@ -567,10 +567,10 @@ func TestContext2Input_varPartiallyComputed(t *testing.T) {
 						},
 					},
 				},
-				&ModuleState{
+				{
 					Path: append(rootModulePath, "child"),
 					Resources: map[string]*ResourceState{
-						"aws_instance.mod": &ResourceState{
+						"aws_instance.mod": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "i-bcd345",

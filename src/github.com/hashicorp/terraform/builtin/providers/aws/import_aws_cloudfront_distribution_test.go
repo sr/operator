@@ -14,10 +14,10 @@ func TestAccAWSCloudFrontDistribution_importBasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCloudFrontDistributionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSCloudFrontDistributionS3Config,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,

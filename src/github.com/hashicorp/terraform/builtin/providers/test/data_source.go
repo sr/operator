@@ -11,7 +11,7 @@ func testDataSource() *schema.Resource {
 		Read: testDataSourceRead,
 
 		Schema: map[string]*schema.Schema{
-			"list": &schema.Schema{
+			"list": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

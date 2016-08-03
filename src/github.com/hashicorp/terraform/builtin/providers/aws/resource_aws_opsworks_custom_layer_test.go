@@ -22,7 +22,7 @@ func TestAccAWSOpsworksCustomLayer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAwsOpsworksCustomLayerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAwsOpsworksCustomLayerConfigCreate(stackName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -69,7 +69,7 @@ func TestAccAWSOpsworksCustomLayer(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAwsOpsworksCustomLayerConfigUpdate(stackName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(

@@ -13,7 +13,7 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"endpoint": &schema.Schema{
+			"endpoint": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_ENDPOINT", nil),
@@ -27,7 +27,7 @@ func Provider() terraform.ResourceProvider {
 				},
 			},
 
-			"username": &schema.Schema{
+			"username": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_USERNAME", nil),
@@ -41,7 +41,7 @@ func Provider() terraform.ResourceProvider {
 				},
 			},
 
-			"password": &schema.Schema{
+			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_PASSWORD", nil),

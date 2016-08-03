@@ -240,16 +240,16 @@ func TestResourceProvider_linuxCreateConfigFiles(t *testing.T) {
 		"Attributes": {
 			Config: testConfig(t, map[string]interface{}{
 				"attributes": []map[string]interface{}{
-					map[string]interface{}{
+					{
 						"key1": []map[string]interface{}{
-							map[string]interface{}{
+							{
 								"subkey1": []map[string]interface{}{
-									map[string]interface{}{
+									{
 										"subkey2a": []interface{}{
 											"val1", "val2", "val3",
 										},
 										"subkey2b": []map[string]interface{}{
-											map[string]interface{}{
+											{
 												"subkey3": "value3",
 											},
 										},

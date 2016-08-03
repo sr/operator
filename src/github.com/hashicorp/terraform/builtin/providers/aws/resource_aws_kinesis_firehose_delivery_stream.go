@@ -23,13 +23,13 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 		SchemaVersion: 1,
 		MigrateState:  resourceAwsKinesisFirehoseMigrateState,
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"destination": &schema.Schema{
+			"destination": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -40,82 +40,82 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 			},
 
 			// elements removed in v0.7.0
-			"role_arn": &schema.Schema{
+			"role_arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "role_arn has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_bucket_arn": &schema.Schema{
+			"s3_bucket_arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "s3_bucket_arn has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_prefix": &schema.Schema{
+			"s3_prefix": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "s3_prefix has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_buffer_size": &schema.Schema{
+			"s3_buffer_size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Removed:  "s3_buffer_size has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_buffer_interval": &schema.Schema{
+			"s3_buffer_interval": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Removed:  "s3_buffer_interval has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_data_compression": &schema.Schema{
+			"s3_data_compression": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "s3_data_compression has been removed. Use a s3_configuration block instead. See https://terraform.io/docs/providers/aws/r/kinesis_firehose_delivery_stream.html",
 			},
 
-			"s3_configuration": &schema.Schema{
+			"s3_configuration": {
 				Type:     schema.TypeList,
 				Required: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"bucket_arn": &schema.Schema{
+						"bucket_arn": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"buffer_size": &schema.Schema{
+						"buffer_size": {
 							Type:     schema.TypeInt,
 							Optional: true,
 							Default:  5,
 						},
 
-						"buffer_interval": &schema.Schema{
+						"buffer_interval": {
 							Type:     schema.TypeInt,
 							Optional: true,
 							Default:  300,
 						},
 
-						"compression_format": &schema.Schema{
+						"compression_format": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "UNCOMPRESSED",
 						},
 
-						"kms_key_arn": &schema.Schema{
+						"kms_key_arn": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"role_arn": &schema.Schema{
+						"role_arn": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"prefix": &schema.Schema{
+						"prefix": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -123,43 +123,43 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 				},
 			},
 
-			"redshift_configuration": &schema.Schema{
+			"redshift_configuration": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cluster_jdbcurl": &schema.Schema{
+						"cluster_jdbcurl": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"username": &schema.Schema{
+						"username": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"password": &schema.Schema{
+						"password": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"role_arn": &schema.Schema{
+						"role_arn": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"copy_options": &schema.Schema{
+						"copy_options": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"data_table_columns": &schema.Schema{
+						"data_table_columns": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"data_table_name": &schema.Schema{
+						"data_table_name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -167,19 +167,19 @@ func resourceAwsKinesisFirehoseDeliveryStream() *schema.Resource {
 				},
 			},
 
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"version_id": &schema.Schema{
+			"version_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"destination_id": &schema.Schema{
+			"destination_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

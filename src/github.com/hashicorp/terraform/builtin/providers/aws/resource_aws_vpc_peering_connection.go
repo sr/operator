@@ -23,27 +23,27 @@ func resourceAwsVpcPeeringConnection() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"peer_owner_id": &schema.Schema{
+			"peer_owner_id": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("AWS_ACCOUNT_ID", nil),
 			},
-			"peer_vpc_id": &schema.Schema{
+			"peer_vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"auto_accept": &schema.Schema{
+			"auto_accept": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"accept_status": &schema.Schema{
+			"accept_status": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

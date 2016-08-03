@@ -24,14 +24,14 @@ func resourceAwsEfsFileSystem() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"creation_token": &schema.Schema{
+			"creation_token": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(64),
 			},
 
-			"reference_name": &schema.Schema{
+			"reference_name": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
@@ -40,7 +40,7 @@ func resourceAwsEfsFileSystem() *schema.Resource {
 				ValidateFunc:  validateReferenceName,
 			},
 
-			"performance_mode": &schema.Schema{
+			"performance_mode": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,

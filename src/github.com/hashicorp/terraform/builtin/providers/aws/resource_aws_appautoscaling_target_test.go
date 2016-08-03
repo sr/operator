@@ -23,7 +23,7 @@ func TestAccAWSAppautoScalingTarget_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSAppautoscalingTargetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSAppautoscalingTargetConfig(randClusterName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAppautoscalingTargetExists("aws_appautoscaling_target.bar", &target),
@@ -34,7 +34,7 @@ func TestAccAWSAppautoScalingTarget_basic(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: testAccAWSAppautoscalingTargetConfigUpdate(randClusterName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAppautoscalingTargetExists("aws_appautoscaling_target.bar", &target),

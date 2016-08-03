@@ -42,37 +42,37 @@ func resourceAwsSqsQueue() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"delay_seconds": &schema.Schema{
+			"delay_seconds": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 			},
-			"max_message_size": &schema.Schema{
+			"max_message_size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  262144,
 			},
-			"message_retention_seconds": &schema.Schema{
+			"message_retention_seconds": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  345600,
 			},
-			"receive_wait_time_seconds": &schema.Schema{
+			"receive_wait_time_seconds": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 			},
-			"visibility_timeout_seconds": &schema.Schema{
+			"visibility_timeout_seconds": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  30,
 			},
-			"policy": &schema.Schema{
+			"policy": {
 				Type:     schema.TypeString,
 				Optional: true,
 				StateFunc: func(v interface{}) string {
@@ -89,12 +89,12 @@ func resourceAwsSqsQueue() *schema.Resource {
 					return buffer.String()
 				},
 			},
-			"redrive_policy": &schema.Schema{
+			"redrive_policy": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				StateFunc: normalizeJson,
 			},
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

@@ -17,7 +17,7 @@ func TestAccScalewaySecurityGroupRule_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckScalewaySecurityGroupRuleDestroy(&group),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckScalewaySecurityGroupRuleConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckScalewaySecurityGroupsExists("scaleway_security_group.base", &group),

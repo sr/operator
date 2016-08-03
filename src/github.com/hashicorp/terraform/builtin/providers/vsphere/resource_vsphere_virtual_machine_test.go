@@ -284,7 +284,7 @@ func TestAccVSphereVirtualMachine_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: basic_vars.label}.testCheckFuncBasic(),
@@ -317,7 +317,7 @@ func TestAccVSphereVirtualMachine_client_debug(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -365,7 +365,7 @@ func TestAccVSphereVirtualMachine_diskInitType(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -396,7 +396,7 @@ func TestAccVSphereVirtualMachine_dhcp(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, vmName: "vsphere_virtual_machine.bar"}.testCheckFuncBasic(),
@@ -436,7 +436,7 @@ func TestAccVSphereVirtualMachine_custom_configs(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -479,7 +479,7 @@ func TestAccVSphereVirtualMachine_createInExistingFolder(t *testing.T) {
 			removeVSphereFolder(datacenter, folder, ""),
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				PreConfig: func() { createVSphereFolder(datacenter, folder) },
 				Config:    config,
 				Check: resource.ComposeTestCheckFunc(
@@ -532,7 +532,7 @@ func TestAccVSphereVirtualMachine_createWithFolder(t *testing.T) {
 			testAccCheckVSphereFolderDestroy,
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -579,7 +579,7 @@ func TestAccVSphereVirtualMachine_createWithCdrom(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -636,7 +636,7 @@ func TestAccVSphereVirtualMachine_createWithExistingVmdk(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, vmName: "vsphere_virtual_machine.with_existing_vmdk",
@@ -684,13 +684,13 @@ func TestAccVSphereVirtualMachine_updateMemory(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, vmName: "vsphere_virtual_machine.bar"}.testCheckFuncBasic(),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: configUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, mem: "2048", vmName: "vsphere_virtual_machine.bar"}.testCheckFuncBasic(),
@@ -732,13 +732,13 @@ func TestAccVSphereVirtualMachine_updateVcpu(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, vmName: "vsphere_virtual_machine.bar"}.testCheckFuncBasic(),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: configUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: data.label, vmName: "vsphere_virtual_machine.bar", numCPU: "4"}.testCheckFuncBasic(),
@@ -810,7 +810,7 @@ func TestAccVSphereVirtualMachine_ipv4Andipv6(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -880,19 +880,19 @@ func TestAccVSphereVirtualMachine_updateDisks(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config_basic,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: basic_vars.label, numDisks: "2"}.testCheckFuncBasic(),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: config_add,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: basic_vars.label, numDisks: "4"}.testCheckFuncBasic(),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: config_del,
 				Check: resource.ComposeTestCheckFunc(
 					TestFuncData{vm: vm, label: basic_vars.label, numDisks: "1"}.testCheckFuncBasic(),
@@ -960,7 +960,7 @@ func TestAccVSphereVirtualMachine_mac_address(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
@@ -1199,13 +1199,13 @@ func TestAccVSphereVirtualMachine_keepOnRemove(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVSphereVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					test_exists, test_name, test_cpu, test_uuid, test_mem, test_num_disk, test_num_of_nic, test_nic_label,
 				),
 			},
-			resource.TestStep{
+			{
 				Config: " ",
 				Check:  checkForDisk(datacenter, datastore, "terraform-test", "one.vmdk"),
 			},

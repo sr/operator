@@ -19,7 +19,7 @@ func TestAccAWSSpotFleetRequest_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSSpotFleetRequestDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSSpotFleetRequestConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSpotFleetRequestExists(
@@ -41,7 +41,7 @@ func TestAccAWSSpotFleetRequest_launchConfiguration(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSSpotFleetRequestDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSSpotFleetRequestWithAdvancedLaunchSpecConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSSpotFleetRequestExists(
