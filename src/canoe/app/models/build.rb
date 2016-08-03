@@ -1,7 +1,7 @@
 require "base64"
 require "json"
 
-class ProvisionalDeploy
+class Build
   attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
 
@@ -31,10 +31,10 @@ class ProvisionalDeploy
       begin
         properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
       rescue JSON::ParseError
-        Instrumentation.log_exception($!, {
-          at: "ProvisionalDeploy",
-          fn: "from_artifact_url_and_properties",
-        })
+        Instrumentation.log_exception($!,
+          at: "Build",
+          fn: "from_artifact_url_and_properties"
+        )
         nil
       end
 
@@ -45,9 +45,9 @@ class ProvisionalDeploy
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
-      created_at: Time.parse(properties["buildTimeStamp"]),
+      created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
       options_validator: options_validator,
-      options: {}
+      options: { meta_data: properties }
     )
   end
 
@@ -90,5 +90,23 @@ class ProvisionalDeploy
 
   def passed_ci?
     @passed_ci
+  end
+
+  def test_state(test)
+    key = (test == :PPANT) ? "passedCI" : "ciJob[#{test}]"
+    state = options[:meta_data][key]
+    build_time = DateTime.parse(options[:meta_data]["buildTimeStamp"]).iso8601
+
+    # Since Bamboo doesn't have a run code on failure option we don't know if
+    # the build plan is still processing
+    # TODO: Interface with the Bamboo API to verify build status
+    if state == "false" && build_time > 30.minutes.ago
+      state = "pending"
+    end
+    state
+  end
+
+  def build_url(test)
+    options[:meta_data]["ciJobUrl[#{test}]"]
   end
 end

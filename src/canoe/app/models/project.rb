@@ -2,6 +2,21 @@ class Project < ApplicationRecord
   ARTIFACTORY_REPO = "pd-canoe".freeze
   GITHUB_URL = "https://git.dev.pardot.com".freeze
 
+  def test_list
+    case name
+    when "pardot"
+      {
+        PPANT: "PPANT",
+        WT: "WebDriver",
+        TSIT: "Salesforce Integration",
+        PPANTCLONE666: "AB Combinatorial",
+        PPANTCLONE6666: "List Combinatorial"
+      }
+    else
+      {}
+    end
+  end
+
   def to_param
     name
   end
@@ -11,7 +26,7 @@ class Project < ApplicationRecord
     artifact_hashes = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
 
-    artifact_hashes.map { |hash| ProvisionalDeploy.from_artifact_hash(hash) }
+    artifact_hashes.map { |hash| Build.from_artifact_hash(hash) }
       .compact
       .sort_by { |deploy| -deploy.build_number }
   end
