@@ -101,7 +101,8 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
       "50.22.140.200/32",   # tools-s1.dev
-      "${aws_eip.internal_apps_nat_gw.public_ip}/32"
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_nat_gw.public_ip}/32"
     ]
     security_groups = [
       "${aws_security_group.internal_apps_chef_server.id}"
