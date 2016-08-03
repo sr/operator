@@ -36,7 +36,7 @@ Lint/CircularArgumentReference:
 # Configuration parameters: CountKeywordArgs.
 Metrics/ParameterLists:
   Exclude:
-    - 'src/canoe/app/models/provisional_deploy.rb'
+    - 'src/canoe/app/models/build.rb'
     - 'src/canoe/lib/canoe/deployer.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/zabbixmon.rb'
@@ -52,7 +52,6 @@ Rails/TimeZone:
   Exclude:
     - 'src/canoe/app/controllers/application_controller.rb'
     - 'src/canoe/app/helpers/canoe_helper.rb'
-    - 'src/canoe/app/models/provisional_deploy.rb'
     - 'src/hal9000/plugins/lita-replication-fixing/lib/lita/handlers/replication_fixing.rb'
     - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/alerting_manager.rb'
     - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/fixing_status_client.rb'
@@ -61,15 +60,6 @@ Rails/TimeZone:
     - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/maintenance_supervisor.rb'
     - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
-
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'src/canoe/app/models/provisional_deploy.rb'
 
 # Offense count: 4
 Style/CaseEquality:
@@ -88,7 +78,7 @@ Style/ConditionalAssignment:
 # Offense count: 3
 Style/DoubleNegation:
   Exclude:
-    - 'src/canoe/app/models/provisional_deploy.rb'
+    - 'src/canoe/app/models/build.rb'
     - 'src/canoe/config/application.rb'
     - 'src/canoe/lib/canoe/ldap_authorizer.rb'
     - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/monitor_supervisor.rb'
@@ -146,7 +136,6 @@ Style/StringLiteralsInInterpolation:
 Style/TrailingCommaInLiteral:
   Exclude:
     - 'src/canoe/app/models/project.rb'
-    - 'src/canoe/app/models/provisional_deploy.rb'
 
 # Offense count: 6
 # Cop supports --auto-correct.
