@@ -107,7 +107,7 @@ class Project < ApplicationRecord
       conditions << {
         "$or" => [
           { "@passedCI" => { "$eq" => "true" } },
-          { "created"   => { "$gt" => 30.minutes.ago.iso8601 } },
+          { "created"   => { "$gt" => 1.hour.ago.iso8601 } },
         ]
       }
     else
