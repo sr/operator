@@ -15,7 +15,7 @@ variable "environment_appdev" {
     db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
-    num_whoisdb1_hosts = 1
+    num_whoisdb1_hosts = 2
     num_app1_hosts = 2
     num_thumbs1_hosts = 1
     num_redisjob1_hosts = 2
@@ -50,12 +50,6 @@ variable "appdev_dbshard1_ips" {
     "1" = "172.26.93.40"
     "2" = "172.26.75.74"
     "3" = "172.26.69.79"
-  }
-}
-
-variable "appdev_whoisdb1_ips" {
-  default = {
-    "0" = "172.26.66.54"
   }
 }
 
@@ -888,7 +882,6 @@ resource "aws_instance" "appdev_whoisdb1" {
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
-  private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
