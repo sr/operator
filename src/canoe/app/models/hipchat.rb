@@ -96,10 +96,10 @@ class Hipchat
     end
 
     def build_link(deploy, link = true)
-      if deploy.what_details == "master"
+      if deploy.branch == "master"
         build_txt = "build#{deploy.build_number}"
       else
-        build_txt = "#{deploy.what_details} build#{deploy.build_number}"
+        build_txt = "#{deploy.branch} build#{deploy.build_number}"
       end
       commit_link = deploy.project.commit_url(deploy)
       link ? "<a href='#{commit_link}'>#{build_txt}</a>" : build_txt

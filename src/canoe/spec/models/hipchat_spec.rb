@@ -16,7 +16,7 @@ RSpec.describe Hipchat do
 
     it "with branch build" do
       project = FactoryGirl.create(:project) # TODO: Remove this when we've added an association btw Deploy & Project
-      deploy = FactoryGirl.create(:deploy, project_name: project.name, what_details: "ju/BREAD-111", build_number: 214, servers_used: "test-server")
+      deploy = FactoryGirl.create(:deploy, project_name: project.name, branch: "ju/BREAD-111", build_number: 214, servers_used: "test-server")
       support_msg = "#{deploy.auth_user.email} just began syncing ju/BREAD-111 build214 to Test"
       eng_msg = "Test: #{deploy.auth_user.email} just began " \
                 "syncing #{project.name.capitalize} to <a href='https://git.dev.pardot.com/" \
@@ -30,7 +30,7 @@ RSpec.describe Hipchat do
       project = FactoryGirl.create(:project) # TODO: Remove this when we've added an association btw Deploy & Project
       deploy_target = FactoryGirl.create(:deploy_target)
       FactoryGirl.create(:deploy, project_name: project.name, deploy_target: deploy_target, build_number: 214)
-      deploy = FactoryGirl.create(:deploy, project_name: project.name, deploy_target: deploy_target, what_details: "ju/BREAD-111", build_number: 214, servers_used: "test-server")
+      deploy = FactoryGirl.create(:deploy, project_name: project.name, deploy_target: deploy_target, branch: "ju/BREAD-111", build_number: 214, servers_used: "test-server")
 
       support_msg = "#{deploy.auth_user.email} just began syncing ju/BREAD-111 build214 to Test"
       eng_msg = "Test: #{deploy.auth_user.email} just began " \

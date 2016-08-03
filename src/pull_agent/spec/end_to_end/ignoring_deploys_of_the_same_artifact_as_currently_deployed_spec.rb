@@ -9,7 +9,7 @@ describe "ignoring deploys of the same artifact as currently deployed" do
 
   before do
     stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
+      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
     bootstrap_repo_path(tempdir)
     current_version = Pardot::PullAgent::BuildVersion.new(build_number, sha, artifact_url)
