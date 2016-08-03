@@ -90,7 +90,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
 
 resource "aws_iam_role" "internal_apps_ldap_master" {
   name = "internal_apps_ldap_master"
-  assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"
+  assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
 }
 
 resource "aws_iam_instance_profile" "internal_apps_ldap_master" {
