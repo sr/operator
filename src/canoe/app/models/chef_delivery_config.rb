@@ -55,7 +55,7 @@ class ChefDeliveryConfig
   def chat_room_id(server)
     case server.datacenter
     when AWS
-      if server.hostname =~ /pardot2/
+      if server.hostname =~ /^pardot2/
         return OPS_ROOM
       end
 
