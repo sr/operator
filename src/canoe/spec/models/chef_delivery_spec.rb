@@ -163,6 +163,30 @@ RSpec.describe ChefDelivery do
     assert_equal "deploy", response.action
   end
 
+  it "deploys to two chef servers within the same datacenter" do
+    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
+    checkout = ChefCheckinRequest::Checkout.new("sha1^", "master")
+    request = ChefCheckinRequest.new(server, checkout)
+    @repo.current_build = build_build(sha: "sha1")
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+    request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
+    @delivery.complete_deploy(request)
+
+    server = ChefDelivery::Server.new("test", "production", "pardot2-chef1")
+    request = ChefCheckinRequest.new(server, checkout)
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+    request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
+    @delivery.complete_deploy(request)
+
+    assert_equal 2, @config.notifier.messages.size
+    msg = @config.notifier.messages.pop
+    assert_includes msg.message, "pardot2-chef1"
+    msg = @config.notifier.messages.pop
+    assert_includes msg.message, "pardot0-chef1"
+  end
+
   it "notifies of successful deployment" do
     deploy = create_current_deploy(
       state: ChefDelivery::PENDING,
