@@ -16,11 +16,11 @@ module ReplicationFixing
     end
 
     def ==(other)
-      Hostname === other && hostname == other.hostname
+      other.is_a?(Hostname) && hostname == other.hostname
     end
 
     def eql?(other)
-      Hostname === other && hostname == other.hostname
+      other.is_a?(Hostname) && hostname == other.hostname
     end
 
     def hash

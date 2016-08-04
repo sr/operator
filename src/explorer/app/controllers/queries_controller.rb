@@ -57,7 +57,7 @@ class QueriesController < ApplicationController
 
   def check_account_access
     if params.key?(:account_id) && !account_access?
-      message = "Please request engineering access to account #{params[:account_id]}."
+      message = "Please request support to account #{params[:account_id]}."
       flash[:error] = message
       redirect_to "/accounts"
     end

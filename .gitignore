@@ -20,3 +20,5 @@ coverage
 !/bin/dailyjob
 !/bin/deploy
 !/bin/terra
+.idea
+**/.idea

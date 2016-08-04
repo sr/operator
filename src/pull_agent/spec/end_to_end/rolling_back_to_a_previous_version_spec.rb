@@ -14,7 +14,7 @@ describe "rollback back to a previous version" do
   # The second build is deployed, and we're stubbing out a revert deploy back to the first build.
   before do
     stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"what":"branch","what_details":"master","artifact_url":"#{first_artifact_url}","build_number":#{first_build_number},"created_at":"2015-12-20T14:26:29-05:00", "servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
+      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{first_artifact_url}","build_number":#{first_build_number},"created_at":"2015-12-20T14:26:29-05:00", "servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
     bootstrap_repo_path(tempdir)
 

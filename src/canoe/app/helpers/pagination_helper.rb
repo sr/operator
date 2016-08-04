@@ -46,9 +46,9 @@ module PaginationHelper
   def link_plus_page_param(url, page_num)
     link_address = url
     if link_address =~ /\?/
-      "&page=#{page_num}"
+      link_address += "&page=#{page_num}"
     else
-      "?page=#{page_num}"
+      link_address += "?page=#{page_num}"
     end
     link_address
   end

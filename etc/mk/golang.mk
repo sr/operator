@@ -7,7 +7,7 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... github.com/sr/operator/...)
+PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... devenv/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 OPERATOR_IMPORT_PATH ?= bread

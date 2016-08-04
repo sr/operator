@@ -154,11 +154,11 @@ module Pardot
         # common hooks
 
         def notify_begin_kibana(deploy)
-          Logger.log(:info, "Started fetch of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
+          Logger.log(:info, "Started fetch of #{deploy.branch}/#{deploy.build_number} (#{deploy.artifact_url})")
         end
 
         def notify_complete_kibana(deploy)
-          Logger.log(:info, "Finished deploy of #{deploy.what}/#{deploy.what_details} (#{deploy.artifact_url})")
+          Logger.log(:info, "Finished deploy of #{deploy.branch}/#{deploy.build_number} (#{deploy.artifact_url})")
         end
 
         def notify_complete_canoe(deploy)
@@ -227,7 +227,7 @@ module Pardot
             if jarfile.nil? || jarfile == ""
               Logger.log(:err, "deploy_topology was called, but no jar file containing topologies was found!")
             else
-              Logger.log(:info, "Topology Deployment Param: #{deploy.options['topology']}")
+              Logger.log(:info, "Topology Deployment Param: #{deploy.options["topology"]}")
               Logger.log(:info, "Topology Deployment JAR: #{jarfile}")
               storm = Storm.new(deploy.options["topology"], deploy.options["topo_env"], jarfile)
               storm.load

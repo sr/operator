@@ -236,4 +236,12 @@ RSpec.describe ChefDelivery do
     @delivery.knife(request)
     assert_equal 0, @config.notifier.messages.size
   end
+
+  it "ignores 'knife node list' commands" do
+    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    command = %w[node list]
+    request = KnifeRequest.new(server, command)
+    @delivery.knife(request)
+    assert_equal 0, @config.notifier.messages.size
+  end
 end

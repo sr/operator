@@ -1,3 +1,9 @@
+resource "aws_route53_zone" "appdev_aws_pardot_com_hosted_zone" {
+  name = "aws.pardot.com"
+  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.appdev.id} Only. Hosted solely in AWS."
+  vpc_id = "${aws_vpc.appdev.id}"
+}
+
 resource "aws_vpc" "appdev" {
   cidr_block = "172.26.0.0/16"
   enable_dns_support = true
@@ -184,7 +190,7 @@ resource "aws_security_group" "appdev_vpc_default" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_instance.appdev_bastion.public_ip}/32",
+      "${aws_eip.appdev_bastion_eip.public_ip}/32",
       "${aws_instance.appdev_bastion.private_ip}/32"
     ]
   }
@@ -272,16 +278,17 @@ resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
 }
 
 resource "aws_instance" "appdev_bastion" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.small"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   vpc_security_group_ids = ["${aws_security_group.appdev_sfdc_vpn_ssh.id}"]
   private_ip = "172.26.220.43"
+  associate_public_ip_address = false
   root_block_device {
     volume_type = "gp2"
-    volume_size = "20"
-    delete_on_termination = false
+    volume_size = "50"
+    delete_on_termination = true
   }
   tags {
     terraform = "true"
@@ -289,10 +296,15 @@ resource "aws_instance" "appdev_bastion" {
   }
 }
 
+resource "aws_eip" "appdev_bastion_eip" {
+  vpc = true
+  instance = "${aws_instance.appdev_bastion.id}"
+}
+
 resource "aws_route53_record" "appdev_bastion_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot2-bastion1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["54.226.27.145"]
+  records = ["${aws_eip.appdev_bastion_eip.public_ip}"]
   type = "A"
   ttl = "900"
 }

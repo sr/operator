@@ -18,7 +18,9 @@ module ReplicationFixing
         error = %(Query: 'INSERT INTO natural_search_query (account_id, query) values ('109722', 'El niño test 3')')
         redacted = sanitizer.sanitize(error)
 
-        expect(redacted).to eq(%(Query: 'INSERT INTO natural_search_query (account_id, query) values ('109722', [REDACTED])'))
+        expect(
+          redacted
+        ).to eq(%(Query: 'INSERT INTO natural_search_query (account_id, query) values ('109722', [REDACTED])'))
       end
     end
   end

@@ -5,6 +5,7 @@ gem "lita-hipchat", "3.0.2"
 
 gem "lita-replication-fixing", path: "plugins/lita-replication-fixing"
 gem "lita-zabbix", path: "plugins/lita-zabbix"
+gem "lita-commit", path: "plugins/lita-commit"
 
 gem "rspec", "~> 3.4", ">= 3.4.0"
 

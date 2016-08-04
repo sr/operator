@@ -182,7 +182,7 @@ module Pardot
           Logger.log(:info, "We are up to date")
           Canoe.notify_server(environment, request)
         else
-          Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || '<< None >>'}")
+          Logger.log(:info, "Currently deploy: #{current_build_version && current_build_version.artifact_url || "<< None >>"}")
           Logger.log(:info, "Requested deploy: #{request.artifact_url}")
           environment.conductor.deploy!(request)
         end

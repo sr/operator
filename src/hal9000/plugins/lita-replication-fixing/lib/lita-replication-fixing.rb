@@ -8,5 +8,5 @@ require "lita/handlers/replication_fixing"
 
 Lita::Handlers::ReplicationFixing.template_root File.expand_path(
   File.join("..", "..", "templates"),
- __FILE__
+  __FILE__
 )

@@ -12,8 +12,10 @@ variable "environment_appdev" {
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
+    db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
+    num_whoisdb1_hosts = 2
     num_app1_hosts = 2
     num_thumbs1_hosts = 1
     num_redisjob1_hosts = 2
@@ -31,21 +33,103 @@ variable "environment_appdev" {
     num_nimbus1_hosts = 1
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
+    num_proxyout1_hosts = 1
   }
 }
 
+variable "appdev_globaldb1_ips" {
+  default = {
+    "0" = "172.26.80.125"
+    "1" = "172.26.81.47"
+  }
+}
+
+variable "appdev_dbshard1_ips" {
+  default = {
+    "0" = "172.26.92.23"
+    "1" = "172.26.93.40"
+    "2" = "172.26.75.74"
+    "3" = "172.26.69.79"
+  }
+}
+
+variable "appdev_whoisdb1_ips" {
+  default = {
+    "0" = "172.26.66.54"
+    "1" = "172.26.66.55"
+  }
+}
 
 ////
 //// TEMPLATES
 ////
 //
-//// EC2 INSTANCE: replace "lbl" w/ "servicename", edit secgroups accordingly, and adjust instance_type upward if necessary
+//// EC2 DB INSTANCE: replace "lbl" w/ "servicename"
 //resource "aws_instance" "appdev_lbl1" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
-//  ami = "${var.centos_6_hvm_ebs_ami}"
-//  instance_type = "${var.environment_appdev["app_instance_type}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
 //  subnet_id = "${var.environment_appdev["subnet_id}"
+//  ebs_optimized = "true"
+//  root_block_device {
+//    volume_type = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = true
+//  }
+//  ebs_block_device {
+//    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+//    volume_type = "gp2"
+//    volume_size = "512"
+//    delete_on_termination = true
+//  }
+//  vpc_security_group_ids = [
+//    "${aws_security_group.appdev_vpc_default.id}",
+//    "${aws_security_group.appdev_dbhost.id}",
+//    "${aws_security_group.appdev_apphost.id}"
+//  ]
+//  tags {
+//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+//    terraform = "true"
+//  }
+//}
+//
+//// EC2 APP INSTANCE: replace "lbl" w/ "servicename"
+//resource "aws_instance" "appdev_lbl1" {
+//  key_name = "internal_apps"
+//  count = "${var.environment_appdev["num_lbl1_hosts"]}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
+//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  root_block_device {
+//    volume_type = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = true
+//  }
+//  vpc_security_group_ids = [
+//    "${aws_security_group.appdev_vpc_default.id}",
+//    "${aws_security_group.appdev_dbhost.id}",
+//    "${aws_security_group.appdev_apphost.id}"
+//  ]
+//  tags {
+//    Name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+//    terraform = "true"
+//  }
+//}
+//
+//// EC2 JOB INSTANCE: replace "lbl" w/ "servicename"
+//resource "aws_instance" "appdev_lbl1" {
+//  key_name = "internal_apps"
+//  count = "${var.environment_appdev["num_lbl1_hosts"]}"
+//  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+//  instance_type = "${var.environment_appdev["db_instance_type}"
+//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  ebs_optimized = "true"
+//  root_block_device {
+//    volume_type = "gp2"
+//    volume_size = "50"
+//    delete_on_termination = true
+//  }
 //  vpc_security_group_ids = [
 //    "${aws_security_group.appdev_vpc_default.id}",
 //    "${aws_security_group.appdev_dbhost.id}",
@@ -64,12 +148,12 @@ variable "environment_appdev" {
 //  vpc = true
 //}
 //
-//// route53 A-RECORD: replace "lbl" w/ "servicename"
+//// ROUTE53 A-RECORD: replace "lbl" w/ "servicename"
 //resource "aws_route53_record" "appdev_lbl1_arecord" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
-//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-//  name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-//  records = ["${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"]
+//  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+//  name = "${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+//  records = ["${var.environment_appdev["pardot_env_id"]}-lbl1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"]
 //  type = "A"
 //  ttl = 900
 //}
@@ -171,12 +255,34 @@ resource "aws_elb" "appdev_app_elb" {
   }
 }
 
+#TODO: rename/copy this from appdev.dev.pardot.com to app.dev.pardot.com
+resource "aws_route53_record" "appdev_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "appdev.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.appdev_app_elb.dns_name}"]
+  type = "CNAME"
+  ttl = "900"
+}
+
 resource "aws_instance" "appdev_globaldb1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_globaldb1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
+  private_ip = "${lookup(var.appdev_globaldb1_ips,count.index)}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_type = "gp2"
+    volume_size = "512"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
@@ -190,9 +296,9 @@ resource "aws_instance" "appdev_globaldb1" {
 
 resource "aws_route53_record" "appdev_globaldb1_arecord" {
   count = "${var.environment_appdev["num_globaldb1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_globaldb1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_globaldb1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -200,25 +306,38 @@ resource "aws_route53_record" "appdev_globaldb1_arecord" {
 resource "aws_instance" "appdev_dbshard1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_dbshard1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
+  private_ip = "${lookup(var.appdev_dbshard1_ips,count.index)}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_type = "gp2"
+    volume_size = "512"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}",
     "${aws_security_group.appdev_dbhost.id}"
   ]
   tags {
-    Name = "${var.environment_appdev["pardot_env_id"]}-globaldb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    Name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
 
 resource "aws_route53_record" "appdev_dbshard1_arecord" {
   count = "${var.environment_appdev["num_dbshard1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_dbshard1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-dbshard1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_dbshard1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -226,9 +345,14 @@ resource "aws_route53_record" "appdev_dbshard1_arecord" {
 resource "aws_instance" "appdev_app1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_app1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -241,9 +365,9 @@ resource "aws_instance" "appdev_app1" {
 
 resource "aws_route53_record" "appdev_app1_arecord" {
   count = "${var.environment_appdev["num_app1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_app1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_app1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -251,9 +375,15 @@ resource "aws_route53_record" "appdev_app1_arecord" {
 resource "aws_instance" "appdev_thumbs1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_thumbs1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -266,9 +396,9 @@ resource "aws_instance" "appdev_thumbs1" {
 
 resource "aws_route53_record" "appdev_thumbs1_arecord" {
   count = "${var.environment_appdev["num_thumbs1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_thumbs1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-thumbs1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_thumbs1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -276,9 +406,14 @@ resource "aws_route53_record" "appdev_thumbs1_arecord" {
 resource "aws_instance" "appdev_redisjob1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_redisjob1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -291,9 +426,9 @@ resource "aws_instance" "appdev_redisjob1" {
 
 resource "aws_route53_record" "appdev_redisjob1_arecord" {
   count = "${var.environment_appdev["num_redisjob1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_redisjob1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-redisjob1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_redisjob1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -301,9 +436,14 @@ resource "aws_route53_record" "appdev_redisjob1_arecord" {
 resource "aws_instance" "appdev_jobmanager1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -316,9 +456,9 @@ resource "aws_instance" "appdev_jobmanager1" {
 
 resource "aws_route53_record" "appdev_jobmanager1_arecord" {
   count = "${var.environment_appdev["num_jobmanager1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_jobmanager1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-jobmanager1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_jobmanager1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -326,9 +466,14 @@ resource "aws_route53_record" "appdev_jobmanager1_arecord" {
 resource "aws_instance" "appdev_push1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_push1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -341,9 +486,9 @@ resource "aws_instance" "appdev_push1" {
 
 resource "aws_route53_record" "appdev_push1_arecord" {
   count = "${var.environment_appdev["num_push1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_push1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-push1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_push1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -351,9 +496,14 @@ resource "aws_route53_record" "appdev_push1_arecord" {
 resource "aws_instance" "appdev_provisioning1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_provisioning1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -366,9 +516,9 @@ resource "aws_instance" "appdev_provisioning1" {
 
 resource "aws_route53_record" "appdev_provisioning1_arecord" {
   count = "${var.environment_appdev["num_provisioning1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_provisioning1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-provisioning1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_provisioning1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -376,9 +526,14 @@ resource "aws_route53_record" "appdev_provisioning1_arecord" {
 resource "aws_instance" "appdev_rabbit1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -391,9 +546,9 @@ resource "aws_instance" "appdev_rabbit1" {
 
 resource "aws_route53_record" "appdev_rabbit1_arecord" {
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_rabbit1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_rabbit1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -401,9 +556,14 @@ resource "aws_route53_record" "appdev_rabbit1_arecord" {
 resource "aws_instance" "appdev_redisrules1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_redisrules1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -416,9 +576,9 @@ resource "aws_instance" "appdev_redisrules1" {
 
 resource "aws_route53_record" "appdev_redisrules1_arecord" {
   count = "${var.environment_appdev["num_redisrules1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_redisrules1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-redisrules1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_redisrules1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -426,9 +586,14 @@ resource "aws_route53_record" "appdev_redisrules1_arecord" {
 resource "aws_instance" "appdev_autojob1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_autojob1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["job_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -441,9 +606,9 @@ resource "aws_instance" "appdev_autojob1" {
 
 resource "aws_route53_record" "appdev_autojob1_arecord" {
   count = "${var.environment_appdev["num_autojob1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_autojob1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-autojob1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_autojob1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -451,9 +616,14 @@ resource "aws_route53_record" "appdev_autojob1_arecord" {
 resource "aws_instance" "appdev_storm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_storm1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -466,9 +636,9 @@ resource "aws_instance" "appdev_storm1" {
 
 resource "aws_route53_record" "appdev_storm1_arecord" {
   count = "${var.environment_appdev["num_storm1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_storm1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-storm1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_storm1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -476,9 +646,14 @@ resource "aws_route53_record" "appdev_storm1_arecord" {
 resource "aws_instance" "appdev_kafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_kafka1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -491,9 +666,9 @@ resource "aws_instance" "appdev_kafka1" {
 
 resource "aws_route53_record" "appdev_kafka1_arecord" {
   count = "${var.environment_appdev["num_kafka1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_kafka1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-kafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_kafka1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -501,9 +676,14 @@ resource "aws_route53_record" "appdev_kafka1_arecord" {
 resource "aws_instance" "appdev_zkkafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -516,9 +696,9 @@ resource "aws_instance" "appdev_zkkafka1" {
 
 resource "aws_route53_record" "appdev_zkkafka1_arecord" {
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_zkkafka1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_zkkafka1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -526,9 +706,14 @@ resource "aws_route53_record" "appdev_zkkafka1_arecord" {
 resource "aws_instance" "appdev_pubsub1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_pubsub1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -541,9 +726,9 @@ resource "aws_instance" "appdev_pubsub1" {
 
 resource "aws_route53_record" "appdev_pubsub1_arecord" {
   count = "${var.environment_appdev["num_pubsub1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_pubsub1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-pubsub1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_pubsub1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -551,9 +736,14 @@ resource "aws_route53_record" "appdev_pubsub1_arecord" {
 resource "aws_instance" "appdev_zkstorm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -566,9 +756,9 @@ resource "aws_instance" "appdev_zkstorm1" {
 
 resource "aws_route53_record" "appdev_zkstorm1_arecord" {
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_zkstorm1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_zkstorm1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -576,9 +766,14 @@ resource "aws_route53_record" "appdev_zkstorm1_arecord" {
 resource "aws_instance" "appdev_nimbus1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_nimbus1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -591,9 +786,9 @@ resource "aws_instance" "appdev_nimbus1" {
 
 resource "aws_route53_record" "appdev_nimbus1_arecord" {
   count = "${var.environment_appdev["num_nimbus1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_nimbus1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_nimbus1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -601,9 +796,14 @@ resource "aws_route53_record" "appdev_nimbus1_arecord" {
 resource "aws_instance" "appdev_appcache1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_appcache1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -616,9 +816,9 @@ resource "aws_instance" "appdev_appcache1" {
 
 resource "aws_route53_record" "appdev_appcache1_arecord" {
   count = "${var.environment_appdev["num_appcache1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_appcache1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-appcache1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_appcache1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -626,9 +826,14 @@ resource "aws_route53_record" "appdev_appcache1_arecord" {
 resource "aws_instance" "appdev_discovery1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_discovery1_hosts"]}"
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
     "${aws_security_group.appdev_apphost.id}"
@@ -641,9 +846,78 @@ resource "aws_instance" "appdev_discovery1" {
 
 resource "aws_route53_record" "appdev_discovery1_arecord" {
   count = "${var.environment_appdev["num_discovery1_hosts"]}"
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_discovery1.*.private_ip}"]
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-discovery1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_discovery1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_proxyout1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_proxyout1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_apphost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_proxyout1_arecord" {
+  count = "${var.environment_appdev["num_proxyout1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_proxyout1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_whoisdb1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["db_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  ebs_optimized = "true"
+  private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name = "${var.environment_appdev["db_volume_device_name"]}"
+    volume_type = "gp2"
+    volume_size = "512"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_dbhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_whoisdb1_arecord" {
+  count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_whoisdb1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }

@@ -1,11 +1,8 @@
-require "deployable"
 require "base64"
 require "json"
 
-class ProvisionalDeploy
-  include Deployable
-
-  attr_reader :artifact_url, :what, :what_details, :build_number, :sha, :passed_ci, :created_at
+class Build
+  attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at
   attr_reader :options_validator, :options
 
   def self.from_artifact_url(project, artifact_url)
@@ -34,24 +31,23 @@ class ProvisionalDeploy
       begin
         properties["optionsValidator"] && JSON.parse(Base64.decode64(properties["optionsValidator"]))
       rescue JSON::ParseError
-        Instrumentation.log_exception($!, {
-          at: "ProvisionalDeploy",
-          fn: "from_artifact_url_and_properties",
-        })
+        Instrumentation.log_exception($!,
+          at: "Build",
+          fn: "from_artifact_url_and_properties"
+        )
         nil
       end
 
     new(
       project: project,
       artifact_url: artifact_url,
-      what: "branch",
-      what_details: properties["gitBranch"],
+      branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
-      created_at: Time.parse(properties["buildTimeStamp"]),
+      created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
       options_validator: options_validator,
-      options: {}
+      options: { meta_data: properties }
     )
   end
 
@@ -59,8 +55,7 @@ class ProvisionalDeploy
     new(
       project: project,
       artifact_url: deploy.artifact_url,
-      what: deploy.what,
-      what_details: deploy.what_details,
+      branch: deploy.branch,
       build_number: deploy.build_number,
       sha: deploy.sha,
       passed_ci: deploy.passed_ci,
@@ -69,11 +64,10 @@ class ProvisionalDeploy
     )
   end
 
-  def initialize(project:, artifact_url:, what:, what_details:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
+  def initialize(project:, artifact_url:, branch:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
     @project = project
     @artifact_url = artifact_url
-    @what = what
-    @what_details = what_details
+    @branch = branch
     @build_number = build_number
     @sha = sha
     @passed_ci = passed_ci
@@ -96,5 +90,23 @@ class ProvisionalDeploy
 
   def passed_ci?
     @passed_ci
+  end
+
+  def test_state(test)
+    key = (test == :PPANT) ? "passedCI" : "ciJob[#{test}]"
+    state = options[:meta_data][key]
+    build_time = DateTime.parse(options[:meta_data]["buildTimeStamp"]).iso8601
+
+    # Since Bamboo doesn't have a run code on failure option we don't know if
+    # the build plan is still processing
+    # TODO: Interface with the Bamboo API to verify build status
+    if state == "false" && build_time > 30.minutes.ago
+      state = "pending"
+    end
+    state
+  end
+
+  def build_url(test)
+    options[:meta_data]["ciJobUrl[#{test}]"]
   end
 end

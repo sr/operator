@@ -66,7 +66,7 @@ func (r *JobRunner) RunStartupHook() error {
 }
 
 func (r *JobRunner) RunCleanupHook() error {
-	return r.runOptionalHook("runner-hook-Cleanup")
+	return r.runOptionalHook("runner-hook-cleanup")
 }
 
 func (r *JobRunner) runOptionalHook(hook string) error {
