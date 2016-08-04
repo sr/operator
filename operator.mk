@@ -47,10 +47,10 @@ $(OPERATORC): $(PROTOC_GEN_GO)
 	$(GO) install -v github.com/sr/operator/cmd/operatorc
 
 $(OPERATORCTL): $(OPERATORCTL_GEN_SRC)
-	$(GO) install -v ./cmd/$$(basename $(OPERATORCTL))
+	$(GO) install -v $(OPERATOR_IMPORT_PATH)/cmd/$$(basename $(OPERATORCTL))
 
 $(OPERATORD): $(OPERATORD_SRC)
-	$(GO) install -v ./cmd/$$(basename $(OPERATORD))
+	$(GO) install -v $(OPERATOR_IMPORT_PATH)/cmd/$$(basename $(OPERATORD))
 
 $(PROTOC_GEN_GO):
 	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
