@@ -23,11 +23,13 @@ class ChefDeliveryNotification
     if deploy.successful?
       color = GREEN
       message = "chef/master #{link_to(deploy)} successfully deployed to " \
-        "#{deploy.datacenter}/#{deploy.environment}"
+        "#{deploy.datacenter}/#{deploy.environment} on host " \
+        "<code>#{deploy.hostname}</code>"
     else
       color = RED
       message = "chef/master #{link_to(deploy)} failed to deploy to " \
-        "#{deploy.datacenter}/#{deploy.environment} /cc @sr" \
+        "#{deploy.datacenter}/#{deploy.environment} " \
+        "on host #{deploy.hostname} /cc @sr" \
         "<br/><pre>#{error_message}</pre>"
     end
 
