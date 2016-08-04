@@ -36,7 +36,8 @@ class ChefDeliveryNotification
 
   def knife_command(room_id, server, command)
     message = "knife command executed in " \
-      "#{server.datacenter}/#{server.environment}: <br/>" \
+      "#{server.datacenter}/#{server.environment} on " \
+      "<code>#{server.hostname}</code>: <br/>" \
       "<code>knife #{command.join(" ")}</code>"
 
     @notifier.notify_room(room_id, message, GRAY)
