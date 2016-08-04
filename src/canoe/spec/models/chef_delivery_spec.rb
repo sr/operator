@@ -197,9 +197,9 @@ RSpec.describe ChefDelivery do
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("successfully deployed")
-    assert msg.message.include?("#9000")
-    assert msg.message.include?("pardot0-chef1")
+    assert_includes msg.message, "successfully deployed"
+    assert_includes msg.message, "#9000"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "notifies of failed deployment" do
@@ -211,9 +211,9 @@ RSpec.describe ChefDelivery do
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("failed to deploy")
-    assert msg.message.include?("boomtown")
-    assert msg.message.include?("pardot0-chef1")
+    assert_includes msg.message, "failed to deploy"
+    assert_includes msg.message, "boomtown"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "notifies of executed knife commands" do
