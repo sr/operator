@@ -1,31 +1,3 @@
-//#SCRIPT USED TO CONVERT DNS ZONE OUTPUT INTO (mostly intact) ROUTE53 RECORDS (still needs manual fixing of spf records)
-//#!/usr/bin/env bash
-//
-//#strict format "app 900 CNAME lba-s1.dev.pardot.com."
-//dnszoneinputfile=/tmp/dnslist
-//
-//function drawtf() {
-//name=$1
-//ttl=$2
-//type=$3
-//record=$4
-//
-//echo "resource \"aws_route53_record\" \"${name}_dev_pardot_com_${type}record\" {"
-//echo "  zone_id = \"\${aws_route53_zone.dev_pardot_com.zone_id}\""
-//echo "  name = \"${name}.\${aws_route53_zone.dev_pardot_com.name}\""
-//echo "  records = [\"${record}\"]"
-//echo "  type = \"${type}\""
-//echo "  ttl = \"900\""
-//echo "}"
-//
-//}
-//
-//while read -r line
-//do
-//drawtf `echo "$line" | awk '{ print $1 }'` `echo "$line" | awk '{ print $2 }'` `echo "$line" | awk '{ print $3 }'` `echo "$line" | awk '{ print $4 }'`
-//done < "${dnszoneinputfile}"
-
-
 resource "aws_route53_zone" "dev_pardot_com" {
   name = "dev.pardot.com"
   comment = "Managed by Terraform. Subdomain of pardot.com hosted in Dyn."
