@@ -109,6 +109,9 @@ case "$project" in
         build-ruby "$project"
         test -n "$CI" && docker-push "$project"
         ;;
+    operator)
+        true
+        ;;
     parbot)
         parbotdir="${PARBOT_DIR:-""}"
         echo "$parbotdir"
