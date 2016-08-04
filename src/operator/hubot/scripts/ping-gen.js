@@ -16,7 +16,7 @@ var protodir = path.resolve(__dirname + "/../proto"),
 	ping = grpc.loadObject(proto.ns).ping;
 
 var address = process.env.OPERATORD_ADDRESS,
-	client = new ping.Pinger(address, grpc.Credentials.createInsecure());
+	client = new ping.Pinger(address, grpc.credentials.createInsecure());
 
 module.exports = function(robot) {
 

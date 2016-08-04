@@ -12,18 +12,6 @@ TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 all: deadleaves fmt lint vet errcheck test install interfacer unused
 
-OPERATOR_IMPORT_PATH ?= bread
-OPERATORD ?= $(GOPATH)/bin/operatord
-OPERATORCTL ?= $(GOPATH)/bin/operatorctl
-OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
-OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
-SVC_DIR ?= $(GOPATH)/src/bread
-HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/chatops/hubot/scripts
-
-include $(GOPATH)/src/github.com/sr/operator/operator.mk
-
-generate: operator-generate
-
 install:
 	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
 
