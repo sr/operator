@@ -116,6 +116,7 @@ func resourcePoolV2() *schema.Resource {
 
 			"admin_state_up": {
 				Type:     schema.TypeBool,
+				Default:  true,
 				Optional: true,
 			},
 

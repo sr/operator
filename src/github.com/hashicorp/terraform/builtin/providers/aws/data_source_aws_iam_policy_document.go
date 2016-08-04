@@ -24,16 +24,16 @@ func dataSourceAwsIamPolicyDocument() *schema.Resource {
 		Read: dataSourceAwsIamPolicyDocumentRead,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"policy_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"statement": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"sid": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -87,17 +87,21 @@ func dataSourceAwsIamPolicyDocumentRead(d *schema.ResourceData, meta interface{}
 		Version: "2012-10-17",
 	}
 
-	if policyId, hasPolicyId := d.GetOk("id"); hasPolicyId {
+	if policyId, hasPolicyId := d.GetOk("policy_id"); hasPolicyId {
 		doc.Id = policyId.(string)
 	}
 
-	var cfgStmts = d.Get("statement").(*schema.Set).List()
+	var cfgStmts = d.Get("statement").([]interface{})
 	stmts := make([]*IAMPolicyStatement, len(cfgStmts))
 	doc.Statements = stmts
 	for i, stmtI := range cfgStmts {
 		cfgStmt := stmtI.(map[string]interface{})
 		stmt := &IAMPolicyStatement{
 			Effect: cfgStmt["effect"].(string),
+		}
+
+		if sid, ok := cfgStmt["sid"]; ok {
+			stmt.Sid = sid.(string)
 		}
 
 		if actions := cfgStmt["actions"].(*schema.Set).List(); len(actions) > 0 {
