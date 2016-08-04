@@ -53,11 +53,11 @@ module.exports = (robot) ->
           deployMsg = "<a href=\"mailto:#{deploy.user}\">#{deploy.user}</a> synced "
           if previousDeploy
             deployMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/compare/#{previousDeploy.sha}...#{deploy.sha}\">"
-            deployMsg += "#{previousDeploy.what_details}/build#{previousDeploy.build_number}...#{deploy.what_details}/build#{deploy.build_number}"
+            deployMsg += "#{previousDeploy.branch}/build#{previousDeploy.build_number}...#{deploy.branch}/build#{deploy.build_number}"
             deployMsg += "</a>"
           else
             deployMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/tree/#{deploy.sha}\">"
-            deployMsg += "#{deploy.what_details}/build#{deploy.build_number}"
+            deployMsg += "#{deploy.branch}/build#{deploy.build_number}"
             deployMsg += "</a>"
           deployMsg += " on #{date.formatDateString(deploy.created_at)}"
 
@@ -105,8 +105,8 @@ module.exports = (robot) ->
         deploy = results[0]
         build = results[1]
 
-        if deploy.what_details == "master" and deploy.build_number == build.build_number
+        if deploy.branch == "master" and deploy.build_number == build.build_number
           msg.send "Looks like we are up to date. (buttrock)"
         else
           githubLink = "https://git.dev.pardot.com/pardot/pardot/compare/#{deploy.sha}...#{build.sha}"
-          msg.hipchatNotify "Changes on deck: <a href=\"#{githubLink}\">#{deploy.what_details}/build#{deploy.build_number}...master/build#{build.build_number}</a>"
+          msg.hipchatNotify "Changes on deck: <a href=\"#{githubLink}\">#{deploy.branch}/build#{deploy.build_number}...master/build#{build.build_number}</a>"
