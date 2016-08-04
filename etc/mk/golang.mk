@@ -7,7 +7,7 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/...)
+PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/...)
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 all: deadleaves fmt lint vet errcheck test install interfacer unused
