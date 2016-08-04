@@ -166,7 +166,8 @@ RSpec.describe ChefDelivery do
   it "notifies of successful deployment" do
     deploy = create_current_deploy(
       state: ChefDelivery::PENDING,
-      build_url: "https://BREAD-9000"
+      build_url: "https://BREAD-9000",
+      hostname: "pardot0-chef1"
     )
     request = ChefCompleteDeployRequest.new(deploy.id, true, nil)
     @delivery.complete_deploy(request)
@@ -174,16 +175,21 @@ RSpec.describe ChefDelivery do
     msg = @config.notifier.messages.pop
     assert msg.message.include?("successfully deployed")
     assert msg.message.include?("#9000")
+    assert msg.message.include?("pardot0-chef1")
   end
 
   it "notifies of failed deployment" do
-    deploy = create_current_deploy(state: ChefDelivery::PENDING)
+    deploy = create_current_deploy(
+      state: ChefDelivery::PENDING,
+      hostname: "pardot0-chef1"
+    )
     request = ChefCompleteDeployRequest.new(deploy.id, false, "boomtown")
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
     assert msg.message.include?("failed to deploy")
     assert msg.message.include?("boomtown")
+    assert msg.message.include?("pardot0-chef1")
   end
 
   it "notifies of executed knife commands" do
