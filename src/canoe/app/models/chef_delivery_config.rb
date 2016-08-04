@@ -55,6 +55,10 @@ class ChefDeliveryConfig
   def chat_room_id(server)
     case server.datacenter
     when AWS
+      if server.hostname =~ /pardot2/
+        return OPS_ROOM
+      end
+
       BREAD_ROOM
     else
       Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", OPS_ROOM))
