@@ -110,7 +110,24 @@ case "$project" in
         test -n "$CI" && docker-push "$project"
         ;;
     operator)
-        true
+        docker run --rm -w /go -v "$(pwd):/go" \
+            -e PACKAGES=bread/cmd/operatord \
+            build/build \
+            make -f etc/mk/golang.mk
+
+        docker run --rm -w /go -v "/tmp:/tmp" -v "$(pwd):/go" \
+            -e TMPDIR=/tmp \
+            build/build \
+            make -C src/operator build-operatord-linux
+
+        trap 'rm -f src/operator/operatord' EXIT
+        cp /tmp/operatord_linux src/operator/operatord
+        make -C src/operator docker-build-hubot docker-build-operatord
+
+        if [ -n "$CI" ]; then
+            docker-push "${project}hubot"
+            docker-push "${project}d"
+        fi
         ;;
     parbot)
         parbotdir="${PARBOT_DIR:-""}"

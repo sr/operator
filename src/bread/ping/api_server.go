@@ -1,4 +1,4 @@
-package pinger
+package breadping
 
 import (
 	"github.com/sr/operator"
@@ -12,7 +12,7 @@ type apiServer struct {
 func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
 	return &PingResponse{
 		Output: &operator.Output{
-			PlainText: "hello, world",
+			PlainText: "pong",
 		},
 	}, nil
 }

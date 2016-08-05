@@ -23,7 +23,7 @@ var protodir = path.resolve(__dirname + "/../proto"),
 	{{.Name}} = grpc.loadObject(proto.ns).{{.Name}};
 
 var address = process.env.OPERATORD_ADDRESS,
-	client = new {{.PackageName}}.{{.FullName}}(address, grpc.Credentials.createInsecure());
+	client = new {{.PackageName}}.{{.FullName}}(address, grpc.credentials.createInsecure());
 
 module.exports = function(robot) {
 {{$service := .Name}}
