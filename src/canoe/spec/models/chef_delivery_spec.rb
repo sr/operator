@@ -217,7 +217,7 @@ RSpec.describe ChefDelivery do
   end
 
   it "notifies of executed knife commands" do
-    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    server = ChefDelivery::Server.new("dfw", "dev", "pardot0-chef1")
     command = %w[environment from file fail.rb]
     request = KnifeRequest.new(server, command)
     @delivery.knife(request)
@@ -225,6 +225,7 @@ RSpec.describe ChefDelivery do
     msg = @config.notifier.messages.pop
     assert_includes msg.message, "dfw/dev"
     assert_includes msg.message, "knife #{command.join(" ")}"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "ignores 'knife node from file' commands" do
