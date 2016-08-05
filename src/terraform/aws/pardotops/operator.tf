@@ -64,7 +64,7 @@ resource "aws_launch_configuration" "operator_production" {
 
 resource "aws_autoscaling_group" "operator_production" {
   max_size = 1
-  min_size = 0
+  min_size = 1
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
   vpc_zone_identifier = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
