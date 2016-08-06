@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# This is set by Docker
+: $OPERATORD_PORT
+
+PATH="$(pwd)/node_modules/.bin:$PATH"
+export PATH
+
+OPERATORD_ADDRESS="$(echo "$OPERATORD_PORT" | sed 's,tcp://,,')"
+export OPERATORD_ADDRESS
+
+exec node_modules/.bin/hubot --disable-httpd $@

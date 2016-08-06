@@ -4,6 +4,6 @@ WORKDIR /app
 COPY /hubot/package.json /app/package.json
 COPY /hubot/npm-shrinkwrap.json /app/npm-shrinkwrap.json
 RUN npm install
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH /app/bin:$PATH
 CMD ["hubot"]
 COPY /hubot /app
