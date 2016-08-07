@@ -11,13 +11,10 @@ const (
 	PublicRoom  = 42  // Build & Automate
 )
 
-func NewOperatorServer(logger operator.Logger) *grpc.Server {
-	return grpc.NewServer(
-		grpc.UnaryInterceptor(
-			operator.NewInterceptor(
-				operator.NewInstrumenter(logger),
-				newLDAPAuthorizer(),
-			),
-		),
-	)
+func NewOperatorServer() *grpc.Server {
+	return grpc.NewServer()
+}
+
+func NewLDAPAuthorizer() operator.Authorizer {
+	return newLDAPAuthorizer()
 }
