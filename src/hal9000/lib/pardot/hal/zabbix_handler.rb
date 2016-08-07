@@ -5,11 +5,26 @@ require "zabbix/zabbixmon"
 require "zabbix/monitor_supervisor"
 require "zabbix/pagerduty_pager"
 require "zabbix/test_pager"
-require "human_time"
 
-module Lita
-  module Handlers
-    class Zabbix < Handler
+module Pardot
+  module HAL
+    class ZabbixHandler < Handler
+      module HumanTime
+        def self.parse(str, now: Time.now)
+          if /^([+-]?\d+)(d|day|day)$/ =~ str
+            Time.now + Regexp.last_match(1).to_i * 60 * 60 * 24
+          elsif /^([+-]?\d+)(h|hr|hrs|hour|hours)$/ =~ str
+            Time.now + Regexp.last_match(1).to_i * 60 * 60
+          elsif /^([+-]?\d+)(m|min|mins|minute|minutes)$/ =~ str
+            Time.now + Regexp.last_match(1).to_i * 60
+          elsif /^([+-]?\d+)(s|sec|secs|second|seconds)$/ =~ str
+            Time.now + Regexp.last_match(1).to_i
+          else
+            Time.parse(str)
+          end
+        end
+      end
+
       MonitorNotFound = Class.new(StandardError)
       MonitorDataInsertionFailed = Class.new(StandardError)
       MonitoringFailure = Class.new(StandardError)
@@ -423,7 +438,7 @@ module Lita
         robot.send_message(@status_room, errmsg)
       end
 
-      Lita.register_handler(self)
+      HAL.register_handler(self)
     end
   end
 end

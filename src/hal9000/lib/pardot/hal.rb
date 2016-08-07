@@ -25,6 +25,7 @@ module Pardot
     def self.require_handlers
       require "pardot/hal/commit_handler"
       require "pardot/hal/replication_fixing_handler"
+      require "pardot/hal/zabbix_handler"
     end
 
     def self.start

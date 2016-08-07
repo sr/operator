@@ -1,15 +1,20 @@
 require "spec_helper"
+require_relative "helpers/zabbix_spec_helpers"
 
-describe Lita::Handlers::Zabbix, lita_handler: true do
-  include ZabbixTestHelpers
+describe Pardot::HAL::ZabbixHandler, lita_handler: true do
+  include ZabbixSpecHelpers
+
+  def handler_config
+    registry.config.handlers.zabbix_handler
+  end
 
   before do
-    registry.config.handlers.zabbix.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
-    registry.config.handlers.zabbix.zabbix_monitor_payload_url = "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
-    registry.config.handlers.zabbix.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
-    registry.config.handlers.zabbix.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
-    registry.config.handlers.zabbix.pager = "pagerduty"
-    registry.config.handlers.zabbix.zabbix_password = "abc123"
+    handler_config.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
+    handler_config.zabbix_monitor_payload_url = "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
+    handler_config.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
+    handler_config.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
+    handler_config.pager = "pagerduty"
+    handler_config.zabbix_password = "abc123"
   end
 
   describe "!zabbix maintenance start" do

@@ -2,10 +2,8 @@ source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 
 gem "lita", "4.7.0"
 gem "lita-hipchat", "3.0.2"
-
 gem "pagerduty", "~>2.1.0"
-
-gem "lita-zabbix", path: "plugins/lita-zabbix"
+gem "zabbixapi", "~> 2.4"
 
 group :test do
   gem "rack-test", "~> 0.6.3"

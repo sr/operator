@@ -1,6 +1,6 @@
 require "date"
 
-module ZabbixTestHelpers
+module ZabbixSpecHelpers
   def stub_api_version(url: "https://zabbix-dfw.example/api_jsonrpc.php", version: "2.4.6")
     stub_request(:post, url)
       .with(body: /"method":"apiinfo.version"/)
