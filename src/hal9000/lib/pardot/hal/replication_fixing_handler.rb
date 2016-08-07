@@ -1,20 +1,6 @@
-require "json"
-require "replication_fixing/alerting_manager"
-require "replication_fixing/datacenter_aware_registry"
-require "replication_fixing/fixing_client"
-require "replication_fixing/fixing_status_client"
-require "replication_fixing/hostname"
-require "replication_fixing/ignore_client"
-require "replication_fixing/message_throttler"
-require "replication_fixing/monitor_supervisor"
-require "replication_fixing/pagerduty_pager"
-require "replication_fixing/replication_error_sanitizer"
-require "replication_fixing/shard"
-require "replication_fixing/test_pager"
-
-module Lita
-  module Handlers
-    class ReplicationFixing < Handler
+module Pardot
+  module HAL
+    class ReplicationFixingHandler < Lita::Handler
       config :repfix_url, default: "https://repfix-%datacenter%.pardot.com"
       config :datacenters, default: %w[dfw phx]
       config :default_datacenter, default: "dfw"

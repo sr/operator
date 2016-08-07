@@ -1,10 +1,9 @@
 require "spec_helper"
 require "uri"
-require "json"
 
-describe Lita::Handlers::ReplicationFixing, lita_handler: true do
+describe Pardot::HAL::ReplicationFixingHandler, lita_handler: true do
   before do
-    registry.config.handlers.replication_fixing.pager = "test"
+    registry.config.handlers.replication_fixing_handler.pager = "test"
   end
 
   describe "POST /replication/errors" do

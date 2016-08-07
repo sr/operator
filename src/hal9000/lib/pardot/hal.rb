@@ -1,12 +1,30 @@
 require "bundler"
+
+require "json"
+
 require "lita"
 require "lita/cli"
+require "lita/handler"
+
+require "replication_fixing/alerting_manager"
+require "replication_fixing/datacenter_aware_registry"
+require "replication_fixing/fixing_client"
+require "replication_fixing/fixing_status_client"
+require "replication_fixing/hostname"
+require "replication_fixing/ignore_client"
+require "replication_fixing/message_throttler"
+require "replication_fixing/monitor_supervisor"
+require "replication_fixing/pagerduty_pager"
+require "replication_fixing/replication_error_sanitizer"
+require "replication_fixing/shard"
+require "replication_fixing/test_pager"
+
+require "pardot/hal/commit_handler"
+require "pardot/hal/replication_fixing_handler"
 
 module Pardot
   module HAL
     def self.start
-      require "pardot/hal/commit_handler"
-
       Lita::CLI.start
     end
   end
