@@ -1,6 +1,6 @@
 module Pardot
   module HAL
-    class CommitHandler < Lita::Handler
+    class CommitHandler < Handler
       DEFAULT_REPO = "pardot".freeze
       DEFAULT_BRANCH = "master".freeze
 
@@ -35,7 +35,7 @@ module Pardot
         response.reply(url)
       end
 
-      Lita.register_handler(self)
+      HAL.register_handler(self)
     end
   end
 end

@@ -1,6 +1,6 @@
 module Pardot
   module HAL
-    class ReplicationFixingHandler < Lita::Handler
+    class ReplicationFixingHandler < Handler
       config :repfix_url, default: "https://repfix-%datacenter%.pardot.com"
       config :datacenters, default: %w[dfw phx]
       config :default_datacenter, default: "dfw"

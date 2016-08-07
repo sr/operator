@@ -19,13 +19,23 @@ require "replication_fixing/replication_error_sanitizer"
 require "replication_fixing/shard"
 require "replication_fixing/test_pager"
 
-require "pardot/hal/commit_handler"
-require "pardot/hal/replication_fixing_handler"
 
 module Pardot
   module HAL
+    def self.require_handlers
+      require "pardot/hal/commit_handler"
+      require "pardot/hal/replication_fixing_handler"
+    end
+
     def self.start
       Lita::CLI.start
+    end
+
+    def self.register_handler(handler)
+      Lita.register_handler(handler)
+    end
+
+    class Handler < Lita::Handler
     end
   end
 end

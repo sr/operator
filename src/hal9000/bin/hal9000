@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
 require "pardot/hal"
+Pardot::HAL.require_handlers
 Pardot::HAL.start
