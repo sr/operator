@@ -3,10 +3,9 @@ package operator
 import (
 	"errors"
 	"flag"
-	"strings"
+	"net/http"
 	"time"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/proto"
@@ -30,9 +29,11 @@ type Logger interface {
 	Error(proto.Message)
 }
 
-type Sourcer interface {
-	GetSource() *Source
+type RequestDecoder interface {
+	Decode(*http.Request) (*Request, error)
 }
+
+type RequestDispatcher func(path string) bool
 
 type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
 
@@ -65,6 +66,14 @@ type MethodCommand struct {
 	Run      func(*CommandContext) (string, error)
 }
 
+type Handler struct {
+	logger       Logger
+	instrumenter Instrumenter
+	authorizer   Authorizer
+	decoder      RequestDecoder
+	dispatcher   RequestDispatcher
+}
+
 func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
@@ -77,40 +86,42 @@ func NewInstrumenter(logger Logger) Instrumenter {
 	return newInstrumenter(logger)
 }
 
-func NewInterceptor(
+func NewHandler(
+	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-) grpc.UnaryServerInterceptor {
-	return func(
-		ctx context.Context,
-		in interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (interface{}, error) {
-		sourcer, ok := in.(Sourcer)
-		if !ok || sourcer.GetSource() == nil {
-			return nil, ErrInvalidRequest
-		}
-		s := strings.Split(info.FullMethod, "/")
-		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
-			return nil, ErrInvalidRequest
-		}
-		request := &Request{
-			Source: sourcer.GetSource(),
-			Call:   &Call{Service: s[1], Method: s[2]},
-		}
-		if err := authorizer.Authorize(request); err != nil {
-			return nil, err
-		}
-		start := time.Now()
-		response, err := handler(ctx, in)
-		if err != nil {
-			request.Call.Error = &Error{Message: err.Error()}
-		}
-		request.Call.Duration = ptypes.DurationProto(time.Since(start))
-		instrumenter.Instrument(request)
-		return response, err
+	decoder RequestDecoder,
+	dispatcher RequestDispatcher,
+) http.Handler {
+	return &Handler{
+		logger,
+		instrumenter,
+		authorizer,
+		decoder,
+		dispatcher,
 	}
+}
+
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	req, err := h.decoder.Decode(r)
+	if err != nil {
+		// TODO(sr) Log decoding error
+		return
+	}
+	if err := h.authorizer.Authorize(req); err != nil {
+		// TODO(sr) Log unauthorized error
+		return
+	}
+	start := time.Now()
+	if !h.dispatcher(r.URL.Path) {
+		// TODO(sr) Log unhandled message
+		return
+	}
+	if err != nil {
+		req.Call.Error = &Error{Message: err.Error()}
+	}
+	req.Call.Duration = ptypes.DurationProto(time.Since(start))
+	h.instrumenter.Instrument(req)
 }
 
 func NewArgumentRequiredError(argument string) error {
