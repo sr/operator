@@ -1,20 +1,20 @@
-module Lita
-  module Handlers
-    class Commit < Handler
+module Pardot
+  module HAL
+    class CommitHandler < Lita::Handler
       DEFAULT_REPO = "pardot".freeze
       DEFAULT_BRANCH = "master".freeze
 
       # The <repo> group is optional in this regex, the commit method
       # will set the default repo to 'pardot' if no <repo> is provided
-      route /^commit(?:\s+(?<repo>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
+      route(/^commit(?:\s+(?<repo>[a-z0-9\-]+))?\s+(?<sha>[a-f0-9]+)$/i, :commit, command: true, help: {
         "commit (repo)? <commit sha>" => "Responds with the commit url for the given params, repo defaults to pardot"
-      }
+      })
 
       # The <sha1> and <repo> groups are optional in this regex. The diff method will
       # default to comparing just <sha2> to pardot master if no <sha1> provided
-      route /^diff(?<repo>[a-z0-9]+)?(?:\s+(?<sha1>[^\s]+))?\s+(?<sha2>[^\s]+)$/i, :diff, command: true, help: {
+      route(/^diff(?<repo>[a-z0-9]+)?(?:\s+(?<sha1>[^\s]+))?\s+(?<sha2>[^\s]+)$/i, :diff, command: true, help: {
         "diff(repo) (sha1) <sha2>" => "Responds with the compare url for the given params, repo defaults to pardot"
-      }
+      })
 
       def commit(response)
         sha = response.match_data["sha"]

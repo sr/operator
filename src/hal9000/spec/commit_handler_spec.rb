@@ -1,6 +1,7 @@
 require "spec_helper"
+require "pardot/hal/commit_handler"
 
-describe Lita::Handlers::Commit, lita_handler: true do
+describe Pardot::HAL::CommitHandler, lita_handler: true do
   describe "!commit 1234" do
     it "returns a link to this commit for pardot" do
       send_command("commit 1234")
