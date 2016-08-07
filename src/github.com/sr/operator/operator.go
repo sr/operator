@@ -33,7 +33,11 @@ type RequestDecoder interface {
 	Decode(*http.Request) (*Request, error)
 }
 
-type RequestDispatcher func(path string) bool
+type MessageDispatcher interface {
+	Dispatch(*Message) (bool, error)
+}
+
+type Invoker func(conn *grpc.ClientConn, call string, msg *Message) (bool, error)
 
 type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
 
@@ -71,7 +75,7 @@ type Handler struct {
 	instrumenter Instrumenter
 	authorizer   Authorizer
 	decoder      RequestDecoder
-	dispatcher   RequestDispatcher
+	dispatcher   MessageDispatcher
 }
 
 func NewCommand(name string, services []ServiceCommand) Command {
@@ -91,7 +95,7 @@ func NewHandler(
 	instrumenter Instrumenter,
 	authorizer Authorizer,
 	decoder RequestDecoder,
-	dispatcher RequestDispatcher,
+	dispatcher MessageDispatcher,
 ) http.Handler {
 	return &Handler{
 		logger,
@@ -113,7 +117,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start := time.Now()
-	if !h.dispatcher(r.URL.Path) {
+	ok, err := h.dispatcher.Dispatch(&Message{Source: req.Source, Text: "TODO"})
+	if !ok {
 		// TODO(sr) Log unhandled message
 		return
 	}
@@ -122,6 +127,20 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	req.Call.Duration = ptypes.DurationProto(time.Since(start))
 	h.instrumenter.Instrument(req)
+}
+
+func NewMessageDispatcher(
+	logger Logger,
+	conn *grpc.ClientConn,
+	prefix string,
+	invoker Invoker,
+) (MessageDispatcher, error) {
+	return newMessageDispatcher(
+		logger,
+		conn,
+		prefix,
+		invoker,
+	)
 }
 
 func NewArgumentRequiredError(argument string) error {
