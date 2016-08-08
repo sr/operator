@@ -102,20 +102,11 @@ case "$project" in
 
         if [ -n "$CI" ]; then
           pushd "bin"
-
           tarball="$(tarball-build "jiracleaner")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-
-          # Cross-compiled builds
-          pushd "darwin_amd64"
-          export CI_JOB="DEVENV"
-          tarball="$(tarball-build "devenv")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-          popd
-
           popd
         fi
         ;;
