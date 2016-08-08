@@ -24,6 +24,9 @@ clean: operator-clean
 install-tools:
 	$(GO) install -v $(TOOLS)
 
+install-devenv:
+	$(GO) install -v $$($(GO) list devenv/...)
+
 deadleaves: $(DEADLEAVES)
 	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
 		if [ -n "$$out" ]; then \
