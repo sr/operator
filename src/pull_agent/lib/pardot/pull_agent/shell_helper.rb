@@ -8,6 +8,11 @@ module Pardot
         ENV.fetch("PULL_HOSTNAME", Socket.gethostname.sub(/(\.pardot\.com|\.ops\.sfdc\.net|\.pd25\.com|\.pd26\.com)$/, ""))
       end
 
+      # TODO: Remove this when we have standardized on chef as our ansible dynamic inventory
+      def self.datacenter
+        hostname.split("-").last
+      end
+
       # this should make it easier to test, etc...
       def self.execute(command, opt = {})
         raise SecurityException, "command must be an array to avoid shell expansion" unless command.is_a?(Array)
