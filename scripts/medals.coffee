@@ -75,7 +75,6 @@ module.exports = (robot) ->
           numPlace = 'th'
 
         if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
-            total_medals = ''
             if (medal_report.total_count > 1)
               total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with #{medal_report.total_count} medals: "
             else if (medal_report.total_count == 0)
