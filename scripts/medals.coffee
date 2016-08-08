@@ -122,6 +122,8 @@ module.exports = (robot) ->
                   total_medals = total_medals + ' a bronze medal'
 
             msg.send total_medals + '.'
+        else
+          msg.send "No medal results found for #{country}."
         return
 
 getMedals = (callback) ->
