@@ -3,8 +3,8 @@
 #
 #
 # Commands
-#   hubot traffic (map|incidents) - returns current traffic conditions in Atlanta
-#   hubot traveltime (at <departure_time>) (to) <location> - returns travel time to location from the office, default departure time is now
+#   hubot medals - returns the top 3 medal-winning nations
+#   hubot medals (country) - returns the medal count of a specific country
 #
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
