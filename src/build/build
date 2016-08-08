@@ -100,7 +100,7 @@ case "$project" in
             -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
             make -f etc/mk/golang.mk install-devenv
 
-        test -n "$CI" && {
+        if [ -n "$CI" ]; then
           pushd "bin"
 
           tarball="$(tarball-build "jiracleaner")"
@@ -117,7 +117,7 @@ case "$project" in
           popd
 
           popd
-        }
+        fi
         ;;
     hal9000)
         build-ruby "$project"
