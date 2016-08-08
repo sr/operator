@@ -74,48 +74,55 @@ module.exports = (robot) ->
         else
           numPlace = 'th'
 
-        total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with "
-        if medal_report.gold_count > 0
-          if medal_report.gold_count == 0 || medal_report.gold_count > 1
-            total_medals = total_medals + "#{medal_report.gold_count} gold medals"
-          else
-            total_medals = total_medals + 'a gold medal'
+        if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
+            total_medals = ''
+            if (medal_report.total_count > 1)
+              total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with #{medal_report.total_count} medals: "
+            else if (medal_report.total_count == 0)
+              total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with 0 medals"
+            else
+              total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with 1 medal: "
+            if medal_report.gold_count > 0
+              if medal_report.gold_count == 0 || medal_report.gold_count > 1
+                total_medals = total_medals + "#{medal_report.gold_count} gold medals"
+              else
+                total_medals = total_medals + 'a gold medal'
 
-        if medal_report.silver_count > 0
-          if medal_report.gold_count > 0 && medal_report.bronze_count == 0
-            if medal_report.silver_count == 0 || medal_report.silver_count > 1
-              total_medals = total_medals + " and #{medal_report.silver_count} silver medals"
-            else
-              total_medals = total_medals + ' and a silver medal'
-          else if medal_report.gold_count > 0 && medal_report.bronze_count > 0
-            if medal_report.silver_count == 0 || medal_report.silver_count > 1
-              total_medals = total_medals + ", #{medal_report.silver_count} silver medals"
-            else
-              total_medals = total_medals + ', a silver medal'
-          else
-            if medal_report.silver_count == 0 || medal_report.silver_count > 1
-              total_medals = total_medals + " #{medal_report.silver_count} silver medals"
-            else
-              total_medals = total_medals + ' a silver medal'
+            if medal_report.silver_count > 0
+              if medal_report.gold_count > 0 && medal_report.bronze_count == 0
+                if medal_report.silver_count == 0 || medal_report.silver_count > 1
+                  total_medals = total_medals + " and #{medal_report.silver_count} silver medals"
+                else
+                  total_medals = total_medals + ' and a silver medal'
+              else if medal_report.gold_count > 0 && medal_report.bronze_count > 0
+                if medal_report.silver_count == 0 || medal_report.silver_count > 1
+                  total_medals = total_medals + ", #{medal_report.silver_count} silver medals"
+                else
+                  total_medals = total_medals + ', a silver medal'
+              else
+                if medal_report.silver_count == 0 || medal_report.silver_count > 1
+                  total_medals = total_medals + " #{medal_report.silver_count} silver medals"
+                else
+                  total_medals = total_medals + ' a silver medal'
 
-        if medal_report.bronze_count > 0
-          if medal_report.gold_count > 0 && medal_report.silver_count > 0
-            if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
-              total_medals = total_medals + ", and #{medal_report.bronze_count} bronze medals"
-            else
-              total_medals = total_medals + ', and a bronze medal'
-          else if (medal_report.gold_count > 0 && medal_report.silver_count == 0) || (medal_report.silver_count > 0 && medal_report.gold_count == 0)
-            if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
-              total_medals = total_medals + " and #{medal_report.bronze_count} bronze medals"
-            else
-              total_medals = total_medals + ' and a bronze medal'
-          else
-            if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
-              total_medals = total_medals + " #{medal_report.bronze_count} bronze medals"
-            else
-              total_medals = total_medals + ' a bronze medal'
+            if medal_report.bronze_count > 0
+              if medal_report.gold_count > 0 && medal_report.silver_count > 0
+                if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
+                  total_medals = total_medals + ", and #{medal_report.bronze_count} bronze medals"
+                else
+                  total_medals = total_medals + ', and a bronze medal'
+              else if (medal_report.gold_count > 0 && medal_report.silver_count == 0) || (medal_report.silver_count > 0 && medal_report.gold_count == 0)
+                if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
+                  total_medals = total_medals + " and #{medal_report.bronze_count} bronze medals"
+                else
+                  total_medals = total_medals + ' and a bronze medal'
+              else
+                if medal_report.bronze_count == 0 || medal_report.bronze_count > 1
+                  total_medals = total_medals + " #{medal_report.bronze_count} bronze medals"
+                else
+                  total_medals = total_medals + ' a bronze medal'
 
-        msg.send total_medals + '.'
+            msg.send total_medals + '.'
         return
 
 getMedals = (callback) ->
