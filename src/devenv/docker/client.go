@@ -1,9 +1,16 @@
 package docker
 
-import "os/exec"
+import (
+	"os"
+	"os/exec"
+)
+
+const (
+	Binary = "/usr/local/bin/docker"
+)
 
 func IsInstalled() bool {
-	if _, err := exec.LookPath("docker"); err != nil {
+	if _, err := os.Stat(Binary); err != nil {
 		return false
 	}
 	return true
@@ -31,6 +38,6 @@ func Inspect(args ...string) ([]byte, error) {
 
 func clientExec(subcommand string, args []string) ([]byte, error) {
 	args = append([]string{subcommand}, args...)
-	cmd := exec.Command("docker", args...)
+	cmd := exec.Command(Binary, args...)
 	return cmd.CombinedOutput()
 }

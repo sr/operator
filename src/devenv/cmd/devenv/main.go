@@ -2,11 +2,12 @@ package main
 
 import (
 	"devenv"
+	"devenv/compose"
+	"devenv/docker"
 	"devenv/sshforwarder"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"syscall"
 )
 
@@ -52,21 +53,11 @@ func main() {
 				args = newArgs
 			}
 
-			dockerPath, err := exec.LookPath("docker")
-			if err != nil {
-				log.Fatalf("error: unable to find docker binary: %v", err)
-			}
-
-			if err = syscall.Exec(dockerPath, args, os.Environ()); err != nil {
+			if err := syscall.Exec(docker.Binary, args, os.Environ()); err != nil {
 				log.Fatalf("error: unable to start docker: %v", err)
 			}
 		} else if args[0] == "compose" {
-			composePath, err := exec.LookPath("docker-compose")
-			if err != nil {
-				log.Fatalf("error: unable to find docker-compose binary: %v", err)
-			}
-
-			if err = syscall.Exec(composePath, args, os.Environ()); err != nil {
+			if err := syscall.Exec(compose.Binary, args, os.Environ()); err != nil {
 				log.Fatalf("error: unable to start docker-compose: %v", err)
 			}
 		}
