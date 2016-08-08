@@ -14,7 +14,7 @@ func main() {
 	args := os.Args[1:]
 	if len(args) <= 0 || args[0] == "--help" || args[0] == "-h" {
 		usage(0)
-	} else if args[0] == "--version" || args[0] == "-v" {
+	} else if args[0] == "version" {
 		fmt.Printf("%s\n", devenv.Version)
 	} else if args[0] == "docker" || args[0] == "compose" {
 		errors := devenv.UnsatisfiedRequirements()
@@ -81,11 +81,12 @@ func main() {
 
 func usage(exitCode int) {
 	fmt.Println("Usage: devenv COMMAND [arg...]")
-	fmt.Println("       devenv [--help | -v | --version]")
+	fmt.Println("       devenv [--help]")
 	fmt.Println("")
 	fmt.Println("A developer-friendly wrapper for Docker")
 	fmt.Println("")
 	fmt.Println("Commands:")
+	fmt.Println("  version Displays the installed version of `devenv`")
 	fmt.Println("  docker  Sets up a Docker environment and executes `docker`")
 	fmt.Println("  compose Sets up a Docker environment and executes `docker-compose`")
 	fmt.Println("")
