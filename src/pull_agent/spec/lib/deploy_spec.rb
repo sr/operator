@@ -48,7 +48,7 @@ describe Pardot::PullAgent::Deploy do
   describe ".servers" do
     it "is derived from server_actions" do
       deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "server1" => { "action" => nil }, "server2" => { "action" => "deploy" } })
-      expect(deploy.servers).to eq(["server1", "server2"])
+      expect(deploy.servers).to eq(%w(server1 server2))
     end
   end
 end
