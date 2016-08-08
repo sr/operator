@@ -28,7 +28,7 @@ module.exports = (robot) ->
       country = ''
     else if country == 'usa' || country == 'united states' || country == 'america' || country == 'pardot' || country == 'salesforce'
       country = 'united-states'
-    else if country == 'gb' || country == 'uk' || country == 'united kingdom' || country == 'great britain' || country == 'england' || country == 'wales' || country == 'scotland' || country == 'northern ireland'
+    else if country == 'gb' || country == 'uk' || country == 'united kingdom' || country == 'great britain' || country == 'england' || country == 'wales' || country == 'scotland' || country == 'northern ireland' || country == 'britain'
       country = 'great-britain'
     else
       country = country.replace(/\s+/g, '-')
@@ -57,24 +57,24 @@ module.exports = (robot) ->
         msg.send medal_response
       else
         medal_report = medals
-        total_medals = ''
-        if medal_report.id == 'united-states'
-          total_medals = '(murica) '
-        else if medal_report.id == 'great-britain'
-          total_medals = '(brexitchatty) '
-        else
-          total_medals = '(goldstar) '
-        numPlace = ''
-        if (medal_report.place % 10 == 1)
-          numPlace = 'st'
-        else if (medal_report.place % 10 == 2)
-          numPlace = 'nd'
-        else if (medal_report.place % 10 == 3)
-          numPlace = 'rd'
-        else
-          numPlace = 'th'
-
         if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
+            total_medals = ''
+            if medal_report.id == 'united-states'
+              total_medals = '(murica) '
+            else if medal_report.id == 'great-britain'
+              total_medals = '(brexitchatty) '
+            else
+              total_medals = '(goldstar) '
+            numPlace = ''
+            if (medal_report.place % 10 == 1)
+              numPlace = 'st'
+            else if (medal_report.place % 10 == 2)
+              numPlace = 'nd'
+            else if (medal_report.place % 10 == 3)
+              numPlace = 'rd'
+            else
+              numPlace = 'th'
+
             if (medal_report.total_count > 1)
               total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with #{medal_report.total_count} medals: "
             else if (medal_report.total_count == 0)
