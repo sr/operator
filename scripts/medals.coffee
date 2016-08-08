@@ -9,31 +9,18 @@
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
 
-request = require('request')
 moment = require('moment')
 medals_api_url = 'http://www.medalbot.com/api/v1/medals'
-medals = []
-country = ''
 
 module.exports = (robot) ->
   robot.respond /medals(?:\s+(.*))?$/i, (msg) ->
-
-    if msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined
-      country = ''
-    else
+    country = ''
+    if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
       country = msg.match[1].toLowerCase()
+      
+    country = cleanUpCountry(country)
 
-
-    if country == '' || country == null
-      country = ''
-    else if country == 'usa' || country == 'united states' || country == 'america' || country == 'pardot' || country == 'salesforce'
-      country = 'united-states'
-    else if country == 'gb' || country == 'uk' || country == 'united kingdom' || country == 'great britain' || country == 'england' || country == 'wales' || country == 'scotland' || country == 'northern ireland' || country == 'britain'
-      country = 'great-britain'
-    else
-      country = country.replace(/\s+/g, '-')
-
-    getMedals (err)->
+    getMedals(msg, country, (err, medals)->
       if err
         msg.send err
         return
@@ -65,15 +52,8 @@ module.exports = (robot) ->
               total_medals = '(brexitchatty) '
             else
               total_medals = '(goldstar) '
-            numPlace = ''
-            if (medal_report.place % 10 == 1)
-              numPlace = 'st'
-            else if (medal_report.place % 10 == 2)
-              numPlace = 'nd'
-            else if (medal_report.place % 10 == 3)
-              numPlace = 'rd'
-            else
-              numPlace = 'th'
+
+            numPlace = suffixForNum(medal_report.place)
 
             if (medal_report.total_count > 1)
               total_medals = total_medals + "#{medal_report.country_name} is currently in #{medal_report.place}#{numPlace} with #{medal_report.total_count} medals: "
@@ -124,14 +104,37 @@ module.exports = (robot) ->
             msg.send total_medals + '.'
         else
           msg.send "No medal results found for #{country}."
-        return
+    )
 
-getMedals = (callback) ->
-  if country == '' || country == null
-    request medals_api_url, (err, resp, body) ->
-      medals = JSON.parse(body)
-      callback()
+getMedals = (msg, country, callback) ->
+  url_combine = medals_api_url
+  if country != ''
+    url_combine = url_combine + '/' + country
+
+  msg.http(url_combine)
+       .header('Content-Type', 'application/json')
+       .get() (err, res, body) ->
+          if err
+            callback("Error: #{err}", JSON.parse(body))
+          else
+            callback(null, JSON.parse(body))
+
+suffixForNum = (num) ->
+  if (num % 10 == 1)
+    return'st'
+  else if (num % 10 == 2)
+    return 'nd'
+  else if (num % 10 == 3)
+    return 'rd'
   else
-    request medals_api_url + '/' + country, (err, resp, body) ->
-      medals = JSON.parse(body)
-      callback()
+    return 'th'
+
+cleanUpCountry = (input) ->
+  if input == ''
+    return ''
+  else if input == 'usa' || input == 'united states' || input == 'america' || input == 'pardot' || input == 'salesforce'
+    return 'united-states'
+  else if input == 'gb' || input == 'uk' || input == 'united kingdom' || input == 'great britain' || input == 'england' || input == 'wales' || input == 'scotland' || input == 'northern ireland' || input == 'britain'
+    return 'great-britain'
+  else
+    return input.replace(/\s+/g, '-')
