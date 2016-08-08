@@ -1,0 +1,4 @@
+FROM scratch
+COPY /operatord /app/operatord
+EXPOSE 9000
+CMD ["/app/operatord"]

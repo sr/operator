@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	pinger "chatops/services/ping"
+	ping "bread/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -18,7 +18,7 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "pinger",
+			Name:     "ping",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -34,10 +34,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := pinger.NewPingerClient(conn)
+						client := ping.NewPingerClient(conn)
 						response, err := client.Ping(
 							context.Background(),
-							&pinger.PingRequest{
+							&ping.PingRequest{
 								Source: ctx.Source,
 							},
 						)
