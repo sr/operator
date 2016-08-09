@@ -28,8 +28,8 @@ module.exports = (robot) ->
       if medals.length > 0
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
-        medal_response = "Medal Standings (as of #{date})\n"
-        while i < 3
+        response = "<h3 style=\"text-align:center\">Medal Standings (as of #{date})</h3><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
+        while i < 5
           medal_report = medals[i]
           country_response = ''
           if medal_report.id == 'united-states'
@@ -38,10 +38,15 @@ module.exports = (robot) ->
             country_response = '(brexitchatty) '
           else
             country_response = ''
-          country_response = country_response + medal_report.country_name
-          medal_response = medal_response + "#{medal_report.place}) #{country_response} (#{medal_report.total_count} total - #{medal_report.gold_count} gold, #{medal_report.silver_count} silver, #{medal_report.bronze_count} bronze)\n"
+          response += "<td>#{country_response}#{medal_report.country_name}</td>"
+          response += "<td>#{medal_report.total_count}</td>"
+          response += "<td>#{medal_report.gold_count}</td>"
+          response += "<td>#{medal_report.silver_count}</td>"
+          response += "<td>#{medal_report.bronze_count}</td>"
+          response += "</tr>"
           i++
-        msg.send medal_response
+        response += "</table>"
+        msg.hipchatNotify(response)
       else
         medal_report = medals
         if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
@@ -109,7 +114,7 @@ module.exports = (robot) ->
 getMedals = (msg, country, callback) ->
   url_combine = medals_api_url
   if country != ''
-    url_combine = url_combine + '/' + country
+    url_combine += ('/' + country)
 
   msg.http(url_combine)
        .header('Content-Type', 'application/json')
