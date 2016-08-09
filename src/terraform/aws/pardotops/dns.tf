@@ -8,14 +8,6 @@ resource "aws_route53_zone" "ops_pardot_com" {
   comment = "Managed by Terraform. Subdomain of pardot.com hosted in Dyn."
 }
 
-resource "aws_route53_record" "app_dev_pardot_com_CNAMErecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "app.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["lba-s1.dev.pardot.com."]
-  type = "CNAME"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "app-s1_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "app-s1.${aws_route53_zone.dev_pardot_com.name}"
