@@ -82,5 +82,5 @@ module.exports = (robot) ->
   robot.respond /ELF (.*)\s*\.\.\.\s*(.*)/i, id: 'meme.elf', (msg) ->
     memeGenerator msg, '0tzPkw', msg.match[1], msg.match[2]
 
-  robot.respond /(MAKE .*\s)(GREAT AGAIN)/i, id: 'meme.great-again', (msg) ->
+  robot.respond /(MAKE .*)(GREAT AGAIN)$/i, id: 'meme.great-again', (msg) ->
     memeGenerator msg, 'PqriTg', msg.match[1], msg.match[2]
