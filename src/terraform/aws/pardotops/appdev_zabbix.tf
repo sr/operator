@@ -37,7 +37,7 @@ resource "aws_route53_record" "appdev_zabbix1_arecord" {
   ttl = "900"
 }
 
-resource "aws_route53_record" "appdev_zabbix1_arecord" {
+resource "aws_route53_record" "appdev_zabbix-internal1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-monitor-internal1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.appdev_zabbix1.private_ip}"]
