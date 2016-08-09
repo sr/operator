@@ -40,6 +40,14 @@ resource "aws_route53_record" "artifactory_dev_pardot_com_Arecord" {
   ttl = "900"
 }
 
+resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["52.21.58.50"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_route53_record" "artifactory-internal_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
@@ -204,6 +212,14 @@ resource "aws_route53_record" "docker_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "docker.${aws_route53_zone.dev_pardot_com.name}"
   records = ["artifactory.dev.pardot.com."]
+  type = "CNAME"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "docker-origin_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "docker-origin.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["artifactory-origin.dev.pardot.com."]
   type = "CNAME"
   ttl = "900"
 }
