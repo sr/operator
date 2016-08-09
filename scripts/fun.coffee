@@ -208,7 +208,8 @@ module.exports = (robot) ->
       'http://i.giphy.com/dcubXtnbck0RG.gif',
       'https://media.giphy.com/media/FphE0L24UycIU/giphy.gif',
       'http://i.giphy.com/dcubXtnbck0RG.gif',
-      'https://media.giphy.com/media/YPjFIgSccMHS0/giphy.gif'
+      'https://media.giphy.com/media/YPjFIgSccMHS0/giphy.gif',
+      'https://hipchat.dev.pardot.com/files/1/15/j2gDs5UDFKzGIZ4/bees.gif',
     ]
     msg.send msg.random bees
 
