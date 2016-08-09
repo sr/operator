@@ -17,6 +17,7 @@
 #   ! DUMPSTER FIRE <text> - Meme: Name your own dumpster fire!
 #   ! OMG <text> - Meme: Ermahgerd terxt
 #   ! ELF <text_top>...<text_bottom> - Buddy the Elf
+#   ! MAKE <text> GREAT AGAIN - Meme: Trump
 #
 # Author:
 #   brianhays
@@ -80,3 +81,6 @@ module.exports = (robot) ->
 
   robot.respond /ELF (.*)\s*\.\.\.\s*(.*)/i, id: 'meme.elf', (msg) ->
     memeGenerator msg, '0tzPkw', msg.match[1], msg.match[2]
+
+  robot.respond /(MAKE .*)(GREAT AGAIN)$/i, id: 'meme.great-again', (msg) ->
+    memeGenerator msg, 'PqriTg', msg.match[1], msg.match[2]
