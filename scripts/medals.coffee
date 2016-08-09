@@ -17,7 +17,7 @@ module.exports = (robot) ->
     country = ''
     if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
       country = msg.match[1].toLowerCase()
-      
+
     country = cleanUpCountry(country)
 
     getMedals(msg, country, (err, medals)->
@@ -120,19 +120,22 @@ getMedals = (msg, country, callback) ->
             callback(null, JSON.parse(body))
 
 suffixForNum = (num) ->
-  if (num % 10 == 1)
-    return'st'
-  else if (num % 10 == 2)
-    return 'nd'
-  else if (num % 10 == 3)
-    return 'rd'
+  if (num > 10 && num < 20)
+    return "th"
   else
-    return 'th'
+    if (num % 10 == 1)
+      return'st'
+    else if (num % 10 == 2)
+      return 'nd'
+    else if (num % 10 == 3)
+      return 'rd'
+    else
+      return 'th'
 
 cleanUpCountry = (input) ->
   if input == ''
     return ''
-  else if input == 'usa' || input == 'united states' || input == 'america' || input == 'pardot' || input == 'salesforce'
+  else if input == 'usa' || input == 'united states' || input == 'america' || input == 'pardot' || input == 'salesforce' || input == '\'murica' || input == 'murica' || input == 'america' || input == 'united states of america'
     return 'united-states'
   else if input == 'gb' || input == 'uk' || input == 'united kingdom' || input == 'great britain' || input == 'england' || input == 'wales' || input == 'scotland' || input == 'northern ireland' || input == 'britain'
     return 'great-britain'
