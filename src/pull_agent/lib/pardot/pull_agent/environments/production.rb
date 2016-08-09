@@ -33,6 +33,8 @@ module Pardot
         after_deploy :link_mesh_shared_files, only: :mesh
         after_deploy :restart_mesh_service, only: :mesh
 
+        after_deploy :link_correct_inventory, only: :ansible
+
         def short_name
           "prod"
         end

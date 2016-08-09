@@ -314,6 +314,10 @@ module Pardot
           )
         end
 
+        def link_correct_inventory
+          FileUtils.ln_sf("#{payload.current_link}/production_#{ShellHelper.datacenter}.ini", "#{payload.current_link}/hosts")
+        end
+
         def restart_repfix_service
           restart_puma("/var/run/repfix/puma.pid")
         end
