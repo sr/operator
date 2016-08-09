@@ -166,6 +166,9 @@ These are the environemt variables you will need to set as exports in `script/se
 This file should be added to your `.gitignore`, don't reveal it!
 
 ```
+# Make sure hubot alias is different than '!', that's what Parbot uses
+# and you don't want your bot to respond whenever people call Parbot
+export HUBOT_ALIAS="<some alias>"
 export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
 export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
 export HUBOT_HIPCHAT_JID="<your JabberId>"
@@ -188,6 +191,4 @@ Then after all those are setup you should be able to run it locally with
 script/server --adapter hipchat
 ```
 
-Keep in mind that your local bot will be represented by you in hipchat.
-You will not be able to call functions on yourself.
-You may want to use the `!echo <args>` function of Parbot so that Parbot will echo out your commands and then your local bot will respond.
+Keep in mind that your local bot will be represented by you in hipchat. The hubot framework does not allow a hubot to respond to itself. So if you try to call functions on your local bot, it will not respond because it is under your hipchat account. You can either get someone else to call the functions for you or you may want to use the `!echo <args>` function of Parbot so that Parbot will echo out your commands and then your local bot will respond.
