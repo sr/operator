@@ -120,7 +120,7 @@ getMedals = (msg, country, callback) ->
             callback(null, JSON.parse(body))
 
 suffixForNum = (num) ->
-  if (num > 10 && num < 20)
+  if (num % 100 > 10 && num % 100 < 20)
     return "th"
   else
     if (num % 10 == 1)
