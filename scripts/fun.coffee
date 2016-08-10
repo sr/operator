@@ -915,7 +915,7 @@ module.exports = (robot) ->
       q: query,
       searchType:'image',
       fileType:'gif'
-      num: 7,
+      num: 10,
       safe:'high',
       cx: googleCseId,
       key: googleApiKey
