@@ -166,6 +166,8 @@ resource "aws_eip" "internal_apps_ldap_replica" {
   instance = "${aws_instance.internal_apps_ldap_replica.id}"
 }
 
+// THE FOLLOWING FOUR RECORDS MUST STAY SYNCHRONIZED BETWEEN PRIVATE AND PUBLIC VERSIONS! SEEK BREAD-TEAM FOR ASSISTANCE
+
 resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot0-auth1-1-ue1.aws.pardot.com"
@@ -176,6 +178,22 @@ resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
 
 resource "aws_route53_record" "internal_apps_auth1-2_Arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-2-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-1_Arecord_PUBLIC" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-2_Arecord_PUBLIC" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "pardot0-auth1-2-ue1.aws.pardot.com"
   records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
   type = "A"

@@ -8,6 +8,11 @@ resource "aws_route53_zone" "ops_pardot_com" {
   comment = "Managed by Terraform. Subdomain of pardot.com hosted in Dyn."
 }
 
+resource "aws_route53_zone" "aws_pardot_com_restricted_use_public_zone" {
+  name = "aws.pardot.com"
+  comment = "This is the public face of aws.pardot.com, and it should be used as VERY LITTLE as possible. Seek BREAD approval before use!"
+}
+
 resource "aws_route53_record" "app-s1_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "app-s1.${aws_route53_zone.dev_pardot_com.name}"
