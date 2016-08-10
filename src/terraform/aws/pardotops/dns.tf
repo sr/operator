@@ -211,7 +211,7 @@ resource "aws_route53_record" "crowd_dev_pardot_com_TXTrecord" {
 resource "aws_route53_record" "docker_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "docker.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["artifactory.dev.pardot.com."]
+  records = ["${aws_elb.external_artifact_cache_lb.dns_name}"]
   type = "CNAME"
   ttl = "900"
 }
