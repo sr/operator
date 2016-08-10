@@ -1,5 +1,7 @@
 resource "aws_security_group" "artifact_cache_http_lb" {
   name = "artifact_cache_http_lb"
+  # description should read "Allow HTTP/HTTPS from Bamboo instances" but
+  # changing it after the fact requires rebuilding all dependencies
   description = "Allow HTTP/HTTPS from SFDC VPN only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
@@ -8,7 +10,44 @@ resource "aws_security_group" "artifact_cache_http_lb" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "192.168.128.0/22"    # bamboo instances in pardot-artifactory
+      "192.168.128.0/22" # Bamboo instances in pardot-artifactory
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "external_artifact_cache_http_lb" {
+  name = "external_artifact_cache_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC VPN and datacenters only"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_nat_gw.public_ip}/32"
     ]
   }
 
@@ -40,7 +79,8 @@ resource "aws_security_group" "artifact_cache_server" {
     to_port = 80
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.artifact_cache_http_lb.id}"
+      "${aws_security_group.artifact_cache_http_lb.id}",
+      "${aws_security_group.external_artifact_cache_http_lb.id}"
     ]
   }
 
@@ -97,7 +137,55 @@ resource "aws_elb" "artifact_cache_lb" {
   }
 
   tags {
-    Name = "artifact-cache-lb"
+    Name = "internal-artifact-cache-lb"
+  }
+}
+
+resource "aws_elb" "external_artifact_cache_lb" {
+  name = "external-artifact-cache-lb"
+  security_groups = ["${aws_security_group.external_artifact_cache_http_lb.id}"]
+  subnets = [
+    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
+  ]
+  cross_zone_load_balancing = true
+  connection_draining = true
+  connection_draining_timeout = 30
+
+  instances = [
+    "${aws_instance.artifact_cache_server_1.id}",
+    "${aws_instance.artifact_cache_server_2.id}",
+    "${aws_instance.artifact_cache_server_3.id}",
+    "${aws_instance.artifact_cache_server_4.id}"
+  ]
+
+  listener {
+    lb_port = 80
+    lb_protocol = "http"
+    instance_port = 80
+    instance_protocol = "http"
+  }
+
+  listener {
+    lb_port = 443
+    lb_protocol = "https"
+    instance_port = 80
+    instance_protocol = "http"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "TCP:80"
+    interval = 5
+  }
+
+  tags {
+    Name = "external-artifact-cache-lb"
   }
 }
 
