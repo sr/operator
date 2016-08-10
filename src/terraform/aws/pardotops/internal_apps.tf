@@ -7,6 +7,12 @@ resource "aws_vpc" "internal_apps" {
   }
 }
 
+resource "aws_route53_zone" "internal_apps_aws_pardot_com_hosted_zone" {
+  name = "aws.pardot.com"
+  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.internal_apps.id} Only. Hosted solely in AWS."
+  vpc_id = "${aws_vpc.appdev.id}"
+}
+
 resource "aws_subnet" "internal_apps_us_east_1a" {
   vpc_id = "${aws_vpc.internal_apps.id}"
   availability_zone = "us-east-1a"
@@ -325,4 +331,21 @@ resource "aws_instance" "internal_apps_bastion_2" {
 resource "aws_eip" "internal_apps_bastion_2" {
   vpc = true
   instance = "${aws_instance.internal_apps_bastion_2.id}"
+}
+
+
+resource "aws_route53_record" "internal_apps_bastion1-1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-bastion1-1-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_bastion.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_bastion1-2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-bastion1-2-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_bastion_2.private_ip}"]
+  type = "A"
+  ttl = "900"
 }

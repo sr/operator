@@ -315,9 +315,3 @@ resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" 
   vpc_id = "${aws_vpc.appdev.id}"
 }
 
-resource "aws_vpc_peering_connection" "appdev_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "${var.pardotops_account_number}"
-  peer_vpc_id = "${aws_vpc.artifactory_integration.id}"
-  vpc_id = "${aws_vpc.appdev.id}"
-}
-

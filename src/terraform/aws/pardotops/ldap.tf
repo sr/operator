@@ -137,11 +137,6 @@ resource "aws_instance" "internal_apps_ldap_master" {
   }
 }
 
-resource "aws_eip" "internal_apps_ldap_master" {
-  vpc = true
-  instance = "${aws_instance.internal_apps_ldap_master.id}"
-}
-
 resource "aws_instance" "internal_apps_ldap_replica" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
@@ -161,7 +156,28 @@ resource "aws_instance" "internal_apps_ldap_replica" {
   }
 }
 
+resource "aws_eip" "internal_apps_ldap_master" {
+  vpc = true
+  instance = "${aws_instance.internal_apps_ldap_master.id}"
+}
+
 resource "aws_eip" "internal_apps_ldap_replica" {
   vpc = true
   instance = "${aws_instance.internal_apps_ldap_replica.id}"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-2-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  type = "A"
+  ttl = "900"
 }
