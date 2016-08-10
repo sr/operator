@@ -41,6 +41,16 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_nat_gw.public_ip}/32"
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
