@@ -621,14 +621,6 @@ resource "aws_route53_record" "gwaulixbpldbwxydib3a6hqpss6xka7b_domainkey_aws_pa
   ttl = "900"
 }
 
-resource "aws_route53_record" "gwaulixbpldbwxydib3a6hqpss6xka7b_domainkey_aws_pardot_com_CNAMErecord" {
-  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
-  name = "gwaulixbpldbwxydib3a6hqpss6xka7b._domainkey.aws.pardot.com"
-  records = ["gwaulixbpldbwxydib3a6hqpss6xka7b.dkim.amazonses.com."]
-  type = "TXT"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "if6ggapiro7g2s7udchcwj3hb2uujydn_domainkey_aws_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "if6ggapiro7g2s7udchcwj3hb2uujydn._domainkey.aws.pardot.com"
