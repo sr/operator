@@ -29,30 +29,14 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   egress {
