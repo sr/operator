@@ -596,3 +596,45 @@ resource "aws_route53_record" "dev_pardot_com_TXTrecord" {
   type = "TXT"
   ttl = "900"
 }
+
+resource "aws_route53_record" "_amazonses_aws_pardot_com_TXTrecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "_amazonses.aws.pardot.com"
+  records = ["9KokSQhsvoTH6kRsi7ZJeWvq1lqa6iPjZQjd+m9om9I="]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "4vvsycwinukyxljj75npvs4n72ks43x4_domainkey_aws_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "4vvsycwinukyxljj75npvs4n72ks43x4._domainkey.aws.pardot.com"
+  records = ["4vvsycwinukyxljj75npvs4n72ks43x4.dkim.amazonses.com."]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "gwaulixbpldbwxydib3a6hqpss6xka7b_domainkey_aws_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "gwaulixbpldbwxydib3a6hqpss6xka7b._domainkey.aws.pardot.com"
+  records = ["gwaulixbpldbwxydib3a6hqpss6xka7b.dkim.amazonses.com."]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "gwaulixbpldbwxydib3a6hqpss6xka7b_domainkey_aws_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "gwaulixbpldbwxydib3a6hqpss6xka7b._domainkey.aws.pardot.com"
+  records = ["gwaulixbpldbwxydib3a6hqpss6xka7b.dkim.amazonses.com."]
+  type = "TXT"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "if6ggapiro7g2s7udchcwj3hb2uujydn_domainkey_aws_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "if6ggapiro7g2s7udchcwj3hb2uujydn._domainkey.aws.pardot.com"
+  records = ["if6ggapiro7g2s7udchcwj3hb2uujydn.dkim.amazonses.com."]
+  type = "TXT"
+  ttl = "900"
+}
+
+
