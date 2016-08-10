@@ -10,7 +10,7 @@ resource "aws_vpc" "internal_apps" {
 resource "aws_route53_zone" "internal_apps_aws_pardot_com_hosted_zone" {
   name = "aws.pardot.com"
   comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.internal_apps.id} Only. Hosted solely in AWS."
-  vpc_id = "${aws_vpc.appdev.id}"
+  vpc_id = "${aws_vpc.internal_apps.id}"
 }
 
 resource "aws_subnet" "internal_apps_us_east_1a" {
