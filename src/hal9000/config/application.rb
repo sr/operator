@@ -108,7 +108,7 @@ module HAL9000
           next
         end
 
-        require file.sub(".rb", "") #"app/handlers/#{file.basename.sub(".rb", "")}"
+        require file.sub(".rb", "")
       end
 
       ApplicationHandler.subclasses.each do |handler|
