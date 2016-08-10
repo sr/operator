@@ -42,7 +42,7 @@ resource "aws_route53_record" "artifactory_dev_pardot_com_CNAMErecord" {
   name = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_elb.external_artifact_cache_lb.dns_name}"]
   type = "CNAME"
-  ttl = "60"
+  ttl = "900"
 }
 
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
