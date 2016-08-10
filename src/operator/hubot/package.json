@@ -7,7 +7,6 @@
   "dependencies": {
     "grpc": "=0.15.0",
     "hubot": "=2.19.0",
-    "hubot-help": "=0.2.0",
     "hubot-hipchat": "git+https://github.com/alindeman/hubot-hipchat.git#92c766e01ad16382d1bc5c5be84e39cdd991297b"
   },
   "engines": {
