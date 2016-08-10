@@ -27,8 +27,7 @@ module.exports = (robot) ->
         return
 
       if medals.length > 0
-        medals = _.sortBy medals, (item) ->
-          return -1 * item.total_count
+        medals = _.chain(medals).sortBy((i) -> -i.bronze_count).sortBy((i) -> -i.silver_count).sortBy((i) -> -i.gold_count).sortBy((i) -> -i.total_count).value()
 
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
