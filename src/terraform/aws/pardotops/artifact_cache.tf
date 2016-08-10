@@ -1,6 +1,8 @@
 resource "aws_security_group" "artifact_cache_http_lb" {
   name = "artifact_cache_http_lb"
-  description = "Allow HTTP/HTTPS from Bamboo instances"
+  # description should read "Allow HTTP/HTTPS from Bamboo instances" but
+  # changing it after the fact requires rebuilding all dependencies
+  description = "Allow HTTP/HTTPS from SFDC VPN only"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
