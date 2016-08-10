@@ -26,6 +26,9 @@ module.exports = (robot) ->
         return
 
       if medals.length > 0
+        medals = medals.sort (arg1, arg2) ->
+            sortByMedalCount(arg1, arg2)
+            
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
         response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
@@ -47,7 +50,7 @@ module.exports = (robot) ->
           response += "</tr>"
           i++
         response += "</table>"
-        msg.hipchatNotify(response)
+        msg.hipchatNotify(response, {color: "gray"})
       else
         medal_report = medals
         if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
@@ -147,3 +150,21 @@ cleanUpCountry = (input) ->
     return 'great-britain'
   else
     return input.replace(/\s+/g, '-')
+
+sortByMedalCount = (arg1, arg2) ->
+  if arg1.total_count > arg2.total_count
+    -1
+  else if arg1.total_count is arg2.total_count
+    if arg1.gold_count > arg2.gold_count
+      -1
+    else if arg1.gold_count is arg2.gold_count
+      if arg1.country_name < arg2.country_name
+        -1
+      else if arg1.country_name is arg2.country_name
+        0
+      else
+        -1
+    else
+      1
+  else
+    1
