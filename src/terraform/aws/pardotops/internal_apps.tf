@@ -149,37 +149,14 @@ resource "aws_security_group" "internal_apps_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-      "50.22.140.200/32"    # tools-s1.dev
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   egress {
@@ -199,27 +176,14 @@ resource "aws_security_group" "internal_apps_dc_only_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${var.sfdc_proxyout_cidr_blocks}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "208.43.203.134/32",  # email-d1 (replication check)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${var.sfdc_proxyout_cidr_blocks}"
   }
 
   egress {
@@ -266,13 +230,7 @@ resource "aws_security_group" "internal_apps_bastion" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27"    # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
