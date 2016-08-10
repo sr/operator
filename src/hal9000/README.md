@@ -41,9 +41,6 @@ Hal: help - Lists help information for terms and command the robot will respond 
 ### Tests
 
 ```bash
-devenv compose run app make test
-
-# Or a specific plugin test
 devenv compose run app script/test
 ```
 
@@ -53,5 +50,5 @@ Familiarize yourself with the [Plugin Authoring](http://docs.lita.io/plugin-auth
 
 #### New Handler
 
-Create the a new file under the `lib/pardot/hal` directory and checkout one of
-the existing handlers for an example.
+Checkout one the existing handlers under the `app/handlers` directory for
+examples.

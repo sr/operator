@@ -1,7 +1,7 @@
 require "spec_helper"
-require_relative "helpers/zabbix_spec_helpers"
+require_relative "../helpers/zabbix_spec_helpers"
 
-describe Pardot::HAL::ZabbixHandler, lita_handler: true do
+describe ZabbixHandler, lita_handler: true do
   include ZabbixSpecHelpers
 
   def handler_config

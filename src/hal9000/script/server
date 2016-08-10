@@ -8,4 +8,4 @@ export PATH
 RUBYLIB="$(pwd)/lib:${RUBYLIB:-""}"
 export RUBYLIB
 
-bundler exec hal9000
+bin/hal9000

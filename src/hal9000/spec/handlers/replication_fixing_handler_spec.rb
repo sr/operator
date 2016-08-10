@@ -1,7 +1,7 @@
 require "spec_helper"
 require "uri"
 
-describe Pardot::HAL::ReplicationFixingHandler, lita_handler: true do
+describe ReplicationFixingHandler, lita_handler: true do
   before do
     registry.config.handlers.replication_fixing_handler.pager = "test"
   end
