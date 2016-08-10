@@ -552,10 +552,6 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     cidr_block = "172.30.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
   }
-  route {
-    cidr_block = "172.26.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
-  }
 }
 
 resource "aws_route" "artifactory_integration_to_pardot_ci" {

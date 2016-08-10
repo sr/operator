@@ -119,10 +119,6 @@ resource "aws_route_table" "appdev_route_dmz" {
     gateway_id = "${aws_internet_gateway.appdev_internet_gw.id}"
   }
   route {
-    cidr_block = "172.28.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
-  }
-  route {
     cidr_block = "172.31.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
   }
@@ -131,12 +127,6 @@ resource "aws_route_table" "appdev_route_dmz" {
 resource "aws_route" "appdev_and_pardot_atlassian_route" {
   destination_cidr_block = "172.31.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
-  route_table_id = "${aws_vpc.appdev.main_route_table_id}"
-}
-
-resource "aws_route" "appdev_and_artifactory_integration_route" {
-  destination_cidr_block = "172.28.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
   route_table_id = "${aws_vpc.appdev.main_route_table_id}"
 }
 
