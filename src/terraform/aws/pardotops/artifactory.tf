@@ -73,14 +73,7 @@ resource "aws_security_group" "artifactory_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "174.37.191.2/32"     # proxy.dev
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
     self = "true"
   }
 
@@ -88,15 +81,7 @@ resource "aws_security_group" "artifactory_http_lb" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "174.37.191.2/32",    # proxy.dev
-      "50.22.140.200/32"    # tools-s1.dev
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {

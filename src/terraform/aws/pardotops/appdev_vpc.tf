@@ -221,26 +221,14 @@ resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
@@ -260,13 +248,7 @@ resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27"    # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
