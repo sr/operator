@@ -28,17 +28,18 @@ module.exports = (robot) ->
       if medals.length > 0
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
-        response = "<h3 style=\"text-align:center\">Medal Standings (as of #{date})</h3><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
+        response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
         while i < 5
           medal_report = medals[i]
           country_response = ''
+          response += "<td>#{medal_report.country_name}"
           if medal_report.id == 'united-states'
-            country_response = '(murica) '
+            country_response = ' <img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/murica-1447693257@2x.png" width="30" height="30">'
           else if medal_report.id == 'great-britain'
-            country_response = '(brexitchatty) '
+            country_response = ' <img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/brexitchatty-1467219597@2x.png" width="30" height="30">'
           else
             country_response = ''
-          response += "<td>#{country_response}#{medal_report.country_name}</td>"
+          response += "#{country_response}</td>"
           response += "<td>#{medal_report.total_count}</td>"
           response += "<td>#{medal_report.gold_count}</td>"
           response += "<td>#{medal_report.silver_count}</td>"
