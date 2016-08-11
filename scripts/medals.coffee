@@ -3,22 +3,34 @@
 #
 #
 # Commands
-#   hubot medals - returns the top 3 medal-winning nations
+#   hubot medals - returns the top 5 medal-winning nations
 #   hubot medals (country) - returns the medal count of a specific country
+#   hubot medals top (num) - returns as many of the top medal-winning nations as specified by num
+#   hubot medals all - returns all medal-winning nations
 #
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
 
 moment = require('moment')
+_ = require('underscore')
 medals_api_url = 'http://www.medalbot.com/api/v1/medals'
 
 module.exports = (robot) ->
-  robot.respond /medals(?:\s+(.*))?$/i, (msg) ->
+  robot.respond /medals(?:\s+(?:(?:top\s+(\d+)\s*)|(all\s*)|(.*)))?$/, (msg) ->
     country = ''
-    if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
-      country = msg.match[1].toLowerCase()
-
-    country = cleanUpCountry(country)
+    topCount = 5
+    if msg.match[1]
+      if msg.match[1] <= 0
+        return
+      else
+        topCount = msg.match[1]
+    else if msg.match[2]
+      topCount = 100000 # this will automagically be converted to all medal-winning countries below
+    else if msg.match[3]
+      country = msg.match[3].toLowerCase().trim()
+      country = cleanUpCountry(country)
+      if country.indexOf('top-') != -1
+        return
 
     getMedals(msg, country, (err, medals)->
       if err
@@ -26,22 +38,33 @@ module.exports = (robot) ->
         return
 
       if medals.length > 0
+        medals = _.chain(medals).sortBy((i) -> -i.bronze_count).sortBy((i) -> -i.silver_count).sortBy((i) -> -i.gold_count).sortBy((i) -> -i.total_count).value()
+
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
-        medal_response = "Medal Standings (as of #{date})\n"
-        while i < 3
+        response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Place</th><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
+        if topCount > medals.length
+          topCount = medals.length
+
+        while i < topCount
           medal_report = medals[i]
           country_response = ''
+          response += "<td>#{(i + 1)}</td><td>#{medal_report.country_name}"
           if medal_report.id == 'united-states'
-            country_response = '(murica) '
+            country_response = ' <img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/murica-1447693257@2x.png" width="30" height="30">'
           else if medal_report.id == 'great-britain'
-            country_response = '(brexitchatty) '
+            country_response = ' <img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/brexitchatty-1467219597@2x.png" width="30" height="30">'
           else
             country_response = ''
-          country_response = country_response + medal_report.country_name
-          medal_response = medal_response + "#{medal_report.place}) #{country_response} (#{medal_report.total_count} total - #{medal_report.gold_count} gold, #{medal_report.silver_count} silver, #{medal_report.bronze_count} bronze)\n"
+          response += "#{country_response}</td>"
+          response += "<td>#{medal_report.total_count}</td>"
+          response += "<td>#{medal_report.gold_count}</td>"
+          response += "<td>#{medal_report.silver_count}</td>"
+          response += "<td>#{medal_report.bronze_count}</td>"
+          response += "</tr>"
           i++
-        msg.send medal_response
+        response += "</table>"
+        msg.hipchatNotify(response, {color: "gray"})
       else
         medal_report = medals
         if medal_report.country_name != undefined && medal_report.country_name != 'undefined'
@@ -109,7 +132,7 @@ module.exports = (robot) ->
 getMedals = (msg, country, callback) ->
   url_combine = medals_api_url
   if country != ''
-    url_combine = url_combine + '/' + country
+    url_combine += ('/' + country)
 
   msg.http(url_combine)
        .header('Content-Type', 'application/json')
