@@ -255,10 +255,9 @@ resource "aws_elb" "appdev_app_elb" {
   }
 }
 
-#TODO: rename/copy this from appdev.dev.pardot.com to app.dev.pardot.com
-resource "aws_route53_record" "appdev_dev_pardot_com_CNAMErecord" {
+resource "aws_route53_record" "app_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "appdev.${aws_route53_zone.dev_pardot_com.name}"
+  name = "app.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_elb.appdev_app_elb.dns_name}"]
   type = "CNAME"
   ttl = "900"

@@ -14,4 +14,4 @@ export OPERATORD_ADDRESS
 HUBOT_HELP_REPLY_IN_PRIVATE=1
 export HUBOT_HELP_REPLY_IN_PRIVATE
 
-exec node_modules/.bin/hubot --disable-httpd $@
+exec node_modules/.bin/hubot --disable-httpd "$@"
