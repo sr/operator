@@ -122,10 +122,9 @@ case "$project" in
 
         trap 'rm -f src/operator/operatord' EXIT
         cp /tmp/operatord_linux src/operator/operatord
-        make -C src/operator docker-build-hubot docker-build-operatord
+        make -C src/operator docker-build-operatord
 
         if [ -n "$CI" ]; then
-            docker-push "${project}hubot"
             docker-push "${project}d"
         fi
         ;;

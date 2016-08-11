@@ -11,9 +11,6 @@ OPERATORCTL ?= $(GOPATH)/bin/operatorctl
 OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
 OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
 
-HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/operator/hubot/scripts
-HUBOT_PROTO_DIR ?= $(GOPATH)/src/operator/hubot/proto
-
 SVC_DIR ?= $(GOPATH)/src/bread
 SVC_PROTOS ?= $(shell find $(SVC_DIR) -name '*.proto')
 
@@ -36,11 +33,7 @@ clean: operator-clean
 docker-build-operatord:
 	docker build -f Dockerfile.operatord -t operatord_app .
 
-docker-build-hubot:
-	docker build -f Dockerfile.hubot -t operatorhubot_app .
-
 .PHONY: \
 	build-operatord \
 	generate \
-	clean \
-	docker-build-hubot
+	clean
