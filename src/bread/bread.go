@@ -64,5 +64,5 @@ func NewHipchatAddonHandler(
 func PingHandler(w http.ResponseWriter, _ *http.Request) {
 	h := w.Header()
 	h.Set("Content-Type", "application/json")
-	w.Write([]byte(`{"ok": true}`))
+	_, _ = w.Write([]byte(`{"ok": true}`))
 }

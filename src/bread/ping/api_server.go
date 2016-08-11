@@ -13,7 +13,7 @@ type apiServer struct {
 }
 
 func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
-	s.chat.SendRoomNotification(
+	if err := s.chat.SendRoomNotification(
 		&bread.ChatRoomNotification{
 			RoomID:        bread.TestingRoom,
 			From:          "pinger.Ping",
@@ -21,7 +21,9 @@ func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingRe
 			MessageFormat: "text",
 			Message:       "pong",
 		},
-	)
+	); err != nil {
+		return nil, err
+	}
 	return &PingResponse{
 		Output: &operator.Output{
 			PlainText: "pong",

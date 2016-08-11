@@ -96,7 +96,7 @@ func (c *hipchatClient) SendRoomNotification(notif *ChatRoomNotification) error 
 	if err != nil {
 		return fmt.Errorf("hipchat request failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != 204 {
 		return fmt.Errorf("hipchat request failed with status %d", resp.StatusCode)
 	}
@@ -150,7 +150,7 @@ func newHipchatAddonHandler(
 func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" && req.URL.Path == h.url.Path {
 		req.Header.Set("Content-Type", "application/json")
-		w.Write([]byte(h.descriptor))
+		_, _ = w.Write([]byte(h.descriptor))
 		return
 	}
 	if req.Method == "POST" && req.URL.Path == h.url.Path {
@@ -163,7 +163,7 @@ func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 		decoder := json.NewDecoder(req.Body)
 		if err := decoder.Decode(&data); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 		// TODO(sr) Save the OAuth secret token somewhere safe.
