@@ -2,16 +2,27 @@ package operator_test
 
 import (
 	"bread/ping"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/sr/operator"
+	"github.com/sr/operator/hipchat"
 )
 
+var logger = &fakeLogger{}
+
 type fakeLogger struct{}
+
+type fakeAuthorizer struct{}
 
 func (l *fakeLogger) Info(_ proto.Message) {
 }
@@ -19,9 +30,14 @@ func (l *fakeLogger) Info(_ proto.Message) {
 func (l *fakeLogger) Error(_ proto.Message) {
 }
 
-func TestMessageDispatcher(t *testing.T) {
+func (a *fakeAuthorizer) Authorize(_ *operator.Request) error {
+	return nil
+}
+
+func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
+	defer server.Stop()
 	pingServer, err := breadping.NewAPIServer(&breadping.PingerConfig{})
 	if err != nil {
 		t.Fatal(err)
@@ -38,31 +54,65 @@ func TestMessageDispatcher(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	disp, err := operator.NewMessageDispatcher(
-		&fakeLogger{},
-		conn,
+	h, err := operator.NewHandler(
+		logger,
+		operator.NewInstrumenter(logger),
+		&fakeAuthorizer{},
+		operatorhipchat.NewRequestDecoder(),
 		"!",
-		func(conn *grpc.ClientConn, call string, m *operator.Message) (bool, error) {
+		conn,
+		func(conn *grpc.ClientConn, req *operator.Request) (bool, error) {
 			return true, nil
 		},
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
+	ts := httptest.NewServer(h)
 	for _, tt := range []struct {
-		text string
-		ok   bool
+		text   string
+		status int
 	}{
-		{"!ping ping", true},
-		{"!ping", false},
-		{"!", false},
-		{" !ping ping", false},
-		{"ping", false},
-		{"", false},
+		{"!ping ping", 200},
+		{"!ping", 404},
+		{"!", 404},
+		{" !ping ping", 404},
+		{"ping", 404},
+		{"", 404},
 	} {
-		ok, _ := disp.Dispatch(&operator.Message{Text: tt.text})
-		if ok != tt.ok {
-			t.Errorf("message `%s` expected ok %#v got %#v", tt.text, tt.ok, ok)
+		webhook := &operatorhipchat.Payload{
+			Event: "room_message",
+			Item: &operatorhipchat.Item{
+				Message: &operatorhipchat.Message{
+					Message: tt.text,
+					From: &operatorhipchat.User{
+						ID:          "1",
+						MentionName: "breadsignal",
+						Name:        "Breadman",
+					},
+				},
+				Room: &operatorhipchat.Room{
+					ID:   "1",
+					Name: "BREAD",
+				},
+			},
 		}
+		data, err := json.Marshal(webhook)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp, err := http.Post(ts.URL, "application/json", bytes.NewReader(data))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != tt.status {
+			t.Errorf("message `%s` expected status code %d, got %#v", tt.text, tt.status, resp.StatusCode)
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		fmt.Printf("%s", body)
 	}
 }
