@@ -8,14 +8,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-func invoker(conn *grpc.ClientConn, call string, msg *operator.Message) (bool, error) {
-	switch call {
-	case "ping ping":
+func invoker(conn *grpc.ClientConn, req *operator.Request) (bool, error) {
+	if req.Call.Service == "ping" && req.Call.Method == "ping" {
 		c := breadping.NewPingerClient(conn)
 		_, err := c.Ping(
 			context.Background(),
 			&breadping.PingRequest{
-				Source: msg.Source,
+				Source: req.Source,
 			},
 		)
 		if err != nil {

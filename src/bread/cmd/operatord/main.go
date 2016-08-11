@@ -60,21 +60,20 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		if err != nil {
 			return err
 		}
-		disp, err := operator.NewMessageDispatcher(logger, conn, prefix, invoker)
+		handler, err := operator.NewHandler(
+			logger,
+			operator.NewInstrumenter(logger),
+			bread.NewLDAPAuthorizer(),
+			operatorhipchat.NewRequestDecoder(),
+			prefix,
+			conn,
+			invoker,
+		)
 		if err != nil {
 			return err
 		}
 		mux := http.NewServeMux()
-		mux.Handle(
-			"/hipchat",
-			operator.NewHandler(
-				logger,
-				operator.NewInstrumenter(logger),
-				bread.NewLDAPAuthorizer(),
-				operatorhipchat.NewRequestDecoder(),
-				disp,
-			),
-		)
+		mux.Handle("/hipchat", handler)
 		go func() {
 			errC <- http.ListenAndServe(httpAddr, mux)
 		}()
