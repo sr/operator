@@ -2,6 +2,7 @@ package bread
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/sr/operator"
 	"google.golang.org/grpc"
@@ -25,4 +26,8 @@ func PingHandler(w http.ResponseWriter, _ *http.Request) {
 	h := w.Header()
 	h.Set("Content-Type", "application/json")
 	w.Write([]byte(`{"ok": true}`))
+}
+
+func NewHipchatAddonHandler(id string, url *url.URL) http.Handler {
+	return newHipchatAddonHandler(id, url)
 }
