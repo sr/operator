@@ -42,14 +42,14 @@ module.exports = (robot) ->
 
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
-        response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
+        response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Place</th><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
         if topCount > medals.length
           topCount = medals.length
 
         while i < topCount
           medal_report = medals[i]
           country_response = ''
-          response += "<td>#{medal_report.country_name}"
+          response += "<td>#{(i + 1)}</td><td>#{medal_report.country_name}"
           if medal_report.id == 'united-states'
             country_response = ' <img src="https://hipchat.dev.pardot.com/files/img/emoticons/1/murica-1447693257@2x.png" width="30" height="30">'
           else if medal_report.id == 'great-britain'
