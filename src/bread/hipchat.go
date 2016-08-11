@@ -28,6 +28,7 @@ const descriptorTmpl = `
 		},
 		"hipchatApiConsumer": {
 			"scopes": [
+				"send_message",
 				"send_notification"
 			]
 		}
