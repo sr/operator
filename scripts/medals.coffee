@@ -21,6 +21,8 @@ module.exports = (robot) ->
     if msg.match[2]
       country = msg.match[2].toLowerCase()
       country = cleanUpCountry(country)
+      if country.indexOf('top-') != -1
+        return
     else if msg.match[1]
       if msg.match[1] <= 0
         return
