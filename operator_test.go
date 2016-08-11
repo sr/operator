@@ -86,13 +86,13 @@ func TestHandler(t *testing.T) {
 				Message: &operatorhipchat.Message{
 					Message: tt.text,
 					From: &operatorhipchat.User{
-						ID:          "1",
+						ID:          1,
 						MentionName: "breadsignal",
 						Name:        "Breadman",
 					},
 				},
 				Room: &operatorhipchat.Room{
-					ID:   "1",
+					ID:   1,
 					Name: "BREAD",
 				},
 			},
