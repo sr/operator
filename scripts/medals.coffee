@@ -24,10 +24,6 @@ module.exports = (robot) ->
     else if msg.match[1]
       topCount = msg.match[1]
 
-#  if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
-#    country = msg.match[1].toLowerCase()
-#    country = cleanUpCountry(country)
-
     getMedals(msg, country, (err, medals)->
       if err
         msg.send err
