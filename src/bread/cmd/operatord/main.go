@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 
 	"google.golang.org/grpc"
@@ -20,8 +19,9 @@ var (
 	httpAddr string
 	prefix   string
 
-	hipchatAddonID  string
-	hipchatAddonURL string
+	hipchatAddonID    string
+	hipchatAddonURL   string
+	hipchatWebhookURL string
 )
 
 func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
@@ -31,6 +31,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	flags.StringVar(&prefix, "prefix", "!", "The prefix used to denote a command invocation in chat messages")
 	flags.StringVar(&hipchatAddonID, "hipchat-addon-id", "", "")
 	flags.StringVar(&hipchatAddonURL, "hipchat-addon-url", "", "")
+	flags.StringVar(&hipchatWebhookURL, "hipchat-webhook-url", "", "")
 	logger := operator.NewLogger()
 	server := bread.NewOperatorServer()
 	errC := make(chan error)
@@ -82,20 +83,22 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		mux.HandleFunc("/_ping", bread.PingHandler)
 		mux.Handle("/hipchat/webhook", handler)
 		if hipchatAddonURL != "" {
+			if hipchatWebhookURL == "" {
+				return fmt.Errorf("require flag missing: hipchat-webhook-url")
+			}
 			if hipchatAddonID == "" {
 				return fmt.Errorf("require flag missing: hipchat-addon-id")
 			}
-			u, err := url.Parse(hipchatAddonURL)
+			h, err := bread.NewHipchatAddonHandler(
+				hipchatAddonID,
+				hipchatAddonURL,
+				hipchatWebhookURL,
+				prefix,
+			)
 			if err != nil {
 				return err
 			}
-			mux.Handle(
-				"/hipchat/addon",
-				bread.NewHipchatAddonHandler(
-					hipchatAddonID,
-					u,
-				),
-			)
+			mux.Handle("/hipchat/addon", h)
 		}
 		go func() {
 			errC <- http.ListenAndServe(httpAddr, mux)

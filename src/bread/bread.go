@@ -44,8 +44,21 @@ func NewHipchatClient(token string) (ChatClient, error) {
 	), nil
 }
 
-func NewHipchatAddonHandler(id string, url *url.URL) http.Handler {
-	return newHipchatAddonHandler(id, url)
+func NewHipchatAddonHandler(
+	id string,
+	addonURL string,
+	webhookURL string,
+	prefix string,
+) (http.Handler, error) {
+	u, err := url.Parse(addonURL)
+	if err != nil {
+		return nil, err
+	}
+	wu, err := url.Parse(webhookURL)
+	if err != nil {
+		return nil, err
+	}
+	return newHipchatAddonHandler(id, u, wu, prefix)
 }
 
 func PingHandler(w http.ResponseWriter, _ *http.Request) {

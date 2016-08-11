@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/url"
 
@@ -11,21 +12,29 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-const descriptorTmpl = `
-{
-	"name": "Operator",
-	"key": "com.pardot.ops.operator.%s",
+var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
+	"name": "Operator {{.AddonID}}",
+	"key": "com.pardot.dev.operator.{{.AddonID}}",
 	"description": "ChatOps",
 	"links": {
 		"homepage": "https://git.dev.pardot.com/Pardot/bread",
-		"self": "%s"
+		"self": "{{.AddonURL}}"
 	},
 	"capabilities": {
 		"installable": {
 			"allowGlobal": true,
 			"allowRoom": false,
-			"callbackUrl": "%s"
+			"callbackUrl": "{{.AddonURL}}"
 		},
+		"webhook": [
+			{
+				"url": "{{.WebhookURL}}",
+				"pattern": "{{.Pattern}}",
+				"event": "room_message",
+				"authentication": "jwt",
+				"name": "Operator"
+			}
+		],
 		"hipchatApiConsumer": {
 			"scopes": [
 				"send_message",
@@ -33,8 +42,7 @@ const descriptorTmpl = `
 			]
 		}
 	}
-}
-`
+}`))
 
 var oauthScopes = []string{"send_message", "send_notification"}
 
@@ -115,16 +123,28 @@ type hipchatAddonHandler struct {
 	descriptor string
 }
 
-func newHipchatAddonHandler(id string, url *url.URL) *hipchatAddonHandler {
-	return &hipchatAddonHandler{
-		url,
-		fmt.Sprintf(
-			descriptorTmpl,
-			id,
-			url.String(),
-			url.String(),
-		),
+func newHipchatAddonHandler(
+	id string,
+	url *url.URL,
+	webhookURL *url.URL,
+	prefix string,
+) (*hipchatAddonHandler, error) {
+	data := struct {
+		AddonID    string
+		AddonURL   string
+		WebhookURL string
+		Pattern    string
+	}{
+		id,
+		url.String(),
+		webhookURL.String(),
+		"^" + prefix,
 	}
+	var buf bytes.Buffer
+	if err := descriptorTmpl.Execute(&buf, data); err != nil {
+		return nil, err
+	}
+	return &hipchatAddonHandler{url, buf.String()}, nil
 }
 
 func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
