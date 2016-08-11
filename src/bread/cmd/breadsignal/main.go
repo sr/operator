@@ -30,7 +30,11 @@ func run() error {
 	if *terraformVersion == "" {
 		return errors.New("required flag missing: terraform-version")
 	}
-	client, err := bread.NewChatClient()
+	token, ok := os.LookupEnv("HIPCHAT_TOKEN")
+	if !ok {
+		return errors.New("required environment variable missing: HIPCHAT_TOKEN")
+	}
+	client, err := bread.NewHipchatClient(token)
 	if err != nil {
 		return err
 	}
@@ -78,7 +82,7 @@ func run() error {
 			From:          "breadsignal",
 			Message:       message,
 			MessageFormat: "html",
-			RoomId:        room,
+			RoomID:        room,
 		},
 	)
 }
