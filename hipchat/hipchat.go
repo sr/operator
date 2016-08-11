@@ -3,6 +3,7 @@ package operatorhipchat
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/sr/operator"
 )
@@ -25,13 +26,13 @@ type Message struct {
 }
 
 type User struct {
-	ID          string `json:"id"`
+	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	MentionName string `json:"mention_name"`
 }
 
 type Room struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -55,7 +56,7 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 				Name: data.Item.Room.Name,
 			},
 			User: &operator.User{
-				Id:       data.Item.Message.From.ID,
+				Id:       strconv.Itoa(data.Item.Message.From.ID),
 				Login:    data.Item.Message.From.MentionName,
 				RealName: data.Item.Message.From.Name,
 				Email:    "",
