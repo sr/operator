@@ -3,8 +3,9 @@
 #
 #
 # Commands
-#   hubot medals - returns the top 3 medal-winning nations
+#   hubot medals - returns the top 5 medal-winning nations
 #   hubot medals (country) - returns the medal count of a specific country
+#   hubot medals top (num) - returns as many of the top medal-winning nations as specified by num
 #
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
