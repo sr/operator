@@ -1,6 +1,8 @@
 package bread
 
 import (
+	"net/http"
+
 	"github.com/sr/operator"
 	"google.golang.org/grpc"
 )
@@ -17,4 +19,10 @@ func NewOperatorServer() *grpc.Server {
 
 func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
+}
+
+func PingHandler(w http.ResponseWriter, _ *http.Request) {
+	h := w.Header()
+	h.Set("Content-Type", "application/json")
+	w.Write([]byte(`{"ok": true}`))
 }

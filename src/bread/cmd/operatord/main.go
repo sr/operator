@@ -73,6 +73,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			return err
 		}
 		mux := http.NewServeMux()
+		mux.HandleFunc("/_ping", bread.PingHandler)
 		mux.Handle("/hipchat", handler)
 		go func() {
 			errC <- http.ListenAndServe(httpAddr, mux)
