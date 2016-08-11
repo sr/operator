@@ -4,22 +4,42 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 )
+
+const descriptorTmpl = `
+{
+	"name": "Operator",
+	"key": "com.pardot.ops.operator.%s",
+	"description": "ChatOps",
+	"links": {
+		"homepage": "https://git.dev.pardot.com/Pardot/bread",
+		"self": "%s"
+	},
+	"capabilities": {
+		"installable": {
+			"allowGlobal": true,
+			"allowRoom": false,
+			"callbackUrl": "%s"
+		},
+		"hipchatApiConsumer": {
+			"scopes": [
+				"send_notification"
+			]
+		}
+	}
+}
+`
 
 var oauthScopes = []string{"send_message", "send_notification"}
 
 type hipchatClient struct {
 	client *http.Client
 	host   string
-}
-
-type hipchatTransport struct {
-	token string
 }
 
 func newHipchatClient(
@@ -31,9 +51,7 @@ func newHipchatClient(
 	var client *http.Client
 	if token != "" {
 		client = &http.Client{
-			Transport: hipchatTransport{
-				token: token,
-			},
+			Transport: tokenTransport{token},
 		}
 	} else {
 		// TODO(sr) Fetch this from datastore somehow
@@ -82,7 +100,54 @@ func (c *hipchatClient) doRequest(req *http.Request) (*http.Response, error) {
 	return c.client.Do(req)
 }
 
-func (t hipchatTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+type tokenTransport struct {
+	token string
+}
+
+func (t tokenTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+t.token)
 	return http.DefaultTransport.RoundTrip(req)
+}
+
+type hipchatAddonHandler struct {
+	url        *url.URL
+	descriptor string
+}
+
+func newHipchatAddonHandler(id string, url *url.URL) *hipchatAddonHandler {
+	return &hipchatAddonHandler{
+		url,
+		fmt.Sprintf(
+			descriptorTmpl,
+			id,
+			url.String(),
+			url.String(),
+		),
+	}
+}
+
+func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" && req.URL.Path == h.url.Path {
+		req.Header.Set("Content-Type", "application/json")
+		w.Write([]byte(h.descriptor))
+		return
+	}
+	if req.Method == "POST" && req.URL.Path == h.url.Path {
+		type payload struct {
+			URL         string `json:"capabilitiesUrl"`
+			OAuthID     string `json:"oauthId"`
+			OAuthSecret string `json:"oauthSecret"`
+		}
+		var data payload
+		decoder := json.NewDecoder(req.Body)
+		if err := decoder.Decode(&data); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		// TODO(sr) Save the OAuth secret token somewhere safe.
+		fmt.Printf("callback %#v\n", data)
+		return
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
