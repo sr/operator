@@ -47,7 +47,8 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_eip.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32"
     ]
   }
 
