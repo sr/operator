@@ -14,12 +14,18 @@ _ = require('underscore')
 medals_api_url = 'http://www.medalbot.com/api/v1/medals'
 
 module.exports = (robot) ->
-  robot.respond /medals(?:\s+(.*))?$/i, (msg) ->
+  robot.respond /medals(?:\s+(?:(?:top\s+(\d+)\s*)|(.*)))?$/i, (msg) ->
     country = ''
-    if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
-      country = msg.match[1].toLowerCase()
+    topCount = 5
+    if msg.match[2]
+      country = msg.match[2].toLowerCase()
+      country = cleanUpCountry(country)
+    else if msg.match[1]
+      topCount = msg.match[1]
 
-    country = cleanUpCountry(country)
+#  if !(msg.match.length == 1 || msg.match[1] == null || msg.match[1] == '' || msg.match[1] == undefined)
+#    country = msg.match[1].toLowerCase()
+#    country = cleanUpCountry(country)
 
     getMedals(msg, country, (err, medals)->
       if err
@@ -32,7 +38,7 @@ module.exports = (robot) ->
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
         response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
-        while i < 5
+        while i < topCount
           medal_report = medals[i]
           country_response = ''
           response += "<td>#{medal_report.country_name}"
