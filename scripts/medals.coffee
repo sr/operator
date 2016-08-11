@@ -22,7 +22,10 @@ module.exports = (robot) ->
       country = msg.match[2].toLowerCase()
       country = cleanUpCountry(country)
     else if msg.match[1]
-      topCount = msg.match[1]
+      if msg.match[1] <= 0
+        return
+      else
+        topCount = msg.match[1]
 
     getMedals(msg, country, (err, medals)->
       if err
@@ -35,6 +38,9 @@ module.exports = (robot) ->
         i = 0
         date = moment().format('MMMM Do YYYY, h:mm:ss a')
         response = "<b>Medal Standings (as of #{date})</b><table><tr><th>Country</th><th>Total</th><th>Gold</th><th>Silver</th><th>Bronze</th></tr>"
+        if topCount > medals.length
+          topCount = medals.length
+
         while i < topCount
           medal_report = medals[i]
           country_response = ''
