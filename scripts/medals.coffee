@@ -6,6 +6,7 @@
 #   hubot medals - returns the top 5 medal-winning nations
 #   hubot medals (country) - returns the medal count of a specific country
 #   hubot medals top (num) - returns as many of the top medal-winning nations as specified by num
+#   hubot medals all - returns all medal-winning nations
 #
 # Author:
 #   Akshay Easwaran <aeaswaran@salesforce.com>
@@ -15,19 +16,21 @@ _ = require('underscore')
 medals_api_url = 'http://www.medalbot.com/api/v1/medals'
 
 module.exports = (robot) ->
-  robot.respond /medals(?:\s+(?:(?:top\s+(\d+)\s*)|(.*)))?$/i, (msg) ->
+  robot.respond /medals(?:\s+(?:(?:top\s+(\d+)\s*)|(all\s*)|(.*)))?$/, (msg) ->
     country = ''
     topCount = 5
-    if msg.match[2]
-      country = msg.match[2].toLowerCase()
-      country = cleanUpCountry(country)
-      if country.indexOf('top-') != -1
-        return
-    else if msg.match[1]
+    if msg.match[1]
       if msg.match[1] <= 0
         return
       else
         topCount = msg.match[1]
+    else if msg.match[2]
+      topCount = 100000 # this will automagically be converted to all medal-winning countries below
+    else if msg.match[3]
+      country = msg.match[3].toLowerCase().trim()
+      country = cleanUpCountry(country)
+      if country.indexOf('top-') != -1
+        return
 
     getMedals(msg, country, (err, medals)->
       if err
