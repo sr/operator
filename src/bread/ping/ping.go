@@ -1,5 +1,11 @@
 package breadping
 
+import "bread"
+
 func NewAPIServer(config *PingerConfig) (PingerServer, error) {
-	return &apiServer{config}, nil
+	c, err := bread.NewHipchatClient("")
+	if err != nil {
+		return nil, err
+	}
+	return &apiServer{config, c}, err
 }

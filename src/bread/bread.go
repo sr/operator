@@ -39,8 +39,8 @@ func NewHipchatClient(token string) (ChatClient, error) {
 		HipchatHost,
 		token,
 		// TODO(sr) Fetch this from a datastore somehow
-		"410641fd-7180-48aa-a7fb-a14df80b99f0",
-		"NyZtyBzKgxZKJHdS1h3Gcv8HbvvzoCvNS5JG8whu",
+		"65a847db-d0f5-46ed-b68d-5f28505a66c1",
+		"zIXhISzkqca4ylj16p6QqCBG2iOQCV05PJBcC4XW",
 	), nil
 }
 
