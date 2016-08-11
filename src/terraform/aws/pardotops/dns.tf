@@ -629,4 +629,12 @@ resource "aws_route53_record" "if6ggapiro7g2s7udchcwj3hb2uujydn_domainkey_aws_pa
   ttl = "900"
 }
 
+resource "aws_route53_record" "aws_amazon_come_spf_TXTrecord" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "spf-aws.pardot.com"
+  records = ["v=spf1 include:amazonses.com -all"]
+  type = "TXT"
+  ttl = "900"
+}
+
 
