@@ -35,7 +35,7 @@ type Room struct {
 	Name string `json:"name"`
 }
 
-func NewRequestDecoder() *requestDecoder {
+func NewRequestDecoder() operator.RequestDecoder {
 	return &requestDecoder{}
 }
 
