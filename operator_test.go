@@ -1,7 +1,6 @@
 package operator_test
 
 import (
-	"bread/ping"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -16,6 +15,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
+	"github.com/sr/operator/testing"
 )
 
 var logger = &fakeLogger{}
@@ -44,11 +44,14 @@ func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
 	defer server.Stop()
-	pingServer, err := breadping.NewAPIServer(&fakeChatClient{}, &breadping.PingerConfig{})
+	pingServer, err := operatortesting.NewAPIServer(
+		&fakeChatClient{},
+		&operatortesting.PingerConfig{},
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	breadping.RegisterPingerServer(server, pingServer)
+	operatortesting.RegisterPingerServer(server, pingServer)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		t.Fatalf("Failed to listen: %v", err)
