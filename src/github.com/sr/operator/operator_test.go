@@ -24,6 +24,8 @@ type fakeLogger struct{}
 
 type fakeAuthorizer struct{}
 
+type fakeChatClient struct{}
+
 func (l *fakeLogger) Info(_ proto.Message) {
 }
 
@@ -34,11 +36,15 @@ func (a *fakeAuthorizer) Authorize(_ *operator.Request) error {
 	return nil
 }
 
+func (c *fakeChatClient) SendRoomNotification(_ *operator.ChatRoomNotification) error {
+	return nil
+}
+
 func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
 	defer server.Stop()
-	pingServer, err := breadping.NewAPIServer(&breadping.PingerConfig{})
+	pingServer, err := breadping.NewAPIServer(&fakeChatClient{}, &breadping.PingerConfig{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +67,7 @@ func TestHandler(t *testing.T) {
 		operatorhipchat.NewRequestDecoder(),
 		"!",
 		conn,
-		func(conn *grpc.ClientConn, req *operator.Request) (bool, error) {
+		func(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 			return true, nil
 		},
 	)

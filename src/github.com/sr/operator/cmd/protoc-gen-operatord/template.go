@@ -22,6 +22,7 @@ import (
 )
 
 func buildOperatorServer(
+	chat operator.ChatClient,
 	server *grpc.Server,
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
@@ -51,7 +52,7 @@ func buildOperatorServer(
 	if len(errs["{{.Name}}"]) != 0 {
 		services["{{.Name}}"] = errors.New("required flag(s) missing: "+strings.Join(errs["{{.Name}}"], ", "))
 	} else {
-		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer({{.PackageName}}Config)
+		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer(chat, {{.PackageName}}Config)
 		if err != nil {
 			services["{{.Name}}"] = err
 		} else {
