@@ -2,12 +2,12 @@
 #   Searches brewerydb.com for beers and breweries
 #
 # Configuration:
-#   BREWERYDB_KEY
+#   HUBOT_BREWERYDB_KEY
 #
 # Commands:
-#   ! beer || beer me <beer name> - Finds information about beers
-#   ! brewery || brewery me <brewery name> - Finds information about breweries
-#   ! cheers || salud || salut || prost || <cheers in other languages>
+#   hubot beer || beer me <beer name> - Finds information about beers
+#   hubot brewery || brewery me <brewery name> - Finds information about breweries
+#   hubot cheers || salud || salut || prost || <cheers in other languages>
 #
 # Author:
 #   Thor
@@ -15,7 +15,7 @@
 module.exports = (robot) ->
 
   url="http://api.brewerydb.com/v2/search"
-  key = process.env.BREWERYDB_KEY
+  key = process.env.HUBOT_BREWERYDB_KEY
 
   robot.respond /beer(?:\s)(?:me)?(?:\s)?(.*)/i, (msg) ->
     beer_me msg, key, url
@@ -31,12 +31,16 @@ beer_me = (msg, key, url) ->
     msg.send "API key not set. Panic!"
     return
 
-  query = { q: msg.match[1].replace(" ", "+"), key: key, format: "json", type: "beer" }
+  query =
+    q: msg.match[1].replace(" ", "+"), 
+    key: key, 
+    format: "json", 
+    type: "beer"
 
   msg.http(url).query(query).get() (err, res, body) ->
     data = JSON.parse(body)['data']
 
-    if data
+    if data[0]?
       beer = data[0]
     else
       msg.send "Unfortunately, my knowledge still has limits."
@@ -60,11 +64,16 @@ brewery_me = (msg, key, url) ->
     msg.send "API key not set. Panic!"
     return
 
-  query = { q: msg.match[1].replace(" ", "+"), key: key, format: "json", type: "brewery" }
+  query = 
+    q: msg.match[1].replace(" ", "+"), 
+    key: key, 
+    format: "json", 
+    type: "brewery"
+
   msg.http(url).query(query).get() (err, res, body) ->
     data = JSON.parse(body)['data']
 
-    if data
+    if data[0]?
       brewery = data[0]
     else
       msg.send "Unfortunately, my knowledge still has limits."
