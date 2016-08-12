@@ -411,7 +411,8 @@ module.exports = (robot) ->
   robot.respond /casey$/i, (msg) ->
     tehcehseh = [
       'http://i.imgur.com/cuxU9VC.gif',
-      'http://i.imgur.com/kfyhTcm.gif'
+      'http://i.imgur.com/kfyhTcm.gif',
+      'https://hipchat.dev.pardot.com/files/1/162/i8CueeiNYtW8YqZ/CaseyPie.gif'
     ]
     msg.send msg.random tehcehseh
 
