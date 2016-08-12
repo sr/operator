@@ -12,6 +12,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sr/operator"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 {{range .Services}}
@@ -59,4 +61,33 @@ func buildOperatorServer(
 	}
 {{- end}}
 	return services, nil
-}`)
+}
+
+func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+{{- range .Services}}
+	{{- $serviceName := .PackageName }}
+	{{- $serviceFullName := .FullName }}
+	if req.Call.Service == "{{.PackageName}}" {
+	{{- range .Methods }}
+		if req.Call.Method == "{{.Name}}" {
+			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+			_, err := client.{{.Name}}(
+				context.Background(),
+				&{{$serviceName}}.{{.Input}}{
+					Source: req.Source,
+					{{- range .Arguments}}
+					{{camelCase .Name}}: args["{{.Name}}"],
+					{{- end}}
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+	{{- end }}
+	}
+	return false, nil
+{{- end }}
+}
+`)

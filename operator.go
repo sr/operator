@@ -31,7 +31,7 @@ type RequestDecoder interface {
 	Decode(*http.Request) (*Message, error)
 }
 
-type Invoker func(conn *grpc.ClientConn, req *Request) (bool, error)
+type Invoker func(conn *grpc.ClientConn, req *Request, args map[string]string) (bool, error)
 
 type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
 
