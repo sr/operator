@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "operator.proto";
+
+package testing;
+
+option go_package = "operatortesting";
+
+service Pinger {
+	option (operator.name) = "ping";
+
+	rpc Ping(PingRequest) returns (PingResponse);
+}
+
+message PingerConfig {
+}
+
+message PingRequest {
+	operator.Source source = 1;
+}
+
+message PingResponse {
+	operator.Output output = 1;
+}
