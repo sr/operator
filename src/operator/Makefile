@@ -12,7 +12,6 @@ OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
 OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
 
 SVC_DIR ?= $(GOPATH)/src/bread
-SVC_PROTOS ?= $(shell find $(SVC_DIR) -name '*.proto')
 
 -include $(GOPATH)/src/github.com/sr/operator/operator.mk
 
@@ -22,13 +21,9 @@ build-operatord-linux: $(TMPDIR)
 			-o $(TMPDIR)/operatord_linux bread/cmd/operatord
 
 generate: operator-generate
-	cp $(SVC_PROTOS) $(OPERATOR_PROTO) $(HUBOT_PROTO_DIR)
 
 clean: operator-clean
-	rm -f \
-		$(HUBOT_PROTO_DIR)/*.proto \
-		$(HUBOT_SCRIPTS_DIR)/*-gen.js \
-		$(OPERATORD_LINUX)
+	rm -f $(OPERATORD_LINUX)
 
 docker-build-operatord:
 	docker build -f Dockerfile.operatord -t operatord_app .
