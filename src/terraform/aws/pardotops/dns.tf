@@ -617,7 +617,7 @@ resource "aws_route53_record" "gwaulixbpldbwxydib3a6hqpss6xka7b_domainkey_aws_pa
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "gwaulixbpldbwxydib3a6hqpss6xka7b._domainkey.aws.pardot.com"
   records = ["gwaulixbpldbwxydib3a6hqpss6xka7b.dkim.amazonses.com."]
-  type = "TXT"
+  type = "CNAME"
   ttl = "900"
 }
 
@@ -625,7 +625,7 @@ resource "aws_route53_record" "if6ggapiro7g2s7udchcwj3hb2uujydn_domainkey_aws_pa
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "if6ggapiro7g2s7udchcwj3hb2uujydn._domainkey.aws.pardot.com"
   records = ["if6ggapiro7g2s7udchcwj3hb2uujydn.dkim.amazonses.com."]
-  type = "TXT"
+  type = "CNAME"
   ttl = "900"
 }
 
@@ -633,7 +633,7 @@ resource "aws_route53_record" "aws_amazon_come_spf_TXTrecord" {
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "aws.pardot.com"
   records = ["v=spf1 include:amazonses.com -all"]
-  type = "TXT"
+  type = "CNAME"
   ttl = "900"
 }
 
