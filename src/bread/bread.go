@@ -1,11 +1,11 @@
 package bread
 
 import (
+	"database/sql"
 	"net/http"
 	"net/url"
 
 	"github.com/sr/operator"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -26,28 +26,27 @@ type ChatRoomNotification struct {
 	RoomID        int    `json:"-"`
 }
 
-func NewOperatorServer() *grpc.Server {
-	return grpc.NewServer()
+func NewLogger() operator.Logger {
+	return operator.NewLogger()
 }
 
 func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClient(token string) (ChatClient, error) {
-	return newHipchatClient(
-		HipchatHost,
-		token,
-		// TODO(sr) Fetch this from a datastore somehow
-		"65a847db-d0f5-46ed-b68d-5f28505a66c1",
-		"zIXhISzkqca4ylj16p6QqCBG2iOQCV05PJBcC4XW",
-	), nil
+func NewHipchatClientFromToken(token string) (ChatClient, error) {
+	return newHipchatClientFromToken(token, HipchatHost), nil
+}
+
+func NewHipchatClientFromDatabase(db *sql.DB, addon_id string) (ChatClient, error) {
+	return newHipchatClientFromDatabase(db, HipchatHost, addon_id)
 }
 
 func NewHipchatAddonHandler(
 	id string,
 	addonURL string,
 	webhookURL string,
+	db *sql.DB,
 	prefix string,
 ) (http.Handler, error) {
 	u, err := url.Parse(addonURL)
@@ -58,11 +57,9 @@ func NewHipchatAddonHandler(
 	if err != nil {
 		return nil, err
 	}
-	return newHipchatAddonHandler(id, u, wu, prefix)
+	return newHipchatAddonHandler(id, u, wu, prefix, db)
 }
 
-func PingHandler(w http.ResponseWriter, _ *http.Request) {
-	h := w.Header()
-	h.Set("Content-Type", "application/json")
-	_, _ = w.Write([]byte(`{"ok": true}`))
+func NewPingHandler(db *sql.DB) http.Handler {
+	return newPingHandler(db)
 }

@@ -2,6 +2,7 @@ package bread
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -47,32 +48,38 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 var oauthScopes = []string{"send_message", "send_notification"}
 
 type hipchatClient struct {
-	client *http.Client
-	host   string
+	client   *http.Client
+	hostname string
 }
 
-func newHipchatClient(
-	host string,
-	token string,
-	oauthID string,
-	oauthSecret string,
-) *hipchatClient {
-	var client *http.Client
-	if token != "" {
-		client = &http.Client{
-			Transport: tokenTransport{token},
-		}
-	} else {
-		// TODO(sr) Fetch this from datastore somehow
-		config := &clientcredentials.Config{
-			ClientID:     oauthID,
-			ClientSecret: oauthSecret,
-			TokenURL:     fmt.Sprintf("%s/v2/oauth/token", host),
-			Scopes:       oauthScopes,
-		}
-		client = config.Client(context.Background())
+func newHipchatClientFromDatabase(db *sql.DB, hostname, addon_id string) (*hipchatClient, error) {
+	var (
+		oauthID     string
+		oauthSecret string
+	)
+	row := db.QueryRow(`
+		SELECT oauth_id, oauth_secret
+		FROM hipchat_addon_installs WHERE addon_id = ?`,
+		addon_id,
+	)
+	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
+		return nil, err
 	}
-	return &hipchatClient{client, host}
+	config := &clientcredentials.Config{
+		ClientID:     oauthID,
+		ClientSecret: oauthSecret,
+		TokenURL:     fmt.Sprintf("%s/v2/oauth/token", hostname),
+		Scopes:       oauthScopes,
+	}
+	// TODO(sr) Proper context
+	return &hipchatClient{config.Client(context.Background()), hostname}, nil
+}
+
+func newHipchatClientFromToken(token, hostname string) *hipchatClient {
+	return &hipchatClient{
+		&http.Client{Transport: tokenTransport{token}},
+		hostname,
+	}
 }
 
 func (c *hipchatClient) SendRoomNotification(notif *ChatRoomNotification) error {
@@ -84,7 +91,7 @@ func (c *hipchatClient) SendRoomNotification(notif *ChatRoomNotification) error 
 		"POST",
 		fmt.Sprintf(
 			"%s/v2/room/%d/notification",
-			c.host,
+			c.hostname,
 			notif.RoomID,
 		),
 		bytes.NewReader(data),
@@ -119,8 +126,10 @@ func (t tokenTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 type hipchatAddonHandler struct {
+	id         string
 	url        *url.URL
 	descriptor string
+	db         *sql.DB
 }
 
 func newHipchatAddonHandler(
@@ -128,6 +137,7 @@ func newHipchatAddonHandler(
 	url *url.URL,
 	webhookURL *url.URL,
 	prefix string,
+	db *sql.DB,
 ) (*hipchatAddonHandler, error) {
 	data := struct {
 		AddonID    string
@@ -144,7 +154,7 @@ func newHipchatAddonHandler(
 	if err := descriptorTmpl.Execute(&buf, data); err != nil {
 		return nil, err
 	}
-	return &hipchatAddonHandler{url, buf.String()}, nil
+	return &hipchatAddonHandler{id, url, buf.String(), db}, nil
 }
 
 func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -166,8 +176,26 @@ func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		// TODO(sr) Save the OAuth secret token somewhere safe.
-		fmt.Printf("callback %#v\n", data)
+		_, err := h.db.Exec(`
+			INSERT INTO hipchat_addon_installs (
+				created_at,
+				addon_id,
+				url,
+				oauth_id,
+				oauth_secret
+			)
+			VALUES (NOW(), ?, ?, ?, ?)`,
+			h.id,
+			data.URL,
+			data.OAuthID,
+			data.OAuthSecret,
+		)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			// TODO(sr) Log this but do not return it to the client
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
 		return
 	}
 	w.WriteHeader(http.StatusNotFound)

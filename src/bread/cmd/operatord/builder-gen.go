@@ -2,9 +2,9 @@
 package main
 
 import (
+	"bread"
 	"errors"
 	"flag"
-	"os"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -15,17 +15,15 @@ import (
 func buildOperatorServer(
 	server *grpc.Server,
 	flags *flag.FlagSet,
+	chatClient bread.ChatClient,
 ) (map[string]error, error) {
 	pingConfig := &ping.PingerConfig{}
 	services := make(map[string]error)
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return services, err
-	}
 	errs := make(map[string][]string)
 	if len(errs["ping"]) != 0 {
 		services["ping"] = errors.New("required flag(s) missing: " + strings.Join(errs["ping"], ", "))
 	} else {
-		pingServer, err := ping.NewAPIServer(pingConfig)
+		pingServer, err := ping.NewAPIServer(pingConfig, chatClient)
 		if err != nil {
 			services["ping"] = err
 		} else {
