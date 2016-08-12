@@ -1,7 +1,7 @@
 package breadping
 
-import "bread"
+import "github.com/sr/operator"
 
-func NewAPIServer(config *PingerConfig, chat bread.ChatClient) (PingerServer, error) {
+func NewAPIServer(chat operator.ChatClient, config *PingerConfig) (PingerServer, error) {
 	return &apiServer{config, chat}, nil
 }

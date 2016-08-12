@@ -32,9 +32,7 @@ type config struct {
 	webhookEnabled bool
 }
 
-type serverBuilder func(*grpc.Server, *flag.FlagSet, bread.ChatClient) (map[string]error, error)
-
-func run(builder serverBuilder, invoker operator.Invoker) error {
+func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	config := &config{}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "grpc-addr", ":9000", "Listen address of the operator gRPC server")
@@ -101,7 +99,7 @@ func run(builder serverBuilder, invoker operator.Invoker) error {
 				return err
 			}
 			msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-			services, err := builder(server, flags, chat)
+			services, err := builder(chat, server, flags)
 			if err != nil {
 				return err
 			}

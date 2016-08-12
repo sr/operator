@@ -7,6 +7,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/sr/operator"
 )
 
 func main() {
@@ -77,7 +79,7 @@ func run() error {
 		return nil
 	}
 	return client.SendRoomNotification(
-		&bread.ChatRoomNotification{
+		&operator.ChatRoomNotification{
 			Color:         color,
 			From:          "breadsignal",
 			Message:       message,

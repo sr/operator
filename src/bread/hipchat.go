@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/sr/operator"
+
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -52,7 +54,7 @@ type hipchatClient struct {
 	hostname string
 }
 
-func newHipchatClientFromDatabase(db *sql.DB, hostname, addon_id string) (*hipchatClient, error) {
+func newHipchatClientFromDatabase(db *sql.DB, hostname, addonID string) (*hipchatClient, error) {
 	var (
 		oauthID     string
 		oauthSecret string
@@ -60,7 +62,7 @@ func newHipchatClientFromDatabase(db *sql.DB, hostname, addon_id string) (*hipch
 	row := db.QueryRow(`
 		SELECT oauth_id, oauth_secret
 		FROM hipchat_addon_installs WHERE addon_id = ?`,
-		addon_id,
+		addonID,
 	)
 	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
 		return nil, err
@@ -82,7 +84,7 @@ func newHipchatClientFromToken(token, hostname string) *hipchatClient {
 	}
 }
 
-func (c *hipchatClient) SendRoomNotification(notif *ChatRoomNotification) error {
+func (c *hipchatClient) SendRoomNotification(notif *operator.ChatRoomNotification) error {
 	data, err := json.Marshal(notif)
 	if err != nil {
 		return err

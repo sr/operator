@@ -14,18 +14,6 @@ const (
 	PublicRoom  = 42  // Build & Automate
 )
 
-type ChatClient interface {
-	SendRoomNotification(*ChatRoomNotification) error
-}
-
-type ChatRoomNotification struct {
-	Color         string `json:"color"`
-	From          string `json:"from"`
-	Message       string `json:"message"`
-	MessageFormat string `json:"message_format"`
-	RoomID        int    `json:"-"`
-}
-
 func NewLogger() operator.Logger {
 	return operator.NewLogger()
 }
@@ -34,12 +22,12 @@ func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClientFromToken(token string) (ChatClient, error) {
+func NewHipchatClientFromToken(token string) (operator.ChatClient, error) {
 	return newHipchatClientFromToken(token, HipchatHost), nil
 }
 
-func NewHipchatClientFromDatabase(db *sql.DB, addon_id string) (ChatClient, error) {
-	return newHipchatClientFromDatabase(db, HipchatHost, addon_id)
+func NewHipchatClientFromDatabase(db *sql.DB, addonID string) (operator.ChatClient, error) {
+	return newHipchatClientFromDatabase(db, HipchatHost, addonID)
 }
 
 func NewHipchatAddonHandler(

@@ -9,12 +9,12 @@ import (
 
 type apiServer struct {
 	config *PingerConfig
-	chat   bread.ChatClient
+	chat   operator.ChatClient
 }
 
 func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
 	if err := s.chat.SendRoomNotification(
-		&bread.ChatRoomNotification{
+		&operator.ChatRoomNotification{
 			RoomID:        bread.TestingRoom,
 			From:          "pinger.Ping",
 			Color:         "green",
