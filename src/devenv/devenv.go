@@ -3,6 +3,8 @@ package devenv
 import (
 	"os"
 	"path"
+
+	"github.com/fsouza/go-dockerclient"
 )
 
 const (
@@ -40,4 +42,10 @@ func UnsatisfiedRequirements() []string {
 	}
 
 	return errors
+}
+
+func NewSSHForwarder(client *docker.Client) *SSHForwarder {
+	return &SSHForwarder{
+		client: client,
+	}
 }

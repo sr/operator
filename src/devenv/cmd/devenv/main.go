@@ -2,7 +2,6 @@ package main
 
 import (
 	"devenv"
-	"devenv/sshforwarder"
 	"fmt"
 	"os"
 	"syscall"
@@ -47,8 +46,9 @@ func run() error {
 			return err
 		}
 
-		if sshforwarder.IsStarted(client) {
-			authSock, err := sshforwarder.DockerSSHAuthSock()
+		forwarder := devenv.NewSSHForwarder(client)
+		if forwarder.IsStarted() {
+			authSock, err := forwarder.DockerSSHAuthSock()
 			if err != nil {
 				return err
 			}
@@ -57,7 +57,7 @@ func run() error {
 				return err
 			}
 
-			volume, err := sshforwarder.DockerVolume()
+			volume, err := forwarder.DockerVolume()
 			if err != nil {
 				return err
 			}
@@ -95,7 +95,8 @@ func run() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		if err := sshforwarder.Run(client, ctx); err != nil {
+		forwarder := devenv.NewSSHForwarder(client)
+		if err := forwarder.Run(ctx); err != nil {
 			return err
 		}
 	} else {

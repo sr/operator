@@ -1,8 +1,7 @@
-package sshforwarder
+package devenv
 
 import (
 	"bytes"
-	"devenv"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -24,12 +23,16 @@ const (
 	sshAuthSockPathFile      = "ssh-auth-sock.path"
 )
 
-func Run(client *docker.Client, ctx context.Context) error {
-	if err := ensureSSHForwarderStopped(client, ctx); err != nil {
+type SSHForwarder struct {
+	client *docker.Client
+}
+
+func (f *SSHForwarder) Run(ctx context.Context) error {
+	if err := f.ensureSSHForwarderStopped(ctx); err != nil {
 		return err
 	}
 
-	sshAgentPath, err := devenv.EnsurePersistentDirectoryCreated("ssh-agent", true)
+	sshAgentPath, err := EnsurePersistentDirectoryCreated("ssh-agent", true)
 	if err != nil {
 		return err
 	}
@@ -49,15 +52,15 @@ func Run(client *docker.Client, ctx context.Context) error {
 		Context: ctx,
 	}
 
-	if _, err := client.CreateContainer(opts); err != nil {
+	if _, err := f.client.CreateContainer(opts); err != nil {
 		return err
 	}
 
-	if err := client.StartContainer(sshForwarderContainerName, nil); err != nil {
+	if err := f.client.StartContainer(sshForwarderContainerName, nil); err != nil {
 		return err
 	}
 
-	container, err := client.InspectContainer(sshForwarderContainerName)
+	container, err := f.client.InspectContainer(sshForwarderContainerName)
 	if err != nil {
 		return err
 	}
@@ -105,8 +108,8 @@ func Run(client *docker.Client, ctx context.Context) error {
 	}
 }
 
-func IsStarted(client *docker.Client) bool {
-	container, err := client.InspectContainer(sshForwarderContainerName)
+func (f *SSHForwarder) IsStarted() bool {
+	container, err := f.client.InspectContainer(sshForwarderContainerName)
 	if err != nil {
 		return false
 	}
@@ -114,8 +117,8 @@ func IsStarted(client *docker.Client) bool {
 	return container.State.Running
 }
 
-func DockerVolume() (string, error) {
-	sshAgentPath, err := devenv.EnsurePersistentDirectoryCreated("ssh-agent", false)
+func (f *SSHForwarder) DockerVolume() (string, error) {
+	sshAgentPath, err := EnsurePersistentDirectoryCreated("ssh-agent", false)
 	if err != nil {
 		return "", err
 	}
@@ -123,8 +126,8 @@ func DockerVolume() (string, error) {
 	return fmt.Sprintf("%s:%s", sshAgentPath, containerVolumeMountPath), nil
 }
 
-func DockerSSHAuthSock() (string, error) {
-	sshAgentPath, err := devenv.EnsurePersistentDirectoryCreated("ssh-agent", false)
+func (f *SSHForwarder) DockerSSHAuthSock() (string, error) {
+	sshAgentPath, err := EnsurePersistentDirectoryCreated("ssh-agent", false)
 	if err != nil {
 		return "", err
 	}
@@ -140,13 +143,13 @@ func DockerSSHAuthSock() (string, error) {
 	), nil
 }
 
-func ensureSSHForwarderStopped(client *docker.Client, ctx context.Context) error {
+func (f *SSHForwarder) ensureSSHForwarderStopped(ctx context.Context) error {
 	opts := docker.RemoveContainerOptions{
 		ID:      sshForwarderContainerName,
 		Force:   true,
 		Context: ctx,
 	}
-	if err := client.RemoveContainer(opts); err != nil {
+	if err := f.client.RemoveContainer(opts); err != nil {
 		if _, ok := err.(*docker.NoSuchContainer); ok {
 			return nil
 		}
