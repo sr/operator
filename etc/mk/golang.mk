@@ -13,7 +13,7 @@ TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 all: deadleaves fmt lint vet errcheck test install interfacer unused
 
 install:
-	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
+	$(GO) install -v $(PACKAGES)
 
 test:
 	$(GO) test -race $(PACKAGES)
@@ -28,14 +28,14 @@ install-devenv:
 	$(GO) install -v $$($(GO) list devenv/...)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
+	@ out="$$($< 2>&1 | grep -Ev 'github.com/')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
 		fi
 
 fmt: $(GOFMT)
-	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
+	@ for file in $$(find src -name '*.go' | grep -Ev '^src/github.com/' | grep -v -E '\.pb\.go$$'); do \
 			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
@@ -88,7 +88,7 @@ $(INTERFACER):
 	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install -v github.com/dominikh/go-unused/cmd
+	$(GO) install -v github.com/dominikh/go-unused/cmd/unused
 
 .PHONY: \
 	all \
