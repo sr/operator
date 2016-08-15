@@ -4,6 +4,7 @@ import (
 	"devenv"
 	"fmt"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
@@ -81,6 +82,26 @@ func run() error {
 				return err
 			}
 		} else if args[0] == "compose" {
+			// If left unspecified by the user, set COMPOSE_FILE to include
+			// docker-compose.devenv.yml
+			if os.Getenv("COMPOSE_FILE") == "" {
+				cwd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+
+				composeFiles := make([]string, 0, 2)
+				if file := devenv.FindDockerComposeFile("docker-compose.yml", cwd); file != "" {
+					composeFiles = append(composeFiles, file)
+				}
+				if file := devenv.FindDockerComposeFile("docker-compose.devenv.yml", cwd); file != "" {
+					composeFiles = append(composeFiles, file)
+				}
+				if err = os.Setenv("COMPOSE_FILE", strings.Join(composeFiles, ":")); err != nil {
+					return err
+				}
+			}
+
 			if err := syscall.Exec(ComposeBinary, args, os.Environ()); err != nil {
 				return err
 			}
