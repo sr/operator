@@ -6,7 +6,6 @@ import (
 	"devenv/docker"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -42,7 +41,6 @@ func Run() error {
 		sshForwarderContainerURL,
 	)
 	if err != nil {
-		log.Printf("unable to start ssh-forwarder container: %s", output)
 		return err
 	}
 
@@ -51,7 +49,6 @@ func Run() error {
 		sshForwaderContainerName,
 	)
 	if err != nil {
-		log.Printf("unable to determine published port for ssh-forwarder: %s", output)
 		return err
 	}
 	sshPort := bytes.TrimSpace(output)
@@ -84,7 +81,6 @@ func Run() error {
 			}
 
 			if !startupError {
-				log.Printf("startup error, restarting ssh: %s", output)
 				return err
 			}
 		} else {
@@ -134,7 +130,6 @@ func ensureSSHForwarderStopped() error {
 		} else if bytes.Contains(output, []byte("is not running")) {
 			// Container is not running.
 		} else {
-			log.Printf("unable to kill ssh-forwarder container: %s", output)
 			return err
 		}
 	}
@@ -145,7 +140,6 @@ func ensureSSHForwarderStopped() error {
 			return nil
 		}
 
-		log.Printf("unable to rm ssh-forwarder container: %s", output)
 		return err
 	}
 
