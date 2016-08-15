@@ -2,12 +2,20 @@ package main
 
 import (
 	"devenv"
-	"devenv/compose"
-	"devenv/docker"
 	"devenv/sshforwarder"
 	"fmt"
 	"os"
 	"syscall"
+	"time"
+
+	"golang.org/x/net/context"
+
+	"github.com/fsouza/go-dockerclient"
+)
+
+const (
+	DockerBinary  = "/usr/local/bin/docker"
+	ComposeBinary = "/usr/local/bin/docker-compose"
 )
 
 func main() {
@@ -34,7 +42,12 @@ func run() error {
 			return fmt.Errorf("unresolved requirements")
 		}
 
-		if sshforwarder.IsStarted() {
+		client, err := docker.NewClientFromEnv()
+		if err != nil {
+			return err
+		}
+
+		if sshforwarder.IsStarted(client) {
 			authSock, err := sshforwarder.DockerSSHAuthSock()
 			if err != nil {
 				return err
@@ -64,16 +77,25 @@ func run() error {
 				args = newArgs
 			}
 
-			if err := syscall.Exec(docker.Binary, args, os.Environ()); err != nil {
+			if err := syscall.Exec(DockerBinary, args, os.Environ()); err != nil {
 				return err
 			}
 		} else if args[0] == "compose" {
-			if err := syscall.Exec(compose.Binary, args, os.Environ()); err != nil {
+			if err := syscall.Exec(ComposeBinary, args, os.Environ()); err != nil {
 				return err
 			}
 		}
 	} else if args[0] == "ssh-forwarder" {
-		if err := sshforwarder.Run(); err != nil {
+		client, err := docker.NewClientFromEnv()
+		if err != nil {
+			return err
+		}
+
+		// TODO: Make timeout configurable
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := sshforwarder.Run(client, ctx); err != nil {
 			return err
 		}
 	} else {

@@ -3,7 +3,6 @@ package sshforwarder
 import (
 	"bytes"
 	"devenv"
-	"devenv/docker"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -11,18 +10,22 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"golang.org/x/net/context"
+
+	"github.com/fsouza/go-dockerclient"
 )
 
 const (
-	sshForwaderContainerName = "devenv-ssh-forwarder"
-	sshForwarderContainerURL = "docker.dev.pardot.com/base/ssh-forwarder"
+	sshForwarderContainerName = "devenv-ssh-forwarder"
+	sshForwarderContainerURL  = "docker.dev.pardot.com/base/ssh-forwarder"
 
 	containerVolumeMountPath = "/tmp/ssh-agent"
 	sshAuthSockPathFile      = "ssh-auth-sock.path"
 )
 
-func Run() error {
-	if err := ensureSSHForwarderStopped(); err != nil {
+func Run(client *docker.Client, ctx context.Context) error {
+	if err := ensureSSHForwarderStopped(client, ctx); err != nil {
 		return err
 	}
 
@@ -31,36 +34,47 @@ func Run() error {
 		return err
 	}
 
-	home := os.Getenv("HOME")
-	output, err := docker.Run("-d",
-		"--security-opt", "seccomp:unconfined",
-		"-v", fmt.Sprintf("%s:/tmp", sshAgentPath),
-		"-v", fmt.Sprintf("%s/.ssh/id_rsa.pub:/root/.ssh/authorized_keys", home),
-		"--publish-all",
-		"--name", sshForwaderContainerName,
-		sshForwarderContainerURL,
-	)
+	opts := docker.CreateContainerOptions{
+		Name: sshForwarderContainerName,
+		Config: &docker.Config{
+			Image: sshForwarderContainerURL,
+		},
+		HostConfig: &docker.HostConfig{
+			Binds: []string{
+				fmt.Sprintf("%s/tmp:/tmp", sshAgentPath),
+				fmt.Sprintf("%s/.ssh/id_rsa.pub:/root/.ssh/authorized_keys:ro", os.Getenv("HOME")),
+			},
+			PublishAllPorts: true,
+		},
+		Context: ctx,
+	}
+
+	if _, err := client.CreateContainer(opts); err != nil {
+		return err
+	}
+
+	if err := client.StartContainer(sshForwarderContainerName, nil); err != nil {
+		return err
+	}
+
+	container, err := client.InspectContainer(sshForwarderContainerName)
 	if err != nil {
 		return err
 	}
 
-	output, err = docker.Inspect(
-		"--format={{index . \"NetworkSettings\" \"Ports\" \"22/tcp\" 0 \"HostPort\"}}",
-		sshForwaderContainerName,
-	)
-	if err != nil {
-		return err
+	sshPortMappings, ok := container.NetworkSettings.Ports["22/tcp"]
+	if !ok || len(sshPortMappings) <= 0 {
+		return fmt.Errorf("unable to find port mapping for 22/tcp")
 	}
-	sshPort := bytes.TrimSpace(output)
 
 	for {
 		cmd := exec.Command(
 			"ssh",
 			"-A",
-			"-p", string(sshPort),
+			"-p", sshPortMappings[0].HostPort,
 			"-o", "StrictHostKeyChecking=no",
 			"-o", "UserKnownHostsFile=/dev/null",
-			"-o", fmt.Sprintf("IdentityFile=%s/.ssh/id_rsa", home),
+			"-o", fmt.Sprintf("IdentityFile=%s/.ssh/id_rsa", os.Getenv("HOME")),
 			"root@127.0.0.1",
 			fmt.Sprintf("echo \"$SSH_AUTH_SOCK\" > /tmp/%s && sleep inf", sshAuthSockPathFile),
 		)
@@ -91,9 +105,13 @@ func Run() error {
 	}
 }
 
-func IsStarted() bool {
-	output, err := docker.Inspect("--format={{.State.Running}}", sshForwaderContainerName)
-	return err == nil && bytes.Contains(output, []byte("true"))
+func IsStarted(client *docker.Client) bool {
+	container, err := client.InspectContainer(sshForwarderContainerName)
+	if err != nil {
+		return false
+	}
+
+	return container.State.Running
 }
 
 func DockerVolume() (string, error) {
@@ -122,24 +140,16 @@ func DockerSSHAuthSock() (string, error) {
 	), nil
 }
 
-func ensureSSHForwarderStopped() error {
-	if output, err := docker.Kill(sshForwaderContainerName); err != nil {
-		if bytes.Contains(output, []byte("No such container")) {
-			// Nothing more to do
-			return nil
-		} else if bytes.Contains(output, []byte("is not running")) {
-			// Container is not running.
-		} else {
-			return err
-		}
+func ensureSSHForwarderStopped(client *docker.Client, ctx context.Context) error {
+	opts := docker.RemoveContainerOptions{
+		ID:      sshForwarderContainerName,
+		Force:   true,
+		Context: ctx,
 	}
-
-	if output, err := docker.Rm(sshForwaderContainerName); err != nil {
-		if bytes.Contains(output, []byte("No such container")) {
-			// Nothing more to do
+	if err := client.RemoveContainer(opts); err != nil {
+		if _, ok := err.(*docker.NoSuchContainer); ok {
 			return nil
 		}
-
 		return err
 	}
 

@@ -29,3 +29,15 @@ func EnsurePersistentDirectoryCreated(name string, clear bool) (string, error) {
 
 	return pathname, nil
 }
+
+// UnsatisfiedRequirements returns a list of any issues that might prevent
+// devenv from running properly. If no issues are present, an empty slice will be
+// returned.
+func UnsatisfiedRequirements() []string {
+	errors := []string{}
+	if _, err := os.Stat(path.Join(os.Getenv("HOME"), ".ssh", "id_rsa.pub")); err != nil {
+		errors = append(errors, "~/.ssh/id_rsa.pub is not available. Please generate an RSA key with a passphrase: ssh-keygen -t rsa -f ~/.ssh/id_rsa.pub")
+	}
+
+	return errors
+}
