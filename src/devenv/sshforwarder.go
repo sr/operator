@@ -44,7 +44,7 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		},
 		HostConfig: &docker.HostConfig{
 			Binds: []string{
-				fmt.Sprintf("%s/tmp:/tmp", sshAgentPath),
+				fmt.Sprintf("%s:/tmp", sshAgentPath),
 				fmt.Sprintf("%s/.ssh/id_rsa.pub:/root/.ssh/authorized_keys:ro", os.Getenv("HOME")),
 			},
 			PublishAllPorts: true,
