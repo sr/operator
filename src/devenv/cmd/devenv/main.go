@@ -6,43 +6,54 @@ import (
 	"devenv/docker"
 	"devenv/sshforwarder"
 	"fmt"
-	"log"
 	"os"
 	"syscall"
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintf(os.Stderr, "devenv: %v\n", err)
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+
+func run() error {
 	args := os.Args[1:]
 	if len(args) <= 0 || args[0] == "--help" || args[0] == "-h" {
-		usage(0)
+		usage()
 	} else if args[0] == "version" {
 		fmt.Printf("%s\n", devenv.Version)
 	} else if args[0] == "docker" || args[0] == "compose" {
 		errors := devenv.UnsatisfiedRequirements()
 		if len(errors) > 0 {
-			printErrorsAndExit(errors)
+			fmt.Fprintf(os.Stderr, "devenv cannot start until the following requirements are satisfied:\n")
+			for e := range errors {
+				fmt.Fprintf(os.Stderr, "  * %v\n", e)
+			}
+			return fmt.Errorf("unresolved requirements")
 		}
 
 		if sshforwarder.IsStarted() {
 			authSock, err := sshforwarder.DockerSSHAuthSock()
 			if err != nil {
-				log.Fatalf("error: could not determine docker ssh auth sock for ssh forwarder: %v", err)
+				return err
 			}
 
 			if err = os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
-				log.Fatalf("error: unable to set SSH_AUTH_SOCK environment variable: %v", err)
+				return err
 			}
 
 			volume, err := sshforwarder.DockerVolume()
 			if err != nil {
-				log.Fatalf("error: could not determine docker volume mount for ssh forwarder: %v", err)
+				return err
 			}
 
 			if err = os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
-				log.Fatalf("error: unable to set SSH_AUTH_VOLUME environment variable: %v", err)
+				return err
 			}
 		} else {
-			log.Printf("warning: the ssh-forwarder container is not started")
+			fmt.Fprintf(os.Stderr, "warning: the ssh-forwarder container is not started\n")
 		}
 
 		if args[0] == "docker" {
@@ -54,23 +65,25 @@ func main() {
 			}
 
 			if err := syscall.Exec(docker.Binary, args, os.Environ()); err != nil {
-				log.Fatalf("error: unable to start docker: %v", err)
+				return err
 			}
 		} else if args[0] == "compose" {
 			if err := syscall.Exec(compose.Binary, args, os.Environ()); err != nil {
-				log.Fatalf("error: unable to start docker-compose: %v", err)
+				return err
 			}
 		}
 	} else if args[0] == "ssh-forwarder" {
 		if err := sshforwarder.Run(); err != nil {
-			log.Fatalf("error starting forwarder: %v", err)
+			return err
 		}
 	} else {
-		usage(1)
+		usage()
+		return fmt.Errorf("unknown command: %v", args[0])
 	}
+	return nil
 }
 
-func usage(exitCode int) {
+func usage() {
 	fmt.Println("Usage: devenv COMMAND [arg...]")
 	fmt.Println("       devenv [--help]")
 	fmt.Println("")
@@ -84,13 +97,5 @@ func usage(exitCode int) {
 	fmt.Println("Examples:")
 	fmt.Println("  devenv docker ps")
 	fmt.Println("  devenv compose up")
-	os.Exit(exitCode)
-}
-
-func printErrorsAndExit(errors []string) {
-	fmt.Println("devenv cannot run until the following issues are resolved:")
-	for _, error := range errors {
-		fmt.Printf("  * %s\n", error)
-	}
-	os.Exit(1)
+	fmt.Println("")
 }
