@@ -7,7 +7,6 @@ ARG bower_version=1.7.2
 ARG parallel_version=20160322
 ARG phantomjs_version=2.1.1-1
 ARG libzookeeper_version=3.4.6-1.pardot
-ARG geoip_version=2016.01.27-1
 ARG git_version=2.7.4-1
 # https://git.dev.pardot.com/Pardot/chef/blob/master/cookbooks/pardot_php70/attributes/default.rb
 ARG php_version=7.0.8-1
@@ -28,7 +27,6 @@ RUN yum install -y epel-release && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/libzookeeper-devel-${libzookeeper_version}.${dist}.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/git-${git_version}.${dist}.x86_64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm" && \
-  yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/pardot-geoip-${geoip_version}.${dist}.noarch.rpm" && \
   yum clean all
 
 # Parallel
@@ -77,6 +75,10 @@ RUN mkdir -p ~/.ssh && \
   ssh-keyscan git.dev.pardot.com > ~/.ssh/known_hosts && \
   ssh-keyscan github.com >> ~/.ssh/known_hosts && \
   chmod 0600 ~/.ssh/known_hosts
+
+# GeoIP
+RUN mkdir -p /var/www && \
+  curl -L https://${artifactory_host}/artifactory/pd-tarball/bamboo-elastic-instance/geoip.tgz | tar -xzv -C /var/www
 
 # Make room for demo fixtures
 RUN mkdir -p /opt/pardot
