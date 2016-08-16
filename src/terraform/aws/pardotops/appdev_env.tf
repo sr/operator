@@ -211,6 +211,28 @@ resource "aws_security_group" "appdev_dbhost" {
   }
 }
 
+resource "aws_security_group" "appdev_proxyout_host" {
+  name = "appdev_proxyout_host"
+  description = "Allow Squid proxy traffic from appdev apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 3128
+    to_port = 3128
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_elb" "appdev_app_elb" {
   name = "${var.environment_appdev["env_name"]}-app-elb"
   security_groups = [
@@ -858,6 +880,7 @@ resource "aws_instance" "appdev_proxyout1" {
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
@@ -865,7 +888,8 @@ resource "aws_instance" "appdev_proxyout1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_proxyout_host.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
