@@ -54,33 +54,63 @@ type hipchatClient struct {
 	hostname string
 }
 
-func newHipchatClientFromDatabase(db *sql.DB, hostname, addonID string) (*hipchatClient, error) {
+type hipchatAccessTokenStore struct {
+	db      *sql.DB
+	addonID string
+}
+
+func (s *hipchatAccessTokenStore) Get() (*HipchatConfig, error) {
 	var (
 		oauthID     string
 		oauthSecret string
 	)
-	row := db.QueryRow(`
+	row := s.db.QueryRow(`
 		SELECT oauth_id, oauth_secret
 		FROM hipchat_addon_installs WHERE addon_id = ?`,
-		addonID,
+		s.addonID,
 	)
 	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
 		return nil, err
 	}
-	config := &clientcredentials.Config{
-		ClientID:     oauthID,
-		ClientSecret: oauthSecret,
-		TokenURL:     fmt.Sprintf("%s/v2/oauth/token", hostname),
+	return &HipchatConfig{
+		OAuthID:     oauthID,
+		OAuthSecret: oauthSecret,
+	}, nil
+}
+
+func (s *hipchatAccessTokenStore) Set(oauthID, oauthSecret string) error {
+	_, err := s.db.Exec(`
+		INSERT INTO hipchat_addon_installs (
+			created_at,
+			addon_id,
+			oauth_id,
+			oauth_secret
+		)
+		VALUES (NOW(), ?, ?, ?)`,
+		s.addonID,
+		oauthID,
+		oauthSecret,
+	)
+	return err
+}
+
+func newHipchatClient(config *HipchatConfig) *hipchatClient {
+	if config.Token != "" {
+		return &hipchatClient{
+			&http.Client{Transport: tokenTransport{config.Token}},
+			config.Hostname,
+		}
+	}
+	cfg := &clientcredentials.Config{
+		ClientID:     config.OAuthID,
+		ClientSecret: config.OAuthSecret,
+		TokenURL:     fmt.Sprintf("%s/v2/oauth/token", config.Hostname),
 		Scopes:       oauthScopes,
 	}
 	// TODO(sr) Proper context
-	return &hipchatClient{config.Client(context.Background()), hostname}, nil
-}
-
-func newHipchatClientFromToken(token, hostname string) *hipchatClient {
 	return &hipchatClient{
-		&http.Client{Transport: tokenTransport{token}},
-		hostname,
+		cfg.Client(context.Background()),
+		config.Hostname,
 	}
 }
 
@@ -128,10 +158,10 @@ func (t tokenTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 type hipchatAddonHandler struct {
-	id         string
-	url        *url.URL
-	descriptor string
-	db         *sql.DB
+	id   string
+	url  *url.URL
+	desc string
+	s    HipchatAccessTokenStore
 }
 
 func newHipchatAddonHandler(
@@ -139,7 +169,7 @@ func newHipchatAddonHandler(
 	url *url.URL,
 	webhookURL *url.URL,
 	prefix string,
-	db *sql.DB,
+	s HipchatAccessTokenStore,
 ) (*hipchatAddonHandler, error) {
 	data := struct {
 		AddonID    string
@@ -156,13 +186,13 @@ func newHipchatAddonHandler(
 	if err := descriptorTmpl.Execute(&buf, data); err != nil {
 		return nil, err
 	}
-	return &hipchatAddonHandler{id, url, buf.String(), db}, nil
+	return &hipchatAddonHandler{id, url, buf.String(), s}, nil
 }
 
 func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" && req.URL.Path == h.url.Path {
 		req.Header.Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(h.descriptor))
+		_, _ = w.Write([]byte(h.desc))
 		return
 	}
 	if req.Method == "POST" && req.URL.Path == h.url.Path {
@@ -178,21 +208,7 @@ func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		_, err := h.db.Exec(`
-			INSERT INTO hipchat_addon_installs (
-				created_at,
-				addon_id,
-				url,
-				oauth_id,
-				oauth_secret
-			)
-			VALUES (NOW(), ?, ?, ?, ?)`,
-			h.id,
-			data.URL,
-			data.OAuthID,
-			data.OAuthSecret,
-		)
-		if err != nil {
+		if err := h.s.Set(data.OAuthID, data.OAuthSecret); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			// TODO(sr) Log this but do not return it to the client
 			_, _ = w.Write([]byte(err.Error()))

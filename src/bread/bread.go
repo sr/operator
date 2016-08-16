@@ -14,6 +14,18 @@ const (
 	PublicRoom  = 42  // Build & Automate
 )
 
+type HipchatConfig struct {
+	Hostname    string
+	Token       string
+	OAuthID     string
+	OAuthSecret string
+}
+
+type HipchatAccessTokenStore interface {
+	Get() (*HipchatConfig, error)
+	Set(oauthID, oauthSecret string) error
+}
+
 func NewLogger() operator.Logger {
 	return operator.NewLogger()
 }
@@ -22,19 +34,19 @@ func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClientFromToken(token string) (operator.ChatClient, error) {
-	return newHipchatClientFromToken(token, HipchatHost), nil
+func NewHipchatClient(config *HipchatConfig) operator.ChatClient {
+	return newHipchatClient(config)
 }
 
-func NewHipchatClientFromDatabase(db *sql.DB, addonID string) (operator.ChatClient, error) {
-	return newHipchatClientFromDatabase(db, HipchatHost, addonID)
+func NewHipchatAccessTokenStore(db *sql.DB, addonID string) HipchatAccessTokenStore {
+	return &hipchatAccessTokenStore{db, addonID}
 }
 
 func NewHipchatAddonHandler(
 	id string,
 	addonURL string,
 	webhookURL string,
-	db *sql.DB,
+	s HipchatAccessTokenStore,
 	prefix string,
 ) (http.Handler, error) {
 	u, err := url.Parse(addonURL)
@@ -45,7 +57,7 @@ func NewHipchatAddonHandler(
 	if err != nil {
 		return nil, err
 	}
-	return newHipchatAddonHandler(id, u, wu, prefix, db)
+	return newHipchatAddonHandler(id, u, wu, prefix, s)
 }
 
 func NewPingHandler(db *sql.DB) http.Handler {

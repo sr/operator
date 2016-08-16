@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS hipchat_addon_installs (
 	id integer PRIMARY KEY NOT NULL,
-	url varchar(255) NOT NULL,
 	created_at datetime NOT NULL,
 	deleted_at datetime NULL,
 	oauth_id varchar(255) NOT NULL ,
