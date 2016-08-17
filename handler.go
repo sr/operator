@@ -51,6 +51,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	message, err := h.decoder.Decode(r)
 	if err != nil {
 		// TODO(sr) Log decoding error
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	matches := h.re.FindStringSubmatch(message.Text)
@@ -67,6 +68,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.authorizer.Authorize(req); err != nil {
 		// TODO(sr) Log unauthorized error
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	start := time.Now()
