@@ -119,7 +119,8 @@ case "$project" in
         ;;
     operator)
         # TODO(sr) Do this for all builds
-        export BREAD="$(pwd)"
+        BREAD="$(pwd)"
+        export BREAD
 
         docker run --rm -w /go -v "$(pwd):/go" \
             -e PACKAGES=bread/cmd/operatord \
