@@ -1,14 +1,28 @@
 package operatorhipchat
 
 import (
+	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
+
+	"golang.org/x/oauth2/jws"
 
 	"github.com/sr/operator"
 )
 
-type requestDecoder struct{}
+type OAuthClientStore interface {
+	GetByAddonID(string) (*OAuthClient, error)
+	GetByOAuthID(string) (*OAuthClient, error)
+	PutByAddonID(string, *OAuthClient) error
+}
+
+type OAuthClient struct {
+	ID     string
+	Secret string
+}
 
 type Payload struct {
 	Event string `json:"event"`
@@ -36,8 +50,12 @@ type Room struct {
 	Name string `json:"name"`
 }
 
-func NewRequestDecoder() operator.RequestDecoder {
-	return &requestDecoder{}
+type requestDecoder struct {
+	store OAuthClientStore
+}
+
+func NewRequestDecoder(store OAuthClientStore) operator.RequestDecoder {
+	return &requestDecoder{store}
 }
 
 func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
@@ -46,7 +64,29 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 	if err := decoder.Decode(&data); err != nil {
 		return nil, err
 	}
-	// TODO(sr) Verify JWT signature of the request
+	auth := req.Header.Get("Authorization")
+	if auth == "" {
+		return nil, errors.New("no Authorization header")
+	}
+	parts := strings.Split(auth, " ")
+	if len(parts) != 2 || parts[0] != "JWT" {
+		return nil, errors.New("invalid Authorization header")
+	}
+	claim, err := jws.Decode(parts[1])
+	if err != nil {
+		return nil, err
+	}
+	oauthClient, err := d.store.GetByOAuthID(claim.Iss)
+	if err != nil {
+		return nil, err
+	}
+	key, err := x509.ParsePKCS1PrivateKey([]byte(oauthClient.Secret))
+	if err != nil {
+		return nil, err
+	}
+	if err := jws.Verify(parts[1], &key.PublicKey); err != nil {
+		return nil, err
+	}
 	return &operator.Message{
 		Text: data.Item.Message.Message,
 		Source: &operator.Source{
