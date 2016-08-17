@@ -96,14 +96,19 @@ case "$project" in
         docker run --rm -w /go -v "$(pwd):/go" build/build \
             make -f etc/mk/golang.mk
 
-        test -n "$CI" && {
-          cd "bin"
-          tarball="$(tarball-build "jiracleaner" "devenv")"
+        docker run --rm -w /go -v "$(pwd):/go" \
+            -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
+            make -f etc/mk/golang.mk install-devenv
+
+        if [ -n "$CI" ]; then
+          pushd "bin"
+          tarball="$(tarball-build "jiracleaner")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
           docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-        }
+          popd
+        fi
         ;;
     hal9000)
         build-ruby "$project"
