@@ -92,13 +92,14 @@ case "$project" in
             docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
         ;;
-    golang)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
-            make -f etc/mk/golang.mk
-
+    devenv)
         docker run --rm -w /go -v "$(pwd):/go" \
             -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
             make -f etc/mk/golang.mk install-devenv
+        ;;
+    golang)
+        docker run --rm -w /go -v "$(pwd):/go" build/build \
+            make -f etc/mk/golang.mk
 
         if [ -n "$CI" ]; then
           pushd "bin"
