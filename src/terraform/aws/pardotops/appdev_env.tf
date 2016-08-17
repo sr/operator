@@ -221,7 +221,8 @@ resource "aws_security_group" "appdev_proxyout_host" {
     to_port = 3128
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}"
+      "${aws_vpc.appdev.cidr_block}",
+      "${aws_eip.appdev_nat_gw.public_ip}/32"
     ]
   }
 
