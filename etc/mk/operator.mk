@@ -26,9 +26,10 @@ clean: operator-clean
 	rm -f $(OPERATORD_LINUX)
 
 docker-build-operatord:
-	docker build -f Dockerfile.operatord -t operatord_app .
+	docker build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
 
 .PHONY: \
 	build-operatord \
+	docker-build-operatord \
 	generate \
 	clean

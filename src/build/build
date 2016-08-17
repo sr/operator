@@ -126,11 +126,11 @@ case "$project" in
         docker run --rm -w /go -v "/tmp:/tmp" -v "$(pwd):/go" \
             -e TMPDIR=/tmp \
             build/build \
-            make -C src/operator build-operatord-linux
+            make -f etc/mk/operator.mk build-operatord-linux
 
-        trap 'rm -f src/operator/operatord' EXIT
-        cp /tmp/operatord_linux src/operator/operatord
-        make -C src/operator docker-build-operatord
+        trap 'rm -f $BREAD/operatord' EXIT
+        cp /tmp/operatord_linux "$BREAD/operatord"
+        make -f etc/mk/operator.mk docker-build-operatord
 
         if [ -n "$CI" ]; then
             docker-push "${project}d"
