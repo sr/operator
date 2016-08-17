@@ -13,6 +13,12 @@ export PATH
 : "${DEBUG:=""}"
 test -n "$DEBUG" && set -x
 
+: "${NOPULL:=""}"
+pullopts=""
+if [ -z "$NOPULL" ]; then
+  pullopts="--pull"
+fi
+
 usage() {
     grep ^#/ <"$0" |cut -c4-
     exit 1
@@ -44,7 +50,7 @@ docker-hack-restart
 
 # HACK: Override Artifactory host name on CI machines to workaround this:
 # https://jira.dev.pardot.com/browse/BREAD-797
-if [ -n "$CI"  ]
+if [ -n "$CI" ]
 then
     find src -type f -name Gemfile -print0 |
     xargs -0 sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g'
@@ -53,11 +59,7 @@ then
     unset -v ARTIFACTORY_URL
 fi
 
-# Build the container used for most builds.
-if [ -n "$CI" ]
-then docker build --pull -f etc/docker/Dockerfile.build -t build/build .
-else docker build -f etc/docker/Dockerfile.build -t build/build .
-fi
+docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
 build_rubygem() {
     docker run --rm \
@@ -92,13 +94,14 @@ case "$project" in
             docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
         }
         ;;
-    golang)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
-            make -f etc/mk/golang.mk
-
+    devenv)
         docker run --rm -w /go -v "$(pwd):/go" \
             -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
             make -f etc/mk/golang.mk install-devenv
+        ;;
+    golang)
+        docker run --rm -w /go -v "$(pwd):/go" build/build \
+            make -f etc/mk/golang.mk
 
         if [ -n "$CI" ]; then
           pushd "bin"
@@ -143,7 +146,7 @@ case "$project" in
 
         trap 'rm -f $parbotdir/Dockerfile' EXIT
         cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
-        docker build -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
+        docker build $pullopts -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
 
         test -n "$CI" && docker-push "$project"
         ;;
@@ -165,12 +168,12 @@ case "$project" in
         build-ruby "rubylib"
         ;;
     shell)
-        docker build -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
+        docker build $pullopts -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
         docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" \
             build/shellcheck lint-shell
         ;;
     teampass)
-        docker build -f src/teampass/Dockerfile -t teampass_app src/teampass
+        docker build $pullopts -f src/teampass/Dockerfile -t teampass_app src/teampass
         test -n "$CI" && docker-push "$project"
         ;;
     terraform)

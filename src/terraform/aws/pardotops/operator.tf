@@ -28,6 +28,61 @@ resource "aws_security_group" "operator_app_production" {
   }
 }
 
+resource "aws_security_group" "internal_apps_operator_http_lb" {
+  name = "internal_apps_operator_http_lb"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_elb" "operator_production" {
+  name = "operator-production"
+  security_groups = ["${aws_security_group.internal_apps_operator_http_lb.id}"]
+  subnets = [
+    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1e_dmz.id}"
+  ]
+  cross_zone_load_balancing = true
+  connection_draining = true
+  connection_draining_timeout = 30
+
+  listener {
+    lb_port = 443
+    lb_protocol = "https"
+    instance_port = 80
+    instance_protocol = "http"
+    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 3
+    target = "HTTP:80/_ping"
+    interval = 5
+  }
+
+  tags {
+    Name = "operator_production"
+  }
+}
+
 resource "template_file" "operator_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 

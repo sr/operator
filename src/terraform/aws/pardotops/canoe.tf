@@ -98,7 +98,8 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_eip.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32"
     ]
     security_groups = [
       "${aws_security_group.internal_apps_chef_server.id}"
