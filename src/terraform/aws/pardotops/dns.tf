@@ -341,6 +341,14 @@ resource "aws_route53_record" "hal9000_dev_pardot_com_CNAMErecord" {
   ttl = "900"
 }
 
+resource "aws_route53_record" "operator_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "operator.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.operator_production.dns_name}"]
+  type = "CNAME"
+  ttl = "900"
+}
+
 resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"

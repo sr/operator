@@ -1,57 +1,18 @@
 [
   {
     "name": "operatord",
-    "image": "docker.dev.pardot.com/build/bread/operatord/app:BREAD-BREAD209-10",
+    "image": "docker.dev.pardot.com/build/bread/operatord/app:BREAD-BREAD225-8",
     "essential": true,
     "cpu": 512,
     "memory": 512,
-    "portMappings": [],
+    "portMappings": [
+      {
+        "hostPort": 80,
+        "containerPort": 8080,
+        "protocol": "tcp"
+      }
+    ],
     "links": null,
     "environment": []
-  },
-  {
-    "name": "operatorhubot",
-    "image": "docker.dev.pardot.com/build/bread/operatorhubot/app:BREAD-BREAD209-10",
-    "essential": true,
-    "cpu": 512,
-    "memory": 512,
-    "portMappings": [],
-    "links": [
-      "operatord:operatord"
-    ],
-    "environment": [
-      {
-        "name": "HUBOT_ADAPTER",
-        "value": "hipchat"
-      },
-      {
-        "name": "HUBOT_ALIAS",
-        "value": ""
-      },
-      {
-        "name": "HUBOT_NAME",
-        "value": "operator"
-      },
-      {
-        "name": "HUBOT_LOG_LEVEL",
-        "value": "DEBUG"
-      },
-      {
-        "name": "HUBOT_HIPCHAT_HOST",
-        "value": "hipchat.dev.pardot.com"
-      },
-      {
-        "name": "HUBOT_HIPCHAT_NAME",
-        "value": "operator"
-      },
-      {
-        "name": "HUBOT_HIPCHAT_TOKEN",
-        "value": ""
-      },
-      {
-        "name": "HUBOT_HIPCHAT_PASSWORD",
-        "value": ""
-      }
-    ]
   }
 ]
