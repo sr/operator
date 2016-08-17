@@ -1,15 +1,13 @@
 package operatorhipchat
 
 import (
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"golang.org/x/oauth2/jws"
-
+	"github.com/dvsekhvalnov/jose2go"
 	"github.com/sr/operator"
 )
 
@@ -72,19 +70,20 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 	if len(parts) != 2 || parts[0] != "JWT" {
 		return nil, errors.New("invalid Authorization header")
 	}
-	claim, err := jws.Decode(parts[1])
+	_, _, err := jose.Decode(parts[1], func(_ map[string]interface{}, payload string) interface{} {
+		var data struct {
+			Iss string
+		}
+		if err := json.Unmarshal([]byte(payload), &data); err != nil {
+			return err
+		}
+		c, err := d.store.GetByOAuthID(data.Iss)
+		if err != nil {
+			return err
+		}
+		return []byte(c.Secret)
+	})
 	if err != nil {
-		return nil, err
-	}
-	oauthClient, err := d.store.GetByOAuthID(claim.Iss)
-	if err != nil {
-		return nil, err
-	}
-	key, err := x509.ParsePKCS1PrivateKey([]byte(oauthClient.Secret))
-	if err != nil {
-		return nil, err
-	}
-	if err := jws.Verify(parts[1], &key.PublicKey); err != nil {
 		return nil, err
 	}
 	return &operator.Message{
