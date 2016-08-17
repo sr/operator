@@ -1,13 +1,16 @@
 source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 
+gem "activesupport", "~> 5.0"
 gem "lita", "4.7.0"
 gem "lita-hipchat", "3.0.2"
+gem "pagerduty", "~> 2.1.0"
+gem "zabbixapi", "~> 2.4"
 
-gem "lita-replication-fixing", path: "plugins/lita-replication-fixing"
-gem "lita-zabbix", path: "plugins/lita-zabbix"
-gem "lita-commit", path: "plugins/lita-commit"
-
-gem "rspec", "~> 3.4", ">= 3.4.0"
+group :test do
+  gem "rack-test", "~> 0.6.3"
+  gem "rspec", "~> 3.4"
+  gem "webmock", "~> 1.23"
+end
 
 # Add handlers to give Lita new functionality.
 # For example:
