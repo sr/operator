@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/sr/operator"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func run(builder operator.ServerBuilder) error {
