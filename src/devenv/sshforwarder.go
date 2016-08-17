@@ -10,14 +10,15 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
-
 	"github.com/fsouza/go-dockerclient"
+
+	"golang.org/x/net/context"
 )
 
 const (
 	sshForwarderContainerName = "devenv-ssh-forwarder"
 	sshForwarderContainerURL  = "docker.dev.pardot.com/base/ssh-forwarder"
+	sshForwarderRegistry      = "docker.dev.pardot.com"
 
 	containerVolumeMountPath = "/tmp/ssh-agent"
 	sshAuthSockPathFile      = "ssh-auth-sock.path"
@@ -37,7 +38,25 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		return err
 	}
 
-	opts := docker.CreateContainerOptions{
+	_, err = f.client.InspectImage(sshForwarderContainerURL)
+	if err == docker.ErrNoSuchImage {
+		authConfigs, err := docker.NewAuthConfigurationsFromDockerCfg()
+		if err != nil {
+			return err
+		}
+
+		pullOpts := docker.PullImageOptions{
+			Repository: sshForwarderContainerURL,
+			Context:    ctx,
+		}
+		if err := f.client.PullImage(pullOpts, authConfigs.Configs[sshForwarderRegistry]); err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
+	createOpts := docker.CreateContainerOptions{
 		Name: sshForwarderContainerName,
 		Config: &docker.Config{
 			Image: sshForwarderContainerURL,
@@ -52,7 +71,7 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		Context: ctx,
 	}
 
-	if _, err := f.client.CreateContainer(opts); err != nil {
+	if _, err := f.client.CreateContainer(createOpts); err != nil {
 		return err
 	}
 
@@ -84,6 +103,8 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
+			fmt.Printf("-- ssh output --\n%s\n--\n", output)
+
 			potentialStartupErrors := [][]byte{
 				[]byte("Connection refused"),
 				[]byte("Connection closed by remote host"),

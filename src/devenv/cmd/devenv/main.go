@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"golang.org/x/net/context"
-
 	"github.com/fsouza/go-dockerclient"
+
+	"golang.org/x/net/context"
 )
 
 const (
@@ -92,7 +92,7 @@ func run() error {
 		}
 
 		// TODO: Make timeout configurable
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
 		forwarder := devenv.NewSSHForwarder(client)
