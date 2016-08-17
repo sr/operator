@@ -6,8 +6,8 @@ import (
 )
 
 func calculateHmac(keySizeBits int, securedInput []byte, key []byte) []byte {
-	hasher := hmac.New(func() hash.Hash { return hashAlg(keySizeBits)}, key)	
-	hasher.Write(securedInput)	
-	
-	return hasher.Sum(nil)	
+	hasher := hmac.New(func() hash.Hash { return hashAlg(keySizeBits) }, key)
+	hasher.Write(securedInput)
+
+	return hasher.Sum(nil)
 }
