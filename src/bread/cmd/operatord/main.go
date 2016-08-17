@@ -67,7 +67,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/_ping", bread.NewPingHandler(db))
-	store := bread.NewHipchatAccessTokenStore(db, config.hipchatAddonID)
+	store := bread.NewHipchatOAuthClientStore(db)
 	if config.hipchatAddonSetup {
 		if config.hipchatAddonURL == "" {
 			return fmt.Errorf("required flag missing: hipchat-addon-url")
@@ -94,11 +94,14 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			if config.hipchatAddonID == "" {
 				return fmt.Errorf("required flag missing: hipchat-addon-id")
 			}
-			cfg, err := store.Get()
+			c, err := store.GetByAddonID(config.hipchatAddonID)
 			if err != nil {
 				return err
 			}
-			chat := bread.NewHipchatClient(cfg)
+			chat, err := bread.NewHipchatClient(&bread.HipchatConfig{OAuthClient: c})
+			if err != nil {
+				return err
+			}
 			server := grpc.NewServer()
 			msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 			services, err := builder(chat, server, flags)
@@ -141,7 +144,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 				logger,
 				operator.NewInstrumenter(logger),
 				bread.NewLDAPAuthorizer(),
-				operatorhipchat.NewRequestDecoder(),
+				operatorhipchat.NewRequestDecoder(store),
 				config.prefix,
 				conn,
 				invoker,

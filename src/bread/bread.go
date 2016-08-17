@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/sr/operator"
+	"github.com/sr/operator/hipchat"
 )
 
 const (
@@ -17,13 +18,7 @@ const (
 type HipchatConfig struct {
 	Hostname    string
 	Token       string
-	OAuthID     string
-	OAuthSecret string
-}
-
-type HipchatAccessTokenStore interface {
-	Get() (*HipchatConfig, error)
-	Set(oauthID, oauthSecret string) error
+	OAuthClient *operatorhipchat.OAuthClient
 }
 
 func NewLogger() operator.Logger {
@@ -34,19 +29,19 @@ func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClient(config *HipchatConfig) operator.ChatClient {
+func NewHipchatClient(config *HipchatConfig) (operator.ChatClient, error) {
 	return newHipchatClient(config)
 }
 
-func NewHipchatAccessTokenStore(db *sql.DB, addonID string) HipchatAccessTokenStore {
-	return &hipchatAccessTokenStore{db, addonID}
+func NewHipchatOAuthClientStore(db *sql.DB) operatorhipchat.OAuthClientStore {
+	return newHipchatOAuthClientStore(db)
 }
 
 func NewHipchatAddonHandler(
 	id string,
 	addonURL string,
 	webhookURL string,
-	s HipchatAccessTokenStore,
+	s operatorhipchat.OAuthClientStore,
 	prefix string,
 ) (http.Handler, error) {
 	u, err := url.Parse(addonURL)
