@@ -2,11 +2,6 @@ resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
 
-resource "aws_ecs_task_definition" "operator_production" {
-  family = "operator_production"
-  container_definitions = "${file("operator.json")}"
-}
-
 resource "aws_security_group" "operator_app_production" {
   name = "operator_app_production"
   vpc_id = "${aws_vpc.internal_apps.id}"
