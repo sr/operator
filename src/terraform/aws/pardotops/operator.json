@@ -1,11 +1,17 @@
 [
   {
     "name": "operatord",
-    "image": "docker.dev.pardot.com/build/bread/operatord/app:BREAD-BREAD209-10",
+    "image": "docker.dev.pardot.com/build/bread/operatord/app:BREAD-BREAD225-8",
     "essential": true,
     "cpu": 512,
     "memory": 512,
-    "portMappings": [],
+    "portMappings": [
+      {
+        "hostPort": 80,
+        "containerPort": 8080,
+        "protocol": "tcp"
+      }
+    ],
     "links": null,
     "environment": []
   }
