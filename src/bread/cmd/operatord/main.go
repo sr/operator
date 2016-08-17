@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 
 	"google.golang.org/grpc"
 
@@ -44,6 +45,14 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "", "")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "", "")
 	flags.BoolVar(&config.webhookEnabled, "enable-webhook", true, "")
+	flags.VisitAll(func(f *flag.Flag) {
+		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
+		if v := os.Getenv(k); v != "" {
+			if err := f.Value.Set(v); err != nil {
+				panic(err)
+			}
+		}
+	})
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
