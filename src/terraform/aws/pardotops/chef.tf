@@ -71,3 +71,11 @@ resource "aws_instance" "internal_apps_chef_server" {
     terraform = true
   }
 }
+
+resource "aws_route53_record" "internal_apps_chef1-1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-chef1-1-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_chef_server.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
