@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+PATH="$(pwd)/bin:$PATH"
+export PATH
+
+RUBYLIB="$(pwd)/lib:${RUBYLIB:-""}"
+export RUBYLIB
+
+bin/hal9000

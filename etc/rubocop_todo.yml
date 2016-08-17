@@ -19,14 +19,14 @@ Lint/AssignmentInCondition:
   Exclude:
     - 'src/canoe/app/controllers/application_controller.rb'
     - 'src/canoe/app/models/deploy_target.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/message_throttler.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/maintenance_supervisor.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
+    - 'src/hal9000/app/models/replication_fixing/message_throttler.rb'
+    - 'src/hal9000/app/models/zabbix/maintenance_supervisor.rb'
+    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
 
 # Offense count: 18
 Lint/AmbiguousRegexpLiteral:
   Exclude:
-    - 'src/hal9000/plugins/lita-*/lib/lita/handlers/*.rb'
+    - 'src/hal9000/app/handlers/*_handler.rb'
 
 # Offense count: 1
 Lint/CircularArgumentReference:
@@ -39,8 +39,8 @@ Metrics/ParameterLists:
   Exclude:
     - 'src/canoe/app/models/build.rb'
     - 'src/canoe/lib/canoe/deployer.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/zabbixmon.rb'
+    - 'src/hal9000/app/handlers/zabbix_handler.rb'
+    - 'src/hal9000/app/models/zabbix/zabbixmon.rb'
 
 # Offense count: 3
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -49,14 +49,13 @@ Rails/TimeZone:
   Exclude:
     - 'src/canoe/app/controllers/application_controller.rb'
     - 'src/canoe/app/helpers/canoe_helper.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/lita/handlers/replication_fixing.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/alerting_manager.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/fixing_status_client.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/spec/alerting_manager_spec.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/human_time.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/lita/handlers/zabbix.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/maintenance_supervisor.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
+    - 'src/hal9000/app/handlers/replication_fixing_handler.rb'
+    - 'src/hal9000/app/models/replication_fixing/alerting_manager.rb'
+    - 'src/hal9000/app/models/replication_fixing/fixing_status_client.rb'
+    - 'src/hal9000/spec/models/replication_fixing/alerting_manager_spec.rb'
+    - 'src/hal9000/app/handlers/zabbix_handler.rb'
+    - 'src/hal9000/app/models/zabbix/maintenance_supervisor.rb'
+    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -114,21 +113,21 @@ Style/TrailingCommaInLiteral:
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
 Lint/UnusedMethodArgument:
   Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/test_pager.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/human_time.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/monitor_supervisor.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/test_pager.rb'
-    - 'src/hal9000/plugins/lita-zabbix/spec/helpers/zabbix_test_helpers.rb'
+    - 'src/hal9000/app/models/replication_fixing/test_pager.rb'
+    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
+    - 'src/hal9000/app/models/zabbix/test_pager.rb'
+    - 'src/hal9000/spec/helpers/zabbix_spec_helpers.rb'
+    - 'src/hal9000/app/handlers/zabbix_handler.rb'
 
 # Offense count: 5
 Lint/UselessAssignment:
   Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/message_throttler.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/spec/lita/handlers/replication_fixing_spec.rb'
-    - 'src/hal9000/plugins/lita-replication-fixing/spec/monitor_supervisor_spec.rb'
-    - 'src/hal9000/plugins/lita-zabbix/lib/zabbix/zabbixmon.rb'
+    - 'src/hal9000/app/models/replication_fixing/message_throttler.rb'
+    - 'src/hal9000/spec/handlers/replication_fixing_handler_spec.rb'
+    - 'src/hal9000/spec/models/replication_fixing/monitor_supervisor_spec.rb'
+    - 'src/hal9000/app/models/zabbix/zabbixmon.rb'
 
 # Offense count: 1
 Lint/UselessAccessModifier:
   Exclude:
-    - 'src/hal9000/plugins/lita-replication-fixing/lib/replication_fixing/monitor_supervisor.rb'
+    - 'src/hal9000/app/models/replication_fixing/monitor_supervisor.rb'
