@@ -195,7 +195,7 @@ type hipchatAddonHandler struct {
 func newHipchatAddonHandler(
 	id string,
 	url *url.URL,
-	webhookURL *url.URL,
+	webhookURL fmt.Stringer,
 	prefix string,
 	store operatorhipchat.OAuthClientStore,
 ) (*hipchatAddonHandler, error) {

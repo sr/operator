@@ -28,7 +28,7 @@ install-devenv:
 	$(GO) install -v $$($(GO) list devenv/...)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^devenv/vendor/)')"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^devenv/vendor/|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
