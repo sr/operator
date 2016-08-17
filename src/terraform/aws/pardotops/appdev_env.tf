@@ -221,8 +221,7 @@ resource "aws_security_group" "appdev_proxyout_host" {
     to_port = 3128
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_vpc.appdev.cidr_block}"
     ]
   }
 
@@ -907,7 +906,7 @@ resource "aws_route53_record" "appdev_proxyout1_arecord" {
   count = "${var.environment_appdev["num_proxyout1_hosts"]}"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.appdev_proxyout1_eip.public_ip}"]
+  records = ["${element(aws_instance.appdev_proxyout1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
