@@ -3,8 +3,6 @@ package operator_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/dvsekhvalnov/jose2go"
 	"github.com/golang/protobuf/proto"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -40,6 +39,22 @@ func (c *fakeChatClient) SendRoomNotification(_ *operator.ChatRoomNotification) 
 	return nil
 }
 
+type fakeOAuthClientStore struct {
+	client *operatorhipchat.OAuthClient
+}
+
+func (s *fakeOAuthClientStore) GetByAddonID(_ string) (*operatorhipchat.OAuthClient, error) {
+	return s.client, nil
+}
+
+func (s *fakeOAuthClientStore) GetByOAuthID(_ string) (*operatorhipchat.OAuthClient, error) {
+	return s.client, nil
+}
+
+func (s *fakeOAuthClientStore) PutByAddonID(_ string, _ *operatorhipchat.OAuthClient) error {
+	return nil
+}
+
 func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
@@ -63,11 +78,16 @@ func TestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
+	oauthClient := &operatorhipchat.OAuthClient{
+		ID:     "32a1811e-beee-4285-9df2-39c3a7971982",
+		Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
+	}
+	store := &fakeOAuthClientStore{oauthClient}
 	h, err := operator.NewHandler(
 		logger,
 		operator.NewInstrumenter(logger),
 		&fakeAuthorizer{},
-		operatorhipchat.NewRequestDecoder(),
+		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
 		func(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
@@ -81,13 +101,15 @@ func TestHandler(t *testing.T) {
 	for _, tt := range []struct {
 		text   string
 		status int
+		jwt    bool
 	}{
-		{"!ping ping", 200},
-		{"!ping", 404},
-		{"!", 404},
-		{" !ping ping", 404},
-		{"ping", 404},
-		{"", 404},
+		{"!ping ping", 200, true},
+		{"!ping ping", 400, false},
+		{"!ping", 404, true},
+		{"!", 404, true},
+		{" !ping ping", 404, true},
+		{"ping", 404, true},
+		{"", 404, true},
 	} {
 		webhook := &operatorhipchat.Payload{
 			Event: "room_message",
@@ -110,18 +132,28 @@ func TestHandler(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, err := http.Post(ts.URL, "application/json", bytes.NewReader(data))
+		var token string
+		if tt.jwt == false {
+			token = "bogus"
+		} else {
+			token, err = jose.Sign("{}", jose.HS256, []byte(oauthClient.Secret))
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		req, err := http.NewRequest("POST", ts.URL, bytes.NewReader(data))
 		if err != nil {
 			t.Fatal(err)
 		}
-		if resp.StatusCode != tt.status {
-			t.Errorf("message `%s` expected status code %d, got %#v", tt.text, tt.status, resp.StatusCode)
-		}
-		body, err := ioutil.ReadAll(resp.Body)
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "JWT "+token)
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			t.Fatal(err)
 		}
 		defer resp.Body.Close()
-		fmt.Printf("%s", body)
+		if resp.StatusCode != tt.status {
+			t.Errorf("message `%s` expected status code %d, got %#v", tt.text, tt.status, resp.StatusCode)
+		}
 	}
 }
