@@ -41,7 +41,7 @@ func buildOperatorServer(
 
 func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 	if req.Call.Service == "ping" {
-		if req.Call.Method == "Ping" {
+		if req.Call.Method == "ping" {
 			client := ping.NewPingerClient(conn)
 			_, err := client.Ping(
 				context.Background(),
