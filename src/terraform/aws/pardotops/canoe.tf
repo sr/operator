@@ -73,7 +73,7 @@ resource "aws_db_instance" "canoe_production" {
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
   vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
   storage_encrypted = false
-  backup_retention_period = 5
+  backup_retention_period = 30
   apply_immediately = true
 }
 
