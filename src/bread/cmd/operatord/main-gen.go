@@ -47,6 +47,7 @@ func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]strin
 				context.Background(),
 				&ping.PingRequest{
 					Source: req.Source,
+					Arg1:   args["arg1"],
 				},
 			)
 			if err != nil {
