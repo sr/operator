@@ -38,6 +38,12 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		return err
 	}
 
+	// If the auth socket isn't ready, it's better for us to exit and get
+	// relaunched by launchd after ssh-agent is properly setup
+	if err := f.sshAuthSockReady(); err != nil {
+		return err
+	}
+
 	_, err = f.client.InspectImage(sshForwarderContainerURL)
 	if err == docker.ErrNoSuchImage {
 		authConfigs, err := docker.NewAuthConfigurationsFromDockerCfg()
@@ -91,43 +97,24 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 
 	DaemonLogger.Printf("SSH_AUTH_SOCK=%v\n", os.Getenv("SSH_AUTH_SOCK"))
 	DaemonLogger.Printf("attempting to ssh to the ssh-forwarder container\n")
+
+	errSSHC := make(chan error)
+	stopSSHC := make(chan interface{})
+	go func() { errSSHC <- f.forwardAgentOverSSH(sshPortMappings[0].HostPort, stopSSHC) }()
+
 	for {
-		cmd := exec.Command(
-			"ssh",
-			"-A",
-			"-p", sshPortMappings[0].HostPort,
-			"-o", "StrictHostKeyChecking=no",
-			"-o", "UserKnownHostsFile=/dev/null",
-			"-o", fmt.Sprintf("IdentityFile=%s/.ssh/id_rsa", os.Getenv("HOME")),
-			"root@127.0.0.1",
-			fmt.Sprintf("echo \"$SSH_AUTH_SOCK\" > /tmp/%s && sleep inf", sshAuthSockPathFile),
-		)
-
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			DaemonLogger.Printf("ssh output: %s\n", output)
-
-			potentialStartupErrors := [][]byte{
-				[]byte("Connection refused"),
-				[]byte("Connection closed by remote host"),
-			}
-
-			startupError := false
-			for _, potentialError := range potentialStartupErrors {
-				if bytes.Contains(output, potentialError) {
-					startupError = true
-					break
-				}
-			}
-
-			if !startupError {
+		select {
+		case <-time.After(5 * time.Second):
+			if err := f.sshAuthSockReady(); err != nil {
+				// The SSH_AUTH_SOCK is no longer available. ssh-agent may have restarted.
+				// In this case, we need to crash ourselves and restart too.
+				stopSSHC <- true
+				_ = <-errSSHC
 				return err
 			}
-		} else {
-			return nil
+		case err := <-errSSHC:
+			return err
 		}
-
-		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -180,4 +167,86 @@ func (f *SSHForwarder) ensureSSHForwarderStopped(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (f *SSHForwarder) sshAuthSockReady() error {
+	authSock := os.Getenv("SSH_AUTH_SOCK")
+	if authSock == "" {
+		return fmt.Errorf("SSH_AUTH_SOCK is unset")
+	}
+
+	_, err := os.Stat(authSock)
+	if err != nil {
+		return fmt.Errorf("unable to stat %v: %v", authSock, err)
+	}
+
+	return nil
+}
+
+func (f *SSHForwarder) forwardAgentOverSSH(hostPort string, stop <-chan interface{}) error {
+	for {
+		cmd := exec.Command(
+			"ssh",
+			"-A",
+			"-p", hostPort,
+			"-o", "StrictHostKeyChecking=no",
+			"-o", "UserKnownHostsFile=/dev/null",
+			"-o", fmt.Sprintf("IdentityFile=%s/.ssh/id_rsa", os.Getenv("HOME")),
+			"root@127.0.0.1",
+			fmt.Sprintf("echo \"$SSH_AUTH_SOCK\" > /tmp/%s && sleep inf", sshAuthSockPathFile),
+		)
+		var buf bytes.Buffer
+		cmd.Stdin = nil
+		cmd.Stdout = &buf
+		cmd.Stderr = &buf
+
+		if err := cmd.Start(); err != nil {
+			return err
+		}
+
+		waitC := make(chan error)
+		go func() { waitC <- cmd.Wait() }()
+
+		select {
+		case err := <-waitC:
+			output := buf.String()
+			DaemonLogger.Printf("ssh output: %s\n", output)
+
+			if err != nil {
+				// Some errors are allowed to account for a race between the Docker
+				// SSH container starting, and our ability to SSH to it.
+				potentialStartupErrors := []string{
+					"Connection refused",
+					"Connection closed by remote host",
+				}
+
+				startupError := false
+				for _, potentialError := range potentialStartupErrors {
+					if strings.Contains(output, potentialError) {
+						startupError = true
+						break
+					}
+				}
+
+				if !startupError {
+					return err
+				}
+			} else {
+				DaemonLogger.Printf("ssh exited normally, restarting")
+			}
+		case <-stop:
+			_ = cmd.Process.Kill()
+			_ = cmd.Wait()
+			return nil
+		}
+
+		select {
+		case <-time.After(1 * time.Second):
+			continue
+		case <-stop:
+			_ = cmd.Process.Kill()
+			_ = cmd.Wait()
+			return nil
+		}
+	}
 }
