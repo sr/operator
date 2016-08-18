@@ -1,3 +1,4 @@
+DOCKER ?= docker
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
 TMPDIR ?= /tmp
@@ -23,10 +24,13 @@ build-operatord-linux: $(TMPDIR)
 generate: operator-generate
 
 clean: operator-clean
-	rm -f $(OPERATORD_LINUX)
+	rm -f $(OPERATORD_LINUX) etc/ca-bundle.crt
 
-docker-build-operatord:
-	docker build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
+docker-build-operatord: etc/ca-bundle.crt etc/ca-bundle.trust.crt
+	$(DOCKER) build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
+
+etc/ca-bundle.crt:
+	$(DOCKER) run docker.dev.pardot.com/base/centos:7 cat /etc/pki/tls/certs/ca-bundle.crt > $@
 
 .PHONY: \
 	build-operatord \
