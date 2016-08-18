@@ -107,7 +107,12 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			if err != nil {
 				return err
 			}
-			chat, err := bread.NewHipchatClient(&bread.HipchatConfig{OAuthClient: c})
+			chat, err := bread.NewHipchatClient(
+				&bread.HipchatConfig{
+					OAuthClient: c,
+					Hostname:    bread.HipchatHost,
+				},
+			)
 			if err != nil {
 				return err
 			}
