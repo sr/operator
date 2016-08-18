@@ -22,8 +22,8 @@ module Pardot
       class << self
         def bounce_workers(type, redis_hosts = [])
           valid_types = \
-            %w[ automationWorkers
-                PerAccountAutomationWorker
+            %w[ PerAccountAutomationWorker
+                PerAccountAutomationWorker-timed
                 automationRelatedObjectWorkers
                 previewWorkers
                 PerAccountAutomationWorker ]
@@ -39,7 +39,7 @@ module Pardot
             port = Integer(port_string)
 
             host = Host.new(hostname, port)
-            next if host.key?(key)
+            next unless host.key?(key)
             Logger.log(:info, "Found key #{key} on #{hostname}:#{port}. Restarting workers using timestamp value #{value}")
             host.hset(key, entry, value)
             found = true
