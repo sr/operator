@@ -15,9 +15,12 @@ func newPingHandler(db *sql.DB) *pingHandler {
 	return &pingHandler{db}
 }
 
-func (h *pingHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
+func (h *pingHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var payload string
+	if req.URL.Query().Get("boomtown") != "" {
+		panic("boomtown")
+	}
 	if err := h.db.Ping(); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		payload = `{"now": %d, "status": "failures"}`
