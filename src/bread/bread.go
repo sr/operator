@@ -25,6 +25,10 @@ func NewLogger() operator.Logger {
 	return operator.NewLogger()
 }
 
+func NewHTTPLoggerHandler(l operator.Logger, h http.Handler) http.Handler {
+	return &wrapperHandler{l, h}
+}
+
 func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }

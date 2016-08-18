@@ -75,7 +75,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		return err
 	}
 	mux := http.NewServeMux()
-	mux.Handle("/_ping", bread.NewPingHandler(db))
+	mux.Handle("/_ping", bread.NewHTTPLoggerHandler(logger, bread.NewPingHandler(db)))
 	store := bread.NewHipchatOAuthClientStore(db)
 	if config.hipchatAddonSetup {
 		if config.hipchatAddonURL == "" {
@@ -97,7 +97,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		if err != nil {
 			return err
 		}
-		mux.Handle("/hipchat/addon", h)
+		mux.Handle("/hipchat/addon", bread.NewHTTPLoggerHandler.new(logger, h))
 	} else {
 		if config.grpcAddr != "" {
 			if config.hipchatAddonID == "" {
@@ -161,7 +161,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			if err != nil {
 				return err
 			}
-			mux.Handle("/hipchat/webhook", handler)
+			mux.Handle("/hipchat/webhook", bread.NewHTTPLoggerHandler(handler))
 			logger.Info(&operator.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
 		}
 	}
