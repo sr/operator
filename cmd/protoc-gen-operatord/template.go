@@ -68,9 +68,9 @@ func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]strin
 {{- range .Services}}
 	{{- $serviceName := .PackageName }}
 	{{- $serviceFullName := .FullName }}
-	if req.Call.Service == "{{.PackageName}}" {
+	if req.Call.Service == "{{lowerCase .PackageName}}" {
 	{{- range .Methods }}
-		if req.Call.Method == "{{.Name}}" {
+		if req.Call.Method == "{{lowerCase .Name}}" {
 			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
 			_, err := client.{{.Name}}(
 				context.Background(),
