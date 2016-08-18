@@ -2,4 +2,4 @@ FROM scratch
 COPY /operatord /app/operatord
 EXPOSE 9000
 EXPOSE 8080
-CMD ["/app/operatord","-grpc-addr","0.0.0.0:9000","-http-addr","0.0.0.0:8080"]
+CMD ["/app/operatord","-grpc-addr","0.0.0.0:9000","-http-addr","0.0.0.0:8080","-hipchat-addon-setup","-hipchat-addon-url","https://operator.dev.pardot.com/hipchat/addon","-hipchat-webhook-url","https://operator.dev.pardot.com/hipchat/webhook"]
