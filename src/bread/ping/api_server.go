@@ -20,7 +20,7 @@ func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingRe
 			From:          "pinger.Ping",
 			Color:         "green",
 			MessageFormat: "text",
-			Message:       fmt.Sprintf("pong arg1=\"%#v\"", request.Arg1),
+			Message:       fmt.Sprintf("pong arg1=%#v", request.Arg1),
 		},
 	); err != nil {
 		return nil, err
