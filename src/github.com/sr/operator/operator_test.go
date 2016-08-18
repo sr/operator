@@ -83,6 +83,7 @@ func TestHandler(t *testing.T) {
 		Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
 	}
 	store := &fakeOAuthClientStore{oauthClient}
+	tArgs := make(map[string]string)
 	h, err := operator.NewHandler(
 		logger,
 		operator.NewInstrumenter(logger),
@@ -91,6 +92,7 @@ func TestHandler(t *testing.T) {
 		"!",
 		conn,
 		func(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+			tArgs = args
 			return true, nil
 		},
 	)
@@ -98,18 +100,22 @@ func TestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 	ts := httptest.NewServer(h)
+	noArgs := make(map[string]string)
 	for _, tt := range []struct {
 		text   string
 		status int
 		jwt    bool
+		args   map[string]string
 	}{
-		{"!ping ping", 200, true},
-		{"!ping ping", 400, false},
-		{"!ping", 404, true},
-		{"!", 404, true},
-		{" !ping ping", 404, true},
-		{"ping", 404, true},
-		{"", 404, true},
+		{"!ping ping", 200, true, noArgs},
+		{"!ping ping foo=bar spam=\"boom town\" x='sup'", 200, true,
+			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}},
+		{"!ping ping", 400, false, noArgs},
+		{"!ping", 404, true, noArgs},
+		{"!", 404, true, noArgs},
+		{" !ping ping", 404, true, noArgs},
+		{"ping", 404, true, noArgs},
+		{"", 404, true, noArgs},
 	} {
 		webhook := &operatorhipchat.Payload{
 			Event: "room_message",
@@ -154,6 +160,16 @@ func TestHandler(t *testing.T) {
 		defer resp.Body.Close()
 		if resp.StatusCode != tt.status {
 			t.Errorf("message `%s` expected status code %d, got %#v", tt.text, tt.status, resp.StatusCode)
+		}
+		if len(tt.args) != 0 {
+			for key, val := range tArgs {
+				s, ok := tt.args[key]
+				if !ok {
+					t.Errorf("message `%s` expected to have arg %s but didn't", tt.text, key)
+				} else if s != val {
+					t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
+				}
+			}
 		}
 	}
 }

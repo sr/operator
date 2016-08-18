@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
+	"unicode"
 
 	"google.golang.org/grpc"
 
@@ -59,6 +61,31 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	args := make(map[string]string)
+	lastQuote := rune(0)
+	words := strings.FieldsFunc(matches[3], func(c rune) bool {
+		switch {
+		case c == lastQuote:
+			lastQuote = rune(0)
+			return false
+		case lastQuote != rune(0):
+			return false
+		case unicode.In(c, unicode.Quotation_Mark):
+			lastQuote = c
+			return false
+		default:
+			return unicode.IsSpace(c)
+		}
+	})
+	for _, arg := range words {
+		parts := strings.Split(arg, "=")
+		if len(parts) != 2 {
+			continue
+		}
+		args[parts[0]] = strings.TrimFunc(parts[1], func(c rune) bool {
+			return unicode.In(c, unicode.Quotation_Mark)
+		})
+	}
 	req := &Request{
 		Call: &Call{
 			Service: matches[1],
@@ -72,7 +99,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start := time.Now()
-	ok, err := h.invoker(h.conn, req, map[string]string{})
+	ok, err := h.invoker(h.conn, req, args)
 	if !ok {
 		// TODO(sr) Log unhandled message
 		w.WriteHeader(http.StatusNotFound)
