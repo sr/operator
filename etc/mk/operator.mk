@@ -26,7 +26,7 @@ generate: operator-generate
 clean: operator-clean
 	rm -f $(OPERATORD_LINUX) etc/ca-bundle.crt
 
-docker-build-operatord: etc/ca-bundle.crt etc/ca-bundle.trust.crt
+docker-build-operatord: etc/ca-bundle.crt
 	$(DOCKER) build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
 
 etc/ca-bundle.crt:
