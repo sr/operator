@@ -15,6 +15,13 @@ resource "aws_security_group" "operator_app_production" {
     ]
   }
 
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+  }
+
   egress {
     from_port = 0
     to_port = 0
