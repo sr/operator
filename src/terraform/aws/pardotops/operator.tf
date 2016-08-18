@@ -23,6 +23,24 @@ resource "aws_security_group" "operator_app_production" {
   }
 }
 
+resource "aws_security_group" "operator_db_production" {
+  name = "operator_db_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.operator_app_production.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "internal_apps_operator_http_lb" {
   name = "internal_apps_operator_http_lb"
   vpc_id = "${aws_vpc.internal_apps.id}"
@@ -76,6 +94,26 @@ resource "aws_elb" "operator_production" {
   tags {
     Name = "operator_production"
   }
+}
+
+resource "aws_db_instance" "operator_production" {
+  identifier = "operator-production"
+  allocated_storage = 20
+  engine = "mysql"
+  engine_version = "5.6.23"
+  instance_class = "db.t2.small"
+  storage_type = "gp2"
+  name = "operator_production"
+  username = "operator"
+  password = "choy8seoGuveelo"
+  maintenance_window = "Tue:00:00-Tue:04:00"
+  multi_az = true
+  publicly_accessible = false
+  db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
+  vpc_security_group_ids = ["${aws_security_group.operator_db_production.id}"]
+  storage_encrypted = false
+  backup_retention_period = 5
+  apply_immediately = true
 }
 
 resource "template_file" "operator_production_user_data" {
