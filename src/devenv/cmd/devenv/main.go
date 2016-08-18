@@ -98,6 +98,7 @@ func run() error {
 
 		forwarder := devenv.NewSSHForwarder(client)
 		if err := forwarder.Run(ctx); err != nil {
+			devenv.DaemonLogger.Printf("ssh-forwarder: %v\n", err)
 			return err
 		}
 	} else {

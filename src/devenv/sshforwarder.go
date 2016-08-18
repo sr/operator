@@ -89,6 +89,8 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		return fmt.Errorf("unable to find port mapping for 22/tcp")
 	}
 
+	DaemonLogger.Printf("SSH_AUTH_SOCK=%v\n", os.Getenv("SSH_AUTH_SOCK"))
+	DaemonLogger.Printf("attempting to ssh to the ssh-forwarder container\n")
 	for {
 		cmd := exec.Command(
 			"ssh",
@@ -103,7 +105,7 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("-- ssh output --\n%s\n--\n", output)
+			DaemonLogger.Printf("ssh output: %s\n", output)
 
 			potentialStartupErrors := [][]byte{
 				[]byte("Connection refused"),

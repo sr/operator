@@ -1,6 +1,9 @@
 package devenv
 
 import (
+	"io"
+	"log"
+	"log/syslog"
 	"os"
 	"path"
 
@@ -12,6 +15,24 @@ const (
 
 	preferencesSubdirectory = ".devenv"
 )
+
+var (
+	// DaemonLogger is a logger appropriate for use for background tasks. It
+	// outputs to syslog if possible.
+	DaemonLogger *log.Logger
+)
+
+func init() {
+	var w io.Writer
+
+	w, err := syslog.New(syslog.LOG_NOTICE|syslog.LOG_DAEMON, "devenv")
+	if err != nil {
+		DaemonLogger = log.New(os.Stderr, "devenv", log.LstdFlags)
+		DaemonLogger.Printf("unable to log to syslog, falling back to stderr: %v\n", err)
+	} else {
+		DaemonLogger = log.New(w, "", 0)
+	}
+}
 
 // EnsurePersistentDirectoryCreated ensures a directory underneath ~/.devenv is
 // created and ready for use. If clear is true, the directory is recursively
