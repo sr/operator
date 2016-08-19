@@ -58,19 +58,17 @@ func run() error {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
 				return err
-			} else {
-				if err = os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
-					return err
-				}
+			}
+			if err := os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
+				return err
 			}
 
 			volume, err := forwarder.DockerVolume()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
-			} else {
-				if err = os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
-					return err
-				}
+			}
+			if err := os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
+				return err
 			}
 		} else {
 			fmt.Fprintf(os.Stderr, "Warning: The ssh-forwarder container is not started. Have you started the service? Try: brew services start devenv\n")
