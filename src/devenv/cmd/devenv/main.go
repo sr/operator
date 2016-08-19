@@ -7,6 +7,7 @@ import (
 	"log"
 	"log/syslog"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
@@ -57,19 +58,17 @@ func run() error {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
 				return err
-			} else {
-				if err = os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
-					return err
-				}
+			}
+			if err := os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
+				return err
 			}
 
 			volume, err := forwarder.DockerVolume()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
-			} else {
-				if err = os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
-					return err
-				}
+			}
+			if err := os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
+				return err
 			}
 		} else {
 			fmt.Fprintf(os.Stderr, "Warning: The ssh-forwarder container is not started. Have you started the service? Try: brew services start devenv\n")
@@ -87,6 +86,26 @@ func run() error {
 				return err
 			}
 		} else if args[0] == "compose" {
+			// If left unspecified by the user, set COMPOSE_FILE to include
+			// docker-compose.dev.yml
+			if os.Getenv("COMPOSE_FILE") == "" {
+				cwd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+
+				composeFiles := make([]string, 0, 2)
+				if file := devenv.FindDockerComposeFile("docker-compose.yml", cwd); file != "" {
+					composeFiles = append(composeFiles, file)
+				}
+				if file := devenv.FindDockerComposeFile("docker-compose.dev.yml", cwd); file != "" {
+					composeFiles = append(composeFiles, file)
+				}
+				if err = os.Setenv("COMPOSE_FILE", strings.Join(composeFiles, ":")); err != nil {
+					return err
+				}
+			}
+
 			if err := syscall.Exec(ComposeBinary, args, os.Environ()); err != nil {
 				return err
 			}
