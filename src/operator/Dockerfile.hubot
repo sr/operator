@@ -1,9 +1,0 @@
-FROM node:0.12
-MAINTAINER pd-bread@salesforce.com
-WORKDIR /app
-COPY /hubot/package.json /app/package.json
-COPY /hubot/npm-shrinkwrap.json /app/npm-shrinkwrap.json
-RUN npm install
-ENV PATH /app/bin:$PATH
-CMD ["hubot"]
-COPY /hubot /app

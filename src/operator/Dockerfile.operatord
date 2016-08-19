@@ -1,4 +1,0 @@
-FROM scratch
-COPY /operatord /app/operatord
-EXPOSE 9000
-CMD ["/app/operatord","-listen-addr","0.0.0.0:9000"]
