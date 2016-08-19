@@ -177,8 +177,7 @@ func (f *SSHForwarder) sshAuthSockReady() error {
 		return fmt.Errorf("SSH_AUTH_SOCK is unset")
 	}
 
-	_, err := os.Stat(authSock)
-	if err != nil {
+	if _, err := os.Stat(authSock); err != nil {
 		return fmt.Errorf("unable to stat %v: %v", authSock, err)
 	}
 
