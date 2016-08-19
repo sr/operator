@@ -1,4 +1,17 @@
-# Parbot
+# Parbot is deprecated
+
+Parbot is deprecated. Only bug fixes and minor changes will be accepted. Please
+develop all new production commands and other fun stuff for [HAL9000][].
+
+Come talk to us in the [Build & Automate][HipChat] room on HipChat if you
+any have question.
+
+— The BREAD Team
+
+[HipChat]: https://hipchat.dev.pardot.com/rooms/show/42
+[HAL9000]: https://git.dev.pardot.com/Pardot/bread/tree/master/src/hal9000#readme
+
+* * *
 
 Parbot is our useful, but not production-critical chatbot. If you're looking for
 our production-critical chatops bot, head over to
