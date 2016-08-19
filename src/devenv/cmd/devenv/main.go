@@ -3,6 +3,9 @@ package main
 import (
 	"devenv"
 	"fmt"
+	"io"
+	"log"
+	"log/syslog"
 	"os"
 	"syscall"
 	"time"
@@ -26,6 +29,8 @@ func main() {
 }
 
 func run() error {
+	logger := buildLogger()
+
 	args := os.Args[1:]
 	if len(args) <= 0 || args[0] == "--help" || args[0] == "-h" {
 		usage()
@@ -46,27 +51,28 @@ func run() error {
 			return err
 		}
 
-		forwarder := devenv.NewSSHForwarder(client)
+		forwarder := devenv.NewSSHForwarder(client, logger)
 		if forwarder.IsStarted() {
 			authSock, err := forwarder.DockerSSHAuthSock()
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
 				return err
-			}
-
-			if err = os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
-				return err
+			} else {
+				if err = os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
+					return err
+				}
 			}
 
 			volume, err := forwarder.DockerVolume()
 			if err != nil {
-				return err
-			}
-
-			if err = os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
-				return err
+				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
+			} else {
+				if err = os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
+					return err
+				}
 			}
 		} else {
-			fmt.Fprintf(os.Stderr, "warning: the ssh-forwarder container is not started\n")
+			fmt.Fprintf(os.Stderr, "Warning: The ssh-forwarder container is not started. Have you started the service? Try: brew services start devenv\n")
 		}
 
 		if args[0] == "docker" {
@@ -95,8 +101,9 @@ func run() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
-		forwarder := devenv.NewSSHForwarder(client)
+		forwarder := devenv.NewSSHForwarder(client, logger)
 		if err := forwarder.Run(ctx); err != nil {
+			logger.Printf("ssh-forwarder: %v\n", err)
 			return err
 		}
 	} else {
@@ -121,4 +128,15 @@ func usage() {
 	fmt.Println("  devenv docker ps")
 	fmt.Println("  devenv compose up")
 	fmt.Println("")
+}
+
+func buildLogger() *log.Logger {
+	var w io.Writer
+
+	w, err := syslog.New(syslog.LOG_NOTICE|syslog.LOG_DAEMON, "devenv")
+	if err != nil {
+		return log.New(os.Stderr, "devenv", log.LstdFlags)
+	}
+
+	return log.New(w, "", 0)
 }
