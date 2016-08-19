@@ -7,13 +7,13 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/...)
+PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/... | grep -Ev '^devenv/vendor/')
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 all: deadleaves fmt lint vet errcheck test install interfacer unused
 
 install:
-	$(GO) install -v $(PACKAGES)
+	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
 
 test:
 	$(GO) test -race $(PACKAGES)
@@ -28,14 +28,14 @@ install-devenv:
 	$(GO) install -v $$($(GO) list devenv/...)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -Ev 'github.com/')"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^devenv/vendor/|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
 		fi
 
 fmt: $(GOFMT)
-	@ for file in $$(find src -name '*.go' | grep -Ev '^src/github.com/' | grep -v -E '\.pb\.go$$'); do \
+	@ for file in $$(find src -name '*.go' | grep -v -E '\.pb\.go$$'); do \
 			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
@@ -64,7 +64,7 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				fail=true; \
@@ -76,7 +76,7 @@ interfacer: $(INTERFACER)
 	$< $(PACKAGES)
 
 $(DEADLEAVES):
-	$(GO) install -v github.com/nf/deadleaves
+	$(GO) install -v github.com/alindeman/deadleaves
 
 $(ERRCHECK):
 	$(GO) install -v github.com/kisielk/errcheck

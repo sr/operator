@@ -7,18 +7,19 @@ package ping;
 option go_package = "breadping";
 
 service Pinger {
-  option (operator.name) = "ping";
+    option (operator.name) = "ping";
 
-  rpc Ping(PingRequest) returns (PingResponse);
+    rpc Ping(PingRequest) returns (PingResponse);
 }
 
 message PingerConfig {
 }
 
 message PingRequest {
-  operator.Source source = 1;
+    operator.Source source = 1;
+    string arg1 = 2;
 }
 
 message PingResponse {
-  operator.Output output = 1;
+    operator.Output output = 1;
 }

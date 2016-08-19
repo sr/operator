@@ -1,6 +1,7 @@
 package devenv
 
 import (
+	"log"
 	"os"
 	"path"
 
@@ -44,8 +45,9 @@ func UnsatisfiedRequirements() []string {
 	return errors
 }
 
-func NewSSHForwarder(client *docker.Client) *SSHForwarder {
+func NewSSHForwarder(client *docker.Client, logger *log.Logger) *SSHForwarder {
 	return &SSHForwarder{
 		client: client,
+		logger: logger,
 	}
 }

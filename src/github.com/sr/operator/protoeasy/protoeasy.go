@@ -58,8 +58,6 @@ type CompileOptions struct {
 	LetmegrpcModifiers          map[string]string
 	OperatorCmd                 bool
 	OperatorCmdOut              string
-	OperatorHubot               bool
-	OperatorHubotOut            string
 	OperatorLocal               bool
 	OperatorLocalOut            string
 	OperatorServer              bool
