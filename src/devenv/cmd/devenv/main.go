@@ -76,8 +76,11 @@ func run() error {
 
 		if args[0] == "docker" {
 			if args[1] == "run" {
-				newArgs := args[0:2]
-				newArgs = append(newArgs, "-e", "DOCKER_SSH_AUTH_SOCK", "-v", os.Getenv("DOCKER_SSH_AUTH_VOLUME"))
+				newArgs := []string{args[0], args[1]}
+				newArgs = append(newArgs, "-e", "DOCKER_SSH_AUTH_SOCK")
+				if sshAuthVolume := os.Getenv("DOCKER_SSH_AUTH_VOLUME"); sshAuthVolume != "" {
+					newArgs = append(newArgs, "-v", sshAuthVolume)
+				}
 				newArgs = append(newArgs, args[2:]...)
 				args = newArgs
 			}
