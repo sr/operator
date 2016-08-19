@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -26,6 +27,7 @@ const (
 
 type SSHForwarder struct {
 	client *docker.Client
+	logger *log.Logger
 }
 
 func (f *SSHForwarder) Run(ctx context.Context) error {
@@ -95,8 +97,8 @@ func (f *SSHForwarder) Run(ctx context.Context) error {
 		return fmt.Errorf("unable to find port mapping for 22/tcp")
 	}
 
-	DaemonLogger.Printf("SSH_AUTH_SOCK=%v\n", os.Getenv("SSH_AUTH_SOCK"))
-	DaemonLogger.Printf("attempting to ssh to the ssh-forwarder container\n")
+	f.logger.Printf("SSH_AUTH_SOCK=%v\n", os.Getenv("SSH_AUTH_SOCK"))
+	f.logger.Printf("attempting to ssh to the ssh-forwarder container\n")
 
 	errSSHC := make(chan error)
 	stopSSHC := make(chan interface{})
@@ -210,7 +212,7 @@ func (f *SSHForwarder) forwardAgentOverSSH(hostPort string, stop <-chan interfac
 		select {
 		case err := <-waitC:
 			output := buf.String()
-			DaemonLogger.Printf("ssh output: %s\n", output)
+			f.logger.Printf("ssh output: %s\n", output)
 
 			if err != nil {
 				// Some errors are allowed to account for a race between the Docker
@@ -232,7 +234,7 @@ func (f *SSHForwarder) forwardAgentOverSSH(hostPort string, stop <-chan interfac
 					return err
 				}
 			} else {
-				DaemonLogger.Printf("ssh exited normally, restarting")
+				f.logger.Printf("ssh exited normally, restarting")
 			}
 		case <-stop:
 			_ = cmd.Process.Kill()

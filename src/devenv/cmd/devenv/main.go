@@ -3,6 +3,9 @@ package main
 import (
 	"devenv"
 	"fmt"
+	"io"
+	"log"
+	"log/syslog"
 	"os"
 	"syscall"
 	"time"
@@ -26,6 +29,8 @@ func main() {
 }
 
 func run() error {
+	logger := buildLogger()
+
 	args := os.Args[1:]
 	if len(args) <= 0 || args[0] == "--help" || args[0] == "-h" {
 		usage()
@@ -46,7 +51,7 @@ func run() error {
 			return err
 		}
 
-		forwarder := devenv.NewSSHForwarder(client)
+		forwarder := devenv.NewSSHForwarder(client, logger)
 		if forwarder.IsStarted() {
 			authSock, err := forwarder.DockerSSHAuthSock()
 			if err != nil {
@@ -96,9 +101,9 @@ func run() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
-		forwarder := devenv.NewSSHForwarder(client)
+		forwarder := devenv.NewSSHForwarder(client, logger)
 		if err := forwarder.Run(ctx); err != nil {
-			devenv.DaemonLogger.Printf("ssh-forwarder: %v\n", err)
+			logger.Printf("ssh-forwarder: %v\n", err)
 			return err
 		}
 	} else {
@@ -123,4 +128,15 @@ func usage() {
 	fmt.Println("  devenv docker ps")
 	fmt.Println("  devenv compose up")
 	fmt.Println("")
+}
+
+func buildLogger() *log.Logger {
+	var w io.Writer
+
+	w, err := syslog.New(syslog.LOG_NOTICE|syslog.LOG_DAEMON, "devenv")
+	if err != nil {
+		return log.New(os.Stderr, "devenv", log.LstdFlags)
+	}
+
+	return log.New(w, "", 0)
 }
