@@ -73,7 +73,7 @@ resource "aws_db_instance" "canoe_production" {
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
   vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
   storage_encrypted = false
-  backup_retention_period = 5
+  backup_retention_period = 30
   apply_immediately = true
 }
 
@@ -98,7 +98,8 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_eip.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32"
     ]
     security_groups = [
       "${aws_security_group.internal_apps_chef_server.id}"

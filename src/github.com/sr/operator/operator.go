@@ -3,14 +3,11 @@ package operator
 import (
 	"errors"
 	"flag"
-	"strings"
-	"time"
+	"net/http"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 )
 
 const DefaultAddress = "localhost:9000"
@@ -30,11 +27,25 @@ type Logger interface {
 	Error(proto.Message)
 }
 
-type Sourcer interface {
-	GetSource() *Source
+type RequestDecoder interface {
+	Decode(*http.Request) (*Message, error)
 }
 
-type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
+type ChatClient interface {
+	SendRoomNotification(*ChatRoomNotification) error
+}
+
+type ChatRoomNotification struct {
+	Color         string `json:"color"`
+	From          string `json:"from"`
+	Message       string `json:"message"`
+	MessageFormat string `json:"message_format"`
+	RoomID        int    `json:"-"`
+}
+
+type Invoker func(*grpc.ClientConn, *Request, map[string]string) (bool, error)
+
+type ServerBuilder func(ChatClient, *grpc.Server, *flag.FlagSet) (map[string]error, error)
 
 type Config struct {
 	Address string
@@ -77,40 +88,24 @@ func NewInstrumenter(logger Logger) Instrumenter {
 	return newInstrumenter(logger)
 }
 
-func NewInterceptor(
+func NewHandler(
+	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-) grpc.UnaryServerInterceptor {
-	return func(
-		ctx context.Context,
-		in interface{},
-		info *grpc.UnaryServerInfo,
-		handler grpc.UnaryHandler,
-	) (interface{}, error) {
-		sourcer, ok := in.(Sourcer)
-		if !ok || sourcer.GetSource() == nil {
-			return nil, ErrInvalidRequest
-		}
-		s := strings.Split(info.FullMethod, "/")
-		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
-			return nil, ErrInvalidRequest
-		}
-		request := &Request{
-			Source: sourcer.GetSource(),
-			Call:   &Call{Service: s[1], Method: s[2]},
-		}
-		if err := authorizer.Authorize(request); err != nil {
-			return nil, err
-		}
-		start := time.Now()
-		response, err := handler(ctx, in)
-		if err != nil {
-			request.Call.Error = &Error{Message: err.Error()}
-		}
-		request.Call.Duration = ptypes.DurationProto(time.Since(start))
-		instrumenter.Instrument(request)
-		return response, err
-	}
+	decoder RequestDecoder,
+	prefix string,
+	conn *grpc.ClientConn,
+	invoker Invoker,
+) (http.Handler, error) {
+	return newHandler(
+		logger,
+		instrumenter,
+		authorizer,
+		decoder,
+		prefix,
+		conn,
+		invoker,
+	)
 }
 
 func NewArgumentRequiredError(argument string) error {

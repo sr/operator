@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+
+package bread;
+
+message HTTPRequest {
+  string method = 1;
+  string path = 2;
+  map<string, string> query = 3;
+  uint32 status_code = 7;
+  google.protobuf.Duration duration = 8;
+  string error = 9;
+}

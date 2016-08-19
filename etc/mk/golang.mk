@@ -7,7 +7,7 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/...)
+PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/... | grep -Ev '^devenv/vendor/')
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 all: deadleaves fmt lint vet errcheck test install interfacer unused
@@ -24,8 +24,11 @@ clean: operator-clean
 install-tools:
 	$(GO) install -v $(TOOLS)
 
+install-devenv:
+	$(GO) install -v $$($(GO) list devenv/...)
+
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^devenv/vendor/|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
@@ -61,7 +64,7 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				fail=true; \
@@ -85,7 +88,7 @@ $(INTERFACER):
 	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install -v github.com/dominikh/go-unused/cmd
+	$(GO) install -v github.com/dominikh/go-unused/cmd/unused
 
 .PHONY: \
 	all \

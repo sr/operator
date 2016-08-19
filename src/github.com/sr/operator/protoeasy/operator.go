@@ -65,13 +65,6 @@ func getOperatorPlugins(options *CompileOptions) []plugin {
 			options.GoImportPath,
 		})
 	}
-	if options.OperatorHubot {
-		plugins = append(plugins, &operatorPlugin{
-			"hubot",
-			options.OperatorHubotOut,
-			options.GoImportPath,
-		})
-	}
 	if options.OperatorLocal {
 		plugins = append(plugins, &operatorPlugin{
 			"local",

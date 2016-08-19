@@ -24,8 +24,14 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "ping",
 					Synopsis: `Undocumented.`,
-					Flags:    []*flag.Flag{},
+					Flags: []*flag.Flag{
+						{
+							Name:  "arg1",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
+						arg1 := ctx.Flags.String("arg1", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -39,6 +45,7 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&ping.PingRequest{
 								Source: ctx.Source,
+								Arg1:   *arg1,
 							},
 						)
 						if err != nil {

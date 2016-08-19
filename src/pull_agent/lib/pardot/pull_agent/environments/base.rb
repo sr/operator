@@ -172,8 +172,6 @@ module Pardot
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
           end.map { |s| [s["address"], s["port"]].join(":") }
 
-          # Restart automation workers
-          redis.bounce_workers("automationWorkers", autojob_disco_master)
           # Restart per account automation workers
           redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)
           # Restart timed automation workers

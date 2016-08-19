@@ -10,7 +10,7 @@ import (
 
 const (
 	executable = "protoc-gen-operatord"
-	filename   = "builder-gen.go"
+	filename   = "main-gen.go"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {

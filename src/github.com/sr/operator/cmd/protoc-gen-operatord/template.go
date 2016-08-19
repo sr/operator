@@ -12,6 +12,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sr/operator"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 {{range .Services}}
@@ -20,6 +22,7 @@ import (
 )
 
 func buildOperatorServer(
+	chat operator.ChatClient,
 	server *grpc.Server,
 	flags *flag.FlagSet,
 ) (map[string]error, error) {
@@ -49,7 +52,7 @@ func buildOperatorServer(
 	if len(errs["{{.Name}}"]) != 0 {
 		services["{{.Name}}"] = errors.New("required flag(s) missing: "+strings.Join(errs["{{.Name}}"], ", "))
 	} else {
-		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer({{.PackageName}}Config)
+		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer(chat, {{.PackageName}}Config)
 		if err != nil {
 			services["{{.Name}}"] = err
 		} else {
@@ -59,4 +62,33 @@ func buildOperatorServer(
 	}
 {{- end}}
 	return services, nil
-}`)
+}
+
+func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+{{- range .Services}}
+	{{- $serviceName := .PackageName }}
+	{{- $serviceFullName := .FullName }}
+	if req.Call.Service == "{{lowerCase .PackageName}}" {
+	{{- range .Methods }}
+		if req.Call.Method == "{{lowerCase .Name}}" {
+			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+			_, err := client.{{.Name}}(
+				context.Background(),
+				&{{$serviceName}}.{{.Input}}{
+					Source: req.Source,
+					{{- range .Arguments}}
+					{{camelCase .Name}}: args["{{.Name}}"],
+					{{- end}}
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+	{{- end }}
+	}
+	return false, nil
+{{- end }}
+}
+`)

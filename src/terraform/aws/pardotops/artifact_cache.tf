@@ -47,7 +47,9 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_eip.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
+      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32"
     ]
   }
 
@@ -205,6 +207,14 @@ resource "aws_instance" "artifact_cache_server_1" {
     Name = "pardot0-artifactcache1-1-ue1"
   }
 }
+resource "aws_route53_record" "artifact_cache_server_1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-artifactcache1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.artifact_cache_server_1.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "artifact_cache_server_2" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
@@ -221,6 +231,14 @@ resource "aws_instance" "artifact_cache_server_2" {
     Name = "pardot0-artifactcache1-2-ue1"
   }
 }
+resource "aws_route53_record" "artifact_cache_server_2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-artifactcache1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.artifact_cache_server_2.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "artifact_cache_server_3" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
@@ -237,6 +255,14 @@ resource "aws_instance" "artifact_cache_server_3" {
     Name = "pardot0-artifactcache1-3-ue1"
   }
 }
+resource "aws_route53_record" "artifact_cache_server_3_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-artifactcache1-3-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.artifact_cache_server_3.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_instance" "artifact_cache_server_4" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
@@ -252,4 +278,11 @@ resource "aws_instance" "artifact_cache_server_4" {
     terraform = "true"
     Name = "pardot0-artifactcache1-4-ue1"
   }
+}
+resource "aws_route53_record" "artifact_cache_server_4_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-artifactcache1-4-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.artifact_cache_server_4.private_ip}"]
+  type = "A"
+  ttl = "900"
 }
