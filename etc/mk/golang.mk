@@ -76,7 +76,7 @@ interfacer: $(INTERFACER)
 	$< $(PACKAGES)
 
 $(DEADLEAVES):
-	$(GO) install -v github.com/alindeman/deadleaves
+	$(GO) install -v github.com/nf/deadleaves
 
 $(ERRCHECK):
 	$(GO) install -v github.com/kisielk/errcheck
