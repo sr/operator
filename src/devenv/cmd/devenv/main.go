@@ -89,7 +89,7 @@ func run() error {
 			}
 		} else if args[0] == "compose" {
 			// If left unspecified by the user, set COMPOSE_FILE to include
-			// docker-compose.devenv.yml
+			// docker-compose.dev.yml
 			if os.Getenv("COMPOSE_FILE") == "" {
 				cwd, err := os.Getwd()
 				if err != nil {
@@ -100,7 +100,7 @@ func run() error {
 				if file := devenv.FindDockerComposeFile("docker-compose.yml", cwd); file != "" {
 					composeFiles = append(composeFiles, file)
 				}
-				if file := devenv.FindDockerComposeFile("docker-compose.devenv.yml", cwd); file != "" {
+				if file := devenv.FindDockerComposeFile("docker-compose.dev.yml", cwd); file != "" {
 					composeFiles = append(composeFiles, file)
 				}
 				if err = os.Setenv("COMPOSE_FILE", strings.Join(composeFiles, ":")); err != nil {

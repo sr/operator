@@ -1,6 +1,7 @@
-package devenv
+package devenv_test
 
 import (
+	"devenv"
 	"io/ioutil"
 	"os"
 	"path"
@@ -27,12 +28,12 @@ func TestFindsComposeFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	file := FindDockerComposeFile("docker-compose.yml", path.Join(tempDir, "dir1", "dir2", "dir3"))
+	file := devenv.FindDockerComposeFile("docker-compose.yml", path.Join(tempDir, "dir1", "dir2", "dir3"))
 	if file != dockerComposeFile {
 		t.Fatalf("expected %v, got %v", dockerComposeFile, file)
 	}
 
-	file = FindDockerComposeFile("nananana-batman.yml", path.Join(tempDir, "dir1", "dir2", "dir3"))
+	file = devenv.FindDockerComposeFile("nananana-batman.yml", path.Join(tempDir, "dir1", "dir2", "dir3"))
 	if file != "" {
 		t.Fatalf("expected %v, got %v", "", file)
 	}
