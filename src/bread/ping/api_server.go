@@ -15,6 +15,7 @@ type apiServer struct {
 
 func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
 	if err := s.chat.SendRoomNotification(
+		context,
 		&operator.ChatRoomNotification{
 			RoomID:        bread.TestingRoom,
 			From:          "pinger.Ping",

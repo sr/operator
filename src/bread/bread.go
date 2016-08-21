@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"golang.org/x/net/context"
+
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 )
@@ -14,12 +16,6 @@ const (
 	TestingRoom = 882 // BREAD Testing
 	PublicRoom  = 42  // Build & Automate
 )
-
-type HipchatConfig struct {
-	Hostname    string
-	Token       string
-	OAuthClient *operatorhipchat.OAuthClient
-}
 
 func NewLogger() operator.Logger {
 	return operator.NewLogger()
@@ -33,8 +29,8 @@ func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClient(config *HipchatConfig) (operator.ChatClient, error) {
-	return newHipchatClient(config)
+func NewHipchatClient(config *operatorhipchat.ClientConfig) (operator.ChatClient, error) {
+	return operatorhipchat.NewClient(context.Background(), config)
 }
 
 func NewHipchatOAuthClientStore(db *sql.DB) operatorhipchat.OAuthClientStore {

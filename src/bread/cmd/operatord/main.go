@@ -103,13 +103,13 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			if config.hipchatAddonID == "" {
 				return fmt.Errorf("required flag missing: hipchat-addon-id")
 			}
-			c, err := store.GetByAddonID(config.hipchatAddonID)
+			creds, err := store.GetByAddonID(config.hipchatAddonID)
 			if err != nil {
 				return err
 			}
 			chat, err := bread.NewHipchatClient(
-				&bread.HipchatConfig{
-					OAuthClient: c,
+				&operatorhipchat.ClientConfig{
+					Credentials: creds,
 					Hostname:    bread.HipchatHost,
 				},
 			)
