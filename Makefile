@@ -5,6 +5,8 @@ GOLINT ?= $(GOBIN)/golint
 DEADLEAVES ?= $(GOBIN)/deadleaves
 ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
+PROTOC ?= $(shell which protoc)
+PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
 UNUSED = $(GOBIN)/unused
 
 PACKAGES ?= $(shell $(GO) list ./...)
@@ -21,6 +23,9 @@ test:
 
 clean:
 	$(GO) clean -i ./...
+
+proto: $(PROTOC) $(PROTOC_GEN_GO)
+	$< -I. --go_out=Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:. *.proto
 
 deps:
 	$(GO) get \
@@ -88,6 +93,9 @@ $(GOLINT):
 $(INTERFACER):
 	$(GO) get -v github.com/mvdan/interfacer/cmd/interfacer
 
+$(PROTOC_GEN_GEN):
+	$(GO) get -v github.com/golang/protobuf/protoc-gen-go
+
 $(UNUSED):
 	$(GO) get -v github.com/dominikh/go-unused/cmd/unused
 
@@ -101,5 +109,6 @@ $(UNUSED):
 	install \
 	interfacer \
 	lint \
+	proto \
 	unused \
 	vet
