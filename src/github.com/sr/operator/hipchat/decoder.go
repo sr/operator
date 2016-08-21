@@ -66,11 +66,11 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 		if err := json.Unmarshal([]byte(payload), &data); err != nil {
 			return err
 		}
-		c, err := d.store.GetByOAuthID(data.Iss)
+		creds, err := d.store.GetByOAuthID(data.Iss)
 		if err != nil {
 			return err
 		}
-		return []byte(c.Secret)
+		return []byte(creds.Secret)
 	})
 	if err != nil {
 		return nil, err
@@ -88,9 +88,8 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 				Id:       strconv.Itoa(data.Item.Message.From.ID),
 				Login:    data.Item.Message.From.MentionName,
 				RealName: data.Item.Message.From.Name,
-				Email:    "",
+				Email:    "", // TODO(sr) Fetch the user email from the API
 			},
-			Hostname: "",
 		},
 	}, nil
 }

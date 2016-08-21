@@ -1,10 +1,8 @@
 package breadping
 
 import (
-	"bread"
-	"fmt"
-
 	"github.com/sr/operator"
+	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 )
 
@@ -13,22 +11,13 @@ type apiServer struct {
 	chat   operator.ChatClient
 }
 
-func (s *apiServer) Ping(context context.Context, request *PingRequest) (*PingResponse, error) {
-	if err := s.chat.SendRoomNotification(
-		context,
-		&operator.ChatRoomNotification{
-			RoomID:        bread.TestingRoom,
-			From:          "pinger.Ping",
-			Color:         "green",
-			MessageFormat: "text",
-			Message:       fmt.Sprintf("pong arg1=%#v", request.Arg1),
+func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*PingResponse, error) {
+	return &PingResponse{}, operator.Reply(ctx, req, &operator.Message{
+		Text: "pong",
+		HTML: "<b>pong</b>",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "gray",
+			From:  "pinger.Ping",
 		},
-	); err != nil {
-		return nil, err
-	}
-	return &PingResponse{
-		Output: &operator.Output{
-			PlainText: "pong",
-		},
-	}, nil
+	}, s.chat)
 }

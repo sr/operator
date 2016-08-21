@@ -49,11 +49,6 @@ message User {
 	string email = 4;
 }
 
-message Message {
-	Source source = 1;
-	string text = 2;
-}
-
 message Output {
 	string PlainText = 1;
 }
