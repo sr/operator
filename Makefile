@@ -1,17 +1,26 @@
 GO ?= go
 GOBIN ?= $(GOPATH)/bin
-GOFMT ?= gofmt
+GOFMT ?= $(shell which gofmt)
 GOLINT ?= $(GOBIN)/golint
+DEADLEAVES ?= $(GOBIN)/deadleaves
 ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES ?= $(shell go list ./...)
-SRC ?= $(shell find . -name '*.go' | sort)
+PACKAGES ?= $(shell $(GO) list ./...)
 
-all: deps fmt lint vet errcheck interfacer unused install
+all: deps fmt lint vet errcheck test install interfacer unused
 
 ci: clean all
+
+install:
+	$(GO) install -v $(PACKAGES)
+
+test:
+	$(GO) test -race $(PACKAGES)
+
+clean:
+	$(GO) clean -i ./...
 
 deps:
 	$(GO) get \
@@ -26,15 +35,9 @@ deps:
 		google.golang.org/grpc \
 		golang.org/x/net/context
 
-clean:
-	$(GO) clean -i $(PACKAGES)
-
-install:
-	go install -race -v $(PACKAGES)
-
-fmt:
-	@ for file in $(SRC); do \
-			out="$$($(GOFMT) -s -d $$file)"; \
+fmt: $(GOFMT)
+	@ for file in $$(find . -name '*.go' | grep -v -E '\.pb\.go$$'); do \
+			out="$$($< -s -d $$file)"; \
 			if [ $$? -ne 0 ]; then \
 				echo "fmt: $$out"; \
 				exit 1; \
@@ -54,35 +57,27 @@ lint: $(GOLINT)
 				fi; \
 			done
 
+unused: $(UNUSED)
+	$< $(PACKAGES)
+
+vet:
+	$(GO) vet $(PACKAGES)
+
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
+			if [ -n "$$out" ]; then \
+				echo "$$out"; \
 				fail=true; \
 			fi; \
 	  done; \
 	  test $$fail && exit 1; true
 
 interfacer: $(INTERFACER)
-	@ for pkg in $(PACKAGES); do \
-			$< $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-	  done; \
-	  test $$fail && exit 1; true
+	$< $(PACKAGES)
 
-unused: $(UNUSED)
-	@ for pkg in $(PACKAGES); do \
-			$< -fields $$pkg; \
-			if [ $$? -ne 0 ]; then \
-				fail=true; \
-			fi; \
-		done; \
-		test $$fail && exit 1; true
-
-vet:
-	@ $(GO) vet $(PACKAGES)
+$(DEADLEAVES):
+	$(GO) get -v github.com/nf/deadleaves
 
 $(ERRCHECK):
 	$(GO) get -v github.com/kisielk/errcheck
@@ -94,12 +89,13 @@ $(INTERFACER):
 	$(GO) get -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) get -v honnef.co/go/unused/cmd/unused
+	$(GO) get -v github.com/dominikh/go-unused/cmd/unused
 
 .PHONY: \
 	all \
-	ci \
-	clean \
+	build \
+  ci \
+	deps \
 	errcheck \
 	fmt \
 	install \
