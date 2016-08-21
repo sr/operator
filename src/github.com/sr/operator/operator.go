@@ -115,15 +115,15 @@ func NewHandler(
 	)
 }
 
-func Reply(ctx context.Context, req Sourcer, msg *Message, chat ChatClient) error {
+func Reply(ctx context.Context, req Sourcer, msg *Message, chat ChatClient) (*Response, error) {
 	if req.GetSource() == nil {
-		return errors.New("unable to reply to message without a source")
+		return nil, errors.New("unable to reply to message without a source")
 	}
 	if chat == nil {
-		return errors.New("unable to reply without a chat client")
+		return nil, errors.New("unable to reply without a chat client")
 	}
 	if msg.HTML == "" && msg.Text == "" {
-		return errors.New("one of msg.HTML or msg.Text must be set")
+		return nil, errors.New("one of msg.HTML or msg.Text must be set")
 	}
-	return chat.Reply(ctx, req.GetSource(), msg)
+	return &Response{Message: msg.Text}, chat.Reply(ctx, req.GetSource(), msg)
 }

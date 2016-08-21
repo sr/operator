@@ -11,8 +11,8 @@ type apiServer struct {
 	chat   operator.ChatClient
 }
 
-func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*PingResponse, error) {
-	return &PingResponse{}, operator.Reply(ctx, req, &operator.Message{
+func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {
+	return operator.Reply(ctx, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
 		Options: &operatorhipchat.MessageOptions{
