@@ -2,6 +2,7 @@ package bread
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -41,7 +42,7 @@ func NewHipchatAddonHandler(
 	id string,
 	addonURL string,
 	webhookURL string,
-	s operatorhipchat.ClientCredentialsStore,
+	store operatorhipchat.ClientCredentialsStore,
 	prefix string,
 ) (http.Handler, error) {
 	u, err := url.Parse(addonURL)
@@ -52,7 +53,18 @@ func NewHipchatAddonHandler(
 	if err != nil {
 		return nil, err
 	}
-	return newHipchatAddonHandler(id, u, wu, prefix, s)
+	return operatorhipchat.NewAddonHandler(
+		store,
+		&operatorhipchat.AddonConfig{
+			ID:            id,
+			Name:          fmt.Sprintf("Operator (%s)", id),
+			Key:           "com.pardot.dev.operator." + id,
+			URL:           u,
+			Homepage:      "https://git.dev.pardot.com/Pardot/bread",
+			WebhookPrefix: prefix,
+			WebhookURL:    wu,
+		},
+	)
 }
 
 func NewPingHandler(db *sql.DB) http.Handler {

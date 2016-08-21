@@ -17,8 +17,6 @@ import (
 
 const defaultHostname = "api.hipchat.com"
 
-var defaultScopes = []string{"send_message", "send_notification"}
-
 type client struct {
 	hostname string
 	cli      *http.Client
@@ -29,7 +27,7 @@ func newClient(ctx context.Context, config *ClientConfig) (*client, error) {
 		config.Hostname = defaultHostname
 	}
 	if config.Scopes == nil {
-		config.Scopes = defaultScopes
+		config.Scopes = DefaultScopes
 	}
 	if config.Token != "" {
 		return &client{

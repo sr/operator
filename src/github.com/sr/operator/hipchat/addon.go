@@ -1,29 +1,28 @@
-package bread
+package operatorhipchat
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 	"net/url"
-
-	"github.com/sr/operator/hipchat"
+	"strings"
+	"text/template"
 )
 
 var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
-	"name": "Operator {{.AddonID}}",
-	"key": "com.pardot.dev.operator.{{.AddonID}}",
+	"name": "{{.Name}}",
+	"key": "{{.Key}}",
 	"description": "ChatOps",
 	"links": {
-		"homepage": "https://git.dev.pardot.com/Pardot/bread",
-		"self": "{{.AddonURL}}"
+		"homepage": "{{.Homepage}}",
+		"self": "{{.URL}}"
 	},
 	"capabilities": {
 		"installable": {
 			"allowGlobal": true,
 			"allowRoom": false,
-			"callbackUrl": "{{.AddonURL}}"
+			"callbackUrl": "{{.URL}}"
 		},
 		"webhook": [
 			{
@@ -31,51 +30,62 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 				"pattern": "{{.Pattern}}",
 				"event": "room_message",
 				"authentication": "jwt",
-				"name": "Operator"
+				"name": "operator"
 			}
 		],
 		"hipchatApiConsumer": {
-			"scopes": [
-				"send_message",
-				"send_notification"
-			]
+			"scopes": [{{.Scopes}}]
 		}
 	}
 }`))
 
-type hipchatAddonHandler struct {
+type addonHandler struct {
 	id    string
 	url   *url.URL
 	desc  string
-	store operatorhipchat.ClientCredentialsStore
+	store ClientCredentialsStore
 }
 
-func newHipchatAddonHandler(
-	id string,
-	url *url.URL,
-	webhookURL fmt.Stringer,
-	prefix string,
-	store operatorhipchat.ClientCredentialsStore,
-) (*hipchatAddonHandler, error) {
+func newAddonHandler(store ClientCredentialsStore, config *AddonConfig) (*addonHandler, error) {
+	if config.APIConsumerScopes == nil {
+		config.APIConsumerScopes = DefaultScopes
+	}
+	scopes := make([]string, len(config.APIConsumerScopes))
+	for i, s := range config.APIConsumerScopes {
+		scopes[i] = fmt.Sprintf(`"%s"`, s)
+	}
 	data := struct {
-		AddonID    string
-		AddonURL   string
+		ID         string
+		Name       string
+		Key        string
+		URL        string
+		Homepage   string
 		WebhookURL string
 		Pattern    string
+		Scopes     string
 	}{
-		id,
-		url.String(),
-		webhookURL.String(),
-		"^" + prefix,
+		config.ID,
+		config.Name,
+		config.Key,
+		config.URL.String(),
+		config.Homepage,
+		config.WebhookURL.String(),
+		"^" + config.WebhookPrefix,
+		strings.Join(scopes, ", "),
 	}
 	var buf bytes.Buffer
 	if err := descriptorTmpl.Execute(&buf, data); err != nil {
 		return nil, err
 	}
-	return &hipchatAddonHandler{id, url, buf.String(), store}, nil
+	return &addonHandler{
+		config.ID,
+		config.URL,
+		buf.String(),
+		store,
+	}, nil
 }
 
-func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" && req.URL.Path == h.url.Path {
 		req.Header.Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(h.desc))
@@ -94,7 +104,13 @@ func (h *hipchatAddonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
-		if err := h.store.PutByAddonID(h.id, &operatorhipchat.ClientCredentials{ID: data.OAuthID, Secret: data.OAuthSecret}); err != nil {
+		if err := h.store.PutByAddonID(
+			h.id,
+			&ClientCredentials{
+				ID:     data.OAuthID,
+				Secret: data.OAuthSecret,
+			},
+		); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			// TODO(sr) Log this but do not return it to the client
 			_, _ = w.Write([]byte(err.Error()))
