@@ -64,7 +64,7 @@ func buildOperatorServer(
 	return services, nil
 }
 
-func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 {{- range .Services}}
 	{{- $serviceName := .PackageName }}
 	{{- $serviceFullName := .FullName }}
@@ -73,7 +73,7 @@ func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]strin
 		if req.Call.Method == "{{lowerCase .Name}}" {
 			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
 			_, err := client.{{.Name}}(
-				context.Background(),
+				ctx,
 				&{{$serviceName}}.{{.Input}}{
 					Source: req.Source,
 					{{- range .Arguments}}

@@ -41,7 +41,7 @@ var cmd = operator.NewCommand(
 						}
 						defer conn.Close()
 						client := ping.NewPingerClient(conn)
-						response, err := client.Ping(
+						resp, err := client.Ping(
 							context.Background(),
 							&ping.PingRequest{
 								Source: ctx.Source,
@@ -51,7 +51,7 @@ var cmd = operator.NewCommand(
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
 					},
 				},
 			},
