@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type OAuthClientStore interface {
+type ClientCredentialsStore interface {
 	GetByAddonID(string) (*ClientCredentials, error)
 	GetByOAuthID(string) (*ClientCredentials, error)
 	PutByAddonID(string, *ClientCredentials) error
@@ -23,7 +23,7 @@ type ClientCredentials struct {
 	Secret string
 }
 
-func NewRequestDecoder(store OAuthClientStore) operator.RequestDecoder {
+func NewRequestDecoder(store ClientCredentialsStore) operator.RequestDecoder {
 	return newRequestDecoder(store)
 }
 

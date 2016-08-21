@@ -33,15 +33,15 @@ func NewHipchatClient(config *operatorhipchat.ClientConfig) (operator.ChatClient
 	return operatorhipchat.NewClient(context.Background(), config)
 }
 
-func NewHipchatOAuthClientStore(db *sql.DB) operatorhipchat.OAuthClientStore {
-	return newHipchatOAuthClientStore(db)
+func NewHipchatClientCredentialsStore(db *sql.DB) operatorhipchat.ClientCredentialsStore {
+	return newHipchatClientCredentialsStore(db)
 }
 
 func NewHipchatAddonHandler(
 	id string,
 	addonURL string,
 	webhookURL string,
-	s operatorhipchat.OAuthClientStore,
+	s operatorhipchat.ClientCredentialsStore,
 	prefix string,
 ) (http.Handler, error) {
 	u, err := url.Parse(addonURL)

@@ -76,7 +76,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/_ping", bread.NewHTTPLoggerHandler(logger, bread.NewPingHandler(db)))
-	store := bread.NewHipchatOAuthClientStore(db)
+	store := bread.NewHipchatClientCredentialsStore(db)
 	if config.hipchatAddonSetup {
 		if config.hipchatAddonURL == "" {
 			return fmt.Errorf("required flag missing: hipchat-addon-url")

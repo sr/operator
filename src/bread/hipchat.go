@@ -44,15 +44,15 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 	}
 }`))
 
-type hipchatOAuthClientStore struct {
+type hipchatClientCredentialsStore struct {
 	db *sql.DB
 }
 
-func newHipchatOAuthClientStore(db *sql.DB) *hipchatOAuthClientStore {
-	return &hipchatOAuthClientStore{db}
+func newHipchatClientCredentialsStore(db *sql.DB) *hipchatClientCredentialsStore {
+	return &hipchatClientCredentialsStore{db}
 }
 
-func (s *hipchatOAuthClientStore) GetByOAuthID(id string) (*operatorhipchat.ClientCredentials, error) {
+func (s *hipchatClientCredentialsStore) GetByOAuthID(id string) (*operatorhipchat.ClientCredentials, error) {
 	var (
 		oauthID     string
 		oauthSecret string
@@ -72,7 +72,7 @@ func (s *hipchatOAuthClientStore) GetByOAuthID(id string) (*operatorhipchat.Clie
 	}, nil
 }
 
-func (s *hipchatOAuthClientStore) GetByAddonID(id string) (*operatorhipchat.ClientCredentials, error) {
+func (s *hipchatClientCredentialsStore) GetByAddonID(id string) (*operatorhipchat.ClientCredentials, error) {
 	var (
 		oauthID     string
 		oauthSecret string
@@ -92,7 +92,7 @@ func (s *hipchatOAuthClientStore) GetByAddonID(id string) (*operatorhipchat.Clie
 	}, nil
 }
 
-func (s *hipchatOAuthClientStore) PutByAddonID(addonID string, client *operatorhipchat.ClientCredentials) error {
+func (s *hipchatClientCredentialsStore) PutByAddonID(addonID string, client *operatorhipchat.ClientCredentials) error {
 	_, err := s.db.Exec(`
 		INSERT INTO hipchat_addon_installs (
 			created_at,
@@ -112,7 +112,7 @@ type hipchatAddonHandler struct {
 	id    string
 	url   *url.URL
 	desc  string
-	store operatorhipchat.OAuthClientStore
+	store operatorhipchat.ClientCredentialsStore
 }
 
 func newHipchatAddonHandler(
@@ -120,7 +120,7 @@ func newHipchatAddonHandler(
 	url *url.URL,
 	webhookURL fmt.Stringer,
 	prefix string,
-	store operatorhipchat.OAuthClientStore,
+	store operatorhipchat.ClientCredentialsStore,
 ) (*hipchatAddonHandler, error) {
 	data := struct {
 		AddonID    string
