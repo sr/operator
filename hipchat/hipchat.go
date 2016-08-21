@@ -92,6 +92,7 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
 			// TODO(sr) New SourceType
 			Type: operator.SourceType_HUBOT,
 			Room: &operator.Room{
+				ID:   data.Item.Room.ID,
 				Name: data.Item.Room.Name,
 			},
 			User: &operator.User{
