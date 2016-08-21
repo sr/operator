@@ -11,28 +11,28 @@ import (
 	"github.com/sr/operator"
 )
 
-type payload struct {
+type Payload struct {
 	Event string `json:"event"`
-	Item  *item  `json:"item"`
+	Item  *Item  `json:"item"`
 }
 
-type item struct {
-	Message *message `json:"message"`
-	Room    *room    `json:"room"`
+type Item struct {
+	Message *Message `json:"message"`
+	Room    *Room    `json:"room"`
 }
 
-type message struct {
+type Message struct {
 	Message string `json:"message"`
-	From    *user  `json:"from"`
+	From    *User  `json:"from"`
 }
 
-type user struct {
+type User struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	MentionName string `json:"mention_name"`
 }
 
-type room struct {
+type Room struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
@@ -46,7 +46,7 @@ func newRequestDecoder(store ClientCredentialsStore) *requestDecoder {
 }
 
 func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
-	var data payload
+	var data Payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&data); err != nil {
 		return nil, err
