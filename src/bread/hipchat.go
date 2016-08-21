@@ -2,7 +2,6 @@ package bread
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -43,70 +42,6 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 		}
 	}
 }`))
-
-type hipchatClientCredentialsStore struct {
-	db *sql.DB
-}
-
-func newHipchatClientCredentialsStore(db *sql.DB) *hipchatClientCredentialsStore {
-	return &hipchatClientCredentialsStore{db}
-}
-
-func (s *hipchatClientCredentialsStore) GetByOAuthID(id string) (*operatorhipchat.ClientCredentials, error) {
-	var (
-		oauthID     string
-		oauthSecret string
-	)
-	row := s.db.QueryRow(`
-		SELECT oauth_id, oauth_secret
-		FROM hipchat_addon_installs
-		WHERE oauth_id = ?`,
-		id,
-	)
-	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
-		return nil, err
-	}
-	return &operatorhipchat.ClientCredentials{
-		ID:     oauthID,
-		Secret: oauthSecret,
-	}, nil
-}
-
-func (s *hipchatClientCredentialsStore) GetByAddonID(id string) (*operatorhipchat.ClientCredentials, error) {
-	var (
-		oauthID     string
-		oauthSecret string
-	)
-	row := s.db.QueryRow(`
-		SELECT oauth_id, oauth_secret
-		FROM hipchat_addon_installs
-		WHERE addon_id = ?`,
-		id,
-	)
-	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
-		return nil, err
-	}
-	return &operatorhipchat.ClientCredentials{
-		ID:     oauthID,
-		Secret: oauthSecret,
-	}, nil
-}
-
-func (s *hipchatClientCredentialsStore) PutByAddonID(addonID string, client *operatorhipchat.ClientCredentials) error {
-	_, err := s.db.Exec(`
-		INSERT INTO hipchat_addon_installs (
-			created_at,
-			addon_id,
-			oauth_id,
-			oauth_secret
-		)
-		VALUES (NOW(), ?, ?, ?)`,
-		addonID,
-		client.ID,
-		client.Secret,
-	)
-	return err
-}
 
 type hipchatAddonHandler struct {
 	id    string

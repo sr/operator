@@ -1,6 +1,8 @@
 package operatorhipchat
 
 import (
+	"database/sql"
+
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -29,4 +31,8 @@ func NewRequestDecoder(store ClientCredentialsStore) operator.RequestDecoder {
 
 func NewClient(ctx context.Context, config *ClientConfig) (operator.ChatClient, error) {
 	return newClient(ctx, config)
+}
+
+func NewSQLClientCredentialsStore(db *sql.DB) ClientCredentialsStore {
+	return newSQLClientCredentialsStore(db)
 }
