@@ -38,10 +38,10 @@ type room struct {
 }
 
 type requestDecoder struct {
-	store OAuthClientStore
+	store ClientCredentialsStore
 }
 
-func newRequestDecoder(store OAuthClientStore) *requestDecoder {
+func newRequestDecoder(store ClientCredentialsStore) *requestDecoder {
 	return &requestDecoder{store}
 }
 
