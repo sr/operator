@@ -12,6 +12,10 @@ message Request {
 	Call call = 2;
 }
 
+message Response {
+    string message = 1;
+}
+
 // Call represents a completed gRPC call. The Error field will be non-nil if
 // it resulted in an error.
 message Call {
