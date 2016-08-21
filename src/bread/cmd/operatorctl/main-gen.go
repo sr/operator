@@ -66,7 +66,7 @@ func main() {
 			panic(err)
 		}
 	} else {
-		if _, err := io.WriteString(os.Stdout, output); err != nil {
+		if _, err := io.WriteString(os.Stdout, output+"\n"); err != nil {
 			panic(err)
 		}
 	}
