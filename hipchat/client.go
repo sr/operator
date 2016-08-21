@@ -18,8 +18,14 @@ import (
 const defaultHostname = "api.hipchat.com"
 
 type client struct {
-	hostname string
-	cli      *http.Client
+	hostname   string
+	httpclient *http.Client
+}
+
+type roomNotification struct {
+	*MessageOptions
+	Message       string `json:"message"`
+	MessageFormat string `json:"message_format"`
 }
 
 func newClient(ctx context.Context, config *ClientConfig) (*client, error) {
@@ -58,7 +64,24 @@ func newClient(ctx context.Context, config *ClientConfig) (*client, error) {
 	}
 }
 
-func (c *client) SendRoomNotification(ctx context.Context, notif *operator.ChatRoomNotification) error {
+func (c *client) Reply(ctx context.Context, src *operator.Source, msg *operator.Message) error {
+	if src.Type != operator.SourceType_HUBOT {
+		return nil
+	}
+	if src.Room == nil || src.Room.Id == 0 {
+		return errors.New("unable to reply to request without a room ID")
+	}
+	notif := &roomNotification{}
+	if msg.HTML != "" {
+		notif.MessageFormat = "html"
+		notif.Message = msg.HTML
+	} else {
+		notif.MessageFormat = "plain"
+		notif.Message = msg.Text
+	}
+	if v, ok := msg.Options.(*MessageOptions); ok {
+		notif.MessageOptions = v
+	}
 	data, err := json.Marshal(notif)
 	if err != nil {
 		return err
@@ -68,7 +91,7 @@ func (c *client) SendRoomNotification(ctx context.Context, notif *operator.ChatR
 		fmt.Sprintf(
 			"%s/v2/room/%d/notification",
 			c.hostname,
-			notif.RoomID,
+			src.Room.Id,
 		),
 		bytes.NewReader(data),
 	)
@@ -77,7 +100,7 @@ func (c *client) SendRoomNotification(ctx context.Context, notif *operator.ChatR
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := ctxhttp.Do(ctx, c.cli, req)
+	resp, err := ctxhttp.Do(ctx, c.httpclient, req)
 	if err != nil {
 		return fmt.Errorf("hipchat request failed: %v", err)
 	}

@@ -14,10 +14,23 @@ import (
 
 const DefaultAddress = "localhost:9000"
 
-var ErrInvalidRequest = errors.New("invalid rpc request")
+var (
+	ErrInvalidRequest = errors.New("invalid rpc request")
+)
 
 type Authorizer interface {
 	Authorize(*Request) error
+}
+
+type Sourcer interface {
+	GetSource() *Source
+}
+
+type Message struct {
+	Source  *Source
+	Text    string
+	HTML    string
+	Options interface{}
 }
 
 type Instrumenter interface {
@@ -34,18 +47,10 @@ type RequestDecoder interface {
 }
 
 type ChatClient interface {
-	SendRoomNotification(context.Context, *ChatRoomNotification) error
+	Reply(context.Context, *Source, *Message) error
 }
 
-type ChatRoomNotification struct {
-	Color         string `json:"color"`
-	From          string `json:"from"`
-	Message       string `json:"message"`
-	MessageFormat string `json:"message_format"`
-	RoomID        int    `json:"-"`
-}
-
-type Invoker func(*grpc.ClientConn, *Request, map[string]string) (bool, error)
+type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
 
 type ServerBuilder func(ChatClient, *grpc.Server, *flag.FlagSet) (map[string]error, error)
 
@@ -108,4 +113,17 @@ func NewHandler(
 		conn,
 		invoker,
 	)
+}
+
+func Reply(ctx context.Context, req Sourcer, msg *Message, chat ChatClient) error {
+	if req.GetSource() == nil {
+		return errors.New("unable to reply to message without a source")
+	}
+	if chat == nil {
+		return errors.New("unable to reply without a chat client")
+	}
+	if msg.HTML == "" && msg.Text == "" {
+		return errors.New("one of msg.HTML or msg.Text must be set")
+	}
+	return chat.Reply(ctx, req.GetSource(), msg)
 }
