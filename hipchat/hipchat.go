@@ -28,6 +28,11 @@ type AddonConfig struct {
 	APIConsumerScopes []string
 }
 
+type MessageOptions struct {
+	Color string `json:"color"`
+	From  string `json:"from"`
+}
+
 type ClientConfig struct {
 	Hostname    string
 	Token       string
