@@ -107,7 +107,3 @@ func NewHandler(
 		invoker,
 	)
 }
-
-func NewArgumentRequiredError(argument string) error {
-	return &argumentRequiredError{argument}
-}
