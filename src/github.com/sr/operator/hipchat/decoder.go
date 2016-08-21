@@ -11,6 +11,32 @@ import (
 	"github.com/sr/operator"
 )
 
+type payload struct {
+	Event string `json:"event"`
+	Item  *item  `json:"item"`
+}
+
+type item struct {
+	Message *message `json:"message"`
+	Room    *room    `json:"room"`
+}
+
+type message struct {
+	Message string `json:"message"`
+	From    *user  `json:"from"`
+}
+
+type user struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	MentionName string `json:"mention_name"`
+}
+
+type room struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type requestDecoder struct {
 	store OAuthClientStore
 }
@@ -20,7 +46,7 @@ func newRequestDecoder(store OAuthClientStore) *requestDecoder {
 }
 
 func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, error) {
-	var data Payload
+	var data payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&data); err != nil {
 		return nil, err
