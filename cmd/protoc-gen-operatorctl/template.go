@@ -57,7 +57,7 @@ var cmd = operator.NewCommand(
 						}
 						defer conn.Close()
 						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
-						response, err := client.{{.Name}}(
+						resp, err := client.{{.Name}}(
 							context.Background(),
 							&{{$serviceName}}.{{.Input}}{
 								Source: ctx.Source,
@@ -69,7 +69,7 @@ var cmd = operator.NewCommand(
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
 					},
 				},
 	{{- end }}
