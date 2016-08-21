@@ -5,6 +5,8 @@ import (
 	"flag"
 	"net/http"
 
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/proto"
@@ -32,7 +34,7 @@ type RequestDecoder interface {
 }
 
 type ChatClient interface {
-	SendRoomNotification(*ChatRoomNotification) error
+	SendRoomNotification(context.Context, *ChatRoomNotification) error
 }
 
 type ChatRoomNotification struct {
