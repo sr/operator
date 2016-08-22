@@ -17,7 +17,7 @@ import (
 const (
 	binaryParam     = "binary"
 	importPathParam = "import_path"
-	sourceField     = "source"
+	sourceField     = "request"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {

@@ -14,23 +14,10 @@ import (
 
 const DefaultAddress = "localhost:9000"
 
-var (
-	ErrInvalidRequest = errors.New("invalid rpc request")
-)
+var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
 	Authorize(*Request) error
-}
-
-type Sourcer interface {
-	GetSource() *Source
-}
-
-type Message struct {
-	Source  *Source
-	Text    string
-	HTML    string
-	Options interface{}
 }
 
 type Instrumenter interface {
@@ -42,20 +29,27 @@ type Logger interface {
 	Error(proto.Message)
 }
 
-type RequestDecoder interface {
-	Decode(*http.Request) (*Message, error)
+type Requester interface {
+	GetRequest() *Request
 }
 
-type ChatClient interface {
-	Reply(context.Context, *Source, *Message) error
+type Decoder interface {
+	Decode(*http.Request) (*Message, string, error)
+}
+
+type Replier interface {
+	Reply(context.Context, *Source, string, *Message) error
 }
 
 type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
 
-type ServerBuilder func(ChatClient, *grpc.Server, *flag.FlagSet) (map[string]error, error)
+type ServerBuilder func(Replier, *grpc.Server, *flag.FlagSet) (map[string]error, error)
 
-type Config struct {
-	Address string
+type Message struct {
+	Source  *Source
+	Text    string
+	HTML    string
+	Options interface{}
 }
 
 type Command struct {
@@ -65,7 +59,7 @@ type Command struct {
 
 type CommandContext struct {
 	Address string
-	Source  *Source
+	Request *Request
 	Flags   *flag.FlagSet
 	Args    []string
 }
@@ -99,7 +93,7 @@ func NewHandler(
 	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-	decoder RequestDecoder,
+	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
@@ -115,15 +109,17 @@ func NewHandler(
 	)
 }
 
-func Reply(ctx context.Context, req Sourcer, msg *Message, chat ChatClient) (*Response, error) {
-	if req.GetSource() == nil {
-		return nil, errors.New("unable to reply to message without a source")
+func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {
+	req := r.GetRequest()
+	if req == nil {
+		return nil, errors.New("unable to reply without a request")
 	}
-	if chat == nil {
-		return nil, errors.New("unable to reply without a chat client")
+	src := req.GetSource()
+	if req == nil {
+		return nil, errors.New("unable to reply to request with a source")
 	}
 	if msg.HTML == "" && msg.Text == "" {
-		return nil, errors.New("one of msg.HTML or msg.Text must be set")
+		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
-	return &Response{Message: msg.Text}, chat.Reply(ctx, req.GetSource(), msg)
+	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
 }
