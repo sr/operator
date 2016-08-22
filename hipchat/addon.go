@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"text/template"
 )
@@ -40,83 +39,83 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 }`))
 
 type addonHandler struct {
-	id    string
-	url   *url.URL
-	desc  string
-	store ClientCredentialsStore
+	config *AddonConfig
+	store  ClientCredentialsStore
 }
 
-func newAddonHandler(store ClientCredentialsStore, config *AddonConfig) (*addonHandler, error) {
+func newAddonHandler(store ClientCredentialsStore, config *AddonConfig) *addonHandler {
 	if config.APIConsumerScopes == nil {
 		config.APIConsumerScopes = DefaultScopes
 	}
-	scopes := make([]string, len(config.APIConsumerScopes))
-	for i, s := range config.APIConsumerScopes {
-		scopes[i] = fmt.Sprintf(`"%s"`, s)
-	}
-	data := struct {
-		ID         string
-		Name       string
-		Key        string
-		URL        string
-		Homepage   string
-		WebhookURL string
-		Pattern    string
-		Scopes     string
-	}{
-		config.ID,
-		config.Name,
-		config.Key,
-		config.URL.String(),
-		config.Homepage,
-		config.WebhookURL.String(),
-		"^" + config.WebhookPrefix,
-		strings.Join(scopes, ", "),
-	}
-	var buf bytes.Buffer
-	if err := descriptorTmpl.Execute(&buf, data); err != nil {
-		return nil, err
-	}
-	return &addonHandler{
-		config.ID,
-		config.URL,
-		buf.String(),
-		store,
-	}, nil
+	return &addonHandler{config, store}
 }
 
 func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" && req.URL.Path == h.url.Path {
-		req.Header.Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(h.desc))
-		return
-	}
-	if req.Method == "POST" && req.URL.Path == h.url.Path {
-		type payload struct {
-			URL         string `json:"capabilitiesUrl"`
-			OAuthID     string `json:"oauthId"`
-			OAuthSecret string `json:"oauthSecret"`
-		}
-		var data payload
-		decoder := json.NewDecoder(req.Body)
-		if err := decoder.Decode(&data); err != nil {
+	if req.Method == "GET" && req.URL.Path == h.config.URL.Path {
+		var key string
+		key = req.URL.Query().Get("key")
+		if key == "" {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte("?key query param is required"))
 			return
 		}
-		if err := h.store.PutByAddonID(
-			h.id,
-			&ClientCredentials{
-				ID:     data.OAuthID,
-				Secret: data.OAuthSecret,
-			},
-		); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			// TODO(sr) Log this but do not return it to the client
-			_, _ = w.Write([]byte(err.Error()))
+		scopes := make([]string, len(h.config.APIConsumerScopes))
+		for i, s := range h.config.APIConsumerScopes {
+			scopes[i] = fmt.Sprintf(`"%s"`, s)
+		}
+		data := struct {
+			Name       string
+			Key        string
+			URL        string
+			Homepage   string
+			WebhookURL string
+			Pattern    string
+			Scopes     string
+		}{
+			fmt.Sprintf("%s.%s", h.config.Namespace, key),
+			fmt.Sprintf("%s.%s", h.config.Namespace, key),
+			fmt.Sprintf("%s?%s", h.config.URL, req.URL.Query().Encode()),
+			h.config.Homepage,
+			h.config.WebhookURL.String(),
+			"^" + h.config.WebhookPrefix,
+			strings.Join(scopes, ", "),
+		}
+		var buf bytes.Buffer
+		if err := descriptorTmpl.Execute(&buf, data); err != nil {
+			// TODO(sr) Log the error but do not return it to the client
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		req.Header.Set("Content-Type", "application/json")
+		w.Write(buf.Bytes())
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	if req.Method != "POST" || req.URL.Path != h.config.URL.Path {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	type payload struct {
+		URL         string `json:"capabilitiesUrl"`
+		OAuthID     string `json:"oauthId"`
+		OAuthSecret string `json:"oauthSecret"`
+	}
+	var data payload
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&data); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
+	if err := h.store.PutByAddonID(
+		"TODO(sr) Remove once we have per-request chat client",
+		&ClientCredentials{
+			ID:     data.OAuthID,
+			Secret: data.OAuthSecret,
+		},
+	); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		// TODO(sr) Log this but do not return it to the client
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
 }
