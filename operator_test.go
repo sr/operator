@@ -25,7 +25,7 @@ type fakeLogger struct{}
 
 type fakeAuthorizer struct{}
 
-type fakeChatClient struct{}
+type fakeReplier struct{}
 
 func (l *fakeLogger) Info(_ proto.Message) {
 }
@@ -37,7 +37,7 @@ func (a *fakeAuthorizer) Authorize(_ *operator.Request) error {
 	return nil
 }
 
-func (c *fakeChatClient) Reply(_ context.Context, _ *operator.Source, _ *operator.Message) error {
+func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
 }
 
@@ -45,15 +45,11 @@ type fakeStore struct {
 	client *operatorhipchat.ClientCredentials
 }
 
-func (s *fakeStore) GetByAddonID(_ string) (*operatorhipchat.ClientCredentials, error) {
-	return s.client, nil
-}
-
 func (s *fakeStore) GetByOAuthID(_ string) (*operatorhipchat.ClientCredentials, error) {
 	return s.client, nil
 }
 
-func (s *fakeStore) PutByAddonID(_ string, _ *operatorhipchat.ClientCredentials) error {
+func (s *fakeStore) Create(_ *operatorhipchat.ClientCredentials) error {
 	return nil
 }
 
@@ -62,7 +58,7 @@ func TestHandler(t *testing.T) {
 	server := grpc.NewServer()
 	defer server.Stop()
 	pingServer, err := operatortesting.NewAPIServer(
-		&fakeChatClient{},
+		&fakeReplier{},
 		&operatortesting.PingerConfig{},
 	)
 	if err != nil {

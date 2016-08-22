@@ -85,9 +85,9 @@ func (c Command) Run(args []string) (int, string) {
 		return 1, fmt.Sprintf("Service \"%s\" has no method \"%v\"", serviceName, methodName)
 	}
 	ctx := &CommandContext{
-		Args:   args[3:],
-		Flags:  flag.NewFlagSet(c.name, flag.ContinueOnError),
-		Source: getSource(),
+		Args:    args[3:],
+		Flags:   flag.NewFlagSet(c.name, flag.ContinueOnError),
+		Request: &Request{Source: getSource()},
 	}
 	ctx.Flags.Usage = func() {}
 	ctx.Flags.SetOutput(ioutil.Discard)
