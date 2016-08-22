@@ -44,8 +44,8 @@ var cmd = operator.NewCommand(
 						resp, err := client.Ping(
 							context.Background(),
 							&ping.PingRequest{
-								Source: ctx.Source,
-								Arg1:   *arg1,
+								Request: ctx.Request,
+								Arg1:    *arg1,
 							},
 						)
 						if err != nil {

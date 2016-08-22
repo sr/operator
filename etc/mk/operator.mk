@@ -26,7 +26,7 @@ SVC_IMPORT_PATH ?= bread
 
 all: clean generate docker-build-operatord
 
-generate: $(PROTOC)
+generate: $(PROTOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD)
 	find $(GOPATH)/src/bread -type f -name "*.proto" | \
 	while read f; do \
 		$< \
@@ -51,6 +51,15 @@ docker-build-operatord: etc/ca-bundle.crt build-operatord
 
 etc/ca-bundle.crt:
 	$(DOCKER) run docker.dev.pardot.com/base/centos:7 cat /etc/pki/tls/certs/ca-bundle.crt > $@
+
+$(PROTOC_GEN_GO):
+	$(GO) install -v github.com/golang/protobuf/protoc-gen-go
+
+$(PROTOC_GEN_OPERATORCTL):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatorctl
+
+$(PROTOC_GEN_OPERATORD):
+	$(GO) install -v github.com/sr/operator/cmd/protoc-gen-operatord
 
 .PHONY: \
 	build-operatord \

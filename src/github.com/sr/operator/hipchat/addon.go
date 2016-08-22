@@ -87,7 +87,7 @@ func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		req.Header.Set("Content-Type", "application/json")
-		w.Write(buf.Bytes())
+		_, _ = w.Write(buf.Bytes())
 		return
 	}
 	if req.Method != "POST" || req.URL.Path != h.config.URL.Path {
@@ -106,8 +106,7 @@ func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
-	if err := h.store.PutByAddonID(
-		"TODO(sr) Remove once we have per-request chat client",
+	if err := h.store.Create(
 		&ClientCredentials{
 			ID:     data.OAuthID,
 			Secret: data.OAuthSecret,

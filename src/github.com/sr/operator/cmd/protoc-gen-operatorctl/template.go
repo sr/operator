@@ -60,7 +60,7 @@ var cmd = operator.NewCommand(
 						resp, err := client.{{.Name}}(
 							context.Background(),
 							&{{$serviceName}}.{{.Input}}{
-								Source: ctx.Source,
+								Request: ctx.Request,
 								{{- range .Arguments}}
 								{{camelCase .Name}}: *{{.Name}},
 								{{- end}}

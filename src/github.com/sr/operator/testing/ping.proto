@@ -16,5 +16,5 @@ message PingerConfig {
 }
 
 message PingRequest {
-	operator.Source source = 1;
+	operator.Request request = 1;
 }

@@ -29,7 +29,7 @@ func NewLDAPAuthorizer() operator.Authorizer {
 	return newLDAPAuthorizer()
 }
 
-func NewHipchatClient(config *operatorhipchat.ClientConfig) (operator.ChatClient, error) {
+func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
 	return operatorhipchat.NewClient(context.Background(), config)
 }
 

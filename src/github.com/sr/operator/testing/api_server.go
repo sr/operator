@@ -6,13 +6,13 @@ import (
 )
 
 type apiServer struct {
+	operator.Replier
 	config *PingerConfig
-	chat   operator.ChatClient
 }
 
 func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {
-	return operator.Reply(ctx, req, &operator.Message{
+	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
-	}, s.chat)
+	})
 }

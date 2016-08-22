@@ -21,7 +21,7 @@ type handler struct {
 	logger       Logger
 	instrumenter Instrumenter
 	authorizer   Authorizer
-	decoder      RequestDecoder
+	decoder      Decoder
 	re           *regexp.Regexp
 	conn         *grpc.ClientConn
 	invoker      Invoker
@@ -31,7 +31,7 @@ func newHandler(
 	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-	decoder RequestDecoder,
+	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
@@ -53,7 +53,7 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, err := h.decoder.Decode(r)
+	message, replierID, err := h.decoder.Decode(r)
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
@@ -94,7 +94,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Service: matches[1],
 			Method:  matches[2],
 		},
-		Source: message.Source,
+		Source:    message.Source,
+		ReplierId: replierID,
 	}
 	if err := h.authorizer.Authorize(req); err != nil {
 		// TODO(sr) Log unauthorized error

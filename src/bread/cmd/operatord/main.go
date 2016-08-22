@@ -85,23 +85,12 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	logger = bread.NewLogger()
 	var store operatorhipchat.ClientCredentialsStore
 	store = bread.NewHipchatCredsStore(db)
-	var chat operator.ChatClient
-	creds, err := store.GetByAddonID("dev.sr2") // TODO(sr)
-	if err != nil {
-		return err
-	}
-	if chat, err = bread.NewHipchatClient(
-		&operatorhipchat.ClientConfig{
-			Credentials: creds,
-			Hostname:    bread.HipchatHost,
-		},
-	); err != nil {
-		return err
-	}
+	var replier operator.Replier
+	replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
 	var grpcServer *grpc.Server
 	grpcServer = grpc.NewServer()
 	msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-	services, err := builder(chat, grpcServer, flags)
+	services, err := builder(replier, grpcServer, flags)
 	if err != nil {
 		return err
 	}

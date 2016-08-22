@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sr/operator"
+	"golang.org/x/net/context"
+
+	"github.com/sr/operator/hipchat"
 )
 
 func main() {
@@ -36,7 +38,7 @@ func run() error {
 	if !ok {
 		return errors.New("required environment variable missing: HIPCHAT_TOKEN")
 	}
-	client, err := bread.NewHipchatClient(&bread.HipchatConfig{Token: token})
+	client, err := bread.NewHipchatClient(&operatorhipchat.ClientConfig{Token: token})
 	if err != nil {
 		return err
 	}
@@ -79,12 +81,13 @@ func run() error {
 		return nil
 	}
 	return client.SendRoomNotification(
-		&operator.ChatRoomNotification{
+		context.Background(),
+		&operatorhipchat.RoomNotification{
 			Color:         color,
 			From:          "breadsignal",
 			Message:       message,
 			MessageFormat: "html",
-			RoomID:        room,
+			RoomID:        int64(room),
 		},
 	)
 }
