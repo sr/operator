@@ -57,6 +57,6 @@ func NewRequestDecoder(store ClientCredentialsStore) operator.RequestDecoder {
 	return newRequestDecoder(store)
 }
 
-func NewSQLClientCredentialsStore(db *sql.DB) ClientCredentialsStore {
-	return newSQLClientCredentialsStore(db)
+func NewSQLStore(db *sql.DB) ClientCredentialsStore {
+	return newSQLStore(db)
 }

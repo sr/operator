@@ -6,7 +6,7 @@ type sqlStore struct {
 	db *sql.DB
 }
 
-func newSQLClientCredentialsStore(db *sql.DB) *sqlStore {
+func newSQLStore(db *sql.DB) *sqlStore {
 	return &sqlStore{db}
 }
 
