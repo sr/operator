@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -21,30 +22,26 @@ import (
 type config struct {
 	grpcAddr string
 	httpAddr string
-	prefix   string
 
 	databaseURL string
+	prefix      string
 
-	hipchatAddonSetup bool
-	hipchatAddonID    string
+	hipchatNamespace  string
 	hipchatAddonURL   string
 	hipchatWebhookURL string
-
-	webhookEnabled bool
 }
 
 func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	config := &config{}
 	flags := flag.CommandLine
-	flags.StringVar(&config.grpcAddr, "grpc-addr", ":9000", "Listen address of the operator gRPC server")
-	flags.StringVar(&config.httpAddr, "http-addr", ":8080", "Listen address of the HTTP webhook server. Optional.")
-	flags.StringVar(&config.prefix, "prefix", "!", "The prefix used to denote a command invocation in chat messages")
-	flags.StringVar(&config.databaseURL, "database-url", "", "")
-	flags.BoolVar(&config.hipchatAddonSetup, "hipchat-addon-setup", false, "")
-	flags.StringVar(&config.hipchatAddonID, "hipchat-addon-id", "", "")
-	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "", "")
-	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "", "")
-	flags.BoolVar(&config.webhookEnabled, "enable-webhook", true, "")
+	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
+	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
+	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
+	flags.StringVar(&config.prefix, "prefix", "!", "Prefix used to indicate commands in chat messages")
+	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
+	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
+	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
+	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
 		if v := os.Getenv(k); v != "" {
@@ -56,17 +53,27 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
-	if config.databaseURL == "" {
-		return fmt.Errorf("required flag missing: database-url")
+	if config.grpcAddr == "" {
+		return fmt.Errorf("required flag missing: addr-grpc")
 	}
 	if config.httpAddr == "" {
-		return fmt.Errorf("required flag missing: http-addr")
+		return fmt.Errorf("required flag missing: addr-http")
+	}
+	if config.databaseURL == "" {
+		return fmt.Errorf("required flag missing: database-url")
 	}
 	if config.prefix == "" {
 		return fmt.Errorf("required flag missing: prefix")
 	}
-	logger := bread.NewLogger()
-	errC := make(chan error)
+	if config.hipchatNamespace == "" {
+		return fmt.Errorf("required flag missing: hipchat-namespace")
+	}
+	if config.hipchatAddonURL == "" {
+		return fmt.Errorf("required flag missing: hipchat-addon-url")
+	}
+	if config.hipchatWebhookURL == "" {
+		return fmt.Errorf("required flag missing: hipchat-webhook-url")
+	}
 	db, err := sql.Open("mysql", config.databaseURL)
 	if err != nil {
 		return err
@@ -74,104 +81,106 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if err := db.Ping(); err != nil {
 		return err
 	}
-	mux := http.NewServeMux()
-	mux.Handle("/_ping", bread.NewHTTPLoggerHandler(logger, bread.NewPingHandler(db)))
-	store := bread.NewHipchatClientCredentialsStore(db)
-	if config.hipchatAddonSetup {
-		if config.hipchatAddonURL == "" {
-			return fmt.Errorf("required flag missing: hipchat-addon-url")
-		}
-		if config.hipchatWebhookURL == "" {
-			return fmt.Errorf("required flag missing: hipchat-webhook-url")
-		}
-		if config.hipchatAddonID == "" {
-			return fmt.Errorf("required flag missing: hipchat-addon-id")
-		}
-		h, err := bread.NewHipchatAddonHandler(
-			config.hipchatAddonID,
-			config.hipchatAddonURL,
-			config.hipchatWebhookURL,
-			store,
-			config.prefix,
-		)
+	var logger operator.Logger
+	logger = bread.NewLogger()
+	var store operatorhipchat.ClientCredentialsStore
+	store = bread.NewHipchatCredsStore(db)
+	var chat operator.ChatClient
+	creds, err := store.GetByAddonID("dev.sr2") // TODO(sr)
+	if err != nil {
+		return err
+	}
+	if chat, err = bread.NewHipchatClient(
+		&operatorhipchat.ClientConfig{
+			Credentials: creds,
+			Hostname:    bread.HipchatHost,
+		},
+	); err != nil {
+		return err
+	}
+	var grpcServer *grpc.Server
+	grpcServer = grpc.NewServer()
+	msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
+	services, err := builder(chat, grpcServer, flags)
+	if err != nil {
+		return err
+	}
+	for svc, err := range services {
 		if err != nil {
-			return err
-		}
-		mux.Handle("/hipchat/addon", bread.NewHTTPLoggerHandler(logger, h))
-	} else {
-		if config.grpcAddr != "" {
-			if config.hipchatAddonID == "" {
-				return fmt.Errorf("required flag missing: hipchat-addon-id")
-			}
-			creds, err := store.GetByAddonID(config.hipchatAddonID)
-			if err != nil {
-				return err
-			}
-			chat, err := bread.NewHipchatClient(
-				&operatorhipchat.ClientConfig{
-					Credentials: creds,
-					Hostname:    bread.HipchatHost,
+			logger.Error(
+				&operator.ServiceStartupError{
+					Service: &operator.Service{Name: svc},
+					Message: err.Error(),
 				},
 			)
-			if err != nil {
-				return err
-			}
-			server := grpc.NewServer()
-			msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-			services, err := builder(chat, server, flags)
-			if err != nil {
-				return err
-			}
-			for svc, err := range services {
-				if err != nil {
-					logger.Error(
-						&operator.ServiceStartupError{
-							Service: &operator.Service{Name: svc},
-							Message: err.Error(),
-						},
-					)
-				} else {
-					msg.Services = append(msg.Services, &operator.Service{Name: svc})
-				}
-			}
-			listener, err := net.Listen("tcp", config.grpcAddr)
-			if err != nil {
-				return err
-			}
-			go func() {
-				errC <- server.Serve(listener)
-			}()
-			logger.Info(msg)
-		}
-		if config.webhookEnabled {
-			if config.grpcAddr == "" {
-				return fmt.Errorf("required flag missing: grpc-addr")
-			}
-			if config.httpAddr == "" {
-				return fmt.Errorf("required flag missing: http-addr")
-			}
-			conn, err := grpc.Dial(config.grpcAddr, grpc.WithInsecure())
-			if err != nil {
-				return err
-			}
-			handler, err := operator.NewHandler(
-				logger,
-				operator.NewInstrumenter(logger),
-				bread.NewLDAPAuthorizer(),
-				operatorhipchat.NewRequestDecoder(store),
-				config.prefix,
-				conn,
-				invoker,
-			)
-			if err != nil {
-				return err
-			}
-			mux.Handle("/hipchat/webhook", bread.NewHTTPLoggerHandler(logger, handler))
-			logger.Info(&operator.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+		} else {
+			msg.Services = append(msg.Services, &operator.Service{Name: svc})
 		}
 	}
+	errC := make(chan error)
+	grpcList, err := net.Listen("tcp", config.grpcAddr)
+	if err != nil {
+		return err
+	}
 	go func() {
-		errC <- http.ListenAndServe(config.httpAddr, mux)
+		errC <- grpcServer.Serve(grpcList)
+	}()
+	logger.Info(msg)
+	var webhookHandler http.Handler
+	conn, err := grpc.Dial(config.grpcAddr, grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+	if webhookHandler, err = operator.NewHandler(
+		logger,
+		operator.NewInstrumenter(logger),
+		bread.NewLDAPAuthorizer(),
+		operatorhipchat.NewRequestDecoder(store),
+		config.prefix,
+		conn,
+		invoker,
+	); err != nil {
+		return err
+	}
+	httpServer := http.NewServeMux()
+	httpServer.Handle(
+		"/_ping",
+		bread.NewHTTPLoggerHandler(
+			logger,
+			bread.NewPingHandler(db),
+		),
+	)
+	addonURL, err := url.Parse(config.hipchatAddonURL)
+	if err != nil {
+		return err
+	}
+	webhookURL, err := url.Parse(config.hipchatWebhookURL)
+	if err != nil {
+		return err
+	}
+	httpServer.Handle(
+		"/hipchat/addon",
+		bread.NewHTTPLoggerHandler(
+			logger,
+			bread.NewHipchatAddonHandler(
+				config.prefix,
+				config.hipchatNamespace,
+				addonURL,
+				webhookURL,
+				store,
+			),
+		),
+	)
+	httpServer.Handle(
+		"/hipchat/webhook",
+		bread.NewHTTPLoggerHandler(
+			logger,
+			webhookHandler,
+		),
+	)
+	logger.Info(&operator.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+	go func() {
+		errC <- http.ListenAndServe(config.httpAddr, httpServer)
 	}()
 	return <-errC
 }

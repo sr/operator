@@ -18,9 +18,7 @@ type ClientCredentialsStore interface {
 }
 
 type AddonConfig struct {
-	ID                string
-	Name              string
-	Key               string
+	Namespace         string
 	URL               *url.URL
 	Homepage          string
 	WebhookURL        *url.URL
@@ -49,7 +47,7 @@ func NewClient(ctx context.Context, config *ClientConfig) (operator.ChatClient, 
 	return newClient(ctx, config)
 }
 
-func NewAddonHandler(store ClientCredentialsStore, config *AddonConfig) (http.Handler, error) {
+func NewAddonHandler(store ClientCredentialsStore, config *AddonConfig) http.Handler {
 	return newAddonHandler(store, config)
 }
 
