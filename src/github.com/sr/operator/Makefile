@@ -100,7 +100,7 @@ $(PROTOC_GEN_GO):
 	$(GO) get -v github.com/golang/protobuf/protoc-gen-go
 
 $(UNUSED):
-	$(GO) get -v github.com/dominikh/go-unused/cmd/unused
+	$(GO) get -v honnef.co/go/unused/cmd/unused
 
 .PHONY: \
 	all \
