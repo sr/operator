@@ -1,4 +1,6 @@
-FROM maven:3.3.9-jdk-8
+FROM docker.dev.pardot.com/base/java:8u102-jdk
+
+ARG artifactory_host
 
 RUN mkdir /pardriver
 WORKDIR /pardriver
