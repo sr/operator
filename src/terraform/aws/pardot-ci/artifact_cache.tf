@@ -3,28 +3,17 @@ resource "aws_security_group" "artifact_cache_http_lb" {
   # description should read "Allow HTTP/HTTPS from Bamboo instances" but
   # changing it after the fact requires rebuilding all dependencies
   description = "Allow HTTP/HTTPS from SFDC VPN only"
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "192.168.128.0/22" # Bamboo instances in pardot-artifactory
+      "${aws_vpc.pardot_ci.cidr_block}",
+      "${var.pardotops_appdev_vpc_cidr}"
     ]
   }
-
-//  ingress {
-//    from_port = 443
-//    to_port = 443
-//    protocol = "tcp"
-//    cidr_blocks = [
-//      "${var.pardot2-artifactcache1-1-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-2-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-3-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-4-ue1_aws_pardot_com_private_ip}/32",
-//    ]
-//  }
 
   egress {
     from_port = 0
@@ -36,45 +25,30 @@ resource "aws_security_group" "artifact_cache_http_lb" {
 
 resource "aws_security_group" "external_artifact_cache_http_lb" {
   name = "external_artifact_cache_http_lb"
-  description = "Allow HTTP/HTTPS from SFDC VPN and datacenters only"
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  description = "Allow HTTP/HTTPS from pardot-ci, appdev, and SFDC VPN only"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
-
-  //  ingress {
-  //    from_port = 443
-  //    to_port = 443
-  //    protocol = "tcp"
-  //    cidr_blocks = [
-  //      "${var.pardot2-artifactcache1-1-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-2-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-3-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-4-ue1_aws_pardot_com_public_ip}/32",
-  //    ]
-  //  }
-
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
-      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32"
+      "${aws_eip.pardot_ci_nat_gw.public_ip}/32",
+      "${var.pardotops_appdev_vpc_nat_gw_public_ip}/32"
     ]
   }
 
@@ -89,7 +63,7 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
 resource "aws_security_group" "artifact_cache_server" {
   name = "artifact_cache_server"
   description = "Allow HTTP from Artifact Cache LB"
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  vpc_id = "${aws_vpc.pardot_ci.id}"
 
   # SSH from bastion
   ingress {
@@ -97,7 +71,7 @@ resource "aws_security_group" "artifact_cache_server" {
     to_port = 22
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}"
+      "${aws_security_group.bastion_ssh_ingress.id}"
     ]
   }
 
@@ -123,10 +97,10 @@ resource "aws_elb" "artifact_cache_lb" {
   name = "artifact-cache-lb"
   security_groups = ["${aws_security_group.artifact_cache_http_lb.id}"]
   subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e.id}",
+    "${aws_subnet.pardot_ci_us_east_1a.id}",
+    "${aws_subnet.pardot_ci_us_east_1c.id}",
+    "${aws_subnet.pardot_ci_us_east_1b.id}",
+    "${aws_subnet.pardot_ci_us_east_1e.id}",
   ]
   cross_zone_load_balancing = true
   connection_draining = true
@@ -172,10 +146,10 @@ resource "aws_elb" "external_artifact_cache_lb" {
   name = "external-artifact-cache-lb"
   security_groups = ["${aws_security_group.external_artifact_cache_http_lb.id}"]
   subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
+    "${aws_subnet.pardot_ci_us_east_1a_dmz.id}",
+    "${aws_subnet.pardot_ci_us_east_1c_dmz.id}",
+    "${aws_subnet.pardot_ci_us_east_1b_dmz.id}",
+    "${aws_subnet.pardot_ci_us_east_1e_dmz.id}",
   ]
   cross_zone_load_balancing = true
   connection_draining = true
@@ -219,7 +193,7 @@ resource "aws_elb" "external_artifact_cache_lb" {
 resource "aws_instance" "artifact_cache_server_1" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1a.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
   root_block_device {
@@ -229,12 +203,12 @@ resource "aws_instance" "artifact_cache_server_1" {
   }
   tags {
     terraform = "true"
-    Name = "pardot0-artifactcache1-1-ue1"
+    Name = "pardot2-artifactcache1-1-ue1"
   }
 }
 resource "aws_route53_record" "artifact_cache_server_1_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-artifactcache1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-artifactcache1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.artifact_cache_server_1.private_ip}"]
   type = "A"
   ttl = "900"
@@ -243,7 +217,7 @@ resource "aws_route53_record" "artifact_cache_server_1_Arecord" {
 resource "aws_instance" "artifact_cache_server_2" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1c.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
   root_block_device {
@@ -253,12 +227,12 @@ resource "aws_instance" "artifact_cache_server_2" {
   }
   tags {
     terraform = "true"
-    Name = "pardot0-artifactcache1-2-ue1"
+    Name = "pardot2-artifactcache1-2-ue1"
   }
 }
 resource "aws_route53_record" "artifact_cache_server_2_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-artifactcache1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-artifactcache1-2-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.artifact_cache_server_2.private_ip}"]
   type = "A"
   ttl = "900"
@@ -267,7 +241,7 @@ resource "aws_route53_record" "artifact_cache_server_2_Arecord" {
 resource "aws_instance" "artifact_cache_server_3" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1b.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
   root_block_device {
@@ -277,12 +251,12 @@ resource "aws_instance" "artifact_cache_server_3" {
   }
   tags {
     terraform = "true"
-    Name = "pardot0-artifactcache1-3-ue1"
+    Name = "pardot2-artifactcache1-3-ue1"
   }
 }
 resource "aws_route53_record" "artifact_cache_server_3_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-artifactcache1-3-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-artifactcache1-3-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.artifact_cache_server_3.private_ip}"]
   type = "A"
   ttl = "900"
@@ -291,7 +265,7 @@ resource "aws_route53_record" "artifact_cache_server_3_Arecord" {
 resource "aws_instance" "artifact_cache_server_4" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "c4.2xlarge"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1e.id}"
+  subnet_id = "${aws_subnet.pardot_ci_us_east_1e.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
   root_block_device {
@@ -301,12 +275,12 @@ resource "aws_instance" "artifact_cache_server_4" {
   }
   tags {
     terraform = "true"
-    Name = "pardot0-artifactcache1-4-ue1"
+    Name = "pardot2-artifactcache1-4-ue1"
   }
 }
 resource "aws_route53_record" "artifact_cache_server_4_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-artifactcache1-4-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-artifactcache1-4-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.artifact_cache_server_4.private_ip}"]
   type = "A"
   ttl = "900"
