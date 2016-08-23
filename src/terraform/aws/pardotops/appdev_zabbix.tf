@@ -1,7 +1,7 @@
 resource "aws_instance" "appdev_zabbix1" {
   key_name = "internal_apps"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "m4.large"
+  instance_type = "m4.xlarge"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
@@ -47,7 +47,7 @@ resource "aws_route53_record" "appdev_zabbix-internal1_arecord" {
 
 resource "aws_security_group" "appdev_zabbix_host" {
   name = "appdev_sfdc_vpn_ssh"
-  description = "Allow SSH traffic from SFDC VPN"
+  description = "allows traffic on 443 from the appdev vpc and the SFDC VPN"
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
@@ -56,7 +56,8 @@ resource "aws_security_group" "appdev_zabbix_host" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
-      "${aws_vpc.appdev.cidr_block}"
+      "${aws_vpc.appdev.cidr_block}",
+      "${var.aloha_vpn_cidr_blocks}"
     ]
   }
 
