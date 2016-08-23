@@ -105,7 +105,7 @@ $(UNUSED):
 .PHONY: \
 	all \
 	build \
-  ci \
+	ci \
 	deps \
 	errcheck \
 	fmt \
