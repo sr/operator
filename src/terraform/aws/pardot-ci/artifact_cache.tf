@@ -1,8 +1,6 @@
 resource "aws_security_group" "artifact_cache_http_lb" {
   name = "artifact_cache_http_lb"
-  # description should read "Allow HTTP/HTTPS from Bamboo instances" but
-  # changing it after the fact requires rebuilding all dependencies
-  description = "Allow HTTP/HTTPS from SFDC VPN only"
+  description = "internal artifact cache load balancing"
   vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
@@ -25,7 +23,7 @@ resource "aws_security_group" "artifact_cache_http_lb" {
 
 resource "aws_security_group" "external_artifact_cache_http_lb" {
   name = "external_artifact_cache_http_lb"
-  description = "Allow HTTP/HTTPS from pardot-ci, appdev, and SFDC VPN only"
+  description = "external artifact cache load balancing"
   vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
@@ -71,7 +69,8 @@ resource "aws_security_group" "artifact_cache_server" {
     to_port = 22
     protocol = "tcp"
     security_groups = [
-      "${aws_security_group.bastion_ssh_ingress.id}"
+      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}",
+      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_public_ip}"
     ]
   }
 
@@ -196,6 +195,7 @@ resource "aws_instance" "artifact_cache_server_1" {
   subnet_id = "${aws_subnet.pardot_ci_us_east_1a.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
+  disable_api_termination = true
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -206,6 +206,7 @@ resource "aws_instance" "artifact_cache_server_1" {
     Name = "pardot2-artifactcache1-1-ue1"
   }
 }
+
 resource "aws_route53_record" "artifact_cache_server_1_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-artifactcache1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
@@ -220,6 +221,7 @@ resource "aws_instance" "artifact_cache_server_2" {
   subnet_id = "${aws_subnet.pardot_ci_us_east_1c.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
+  disable_api_termination = true
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -230,6 +232,7 @@ resource "aws_instance" "artifact_cache_server_2" {
     Name = "pardot2-artifactcache1-2-ue1"
   }
 }
+
 resource "aws_route53_record" "artifact_cache_server_2_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-artifactcache1-2-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
@@ -244,6 +247,7 @@ resource "aws_instance" "artifact_cache_server_3" {
   subnet_id = "${aws_subnet.pardot_ci_us_east_1b.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
+  disable_api_termination = true
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -254,6 +258,7 @@ resource "aws_instance" "artifact_cache_server_3" {
     Name = "pardot2-artifactcache1-3-ue1"
   }
 }
+
 resource "aws_route53_record" "artifact_cache_server_3_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-artifactcache1-3-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
@@ -268,6 +273,7 @@ resource "aws_instance" "artifact_cache_server_4" {
   subnet_id = "${aws_subnet.pardot_ci_us_east_1e.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name = "internal_apps"
+  disable_api_termination = true
   root_block_device {
     volume_type = "gp2"
     volume_size = "512"
@@ -278,6 +284,7 @@ resource "aws_instance" "artifact_cache_server_4" {
     Name = "pardot2-artifactcache1-4-ue1"
   }
 }
+
 resource "aws_route53_record" "artifact_cache_server_4_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-artifactcache1-4-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"

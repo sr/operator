@@ -162,7 +162,7 @@ resource "aws_vpc_peering_connection" "pardotops_appdev_and_pardot_ci_vpc_peerin
   vpc_id = "${aws_vpc.pardot_ci.id}"
 }
 
-resource aws_security_group "bastion_ssh_ingress" {
+resource aws_security_group "pardot2_bastion_1_1_ue1_ssh_ingress" {
 
   ingress {
     from_port = "22"
@@ -170,8 +170,15 @@ resource aws_security_group "bastion_ssh_ingress" {
     protocol = "tcp"
     cidr_blocks = [
       "${var.pardot2-bastion1-1-ue1_aws_pardot_com_public_ip}",
-      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}",
+      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}"
     ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
