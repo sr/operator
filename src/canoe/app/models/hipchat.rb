@@ -73,7 +73,7 @@ class Hipchat
 
       body = {
         format: "json",
-        auth_token: "62b38be68d7593e4da865dcff0c2db",
+        auth_token: ENV["HIPCHAT_AUTH_TOKEN"],
         room_id: room,
         from: "Canoe",
         color: color,
