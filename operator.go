@@ -5,11 +5,9 @@ import (
 	"flag"
 	"net/http"
 
-	"golang.org/x/net/context"
-
-	"google.golang.org/grpc"
-
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 const DefaultAddress = "localhost:9000"
