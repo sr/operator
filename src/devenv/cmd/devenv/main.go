@@ -59,7 +59,7 @@ func run() error {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
 				return err
 			}
-			if err := os.Setenv("SSH_AUTH_SOCK", authSock); err != nil {
+			if err := os.Setenv("DOCKER_SSH_AUTH_SOCK", authSock); err != nil {
 				return err
 			}
 
@@ -67,7 +67,7 @@ func run() error {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
 			}
-			if err := os.Setenv("SSH_AUTH_VOLUME", volume); err != nil {
+			if err := os.Setenv("DOCKER_SSH_AUTH_VOLUME", volume); err != nil {
 				return err
 			}
 		} else {
@@ -77,7 +77,7 @@ func run() error {
 		if args[0] == "docker" {
 			if args[1] == "run" {
 				newArgs := args[0:2]
-				newArgs = append(newArgs, "-e", "SSH_AUTH_SOCK", "-v", os.Getenv("SSH_AUTH_VOLUME"))
+				newArgs = append(newArgs, "-e", "DOCKER_SSH_AUTH_SOCK", "-v", os.Getenv("DOCKER_SSH_AUTH_VOLUME"))
 				newArgs = append(newArgs, args[2:]...)
 				args = newArgs
 			}
