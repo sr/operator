@@ -46,7 +46,7 @@ resource "aws_route53_record" "appdev_zabbix-internal1_arecord" {
 }
 
 resource "aws_security_group" "appdev_zabbix_host" {
-  name = "appdev_sfdc_vpn_ssh"
+  name = "appdev_zabbix_host"
   description = "allows traffic on 443 from the appdev vpc and the SFDC VPN"
   vpc_id = "${aws_vpc.appdev.id}"
 
