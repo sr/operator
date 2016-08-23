@@ -95,6 +95,7 @@
 #   hubot pieces - Pieces (and murica!)
 #   hubot trolledum8 - rekt
 #   hubot rekt - trolledum8
+#   hubot gus - Rage GUS!
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -107,6 +108,9 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
       "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
+
+  robot.respond /gus$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/252/6jIMiKPvXi17T0l/fuuuuuu_gus.jpg"
 
   robot.respond /dumpsterfire$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/71ixUc3gH6lnWLC/upload.png"
