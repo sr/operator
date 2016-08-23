@@ -17,3 +17,7 @@ variable "pardot_atlassian_acct_number" {
 variable "pardot_atlassian_vpc_id" {
   default = "vpc-c35928a6"
 }
+
+variable "pardot_ci_nat_gw_public_ip" {
+  default = "0.0.0.0"
+}
