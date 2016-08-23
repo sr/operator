@@ -31,6 +31,7 @@ proto: $(PROTOC) $(PROTOC_GEN_GO)
 deps:
 	$(GO) get \
 		github.com/acsellers/inflections \
+		github.com/dvsekhvalnov/jose2go \
 		github.com/golang/protobuf/proto \
 		github.com/golang/protobuf/ptypes/duration \
 		github.com/golang/protobuf/ptypes/timestamp \
@@ -39,6 +40,7 @@ deps:
 		github.com/satori/go.uuid \
 		github.com/serenize/snaker \
 		google.golang.org/grpc \
+		golang.org/x/oauth2/clientcredentials \
 		golang.org/x/net/context
 
 fmt: $(GOFMT)
