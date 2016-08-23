@@ -96,7 +96,7 @@ $(GOLINT):
 $(INTERFACER):
 	$(GO) get -v github.com/mvdan/interfacer/cmd/interfacer
 
-$(PROTOC_GEN_GEN):
+$(PROTOC_GEN_GO):
 	$(GO) get -v github.com/golang/protobuf/protoc-gen-go
 
 $(UNUSED):
