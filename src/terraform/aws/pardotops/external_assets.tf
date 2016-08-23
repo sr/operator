@@ -17,36 +17,3 @@ variable "pardot_atlassian_acct_number" {
 variable "pardot_atlassian_vpc_id" {
   default = "vpc-c35928a6"
 }
-
-////TODO: FILL THESE OUT WHEN <computed> and uncomment in artifact-cache.tf in pardotops
-//variable "pardot2-artifactcache1-1-ue1_aws_pardot_com_public_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-2-ue1_aws_pardot_com_public_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-3-ue1_aws_pardot_com_public_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-4-ue1_aws_pardot_com_public_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-1-ue1_aws_pardot_com_private_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-2-ue1_aws_pardot_com_private_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-3-ue1_aws_pardot_com_private_ip" {
-//  default = ""
-//}
-//
-//variable "pardot2-artifactcache1-4-ue1_aws_pardot_com_private_ip" {
-//  default = ""
-//}

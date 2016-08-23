@@ -14,18 +14,6 @@ resource "aws_security_group" "artifact_cache_http_lb" {
     ]
   }
 
-//  ingress {
-//    from_port = 443
-//    to_port = 443
-//    protocol = "tcp"
-//    cidr_blocks = [
-//      "${var.pardot2-artifactcache1-1-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-2-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-3-ue1_aws_pardot_com_private_ip}/32",
-//      "${var.pardot2-artifactcache1-4-ue1_aws_pardot_com_private_ip}/32",
-//    ]
-//  }
-
   egress {
     from_port = 0
     to_port = 0
@@ -52,19 +40,6 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     protocol = "tcp"
     cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
-
-  //  ingress {
-  //    from_port = 443
-  //    to_port = 443
-  //    protocol = "tcp"
-  //    cidr_blocks = [
-  //      "${var.pardot2-artifactcache1-1-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-2-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-3-ue1_aws_pardot_com_public_ip}/32",
-  //      "${var.pardot2-artifactcache1-4-ue1_aws_pardot_com_public_ip}/32",
-  //    ]
-  //  }
-
 
   ingress {
     from_port = 443
