@@ -1,13 +1,13 @@
 Name: kafka
-Version: 0.9.0.1
+Version: 0.10.0.1
 Release: 1%{?dist}
 BuildArch: noarch
 Summary: Kafka is a distributed, partitioned, replicated commit log service
 Group: Applications/Internet
 License: Apache
 URL: http://kafka.apache.org/
-Source0: http://www.us.apache.org/dist/kafka/%{version}/kafka_2.11-%{version}.tgz
-Source1: http://chef-repos.pardot.com/pardot/no-arch/kafka-statsd-reporter-1.0.1.jar
+Source0: http://apache.claz.org/kafka/%{version}/kafka_2.11-%{version}.tgz
+Source1: http://www.us.apache.org/dist/kafka/%{version}/kafka_2.11-%{version}.tgz
 BuildRoot: %{_tmppath}/%name-root
 %define debug_package %{nil}
 
