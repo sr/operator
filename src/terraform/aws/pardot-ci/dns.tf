@@ -4,10 +4,27 @@ resource "aws_route53_zone" "pardot_ci_aws_pardot_com_hosted_zone" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
 }
 
-resource "aws_route53_record" "appdev_auth1_arecord" {
+resource "aws_route53_record" "pardot2_auth1_1_ue1_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-auth1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${var.pardot2-auth1-1-ue1_aws_pardot_com_private_ip}"]
   ttl = "900"
   type = "A"
 }
+
+resource "aws_route53_record" "pardot2_chef1_1_ue1_Arecord" {
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-chef1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
+  records = ["${var.pardot2-chef1-1-ue1_aws_pardot_com_private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "pardot2_bastion1_1_ue1_Arecord" {
+  zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot2-chef1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
+  records = ["${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+

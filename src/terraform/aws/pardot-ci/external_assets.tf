@@ -33,3 +33,7 @@ variable "pardot2-bastion1-1-ue1_aws_pardot_com_public_ip" {
 variable "pardot2-bastion1-1-ue1_aws_pardot_com_private_ip" {
   default = "172.26.220.43"
 }
+
+variable "pardot2-chef1-1-ue1_aws_pardot_com_private_ip" {
+  default = "172.26.64.254"
+}
