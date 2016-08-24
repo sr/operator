@@ -1,0 +1,30 @@
+#
+# YubiKey LDAP schema
+#
+# Author: Michal Ludvig <michal@logix.cz>
+# Consider a small PayPal donation:
+#         http://logix.cz/michal/devel/yubikey-ldap/
+#
+
+# Common Logix OID structure
+# 1.3.6.1.4.1.40789.<Project>.<1=SNMP/2=LDAP>.<...>
+objectIdentifier lxYubiKeyPrj    1.3.6.1.4.1.40789.2012.11.1
+objectIdentifier lxYkSNMP        lxYubiKeyPrj:1
+objectIdentifier lxYkLDAP        lxYubiKeyPrj:2
+
+# YubiKey schema sub-tree
+objectIdentifier lxYkAttribute   lxYkLDAP:1
+objectIdentifier lxYkObjectClass lxYkLDAP:2
+
+attributetype ( lxYkAttribute:1
+  NAME 'yubiKeyId'
+  DESC 'Yubico YubiKey ID'
+  EQUALITY caseIgnoreIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} )
+
+objectclass ( lxYkObjectClass:1
+  NAME 'yubiKeyUser'
+  DESC 'Yubico YubiKey User'
+  SUP top
+  AUXILIARY
+  MAY ( yubiKeyId ) )
