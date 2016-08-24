@@ -19,5 +19,5 @@ variable "pardot_atlassian_vpc_id" {
 }
 
 variable "pardot_ci_nat_gw_public_ip" {
-  default = "0.0.0.0"
+  default = "52.200.146.253"
 }
