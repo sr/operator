@@ -38,7 +38,7 @@ func run() error {
 	if !ok {
 		return errors.New("required environment variable missing: HIPCHAT_TOKEN")
 	}
-	client, err := bread.NewHipchatClient(&bread.HipchatConfig{
+	client, err := bread.NewHipchatClient(&operatorhipchat.ClientConfig{
 		Hostname: bread.HipchatHost,
 		Token:    token,
 	})
