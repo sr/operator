@@ -297,10 +297,3 @@ resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" 
   vpc_id = "${aws_vpc.appdev.id}"
 }
 
-
-resource "aws_vpc_peering_connection" "appdev_and_pardot_ci_vpc_peering" {
-  peer_owner_id = "${var.pardot_ci_acct_number}"
-  peer_vpc_id = "${var.pardot_ci_vpc_id}"
-  vpc_id = "${aws_vpc.appdev.id}"
-}
-
