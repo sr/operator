@@ -58,7 +58,7 @@ func (a *ldapAuthorizer) userGroups(email string) ([]string, error) {
 	res, err := conn.Search(ldap.NewSearchRequest(
 		a.config.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(mail=%s)", email),
+		fmt.Sprintf("(mail=%s)", ldap.EscapeFilter(email)),
 		[]string{"cn"},
 		nil,
 	))
@@ -78,7 +78,7 @@ func (a *ldapAuthorizer) userGroups(email string) ([]string, error) {
 	res, err = conn.Search(ldap.NewSearchRequest(
 		a.config.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(memberUid=%s)", uid),
+		fmt.Sprintf("(memberUid=%s)", ldap.EscapeFilter(uid)),
 		[]string{"cn"},
 		nil,
 	))
