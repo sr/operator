@@ -8,9 +8,8 @@ ENV PATH="/usr/local/maven/bin:$PATH" \
   M2_HOME="/usr/local/maven" \
   JAVA_HOME=/usr/java/jdk1.8.0_102
 
-RUN yum install -y epel-release && \
-  yum install -y "https://${artifactory_host}/artifactory/pd-tarball/jdk/jdk-${jdk_version}-linux-x64.rpm" && \
+RUN yum install -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/jdk-${jdk_version}-linux-x64.rpm" && \
   yum clean all
 
-RUN curl -L "http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz" | tar -xzv -C /usr/local && \
+RUN curl -L "https://${artifactory_host}/artifactory/pd-tarball/maven/apache-maven-${maven_version}-bin.tar.gz" | tar -xzv -C /usr/local && \
   ln -sf "/usr/local/apache-maven-${maven_version}" /usr/local/maven

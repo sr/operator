@@ -15,7 +15,6 @@ images:
   docker.dev.pardot.com/base/ssh-forwarder:
     build: ssh-forwarder
 
-
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
     build: pardot/app
