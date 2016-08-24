@@ -122,10 +122,10 @@ resource "aws_route_table" "appdev_route_dmz" {
     cidr_block = "172.31.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
   }
-//  route {
-//    cidr_block = "172.27.0.0/16"
-//    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_ci_vpc_peering.id}"
-//  }
+  route {
+    cidr_block = "172.27.0.0/16"
+    vpc_peering_connection_id = "${var.pardot_ci_to_pardotops_appdev_vpc_peering_connection_id}"
+  }
 }
 
 resource "aws_route" "appdev_and_pardot_atlassian_route" {
@@ -134,11 +134,11 @@ resource "aws_route" "appdev_and_pardot_atlassian_route" {
   route_table_id = "${aws_vpc.appdev.main_route_table_id}"
 }
 
-//resource "aws_route" "appdev_and_pardot_ci_route" {
-//  destination_cidr_block = "172.27.0.0/16"
-//  vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_ci_vpc_peering.id}"
-//  route_table_id = "${aws_vpc.appdev.main_route_table_id}"
-//}
+resource "aws_route" "appdev_and_pardot_ci_route" {
+  destination_cidr_block = "172.27.0.0/16"
+  vpc_peering_connection_id = "${var.pardot_ci_to_pardotops_appdev_vpc_peering_connection_id}"
+  route_table_id = "${aws_vpc.appdev.main_route_table_id}"
+}
 
 resource "aws_route_table_association" "appdev_us_east_1a" {
   subnet_id = "${aws_subnet.appdev_us_east_1a.id}"
