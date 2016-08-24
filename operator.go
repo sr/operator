@@ -121,3 +121,10 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	}
 	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
 }
+
+func (r *Request) UserEmail() string {
+	if r != nil && r.Source != nil && r.Source.User != nil {
+		return r.Source.User.Email
+	}
+	return ""
+}
