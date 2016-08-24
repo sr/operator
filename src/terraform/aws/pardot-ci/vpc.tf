@@ -23,7 +23,7 @@ resource "aws_subnet" "pardot_ci_us_east_1c" {
 
 resource "aws_subnet" "pardot_ci_us_east_1b" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
-  availability_zone = "us-east-1d"
+  availability_zone = "us-east-1b"
   cidr_block = "172.27.64.0/19"
   map_public_ip_on_launch = false
 }
@@ -51,7 +51,7 @@ resource "aws_subnet" "pardot_ci_us_east_1c_dmz" {
 
 resource "aws_subnet" "pardot_ci_us_east_1b_dmz" {
   vpc_id = "${aws_vpc.pardot_ci.id}"
-  availability_zone = "us-east-1d"
+  availability_zone = "us-east-1b"
   cidr_block = "172.27.192.0/19"
   map_public_ip_on_launch = true
 }
@@ -169,8 +169,8 @@ resource aws_security_group "pardot2_bastion_1_1_ue1_ssh_ingress" {
     to_port = "22"
     protocol = "tcp"
     cidr_blocks = [
-      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_public_ip}",
-      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}"
+      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_public_ip}/32",
+      "${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}/32"
     ]
   }
 

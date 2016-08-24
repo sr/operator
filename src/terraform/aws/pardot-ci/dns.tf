@@ -22,7 +22,7 @@ resource "aws_route53_record" "pardot2_chef1_1_ue1_Arecord" {
 
 resource "aws_route53_record" "pardot2_bastion1_1_ue1_Arecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot2-chef1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
+  name = "pardot2-bastion1-1-ue1.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
   records = ["${var.pardot2-bastion1-1-ue1_aws_pardot_com_private_ip}"]
   type = "A"
   ttl = "900"
