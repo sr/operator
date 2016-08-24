@@ -44,7 +44,7 @@ build-operatord: $(TMPDIR)
 	env CGO_ENABLED=0 GOOS=linux $(GO) build -a -tags netgo -ldflags "-w" \
 		-o $(OPERATORD_LINUX) bread/cmd/operatord
 
-docker-build-operatord: etc/ca-bundle.crt build-operatord
+docker-build-operatord: etc/ca-bundle.crt $(OPERATORD_LINUX)
 	cp $(OPERATORD_LINUX) operatord
 	$(DOCKER) build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
 	rm -f operatord
