@@ -1,11 +1,3 @@
-variable "pardot_ci_acct_number" {
-  default = "096113534078"
-}
-
-variable "pardot_ci_vpc_id" {
-  default = "vpc-6d80c40a"
-}
-
 variable "pardot_ci_vpc_cidr" {
   default = "172.27.0.0/16"
 }
