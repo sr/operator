@@ -54,7 +54,7 @@ resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
         "ec2:StopInstances",
         "ec2:StartInstances"
     ],
-    "Resource": "arn:aws:ec2:eu-west-1:${var.pardot_ci_account_number}:instance/*",
+    "Resource": "arn:aws:ec2:us-east-1:${var.pardot_ci_account_number}:instance/*",
     "Condition": {
         "StringEquals": {
             "ec2:ResourceTag/Name": "bam::bamboo.dev.pardot.com::bamboo"
