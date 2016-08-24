@@ -6,6 +6,8 @@ images:
   docker.dev.pardot.com/base/centos:6:
     build: centos/6
     pull: true
+  docker.dev.pardot.com/base/java:8u102-jdk:
+    build: java/8u102-jdk
   docker.dev.pardot.com/base/percona-server:5.5:
     build: percona-server/5.5
   docker.dev.pardot.com/base/ruby:2.3.0:
@@ -24,6 +26,10 @@ images:
     build: pardot/proxyout
   docker.dev.pardot.com/base/pardot/kafka:
     build: pardot/kafka
+
+  # Pardot/pardriver
+  docker.dev.pardot.com/base/pardriver/pardriver:
+    build: pardriver/pardriver
 
   # Pardot/java-services
   docker.dev.pardot.com/base/java-services/app:
