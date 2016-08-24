@@ -34,6 +34,8 @@ variable "environment_appdev" {
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
     num_proxyout1_hosts = 1
+    num_vault1_hosts = 3
+    num_consul1_hosts = 2
   }
 }
 
@@ -179,6 +181,26 @@ resource "aws_security_group" "appdev_apphost" {
     security_groups = [
       "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
     ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "appdev_consulhost" {
+  name = "appdev_apphost"
+  description = "Allows communication among Vault and Consul hosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
   }
 
   egress {
@@ -946,6 +968,66 @@ resource "aws_route53_record" "appdev_whoisdb1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "${var.environment_appdev["pardot_env_id"]}-whoisdb1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${element(aws_instance.appdev_whoisdb1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_vault1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_vault1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_consulhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-vault1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_vault1_arecord" {
+  count = "${var.environment_appdev["num_vault1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-vault1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_vault1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_consul1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_consul1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_consulhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-consul1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_consul1_arecord" {
+  count = "${var.environment_appdev["num_consul1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-consul1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_consul1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
