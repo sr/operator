@@ -8,9 +8,9 @@ class MyLDIF(LDIFParser):
 
   def handle(self, dn, entry):
     if 'sshPublicKey' in entry:
-      del entry['sshPublicKey']
+      entry['sshPublicKey'] = ['ssh']
     if 'userPassword' in entry:
-      del entry['userPassword']
+      entry['userPassword'] = ['password']
     if 'pwdChangedTime' in entry:
       del entry['pwdChangedTime']
     if 'pwmEventLog' in entry:

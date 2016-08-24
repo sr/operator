@@ -3,14 +3,20 @@ package bread_test
 import (
 	"bread"
 	"errors"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/sr/operator"
 )
 
 func TestLDAPAuthorizer(t *testing.T) {
+	v, ok := os.LookupEnv("LDAP_PORT")
+	if !ok {
+		t.Fatal("LDAP_PORT not set")
+	}
 	auth := bread.NewLDAPAuthorizer(&bread.LDAPConfig{
-		Address: "localhost:32790",
+		Address: fmt.Sprintf("localhost:%s", v),
 	})
 	sr := "srozet@salesforce.com"
 	for _, tc := range []struct {
@@ -42,7 +48,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 			}
 		} else {
 			if tc.err == nil {
-				t.Fatalf("unexpected error: %#v", err)
+				t.Fatalf("unexpected error: %s", err)
 			}
 			if err.Error() != tc.err.Error() {
 				t.Errorf("expected error message %#v, got %#v", tc.err.Error(), err.Error())

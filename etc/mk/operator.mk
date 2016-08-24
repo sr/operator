@@ -39,7 +39,11 @@ ldap-dev: docker-build-ldap
 	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true
 	$(DOCKER) rm operator_ldap >/dev/null || true
 	$(DOCKER) run --name "operator_ldap" -P -d \
-		-v "$(BREAD)/etc/docker/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
+		-v "$(BREAD)/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
+
+test: etc/ldap.ldif ldap-dev
+	env LDAP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)" \
+		go test bread github.com/sr/operator
 
 clean:
 	rm -f etc/docker/ca-bundle.crt $(OPERATORD_LINUX) \
