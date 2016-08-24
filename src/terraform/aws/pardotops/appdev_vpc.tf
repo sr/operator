@@ -122,11 +122,21 @@ resource "aws_route_table" "appdev_route_dmz" {
     cidr_block = "172.31.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
   }
+  route {
+    cidr_block = "172.27.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_ci_vpc_peering.id}"
+  }
 }
 
 resource "aws_route" "appdev_and_pardot_atlassian_route" {
   destination_cidr_block = "172.31.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
+  route_table_id = "${aws_vpc.appdev.main_route_table_id}"
+}
+
+resource "aws_route" "appdev_and_pardot_ci_route" {
+  destination_cidr_block = "172.27.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_ci_vpc_peering.id}"
   route_table_id = "${aws_vpc.appdev.main_route_table_id}"
 }
 
@@ -282,8 +292,15 @@ resource "aws_route53_record" "appdev_bastion_Arecord" {
 }
 
 resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" {
-  peer_owner_id = "010094454891" # pardot-atlassian
-  peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
+  peer_owner_id = "${var.pardot_atlassian_acct_number}"
+  peer_vpc_id = "${var.pardot_atlassian_vpc_id}"
+  vpc_id = "${aws_vpc.appdev.id}"
+}
+
+
+resource "aws_vpc_peering_connection" "appdev_and_pardot_ci_vpc_peering" {
+  peer_owner_id = "${var.pardot_ci_acct_number}"
+  peer_vpc_id = "${var.pardot_ci_vpc_id}"
   vpc_id = "${aws_vpc.appdev.id}"
 }
 
