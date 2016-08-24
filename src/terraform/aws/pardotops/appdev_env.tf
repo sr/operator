@@ -192,7 +192,7 @@ resource "aws_security_group" "appdev_apphost" {
 }
 
 resource "aws_security_group" "appdev_consulhost" {
-  name = "appdev_apphost"
+  name = "appdev_consulhost"
   description = "Allows communication among Vault and Consul hosts"
   vpc_id = "${aws_vpc.appdev.id}"
 
