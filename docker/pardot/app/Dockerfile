@@ -70,11 +70,9 @@ RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-
   npm install -g grunt-cli
 
 # Save public key information for remote Git servers
-RUN mkdir -p ~/.ssh && \
-  chmod 0700 ~/.ssh && \
-  ssh-keyscan git.dev.pardot.com > ~/.ssh/known_hosts && \
-  ssh-keyscan github.com >> ~/.ssh/known_hosts && \
-  chmod 0600 ~/.ssh/known_hosts
+RUN mkdir -p /root/.ssh
+COPY known_hosts /root/.ssh/known_hosts
+RUN chmod 0700 /root/.ssh && chmod 0600 /root/.ssh/known_hosts
 
 # GeoIP
 RUN mkdir -p /var/www && \
