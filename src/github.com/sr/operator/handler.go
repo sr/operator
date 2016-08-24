@@ -8,6 +8,8 @@ import (
 	"time"
 	"unicode"
 
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/ptypes"
@@ -19,7 +21,7 @@ type handler struct {
 	logger       Logger
 	instrumenter Instrumenter
 	authorizer   Authorizer
-	decoder      RequestDecoder
+	decoder      Decoder
 	re           *regexp.Regexp
 	conn         *grpc.ClientConn
 	invoker      Invoker
@@ -29,11 +31,12 @@ func newHandler(
 	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-	decoder RequestDecoder,
+	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
 ) (*handler, error) {
+	// TODO(sr) Quote the prefix with regexp.QuoteMeta
 	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, prefix))
 	if err != nil {
 		return nil, err
@@ -50,7 +53,7 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, err := h.decoder.Decode(r)
+	message, replierID, err := h.decoder.Decode(r)
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
@@ -91,7 +94,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Service: matches[1],
 			Method:  matches[2],
 		},
-		Source: message.Source,
+		Source:    message.Source,
+		ReplierId: replierID,
 	}
 	if err := h.authorizer.Authorize(req); err != nil {
 		// TODO(sr) Log unauthorized error
@@ -99,7 +103,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start := time.Now()
-	ok, err := h.invoker(h.conn, req, args)
+	ok, err := h.invoker(context.Background(), h.conn, req, args)
 	if !ok {
 		// TODO(sr) Log unhandled message
 		w.WriteHeader(http.StatusNotFound)

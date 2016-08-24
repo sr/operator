@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
 	"github.com/dvsekhvalnov/jose2go"
@@ -23,7 +25,7 @@ type fakeLogger struct{}
 
 type fakeAuthorizer struct{}
 
-type fakeChatClient struct{}
+type fakeReplier struct{}
 
 func (l *fakeLogger) Info(_ proto.Message) {
 }
@@ -35,23 +37,19 @@ func (a *fakeAuthorizer) Authorize(_ *operator.Request) error {
 	return nil
 }
 
-func (c *fakeChatClient) SendRoomNotification(_ *operator.ChatRoomNotification) error {
+func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
 }
 
-type fakeOAuthClientStore struct {
-	client *operatorhipchat.OAuthClient
+type fakeStore struct {
+	client *operatorhipchat.ClientCredentials
 }
 
-func (s *fakeOAuthClientStore) GetByAddonID(_ string) (*operatorhipchat.OAuthClient, error) {
+func (s *fakeStore) GetByOAuthID(_ string) (*operatorhipchat.ClientCredentials, error) {
 	return s.client, nil
 }
 
-func (s *fakeOAuthClientStore) GetByOAuthID(_ string) (*operatorhipchat.OAuthClient, error) {
-	return s.client, nil
-}
-
-func (s *fakeOAuthClientStore) PutByAddonID(_ string, _ *operatorhipchat.OAuthClient) error {
+func (s *fakeStore) Create(_ *operatorhipchat.ClientCredentials) error {
 	return nil
 }
 
@@ -60,7 +58,7 @@ func TestHandler(t *testing.T) {
 	server := grpc.NewServer()
 	defer server.Stop()
 	pingServer, err := operatortesting.NewAPIServer(
-		&fakeChatClient{},
+		&fakeReplier{},
 		&operatortesting.PingerConfig{},
 	)
 	if err != nil {
@@ -78,11 +76,11 @@ func TestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	oauthClient := &operatorhipchat.OAuthClient{
+	oauthClient := &operatorhipchat.ClientCredentials{
 		ID:     "32a1811e-beee-4285-9df2-39c3a7971982",
 		Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
 	}
-	store := &fakeOAuthClientStore{oauthClient}
+	store := &fakeStore{oauthClient}
 	tArgs := make(map[string]string)
 	h, err := operator.NewHandler(
 		logger,
@@ -91,7 +89,7 @@ func TestHandler(t *testing.T) {
 		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
-		func(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 			tArgs = args
 			return true, nil
 		},
