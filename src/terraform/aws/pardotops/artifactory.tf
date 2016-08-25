@@ -25,7 +25,6 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}",
       "172.31.0.0/16", # pardot-atlassian: default vpc
       "192.168.128.0/22" # pardot-ci: default vpc
     ]
@@ -39,7 +38,6 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}",
       "172.31.0.0/16", # pardot-atlassian: default vpc
       "192.168.128.0/22" # pardot-ci: default vpc
     ]
@@ -144,7 +142,6 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}",
       "172.31.0.0/16", # pardot-atlassian: default vpc
       "192.168.128.0/22" # pardot-ci: default vpc
     ]
@@ -158,7 +155,6 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.pardot_ci.cidr_block}",
       "172.31.0.0/16", # pardot-atlassian: default vpc
       "192.168.128.0/22" # pardot-ci: default vpc
     ]
@@ -545,19 +541,9 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     gateway_id = "${aws_internet_gateway.artifactory_integration_internet_gw.id}"
   }
   route {
-    cidr_block = "172.27.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
-  }
-  route {
     cidr_block = "172.30.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
   }
-}
-
-resource "aws_route" "artifactory_integration_to_pardot_ci" {
-  destination_cidr_block = "172.27.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
-  route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
 }
 
 resource "aws_route" "artifactory_integration_to_legacy_pardot_ci" {
@@ -652,12 +638,6 @@ resource "aws_db_subnet_group" "artifactory_integration" {
 resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration_vpc_peering" {
   peer_owner_id = "${var.pardotops_account_number}"
   peer_vpc_id = "${aws_vpc.internal_apps.id}"
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
-}
-
-resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "${var.pardotops_account_number}"
-  peer_vpc_id = "${aws_vpc.pardot_ci.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 

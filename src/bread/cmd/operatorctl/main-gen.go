@@ -41,17 +41,43 @@ var cmd = operator.NewCommand(
 						}
 						defer conn.Close()
 						client := ping.NewPingerClient(conn)
-						response, err := client.Ping(
+						resp, err := client.Ping(
 							context.Background(),
 							&ping.PingRequest{
-								Source: ctx.Source,
-								Arg1:   *arg1,
+								Request: ctx.Request,
+								Arg1:    *arg1,
 							},
 						)
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
+					},
+				},
+				{
+					Name:     "whoami",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := ping.NewPingerClient(conn)
+						resp, err := client.Whoami(
+							context.Background(),
+							&ping.WhoamiRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
 					},
 				},
 			},
@@ -66,7 +92,7 @@ func main() {
 			panic(err)
 		}
 	} else {
-		if _, err := io.WriteString(os.Stdout, output); err != nil {
+		if _, err := io.WriteString(os.Stdout, output+"\n"); err != nil {
 			panic(err)
 		}
 	}

@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
 	"github.com/dvsekhvalnov/jose2go"
@@ -17,13 +19,18 @@ import (
 	"github.com/sr/operator/testing"
 )
 
+var credentials = &operatorhipchat.ClientCredentials{
+	ID:     "32a1811e-beee-4285-9df2-39c3a7971982",
+	Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
+}
+
 var logger = &fakeLogger{}
 
 type fakeLogger struct{}
 
 type fakeAuthorizer struct{}
 
-type fakeChatClient struct{}
+type fakeReplier struct{}
 
 func (l *fakeLogger) Info(_ proto.Message) {
 }
@@ -31,36 +38,61 @@ func (l *fakeLogger) Info(_ proto.Message) {
 func (l *fakeLogger) Error(_ proto.Message) {
 }
 
-func (a *fakeAuthorizer) Authorize(_ *operator.Request) error {
+func (a *fakeAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
 	return nil
 }
 
-func (c *fakeChatClient) SendRoomNotification(_ *operator.ChatRoomNotification) error {
+func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
 }
 
-type fakeOAuthClientStore struct {
-	client *operatorhipchat.OAuthClient
+type fakeStore struct {
+	config *operatorhipchat.ClientConfig
 }
 
-func (s *fakeOAuthClientStore) GetByAddonID(_ string) (*operatorhipchat.OAuthClient, error) {
-	return s.client, nil
+func (s *fakeStore) GetByOAuthID(_ string) (operatorhipchat.ClientConfiger, error) {
+	return &fakeClientConfig{s.config}, nil
 }
 
-func (s *fakeOAuthClientStore) GetByOAuthID(_ string) (*operatorhipchat.OAuthClient, error) {
-	return s.client, nil
+func (s *fakeStore) Create(_ *operatorhipchat.ClientCredentials) error {
+	return nil
 }
 
-func (s *fakeOAuthClientStore) PutByAddonID(_ string, _ *operatorhipchat.OAuthClient) error {
+type fakeClientConfig struct {
+	config *operatorhipchat.ClientConfig
+}
+
+func (c *fakeClientConfig) ID() string {
+	return credentials.ID
+}
+
+func (c *fakeClientConfig) Secret() string {
+	return credentials.Secret
+}
+
+func (c *fakeClientConfig) Client(_ context.Context) (operatorhipchat.Client, error) {
+	return &fakeHipchatClient{}, nil
+}
+
+type fakeHipchatClient struct{}
+
+func (c *fakeHipchatClient) GetUser(_ context.Context, id int) (*operatorhipchat.User, error) {
+	return &operatorhipchat.User{
+		ID:    id,
+		Email: "jane@salesforce.com",
+	}, nil
+}
+
+func (c *fakeHipchatClient) SendRoomNotification(_ context.Context, _ *operatorhipchat.RoomNotification) error {
 	return nil
 }
 
 func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
-	defer server.Stop()
+	defer server.GracefulStop()
 	pingServer, err := operatortesting.NewAPIServer(
-		&fakeChatClient{},
+		&fakeReplier{},
 		&operatortesting.PingerConfig{},
 	)
 	if err != nil {
@@ -78,11 +110,14 @@ func TestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	oauthClient := &operatorhipchat.OAuthClient{
-		ID:     "32a1811e-beee-4285-9df2-39c3a7971982",
-		Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
+	config := &operatorhipchat.ClientConfig{
+		Hostname: "api.hipchat.test",
+		Credentials: &operatorhipchat.ClientCredentials{
+			ID:     "32a1811e-beee-4285-9df2-39c3a7971982",
+			Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
+		},
 	}
-	store := &fakeOAuthClientStore{oauthClient}
+	store := &fakeStore{config}
 	tArgs := make(map[string]string)
 	h, err := operator.NewHandler(
 		logger,
@@ -91,7 +126,7 @@ func TestHandler(t *testing.T) {
 		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
-		func(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 			tArgs = args
 			return true, nil
 		},
@@ -142,7 +177,7 @@ func TestHandler(t *testing.T) {
 		if tt.jwt == false {
 			token = "bogus"
 		} else {
-			token, err = jose.Sign("{}", jose.HS256, []byte(oauthClient.Secret))
+			token, err = jose.Sign("{}", jose.HS256, []byte(config.Credentials.Secret))
 			if err != nil {
 				t.Fatal(err)
 			}

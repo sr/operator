@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"golang.org/x/net/context"
+
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 )
@@ -13,12 +15,24 @@ const (
 	HipchatHost = "https://hipchat.dev.pardot.com"
 	TestingRoom = 882 // BREAD Testing
 	PublicRoom  = 42  // Build & Automate
+	LDAPBase    = "dc=pardot,dc=com"
 )
 
-type HipchatConfig struct {
-	Hostname    string
-	Token       string
-	OAuthClient *operatorhipchat.OAuthClient
+var ACL = map[*operator.Call]string{
+	&operator.Call{
+		Service: "ping",
+		Method:  "ping",
+	}: "sysadmin",
+	&operator.Call{
+		Service: "ping",
+		Method:  "whoami",
+	}: "sysadmin",
+}
+
+type LDAPConfig struct {
+	Address    string
+	Encryption string
+	Base       string
 }
 
 func NewLogger() operator.Logger {
@@ -29,34 +43,38 @@ func NewHTTPLoggerHandler(l operator.Logger, h http.Handler) http.Handler {
 	return &wrapperHandler{l, h}
 }
 
-func NewLDAPAuthorizer() operator.Authorizer {
-	return newLDAPAuthorizer()
+func NewLDAPAuthorizer(config *LDAPConfig) operator.Authorizer {
+	if config.Base == "" {
+		config.Base = LDAPBase
+	}
+	return newLDAPAuthorizer(config, ACL)
 }
 
-func NewHipchatClient(config *HipchatConfig) (operator.ChatClient, error) {
-	return newHipchatClient(config)
+func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
+	return operatorhipchat.NewClient(context.Background(), config)
 }
 
-func NewHipchatOAuthClientStore(db *sql.DB) operatorhipchat.OAuthClientStore {
-	return newHipchatOAuthClientStore(db)
+func NewHipchatCredsStore(db *sql.DB) operatorhipchat.ClientCredentialsStore {
+	return operatorhipchat.NewSQLStore(db, HipchatHost)
 }
 
 func NewHipchatAddonHandler(
-	id string,
-	addonURL string,
-	webhookURL string,
-	s operatorhipchat.OAuthClientStore,
 	prefix string,
-) (http.Handler, error) {
-	u, err := url.Parse(addonURL)
-	if err != nil {
-		return nil, err
-	}
-	wu, err := url.Parse(webhookURL)
-	if err != nil {
-		return nil, err
-	}
-	return newHipchatAddonHandler(id, u, wu, prefix, s)
+	namespace string,
+	addonURL *url.URL,
+	webhookURL *url.URL,
+	store operatorhipchat.ClientCredentialsStore,
+) http.Handler {
+	return operatorhipchat.NewAddonHandler(
+		store,
+		&operatorhipchat.AddonConfig{
+			Namespace:     namespace,
+			URL:           addonURL,
+			Homepage:      "https://git.dev.pardot.com/Pardot/bread",
+			WebhookPrefix: prefix,
+			WebhookURL:    webhookURL,
+		},
+	)
 }
 
 func NewPingHandler(db *sql.DB) http.Handler {

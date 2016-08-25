@@ -6,3 +6,6 @@ pardotqe_secret_access_key = ""
 
 pardotatlassian_access_key_id = ""
 pardotatlassian_secret_access_key = ""
+
+pardotci_access_key_id = ""
+pardotci_secret_access_key = ""

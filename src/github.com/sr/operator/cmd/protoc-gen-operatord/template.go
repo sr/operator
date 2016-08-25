@@ -21,11 +21,7 @@ import (
 {{- end}}
 )
 
-func buildOperatorServer(
-	chat operator.ChatClient,
-	server *grpc.Server,
-	flags *flag.FlagSet,
-) (map[string]error, error) {
+func buildOperatorServer(replier operator.Replier, server *grpc.Server, flags *flag.FlagSet) (map[string]error, error) {
 {{- range .Services}}
 	{{.PackageName}}Config := &{{.PackageName}}.{{.FullName}}Config{}
 {{- end}}
@@ -52,7 +48,7 @@ func buildOperatorServer(
 	if len(errs["{{.Name}}"]) != 0 {
 		services["{{.Name}}"] = errors.New("required flag(s) missing: "+strings.Join(errs["{{.Name}}"], ", "))
 	} else {
-		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer(chat, {{.PackageName}}Config)
+		{{.PackageName}}Server, err := {{.PackageName}}.NewAPIServer(replier, {{.PackageName}}Config)
 		if err != nil {
 			services["{{.Name}}"] = err
 		} else {
@@ -64,7 +60,7 @@ func buildOperatorServer(
 	return services, nil
 }
 
-func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 {{- range .Services}}
 	{{- $serviceName := .PackageName }}
 	{{- $serviceFullName := .FullName }}
@@ -73,9 +69,9 @@ func invoker(conn *grpc.ClientConn, req *operator.Request, args map[string]strin
 		if req.Call.Method == "{{lowerCase .Name}}" {
 			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
 			_, err := client.{{.Name}}(
-				context.Background(),
+				ctx,
 				&{{$serviceName}}.{{.Input}}{
-					Source: req.Source,
+					Request: req,
 					{{- range .Arguments}}
 					{{camelCase .Name}}: args["{{.Name}}"],
 					{{- end}}

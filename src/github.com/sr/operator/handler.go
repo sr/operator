@@ -8,6 +8,8 @@ import (
 	"time"
 	"unicode"
 
+	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/ptypes"
@@ -16,10 +18,11 @@ import (
 const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
+	ctx          context.Context
 	logger       Logger
 	instrumenter Instrumenter
 	authorizer   Authorizer
-	decoder      RequestDecoder
+	decoder      Decoder
 	re           *regexp.Regexp
 	conn         *grpc.ClientConn
 	invoker      Invoker
@@ -29,16 +32,18 @@ func newHandler(
 	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-	decoder RequestDecoder,
+	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
 ) (*handler, error) {
+	// TODO(sr) Quote the prefix with regexp.QuoteMeta
 	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, prefix))
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
+		context.Background(),
 		logger,
 		instrumenter,
 		authorizer,
@@ -50,10 +55,11 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, err := h.decoder.Decode(r)
+	message, replierID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Printf("DEBUG decode error: %s\n", err)
 		return
 	}
 	matches := h.re.FindStringSubmatch(message.Text)
@@ -91,15 +97,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Service: matches[1],
 			Method:  matches[2],
 		},
-		Source: message.Source,
+		Source:    message.Source,
+		ReplierId: replierID,
 	}
-	if err := h.authorizer.Authorize(req); err != nil {
+	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
 		// TODO(sr) Log unauthorized error
+		fmt.Printf("DEBUG authorize error: %s\n", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	start := time.Now()
-	ok, err := h.invoker(h.conn, req, args)
+	ok, err := h.invoker(h.ctx, h.conn, req, args)
 	if !ok {
 		// TODO(sr) Log unhandled message
 		w.WriteHeader(http.StatusNotFound)

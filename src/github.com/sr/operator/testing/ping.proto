@@ -9,16 +9,12 @@ option go_package = "operatortesting";
 service Pinger {
 	option (operator.name) = "ping";
 
-	rpc Ping(PingRequest) returns (PingResponse);
+	rpc Ping(PingRequest) returns (operator.Response);
 }
 
 message PingerConfig {
 }
 
 message PingRequest {
-	operator.Source source = 1;
-}
-
-message PingResponse {
-	operator.Output output = 1;
+	operator.Request request = 1;
 }

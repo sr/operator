@@ -3,11 +3,12 @@ package operator
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"net/http"
 
-	"google.golang.org/grpc"
-
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 const DefaultAddress = "localhost:9000"
@@ -15,7 +16,7 @@ const DefaultAddress = "localhost:9000"
 var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
-	Authorize(*Request) error
+	Authorize(context.Context, *Request) error
 }
 
 type Instrumenter interface {
@@ -27,28 +28,27 @@ type Logger interface {
 	Error(proto.Message)
 }
 
-type RequestDecoder interface {
-	Decode(*http.Request) (*Message, error)
+type Requester interface {
+	GetRequest() *Request
 }
 
-type ChatClient interface {
-	SendRoomNotification(*ChatRoomNotification) error
+type Decoder interface {
+	Decode(context.Context, *http.Request) (*Message, string, error)
 }
 
-type ChatRoomNotification struct {
-	Color         string `json:"color"`
-	From          string `json:"from"`
-	Message       string `json:"message"`
-	MessageFormat string `json:"message_format"`
-	RoomID        int    `json:"-"`
+type Replier interface {
+	Reply(context.Context, *Source, string, *Message) error
 }
 
-type Invoker func(*grpc.ClientConn, *Request, map[string]string) (bool, error)
+type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
 
-type ServerBuilder func(ChatClient, *grpc.Server, *flag.FlagSet) (map[string]error, error)
+type ServerBuilder func(Replier, *grpc.Server, *flag.FlagSet) (map[string]error, error)
 
-type Config struct {
-	Address string
+type Message struct {
+	Source  *Source
+	Text    string
+	HTML    string
+	Options interface{} `json:"-"`
 }
 
 type Command struct {
@@ -58,7 +58,7 @@ type Command struct {
 
 type CommandContext struct {
 	Address string
-	Source  *Source
+	Request *Request
 	Flags   *flag.FlagSet
 	Args    []string
 }
@@ -92,7 +92,7 @@ func NewHandler(
 	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
-	decoder RequestDecoder,
+	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
@@ -108,6 +108,28 @@ func NewHandler(
 	)
 }
 
-func NewArgumentRequiredError(argument string) error {
-	return &argumentRequiredError{argument}
+func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {
+	req := r.GetRequest()
+	if req == nil {
+		return nil, errors.New("unable to reply without a request")
+	}
+	src := req.GetSource()
+	if req == nil {
+		return nil, errors.New("unable to reply to request with a source")
+	}
+	if msg.HTML == "" && msg.Text == "" {
+		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
+	}
+	err := rep.Reply(ctx, src, req.ReplierId, msg)
+	if err != nil {
+		fmt.Printf("DEBUG reply err: %s\n", err)
+	}
+	return &Response{Message: msg.Text}, err
+}
+
+func (r *Request) UserEmail() string {
+	if r != nil && r.Source != nil && r.Source.User != nil {
+		return r.Source.User.Email
+	}
+	return ""
 }
