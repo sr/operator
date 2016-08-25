@@ -86,10 +86,12 @@ func run() error {
 	return client.SendRoomNotification(
 		context.Background(),
 		&operatorhipchat.RoomNotification{
-			Color:         color,
-			From:          "breadsignal",
+			MessageOptions: &operatorhipchat.MessageOptions{
+				Color: color,
+				From:  "breadsignal",
+			},
 			Message:       message,
-			MessageFormat: "html",
+			MessageFormat: "text",
 			RoomID:        int64(room),
 		},
 	)

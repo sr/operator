@@ -48,7 +48,7 @@ type Message struct {
 	Source  *Source
 	Text    string
 	HTML    string
-	Options interface{}
+	Options interface{} `json:"-"`
 }
 
 type Command struct {
