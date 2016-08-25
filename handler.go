@@ -99,7 +99,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Source:    message.Source,
 		ReplierId: replierID,
 	}
-	if err := h.authorizer.Authorize(req); err != nil {
+	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
 		// TODO(sr) Log unauthorized error
 		w.WriteHeader(http.StatusUnauthorized)
 		return
