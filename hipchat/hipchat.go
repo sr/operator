@@ -12,6 +12,7 @@ import (
 var DefaultScopes = []string{"send_message", "send_notification"}
 
 type Client interface {
+	GetUser(context.Context, int) (*User, error)
 	SendRoomNotification(context.Context, *RoomNotification) error
 }
 
@@ -55,6 +56,14 @@ type RoomNotification struct {
 	RoomID        int64  `json:"-"`
 }
 
+type User struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Deleted     bool   `json:"is_deleted"`
+	MentionName string `json:"mention_name"`
+}
+
 func NewAddonHandler(store ClientCredentialsStore, config *AddonConfig) http.Handler {
 	return newAddonHandler(store, config)
 }
@@ -67,8 +76,8 @@ func NewReplier(store ClientCredentialsStore, hostname string) operator.Replier 
 	return newReplier(store, hostname)
 }
 
-func NewRequestDecoder(store ClientCredentialsStore) operator.Decoder {
-	return newRequestDecoder(store)
+func NewRequestDecoder(store ClientCredentialsStore, hostname string) operator.Decoder {
+	return newRequestDecoder(store, hostname)
 }
 
 func NewSQLStore(db *sql.DB) ClientCredentialsStore {
