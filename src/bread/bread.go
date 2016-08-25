@@ -23,6 +23,10 @@ var ACL = map[*operator.Call]string{
 		Service: "ping",
 		Method:  "ping",
 	}: "sysadmin",
+	&operator.Call{
+		Service: "ping",
+		Method:  "whoami",
+	}: "sysadmin",
 }
 
 type LDAPConfig struct {
