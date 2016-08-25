@@ -9,6 +9,7 @@ import (
 
 	"github.com/dvsekhvalnov/jose2go"
 	"github.com/sr/operator"
+	"golang.org/x/net/context"
 )
 
 type Payload struct {
@@ -26,26 +27,23 @@ type Message struct {
 	From    *User  `json:"from"`
 }
 
-type User struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	MentionName string `json:"mention_name"`
-}
-
 type Room struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 type requestDecoder struct {
-	store ClientCredentialsStore
+	store    ClientCredentialsStore
+	hostname string
 }
 
-func newRequestDecoder(store ClientCredentialsStore) *requestDecoder {
-	return &requestDecoder{store}
+// TODO(sr) Store the hostname alongs with the OAuth ID and OAuth Secret so the
+// hostname argument is not necessary
+func newRequestDecoder(store ClientCredentialsStore, hostname string) *requestDecoder {
+	return &requestDecoder{store, hostname}
 }
 
-func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, error) {
+func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operator.Message, string, error) {
 	var data Payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&data); err != nil {
@@ -59,7 +57,7 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 	if len(parts) != 2 || parts[0] != "JWT" {
 		return nil, "", errors.New("invalid Authorization header")
 	}
-	var oauthID string
+	var oauthID, oauthSecret string
 	_, _, err := jose.Decode(parts[1], func(_ map[string]interface{}, payload string) interface{} {
 		var data struct {
 			Iss string
@@ -77,6 +75,20 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 	if err != nil {
 		return nil, "", err
 	}
+	client, err := NewClient(ctx, &ClientConfig{
+		Hostname: d.hostname,
+		Credentials: &ClientCredentials{
+			ID:     oauthID,
+			Secret: oauthSecret,
+		},
+	})
+	if err != nil {
+		return nil, "", err
+	}
+	user, err := client.GetUser(ctx, data.Item.Message.From.ID)
+	if err != nil {
+		return nil, "", err
+	}
 	return &operator.Message{
 		Text: data.Item.Message.Message,
 		Source: &operator.Source{
@@ -90,7 +102,7 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 				Id:       strconv.Itoa(data.Item.Message.From.ID),
 				Login:    data.Item.Message.From.MentionName,
 				RealName: data.Item.Message.From.Name,
-				Email:    "", // TODO(sr) Fetch the user email from the API
+				Email:    user.Email,
 			},
 		},
 	}, oauthID, nil

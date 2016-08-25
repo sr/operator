@@ -18,6 +18,7 @@ import (
 const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
+	ctx          context.Context
 	logger       Logger
 	instrumenter Instrumenter
 	authorizer   Authorizer
@@ -42,6 +43,7 @@ func newHandler(
 		return nil, err
 	}
 	return &handler{
+		context.Background(),
 		logger,
 		instrumenter,
 		authorizer,
@@ -53,7 +55,7 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, replierID, err := h.decoder.Decode(r)
+	message, replierID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
@@ -103,7 +105,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start := time.Now()
-	ok, err := h.invoker(context.Background(), h.conn, req, args)
+	ok, err := h.invoker(h.ctx, h.conn, req, args)
 	if !ok {
 		// TODO(sr) Log unhandled message
 		w.WriteHeader(http.StatusNotFound)
