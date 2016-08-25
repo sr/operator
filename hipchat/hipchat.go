@@ -55,8 +55,6 @@ type MessageOptions struct {
 
 type RoomNotification struct {
 	*MessageOptions
-	Color         string `json:"color"`
-	From          string `json:"from"`
 	Message       string `json:"message"`
 	MessageFormat string `json:"message_format"`
 	RoomID        int64  `json:"-"`

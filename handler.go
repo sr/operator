@@ -59,7 +59,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Printf("DEBUG decode error: %#v\n", err)
+		fmt.Printf("DEBUG decode error: %s\n", err)
 		return
 	}
 	matches := h.re.FindStringSubmatch(message.Text)
@@ -102,7 +102,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
 		// TODO(sr) Log unauthorized error
-		fmt.Printf("DEBUG authorize error: %#v\n", err)
+		fmt.Printf("DEBUG authorize error: %s\n", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
