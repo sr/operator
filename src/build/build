@@ -147,7 +147,7 @@ case "$project" in
             -v "$BREAD/etc/mk:/go/etc/mk" \
             -e TMPDIR=/tmp \
             build/build \
-            make -f etc/mk/operator.mk test build-operatord
+            make -f etc/mk/operator.mk build-operatord
 
         # Build operatord container for deployment
         trap 'rm -f $BREAD/operatord' EXIT
