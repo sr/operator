@@ -102,6 +102,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
 		// TODO(sr) Log unauthorized error
+		fmt.Printf("DEBUG authorize error: %#v\n", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
