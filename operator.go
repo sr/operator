@@ -32,7 +32,7 @@ type Requester interface {
 }
 
 type Decoder interface {
-	Decode(*http.Request) (*Message, string, error)
+	Decode(context.Context, *http.Request) (*Message, string, error)
 }
 
 type Replier interface {
