@@ -16,9 +16,15 @@ type Client interface {
 	SendRoomNotification(context.Context, *RoomNotification) error
 }
 
+type ClientConfiger interface {
+	ID() string
+	Secret() string
+	Client(context.Context) (Client, error)
+}
+
 type ClientCredentialsStore interface {
 	Create(*ClientCredentials) error
-	GetByOAuthID(string) (*ClientCredentials, error)
+	GetByOAuthID(string) (ClientConfiger, error)
 }
 
 type AddonConfig struct {
@@ -72,12 +78,24 @@ func NewClient(ctx context.Context, config *ClientConfig) (Client, error) {
 	return newClient(ctx, config)
 }
 
+func (c *ClientConfig) Client(ctx context.Context) (Client, error) {
+	return newClient(ctx, c)
+}
+
+func (c *ClientConfig) ID() string {
+	return c.Credentials.ID
+}
+
+func (c *ClientConfig) Secret() string {
+	return c.Credentials.Secret
+}
+
 func NewReplier(store ClientCredentialsStore, hostname string) operator.Replier {
 	return newReplier(store, hostname)
 }
 
-func NewRequestDecoder(store ClientCredentialsStore, hostname string) operator.Decoder {
-	return newRequestDecoder(store, hostname)
+func NewRequestDecoder(store ClientCredentialsStore) operator.Decoder {
+	return newRequestDecoder(store)
 }
 
 func NewSQLStore(db *sql.DB) ClientCredentialsStore {

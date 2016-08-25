@@ -33,14 +33,11 @@ type Room struct {
 }
 
 type requestDecoder struct {
-	store    ClientCredentialsStore
-	hostname string
+	store ClientCredentialsStore
 }
 
-// TODO(sr) Store the hostname alongs with the OAuth ID and OAuth Secret so the
-// hostname argument is not necessary
-func newRequestDecoder(store ClientCredentialsStore, hostname string) *requestDecoder {
-	return &requestDecoder{store, hostname}
+func newRequestDecoder(store ClientCredentialsStore) *requestDecoder {
+	return &requestDecoder{store}
 }
 
 func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operator.Message, string, error) {
@@ -57,7 +54,7 @@ func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operat
 	if len(parts) != 2 || parts[0] != "JWT" {
 		return nil, "", errors.New("invalid Authorization header")
 	}
-	var oauthID, oauthSecret string
+	var config ClientConfiger
 	_, _, err := jose.Decode(parts[1], func(_ map[string]interface{}, payload string) interface{} {
 		var data struct {
 			Iss string
@@ -65,23 +62,17 @@ func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operat
 		if err := json.Unmarshal([]byte(payload), &data); err != nil {
 			return err
 		}
-		creds, err := d.store.GetByOAuthID(data.Iss)
+		cfg, err := d.store.GetByOAuthID(data.Iss)
 		if err != nil {
 			return err
 		}
-		oauthID = creds.ID
-		return []byte(creds.Secret)
+		config = cfg
+		return []byte(cfg.Secret())
 	})
 	if err != nil {
 		return nil, "", err
 	}
-	client, err := NewClient(ctx, &ClientConfig{
-		Hostname: d.hostname,
-		Credentials: &ClientCredentials{
-			ID:     oauthID,
-			Secret: oauthSecret,
-		},
-	})
+	client, err := config.Client(ctx)
 	if err != nil {
 		return nil, "", err
 	}
@@ -105,5 +96,5 @@ func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operat
 				Email:    user.Email,
 			},
 		},
-	}, oauthID, nil
+	}, config.ID(), nil
 }

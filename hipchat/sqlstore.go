@@ -1,6 +1,11 @@
 package operatorhipchat
 
-import "database/sql"
+import (
+	"database/sql"
+)
+
+// TODO(sr) Move this to the DB
+const hostname = "hipchat.dev.pardot.com"
 
 type sqlStore struct {
 	db *sql.DB
@@ -24,7 +29,7 @@ func (s *sqlStore) Create(client *ClientCredentials) error {
 	return err
 }
 
-func (s *sqlStore) GetByOAuthID(id string) (*ClientCredentials, error) {
+func (s *sqlStore) GetByOAuthID(id string) (ClientConfiger, error) {
 	var (
 		oauthID     string
 		oauthSecret string
@@ -38,8 +43,11 @@ func (s *sqlStore) GetByOAuthID(id string) (*ClientCredentials, error) {
 	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
 		return nil, err
 	}
-	return &ClientCredentials{
-		ID:     oauthID,
-		Secret: oauthSecret,
+	return &ClientConfig{
+		Hostname: hostname,
+		Credentials: &ClientCredentials{
+			ID:     oauthID,
+			Secret: oauthSecret,
+		},
 	}, nil
 }
