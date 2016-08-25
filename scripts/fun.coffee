@@ -783,6 +783,15 @@ module.exports = (robot) ->
     ]
     msg.send msg.random sysadmins
 
+  robot.responds /hybrid$/i, (msg) ->
+    hybrid=[
+      'http://www.freakingnews.com/pictures/128500/Hybrid-pets--128901.jpg',
+      'https://s-media-cache-ak0.pinimg.com/736x/5f/5b/4b/5f5b4bba9e656b1fbf12c73d203fde58.jpg',
+      'https://media.mnn.com/assets/images/2014/06/hybrid%20banana%20large.jpg',
+      'https://s-media-cache-ak0.pinimg.com/236x/21/04/72/210472376ed1a284f5e7a8638b1b88aa.jpg'
+    ]
+    msg.send msg.random hybrid
+
   robot.hear /over 9000$/i, (msg) ->
     msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
 
