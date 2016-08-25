@@ -40,7 +40,20 @@ const debugFormat = false // default: false
 // If trace is set, debugging output is printed to std out.
 const trace = false // default: false
 
-const exportVersion = "v0"
+// Current export format version.
+// Must not start with 'c' or 'd' (initials of prior format).
+const exportVersion = "version 1"
+
+// trackAllTypes enables cycle tracking for all types, not just named
+// types. The existing compiler invariants assume that unnamed types
+// that are not completely set up are not used, or else there are spurious
+// errors.
+// If disabled, only named types are tracked, possibly leading to slightly
+// less efficient encoding in rare cases. It also prevents the export of
+// some corner-case type declarations (but those are not handled correctly
+// with with the textual export format either).
+// TODO(gri) enable and remove once issues caused by it are fixed
+const trackAllTypes = false
 
 type exporter struct {
 	fset *token.FileSet
@@ -72,32 +85,17 @@ func BExportData(fset *token.FileSet, pkg *types.Package) []byte {
 		posInfoFormat: true, // TODO(gri) might become a flag, eventually
 	}
 
-	// first byte indicates low-level encoding format
-	var format byte = 'c' // compact
+	// write version info
+	p.rawStringln(exportVersion)
+	var debug string
 	if debugFormat {
-		format = 'd'
+		debug = "debug"
 	}
-	p.rawByte(format)
-
-	// posInfo exported or not?
+	p.rawStringln(debug) // cannot use p.bool since it's affected by debugFormat; also want to see this clearly
+	p.bool(trackAllTypes)
 	p.bool(p.posInfoFormat)
 
 	// --- generic export data ---
-
-	if trace {
-		p.tracef("\n--- generic export data ---\n")
-		if p.indent != 0 {
-			log.Fatalf("gcimporter: incorrect indentation %d", p.indent)
-		}
-	}
-
-	if trace {
-		p.tracef("version = ")
-	}
-	p.string(exportVersion)
-	if trace {
-		p.tracef("\n")
-	}
 
 	// populate type map with predeclared "known" types
 	for index, typ := range predeclared {
@@ -283,15 +281,21 @@ func (p *exporter) typ(t types.Type) {
 	}
 
 	// otherwise, remember the type, write the type tag (< 0) and type data
-	index := len(p.typIndex)
-	if trace {
-		p.tracef("T%d = {>\n", index)
-		defer p.tracef("<\n} ")
+	if trackAllTypes {
+		if trace {
+			p.tracef("T%d = {>\n", len(p.typIndex))
+			defer p.tracef("<\n} ")
+		}
+		p.typIndex[t] = len(p.typIndex)
 	}
-	p.typIndex[t] = index
 
 	switch t := t.(type) {
 	case *types.Named:
+		if !trackAllTypes {
+			// if we don't track all types, track named types now
+			p.typIndex[t] = len(p.typIndex)
+		}
+
 		p.tag(namedTag)
 		p.pos(t.Obj())
 		p.qualifiedName(t.Obj())
@@ -375,6 +379,7 @@ func (p *exporter) assocMethods(named *types.Named) {
 		p.paramList(types.NewTuple(sig.Recv()), false)
 		p.paramList(sig.Params(), sig.Variadic())
 		p.paramList(sig.Results(), false)
+		p.int(0) // dummy value for go:nointerface pragma - ignored by importer
 	}
 
 	if trace && methods != nil {
@@ -450,8 +455,7 @@ func (p *exporter) method(m *types.Func) {
 	p.paramList(sig.Results(), false)
 }
 
-// fieldName is like qualifiedName but it doesn't record the package
-// for blank (_) or exported names.
+// fieldName is like qualifiedName but it doesn't record the package for exported names.
 func (p *exporter) fieldName(f *types.Var) {
 	name := f.Name()
 
@@ -463,12 +467,12 @@ func (p *exporter) fieldName(f *types.Var) {
 			base = ptr.Elem()
 		}
 		if named, ok := base.(*types.Named); ok && !named.Obj().Exported() {
-			name = "?"
+			// anonymous field with unexported base type name
+			name = "?" // unexported name to force export of package
 		}
 	}
-
 	p.string(name)
-	if name == "?" || name != "_" && !f.Exported() {
+	if !f.Exported() {
 		p.pkg(f.Pkg(), false)
 	}
 }
@@ -490,8 +494,11 @@ func (p *exporter) paramList(params *types.Tuple, variadic bool) {
 		}
 		p.typ(t)
 		if n > 0 {
-			p.string(q.Name())
-			p.pkg(q.Pkg(), false)
+			name := q.Name()
+			p.string(name)
+			if name != "_" {
+				p.pkg(q.Pkg(), false)
+			}
 		}
 		p.string("") // no compiler-specific info
 	}
@@ -690,13 +697,21 @@ func (p *exporter) marker(m byte) {
 	p.rawInt64(int64(p.written))
 }
 
-// rawInt64 should only be used by low-level encoders
+// rawInt64 should only be used by low-level encoders.
 func (p *exporter) rawInt64(x int64) {
 	var tmp [binary.MaxVarintLen64]byte
 	n := binary.PutVarint(tmp[:], x)
 	for i := 0; i < n; i++ {
 		p.rawByte(tmp[i])
 	}
+}
+
+// rawStringln should only be used to emit the initial version string.
+func (p *exporter) rawStringln(s string) {
+	for i := 0; i < len(s); i++ {
+		p.rawByte(s[i])
+	}
+	p.rawByte('\n')
 }
 
 // rawByte is the bottleneck interface to write to p.out.
