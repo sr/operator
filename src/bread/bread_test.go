@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/sr/operator"
+	"golang.org/x/net/context"
 )
 
 func TestLDAPAuthorizer(t *testing.T) {
@@ -36,7 +37,7 @@ func TestLDAPAuthorizer(t *testing.T) {
 		{sr, "ping", "pong", errors.New("no ACL defined for ping.pong")},
 		{"boom@gmail.com", "ping", "ping", errors.New("no user matching email `boom@gmail.com`")},
 	} {
-		err := auth.Authorize(&operator.Request{
+		err := auth.Authorize(context.Background(), &operator.Request{
 			Source: &operator.Source{
 				Type: operator.SourceType_HUBOT,
 				User: &operator.User{
