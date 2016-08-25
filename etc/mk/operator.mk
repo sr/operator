@@ -42,7 +42,9 @@ ldap-dev: docker-build-ldap
 		-v "$(BREAD)/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
 
 test: etc/ldap.ldif ldap-dev
-	go test bread -ldap-addr "localhost:$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)"
+	LDAP_PORT_389_TCP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)" \
+	LDAP_PORT_389_TCP_ADDR="localhost" \
+	go test bread github.com/sr/operator/...
 
 clean:
 	rm -f etc/docker/ca-bundle.crt $(OPERATORD_LINUX) \

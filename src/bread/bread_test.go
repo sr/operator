@@ -3,7 +3,6 @@ package bread_test
 import (
 	"bread"
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"testing"
@@ -11,20 +10,19 @@ import (
 	"github.com/sr/operator"
 )
 
-var ldapPort = flag.String("ldap-port", "", "")
-
 func TestLDAPAuthorizer(t *testing.T) {
-	var port string
-	if *ldapPort != "" {
-		port = *ldapPort
-	} else {
-		port = os.Getenv("LDAP_PORT_389_TCP_PORT")
+	var host, port string
+	if v, ok := os.LookupEnv("LDAP_PORT_389_TCP_ADDR"); ok {
+		host = v
 	}
-	if port == "" {
-		t.Skip("ldap-addr not set. skipping test")
+	if v, ok := os.LookupEnv("LDAP_PORT_389_TCP_PORT"); ok {
+		port = v
+	}
+	if host == "" || port == "" {
+		t.Skip("LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 	}
 	auth := bread.NewLDAPAuthorizer(&bread.LDAPConfig{
-		Address: fmt.Sprintf("localhost:%s", port),
+		Address: fmt.Sprintf("%s:%s", host, port),
 	})
 	sr := "srozet@salesforce.com"
 	for _, tc := range []struct {
