@@ -129,18 +129,22 @@ case "$project" in
         docker run --name "$ldapc" -d -v "$BREAD/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
 
         # Run the entire Go test suite
-        docker run --rm -w /go -v "$(pwd):/go" \
+        docker run --rm -w /go \
+            -v "$BREAD/src:/go/src" \
+            -v "$BREAD/etc/mk:/go/etc/mk" \
             -e PACKAGES=bread/cmd/operatord \
             build/build \
             make -f etc/mk/golang.mk
 
         # Run the LDAP Authorizer tests
-        docker run --rm -w /go -v "$(pwd):/go" --link "$ldapc:ldap" \
+        docker run --rm -w /go -v "$BREAD/src:/go/src" --link "$ldapc:ldap" \
             build/build go test -v bread
 
         # Build static operatord binary for Linux
         docker run --rm -w /go \
-            -v "/tmp:/tmp" -v "$(pwd):/go" \
+            -v "/tmp:/tmp" \
+            -v "$BREAD/src:/go" \
+            -v "$BREAD/etc/mk:/go/etc/mk" \
             -e TMPDIR=/tmp \
             build/build \
             make -f etc/mk/operator.mk test build-operatord
