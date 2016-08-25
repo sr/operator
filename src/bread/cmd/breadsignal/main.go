@@ -91,7 +91,7 @@ func run() error {
 				From:  "breadsignal",
 			},
 			Message:       message,
-			MessageFormat: "text",
+			MessageFormat: "html",
 			RoomID:        int64(room),
 		},
 	)
