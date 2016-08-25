@@ -15,7 +15,7 @@ const DefaultAddress = "localhost:9000"
 var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
-	Authorize(*Request) error
+	Authorize(context.Context, *Request) error
 }
 
 type Instrumenter interface {

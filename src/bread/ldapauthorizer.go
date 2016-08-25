@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
+	"golang.org/x/net/context"
 )
 
 var ErrNoACL = errors.New("no ACL defined")
@@ -19,7 +20,7 @@ func newLDAPAuthorizer(config *LDAPConfig, acl map[*operator.Call]string) *ldapA
 	return &ldapAuthorizer{config, acl}
 }
 
-func (a *ldapAuthorizer) Authorize(req *operator.Request) error {
+func (a *ldapAuthorizer) Authorize(ctx context.Context, req *operator.Request) error {
 	if req.UserEmail() == "" {
 		return fmt.Errorf("unable to authorize request without an user email")
 	}
