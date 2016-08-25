@@ -163,6 +163,7 @@ resource "aws_vpc_peering_connection" "pardotops_appdev_and_pardot_ci_vpc_peerin
 }
 
 resource aws_security_group "pardot2_bastion_1_1_ue1_ssh_ingress" {
+  vpc_id = "${aws_vpc.pardot_ci.id}"
 
   ingress {
     from_port = "22"
