@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-var DefaultScopes = []string{"send_message", "send_notification"}
+var DefaultScopes = []string{"send_message", "send_notification", "view_group"}
 
 type Client interface {
 	GetUser(context.Context, int) (*User, error)
