@@ -37,3 +37,7 @@ variable "pardot2-bastion1-1-ue1_aws_pardot_com_private_ip" {
 variable "pardot2-chef1-1-ue1_aws_pardot_com_private_ip" {
   default = "172.26.64.254"
 }
+
+variable "pardot0_artifactcache_elb_public_dns" {
+  default = "external-artifact-cache-lb-2076323587.us-east-1.elb.amazonaws.com"
+}
