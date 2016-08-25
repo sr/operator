@@ -4,15 +4,13 @@ import (
 	"database/sql"
 )
 
-// TODO(sr) Move this to the DB
-const hostname = "hipchat.dev.pardot.com"
-
 type sqlStore struct {
-	db *sql.DB
+	db       *sql.DB
+	hostname string
 }
 
-func newSQLStore(db *sql.DB) *sqlStore {
-	return &sqlStore{db}
+func newSQLStore(db *sql.DB, hostname string) *sqlStore {
+	return &sqlStore{db, hostname}
 }
 
 func (s *sqlStore) Create(client *ClientCredentials) error {
@@ -44,7 +42,7 @@ func (s *sqlStore) GetByOAuthID(id string) (ClientConfiger, error) {
 		return nil, err
 	}
 	return &ClientConfig{
-		Hostname: hostname,
+		Hostname: s.hostname,
 		Credentials: &ClientCredentials{
 			ID:     oauthID,
 			Secret: oauthSecret,
