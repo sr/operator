@@ -23,14 +23,11 @@ func (s *replier) Reply(ctx context.Context, src *operator.Source, rep string, m
 	if rep == "" {
 		return errors.New("unable to reply without an OAuth ID")
 	}
-	creds, err := s.store.GetByOAuthID(rep)
+	config, err := s.store.GetByOAuthID(rep)
 	if err != nil {
 		return err
 	}
-	client, err := NewClient(ctx, &ClientConfig{
-		Hostname:    s.hostname,
-		Credentials: creds,
-	})
+	client, err := config.Client(ctx)
 	if err != nil {
 		return err
 	}

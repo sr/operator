@@ -13,6 +13,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
+// TODO(sr) Store the hostname alongs with the OAuth ID and OAuth Secret in the DB
 const defaultHostname = "api.hipchat.com"
 
 type client struct {
@@ -70,12 +71,19 @@ func (c *client) GetUser(ctx context.Context, id int) (*User, error) {
 		return nil, err
 	}
 	resp, err := c.do(ctx, req)
-	var user *User
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("hipchat request failed with status %d", resp.StatusCode)
+	}
+	var user User
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&user); err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (c *client) SendRoomNotification(ctx context.Context, notif *RoomNotification) error {
