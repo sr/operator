@@ -14,6 +14,6 @@ else
 fi
 
 test -f "$BREAD/etc/secrets" &&
-source "$BREAD/etc/secrets"
+. "$BREAD/etc/secrets"
 
 true
