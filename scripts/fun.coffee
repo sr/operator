@@ -783,7 +783,7 @@ module.exports = (robot) ->
     ]
     msg.send msg.random sysadmins
 
-  robot.responds /hybrid$/i, (msg) ->
+  robot.respond /hybrid$/i, (msg) ->
     hybrid=[
       'http://www.freakingnews.com/pictures/128500/Hybrid-pets--128901.jpg',
       'https://s-media-cache-ak0.pinimg.com/736x/5f/5b/4b/5f5b4bba9e656b1fbf12c73d203fde58.jpg',
