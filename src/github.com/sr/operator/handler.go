@@ -59,6 +59,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// TODO(sr) Log decoding error
 		w.WriteHeader(http.StatusBadRequest)
+		fmt.Printf("DEBUG decode error: %#v\n", err)
 		return
 	}
 	matches := h.re.FindStringSubmatch(message.Text)
