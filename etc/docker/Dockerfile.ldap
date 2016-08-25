@@ -1,0 +1,9 @@
+FROM docker.dev.pardot.com/base/centos:6
+RUN yum install -y openldap-servers
+RUN rm -rf /etc/openldap/slapd.d
+EXPOSE 389
+VOLUME /data
+COPY /etc/docker/ldap/bin/docker-slapd /bin/docker-slapd
+COPY /etc/docker/ldap/etc/openldap /etc/openldap
+COPY /etc/docker/ldap/var/lib/ldap/DB_CONFIG /var/lib/ldap/DB_CONFIG
+CMD ["/bin/docker-slapd"]

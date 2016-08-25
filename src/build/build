@@ -122,20 +122,39 @@ case "$project" in
         BREAD="$(pwd)"
         export BREAD
 
-        docker run --rm -w /go -v "$(pwd):/go" \
+        # Start the test LDAP server
+        make -f etc/mk/operator.mk docker-build-ldap
+        ldapc="operator_ldap_$$"
+        trap 'docker stop -t3 $ldapc >/dev/null 2>&1' EXIT
+        docker run --name "$ldapc" -d -v "$BREAD/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
+
+        # Run the entire Go test suite
+        docker run --rm -w /go \
+            -v "$BREAD/src:/go/src" \
+            -v "$BREAD/etc/mk:/go/etc/mk" \
             -e PACKAGES=bread/cmd/operatord \
             build/build \
             make -f etc/mk/golang.mk
 
-        docker run --rm -w /go -v "/tmp:/tmp" -v "$(pwd):/go" \
+        # Run the LDAP Authorizer tests
+        docker run --rm -w /go -v "$BREAD/src:/go/src" --link "$ldapc:ldap" \
+            build/build go test -v bread
+
+        # Build static operatord binary for Linux
+        docker run --rm -w /go \
+            -v "/tmp:/tmp" \
+            -v "$BREAD/src:/go/src" \
+            -v "$BREAD/etc/mk:/go/etc/mk" \
             -e TMPDIR=/tmp \
             build/build \
             make -f etc/mk/operator.mk build-operatord
 
+        # Build operatord container for deployment
         trap 'rm -f $BREAD/operatord' EXIT
         cp /tmp/operatord_linux "$BREAD/operatord"
         make -f etc/mk/operator.mk docker-build-operatord
 
+        # Push the container to Artifactory on CI
         if [ -n "$CI" ]; then
             docker-push "${project}d"
         fi

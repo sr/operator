@@ -15,7 +15,25 @@ const (
 	HipchatHost = "https://hipchat.dev.pardot.com"
 	TestingRoom = 882 // BREAD Testing
 	PublicRoom  = 42  // Build & Automate
+	LDAPBase    = "dc=pardot,dc=com"
 )
+
+var ACL = map[*operator.Call]string{
+	&operator.Call{
+		Service: "ping",
+		Method:  "ping",
+	}: "sysadmin",
+	&operator.Call{
+		Service: "ping",
+		Method:  "whoami",
+	}: "sysadmin",
+}
+
+type LDAPConfig struct {
+	Address    string
+	Encryption string
+	Base       string
+}
 
 func NewLogger() operator.Logger {
 	return operator.NewLogger()
@@ -25,8 +43,11 @@ func NewHTTPLoggerHandler(l operator.Logger, h http.Handler) http.Handler {
 	return &wrapperHandler{l, h}
 }
 
-func NewLDAPAuthorizer() operator.Authorizer {
-	return newLDAPAuthorizer()
+func NewLDAPAuthorizer(config *LDAPConfig) operator.Authorizer {
+	if config.Base == "" {
+		config.Base = LDAPBase
+	}
+	return newLDAPAuthorizer(config, ACL)
 }
 
 func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
@@ -34,7 +55,7 @@ func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Cli
 }
 
 func NewHipchatCredsStore(db *sql.DB) operatorhipchat.ClientCredentialsStore {
-	return operatorhipchat.NewSQLStore(db)
+	return operatorhipchat.NewSQLStore(db, HipchatHost)
 }
 
 func NewHipchatAddonHandler(

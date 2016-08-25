@@ -23,6 +23,8 @@ type config struct {
 	grpcAddr string
 	httpAddr string
 
+	ldap *bread.LDAPConfig
+
 	databaseURL string
 	prefix      string
 
@@ -32,10 +34,12 @@ type config struct {
 }
 
 func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
-	config := &config{}
+	config := &config{ldap: &bread.LDAPConfig{}}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
+	flags.StringVar(&config.ldap.Address, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
+	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
 	flags.StringVar(&config.prefix, "prefix", "!", "Prefix used to indicate commands in chat messages")
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
@@ -123,7 +127,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if webhookHandler, err = operator.NewHandler(
 		logger,
 		operator.NewInstrumenter(logger),
-		bread.NewLDAPAuthorizer(),
+		bread.NewLDAPAuthorizer(config.ldap),
 		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,
 		conn,

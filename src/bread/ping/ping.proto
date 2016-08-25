@@ -10,6 +10,7 @@ service Pinger {
     option (operator.name) = "ping";
 
     rpc Ping(PingRequest) returns (operator.Response);
+    rpc Whoami(WhoamiRequest) returns (operator.Response);
 }
 
 message PingerConfig {
@@ -18,4 +19,8 @@ message PingerConfig {
 message PingRequest {
     operator.Request request = 1;
     string arg1 = 2;
+}
+
+message WhoamiRequest {
+    operator.Request request = 1;
 }
