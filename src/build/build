@@ -143,7 +143,7 @@ case "$project" in
         # Build static operatord binary for Linux
         docker run --rm -w /go \
             -v "/tmp:/tmp" \
-            -v "$BREAD/src:/go" \
+            -v "$BREAD/src:/go/src" \
             -v "$BREAD/etc/mk:/go/etc/mk" \
             -e TMPDIR=/tmp \
             build/build \
