@@ -95,6 +95,7 @@
 #   hubot pieces - Pieces (and murica!)
 #   hubot trolledum8 - rekt
 #   hubot rekt - trolledum8
+#   hubot gus - Rage GUS!
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -107,6 +108,9 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
       "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
+
+  robot.respond /gus$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/252/6jIMiKPvXi17T0l/fuuuuuu_gus.jpg"
 
   robot.respond /dumpsterfire$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/71ixUc3gH6lnWLC/upload.png"
@@ -411,7 +415,8 @@ module.exports = (robot) ->
   robot.respond /casey$/i, (msg) ->
     tehcehseh = [
       'http://i.imgur.com/cuxU9VC.gif',
-      'http://i.imgur.com/kfyhTcm.gif'
+      'http://i.imgur.com/kfyhTcm.gif',
+      'https://hipchat.dev.pardot.com/files/1/162/i8CueeiNYtW8YqZ/CaseyPie.gif'
     ]
     msg.send msg.random tehcehseh
 
@@ -777,6 +782,15 @@ module.exports = (robot) ->
       'http://i.imgur.com/qjYCPWj.jpg',
     ]
     msg.send msg.random sysadmins
+
+  robot.respond /hybrid$/i, (msg) ->
+    hybrid=[
+      'http://www.freakingnews.com/pictures/128500/Hybrid-pets--128901.jpg',
+      'https://s-media-cache-ak0.pinimg.com/736x/5f/5b/4b/5f5b4bba9e656b1fbf12c73d203fde58.jpg',
+      'https://media.mnn.com/assets/images/2014/06/hybrid%20banana%20large.jpg',
+      'https://s-media-cache-ak0.pinimg.com/236x/21/04/72/210472376ed1a284f5e7a8638b1b88aa.jpg'
+    ]
+    msg.send msg.random hybrid
 
   robot.hear /over 9000$/i, (msg) ->
     msg.send 'http://24.media.tumblr.com/tumblr_lwhv2roIab1qd47jqo1_500.gif#.png'
