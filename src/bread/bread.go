@@ -51,7 +51,7 @@ func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Cli
 }
 
 func NewHipchatCredsStore(db *sql.DB) operatorhipchat.ClientCredentialsStore {
-	return operatorhipchat.NewSQLStore(db)
+	return operatorhipchat.NewSQLStore(db, HipchatHost)
 }
 
 func NewHipchatAddonHandler(

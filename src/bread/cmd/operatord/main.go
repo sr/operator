@@ -128,7 +128,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		logger,
 		operator.NewInstrumenter(logger),
 		bread.NewLDAPAuthorizer(config.ldap),
-		operatorhipchat.NewRequestDecoder(store, bread.HipchatHost),
+		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,
 		conn,
 		invoker,
