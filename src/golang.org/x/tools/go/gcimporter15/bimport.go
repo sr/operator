@@ -16,6 +16,7 @@ import (
 	"go/types"
 	"sort"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 )
@@ -25,16 +26,20 @@ type importer struct {
 	data    []byte
 	path    string
 	buf     []byte // for reading strings
+	version int
 
 	// object lists
-	strList []string         // in order of appearance
-	pkgList []*types.Package // in order of appearance
-	typList []types.Type     // in order of appearance
+	strList       []string         // in order of appearance
+	pkgList       []*types.Package // in order of appearance
+	typList       []types.Type     // in order of appearance
+	trackAllTypes bool
 
 	// position encoding
 	posInfoFormat bool
 	prevFile      string
 	prevLine      int
+	fset          *token.FileSet
+	files         map[string]*token.File
 
 	// debugging support
 	debugFormat bool
@@ -45,31 +50,47 @@ type importer struct {
 // and returns the number of bytes consumed and a reference to the package.
 // If data is obviously malformed, an error is returned but in
 // general it is not recommended to call BImportData on untrusted data.
-func BImportData(imports map[string]*types.Package, data []byte, path string) (int, *types.Package, error) {
+func BImportData(fset *token.FileSet, imports map[string]*types.Package, data []byte, path string) (int, *types.Package, error) {
 	p := importer{
 		imports: imports,
 		data:    data,
 		path:    path,
 		strList: []string{""}, // empty string is mapped to 0
+		fset:    fset,
+		files:   make(map[string]*token.File),
 	}
 
-	// read low-level encoding format
-	switch format := p.rawByte(); format {
-	case 'c':
-		// compact format - nothing to do
-	case 'd':
-		p.debugFormat = true
-	default:
-		return p.read, nil, fmt.Errorf("invalid encoding format in export data: got %q; want 'c' or 'd'", format)
+	// read version info
+	if b := p.rawByte(); b == 'c' || b == 'd' {
+		// Go1.7 encoding; first byte encodes low-level
+		// encoding format (compact vs debug).
+		// For backward-compatibility only (avoid problems with
+		// old installed packages). Newly compiled packages use
+		// the extensible format string.
+		// TODO(gri) Remove this support eventually; after Go1.8.
+		if b == 'd' {
+			p.debugFormat = true
+		}
+		p.trackAllTypes = p.rawByte() == 'a'
+		p.posInfoFormat = p.int() != 0
+		const go17version = "v1"
+		if s := p.string(); s != go17version {
+			return p.read, nil, fmt.Errorf("importer: unknown export data format: %s (imported package compiled with old compiler?)", s)
+		}
+		p.version = 0
+	} else {
+		// Go1.8 extensible encoding
+		const exportVersion = "version 1"
+		if s := p.rawStringln(b); s != exportVersion {
+			return p.read, nil, fmt.Errorf("importer: unknown export data format: %s (imported package compiled with old compiler?)", s)
+		}
+		p.version = 1
+		p.debugFormat = p.rawStringln(p.rawByte()) == "debug"
+		p.trackAllTypes = p.int() != 0
+		p.posInfoFormat = p.int() != 0
 	}
-
-	p.posInfoFormat = p.int() != 0
 
 	// --- generic export data ---
-
-	if v := p.string(); v != "v0" {
-		return p.read, nil, fmt.Errorf("unknown export data version: %s", v)
-	}
 
 	// populate typList with predeclared "known" types
 	p.typList = append(p.typList, predeclared...)
@@ -97,7 +118,12 @@ func BImportData(imports map[string]*types.Package, data []byte, path string) (i
 
 	// complete interfaces
 	for _, typ := range p.typList {
-		if it, ok := typ.(*types.Interface); ok {
+		// If we only record named types (!p.trackAllTypes),
+		// we must check the underlying types here. If we
+		// track all types, the Underlying() method call is
+		// not needed.
+		// TODO(gri) Remove if p.trackAllTypes is gone.
+		if it, ok := typ.Underlying().(*types.Interface); ok {
 			it.Complete()
 		}
 	}
@@ -166,44 +192,44 @@ func (p *importer) declare(obj types.Object) {
 		// imported.
 		// (See also the comment in cmd/compile/internal/gc/bimport.go importer.obj,
 		// switch case importing functions).
-		panic(fmt.Sprintf("%s already declared", alt.Name()))
+		panic(fmt.Sprintf("inconsistent import:\n\t%v\npreviously imported as:\n\t%v\n", alt, obj))
 	}
 }
 
 func (p *importer) obj(tag int) {
 	switch tag {
 	case constTag:
-		p.pos()
+		pos := p.pos()
 		pkg, name := p.qualifiedName()
 		typ := p.typ(nil)
 		val := p.value()
-		p.declare(types.NewConst(token.NoPos, pkg, name, typ, val))
+		p.declare(types.NewConst(pos, pkg, name, typ, val))
 
 	case typeTag:
 		_ = p.typ(nil)
 
 	case varTag:
-		p.pos()
+		pos := p.pos()
 		pkg, name := p.qualifiedName()
 		typ := p.typ(nil)
-		p.declare(types.NewVar(token.NoPos, pkg, name, typ))
+		p.declare(types.NewVar(pos, pkg, name, typ))
 
 	case funcTag:
-		p.pos()
+		pos := p.pos()
 		pkg, name := p.qualifiedName()
 		params, isddd := p.paramList()
 		result, _ := p.paramList()
 		sig := types.NewSignature(nil, params, result, isddd)
-		p.declare(types.NewFunc(token.NoPos, pkg, name, sig))
+		p.declare(types.NewFunc(pos, pkg, name, sig))
 
 	default:
 		panic(fmt.Sprintf("unexpected object tag %d", tag))
 	}
 }
 
-func (p *importer) pos() {
+func (p *importer) pos() token.Pos {
 	if !p.posInfoFormat {
-		return
+		return token.NoPos
 	}
 
 	file := p.prevFile
@@ -219,8 +245,39 @@ func (p *importer) pos() {
 	}
 	p.prevLine = line
 
-	// TODO(gri) register new position
+	// Synthesize a token.Pos
+
+	// Since we don't know the set of needed file positions, we
+	// reserve maxlines positions per file.
+	const maxlines = 64 * 1024
+	f := p.files[file]
+	if f == nil {
+		f = p.fset.AddFile(file, -1, maxlines)
+		p.files[file] = f
+		// Allocate the fake linebreak indices on first use.
+		// TODO(adonovan): opt: save ~512KB using a more complex scheme?
+		fakeLinesOnce.Do(func() {
+			fakeLines = make([]int, maxlines)
+			for i := range fakeLines {
+				fakeLines[i] = i
+			}
+		})
+		f.SetLines(fakeLines)
+	}
+
+	if line > maxlines {
+		line = 1
+	}
+
+	// Treat the file as if it contained only newlines
+	// and column=1: use the line number as the offset.
+	return f.Pos(line - 1)
 }
+
+var (
+	fakeLines     []int
+	fakeLinesOnce sync.Once
+)
 
 func (p *importer) qualifiedName() (pkg *types.Package, name string) {
 	name = p.string()
@@ -257,14 +314,14 @@ func (p *importer) typ(parent *types.Package) types.Type {
 	switch i {
 	case namedTag:
 		// read type object
-		p.pos()
+		pos := p.pos()
 		parent, name := p.qualifiedName()
 		scope := parent.Scope()
 		obj := scope.Lookup(name)
 
 		// if the object doesn't exist yet, create and insert it
 		if obj == nil {
-			obj = types.NewTypeName(token.NoPos, parent, name, nil)
+			obj = types.NewTypeName(pos, parent, name, nil)
 			scope.Insert(obj)
 		}
 
@@ -290,7 +347,7 @@ func (p *importer) typ(parent *types.Package) types.Type {
 		// read associated methods
 		for i := p.int(); i > 0; i-- {
 			// TODO(gri) replace this with something closer to fieldName
-			p.pos()
+			pos := p.pos()
 			name := p.string()
 			if !exported(name) {
 				p.pkg()
@@ -299,16 +356,19 @@ func (p *importer) typ(parent *types.Package) types.Type {
 			recv, _ := p.paramList() // TODO(gri) do we need a full param list for the receiver?
 			params, isddd := p.paramList()
 			result, _ := p.paramList()
+			p.int() // go:nointerface pragma - discarded
 
 			sig := types.NewSignature(recv.At(0), params, result, isddd)
-			t0.AddMethod(types.NewFunc(token.NoPos, parent, name, sig))
+			t0.AddMethod(types.NewFunc(pos, parent, name, sig))
 		}
 
 		return t
 
 	case arrayTag:
 		t := new(types.Array)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		n := p.int64()
 		*t = *types.NewArray(p.typ(parent), n)
@@ -316,35 +376,45 @@ func (p *importer) typ(parent *types.Package) types.Type {
 
 	case sliceTag:
 		t := new(types.Slice)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		*t = *types.NewSlice(p.typ(parent))
 		return t
 
 	case dddTag:
 		t := new(dddSlice)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		t.elem = p.typ(parent)
 		return t
 
 	case structTag:
 		t := new(types.Struct)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		*t = *types.NewStruct(p.fieldList(parent))
 		return t
 
 	case pointerTag:
 		t := new(types.Pointer)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		*t = *types.NewPointer(p.typ(parent))
 		return t
 
 	case signatureTag:
 		t := new(types.Signature)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		params, isddd := p.paramList()
 		result, _ := p.paramList()
@@ -357,7 +427,9 @@ func (p *importer) typ(parent *types.Package) types.Type {
 		// such cycle must contain a named type which would have been
 		// first defined earlier.
 		n := len(p.typList)
-		p.record(nil)
+		if p.trackAllTypes {
+			p.record(nil)
+		}
 
 		// no embedded interfaces with gc compiler
 		if p.int() != 0 {
@@ -365,12 +437,16 @@ func (p *importer) typ(parent *types.Package) types.Type {
 		}
 
 		t := types.NewInterface(p.methodList(parent), nil)
-		p.typList[n] = t
+		if p.trackAllTypes {
+			p.typList[n] = t
+		}
 		return t
 
 	case mapTag:
 		t := new(types.Map)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		key := p.typ(parent)
 		val := p.typ(parent)
@@ -379,7 +455,9 @@ func (p *importer) typ(parent *types.Package) types.Type {
 
 	case chanTag:
 		t := new(types.Chan)
-		p.record(t)
+		if p.trackAllTypes {
+			p.record(t)
+		}
 
 		var dir types.ChanDir
 		// tag values must match the constants in cmd/compile/internal/gc/go.go
@@ -415,7 +493,7 @@ func (p *importer) fieldList(parent *types.Package) (fields []*types.Var, tags [
 }
 
 func (p *importer) field(parent *types.Package) *types.Var {
-	p.pos()
+	pos := p.pos()
 	pkg, name := p.fieldName(parent)
 	typ := p.typ(parent)
 
@@ -434,7 +512,7 @@ func (p *importer) field(parent *types.Package) *types.Var {
 		anonymous = true
 	}
 
-	return types.NewField(token.NoPos, pkg, name, typ, anonymous)
+	return types.NewField(pos, pkg, name, typ, anonymous)
 }
 
 func (p *importer) methodList(parent *types.Package) (methods []*types.Func) {
@@ -448,28 +526,29 @@ func (p *importer) methodList(parent *types.Package) (methods []*types.Func) {
 }
 
 func (p *importer) method(parent *types.Package) *types.Func {
-	p.pos()
+	pos := p.pos()
 	pkg, name := p.fieldName(parent)
 	params, isddd := p.paramList()
 	result, _ := p.paramList()
 	sig := types.NewSignature(nil, params, result, isddd)
-	return types.NewFunc(token.NoPos, pkg, name, sig)
+	return types.NewFunc(pos, pkg, name, sig)
 }
 
 func (p *importer) fieldName(parent *types.Package) (*types.Package, string) {
+	name := p.string()
 	pkg := parent
 	if pkg == nil {
 		// use the imported package instead
 		pkg = p.pkgList[0]
 	}
-	name := p.string()
-	if name == "" {
-		return pkg, "" // anonymous
+	if p.version < 1 && name == "_" {
+		// versions < 1 don't export a package for _ fields
+		// TODO: remove once versions are not supported anymore
+		return pkg, name
 	}
-	if name == "?" || name != "_" && !exported(name) {
-		// explicitly qualified field
+	if name != "" && !exported(name) {
 		if name == "?" {
-			name = "" // anonymous
+			name = ""
 		}
 		pkg = p.pkg()
 	}
@@ -510,10 +589,12 @@ func (p *importer) param(named bool) (*types.Var, bool) {
 		if name == "" {
 			panic("expected named parameter")
 		}
+		if name != "_" {
+			pkg = p.pkg()
+		}
 		if i := strings.Index(name, "·"); i > 0 {
 			name = name[:i] // cut off gc-specific parameter numbering
 		}
-		pkg = p.pkg()
 	}
 
 	// read and discard compiler-specific info
@@ -657,13 +738,23 @@ func (p *importer) marker(want byte) {
 	}
 }
 
-// rawInt64 should only be used by low-level decoders
+// rawInt64 should only be used by low-level decoders.
 func (p *importer) rawInt64() int64 {
 	i, err := binary.ReadVarint(p)
 	if err != nil {
 		panic(fmt.Sprintf("read error: %v", err))
 	}
 	return i
+}
+
+// rawStringln should only be used to read the initial version string.
+func (p *importer) rawStringln(b byte) string {
+	p.buf = p.buf[:0]
+	for b != '\n' {
+		p.buf = append(p.buf, b)
+		b = p.rawByte()
+	}
+	return string(p.buf)
 }
 
 // needed for binary.ReadVarint in rawInt64
