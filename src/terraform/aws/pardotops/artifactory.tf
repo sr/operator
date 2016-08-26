@@ -168,13 +168,13 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
   }
 }
 
-
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.138"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -198,7 +198,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-1-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
@@ -217,6 +217,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   private_ip="172.28.0.209"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -240,7 +241,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-2-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
@@ -259,6 +260,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   private_ip="172.28.0.182"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -283,7 +285,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-3-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
