@@ -31,10 +31,9 @@ do
         echo "==> Importing $dump into database $dbname"
         mysql -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
     else
-        mysqladmin -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" \
-            -f create "$dbname" >/dev/null 2>&1 && {
+        if mysqladmin -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" -f create "$dbname" >/dev/null 2>&1; then
             echo "==> Importing $dump into database $dbname"
             mysql -u root -h "$DATABASE_HOST" -P "$DATABASE_PORT" "$dbname" < "$dump"
-        } || true
+        fi
     fi
 done
