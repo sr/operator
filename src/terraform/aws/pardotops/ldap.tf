@@ -200,7 +200,6 @@ resource "aws_route53_record" "artifactory_integration_auth1-2_Arecord" {
   ttl = "900"
 }
 
-
 resource "aws_route53_record" "internal_apps_auth1-1_Arecord_PUBLIC" {
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name = "pardot0-auth1-1-ue1.aws.pardot.com"

@@ -281,7 +281,6 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
   instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
 }
 
-
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
