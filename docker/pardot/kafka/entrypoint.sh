@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+TOPIC_CREATION_RETRIES=30
+
 # KAFKA_TOPICS="topic1 topic2"
 KAFKA_TOPICS="${KAFKA_TOPICS-}"
 
@@ -21,6 +23,7 @@ if [ "$program" = "supervisord" ] && [ ! -e "/opt/kafka/DOCKER-SETUP" ]; then
       IFS=':' read -ra arr <<<"$topic"
 
       if ! ${KAFKA_TOPICS_CMD} --list | grep -q "^${arr[0]}$"; then
+        i=0
         while true; do
           echo "Attempting to create topic: ${arr[0]}"
           set +e
@@ -32,9 +35,15 @@ if [ "$program" = "supervisord" ] && [ ! -e "/opt/kafka/DOCKER-SETUP" ]; then
             break
           else
             echo "Unable to create topic: $output"
-            echo "Retrying ..."
-            sleep 1
+            if [ "$i" -ge "$TOPIC_CREATION_RETRIES" ]; then
+              exit "$?"
+            else
+              echo "Retrying ..."
+              sleep 1
+            fi
           fi
+
+          i=$((i+1))
         done
       fi
     done
