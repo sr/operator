@@ -37,8 +37,7 @@ func newHandler(
 	conn *grpc.ClientConn,
 	invoker Invoker,
 ) (*handler, error) {
-	// TODO(sr) Quote the prefix with regexp.QuoteMeta
-	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, prefix))
+	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
 		return nil, err
 	}
