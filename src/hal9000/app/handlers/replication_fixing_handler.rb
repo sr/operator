@@ -159,7 +159,7 @@ class ReplicationFixingHandler < ApplicationHandler
           case result
           when ::ReplicationFixing::FixingClient::NoErrorDetected
             # This generally means there was an error, but it's not a replication statement issue
-            @throttler.send_message(@status_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
+            @throttler.send_message(@replication_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
           else
             reply_with_fix_result(shard: shard, result: result)
             ensure_monitoring(shard: shard)
