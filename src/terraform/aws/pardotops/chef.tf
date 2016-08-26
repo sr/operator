@@ -79,3 +79,13 @@ resource "aws_route53_record" "internal_apps_chef1-1_Arecord" {
   type = "A"
   ttl = "900"
 }
+
+#TODO: remove all artifactory-integration route53 records and replace w/ dns-sharing w/ internal_apps
+resource "aws_route53_record" "artifactory_integration_chef1-1_Arecord" {
+  zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-chef1-1-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_chef_server.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
