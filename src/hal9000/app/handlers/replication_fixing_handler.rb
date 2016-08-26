@@ -156,11 +156,7 @@ class ReplicationFixingHandler < ApplicationHandler
           result = fixing_client.fix(shard: hostname)
           @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
 
-          case result
-          when ::ReplicationFixing::FixingClient::NoErrorDetected
-            # This generally means there was an error, but it's not a replication statement issue
-            @throttler.send_message(@replication_room, "/me is noticing a potential issue with #{hostname}: #{body["error"]}")
-          else
+          unless result.is_a?(::ReplicationFixing::FixingClient::NoErrorDetected)
             reply_with_fix_result(shard: shard, result: result)
             ensure_monitoring(shard: shard)
           end
