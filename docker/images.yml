@@ -10,6 +10,8 @@ images:
     build: java/8u102-jdk
   docker.dev.pardot.com/base/percona-server:5.5:
     build: percona-server/5.5
+  docker.dev.pardot.com/base/percona-server:5.7:
+    build: percona-server/5.7
   docker.dev.pardot.com/base/ruby:2.3.0:
     build: ruby/2.3.0
   docker.dev.pardot.com/base/ssh-forwarder:
