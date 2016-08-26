@@ -29,37 +29,38 @@ do
     esac
 done
 
-test -z "$project" && {
+if [ -z "$project" ]; then
     print_help
     exit 2
-}
+fi
 
 dir="src/$project"
 config="$dir/docker-compose.yml"
 
 # Lint the code with RuboCop
-if $lint
-then docker-lint-ruby "$dir"
+if $lint; then
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" build/build \
+        lint-ruby "/data/$dir"
 fi
 
 test -f "${dir}/Gemfile.lock" && {
-    docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
-        build/build bundle-audit check
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" build/build \
+        bundle-audit check
 }
 
 test -d "${dir}/app/models" && {
-    docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
-        build/build brakeman -A --table-width 260
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" build/build \
+        brakeman -A --table-width 260
 }
 
 # Assume it's a Rails app if there's a docker-compose.yml file
-if test -f "$config"
-then
+if [ -f "$config" ]; then
     docker-compose -p "$project" -f "$config" build --pull
     # TODO(sr) Remove the sleep test...
     docker-compose -p "$project" -f "$config" run app sleep 30
     docker-compose -p "$project" -f "$config" run -e CI=1 app script/test
-# Otherwise just build it as a normal Ruby library
 else
-    docker run --rm -v "$(pwd):/data" build/build build-ruby-lib "$dir"
+    # Otherwise just build it as a normal Ruby library
+    docker run --rm -v "$(pwd):/data" build/build \
+        build-ruby-lib "$dir"
 fi

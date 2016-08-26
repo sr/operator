@@ -12,8 +12,7 @@ cd "$(dirname "$0")/../../.."
 # Print usage and exit if gemspec argument is missing.
 gemname="${1:-""}"
 gemspec="${2:-""}"
-if [ -z "$gemname" ] || [ -z "gemspec" ]
-then
+if [ -z "$gemname" ] || [ -z "gemspec" ]; then
     grep ^#/ <"$0" |cut -c4-
     exit 2
 fi
