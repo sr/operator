@@ -392,7 +392,7 @@ resource "aws_route53_record" "jump_dev_pardot_com_Arecord" {
 resource "aws_route53_record" "lb-s1_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "lb-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.14"]
+  records = ["${aws_eip.appdev_bastion_eip.public_ip}"]
   type = "A"
   ttl = "900"
 }
