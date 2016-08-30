@@ -54,6 +54,32 @@ var cmd = operator.NewCommand(
 						return resp.Message, nil
 					},
 				},
+				{
+					Name:     "whoami",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := ping.NewPingerClient(conn)
+						resp, err := client.Whoami(
+							context.Background(),
+							&ping.WhoamiRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
 			},
 		},
 	},

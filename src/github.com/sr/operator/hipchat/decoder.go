@@ -9,6 +9,7 @@ import (
 
 	"github.com/dvsekhvalnov/jose2go"
 	"github.com/sr/operator"
+	"golang.org/x/net/context"
 )
 
 type Payload struct {
@@ -26,12 +27,6 @@ type Message struct {
 	From    *User  `json:"from"`
 }
 
-type User struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	MentionName string `json:"mention_name"`
-}
-
 type Room struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -45,7 +40,7 @@ func newRequestDecoder(store ClientCredentialsStore) *requestDecoder {
 	return &requestDecoder{store}
 }
 
-func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, error) {
+func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operator.Message, string, error) {
 	var data Payload
 	decoder := json.NewDecoder(req.Body)
 	if err := decoder.Decode(&data); err != nil {
@@ -59,7 +54,7 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 	if len(parts) != 2 || parts[0] != "JWT" {
 		return nil, "", errors.New("invalid Authorization header")
 	}
-	var oauthID string
+	var config ClientConfiger
 	_, _, err := jose.Decode(parts[1], func(_ map[string]interface{}, payload string) interface{} {
 		var data struct {
 			Iss string
@@ -67,13 +62,21 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 		if err := json.Unmarshal([]byte(payload), &data); err != nil {
 			return err
 		}
-		creds, err := d.store.GetByOAuthID(data.Iss)
+		cfg, err := d.store.GetByOAuthID(data.Iss)
 		if err != nil {
 			return err
 		}
-		oauthID = creds.ID
-		return []byte(creds.Secret)
+		config = cfg
+		return []byte(cfg.Secret())
 	})
+	if err != nil {
+		return nil, "", err
+	}
+	client, err := config.Client(ctx)
+	if err != nil {
+		return nil, "", err
+	}
+	user, err := client.GetUser(ctx, data.Item.Message.From.ID)
 	if err != nil {
 		return nil, "", err
 	}
@@ -90,8 +93,8 @@ func (d *requestDecoder) Decode(req *http.Request) (*operator.Message, string, e
 				Id:       strconv.Itoa(data.Item.Message.From.ID),
 				Login:    data.Item.Message.From.MentionName,
 				RealName: data.Item.Message.From.Name,
-				Email:    "", // TODO(sr) Fetch the user email from the API
+				Email:    user.Email,
 			},
 		},
-	}, oauthID, nil
+	}, config.ID(), nil
 }

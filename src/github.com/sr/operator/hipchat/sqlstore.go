@@ -1,13 +1,16 @@
 package operatorhipchat
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type sqlStore struct {
-	db *sql.DB
+	db       *sql.DB
+	hostname string
 }
 
-func newSQLStore(db *sql.DB) *sqlStore {
-	return &sqlStore{db}
+func newSQLStore(db *sql.DB, hostname string) *sqlStore {
+	return &sqlStore{db, hostname}
 }
 
 func (s *sqlStore) Create(client *ClientCredentials) error {
@@ -24,7 +27,7 @@ func (s *sqlStore) Create(client *ClientCredentials) error {
 	return err
 }
 
-func (s *sqlStore) GetByOAuthID(id string) (*ClientCredentials, error) {
+func (s *sqlStore) GetByOAuthID(id string) (ClientConfiger, error) {
 	var (
 		oauthID     string
 		oauthSecret string
@@ -38,8 +41,11 @@ func (s *sqlStore) GetByOAuthID(id string) (*ClientCredentials, error) {
 	if err := row.Scan(&oauthID, &oauthSecret); err != nil {
 		return nil, err
 	}
-	return &ClientCredentials{
-		ID:     oauthID,
-		Secret: oauthSecret,
+	return &ClientConfig{
+		Hostname: s.hostname,
+		Credentials: &ClientCredentials{
+			ID:     oauthID,
+			Secret: oauthSecret,
+		},
 	}, nil
 }

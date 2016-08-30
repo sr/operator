@@ -12,7 +12,7 @@ trusted_networks = [
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress
   "52.72.6.14/32",
   # Ditto, but for App.dev
-  "52.2.232.58/32"
+  "54.82.15.10/32"
 ]
 
 if Rails.env.development?

@@ -51,6 +51,19 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			}
 			return true, nil
 		}
+		if req.Call.Method == "whoami" {
+			client := ping.NewPingerClient(conn)
+			_, err := client.Whoami(
+				ctx,
+				&ping.WhoamiRequest{
+					Request: req,
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
 	}
 	return false, nil
 }

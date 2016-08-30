@@ -24,8 +24,6 @@ OPERATORD_DIR ?= $(GOPATH)/src/bread/cmd/operatord
 SVC_DIR ?= $(GOPATH)/src/bread
 SVC_IMPORT_PATH ?= bread
 
-all: clean generate docker-build-operatord
-
 generate: $(PROTOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD)
 	find $(GOPATH)/src/bread -type f -name "*.proto" | \
 	while read f; do \
@@ -37,19 +35,34 @@ generate: $(PROTOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPER
 			--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) $$f; \
 	done
 
+ldap-dev: docker-build-ldap
+	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true
+	$(DOCKER) rm operator_ldap >/dev/null || true
+	$(DOCKER) run --name "operator_ldap" -P -d \
+		-v "$(BREAD)/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
+
+test: etc/ldap.ldif ldap-dev
+	LDAP_PORT_389_TCP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)" \
+	LDAP_PORT_389_TCP_ADDR="localhost" \
+	go test bread github.com/sr/operator/...
+
 clean:
-	rm -f etc/ca-bundle.crt $(OPERATORD_LINUX) $(OPERATORDCTL_DIR)/main-gen.go $(OPERATORD_DIR)/main-gen.go
+	rm -f etc/docker/ca-bundle.crt $(OPERATORD_LINUX) \
+		$(OPERATORDCTL_DIR)/main-gen.go $(OPERATORD_DIR)/main-gen.go
 
 build-operatord: $(TMPDIR)
 	env CGO_ENABLED=0 GOOS=linux $(GO) build -a -tags netgo -ldflags "-w" \
 		-o $(OPERATORD_LINUX) bread/cmd/operatord
 
-docker-build-operatord: etc/ca-bundle.crt $(OPERATORD_LINUX)
+docker-build-ldap:
+	docker build -f etc/docker/Dockerfile.ldap -t bread/ldap $(BREAD)
+
+docker-build-operatord: etc/docker/ca-bundle.crt $(OPERATORD_LINUX)
 	cp $(OPERATORD_LINUX) operatord
 	$(DOCKER) build -f $(BREAD)/etc/docker/Dockerfile.operatord -t operatord_app $(BREAD)
 	rm -f operatord
 
-etc/ca-bundle.crt:
+etc/docker/ca-bundle.crt:
 	$(DOCKER) run docker.dev.pardot.com/base/centos:7 cat /etc/pki/tls/certs/ca-bundle.crt > $@
 
 $(PROTOC_GEN_GO):
@@ -63,6 +76,9 @@ $(PROTOC_GEN_OPERATORD):
 
 .PHONY: \
 	build-operatord \
+	clean \
 	docker-build-operatord \
+	docker-build-ldap \
 	generate \
-	clean
+	ldap-dev \
+	test

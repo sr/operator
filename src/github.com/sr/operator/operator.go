@@ -3,6 +3,7 @@ package operator
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"net/http"
 
 	"github.com/golang/protobuf/proto"
@@ -15,7 +16,7 @@ const DefaultAddress = "localhost:9000"
 var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
-	Authorize(*Request) error
+	Authorize(context.Context, *Request) error
 }
 
 type Instrumenter interface {
@@ -32,7 +33,7 @@ type Requester interface {
 }
 
 type Decoder interface {
-	Decode(*http.Request) (*Message, string, error)
+	Decode(context.Context, *http.Request) (*Message, string, error)
 }
 
 type Replier interface {
@@ -47,7 +48,7 @@ type Message struct {
 	Source  *Source
 	Text    string
 	HTML    string
-	Options interface{}
+	Options interface{} `json:"-"`
 }
 
 type Command struct {
@@ -119,5 +120,16 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
-	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
+	err := rep.Reply(ctx, src, req.ReplierId, msg)
+	if err != nil {
+		fmt.Printf("DEBUG reply err: %s\n", err)
+	}
+	return &Response{Message: msg.Text}, err
+}
+
+func (r *Request) UserEmail() string {
+	if r != nil && r.Source != nil && r.Source.User != nil {
+		return r.Source.User.Email
+	}
+	return ""
 }

@@ -61,22 +61,6 @@ resource "aws_route53_record" "artifactory-internal_dev_pardot_com_Arecord" {
   ttl = "900"
 }
 
-resource "aws_route53_record" "artifactory2_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "artifactory2.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["52.86.227.208"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "artifactorytest_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "artifactorytest.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["52.5.173.11"]
-  type = "A"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "awstools_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "awstools.${aws_route53_zone.dev_pardot_com.name}"

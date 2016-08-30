@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 
 RACK_ENV="test"
 RAILS_ENV="test"
-RACK_ROOT=$(cd "$(dirname $0)"/.. && pwd)
+RACK_ROOT=$(cd "$(dirname "$0")"/.. && pwd)
 export RACK_ENV RAILS_ENV RACK_ROOT
 
 script/setup
