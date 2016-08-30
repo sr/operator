@@ -24,8 +24,8 @@ It also takes care of silencing and inhibition of alerts.
 echo
 
 %install
-mkdir -vp $RPM_BUILD_ROOT/opt/prometheus
-install -m 755 alertmanager $RPM_BUILD_ROOT/opt/prometheus/alertmanager
+mkdir -vp $RPM_BUILD_ROOT/opt/prometheus/bin
+install -m 755 alertmanager $RPM_BUILD_ROOT/opt/prometheus/bin/alertmanager
 
 %clean
 
@@ -35,4 +35,4 @@ install -m 755 alertmanager $RPM_BUILD_ROOT/opt/prometheus/alertmanager
 
 %files
 %defattr(-,root,root,-)
-/opt/prometheus/alertmanager
+/opt/prometheus/bin/alertmanager

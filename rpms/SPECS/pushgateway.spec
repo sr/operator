@@ -24,8 +24,8 @@ It also takes care of silencing and inhibition of alerts.
 echo
 
 %install
-mkdir -vp $RPM_BUILD_ROOT/opt/prometheus
-install -m 755 pushgateway $RPM_BUILD_ROOT/opt/prometheus/pushgateway
+mkdir -vp $RPM_BUILD_ROOT/opt/prometheus/bin
+install -m 755 pushgateway $RPM_BUILD_ROOT/opt/prometheus/bin/pushgateway
 
 %clean
 
@@ -35,4 +35,4 @@ install -m 755 pushgateway $RPM_BUILD_ROOT/opt/prometheus/pushgateway
 
 %files
 %defattr(-,root,root,-)
-/opt/prometheus/pushgateway
+/opt/prometheus/bin/pushgateway

@@ -25,11 +25,12 @@ some condition is observed to be true.
 echo
 
 %install
+mkdir -vp $RPM_BUILD_ROOT/opt/prometheus/bin
 mkdir -vp $RPM_BUILD_ROOT/opt/prometheus/consoles
 mkdir -vp $RPM_BUILD_ROOT/opt/prometheus/console_libraries
 
-install -m 755 prometheus $RPM_BUILD_ROOT/opt/prometheus/prometheus
-install -m 755 promtool $RPM_BUILD_ROOT/opt/prometheus/promtool
+install -m 755 prometheus $RPM_BUILD_ROOT/opt/prometheus/bin/prometheus
+install -m 755 promtool $RPM_BUILD_ROOT/opt/prometheus/bin/promtool
 
 install -m 755 console_libraries/menu.lib $RPM_BUILD_ROOT/opt/prometheus/console_libraries
 install -m 755 console_libraries/prom.lib $RPM_BUILD_ROOT/opt/prometheus/console_libraries
@@ -63,8 +64,8 @@ install -m 755 consoles/snmp.html $RPM_BUILD_ROOT/opt/prometheus/consoles
 
 %files
 %defattr(-,root,root,-)
-/opt/prometheus/prometheus
-/opt/prometheus/promtool
+/opt/prometheus/bin/prometheus
+/opt/prometheus/bin/promtool
 /opt/prometheus/consoles/aws_elasticache.html
 /opt/prometheus/consoles/aws_elb.html
 /opt/prometheus/consoles/aws_redshift-cluster.html
