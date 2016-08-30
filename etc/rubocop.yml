@@ -31,7 +31,7 @@ Style/AlignHash:
 Style/AlignParameters:
   Enabled: false
 Style/BlockDelimiters:
-  Enabled: false
+  EnforcedStyle: semantic
 Style/ClassAndModuleChildren:
   Enabled: true
 Style/ClosingParenthesisIndentation:
