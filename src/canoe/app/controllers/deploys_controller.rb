@@ -33,9 +33,13 @@ class DeploysController < ApplicationController
     if @prov_deploy
       @previous_deploy = current_target.last_successful_deploy_for(current_project.name)
       @committers = committers_for_compare(@previous_deploy, @prov_deploy)
-      @server_hostnames = current_target.servers(project: current_project).enabled.pluck(:hostname).sort
-
-      @tags = ServerTag.includes(:servers).select { |tag| tag.servers.any? }
+      @servers = current_target.servers(project: current_project).enabled
+      @server_hostnames = @servers.order(:hostname).pluck(:hostname)
+      @tag_to_servers = @servers.includes(:server_tags).flat_map { |server|
+        server.server_tags.map { |tag| [server, tag] }
+      }.each_with_object(Hash.new { |h, k| h[k] = [] }) { |(server, tag), h|
+        h[tag] << server
+      }
     else
       render_invalid_provisional_deploy
     end
