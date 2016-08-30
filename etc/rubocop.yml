@@ -30,6 +30,8 @@ Style/AlignHash:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
+Style/BlockDelimiters:
+  Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: true
 Style/ClosingParenthesisIndentation:
