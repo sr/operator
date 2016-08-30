@@ -36,6 +36,6 @@ export PATH
 
 ecs-deploy \
     --cluster "$cluster" \
-    --timeout 180 \
+    --timeout 600 \
     --service-name "$service" \
     --image "$image"
