@@ -15,15 +15,10 @@ module Pardot
       end
 
       def name
-        @_name ||= \
-          # Camelize
-          begin
-            string = id.to_s
-            string = string.sub(/^[a-z\d]*/) { $&.capitalize }
-            string.gsub!(/(?:_|(\/))([a-z\d]*)/i) do "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" end
-            string.gsub!("/", "::")
-            string
-          end
+        @_name ||= id.to_s
+          .sub(/^[a-z\d]*/) { $&.capitalize }
+          .gsub(/(?:_|(\/))([a-z\d]*)/i) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }
+          .gsub("/", "::")
       end
 
       def artifacts_path
