@@ -5,91 +5,91 @@ namespace :canoe do
   task create_projects: :environment do
     next if Rails.env.test?
 
-    Project.find_or_initialize_by(name: "explorer").tap do |project|
+    Project.find_or_initialize_by(name: "explorer").tap { |project|
       project.icon = "search"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "BREAD"
       project.bamboo_job = "EX"
       project.repository = "Pardot/bread"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "pardot").tap do |project|
+    Project.find_or_initialize_by(name: "pardot").tap { |project|
       project.icon = "cloud"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PPANT"
       project.repository = "Pardot/pardot"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "pithumbs").tap do |project|
+    Project.find_or_initialize_by(name: "pithumbs").tap { |project|
       project.icon = "thumbs-up"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PTHMBS"
       project.repository = "Pardot/pithumbs"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "realtime-frontend").tap do |project|
+    Project.find_or_initialize_by(name: "realtime-frontend").tap { |project|
       project.icon = "bullhorn"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "RTF"
       project.repository = "Pardot/realtime-frontend"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "workflow-stats").tap do |project|
+    Project.find_or_initialize_by(name: "workflow-stats").tap { |project|
       project.icon = "fighter-jet"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "WFST"
       project.repository = "Pardot/workflow-stats"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "murdoc").tap do |project|
+    Project.find_or_initialize_by(name: "murdoc").tap { |project|
       project.icon = "bolt"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "MDOC"
       project.repository = "Pardot/murdoc"
       project.all_servers_default = false
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "chef").tap do |project|
+    Project.find_or_initialize_by(name: "chef").tap { |project|
       project.icon = "food"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "CHEF"
       project.repository = "Pardot/chef"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "repfix").tap do |project|
+    Project.find_or_initialize_by(name: "repfix").tap { |project|
       project.icon = "wrench"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "REPFIX"
       project.repository = "Pardot/repfix"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "internal-api").tap do |project|
+    Project.find_or_initialize_by(name: "internal-api").tap { |project|
       project.icon = "building"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "INTAPI"
       project.repository = "Pardot/internal-api"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "blue-mesh").tap do |project|
+    Project.find_or_initialize_by(name: "blue-mesh").tap { |project|
       project.icon = "th"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "BLUMSH"
       project.repository = "Pardot/blue-mesh"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "mesh").tap do |project|
+    Project.find_or_initialize_by(name: "mesh").tap { |project|
       project.icon = "th-large"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "MESH"
       project.repository = "Pardot/mesh"
-    end.save!
+    }.save!
 
-    Project.find_or_initialize_by(name: "ansible").tap do |project|
+    Project.find_or_initialize_by(name: "ansible").tap { |project|
       project.icon = "signal"
       project.bamboo_project = "SRE"
       project.bamboo_plan = "ANSBL"
       project.repository = "Pardot/ansible"
-    end.save!
+    }.save!
   end
 
   desc "Create targets for deployment"
@@ -106,17 +106,17 @@ namespace :canoe do
       )
     when "production"
       DeployTarget.find_or_initialize_by(name: "staging").save!
-      DeployTarget.find_or_initialize_by(name: "production").tap do |target|
+      DeployTarget.find_or_initialize_by(name: "production").tap { |target|
         target.production = true
-      end.save!
-      DeployTarget.find_or_initialize_by(name: "production_dfw").tap do |target|
-        target.production = true
-        target.enabled = false
-      end.save!
-      DeployTarget.find_or_initialize_by(name: "production_phx").tap do |target|
+      }.save!
+      DeployTarget.find_or_initialize_by(name: "production_dfw").tap { |target|
         target.production = true
         target.enabled = false
-      end.save!
+      }.save!
+      DeployTarget.find_or_initialize_by(name: "production_phx").tap { |target|
+        target.production = true
+        target.enabled = false
+      }.save!
     end
   end
 
@@ -131,10 +131,10 @@ namespace :canoe do
       production_targets = DeployTarget.where(name: %w[production production_dfw production_phx])
       Project.find_each do |project|
         production_targets.each do |target|
-          DeployACLEntry.find_or_initialize_by(project_id: project.id, deploy_target_id: target.id).tap do |entry|
+          DeployACLEntry.find_or_initialize_by(project_id: project.id, deploy_target_id: target.id).tap { |entry|
             entry.acl_type = "ldap_group"
             entry.value = ["releasebox"]
-          end.save!
+          }.save!
         end
       end
     end

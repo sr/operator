@@ -14,9 +14,9 @@ class GithubComparison
   end
 
   def committers
-    authors.collect do |author|
+    authors.collect { |author|
       author.try(:login) || author.try(:name)
-    end.uniq.sort
+    }.uniq.sort
   rescue Octokit::InternalServerError => e
     Instrumentation.log_exception(e, at: "DeployComparison", fn: "committers")
     []

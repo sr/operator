@@ -20,7 +20,7 @@ module Pardot
           begin
             string = id.to_s
             string = string.sub(/^[a-z\d]*/) { $&.capitalize }
-            string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" }
+            string.gsub!(/(?:_|(\/))([a-z\d]*)/i) do "#{Regexp.last_match(1)}#{Regexp.last_match(2).capitalize}" end
             string.gsub!("/", "::")
             string
           end

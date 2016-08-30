@@ -29,7 +29,9 @@ module Zabbix
     end
 
     def ensure_supervising
-      Thread.new { try_supervise }
+      Thread.new do
+        try_supervise
+      end
       true
     end
 
@@ -84,7 +86,9 @@ module Zabbix
                 []
               end
 
-            expirations.each { |hostname| notify_host_maintenance_expired(hostname) }
+            expirations.each do |hostname|
+              notify_host_maintenance_expired(hostname)
+            end
             sleep 60
           end
         ensure

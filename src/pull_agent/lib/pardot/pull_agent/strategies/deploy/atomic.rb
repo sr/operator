@@ -95,9 +95,9 @@ module Pardot
           end
 
           def pick_next_choice(array, current)
-            _, next_choice = array.cycle.each_cons(2).take(array.length).find do |element, _next_element|
+            _, next_choice = array.cycle.each_cons(2).take(array.length).find { |element, _next_element|
               normalize_path(element) == normalize_path(current)
-            end
+            }
 
             next_choice
           end
