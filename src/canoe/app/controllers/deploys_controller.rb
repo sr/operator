@@ -39,7 +39,7 @@ class DeploysController < ApplicationController
         server.server_tags.map { |tag| [server, tag] }
       }.each_with_object(Hash.new { |h, k| h[k] = [] }) { |(server, tag), h|
         h[tag] << server
-      }
+      }.sort_by { |tag, _| tag.name }
     else
       render_invalid_provisional_deploy
     end
