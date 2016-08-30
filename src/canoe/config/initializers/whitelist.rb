@@ -20,7 +20,7 @@ if Rails.env.development?
   trusted_networks << "172.16.0.0/12" # Docker compose instances
 end
 
-trusted_networks.map! { |i| IPAddr.new(i) }
+trusted_networks = trusted_networks.map { |i| IPAddr.new(i) }
 trusted_networks.freeze
 
 Rack::Attack.whitelist("ip whitelist") do |req|

@@ -15,9 +15,9 @@ module ReplicationFixing
 
       it "raises an error if nothing is registered for the datacenter" do
         registry = DatacenterAwareRegistry.new
-        expect do
+        expect {
           registry.for_datacenter("nope")
-        end.to raise_error(DatacenterAwareRegistry::NoSuchDatacenter)
+        }.to raise_error(DatacenterAwareRegistry::NoSuchDatacenter)
       end
     end
   end

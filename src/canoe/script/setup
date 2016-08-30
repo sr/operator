@@ -15,10 +15,10 @@ bin/rake db:create db:migrate
 
 if [ -z "$RAILS_ENV" ] && [ -z "$RACK_ENV" ]; then
   # Only run in development environments
-  echo "===> Adding development targets"
-  bin/rake canoe:create_targets
   echo "===> Adding projects"
   bin/rake canoe:create_projects
+  echo "===> Adding development targets"
+  bin/rake canoe:create_targets
 fi
 
 echo "==> App is now ready to go!"
