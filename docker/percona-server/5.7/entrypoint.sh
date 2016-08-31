@@ -8,6 +8,16 @@ MYSQL_USERS="${MYSQL_USERS-}"
 
 program="${1-}"
 if [ "$program" = "mysqld" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
+  rmdir /var/lib/mysql
+  mkdir /var/lib/mysql /var/log/mysql /var/lib/mysqltmp
+  chown -R mysql:mysql /var/lib/mysql /var/log/mysql /var/lib/mysqltmp
+
+  if ! mysqld --initialize-insecure; then
+    echo "Failed to initialize MySQL database" 2>&1
+    cat /var/log/mysql/error.log
+    exit 1
+  fi
+
   "$@" &
   pid="$!"
   trap "kill -TERM ${pid}" SIGTERM
@@ -23,6 +33,7 @@ if [ "$program" = "mysqld" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
 
   if [ "$i" = "0" ]; then
     echo "MySQL failed to start" >&2
+    cat /var/log/mysql/error.log
     exit 1
   fi
 
