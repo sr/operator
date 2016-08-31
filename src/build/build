@@ -139,7 +139,7 @@ case "$project" in
             trap 'rm -f $tarball' EXIT
 
             # Update the tarball to Artifactory
-            docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+            tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
         fi
         ;;
     golang)
@@ -149,11 +149,11 @@ case "$project" in
         if [ -n "$CI" ]; then
           pushd "bin"
           tarball="$(tarball-build "jiracleaner")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
 
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
           popd
         fi
         ;;
