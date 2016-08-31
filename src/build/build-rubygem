@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
 
-. etc/build/env
+. etc/buildenv
 
 # Print usage and exit if gemspec argument is missing.
 gemname="${1:-""}"
