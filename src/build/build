@@ -50,8 +50,8 @@ if [ -n "$CI" ]; then
     find src -type f -name Gemfile -print0 |
     xargs -0 sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g'
     ARTIFACTORY_HOST="artifactory-internal.dev.pardot.com"
-    export ARTIFACTORY_HOST
-    unset -v ARTIFACTORY_URL
+    ARTIFACTORY_URL="https://${ARTIFACTORY_HOST}/artifactory"
+    export ARTIFACTORY_HOST ARTIFACTORY_URL
 fi
 
 # Pull the latest version of the build image unless $NOPULL is set
