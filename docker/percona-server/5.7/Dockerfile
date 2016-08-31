@@ -27,4 +27,4 @@ COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 3306
-CMD ["mysqld"]
+CMD ["mysqld_safe"]

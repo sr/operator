@@ -7,7 +7,7 @@ MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD-pardot07}"
 MYSQL_USERS="${MYSQL_USERS-}"
 
 program="${1-}"
-if [ "$program" = "mysqld" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
+if [ "$program" = "mysqld_safe" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
   rmdir /var/lib/mysql
   mkdir /var/lib/mysql /var/log/mysql /var/lib/mysqltmp
   chown -R mysql:mysql /var/lib/mysql /var/log/mysql /var/lib/mysqltmp
