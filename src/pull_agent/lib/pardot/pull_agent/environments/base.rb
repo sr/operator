@@ -168,9 +168,9 @@ module Pardot
         def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
-          autojob_disco_master = (1..9).flat_map do |i|
+          autojob_disco_master = (1..9).flat_map { |i|
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-          end.map { |s| [s["address"], s["port"]].join(":") }
+          }.map { |s| [s["address"], s["port"]].join(":") }
 
           # Restart per account automation workers
           redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)

@@ -18,14 +18,14 @@ if [ -z "$gemname" ] || [ -z "gemspec" ]; then
 fi
 
 # Declare required environment variables.
-: $HOME
-: $ARTIFACTORY_URL
-: $ARTIFACTORY_USERNAME
-: $ARTIFACTORY_PASSWORD
-: $ARTIFACTORY_REPO_GEM_LOCAL
-: $CI_PLAN
-: $CI_BRANCH
-: $CI_BUILD_NUMBER
+: "$HOME"
+: "$ARTIFACTORY_URL"
+: "$ARTIFACTORY_USERNAME"
+: "$ARTIFACTORY_PASSWORD"
+: "$ARTIFACTORY_REPO_GEM_LOCAL"
+: "$CI_PLAN"
+: "$CI_BRANCH"
+: "$CI_BUILD_NUMBER"
 
 # Enable tracing if DEBUG is set.
 : "${DEBUG:=""}"

@@ -2,7 +2,6 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-databases="pardot_global pardot_shard1 pardot_shard2"
 vagrant_id="$(vagrant global-status | grep vagrant-dev | awk '{ print $1 }')"
 
 for i in pardot_global pardot_shard1 pardot_shard2

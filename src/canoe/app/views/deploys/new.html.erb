@@ -77,12 +77,12 @@
         <legend>Tags</legend>
 
         <div class="container-fluid">
-          <%- @tags.each_slice(4).each do |slice| %>
+          <%- @tag_to_servers.each_slice(6).each do |slice| %>
             <div class="row">
-              <%- slice.each do |tag| %>
-                <div class="col-xs-3">
+              <%- slice.each do |tag, servers| %>
+                <div class="col-xs-2">
                   <label class="checkbox-inline">
-                    <%= check_box_tag "server_tags[]", tag.id, false, data: {server_hostnames: tag.servers.map(&:hostname)} %> <%= tag.name %>
+                    <%= check_box_tag "server_tags[]", tag.id, false, data: {server_hostnames: servers.map(&:hostname)} %> <%= tag.name %>
                   </label>
                 </div>
               <%- end %>

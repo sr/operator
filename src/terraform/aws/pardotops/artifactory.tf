@@ -168,13 +168,13 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
   }
 }
 
-
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
-  ami = "${var.centos_7_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.138"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -198,7 +198,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-1-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
@@ -212,11 +212,12 @@ resource "aws_route53_record" "pardot0-artifactory-internal1-1-ue1_arecord" {
 }
 
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
-  ami = "${var.centos_7_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.209"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -240,7 +241,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-2-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
@@ -254,11 +255,12 @@ resource "aws_route53_record" "pardot0-artifactory-internal1-2-ue1_arecord" {
 }
 
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
-  ami = "${var.centos_7_hvm_ebs_ami}"
+  ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.182"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -282,7 +284,7 @@ resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.pardot0-artifactory1-3-ue1.public_ip}"]
+  records = ["${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}"]
   type = "A"
   ttl = 900
 }
@@ -296,7 +298,7 @@ resource "aws_route53_record" "pardot0-artifactory-internal1-3-ue1_arecord" {
 }
 
 resource "aws_elb" "artifactory_public_elb" {
-  name = "artifactory-public-elb"
+  name = "afy-pblc-elb-dev-pardot-com"
   security_groups = [
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -346,7 +348,7 @@ resource "aws_elb" "artifactory_public_elb" {
 
 resource "aws_elb" "artifactory_private_elb" {
   internal = true
-  name = "artifactory-private-elb"
+  name = "afy-prvt-elb-dev-pardot-com"
   security_groups = [
     "${aws_security_group.artifactory_internal_elb_secgroup.id}"
   ]
@@ -457,6 +459,7 @@ cidr_block = "172.28.0.0/24"
   tags {
     Name = "artifactory_integration"
   }
+  enable_dns_hostnames = true
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1a" {
@@ -544,9 +547,16 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     cidr_block = "172.30.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
   }
+  route {
+    #TODO: delete
+    cidr_block = "192.168.128.0/22" 
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.legacy_pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  }
+
 }
 
 resource "aws_route" "artifactory_integration_to_legacy_pardot_ci" {
+  #TODO: delete
   destination_cidr_block = "192.168.128.0/22"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.legacy_pardot_ci_and_artifactory_integration_vpc_peering.id}"
   route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
@@ -643,24 +653,8 @@ resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration
 
 # Temporary peering with legacy pardot-ci account
 resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integration_vpc_peering" {
+  #TODO: delete
   peer_owner_id = "096113534078"
   peer_vpc_id = "vpc-4d96a928"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
-
-//// UNCOMMENT THIS TO "TAKE OVER" ARTIFACTORY.DEV.PARDOT.COM (and -internal)
-//resource "aws_route53_record" "artifactory_dev_pardot_com_cname" {
-//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-//  name = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
-//  records = ["${aws_elb.artifactory_public_elb.dns_name}"]
-//  type = "CNAME"
-//  ttl = "900"
-//}
-//
-//resource "aws_route53_record" "artifactory_internal_dev_pardot_com_cname" {
-//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-//  name = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
-//  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
-//  type = "CNAME"
-//  ttl = "900"
-//}

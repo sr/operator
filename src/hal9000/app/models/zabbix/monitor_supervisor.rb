@@ -28,7 +28,9 @@ module Zabbix
     end
 
     def ensure_supervising
-      Thread.new { try_supervise }
+      Thread.new do
+        try_supervise
+      end
       true
     end
 
@@ -82,7 +84,9 @@ module Zabbix
                 []
               end
 
-            expirations.each { |monitorname| notify_monitor_unpaused(monitorname) }
+            expirations.each do |monitorname|
+              notify_monitor_unpaused(monitorname)
+            end
             sleep 60
           end
         ensure

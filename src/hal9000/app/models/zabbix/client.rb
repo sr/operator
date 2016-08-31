@@ -73,9 +73,9 @@ module Zabbix
     private
 
     def maintenance_group_id
-      @client.hostgroups.get_id(name: MAINTENANCE_GROUP_NAME).tap do |group_id|
+      @client.hostgroups.get_id(name: MAINTENANCE_GROUP_NAME).tap { |group_id|
         raise MaintenanceGroupDoesNotExist, "Could not find ID for hostgroup #{MAINTENANCE_GROUP_NAME}" if group_id.nil?
-      end.to_s
+      }.to_s
     end
   end
 end

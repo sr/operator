@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -eu
 
-file bin/* | grep -E "bash script|POSIX shell" | cut -d: -f1 |
+git ls-files |
+grep -v src/build/vendor |
+grep -v src/github.com/hashicorp/terraform |
 while read f; do
-    shellcheck "$f"
+    if file "$f" | grep -q -E "bash script|POSIX shell"; then
+        if ! shellcheck -f gcc "$f"; then
+            exit 1
+        fi
+    fi
 done
 
-find src/build -maxdepth 1 -type f -exec shellcheck -f gcc {} +
+true
