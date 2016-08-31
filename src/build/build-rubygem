@@ -5,7 +5,7 @@
 #/ server. Requires the /etc/env/artifactoryenv file to be readable and to
 #/ contain the hostname and authentication credentials of the Artifactory server.
 set -euo pipefail
-cd "$(dirname "$0")/../../.."
+cd "$(dirname "$0")/../.."
 
 . etc/buildenv
 
