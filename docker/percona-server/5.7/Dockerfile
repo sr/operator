@@ -17,7 +17,9 @@ RUN \
     yum install -y \
       Percona-Server-client-${percona_major_version}-${percona_version} \
       Percona-Server-server-${percona_major_version}-${percona_version} \
-      Percona-Server-devel-${percona_major_version}-${percona_version}
+      Percona-Server-devel-${percona_major_version}-${percona_version} \
+  && \
+    yum clean all
 
 COPY my.cnf /etc/my.cnf
 
