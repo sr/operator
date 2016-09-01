@@ -6,6 +6,8 @@ images:
   docker.dev.pardot.com/base/centos:6:
     build: centos/6
     pull: true
+  docker.dev.pardot.com/base/php:7.0.8:
+    build: php/7.0.8
   docker.dev.pardot.com/base/java:8u102-jdk:
     build: java/8u102-jdk
   docker.dev.pardot.com/base/percona-server:5.5:
