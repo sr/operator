@@ -20,13 +20,13 @@ class UserQuery < ApplicationRecord
   # Returns a Mysql2::Result with the result of executing the query against the
   # appropriate database. Execution is accounted against the given user's rate
   # limit and the query is written to an audit log.
-  def execute(current_user)
+  def execute(current_user, options = {})
     if current_user.rate_limit.at_limit?
       raise UserQuery::RateLimited, current_user
     end
 
     results = Instrumentation.context(user_email: current_user.email) do
-      database.execute(parsed.sql)
+      database.execute(parsed(options[:show_all_rows]).sql)
     end
     current_user.rate_limit.record_transaction
     results
@@ -53,7 +53,7 @@ class UserQuery < ApplicationRecord
 
   # Returns the parsed SQL query with the account_id condition added if this
   # is an account-specific account and with a LIMIT clause added.
-  def parsed
+  def parsed(show_all_rows = false)
     sql_query = SQLQuery.parse(raw_sql)
 
     unless show_all_rows
