@@ -44,11 +44,11 @@ class QueriesController < ApplicationController
   end
 
   def create
-    query query =
-      if !account_id.nil?
-        current_user.account_query(sql, account_id)
+    query =
+      if params[:account_id].present?
+        current_user.account_query(params[:sql], params[:account_id])
       else
-        current_user.global_query(sql)
+        current_user.global_query(params[:sql])
       end
 
     redirect_to "/queries/#{query.id}"
