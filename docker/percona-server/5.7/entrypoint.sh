@@ -63,6 +63,7 @@ EOF
 
     CREATE USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;
 EOF
 
   touch "/var/lib/mysql/DOCKER-SETUP"
