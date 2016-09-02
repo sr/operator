@@ -53,7 +53,11 @@ class UserQuery < ApplicationRecord
   # Returns the parsed SQL query with the account_id condition added if this
   # is an account-specific account and with a LIMIT clause added.
   def parsed
-    sql_query = SQLQuery.parse(raw_sql).limit(DEFAULT_LIMIT)
+    sql_query = SQLQuery.parse(raw_sql)
+
+    unless all_rows
+      sql_query = sql_query.limit(DEFAULT_LIMIT)
+    end
 
     if !for_account?
       return sql_query

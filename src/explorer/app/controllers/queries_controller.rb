@@ -43,17 +43,33 @@ class QueriesController < ApplicationController
   end
 
   def create
-    query =
-      if params[:account_id].present?
-        current_user.account_query(params[:sql], params[:account_id])
-      else
-        current_user.global_query(params[:sql])
-      end
+    query = create_query(params[:sql], params[:account_id])
 
     redirect_to "/queries/#{query.id}"
   end
 
+  def all_rows
+    previous_query = UserQuery.find(params[:id])
+    new_query = create_query(previous_query.raw_sql, previous_query.account_id, true)
+
+    redirect_to "/queries/#{new_query.id}"
+  end
+
   private
+
+  def create_query(sql, account_id, all_rows = false)
+    query =
+      if !account_id.nil?
+        current_user.account_query(sql, account_id)
+      else
+        current_user.global_query(sql)
+      end
+byebug
+    if all_rows
+      query.update(all_rows: true)
+    end
+    query
+  end
 
   def check_account_access
     if params.key?(:account_id) && !account_access?
