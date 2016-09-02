@@ -10,14 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160831190607) do
+ActiveRecord::Schema.define(version: 20160611151703) do
 
   create_table "user_queries", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "account_id"
-    t.text     "raw_sql",    limit: 65535,                 null: false
-    t.integer  "user_id",                                  null: false
-    t.datetime "created_at",                               null: false
-    t.boolean  "all_rows",                 default: false, null: false
+    t.text     "raw_sql",    limit: 65535, null: false
+    t.integer  "user_id",                  null: false
+    t.datetime "created_at",               null: false
     t.index ["user_id"], name: "user_id", using: :btree
   end
 

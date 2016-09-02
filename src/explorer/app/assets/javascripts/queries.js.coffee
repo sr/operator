@@ -21,11 +21,6 @@ ready = ->
     $("#query_is_limited").val("true")
     $('form').submit()
 
-  $(".all_rows").on "click", (e) ->
-    e.preventDefault()
-    $("#query_is_limited").val("false")
-    $('form').submit()
-
   $(".select_column").on "click", (e) ->
     e.preventDefault()
     column_name = $(this).html()
