@@ -15,6 +15,7 @@ class QueriesController < ApplicationController
 
   def show
     query = UserQuery.find(params[:id])
+    query.show_all_rows = params[:all_rows].present?
 
     rate_limit =
       if Rails.env.development? && params[:rate_limited].present?
@@ -43,33 +44,17 @@ class QueriesController < ApplicationController
   end
 
   def create
-    query = create_query(params[:sql], params[:account_id])
-
-    redirect_to "/queries/#{query.id}"
-  end
-
-  def all_rows
-    previous_query = UserQuery.find(params[:id])
-    new_query = create_query(previous_query.raw_sql, previous_query.account_id, true)
-
-    redirect_to "/queries/#{new_query.id}"
-  end
-
-  private
-
-  def create_query(sql, account_id, all_rows = false)
-    query =
+    query query =
       if !account_id.nil?
         current_user.account_query(sql, account_id)
       else
         current_user.global_query(sql)
       end
-byebug
-    if all_rows
-      query.update(all_rows: true)
-    end
-    query
+
+    redirect_to "/queries/#{query.id}"
   end
+
+  private
 
   def check_account_access
     if params.key?(:account_id) && !account_access?

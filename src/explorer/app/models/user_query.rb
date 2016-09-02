@@ -2,6 +2,7 @@ class UserQuery < ApplicationRecord
   DEFAULT_LIMIT = 10
 
   belongs_to :user
+  attr_accessor :show_all_rows
 
   class RateLimited < StandardError
     def initialize(user)
@@ -55,7 +56,7 @@ class UserQuery < ApplicationRecord
   def parsed
     sql_query = SQLQuery.parse(raw_sql)
 
-    unless all_rows
+    unless show_all_rows
       sql_query = sql_query.limit(DEFAULT_LIMIT)
     end
 

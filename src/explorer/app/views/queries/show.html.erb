@@ -38,4 +38,4 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
     </tbody>
   </table>
 </div>
-<%= link_to("Show All Rows", all_rows_query_path, class: "all_rows") %>
+<%= link_to("Show All Rows", query_path(all_rows: 1), class: "all_rows") %>
