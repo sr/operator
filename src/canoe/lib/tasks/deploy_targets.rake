@@ -59,7 +59,7 @@ namespace :canoe do
     }.tap(&:save!)
     murdoc.deploy_notifications.find_or_initialize_by(hipchat_room_id: 901).tap(&:save!) # ES Oncall
 
-    chef = Project.find_or_initialize_by(name: "chef").tap { |project|
+    Project.find_or_initialize_by(name: "chef").tap { |project|
       project.icon = "food"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "CHEF"
