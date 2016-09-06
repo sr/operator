@@ -229,7 +229,9 @@ module.exports = (robot) ->
                 msg.hipchatNotify "<strong>Acknowledged</strong>#{incidentTable(groupedIncidents.acknowledged)}", {color: "yellow"}, cb
               else
                 cb(null)
-          ]
+          ], (err) ->
+            if err?
+              msg.send "Something went wrong: #{err}"
         else
           msg.send "No open incidents 🎉"
 
