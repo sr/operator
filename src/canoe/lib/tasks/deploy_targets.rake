@@ -5,6 +5,13 @@ namespace :canoe do
   task create_projects: :environment do
     next if Rails.env.test?
 
+    BREAD_HIPCHAT_ROOM_ID = 42
+    ENGR_HIPCHAT_ROOM_ID = 2
+    OPS_HIPCHAT_ROOM_ID = 6
+    ES_ONCALL_HIPCHAT_ROOM_ID = 901
+    SUPPORT_HIPCHAT_ROOM_ID = 28
+    TEAM_CAERUS_HIPCHAT_ROOM_ID = 437
+
     explorer = Project.find_or_initialize_by(name: "explorer").tap { |project|
       project.icon = "search"
       project.bamboo_project = "BREAD"
@@ -13,7 +20,7 @@ namespace :canoe do
       project.repository = "Pardot/bread"
       project.save!
     }.tap(&:save!)
-    explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: 42).tap(&:save!) # BREAD
+    explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
     pardot = Project.find_or_initialize_by(name: "pardot").tap { |project|
       project.icon = "cloud"
@@ -21,8 +28,8 @@ namespace :canoe do
       project.bamboo_plan = "PPANT"
       project.repository = "Pardot/pardot"
     }.tap(&:save!)
-    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: 2).tap(&:save!) # Engineering
-    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: 28).tap(&:save!) # Support
+    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
     pithumbs = Project.find_or_initialize_by(name: "pithumbs").tap { |project|
       project.icon = "thumbs-up"
@@ -30,8 +37,8 @@ namespace :canoe do
       project.bamboo_plan = "PTHMBS"
       project.repository = "Pardot/pithumbs"
     }.tap(&:save!)
-    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: 2).tap(&:save!) # Engineering
-    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: 28).tap(&:save!) # Support
+    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
     rtf = Project.find_or_initialize_by(name: "realtime-frontend").tap { |project|
       project.icon = "bullhorn"
@@ -39,8 +46,8 @@ namespace :canoe do
       project.bamboo_plan = "RTF"
       project.repository = "Pardot/realtime-frontend"
     }.tap(&:save!)
-    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: 2).tap(&:save!) # Engineering
-    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: 28).tap(&:save!) # Support
+    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
     wfst = Project.find_or_initialize_by(name: "workflow-stats").tap { |project|
       project.icon = "fighter-jet"
@@ -48,7 +55,7 @@ namespace :canoe do
       project.bamboo_plan = "WFST"
       project.repository = "Pardot/workflow-stats"
     }.tap(&:save!)
-    wfst.deploy_notifications.find_or_initialize_by(hipchat_room_id: 901).tap(&:save!) # ES Oncall
+    wfst.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
 
     murdoc = Project.find_or_initialize_by(name: "murdoc").tap { |project|
       project.icon = "bolt"
@@ -57,7 +64,7 @@ namespace :canoe do
       project.repository = "Pardot/murdoc"
       project.all_servers_default = false
     }.tap(&:save!)
-    murdoc.deploy_notifications.find_or_initialize_by(hipchat_room_id: 901).tap(&:save!) # ES Oncall
+    murdoc.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
 
     Project.find_or_initialize_by(name: "chef").tap { |project|
       project.icon = "food"
@@ -72,7 +79,7 @@ namespace :canoe do
       project.bamboo_plan = "REPFIX"
       project.repository = "Pardot/repfix"
     }.tap(&:save!)
-    repfix.deploy_notifications.find_or_initialize_by(hipchat_room_id: 42).tap(&:save!) # BREAD
+    repfix.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
     intapi = Project.find_or_initialize_by(name: "internal-api").tap { |project|
       project.icon = "building"
@@ -80,7 +87,7 @@ namespace :canoe do
       project.bamboo_plan = "INTAPI"
       project.repository = "Pardot/internal-api"
     }.tap(&:save!)
-    intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: 42).tap(&:save!) # BREAD
+    intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
     blue_mesh = Project.find_or_initialize_by(name: "blue-mesh").tap { |project|
       project.icon = "th"
@@ -88,7 +95,7 @@ namespace :canoe do
       project.bamboo_plan = "BLUMSH"
       project.repository = "Pardot/blue-mesh"
     }.tap(&:save!)
-    blue_mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: 437).tap(&:save!) # Team Caerus
+    blue_mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
     mesh = Project.find_or_initialize_by(name: "mesh").tap { |project|
       project.icon = "th-large"
@@ -96,7 +103,7 @@ namespace :canoe do
       project.bamboo_plan = "MESH"
       project.repository = "Pardot/mesh"
     }.tap(&:save!)
-    mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: 437).tap(&:save!) # Team Caerus
+    mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
     ansible = Project.find_or_initialize_by(name: "ansible").tap { |project|
       project.icon = "signal"
@@ -104,7 +111,7 @@ namespace :canoe do
       project.bamboo_plan = "ANSBL"
       project.repository = "Pardot/ansible"
     }.tap(&:save!)
-    ansible.deploy_notifications.find_or_initialize_by(hipchat_room_id: 6).tap(&:save!) # Ops
+    ansible.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
   end
 
   desc "Create targets for deployment"
