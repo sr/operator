@@ -4,7 +4,6 @@ ARG dist=el6
 ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
-ARG parallel_version=20160322
 ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
 
@@ -19,14 +18,6 @@ RUN yum install -y epel-release && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm" && \
   yum clean all
-
-# Parallel
-RUN cd /tmp && \
-  curl -s "https://ftp.gnu.org/gnu/parallel/parallel-${parallel_version}.tar.bz2" | tar -xjv && \
-  cd parallel-${parallel_version} && \
-  ./configure && make && make install && \
-  cd /tmp && \
-  rm -rf parallel-${parallel_version}
 
 # Percona Client
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
