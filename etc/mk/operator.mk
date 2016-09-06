@@ -45,7 +45,7 @@ test: etc/ldap.ldif ldap-dev
 	export LDAP_PORT_389_TCP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)"; \
 	export LDAP_PORT_389_TCP_ADDR="localhost"; \
 	sleep 0.5; \
-	go test bread github.com/sr/operator/...
+	go test -ldap bread github.com/sr/operator/...
 
 clean:
 	rm -f etc/docker/ca-bundle.crt $(OPERATORD_LINUX) \

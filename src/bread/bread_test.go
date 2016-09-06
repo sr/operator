@@ -3,6 +3,7 @@ package bread_test
 import (
 	"bread"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"testing"
@@ -10,6 +11,8 @@ import (
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
+
+var ldapEnabled = flag.Bool("ldap", false, "")
 
 type fakeOTPVerifier struct {
 	ok bool
@@ -35,7 +38,10 @@ func TestAuthorizer(t *testing.T) {
 		port = v
 	}
 	if host == "" || port == "" {
-		t.Fatal("LDAP_PORT_389_TCP_{ADDR,PORT} not set")
+		if *ldapEnabled {
+			t.Fatal("ldap-enabled flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
+		}
+		t.Skip("ldap-enabled flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 	}
 	otpVerifier := &fakeOTPVerifier{true}
 	auth, err := bread.NewAuthorizer(
