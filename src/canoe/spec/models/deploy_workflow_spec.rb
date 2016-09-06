@@ -93,9 +93,9 @@ RSpec.describe DeployWorkflow do
       server = FactoryGirl.create(:server)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
 
-      expect do
+      expect {
         workflow.notify_action_successful(server: server, action: "restart")
-      end.to raise_error(DeployWorkflow::TransitionError)
+      }.to raise_error(DeployWorkflow::TransitionError)
     end
   end
 

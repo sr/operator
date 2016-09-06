@@ -34,9 +34,9 @@ describe Pardot::PullAgent::DiscoveryClient do
       stub_request(:get, "http://127.0.0.1:8383/v1/service/redis-job-1")
         .to_return(status: 503)
 
-      expect do
+      expect {
         Pardot::PullAgent::DiscoveryClient.new.service("redis-job-1")
-      end.to raise_error(Pardot::PullAgent::DiscoveryClient::Error)
+      }.to raise_error(Pardot::PullAgent::DiscoveryClient::Error)
     end
   end
 end
