@@ -24,6 +24,17 @@ func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Respo
 	})
 }
 
+func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Response, error) {
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "ok",
+		HTML: "<b>ok</b>",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "gray",
+			From:  "pinger.Otp",
+		},
+	})
+}
+
 func (s *apiServer) Whoami(ctx context.Context, req *WhoamiRequest) (*operator.Response, error) {
 	email := req.Request.UserEmail()
 	if email == "" {
