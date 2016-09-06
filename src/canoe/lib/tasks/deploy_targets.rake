@@ -5,7 +5,7 @@ namespace :canoe do
   task create_projects: :environment do
     next if Rails.env.test?
 
-    bread = Project.find_or_initialize_by(name: "explorer").tap { |project|
+    explorer = Project.find_or_initialize_by(name: "explorer").tap { |project|
       project.icon = "search"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "BREAD"
@@ -13,7 +13,7 @@ namespace :canoe do
       project.repository = "Pardot/bread"
       project.save!
     }.tap(&:save!)
-    bread.deploy_notifications.find_or_initialize_by(hipchat_room_id: 42).tap(&:save!) # BREAD
+    explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: 42).tap(&:save!) # BREAD
 
     pardot = Project.find_or_initialize_by(name: "pardot").tap { |project|
       project.icon = "cloud"
