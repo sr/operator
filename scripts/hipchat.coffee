@@ -71,7 +71,7 @@ class Hipchat
           cb(err, null) if cb
         else
           try
-            cb(null, JSON.parse(body)) if cb
+            cb(null, null) if cb
           catch err
             cb(err, null) if cb
 
