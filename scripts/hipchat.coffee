@@ -67,13 +67,7 @@ class Hipchat
     @client.path("/v2/room/#{id}/notification")
       .header("content-type", "application/json")
       .post(JSON.stringify(params)) (err, resp, body) ->
-        if err?
-          cb(err, null) if cb
-        else
-          try
-            cb(null, JSON.parse(body)) if cb
-          catch err
-            cb(err, null) if cb
+        cb(err) if cb
 
   roomShareFile: (id, name, contentType, body, message, cb) ->
     boundary = "boundaryb01de47883263ba880ae8e"
@@ -168,12 +162,14 @@ module.exports = (robot) ->
   setInterval(updateMappings, 1000 * 60 * 10)
   setTimeout(updateMappings, 0)
 
-  hipchatRoomNotify = (robot, roomJid, text, options) ->
+  hipchatRoomNotify = (robot, roomJid, text, options, cb) ->
     if roomId = mapping.get(roomJid)
-      hipchat.notifyRoom roomId, _.extend({}, options || {}, message: text)
+      hipchat.notifyRoom roomId, _.extend({}, options || {}, message: text), cb
     else
       console.log "Couldn't find JID mapping"
       robot.send roomJid, text
+      # robot.send doesn't offer a callback, so invoke it immediately (sadpanda)
+      cb(null) if cb
 
   hipchatRoomShareFile = (robot, roomJid, name, contentType, body, message, cb) ->
     if roomId = mapping.get(roomJid)
@@ -187,12 +183,12 @@ module.exports = (robot) ->
 
   robot.listenerMiddleware (context, next, done) ->
     # Adds the hipchatNotify function to the msg object in listeners
-    context.response.hipchatNotify = (text, options) ->
-      hipchatRoomNotify(robot, context.response.envelope?.user?.reply_to, text, options)
+    context.response.hipchatNotify = (text, options, cb = null) ->
+      hipchatRoomNotify(robot, context.response.envelope?.user?.reply_to, text, options, cb)
 
     # Adds the hipchatNotifyRoom function to the msg object in listeners
-    context.response.hipchatNotifyRoom = (roomJid, text, options) ->
-      hipchatRoomNotify(robot, roomJid, text, options)
+    context.response.hipchatNotifyRoom = (roomJid, text, options, cb = null) ->
+      hipchatRoomNotify(robot, roomJid, text, options, cb)
 
     # Adds the hipchatShareFile function to the msg object in listeners
     context.response.hipchatShareFile = (name, contentType, body, message, cb = null) ->
