@@ -2,6 +2,7 @@ class UserQuery < ApplicationRecord
   DEFAULT_LIMIT = 10
 
   belongs_to :user
+  attr_accessor :show_all_rows
 
   class RateLimited < StandardError
     def initialize(user)
