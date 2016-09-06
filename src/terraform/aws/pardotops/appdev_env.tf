@@ -261,10 +261,10 @@ resource "aws_elb" "appdev_app_elb" {
     "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
   ]
   subnets = [
-    "${aws_subnet.appdev_us_east_1a.id}",
-    "${aws_subnet.appdev_us_east_1c.id}",
-    "${aws_subnet.appdev_us_east_1d.id}",
-    "${aws_subnet.appdev_us_east_1e.id}"
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.appdev_us_east_1c_dmz.id}",
+    "${aws_subnet.appdev_us_east_1d_dmz.id}",
+    "${aws_subnet.appdev_us_east_1e_dmz.id}"
   ]
   cross_zone_load_balancing = true
   connection_draining = true
