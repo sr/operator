@@ -67,13 +67,7 @@ class Hipchat
     @client.path("/v2/room/#{id}/notification")
       .header("content-type", "application/json")
       .post(JSON.stringify(params)) (err, resp, body) ->
-        if err?
-          cb(err, null) if cb
-        else
-          try
-            cb(null, null) if cb
-          catch err
-            cb(err, null) if cb
+        cb(err) if cb
 
   roomShareFile: (id, name, contentType, body, message, cb) ->
     boundary = "boundaryb01de47883263ba880ae8e"
