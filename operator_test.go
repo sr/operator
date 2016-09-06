@@ -105,7 +105,7 @@ func TestHandler(t *testing.T) {
 	}
 	defer listener.Close()
 	go server.Serve(listener)
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(listener.Addr().String(), grpc.WithInsecure())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,6 +119,7 @@ func TestHandler(t *testing.T) {
 	}
 	store := &fakeStore{config}
 	tArgs := make(map[string]string)
+	tOTP := ""
 	h, err := operator.NewHandler(
 		logger,
 		operator.NewInstrumenter(logger),
@@ -128,6 +129,7 @@ func TestHandler(t *testing.T) {
 		conn,
 		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 			tArgs = args
+			tOTP = req.Otp
 			return true, nil
 		},
 	)
@@ -141,16 +143,20 @@ func TestHandler(t *testing.T) {
 		status int
 		jwt    bool
 		args   map[string]string
+		otp    string
 	}{
-		{"!ping ping", 200, true, noArgs},
+		{"!ping ping", 200, true, noArgs, ""},
 		{"!ping ping foo=bar spam=\"boom town\" x='sup'", 200, true,
-			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}},
-		{"!ping ping", 400, false, noArgs},
-		{"!ping", 404, true, noArgs},
-		{"!", 404, true, noArgs},
-		{" !ping ping", 404, true, noArgs},
-		{"ping", 404, true, noArgs},
-		{"", 404, true, noArgs},
+			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}, ""},
+		{"!ping ping", 400, false, noArgs, ""},
+		{"!ping ping deadbeef", 200, true, noArgs, "deadbeef"},
+		{"!ping ping x=\"y\" z=w deadbeef", 200, true,
+			map[string]string{"x": "y", "z": "w"}, "deadbeef"},
+		{"!ping", 404, true, noArgs, ""},
+		{"!", 404, true, noArgs, ""},
+		{" !ping ping", 404, true, noArgs, ""},
+		{"ping", 404, true, noArgs, ""},
+		{"", 404, true, noArgs, ""},
 	} {
 		webhook := &operatorhipchat.Payload{
 			Event: "room_message",
@@ -205,6 +211,9 @@ func TestHandler(t *testing.T) {
 					t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
 				}
 			}
+		}
+		if tt.otp != "" && tOTP != tt.otp {
+			t.Errorf("message `%s` expected to have OTP `%s` got `%s`", tt.text, tt.otp, tOTP)
 		}
 	}
 }
