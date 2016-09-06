@@ -42,9 +42,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
-      "52.3.83.197/32",     # 2.git.dev.pardot.com
-      "173.192.141.222/32", # tools-s1 (password.pardot.com)
-      "67.228.6.68/32"      # auth-d1
+      "52.3.83.197/32"      # 2.git.dev.pardot.com
     ]
   }
   ingress {
@@ -62,9 +60,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
-      "52.3.83.197/32",     # 2.git.dev.pardot.com
-      "173.192.141.222/32", # tools-s1 (password.pardot.com)
-      "67.228.6.68/32"      # auth-d1
+      "52.3.83.197/32"      # 2.git.dev.pardot.com
     ]
   }
 
