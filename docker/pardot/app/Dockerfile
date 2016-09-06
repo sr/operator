@@ -33,12 +33,6 @@ RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-
 RUN mkdir -p /var/www && \
   curl -L https://${artifactory_host}/artifactory/pd-tarball/bamboo-elastic-instance/geoip.tgz | tar -xzv -C /var/www
 
-# TODO: Remove once https://git.dev.pardot.com/Pardot/pardot/pull/18174 is well circulated
-RUN mkdir -p /root/.ssh && \
-  touch /root/.ssh/known_hosts && \
-  chmod 0700 /root/.ssh && \
-  chmod 0600 /root/.ssh/known_hosts
-
 # Make room for demo fixtures
 RUN mkdir -p /opt/pardot
 
