@@ -37,8 +37,7 @@ func newHandler(
 	conn *grpc.ClientConn,
 	invoker Invoker,
 ) (*handler, error) {
-	// TODO(sr) Quote the prefix with regexp.QuoteMeta
-	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, prefix))
+	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +82,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.IsSpace(c)
 		}
 	})
+	var otp string
+	if len(words) != 0 && !strings.Contains(words[len(words)-1], "=") {
+		otp, words = words[len(words)-1], words[:len(words)-1]
+	}
 	for _, arg := range words {
 		parts := strings.Split(arg, "=")
 		if len(parts) != 2 {
@@ -97,8 +100,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Service: matches[1],
 			Method:  matches[2],
 		},
-		Source:    message.Source,
+		Otp:       otp,
 		ReplierId: replierID,
+		Source:    message.Source,
 	}
 	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
 		// TODO(sr) Log unauthorized error

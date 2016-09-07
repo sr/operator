@@ -2,11 +2,13 @@ package bread
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"net/url"
 
 	"golang.org/x/net/context"
 
+	"github.com/GeertJohan/yubigo"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 )
@@ -18,21 +20,75 @@ const (
 	LDAPBase    = "dc=pardot,dc=com"
 )
 
-var ACL = map[*operator.Call]string{
-	&operator.Call{
-		Service: "ping",
-		Method:  "ping",
-	}: "sysadmin",
-	&operator.Call{
-		Service: "ping",
-		Method:  "whoami",
-	}: "sysadmin",
+var ACL = []*ACLEntry{
+	{
+		Call: &operator.Call{
+			Service: "ping",
+			Method:  "ping",
+		},
+		Group: "sysadmin",
+		OTP:   false,
+	},
+	{
+		Call: &operator.Call{
+			Service: "ping",
+			Method:  "otp",
+		},
+		Group: "sysadmin",
+		OTP:   true,
+	},
+	{
+		Call: &operator.Call{
+			Service: "ping",
+			Method:  "whoami",
+		},
+		Group: "sysadmin",
+		OTP:   false,
+	},
+}
+
+type OTPVerifier interface {
+	Verify(otp string) error
+}
+
+type ACLEntry struct {
+	Call  *operator.Call
+	Group string
+	OTP   bool
 }
 
 type LDAPConfig struct {
 	Address    string
 	Encryption string
 	Base       string
+}
+
+type YubicoConfig struct {
+	ID  string
+	Key string
+}
+
+type yubicoVerifier struct {
+	yubico *yubigo.YubiAuth
+}
+
+func NewYubicoVerifier(config *YubicoConfig) (OTPVerifier, error) {
+	auth, err := yubigo.NewYubiAuth(config.ID, config.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &yubicoVerifier{auth}, nil
+}
+
+func (v *yubicoVerifier) Verify(otp string) error {
+	_, ok, err := v.yubico.Verify(otp)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("TODO")
+	}
+	return nil
 }
 
 func NewLogger() operator.Logger {
@@ -43,11 +99,11 @@ func NewHTTPLoggerHandler(l operator.Logger, h http.Handler) http.Handler {
 	return &wrapperHandler{l, h}
 }
 
-func NewLDAPAuthorizer(config *LDAPConfig) operator.Authorizer {
-	if config.Base == "" {
-		config.Base = LDAPBase
+func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer, error) {
+	if ldap.Base == "" {
+		ldap.Base = LDAPBase
 	}
-	return newLDAPAuthorizer(config, ACL)
+	return newAuthorizer(ldap, verifier, ACL)
 }
 
 func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {

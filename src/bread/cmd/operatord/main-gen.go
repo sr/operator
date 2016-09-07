@@ -37,6 +37,19 @@ func buildOperatorServer(replier operator.Replier, server *grpc.Server, flags *f
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 	if req.Call.Service == "ping" {
+		if req.Call.Method == "otp" {
+			client := ping.NewPingerClient(conn)
+			_, err := client.Otp(
+				ctx,
+				&ping.OtpRequest{
+					Request: req,
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
 		if req.Call.Method == "ping" {
 			client := ping.NewPingerClient(conn)
 			_, err := client.Ping(
