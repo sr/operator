@@ -11,7 +11,7 @@ func newInstrumenter(
 }
 
 func (i *instrumenter) Instrument(request *Request) {
-	if request.Call.Error != nil {
+	if request.Call.Error != "" {
 		i.logger.Error(request)
 	} else {
 		i.logger.Info(request)

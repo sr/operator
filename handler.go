@@ -118,7 +118,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		req.Call.Error = &Error{Message: err.Error()}
+		req.Call.Error = err.Error()
 	}
 	req.Call.Duration = ptypes.DurationProto(time.Since(start))
 	h.instrumenter.Instrument(req)
