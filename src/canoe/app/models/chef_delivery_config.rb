@@ -65,14 +65,8 @@ class ChefDeliveryConfig
     end
   end
 
-  class HipchatNotifier
-    def self.notify_room(room_id, message, color = nil)
-      Hipchat.notify_room(room_id, message, false, color)
-    end
-  end
-
   def notifier
-    @notifier ||= HipchatNotifier
+    @notifier ||= HipchatNotifier.new
   end
 
   private

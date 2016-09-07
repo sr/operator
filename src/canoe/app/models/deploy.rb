@@ -13,8 +13,11 @@ class Deploy < ApplicationRecord
   validate :options_are_valid
 
   after_commit on: :create do |deploy|
-    Hipchat.notify_deploy_start(deploy)
-    Hipchat.notify_untested_deploy(deploy) if deploy.deploy_target.production? && !deploy.passed_ci
+    next unless deploy.project.present?
+    deploy.project.deploy_notifications.each do |notification|
+      notification.notify_deploy_start(deploy)
+      notification.notify_untested_deploy(deploy) if deploy.deploy_target.production? && !deploy.passed_ci
+    end
   end
 
   scope :reverse_chronological, -> { order(created_at: :desc) }
@@ -75,12 +78,22 @@ class Deploy < ApplicationRecord
 
   def complete!
     update!(completed: true)
-    Hipchat.notify_deploy_complete(self)
+
+    if project.present?
+      project.deploy_notifications.each do |notification|
+        notification.notify_deploy_complete(self)
+      end
+    end
   end
 
   def cancel!
     update!(canceled: true, completed: true)
-    Hipchat.notify_deploy_cancelled(self)
+
+    if project.present?
+      project.deploy_notifications.each do |notification|
+        notification.notify_deploy_cancelled(self)
+      end
+    end
   end
 
   # TODO: Replace the project_name column with project_id
