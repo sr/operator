@@ -37,11 +37,11 @@ module Pardot
       end
 
       def remove_topology(topo)
-        ShellHelper.sudo_execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME.to_s], "storm", err: [:child, :out])
+        ShellHelper.execute([STORM_BIN, "kill", topo_name(topo), "-w", PROC_KILL_WAIT_TIME.to_s], err: [:child, :out])
       end
 
       def active?(topo)
-        list = ShellHelper.sudo_execute([STORM_BIN, "list"], "storm")
+        list = ShellHelper.execute([STORM_BIN, "list"])
         topo_active = list.each_line.select { |_line| /#{Regexp.escape(topo_name(topo))}\s+ACTIVE/ }.any?
         Logger.log(:info, "Topology #{topo_name(topo)}: active? == #{topo_active}")
 
@@ -50,7 +50,7 @@ module Pardot
 
       def add_topology(topo, topo_env, jar)
         add_topo_command = [STORM_BIN, "jar", "-c", "env=#{topo_env}", jar, "com.pardot.storm.topology.TopologyRunner", "--topo-def=#{topo_class(topo)}", "--name=#{topo_name(topo)}", "--remote"]
-        add_topo_output = ShellHelper.sudo_execute(add_topo_command, "storm", err: [:child, :out])
+        add_topo_output = ShellHelper.execute(add_topo_command, err: [:child, :out])
         Logger.log(:info, "Topology Deploy Routine Command:\n#{add_topo_command}\n")
         Logger.log(:info, "Topology Deploy Routine Output:\n#{add_topo_output}\n")
       end
