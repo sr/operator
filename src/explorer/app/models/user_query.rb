@@ -2,6 +2,7 @@ class UserQuery < ApplicationRecord
   DEFAULT_LIMIT = 10
 
   belongs_to :user
+  attr_accessor :show_all_rows
 
   class RateLimited < StandardError
     def initialize(user)
@@ -19,13 +20,13 @@ class UserQuery < ApplicationRecord
   # Returns a Mysql2::Result with the result of executing the query against the
   # appropriate database. Execution is accounted against the given user's rate
   # limit and the query is written to an audit log.
-  def execute(current_user, options = {})
+  def execute(current_user)
     if current_user.rate_limit.at_limit?
       raise UserQuery::RateLimited, current_user
     end
 
     results = Instrumentation.context(user_email: current_user.email) do
-      database.execute(parsed(options[:show_all_rows]).sql)
+      database.execute(parsed.sql)
     end
     current_user.rate_limit.record_transaction
     results
@@ -52,7 +53,7 @@ class UserQuery < ApplicationRecord
 
   # Returns the parsed SQL query with the account_id condition added if this
   # is an account-specific account and with a LIMIT clause added.
-  def parsed(show_all_rows = false)
+  def parsed
     sql_query = SQLQuery.parse(raw_sql)
 
     unless show_all_rows

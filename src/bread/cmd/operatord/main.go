@@ -23,7 +23,8 @@ type config struct {
 	grpcAddr string
 	httpAddr string
 
-	ldap *bread.LDAPConfig
+	ldap   *bread.LDAPConfig
+	yubico *bread.YubicoConfig
 
 	databaseURL string
 	prefix      string
@@ -34,7 +35,10 @@ type config struct {
 }
 
 func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
-	config := &config{ldap: &bread.LDAPConfig{}}
+	config := &config{
+		ldap:   &bread.LDAPConfig{},
+		yubico: &bread.YubicoConfig{},
+	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
@@ -45,6 +49,8 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
+	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
+	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -77,6 +83,12 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	if config.hipchatWebhookURL == "" {
 		return fmt.Errorf("required flag missing: hipchat-webhook-url")
+	}
+	if config.yubico.ID == "" {
+		return fmt.Errorf("required flag missing: yubico-api-id")
+	}
+	if config.yubico.Key == "" {
+		return fmt.Errorf("required flag missing: yubico-api-key")
 	}
 	db, err := sql.Open("mysql", config.databaseURL)
 	if err != nil {
@@ -124,10 +136,18 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if err != nil {
 		return err
 	}
+	var verifier bread.OTPVerifier
+	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
+		return err
+	}
+	var authorizer operator.Authorizer
+	if authorizer, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
+		return err
+	}
 	if webhookHandler, err = operator.NewHandler(
 		logger,
 		operator.NewInstrumenter(logger),
-		bread.NewLDAPAuthorizer(config.ldap),
+		authorizer,
 		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,
 		conn,

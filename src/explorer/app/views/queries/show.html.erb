@@ -39,4 +39,4 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
   </table>
 </div>
 <%# Only enabling this for shards right now. Will see what the query usage is on global before enabling %>
-<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !@show_all_rows %>
+<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !query.show_all_rows %>

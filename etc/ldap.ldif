@@ -6338,6 +6338,7 @@ structuralObjectClass: inetOrgPerson
 uid: simon.rozet
 uidNumber: 687
 userPassword: password
+yubiKeyId: ccccccdluefe
 
 dn: cn=qagroup,ou=Group,dc=pardot,dc=com
 cn: qagroup
