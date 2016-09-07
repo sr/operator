@@ -6,7 +6,6 @@ package protolog
 import (
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 	"time"
 
@@ -41,11 +40,6 @@ var (
 	DiscardPusher = discardPusherInstance
 	// DiscardLogger is a Logger that discards all logs.
 	DiscardLogger = NewLogger(DiscardPusher)
-
-	// DefaultPusher is the default Pusher.
-	DefaultPusher = NewTextWritePusher(os.Stderr)
-	// DefaultLogger is the default Logger.
-	DefaultLogger = NewLogger(DefaultPusher)
 
 	levelToName = map[Level]string{
 		LevelDebug: "DEBUG",

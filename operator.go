@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -80,8 +82,10 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
+// NewLogger returns a logger that writes protobuf messages marshalled as JSON
+// objects to stderr.
 func NewLogger() Logger {
-	return newLogger()
+	return protolog.NewLogger(protolog.NewTextWritePusher(os.Stderr))
 }
 
 func NewInstrumenter(logger Logger) Instrumenter {
