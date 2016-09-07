@@ -112,14 +112,9 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	for svc, err := range services {
 		if err != nil {
-			logger.Error(
-				&operator.ServiceStartupError{
-					Service: &operator.Service{Name: svc},
-					Message: err.Error(),
-				},
-			)
+			logger.Error(&operator.ServiceStartupError{Service: svc, Error: err.Error()})
 		} else {
-			msg.Services = append(msg.Services, &operator.Service{Name: svc})
+			msg.Services = append(msg.Services, svc)
 		}
 	}
 	errC := make(chan error)

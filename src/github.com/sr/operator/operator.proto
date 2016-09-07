@@ -23,12 +23,8 @@ message Response {
 message Call {
 	string service = 1;
 	string method = 2;
-	Error error = 5;
-	google.protobuf.Duration duration = 6;
-}
-
-message Error {
-	string message = 1;
+	string error = 3;
+	google.protobuf.Duration duration = 4;
 }
 
 message Source {
@@ -55,31 +51,15 @@ message User {
 	string email = 4;
 }
 
-message Output {
-	string PlainText = 1;
-}
-
 message ServerStartupNotice {
 	string Address = 1;
 	string Protocol = 2;
-	repeated Service services = 3;
-}
-
-message Service {
-	string name = 1;
-}
-
-message ServerStartupError {
-	string message = 1;
-}
-
-message ServiceRegistered {
-	Service service = 1;
+	repeated string services = 3;
 }
 
 message ServiceStartupError {
-	Service service = 1;
-	string message = 2;
+	string service = 1;
+	string error = 2;
 }
 
 extend google.protobuf.ServiceOptions {
