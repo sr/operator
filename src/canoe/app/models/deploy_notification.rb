@@ -1,5 +1,11 @@
 class DeployNotification < ApplicationRecord
+  PRODUCTION_COLOR = "purple".freeze
+  NON_PRODUCTION_COLOR = "gray".freeze
+
   belongs_to :project
+
+  # For injecting a fake during test
+  attr_writer :notifier
 
   def notify_deploy_start(deploy)
     server_count = deploy.all_servers.size
@@ -19,25 +25,48 @@ class DeployNotification < ApplicationRecord
       "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" \
       "</a>" if previous_deploy
 
-    Hipchat.notify_room(hipchat_room_id, msg, deploy.deploy_target.production?)
+    notifier.notify_room(
+      hipchat_room_id,
+      msg,
+      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+    )
   end
 
   def notify_deploy_complete(deploy)
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} " \
       "just finished syncing #{deploy.project_name.capitalize} to #{build_link(deploy)}"
-    Hipchat.notify_room(hipchat_room_id, msg, deploy.deploy_target.production?)
+
+    notifier.notify_room(
+      hipchat_room_id,
+      msg,
+      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+    )
   end
 
   def notify_deploy_cancelled(deploy)
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just " \
       "CANCELLED syncing #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
-    Hipchat.notify_room(hipchat_room_id, msg, deploy.deploy_target.production?)
+
+    notifier.notify_room(
+      hipchat_room_id,
+      msg,
+      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+    )
   end
 
   def notify_untested_deploy(deploy)
     msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " \
       "an UNTESTED deploy of #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
-    Hipchat.notify_room(hipchat_room_id, msg, deploy.deploy_target.production?, "red")
+
+    notifier.notify_room(
+      hipchat_room_id,
+      msg,
+      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+    )
+  end
+
+  def notifier
+    @notifier ||= HipchatNotifier.new
   end
 
   private

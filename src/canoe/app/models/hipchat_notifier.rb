@@ -1,19 +1,16 @@
 require "uri"
 require "net/http"
 
-class Hipchat
-  def self.notify_room(room, msg, production, color = nil)
+class HipchatNotifier
+  def notify_room(room_id, msg, opts = {})
     hipchat_host = "hipchat.dev.pardot.com"
     uri = URI.parse("https://#{hipchat_host}/v1/rooms/message")
 
-    unless %w[yellow red green purple gray].include?(color)
-      color = (production ? "purple" : "gray")
-    end
-
+    color = opts.fetch(:color, "purple")
     body = {
       format: "json",
       auth_token: ENV["HIPCHAT_AUTH_TOKEN"],
-      room_id: room,
+      room_id: room_id,
       from: "Canoe",
       color: color,
       message_format: "html",
@@ -31,6 +28,6 @@ class Hipchat
       http.request(request)
     end
 
-    Instrumentation.log(at: "hipchat", room: room, msg: msg)
+    Instrumentation.log(at: "hipchat", room_id: room_id, msg: msg)
   end
 end
