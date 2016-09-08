@@ -88,6 +88,7 @@ namespace :canoe do
       project.repository = "Pardot/internal-api"
     }.tap(&:save!)
     intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
+    intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
     blue_mesh = Project.find_or_initialize_by(name: "blue-mesh").tap { |project|
       project.icon = "th"
