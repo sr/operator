@@ -5,14 +5,11 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 
 	"golang.org/x/net/context"
 
 	"google.golang.org/grpc"
-
-	"github.com/golang/protobuf/ptypes"
 )
 
 const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
@@ -20,7 +17,6 @@ const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options
 type handler struct {
 	ctx          context.Context
 	instrumenter Instrumenter
-	authorizer   Authorizer
 	decoder      Decoder
 	re           *regexp.Regexp
 	conn         *grpc.ClientConn
@@ -29,7 +25,6 @@ type handler struct {
 
 func newHandler(
 	instrumenter Instrumenter,
-	authorizer Authorizer,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
@@ -42,7 +37,6 @@ func newHandler(
 	return &handler{
 		context.Background(),
 		instrumenter,
-		authorizer,
 		decoder,
 		re,
 		conn,
@@ -101,22 +95,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ReplierId: replierID,
 		Source:    message.Source,
 	}
-	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
-		// TODO(sr) Log unauthorized error
-		fmt.Printf("DEBUG authorize error: %s\n", err)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	start := time.Now()
-	ok, err := h.invoker(h.ctx, h.conn, req, args)
+	// TODO(sr) Log the error still
+	ok, _ := h.invoker(h.ctx, h.conn, req, args)
 	if !ok {
 		// TODO(sr) Log unhandled message
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	if err != nil {
-		req.Call.Error = err.Error()
-	}
-	req.Call.Duration = ptypes.DurationProto(time.Since(start))
-	h.instrumenter.Instrument(req)
 }
