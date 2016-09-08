@@ -18,6 +18,8 @@ images:
     build: ruby/2.3.0
   docker.dev.pardot.com/base/ssh-forwarder:
     build: ssh-forwarder
+  docker.dev.pardot.com/base/chefdk:0.17.17:
+    build: chefdk/0.17.17
 
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
