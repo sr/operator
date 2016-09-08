@@ -5,6 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -76,7 +80,6 @@ func NewCommand(name string, services []ServiceCommand) Command {
 
 func NewHandler(
 	instrumenter Instrumenter,
-	authorizer Authorizer,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
@@ -84,12 +87,47 @@ func NewHandler(
 ) (http.Handler, error) {
 	return newHandler(
 		instrumenter,
-		authorizer,
 		decoder,
 		prefix,
 		conn,
 		invoker,
 	)
+}
+
+func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		in interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		requester, ok := in.(interface {
+			GetRequest() *Request
+		})
+		req := requester.GetRequest()
+		if !ok || req == nil {
+			return nil, ErrInvalidRequest
+		}
+		s := strings.Split(info.FullMethod, "/")
+		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
+			return nil, ErrInvalidRequest
+		}
+		req.Call = &Call{
+			Service: strings.ToLower(s[1]),
+			Method:  strings.ToLower(s[2]),
+		}
+		if err := auth.Authorize(ctx, req); err != nil {
+			return nil, err
+		}
+		start := time.Now()
+		resp, err := handler(ctx, in)
+		if err != nil {
+			req.Call.Error = err.Error()
+		}
+		req.Call.Duration = ptypes.DurationProto(time.Since(start))
+		inst.Instrument(req)
+		return resp, err
+	}
 }
 
 func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {

@@ -100,12 +100,22 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	var logger protolog.Logger
 	logger = bread.NewLogger()
+	var inst operator.Instrumenter
+	inst = bread.NewInstrumenter(logger)
 	var store operatorhipchat.ClientCredentialsStore
 	store = bread.NewHipchatCredsStore(db)
 	var replier operator.Replier
 	replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
+	var verifier bread.OTPVerifier
+	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
+		return err
+	}
+	var authorizer operator.Authorizer
+	if authorizer, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
+		return err
+	}
 	var grpcServer *grpc.Server
-	grpcServer = grpc.NewServer()
+	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryInterceptor(authorizer, inst)))
 	msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 	services, err := builder(replier, grpcServer, flags)
 	if err != nil {
@@ -132,17 +142,8 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if err != nil {
 		return err
 	}
-	var verifier bread.OTPVerifier
-	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
-		return err
-	}
-	var authorizer operator.Authorizer
-	if authorizer, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
-		return err
-	}
 	if webhookHandler, err = operator.NewHandler(
-		bread.NewInstrumenter(logger),
-		authorizer,
+		inst,
 		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,
 		conn,

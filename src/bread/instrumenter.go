@@ -14,5 +14,7 @@ func newInstrumenter(logger protolog.Logger) *instrumenter {
 }
 
 func (i *instrumenter) Instrument(req *operator.Request) {
+	req.Otp = ""
+	req.ReplierId = ""
 	i.logger.Info(req)
 }
