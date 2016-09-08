@@ -28,3 +28,14 @@ message HTTPRequest {
   google.protobuf.Duration duration = 8;
   string error = 9;
 }
+
+message ServerStartupNotice {
+	string Address = 1;
+	string Protocol = 2;
+	repeated string services = 3;
+}
+
+message ServiceStartupError {
+	string service = 1;
+	string error = 2;
+}

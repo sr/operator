@@ -116,7 +116,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	var grpcServer *grpc.Server
 	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryInterceptor(authorizer, inst)))
-	msg := &operator.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
+	msg := &bread.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 	services, err := builder(replier, grpcServer, flags)
 	if err != nil {
 		return err
@@ -187,7 +187,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			webhookHandler,
 		),
 	)
-	logger.Info(&operator.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+	logger.Info(&bread.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
 	go func() {
 		errC <- http.ListenAndServe(config.httpAddr, httpServer)
 	}()
