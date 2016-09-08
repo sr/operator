@@ -15,6 +15,7 @@ import (
 
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
+	"github.com/sr/operator/protolog"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -97,7 +98,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if err := db.Ping(); err != nil {
 		return err
 	}
-	var logger operator.Logger
+	var logger protolog.Logger
 	logger = bread.NewLogger()
 	var store operatorhipchat.ClientCredentialsStore
 	store = bread.NewHipchatCredsStore(db)
@@ -140,8 +141,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		return err
 	}
 	if webhookHandler, err = operator.NewHandler(
-		logger,
-		operator.NewInstrumenter(logger),
+		bread.NewInstrumenter(logger),
 		authorizer,
 		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,

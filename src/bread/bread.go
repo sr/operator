@@ -5,12 +5,14 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"os"
 
 	"golang.org/x/net/context"
 
 	"github.com/GeertJohan/yubigo"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
+	"github.com/sr/operator/protolog"
 )
 
 const (
@@ -91,11 +93,18 @@ func (v *yubicoVerifier) Verify(otp string) error {
 	return nil
 }
 
-func NewLogger() operator.Logger {
-	return operator.NewLogger()
+// NewLogger returns a logger that writes protobuf messages marshalled as JSON
+// objects to stderr.
+func NewLogger() protolog.Logger {
+	return protolog.NewLogger(protolog.NewTextWritePusher(os.Stderr))
 }
 
-func NewHTTPLoggerHandler(l operator.Logger, h http.Handler) http.Handler {
+// NewInstrumenter returns an operator.Instrumenter that logs all requests.
+func NewInstrumenter(logger protolog.Logger) operator.Instrumenter {
+	return newInstrumenter(logger)
+}
+
+func NewHTTPLoggerHandler(l protolog.Logger, h http.Handler) http.Handler {
 	return &wrapperHandler{l, h}
 }
 

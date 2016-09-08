@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/sr/operator"
+	"github.com/sr/operator/protolog"
 )
 
 type wrapperHandler struct {
-	logger  operator.Logger
+	logger  protolog.Logger
 	handler http.Handler
 }
 
