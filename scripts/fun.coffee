@@ -96,6 +96,7 @@
 #   hubot trolledum8 - rekt
 #   hubot rekt - trolledum8
 #   hubot gus - Rage GUS!
+#   hubot lightning - Rage Lightning!
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -174,7 +175,7 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/5/kF39KN4eqcehAW9/master_open_1.jpg",
       "https://hipchat.dev.pardot.com/files/1/5/b8dAgHlHnapHPdy/master_open_3.jpg"
     ]
-    msg.send msg.random opens 
+    msg.send msg.random opens
 
   robot.respond /capital(\s)?idea$/i, (msg) ->
     msg.send "http://i.imgur.com/8aVB7x0.png"
@@ -553,9 +554,9 @@ module.exports = (robot) ->
           response = if payload.message then payload.message else "It probably won't happen again (shrug)"
           if target
             rand = Math.floor(Math.random() * 3)
-            if rand is 0 
+            if rand is 0
               msg.send "I recall #{target} saying, \"#{response}\""
-            else if rand is 1              
+            else if rand is 1
               msg.send "To quote #{target} precisely:"
               msg.send "/quote #{response}"
             else if rand is 2
@@ -602,7 +603,7 @@ module.exports = (robot) ->
     css = [
       'http://i.imgur.com/lLhBzQ3.jpg'
     ]
-    msg.send msg.random css 
+    msg.send msg.random css
 
 
   robot.respond /chikin$/i, (msg) ->
@@ -767,7 +768,7 @@ module.exports = (robot) ->
     ]
     msg.send msg.random TLDRS
 
-  robot.respond /sysadmin$/i, (msg) -> 
+  robot.respond /sysadmin$/i, (msg) ->
     sysadmins=[
       'http://i.imgur.com/V5FpuGB.jpg',
       'http://i.imgur.com/7zkAZld.jpg',
@@ -909,10 +910,13 @@ module.exports = (robot) ->
     gifMe msg, msg.match[1], (url) ->
       msg.send "#{url}"
 
+  robot.respond /lightning$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/252/cWFbm8VYCnHmmaN/Rage_Lightning.jpg"
+
   gifMe = (msg, query, cb) ->
     googleCseId = process.env.HUBOT_GOOGLE_CSE_ID
     googleApiKey = process.env.HUBOT_GOOGLE_API_KEY
- 
+
     sites = [
       "site:i.imgur.com",
       "site:reactiongifs.com",
