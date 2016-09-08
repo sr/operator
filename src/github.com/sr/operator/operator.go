@@ -23,7 +23,7 @@ type Authorizer interface {
 }
 
 type Instrumenter interface {
-	Instrument(*Request)
+	Instrument(*Event)
 }
 
 type Requester interface {
@@ -41,6 +41,14 @@ type Replier interface {
 type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
 
 type ServerBuilder func(Replier, *grpc.Server, *flag.FlagSet) (map[string]error, error)
+
+type Event struct {
+	Key     string
+	Message *Message
+	Request *Request
+	Args    map[string]string
+	Error   error
+}
 
 type Message struct {
 	Source  *Source
@@ -125,7 +133,7 @@ func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInt
 			req.Call.Error = err.Error()
 		}
 		req.Call.Duration = ptypes.DurationProto(time.Since(start))
-		inst.Instrument(req)
+		inst.Instrument(&Event{Key: "interceptor_request", Request: req, Error: err})
 		return resp, err
 	}
 }

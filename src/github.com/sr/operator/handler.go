@@ -15,16 +15,16 @@ import (
 const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
-	ctx          context.Context
-	instrumenter Instrumenter
-	decoder      Decoder
-	re           *regexp.Regexp
-	conn         *grpc.ClientConn
-	invoker      Invoker
+	ctx     context.Context
+	inst    Instrumenter
+	decoder Decoder
+	re      *regexp.Regexp
+	conn    *grpc.ClientConn
+	invoker Invoker
 }
 
 func newHandler(
-	instrumenter Instrumenter,
+	inst Instrumenter,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
@@ -36,7 +36,7 @@ func newHandler(
 	}
 	return &handler{
 		context.Background(),
-		instrumenter,
+		inst,
 		decoder,
 		re,
 		conn,
@@ -45,15 +45,15 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, replierID, err := h.decoder.Decode(h.ctx, r)
+	msg, replierID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
-		// TODO(sr) Log decoding error
+		h.inst.Instrument(&Event{Key: "handler_decode_error", Error: err})
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Printf("DEBUG decode error: %s\n", err)
 		return
 	}
-	matches := h.re.FindStringSubmatch(message.Text)
+	matches := h.re.FindStringSubmatch(msg.Text)
 	if matches == nil {
+		h.inst.Instrument(&Event{Key: "handler_ignored_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -93,12 +93,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		},
 		Otp:       otp,
 		ReplierId: replierID,
-		Source:    message.Source,
+		Source:    msg.Source,
 	}
-	// TODO(sr) Log the error still
-	ok, _ := h.invoker(h.ctx, h.conn, req, args)
+	ok, err := h.invoker(h.ctx, h.conn, req, args)
 	if !ok {
-		// TODO(sr) Log unhandled message
+		h.inst.Instrument(&Event{
+			Key:     "handler_unhandled_message",
+			Message: msg,
+			Request: req,
+			Args:    args,
+			Error:   err,
+		})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

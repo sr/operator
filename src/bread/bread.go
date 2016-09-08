@@ -25,7 +25,8 @@ const (
 var ACL = []*ACLEntry{
 	{
 		Call: &operator.Call{
-			Service: "ping",
+			// TODO(sr) Add Package field to operator.Call struct
+			Service: "ping.pinger",
 			Method:  "ping",
 		},
 		Group: "sysadmin",
@@ -33,7 +34,7 @@ var ACL = []*ACLEntry{
 	},
 	{
 		Call: &operator.Call{
-			Service: "ping",
+			Service: "ping.pinger",
 			Method:  "otp",
 		},
 		Group: "sysadmin",
@@ -41,7 +42,7 @@ var ACL = []*ACLEntry{
 	},
 	{
 		Call: &operator.Call{
-			Service: "ping",
+			Service: "ping.pinger",
 			Method:  "whoami",
 		},
 		Group: "sysadmin",
