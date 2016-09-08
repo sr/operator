@@ -105,8 +105,9 @@ func NewInstrumenter(logger protolog.Logger) operator.Instrumenter {
 	return newInstrumenter(logger)
 }
 
-func NewHTTPLoggerHandler(l protolog.Logger, h http.Handler) http.Handler {
-	return &wrapperHandler{l, h}
+// NewHandler returns an http.Handler that logs all requests.
+func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
+	return &wrapperHandler{logger, handler}
 }
 
 func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer, error) {

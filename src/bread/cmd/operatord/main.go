@@ -154,10 +154,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	httpServer := http.NewServeMux()
 	httpServer.Handle(
 		"/_ping",
-		bread.NewHTTPLoggerHandler(
-			logger,
-			bread.NewPingHandler(db),
-		),
+		bread.NewHandler(logger, bread.NewPingHandler(db)),
 	)
 	addonURL, err := url.Parse(config.hipchatAddonURL)
 	if err != nil {
@@ -169,7 +166,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	}
 	httpServer.Handle(
 		"/hipchat/addon",
-		bread.NewHTTPLoggerHandler(
+		bread.NewHandler(
 			logger,
 			bread.NewHipchatAddonHandler(
 				config.prefix,
@@ -180,13 +177,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 			),
 		),
 	)
-	httpServer.Handle(
-		"/hipchat/webhook",
-		bread.NewHTTPLoggerHandler(
-			logger,
-			webhookHandler,
-		),
-	)
+	httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
 	logger.Info(&bread.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
 	go func() {
 		errC <- http.ListenAndServe(config.httpAddr, httpServer)
