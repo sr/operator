@@ -5,10 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -23,11 +20,6 @@ type Authorizer interface {
 
 type Instrumenter interface {
 	Instrument(*Request)
-}
-
-type Logger interface {
-	Info(proto.Message)
-	Error(proto.Message)
 }
 
 type Requester interface {
@@ -82,18 +74,7 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
-// NewLogger returns a logger that writes protobuf messages marshalled as JSON
-// objects to stderr.
-func NewLogger() Logger {
-	return protolog.NewLogger(protolog.NewTextWritePusher(os.Stderr))
-}
-
-func NewInstrumenter(logger Logger) Instrumenter {
-	return newInstrumenter(logger)
-}
-
 func NewHandler(
-	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
 	decoder Decoder,
@@ -102,7 +83,6 @@ func NewHandler(
 	invoker Invoker,
 ) (http.Handler, error) {
 	return newHandler(
-		logger,
 		instrumenter,
 		authorizer,
 		decoder,

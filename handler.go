@@ -19,7 +19,6 @@ const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options
 
 type handler struct {
 	ctx          context.Context
-	logger       Logger
 	instrumenter Instrumenter
 	authorizer   Authorizer
 	decoder      Decoder
@@ -29,7 +28,6 @@ type handler struct {
 }
 
 func newHandler(
-	logger Logger,
 	instrumenter Instrumenter,
 	authorizer Authorizer,
 	decoder Decoder,
@@ -43,7 +41,6 @@ func newHandler(
 	}
 	return &handler{
 		context.Background(),
-		logger,
 		instrumenter,
 		authorizer,
 		decoder,
