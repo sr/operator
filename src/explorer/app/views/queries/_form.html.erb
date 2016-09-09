@@ -15,7 +15,7 @@
     <button type="button" class="btn btn-default<%= active?(current_view, ui_view) %>" data-val="<%= ui_view %>">Pretty UI View</button>
   </div>
   <div class="viewoption" <%= active?(current_view, ui_view, 'style="display:none;"') %>>
-    <%= text_area_tag(:sql, query.parsed.sql, rows: 10, cols: 80) %>
+    <%= text_area_tag(:sql, query.raw_sql, rows: 10, cols: 80) %>
     <%= submit_tag "Run Query" %>
   </div>
 
@@ -30,15 +30,12 @@
   </div>
 <% end %>
 
-<!-- TODO(sr) Bring this back -->
-<% if false %>
-  <div id="error_explanation">
-    <h2><%= pluralize(query.errors.count, "error") %> prohibited this query from being executed:</h2>
+<div id="error_explanation" class="bg-danger well-sm">
+  <h4><%= pluralize(query.errors.count, "error") %> prohibited this query from being executed:</h4>
 
-    <ul>
-    <% query.errors.full_messages.each do |message| %>
-      <li><%= message %></li>
-    <% end %>
-    </ul>
-  </div>
-<% end %>
+  <ul>
+  <% query.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+  <% end %>
+  </ul>
+</div>

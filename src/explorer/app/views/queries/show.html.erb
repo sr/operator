@@ -10,9 +10,7 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
 <%= distance_of_time_in_words(rate_limit.resets_in) %> before refreshing.
 </p>
 <%- end %>
-<p>
-<pre><%= query.parsed.sql %></pre>
-</p>
+<label id="parsed_label">Parsed Query</label><pre id="parsed_sql"><%= query.parsed.to_sql %></pre>
 <div>
   <table class="table table-striped">
     <thead>
@@ -39,4 +37,4 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
   </table>
 </div>
 <%# Only enabling this for shards right now. Will see what the query usage is on global before enabling %>
-<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !query.show_all_rows %>
+<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !@show_all_rows %>
