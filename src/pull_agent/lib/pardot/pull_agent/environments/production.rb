@@ -42,6 +42,8 @@ module Pardot
 
         after_deploy :link_correct_inventory, only: :ansible
 
+        after_deploy :deploy_topology, only: :'engagement-history-topology'
+
         def short_name
           "prod"
         end

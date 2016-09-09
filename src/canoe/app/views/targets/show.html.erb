@@ -35,7 +35,7 @@
           <%= link_to "All Deploys", target_project_deploys_path(current_target, project), class: "btn btn-xs btn-primary" %>
         </td>
 
-        <td><%= link_to project.name, project_branch_builds_path(project, "master") %></td>
+        <td><%= link_to project.titleized_name, project_branch_builds_path(project, "master") %></td>
 
         <td>
           <%- if deploy = current_target.last_deploy_for(project.name) %>

@@ -51,8 +51,8 @@ module Pardot
       def add_topology(topo, topo_env, jar)
         add_topo_command = [STORM_BIN, "jar", "-c", "env=#{topo_env}", jar, "com.pardot.storm.topology.TopologyRunner", "--topo-def=#{topo_class(topo)}", "--name=#{topo_name(topo)}", "--remote"]
         add_topo_output = ShellHelper.execute(add_topo_command, err: [:child, :out])
-        Logger.log(:info, "Topology Deploy Routine Command:\n#{add_topo_command}\n")
-        Logger.log(:info, "Topology Deploy Routine Output:\n#{add_topo_output}\n")
+        Logger.log(:info, "Topology Deploy Routine Command: #{add_topo_command.inspect}")
+        Logger.log(:info, "Topology Deploy Routine Output: #{add_topo_output.gsub(/^/, "  ")}")
       end
     end
   end

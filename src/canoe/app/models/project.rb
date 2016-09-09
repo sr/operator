@@ -19,6 +19,10 @@ class Project < ApplicationRecord
     end
   end
 
+  def titleized_name
+    @friendly_name ||= name.titleize
+  end
+
   def to_param
     name
   end
