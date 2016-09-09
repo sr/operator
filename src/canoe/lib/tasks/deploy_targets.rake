@@ -5,91 +5,114 @@ namespace :canoe do
   task create_projects: :environment do
     next if Rails.env.test?
 
-    Project.find_or_initialize_by(name: "explorer").tap { |project|
+    BREAD_HIPCHAT_ROOM_ID = 42
+    ENGR_HIPCHAT_ROOM_ID = 2
+    OPS_HIPCHAT_ROOM_ID = 6
+    ES_ONCALL_HIPCHAT_ROOM_ID = 901
+    SUPPORT_HIPCHAT_ROOM_ID = 28
+    TEAM_CAERUS_HIPCHAT_ROOM_ID = 437
+
+    explorer = Project.find_or_initialize_by(name: "explorer").tap { |project|
       project.icon = "search"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "BREAD"
       project.bamboo_job = "EX"
       project.repository = "Pardot/bread"
-    }.save!
+      project.save!
+    }.tap(&:save!)
+    explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "pardot").tap { |project|
+    pardot = Project.find_or_initialize_by(name: "pardot").tap { |project|
       project.icon = "cloud"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PPANT"
       project.repository = "Pardot/pardot"
-    }.save!
+    }.tap(&:save!)
+    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "pithumbs").tap { |project|
+    pithumbs = Project.find_or_initialize_by(name: "pithumbs").tap { |project|
       project.icon = "thumbs-up"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PTHMBS"
       project.repository = "Pardot/pithumbs"
-    }.save!
+    }.tap(&:save!)
+    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "realtime-frontend").tap { |project|
+    rtf = Project.find_or_initialize_by(name: "realtime-frontend").tap { |project|
       project.icon = "bullhorn"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "RTF"
       project.repository = "Pardot/realtime-frontend"
-    }.save!
+    }.tap(&:save!)
+    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
+    rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "workflow-stats").tap { |project|
+    wfst = Project.find_or_initialize_by(name: "workflow-stats").tap { |project|
       project.icon = "fighter-jet"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "WFST"
       project.repository = "Pardot/workflow-stats"
-    }.save!
+    }.tap(&:save!)
+    wfst.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "murdoc").tap { |project|
+    murdoc = Project.find_or_initialize_by(name: "murdoc").tap { |project|
       project.icon = "bolt"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "MDOC"
       project.repository = "Pardot/murdoc"
       project.all_servers_default = false
-    }.save!
+    }.tap(&:save!)
+    murdoc.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
 
     Project.find_or_initialize_by(name: "chef").tap { |project|
       project.icon = "food"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "CHEF"
       project.repository = "Pardot/chef"
-    }.save!
+    }.tap(&:save!)
 
-    Project.find_or_initialize_by(name: "repfix").tap { |project|
+    repfix = Project.find_or_initialize_by(name: "repfix").tap { |project|
       project.icon = "wrench"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "REPFIX"
       project.repository = "Pardot/repfix"
-    }.save!
+    }.tap(&:save!)
+    repfix.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "internal-api").tap { |project|
+    intapi = Project.find_or_initialize_by(name: "internal-api").tap { |project|
       project.icon = "building"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "INTAPI"
       project.repository = "Pardot/internal-api"
-    }.save!
+    }.tap(&:save!)
+    intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
+    intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "blue-mesh").tap { |project|
+    blue_mesh = Project.find_or_initialize_by(name: "blue-mesh").tap { |project|
       project.icon = "th"
       project.bamboo_project = "PDT"
       project.bamboo_plan = "BLUMSH"
       project.repository = "Pardot/blue-mesh"
-    }.save!
+    }.tap(&:save!)
+    blue_mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "mesh").tap { |project|
+    mesh = Project.find_or_initialize_by(name: "mesh").tap { |project|
       project.icon = "th-large"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "MESH"
       project.repository = "Pardot/mesh"
-    }.save!
+    }.tap(&:save!)
+    mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
-    Project.find_or_initialize_by(name: "ansible").tap { |project|
+    ansible = Project.find_or_initialize_by(name: "ansible").tap { |project|
       project.icon = "signal"
       project.bamboo_project = "SRE"
       project.bamboo_plan = "ANSBL"
       project.repository = "Pardot/ansible"
-    }.save!
+    }.tap(&:save!)
+    ansible.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
   end
 
   desc "Create targets for deployment"
@@ -98,25 +121,25 @@ namespace :canoe do
 
     case Rails.env
     when "development"
-      DeployTarget.find_or_initialize_by(name: "test").save!
+      DeployTarget.find_or_initialize_by(name: "test").tap(&:save!)
       DeployScenario.find_or_create_by(
         project: Project.find_or_create_by(name: "pardot"),
         server: Server.find_or_create_by(hostname: "local-1"),
         deploy_target: DeployTarget.find_or_create_by(name: "dev")
       )
     when "production"
-      DeployTarget.find_or_initialize_by(name: "staging").save!
+      DeployTarget.find_or_initialize_by(name: "staging").tap(&:save!)
       DeployTarget.find_or_initialize_by(name: "production").tap { |target|
         target.production = true
-      }.save!
+      }.tap(&:save!)
       DeployTarget.find_or_initialize_by(name: "production_dfw").tap { |target|
         target.production = true
         target.enabled = false
-      }.save!
+      }.tap(&:save!)
       DeployTarget.find_or_initialize_by(name: "production_phx").tap { |target|
         target.production = true
         target.enabled = false
-      }.save!
+      }.tap(&:save!)
     end
   end
 
@@ -134,7 +157,7 @@ namespace :canoe do
           DeployACLEntry.find_or_initialize_by(project_id: project.id, deploy_target_id: target.id).tap { |entry|
             entry.acl_type = "ldap_group"
             entry.value = ["releasebox"]
-          }.save!
+          }.tap(&:save!)
         end
       end
     end

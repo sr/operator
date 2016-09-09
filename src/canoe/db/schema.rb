@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160727183818) do
+ActiveRecord::Schema.define(version: 20160906201125) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -44,6 +44,14 @@ ActiveRecord::Schema.define(version: 20160727183818) do
     t.datetime "updated_at",                     null: false
     t.index ["deploy_target_id", "project_id"], name: "index_deploy_acl_entries_on_deploy_target_id_and_project_id", unique: true, using: :btree
     t.index ["project_id"], name: "index_deploy_acl_entries_on_project_id", using: :btree
+  end
+
+  create_table "deploy_notifications", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "project_id",      null: false
+    t.integer  "hipchat_room_id", null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["project_id", "hipchat_room_id"], name: "index_deploy_notifications_on_project_id_and_hipchat_room_id", unique: true, using: :btree
   end
 
   create_table "deploy_restart_servers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

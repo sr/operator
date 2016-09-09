@@ -16,7 +16,7 @@ class ChefDeliveryNotification
       "#{link_to(checkout.branch)} is checked out on " \
       "<code>#{server.hostname}</code>"
 
-    @notifier.notify_room(room_id, message, YELLOW)
+    @notifier.notify_room(room_id, message, color: YELLOW)
   end
 
   def deploy_completed(room_id, deploy, error_message)
@@ -33,7 +33,7 @@ class ChefDeliveryNotification
         "<br/><pre>#{error_message}</pre>"
     end
 
-    @notifier.notify_room(room_id, message, color)
+    @notifier.notify_room(room_id, message, color: color)
   end
 
   def knife_command(room_id, server, command)
@@ -42,7 +42,7 @@ class ChefDeliveryNotification
       "<code>#{server.hostname}</code>: <br/>" \
       "<code>knife #{command.join(" ")}</code>"
 
-    @notifier.notify_room(room_id, message, GRAY)
+    @notifier.notify_room(room_id, message, color: GRAY)
   end
 
   private
