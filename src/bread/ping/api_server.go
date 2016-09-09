@@ -10,7 +10,6 @@ import (
 
 type apiServer struct {
 	operator.Replier
-	config *PingerConfig
 }
 
 func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {

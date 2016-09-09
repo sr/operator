@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"os"
 
-	"golang.org/x/net/context"
-
 	"github.com/GeertJohan/yubigo"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+
+	"bread/ping"
 )
 
 const (
@@ -114,6 +116,22 @@ func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 // check endpoint for use with ELB.
 func NewPingHandler(db *sql.DB) http.Handler {
 	return newPingHandler(db)
+}
+
+func NewServer(
+	auth operator.Authorizer,
+	inst operator.Instrumenter,
+	repl operator.Replier,
+) (*grpc.Server, error) {
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
+	)
+	if srv, err := breadping.NewAPIServer(repl); err != nil {
+		return nil, err
+	} else {
+		breadping.RegisterPingerServer(server, srv)
+	}
+	return server, nil
 }
 
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps

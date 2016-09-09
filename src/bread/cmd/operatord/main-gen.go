@@ -2,38 +2,12 @@
 package main
 
 import (
-	"errors"
-	"flag"
-	"os"
-	"strings"
-
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	ping "bread/ping"
 )
-
-func buildOperatorServer(replier operator.Replier, server *grpc.Server, flags *flag.FlagSet) (map[string]error, error) {
-	pingConfig := &ping.PingerConfig{}
-	services := make(map[string]error)
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return services, err
-	}
-	errs := make(map[string][]string)
-	if len(errs["ping"]) != 0 {
-		services["ping"] = errors.New("required flag(s) missing: " + strings.Join(errs["ping"], ", "))
-	} else {
-		pingServer, err := ping.NewAPIServer(replier, pingConfig)
-		if err != nil {
-			services["ping"] = err
-		} else {
-			ping.RegisterPingerServer(server, pingServer)
-			services["ping"] = nil
-		}
-	}
-	return services, nil
-}
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 	if req.Call.Service == "ping" {

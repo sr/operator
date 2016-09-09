@@ -35,7 +35,7 @@ type config struct {
 	hipchatWebhookURL string
 }
 
-func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
+func run(invoker operator.Invoker) error {
 	config := &config{
 		ldap:   &bread.LDAPConfig{},
 		yubico: &bread.YubicoConfig{},
@@ -110,23 +110,18 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
 		return err
 	}
-	var authorizer operator.Authorizer
-	if authorizer, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
+	var auth operator.Authorizer
+	if auth, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
 		return err
 	}
 	var grpcServer *grpc.Server
-	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryInterceptor(authorizer, inst)))
-	msg := &bread.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-	services, err := builder(replier, grpcServer, flags)
+	grpcServer, err = bread.NewServer(auth, inst, replier)
 	if err != nil {
 		return err
 	}
-	for svc, err := range services {
-		if err != nil {
-			logger.Error(&operator.ServiceStartupError{Service: svc, Error: err.Error()})
-		} else {
-			msg.Services = append(msg.Services, svc)
-		}
+	msg := &bread.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
+	for svc, _ := range grpcServer.GetServiceInfo() {
+		msg.Services = append(msg.Services, svc)
 	}
 	errC := make(chan error)
 	grpcList, err := net.Listen("tcp", config.grpcAddr)
@@ -188,7 +183,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 }
 
 func main() {
-	if err := run(buildOperatorServer, invoker); err != nil {
+	if err := run(invoker); err != nil {
 		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
