@@ -89,7 +89,7 @@ func (v *yubicoVerifier) Verify(otp string) error {
 		return err
 	}
 	if !ok {
-		return errors.New("TODO")
+		return errors.New("OTP verification failed")
 	}
 	return nil
 }
@@ -110,6 +110,15 @@ func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 	return &wrapperHandler{logger, handler}
 }
 
+// NewPingHandler returns an http.Handler that implements a simple health
+// check endpoint for use with ELB.
+func NewPingHandler(db *sql.DB) http.Handler {
+	return newPingHandler(db)
+}
+
+// NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps
+// commands using LDAP for authN/authZ, and verifies 2FA tokens via Yubikey's
+// YubiCloud web service. See: https://developers.yubico.com/OTP/
 func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer, error) {
 	if ldap.Base == "" {
 		ldap.Base = LDAPBase
@@ -117,10 +126,8 @@ func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer,
 	return newAuthorizer(ldap, verifier, ACL)
 }
 
+// NewHipchatClient returns a client implementing a very limited subset of the
+// Hipchat API V2. See: https://www.hipchat.com/docs/apiv2
 func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
 	return operatorhipchat.NewClient(context.Background(), config)
-}
-
-func NewPingHandler(db *sql.DB) http.Handler {
-	return newPingHandler(db)
 }
