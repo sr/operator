@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(version: 20160909171321) do
     t.datetime "created_at", default: '2016-01-21 14:59:58', null: false
     t.datetime "updated_at", default: '2016-01-21 14:59:58', null: false
     t.boolean  "archived",   default: false,                 null: false
+    t.index ["archived"], name: "index_servers_on_archived", using: :btree
     t.index ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
   end
 
