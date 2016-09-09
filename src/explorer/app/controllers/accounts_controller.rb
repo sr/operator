@@ -1,14 +1,10 @@
 class AccountsController < ApplicationController
   def index
     structure = GlobalAccount.arel_table
-    account_id = begin
-      Integer(params[:q])
-    rescue ArgumentError
-      false
-    end
 
-    if account_id
-      accounts = GlobalAccount.where(id: account_id)
+    case params[:q]
+    when /\A\d+\z/
+      accounts = GlobalAccount.where(id: params[:q].to_i)
     else
       accounts = GlobalAccount.where(structure[:company].matches("%#{params[:q]}%"))
     end
