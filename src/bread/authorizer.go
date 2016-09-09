@@ -69,18 +69,14 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 			return fmt.Errorf("user `%s` does not have a Yubikey ID", req.UserEmail())
 		}
 		if err := a.verifier.Verify(req.Otp); err != nil {
-			fmt.Printf("DEBUG yubico error: %s\n", err)
-			return errors.New("could not verify given Yubikey OTP")
+			return fmt.Errorf("could not verify Yubikey OTP: %s", err)
 		}
 		id, _, err := yubigo.ParseOTP(req.Otp)
-		if id != user.yubikeyID || err != nil {
-			if err != nil {
-				fmt.Printf("DEBUG yubigo.ParseOTP error: %s\n", err)
-			}
-			if id != user.yubikeyID {
-				fmt.Printf("DEBUG yubico id mismatch id=%s ldap-id=%s\n", id, user.yubikeyID)
-			}
-			return errors.New("could not verify given Yubikey OTP")
+		if err != nil {
+			return err
+		}
+		if id != user.yubikeyID {
+			return errors.New("could not verify Yubikey OTP: IDs mismatch")
 		}
 	}
 	return nil
