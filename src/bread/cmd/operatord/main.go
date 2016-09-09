@@ -13,6 +13,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -24,7 +25,9 @@ type config struct {
 	grpcAddr string
 	httpAddr string
 
-	ldap   *bread.LDAPConfig
+	ldapAddr string
+	ldapBase string
+
 	yubico *bread.YubicoConfig
 
 	databaseURL string
@@ -36,15 +39,12 @@ type config struct {
 }
 
 func run(invoker operator.Invoker) error {
-	config := &config{
-		ldap:   &bread.LDAPConfig{},
-		yubico: &bread.YubicoConfig{},
-	}
+	config := &config{yubico: &bread.YubicoConfig{}}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
-	flags.StringVar(&config.ldap.Address, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
-	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
+	flags.StringVar(&config.ldapAddr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
+	flags.StringVar(&config.ldapBase, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
 	flags.StringVar(&config.prefix, "prefix", "!", "Prefix used to indicate commands in chat messages")
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
@@ -110,8 +110,15 @@ func run(invoker operator.Invoker) error {
 	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
 		return err
 	}
+	var lconn *ldap.Conn
+	if lconn, err = ldap.Dial("tcp", config.ldapAddr); err != nil {
+		return err
+	}
+	if err := lconn.Bind("", ""); err != nil {
+		return err
+	}
 	var auth operator.Authorizer
-	if auth, err = bread.NewAuthorizer(config.ldap, verifier); err != nil {
+	if auth, err = bread.NewAuthorizer(lconn, bread.LDAPBase, verifier); err != nil {
 		return err
 	}
 	var grpcServer *grpc.Server

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/GeertJohan/yubigo"
+	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -60,12 +61,6 @@ type ACLEntry struct {
 	Call  *operator.Call
 	Group string
 	OTP   bool
-}
-
-type LDAPConfig struct {
-	Address    string
-	Encryption string
-	Base       string
 }
 
 type YubicoConfig struct {
@@ -137,11 +132,11 @@ func NewServer(
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps
 // commands using LDAP for authN/authZ, and verifies 2FA tokens via Yubikey's
 // YubiCloud web service. See: https://developers.yubico.com/OTP/
-func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer, error) {
-	if ldap.Base == "" {
-		ldap.Base = LDAPBase
+func NewAuthorizer(conn *ldap.Conn, base string, verifier OTPVerifier) (operator.Authorizer, error) {
+	if base == "" {
+		base = LDAPBase
 	}
-	return newAuthorizer(ldap, verifier, ACL)
+	return newAuthorizer(conn, base, verifier, ACL)
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the
