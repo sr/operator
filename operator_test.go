@@ -27,12 +27,6 @@ type noopInstrumenter struct{}
 
 func (i *noopInstrumenter) Instrument(*operator.Event) {}
 
-type fakeAuthorizer struct{}
-
-func (a *fakeAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
-	return nil
-}
-
 type fakeReplier struct{}
 
 func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
