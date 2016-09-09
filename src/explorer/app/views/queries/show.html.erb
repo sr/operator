@@ -18,7 +18,8 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
     <% results.fields.each_with_index do |field, i| %>
       <th>
         <%= link_to field, "#", class: 'select_column' %>
-        <% if !query.parsed.select_all? && (i == results.fields.length-1) %>
+        <%# TODO Bring this functionality back %>
+        <% if false && !query.parsed.select_all? && (i == results.fields.length-1) %>
           <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>

@@ -30,12 +30,14 @@
   </div>
 <% end %>
 
-<div id="error_explanation" class="bg-danger well-sm">
-  <h4><%= pluralize(query.errors.count, "error") %> prohibited this query from being executed:</h4>
+<% if query.errors.any? %>
+  <div id="error_explanation" class="bg-danger well-sm">
+    <h4><%= pluralize(query.errors.count, "error") %> prohibited this query from being  executed:</h4>
 
-  <ul>
-  <% query.errors.full_messages.each do |message| %>
-    <li><%= message %></li>
-  <% end %>
-  </ul>
-</div>
+    <ul>
+    <% query.errors.full_messages.each do |message| %>
+      <li><%= message %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>

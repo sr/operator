@@ -1,6 +1,6 @@
 class SQLQuery
   def initialize(query)
-    @ast = SQLParser::Parser.new.scan_str(query)
+    @ast = SQLParser::Parser.new.scan_str(query.sub(/;$/, ''))
   rescue Racc::ParseError, SQLParser::Parser::ScanError
     raise ArgumentError, $!.message
   end
