@@ -65,19 +65,19 @@ func TestAuthorizer(t *testing.T) {
 		otpOK   bool
 		err     error
 	}{
-		{swe, "ping", "ping", "", true, nil},
-		{swe, "ping", "whoami", "", true, nil},
+		{swe, "ping.pinger", "ping", "", true, nil},
+		{swe, "ping.pinger", "whoami", "", true, nil},
 
-		{"", "ping", "ping", "", true, errors.New("unable to authorize request without an user email")},
-		{swe, "ping", "pong", "", true, errors.New("no ACL entry found for command `ping pong`")},
-		{unknown, "ping", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
+		{"", "ping.pinger", "ping", "", true, errors.New("unable to authorize request without an user email")},
+		{swe, "ping.pinger", "pong", "", true, errors.New("no ACL entry found for command `ping pong`")},
+		{unknown, "ping.pinger", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
 
-		{swe, "ping", "otp", validOTP, true, nil},
+		{swe, "ping.pinger", "otp", validOTP, true, nil},
 
-		{noYubiKey, "ping", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
-		{swe, "ping", "otp", "", true, errors.New("command `ping otp` requires a Yubikey OTP")},
-		{swe, "ping", "otp", validOTP, false, errors.New("could not verify given Yubikey OTP")},
-		{swe, "ping", "otp", "garbage", true, errors.New("could not verify given Yubikey OTP")},
+		{noYubiKey, "ping.pinger", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
+		{swe, "ping.pinger", "otp", "", true, errors.New("command `ping otp` requires a Yubikey OTP")},
+		{swe, "ping.pinger", "otp", validOTP, false, errors.New("could not verify given Yubikey OTP")},
+		{swe, "ping.pinger", "otp", "garbage", true, errors.New("could not verify given Yubikey OTP")},
 	} {
 		if !tc.otpOK {
 			otpVerifier.fail()
