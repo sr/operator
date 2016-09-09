@@ -5,7 +5,7 @@ import "operator.proto";
 
 package bread;
 
-option go_package = "bread";
+option go_package = "breadpb";
 
 message OperatorRequest {
     operator.Request request = 1;

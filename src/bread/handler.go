@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"bread/pb"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sr/operator/protolog"
 )
@@ -32,7 +34,7 @@ func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		} else {
 			statusCode = wrappedW.statusCode
 		}
-		log := &HTTPRequest{
+		log := &breadpb.HTTPRequest{
 			Method:     req.Method,
 			StatusCode: uint32(statusCode),
 			Error:      errS,

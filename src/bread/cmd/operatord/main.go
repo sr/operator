@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bread"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -11,12 +10,14 @@ import (
 	"os"
 	"strings"
 
-	"google.golang.org/grpc"
+	"bread"
+	"bread/pb"
 
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
+	"google.golang.org/grpc"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -126,7 +127,7 @@ func run(invoker operator.Invoker) error {
 	if err != nil {
 		return err
 	}
-	msg := &bread.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
+	msg := &breadpb.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 	for svc := range grpcServer.GetServiceInfo() {
 		msg.Services = append(msg.Services, svc)
 	}
@@ -182,7 +183,7 @@ func run(invoker operator.Invoker) error {
 		),
 	)
 	httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
-	logger.Info(&bread.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+	logger.Info(&breadpb.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
 	go func() {
 		errC <- http.ListenAndServe(config.httpAddr, httpServer)
 	}()
