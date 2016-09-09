@@ -120,7 +120,7 @@ func run(invoker operator.Invoker) error {
 		return err
 	}
 	msg := &bread.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-	for svc, _ := range grpcServer.GetServiceInfo() {
+	for svc := range grpcServer.GetServiceInfo() {
 		msg.Services = append(msg.Services, svc)
 	}
 	errC := make(chan error)

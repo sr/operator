@@ -126,11 +126,11 @@ func NewServer(
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
 	)
-	if srv, err := breadping.NewAPIServer(repl); err != nil {
+	pinger, err := breadping.NewAPIServer(repl)
+	if err != nil {
 		return nil, err
-	} else {
-		breadping.RegisterPingerServer(server, srv)
 	}
+	breadping.RegisterPingerServer(server, pinger)
 	return server, nil
 }
 
