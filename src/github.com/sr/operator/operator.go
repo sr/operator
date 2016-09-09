@@ -124,6 +124,7 @@ func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInt
 			Method:  strings.ToLower(s[2]),
 		}
 		if err := auth.Authorize(ctx, req); err != nil {
+			inst.Instrument(&Event{Key: "authorizer", Request: req, Error: err})
 			return nil, err
 		}
 		start := time.Now()
