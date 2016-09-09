@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/dvsekhvalnov/jose2go"
-	"github.com/golang/protobuf/proto"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/testing"
@@ -24,23 +23,17 @@ var credentials = &operatorhipchat.ClientCredentials{
 	Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
 }
 
-var logger = &fakeLogger{}
+type noopInstrumenter struct{}
 
-type fakeLogger struct{}
+func (i *noopInstrumenter) Instrument(*operator.Event) {}
 
 type fakeAuthorizer struct{}
-
-type fakeReplier struct{}
-
-func (l *fakeLogger) Info(_ proto.Message) {
-}
-
-func (l *fakeLogger) Error(_ proto.Message) {
-}
 
 func (a *fakeAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
 	return nil
 }
+
+type fakeReplier struct{}
 
 func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
@@ -121,9 +114,7 @@ func TestHandler(t *testing.T) {
 	tArgs := make(map[string]string)
 	tOTP := ""
 	h, err := operator.NewHandler(
-		logger,
-		operator.NewInstrumenter(logger),
-		&fakeAuthorizer{},
+		&noopInstrumenter{},
 		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
