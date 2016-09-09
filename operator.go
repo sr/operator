@@ -3,7 +3,6 @@ package operator
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -150,11 +149,7 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
-	err := rep.Reply(ctx, src, req.ReplierId, msg)
-	if err != nil {
-		fmt.Printf("DEBUG reply err: %s\n", err)
-	}
-	return &Response{Message: msg.Text}, err
+	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
 }
 
 func (r *Request) UserEmail() string {
