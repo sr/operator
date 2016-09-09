@@ -103,7 +103,7 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 	var inst operator.Instrumenter
 	inst = bread.NewInstrumenter(logger)
 	var store operatorhipchat.ClientCredentialsStore
-	store = bread.NewHipchatCredsStore(db)
+	store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 	var replier operator.Replier
 	replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
 	var verifier bread.OTPVerifier
@@ -168,12 +168,14 @@ func run(builder operator.ServerBuilder, invoker operator.Invoker) error {
 		"/hipchat/addon",
 		bread.NewHandler(
 			logger,
-			bread.NewHipchatAddonHandler(
-				config.prefix,
-				config.hipchatNamespace,
-				addonURL,
-				webhookURL,
+			operatorhipchat.NewAddonHandler(
 				store,
+				&operatorhipchat.AddonConfig{
+					Namespace:  config.hipchatNamespace,
+					URL:        addonURL,
+					Homepage:   bread.RepoURL,
+					WebhookURL: webhookURL,
+				},
 			),
 		),
 	)

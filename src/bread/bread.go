@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"net/url"
 	"os"
 
 	"golang.org/x/net/context"
@@ -17,6 +16,7 @@ import (
 
 const (
 	HipchatHost = "https://hipchat.dev.pardot.com"
+	RepoURL     = "https://git.dev.pardot.com/Pardot/bread"
 	TestingRoom = 882 // BREAD Testing
 	PublicRoom  = 42  // Build & Automate
 	LDAPBase    = "dc=pardot,dc=com"
@@ -119,29 +119,6 @@ func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier) (operator.Authorizer,
 
 func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
 	return operatorhipchat.NewClient(context.Background(), config)
-}
-
-func NewHipchatCredsStore(db *sql.DB) operatorhipchat.ClientCredentialsStore {
-	return operatorhipchat.NewSQLStore(db, HipchatHost)
-}
-
-func NewHipchatAddonHandler(
-	prefix string,
-	namespace string,
-	addonURL *url.URL,
-	webhookURL *url.URL,
-	store operatorhipchat.ClientCredentialsStore,
-) http.Handler {
-	return operatorhipchat.NewAddonHandler(
-		store,
-		&operatorhipchat.AddonConfig{
-			Namespace:     namespace,
-			URL:           addonURL,
-			Homepage:      "https://git.dev.pardot.com/Pardot/bread",
-			WebhookPrefix: prefix,
-			WebhookURL:    webhookURL,
-		},
-	)
 }
 
 func NewPingHandler(db *sql.DB) http.Handler {
