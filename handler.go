@@ -53,7 +53,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	matches := h.re.FindStringSubmatch(msg.Text)
 	if matches == nil {
-		h.inst.Instrument(&Event{Key: "handler_ignored_message", Message: msg})
+		h.inst.Instrument(&Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -95,10 +95,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ReplierId: replierID,
 		Source:    msg.Source,
 	}
-	ok, err := h.invoker(h.ctx, h.conn, req, args)
-	if !ok {
+	if ok, err := h.invoker(h.ctx, h.conn, req, args); !ok || err != nil {
 		h.inst.Instrument(&Event{
-			Key:     "handler_unhandled_message",
+			Key:     "handler_invoker_error",
 			Message: msg,
 			Request: req,
 			Args:    args,
@@ -107,4 +106,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	h.inst.Instrument(&Event{
+		Key:     "handler_message_handled",
+		Message: msg,
+		Request: req,
+		Args:    args,
+	})
 }
