@@ -39,8 +39,6 @@ type Replier interface {
 
 type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
 
-type ServerBuilder func(Replier, *grpc.Server, *flag.FlagSet) (map[string]error, error)
-
 type Event struct {
 	Key     string
 	Message *Message
