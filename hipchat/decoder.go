@@ -54,7 +54,7 @@ func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operat
 	if len(parts) != 2 || parts[0] != "JWT" {
 		return nil, "", errors.New("invalid Authorization header")
 	}
-	var config ClientConfiger
+	var config Clienter
 	_, _, err := jose.Decode(parts[1], func(_ map[string]interface{}, payload string) interface{} {
 		var data struct {
 			Iss string
