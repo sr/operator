@@ -13,7 +13,9 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_instance.internal_apps_bastion.public_ip}/32",
-      "${aws_instance.internal_apps_bastion_2.public_ip}/32"
+      "${aws_instance.internal_apps_bastion_2.public_ip}/32",
+      "${aws_instance.internal_apps_bastion.private_ip}/32",
+      "${aws_instance.internal_apps_bastion_2.private_ip}/32",
     ]
   }
 
