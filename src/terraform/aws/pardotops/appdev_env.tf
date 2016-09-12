@@ -1085,8 +1085,8 @@ resource "aws_s3_bucket" "cephthumbs_s3_filestore_long" {
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::cephthumbs_s3_filestore",
-        "arn:aws:s3:::cephthumbs_s3_filestore/*"
+        "arn:aws:s3:::cephthumbs_s3_filestore_long",
+        "arn:aws:s3:::cephthumbs_s3_filestore_long/*"
       ]
     }
   ]
