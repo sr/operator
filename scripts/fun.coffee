@@ -97,6 +97,7 @@
 #   hubot rekt - trolledum8
 #   hubot gus - Rage GUS!
 #   hubot lightning - Rage Lightning!
+#   hubot pushit(realgood) - Salt N Peppa 4 Lyfe!
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -243,6 +244,12 @@ module.exports = (robot) ->
       'http://i0.kym-cdn.com/photos/images/original/000/160/195/OP-Will-deliver-soon.jpg'
     ]
     msg.send msg.random op
+
+  robot.respond /push(\s)?it(\s)?(real)?(\s)?(good)?$/i, (msg) ->
+    pushit = [
+      'https://www.youtube.com/watch?v=vCadcBR95oU' 
+    ]
+    msg.send msg.random pushit
 
   robot.respond /bingo$/i, (msg) ->
     bingo = [
