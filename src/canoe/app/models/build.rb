@@ -2,7 +2,7 @@ require "base64"
 require "json"
 
 class Build
-  attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at
+  attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at, :properties
   attr_reader :options_validator, :options
 
   def self.from_artifact_url(project, artifact_url)
@@ -47,7 +47,8 @@ class Build
       passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
       created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
       options_validator: options_validator,
-      options: { meta_data: properties }
+      options: {},
+      properties: properties
     )
   end
 
@@ -64,7 +65,7 @@ class Build
     )
   end
 
-  def initialize(project:, artifact_url:, branch:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {})
+  def initialize(project:, artifact_url:, branch:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {}, properties: {})
     @project = project
     @artifact_url = artifact_url
     @branch = branch
@@ -74,6 +75,7 @@ class Build
     @created_at = created_at
     @options_validator = options_validator
     @options = options
+    @properties = properties
   end
 
   def project_name
@@ -94,8 +96,8 @@ class Build
 
   def test_state(test)
     key = (test == :PPANT) ? "passedCI" : "ciJob[#{test}]"
-    state = options[:meta_data][key]
-    build_time = DateTime.parse(options[:meta_data]["buildTimeStamp"]).iso8601
+    state = properties[key]
+    build_time = DateTime.parse(properties["buildTimeStamp"]).iso8601
 
     # Since Bamboo doesn't have a run code on failure option we don't know if
     # the build plan is still processing
@@ -107,6 +109,6 @@ class Build
   end
 
   def build_url(test)
-    options[:meta_data]["ciJobUrl[#{test}]"]
+    properties["ciJobUrl[#{test}]"]
   end
 end
