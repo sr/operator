@@ -4,7 +4,6 @@ ARG dist=el6
 ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG bower_version=1.7.2
-ARG parallel_version=20160322
 ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
 
@@ -20,14 +19,6 @@ RUN yum install -y epel-release && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm" && \
   yum clean all
 
-# Parallel
-RUN cd /tmp && \
-  curl -s "https://ftp.gnu.org/gnu/parallel/parallel-${parallel_version}.tar.bz2" | tar -xjv && \
-  cd parallel-${parallel_version} && \
-  ./configure && make && make install && \
-  cd /tmp && \
-  rm -rf parallel-${parallel_version}
-
 # Percona Client
 RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm && \
   yum install -y Percona-Server-client-${percona_major_version} Percona-Server-devel-${percona_major_version} && \
@@ -41,12 +32,6 @@ RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-
 # GeoIP
 RUN mkdir -p /var/www && \
   curl -L https://${artifactory_host}/artifactory/pd-tarball/bamboo-elastic-instance/geoip.tgz | tar -xzv -C /var/www
-
-# TODO: Remove once https://git.dev.pardot.com/Pardot/pardot/pull/18174 is well circulated
-RUN mkdir -p /root/.ssh && \
-  touch /root/.ssh/known_hosts && \
-  chmod 0700 /root/.ssh && \
-  chmod 0600 /root/.ssh/known_hosts
 
 # Make room for demo fixtures
 RUN mkdir -p /opt/pardot
