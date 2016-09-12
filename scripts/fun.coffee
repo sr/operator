@@ -245,7 +245,7 @@ module.exports = (robot) ->
     ]
     msg.send msg.random op
 
-  robot.respond /push?(/s)it?(/s)?(real)?(/s)?(good)/i, (msg) ->
+  robot.respond /push(\s)?it(\s)?(real)?(\s)?(good)?$/i, (msg) ->
     pushit = [
       'https://www.youtube.com/watch?v=vCadcBR95oU' 
     ]
