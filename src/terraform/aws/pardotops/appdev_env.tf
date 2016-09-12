@@ -1032,61 +1032,68 @@ resource "aws_route53_record" "appdev_consul1_arecord" {
   ttl = "900"
 }
 
-resource "aws_iam_user" "artifactory_sysacct" {
-  name = "artifactorysysacct"
+resource "aws_iam_user" "cephthumbs_sysacct" {
+  name = "sa_cephthumbs"
 }
 
-resource "aws_s3_bucket" "artifactory_s3_filestore" {
-  bucket = "artifactory_s3_filestore"
+resource "aws_s3_bucket" "cephthumbs_s3_filestore" {
+  bucket = "cephthumbs_s3_filestore"
+  lifecycle_rule {
+    prefix = "/"
+    enabled = true
+    expiration {
+      days = 30
+    }
+  } 
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "allow artifactory sysacct",
+      "Sid": "allow cephthumbs sysacct",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
+        "AWS": "${aws_iam_user.cephthumbs_sysacct.arn}"
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::artifactory_s3_filestore",
-        "arn:aws:s3:::artifactory_s3_filestore/*"
+        "arn:aws:s3:::cephthumbs_s3_filestore",
+        "arn:aws:s3:::cephthumbs_s3_filestore/*"
       ]
     }
   ]
 }
 EOF
   tags {
-    Name = "artifactory_s3_filestore"
+    Name = "cephthumbs_s3_filestore"
     terraform = "true"
   }
 }
 
-resource "aws_s3_bucket" "artifactory_s3_filestore" {
-  bucket = "artifactory_s3_filestore"
+resource "aws_s3_bucket" "cephthumbs_s3_filestore_long" {
+  bucket = "cephthumbs_s3_filestore_long"
   acl = "private"
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "allow artifactory sysacct",
+      "Sid": "allow cephthumbs sysacct",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
+        "AWS": "${aws_iam_user.cephthumbs_sysacct.arn}"
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::artifactory_s3_filestore",
-        "arn:aws:s3:::artifactory_s3_filestore/*"
+        "arn:aws:s3:::cephthumbs_s3_filestore",
+        "arn:aws:s3:::cephthumbs_s3_filestore/*"
       ]
     }
   ]
 }
 EOF
   tags {
-    Name = "artifactory_s3_filestore"
+    Name = "cephthumbs_s3_filestore"
     terraform = "true"
   }
 }
