@@ -2,7 +2,7 @@ class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
 
-  AWS = "ue1.aws".freeze
+  AWS = "ue1".freeze
   DFW = "dfw".freeze
   PHX = "phx".freeze
 

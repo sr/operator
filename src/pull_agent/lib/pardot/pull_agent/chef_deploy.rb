@@ -6,14 +6,14 @@ module Pardot
       CHEF_ENVIRONMENT_FILE = {
         "dfw" => "environments/dfw/production.rb",
         "phx" => "environments/phx/production.rb",
-        "ue1.aws" => "environments/aws/production.rb",
+        "ue1" => "environments/aws/production.rb",
         "local" => "none"
       }.freeze
 
       CHEF_NODES_DIR = {
         "dfw" => "nodes/dfw",
         "phx" => "nodes/phx",
-        "ue1.aws" => "nodes/aws",
+        "ue1" => "nodes/aws",
         "local" => "none"
       }.freeze
 
