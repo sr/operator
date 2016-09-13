@@ -21,7 +21,8 @@ class ChefDelivery
       at: "chef",
       branch: request.checkout_branch,
       sha: request.checkout_sha,
-      current_build: current_build.to_json
+      current_build: current_build.to_json,
+      server: request.server.to_json,
     )
 
     if !@config.enabled?(request.server)
