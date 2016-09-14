@@ -98,6 +98,7 @@
 #   hubot gus - Rage GUS!
 #   hubot lightning - Rage Lightning!
 #   hubot pushit(realgood) - Salt N Peppa 4 Lyfe!
+#   hubot lemon - Get's a random image of Lemon
 
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -113,6 +114,9 @@ module.exports = (robot) ->
 
   robot.respond /gus$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/252/6jIMiKPvXi17T0l/fuuuuuu_gus.jpg"
+
+  robot.respond /lemon$/i, (msg) ->
+    msg.send "http://i.imgur.com/bMWBLVk.gifv"
 
   robot.respond /dumpsterfire$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/71ixUc3gH6lnWLC/upload.png"
