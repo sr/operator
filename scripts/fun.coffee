@@ -247,7 +247,7 @@ module.exports = (robot) ->
 
   robot.respond /push(\s)?it(\s)?(real)?(\s)?(good)?$/i, (msg) ->
     pushit = [
-      'https://www.youtube.com/watch?v=vCadcBR95oU' 
+      'https://www.youtube.com/watch?v=vCadcBR95oU'
     ]
     msg.send msg.random pushit
 
@@ -695,7 +695,8 @@ module.exports = (robot) ->
     msg.send msg.random [
       "https://hipchat.dev.pardot.com/files/1/282/eYuVJnFMlUJAqnw/2015-10-15%2016_37_09.gif",
       "https://hipchat.dev.pardot.com/files/1/65/sWAGNmuFsb4TOjt/Kyle%20Gets%20Weird.gif",
-      "http://i.imgur.com/DdEEkOw.gifv"
+      "http://i.imgur.com/DdEEkOw.gifv",
+      "https://hipchat.dev.pardot.com/files/1/235/DfSuBe6injLobrN/IMG_20160519_183230.jpg",
     ]
 
   robot.respond /superkyle$/i, (msg) ->
