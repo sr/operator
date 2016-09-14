@@ -581,7 +581,8 @@ resource "aws_instance" "appdev_rabbit1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_toolsproxy_access.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
@@ -612,7 +613,8 @@ resource "aws_instance" "appdev_rabbit2" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_toolsproxy_access.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
@@ -1018,12 +1020,24 @@ resource "aws_security_group" "appdev_toolsproxy" {
   }
 
   egress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_instance.appdev_rabbit1.private_ip}/32",
-      "${aws_instance.appdev_rabbit2.private_ip}/32"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "appdev_toolsproxy_access" {
+  name = "appdev_toolsproxy_access"
+  description = "Allow access through the toolsproxy"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}"
     ]
   }
 }
