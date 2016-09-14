@@ -1,5 +1,5 @@
-//// App.dev environment
-//// managed by pd-bread@salesforce.com
+# App.dev environment
+# managed by pd-bread@salesforce.com
 
 
 variable "environment_appdev" {
@@ -35,6 +35,7 @@ variable "environment_appdev" {
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
     num_proxyout1_hosts = 1
+    num_toolsproxy1_hosts = 1
     num_vault1_hosts = 3
     num_consul1_hosts = 2
   }
@@ -63,7 +64,7 @@ variable "appdev_whoisdb1_ips" {
   }
 }
 
-////
+/*
 //// TEMPLATES
 ////
 //
@@ -102,8 +103,8 @@ variable "appdev_whoisdb1_ips" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-//  instance_type = "${var.environment_appdev["db_instance_type}"
-//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  instance_type = "${var.environment_appdev["app_instance_type"]}"
+//  subnet_id = "${var.environment_appdev["subnet_id"]}"
 //  root_block_device {
 //    volume_type = "gp2"
 //    volume_size = "50"
@@ -125,8 +126,8 @@ variable "appdev_whoisdb1_ips" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-//  instance_type = "${var.environment_appdev["db_instance_type}"
-//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  instance_type = "${var.environment_appdev["job_instance_type"]}"
+//  subnet_id = "${var.environment_appdev["subnet_id"]}"
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_type = "gp2"
@@ -160,7 +161,7 @@ variable "appdev_whoisdb1_ips" {
 //  type = "A"
 //  ttl = 900
 //}
-
+*/
 
 resource "aws_security_group" "appdev_apphost" {
   name = "appdev_apphost"
@@ -970,7 +971,7 @@ resource "aws_instance" "appdev_whoisdb1" {
   count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   ebs_optimized = "true"
   private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
   root_block_device {
@@ -1002,6 +1003,29 @@ resource "aws_route53_record" "appdev_whoisdb1_arecord" {
   records = ["${element(aws_instance.appdev_whoisdb1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
+}
+
+resource "aws_instance" "appdev_toolsproxy1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${var.environment_appdev["subnet_id"]}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_dbhost.id}",
+    "${aws_security_group.appdev_apphost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
 }
 
 resource "aws_instance" "appdev_vault1" {
