@@ -16,7 +16,7 @@ type Client interface {
 	SendRoomNotification(context.Context, *RoomNotification) error
 }
 
-type ClientConfiger interface {
+type Clienter interface {
 	ID() string
 	Secret() string
 	Client(context.Context) (Client, error)
@@ -24,7 +24,7 @@ type ClientConfiger interface {
 
 type ClientCredentialsStore interface {
 	Create(*ClientCredentials) error
-	GetByOAuthID(string) (ClientConfiger, error)
+	GetByOAuthID(string) (Clienter, error)
 }
 
 type AddonConfig struct {

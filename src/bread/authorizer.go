@@ -11,7 +11,8 @@ import (
 )
 
 type authorizer struct {
-	config   *LDAPConfig
+	conn     *ldap.Conn
+	base     string
 	verifier OTPVerifier
 	acl      []*ACLEntry
 }
@@ -22,7 +23,8 @@ type ldapUser struct {
 }
 
 func newAuthorizer(
-	config *LDAPConfig,
+	conn *ldap.Conn,
+	base string,
 	verifier OTPVerifier,
 	acl []*ACLEntry,
 ) (*authorizer, error) {
@@ -31,7 +33,7 @@ func newAuthorizer(
 			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
 		}
 	}
-	return &authorizer{config, verifier, acl}, nil
+	return &authorizer{conn, base, verifier, acl}, nil
 }
 
 func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {
@@ -69,35 +71,23 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 			return fmt.Errorf("user `%s` does not have a Yubikey ID", req.UserEmail())
 		}
 		if err := a.verifier.Verify(req.Otp); err != nil {
-			fmt.Printf("DEBUG yubico error: %s\n", err)
-			return errors.New("could not verify given Yubikey OTP")
+			return fmt.Errorf("could not verify Yubikey OTP: %s", err)
 		}
 		id, _, err := yubigo.ParseOTP(req.Otp)
-		if id != user.yubikeyID || err != nil {
-			if err != nil {
-				fmt.Printf("DEBUG yubigo.ParseOTP error: %s\n", err)
-			}
-			if id != user.yubikeyID {
-				fmt.Printf("DEBUG yubico id mismatch id=%s ldap-id=%s\n", id, user.yubikeyID)
-			}
-			return errors.New("could not verify given Yubikey OTP")
+		if err != nil {
+			return err
+		}
+		if id != user.yubikeyID {
+			return errors.New("could not verify Yubikey OTP: IDs mismatch")
 		}
 	}
 	return nil
 }
 
 func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
-	conn, err := ldap.Dial("tcp", a.config.Address)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-	if err := conn.Bind("", ""); err != nil {
-		return nil, err
-	}
 	var uid string
-	res, err := conn.Search(ldap.NewSearchRequest(
-		a.config.Base,
+	res, err := a.conn.Search(ldap.NewSearchRequest(
+		a.base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(mail=%s)", ldap.EscapeFilter(email)),
 		[]string{"cn", "yubiKeyId"},
@@ -117,8 +107,8 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 		return nil, errors.New("received an invalid response from the LDAP server")
 	}
 	yubikeyID := res.Entries[0].GetAttributeValue("yubiKeyId")
-	res, err = conn.Search(ldap.NewSearchRequest(
-		a.config.Base,
+	res, err = a.conn.Search(ldap.NewSearchRequest(
+		a.base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(memberUid=%s)", ldap.EscapeFilter(uid)),
 		[]string{"cn"},

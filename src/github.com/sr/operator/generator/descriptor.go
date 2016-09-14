@@ -76,13 +76,17 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			nameStr := *name.(*string)
 			fn := file.GetName()
 			importPath := filepath.Join(importPathPrefix, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
+			pkg := file.GetPackage()
+			// Check for overriden go package
+			if gopkg := file.GetOptions().GetGoPackage(); gopkg != "" {
+				pkg = gopkg
+			}
 			services[j] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
-				// TODO(sr) might have to handle go_package proto option as well
-				PackageName: file.GetPackage(),
+				PackageName: pkg,
 				ImportPath:  importPath,
 			}
 			if m, ok := messagesByName[service.GetName()+"Config"]; ok {

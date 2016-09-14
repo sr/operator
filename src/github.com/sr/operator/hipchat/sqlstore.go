@@ -27,7 +27,7 @@ func (s *sqlStore) Create(client *ClientCredentials) error {
 	return err
 }
 
-func (s *sqlStore) GetByOAuthID(id string) (ClientConfiger, error) {
+func (s *sqlStore) GetByOAuthID(id string) (Clienter, error) {
 	var (
 		oauthID     string
 		oauthSecret string
