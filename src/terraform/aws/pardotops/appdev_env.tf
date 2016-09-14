@@ -971,7 +971,7 @@ resource "aws_instance" "appdev_whoisdb1" {
   count = "${var.environment_appdev["num_whoisdb1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["db_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
   private_ip = "${lookup(var.appdev_whoisdb1_ips,count.index)}"
   root_block_device {
@@ -1005,22 +1005,42 @@ resource "aws_route53_record" "appdev_whoisdb1_arecord" {
   ttl = "900"
 }
 
+resource "aws_security_group" "appdev_toolsproxy" {
+  name = "appdev_toolsproxy"
+  description = "Allow access to rabbit servers"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+  }
+
+  egress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.appdev_rabbit1.private_ip}/32",
+      "${aws_instance.appdev_rabbit2.private_ip}/32"
+    ]
+  }
+}
+
 resource "aws_instance" "appdev_toolsproxy1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${var.environment_appdev["subnet_id"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
     delete_on_termination = true
   }
   vpc_security_group_ids = [
-    "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
-    "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_dbhost.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_toolsproxy.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
