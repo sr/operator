@@ -1050,6 +1050,16 @@ resource "aws_security_group" "appdev_toolsproxy" {
     cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.appdev_bastion.private_ip}/32",
+      "${aws_instance.appdev_bastion.public_ip}/32"
+      ]
+  }
+
   egress {
     from_port = 0
     to_port = 0
@@ -1064,6 +1074,7 @@ resource "aws_instance" "appdev_toolsproxy1" {
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
