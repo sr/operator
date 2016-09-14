@@ -47,7 +47,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
   scenario "happy path deployment" do
     login_as "Joe Syncmaster", "joe.syncmaster@salesforce.com"
 
-    find(".projects-index-list a", text: @project.name).click
+    find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
     find("a[data-target='test']", text: "Ship it Here").click

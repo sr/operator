@@ -4,6 +4,7 @@ class Server < ApplicationRecord
   attr_readonly :hostname
 
   scope :enabled, -> { where(enabled: true) }
+  scope :active, -> { where(archived: false) }
 
   has_many :deploy_scenarios
   accepts_nested_attributes_for :deploy_scenarios, allow_destroy: true

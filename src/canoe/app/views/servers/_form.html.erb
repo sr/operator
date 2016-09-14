@@ -12,7 +12,7 @@
       <%= f.fields_for :deploy_scenarios do |ff| %>
         <%= ff.collection_select :project_id, Project.all, :id, :name, include_blank: false %>
         in
-        <%= ff.collection_select :deploy_target_id, DeployTarget.all, :id, :name, include_blank: false %>
+        <%= ff.collection_select :deploy_target_id, DeployTarget.enabled, :id, :name, include_blank: false %>
         <%= ff.link_to_remove "Remove", class: "btn btn-xs btn-danger" %>
       <%- end %>
       <%= f.link_to_add "Add Scenario", :deploy_scenarios, class: "btn btn-xs btn-default" %>

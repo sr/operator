@@ -2,7 +2,6 @@ class UserQuery < ApplicationRecord
   DEFAULT_LIMIT = 10
 
   belongs_to :user
-  attr_accessor :show_all_rows
 
   class RateLimited < StandardError
     def initialize(user)
@@ -11,6 +10,7 @@ class UserQuery < ApplicationRecord
   end
 
   BlankResultSet = Struct.new(:fields).new([])
+  BlankSQLQuery = Struct.new(:to_sql).new
 
   # Returns an empty result set.
   def blank
@@ -20,13 +20,13 @@ class UserQuery < ApplicationRecord
   # Returns a Mysql2::Result with the result of executing the query against the
   # appropriate database. Execution is accounted against the given user's rate
   # limit and the query is written to an audit log.
-  def execute(current_user)
+  def execute(current_user, show_all_rows = false)
     if current_user.rate_limit.at_limit?
       raise UserQuery::RateLimited, current_user
     end
 
     results = Instrumentation.context(user_email: current_user.email) do
-      database.execute(parsed.sql)
+      database.execute(parse(show_all_rows).to_sql)
     end
     current_user.rate_limit.record_transaction
     results
@@ -51,23 +51,27 @@ class UserQuery < ApplicationRecord
     database.tables
   end
 
+  def parsed
+    @parsed || BlankSQLQuery
+  end
+
+  private
+
   # Returns the parsed SQL query with the account_id condition added if this
   # is an account-specific account and with a LIMIT clause added.
-  def parsed
-    sql_query = SQLQuery.parse(raw_sql)
+  def parse(show_all_rows)
+    sql_query = SQLQuery.new(raw_sql)
 
     unless show_all_rows
       sql_query = sql_query.limit(DEFAULT_LIMIT)
     end
 
-    if !for_account?
-      return sql_query
+    if for_account?
+      sql_query = sql_query.scope_to(account_id)
     end
 
-    sql_query.scope_to(account_id)
+    @parsed = sql_query
   end
-
-  private
 
   def database
     if for_account?

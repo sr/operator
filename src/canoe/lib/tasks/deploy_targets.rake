@@ -7,10 +7,20 @@ namespace :canoe do
 
     BREAD_HIPCHAT_ROOM_ID = 42
     ENGR_HIPCHAT_ROOM_ID = 2
-    OPS_HIPCHAT_ROOM_ID = 6
     ES_ONCALL_HIPCHAT_ROOM_ID = 901
+    OPS_HIPCHAT_ROOM_ID = 6
     SUPPORT_HIPCHAT_ROOM_ID = 28
     TEAM_CAERUS_HIPCHAT_ROOM_ID = 437
+    TRITON_HIPCHAT_ROOM_ID = 872
+
+    eht = Project.find_or_initialize_by(name: "engagement-history-topology").tap { |project|
+      project.icon = "book"
+      project.bamboo_project = "PDT"
+      project.bamboo_plan = "EHT"
+      project.repository = "Pardot/engagement-history-topology"
+      project.save!
+    }.tap(&:save!)
+    eht.deploy_notifications.find_or_initialize_by(hipchat_room_id: TRITON_HIPCHAT_ROOM_ID).tap(&:save!)
 
     explorer = Project.find_or_initialize_by(name: "explorer").tap { |project|
       project.icon = "search"
