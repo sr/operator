@@ -1078,6 +1078,12 @@ resource "aws_instance" "appdev_toolsproxy1" {
   }
 }
 
+resource "aws_eip" "appdev_toolsproxy1" {
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  instance = "${element(aws_instance.appdev_toolsproxy1.*.id, count.index)}"
+  vpc = true
+}
+
 resource "aws_route53_record" "appdev_toolsproxy1_arecord" {
   count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
