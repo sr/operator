@@ -7,56 +7,40 @@ var builderTemplate = generator.NewTemplate("builder-gen.go",
 package main
 
 import (
-	"errors"
-	"flag"
-	"os"
-	"strings"
-
+	"github.com/sr/operator"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 {{range .Services}}
-	"{{.ImportPath}}"
+	{{.PackageName}} "{{.ImportPath}}"
 {{- end}}
 )
 
-func buildOperatorServer(
-	server *grpc.Server,
-	flags *flag.FlagSet,
-) (map[string]error, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 {{- range .Services}}
-	{{.Name}}Config := &{{.PackageName}}.{{.FullName}}Config{}
-{{- end}}
-{{- range .Services}}
-	{{- $serviceName := .Name }}
-	{{- range .Config}}
-	flags.StringVar(&{{$serviceName}}Config.{{camelCase .Name}}, "{{$serviceName}}-{{.Name}}", "", "")
-	{{- end}}
-{{- end}}
-	services := make(map[string]error)
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return services, err
-	}
-	errs := make(map[string][]string)
-{{- range .Services}}
-	{{- $serviceName := .Name }}
-	{{- range .Config}}
-	if {{$serviceName}}Config.{{camelCase .Name}} == "" {
-		errs["{{$serviceName}}"] = append(errs["{{$serviceName}}"], "{{.Name}}")
-	}
-	{{- end }}
-{{- end }}
-{{- range .Services}}
-	if len(errs["{{.Name}}"]) != 0 {
-		services["{{.Name}}"] = errors.New("required flag(s) missing: "+strings.Join(errs["{{.Name}}"], ", "))
-	} else {
-		{{.Name}}Server, err := {{.PackageName}}.NewAPIServer({{.Name}}Config)
-		if err != nil {
-			services["{{.Name}}"] = err
-		} else {
-			{{.Name}}.Register{{camelCase .FullName}}Server(server, {{.Name}}Server)
-			services["{{.Name}}"] = nil
+	{{- $serviceName := .PackageName }}
+	{{- $serviceFullName := .FullName }}
+	if req.Call.Service == "{{lowerCase .PackageName}}" {
+	{{- range .Methods }}
+		if req.Call.Method == "{{lowerCase .Name}}" {
+			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+			_, err := client.{{.Name}}(
+				ctx,
+				&{{$serviceName}}.{{.Input}}{
+					Request: req,
+					{{- range .Arguments}}
+					{{camelCase .Name}}: args["{{.Name}}"],
+					{{- end}}
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
 		}
+	{{- end }}
 	}
-{{- end}}
-	return services, nil
-}`)
+	return false, nil
+{{- end }}
+}
+`)

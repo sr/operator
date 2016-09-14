@@ -3,14 +3,14 @@ package operator
 import (
 	"errors"
 	"flag"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 )
 
 const DefaultAddress = "localhost:9000"
@@ -18,26 +18,40 @@ const DefaultAddress = "localhost:9000"
 var ErrInvalidRequest = errors.New("invalid rpc request")
 
 type Authorizer interface {
-	Authorize(*Request) error
+	Authorize(context.Context, *Request) error
 }
 
 type Instrumenter interface {
-	Instrument(*Request)
+	Instrument(*Event)
 }
 
-type Logger interface {
-	Info(proto.Message)
-	Error(proto.Message)
+type Requester interface {
+	GetRequest() *Request
 }
 
-type Sourcer interface {
-	GetSource() *Source
+type Decoder interface {
+	Decode(context.Context, *http.Request) (*Message, string, error)
 }
 
-type ServerBuilder func(server *grpc.Server, flags *flag.FlagSet) (map[string]error, error)
+type Replier interface {
+	Reply(context.Context, *Source, string, *Message) error
+}
 
-type Config struct {
-	Address string
+type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
+
+type Event struct {
+	Key     string
+	Message *Message
+	Request *Request
+	Args    map[string]string
+	Error   error
+}
+
+type Message struct {
+	Source  *Source
+	Text    string
+	HTML    string
+	Options interface{} `json:"-"`
 }
 
 type Command struct {
@@ -47,7 +61,7 @@ type Command struct {
 
 type CommandContext struct {
 	Address string
-	Source  *Source
+	Request *Request
 	Flags   *flag.FlagSet
 	Args    []string
 }
@@ -69,50 +83,77 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
-func NewLogger() Logger {
-	return newLogger()
-}
-
-func NewInstrumenter(logger Logger) Instrumenter {
-	return newInstrumenter(logger)
-}
-
-func NewInterceptor(
+func NewHandler(
 	instrumenter Instrumenter,
-	authorizer Authorizer,
-) grpc.UnaryServerInterceptor {
+	decoder Decoder,
+	prefix string,
+	conn *grpc.ClientConn,
+	invoker Invoker,
+) (http.Handler, error) {
+	return newHandler(
+		instrumenter,
+		decoder,
+		prefix,
+		conn,
+		invoker,
+	)
+}
+
+func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		in interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		sourcer, ok := in.(Sourcer)
-		if !ok || sourcer.GetSource() == nil {
+		requester, ok := in.(interface {
+			GetRequest() *Request
+		})
+		req := requester.GetRequest()
+		if !ok || req == nil {
 			return nil, ErrInvalidRequest
 		}
 		s := strings.Split(info.FullMethod, "/")
 		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
 			return nil, ErrInvalidRequest
 		}
-		request := &Request{
-			Source: sourcer.GetSource(),
-			Call:   &Call{Service: s[1], Method: s[2]},
+		req.Call = &Call{
+			Service: strings.ToLower(s[1]),
+			Method:  strings.ToLower(s[2]),
 		}
-		if err := authorizer.Authorize(request); err != nil {
+		if err := auth.Authorize(ctx, req); err != nil {
+			inst.Instrument(&Event{Key: "unauthorized_request", Request: req, Error: err})
 			return nil, err
 		}
 		start := time.Now()
-		response, err := handler(ctx, in)
+		resp, err := handler(ctx, in)
 		if err != nil {
-			request.Call.Error = &Error{Message: err.Error()}
+			req.Call.Error = err.Error()
 		}
-		request.Call.Duration = ptypes.DurationProto(time.Since(start))
-		instrumenter.Instrument(request)
-		return response, err
+		req.Call.Duration = ptypes.DurationProto(time.Since(start))
+		inst.Instrument(&Event{Key: "completed_request", Request: req, Error: err})
+		return resp, err
 	}
 }
 
-func NewArgumentRequiredError(argument string) error {
-	return &argumentRequiredError{argument}
+func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {
+	req := r.GetRequest()
+	if req == nil {
+		return nil, errors.New("unable to reply without a request")
+	}
+	src := req.GetSource()
+	if req == nil {
+		return nil, errors.New("unable to reply to request with a source")
+	}
+	if msg.HTML == "" && msg.Text == "" {
+		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
+	}
+	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
+}
+
+func (r *Request) UserEmail() string {
+	if r != nil && r.Source != nil && r.Source.User != nil {
+		return r.Source.User.Email
+	}
+	return ""
 }

@@ -27,7 +27,7 @@ var cmd = operator.NewCommand(
 	[]operator.ServiceCommand{
 {{- range .Services}}
 		{
-{{- $serviceName := .Name }}
+{{- $serviceName := .PackageName }}
 {{- $serviceFullName := .FullName }}
 			Name:     "{{ $serviceName }}",
 			Synopsis: `+"`"+`{{ .Description }}`+"`"+`,
@@ -57,10 +57,10 @@ var cmd = operator.NewCommand(
 						}
 						defer conn.Close()
 						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
-						response, err := client.{{.Name}}(
+						resp, err := client.{{.Name}}(
 							context.Background(),
 							&{{$serviceName}}.{{.Input}}{
-								Source: ctx.Source,
+								Request: ctx.Request,
 								{{- range .Arguments}}
 								{{camelCase .Name}}: *{{.Name}},
 								{{- end}}
@@ -69,7 +69,7 @@ var cmd = operator.NewCommand(
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
 					},
 				},
 	{{- end }}
@@ -86,7 +86,7 @@ func main() {
 			panic(err)
 		}
 	} else {
-		if _, err := io.WriteString(os.Stdout, output); err != nil {
+		if _, err := io.WriteString(os.Stdout, output+"\n"); err != nil {
 			panic(err)
 		}
 	}

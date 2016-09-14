@@ -17,9 +17,7 @@ import (
 const (
 	binaryParam     = "binary"
 	importPathParam = "import_path"
-
-	outputField = "output"
-	sourceField = "source"
+	sourceField     = "request"
 )
 
 func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
@@ -78,13 +76,17 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			nameStr := *name.(*string)
 			fn := file.GetName()
 			importPath := filepath.Join(importPathPrefix, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
+			pkg := file.GetPackage()
+			// Check for overriden go package
+			if gopkg := file.GetOptions().GetGoPackage(); gopkg != "" {
+				pkg = gopkg
+			}
 			services[j] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
-				// TODO(sr) might have to handle go_package proto option as well
-				PackageName: file.GetPackage(),
+				PackageName: pkg,
 				ImportPath:  importPath,
 			}
 			if m, ok := messagesByName[service.GetName()+"Config"]; ok {
@@ -109,12 +111,28 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				if err := validateMessageHasField(input, sourceField); err != nil {
 					return nil, err
 				}
-				output, ok := messagesByName[outputName]
-				if !ok {
-					return nil, fmt.Errorf("No definition for output message %s", outputName)
-				}
-				if err := validateMessageHasField(output, outputField); err != nil {
-					return nil, err
+				if method.GetOutputType() != ".operator.Response" {
+					output, ok := messagesByName[outputName]
+					if !ok {
+						return nil, fmt.Errorf("No definition for output message %s", outputName)
+					}
+					if len(output.Field) == 0 {
+						return nil, fmt.Errorf("Output message '%s' has no field", output.GetName())
+					}
+					var field *descriptor.FieldDescriptorProto
+					ok = false
+					for _, f := range output.Field {
+						if f.GetNumber() == 1 {
+							ok = true
+							field = f
+						}
+					}
+					if !ok {
+						return nil, fmt.Errorf("Output message '%s' has no field with ID = %d", output.GetName(), 1)
+					}
+					if field.GetType() != descriptor.FieldDescriptorProto_TYPE_STRING {
+						return nil, fmt.Errorf("field %s.message must be a string", output.GetName())
+					}
 				}
 				services[j].Methods[k] = &Method{
 					Name:        method.GetName(),
