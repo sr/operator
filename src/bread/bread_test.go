@@ -64,10 +64,10 @@ func TestAuthorizer(t *testing.T) {
 		if err == nil {
 			break
 		}
-		if i >= 5 {
+		if i >= 500 {
 			t.Fatal(err)
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Millisecond)
 		i = i + 1
 	}
 	defer conn.Close()
