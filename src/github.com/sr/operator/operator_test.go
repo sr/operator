@@ -37,7 +37,7 @@ type fakeStore struct {
 	config *operatorhipchat.ClientConfig
 }
 
-func (s *fakeStore) GetByOAuthID(_ string) (operatorhipchat.ClientConfiger, error) {
+func (s *fakeStore) GetByOAuthID(_ string) (operatorhipchat.Clienter, error) {
 	return &fakeClientConfig{s.config}, nil
 }
 
