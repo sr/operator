@@ -632,7 +632,6 @@ resource "aws_route53_record" "appdev_rabbit1_arecord" {
   ttl = "900"
 }
 
-
 resource "aws_instance" "appdev_rabbit2" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_rabbit2_hosts"]}"
