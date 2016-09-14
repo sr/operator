@@ -581,14 +581,47 @@ resource "aws_instance" "appdev_rabbit1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
-    "${aws_security_group.appdev_toolsproxy_access.id}"
+    "${aws_security_group.appdev_rabbithost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
 }
+
+resource "aws_security_group" "appdev_rabbithost" {
+  name = "appdev_rabbithost"
+  description = "Allow access through the toolsproxy and from apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}",
+      "${aws_security_group.appdev_apphost.id}"
+    ]
+  }
+
+  # allow health check from ELBs
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 
 resource "aws_route53_record" "appdev_rabbit1_arecord" {
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
@@ -613,8 +646,7 @@ resource "aws_instance" "appdev_rabbit2" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
-    "${aws_security_group.appdev_toolsproxy_access.id}"
+    "${aws_security_group.appdev_rabbithost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
@@ -1027,21 +1059,6 @@ resource "aws_security_group" "appdev_toolsproxy" {
   }
 }
 
-resource "aws_security_group" "appdev_toolsproxy_access" {
-  name = "appdev_toolsproxy_access"
-  description = "Allow access through the toolsproxy"
-  vpc_id = "${aws_vpc.appdev.id}"
-
-  ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    security_groups = [
-      "${aws_security_group.appdev_toolsproxy.id}"
-    ]
-  }
-}
-
 resource "aws_instance" "appdev_toolsproxy1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
@@ -1060,6 +1077,15 @@ resource "aws_instance" "appdev_toolsproxy1" {
     Name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "aws_route53_record" "appdev_toolsproxy1_arecord" {
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_toolsproxy1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
 }
 
 resource "aws_instance" "appdev_vault1" {
