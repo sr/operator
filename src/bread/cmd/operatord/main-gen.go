@@ -6,16 +6,16 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	ping "bread/ping"
+	breadping "bread/ping"
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "ping" {
+	if req.Call.Service == "breadping" {
 		if req.Call.Method == "otp" {
-			client := ping.NewPingerClient(conn)
+			client := breadping.NewPingerClient(conn)
 			_, err := client.Otp(
 				ctx,
-				&ping.OtpRequest{
+				&breadping.OtpRequest{
 					Request: req,
 				},
 			)
@@ -25,10 +25,10 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return true, nil
 		}
 		if req.Call.Method == "ping" {
-			client := ping.NewPingerClient(conn)
+			client := breadping.NewPingerClient(conn)
 			_, err := client.Ping(
 				ctx,
-				&ping.PingRequest{
+				&breadping.PingRequest{
 					Request: req,
 					Arg1:    args["arg1"],
 				},
@@ -39,10 +39,10 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return true, nil
 		}
 		if req.Call.Method == "whoami" {
-			client := ping.NewPingerClient(conn)
+			client := breadping.NewPingerClient(conn)
 			_, err := client.Whoami(
 				ctx,
-				&ping.WhoamiRequest{
+				&breadping.WhoamiRequest{
 					Request: req,
 				},
 			)

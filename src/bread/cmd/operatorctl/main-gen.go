@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	ping "bread/ping"
+	breadping "bread/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -18,7 +18,7 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "ping",
+			Name:     "breadping",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -34,10 +34,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ping.NewPingerClient(conn)
+						client := breadping.NewPingerClient(conn)
 						resp, err := client.Otp(
 							context.Background(),
-							&ping.OtpRequest{
+							&breadping.OtpRequest{
 								Request: ctx.Request,
 							},
 						)
@@ -66,10 +66,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ping.NewPingerClient(conn)
+						client := breadping.NewPingerClient(conn)
 						resp, err := client.Ping(
 							context.Background(),
-							&ping.PingRequest{
+							&breadping.PingRequest{
 								Request: ctx.Request,
 								Arg1:    *arg1,
 							},
@@ -93,10 +93,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ping.NewPingerClient(conn)
+						client := breadping.NewPingerClient(conn)
 						resp, err := client.Whoami(
 							context.Background(),
-							&ping.WhoamiRequest{
+							&breadping.WhoamiRequest{
 								Request: ctx.Request,
 							},
 						)
