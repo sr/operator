@@ -9,6 +9,7 @@ variable "environment_appdev" {
     env_name = "appdev"
     pardot_env_id = "pardot2"
     dc_id = "ue1"
+    lightweight_instance_type = "c4.large"
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
@@ -1072,7 +1073,7 @@ resource "aws_instance" "appdev_toolsproxy1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["lightweight_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   associate_public_ip_address = false
   root_block_device {
