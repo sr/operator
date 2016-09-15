@@ -11,6 +11,7 @@
 # Commands:
 #   hubot gif <query> - returns a relevant .gifv to the query
 #   hubot aggablagblag - agga blag blag
+#   hubot terrifying - Get TV Commercial Hearttrhrob Milana Vayntraub
 #   hubot casey - Get casey
 #   hubot baller - Get Chappelle. Just saiyan...
 #   hubot meeks - Get meeks
@@ -142,6 +143,9 @@ module.exports = (robot) ->
 
   robot.respond /picklegusta$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/62/SmWraho0s2Iyhkf/upload.png"
+
+  robot.respond /terrifying$/i, (msg) ->
+    msg.send "http://i.imgur.com/9f8x6MF.gif"
 
   robot.respond /thumbsup$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/88/MVcZU1s2CcLTCeS/thumbsup.png"
