@@ -12,6 +12,7 @@
 #   hubot gif <query> - returns a relevant .gifv to the query
 #   hubot aggablagblag - agga blag blag
 #   hubot casey - Get casey
+#   hubot baller - Get Chappelle. Just saiyan...
 #   hubot meeks - Get meeks
 #   hubot toiletnuggets - Get rid of some nuggets
 #   hubot reversenuggets - Get nuggets
@@ -114,6 +115,9 @@ module.exports = (robot) ->
 
   robot.respond /gus$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/252/6jIMiKPvXi17T0l/fuuuuuu_gus.jpg"
+
+  robot.respond /baller$/i, (msg) ->
+    msg.send "http://i.imgur.com/zRKUVBS.gifv"
 
   robot.respond /lemon$/i, (msg) ->
     msg.send "http://i.imgur.com/bMWBLVk.gifv"
