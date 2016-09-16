@@ -1,6 +1,7 @@
 class DeployNotification < ApplicationRecord
   PRODUCTION_COLOR = "purple".freeze
   NON_PRODUCTION_COLOR = "gray".freeze
+  UNTESTED_COLOR = "red".freeze
 
   belongs_to :project
 
@@ -61,7 +62,7 @@ class DeployNotification < ApplicationRecord
     notifier.notify_room(
       hipchat_room_id,
       msg,
-      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+      color: UNTESTED_COLOR
     )
   end
 
