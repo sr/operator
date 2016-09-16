@@ -625,8 +625,8 @@ resource "aws_security_group" "appdev_rabbithost" {
 
 resource "aws_route53_record" "appdev_rabbit_webapp_arecord" {
   count = "2"
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
-  name = "rabbit${count.index + 1}-appdev.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "rabbit${count.index + 1}-app.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_eip.appdev_toolsproxy1.public_ip}"]
   type = "A"
   ttl = "900"
