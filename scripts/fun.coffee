@@ -13,6 +13,7 @@
 #   hubot aggablagblag - agga blag blag
 #   hubot terrifying - Get TV Commercial Hearttrhrob Milana Vayntraub
 #   hubot casey - Get casey
+#   hubot soon - Get CPJ
 #   hubot baller - Get Chappelle. Just saiyan...
 #   hubot meeks - Get meeks
 #   hubot toiletnuggets - Get rid of some nuggets
@@ -137,6 +138,9 @@ module.exports = (robot) ->
 
   robot.respond /trolledum8$/i, (msg) ->
     msg.send "http://media2.giphy.com/media/12kwNiP8SSIUus/giphy.gif"
+
+  robot.respond /soon$/i, (msg) ->
+    msg.send "http://assets.sbnation.com/assets/785150/pjsoon-vi.gif"
 
   robot.respond /raptorcamp$/i, (msg) ->
     msg.send "http://www.mtv.com/news/wp-content/uploads/buzz/2012/12/Ecstasy-Must-Be-Hitting-Bible-Camp.gif"
