@@ -117,7 +117,6 @@ resource "aws_elasticache_cluster" "parbot_production" {
   security_group_ids = ["${aws_security_group.parbot_redis_production.id}"]
   snapshot_retention_limit = 30
   snapshot_window = "04:00-06:00"
-  apply_immediately = true
 }
 
 resource "aws_security_group" "parbot_db_production" {

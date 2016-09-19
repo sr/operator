@@ -40,7 +40,6 @@ resource "aws_elasticache_cluster" "hal9000_production" {
   security_group_ids = ["${aws_security_group.hal9000_redis_production.id}"]
   snapshot_retention_limit = 30
   snapshot_window = "04:00-06:00"
-  apply_immediately = true
 }
 
 resource "aws_elb" "hal9000_production" {
