@@ -1078,15 +1078,6 @@ resource "aws_security_group" "appdev_toolsproxy" {
       ]
   }
 
-  ingress {
-    from_port = 15672
-    to_port = 15672
-    protocol = "tcp"
-    secuirty_grops = [
-      "${aws_security_group.appdev_rabbithost.id}"
-    ]
-  }
-
   egress {
     from_port = 0
     to_port = 0
