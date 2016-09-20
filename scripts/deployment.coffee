@@ -113,12 +113,10 @@ module.exports = (robot) ->
       inProgressBuilds: (cb) ->
         bamboo.inProgressBuilds 'PDT-PPANT', (err, builds) ->
           if err?
-            console.log "bamboo err: #{err}"
             cb(err, null)
           else
-            console.log builds
             async.map builds,
-              (b, cb) -> console.log(b); bamboo.buildStatus(b.key, cb),
+              (b, cb) -> bamboo.buildStatus(b.key, cb),
               cb
     , (err, result) ->
       prettifiedInProgressBuilds = _.chain(result.inProgressBuilds)
