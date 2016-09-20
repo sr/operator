@@ -392,7 +392,7 @@ resource "aws_elb" "artifactory_private_elb" {
 }
 
 resource "aws_iam_user" "artifactory_sysacct" {
-  name = "artifactorysysacct"
+  name = "sa_artifactory"
 }
 
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
