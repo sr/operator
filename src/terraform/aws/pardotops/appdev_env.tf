@@ -26,7 +26,7 @@ variable "environment_appdev" {
     num_rabbit1_hosts = 3
     num_rabbit2_hosts = 3
     num_redisrules1_hosts = 2
-    num_autojob1_hosts = 1
+    num_autojob1_hosts = 4
     num_storm1_hosts = 1
     num_kafka1_hosts = 1
     num_zkkafka1_hosts = 1
@@ -1194,7 +1194,7 @@ resource "aws_s3_bucket" "cephthumbs_s3_filestore" {
     expiration {
       days = 30
     }
-  } 
+  }
   policy = <<EOF
 {
   "Version": "2012-10-17",
