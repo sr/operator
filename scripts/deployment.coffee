@@ -123,7 +123,7 @@ module.exports = (robot) ->
         .select((r) -> r.progress)
         .map((r) -> "<a href=\"#{bamboo.host}/browse/#{r.key}\">master/build#{_.last(r.key.split('-'))}</a>: #{r.progress.prettyTimeRemainingLong}")
         .join("<br>")
-        .value()
+        .value() || "<i>no builds in progress</i>"
 
       if err?
         msg.send "Something went wrong: #{err}"
