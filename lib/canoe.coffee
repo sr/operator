@@ -14,6 +14,8 @@ class Canoe
       .get() (err, res, body) ->
         if err?
           cb(err, null) if cb
+        else if res.statusCode isnt 200
+          cb(new Error("HTTP #{res.statusCode}"), null) if cb
         else
           cb(null, JSON.parse(body)) if cb
 
@@ -23,6 +25,8 @@ class Canoe
       .get() (err, res, body) ->
         if err?
           cb(err, null) if cb
+        else if res.statusCode isnt 200
+          cb(new Error("HTTP #{res.statusCode}"), null) if cb
         else
           cb(null, JSON.parse(body)) if cb
 

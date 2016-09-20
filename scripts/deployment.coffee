@@ -5,6 +5,9 @@
 #   HUBOT_CANOE_HOST
 #   HUBOT_CANOE_API_TOKEN
 #   HUBOT_CANOE_TARGET_NAME
+#   HUBOT_BAMBOO_HOST
+#   HUBOT_BAMBOO_USERNAME
+#   HUBOT_BAMBOO_PASSWORD
 #
 # Commands:
 #   hubot lastrelease - Returns information about the last Pardot sync
@@ -23,10 +26,19 @@ async = require "async"
 eachCons = require "each-cons"
 
 Canoe = require "../lib/canoe"
+Bamboo = require "../lib/bamboo"
 date = require "../lib/date"
 
 module.exports = (robot) ->
-  canoe = new Canoe(process.env.HUBOT_CANOE_HOST, process.env.HUBOT_CANOE_API_TOKEN)
+  canoe = new Canoe(
+    process.env.HUBOT_CANOE_HOST || 'https://canoe.dev.pardot.com',
+    process.env.HUBOT_CANOE_API_TOKEN
+  )
+  bamboo = new Bamboo(
+    process.env.HUBOT_BAMBOO_HOST || 'https://bamboo.dev.pardot.com',
+    process.env.HUBOT_BAMBOO_USERNAME,
+    process.env.HUBOT_BAMBOO_PASSWORD
+  )
 
   robot.respond /doc(?:s)?\s*(.*)?/i, (msg) ->
     conf = "https://confluence.dev.pardot.com/"
@@ -40,7 +52,7 @@ module.exports = (robot) ->
   robot.respond /last(?:releases?|syncs?)(?:\s+(\d+))?$/i, (msg) ->
     number = _.min([10, parseInt(msg.match[1] || "1")])
 
-    canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME, "pardot", (err, deploys) ->
+    canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME || "production", "pardot", (err, deploys) ->
       if err?
         msg.send "Something went wrong: #{err}"
       else
@@ -85,28 +97,39 @@ module.exports = (robot) ->
         msg.hipchatNotify msgs.join("<br>\n")
 
   robot.respond /ondeck$/i, (msg) ->
-    async.parallel [
-      (cb) ->
-        canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME, "pardot", (err, deploys) ->
+    async.parallel
+      latestDeploy: (cb) ->
+        canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME || "production", "pardot", (err, deploys) ->
           if err?
             cb(err, null)
           else
             cb(null, deploys[0])
-      , (cb) ->
+      latestBuild: (cb) ->
         canoe.builds "pardot", "master", 10, (err, builds) ->
           if err?
             cb(err, null)
           else
             cb(null, builds[0])
-    ], (err, results) ->
+      inProgressBuilds: (cb) ->
+        bamboo.inProgressBuilds 'PDT-PPANT', (err, builds) ->
+          if err?
+            cb(err, null)
+          else
+            async.map builds,
+              (b, cb) -> bamboo.buildStatus(b.key, cb),
+              cb
+    , (err, result) ->
+      prettifiedInProgressBuilds = _.chain(result.inProgressBuilds)
+        .select((r) -> r.progress)
+        .map((r) -> "<a href=\"#{bamboo.host}/browse/#{r.key}\">master/build#{_.last(r.key.split('-'))}</a>: #{r.progress.prettyTimeRemainingLong}")
+        .join("<br>")
+        .value() || "<i>no builds in progress</i>"
+
       if err?
         msg.send "Something went wrong: #{err}"
       else
-        deploy = results[0]
-        build = results[1]
-
-        if deploy.branch == "master" and deploy.build_number == build.build_number
-          msg.send "Looks like we are up to date. (buttrock)"
+        if result.latestDeploy.branch == "master" and result.latestDeploy.build_number == result.latestBuild.build_number
+          msg.hipchatNotify "Looks like we are up to date. <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\"><br><br>#{prettifiedInProgressBuilds}"
         else
-          githubLink = "https://git.dev.pardot.com/pardot/pardot/compare/#{deploy.sha}...#{build.sha}"
-          msg.hipchatNotify "Changes on deck: <a href=\"#{githubLink}\">#{deploy.branch}/build#{deploy.build_number}...master/build#{build.build_number}</a>"
+          githubLink = "https://git.dev.pardot.com/pardot/pardot/compare/#{result.latestDeploy.sha}...#{result.latestBuild.sha}"
+          msg.hipchatNotify "Changes on deck: <b><a href=\"#{githubLink}\">#{result.latestDeploy.branch}/build#{result.latestDeploy.build_number}...master/build#{result.latestBuild.build_number}</a></b><br><br>#{prettifiedInProgressBuilds}"
