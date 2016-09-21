@@ -61,7 +61,7 @@ func run(invoker operator.Invoker) error {
 	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
 	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
 	flags.StringVar(&config.bamboo.Username, "bamboo-username", "", "TODO")
-	flags.StringVar(&config.bamboo.Password, "bamboo-username", "", "TODO")
+	flags.StringVar(&config.bamboo.Password, "bamboo-password", "", "TODO")
 	flags.StringVar(&config.bamboo.URL, "bamboo-url", "", "TODO")
 	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "", "TODO")
 	flags.StringVar(&config.deploy.CanoeECSService, "deploy-canoe-ecs-service", "", "TODO")
