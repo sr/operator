@@ -4,32 +4,25 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-PATH="$(pwd)/bin:$PATH"
+: "${BREAD:="$(pwd)"}"
+export BREAD
+
+PATH="$BREAD/bin:$PATH"
 export PATH
 
 # Bring in configuration settings
-. etc/build/env
+. "$BREAD/etc/buildenv"
 
+# Enable tracing output if DEBUG is set
 : "${DEBUG:=""}"
 test -n "$DEBUG" && set -x
 
-: "${NOPULL:=""}"
-pullopts=""
-if [ -z "$NOPULL" ]; then
-  pullopts="--pull"
-fi
-
-usage() {
-    grep ^#/ <"$0" |cut -c4-
-    exit 1
-}
-
 project=""
-while [ $# -gt 0 ]
-do
+while [ $# -gt 0 ]; do
     case "$1" in
         -h|--help)
-            usage
+            grep ^#/ <"$0" |cut -c4-
+            exit 1
             ;;
         *)
             project="$1"
@@ -38,32 +31,42 @@ do
     esac
 done
 
-# Bail out in case there is nothing to build. This typically does should not
-# happen during normal usage and is therefore considered an error.
-test -z "$project"  && {
+# Bail out in case there is nothing to build. This typically should not happen
+# during normal usage and is therefore considered an error (non-zero status code)
+if [ -z "$project"  ]; then
     echo "build: Nothing to build." 2>&1
     exit 1
-}
+fi
 
-# Workaround docker networking bug
-docker-hack-restart
+# HACK: Workaround for docker networking issues
+if [ -x "/bin/systemctl" ] && [ "$(hostname -f | cut -d. -f2-4)" != "internal.salesforce.com" ]; then
+    docker network ls --filter="type=custom" | sed 1d | awk '{print $2}' | xargs -r docker network rm || true
+    sudo /bin/systemctl restart docker.service
+    sleep 5
+fi
 
-# HACK: Override Artifactory host name on CI machines to workaround this:
-# https://jira.dev.pardot.com/browse/BREAD-797
-if [ -n "$CI" ]
-then
+# HACK: Override Artifactory hostname on CI machines to workaround BREAD-797
+if [ -n "$CI" ]; then
     find src -type f -name Gemfile -print0 |
     xargs -0 sed -i.bak -e's/artifactory\.dev\.pardot\.com/artifactory-internal\.dev\.pardot\.com/g'
     ARTIFACTORY_HOST="artifactory-internal.dev.pardot.com"
-    export ARTIFACTORY_HOST
-    unset -v ARTIFACTORY_URL
+    ARTIFACTORY_URL="https://${ARTIFACTORY_HOST}/artifactory"
+    export ARTIFACTORY_HOST ARTIFACTORY_URL
 fi
 
+# Pull the latest version of the build image unless $NOPULL is set
+: "${NOPULL:=""}"
+pullopts=""
+if [ -z "$NOPULL" ]; then
+  pullopts="--pull"
+fi
 docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
 build_rubygem() {
+    gemname="$1"
+    gemspec="$2"
     docker run --rm \
-        -v "$(pwd):/data" \
+        -v "$BREAD:/data" \
         -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
         -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
         -e "CI_BRANCH=$CI_BRANCH" \
@@ -72,8 +75,44 @@ build_rubygem() {
         -e "DEBUG=$DEBUG" \
         build/build \
         build-rubygem \
-        "$1" \
-        "$2"
+        "$gemname" \
+        "$gemspec"
+}
+
+docker_push() {
+    app="$1"
+    repo="$DOCKER_REPO_BREAD/$app/app:$(docker-image-tag)"
+    echo "Pushing container image to ${repo}..." 2>&1
+    docker tag "${app}_app" "$repo"
+    docker push "$repo"
+}
+
+tarball_upload() {
+    gitsha1="$1"
+    tarball="$2"
+    green="$3"
+
+    docker run --rm \
+        -v "$BREAD:/data" \
+        -v "${tarball}:/data/tarball.tar" \
+        -w "/data" \
+        -e "ARTIFACTORY_HOST=$ARTIFACTORY_HOST" \
+        -e "ARTIFACTORY_REPO_CANOE=$ARTIFACTORY_REPO_CANOE" \
+        -e "ARTIFACTORY_URL=$ARTIFACTORY_URL" \
+        -e "ARTIFACTORY_USERNAME=$ARTIFACTORY_USERNAME" \
+        -e "ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD" \
+        -e "BAMBOO_BUILD_RESULTS_URL=$BAMBOO_BUILD_RESULTS_URL" \
+        -e "BAMBOO_BUILD_TIMESTAMP=$BAMBOO_BUILD_TIMESTAMP" \
+        -e "BAMBOO_REPO_URL=$BAMBOO_REPO_URL" \
+        -e "CANOE_ARTIFACTORY_REPO=$ARTIFACTORY_REPO_CANOE" \
+        -e "CI=$CI" \
+        -e "CI_PLAN=$CI_PLAN" \
+        -e "CI_JOB=$CI_JOB" \
+        -e "CI_PROJECT=$CI_PROJECT" \
+        -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
+        -e "CI_BRANCH=$CI_BRANCH" \
+        build/build \
+        tarball-upload "$gitsha1" "$green" /data/tarball.tar
 }
 
 echo "===> Building ${project}..." 2>&1
@@ -81,54 +120,58 @@ echo "===> Building ${project}..." 2>&1
 case "$project" in
     canoe)
         build-ruby "$project"
-        test -n "$CI" && docker-push "$project"
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
+        ;;
+    devenv)
+        docker run --rm -w /go -v "$BREAD/src:/go/src" \
+            -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
+            make -f etc/mk/golang.mk install-devenv
         ;;
     explorer)
         build-ruby "$project"
-        test -n "$CI" && {
+
+        if [ -n "$CI" ]; then
             # Build a tarball from the app container built above
             tarball="$(tarball-build-ruby "explorer_app")"
             trap 'rm -f $tarball' EXIT
 
-            # Prepare the tarball and upload it to Artifactory
-            docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
-        }
-        ;;
-    devenv)
-        docker run --rm -w /go -v "$(pwd):/go" \
-            -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
-            make -f etc/mk/golang.mk install-devenv
+            # Update the tarball to Artifactory
+            tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+        fi
         ;;
     golang)
-        docker run --rm -w /go -v "$(pwd):/go" build/build \
+        docker run --rm -w /go -v "$BREAD:/go" build/build \
             make -f etc/mk/golang.mk
 
         if [ -n "$CI" ]; then
           pushd "bin"
           tarball="$(tarball-build "jiracleaner")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
-          docker-tarball-upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
           popd
         fi
         ;;
     hal9000)
         build-ruby "$project"
-        test -n "$CI" && docker-push "$project"
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
         ;;
     operator)
-        # TODO(sr) Do this for all builds
-        BREAD="$(pwd)"
-        export BREAD
-
         # Start the test LDAP server
         make -f etc/mk/operator.mk docker-build-ldap
         ldapc="operator_ldap_$$"
         trap 'docker stop -t3 $ldapc >/dev/null 2>&1' EXIT
         docker run --name "$ldapc" -d -v "$BREAD/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
 
-        # Run the entire Go test suite
+        # Run the normal set of Go checks against the operatord command
         docker run --rm -w /go \
             -v "$BREAD/src:/go/src" \
             -v "$BREAD/etc/mk:/go/etc/mk" \
@@ -154,12 +197,14 @@ case "$project" in
         cp /tmp/operatord_linux "$BREAD/operatord"
         make -f etc/mk/operator.mk docker-build-operatord
 
-        # Push the container to Artifactory on CI
+        # Push the container to Artifactory (CI-only)
         if [ -n "$CI" ]; then
-            docker-push "${project}d"
+            docker_push "${project}d"
         fi
         ;;
     parbot)
+        # This expects PARBOT_DIR to be pointing to a checkout of the
+        # Pardot/parbot repository.
         parbotdir="${PARBOT_DIR:-""}"
         echo "$parbotdir"
         if [ -z "$parbotdir" ] || [ ! -d "$parbotdir" ]; then
@@ -171,41 +216,56 @@ case "$project" in
         cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
         docker build $pullopts -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
 
-        test -n "$CI" && docker-push "$project"
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
         ;;
     pd-sync-chef)
+        # This is a fork of <https://github.com/PagerDuty/pd-sync-chef> which
+        # does not follow the strict formatting and styles rules we normally
+        # enforce for Ruby code within this repository so we skip the lint check
         build-ruby --no-lint "$project"
 
-        test -n "$CI" &&
-        build_rubygem "pardot_chef-sync" "src/pd-sync-chef/pardot_chef-sync.gemspec"
+        if [ -n "$CI" ]; then
+            build_rubygem "pardot_chef-sync" \
+                "src/pd-sync-chef/pardot_chef-sync.gemspec"
+        fi
         ;;
     pull_agent)
         build-ruby "$project"
 
-        test -n "$CI" && {
+        if [ -n "$CI" ]; then
             build_rubygem "pardot_pull-agent" \
                 "src/pull_agent/pardot_pull-agent.gemspec"
-        }
+        fi
         ;;
     rubylib)
         build-ruby "rubylib"
         ;;
     shell)
-        docker build $pullopts -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
-        docker run --rm -v "$(pwd):/data" -e "PATH=/data/src/build:$PATH" \
-            build/shellcheck lint-shell
+        # Build a container image with the shellcheck package installed.
+        # Unfortunately installing shellcheck on CentOS is non-trivial so this
+        # an Ubuntu image.
+        docker build $pullopts \
+            -f etc/docker/Dockerfile.shellcheck -t build/shellcheck .
+
+        # Lint all shell scripts
+        docker run --rm -v "$BREAD:/data" \
+            -e "PATH=/data/src/build:$PATH" build/shellcheck lint-shell
         ;;
     teampass)
-        docker build $pullopts -f src/teampass/Dockerfile -t teampass_app src/teampass
-        test -n "$CI" && docker-push "$project"
+        docker build $pullopts \
+            -f src/teampass/Dockerfile -t teampass_app src/teampass
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
         ;;
     terraform)
-        docker run -e "GOPATH=/data" --rm -v "$(pwd):/data" \
-            build/build \
+        docker run -e "GOPATH=/data" --rm -v "$BREAD:/data" build/build \
             terra validate
         ;;
     *)
-        echo "No build rule defined for project \"$project\"." 2>&1
         exit 1
         ;;
 esac

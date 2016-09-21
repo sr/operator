@@ -3,5 +3,5 @@
 #/ Writes the image ID of the current build to standard output.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-. etc/build/env
+. etc/buildenv
 printf "%s-%s-%s" "$CI_PROJECT" "$CI_PLAN" "$CI_BUILD_NUMBER"
