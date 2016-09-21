@@ -9,3 +9,6 @@ pardotatlassian_secret_access_key = ""
 
 pardotci_access_key_id = ""
 pardotci_secret_access_key = ""
+
+pardot_access_key_id = ""
+pardot_secret_access_key = ""
