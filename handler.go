@@ -96,21 +96,14 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ReplierId: replierID,
 		Source:    msg.Source,
 	}
-	if ok, err := h.invoker(h.ctx, h.conn, req); !ok || err != nil {
-		h.inst.Instrument(&Event{
-			Key:     "handler_invoker_error",
-			Message: msg,
-			Request: req,
-			Args:    args,
-			Error:   err,
-		})
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	h.inst.Instrument(&Event{
-		Key:     "handler_message_handled",
-		Message: msg,
-		Request: req,
-		Args:    args,
-	})
+	go func(req *Request, msg *Message) {
+		if ok, err := h.invoker(h.ctx, h.conn, req); !ok || err != nil {
+			h.inst.Instrument(&Event{
+				Key:     "handler_invoker_error",
+				Message: msg,
+				Request: req,
+				Error:   err,
+			})
+		}
+	}(req, msg)
 }
