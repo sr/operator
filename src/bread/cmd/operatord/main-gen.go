@@ -9,7 +9,7 @@ import (
 	breadpb "bread/pb"
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
 	if req.Call.Service == "ci" {
 		if req.Call.Method == "listBuilds" {
 			client := breadpb.NewBambooClient(conn)
@@ -17,7 +17,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				ctx,
 				&breadpb.ListBuildsRequest{
 					Request: req,
-					Plan:    args["plan"],
+					Plan:    req.Call.Args["plan"],
 				},
 			)
 			if err != nil {
@@ -46,8 +46,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				ctx,
 				&breadpb.TriggerRequest{
 					Request: req,
-					App:     args["app"],
-					Build:   args["build"],
+					App:     req.Call.Args["app"],
+					Build:   req.Call.Args["build"],
 				},
 			)
 			if err != nil {
@@ -76,7 +76,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				ctx,
 				&breadpb.PingRequest{
 					Request: req,
-					Arg1:    args["arg1"],
+					Arg1:    req.Call.Args["arg1"],
 				},
 			)
 			if err != nil {

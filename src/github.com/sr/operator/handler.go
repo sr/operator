@@ -90,12 +90,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Call: &Call{
 			Service: matches[1],
 			Method:  matches[2],
+			Args:    args,
 		},
 		Otp:       otp,
 		ReplierId: replierID,
 		Source:    msg.Source,
 	}
-	if ok, err := h.invoker(h.ctx, h.conn, req, args); !ok || err != nil {
+	if ok, err := h.invoker(h.ctx, h.conn, req); !ok || err != nil {
 		h.inst.Instrument(&Event{
 			Key:     "handler_invoker_error",
 			Message: msg,

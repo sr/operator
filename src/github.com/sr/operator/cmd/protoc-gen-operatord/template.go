@@ -16,7 +16,7 @@ import (
 {{end}}
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
 {{- range .Services}}
 	{{- $pkg := .Package }}
 	{{- $svc := .FullName }}
@@ -29,7 +29,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				&{{$pkg}}.{{.Input}}{
 					Request: req,
 					{{- range .Arguments}}
-					{{camelCase .Name}}: args["{{.Name}}"],
+					{{camelCase .Name}}: req.Call.Args["{{.Name}}"],
 					{{- end}}
 				},
 			)
