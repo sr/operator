@@ -15,9 +15,9 @@ import (
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
-	{{- range .Services}}
-	{{.PackageName}} "{{.ImportPath}}"
-	{{- end}}
+{{range $k, $v := .Imports}}
+	{{$k}} "{{$v}}"
+{{end}}
 )
 
 const programName = "{{.Options.BinaryName}}"
@@ -27,9 +27,9 @@ var cmd = operator.NewCommand(
 	[]operator.ServiceCommand{
 {{- range .Services}}
 		{
-{{- $serviceName := .PackageName }}
-{{- $serviceFullName := .FullName }}
-			Name:     "{{ $serviceName }}",
+{{- $pkg := .Package }}
+{{- $svc := .FullName }}
+			Name:     "{{ .Name }}",
 			Synopsis: `+"`"+`{{ .Description }}`+"`"+`,
 			Methods: []operator.MethodCommand{
 	{{- range .Methods}}
@@ -56,10 +56,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+						client := {{$pkg}}.New{{$svc}}Client(conn)
 						resp, err := client.{{.Name}}(
 							context.Background(),
-							&{{$serviceName}}.{{.Input}}{
+							&{{$pkg}}.{{.Input}}{
 								Request: ctx.Request,
 								{{- range .Arguments}}
 								{{camelCase .Name}}: *{{.Name}},

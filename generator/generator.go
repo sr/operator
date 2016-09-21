@@ -22,6 +22,7 @@ const (
 
 type Descriptor struct {
 	Options  *Options
+	Imports  map[string]string
 	Services []*Service
 }
 
@@ -34,8 +35,7 @@ type Service struct {
 	Name        string
 	FullName    string
 	Description string
-	PackageName string
-	ImportPath  string
+	Package     string
 	Methods     []*Method
 	Config      []Setting
 }

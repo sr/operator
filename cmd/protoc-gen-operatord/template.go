@@ -11,22 +11,22 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-{{range .Services}}
-	{{.PackageName}} "{{.ImportPath}}"
-{{- end}}
+{{range $k, $v := .Imports}}
+	{{$k}} "{{$v}}"
+{{end}}
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 {{- range .Services}}
-	{{- $serviceName := .PackageName }}
-	{{- $serviceFullName := .FullName }}
-	if req.Call.Service == "{{lowerCase .PackageName}}" {
+	{{- $pkg := .Package }}
+	{{- $svc := .FullName }}
+	if req.Call.Service == "{{lowerCase .Name}}" {
 	{{- range .Methods }}
 		if req.Call.Method == "{{lowerCase .Name}}" {
-			client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+			client := {{$pkg}}.New{{$svc}}Client(conn)
 			_, err := client.{{.Name}}(
 				ctx,
-				&{{$serviceName}}.{{.Input}}{
+				&{{$pkg}}.{{.Input}}{
 					Request: req,
 					{{- range .Arguments}}
 					{{camelCase .Name}}: args["{{.Name}}"],
@@ -40,7 +40,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 		}
 	{{- end }}
 	}
-	return false, nil
 {{- end }}
+	return false, nil
 }
 `)
