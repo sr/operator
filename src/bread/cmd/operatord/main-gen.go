@@ -10,7 +10,7 @@ import (
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "deploy" {
+	if req.Call.Service == "ci" {
 		if req.Call.Method == "listBuilds" {
 			client := breadpb.NewBambooClient(conn)
 			_, err := client.ListBuilds(
@@ -25,6 +25,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			}
 			return true, nil
 		}
+	}
+	if req.Call.Service == "deploy" {
 		if req.Call.Method == "listApps" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListApps(

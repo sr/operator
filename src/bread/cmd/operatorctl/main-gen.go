@@ -7,10 +7,10 @@ import (
 	"io"
 	"os"
 
-	breadpb "bread/pb"
-
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
+
+	breadpb "bread/pb"
 )
 
 const programName = "operator"
@@ -19,7 +19,7 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "breadpb",
+			Name:     "ci",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -59,7 +59,7 @@ var cmd = operator.NewCommand(
 		},
 
 		{
-			Name:     "breadpb",
+			Name:     "deploy",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -131,7 +131,7 @@ var cmd = operator.NewCommand(
 		},
 
 		{
-			Name:     "breadpb",
+			Name:     "ping",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{

@@ -55,6 +55,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		Options: &Options{
 			BinaryName: binaryName,
 		},
+		Imports: map[string]string{},
 	}
 	i := 0
 	sort.Strings(request.FileToGenerate)
@@ -74,20 +75,21 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				return nil, err
 			}
 			nameStr := *name.(*string)
-			fn := file.GetName()
-			importPath := filepath.Join(importPathPrefix, strings.Replace(path.Base(fn), path.Ext(fn), "", -1))
 			pkg := file.GetPackage()
 			// Check for overriden go package
 			if gopkg := file.GetOptions().GetGoPackage(); gopkg != "" {
 				pkg = gopkg
 			}
+			fn := file.GetName()
+			if _, ok := desc.Imports[pkg]; !ok {
+				desc.Imports[pkg] = filepath.Join(importPathPrefix, path.Dir(fn))
+			}
 			services[j] = &Service{
 				Name:        nameStr,
 				FullName:    service.GetName(),
+				Package:     pkg,
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
-				PackageName: pkg,
-				ImportPath:  importPath,
 			}
 			if m, ok := messagesByName[service.GetName()+"Config"]; ok {
 				services[j].Config = make([]Setting, len(m.Field))
