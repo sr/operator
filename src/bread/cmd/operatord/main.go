@@ -99,6 +99,12 @@ func run(invoker operator.Invoker) error {
 	if config.hipchatWebhookURL == "" {
 		return fmt.Errorf("required flag missing: hipchat-webhook-url")
 	}
+	if config.bamboo.Username == "" {
+		return fmt.Errorf("required flag missing: bamboo-username")
+	}
+	if config.bamboo.Password == "" {
+		return fmt.Errorf("required flag missing: bamboo-password")
+	}
 	if config.yubico.ID == "" {
 		return fmt.Errorf("required flag missing: yubico-api-id")
 	}
