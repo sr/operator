@@ -1,9 +1,9 @@
 syntax = "proto3";
 
+package bread;
+
 import "google/protobuf/duration.proto";
 import "operator.proto";
-
-package bread;
 
 option go_package = "breadpb";
 

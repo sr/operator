@@ -1,4 +1,4 @@
-package breaddeploy
+package bread
 
 import (
 	"errors"
@@ -7,14 +7,15 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"golang.org/x/net/context"
+
+	"bread/pb"
 )
 
-const defaultPlan = "BREAD-BREAD"
-
-type apiServer struct {
+type deployAPIServer struct {
 	ecs    *ecs.ECS
 	ecr    *ecr.ECR
 	apps   map[string]string
@@ -28,34 +29,29 @@ type parsedImg struct {
 	tag        string
 }
 
-func newAPIServer(
-	ecs *ecs.ECS,
-	ecr *ecr.ECR,
-	apps map[string]string,
-	ecsSvc string,
-	_ int,
-) (*apiServer, error) {
-	return &apiServer{
-		ecs,
-		ecr,
-		apps,
-		ecsSvc,
-	}, nil
+func newDeployAPIServer(config *DeployConfig) *deployAPIServer {
+	client := session.New(&aws.Config{Region: aws.String(config.AWSRegion)})
+	return &deployAPIServer{
+		ecs.New(client),
+		ecr.New(client),
+		config.Apps,
+		config.CanoeECSService,
+	}
 }
 
-func (s *apiServer) ListApps(ctx context.Context, in *ListAppsRequest) (*ListAppsResponse, error) {
+func (s *deployAPIServer) ListApps(ctx context.Context, in *breadpb.ListAppsRequest) (*breadpb.ListAppsResponse, error) {
 	apps := make([]string, len(s.apps))
 	i := 0
 	for _, s := range s.apps {
 		apps[i] = s
 		i = i + 1
 	}
-	return &ListAppsResponse{
+	return &breadpb.ListAppsResponse{
 		Message: fmt.Sprintf("deployable apps: %s", strings.Join(apps, ", ")),
 	}, nil
 }
 
-func (s *apiServer) Trigger(ctx context.Context, in *TriggerRequest) (*TriggerResponse, error) {
+func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
 	var cluster string
 	cluster, ok := s.apps[in.App]
 	if !ok {
@@ -143,7 +139,7 @@ OuterLoop:
 	if err != nil {
 		return nil, err
 	}
-	return &TriggerResponse{
+	return &breadpb.TriggerResponse{
 		Message: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
 	}, nil
 }

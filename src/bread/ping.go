@@ -1,4 +1,4 @@
-package breadping
+package bread
 
 import (
 	"fmt"
@@ -6,13 +6,19 @@ import (
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
+
+	"bread/pb"
 )
 
 type apiServer struct {
 	operator.Replier
 }
 
-func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {
+func newPingAPIServer(replier operator.Replier) breadpb.PingerServer {
+	return &apiServer{replier}
+}
+
+func (s *apiServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
@@ -23,7 +29,7 @@ func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Respo
 	})
 }
 
-func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Response, error) {
+func (s *apiServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "ok",
 		HTML: "<b>ok</b>",
@@ -34,7 +40,7 @@ func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Respons
 	})
 }
 
-func (s *apiServer) Whoami(ctx context.Context, req *WhoamiRequest) (*operator.Response, error) {
+func (s *apiServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
 	email := req.Request.UserEmail()
 	if email == "" {
 		email = "unknown"

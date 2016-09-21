@@ -7,7 +7,8 @@ import (
 	"io"
 	"os"
 
-	breadping "bread/ping"
+	breadpb "bread/pb"
+
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -18,7 +19,119 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "breadping",
+			Name:     "breadpb",
+			Synopsis: `Undocumented.`,
+			Methods: []operator.MethodCommand{
+				{
+					Name:     "list-builds",
+					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "plan",
+							Usage: "Undocumented.",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						plan := ctx.Flags.String("plan", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewBambooClient(conn)
+						resp, err := client.ListBuilds(
+							context.Background(),
+							&breadpb.ListBuildsRequest{
+								Request: ctx.Request,
+								Plan:    *plan,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+			},
+		},
+
+		{
+			Name:     "breadpb",
+			Synopsis: `Undocumented.`,
+			Methods: []operator.MethodCommand{
+				{
+					Name:     "list-apps",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewDeployClient(conn)
+						resp, err := client.ListApps(
+							context.Background(),
+							&breadpb.ListAppsRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
+					Name:     "trigger",
+					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "app",
+							Usage: "Undocumented.",
+						},
+						{
+							Name:  "build",
+							Usage: "Undocumented.",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						app := ctx.Flags.String("app", "", "")
+						build := ctx.Flags.String("build", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewDeployClient(conn)
+						resp, err := client.Trigger(
+							context.Background(),
+							&breadpb.TriggerRequest{
+								Request: ctx.Request,
+								App:     *app,
+								Build:   *build,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+			},
+		},
+
+		{
+			Name:     "breadpb",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
@@ -34,10 +147,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadping.NewPingerClient(conn)
+						client := breadpb.NewPingerClient(conn)
 						resp, err := client.Otp(
 							context.Background(),
-							&breadping.OtpRequest{
+							&breadpb.OtpRequest{
 								Request: ctx.Request,
 							},
 						)
@@ -66,10 +179,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadping.NewPingerClient(conn)
+						client := breadpb.NewPingerClient(conn)
 						resp, err := client.Ping(
 							context.Background(),
-							&breadping.PingRequest{
+							&breadpb.PingRequest{
 								Request: ctx.Request,
 								Arg1:    *arg1,
 							},
@@ -93,10 +206,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadping.NewPingerClient(conn)
+						client := breadpb.NewPingerClient(conn)
 						resp, err := client.Whoami(
 							context.Background(),
-							&breadping.WhoamiRequest{
+							&breadpb.WhoamiRequest{
 								Request: ctx.Request,
 							},
 						)

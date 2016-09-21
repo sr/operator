@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"bread/ping"
+	"bread/pb"
 )
 
 const (
@@ -61,6 +61,19 @@ type ACLEntry struct {
 	Call  *operator.Call
 	Group string
 	OTP   bool
+}
+
+type BambooConfig struct {
+	Username string
+	Password string
+	URL      string
+}
+
+type DeployConfig struct {
+	Apps            map[string]string
+	AWSRegion       string
+	CanoeECSService string
+	Timeout         int
 }
 
 type YubicoConfig struct {
@@ -117,15 +130,25 @@ func NewServer(
 	auth operator.Authorizer,
 	inst operator.Instrumenter,
 	repl operator.Replier,
+	bamboo *BambooConfig,
+	deploy *DeployConfig,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
 	)
-	pinger, err := breadping.NewAPIServer(repl)
+	bambooSrv, err := newBambooAPIServer(bamboo)
 	if err != nil {
 		return nil, err
 	}
-	breadping.RegisterPingerServer(server, pinger)
+	if len(deploy.Apps) == 0 {
+		deploy.Apps = map[string]string{
+			"canoe":   "canoe_production",
+			"hal9000": "hal9000_production",
+		}
+	}
+	breadpb.RegisterPingerServer(server, newPingAPIServer(repl))
+	breadpb.RegisterBambooServer(server, bambooSrv)
+	breadpb.RegisterDeployServer(server, newDeployAPIServer(deploy))
 	return server, nil
 }
 

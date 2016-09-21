@@ -6,16 +6,60 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	breadping "bread/ping"
+	breadpb "bread/pb"
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "breadping" {
+	if req.Call.Service == "deploy" {
+		if req.Call.Method == "listBuilds" {
+			client := breadpb.NewBambooClient(conn)
+			_, err := client.ListBuilds(
+				ctx,
+				&breadpb.ListBuildsRequest{
+					Request: req,
+					Plan:    args["plan"],
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+		if req.Call.Method == "listApps" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListApps(
+				ctx,
+				&breadpb.ListAppsRequest{
+					Request: req,
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+		if req.Call.Method == "trigger" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.Trigger(
+				ctx,
+				&breadpb.TriggerRequest{
+					Request: req,
+					App:     args["app"],
+					Build:   args["build"],
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+	}
+	if req.Call.Service == "ping" {
 		if req.Call.Method == "otp" {
-			client := breadping.NewPingerClient(conn)
+			client := breadpb.NewPingerClient(conn)
 			_, err := client.Otp(
 				ctx,
-				&breadping.OtpRequest{
+				&breadpb.OtpRequest{
 					Request: req,
 				},
 			)
@@ -25,10 +69,10 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return true, nil
 		}
 		if req.Call.Method == "ping" {
-			client := breadping.NewPingerClient(conn)
+			client := breadpb.NewPingerClient(conn)
 			_, err := client.Ping(
 				ctx,
-				&breadping.PingRequest{
+				&breadpb.PingRequest{
 					Request: req,
 					Arg1:    args["arg1"],
 				},
@@ -39,10 +83,10 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return true, nil
 		}
 		if req.Call.Method == "whoami" {
-			client := breadping.NewPingerClient(conn)
+			client := breadpb.NewPingerClient(conn)
 			_, err := client.Whoami(
 				ctx,
-				&breadping.WhoamiRequest{
+				&breadpb.WhoamiRequest{
 					Request: req,
 				},
 			)

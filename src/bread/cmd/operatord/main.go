@@ -37,10 +37,17 @@ type config struct {
 	hipchatNamespace  string
 	hipchatAddonURL   string
 	hipchatWebhookURL string
+
+	bamboo *bread.BambooConfig
+	deploy *bread.DeployConfig
 }
 
 func run(invoker operator.Invoker) error {
-	config := &config{yubico: &bread.YubicoConfig{}}
+	config := &config{
+		bamboo: &bread.BambooConfig{},
+		deploy: &bread.DeployConfig{},
+		yubico: &bread.YubicoConfig{},
+	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
@@ -53,6 +60,12 @@ func run(invoker operator.Invoker) error {
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
 	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
 	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
+	flags.StringVar(&config.bamboo.Username, "bamboo-username", "", "TODO")
+	flags.StringVar(&config.bamboo.Password, "bamboo-username", "", "TODO")
+	flags.StringVar(&config.bamboo.URL, "bamboo-url", "", "TODO")
+	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "", "TODO")
+	flags.StringVar(&config.deploy.CanoeECSService, "deploy-canoe-ecs-service", "", "TODO")
+	flags.IntVar(&config.deploy.Timeout, "deploy-timeout", 120, "TODO")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -123,7 +136,13 @@ func run(invoker operator.Invoker) error {
 		return err
 	}
 	var grpcServer *grpc.Server
-	grpcServer, err = bread.NewServer(auth, inst, replier)
+	grpcServer, err = bread.NewServer(
+		auth,
+		inst,
+		replier,
+		config.bamboo,
+		config.deploy,
+	)
 	if err != nil {
 		return err
 	}

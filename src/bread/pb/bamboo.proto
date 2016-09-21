@@ -1,21 +1,15 @@
 syntax = "proto3";
 
+package bread;
+
 import "operator.proto";
 
-option go_package = "breadbamboo";
-
-package bamboo;
+option go_package = "breadpb";
 
 service Bamboo {
   option (operator.name) = "ci";
 
   rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
-}
-
-message BambooConfig {
-  string BambooUsername = 5;
-  string BambooPassword = 6;
-  string BambooUrl = 7;
 }
 
 message ListBuildsRequest {

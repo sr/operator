@@ -1,10 +1,10 @@
 syntax = "proto3";
 
+package bread;
+
 import "operator.proto";
 
-package ping;
-
-option go_package = "breadping";
+option go_package = "breadpb";
 
 service Pinger {
     option (operator.name) = "ping";
@@ -12,9 +12,6 @@ service Pinger {
     rpc Otp(OtpRequest) returns (operator.Response);
     rpc Ping(PingRequest) returns (operator.Response);
     rpc Whoami(WhoamiRequest) returns (operator.Response);
-}
-
-message PingerConfig {
 }
 
 message OtpRequest {

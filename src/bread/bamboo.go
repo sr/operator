@@ -1,4 +1,4 @@
-package breadbamboo
+package bread
 
 import (
 	"bytes"
@@ -9,20 +9,45 @@ import (
 	"text/tabwriter"
 
 	"golang.org/x/net/context"
+
+	"bread/pb"
 )
 
 const defaultPlan = "BREAD-BREAD"
 
-type apiServer struct {
+type bambooAPIServer struct {
 	bamboo    *http.Client
 	bambooURL *url.URL
 }
 
-func newAPIServer(bamboo *http.Client, bambooURL *url.URL) (*apiServer, error) {
-	return &apiServer{bamboo, bambooURL}, nil
+type bambooTransport struct {
+	Username string
+	Password string
 }
 
-func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*ListBuildsResponse, error) {
+func newBambooAPIServer(config *BambooConfig) (*bambooAPIServer, error) {
+	bamboo := &bambooTransport{
+		Username: config.Username,
+		Password: config.Password,
+	}
+	u, err := url.Parse(config.URL)
+	if err != nil {
+		return nil, err
+	}
+	return &bambooAPIServer{bamboo.Client(), u}, nil
+}
+
+func (t bambooTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.SetBasicAuth(t.Username, t.Password)
+	req.Header.Set("Accept", "application/json")
+	return http.DefaultTransport.RoundTrip(req)
+}
+
+func (t *bambooTransport) Client() *http.Client {
+	return &http.Client{Transport: t}
+}
+
+func (s *bambooAPIServer) ListBuilds(ctx context.Context, in *breadpb.ListBuildsRequest) (*breadpb.ListBuildsResponse, error) {
 	var plan string
 	if in.Plan == "" {
 		plan = defaultPlan
@@ -66,7 +91,7 @@ func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*Lis
 	if err := w.Flush(); err != nil {
 		return nil, err
 	}
-	return &ListBuildsResponse{
+	return &breadpb.ListBuildsResponse{
 		Message: out.String(),
 	}, nil
 }

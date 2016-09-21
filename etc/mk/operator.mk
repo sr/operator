@@ -25,15 +25,12 @@ SVC_DIR ?= $(GOPATH)/src/bread
 SVC_IMPORT_PATH ?= bread
 
 generate: $(PROTOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD)
-	find $(GOPATH)/src/bread -type f -name "*.proto" | \
-	while read f; do \
-		$< \
-			-I$(GOPATH)/src/bread \
-			-I$(GOPATH)/src/github.com/sr/operator \
-			--operatorctl_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORCTL_DIR) \
-			--operatord_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORD_DIR) \
-			--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) $$f; \
-	done
+	$< \
+		-I$(GOPATH)/src/bread \
+		-I$(GOPATH)/src/github.com/sr/operator \
+		--operatorctl_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORCTL_DIR) \
+		--operatord_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORD_DIR) \
+		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) $(GOPATH)/src/bread/pb/*.proto
 
 ldap-dev: docker-build-ldap
 	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true
