@@ -148,7 +148,7 @@ func NewServer(
 	}
 	breadpb.RegisterPingerServer(server, newPingAPIServer(repl))
 	breadpb.RegisterBambooServer(server, bambooSrv)
-	breadpb.RegisterDeployServer(server, newDeployAPIServer(deploy))
+	breadpb.RegisterDeployServer(server, newDeployAPIServer(repl, deploy))
 	return server, nil
 }
 

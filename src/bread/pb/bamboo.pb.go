@@ -20,7 +20,6 @@ It has these top-level messages:
 	ServerStartupNotice
 	ServiceStartupError
 	ListAppsRequest
-	ListAppsResponse
 	TriggerRequest
 	TriggerResponse
 	OtpRequest

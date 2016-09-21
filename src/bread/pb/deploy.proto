@@ -9,16 +9,12 @@ option go_package = "breadpb";
 service Deploy {
   option (operator.name) = "deploy";
 
-  rpc ListApps(ListAppsRequest) returns (ListAppsResponse);
+  rpc ListApps(ListAppsRequest) returns (operator.Response);
   rpc Trigger(TriggerRequest) returns (TriggerResponse);
 }
 
 message ListAppsRequest {
   operator.Request request = 1;
-}
-
-message ListAppsResponse {
-  string Message = 1;
 }
 
 message TriggerRequest {

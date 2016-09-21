@@ -10,12 +10,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
 	"bread/pb"
 )
 
 type deployAPIServer struct {
+	operator.Replier
 	ecs    *ecs.ECS
 	ecr    *ecr.ECR
 	apps   map[string]string
@@ -29,9 +31,10 @@ type parsedImg struct {
 	tag        string
 }
 
-func newDeployAPIServer(config *DeployConfig) *deployAPIServer {
+func newDeployAPIServer(repl operator.Replier, config *DeployConfig) *deployAPIServer {
 	client := session.New(&aws.Config{Region: aws.String(config.AWSRegion)})
 	return &deployAPIServer{
+		repl,
 		ecs.New(client),
 		ecr.New(client),
 		config.Apps,
@@ -39,16 +42,16 @@ func newDeployAPIServer(config *DeployConfig) *deployAPIServer {
 	}
 }
 
-func (s *deployAPIServer) ListApps(ctx context.Context, in *breadpb.ListAppsRequest) (*breadpb.ListAppsResponse, error) {
+func (s *deployAPIServer) ListApps(ctx context.Context, req *breadpb.ListAppsRequest) (*operator.Response, error) {
 	apps := make([]string, len(s.apps))
 	i := 0
 	for _, s := range s.apps {
 		apps[i] = s
 		i = i + 1
 	}
-	return &breadpb.ListAppsResponse{
-		Message: fmt.Sprintf("deployable apps: %s", strings.Join(apps, ", ")),
-	}, nil
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "Deployable apps: " + strings.Join(apps, ", "),
+	})
 }
 
 func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
