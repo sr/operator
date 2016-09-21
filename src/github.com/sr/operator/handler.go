@@ -5,48 +5,38 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 
 	"golang.org/x/net/context"
 
 	"google.golang.org/grpc"
-
-	"github.com/golang/protobuf/ptypes"
 )
 
 const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
-	ctx          context.Context
-	logger       Logger
-	instrumenter Instrumenter
-	authorizer   Authorizer
-	decoder      Decoder
-	re           *regexp.Regexp
-	conn         *grpc.ClientConn
-	invoker      Invoker
+	ctx     context.Context
+	inst    Instrumenter
+	decoder Decoder
+	re      *regexp.Regexp
+	conn    *grpc.ClientConn
+	invoker Invoker
 }
 
 func newHandler(
-	logger Logger,
-	instrumenter Instrumenter,
-	authorizer Authorizer,
+	inst Instrumenter,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
 ) (*handler, error) {
-	// TODO(sr) Quote the prefix with regexp.QuoteMeta
-	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, prefix))
+	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
 		context.Background(),
-		logger,
-		instrumenter,
-		authorizer,
+		inst,
 		decoder,
 		re,
 		conn,
@@ -55,15 +45,15 @@ func newHandler(
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	message, replierID, err := h.decoder.Decode(h.ctx, r)
+	msg, replierID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
-		// TODO(sr) Log decoding error
+		h.inst.Instrument(&Event{Key: "handler_decode_error", Error: err})
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Printf("DEBUG decode error: %s\n", err)
 		return
 	}
-	matches := h.re.FindStringSubmatch(message.Text)
+	matches := h.re.FindStringSubmatch(msg.Text)
 	if matches == nil {
+		h.inst.Instrument(&Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -83,6 +73,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.IsSpace(c)
 		}
 	})
+	var otp string
+	if len(words) != 0 && !strings.Contains(words[len(words)-1], "=") {
+		otp, words = words[len(words)-1], words[:len(words)-1]
+	}
 	for _, arg := range words {
 		parts := strings.Split(arg, "=")
 		if len(parts) != 2 {
@@ -97,25 +91,19 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Service: matches[1],
 			Method:  matches[2],
 		},
-		Source:    message.Source,
+		Otp:       otp,
 		ReplierId: replierID,
+		Source:    msg.Source,
 	}
-	if err := h.authorizer.Authorize(h.ctx, req); err != nil {
-		// TODO(sr) Log unauthorized error
-		fmt.Printf("DEBUG authorize error: %s\n", err)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	start := time.Now()
-	ok, err := h.invoker(h.ctx, h.conn, req, args)
-	if !ok {
-		// TODO(sr) Log unhandled message
+	if ok, err := h.invoker(h.ctx, h.conn, req, args); !ok || err != nil {
+		h.inst.Instrument(&Event{
+			Key:     "handler_invoker_error",
+			Message: msg,
+			Request: req,
+			Args:    args,
+			Error:   err,
+		})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	if err != nil {
-		req.Call.Error = &Error{Message: err.Error()}
-	}
-	req.Call.Duration = ptypes.DurationProto(time.Since(start))
-	h.instrumenter.Instrument(req)
 }

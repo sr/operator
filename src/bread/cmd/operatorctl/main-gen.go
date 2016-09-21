@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	ping "bread/ping"
+	breadping "bread/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -18,9 +18,35 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "ping",
+			Name:     "breadping",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
+				{
+					Name:     "otp",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadping.NewPingerClient(conn)
+						resp, err := client.Otp(
+							context.Background(),
+							&breadping.OtpRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
 				{
 					Name:     "ping",
 					Synopsis: `Undocumented.`,
@@ -40,10 +66,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ping.NewPingerClient(conn)
+						client := breadping.NewPingerClient(conn)
 						resp, err := client.Ping(
 							context.Background(),
-							&ping.PingRequest{
+							&breadping.PingRequest{
 								Request: ctx.Request,
 								Arg1:    *arg1,
 							},
@@ -67,10 +93,10 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := ping.NewPingerClient(conn)
+						client := breadping.NewPingerClient(conn)
 						resp, err := client.Whoami(
 							context.Background(),
-							&ping.WhoamiRequest{
+							&breadping.WhoamiRequest{
 								Request: ctx.Request,
 							},
 						)

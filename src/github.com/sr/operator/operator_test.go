@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/dvsekhvalnov/jose2go"
-	"github.com/golang/protobuf/proto"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/testing"
@@ -24,23 +23,11 @@ var credentials = &operatorhipchat.ClientCredentials{
 	Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
 }
 
-var logger = &fakeLogger{}
+type noopInstrumenter struct{}
 
-type fakeLogger struct{}
-
-type fakeAuthorizer struct{}
+func (i *noopInstrumenter) Instrument(*operator.Event) {}
 
 type fakeReplier struct{}
-
-func (l *fakeLogger) Info(_ proto.Message) {
-}
-
-func (l *fakeLogger) Error(_ proto.Message) {
-}
-
-func (a *fakeAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
-	return nil
-}
 
 func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
@@ -50,7 +37,7 @@ type fakeStore struct {
 	config *operatorhipchat.ClientConfig
 }
 
-func (s *fakeStore) GetByOAuthID(_ string) (operatorhipchat.ClientConfiger, error) {
+func (s *fakeStore) GetByOAuthID(_ string) (operatorhipchat.Clienter, error) {
 	return &fakeClientConfig{s.config}, nil
 }
 
@@ -105,7 +92,7 @@ func TestHandler(t *testing.T) {
 	}
 	defer listener.Close()
 	go server.Serve(listener)
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(listener.Addr().String(), grpc.WithInsecure())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,15 +106,15 @@ func TestHandler(t *testing.T) {
 	}
 	store := &fakeStore{config}
 	tArgs := make(map[string]string)
+	tOTP := ""
 	h, err := operator.NewHandler(
-		logger,
-		operator.NewInstrumenter(logger),
-		&fakeAuthorizer{},
+		&noopInstrumenter{},
 		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
 		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
 			tArgs = args
+			tOTP = req.Otp
 			return true, nil
 		},
 	)
@@ -141,16 +128,20 @@ func TestHandler(t *testing.T) {
 		status int
 		jwt    bool
 		args   map[string]string
+		otp    string
 	}{
-		{"!ping ping", 200, true, noArgs},
+		{"!ping ping", 200, true, noArgs, ""},
 		{"!ping ping foo=bar spam=\"boom town\" x='sup'", 200, true,
-			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}},
-		{"!ping ping", 400, false, noArgs},
-		{"!ping", 404, true, noArgs},
-		{"!", 404, true, noArgs},
-		{" !ping ping", 404, true, noArgs},
-		{"ping", 404, true, noArgs},
-		{"", 404, true, noArgs},
+			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}, ""},
+		{"!ping ping", 400, false, noArgs, ""},
+		{"!ping ping deadbeef", 200, true, noArgs, "deadbeef"},
+		{"!ping ping x=\"y\" z=w deadbeef", 200, true,
+			map[string]string{"x": "y", "z": "w"}, "deadbeef"},
+		{"!ping", 404, true, noArgs, ""},
+		{"!", 404, true, noArgs, ""},
+		{" !ping ping", 404, true, noArgs, ""},
+		{"ping", 404, true, noArgs, ""},
+		{"", 404, true, noArgs, ""},
 	} {
 		webhook := &operatorhipchat.Payload{
 			Event: "room_message",
@@ -205,6 +196,9 @@ func TestHandler(t *testing.T) {
 					t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
 				}
 			}
+		}
+		if tt.otp != "" && tOTP != tt.otp {
+			t.Errorf("message `%s` expected to have OTP `%s` got `%s`", tt.text, tt.otp, tOTP)
 		}
 	}
 }

@@ -13,7 +13,9 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_instance.internal_apps_bastion.public_ip}/32",
-      "${aws_instance.internal_apps_bastion_2.public_ip}/32"
+      "${aws_instance.internal_apps_bastion_2.public_ip}/32",
+      "${aws_instance.internal_apps_bastion.private_ip}/32",
+      "${aws_instance.internal_apps_bastion_2.private_ip}/32",
     ]
   }
 
@@ -100,9 +102,6 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
     ]
@@ -113,10 +112,6 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "208.43.203.134/32",  # email-d1 (replication check)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
       "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
       "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
     ]
@@ -397,7 +392,7 @@ resource "aws_elb" "artifactory_private_elb" {
 }
 
 resource "aws_iam_user" "artifactory_sysacct" {
-  name = "artifactorysysacct"
+  name = "sa_artifactory"
 }
 
 resource "aws_s3_bucket" "artifactory_s3_filestore" {

@@ -3,7 +3,7 @@
   <% if @watching %>
     <i class="icon-eye-open"></i> Watching deploy of
   <% end %>
-  <%= current_deploy.project_name.capitalize %> :
+  <%= current_deploy.project_name.titleize %> :
   <%= print_deploy_what(current_deploy) %>
   to <%= current_deploy.deploy_target.name.capitalize %>
 </p>

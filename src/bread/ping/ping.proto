@@ -9,11 +9,16 @@ option go_package = "breadping";
 service Pinger {
     option (operator.name) = "ping";
 
+    rpc Otp(OtpRequest) returns (operator.Response);
     rpc Ping(PingRequest) returns (operator.Response);
     rpc Whoami(WhoamiRequest) returns (operator.Response);
 }
 
 message PingerConfig {
+}
+
+message OtpRequest {
+    operator.Request request = 1;
 }
 
 message PingRequest {

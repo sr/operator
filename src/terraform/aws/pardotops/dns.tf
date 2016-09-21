@@ -333,6 +333,14 @@ resource "aws_route53_record" "operator_dev_pardot_com_CNAMErecord" {
   ttl = "900"
 }
 
+resource "aws_route53_record" "compliance_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "compliance.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["secure-ravine-3371.whispering-wildwood-3486.herokuspace.com"]
+  type = "CNAME"
+  ttl = "900"
+}
+
 resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "hipchat.${aws_route53_zone.dev_pardot_com.name}"

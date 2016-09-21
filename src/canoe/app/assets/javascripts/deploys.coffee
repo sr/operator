@@ -14,13 +14,20 @@ $ ->
       title: property.title || capitalize(name)
       optionLabels: buildOptionLabels(property)
 
+  buildDefaultData = (properties) ->
+    _.mapObject properties, (property, name) ->
+      if property.enum
+        property.enum[0]
+      else
+        null
+
   $form = $("#deploy-form:first")
   $optionsForm = $("#deploy-options-form:first")
   optionFields = []
   if $optionsForm.length > 0
     validator = $optionsForm.data("validator")
     data = $optionsForm.data("data")
-    data = null if _.isEmpty(data)
+    data = buildDefaultData(validator.properties) if _.isEmpty(data)
 
     $optionsForm.alpaca
       schema: validator

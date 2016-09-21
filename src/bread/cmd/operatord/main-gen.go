@@ -2,46 +2,33 @@
 package main
 
 import (
-	"errors"
-	"flag"
-	"os"
-	"strings"
-
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	ping "bread/ping"
+	breadping "bread/ping"
 )
 
-func buildOperatorServer(replier operator.Replier, server *grpc.Server, flags *flag.FlagSet) (map[string]error, error) {
-	pingConfig := &ping.PingerConfig{}
-	services := make(map[string]error)
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return services, err
-	}
-	errs := make(map[string][]string)
-	if len(errs["ping"]) != 0 {
-		services["ping"] = errors.New("required flag(s) missing: " + strings.Join(errs["ping"], ", "))
-	} else {
-		pingServer, err := ping.NewAPIServer(replier, pingConfig)
-		if err != nil {
-			services["ping"] = err
-		} else {
-			ping.RegisterPingerServer(server, pingServer)
-			services["ping"] = nil
-		}
-	}
-	return services, nil
-}
-
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "ping" {
+	if req.Call.Service == "breadping" {
+		if req.Call.Method == "otp" {
+			client := breadping.NewPingerClient(conn)
+			_, err := client.Otp(
+				ctx,
+				&breadping.OtpRequest{
+					Request: req,
+				},
+			)
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
 		if req.Call.Method == "ping" {
-			client := ping.NewPingerClient(conn)
+			client := breadping.NewPingerClient(conn)
 			_, err := client.Ping(
 				ctx,
-				&ping.PingRequest{
+				&breadping.PingRequest{
 					Request: req,
 					Arg1:    args["arg1"],
 				},
@@ -52,10 +39,10 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return true, nil
 		}
 		if req.Call.Method == "whoami" {
-			client := ping.NewPingerClient(conn)
+			client := breadping.NewPingerClient(conn)
 			_, err := client.Whoami(
 				ctx,
-				&ping.WhoamiRequest{
+				&breadping.WhoamiRequest{
 					Request: req,
 				},
 			)

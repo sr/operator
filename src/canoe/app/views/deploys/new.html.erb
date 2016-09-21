@@ -1,6 +1,6 @@
 <h1>
   <%= content_tag :i, "", class: "icon-#{current_project.icon}" %>
-  <%= current_project.name.capitalize %>
+  <%= current_project.titleized_name %>
 </h1>
 
 <h2 class="steps-count">Step 3 of 3</h2>
@@ -8,7 +8,7 @@
 <%= content_tag :div, class: ["alert", current_target.production? ? "alert-danger" : "alert-info"].compact do %>
   <p class="lead">
     <strong>Deploy:</strong>
-    <%= current_project.name.capitalize %>
+    <%= current_project.titleized_name %>
     <%= print_deploy_what @prov_deploy %>
     to
     <i class="icon-bullseye"></i> <%= current_target.name.upcase %>

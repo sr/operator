@@ -10,7 +10,6 @@ import (
 
 type apiServer struct {
 	operator.Replier
-	config *PingerConfig
 }
 
 func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {
@@ -20,6 +19,17 @@ func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Respo
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.Ping",
+		},
+	})
+}
+
+func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Response, error) {
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "ok",
+		HTML: "<b>ok</b>",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "gray",
+			From:  "pinger.Otp",
 		},
 	})
 }

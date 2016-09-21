@@ -7,32 +7,34 @@ import (
 	"strings"
 	"time"
 
+	"bread/pb"
+
 	"github.com/golang/protobuf/ptypes"
-	"github.com/sr/operator"
+	"github.com/sr/operator/protolog"
 )
 
 type wrapperHandler struct {
-	logger  operator.Logger
+	logger  protolog.Logger
 	handler http.Handler
 }
 
 func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	start := time.Now()
-	ww := &responseWriter{w, 0, nil}
+	wrappedW := &responseWriter{w, 0, nil}
 	defer func() {
 		var errS string
-		if ww.writeError != nil {
-			errS = ww.writeError.Error()
+		if wrappedW.writeError != nil {
+			errS = wrappedW.writeError.Error()
 		} else {
 			errS = ""
 		}
 		var statusCode int
-		if ww.statusCode == 0 {
+		if wrappedW.statusCode == 0 {
 			statusCode = http.StatusOK
 		} else {
-			statusCode = ww.statusCode
+			statusCode = wrappedW.statusCode
 		}
-		log := &HTTPRequest{
+		log := &breadpb.HTTPRequest{
 			Method:     req.Method,
 			StatusCode: uint32(statusCode),
 			Error:      errS,
@@ -42,7 +44,7 @@ func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			log.Query = valuesMap(req.URL.Query())
 		}
 		if r := recover(); r != nil {
-			ww.WriteHeader(http.StatusInternalServerError)
+			wrappedW.WriteHeader(http.StatusInternalServerError)
 			stack := make([]byte, 8192)
 			stack = stack[:runtime.Stack(stack, false)]
 			log.Error = fmt.Sprintf("panic: %v\n%s", r, string(stack))
@@ -50,7 +52,7 @@ func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Duration = ptypes.DurationProto(time.Since(start))
 		h.logger.Info(log)
 	}()
-	h.handler.ServeHTTP(ww, req)
+	h.handler.ServeHTTP(wrappedW, req)
 }
 
 type responseWriter struct {
