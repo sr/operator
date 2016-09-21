@@ -37,13 +37,12 @@ type Replier interface {
 	Reply(context.Context, *Source, string, *Message) error
 }
 
-type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
+type Invoker func(context.Context, *grpc.ClientConn, *Request) (bool, error)
 
 type Event struct {
 	Key     string
 	Message *Message
 	Request *Request
-	Args    map[string]string
 	Error   error
 }
 
