@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package deploy;
+package bread;
 
 import "operator.proto";
 
