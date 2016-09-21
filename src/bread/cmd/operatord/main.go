@@ -45,7 +45,7 @@ type config struct {
 func run(invoker operator.Invoker) error {
 	config := &config{
 		bamboo: &bread.BambooConfig{},
-		deploy: &bread.DeployConfig{},
+		deploy: &bread.DeployConfig{Apps: bread.ECSApps},
 		yubico: &bread.YubicoConfig{},
 	}
 	flags := flag.CommandLine
@@ -98,12 +98,6 @@ func run(invoker operator.Invoker) error {
 	}
 	if config.hipchatWebhookURL == "" {
 		return fmt.Errorf("required flag missing: hipchat-webhook-url")
-	}
-	if config.bamboo.Username == "" {
-		return fmt.Errorf("required flag missing: bamboo-username")
-	}
-	if config.bamboo.Password == "" {
-		return fmt.Errorf("required flag missing: bamboo-password")
 	}
 	if config.yubico.ID == "" {
 		return fmt.Errorf("required flag missing: yubico-api-id")

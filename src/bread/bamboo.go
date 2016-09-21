@@ -25,18 +25,6 @@ type bambooTransport struct {
 	Password string
 }
 
-func newBambooAPIServer(config *BambooConfig) (*bambooAPIServer, error) {
-	bamboo := &bambooTransport{
-		Username: config.Username,
-		Password: config.Password,
-	}
-	u, err := url.Parse(config.URL)
-	if err != nil {
-		return nil, err
-	}
-	return &bambooAPIServer{bamboo.Client(), u}, nil
-}
-
 func (t bambooTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.SetBasicAuth(t.Username, t.Password)
 	req.Header.Set("Accept", "application/json")

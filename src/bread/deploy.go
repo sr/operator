@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
@@ -18,10 +17,9 @@ import (
 
 type deployAPIServer struct {
 	operator.Replier
-	ecs    *ecs.ECS
-	ecr    *ecr.ECR
-	apps   map[string]string
-	ecsSvc string
+	ecs  *ecs.ECS
+	ecr  *ecr.ECR
+	conf *DeployConfig
 }
 
 type parsedImg struct {
@@ -31,21 +29,10 @@ type parsedImg struct {
 	tag        string
 }
 
-func newDeployAPIServer(repl operator.Replier, config *DeployConfig) *deployAPIServer {
-	client := session.New(&aws.Config{Region: aws.String(config.AWSRegion)})
-	return &deployAPIServer{
-		repl,
-		ecs.New(client),
-		ecr.New(client),
-		config.Apps,
-		config.CanoeECSService,
-	}
-}
-
 func (s *deployAPIServer) ListApps(ctx context.Context, req *breadpb.ListAppsRequest) (*operator.Response, error) {
-	apps := make([]string, len(s.apps))
+	apps := make([]string, len(s.conf.Apps))
 	i := 0
-	for _, s := range s.apps {
+	for _, s := range s.conf.Apps {
 		apps[i] = s
 		i = i + 1
 	}
@@ -56,13 +43,13 @@ func (s *deployAPIServer) ListApps(ctx context.Context, req *breadpb.ListAppsReq
 
 func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
 	var cluster string
-	cluster, ok := s.apps[in.App]
+	cluster, ok := s.conf.Apps[in.App]
 	if !ok {
-		return nil, fmt.Errorf("no such app: %s", in.App)
+		return nil, fmt.Errorf("No such app: %s", in.App)
 	}
 	svc, err := s.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
-			Services: []*string{aws.String(s.ecsSvc)},
+			Services: []*string{aws.String(s.conf.CanoeECSService)},
 			Cluster:  aws.String(cluster),
 		},
 	)

@@ -10,15 +10,11 @@ import (
 	"bread/pb"
 )
 
-type apiServer struct {
+type pingAPIServer struct {
 	operator.Replier
 }
 
-func newPingAPIServer(replier operator.Replier) breadpb.PingerServer {
-	return &apiServer{replier}
-}
-
-func (s *apiServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
@@ -29,7 +25,7 @@ func (s *apiServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operat
 	})
 }
 
-func (s *apiServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
+func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "ok",
 		HTML: "<b>ok</b>",
@@ -40,7 +36,7 @@ func (s *apiServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator
 	})
 }
 
-func (s *apiServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
+func (s *pingAPIServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
 	email := req.Request.UserEmail()
 	if email == "" {
 		email = "unknown"

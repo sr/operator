@@ -4,9 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/GeertJohan/yubigo"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ecr"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -25,33 +30,40 @@ const (
 	LDAPBase    = "dc=pardot,dc=com"
 )
 
-var ACL = []*ACLEntry{
-	{
-		Call: &operator.Call{
-			// TODO(sr) Add Package field to operator.Call struct
-			Service: "ping.pinger",
-			Method:  "ping",
+var (
+	ACL = []*ACLEntry{
+		{
+			Call: &operator.Call{
+				// TODO(sr) Add Package field to operator.Call struct
+				Service: "ping.pinger",
+				Method:  "ping",
+			},
+			Group: "sysadmin",
+			OTP:   false,
 		},
-		Group: "sysadmin",
-		OTP:   false,
-	},
-	{
-		Call: &operator.Call{
-			Service: "ping.pinger",
-			Method:  "otp",
+		{
+			Call: &operator.Call{
+				Service: "ping.pinger",
+				Method:  "otp",
+			},
+			Group: "sysadmin",
+			OTP:   true,
 		},
-		Group: "sysadmin",
-		OTP:   true,
-	},
-	{
-		Call: &operator.Call{
-			Service: "ping.pinger",
-			Method:  "whoami",
+		{
+			Call: &operator.Call{
+				Service: "ping.pinger",
+				Method:  "whoami",
+			},
+			Group: "sysadmin",
+			OTP:   false,
 		},
-		Group: "sysadmin",
-		OTP:   false,
-	},
-}
+	}
+
+	ECSApps = map[string]string{
+		"canoe":   "canoe_production",
+		"hal9000": "hal9000_production",
+	}
+)
 
 type OTPVerifier interface {
 	Verify(otp string) error
@@ -136,19 +148,24 @@ func NewServer(
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
 	)
-	bambooSrv, err := newBambooAPIServer(bamboo)
-	if err != nil {
-		return nil, err
-	}
-	if len(deploy.Apps) == 0 {
-		deploy.Apps = map[string]string{
-			"canoe":   "canoe_production",
-			"hal9000": "hal9000_production",
+	breadpb.RegisterPingerServer(server, &pingAPIServer{repl})
+	if bamboo.Username != "" && bamboo.Password != "" && bamboo.URL != "" {
+		u, err := url.Parse(bamboo.URL)
+		if err != nil {
+			return nil, err
 		}
+		t := &bambooTransport{Username: bamboo.Username, Password: bamboo.Password}
+		breadpb.RegisterBambooServer(server, &bambooAPIServer{t.Client(), u})
 	}
-	breadpb.RegisterPingerServer(server, newPingAPIServer(repl))
-	breadpb.RegisterBambooServer(server, bambooSrv)
-	breadpb.RegisterDeployServer(server, newDeployAPIServer(repl, deploy))
+	if len(deploy.Apps) != 0 {
+		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
+		breadpb.RegisterDeployServer(server, &deployAPIServer{
+			repl,
+			ecs.New(sess),
+			ecr.New(sess),
+			deploy,
+		})
+	}
 	return server, nil
 }
 
