@@ -9,16 +9,15 @@ import (
 )
 
 func TestState_basic(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		OverrideEnvVar: true,
-		PreCheck:       func() { testAccPreCheck(t) },
-		Providers:      testAccProviders,
+	resource.UnitTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccState_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckStateValue(
-						"terraform_remote_state.foo", "foo", "bar"),
+						"data.terraform_remote_state.foo", "foo", "bar"),
 				),
 			},
 		},
@@ -26,10 +25,9 @@ func TestState_basic(t *testing.T) {
 }
 
 func TestState_complexOutputs(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		OverrideEnvVar: true,
-		PreCheck:       func() { testAccPreCheck(t) },
-		Providers:      testAccProviders,
+	resource.UnitTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccState_complexOutputs,
@@ -66,7 +64,7 @@ func testAccCheckStateValue(id, name, value string) resource.TestCheckFunc {
 }
 
 const testAccState_basic = `
-resource "terraform_remote_state" "foo" {
+data "terraform_remote_state" "foo" {
 	backend = "_local"
 
 	config {

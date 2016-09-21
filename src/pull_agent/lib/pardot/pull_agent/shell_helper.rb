@@ -5,7 +5,12 @@ module Pardot
 
       def self.hostname
         # Let the environment variable override the hostname
-        ENV.fetch("PULL_HOSTNAME", Socket.gethostname.sub(/(\.pardot\.com|\.ops\.sfdc\.net|\.pd25\.com|\.pd26\.com)$/, ""))
+        ENV.fetch("PULL_HOSTNAME", Socket.gethostname.sub(/(\.aws\.pardot\.com|\.ops\.sfdc\.net)$/, ""))
+      end
+
+      # TODO: Remove this when we have standardized on chef as our ansible dynamic inventory
+      def self.datacenter
+        hostname.split("-").last
       end
 
       # this should make it easier to test, etc...

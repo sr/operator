@@ -73,7 +73,7 @@ resource "aws_db_instance" "canoe_production" {
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
   vpc_security_group_ids = ["${aws_security_group.canoe_db_production.id}"]
   storage_encrypted = false
-  backup_retention_period = 5
+  backup_retention_period = 30
   apply_immediately = true
 }
 
@@ -89,20 +89,17 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
     cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-      "50.22.140.200/32",   # tools-s1.dev
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
-      "${aws_eip.appdev_nat_gw.public_ip}/32"
+      "${aws_eip.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32"
     ]
     security_groups = [
       "${aws_security_group.internal_apps_chef_server.id}"
@@ -113,19 +110,7 @@ resource "aws_security_group" "internal_apps_canoe_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-      "50.22.140.200/32"    # tools-s1.dev
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   egress {

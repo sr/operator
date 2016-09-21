@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #/ Usage: tarball-upload <git-sha1> <build-green> <tarball>
-#/ Appends build version file to the given tarball and uploads it to Artifactory.
+#/ Uploads the tarball to Artifactory.
 #/ This requires the JFrog CLI to be available in the PATH.
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
@@ -12,14 +12,6 @@ test $# -eq 3 || {
 sha1="${1:-""}"
 green="${2:-"false"}"
 tarball="${3:-""}"
-
-# Append version file to the tarball
-versionfile="build.version"
-fileurl="${ARTIFACTORY_HOST}/api/storage/${ARTIFACTORY_REPO_CANOE}/"
-fileurl="${fileurl}${CI_PLAN}/${CI_PLAN}-${CI_BUILD_NUMBER}.tar.gz"
-printf "build%s\n%s\n%s\n" "${CI_BUILD_NUMBER}" "$sha1" "$fileurl" \
-    > "$versionfile"
-tar --append --file="$tarball" "$versionfile"
 
 props="bambooProject=${CI_PROJECT};"
 props+="bambooPlan=${CI_PLAN};"

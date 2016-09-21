@@ -162,7 +162,6 @@ func (i *Interpolater) valueModuleVar(
 		} else {
 			// Same reasons as the comment above.
 			result[n] = unknownVariable()
-
 		}
 	}
 
@@ -485,12 +484,17 @@ func (i *Interpolater) computeResourceMultiVariable(
 			err)
 	}
 
-	// If we have no module in the state yet or count, return empty
-	if module == nil || len(module.Resources) == 0 || count == 0 {
+	// If count is zero, we return an empty list
+	if count == 0 {
 		return &ast.Variable{Type: ast.TypeList, Value: []ast.Variable{}}, nil
 	}
 
-	var values []string
+	// If we have no module in the state yet or count, return unknown
+	if module == nil || len(module.Resources) == 0 {
+		return &unknownVariable, nil
+	}
+
+	var values []interface{}
 	for j := 0; j < count; j++ {
 		id := fmt.Sprintf("%s.%d", v.ResourceId(), j)
 
@@ -518,9 +522,10 @@ func (i *Interpolater) computeResourceMultiVariable(
 			continue
 		}
 
-		// computed list attribute
-		_, ok = r.Primary.Attributes[v.Field+".#"]
-		if !ok {
+		// computed list or map attribute
+		_, isList := r.Primary.Attributes[v.Field+".#"]
+		_, isMap := r.Primary.Attributes[v.Field+".%"]
+		if !(isList || isMap) {
 			continue
 		}
 		multiAttr, err := i.interpolateComplexTypeAttribute(v.Field, r.Primary.Attributes)
@@ -532,14 +537,7 @@ func (i *Interpolater) computeResourceMultiVariable(
 			return &ast.Variable{Type: ast.TypeString, Value: ""}, nil
 		}
 
-		for _, element := range multiAttr.Value.([]ast.Variable) {
-			strVal := element.Value.(string)
-			if strVal == config.UnknownVariableValue {
-				return &unknownVariable, nil
-			}
-
-			values = append(values, strVal)
-		}
+		values = append(values, multiAttr)
 	}
 
 	if len(values) == 0 {

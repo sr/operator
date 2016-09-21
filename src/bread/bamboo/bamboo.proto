@@ -19,10 +19,10 @@ message BambooConfig {
 }
 
 message ListBuildsRequest {
-  operator.Source source = 1;
+  operator.Request request = 1;
   string plan = 2;
 }
 
 message ListBuildsResponse {
-  operator.Output output = 1;
+  string Message = 1;
 }

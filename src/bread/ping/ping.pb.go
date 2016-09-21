@@ -3,17 +3,18 @@
 // DO NOT EDIT!
 
 /*
-Package breadpinger is a generated protocol buffer package.
+Package breadping is a generated protocol buffer package.
 
 It is generated from these files:
 	ping/ping.proto
 
 It has these top-level messages:
 	PingerConfig
+	OtpRequest
 	PingRequest
-	PingResponse
+	WhoamiRequest
 */
-package breadpinger
+package breadping
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -32,7 +33,9 @@ var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
-const _ = proto.ProtoPackageIsVersion1
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type PingerConfig struct {
 }
@@ -42,42 +45,60 @@ func (m *PingerConfig) String() string            { return proto.CompactTextStri
 func (*PingerConfig) ProtoMessage()               {}
 func (*PingerConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
+type OtpRequest struct {
+	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+}
+
+func (m *OtpRequest) Reset()                    { *m = OtpRequest{} }
+func (m *OtpRequest) String() string            { return proto.CompactTextString(m) }
+func (*OtpRequest) ProtoMessage()               {}
+func (*OtpRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *OtpRequest) GetRequest() *operator.Request {
+	if m != nil {
+		return m.Request
+	}
+	return nil
+}
+
 type PingRequest struct {
-	Source *operator.Source `protobuf:"bytes,1,opt,name=source" json:"source,omitempty"`
+	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+	Arg1    string            `protobuf:"bytes,2,opt,name=arg1" json:"arg1,omitempty"`
 }
 
 func (m *PingRequest) Reset()                    { *m = PingRequest{} }
 func (m *PingRequest) String() string            { return proto.CompactTextString(m) }
 func (*PingRequest) ProtoMessage()               {}
-func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *PingRequest) GetSource() *operator.Source {
+func (m *PingRequest) GetRequest() *operator.Request {
 	if m != nil {
-		return m.Source
+		return m.Request
 	}
 	return nil
 }
 
-type PingResponse struct {
-	Output *operator.Output `protobuf:"bytes,1,opt,name=output" json:"output,omitempty"`
+type WhoamiRequest struct {
+	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
 }
 
-func (m *PingResponse) Reset()                    { *m = PingResponse{} }
-func (m *PingResponse) String() string            { return proto.CompactTextString(m) }
-func (*PingResponse) ProtoMessage()               {}
-func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *WhoamiRequest) Reset()                    { *m = WhoamiRequest{} }
+func (m *WhoamiRequest) String() string            { return proto.CompactTextString(m) }
+func (*WhoamiRequest) ProtoMessage()               {}
+func (*WhoamiRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
-func (m *PingResponse) GetOutput() *operator.Output {
+func (m *WhoamiRequest) GetRequest() *operator.Request {
 	if m != nil {
-		return m.Output
+		return m.Request
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterType((*PingerConfig)(nil), "pinger.PingerConfig")
-	proto.RegisterType((*PingRequest)(nil), "pinger.PingRequest")
-	proto.RegisterType((*PingResponse)(nil), "pinger.PingResponse")
+	proto.RegisterType((*PingerConfig)(nil), "ping.PingerConfig")
+	proto.RegisterType((*OtpRequest)(nil), "ping.OtpRequest")
+	proto.RegisterType((*PingRequest)(nil), "ping.PingRequest")
+	proto.RegisterType((*WhoamiRequest)(nil), "ping.WhoamiRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -86,12 +107,14 @@ var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion2
+const _ = grpc.SupportPackageIsVersion3
 
 // Client API for Pinger service
 
 type PingerClient interface {
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
+	Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
 type pingerClient struct {
@@ -102,9 +125,27 @@ func NewPingerClient(cc *grpc.ClientConn) PingerClient {
 	return &pingerClient{cc}
 }
 
-func (c *pingerClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := grpc.Invoke(ctx, "/pinger.Pinger/Ping", in, out, c.cc, opts...)
+func (c *pingerClient) Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+	out := new(operator.Response)
+	err := grpc.Invoke(ctx, "/ping.Pinger/Otp", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pingerClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+	out := new(operator.Response)
+	err := grpc.Invoke(ctx, "/ping.Pinger/Ping", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pingerClient) Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+	out := new(operator.Response)
+	err := grpc.Invoke(ctx, "/ping.Pinger/Whoami", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,11 +155,31 @@ func (c *pingerClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.C
 // Server API for Pinger service
 
 type PingerServer interface {
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
+	Otp(context.Context, *OtpRequest) (*operator.Response, error)
+	Ping(context.Context, *PingRequest) (*operator.Response, error)
+	Whoami(context.Context, *WhoamiRequest) (*operator.Response, error)
 }
 
 func RegisterPingerServer(s *grpc.Server, srv PingerServer) {
 	s.RegisterService(&_Pinger_serviceDesc, srv)
+}
+
+func _Pinger_Otp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OtpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PingerServer).Otp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ping.Pinger/Otp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PingerServer).Otp(ctx, req.(*OtpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Pinger_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -131,7 +192,7 @@ func _Pinger_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pinger.Pinger/Ping",
+		FullMethod: "/ping.Pinger/Ping",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PingerServer).Ping(ctx, req.(*PingRequest))
@@ -139,30 +200,62 @@ func _Pinger_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Pinger_Whoami_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhoamiRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PingerServer).Whoami(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ping.Pinger/Whoami",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PingerServer).Whoami(ctx, req.(*WhoamiRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Pinger_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "pinger.Pinger",
+	ServiceName: "ping.Pinger",
 	HandlerType: (*PingerServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Otp",
+			Handler:    _Pinger_Otp_Handler,
+		},
 		{
 			MethodName: "Ping",
 			Handler:    _Pinger_Ping_Handler,
 		},
+		{
+			MethodName: "Whoami",
+			Handler:    _Pinger_Whoami_Handler,
+		},
 	},
-	Streams: []grpc.StreamDesc{},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: fileDescriptor0,
 }
 
+func init() { proto.RegisterFile("ping/ping.proto", fileDescriptor0) }
+
 var fileDescriptor0 = []byte{
-	// 187 bytes of a gzipped FileDescriptorProto
+	// 229 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0xc8, 0xcc, 0x4b,
-	0xd7, 0x07, 0x11, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42, 0x6c, 0x20, 0x76, 0x6a, 0x91, 0x14,
-	0x5f, 0x7e, 0x41, 0x6a, 0x51, 0x62, 0x49, 0x7e, 0x11, 0x44, 0x5c, 0x89, 0x8f, 0x8b, 0x27, 0x00,
-	0x2c, 0xe3, 0x9c, 0x9f, 0x97, 0x96, 0x99, 0xae, 0x64, 0xce, 0xc5, 0x0d, 0xe2, 0x07, 0xa5, 0x16,
-	0x96, 0xa6, 0x16, 0x97, 0x08, 0x69, 0x70, 0xb1, 0x15, 0xe7, 0x97, 0x16, 0x25, 0xa7, 0x4a, 0x30,
-	0x2a, 0x30, 0x6a, 0x70, 0x1b, 0x09, 0xe8, 0xc1, 0xf5, 0x07, 0x83, 0xc5, 0x83, 0xa0, 0xf2, 0x4a,
-	0x16, 0x10, 0x83, 0x82, 0x52, 0x8b, 0x0b, 0xf2, 0xf3, 0x8a, 0x53, 0x41, 0x3a, 0xf3, 0x4b, 0x4b,
-	0x0a, 0x4a, 0x4b, 0x30, 0x75, 0xfa, 0x83, 0xc5, 0x83, 0xa0, 0xf2, 0x46, 0xee, 0x5c, 0x6c, 0x10,
-	0x27, 0x08, 0x19, 0x72, 0xb1, 0x80, 0x58, 0x42, 0xc2, 0x7a, 0x10, 0xd7, 0xea, 0x21, 0x39, 0x45,
-	0x4a, 0x04, 0x55, 0x10, 0x62, 0x8d, 0x14, 0xd7, 0xa4, 0x26, 0x49, 0xa8, 0xdf, 0x9c, 0x78, 0xa3,
-	0xb8, 0x93, 0x8a, 0x52, 0x13, 0x53, 0x20, 0xdc, 0x24, 0x36, 0xb0, 0x0f, 0x8d, 0x01, 0x01, 0x00,
-	0x00, 0xff, 0xff, 0x9a, 0x39, 0x55, 0x09, 0x0c, 0x01, 0x00, 0x00,
+	0xd7, 0x07, 0x11, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42, 0x2c, 0x20, 0xb6, 0x14, 0x5f, 0x7e,
+	0x41, 0x6a, 0x51, 0x62, 0x49, 0x7e, 0x11, 0x44, 0x54, 0x89, 0x8f, 0x8b, 0x27, 0x20, 0x33, 0x2f,
+	0x3d, 0xb5, 0xc8, 0x39, 0x3f, 0x2f, 0x2d, 0x33, 0x5d, 0xc9, 0x92, 0x8b, 0xcb, 0xbf, 0xa4, 0x20,
+	0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8, 0x44, 0x48, 0x9b, 0x8b, 0xbd, 0x08, 0xc2, 0x94, 0x60, 0x54,
+	0x60, 0xd4, 0xe0, 0x36, 0x12, 0xd4, 0x83, 0xeb, 0x87, 0xaa, 0x09, 0x82, 0xa9, 0x50, 0xf2, 0xe3,
+	0xe2, 0x06, 0x19, 0x45, 0x8e, 0x5e, 0x21, 0x21, 0x2e, 0x96, 0xc4, 0xa2, 0x74, 0x43, 0x09, 0x26,
+	0x05, 0x46, 0x0d, 0xce, 0x20, 0x30, 0x5b, 0xc9, 0x86, 0x8b, 0x37, 0x3c, 0x23, 0x3f, 0x31, 0x37,
+	0x93, 0x1c, 0x13, 0x8d, 0x16, 0x32, 0x72, 0xb1, 0x41, 0x7c, 0x26, 0xa4, 0xcd, 0xc5, 0xec, 0x5f,
+	0x52, 0x20, 0x24, 0xa0, 0x07, 0x0e, 0x0d, 0x84, 0xf7, 0xa4, 0x84, 0x90, 0xf5, 0x17, 0x17, 0xe4,
+	0xe7, 0x15, 0xa7, 0x0a, 0xe9, 0x72, 0xb1, 0x80, 0xb4, 0x09, 0x09, 0x42, 0x54, 0x23, 0xf9, 0x08,
+	0xab, 0x72, 0x43, 0x2e, 0x36, 0x88, 0x23, 0x85, 0x84, 0x21, 0x1a, 0x50, 0x9c, 0x8c, 0x4d, 0x8b,
+	0x14, 0xc7, 0xa4, 0x26, 0x49, 0x70, 0x64, 0x38, 0x71, 0x47, 0x71, 0x26, 0x15, 0xa5, 0x26, 0xa6,
+	0x80, 0x38, 0x49, 0x6c, 0xe0, 0x08, 0x31, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xb6, 0x0e, 0x36,
+	0x40, 0xb9, 0x01, 0x00, 0x00,
 }

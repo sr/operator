@@ -32,13 +32,14 @@ resource "aws_elasticache_cluster" "hal9000_production" {
   engine = "redis"
   engine_version = "2.8.24"
   maintenance_window = "Tue:00:00-Tue:04:00"
-  node_type = "cache.t2.small"
+  node_type = "cache.m3.medium"
   num_cache_nodes = 1
   parameter_group_name = "default.redis2.8"
   port = 6379
   subnet_group_name = "${aws_elasticache_subnet_group.hal9000_production.name}"
   security_group_ids = ["${aws_security_group.hal9000_redis_production.id}"]
-  snapshot_retention_limit = 0 # disable
+  snapshot_retention_limit = 30
+  snapshot_window = "04:00-06:00"
 }
 
 resource "aws_elb" "hal9000_production" {

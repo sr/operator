@@ -23,7 +23,9 @@ describe "ignoring deploys of the same artifact as currently deployed" do
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    output = capturing_stdout { cli.checkin }
+    output = capturing_stdout do
+      cli.checkin
+    end
     expect(output).to match(/We are up to date/)
   end
 
@@ -36,7 +38,9 @@ describe "ignoring deploys of the same artifact as currently deployed" do
     cli.parse_arguments!
     cli.environment.payload.options[:repo_path] = tempdir
 
-    capturing_stdout { cli.checkin }
+    capturing_stdout do
+      cli.checkin
+    end
 
     expect(request).to have_been_made
   end

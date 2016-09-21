@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require File.expand_path("../../config/application", __FILE__)
+HAL9000::Application.load_all
+HAL9000::Application.configure
+HAL9000::Application.start

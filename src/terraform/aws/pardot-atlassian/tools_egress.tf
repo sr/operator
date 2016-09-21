@@ -158,7 +158,7 @@ resource "aws_instance" "tools_egress_proxy" {
   vpc_security_group_ids = ["${aws_security_group.tools_egress_proxy.id}"]
   subnet_id = "${aws_subnet.tools_egress_us_east_1b_dmz.id}"
   private_ip = "172.29.129.1"
-  user_data = "${file(\"tinyproxy_user_data.sh\")}"
+  user_data = "${file("tinyproxy_user_data.sh")}"
   key_name = "pardot-atlassian-instances"
   tags {
     Name = "tools_egress_proxy"

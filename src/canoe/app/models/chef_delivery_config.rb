@@ -2,7 +2,7 @@ class ChefDeliveryConfig
   PRODUCTION = "production".freeze
   DEV = "dev".freeze
 
-  AWS = "ue1.aws".freeze
+  AWS = "ue1".freeze
   DFW = "dfw".freeze
   PHX = "phx".freeze
 
@@ -55,20 +55,18 @@ class ChefDeliveryConfig
   def chat_room_id(server)
     case server.datacenter
     when AWS
+      if server.hostname =~ /^pardot2/
+        return OPS_ROOM
+      end
+
       BREAD_ROOM
     else
       Integer(ENV.fetch("CANOE_CHEF_CHAT_ROOM_ID", OPS_ROOM))
     end
   end
 
-  class HipchatNotifier
-    def self.notify_room(room_id, message, color = nil)
-      Hipchat.notify_room(room_id, message, false, color)
-    end
-  end
-
   def notifier
-    @notifier ||= HipchatNotifier
+    @notifier ||= HipchatNotifier.new
   end
 
   private

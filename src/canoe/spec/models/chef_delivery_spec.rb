@@ -163,31 +163,61 @@ RSpec.describe ChefDelivery do
     assert_equal "deploy", response.action
   end
 
+  it "deploys to two chef servers within the same datacenter" do
+    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
+    checkout = ChefCheckinRequest::Checkout.new("sha1^", "master")
+    request = ChefCheckinRequest.new(server, checkout)
+    @repo.current_build = build_build(sha: "sha1")
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+    request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
+    @delivery.complete_deploy(request)
+
+    server = ChefDelivery::Server.new("test", "production", "pardot2-chef1")
+    request = ChefCheckinRequest.new(server, checkout)
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
+    request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
+    @delivery.complete_deploy(request)
+
+    assert_equal 2, @config.notifier.messages.size
+    msg = @config.notifier.messages.pop
+    assert_includes msg.message, "pardot2-chef1"
+    msg = @config.notifier.messages.pop
+    assert_includes msg.message, "pardot0-chef1"
+  end
+
   it "notifies of successful deployment" do
     deploy = create_current_deploy(
       state: ChefDelivery::PENDING,
-      build_url: "https://BREAD-9000"
+      build_url: "https://BREAD-9000",
+      hostname: "pardot0-chef1"
     )
     request = ChefCompleteDeployRequest.new(deploy.id, true, nil)
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("successfully deployed")
-    assert msg.message.include?("#9000")
+    assert_includes msg.message, "successfully deployed"
+    assert_includes msg.message, "#9000"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "notifies of failed deployment" do
-    deploy = create_current_deploy(state: ChefDelivery::PENDING)
+    deploy = create_current_deploy(
+      state: ChefDelivery::PENDING,
+      hostname: "pardot0-chef1"
+    )
     request = ChefCompleteDeployRequest.new(deploy.id, false, "boomtown")
     @delivery.complete_deploy(request)
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("failed to deploy")
-    assert msg.message.include?("boomtown")
+    assert_includes msg.message, "failed to deploy"
+    assert_includes msg.message, "boomtown"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "notifies of executed knife commands" do
-    server = ChefDelivery::Server.new("dfw", "dev", "chef1")
+    server = ChefDelivery::Server.new("dfw", "dev", "pardot0-chef1")
     command = %w[environment from file fail.rb]
     request = KnifeRequest.new(server, command)
     @delivery.knife(request)
@@ -195,6 +225,7 @@ RSpec.describe ChefDelivery do
     msg = @config.notifier.messages.pop
     assert_includes msg.message, "dfw/dev"
     assert_includes msg.message, "knife #{command.join(" ")}"
+    assert_includes msg.message, "pardot0-chef1"
   end
 
   it "ignores 'knife node from file' commands" do

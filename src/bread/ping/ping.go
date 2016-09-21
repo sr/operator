@@ -1,5 +1,7 @@
-package breadpinger
+package breadping
 
-func NewAPIServer(config *PingerConfig) (PingerServer, error) {
-	return &apiServer{config}, nil
+import "github.com/sr/operator"
+
+func NewAPIServer(replier operator.Replier) (PingerServer, error) {
+	return &apiServer{replier}, nil
 }

@@ -1,5 +1,5 @@
-//// App.dev environment
-//// managed by pd-bread@salesforce.com
+# App.dev environment
+# managed by pd-bread@salesforce.com
 
 
 variable "environment_appdev" {
@@ -9,6 +9,7 @@ variable "environment_appdev" {
     env_name = "appdev"
     pardot_env_id = "pardot2"
     dc_id = "ue1"
+    lightweight_instance_type = "c4.large"
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
@@ -23,8 +24,9 @@ variable "environment_appdev" {
     num_push1_hosts = 2
     num_provisioning1_hosts = 1
     num_rabbit1_hosts = 3
+    num_rabbit2_hosts = 3
     num_redisrules1_hosts = 2
-    num_autojob1_hosts = 1
+    num_autojob1_hosts = 4
     num_storm1_hosts = 1
     num_kafka1_hosts = 1
     num_zkkafka1_hosts = 1
@@ -34,6 +36,9 @@ variable "environment_appdev" {
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
     num_proxyout1_hosts = 1
+    num_toolsproxy1_hosts = 1
+    num_vault1_hosts = 3
+    num_consul1_hosts = 2
   }
 }
 
@@ -60,7 +65,7 @@ variable "appdev_whoisdb1_ips" {
   }
 }
 
-////
+/*
 //// TEMPLATES
 ////
 //
@@ -99,8 +104,8 @@ variable "appdev_whoisdb1_ips" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-//  instance_type = "${var.environment_appdev["db_instance_type}"
-//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  instance_type = "${var.environment_appdev["app_instance_type"]}"
+//  subnet_id = "${var.environment_appdev["subnet_id"]}"
 //  root_block_device {
 //    volume_type = "gp2"
 //    volume_size = "50"
@@ -122,8 +127,8 @@ variable "appdev_whoisdb1_ips" {
 //  key_name = "internal_apps"
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-//  instance_type = "${var.environment_appdev["db_instance_type}"
-//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  instance_type = "${var.environment_appdev["job_instance_type"]}"
+//  subnet_id = "${var.environment_appdev["subnet_id"]}"
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_type = "gp2"
@@ -157,7 +162,7 @@ variable "appdev_whoisdb1_ips" {
 //  type = "A"
 //  ttl = 900
 //}
-
+*/
 
 resource "aws_security_group" "appdev_apphost" {
   name = "appdev_apphost"
@@ -179,6 +184,26 @@ resource "aws_security_group" "appdev_apphost" {
     security_groups = [
       "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
     ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "appdev_consulhost" {
+  name = "appdev_consulhost"
+  description = "Allows communication among Vault and Consul hosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
   }
 
   egress {
@@ -211,16 +236,38 @@ resource "aws_security_group" "appdev_dbhost" {
   }
 }
 
+resource "aws_security_group" "appdev_proxyout_host" {
+  name = "appdev_proxyout_host"
+  description = "Allow Squid proxy traffic from appdev apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 3128
+    to_port = 3128
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_elb" "appdev_app_elb" {
   name = "${var.environment_appdev["env_name"]}-app-elb"
   security_groups = [
     "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
   ]
   subnets = [
-    "${aws_subnet.appdev_us_east_1a.id}",
-    "${aws_subnet.appdev_us_east_1c.id}",
-    "${aws_subnet.appdev_us_east_1d.id}",
-    "${aws_subnet.appdev_us_east_1e.id}"
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.appdev_us_east_1c_dmz.id}",
+    "${aws_subnet.appdev_us_east_1d_dmz.id}",
+    "${aws_subnet.appdev_us_east_1e_dmz.id}"
   ]
   cross_zone_load_balancing = true
   connection_draining = true
@@ -255,10 +302,9 @@ resource "aws_elb" "appdev_app_elb" {
   }
 }
 
-#TODO: rename/copy this from appdev.dev.pardot.com to app.dev.pardot.com
-resource "aws_route53_record" "appdev_dev_pardot_com_CNAMErecord" {
+resource "aws_route53_record" "app_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "appdev.${aws_route53_zone.dev_pardot_com.name}"
+  name = "app.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_elb.appdev_app_elb.dns_name}"]
   type = "CNAME"
   ttl = "900"
@@ -536,7 +582,7 @@ resource "aws_instance" "appdev_rabbit1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_rabbithost.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
@@ -544,11 +590,92 @@ resource "aws_instance" "appdev_rabbit1" {
   }
 }
 
+resource "aws_security_group" "appdev_rabbithost" {
+  name = "appdev_rabbithost"
+  description = "Allow access through the toolsproxy and from apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}",
+      "${aws_security_group.appdev_apphost.id}"
+    ]
+  }
+
+  # allow health check from ELBs
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 15672
+    to_port = 15672
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_route53_record" "appdev_rabbit_webapp_arecord" {
+  count = "2"
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "rabbit${count.index + 1}-app.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_eip.appdev_toolsproxy1.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
 resource "aws_route53_record" "appdev_rabbit1_arecord" {
   count = "${var.environment_appdev["num_rabbit1_hosts"]}"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "${var.environment_appdev["pardot_env_id"]}-rabbit1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${element(aws_instance.appdev_rabbit1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_rabbit2" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_rabbit2_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_rabbithost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-rabbit2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_rabbit2_arecord" {
+  count = "${var.environment_appdev["num_rabbit2_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-rabbit2-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_rabbit2.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
 }
@@ -858,7 +985,8 @@ resource "aws_instance" "appdev_proxyout1" {
   count = "${var.environment_appdev["num_proxyout1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["app_instance_type"]}"
-  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
   root_block_device {
     volume_type = "gp2"
     volume_size = "50"
@@ -866,12 +994,18 @@ resource "aws_instance" "appdev_proxyout1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_proxyout_host.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-proxyout1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
+}
+
+resource "aws_eip" "appdev_proxyout1_eip" {
+  vpc = true
+  instance = "${aws_instance.appdev_proxyout1.id}"
 }
 
 resource "aws_route53_record" "appdev_proxyout1_arecord" {
@@ -920,4 +1054,196 @@ resource "aws_route53_record" "appdev_whoisdb1_arecord" {
   records = ["${element(aws_instance.appdev_whoisdb1.*.private_ip, count.index)}"]
   type = "A"
   ttl = "900"
+}
+
+resource "aws_security_group" "appdev_toolsproxy" {
+  name = "appdev_toolsproxy"
+  description = "Allow access to rabbit servers"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_instance.appdev_bastion.private_ip}/32",
+      "${aws_instance.appdev_bastion.public_ip}/32"
+      ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "appdev_toolsproxy1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["lightweight_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  associate_public_ip_address = false
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_toolsproxy.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_eip" "appdev_toolsproxy1" {
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  instance = "${element(aws_instance.appdev_toolsproxy1.*.id, count.index)}"
+  vpc = true
+}
+
+resource "aws_route53_record" "appdev_toolsproxy1_arecord" {
+  count = "${var.environment_appdev["num_toolsproxy1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-toolsproxy1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_toolsproxy1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_vault1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_vault1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_consulhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-vault1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_vault1_arecord" {
+  count = "${var.environment_appdev["num_vault1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-vault1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_vault1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_instance" "appdev_consul1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_consul1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_consulhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-consul1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_route53_record" "appdev_consul1_arecord" {
+  count = "${var.environment_appdev["num_consul1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-consul1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_consul1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_iam_user" "cephthumbs_sysacct" {
+  name = "sa_cephthumbs"
+}
+
+resource "aws_s3_bucket" "cephthumbs_s3_filestore" {
+  bucket = "cephthumbs_s3_filestore"
+  lifecycle_rule {
+    prefix = "/"
+    enabled = true
+    expiration {
+      days = 30
+    }
+  }
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "allow cephthumbs sysacct",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_user.cephthumbs_sysacct.arn}"
+      },
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::cephthumbs_s3_filestore",
+        "arn:aws:s3:::cephthumbs_s3_filestore/*"
+      ]
+    }
+  ]
+}
+EOF
+  tags {
+    Name = "cephthumbs_s3_filestore"
+    terraform = "true"
+  }
+}
+
+resource "aws_s3_bucket" "cephthumbs_s3_filestore_long" {
+  bucket = "cephthumbs_s3_filestore_long"
+  acl = "private"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "allow cephthumbs sysacct",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_user.cephthumbs_sysacct.arn}"
+      },
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::cephthumbs_s3_filestore_long",
+        "arn:aws:s3:::cephthumbs_s3_filestore_long/*"
+      ]
+    }
+  ]
+}
+EOF
+  tags {
+    Name = "cephthumbs_s3_filestore"
+    terraform = "true"
+  }
 }

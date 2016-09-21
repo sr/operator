@@ -53,13 +53,15 @@ describe Pardot::PullAgent::Environments::Production do
             }
           }
         ])
-      (2..9).each { |i| allow(disco).to receive(:service).with("redis-rules-cache-#{i}").and_return([]) }
+      (2..9).each do |i|
+        allow(disco).to receive(:service).with("redis-rules-cache-#{i}").and_return([])
+      end
 
       redis = class_spy("::Pardot::PullAgent::Redis")
       env.restart_autojobs(nil, disco, redis)
 
-      expect(redis).to have_received(:bounce_workers).with("automationWorkers", ["127.0.0.1:6379"])
       expect(redis).to have_received(:bounce_workers).with("PerAccountAutomationWorker", ["127.0.0.1:6379"])
+      expect(redis).to have_received(:bounce_workers).with("PerAccountAutomationWorker-timed", ["127.0.0.1:6379"])
       expect(redis).to have_received(:bounce_workers).with("automationRelatedObjectWorkers", ["127.0.0.1:6379"])
       expect(redis).to have_received(:bounce_workers).with("previewWorkers", ["127.0.0.1:6379"])
     end

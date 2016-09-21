@@ -36,16 +36,13 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
-      "${aws_eip.pardot_ci_bastion.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
-      "52.3.83.197/32",     # 2.git.dev.pardot.com
-      "173.192.141.222/32", # tools-s1 (password.pardot.com)
-      "67.228.6.68/32"      # auth-d1
+      "52.3.83.197/32"      # 2.git.dev.pardot.com
     ]
   }
   ingress {
@@ -57,16 +54,13 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
-      "${aws_eip.pardot_ci_bastion.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
       "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
-      "52.3.83.197/32",     # 2.git.dev.pardot.com
-      "173.192.141.222/32", # tools-s1 (password.pardot.com)
-      "67.228.6.68/32"      # auth-d1
+      "52.3.83.197/32"      # 2.git.dev.pardot.com
     ]
   }
 
@@ -90,7 +84,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
 
 resource "aws_iam_role" "internal_apps_ldap_master" {
   name = "internal_apps_ldap_master"
-  assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"
+  assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
 }
 
 resource "aws_iam_instance_profile" "internal_apps_ldap_master" {
@@ -137,11 +131,6 @@ resource "aws_instance" "internal_apps_ldap_master" {
   }
 }
 
-resource "aws_eip" "internal_apps_ldap_master" {
-  vpc = true
-  instance = "${aws_instance.internal_apps_ldap_master.id}"
-}
-
 resource "aws_instance" "internal_apps_ldap_replica" {
   ami = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
@@ -161,7 +150,64 @@ resource "aws_instance" "internal_apps_ldap_replica" {
   }
 }
 
+resource "aws_eip" "internal_apps_ldap_master" {
+  vpc = true
+  instance = "${aws_instance.internal_apps_ldap_master.id}"
+}
+
 resource "aws_eip" "internal_apps_ldap_replica" {
   vpc = true
   instance = "${aws_instance.internal_apps_ldap_replica.id}"
+}
+
+// THE FOLLOWING FOUR RECORDS MUST STAY SYNCHRONIZED BETWEEN PRIVATE AND PUBLIC VERSIONS! SEEK BREAD-TEAM FOR ASSISTANCE
+
+resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-2-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+#TODO: remove all artifactory-integration route53 records and replace w/ dns-sharing w/ internal_apps
+resource "aws_route53_record" "artifactory_integration_auth1-1_Arecord" {
+  zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+#TODO: remove all artifactory-integration route53 records and replace w/ dns-sharing w/ internal_apps
+resource "aws_route53_record" "artifactory_integration_auth1-2_Arecord" {
+  zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-auth1-2-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-1_Arecord_PUBLIC" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "pardot0-auth1-1-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_auth1-2_Arecord_PUBLIC" {
+  zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
+  name = "pardot0-auth1-2-ue1.aws.pardot.com"
+  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  type = "A"
+  ttl = "900"
 }

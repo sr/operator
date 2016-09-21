@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+import "operator.proto";
+
+package bread;
+
+option go_package = "breadpb";
+
+message OperatorRequest {
+    operator.Request request = 1;
+    OperatorMessage message = 2;
+    map<string, string> args = 3;
+    string error = 4;
+}
+
+message OperatorMessage {
+    operator.Source source = 1;
+    string text = 2;
+    string html = 3;
+}
+
+message HTTPRequest {
+  string method = 1;
+  string path = 2;
+  map<string, string> query = 3;
+  uint32 status_code = 7;
+  google.protobuf.Duration duration = 8;
+  string error = 9;
+}
+
+message ServerStartupNotice {
+	string Address = 1;
+	string Protocol = 2;
+	repeated string services = 3;
+}
+
+message ServiceStartupError {
+	string service = 1;
+	string error = 2;
+}

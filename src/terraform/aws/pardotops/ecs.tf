@@ -5,7 +5,7 @@ variable "ecs_ami_id" {
 
 resource "aws_iam_role" "ecs_cluster_role" {
   name = "ecs_cluster_role"
-  assume_role_policy = "${file(\"ec2_instance_trust_relationship.json\")}"
+  assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
 }
 
 resource "aws_iam_role_policy" "ecs_cluster_role_policy" {

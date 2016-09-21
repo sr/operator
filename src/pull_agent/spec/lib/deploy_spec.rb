@@ -21,8 +21,8 @@ describe Pardot::PullAgent::Deploy do
       begin
         orig = ENV["PULL_HOSTNAME"]
         ENV["PULL_HOSTNAME"] = nil
-        allow(Socket).to receive(:gethostname).and_return("localhost1.example.pardot.com")
-        deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1.example" => { "action" => nil } })
+        allow(Socket).to receive(:gethostname).and_return("localhost1.aws.pardot.com")
+        deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1" => { "action" => nil } })
 
         expect(deploy.applies_to_this_server?).to eq(true)
       ensure
@@ -31,8 +31,8 @@ describe Pardot::PullAgent::Deploy do
     end
 
     it "is falsey if this server is not in the list of servers" do
-      allow(Socket).to receive(:gethostname).and_return("localhost12345.example.pardot.com")
-      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1.example" => { "action" => nil } })
+      allow(Socket).to receive(:gethostname).and_return("localhost12345.aws.pardot.com")
+      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1" => { "action" => nil } })
 
       expect(deploy.applies_to_this_server?).to eq(false)
     end
@@ -40,15 +40,15 @@ describe Pardot::PullAgent::Deploy do
 
   describe ".action" do
     it "is derived from server_actions" do
-      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1.example" => { "action" => nil } })
+      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "localhost1" => { "action" => nil } })
       expect(deploy.action).to be(nil)
     end
   end
 
   describe ".servers" do
     it "is derived from server_actions" do
-      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "server1.example" => { "action" => nil }, "server2.example" => { "action" => "deploy" } })
-      expect(deploy.servers).to eq(["server1.example", "server2.example"])
+      deploy = Pardot::PullAgent::Deploy.from_hash("servers" => { "server1" => { "action" => nil }, "server2" => { "action" => "deploy" } })
+      expect(deploy.servers).to eq(%w[server1 server2])
     end
   end
 end

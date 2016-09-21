@@ -7,22 +7,10 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES = $(shell $(GO) list bread/... chatops/... privet/... devenv/... github.com/sr/operator/...)
+PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/... | grep -Ev '^devenv/vendor/')
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-OPERATOR_IMPORT_PATH ?= bread
-OPERATORD ?= $(GOPATH)/bin/operatord
-OPERATORCTL ?= $(GOPATH)/bin/operatorctl
-OPERATORCTL_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatorctl/main-gen.go
-OPERATORD_GEN_SRC ?= $(GOPATH)/src/bread/cmd/operatord/builder-gen.go
-SVC_DIR ?= $(GOPATH)/src/bread
-HUBOT_SCRIPTS_DIR ?= $(GOPATH)/src/chatops/hubot/scripts
-
-include $(GOPATH)/src/github.com/sr/operator/operator.mk
-
-all: deadleaves fmt lint vet test install errcheck interfacer unused
-
-generate: operator-generate
+all: deadleaves fmt lint vet errcheck test install interfacer unused
 
 install:
 	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
@@ -30,14 +18,17 @@ install:
 test:
 	$(GO) test -race $(PACKAGES)
 
-clean: operator-clean
+clean:
 	$(GO) clean -i ./...
 
 install-tools:
 	$(GO) install -v $(TOOLS)
 
+install-devenv:
+	$(GO) install -v $$($(GO) list devenv/...)
+
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -v github.com/hashicorp/terraform)"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^devenv/vendor/|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
@@ -73,7 +64,7 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'main-gen\.go')"; \
+			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				fail=true; \
@@ -97,7 +88,7 @@ $(INTERFACER):
 	$(GO) install -v github.com/mvdan/interfacer/cmd/interfacer
 
 $(UNUSED):
-	$(GO) install -v github.com/dominikh/go-unused/cmd
+	$(GO) install -v honnef.co/go/unused/cmd/unused
 
 .PHONY: \
 	all \

@@ -7,14 +7,12 @@ trusted_networks = [
   "62.17.146.140/30",   # aloha-emea
   "62.17.146.144/28",   # aloha-emea
   "62.17.146.160/27",   # aloha-emea
-  "173.192.141.222/32", # tools-s1 (prodbot)
-  "174.37.191.2/32",    # proxy.dev
-  "169.45.0.88/32",     # squid-d4
   "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
   "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-  "50.22.140.200/32",   # tools-s1.dev
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress
-  "52.72.6.14/32"
+  "52.72.6.14/32",
+  # Ditto, but for App.dev
+  "54.82.15.10/32"
 ]
 
 if Rails.env.development?
@@ -22,7 +20,7 @@ if Rails.env.development?
   trusted_networks << "172.16.0.0/12" # Docker compose instances
 end
 
-trusted_networks.map! { |i| IPAddr.new(i) }
+trusted_networks = trusted_networks.map { |i| IPAddr.new(i) }
 trusted_networks.freeze
 
 Rack::Attack.whitelist("ip whitelist") do |req|

@@ -20,19 +20,19 @@ message DeployConfig {
 }
 
 message ListAppsRequest {
-  operator.Source source = 1;
+  operator.Request request = 1;
 }
 
 message ListAppsResponse {
-  operator.Output output = 1;
+  string Message = 1;
 }
 
 message TriggerRequest {
-  operator.Source source = 1;
+  operator.Request request = 1;
   string app = 2;
   string build = 3;
 }
 
 message TriggerResponse {
-  operator.Output output = 1;
+  string Message = 1;
 }

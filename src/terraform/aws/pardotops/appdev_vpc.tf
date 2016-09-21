@@ -119,12 +119,12 @@ resource "aws_route_table" "appdev_route_dmz" {
     gateway_id = "${aws_internet_gateway.appdev_internet_gw.id}"
   }
   route {
-    cidr_block = "172.28.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
-  }
-  route {
     cidr_block = "172.31.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_pardot_atlassian_vpc_peering.id}"
+  }
+  route {
+    cidr_block = "172.27.0.0/16"
+    vpc_peering_connection_id = "${var.pardot_ci_to_pardotops_appdev_vpc_peering_connection_id}"
   }
 }
 
@@ -134,9 +134,9 @@ resource "aws_route" "appdev_and_pardot_atlassian_route" {
   route_table_id = "${aws_vpc.appdev.main_route_table_id}"
 }
 
-resource "aws_route" "appdev_and_artifactory_integration_route" {
-  destination_cidr_block = "172.28.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.appdev_and_artifactory_integration_vpc_peering.id}"
+resource "aws_route" "appdev_and_pardot_ci_route" {
+  destination_cidr_block = "172.27.0.0/16"
+  vpc_peering_connection_id = "${var.pardot_ci_to_pardotops_appdev_vpc_peering_connection_id}"
   route_table_id = "${aws_vpc.appdev.main_route_table_id}"
 }
 
@@ -221,26 +221,14 @@ resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
@@ -260,13 +248,7 @@ resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27"    # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
@@ -310,14 +292,8 @@ resource "aws_route53_record" "appdev_bastion_Arecord" {
 }
 
 resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" {
-  peer_owner_id = "010094454891" # pardot-atlassian
-  peer_vpc_id = "vpc-c35928a6" # atlassian tools VPC
-  vpc_id = "${aws_vpc.appdev.id}"
-}
-
-resource "aws_vpc_peering_connection" "appdev_and_artifactory_integration_vpc_peering" {
-  peer_owner_id = "${var.pardotops_account_number}"
-  peer_vpc_id = "${aws_vpc.artifactory_integration.id}"
+  peer_owner_id = "${var.pardot_atlassian_acct_number}"
+  peer_vpc_id = "${var.pardot_atlassian_vpc_id}"
   vpc_id = "${aws_vpc.appdev.id}"
 }
 

@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"text/tabwriter"
 
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
 
@@ -68,8 +67,6 @@ func (s *apiServer) ListBuilds(ctx context.Context, in *ListBuildsRequest) (*Lis
 		return nil, err
 	}
 	return &ListBuildsResponse{
-		Output: &operator.Output{
-			PlainText: out.String(),
-		},
+		Message: out.String(),
 	}, nil
 }

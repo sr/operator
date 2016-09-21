@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
 
@@ -52,9 +51,7 @@ func (s *apiServer) ListApps(ctx context.Context, in *ListAppsRequest) (*ListApp
 		i = i + 1
 	}
 	return &ListAppsResponse{
-		Output: &operator.Output{
-			PlainText: fmt.Sprintf("deployable apps: %s", strings.Join(apps, ", ")),
-		},
+		Message: fmt.Sprintf("deployable apps: %s", strings.Join(apps, ", ")),
 	}, nil
 }
 
@@ -147,9 +144,7 @@ OuterLoop:
 		return nil, err
 	}
 	return &TriggerResponse{
-		Output: &operator.Output{
-			PlainText: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
-		},
+		Message: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
 	}, nil
 }
 

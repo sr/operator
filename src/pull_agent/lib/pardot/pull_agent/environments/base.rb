@@ -168,12 +168,10 @@ module Pardot
         def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
           Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
-          autojob_disco_master = (1..9).flat_map do |i|
+          autojob_disco_master = (1..9).flat_map { |i|
             disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-          end.map { |s| [s["address"], s["port"]].join(":") }
+          }.map { |s| [s["address"], s["port"]].join(":") }
 
-          # Restart automation workers
-          redis.bounce_workers("automationWorkers", autojob_disco_master)
           # Restart per account automation workers
           redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)
           # Restart timed automation workers
@@ -312,6 +310,10 @@ module Pardot
             "log" => "log",
             "output" => "output"
           )
+        end
+
+        def link_correct_inventory
+          FileUtils.ln_sf("#{payload.current_link}/production_#{ShellHelper.datacenter}.ini", "#{payload.current_link}/hosts")
         end
 
         def restart_repfix_service

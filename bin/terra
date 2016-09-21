@@ -13,6 +13,11 @@ cd "$(dirname "$0")/.."
 : "${PROGRAM:="$(basename "$0")"}"
 : "${HIPCHAT_TOKEN:=""}"
 
+# Prevent Terraform from making a remote API call to HashiCorp's servers.
+# See https://github.com/hashicorp/go-checkpoint for details.
+CHECKPOINT_DISABLE=1
+export CHECKPOINT_DISABLE
+
 print_help() {
     grep ^#/ <"$0" |cut -c4-
 }

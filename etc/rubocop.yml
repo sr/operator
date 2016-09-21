@@ -30,6 +30,32 @@ Style/AlignHash:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  ProceduralMethods:
+    - benchmark
+    - bm
+    - bmbm
+    - create
+    - measure
+    - new
+    - realtime
+    - context
+    - each
+    - transaction
+    - capturing_stdout
+    - multi
+  FunctionalMethods:
+    - let
+    - let!
+    - subject
+    - watch
+    - before
+    - after
+    - around
+  Exclude:
+    # Ignore FactoryGirl's DSL
+    - "src/**/spec/factories/**/*.rb"
 Style/ClassAndModuleChildren:
   Enabled: true
 Style/ClosingParenthesisIndentation:
@@ -42,8 +68,6 @@ Style/DoubleNegation:
   Enabled: true
 Style/FileName:
   Enabled: true
-  # snake case except for lita plugins
-  Regex: !ruby/regexp '/^(?:lita-[\da-z_.?!-]+|[\da-z_.?!]+)$/'
 Style/FormatString:
   Enabled: true
 Style/FrozenStringLiteralComment:

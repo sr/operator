@@ -7,9 +7,7 @@ import (
 	"io"
 	"os"
 
-	bamboo "bread/bamboo"
-	deploy "bread/deploy"
-	pinger "bread/ping"
+	breadping "bread/ping"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
@@ -20,51 +18,11 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "bamboo",
+			Name:     "breadping",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "list-builds",
-					Synopsis: `Undocumented.`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "plan",
-							Usage: "Undocumented.",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						plan := ctx.Flags.String("plan", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := bamboo.NewBambooClient(conn)
-						response, err := client.ListBuilds(
-							context.Background(),
-							&bamboo.ListBuildsRequest{
-								Source: ctx.Source,
-								Plan:   *plan,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-			},
-		},
-
-		{
-			Name:     "deploy",
-			Synopsis: `Undocumented.`,
-			Methods: []operator.MethodCommand{
-				{
-					Name:     "list-apps",
+					Name:     "otp",
 					Synopsis: `Undocumented.`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
@@ -76,68 +34,55 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := deploy.NewDeployClient(conn)
-						response, err := client.ListApps(
+						client := breadping.NewPingerClient(conn)
+						resp, err := client.Otp(
 							context.Background(),
-							&deploy.ListAppsRequest{
-								Source: ctx.Source,
+							&breadping.OtpRequest{
+								Request: ctx.Request,
 							},
 						)
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
 					},
 				},
-				{
-					Name:     "trigger",
-					Synopsis: `Undocumented.`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "app",
-							Usage: "Undocumented.",
-						},
-						{
-							Name:  "build",
-							Usage: "Undocumented.",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						app := ctx.Flags.String("app", "", "")
-						build := ctx.Flags.String("build", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := deploy.NewDeployClient(conn)
-						response, err := client.Trigger(
-							context.Background(),
-							&deploy.TriggerRequest{
-								Source: ctx.Source,
-								App:    *app,
-								Build:  *build,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return response.Output.PlainText, nil
-					},
-				},
-			},
-		},
-
-		{
-			Name:     "pinger",
-			Synopsis: `Undocumented.`,
-			Methods: []operator.MethodCommand{
 				{
 					Name:     "ping",
 					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "arg1",
+							Usage: "Undocumented.",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						arg1 := ctx.Flags.String("arg1", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadping.NewPingerClient(conn)
+						resp, err := client.Ping(
+							context.Background(),
+							&breadping.PingRequest{
+								Request: ctx.Request,
+								Arg1:    *arg1,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
+					Name:     "whoami",
+					Synopsis: `Undocumented.`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
@@ -148,17 +93,17 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := pinger.NewPingerClient(conn)
-						response, err := client.Ping(
+						client := breadping.NewPingerClient(conn)
+						resp, err := client.Whoami(
 							context.Background(),
-							&pinger.PingRequest{
-								Source: ctx.Source,
+							&breadping.WhoamiRequest{
+								Request: ctx.Request,
 							},
 						)
 						if err != nil {
 							return "", err
 						}
-						return response.Output.PlainText, nil
+						return resp.Message, nil
 					},
 				},
 			},

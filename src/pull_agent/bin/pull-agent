@@ -12,7 +12,7 @@ cli.parse_arguments!
 environment = cli.environment
 
 # Wait a random number of seconds, since cron can't be set by second
-if !environment.dev? && ENV.key?("PULL_AGENT_NO_SLEEP")
+if !environment.dev? && !ENV.key?("PULL_AGENT_NO_SLEEP")
   sleep(rand * 60)
 end
 

@@ -16,30 +16,33 @@ class ChefDeliveryNotification
       "#{link_to(checkout.branch)} is checked out on " \
       "<code>#{server.hostname}</code>"
 
-    @notifier.notify_room(room_id, message, YELLOW)
+    @notifier.notify_room(room_id, message, color: YELLOW)
   end
 
   def deploy_completed(room_id, deploy, error_message)
     if deploy.successful?
       color = GREEN
       message = "chef/master #{link_to(deploy)} successfully deployed to " \
-        "#{deploy.datacenter}/#{deploy.environment}"
+        "#{deploy.datacenter}/#{deploy.environment} on host " \
+        "<code>#{deploy.hostname}</code>"
     else
       color = RED
       message = "chef/master #{link_to(deploy)} failed to deploy to " \
-        "#{deploy.datacenter}/#{deploy.environment} /cc @sr" \
+        "#{deploy.datacenter}/#{deploy.environment} " \
+        "on host #{deploy.hostname} /cc @sr" \
         "<br/><pre>#{error_message}</pre>"
     end
 
-    @notifier.notify_room(room_id, message, color)
+    @notifier.notify_room(room_id, message, color: color)
   end
 
   def knife_command(room_id, server, command)
     message = "knife command executed in " \
-      "#{server.datacenter}/#{server.environment}: <br/>" \
+      "#{server.datacenter}/#{server.environment} on " \
+      "<code>#{server.hostname}</code>: <br/>" \
       "<code>knife #{command.join(" ")}</code>"
 
-    @notifier.notify_room(room_id, message, GRAY)
+    @notifier.notify_room(room_id, message, color: GRAY)
   end
 
   private

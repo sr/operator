@@ -7,6 +7,19 @@ resource "aws_vpc" "internal_apps" {
   }
 }
 
+resource "aws_route53_zone" "internal_apps_aws_pardot_com_hosted_zone" {
+  name = "aws.pardot.com"
+  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.internal_apps.id} Only. Hosted solely in AWS."
+  vpc_id = "${aws_vpc.internal_apps.id}"
+}
+
+#TODO: remove this and substitute w/ dns sharing across vpcs
+resource "aws_route53_zone" "artifactory_integration_aws_pardot_com_hosted_zone" {
+  name = "aws.pardot.com"
+  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.internal_apps.id} Only. Hosted solely in AWS."
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+}
+
 resource "aws_subnet" "internal_apps_us_east_1a" {
   vpc_id = "${aws_vpc.internal_apps.id}"
   availability_zone = "us-east-1a"
@@ -149,37 +162,14 @@ resource "aws_security_group" "internal_apps_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27",   # aloha-emea
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
-      "50.22.140.200/32"    # tools-s1.dev
-    ]
+    cidr_blocks = "${concat(var.aloha_vpn_cidr_blocks, var.sfdc_proxyout_cidr_blocks)}"
   }
 
   egress {
@@ -199,27 +189,14 @@ resource "aws_security_group" "internal_apps_dc_only_http_lb" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${var.sfdc_proxyout_cidr_blocks}"
   }
 
   ingress {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "173.192.141.222/32", # tools-s1 (prodbot)
-      "208.43.203.134/32",  # email-d1 (replication check)
-      "174.37.191.2/32",    # proxy.dev
-      "169.45.0.88/32",     # squid-d4
-      "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30"    # pardot-proxyout1-{1,2,3,4}-phx
-    ]
+    cidr_blocks = "${var.sfdc_proxyout_cidr_blocks}"
   }
 
   egress {
@@ -266,13 +243,7 @@ resource "aws_security_group" "internal_apps_bastion" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = [
-      "204.14.236.0/24",    # aloha-east
-      "204.14.239.0/24",    # aloha-west
-      "62.17.146.140/30",   # aloha-emea
-      "62.17.146.144/28",   # aloha-emea
-      "62.17.146.160/27"    # aloha-emea
-    ]
+    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
   }
 
   egress {
@@ -325,4 +296,21 @@ resource "aws_instance" "internal_apps_bastion_2" {
 resource "aws_eip" "internal_apps_bastion_2" {
   vpc = true
   instance = "${aws_instance.internal_apps_bastion_2.id}"
+}
+
+
+resource "aws_route53_record" "internal_apps_bastion1-1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-bastion1-1-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_bastion.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "internal_apps_bastion1-2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name = "pardot0-bastion1-2-ue1.aws.pardot.com"
+  records = ["${aws_instance.internal_apps_bastion_2.private_ip}"]
+  type = "A"
+  ttl = "900"
 }

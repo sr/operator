@@ -14,10 +14,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-version"
-	"github.com/satori/go.uuid"
-
 	"github.com/hashicorp/terraform/config"
 	"github.com/mitchellh/copystructure"
+	"github.com/satori/go.uuid"
 )
 
 const (
@@ -458,23 +457,12 @@ func (s *State) SameLineage(other *State) bool {
 // DeepCopy performs a deep copy of the state structure and returns
 // a new structure.
 func (s *State) DeepCopy() *State {
-	if s == nil {
-		return nil
+	copy, err := copystructure.Copy(s)
+	if err != nil {
+		panic(err)
 	}
-	n := &State{
-		Version:   s.Version,
-		Lineage:   s.Lineage,
-		TFVersion: s.TFVersion,
-		Serial:    s.Serial,
-		Modules:   make([]*ModuleState, 0, len(s.Modules)),
-	}
-	for _, mod := range s.Modules {
-		n.Modules = append(n.Modules, mod.deepcopy())
-	}
-	if s.Remote != nil {
-		n.Remote = s.Remote.deepcopy()
-	}
-	return n
+
+	return copy.(*State)
 }
 
 // IncrementSerialMaybe increments the serial number of this state
@@ -646,8 +634,7 @@ type OutputState struct {
 }
 
 func (s *OutputState) String() string {
-	// This is a v0.6.x implementation only
-	return fmt.Sprintf("%s", s.Value.(string))
+	return fmt.Sprintf("%#v", s.Value)
 }
 
 // Equal compares two OutputState structures for equality. nil values are
@@ -1187,28 +1174,12 @@ func (r *ResourceState) init() {
 }
 
 func (r *ResourceState) deepcopy() *ResourceState {
-	if r == nil {
-		return nil
+	copy, err := copystructure.Copy(r)
+	if err != nil {
+		panic(err)
 	}
 
-	n := &ResourceState{
-		Type:         r.Type,
-		Dependencies: nil,
-		Primary:      r.Primary.DeepCopy(),
-		Provider:     r.Provider,
-	}
-	if r.Dependencies != nil {
-		n.Dependencies = make([]string, len(r.Dependencies))
-		copy(n.Dependencies, r.Dependencies)
-	}
-	if r.Deposed != nil {
-		n.Deposed = make([]*InstanceState, 0, len(r.Deposed))
-		for _, inst := range r.Deposed {
-			n.Deposed = append(n.Deposed, inst.DeepCopy())
-		}
-	}
-
-	return n
+	return copy.(*ResourceState)
 }
 
 // prune is used to remove any instances that are no longer required
@@ -1278,27 +1249,12 @@ func (i *InstanceState) init() {
 }
 
 func (i *InstanceState) DeepCopy() *InstanceState {
-	if i == nil {
-		return nil
+	copy, err := copystructure.Copy(i)
+	if err != nil {
+		panic(err)
 	}
-	n := &InstanceState{
-		ID:        i.ID,
-		Ephemeral: *i.Ephemeral.DeepCopy(),
-		Tainted:   i.Tainted,
-	}
-	if i.Attributes != nil {
-		n.Attributes = make(map[string]string, len(i.Attributes))
-		for k, v := range i.Attributes {
-			n.Attributes[k] = v
-		}
-	}
-	if i.Meta != nil {
-		n.Meta = make(map[string]string, len(i.Meta))
-		for k, v := range i.Meta {
-			n.Meta[k] = v
-		}
-	}
-	return n
+
+	return copy.(*InstanceState)
 }
 
 func (s *InstanceState) Empty() bool {
@@ -1374,7 +1330,7 @@ func (s *InstanceState) MergeDiff(d *InstanceDiff) *InstanceState {
 		}
 	}
 	if d != nil {
-		for k, diff := range d.Attributes {
+		for k, diff := range d.CopyAttributes() {
 			if diff.NewRemoved {
 				delete(result.Attributes, k)
 				continue
@@ -1446,17 +1402,12 @@ func (e *EphemeralState) init() {
 }
 
 func (e *EphemeralState) DeepCopy() *EphemeralState {
-	if e == nil {
-		return nil
+	copy, err := copystructure.Copy(e)
+	if err != nil {
+		panic(err)
 	}
-	n := &EphemeralState{}
-	if e.ConnInfo != nil {
-		n.ConnInfo = make(map[string]string, len(e.ConnInfo))
-		for k, v := range e.ConnInfo {
-			n.ConnInfo[k] = v
-		}
-	}
-	return n
+
+	return copy.(*EphemeralState)
 }
 
 type jsonStateVersionIdentifier struct {
@@ -1522,6 +1473,8 @@ func ReadState(src io.Reader) (*State, error) {
 			return nil, err
 		}
 
+		// increment the Serial whenever we upgrade state
+		v3State.Serial++
 		return v3State, nil
 	case 2:
 		v2State, err := ReadStateV2(jsonBytes)
@@ -1533,6 +1486,7 @@ func ReadState(src io.Reader) (*State, error) {
 			return nil, err
 		}
 
+		v3State.Serial++
 		return v3State, nil
 	case 3:
 		v3State, err := ReadStateV3(jsonBytes)
@@ -1541,8 +1495,8 @@ func ReadState(src io.Reader) (*State, error) {
 		}
 		return v3State, nil
 	default:
-		return nil, fmt.Errorf("State version %d not supported, please update.",
-			versionIdentifier.Version)
+		return nil, fmt.Errorf("Terraform %s does not support state version %d, please update.",
+			SemVersion.String(), versionIdentifier.Version)
 	}
 }
 
@@ -1569,8 +1523,8 @@ func ReadStateV2(jsonBytes []byte) (*State, error) {
 	// Check the version, this to ensure we don't read a future
 	// version that we don't understand
 	if state.Version > StateVersion {
-		return nil, fmt.Errorf("State version %d not supported, please update.",
-			state.Version)
+		return nil, fmt.Errorf("Terraform %s does not support state version %d, please update.",
+			SemVersion.String(), state.Version)
 	}
 
 	// Make sure the version is semantic
@@ -1601,8 +1555,8 @@ func ReadStateV3(jsonBytes []byte) (*State, error) {
 	// Check the version, this to ensure we don't read a future
 	// version that we don't understand
 	if state.Version > StateVersion {
-		return nil, fmt.Errorf("State version %d not supported, please update.",
-			state.Version)
+		return nil, fmt.Errorf("Terraform %s does not support state version %d, please update.",
+			SemVersion.String(), state.Version)
 	}
 
 	// Make sure the version is semantic

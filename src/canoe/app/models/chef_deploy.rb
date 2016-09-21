@@ -11,7 +11,11 @@ class ChefDeploy < ApplicationRecord
       raise ChefDelivery::Error, "build is not successful: #{build.inspect}"
     end
 
-    conditions = { datacenter: server.datacenter, build_url: build.url }
+    conditions = {
+      build_url: build.url,
+      datacenter: server.datacenter,
+      hostname: server.hostname
+    }
     deploys = where(conditions).order("id DESC")
 
     if deploys.count > 0

@@ -38,7 +38,7 @@ do
     esac
 done
 
-shift $(($OPTIND - 1))
+shift $((OPTIND - 1))
 
 action="${1:-""}"
 case "$action" in
