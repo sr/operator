@@ -160,7 +160,11 @@ func run(invoker operator.Invoker) error {
 	}()
 	logger.Info(msg)
 	var webhookHandler http.Handler
-	conn, err := grpc.Dial(config.grpcAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(
+		config.grpcAddr,
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(bread.NewUnaryClientInterceptor(replier)),
+	)
 	if err != nil {
 		return err
 	}

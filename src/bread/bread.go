@@ -145,9 +145,7 @@ func NewServer(
 	bamboo *BambooConfig,
 	deploy *DeployConfig,
 ) (*grpc.Server, error) {
-	server := grpc.NewServer(
-		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
-	)
+	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingerServer(server, &pingAPIServer{repl})
 	if bamboo.Username != "" && bamboo.Password != "" && bamboo.URL != "" {
 		u, err := url.Parse(bamboo.URL)
@@ -167,6 +165,42 @@ func NewServer(
 		})
 	}
 	return server, nil
+}
+
+func NewUnaryClientInterceptor(replier operator.Replier) grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		meth string,
+		req interface{},
+		reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		err := invoker(ctx, meth, req, reply, cc, opts...)
+		if err == nil {
+			return err
+		}
+		r, ok := req.(operator.Requester)
+		if !ok {
+			return err
+		}
+		rr := r.GetRequest()
+		if rr == nil {
+			return err
+		}
+		src := rr.GetSource()
+		if src == nil {
+			return err
+		}
+		replier.Reply(ctx, src, rr.ReplierId, &operator.Message{
+			Text: grpc.ErrorDesc(err),
+			Options: operatorhipchat.MessageOptions{
+				Color: "red",
+			},
+		})
+		return err
+	}
 }
 
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps

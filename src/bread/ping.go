@@ -1,6 +1,7 @@
 package bread
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/sr/operator"

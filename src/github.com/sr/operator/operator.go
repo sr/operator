@@ -98,7 +98,7 @@ func NewHandler(
 	)
 }
 
-func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
+func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		in interface{},
