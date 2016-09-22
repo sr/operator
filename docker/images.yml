@@ -37,6 +37,10 @@ images:
   docker.dev.pardot.com/base/salesforce-package/app:
     build: salesforce-package/app
 
+  # Pardot/engagement-history-package
+  docker.dev.pardot.com/base/engagement-history-package/app:
+    build: engagement-history-package/app
+
   # Pardot/pardriver
   docker.dev.pardot.com/base/pardriver/pardriver:
     build: pardriver/pardriver
