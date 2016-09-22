@@ -10,7 +10,7 @@ service Deploy {
   option (operator.name) = "deploy";
 
   rpc ListApps(ListAppsRequest) returns (operator.Response);
-  rpc Trigger(TriggerRequest) returns (TriggerResponse);
+  rpc Trigger(TriggerRequest) returns (operator.Response);
 }
 
 message ListAppsRequest {
@@ -21,8 +21,4 @@ message TriggerRequest {
   operator.Request request = 1;
   string app = 2;
   string build = 3;
-}
-
-message TriggerResponse {
-  string Message = 1;
 }

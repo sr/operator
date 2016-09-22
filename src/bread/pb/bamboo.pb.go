@@ -21,7 +21,6 @@ It has these top-level messages:
 	ServiceStartupError
 	ListAppsRequest
 	TriggerRequest
-	TriggerResponse
 	OtpRequest
 	PingRequest
 	WhoamiRequest

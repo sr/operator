@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
+	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 
 	"bread/pb"
@@ -41,7 +42,7 @@ func (s *deployAPIServer) ListApps(ctx context.Context, req *breadpb.ListAppsReq
 	})
 }
 
-func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*breadpb.TriggerResponse, error) {
+func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*operator.Response, error) {
 	var cluster string
 	cluster, ok := s.conf.Apps[in.App]
 	if !ok {
@@ -129,9 +130,12 @@ OuterLoop:
 	if err != nil {
 		return nil, err
 	}
-	return &breadpb.TriggerResponse{
-		Message: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
-	}, nil
+	return operator.Reply(s, ctx, in, &operator.Message{
+		Text: fmt.Sprintf("deployed %s to %s", in.App, in.Build),
+		Options: &operatorhipchat.MessageOptions{
+			Color: "yellow",
+		},
+	})
 }
 
 // parseImage parses a ecs.ContainerDefinition string Image.
