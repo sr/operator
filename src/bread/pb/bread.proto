@@ -10,7 +10,6 @@ option go_package = "breadpb";
 message OperatorRequest {
     operator.Request request = 1;
     OperatorMessage message = 2;
-    map<string, string> args = 3;
     string error = 4;
 }
 

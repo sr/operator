@@ -21,7 +21,6 @@ func (i *instrumenter) Instrument(ev *operator.Event) {
 	ev.Request.Source.User.RealName = ""
 	log := &breadpb.OperatorRequest{
 		Request: ev.Request,
-		Args:    ev.Args,
 	}
 	if ev.Message != nil {
 		log.Message = &breadpb.OperatorMessage{
