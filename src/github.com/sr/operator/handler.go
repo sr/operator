@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
 
 	"golang.org/x/net/context"
@@ -21,6 +22,7 @@ type handler struct {
 	re      *regexp.Regexp
 	conn    *grpc.ClientConn
 	invoker Invoker
+	timeout time.Duration
 }
 
 func newHandler(
@@ -29,6 +31,7 @@ func newHandler(
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
+	timeout time.Duration,
 ) (*handler, error) {
 	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
@@ -41,6 +44,7 @@ func newHandler(
 		re,
 		conn,
 		invoker,
+		timeout,
 	}, nil
 }
 
@@ -96,8 +100,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ReplierId: replierID,
 		Source:    msg.Source,
 	}
-	go func(req *Request, msg *Message) {
-		if ok, err := h.invoker(h.ctx, h.conn, req); !ok || err != nil {
+	ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
+	defer cancel()
+	go func(ctx context.Context, req *Request, msg *Message) {
+		if ok, err := h.invoker(ctx, h.conn, req); !ok || err != nil {
 			h.inst.Instrument(&Event{
 				Key:     "handler_invoker_error",
 				Message: msg,
@@ -105,5 +111,15 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Error:   err,
 			})
 		}
-	}(req, msg)
+	}(ctx, req, msg)
+	select {
+	case <-ctx.Done():
+		h.inst.Instrument(&Event{
+			Key:     "handler_timeout",
+			Message: msg,
+			Request: req,
+			Error:   ctx.Err(),
+		})
+	default:
+	}
 }

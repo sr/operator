@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"bread"
 	"bread/pb"
@@ -25,6 +26,7 @@ import (
 type config struct {
 	grpcAddr string
 	httpAddr string
+	timeout  time.Duration
 
 	ldapAddr string
 	ldapBase string
@@ -51,6 +53,7 @@ func run(invoker operator.Invoker) error {
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
+	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "TODO")
 	flags.StringVar(&config.ldapAddr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flags.StringVar(&config.ldapBase, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
@@ -174,6 +177,7 @@ func run(invoker operator.Invoker) error {
 		config.prefix,
 		conn,
 		invoker,
+		config.timeout,
 	); err != nil {
 		return err
 	}
