@@ -84,7 +84,7 @@ class SQLParser::Parser < Racc::Parser
       when (text = @ss.scan(/DATE\s/i))
          action { [:DATE, text] }
 
-      when (text = @ss.scan(/ASC\s/i))
+      when (text = @ss.scan(/ASC/i))
          action { [:ASC, text] }
 
       when (text = @ss.scan(/AS\s/i))
@@ -183,7 +183,7 @@ class SQLParser::Parser < Racc::Parser
       when (text = @ss.scan(/EXISTS\s/i))
          action { [:EXISTS, text] }
 
-      when (text = @ss.scan(/DESC\s/i))
+      when (text = @ss.scan(/DESC/i))
          action { [:DESC, text] }
 
       when (text = @ss.scan(/CURRENT_USER\s{/i))

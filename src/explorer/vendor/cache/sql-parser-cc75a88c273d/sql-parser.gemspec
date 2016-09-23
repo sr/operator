@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Dray Lacy", "Louis Mullie"]
-  s.date = "2016-07-08"
+  s.date = "2016-09-23"
   s.description = " A Racc-based Ruby parser and generator for SQL statements "
   s.email = ["dray@izea.com", "louis.mullie@gmail.com"]
   s.files = ["lib/sql-parser", "lib/sql-parser.rb", "lib/sql-parser/parser.racc", "lib/sql-parser/parser.racc.rb", "lib/sql-parser/parser.rex", "lib/sql-parser/parser.rex.rb", "lib/sql-parser/sql_visitor.rb", "lib/sql-parser/statement.rb", "lib/sql-parser/version.rb"]
