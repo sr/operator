@@ -8,7 +8,8 @@ ENV GOROOT=/usr/local/go
 ENV GOPATH=/tmp/gopath
 
 RUN yum install -y epel-release && \
-  yum install -y supervisor less which git
+  yum install -y supervisor less which git && \
+  yum clean all
 
 RUN curl https://storage.googleapis.com/golang/go${go_version}.linux-amd64.tar.gz | tar -xvz -C /usr/local && \
   mkdir -p "$GOPATH" && \

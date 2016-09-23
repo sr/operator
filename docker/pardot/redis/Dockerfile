@@ -4,7 +4,8 @@ ARG redis_version=2.6.17
 ARG artifactory_host
 
 RUN yum install -y epel-release && \
-  yum install -y supervisor less which
+  yum install -y supervisor less which && \
+  yum clean all
 
 RUN yum install -y make gcc && \
   cd /tmp && \
@@ -14,7 +15,8 @@ RUN yum install -y make gcc && \
   make install && \
   cd /tmp && \
   rm -rf redis-${redis_version} && \
-  rpm -e make gcc
+  rpm -e make gcc && \
+  yum clean all
 
 RUN groupadd -r redis -g 533 && \
   useradd -r -g redis -d /var/lib/redis -s /sbin/nologin -c "Redis" -u 533 redis
