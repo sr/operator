@@ -8,9 +8,6 @@ MYSQL_USERS="${MYSQL_USERS-}"
 
 program="${1-}"
 if [ "$program" = "mysqld" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
-  mkdir -p /var/lib/mysql /var/log/mysql
-  chown -R mysql:mysql /var/lib/mysql /var/log/mysql
-
   if ! mysqld --initialize-insecure; then
     echo "Failed to initialize MySQL database" 2>&1
     cat /var/log/mysql/error.log

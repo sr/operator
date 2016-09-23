@@ -22,6 +22,8 @@ RUN \
     yum clean all
 
 COPY my.cnf /etc/my.cnf
+RUN mkdir -p /var/lib/mysql /var/log/mysql && \
+  chown -R mysql:mysql /var/lib/mysql /var/log/mysql
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
