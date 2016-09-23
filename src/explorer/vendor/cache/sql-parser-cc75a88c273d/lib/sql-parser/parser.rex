@@ -41,7 +41,7 @@ rule
 # keywords
             SELECT\s      { [:SELECT, text] }
             DATE\s        { [:DATE, text] }
-            ASC\s         { [:ASC, text] }
+            ASC           { [:ASC, text] }
             AS\s          { [:AS, text] }
             FROM\s        { [:FROM, text] }
             WHERE\s       { [:WHERE, text] }
@@ -74,7 +74,7 @@ rule
             FULL\s        { [:FULL, text] }
             USING\s       { [:USING, text] }
             EXISTS\s      { [:EXISTS, text] }
-            DESC\s        { [:DESC, text] }
+            DESC          { [:DESC, text] }
             CURRENT_USER\s{ [:CURRENT_USER, text] }
             VALUES\s      { [:VALUES, text] }
             LIMIT\s       { [:LIMIT, text] }
