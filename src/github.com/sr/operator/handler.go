@@ -17,34 +17,35 @@ const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options
 
 type handler struct {
 	ctx     context.Context
+	timeout time.Duration
 	inst    Instrumenter
 	decoder Decoder
 	re      *regexp.Regexp
 	conn    *grpc.ClientConn
 	invoker Invoker
-	timeout time.Duration
 }
 
 func newHandler(
+	ctx context.Context,
+	timeout time.Duration,
 	inst Instrumenter,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
-	timeout time.Duration,
 ) (*handler, error) {
 	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
 		return nil, err
 	}
 	return &handler{
-		context.Background(),
+		ctx,
+		timeout,
 		inst,
 		decoder,
 		re,
 		conn,
 		invoker,
-		timeout,
 	}, nil
 }
 

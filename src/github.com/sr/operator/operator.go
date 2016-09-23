@@ -83,20 +83,22 @@ func NewCommand(name string, services []ServiceCommand) Command {
 }
 
 func NewHandler(
+	ctx context.Context,
+	timeout time.Duration,
 	instrumenter Instrumenter,
 	decoder Decoder,
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
-	timeout time.Duration,
 ) (http.Handler, error) {
 	return newHandler(
+		ctx,
+		timeout,
 		instrumenter,
 		decoder,
 		prefix,
 		conn,
 		invoker,
-		timeout,
 	)
 }
 

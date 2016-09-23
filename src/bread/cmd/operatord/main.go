@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -172,12 +173,13 @@ func run(invoker operator.Invoker) error {
 		return err
 	}
 	if webhookHandler, err = operator.NewHandler(
+		context.Background(),
+		config.timeout,
 		inst,
 		operatorhipchat.NewRequestDecoder(store),
 		config.prefix,
 		conn,
 		invoker,
-		config.timeout,
 	); err != nil {
 		return err
 	}
