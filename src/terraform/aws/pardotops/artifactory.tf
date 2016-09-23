@@ -659,6 +659,7 @@ resource "aws_route53_record" "artifactorylb_dev_pardot_com_CNAME" {
   type = "CNAME"
   zone_id = "${aws_route53_zone.dev_pardot_com.id}"
   records = ["${aws_elb.artifactory_public_elb.dns_name}"]
+  ttl = 900
 }
 
 # TODO: delete bottom entry and dns peer from internal_apps into artifactory_integration
@@ -667,16 +668,19 @@ resource "aws_route53_record" "appdev_artifactorylb_aws_pardot_com_CNAME" {
   type = "CNAME"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.id}"
   records = ["${aws_elb.artifactory_private_elb.dns_name}"]
+  ttl = 900
 }
 resource "aws_route53_record" "internal_apps_artifactorylb_aws_pardot_com_CNAME" {
   name = "artifactorylb.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
   type = "CNAME"
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
   records = ["${aws_elb.artifactory_private_elb.dns_name}"]
+  ttl = 900
 }
 resource "aws_route53_record" "artifactory_integration_artifactorylb_aws_pardot_com_CNAME" {
   name = "artifactorylb.${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.name}"
   type = "CNAME"
   zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.id}"
   records = ["${aws_elb.artifactory_private_elb.dns_name}"]
+  ttl = 900
 }
