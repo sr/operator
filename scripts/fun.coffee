@@ -102,7 +102,9 @@
 #   hubot lightning - Rage Lightning!
 #   hubot pushit(realgood) - Salt N Peppa 4 Lyfe!
 #   hubot lemon - Get's a random image of Lemon
-
+#   hubot sysadmin - Gets random image of sysadmin trading deck
+#   hubot securityfail - Gets random image of securityfail
+#
 _ = require "underscore"
 cycle = require "../lib/cycle"
 
@@ -807,6 +809,21 @@ module.exports = (robot) ->
       'http://i.imgur.com/qjYCPWj.jpg',
     ]
     msg.send msg.random sysadmins
+
+  robot.respond /starpugs$/i, (msg) ->
+    starpugs=[
+      'https://hipchat.dev.pardot.com/files/1/380/RQgJ29Lx4WyE2p6/banthapug.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/LfIBjGgienBuKuq/darth_pug.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/2DbOy3Ad9qoyiMx/pug_skywalker.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/IxvVvYHId5PK4YN/leia_darth_pug.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/gtMxmgqjy1cOzyn/bring-me-solo.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/dEU27jDJyGpvMfD/ewok_pug.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/B5ZH7Tavt2AYGcO/4starwarspugs.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/Z4yi4ePMA6YUOZi/xwing_pug.jpg',
+      'https://hipchat.dev.pardot.com/files/1/380/XYMhlSyflHuj43u/bb-pug.png',
+      'https://hipchat.dev.pardot.com/files/1/380/eCMQZMHfcEkbt7U/yoda_pug.jpg',
+    ]
+    msg.send msg.random starpugs
 
   robot.respond /hybrid$/i, (msg) ->
     hybrid=[
