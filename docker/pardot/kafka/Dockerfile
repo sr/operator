@@ -11,7 +11,8 @@ RUN yum install -y epel-release && \
   yum install -y supervisor && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-stacki/RedHat/RPMS/kafka-${kafka_version}-${kafka_revision}.el6.noarch.rpm" && \
-  ln -s "/opt/kafka/kafka_${kafka_version}" "/opt/kafka/current"
+  ln -s "/opt/kafka/kafka_${kafka_version}" "/opt/kafka/current" && \
+  yum clean all
 
 RUN mkdir -p /etc/kafka
 COPY server.properties /etc/kafka/server.properties
