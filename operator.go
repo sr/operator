@@ -88,6 +88,7 @@ func NewHandler(
 	prefix string,
 	conn *grpc.ClientConn,
 	invoker Invoker,
+	timeout time.Duration,
 ) (http.Handler, error) {
 	return newHandler(
 		instrumenter,
@@ -95,6 +96,7 @@ func NewHandler(
 		prefix,
 		conn,
 		invoker,
+		timeout,
 	)
 }
 
