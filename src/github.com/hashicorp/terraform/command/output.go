@@ -189,7 +189,7 @@ func formatListOutput(indent, outputName string, outputList []interface{}) strin
 
 func formatNestedMap(indent string, outputMap map[string]interface{}) string {
 	ks := make([]string, 0, len(outputMap))
-	for k, _ := range outputMap {
+	for k := range outputMap {
 		ks = append(ks, k)
 	}
 	sort.Strings(ks)
@@ -213,7 +213,7 @@ func formatNestedMap(indent string, outputMap map[string]interface{}) string {
 }
 func formatMapOutput(indent, outputName string, outputMap map[string]interface{}) string {
 	ks := make([]string, 0, len(outputMap))
-	for k, _ := range outputMap {
+	for k := range outputMap {
 		ks = append(ks, k)
 	}
 	sort.Strings(ks)

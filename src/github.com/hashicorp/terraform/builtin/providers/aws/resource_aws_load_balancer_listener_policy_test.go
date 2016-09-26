@@ -19,21 +19,21 @@ func TestAccAWSLoadBalancerListenerPolicy_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSLoadBalancerListenerPolicyDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSLoadBalancerListenerPolicyConfig_basic0,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSLoadBalancerPolicyState("aws_elb.test-lb", "aws_load_balancer_policy.magic-cookie-sticky"),
 					testAccCheckAWSLoadBalancerListenerPolicyState("test-aws-policies-lb", int64(80), "magic-cookie-sticky-policy", true),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSLoadBalancerListenerPolicyConfig_basic1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSLoadBalancerPolicyState("aws_elb.test-lb", "aws_load_balancer_policy.magic-cookie-sticky"),
 					testAccCheckAWSLoadBalancerListenerPolicyState("test-aws-policies-lb", int64(80), "magic-cookie-sticky-policy", true),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSLoadBalancerListenerPolicyConfig_basic2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSLoadBalancerListenerPolicyState("test-aws-policies-lb", int64(80), "magic-cookie-sticky-policy", false),
@@ -86,7 +86,7 @@ func testAccCheckAWSLoadBalancerListenerPolicyDestroy(s *terraform.State) error 
 				return err
 			}
 			policyNames := []string{}
-			for k, _ := range rs.Primary.Attributes {
+			for k := range rs.Primary.Attributes {
 				if strings.HasPrefix(k, "policy_names.") && strings.HasSuffix(k, ".name") {
 					value_key := fmt.Sprintf("%s.value", strings.TrimSuffix(k, ".name"))
 					policyNames = append(policyNames, rs.Primary.Attributes[value_key])

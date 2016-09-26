@@ -168,12 +168,12 @@ func (c *Context) Graph(g *ContextGraphOpts) (*Graph, error) {
 func (c *Context) graphBuilder(g *ContextGraphOpts) GraphBuilder {
 	// TODO test
 	providers := make([]string, 0, len(c.providers))
-	for k, _ := range c.providers {
+	for k := range c.providers {
 		providers = append(providers, k)
 	}
 
 	provisioners := make([]string, 0, len(c.provisioners))
-	for k, _ := range c.provisioners {
+	for k := range c.provisioners {
 		provisioners = append(provisioners, k)
 	}
 

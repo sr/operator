@@ -27,57 +27,57 @@ func resourceAwsS3Bucket() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"bucket": &schema.Schema{
+			"bucket": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"acl": &schema.Schema{
+			"acl": {
 				Type:     schema.TypeString,
 				Default:  "private",
 				Optional: true,
 			},
 
-			"policy": &schema.Schema{
+			"policy": {
 				Type:             schema.TypeString,
 				Optional:         true,
 				Computed:         true,
 				DiffSuppressFunc: suppressEquivalentAwsPolicyDiffs,
 			},
 
-			"cors_rule": &schema.Schema{
+			"cors_rule": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"allowed_headers": &schema.Schema{
+						"allowed_headers": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"allowed_methods": &schema.Schema{
+						"allowed_methods": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"allowed_origins": &schema.Schema{
+						"allowed_origins": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"expose_headers": &schema.Schema{
+						"expose_headers": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"max_age_seconds": &schema.Schema{
+						"max_age_seconds": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
@@ -85,22 +85,22 @@ func resourceAwsS3Bucket() *schema.Resource {
 				},
 			},
 
-			"website": &schema.Schema{
+			"website": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"index_document": &schema.Schema{
+						"index_document": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"error_document": &schema.Schema{
+						"error_document": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"redirect_all_requests_to": &schema.Schema{
+						"redirect_all_requests_to": {
 							Type: schema.TypeString,
 							ConflictsWith: []string{
 								"website.0.index_document",
@@ -110,7 +110,7 @@ func resourceAwsS3Bucket() *schema.Resource {
 							Optional: true,
 						},
 
-						"routing_rules": &schema.Schema{
+						"routing_rules": {
 							Type:      schema.TypeString,
 							Optional:  true,
 							StateFunc: normalizeJson,
@@ -119,34 +119,34 @@ func resourceAwsS3Bucket() *schema.Resource {
 				},
 			},
 
-			"hosted_zone_id": &schema.Schema{
+			"hosted_zone_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"region": &schema.Schema{
+			"region": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"website_endpoint": &schema.Schema{
+			"website_endpoint": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"website_domain": &schema.Schema{
+			"website_domain": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"versioning": &schema.Schema{
+			"versioning": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"enabled": &schema.Schema{
+						"enabled": {
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
@@ -162,16 +162,16 @@ func resourceAwsS3Bucket() *schema.Resource {
 				},
 			},
 
-			"logging": &schema.Schema{
+			"logging": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"target_bucket": &schema.Schema{
+						"target_bucket": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"target_prefix": &schema.Schema{
+						"target_prefix": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -186,80 +186,80 @@ func resourceAwsS3Bucket() *schema.Resource {
 				},
 			},
 
-			"lifecycle_rule": &schema.Schema{
+			"lifecycle_rule": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
+						"id": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							Computed:     true,
 							ValidateFunc: validateS3BucketLifecycleRuleId,
 						},
-						"prefix": &schema.Schema{
+						"prefix": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"enabled": &schema.Schema{
+						"enabled": {
 							Type:     schema.TypeBool,
 							Required: true,
 						},
-						"abort_incomplete_multipart_upload_days": &schema.Schema{
+						"abort_incomplete_multipart_upload_days": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"expiration": &schema.Schema{
+						"expiration": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Set:      expirationHash,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"date": &schema.Schema{
+									"date": {
 										Type:         schema.TypeString,
 										Optional:     true,
 										ValidateFunc: validateS3BucketLifecycleTimestamp,
 									},
-									"days": &schema.Schema{
+									"days": {
 										Type:     schema.TypeInt,
 										Optional: true,
 									},
-									"expired_object_delete_marker": &schema.Schema{
+									"expired_object_delete_marker": {
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"noncurrent_version_expiration": &schema.Schema{
+						"noncurrent_version_expiration": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Set:      expirationHash,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"days": &schema.Schema{
+									"days": {
 										Type:     schema.TypeInt,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"transition": &schema.Schema{
+						"transition": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Set:      transitionHash,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"date": &schema.Schema{
+									"date": {
 										Type:         schema.TypeString,
 										Optional:     true,
 										ValidateFunc: validateS3BucketLifecycleTimestamp,
 									},
-									"days": &schema.Schema{
+									"days": {
 										Type:     schema.TypeInt,
 										Optional: true,
 									},
-									"storage_class": &schema.Schema{
+									"storage_class": {
 										Type:         schema.TypeString,
 										Required:     true,
 										ValidateFunc: validateS3BucketLifecycleStorageClass,
@@ -267,17 +267,17 @@ func resourceAwsS3Bucket() *schema.Resource {
 								},
 							},
 						},
-						"noncurrent_version_transition": &schema.Schema{
+						"noncurrent_version_transition": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Set:      transitionHash,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"days": &schema.Schema{
+									"days": {
 										Type:     schema.TypeInt,
 										Optional: true,
 									},
-									"storage_class": &schema.Schema{
+									"storage_class": {
 										Type:         schema.TypeString,
 										Required:     true,
 										ValidateFunc: validateS3BucketLifecycleStorageClass,
@@ -289,20 +289,20 @@ func resourceAwsS3Bucket() *schema.Resource {
 				},
 			},
 
-			"force_destroy": &schema.Schema{
+			"force_destroy": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"acceleration_status": &schema.Schema{
+			"acceleration_status": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateS3BucketAccelerationStatus,
 			},
 
-			"request_payer": &schema.Schema{
+			"request_payer": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -1425,8 +1425,8 @@ func normalizeRegion(region string) string {
 
 func validateS3BucketAccelerationStatus(v interface{}, k string) (ws []string, errors []error) {
 	validTypes := map[string]struct{}{
-		"Enabled":   struct{}{},
-		"Suspended": struct{}{},
+		"Enabled":   {},
+		"Suspended": {},
 	}
 
 	if _, ok := validTypes[v.(string)]; !ok {

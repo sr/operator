@@ -25,39 +25,39 @@ func resourceAwsCloudWatchEventRule() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateCloudWatchEventRuleName,
 			},
-			"schedule_expression": &schema.Schema{
+			"schedule_expression": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(256),
 			},
-			"event_pattern": &schema.Schema{
+			"event_pattern": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(2048),
 				StateFunc:    normalizeJson,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(512),
 			},
-			"role_arn": &schema.Schema{
+			"role_arn": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(1600),
 			},
-			"is_enabled": &schema.Schema{
+			"is_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"arn": &schema.Schema{
+			"arn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

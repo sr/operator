@@ -235,9 +235,9 @@ func getArmTrafficManagerEndpointProperties(d *schema.ResourceData) *trafficmana
 
 func validateAzureRMTrafficManagerEndpointType(i interface{}, k string) (s []string, errors []error) {
 	valid := map[string]struct{}{
-		"azureEndpoints":    struct{}{},
-		"externalEndpoints": struct{}{},
-		"nestedEndpoints":   struct{}{},
+		"azureEndpoints":    {},
+		"externalEndpoints": {},
+		"nestedEndpoints":   {},
 	}
 
 	if _, ok := valid[i.(string)]; !ok {

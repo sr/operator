@@ -288,9 +288,9 @@ func validateAzureRMTrafficManagerStatus(i interface{}, k string) (s []string, e
 
 func validateAzureRMTrafficManagerRoutingMethod(i interface{}, k string) (s []string, errors []error) {
 	valid := map[string]struct{}{
-		"Performance": struct{}{},
-		"Weighted":    struct{}{},
-		"Priority":    struct{}{},
+		"Performance": {},
+		"Weighted":    {},
+		"Priority":    {},
 	}
 
 	if _, ok := valid[i.(string)]; !ok {

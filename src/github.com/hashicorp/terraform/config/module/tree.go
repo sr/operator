@@ -305,7 +305,7 @@ func (t *Tree) Validate() error {
 		}
 
 		// Compare to the keys in our raw config for the module
-		for k, _ := range m.RawConfig.Raw {
+		for k := range m.RawConfig.Raw {
 			if _, ok := varMap[k]; !ok {
 				newErr.Err = fmt.Errorf(
 					"module %s: %s is not a valid parameter",
@@ -318,7 +318,7 @@ func (t *Tree) Validate() error {
 		}
 
 		// If we have any required left over, they aren't set.
-		for k, _ := range requiredMap {
+		for k := range requiredMap {
 			newErr.Err = fmt.Errorf(
 				"module %s: required variable %s not set",
 				m.Name, k)

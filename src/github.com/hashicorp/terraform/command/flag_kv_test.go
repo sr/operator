@@ -119,7 +119,7 @@ func TestFlagTypedKV(t *testing.T) {
 			`key={"hello" = "world", "foo" = "bar"}`,
 			map[string]interface{}{
 				"key": []map[string]interface{}{
-					map[string]interface{}{
+					{
 						"hello": "world",
 						"foo":   "bar",
 					},

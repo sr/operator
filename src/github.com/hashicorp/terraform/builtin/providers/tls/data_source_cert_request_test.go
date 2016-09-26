@@ -15,7 +15,7 @@ func TestCertRequest(t *testing.T) {
 	r.UnitTest(t, r.TestCase{
 		Providers: testProviders,
 		Steps: []r.TestStep{
-			r.TestStep{
+			{
 				Config: fmt.Sprintf(`
                     data "tls_cert_request" "test" {
                         subject {

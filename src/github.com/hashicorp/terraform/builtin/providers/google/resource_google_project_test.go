@@ -36,7 +36,7 @@ func TestAccGoogleProject_associate(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccGoogleProject_basic, projectId),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGoogleProjectExists("google_project.acceptance"),
@@ -56,7 +56,7 @@ func TestAccGoogleProject_iamPolicy1(t *testing.T) {
 		CheckDestroy: testAccCheckGoogleProjectDestroy,
 		Steps: []resource.TestStep{
 			// First step inventories the project's existing IAM policy
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccGoogleProject_basic, projectId),
 				Check: resource.ComposeTestCheckFunc(
 					testAccGoogleProjectExistingPolicy(policy),
@@ -64,7 +64,7 @@ func TestAccGoogleProject_iamPolicy1(t *testing.T) {
 			},
 			// Second step applies an IAM policy from a data source. The application
 			// merges policies, so we validate the expected state.
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccGoogleProject_policy1, projectId),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGoogleProjectExists("google_project.acceptance"),
@@ -73,7 +73,7 @@ func TestAccGoogleProject_iamPolicy1(t *testing.T) {
 			},
 			// Finally, remove the custom IAM policy from config and apply, then
 			// confirm that the project is in its original state.
-			resource.TestStep{
+			{
 				Config: fmt.Sprintf(testAccGoogleProject_basic, projectId),
 			},
 		},
@@ -198,7 +198,7 @@ func TestIamRolesToMembersBinding(t *testing.T) {
 				},
 			},
 			input: map[string]map[string]bool{
-				"role-1": map[string]bool{
+				"role-1": {
 					"member-1": true,
 					"member-2": true,
 				},
@@ -215,7 +215,7 @@ func TestIamRolesToMembersBinding(t *testing.T) {
 				},
 			},
 			input: map[string]map[string]bool{
-				"role-1": map[string]bool{
+				"role-1": {
 					"member-1": true,
 					"member-2": true,
 				},
@@ -229,7 +229,7 @@ func TestIamRolesToMembersBinding(t *testing.T) {
 				},
 			},
 			input: map[string]map[string]bool{
-				"role-1": map[string]bool{},
+				"role-1": {},
 			},
 		},
 	}
@@ -238,7 +238,7 @@ func TestIamRolesToMembersBinding(t *testing.T) {
 		got := rolesToMembersBinding(test.input)
 
 		sort.Sort(Binding(got))
-		for i, _ := range got {
+		for i := range got {
 			sort.Strings(got[i].Members)
 		}
 
@@ -263,7 +263,7 @@ func TestIamRolesToMembersMap(t *testing.T) {
 				},
 			},
 			expect: map[string]map[string]bool{
-				"role-1": map[string]bool{
+				"role-1": {
 					"member-1": true,
 					"member-2": true,
 				},
@@ -282,7 +282,7 @@ func TestIamRolesToMembersMap(t *testing.T) {
 				},
 			},
 			expect: map[string]map[string]bool{
-				"role-1": map[string]bool{
+				"role-1": {
 					"member-1": true,
 					"member-2": true,
 				},
@@ -295,7 +295,7 @@ func TestIamRolesToMembersMap(t *testing.T) {
 				},
 			},
 			expect: map[string]map[string]bool{
-				"role-1": map[string]bool{},
+				"role-1": {},
 			},
 		},
 	}
@@ -412,7 +412,7 @@ func TestIamMergeBindings(t *testing.T) {
 	for _, test := range table {
 		got := mergeBindings(test.input)
 		sort.Sort(Binding(got))
-		for i, _ := range got {
+		for i := range got {
 			sort.Strings(got[i].Members)
 		}
 

@@ -539,10 +539,10 @@ func TestNameRegexp(t *testing.T) {
 
 func TestProviderConfigName(t *testing.T) {
 	pcs := []*ProviderConfig{
-		&ProviderConfig{Name: "aw"},
-		&ProviderConfig{Name: "aws"},
-		&ProviderConfig{Name: "a"},
-		&ProviderConfig{Name: "gce_"},
+		{Name: "aw"},
+		{Name: "aws"},
+		{Name: "a"},
+		{Name: "gce_"},
 	}
 
 	n := ProviderConfigName("aws_instance", pcs)

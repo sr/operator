@@ -25,7 +25,7 @@ func TestAccAWSKinesisFirehoseDeliveryStream_s3basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisFirehoseDeliveryStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream", &stream),
@@ -57,7 +57,7 @@ func TestAccAWSKinesisFirehoseDeliveryStream_s3ConfigUpdates(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisFirehoseDeliveryStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream", &stream),
@@ -65,7 +65,7 @@ func TestAccAWSKinesisFirehoseDeliveryStream_s3ConfigUpdates(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream", &stream),
@@ -96,7 +96,7 @@ func TestAccAWSKinesisFirehoseDeliveryStream_RedshiftConfigUpdates(t *testing.T)
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisFirehoseDeliveryStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream", &stream),
@@ -104,7 +104,7 @@ func TestAccAWSKinesisFirehoseDeliveryStream_RedshiftConfigUpdates(t *testing.T)
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream", &stream),
@@ -136,14 +136,14 @@ func TestAccAWSKinesisFirehoseDeliveryStream_ElasticsearchConfigUpdates(t *testi
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckKinesisFirehoseDeliveryStreamDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream_es", &stream),
 					testAccCheckAWSKinesisFirehoseDeliveryStreamAttributes(&stream, nil, nil, nil),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKinesisFirehoseDeliveryStreamExists("aws_kinesis_firehose_delivery_stream.test_stream_es", &stream),

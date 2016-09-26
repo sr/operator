@@ -20,7 +20,7 @@ func TestAccAzureRMVirtualNetwork_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMVirtualNetworkDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualNetworkExists("azurerm_virtual_network.test"),
@@ -41,7 +41,7 @@ func TestAccAzureRMVirtualNetwork_withTags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMVirtualNetworkDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualNetworkExists("azurerm_virtual_network.test"),
@@ -54,7 +54,7 @@ func TestAccAzureRMVirtualNetwork_withTags(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualNetworkExists("azurerm_virtual_network.test"),

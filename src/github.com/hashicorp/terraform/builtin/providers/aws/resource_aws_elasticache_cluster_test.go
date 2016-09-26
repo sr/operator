@@ -20,7 +20,7 @@ func TestAccAWSElasticacheCluster_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSElasticacheClusterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSElasticacheClusterConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSecurityGroupExists("aws_elasticache_security_group.bar"),
@@ -45,7 +45,7 @@ func TestAccAWSElasticacheCluster_snapshotsWithUpdates(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSElasticacheClusterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSecurityGroupExists("aws_elasticache_security_group.bar"),
@@ -57,7 +57,7 @@ func TestAccAWSElasticacheCluster_snapshotsWithUpdates(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSecurityGroupExists("aws_elasticache_security_group.bar"),
@@ -84,7 +84,7 @@ func TestAccAWSElasticacheCluster_decreasingCacheNodes(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSElasticacheClusterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSecurityGroupExists("aws_elasticache_security_group.bar"),
@@ -94,7 +94,7 @@ func TestAccAWSElasticacheCluster_decreasingCacheNodes(t *testing.T) {
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSecurityGroupExists("aws_elasticache_security_group.bar"),
@@ -115,7 +115,7 @@ func TestAccAWSElasticacheCluster_vpc(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSElasticacheClusterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSElasticacheClusterInVPCConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSubnetGroupExists("aws_elasticache_subnet_group.bar", &csg),
@@ -137,7 +137,7 @@ func TestAccAWSElasticacheCluster_multiAZInVpc(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSElasticacheClusterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSElasticacheClusterMultiAZInVPCConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSElasticacheSubnetGroupExists("aws_elasticache_subnet_group.bar", &csg),

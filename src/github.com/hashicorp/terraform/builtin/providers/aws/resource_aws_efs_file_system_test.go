@@ -87,7 +87,7 @@ func TestAccAWSEFSFileSystem_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckEfsFileSystemDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccAWSEFSFileSystemConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckEfsFileSystem(
@@ -99,7 +99,7 @@ func TestAccAWSEFSFileSystem_basic(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSEFSFileSystemConfigWithTags,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckEfsFileSystem(
@@ -118,7 +118,7 @@ func TestAccAWSEFSFileSystem_basic(t *testing.T) {
 					),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccAWSEFSFileSystemConfigWithPerformanceMode,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckEfsFileSystem(

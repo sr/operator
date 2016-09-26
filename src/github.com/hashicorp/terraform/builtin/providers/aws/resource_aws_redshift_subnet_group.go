@@ -24,20 +24,20 @@ func resourceAwsRedshiftSubnetGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateRedshiftSubnetGroupName,
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"subnet_ids": &schema.Schema{
+			"subnet_ids": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

@@ -51,11 +51,11 @@ func TestConfigFieldReader(t *testing.T) {
 
 func TestConfigFieldReader_DefaultHandling(t *testing.T) {
 	schema := map[string]*Schema{
-		"strWithDefault": &Schema{
+		"strWithDefault": {
 			Type:    TypeString,
 			Default: "ImADefault",
 		},
-		"strWithDefaultFunc": &Schema{
+		"strWithDefaultFunc": {
 			Type: TypeString,
 			DefaultFunc: func() (interface{}, error) {
 				return "FuncDefault", nil
@@ -136,7 +136,7 @@ func TestConfigFieldReader_DefaultHandling(t *testing.T) {
 
 func TestConfigFieldReader_ComputedMap(t *testing.T) {
 	schema := map[string]*Schema{
-		"map": &Schema{
+		"map": {
 			Type:     TypeMap,
 			Computed: true,
 		},
@@ -176,7 +176,7 @@ func TestConfigFieldReader_ComputedMap(t *testing.T) {
 					"foo": "${var.foo}",
 				},
 			}, map[string]ast.Variable{
-				"var.foo": ast.Variable{
+				"var.foo": {
 					Value: config.UnknownVariableValue,
 					Type:  ast.TypeString,
 				},
@@ -197,14 +197,14 @@ func TestConfigFieldReader_ComputedMap(t *testing.T) {
 			testConfigInterpolate(t, map[string]interface{}{
 				"map": "${var.foo}",
 			}, map[string]ast.Variable{
-				"var.foo": ast.Variable{
+				"var.foo": {
 					Type: ast.TypeMap,
 					Value: map[string]ast.Variable{
-						"bar": ast.Variable{
+						"bar": {
 							Type:  ast.TypeString,
 							Value: "baz",
 						},
-						"baz": ast.Variable{
+						"baz": {
 							Type:  ast.TypeString,
 							Value: "bar",
 						},
@@ -239,7 +239,7 @@ func TestConfigFieldReader_ComputedMap(t *testing.T) {
 
 func TestConfigFieldReader_ComputedSet(t *testing.T) {
 	schema := map[string]*Schema{
-		"strSet": &Schema{
+		"strSet": {
 			Type: TypeSet,
 			Elem: &Schema{Type: TypeString},
 			Set:  HashString,
@@ -277,7 +277,7 @@ func TestConfigFieldReader_ComputedSet(t *testing.T) {
 			testConfigInterpolate(t, map[string]interface{}{
 				"strSet": []interface{}{"${var.foo}"},
 			}, map[string]ast.Variable{
-				"var.foo": ast.Variable{
+				"var.foo": {
 					Value: config.UnknownVariableValue,
 					Type:  ast.TypeString,
 				},
@@ -295,7 +295,7 @@ func TestConfigFieldReader_ComputedSet(t *testing.T) {
 			testConfigInterpolate(t, map[string]interface{}{
 				"strSet": []interface{}{"${var.foo}/32"},
 			}, map[string]ast.Variable{
-				"var.foo": ast.Variable{
+				"var.foo": {
 					Value: config.UnknownVariableValue,
 					Type:  ast.TypeString,
 				},

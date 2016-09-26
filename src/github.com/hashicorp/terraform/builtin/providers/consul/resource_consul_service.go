@@ -15,30 +15,30 @@ func resourceConsulService() *schema.Resource {
 		Delete: resourceConsulServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"address": &schema.Schema{
+			"address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"id": &schema.Schema{
+			"id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"port": &schema.Schema{
+			"port": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

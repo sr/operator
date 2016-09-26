@@ -9,13 +9,13 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"access_key": &schema.Schema{
+			"access_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SCALEWAY_ACCESS_KEY", nil),
 				Description: "The API key for Scaleway API operations.",
 			},
-			"organization": &schema.Schema{
+			"organization": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SCALEWAY_ORGANIZATION", nil),

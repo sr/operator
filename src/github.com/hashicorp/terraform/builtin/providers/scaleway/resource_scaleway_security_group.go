@@ -15,11 +15,11 @@ func resourceScalewaySecurityGroup() *schema.Resource {
 		Update: resourceScalewaySecurityGroupUpdate,
 		Delete: resourceScalewaySecurityGroupDelete,
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Required: true,
 			},

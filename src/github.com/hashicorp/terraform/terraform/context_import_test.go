@@ -15,7 +15,7 @@ func TestContextImport_basic(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -23,7 +23,7 @@ func TestContextImport_basic(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -49,7 +49,7 @@ func TestContextImport_countIndex(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -57,7 +57,7 @@ func TestContextImport_countIndex(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo[0]",
 				ID:   "bar",
 			},
@@ -83,10 +83,10 @@ func TestContextImport_collision(t *testing.T) {
 
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: []string{"root"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.foo": &ResourceState{
+						"aws_instance.foo": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -99,7 +99,7 @@ func TestContextImport_collision(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -107,7 +107,7 @@ func TestContextImport_collision(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -133,14 +133,14 @@ func TestContextImport_missingType(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID: "foo",
 		},
 	}
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -166,7 +166,7 @@ func TestContextImport_moduleProvider(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -188,7 +188,7 @@ func TestContextImport_moduleProvider(t *testing.T) {
 	state, err := ctx.Import(&ImportOpts{
 		Module: m,
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -218,7 +218,7 @@ func TestContextImport_refresh(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -233,7 +233,7 @@ func TestContextImport_refresh(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -259,7 +259,7 @@ func TestContextImport_refreshNil(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -271,7 +271,7 @@ func TestContextImport_refreshNil(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -297,7 +297,7 @@ func TestContextImport_module(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -305,7 +305,7 @@ func TestContextImport_module(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "module.foo.aws_instance.foo",
 				ID:   "bar",
 			},
@@ -331,7 +331,7 @@ func TestContextImport_moduleDepth2(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -339,7 +339,7 @@ func TestContextImport_moduleDepth2(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "module.a.module.b.aws_instance.foo",
 				ID:   "bar",
 			},
@@ -365,10 +365,10 @@ func TestContextImport_moduleDiff(t *testing.T) {
 
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: []string{"root", "bar"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.bar": &ResourceState{
+						"aws_instance.bar": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -381,7 +381,7 @@ func TestContextImport_moduleDiff(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -389,7 +389,7 @@ func TestContextImport_moduleDiff(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "module.foo.aws_instance.foo",
 				ID:   "bar",
 			},
@@ -415,10 +415,10 @@ func TestContextImport_moduleExisting(t *testing.T) {
 
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: []string{"root", "foo"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.bar": &ResourceState{
+						"aws_instance.bar": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -431,7 +431,7 @@ func TestContextImport_moduleExisting(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
@@ -439,7 +439,7 @@ func TestContextImport_moduleExisting(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "module.foo.aws_instance.foo",
 				ID:   "bar",
 			},
@@ -465,11 +465,11 @@ func TestContextImport_multiState(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
-		&InstanceState{
+		{
 			ID:        "bar",
 			Ephemeral: EphemeralState{Type: "aws_instance_thing"},
 		},
@@ -477,7 +477,7 @@ func TestContextImport_multiState(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},
@@ -503,15 +503,15 @@ func TestContextImport_multiStateSame(t *testing.T) {
 	})
 
 	p.ImportStateReturn = []*InstanceState{
-		&InstanceState{
+		{
 			ID:        "foo",
 			Ephemeral: EphemeralState{Type: "aws_instance"},
 		},
-		&InstanceState{
+		{
 			ID:        "bar",
 			Ephemeral: EphemeralState{Type: "aws_instance_thing"},
 		},
-		&InstanceState{
+		{
 			ID:        "qux",
 			Ephemeral: EphemeralState{Type: "aws_instance_thing"},
 		},
@@ -519,7 +519,7 @@ func TestContextImport_multiStateSame(t *testing.T) {
 
 	state, err := ctx.Import(&ImportOpts{
 		Targets: []*ImportTarget{
-			&ImportTarget{
+			{
 				Addr: "aws_instance.foo",
 				ID:   "bar",
 			},

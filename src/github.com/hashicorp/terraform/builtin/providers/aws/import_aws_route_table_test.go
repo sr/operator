@@ -23,11 +23,11 @@ func TestAccAWSRouteTable_importBasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckRouteTableDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccRouteTableConfig,
 			},
 
-			resource.TestStep{
+			{
 				ResourceName:     "aws_route_table.foo",
 				ImportState:      true,
 				ImportStateCheck: checkFn,

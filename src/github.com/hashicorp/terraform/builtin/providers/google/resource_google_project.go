@@ -31,20 +31,20 @@ func resourceGoogleProject() *schema.Resource {
 		Delete: resourceGoogleProjectDelete,
 
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"policy_data": &schema.Schema{
+			"policy_data": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"number": &schema.Schema{
+			"number": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -176,7 +176,7 @@ func resourceGoogleProjectUpdate(d *schema.ResourceData, meta interface{}) error
 			// The role exists in the new state
 			if _, ok := newMap[role]; ok {
 				// Check each memeber
-				for member, _ := range members {
+				for member := range members {
 					// Member does not exist in new state, so it was deleted
 					if _, ok = newMap[role][member]; !ok {
 						deleted[role][member] = true
@@ -185,7 +185,7 @@ func resourceGoogleProjectUpdate(d *schema.ResourceData, meta interface{}) error
 			} else {
 				// This indicates an entire role was deleted. Mark all members
 				// for delete.
-				for member, _ := range members {
+				for member := range members {
 					deleted[role][member] = true
 				}
 			}
@@ -209,7 +209,7 @@ func resourceGoogleProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		// Remove any roles and members that were explicitly deleted
 		mergedBindingsMap := rolesToMembersMap(mergedBindings)
 		for role, members := range deleted {
-			for member, _ := range members {
+			for member := range members {
 				delete(mergedBindingsMap[role], member)
 			}
 		}
@@ -254,7 +254,7 @@ func rolesToMembersBinding(m map[string]map[string]bool) []*cloudresourcemanager
 			Role:    role,
 			Members: make([]string, 0),
 		}
-		for m, _ := range members {
+		for m := range members {
 			b.Members = append(b.Members, m)
 		}
 		bindings = append(bindings, &b)
@@ -290,7 +290,7 @@ func mergeBindings(bindings []*cloudresourcemanager.Binding) []*cloudresourceman
 		var b cloudresourcemanager.Binding
 		b.Role = role
 		b.Members = make([]string, 0)
-		for m, _ := range members {
+		for m := range members {
 			b.Members = append(b.Members, m)
 		}
 		rb = append(rb, &b)

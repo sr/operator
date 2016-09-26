@@ -18,10 +18,10 @@ func TestContext2Refresh(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.web": &ResourceState{
+						"aws_instance.web": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -70,7 +70,7 @@ func TestContext2Refresh_targeted(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_vpc.metoo":      resourceState("aws_vpc", "vpc-abc123"),
@@ -111,7 +111,7 @@ func TestContext2Refresh_targetedCount(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_vpc.metoo":      resourceState("aws_vpc", "vpc-abc123"),
@@ -162,7 +162,7 @@ func TestContext2Refresh_targetedCountIndex(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_vpc.metoo":      resourceState("aws_vpc", "vpc-abc123"),
@@ -222,10 +222,10 @@ func TestContext2Refresh_delete(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.web": &ResourceState{
+						"aws_instance.web": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -288,10 +288,10 @@ func TestContext2Refresh_hook(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.web": &ResourceState{
+						"aws_instance.web": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -319,10 +319,10 @@ func TestContext2Refresh_modules(t *testing.T) {
 	m := testModule(t, "refresh-modules")
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": &ResourceState{
+					"aws_instance.web": {
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID:      "bar",
@@ -332,10 +332,10 @@ func TestContext2Refresh_modules(t *testing.T) {
 				},
 			},
 
-			&ModuleState{
+			{
 				Path: []string{"root", "child"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": &ResourceState{
+					"aws_instance.web": {
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -437,10 +437,10 @@ func TestContext2Refresh_output(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.web": &ResourceState{
+						"aws_instance.web": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -452,7 +452,7 @@ func TestContext2Refresh_output(t *testing.T) {
 					},
 
 					Outputs: map[string]*OutputState{
-						"foo": &OutputState{
+						"foo": {
 							Type:      "string",
 							Sensitive: false,
 							Value:     "foo",
@@ -489,10 +489,10 @@ func TestContext2Refresh_outputPartial(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.foo": &ResourceState{
+						"aws_instance.foo": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -525,10 +525,10 @@ func TestContext2Refresh_state(t *testing.T) {
 	m := testModule(t, "refresh-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": &ResourceState{
+					"aws_instance.web": {
 						Primary: &InstanceState{
 							ID: "bar",
 						},
@@ -575,7 +575,7 @@ func TestContext2Refresh_dataState(t *testing.T) {
 	m := testModule(t, "refresh-data-resource-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: rootModulePath,
 				// Intentionally no resources since data resources are
 				// supposed to refresh themselves even if they didn't
@@ -645,10 +645,10 @@ func TestContext2Refresh_tainted(t *testing.T) {
 	m := testModule(t, "refresh-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": &ResourceState{
+					"aws_instance.web": {
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID:      "bar",
@@ -718,10 +718,10 @@ func TestContext2Refresh_vars(t *testing.T) {
 		State: &State{
 
 			Modules: []*ModuleState{
-				&ModuleState{
+				{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.web": &ResourceState{
+						"aws_instance.web": {
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "foo",
@@ -779,10 +779,10 @@ func TestContext2Refresh_orphanModule(t *testing.T) {
 
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": &ResourceState{
+					"aws_instance.foo": {
 						Primary: &InstanceState{
 							ID: "i-abc123",
 							Attributes: map[string]string{
@@ -797,10 +797,10 @@ func TestContext2Refresh_orphanModule(t *testing.T) {
 					},
 				},
 			},
-			&ModuleState{
+			{
 				Path: append(rootModulePath, "child"),
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": &ResourceState{
+					"aws_instance.bar": {
 						Primary: &InstanceState{
 							ID: "i-bcd234",
 							Attributes: map[string]string{
@@ -813,27 +813,27 @@ func TestContext2Refresh_orphanModule(t *testing.T) {
 					},
 				},
 				Outputs: map[string]*OutputState{
-					"id": &OutputState{
+					"id": {
 						Value: "i-bcd234",
 						Type:  "string",
 					},
-					"grandchild_id": &OutputState{
+					"grandchild_id": {
 						Value: "i-cde345",
 						Type:  "string",
 					},
 				},
 			},
-			&ModuleState{
+			{
 				Path: append(rootModulePath, "child", "grandchild"),
 				Resources: map[string]*ResourceState{
-					"aws_instance.baz": &ResourceState{
+					"aws_instance.baz": {
 						Primary: &InstanceState{
 							ID: "i-cde345",
 						},
 					},
 				},
 				Outputs: map[string]*OutputState{
-					"id": &OutputState{
+					"id": {
 						Value: "i-cde345",
 						Type:  "string",
 					},

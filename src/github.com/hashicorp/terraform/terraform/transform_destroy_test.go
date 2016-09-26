@@ -132,10 +132,10 @@ func TestPruneDestroyTransformer_diff(t *testing.T) {
 
 	diff := &Diff{
 		Modules: []*ModuleDiff{
-			&ModuleDiff{
+			{
 				Path: RootModulePath,
 				Resources: map[string]*InstanceDiff{
-					"aws_instance.bar": &InstanceDiff{},
+					"aws_instance.bar": {},
 				},
 			},
 		},
@@ -210,13 +210,13 @@ func TestPruneDestroyTransformer_countDec(t *testing.T) {
 	diff := &Diff{}
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar.1": &ResourceState{
+					"aws_instance.bar.1": {
 						Primary: &InstanceState{},
 					},
-					"aws_instance.bar.2": &ResourceState{
+					"aws_instance.bar.2": {
 						Primary: &InstanceState{},
 					},
 				},
@@ -259,10 +259,10 @@ func TestPruneDestroyTransformer_countState(t *testing.T) {
 	diff := &Diff{}
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": &ResourceState{
+					"aws_instance.bar": {
 						Primary: &InstanceState{},
 					},
 				},
@@ -305,14 +305,14 @@ func TestPruneDestroyTransformer_prefixMatch(t *testing.T) {
 	diff := &Diff{}
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo-bar.0": &ResourceState{
+					"aws_instance.foo-bar.0": {
 						Primary: &InstanceState{ID: "foo"},
 					},
 
-					"aws_instance.foo-bar.1": &ResourceState{
+					"aws_instance.foo-bar.1": {
 						Primary: &InstanceState{ID: "foo"},
 					},
 				},
@@ -355,10 +355,10 @@ func TestPruneDestroyTransformer_tainted(t *testing.T) {
 	diff := &Diff{}
 	state := &State{
 		Modules: []*ModuleState{
-			&ModuleState{
+			{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": &ResourceState{
+					"aws_instance.bar": {
 						Primary: &InstanceState{
 							ID:      "foo",
 							Tainted: true,

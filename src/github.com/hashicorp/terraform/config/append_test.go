@@ -16,19 +16,19 @@ func TestAppend(t *testing.T) {
 					Name: "foo",
 				},
 				Modules: []*Module{
-					&Module{Name: "foo"},
+					{Name: "foo"},
 				},
 				Outputs: []*Output{
-					&Output{Name: "foo"},
+					{Name: "foo"},
 				},
 				ProviderConfigs: []*ProviderConfig{
-					&ProviderConfig{Name: "foo"},
+					{Name: "foo"},
 				},
 				Resources: []*Resource{
-					&Resource{Name: "foo"},
+					{Name: "foo"},
 				},
 				Variables: []*Variable{
-					&Variable{Name: "foo"},
+					{Name: "foo"},
 				},
 
 				unknownKeys: []string{"foo"},
@@ -39,19 +39,19 @@ func TestAppend(t *testing.T) {
 					Name: "bar",
 				},
 				Modules: []*Module{
-					&Module{Name: "bar"},
+					{Name: "bar"},
 				},
 				Outputs: []*Output{
-					&Output{Name: "bar"},
+					{Name: "bar"},
 				},
 				ProviderConfigs: []*ProviderConfig{
-					&ProviderConfig{Name: "bar"},
+					{Name: "bar"},
 				},
 				Resources: []*Resource{
-					&Resource{Name: "bar"},
+					{Name: "bar"},
 				},
 				Variables: []*Variable{
-					&Variable{Name: "bar"},
+					{Name: "bar"},
 				},
 
 				unknownKeys: []string{"bar"},
@@ -62,24 +62,24 @@ func TestAppend(t *testing.T) {
 					Name: "bar",
 				},
 				Modules: []*Module{
-					&Module{Name: "foo"},
-					&Module{Name: "bar"},
+					{Name: "foo"},
+					{Name: "bar"},
 				},
 				Outputs: []*Output{
-					&Output{Name: "foo"},
-					&Output{Name: "bar"},
+					{Name: "foo"},
+					{Name: "bar"},
 				},
 				ProviderConfigs: []*ProviderConfig{
-					&ProviderConfig{Name: "foo"},
-					&ProviderConfig{Name: "bar"},
+					{Name: "foo"},
+					{Name: "bar"},
 				},
 				Resources: []*Resource{
-					&Resource{Name: "foo"},
-					&Resource{Name: "bar"},
+					{Name: "foo"},
+					{Name: "bar"},
 				},
 				Variables: []*Variable{
-					&Variable{Name: "foo"},
-					&Variable{Name: "bar"},
+					{Name: "foo"},
+					{Name: "bar"},
 				},
 
 				unknownKeys: []string{"foo", "bar"},

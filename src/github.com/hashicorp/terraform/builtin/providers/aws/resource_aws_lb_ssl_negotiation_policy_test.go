@@ -19,7 +19,7 @@ func TestAccAWSLBSSLNegotiationPolicy_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckLBSSLNegotiationPolicyDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccSslNegotiationPolicyConfig(
 					fmt.Sprintf("tf-acctest-%s", acctest.RandString(10))),
 				Check: resource.ComposeTestCheckFunc(

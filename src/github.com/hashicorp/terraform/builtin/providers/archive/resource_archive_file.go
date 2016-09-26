@@ -20,45 +20,45 @@ func resourceArchiveFile() *schema.Resource {
 		Exists: resourceArchiveFileExists,
 
 		Schema: map[string]*schema.Schema{
-			"type": &schema.Schema{
+			"type": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"source_content": &schema.Schema{
+			"source_content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"source_file", "source_dir"},
 			},
-			"source_content_filename": &schema.Schema{
+			"source_content_filename": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"source_file", "source_dir"},
 			},
-			"source_file": &schema.Schema{
+			"source_file": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"source_content", "source_content_filename", "source_dir"},
 			},
-			"source_dir": &schema.Schema{
+			"source_dir": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"source_content", "source_content_filename", "source_file"},
 			},
-			"output_path": &schema.Schema{
+			"output_path": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"output_size": &schema.Schema{
+			"output_size": {
 				Type:     schema.TypeInt,
 				Computed: true,
 				ForceNew: true,
 			},
-			"output_sha": &schema.Schema{
+			"output_sha": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				ForceNew:    true,

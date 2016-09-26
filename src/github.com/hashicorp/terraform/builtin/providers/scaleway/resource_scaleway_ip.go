@@ -14,11 +14,11 @@ func resourceScalewayIP() *schema.Resource {
 		Update: resourceScalewayIPUpdate,
 		Delete: resourceScalewayIPDelete,
 		Schema: map[string]*schema.Schema{
-			"server": &schema.Schema{
+			"server": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"ip": &schema.Schema{
+			"ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

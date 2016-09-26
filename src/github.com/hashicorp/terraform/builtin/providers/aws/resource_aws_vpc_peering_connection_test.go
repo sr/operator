@@ -23,7 +23,7 @@ func TestAccAWSVPCPeeringConnection_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSVpcPeeringConnectionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVpcPeeringConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSVpcPeeringConnectionExists(
@@ -58,7 +58,7 @@ func TestAccAWSVPCPeeringConnection_plan(t *testing.T) {
 		Providers:       testAccProviders,
 		CheckDestroy:    testAccCheckAWSVpcPeeringConnectionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVpcPeeringConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSVpcPeeringConnectionExists(
@@ -83,7 +83,7 @@ func TestAccAWSVPCPeeringConnection_tags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVpcPeeringConfigTags,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSVpcPeeringConnectionExists(
@@ -124,7 +124,7 @@ func TestAccAWSVPCPeeringConnection_options(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSVpcPeeringConnectionDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVpcPeeringConfigOptions,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSVpcPeeringConnectionExists(
@@ -164,7 +164,7 @@ func TestAccAWSVPCPeeringConnection_options(t *testing.T) {
 				),
 				ExpectNonEmptyPlan: true,
 			},
-			resource.TestStep{
+			{
 				Config: testAccVpcPeeringConfigOptions,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSVpcPeeringConnectionExists(

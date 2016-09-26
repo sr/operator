@@ -24,27 +24,27 @@ func resourceAwsVpcPeeringConnection() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"peer_owner_id": &schema.Schema{
+			"peer_owner_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"peer_vpc_id": &schema.Schema{
+			"peer_vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"auto_accept": &schema.Schema{
+			"auto_accept": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"accept_status": &schema.Schema{
+			"accept_status": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -299,17 +299,17 @@ func vpcPeeringConnectionOptionsSchema() *schema.Schema {
 		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"allow_remote_vpc_dns_resolution": &schema.Schema{
+				"allow_remote_vpc_dns_resolution": {
 					Type:     schema.TypeBool,
 					Optional: true,
 					Default:  false,
 				},
-				"allow_classic_link_to_remote_vpc": &schema.Schema{
+				"allow_classic_link_to_remote_vpc": {
 					Type:     schema.TypeBool,
 					Optional: true,
 					Default:  false,
 				},
-				"allow_vpc_to_remote_classic_link": &schema.Schema{
+				"allow_vpc_to_remote_classic_link": {
 					Type:     schema.TypeBool,
 					Optional: true,
 					Default:  false,

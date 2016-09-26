@@ -262,14 +262,14 @@ func TestAccAzureRMVirtualMachine_ChangeComputerName(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualMachineExists("azurerm_virtual_machine.test", &afterCreate),
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualMachineExists("azurerm_virtual_machine.test", &afterUpdate),
@@ -292,14 +292,14 @@ func TestAccAzureRMVirtualMachine_ChangeAvailbilitySet(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMVirtualMachineDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualMachineExists("azurerm_virtual_machine.test", &afterCreate),
 				),
 			},
 
-			resource.TestStep{
+			{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMVirtualMachineExists("azurerm_virtual_machine.test", &afterUpdate),
