@@ -14,7 +14,7 @@ RUN ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime && \
   ln -sf /var/lib/rmux/rmux-rules-slave.sock /tmp/rmux-rules-slave.sock
 
 RUN yum install -y epel-release && \
-  yum install -y font-config supervisor redis bzip2 unzip xz make gcc file libicu openssl nc && \
+  yum install -y pigz font-config supervisor redis bzip2 unzip xz make gcc file libicu openssl nc && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/jre-7u80-linux-x64.rpm" && \
   yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm" && \
   yum clean all
