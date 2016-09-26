@@ -6,15 +6,23 @@ import (
 	"io"
 )
 
+const (
+	// MaxUnitSize corresponds to ARG_MAX on Linux
+	MaxUnitSize = 2621440
+)
+
 type UnitParser struct {
 	r io.Reader
 	s *bufio.Scanner
 }
 
 func NewUnitParser(r io.Reader) *UnitParser {
+	s := bufio.NewScanner(r)
+	s.Buffer(make([]byte, bufio.MaxScanTokenSize), MaxUnitSize)
+
 	return &UnitParser{
 		r: r,
-		s: bufio.NewScanner(r),
+		s: s,
 	}
 }
 

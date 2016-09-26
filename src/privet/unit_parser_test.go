@@ -45,13 +45,9 @@ func TestUnitParserHappyPath(t *testing.T) {
 }
 
 func TestUnitParserScannerError(t *testing.T) {
-	// from the bufio src
-	// https://github.com/golang/go/blob/master/src/bufio/scan.go#L74
-	maxBufferSize := 65536
-
 	absurdlyLongUnits := []string{
-		`{"data": "verylon` + strings.Repeat("g", maxBufferSize+1) + `"}`,
-		`{"data": "toolon` + strings.Repeat("g", maxBufferSize+1) + `"}`,
+		`{"data": "verylon` + strings.Repeat("g", MaxUnitSize+1) + `"}`,
+		`{"data": "toolon` + strings.Repeat("g", MaxUnitSize+1) + `"}`,
 	}
 
 	reader := strings.NewReader(strings.Join(absurdlyLongUnits, "\n"))
