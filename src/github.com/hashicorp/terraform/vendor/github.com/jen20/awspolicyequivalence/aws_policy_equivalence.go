@@ -1,8 +1,8 @@
 package awspolicy
 
 import (
-	"reflect"
 	"encoding/json"
+	"reflect"
 
 	"github.com/hashicorp/errwrap"
 )
@@ -164,7 +164,7 @@ func mapPrincipalsEqual(ours, theirs interface{}) bool {
 	}
 
 	theirPrincipalMap, ok := theirs.(map[string]interface{})
-	if ! ok {
+	if !ok {
 		return false
 	}
 
@@ -218,7 +218,6 @@ func stringPrincipalsEqual(ours, theirs interface{}) bool {
 	return false
 }
 
-
 type awsConditionsBlock map[string]map[string]interface{}
 
 func (conditions awsConditionsBlock) Equals(other awsConditionsBlock) bool {
@@ -256,7 +255,7 @@ func (conditions awsConditionsBlock) Equals(other awsConditionsBlock) bool {
 
 		for innerKey, oursInner := range ours {
 			theirsInner, ok := theirs[innerKey]
-			if ! ok {
+			if !ok {
 				return false
 			}
 
@@ -274,7 +273,7 @@ func (conditions awsConditionsBlock) Equals(other awsConditionsBlock) bool {
 
 		for innerKey, theirsInner := range theirs {
 			oursInner, ok := ours[innerKey]
-			if ! ok {
+			if !ok {
 				return false
 			}
 
@@ -286,7 +285,6 @@ func (conditions awsConditionsBlock) Equals(other awsConditionsBlock) bool {
 
 	return true
 }
-
 
 type awsStringSet []string
 
