@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/digitalocean/godo"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -31,9 +32,10 @@ func resourceDigitalOceanSSHKey() *schema.Resource {
 			},
 
 			"public_key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				DiffSuppressFunc: resourceDigitalOceanSSHKeyPublicKeyDiffSuppress,
 			},
 
 			"fingerprint": {
@@ -42,6 +44,10 @@ func resourceDigitalOceanSSHKey() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceDigitalOceanSSHKeyPublicKeyDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	return strings.TrimSpace(old) == strings.TrimSpace(new)
 }
 
 func resourceDigitalOceanSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {

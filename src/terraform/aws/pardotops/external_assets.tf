@@ -1,7 +1,3 @@
-variable "pardot_ci_vpc_cidr" {
-  default = "172.27.0.0/16"
-}
-
 variable "pardot_ci_to_pardotops_appdev_vpc_peering_connection_id" {
   default = "pcx-70fc7219"
 }

@@ -17,7 +17,7 @@ For more information on Amazon Aurora, see [Aurora on Amazon RDS][2] in the Amaz
 
 Changes to a RDS Cluster can occur when you manually change a
 parameter, such as `port`, and are reflected in the next maintenance
-window. Because of this, Terraform may report a difference in it's planning
+window. Because of this, Terraform may report a difference in its planning
 phase because a modification has not yet taken place. You can use the
 `apply_immediately` flag to instruct the service to apply the change immediately
 (see documentation below).
@@ -94,6 +94,8 @@ The following attributes are exported:
 * `preferred_backup_window` - The backup window
 * `preferred_maintenance_window` - The maintenance window
 * `endpoint` - The DNS address of the RDS instance
+* `reader_endpoint` - A read-only endpoint for the Aurora cluster, automatically
+load-balanced across replicas
 * `engine` - The database engine
 * `engine_version` - The database engine version
 * `maintenance_window` - The instance maintenance window
