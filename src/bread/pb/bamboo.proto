@@ -9,14 +9,10 @@ option go_package = "breadpb";
 service Bamboo {
   option (operator.name) = "ci";
 
-  rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse);
+  rpc ListBuilds(ListBuildsRequest) returns (operator.Response);
 }
 
 message ListBuildsRequest {
   operator.Request request = 1;
   string plan = 2;
-}
-
-message ListBuildsResponse {
-  string Message = 1;
 }

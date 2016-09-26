@@ -24,6 +24,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+const ldapTimeout = 3 * time.Second
+
 type config struct {
 	grpcAddr string
 	httpAddr string
@@ -129,9 +131,13 @@ func run(invoker operator.Invoker) error {
 		return err
 	}
 	var lconn *ldap.Conn
-	if lconn, err = ldap.Dial("tcp", config.ldapAddr); err != nil {
+	c, err := net.DialTimeout("tcp", config.ldapAddr, ldapTimeout)
+	if err != nil {
 		return err
 	}
+	lconn = ldap.NewConn(c, false)
+	lconn.SetTimeout(ldapTimeout)
+	lconn.Start()
 	if err := lconn.Bind("", ""); err != nil {
 		return err
 	}

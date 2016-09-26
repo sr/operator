@@ -153,7 +153,7 @@ func NewServer(
 			return nil, err
 		}
 		t := &bambooTransport{Username: bamboo.Username, Password: bamboo.Password}
-		breadpb.RegisterBambooServer(server, &bambooAPIServer{t.Client(), u})
+		breadpb.RegisterBambooServer(server, &bambooAPIServer{repl, t.Client(), u})
 	}
 	if len(deploy.Apps) != 0 {
 		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})

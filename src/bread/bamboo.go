@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"text/tabwriter"
+
+	"github.com/sr/operator"
 
 	"golang.org/x/net/context"
 
@@ -16,6 +17,7 @@ import (
 const defaultPlan = "BREAD-BREAD"
 
 type bambooAPIServer struct {
+	operator.Replier
 	bamboo    *http.Client
 	bambooURL *url.URL
 }
@@ -35,24 +37,25 @@ func (t *bambooTransport) Client() *http.Client {
 	return &http.Client{Transport: t}
 }
 
-func (s *bambooAPIServer) ListBuilds(ctx context.Context, in *breadpb.ListBuildsRequest) (*breadpb.ListBuildsResponse, error) {
+func (s *bambooAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
 	var plan string
-	if in.Plan == "" {
+	if req.Plan == "" {
 		plan = defaultPlan
 	} else {
-		plan = in.Plan
+		plan = req.Plan
 	}
-	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s", s.bambooURL, plan))
+	resp, err := s.bamboo.Get(fmt.Sprintf("%s/rest/api/latest/result/%s?includeAllStates=true", s.bambooURL, plan))
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("bamboo request failed with status %d", resp.StatusCode)
+		return nil, fmt.Errorf("Bamboo API request failed with status %d", resp.StatusCode)
 	}
 	var data struct {
 		Results struct {
 			Result []struct {
+				State          string `json:"buildState"`
 				LifeCycleState string `json:"lifeCycleState"`
 				Key            string `json:"key"`
 			} `json:"result"`
@@ -61,25 +64,21 @@ func (s *bambooAPIServer) ListBuilds(ctx context.Context, in *breadpb.ListBuilds
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	var (
-		out bytes.Buffer
-		w   tabwriter.Writer
-	)
-	w.Init(&out, 0, 4, 1, '\t', 0)
-	fmt.Fprintf(&w, "%s\t%s\t%s\n", "ID", "STATUS", "URL")
+	var out bytes.Buffer
 	for _, build := range data.Results.Result {
+		var state string
+		if build.LifeCycleState == "Finished" {
+			state = build.State
+		} else {
+			state = "Building..."
+		}
 		fmt.Fprintf(
-			&w,
-			"%s\t%s\t%s\n",
+			&out,
+			"%s %s %s\n",
 			build.Key,
-			build.LifeCycleState,
+			state,
 			fmt.Sprintf("%s/%s", s.bambooURL, build.Key),
 		)
 	}
-	if err := w.Flush(); err != nil {
-		return nil, err
-	}
-	return &breadpb.ListBuildsResponse{
-		Message: out.String(),
-	}, nil
+	return operator.Reply(s, ctx, req, &operator.Message{Text: out.String()})
 }
