@@ -17,30 +17,29 @@ ready = ->
 
   $(".account_helper").on "click", (e) ->
     e.preventDefault()
-    $("#query_sql").val("SELECT * FROM `"+$(this).html()+"`")
-    $("#query_is_limited").val("true")
+    $("#sql").val("SELECT * FROM `"+$(this).html()+"`")
     $('form').submit()
 
   $(".select_column").on "click", (e) ->
     e.preventDefault()
     column_name = $(this).html()
-    query = $("#query_sql").val()
+    query = $("#sql").val()
     query = query.replace /SELECT .* FROM/i, ->
       "SELECT `" + column_name + "` FROM"
-    $("#query_sql").val(query)
+    $("#sql").val(query)
     $('form').submit()
 
   $("#add_column").on "change", ->
     column = $(this).val()
     return if column == "Add column"
     
-    query = $("#query_sql").val()
+    query = $("#sql").val()
     query = query.replace /SELECT (.*) FROM/i, ($0, $1) ->
       if column == "Show all"
         "SELECT * FROM"
       else
         "SELECT " + $1 + ", `" + column + "` FROM"
-    $("#query_sql").val(query)
+    $("#sql").val(query)
     $('form').submit()
 
 $(document).ready(ready)

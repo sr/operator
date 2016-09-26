@@ -78,4 +78,21 @@ class SQLQueryTest < ActiveSupport::TestCase
     expect = "SELECT `prospect_id` FROM `piListxProspect` WHERE (((`listx_id` = 1 OR `listx_id` = 2) AND `account_id` = 1) AND `is_mailable` = 1) ORDER BY rand() ASC LIMIT 10"
     assert_equal expect, parse(input).to_sql
   end
+
+  # Test first_table
+
+  test "Parse table name" do
+    input = "select prospect_id from piListxProspect where (listx_id=1 or listx_id=2) and account_id=1 and is_mailable=1 order by rand() limit 10"
+    assert_equal "piListxProspect", parse(input).first_table
+  end
+
+  test "Parse table from join" do
+    input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va left join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
+    assert_equal = "visitor_activity", parse(input).first_table
+  end
+
+  test "Parse table from inner join" do
+    input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va INNER join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
+    assert_equal = "visitor_activity", parse(input).first_table
+  end
 end

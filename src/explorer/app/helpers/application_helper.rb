@@ -11,8 +11,8 @@ module ApplicationHelper
     params[:view] || sql_view
   end
 
-  def table_columns
-    @query.connection.columns(@query.extract_table_name(@ast)).map(&:name)
+  def table_columns(query,ast)
+    query.connection.columns(query.extract_table_name(ast)).map(&:name)
   end
 
   def audit_log_url
