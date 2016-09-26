@@ -39,7 +39,7 @@ rule
     : sort_key ordering_specification { result = val[1].new(val[0]) }
 
   sort_key
-    : column_name
+    : column_reference
     | built_in_function { result = SQLParser::Statement::BuiltInFunction.new(val[0]) }
     | unsigned_integer { result = SQLParser::Statement::Integer.new(val[0]) }
 

@@ -1,7 +1,8 @@
 #!/bin/sh
 set -eu
+cd "$(dirname "$0")/../.."
 exec rubocop \
-  --config "etc/rubocop.yml" \
+  --config "$(pwd)/etc/rubocop.yml" \
   --format "emacs" \
   --fail-level "C" \
   --rails \

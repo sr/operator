@@ -54,6 +54,12 @@ class SQLQueryTest < ActiveSupport::TestCase
     assert_equal expect, parse(input).to_sql
   end
 
+  test "table.column format" do
+    input = "SELECT `user`.`first_name`, `user`.`last_name`, `user`.`email`, `user`.`created_at` from `user` where `user`.`account_id` = 1 order by `user`.`created_at` desc limit 10"
+    expect = "SELECT `user`.`first_name`, `user`.`last_name`, `user`.`email`, `user`.`created_at` FROM `user` WHERE `user`.`account_id` = 1 ORDER BY `user`.`created_at` DESC LIMIT 10"
+    assert_equal expect, parse(input).to_sql
+  end
+
   # Advanced tests
   test "Date test" do
     input = 'select email_id from visitor_activity where type=12 and created_at<DATE "2014-07-23"'

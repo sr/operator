@@ -206,3 +206,16 @@ resource "aws_route_table_association" "dev_environment_us_east_1e_dmz" {
   subnet_id = "${aws_subnet.dev_environment_us_east_1e_dmz.id}"
   route_table_id = "${aws_route_table.dev_environment_route_dmz.id}"
 }
+
+resource "aws_route53_zone" "pardot_local" {
+  name = "pardot.local"
+  vpc_id = "${aws_vpc.dev_environment.id}"
+}
+
+resource "aws_route53_record" "star_pardot_local" {
+  zone_id = "${aws_route53_zone.pardot_local.zone_id}"
+  name = "*.pardot.local"
+  type = "A"
+  records = ["127.0.0.1"]
+  ttl = "3600"
+}
