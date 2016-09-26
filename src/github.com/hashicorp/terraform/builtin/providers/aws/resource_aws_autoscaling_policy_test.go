@@ -2,10 +2,14 @@ package aws
 
 import (
 	"fmt"
+	"log"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -21,7 +25,7 @@ func TestAccAWSAutoscalingPolicy_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAutoscalingPolicyDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSAutoscalingPolicyConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckScalingPolicyExists("aws_autoscaling_policy.foobar_simple", &policy),
@@ -44,6 +48,66 @@ func TestAccAWSAutoscalingPolicy_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSAutoscalingPolicy_disappears(t *testing.T) {
+	var policy autoscaling.ScalingPolicy
+
+	name := fmt.Sprintf("terraform-test-foobar-%s", acctest.RandString(5))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSAutoscalingPolicyDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccAWSAutoscalingPolicyConfig(name),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckScalingPolicyExists("aws_autoscaling_policy.foobar_simple", &policy),
+					testAccCheckScalingPolicyDisappears(&policy),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func testAccCheckScalingPolicyDisappears(conf *autoscaling.ScalingPolicy) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*AWSClient).autoscalingconn
+
+		params := &autoscaling.DeletePolicyInput{
+			AutoScalingGroupName: conf.AutoScalingGroupName,
+			PolicyName:           conf.PolicyName,
+		}
+
+		log.Printf("TEST %s", spew.Sdump(params))
+		_, err := conn.DeletePolicy(params)
+		if err != nil {
+			return err
+		}
+
+		return resource.Retry(10*time.Minute, func() *resource.RetryError {
+			params := &autoscaling.DescribePoliciesInput{
+				AutoScalingGroupName: conf.AutoScalingGroupName,
+				PolicyNames:          []*string{conf.PolicyName},
+			}
+			resp, err := conn.DescribePolicies(params)
+			if err != nil {
+				cgw, ok := err.(awserr.Error)
+				if ok && cgw.Code() == "ValidationError" {
+					return nil
+				}
+				return resource.NonRetryableError(
+					fmt.Errorf("Error retrieving Autoscaling Policy: %s", err))
+			}
+			if resp.ScalingPolicies == nil || len(resp.ScalingPolicies) == 0 {
+				return nil
+			}
+			return resource.RetryableError(fmt.Errorf(
+				"Waiting for Autoscaling Policy: %v", conf.PolicyName))
+		})
+	}
+}
+
 func TestAccAWSAutoscalingPolicy_upgrade(t *testing.T) {
 	var policy autoscaling.ScalingPolicy
 
@@ -54,7 +118,7 @@ func TestAccAWSAutoscalingPolicy_upgrade(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAutoscalingPolicyDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSAutoscalingPolicyConfig_upgrade_614(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckScalingPolicyExists("aws_autoscaling_policy.foobar_simple", &policy),
@@ -64,7 +128,7 @@ func TestAccAWSAutoscalingPolicy_upgrade(t *testing.T) {
 				ExpectNonEmptyPlan: true,
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSAutoscalingPolicyConfig_upgrade_615(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckScalingPolicyExists("aws_autoscaling_policy.foobar_simple", &policy),
@@ -95,6 +159,8 @@ func testAccCheckScalingPolicyExists(n string, policy *autoscaling.ScalingPolicy
 		if len(resp.ScalingPolicies) == 0 {
 			return fmt.Errorf("ScalingPolicy not found")
 		}
+
+		*policy = *resp.ScalingPolicies[0]
 
 		return nil
 	}

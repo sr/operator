@@ -16,34 +16,36 @@ var quoteReplacer = strings.NewReplacer(`"`, `\"`)
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
-			"influxdb_database": ResourceDatabase(),
+			"influxdb_database":         resourceDatabase(),
+			"influxdb_user":             resourceUser(),
+			"influxdb_continuous_query": resourceContinuousQuery(),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"url": {
+			"url": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				DefaultFunc: schema.EnvDefaultFunc(
 					"INFLUXDB_URL", "http://localhost:8086/",
 				),
 			},
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("INFLUXDB_USERNAME", ""),
 			},
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("INFLUXDB_PASSWORD", ""),
 			},
 		},
 
-		ConfigureFunc: Configure,
+		ConfigureFunc: configure,
 	}
 }
 
-func Configure(d *schema.ResourceData) (interface{}, error) {
+func configure(d *schema.ResourceData) (interface{}, error) {
 	url, err := url.Parse(d.Get("url").(string))
 	if err != nil {
 		return nil, fmt.Errorf("invalid InfluxDB URL: %s", err)
@@ -69,5 +71,5 @@ func Configure(d *schema.ResourceData) (interface{}, error) {
 }
 
 func quoteIdentifier(ident string) string {
-	return fmt.Sprintf(`"%s"`, quoteReplacer.Replace(ident))
+	return fmt.Sprintf(`%q`, quoteReplacer.Replace(ident))
 }

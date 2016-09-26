@@ -17,33 +17,33 @@ func resourceCloudStackStaticNAT() *schema.Resource {
 		Delete: resourceCloudStackStaticNATDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": {
+			"ip_address_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_id": {
+			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_machine_id": {
+			"virtual_machine_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"vm_guest_ip": {
+			"vm_guest_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

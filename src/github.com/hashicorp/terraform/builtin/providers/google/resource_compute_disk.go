@@ -16,48 +16,48 @@ func resourceComputeDisk() *schema.Resource {
 		Delete: resourceComputeDiskDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"snapshot": {
+			"snapshot": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -138,7 +138,7 @@ func resourceComputeDiskCreate(d *schema.ResourceData, meta interface{}) error {
 	// It probably maybe worked, so store the ID now
 	d.SetId(disk.Name)
 
-	err = computeOperationWaitZone(config, op, d.Get("zone").(string), "Creating Disk")
+	err = computeOperationWaitZone(config, op, project, d.Get("zone").(string), "Creating Disk")
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func resourceComputeDiskDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	zone := d.Get("zone").(string)
-	err = computeOperationWaitZone(config, op, zone, "Creating Disk")
+	err = computeOperationWaitZone(config, op, project, zone, "Creating Disk")
 	if err != nil {
 		return err
 	}

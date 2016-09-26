@@ -9,31 +9,31 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"api_url": {
+			"api_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLOUDSTACK_API_URL", nil),
 			},
 
-			"api_key": {
+			"api_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLOUDSTACK_API_KEY", nil),
 			},
 
-			"secret_key": {
+			"secret_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLOUDSTACK_SECRET_KEY", nil),
 			},
 
-			"http_get_only": {
+			"http_get_only": &schema.Schema{
 				Type:        schema.TypeBool,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLOUDSTACK_HTTP_GET_ONLY", false),
 			},
 
-			"timeout": {
+			"timeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("CLOUDSTACK_TIMEOUT", 900),
@@ -41,6 +41,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
+			"cloudstack_affinity_group":       resourceCloudStackAffinityGroup(),
 			"cloudstack_disk":                 resourceCloudStackDisk(),
 			"cloudstack_egress_firewall":      resourceCloudStackEgressFirewall(),
 			"cloudstack_firewall":             resourceCloudStackFirewall(),

@@ -16,77 +16,77 @@ func resourceComputeRoute() *schema.Resource {
 		Delete: resourceComputeRouteDelete,
 
 		Schema: map[string]*schema.Schema{
-			"dest_range": {
+			"dest_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"priority": {
+			"priority": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"next_hop_gateway": {
+			"next_hop_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"next_hop_instance": {
+			"next_hop_instance": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"next_hop_instance_zone": {
+			"next_hop_instance_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"next_hop_ip": {
+			"next_hop_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"next_hop_network": {
+			"next_hop_network": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"next_hop_vpn_tunnel": {
+			"next_hop_vpn_tunnel": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -106,8 +106,7 @@ func resourceComputeRouteCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Look up the network to attach the route to
-	network, err := config.clientCompute.Networks.Get(
-		project, d.Get("network").(string)).Do()
+	network, err := getNetworkLink(d, config, "network")
 	if err != nil {
 		return fmt.Errorf("Error reading network: %s", err)
 	}
@@ -149,7 +148,7 @@ func resourceComputeRouteCreate(d *schema.ResourceData, meta interface{}) error 
 	route := &compute.Route{
 		Name:             d.Get("name").(string),
 		DestRange:        d.Get("dest_range").(string),
-		Network:          network.SelfLink,
+		Network:          network,
 		NextHopInstance:  nextHopInstance,
 		NextHopVpnTunnel: nextHopVpnTunnel,
 		NextHopIp:        nextHopIp,
@@ -167,7 +166,7 @@ func resourceComputeRouteCreate(d *schema.ResourceData, meta interface{}) error 
 	// It probably maybe worked, so store the ID now
 	d.SetId(route.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Creating Route")
+	err = computeOperationWaitGlobal(config, op, project, "Creating Route")
 	if err != nil {
 		return err
 	}
@@ -218,7 +217,7 @@ func resourceComputeRouteDelete(d *schema.ResourceData, meta interface{}) error 
 		return fmt.Errorf("Error deleting route: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting Route")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting Route")
 	if err != nil {
 		return err
 	}

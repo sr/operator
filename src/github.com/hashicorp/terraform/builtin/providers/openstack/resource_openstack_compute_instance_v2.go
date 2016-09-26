@@ -24,7 +24,6 @@ import (
 	"github.com/rackspace/gophercloud/openstack/compute/v2/flavors"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/images"
 	"github.com/rackspace/gophercloud/openstack/compute/v2/servers"
-	"github.com/rackspace/gophercloud/pagination"
 )
 
 func resourceComputeInstanceV2() *schema.Resource {
@@ -35,49 +34,49 @@ func resourceComputeInstanceV2() *schema.Resource {
 		Delete: resourceComputeInstanceV2Delete,
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"image_name": {
+			"image_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"flavor_id": {
+			"flavor_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
 				Computed:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_FLAVOR_ID", nil),
 			},
-			"flavor_name": {
+			"flavor_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
 				Computed:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_FLAVOR_NAME", nil),
 			},
-			"floating_ip": {
+			"floating_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -92,7 +91,7 @@ func resourceComputeInstanceV2() *schema.Resource {
 					}
 				},
 			},
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,
@@ -100,58 +99,58 @@ func resourceComputeInstanceV2() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"fixed_ip_v4": {
+						"fixed_ip_v4": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"fixed_ip_v6": {
+						"fixed_ip_v6": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 							Computed: true,
 						},
-						"floating_ip": {
+						"floating_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"mac": {
+						"mac": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"access_network": {
+						"access_network": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
@@ -159,75 +158,75 @@ func resourceComputeInstanceV2() *schema.Resource {
 					},
 				},
 			},
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: false,
 			},
-			"config_drive": {
+			"config_drive": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
-			"admin_pass": {
+			"admin_pass": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: false,
 			},
-			"access_ip_v4": {
-				Type:     schema.TypeString,
-				Computed: true,
-				Optional: true,
-				ForceNew: false,
-			},
-			"access_ip_v6": {
+			"access_ip_v4": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 				ForceNew: false,
 			},
-			"key_pair": {
+			"access_ip_v6": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+				ForceNew: false,
+			},
+			"key_pair": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"block_device": {
+			"block_device": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"source_type": {
+						"source_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"destination_type": {
+						"destination_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"boot_index": {
+						"boot_index": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
 							ForceNew: true,
 						},
-						"guest_format": {
+						"guest_format": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -235,22 +234,21 @@ func resourceComputeInstanceV2() *schema.Resource {
 					},
 				},
 			},
-			"volume": {
+			"volume": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
-				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"volume_id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"device": {
+						"volume_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"device": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -259,40 +257,40 @@ func resourceComputeInstanceV2() *schema.Resource {
 				},
 				Set: resourceComputeVolumeAttachmentHash,
 			},
-			"scheduler_hints": {
+			"scheduler_hints": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"group": {
+						"group": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"different_host": {
+						"different_host": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"same_host": {
+						"same_host": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"query": {
+						"query": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"target_cell": {
+						"target_cell": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"build_near_host_ip": {
+						"build_near_host_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -301,17 +299,17 @@ func resourceComputeInstanceV2() *schema.Resource {
 				},
 				Set: resourceComputeSchedulerHintsHash,
 			},
-			"personality": {
+			"personality": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"file": {
+						"file": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"content": {
+						"content": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -319,7 +317,7 @@ func resourceComputeInstanceV2() *schema.Resource {
 				},
 				Set: resourceComputeInstancePersonalityHash,
 			},
-			"stop_before_destroy": {
+			"stop_before_destroy": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -348,12 +346,6 @@ func resourceComputeInstanceV2Create(d *schema.ResourceData, meta interface{}) e
 
 	flavorId, err := getFlavorID(computeClient, d)
 	if err != nil {
-		return err
-	}
-
-	// determine if volume configuration is correct
-	// this includes ensuring volume_ids are set
-	if err := checkVolumeConfig(d); err != nil {
 		return err
 	}
 
@@ -712,16 +704,12 @@ func resourceComputeInstanceV2Update(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("volume") {
-		// ensure the volume configuration is correct
-		if err := checkVolumeConfig(d); err != nil {
-			return err
-		}
-
 		// old attachments and new attachments
 		oldAttachments, newAttachments := d.GetChange("volume")
 		// for each old attachment, detach the volume
 		oldAttachmentSet := oldAttachments.(*schema.Set).List()
 
+		log.Printf("[DEBUG] Attempting to detach the following volumes: %#v", oldAttachmentSet)
 		if blockClient, err := config.blockStorageV1Client(d.Get("region").(string)); err != nil {
 			return err
 		} else {
@@ -812,6 +800,22 @@ func resourceComputeInstanceV2Delete(d *schema.ResourceData, meta interface{}) e
 	computeClient, err := config.computeV2Client(d.Get("region").(string))
 	if err != nil {
 		return fmt.Errorf("Error creating OpenStack compute client: %s", err)
+	}
+
+	// Make sure all volumes are detached before deleting
+	volumes := d.Get("volume")
+	if volumeSet, ok := volumes.(*schema.Set); ok {
+		volumeList := volumeSet.List()
+		if len(volumeList) > 0 {
+			log.Printf("[DEBUG] Attempting to detach the following volumes: %#v", volumeList)
+			if blockClient, err := config.blockStorageV1Client(d.Get("region").(string)); err != nil {
+				return err
+			} else {
+				if err := detachVolumesFromInstance(computeClient, blockClient, d.Id(), volumeList); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	if d.Get("stop_before_destroy").(bool) {
@@ -1397,6 +1401,7 @@ func detachVolumesFromInstance(computeClient *gophercloud.ServiceClient, blockCl
 		va := v.(map[string]interface{})
 		aId := va["id"].(string)
 
+		log.Printf("[INFO] Attempting to detach volume %s", va["volume_id"])
 		if err := volumeattach.Delete(computeClient, serverId, aId).ExtractErr(); err != nil {
 			return err
 		}
@@ -1420,64 +1425,39 @@ func detachVolumesFromInstance(computeClient *gophercloud.ServiceClient, blockCl
 }
 
 func getVolumeAttachments(computeClient *gophercloud.ServiceClient, d *schema.ResourceData) error {
-	var attachments []volumeattach.VolumeAttachment
+	var vols []map[string]interface{}
 
-	err := volumeattach.List(computeClient, d.Id()).EachPage(func(page pagination.Page) (bool, error) {
-		actual, err := volumeattach.ExtractVolumeAttachments(page)
-		if err != nil {
-			return false, err
-		}
-
-		attachments = actual
-		return true, nil
-	})
-
+	allPages, err := volumeattach.List(computeClient, d.Id()).AllPages()
 	if err != nil {
 		return err
 	}
 
-	var vols []map[string]interface{}
-	for _, attachment := range attachments {
-		// ignore the volume if it is attached as a root device
-		rootDevFound := false
-		for _, rootDev := range []string{"/dev/vda", "/dev/xda", "/dev/sda", "/dev/xvda"} {
-			if attachment.Device == rootDev {
-				rootDevFound = true
-			}
-		}
-
-		if rootDevFound {
-			continue
-		}
-
-		vol := make(map[string]interface{})
-		vol["id"] = attachment.ID
-		vol["volume_id"] = attachment.VolumeID
-		vol["device"] = attachment.Device
-		vols = append(vols, vol)
+	allVolumeAttachments, err := volumeattach.ExtractVolumeAttachments(allPages)
+	if err != nil {
+		return err
 	}
-	log.Printf("[INFO] Volume attachments: %v", vols)
-	d.Set("volume", vols)
 
-	return nil
-}
-
-func checkVolumeConfig(d *schema.ResourceData) error {
-	// Although a volume_id is required to attach a volume, in order to be able to report
-	// the attached volumes of an instance, it must be "computed" and thus "optional".
-	// This accounts for situations such as "boot from volume" as well as volumes being
-	// attached to the instance outside of Terraform.
-	if v := d.Get("volume"); v != nil {
-		vols := v.(*schema.Set).List()
-		if len(vols) > 0 {
-			for _, v := range vols {
-				va := v.(map[string]interface{})
-				if va["volume_id"].(string) == "" {
-					return fmt.Errorf("A volume_id must be specified when attaching volumes.")
+	if v, ok := d.GetOk("volume"); ok {
+		volumes := v.(*schema.Set).List()
+		for _, volume := range volumes {
+			if volumeMap, ok := volume.(map[string]interface{}); ok {
+				if v, ok := volumeMap["volume_id"].(string); ok {
+					for _, volumeAttachment := range allVolumeAttachments {
+						if v == volumeAttachment.ID {
+							vol := make(map[string]interface{})
+							vol["id"] = volumeAttachment.ID
+							vol["volume_id"] = volumeAttachment.VolumeID
+							vol["device"] = volumeAttachment.Device
+							vols = append(vols, vol)
+						}
+					}
 				}
 			}
 		}
 	}
+
+	log.Printf("[INFO] Volume attachments: %v", vols)
+	d.Set("volume", vols)
 
 	return nil
 }

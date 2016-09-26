@@ -21,50 +21,50 @@ func resourceComputeVpnTunnel() *schema.Resource {
 		Delete: resourceComputeVpnTunnelDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"peer_ip": {
+			"peer_ip": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validatePeerAddr,
 			},
 
-			"shared_secret": {
+			"shared_secret": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"target_vpn_gateway": {
+			"target_vpn_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"detailed_status": {
+			"detailed_status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ike_version": {
+			"ike_version": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,
 				ForceNew: true,
 			},
 
-			"local_traffic_selector": {
+			"local_traffic_selector": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -72,19 +72,19 @@ func resourceComputeVpnTunnel() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -144,7 +144,7 @@ func resourceComputeVpnTunnelCreate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("Error Inserting VPN Tunnel %s : %s", name, err)
 	}
 
-	err = computeOperationWaitRegion(config, op, region, "Inserting VPN Tunnel")
+	err = computeOperationWaitRegion(config, op, project, region, "Inserting VPN Tunnel")
 	if err != nil {
 		return fmt.Errorf("Error Waiting to Insert VPN Tunnel %s: %s", name, err)
 	}
@@ -212,7 +212,7 @@ func resourceComputeVpnTunnelDelete(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("Error Reading VPN Tunnel %s: %s", name, err)
 	}
 
-	err = computeOperationWaitRegion(config, op, region, "Deleting VPN Tunnel")
+	err = computeOperationWaitRegion(config, op, project, region, "Deleting VPN Tunnel")
 	if err != nil {
 		return fmt.Errorf("Error Waiting to Delete VPN Tunnel %s: %s", name, err)
 	}

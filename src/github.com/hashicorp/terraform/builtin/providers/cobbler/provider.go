@@ -10,21 +10,21 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Cobbler URL",
 				DefaultFunc: envDefaultFunc("COBBLER_URL"),
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The username for accessing Cobbler.",
 				DefaultFunc: envDefaultFunc("COBBLER_USERNAME"),
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The password for accessing Cobbler.",

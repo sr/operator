@@ -170,7 +170,7 @@ func (t *Tree) Load(s getter.Storage, mode GetMode) error {
 
 		// Get the directory where this module is so we can load it
 		key := strings.Join(path, ".")
-		key = "root." + key
+		key = fmt.Sprintf("root.%s-%s", key, source)
 		dir, ok, err := getStorage(s, key, source, mode)
 		if err != nil {
 			return err
@@ -305,7 +305,7 @@ func (t *Tree) Validate() error {
 		}
 
 		// Compare to the keys in our raw config for the module
-		for k := range m.RawConfig.Raw {
+		for k, _ := range m.RawConfig.Raw {
 			if _, ok := varMap[k]; !ok {
 				newErr.Err = fmt.Errorf(
 					"module %s: %s is not a valid parameter",
@@ -318,7 +318,7 @@ func (t *Tree) Validate() error {
 		}
 
 		// If we have any required left over, they aren't set.
-		for k := range requiredMap {
+		for k, _ := range requiredMap {
 			newErr.Err = fmt.Errorf(
 				"module %s: required variable %s not set",
 				m.Name, k)

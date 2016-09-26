@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+func TestContext2Validate_badCount(t *testing.T) {
+	p := testProvider("aws")
+	m := testModule(t, "validate-bad-count")
+	c := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	w, e := c.Validate()
+	if len(w) > 0 {
+		t.Fatalf("bad: %#v", w)
+	}
+	if len(e) == 0 {
+		t.Fatalf("bad: %#v", e)
+	}
+}
+
 func TestContext2Validate_badVar(t *testing.T) {
 	p := testProvider("aws")
 	m := testModule(t, "validate-bad-var")
@@ -263,10 +282,10 @@ func TestContext2Validate_moduleProviderInheritOrphan(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: []string{"root", "child"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.bar": {
+						"aws_instance.bar": &ResourceState{
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -353,10 +372,10 @@ func TestContext2Validate_orphans(t *testing.T) {
 	m := testModule(t, "validate-good")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -646,10 +665,10 @@ func TestContext2Validate_tainted(t *testing.T) {
 	m := testModule(t, "validate-good")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID:      "bar",
@@ -698,7 +717,7 @@ func TestContext2Validate_targetedDestroy(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo": resourceState("aws_instance", "i-bcd345"),

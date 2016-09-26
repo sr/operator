@@ -25,7 +25,7 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 		Delete: resourceAwsCodeDeployDeploymentGroupDelete,
 
 		Schema: map[string]*schema.Schema{
-			"app_name": {
+			"app_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -38,7 +38,7 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 				},
 			},
 
-			"deployment_group_name": {
+			"deployment_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -52,19 +52,19 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 				},
 			},
 
-			"service_role_arn": {
+			"service_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"autoscaling_groups": {
+			"autoscaling_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"deployment_config_name": {
+			"deployment_config_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "CodeDeployDefault.OneAtATime",
@@ -78,23 +78,23 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 				},
 			},
 
-			"ec2_tag_filter": {
+			"ec2_tag_filter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"type": {
+						"type": &schema.Schema{
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validateTagFilters,
 						},
 
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -103,23 +103,23 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 				Set: resourceAwsCodeDeployTagFilterHash,
 			},
 
-			"on_premises_instance_tag_filter": {
+			"on_premises_instance_tag_filter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"type": {
+						"type": &schema.Schema{
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validateTagFilters,
 						},
 
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -128,12 +128,12 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 				Set: resourceAwsCodeDeployTagFilterHash,
 			},
 
-			"trigger_configuration": {
+			"trigger_configuration": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"trigger_events": {
+						"trigger_events": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Set:      schema.HashString,
@@ -143,12 +143,12 @@ func resourceAwsCodeDeployDeploymentGroup() *schema.Resource {
 							},
 						},
 
-						"trigger_name": {
+						"trigger_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"trigger_target_arn": {
+						"trigger_target_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -247,11 +247,11 @@ func resourceAwsCodeDeployDeploymentGroupRead(d *schema.ResourceData, meta inter
 		return err
 	}
 
-	d.Set("app_name", *resp.DeploymentGroupInfo.ApplicationName)
+	d.Set("app_name", resp.DeploymentGroupInfo.ApplicationName)
 	d.Set("autoscaling_groups", resp.DeploymentGroupInfo.AutoScalingGroups)
-	d.Set("deployment_config_name", *resp.DeploymentGroupInfo.DeploymentConfigName)
-	d.Set("deployment_group_name", *resp.DeploymentGroupInfo.DeploymentGroupName)
-	d.Set("service_role_arn", *resp.DeploymentGroupInfo.ServiceRoleArn)
+	d.Set("deployment_config_name", resp.DeploymentGroupInfo.DeploymentConfigName)
+	d.Set("deployment_group_name", resp.DeploymentGroupInfo.DeploymentGroupName)
+	d.Set("service_role_arn", resp.DeploymentGroupInfo.ServiceRoleArn)
 	if err := d.Set("ec2_tag_filter", ec2TagFiltersToMap(resp.DeploymentGroupInfo.Ec2TagFilters)); err != nil {
 		return err
 	}

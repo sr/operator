@@ -9,7 +9,7 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"api_key": {
+			"api_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{
@@ -17,6 +17,9 @@ func Provider() terraform.ResourceProvider {
 				}, nil),
 				Description: "Fastly API Key from https://app.fastly.com/#account",
 			},
+		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"fastly_ip_ranges": dataSourceFastlyIPRanges(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"fastly_service_v1": resourceServiceV1(),

@@ -19,7 +19,7 @@ func TestAccAWSVpnConnection_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccAwsVpnConnectionDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAwsVpnConnectionConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccAwsVpnConnection(
@@ -30,7 +30,7 @@ func TestAccAWSVpnConnection_basic(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAwsVpnConnectionConfigUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccAwsVpnConnection(
@@ -119,7 +119,10 @@ func testAccAwsVpnConnection(
 }
 
 func TestAWSVpnConnection_xmlconfig(t *testing.T) {
-	tunnelInfo := xmlConfigToTunnelInfo(testAccAwsVpnTunnelInfoXML)
+	tunnelInfo, err := xmlConfigToTunnelInfo(testAccAwsVpnTunnelInfoXML)
+	if err != nil {
+		t.Fatalf("Error unmarshalling XML: %s", err)
+	}
 	if tunnelInfo.Tunnel1Address != "FIRST_ADDRESS" {
 		t.Fatalf("First address from tunnel XML was incorrect.")
 	}

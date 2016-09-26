@@ -26,67 +26,73 @@ func resourceAwsEcsService() *schema.Resource {
 		Delete: resourceAwsEcsServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cluster": {
+			"cluster": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"task_definition": {
+			"task_definition": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"desired_count": {
+			"desired_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"iam_role": {
+			"iam_role": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
 
-			"deployment_maximum_percent": {
+			"deployment_maximum_percent": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  200,
 			},
 
-			"deployment_minimum_healthy_percent": {
+			"deployment_minimum_healthy_percent": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  100,
 			},
 
-			"load_balancer": {
+			"load_balancer": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"elb_name": {
+						"elb_name": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+
+						"target_group_arn": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+
+						"container_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"container_name": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-
-						"container_port": {
+						"container_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: true,
@@ -195,21 +201,21 @@ func resourceAwsEcsServiceRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Received ECS service %s", service)
 
 	d.SetId(*service.ServiceArn)
-	d.Set("name", *service.ServiceName)
+	d.Set("name", service.ServiceName)
 
 	// Save task definition in the same format
 	if strings.HasPrefix(d.Get("task_definition").(string), "arn:aws:ecs:") {
-		d.Set("task_definition", *service.TaskDefinition)
+		d.Set("task_definition", service.TaskDefinition)
 	} else {
 		taskDefinition := buildFamilyAndRevisionFromARN(*service.TaskDefinition)
 		d.Set("task_definition", taskDefinition)
 	}
 
-	d.Set("desired_count", *service.DesiredCount)
+	d.Set("desired_count", service.DesiredCount)
 
 	// Save cluster in the same format
 	if strings.HasPrefix(d.Get("cluster").(string), "arn:aws:ecs:") {
-		d.Set("cluster", *service.ClusterArn)
+		d.Set("cluster", service.ClusterArn)
 	} else {
 		clusterARN := getNameFromARN(*service.ClusterArn)
 		d.Set("cluster", clusterARN)
@@ -218,7 +224,7 @@ func resourceAwsEcsServiceRead(d *schema.ResourceData, meta interface{}) error {
 	// Save IAM role in the same format
 	if service.RoleArn != nil {
 		if strings.HasPrefix(d.Get("iam_role").(string), "arn:aws:iam:") {
-			d.Set("iam_role", *service.RoleArn)
+			d.Set("iam_role", service.RoleArn)
 		} else {
 			roleARN := getNameFromARN(*service.RoleArn)
 			d.Set("iam_role", roleARN)
@@ -226,8 +232,8 @@ func resourceAwsEcsServiceRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if service.DeploymentConfiguration != nil {
-		d.Set("deployment_maximum_percent", *service.DeploymentConfiguration.MaximumPercent)
-		d.Set("deployment_minimum_healthy_percent", *service.DeploymentConfiguration.MinimumHealthyPercent)
+		d.Set("deployment_maximum_percent", service.DeploymentConfiguration.MaximumPercent)
+		d.Set("deployment_minimum_healthy_percent", service.DeploymentConfiguration.MinimumHealthyPercent)
 	}
 
 	if service.LoadBalancers != nil {

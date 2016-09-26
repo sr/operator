@@ -17,41 +17,41 @@ func resourceAwsEipAssociation() *schema.Resource {
 		Delete: resourceAwsEipAssociationDelete,
 
 		Schema: map[string]*schema.Schema{
-			"allocation_id": {
+			"allocation_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"allow_reassociation": {
+			"allow_reassociation": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"instance_id": {
+			"instance_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"network_interface_id": {
+			"network_interface_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"private_ip_address": {
+			"private_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -106,7 +106,7 @@ func resourceAwsEipAssociationRead(d *schema.ResourceData, meta interface{}) err
 
 	request := &ec2.DescribeAddressesInput{
 		Filters: []*ec2.Filter{
-			{
+			&ec2.Filter{
 				Name:   aws.String("association-id"),
 				Values: []*string{aws.String(d.Id())},
 			},

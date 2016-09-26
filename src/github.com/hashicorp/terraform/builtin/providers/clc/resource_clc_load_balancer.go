@@ -19,26 +19,26 @@ func resourceCLCLoadBalancer() *schema.Resource {
 		Update: resourceCLCLoadBalancerUpdate,
 		Delete: resourceCLCLoadBalancerDelete,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"data_center": {
+			"data_center": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			// optional
-			"status": {
+			"status": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "enabled",
 			},
 			// computed
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

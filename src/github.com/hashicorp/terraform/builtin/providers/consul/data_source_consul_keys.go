@@ -10,34 +10,34 @@ func dataSourceConsulKeys() *schema.Resource {
 		Read: dataSourceConsulKeysRead,
 
 		Schema: map[string]*schema.Schema{
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"key": {
+			"key": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"path": {
+						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"default": {
+						"default": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -45,7 +45,7 @@ func dataSourceConsulKeys() *schema.Resource {
 				},
 			},
 
-			"var": {
+			"var": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},

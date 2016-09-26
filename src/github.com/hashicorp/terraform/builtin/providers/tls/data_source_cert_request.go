@@ -18,7 +18,7 @@ func dataSourceCertRequest() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 
-			"dns_names": {
+			"dns_names": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "List of DNS names to use as subjects of the certificate",
@@ -27,7 +27,7 @@ func dataSourceCertRequest() *schema.Resource {
 				},
 			},
 
-			"ip_addresses": {
+			"ip_addresses": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
 				Description: "List of IP addresses to use as subjects of the certificate",
@@ -36,13 +36,13 @@ func dataSourceCertRequest() *schema.Resource {
 				},
 			},
 
-			"key_algorithm": {
+			"key_algorithm": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the algorithm to use to generate the certificate's private key",
 			},
 
-			"private_key_pem": {
+			"private_key_pem": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "PEM-encoded private key that the certificate will belong to",
@@ -51,13 +51,13 @@ func dataSourceCertRequest() *schema.Resource {
 				},
 			},
 
-			"subject": {
+			"subject": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     nameSchema,
 			},
 
-			"cert_request_pem": {
+			"cert_request_pem": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

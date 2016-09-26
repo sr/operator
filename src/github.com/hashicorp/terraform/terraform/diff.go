@@ -207,7 +207,7 @@ func (d *ModuleDiff) String() string {
 	}
 
 	names := make([]string, 0, len(d.Resources))
-	for name := range d.Resources {
+	for name, _ := range d.Resources {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -233,7 +233,7 @@ func (d *ModuleDiff) String() string {
 		keyLen := 0
 		rdiffAttrs := rdiff.CopyAttributes()
 		keys := make([]string, 0, len(rdiffAttrs))
-		for key := range rdiffAttrs {
+		for key, _ := range rdiffAttrs {
 			if key == "id" {
 				continue
 			}
@@ -361,11 +361,15 @@ func (d *InstanceDiff) Empty() bool {
 
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	return !d.Destroy && len(d.Attributes) == 0
+	return !d.Destroy && !d.DestroyTainted && len(d.Attributes) == 0
 }
 
 func (d *InstanceDiff) GoString() string {
-	return fmt.Sprintf("*%#v", *d)
+	return fmt.Sprintf("*%#v", InstanceDiff{
+		Attributes:     d.Attributes,
+		Destroy:        d.Destroy,
+		DestroyTainted: d.DestroyTainted,
+	})
 }
 
 // RequiresNew returns true if the diff requires the creation of a new
@@ -502,17 +506,17 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 	// same attributes. To start, build up the check map to be all the keys.
 	checkOld := make(map[string]struct{})
 	checkNew := make(map[string]struct{})
-	for k := range d.Attributes {
+	for k, _ := range d.Attributes {
 		checkOld[k] = struct{}{}
 	}
-	for k := range d2.CopyAttributes() {
+	for k, _ := range d2.CopyAttributes() {
 		checkNew[k] = struct{}{}
 	}
 
 	// Make an ordered list so we are sure the approximated hashes are left
 	// to process at the end of the loop
 	keys := make([]string, 0, len(d.Attributes))
-	for k := range d.Attributes {
+	for k, _ := range d.Attributes {
 		keys = append(keys, k)
 	}
 	sort.StringSlice(keys).Sort()
@@ -563,7 +567,7 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 					return false, fmt.Sprintf("regexp failed to compile; err: %#v", err)
 				}
 
-				for k2 := range checkNew {
+				for k2, _ := range checkNew {
 					if re.MatchString(k2) {
 						delete(checkNew, k2)
 					}
@@ -601,12 +605,12 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 			// This is a computed list, set, or map, so remove any keys with
 			// this prefix from the check list.
 			kprefix := k[:len(k)-matchLen]
-			for k2 := range checkOld {
+			for k2, _ := range checkOld {
 				if strings.HasPrefix(k2, kprefix) {
 					delete(checkOld, k2)
 				}
 			}
-			for k2 := range checkNew {
+			for k2, _ := range checkNew {
 				if strings.HasPrefix(k2, kprefix) {
 					delete(checkNew, k2)
 				}
@@ -619,7 +623,7 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 	// Check for leftover attributes
 	if len(checkNew) > 0 {
 		extras := make([]string, 0, len(checkNew))
-		for attr := range checkNew {
+		for attr, _ := range checkNew {
 			extras = append(extras, attr)
 		}
 		return false,

@@ -15,58 +15,58 @@ func resourceScalewayServer() *schema.Resource {
 		Update: resourceScalewayServerUpdate,
 		Delete: resourceScalewayServerDelete,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"image": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"type": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"bootscript": {
+			"type": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"bootscript": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": {
+			"tags": &schema.Schema{
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
 			},
-			"enable_ipv6": {
+			"enable_ipv6": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"dynamic_ip_required": {
+			"dynamic_ip_required": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"security_group": {
+			"security_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"private_ip": {
+			"private_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"state": {
+			"state": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"state_detail": {
+			"state_detail": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

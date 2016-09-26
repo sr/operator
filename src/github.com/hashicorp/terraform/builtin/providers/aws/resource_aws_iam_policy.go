@@ -18,27 +18,27 @@ func resourceAwsIamPolicy() *schema.Resource {
 		Delete: resourceAwsIamPolicyDelete,
 
 		Schema: map[string]*schema.Schema{
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
-			"policy": {
+			"policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

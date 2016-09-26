@@ -17,61 +17,61 @@ func resourceVcdFirewallRules() *schema.Resource {
 		Read:   resourceFirewallRulesRead,
 
 		Schema: map[string]*schema.Schema{
-			"edge_gateway": {
+			"edge_gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"default_action": {
+			"default_action": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"rule": {
+			"rule": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"policy": {
+						"policy": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"destination_port": {
+						"destination_port": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"destination_ip": {
+						"destination_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"source_port": {
+						"source_port": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"source_ip": {
+						"source_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},

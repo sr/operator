@@ -20,7 +20,7 @@ func TestAccAzureRMSubnet_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMSubnetDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMSubnetExists("azurerm_subnet.test"),

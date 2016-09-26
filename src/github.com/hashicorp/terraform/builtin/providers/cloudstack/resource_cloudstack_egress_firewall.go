@@ -20,55 +20,55 @@ func resourceCloudStackEgressFirewall() *schema.Resource {
 		Delete: resourceCloudStackEgressFirewallDelete,
 
 		Schema: map[string]*schema.Schema{
-			"network_id": {
+			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"managed": {
+			"managed": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"rule": {
+			"rule": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cidr_list": {
+						"cidr_list": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"icmp_type": {
+						"icmp_type": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"icmp_code": {
+						"icmp_code": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ports": {
+						"ports": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"uuids": {
+						"uuids": &schema.Schema{
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
@@ -76,7 +76,7 @@ func resourceCloudStackEgressFirewall() *schema.Resource {
 				},
 			},
 
-			"parallelism": {
+			"parallelism": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  2,

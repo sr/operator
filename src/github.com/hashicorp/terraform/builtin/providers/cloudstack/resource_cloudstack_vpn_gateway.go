@@ -16,13 +16,13 @@ func resourceCloudStackVPNGateway() *schema.Resource {
 		Delete: resourceCloudStackVPNGatewayDelete,
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

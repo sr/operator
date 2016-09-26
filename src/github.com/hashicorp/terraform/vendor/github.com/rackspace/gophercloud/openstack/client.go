@@ -39,20 +39,20 @@ func NewClient(endpoint string) (*gophercloud.ProviderClient, error) {
 	}
 
 	parts := strings.Split(path[0:len(path)-1], "/")
-	for index, version := range parts {
+	for index,version := range(parts) {
 		if 2 <= len(version) && len(version) <= 4 && strings.HasPrefix(version, "v") {
 			_, err := strconv.ParseFloat(version[1:], 64)
 			if err == nil {
 				// post version suffixes in path are not supported
 				// version must be on the last index
-				if index < len(parts)-1 {
+				if index < len(parts) - 1 {
 					return nil, fmt.Errorf("Path suffixes (after version) are not supported.")
 				}
 				switch version {
 				case "v2.0", "v3":
 					// valid version found, strip from base
 					return &gophercloud.ProviderClient{
-						IdentityBase:     base[0 : len(base)-len(version)-1],
+						IdentityBase:     base[0:len(base)-len(version)-1],
 						IdentityEndpoint: endpoint,
 					}, nil
 				default:

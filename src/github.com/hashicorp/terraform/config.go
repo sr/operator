@@ -123,7 +123,7 @@ func (c *Config) Discover(ui cli.Ui) error {
 	// a replacement on disk, we'll just use the internal version. Only do this
 	// from the main process, or the log output will break the plugin handshake.
 	if os.Getenv("TF_PLUGIN_MAGIC_COOKIE") == "" {
-		for name := range command.InternalProviders {
+		for name, _ := range command.InternalProviders {
 			if path, found := c.Providers[name]; found {
 				// Allow these warnings to be suppressed via TF_PLUGIN_DEV=1 or similar
 				if os.Getenv("TF_PLUGIN_DEV") == "" {
@@ -139,7 +139,7 @@ func (c *Config) Discover(ui cli.Ui) error {
 				c.Providers[name] = cmd
 			}
 		}
-		for name := range command.InternalProvisioners {
+		for name, _ := range command.InternalProvisioners {
 			if path, found := c.Provisioners[name]; found {
 				if os.Getenv("TF_PLUGIN_DEV") == "" {
 					ui.Warn(fmt.Sprintf("[WARN] %s overrides an internal plugin for %s-provisioner.\n"+
@@ -169,12 +169,18 @@ func (c1 *Config) Merge(c2 *Config) *Config {
 		result.Providers[k] = v
 	}
 	for k, v := range c2.Providers {
+		if v1, ok := c1.Providers[k]; ok {
+			log.Printf("[INFO] Local %s provider configuration '%s' overrides '%s'", k, v, v1)
+		}
 		result.Providers[k] = v
 	}
 	for k, v := range c1.Provisioners {
 		result.Provisioners[k] = v
 	}
 	for k, v := range c2.Provisioners {
+		if v1, ok := c1.Provisioners[k]; ok {
+			log.Printf("[INFO] Local %s provisioner configuration '%s' overrides '%s'", k, v, v1)
+		}
 		result.Provisioners[k] = v
 	}
 

@@ -26,7 +26,7 @@ func resourceComputeInstance() *schema.Resource {
 		MigrateState:  resourceComputeInstanceMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"disk": {
+			"disk": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
@@ -34,44 +34,44 @@ func resourceComputeInstance() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						// TODO(mitchellh): one of image or disk is required
 
-						"disk": {
+						"disk": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"image": {
+						"image": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"scratch": {
+						"scratch": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"auto_delete": {
+						"auto_delete": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 							ForceNew: true,
 						},
 
-						"size": {
+						"size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -79,94 +79,96 @@ func resourceComputeInstance() *schema.Resource {
 				},
 			},
 
-			"machine_type": {
+			"machine_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"can_ip_forward": {
+			"can_ip_forward": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:         schema.TypeMap,
 				Optional:     true,
 				Elem:         schema.TypeString,
 				ValidateFunc: validateInstanceMetadata,
 			},
 
-			"metadata_startup_script": {
+			"metadata_startup_script": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"metadata_fingerprint": {
+			"metadata_fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"network_interface": {
+			"network_interface": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"network": {
+						"network": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"subnetwork": {
+						"subnetwork": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
 							Computed: true,
 						},
 
-						"access_config": {
+						"access_config": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"nat_ip": {
+									"nat_ip": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 
-									"assigned_nat_ip": {
+									"assigned_nat_ip": &schema.Schema{
 										Type:     schema.TypeString,
 										Computed: true,
 									},
@@ -177,36 +179,36 @@ func resourceComputeInstance() *schema.Resource {
 				},
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:       schema.TypeList,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use network_interface",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"source": {
+						"source": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"internal_address": {
+						"internal_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"external_address": {
+						"external_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -214,33 +216,33 @@ func resourceComputeInstance() *schema.Resource {
 				},
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"scheduling": {
+			"scheduling": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"on_host_maintenance": {
+						"on_host_maintenance": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"automatic_restart": {
+						"automatic_restart": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"preemptible": {
+						"preemptible": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
@@ -248,19 +250,21 @@ func resourceComputeInstance() *schema.Resource {
 				},
 			},
 
-			"service_account": {
+			"service_account": &schema.Schema{
 				Type:     schema.TypeList,
+				MaxItems: 1,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"email": {
+						"email": &schema.Schema{
 							Type:     schema.TypeString,
-							Computed: true,
 							ForceNew: true,
+							Optional: true,
+							Computed: true,
 						},
 
-						"scopes": {
+						"scopes": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							ForceNew: true,
@@ -276,14 +280,14 @@ func resourceComputeInstance() *schema.Resource {
 				},
 			},
 
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"tags_fingerprint": {
+			"tags_fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -449,7 +453,7 @@ func resourceComputeInstanceCreate(d *schema.ResourceData, meta interface{}) err
 			// Build the networkInterface
 			var iface compute.NetworkInterface
 			iface.AccessConfigs = []*compute.AccessConfig{
-				{
+				&compute.AccessConfig{
 					Type:  "ONE_TO_ONE_NAT",
 					NatIP: d.Get(prefix + ".address").(string),
 				},
@@ -465,22 +469,22 @@ func resourceComputeInstanceCreate(d *schema.ResourceData, meta interface{}) err
 		networkInterfaces = make([]*compute.NetworkInterface, 0, networkInterfacesCount)
 		for i := 0; i < networkInterfacesCount; i++ {
 			prefix := fmt.Sprintf("network_interface.%d", i)
-			// Load up the name of this network_interfac
+			// Load up the name of this network_interface
 			networkName := d.Get(prefix + ".network").(string)
 			subnetworkName := d.Get(prefix + ".subnetwork").(string)
+			address := d.Get(prefix + ".address").(string)
 			var networkLink, subnetworkLink string
 
 			if networkName != "" && subnetworkName != "" {
 				return fmt.Errorf("Cannot specify both network and subnetwork values.")
 			} else if networkName != "" {
-				network, err := config.clientCompute.Networks.Get(
-					project, networkName).Do()
+				networkLink, err = getNetworkLink(d, config, prefix+".network")
 				if err != nil {
 					return fmt.Errorf(
 						"Error referencing network '%s': %s",
 						networkName, err)
 				}
-				networkLink = network.SelfLink
+
 			} else {
 				region := getRegionFromZone(d.Get("zone").(string))
 				subnetwork, err := config.clientCompute.Subnetworks.Get(
@@ -497,6 +501,7 @@ func resourceComputeInstanceCreate(d *schema.ResourceData, meta interface{}) err
 			var iface compute.NetworkInterface
 			iface.Network = networkLink
 			iface.Subnetwork = subnetworkLink
+			iface.NetworkIP = address
 
 			// Handle access_config structs
 			accessConfigsCount := d.Get(prefix + ".access_config.#").(int)
@@ -524,8 +529,13 @@ func resourceComputeInstanceCreate(d *schema.ResourceData, meta interface{}) err
 			scopes[i] = canonicalizeServiceScope(v.(string))
 		}
 
+		email := "default"
+		if v := d.Get(prefix + ".email"); v != nil {
+			email = v.(string)
+		}
+
 		serviceAccount := &compute.ServiceAccount{
-			Email:  "default",
+			Email:  email,
 			Scopes: scopes,
 		}
 
@@ -577,7 +587,7 @@ func resourceComputeInstanceCreate(d *schema.ResourceData, meta interface{}) err
 	d.SetId(instance.Name)
 
 	// Wait for the operation to complete
-	waitErr := computeOperationWaitZone(config, op, zone.Name, "instance to create")
+	waitErr := computeOperationWaitZone(config, op, project, zone.Name, "instance to create")
 	if waitErr != nil {
 		// The resource didn't actually create
 		d.SetId("")
@@ -786,7 +796,7 @@ func resourceComputeInstanceUpdate(d *schema.ResourceData, meta interface{}) err
 				return fmt.Errorf("Error updating metadata: %s", err)
 			}
 
-			opErr := computeOperationWaitZone(config, op, zone, "metadata to update")
+			opErr := computeOperationWaitZone(config, op, project, zone, "metadata to update")
 			if opErr != nil {
 				return opErr
 			}
@@ -806,7 +816,7 @@ func resourceComputeInstanceUpdate(d *schema.ResourceData, meta interface{}) err
 			return fmt.Errorf("Error updating tags: %s", err)
 		}
 
-		opErr := computeOperationWaitZone(config, op, zone, "tags to update")
+		opErr := computeOperationWaitZone(config, op, project, zone, "tags to update")
 		if opErr != nil {
 			return opErr
 		}
@@ -837,7 +847,7 @@ func resourceComputeInstanceUpdate(d *schema.ResourceData, meta interface{}) err
 			return fmt.Errorf("Error updating scheduling policy: %s", err)
 		}
 
-		opErr := computeOperationWaitZone(config, op, zone,
+		opErr := computeOperationWaitZone(config, op, project, zone,
 			"scheduling policy update")
 		if opErr != nil {
 			return opErr
@@ -879,7 +889,8 @@ func resourceComputeInstanceUpdate(d *schema.ResourceData, meta interface{}) err
 					if err != nil {
 						return fmt.Errorf("Error deleting old access_config: %s", err)
 					}
-					opErr := computeOperationWaitZone(config, op, zone, "old access_config to delete")
+					opErr := computeOperationWaitZone(config, op, project, zone,
+						"old access_config to delete")
 					if opErr != nil {
 						return opErr
 					}
@@ -898,7 +909,8 @@ func resourceComputeInstanceUpdate(d *schema.ResourceData, meta interface{}) err
 					if err != nil {
 						return fmt.Errorf("Error adding new access_config: %s", err)
 					}
-					opErr := computeOperationWaitZone(config, op, zone, "new access_config to add")
+					opErr := computeOperationWaitZone(config, op, project, zone,
+						"new access_config to add")
 					if opErr != nil {
 						return opErr
 					}
@@ -929,7 +941,7 @@ func resourceComputeInstanceDelete(d *schema.ResourceData, meta interface{}) err
 	}
 
 	// Wait for the operation to complete
-	opErr := computeOperationWaitZone(config, op, zone, "instance to delete")
+	opErr := computeOperationWaitZone(config, op, project, zone, "instance to delete")
 	if opErr != nil {
 		return opErr
 	}

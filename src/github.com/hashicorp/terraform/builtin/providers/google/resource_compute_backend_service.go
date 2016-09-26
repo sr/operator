@@ -20,7 +20,7 @@ func resourceComputeBackendService() *schema.Resource {
 		Delete: resourceComputeBackendServiceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -35,44 +35,44 @@ func resourceComputeBackendService() *schema.Resource {
 				},
 			},
 
-			"health_checks": {
+			"health_checks": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Required: true,
 				Set:      schema.HashString,
 			},
 
-			"backend": {
+			"backend": &schema.Schema{
 				Type: schema.TypeSet,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"group": {
+						"group": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"balancing_mode": {
+						"balancing_mode": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "UTILIZATION",
 						},
-						"capacity_scaler": {
+						"capacity_scaler": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 							Default:  1,
 						},
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"max_rate": {
+						"max_rate": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"max_rate_per_instance": {
+						"max_rate_per_instance": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 						},
-						"max_utilization": {
+						"max_utilization": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 							Default:  0.8,
@@ -83,46 +83,52 @@ func resourceComputeBackendService() *schema.Resource {
 				Set:      resourceGoogleComputeBackendServiceBackendHash,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"fingerprint": {
+			"enable_cdn": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"port_name": {
+			"port_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"timeout_sec": {
+			"timeout_sec": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -165,6 +171,10 @@ func resourceComputeBackendServiceCreate(d *schema.ResourceData, meta interface{
 		service.TimeoutSec = int64(v.(int))
 	}
 
+	if v, ok := d.GetOk("enable_cdn"); ok {
+		service.EnableCDN = v.(bool)
+	}
+
 	project, err := getProject(d, config)
 	if err != nil {
 		return err
@@ -181,7 +191,7 @@ func resourceComputeBackendServiceCreate(d *schema.ResourceData, meta interface{
 
 	d.SetId(service.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Creating Backend Service")
+	err = computeOperationWaitGlobal(config, op, project, "Creating Backend Service")
 	if err != nil {
 		return err
 	}
@@ -212,6 +222,7 @@ func resourceComputeBackendServiceRead(d *schema.ResourceData, meta interface{})
 	}
 
 	d.Set("description", service.Description)
+	d.Set("enable_cdn", service.EnableCDN)
 	d.Set("port_name", service.PortName)
 	d.Set("protocol", service.Protocol)
 	d.Set("timeout_sec", service.TimeoutSec)
@@ -244,20 +255,25 @@ func resourceComputeBackendServiceUpdate(d *schema.ResourceData, meta interface{
 		HealthChecks: healthChecks,
 	}
 
-	if d.HasChange("backend") {
-		service.Backends = expandBackends(d.Get("backend").(*schema.Set).List())
+	// Optional things
+	if v, ok := d.GetOk("backend"); ok {
+		service.Backends = expandBackends(v.(*schema.Set).List())
 	}
-	if d.HasChange("description") {
-		service.Description = d.Get("description").(string)
+	if v, ok := d.GetOk("description"); ok {
+		service.Description = v.(string)
 	}
-	if d.HasChange("port_name") {
-		service.PortName = d.Get("port_name").(string)
+	if v, ok := d.GetOk("port_name"); ok {
+		service.PortName = v.(string)
 	}
-	if d.HasChange("protocol") {
-		service.Protocol = d.Get("protocol").(string)
+	if v, ok := d.GetOk("protocol"); ok {
+		service.Protocol = v.(string)
 	}
-	if d.HasChange("timeout_sec") {
-		service.TimeoutSec = int64(d.Get("timeout_sec").(int))
+	if v, ok := d.GetOk("timeout_sec"); ok {
+		service.TimeoutSec = int64(v.(int))
+	}
+
+	if d.HasChange("enable_cdn") {
+		service.EnableCDN = d.Get("enable_cdn").(bool)
 	}
 
 	log.Printf("[DEBUG] Updating existing Backend Service %q: %#v", d.Id(), service)
@@ -269,7 +285,7 @@ func resourceComputeBackendServiceUpdate(d *schema.ResourceData, meta interface{
 
 	d.SetId(service.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Updating Backend Service")
+	err = computeOperationWaitGlobal(config, op, project, "Updating Backend Service")
 	if err != nil {
 		return err
 	}
@@ -292,7 +308,7 @@ func resourceComputeBackendServiceDelete(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Error deleting backend service: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting Backend Service")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting Backend Service")
 	if err != nil {
 		return err
 	}

@@ -23,35 +23,35 @@ func resourceAwsApiGatewayApiKey() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"stage_key": {
+			"stage_key": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"rest_api_id": {
+						"rest_api_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"stage_name": {
+						"stage_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},

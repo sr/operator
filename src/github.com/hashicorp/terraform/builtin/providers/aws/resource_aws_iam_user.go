@@ -22,7 +22,7 @@ func resourceAwsIamUser() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -30,25 +30,25 @@ func resourceAwsIamUser() *schema.Resource {
 				The UniqueID could be used as the Id(), but none of the API
 				calls allow specifying a user by the UniqueID: they require the
 				name. The only way to locate a user by UniqueID is to list them
-				all and that would make this provider unnecessarilly complex
+				all and that would make this provider unnecessarily complex
 				and inefficient. Still, there are other reasons one might want
 				the UniqueID, so we can make it available.
 			*/
-			"unique_id": {
+			"unique_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
-			"force_destroy": {
+			"force_destroy": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,

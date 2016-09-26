@@ -16,17 +16,17 @@ func resourceGithubTeamMembership() *schema.Resource {
 		Delete: resourceGithubTeamMembershipDelete,
 
 		Schema: map[string]*schema.Schema{
-			"team_id": {
+			"team_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"role": {
+			"role": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,

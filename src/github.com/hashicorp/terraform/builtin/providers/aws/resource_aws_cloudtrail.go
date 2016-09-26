@@ -20,60 +20,60 @@ func resourceAwsCloudTrail() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"enable_logging": {
+			"enable_logging": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"s3_bucket_name": {
+			"s3_bucket_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"s3_key_prefix": {
+			"s3_key_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"cloud_watch_logs_role_arn": {
+			"cloud_watch_logs_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"cloud_watch_logs_group_arn": {
+			"cloud_watch_logs_group_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"include_global_service_events": {
+			"include_global_service_events": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"is_multi_region_trail": {
+			"is_multi_region_trail": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"sns_topic_name": {
+			"sns_topic_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enable_log_file_validation": {
+			"enable_log_file_validation": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"home_region": {
+			"home_region": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -122,7 +122,7 @@ func resourceAwsCloudTrailCreate(d *schema.ResourceData, meta interface{}) error
 
 	log.Printf("[DEBUG] CloudTrail created: %s", t)
 
-	d.Set("arn", *t.TrailARN)
+	d.Set("arn", t.TrailARN)
 	d.SetId(*t.Name)
 
 	// AWS CloudTrail sets newly-created trails to false.

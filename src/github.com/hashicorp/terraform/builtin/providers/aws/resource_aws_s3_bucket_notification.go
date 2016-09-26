@@ -20,37 +20,40 @@ func resourceAwsS3BucketNotification() *schema.Resource {
 		Read:   resourceAwsS3BucketNotificationRead,
 		Update: resourceAwsS3BucketNotificationPut,
 		Delete: resourceAwsS3BucketNotificationDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"bucket": {
+			"bucket": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"topic": {
+			"topic": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"filter_prefix": {
+						"filter_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"filter_suffix": {
+						"filter_suffix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"events": {
+						"events": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -60,29 +63,29 @@ func resourceAwsS3BucketNotification() *schema.Resource {
 				},
 			},
 
-			"queue": {
+			"queue": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"filter_prefix": {
+						"filter_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"filter_suffix": {
+						"filter_suffix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"queue_arn": {
+						"queue_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"events": {
+						"events": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -92,29 +95,29 @@ func resourceAwsS3BucketNotification() *schema.Resource {
 				},
 			},
 
-			"lambda_function": {
+			"lambda_function": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
-						"filter_prefix": {
+						"filter_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"filter_suffix": {
+						"filter_suffix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"lambda_function_arn": {
+						"lambda_function_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"events": {
+						"events": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},

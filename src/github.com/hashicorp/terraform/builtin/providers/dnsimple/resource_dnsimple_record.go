@@ -16,45 +16,45 @@ func resourceDNSimpleRecord() *schema.Resource {
 		Delete: resourceDNSimpleRecordDelete,
 
 		Schema: map[string]*schema.Schema{
-			"domain": {
+			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"domain_id": {
+			"domain_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"value": {
+			"value": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "3600",
 			},
 
-			"priority": {
+			"priority": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

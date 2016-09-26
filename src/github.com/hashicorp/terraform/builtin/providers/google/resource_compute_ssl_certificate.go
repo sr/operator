@@ -17,42 +17,42 @@ func resourceComputeSslCertificate() *schema.Resource {
 		Delete: resourceComputeSslCertificateDelete,
 
 		Schema: map[string]*schema.Schema{
-			"certificate": {
+			"certificate": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"private_key": {
+			"private_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -86,7 +86,7 @@ func resourceComputeSslCertificateCreate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Error creating ssl certificate: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Creating SslCertificate")
+	err = computeOperationWaitGlobal(config, op, project, "Creating SslCertificate")
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func resourceComputeSslCertificateDelete(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Error deleting ssl certificate: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting SslCertificate")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting SslCertificate")
 	if err != nil {
 		return err
 	}

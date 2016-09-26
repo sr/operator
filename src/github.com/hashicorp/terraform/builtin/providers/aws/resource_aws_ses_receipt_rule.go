@@ -21,64 +21,64 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 		Delete: resourceAwsSesReceiptRuleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"rule_set_name": {
+			"rule_set_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"after": {
+			"after": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"recipients": {
+			"recipients": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 				Set:      schema.HashString,
 			},
 
-			"scan_enabled": {
+			"scan_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"tls_policy": {
+			"tls_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"add_header_action": {
+			"add_header_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"header_name": {
+						"header_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"header_value": {
+						"header_value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -95,37 +95,37 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"bounce_action": {
+			"bounce_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"message": {
+						"message": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"sender": {
+						"sender": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"smtp_reply_code": {
+						"smtp_reply_code": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"status_code": {
+						"status_code": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -152,28 +152,28 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"lambda_action": {
+			"lambda_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"function_arn": {
+						"function_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"invocation_type": {
+						"invocation_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -198,32 +198,32 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"s3_action": {
+			"s3_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"bucket_name": {
+						"bucket_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"kms_key_arn": {
+						"kms_key_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"object_key_prefix": {
+						"object_key_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -252,17 +252,17 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"sns_action": {
+			"sns_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -278,22 +278,22 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"stop_action": {
+			"stop_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"scope": {
+						"scope": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -314,22 +314,22 @@ func resourceAwsSesReceiptRule() *schema.Resource {
 				},
 			},
 
-			"workmail_action": {
+			"workmail_action": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"organization_arn": {
+						"organization_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"topic_arn": {
+						"topic_arn": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"position": {
+						"position": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},

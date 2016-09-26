@@ -21,36 +21,36 @@ func resourceContainerCluster() *schema.Resource {
 		Delete: resourceContainerClusterDelete,
 
 		Schema: map[string]*schema.Schema{
-			"initial_node_count": {
+			"initial_node_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"master_auth": {
+			"master_auth": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"client_certificate": {
+						"client_certificate": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"client_key": {
+						"client_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"cluster_ca_certificate": {
+						"cluster_ca_certificate": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"password": {
+						"password": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"username": {
+						"username": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
@@ -59,7 +59,7 @@ func resourceContainerCluster() *schema.Resource {
 				},
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -86,13 +86,13 @@ func resourceContainerCluster() *schema.Resource {
 				},
 			},
 
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cluster_ipv4_cidr": {
+			"cluster_ipv4_cidr": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -109,63 +109,63 @@ func resourceContainerCluster() *schema.Resource {
 				},
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"instance_group_urls": {
+			"instance_group_urls": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"logging_service": {
+			"logging_service": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"monitoring_service": {
+			"monitoring_service": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "default",
 				ForceNew: true,
 			},
-			"subnetwork": {
+			"subnetwork": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"addons_config": {
+			"addons_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"http_load_balancing": {
+						"http_load_balancing": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							MaxItems: 1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"disabled": {
+									"disabled": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										ForceNew: true,
@@ -173,14 +173,14 @@ func resourceContainerCluster() *schema.Resource {
 								},
 							},
 						},
-						"horizontal_pod_autoscaling": {
+						"horizontal_pod_autoscaling": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							ForceNew: true,
 							MaxItems: 1,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"disabled": {
+									"disabled": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 										ForceNew: true,
@@ -191,21 +191,21 @@ func resourceContainerCluster() *schema.Resource {
 					},
 				},
 			},
-			"node_config": {
+			"node_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"machine_type": {
+						"machine_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"disk_size_gb": {
+						"disk_size_gb": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
@@ -221,7 +221,7 @@ func resourceContainerCluster() *schema.Resource {
 							},
 						},
 
-						"oauth_scopes": {
+						"oauth_scopes": &schema.Schema{
 							Type:     schema.TypeList,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Optional: true,
@@ -232,13 +232,13 @@ func resourceContainerCluster() *schema.Resource {
 				},
 			},
 
-			"node_version": {
+			"node_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -289,8 +289,12 @@ func resourceContainerClusterCreate(d *schema.ResourceData, meta interface{}) er
 		cluster.MonitoringService = v.(string)
 	}
 
-	if v, ok := d.GetOk("network"); ok {
-		cluster.Network = v.(string)
+	if _, ok := d.GetOk("network"); ok {
+		network, err := getNetworkName(d, "network")
+		if err != nil {
+			return err
+		}
+		cluster.Network = network
 	}
 
 	if v, ok := d.GetOk("subnetwork"); ok {
@@ -409,7 +413,7 @@ func resourceContainerClusterRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("endpoint", cluster.Endpoint)
 
 	masterAuth := []map[string]interface{}{
-		{
+		map[string]interface{}{
 			"username":               cluster.MasterAuth.Username,
 			"password":               cluster.MasterAuth.Password,
 			"client_certificate":     cluster.MasterAuth.ClientCertificate,
@@ -425,7 +429,7 @@ func resourceContainerClusterRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("description", cluster.Description)
 	d.Set("logging_service", cluster.LoggingService)
 	d.Set("monitoring_service", cluster.MonitoringService)
-	d.Set("network", cluster.Network)
+	d.Set("network", d.Get("network").(string))
 	d.Set("subnetwork", cluster.Subnetwork)
 	d.Set("node_config", flattenClusterNodeConfig(cluster.NodeConfig))
 	d.Set("instance_group_urls", cluster.InstanceGroupUrls)
@@ -531,7 +535,7 @@ func resourceContainerClusterDelete(d *schema.ResourceData, meta interface{}) er
 
 func flattenClusterNodeConfig(c *container.NodeConfig) []map[string]interface{} {
 	config := []map[string]interface{}{
-		{
+		map[string]interface{}{
 			"machine_type": c.MachineType,
 			"disk_size_gb": c.DiskSizeGb,
 		},

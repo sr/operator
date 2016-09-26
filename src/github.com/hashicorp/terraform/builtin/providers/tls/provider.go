@@ -76,42 +76,42 @@ func nameFromResourceData(nameMap map[string]interface{}) (*pkix.Name, error) {
 
 var nameSchema *schema.Resource = &schema.Resource{
 	Schema: map[string]*schema.Schema{
-		"organization": {
+		"organization": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"common_name": {
+		"common_name": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"organizational_unit": {
+		"organizational_unit": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"street_address": {
+		"street_address": &schema.Schema{
 			Type:     schema.TypeList,
 			Optional: true,
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		"locality": {
+		"locality": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"province": {
+		"province": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"country": {
+		"country": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"postal_code": {
+		"postal_code": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		"serial_number": {
+		"serial_number": &schema.Schema{
 			Type:     schema.TypeString,
 			Optional: true,
 		},

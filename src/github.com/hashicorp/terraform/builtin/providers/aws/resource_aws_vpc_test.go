@@ -19,13 +19,15 @@ func TestAccAWSVpc_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.foo", &vpc),
 					testAccCheckVpcCidr(&vpc, "10.1.0.0/16"),
 					resource.TestCheckResourceAttr(
 						"aws_vpc.foo", "cidr_block", "10.1.0.0/16"),
+					resource.TestCheckResourceAttrSet(
+						"aws_vpc.foo", "default_route_table_id"),
 				),
 			},
 		},
@@ -40,7 +42,7 @@ func TestAccAWSVpc_dedicatedTenancy(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcDedicatedConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.bar", &vpc),
@@ -60,7 +62,7 @@ func TestAccAWSVpc_tags(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcConfigTags,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.foo", &vpc),
@@ -71,7 +73,7 @@ func TestAccAWSVpc_tags(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccVpcConfigTagsUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.foo", &vpc),
@@ -91,7 +93,7 @@ func TestAccAWSVpc_update(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.foo", &vpc),
@@ -100,7 +102,7 @@ func TestAccAWSVpc_update(t *testing.T) {
 						"aws_vpc.foo", "cidr_block", "10.1.0.0/16"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccVpcConfigUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVpcExists("aws_vpc.foo", &vpc),
@@ -193,7 +195,7 @@ func TestAccAWSVpc_bothDnsOptionsSet(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcConfig_BothDnsOptions,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -212,7 +214,7 @@ func TestAccAWSVpc_classiclinkOptionSet(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckVpcDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVpcConfig_ClassiclinkOption,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(

@@ -22,53 +22,53 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"identifier": {
+			"identifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRdsId,
 			},
 
-			"db_subnet_group_name": {
+			"db_subnet_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"writer": {
+			"writer": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 
-			"cluster_identifier": {
+			"cluster_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"publicly_accessible": {
+			"publicly_accessible": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"instance_class": {
+			"instance_class": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"db_parameter_group_name": {
+			"db_parameter_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -77,24 +77,42 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 			// apply_immediately is used to determine when the update modifications
 			// take place.
 			// See http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.DBInstance.Modifying.html
-			"apply_immediately": {
+			"apply_immediately": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"kms_key_id": {
+			"kms_key_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"storage_encrypted": {
+			"storage_encrypted": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
+			},
+
+			"monitoring_role_arn": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"monitoring_interval": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+
+			"promotion_tier": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
 			},
 
 			"tags": tagsSchema(),
@@ -111,6 +129,7 @@ func resourceAwsRDSClusterInstanceCreate(d *schema.ResourceData, meta interface{
 		DBClusterIdentifier: aws.String(d.Get("cluster_identifier").(string)),
 		Engine:              aws.String("aurora"),
 		PubliclyAccessible:  aws.Bool(d.Get("publicly_accessible").(bool)),
+		PromotionTier:       aws.Int64(int64(d.Get("promotion_tier").(int))),
 		Tags:                tags,
 	}
 
@@ -126,6 +145,14 @@ func resourceAwsRDSClusterInstanceCreate(d *schema.ResourceData, meta interface{
 
 	if attr, ok := d.GetOk("db_subnet_group_name"); ok {
 		createOpts.DBSubnetGroupName = aws.String(attr.(string))
+	}
+
+	if attr, ok := d.GetOk("monitoring_role_arn"); ok {
+		createOpts.MonitoringRoleArn = aws.String(attr.(string))
+	}
+
+	if attr, ok := d.GetOk("monitoring_interval"); ok {
+		createOpts.MonitoringInterval = aws.Int64(int64(attr.(int)))
 	}
 
 	log.Printf("[DEBUG] Creating RDS DB Instance opts: %s", createOpts)
@@ -168,7 +195,7 @@ func resourceAwsRDSClusterInstanceRead(d *schema.ResourceData, meta interface{})
 		return nil
 	}
 
-	// Retreive DB Cluster information, to determine if this Instance is a writer
+	// Retrieve DB Cluster information, to determine if this Instance is a writer
 	conn := meta.(*AWSClient).rdsconn
 	resp, err := conn.DescribeDBClusters(&rds.DescribeDBClustersInput{
 		DBClusterIdentifier: db.DBClusterIdentifier,
@@ -206,13 +233,22 @@ func resourceAwsRDSClusterInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("instance_class", db.DBInstanceClass)
 	d.Set("identifier", db.DBInstanceIdentifier)
 	d.Set("storage_encrypted", db.StorageEncrypted)
+	d.Set("promotion_tier", db.PromotionTier)
+
+	if db.MonitoringInterval != nil {
+		d.Set("monitoring_interval", db.MonitoringInterval)
+	}
+
+	if db.MonitoringRoleArn != nil {
+		d.Set("monitoring_role_arn", db.MonitoringRoleArn)
+	}
 
 	if len(db.DBParameterGroups) > 0 {
 		d.Set("db_parameter_group_name", db.DBParameterGroups[0].DBParameterGroupName)
 	}
 
 	// Fetch and save tags
-	arn, err := buildRDSARN(d.Id(), meta)
+	arn, err := buildRDSARN(d.Id(), meta.(*AWSClient).accountid, meta.(*AWSClient).region)
 	if err != nil {
 		log.Printf("[DEBUG] Error building ARN for RDS Cluster Instance (%s), not setting Tags", *db.DBInstanceIdentifier)
 	} else {
@@ -245,6 +281,24 @@ func resourceAwsRDSClusterInstanceUpdate(d *schema.ResourceData, meta interface{
 
 	}
 
+	if d.HasChange("monitoring_role_arn") {
+		d.SetPartial("monitoring_role_arn")
+		req.MonitoringRoleArn = aws.String(d.Get("monitoring_role_arn").(string))
+		requestUpdate = true
+	}
+
+	if d.HasChange("monitoring_interval") {
+		d.SetPartial("monitoring_interval")
+		req.MonitoringInterval = aws.Int64(int64(d.Get("monitoring_interval").(int)))
+		requestUpdate = true
+	}
+
+	if d.HasChange("promotion_tier") {
+		d.SetPartial("promotion_tier")
+		req.PromotionTier = aws.Int64(int64(d.Get("promotion_tier").(int)))
+		requestUpdate = true
+	}
+
 	log.Printf("[DEBUG] Send DB Instance Modification request: %#v", requestUpdate)
 	if requestUpdate {
 		log.Printf("[DEBUG] DB Instance Modification request: %#v", req)
@@ -271,7 +325,7 @@ func resourceAwsRDSClusterInstanceUpdate(d *schema.ResourceData, meta interface{
 
 	}
 
-	if arn, err := buildRDSARN(d.Id(), meta); err == nil {
+	if arn, err := buildRDSARN(d.Id(), meta.(*AWSClient).accountid, meta.(*AWSClient).region); err == nil {
 		if err := setTagsRDS(conn, d, arn); err != nil {
 			return err
 		}

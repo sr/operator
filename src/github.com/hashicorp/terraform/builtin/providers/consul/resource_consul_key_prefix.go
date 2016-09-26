@@ -15,25 +15,25 @@ func resourceConsulKeyPrefix() *schema.Resource {
 		Delete: resourceConsulKeyPrefixDelete,
 
 		Schema: map[string]*schema.Schema{
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"path_prefix": {
+			"path_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"subkeys": {
+			"subkeys": &schema.Schema{
 				Type:     schema.TypeMap,
 				Required: true,
 				Elem: &schema.Schema{
@@ -148,7 +148,7 @@ func resourceConsulKeyPrefixUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 
 		// Remove deleted keys
-		for k := range om {
+		for k, _ := range om {
 			if _, exists := nm[k]; exists {
 				continue
 			}

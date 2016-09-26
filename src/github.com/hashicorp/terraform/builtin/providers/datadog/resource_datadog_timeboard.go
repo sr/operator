@@ -17,11 +17,11 @@ func resourceDatadogTimeboard() *schema.Resource {
 		Required: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"q": {
+				"q": &schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 				},
-				"stacked": {
+				"stacked": &schema.Schema{
 					Type:     schema.TypeBool,
 					Optional: true,
 					Default:  false,
@@ -36,12 +36,12 @@ func resourceDatadogTimeboard() *schema.Resource {
 		Description: "A list of graph definitions.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"title": {
+				"title": &schema.Schema{
 					Type:        schema.TypeString,
 					Required:    true,
 					Description: "The name of the graph.",
 				},
-				"viz": {
+				"viz": &schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 				},
@@ -56,17 +56,17 @@ func resourceDatadogTimeboard() *schema.Resource {
 		Description: "A list of template variables for using Dashboard templating.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"name": {
+				"name": &schema.Schema{
 					Type:        schema.TypeString,
 					Required:    true,
 					Description: "The name of the variable.",
 				},
-				"prefix": {
+				"prefix": &schema.Schema{
 					Type:        schema.TypeString,
 					Optional:    true,
 					Description: "The tag prefix associated with the variable. Only tags with this prefix will appear in the variable dropdown.",
 				},
-				"default": {
+				"default": &schema.Schema{
 					Type:        schema.TypeString,
 					Optional:    true,
 					Description: "The default value for the template variable on dashboard load.",
@@ -83,17 +83,17 @@ func resourceDatadogTimeboard() *schema.Resource {
 		Exists: resourceDatadogTimeboardExists,
 
 		Schema: map[string]*schema.Schema{
-			"title": {
+			"title": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The name of the dashboard.",
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "A description of the dashboard's content.",
 			},
-			"read_only": {
+			"read_only": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -120,8 +120,10 @@ func appendRequests(datadogGraph *datadog.Graph, terraformRequests *[]interface{
 	for _, t_ := range *terraformRequests {
 		t := t_.(map[string]interface{})
 		d := struct {
-			Query   string `json:"q"`
-			Stacked bool   `json:"stacked"`
+			Query              string `json:"q"`
+			Stacked            bool   `json:"stacked"`
+			Aggregator         string
+			ConditionalFormats []datadog.DashboardConditionalFormat `json:"conditional_formats,omitempty"`
 		}{Query: t["q"].(string)}
 		if stacked, ok := t["stacked"]; ok {
 			d.Stacked = stacked.(bool)

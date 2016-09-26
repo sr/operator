@@ -18,7 +18,7 @@ func TestAccAutoscaler_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAutoscalerDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAutoscaler_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAutoscalerExists(
@@ -37,14 +37,14 @@ func TestAccAutoscaler_update(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAutoscalerDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAutoscaler_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAutoscalerExists(
 						"google_compute_autoscaler.foobar", &ascaler),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAutoscaler_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAutoscalerExists(
@@ -139,7 +139,7 @@ resource "google_compute_instance_template" "foobar" {
 	tags = ["foo", "bar"]
 
 	disk {
-		source_image = "debian-cloud/debian-7-wheezy-v20160301"
+		source_image = "debian-cloud/debian-8-jessie-v20160803"
 		auto_delete = true
 		boot = true
 	}
@@ -179,7 +179,7 @@ resource "google_compute_autoscaler" "foobar" {
 	target = "${google_compute_instance_group_manager.foobar.self_link}"
 	autoscaling_policy = {
 		max_replicas = 5
-		min_replicas = 0
+		min_replicas = 1
 		cooldown_period = 60
 		cpu_utilization = {
 			target = 0.5
@@ -196,7 +196,7 @@ resource "google_compute_instance_template" "foobar" {
 	tags = ["foo", "bar"]
 
 	disk {
-		source_image = "debian-cloud/debian-7-wheezy-v20160301"
+		source_image = "debian-cloud/debian-8-jessie-v20160803"
 		auto_delete = true
 		boot = true
 	}
@@ -236,7 +236,7 @@ resource "google_compute_autoscaler" "foobar" {
 	target = "${google_compute_instance_group_manager.foobar.self_link}"
 	autoscaling_policy = {
 		max_replicas = 10
-		min_replicas = 0
+		min_replicas = 1
 		cooldown_period = 60
 		cpu_utilization = {
 			target = 0.5

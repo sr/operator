@@ -11,10 +11,10 @@ func TestOrphanTransformer(t *testing.T) {
 	mod := testModule(t, "transform-orphan-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -22,7 +22,7 @@ func TestOrphanTransformer(t *testing.T) {
 					},
 
 					// The orphan
-					"aws_instance.db": {
+					"aws_instance.db": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -57,10 +57,10 @@ func TestOrphanTransformer_modules(t *testing.T) {
 	mod := testModule(t, "transform-orphan-modules")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -70,10 +70,10 @@ func TestOrphanTransformer_modules(t *testing.T) {
 			},
 
 			// Orphan module
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -108,10 +108,10 @@ func TestOrphanTransformer_modulesDeps(t *testing.T) {
 	mod := testModule(t, "transform-orphan-modules")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -121,10 +121,10 @@ func TestOrphanTransformer_modulesDeps(t *testing.T) {
 			},
 
 			// Orphan module
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -162,10 +162,10 @@ func TestOrphanTransformer_modulesDepsOrphan(t *testing.T) {
 	mod := testModule(t, "transform-orphan-modules")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -175,10 +175,10 @@ func TestOrphanTransformer_modulesDepsOrphan(t *testing.T) {
 			},
 
 			// Orphan module
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -217,10 +217,10 @@ func TestOrphanTransformer_modulesNoRoot(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
 			// Orphan module
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -255,10 +255,10 @@ func TestOrphanTransformer_resourceDepends(t *testing.T) {
 	mod := testModule(t, "transform-orphan-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -266,7 +266,7 @@ func TestOrphanTransformer_resourceDepends(t *testing.T) {
 					},
 
 					// The orphan
-					"aws_instance.db": {
+					"aws_instance.db": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",

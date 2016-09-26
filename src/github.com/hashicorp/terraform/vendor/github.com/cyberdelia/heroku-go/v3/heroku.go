@@ -1731,3 +1731,4 @@ func (s *Service) StackList(lr *ListRange) ([]*Stack, error) {
 	var stackList []*Stack
 	return stackList, s.Get(&stackList, fmt.Sprintf("/stacks"), lr)
 }
+

@@ -26,7 +26,7 @@ func TestAccAWSELB_basic(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -70,7 +70,7 @@ func TestAccAWSELB_fullCharacterRange(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: fmt.Sprintf(testAccAWSELBFullRangeOfCharacters, lbName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.foo", &conf),
@@ -91,14 +91,14 @@ func TestAccAWSELB_AccessLogs(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBAccessLogs,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.foo", &conf),
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBAccessLogsOn,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.foo", &conf),
@@ -111,7 +111,7 @@ func TestAccAWSELB_AccessLogs(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBAccessLogs,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.foo", &conf),
@@ -133,7 +133,7 @@ func TestAccAWSELB_generatedName(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBGeneratedName,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.foo", &conf),
@@ -154,7 +154,7 @@ func TestAccAWSELB_availabilityZones(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -169,7 +169,7 @@ func TestAccAWSELB_availabilityZones(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig_AvailabilityZonesUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -195,7 +195,7 @@ func TestAccAWSELB_tags(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -205,7 +205,7 @@ func TestAccAWSELB_tags(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig_TagUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -236,7 +236,7 @@ func TestAccAWSELB_iam_server_cert(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccELBIAMServerCertConfig(
 					fmt.Sprintf("tf-acctest-%s", acctest.RandString(10))),
 				Check: resource.ComposeTestCheckFunc(
@@ -284,7 +284,7 @@ func TestAccAWSELB_InstanceAttaching(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -292,7 +292,7 @@ func TestAccAWSELB_InstanceAttaching(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigNewInstance,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -312,7 +312,7 @@ func TestAccAWSELBUpdate_Listener(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -322,7 +322,7 @@ func TestAccAWSELBUpdate_Listener(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigListener_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -343,7 +343,7 @@ func TestAccAWSELB_HealthCheck(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigHealthCheck,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -371,14 +371,14 @@ func TestAccAWSELBUpdate_HealthCheck(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigHealthCheck,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"aws_elb.bar", "health_check.0.healthy_threshold", "5"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigHealthCheck_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -398,7 +398,7 @@ func TestAccAWSELB_Timeout(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigIdleTimeout,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSELBExists("aws_elb.bar", &conf),
@@ -418,7 +418,7 @@ func TestAccAWSELBUpdate_Timeout(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigIdleTimeout,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -426,7 +426,7 @@ func TestAccAWSELBUpdate_Timeout(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigIdleTimeout_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -445,7 +445,7 @@ func TestAccAWSELB_ConnectionDraining(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigConnectionDraining,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -467,7 +467,7 @@ func TestAccAWSELBUpdate_ConnectionDraining(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigConnectionDraining,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -478,7 +478,7 @@ func TestAccAWSELBUpdate_ConnectionDraining(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigConnectionDraining_update_timeout,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -489,7 +489,7 @@ func TestAccAWSELBUpdate_ConnectionDraining(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigConnectionDraining_update_disable,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -508,7 +508,7 @@ func TestAccAWSELB_SecurityGroups(t *testing.T) {
 		Providers:     testAccProviders,
 		CheckDestroy:  testAccCheckAWSELBDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					// ELBs get a default security group
@@ -517,7 +517,7 @@ func TestAccAWSELB_SecurityGroups(t *testing.T) {
 					),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSELBConfigSecurityGroups,
 				Check: resource.ComposeTestCheckFunc(
 					// Count should still be one as we swap in a custom security group
@@ -596,6 +596,183 @@ func TestResourceAWSELB_validateElbNameCannotEndWithHyphen(t *testing.T) {
 
 	if len(errors) != 1 {
 		t.Fatalf("Expected the ELB Name to trigger a validation error")
+	}
+}
+
+func TestResourceAWSELB_validateAccessLogsInterval(t *testing.T) {
+	type testCases struct {
+		Value    int
+		ErrCount int
+	}
+
+	invalidCases := []testCases{
+		{
+			Value:    0,
+			ErrCount: 1,
+		},
+		{
+			Value:    10,
+			ErrCount: 1,
+		},
+		{
+			Value:    -1,
+			ErrCount: 1,
+		},
+	}
+
+	for _, tc := range invalidCases {
+		_, errors := validateAccessLogsInterval(tc.Value, "interval")
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected %q to trigger a validation error.", tc.Value)
+		}
+	}
+
+}
+
+func TestResourceAWSELB_validateListenerProtocol(t *testing.T) {
+	type testCases struct {
+		Value    string
+		ErrCount int
+	}
+
+	invalidCases := []testCases{
+		{
+			Value:    "",
+			ErrCount: 1,
+		},
+		{
+			Value:    "incorrect",
+			ErrCount: 1,
+		},
+		{
+			Value:    "HTTP:",
+			ErrCount: 1,
+		},
+	}
+
+	for _, tc := range invalidCases {
+		_, errors := validateListenerProtocol(tc.Value, "protocol")
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected %q to trigger a validation error.", tc.Value)
+		}
+	}
+
+	validCases := []testCases{
+		{
+			Value:    "TCP",
+			ErrCount: 0,
+		},
+		{
+			Value:    "ssl",
+			ErrCount: 0,
+		},
+		{
+			Value:    "HTTP",
+			ErrCount: 0,
+		},
+	}
+
+	for _, tc := range validCases {
+		_, errors := validateListenerProtocol(tc.Value, "protocol")
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected %q not to trigger a validation error.", tc.Value)
+		}
+	}
+}
+
+func TestResourceAWSELB_validateHealthCheckTarget(t *testing.T) {
+	type testCase struct {
+		Value    string
+		ErrCount int
+	}
+
+	randomRunes := func(n int) string {
+		rand.Seed(time.Now().UTC().UnixNano())
+
+		// A complete set of modern Katakana characters.
+		runes := []rune("アイウエオ" +
+			"カキクケコガギグゲゴサシスセソザジズゼゾ" +
+			"タチツテトダヂヅデドナニヌネノハヒフヘホ" +
+			"バビブベボパピプペポマミムメモヤユヨラリ" +
+			"ルレロワヰヱヲン")
+
+		s := make([]rune, n)
+		for i := range s {
+			s[i] = runes[rand.Intn(len(runes))]
+		}
+		return string(s)
+	}
+
+	validCases := []testCase{
+		{
+			Value:    "TCP:1234",
+			ErrCount: 0,
+		},
+		{
+			Value:    "http:80/test",
+			ErrCount: 0,
+		},
+		{
+			Value:    fmt.Sprintf("HTTP:8080/%s", randomRunes(5)),
+			ErrCount: 0,
+		},
+		{
+			Value:    "SSL:8080",
+			ErrCount: 0,
+		},
+	}
+
+	for _, tc := range validCases {
+		_, errors := validateHeathCheckTarget(tc.Value, "target")
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected %q not to trigger a validation error.", tc.Value)
+		}
+	}
+
+	invalidCases := []testCase{
+		{
+			Value:    "",
+			ErrCount: 1,
+		},
+		{
+			Value:    "TCP:",
+			ErrCount: 1,
+		},
+		{
+			Value:    "TCP:1234/",
+			ErrCount: 1,
+		},
+		{
+			Value:    "SSL:8080/",
+			ErrCount: 1,
+		},
+		{
+			Value:    "HTTP:8080",
+			ErrCount: 1,
+		},
+		{
+			Value:    "incorrect-value",
+			ErrCount: 1,
+		},
+		{
+			Value:    "TCP:123456",
+			ErrCount: 1,
+		},
+		{
+			Value:    "incorrect:80/",
+			ErrCount: 1,
+		},
+		{
+			Value:    fmt.Sprintf("HTTP:8080/%s%s", randomString(512), randomRunes(512)),
+			ErrCount: 1,
+		},
+	}
+
+	for _, tc := range invalidCases {
+		_, errors := validateHeathCheckTarget(tc.Value, "target")
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected %q to trigger a validation error.", tc.Value)
+		}
 	}
 }
 

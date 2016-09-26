@@ -13,27 +13,27 @@ func resourcePacketProject() *schema.Resource {
 		Delete: resourcePacketProjectDelete,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"payment_method": {
+			"payment_method": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"created": {
+			"created": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"updated": {
+			"updated": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

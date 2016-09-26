@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"regexp"
 	"sort"
 	"time"
 
@@ -18,24 +19,24 @@ func dataSourceAwsAmi() *schema.Resource {
 		Read: dataSourceAwsAmiRead,
 
 		Schema: map[string]*schema.Schema{
-			"executable_users": {
+			"executable_users": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"filter": {
+			"filter": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": {
+						"values": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -43,153 +44,158 @@ func dataSourceAwsAmi() *schema.Resource {
 					},
 				},
 			},
-			"most_recent": {
+			"name_regex": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"most_recent": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
-			"owners": {
+			"owners": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			// Computed values.
-			"architecture": {
+			"architecture": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"creation_date": {
+			"creation_date": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"hypervisor": {
+			"hypervisor": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_id": {
+			"image_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_location": {
+			"image_location": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_owner_alias": {
+			"image_owner_alias": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_type": {
+			"image_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"kernel_id": {
+			"kernel_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"owner_id": {
+			"owner_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"platform": {
+			"platform": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"public": {
+			"public": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"ramdisk_id": {
+			"ramdisk_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"root_device_name": {
+			"root_device_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"root_device_type": {
+			"root_device_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"sriov_net_support": {
+			"sriov_net_support": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"state": {
+			"state": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"virtualization_type": {
+			"virtualization_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			// Complex computed values
-			"block_device_mappings": {
+			"block_device_mappings": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiBlockDeviceMappingHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"no_device": {
+						"no_device": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"virtual_name": {
+						"virtual_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"ebs": {
+						"ebs": &schema.Schema{
 							Type:     schema.TypeMap,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"product_codes": {
+			"product_codes": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiProductCodesHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"product_code_id": {
+						"product_code_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"product_code_type": {
+						"product_code_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"state_reason": {
+			"state_reason": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      amiTagsHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -206,10 +212,11 @@ func dataSourceAwsAmiRead(d *schema.ResourceData, meta interface{}) error {
 
 	executableUsers, executableUsersOk := d.GetOk("executable_users")
 	filters, filtersOk := d.GetOk("filter")
+	nameRegex, nameRegexOk := d.GetOk("name_regex")
 	owners, ownersOk := d.GetOk("owners")
 
-	if executableUsersOk == false && filtersOk == false && ownersOk == false {
-		return fmt.Errorf("One of executable_users, filters, or owners must be assigned")
+	if executableUsersOk == false && filtersOk == false && nameRegexOk == false && ownersOk == false {
+		return fmt.Errorf("One of executable_users, filters, name_regex, or owners must be assigned")
 	}
 
 	params := &ec2.DescribeImagesInput{}
@@ -227,20 +234,33 @@ func dataSourceAwsAmiRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	var filteredImages []*ec2.Image
+	if nameRegexOk == true {
+		r := regexp.MustCompile(nameRegex.(string))
+		for _, image := range resp.Images {
+			if r.MatchString(*image.Name) == true {
+				filteredImages = append(filteredImages, image)
+			}
+		}
+	} else {
+		filteredImages = resp.Images[:]
+	}
+
 	var image *ec2.Image
-	if len(resp.Images) < 1 {
+	if len(filteredImages) < 1 {
 		return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
-	} else if len(resp.Images) > 1 {
+	} else if len(filteredImages) > 1 {
 		if (d.Get("most_recent").(bool)) == true {
 			log.Printf("[DEBUG] aws_ami - multiple results found and most_recent is set")
-			image = mostRecentAmi(resp.Images)
+			image = mostRecentAmi(filteredImages)
 		} else {
 			log.Printf("[DEBUG] aws_ami - multiple results found and most_recent not set")
 			return fmt.Errorf("Your query returned more than one result. Please try a more specific search, or set most_recent to true.")
 		}
 	} else {
-		log.Printf("[DEBUG] aws_ami - Single AMI found: %s", *resp.Images[0].ImageId)
-		image = resp.Images[0]
+		log.Printf("[DEBUG] aws_ami - Single AMI found: %s", *filteredImages[0].ImageId)
+		image = filteredImages[0]
 	}
 	return amiDescriptionAttributes(d, image)
 }
@@ -283,39 +303,39 @@ func mostRecentAmi(images []*ec2.Image) *ec2.Image {
 func amiDescriptionAttributes(d *schema.ResourceData, image *ec2.Image) error {
 	// Simple attributes first
 	d.SetId(*image.ImageId)
-	d.Set("architecture", *image.Architecture)
-	d.Set("creation_date", *image.CreationDate)
+	d.Set("architecture", image.Architecture)
+	d.Set("creation_date", image.CreationDate)
 	if image.Description != nil {
-		d.Set("description", *image.Description)
+		d.Set("description", image.Description)
 	}
-	d.Set("hypervisor", *image.Hypervisor)
-	d.Set("image_id", *image.ImageId)
-	d.Set("image_location", *image.ImageLocation)
+	d.Set("hypervisor", image.Hypervisor)
+	d.Set("image_id", image.ImageId)
+	d.Set("image_location", image.ImageLocation)
 	if image.ImageOwnerAlias != nil {
-		d.Set("image_owner_alias", *image.ImageOwnerAlias)
+		d.Set("image_owner_alias", image.ImageOwnerAlias)
 	}
-	d.Set("image_type", *image.ImageType)
+	d.Set("image_type", image.ImageType)
 	if image.KernelId != nil {
-		d.Set("kernel_id", *image.KernelId)
+		d.Set("kernel_id", image.KernelId)
 	}
-	d.Set("name", *image.Name)
-	d.Set("owner_id", *image.OwnerId)
+	d.Set("name", image.Name)
+	d.Set("owner_id", image.OwnerId)
 	if image.Platform != nil {
-		d.Set("platform", *image.Platform)
+		d.Set("platform", image.Platform)
 	}
-	d.Set("public", *image.Public)
+	d.Set("public", image.Public)
 	if image.RamdiskId != nil {
-		d.Set("ramdisk_id", *image.RamdiskId)
+		d.Set("ramdisk_id", image.RamdiskId)
 	}
 	if image.RootDeviceName != nil {
-		d.Set("root_device_name", *image.RootDeviceName)
+		d.Set("root_device_name", image.RootDeviceName)
 	}
-	d.Set("root_device_type", *image.RootDeviceType)
+	d.Set("root_device_type", image.RootDeviceType)
 	if image.SriovNetSupport != nil {
-		d.Set("sriov_net_support", *image.SriovNetSupport)
+		d.Set("sriov_net_support", image.SriovNetSupport)
 	}
-	d.Set("state", *image.State)
-	d.Set("virtualization_type", *image.VirtualizationType)
+	d.Set("state", image.State)
+	d.Set("virtualization_type", image.VirtualizationType)
 	// Complex types get their own functions
 	if err := d.Set("block_device_mappings", amiBlockDeviceMappings(image.BlockDeviceMappings)); err != nil {
 		return err

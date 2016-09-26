@@ -25,14 +25,14 @@ func resourceKey() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Description: "name of this key (will be generated from the key comment, if not set and comment present)",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
 			},
-			"key": {
+			"key": &schema.Schema{
 				Description: "content of public key from disk",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -61,6 +61,8 @@ func resourceKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	d.SetId(d.Get("name").(string))
 
 	err = resourceKeyRead(d, meta)
 	if err != nil {
@@ -95,7 +97,6 @@ func resourceKeyRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(key.Name)
 	d.Set("name", key.Name)
 	d.Set("key", key.Key)
 

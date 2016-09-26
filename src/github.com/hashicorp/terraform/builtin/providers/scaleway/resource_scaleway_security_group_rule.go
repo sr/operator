@@ -15,11 +15,11 @@ func resourceScalewaySecurityGroupRule() *schema.Resource {
 		Update: resourceScalewaySecurityGroupRuleUpdate,
 		Delete: resourceScalewaySecurityGroupRuleDelete,
 		Schema: map[string]*schema.Schema{
-			"security_group": {
+			"security_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"action": {
+			"action": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -30,7 +30,7 @@ func resourceScalewaySecurityGroupRule() *schema.Resource {
 					return
 				},
 			},
-			"direction": {
+			"direction": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -41,11 +41,11 @@ func resourceScalewaySecurityGroupRule() *schema.Resource {
 					return
 				},
 			},
-			"ip_range": {
+			"ip_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -56,7 +56,7 @@ func resourceScalewaySecurityGroupRule() *schema.Resource {
 					return
 				},
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
@@ -89,8 +89,16 @@ func resourceScalewaySecurityGroupRuleCreate(d *schema.ResourceData, m interface
 		return err
 	}
 
+	matches := func(rule api.ScalewaySecurityGroupRule) bool {
+		return rule.Action == req.Action &&
+			rule.Direction == req.Direction &&
+			rule.IPRange == req.IPRange &&
+			rule.Protocol == req.Protocol &&
+			rule.DestPortFrom == req.DestPortFrom
+	}
+
 	for _, rule := range resp.Rules {
-		if rule.Action == req.Action && rule.Direction == req.Direction && rule.IPRange == req.IPRange && rule.Protocol == req.Protocol {
+		if matches(rule) {
 			d.SetId(rule.ID)
 			break
 		}

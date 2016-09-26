@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecs"
@@ -20,23 +21,23 @@ func resourceAwsEcsTaskDefinition() *schema.Resource {
 		Delete: resourceAwsEcsTaskDefinitionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"family": {
+			"family": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"revision": {
+			"revision": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"container_definitions": {
+			"container_definitions": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -46,24 +47,32 @@ func resourceAwsEcsTaskDefinition() *schema.Resource {
 				},
 			},
 
-			"task_role_arn": {
+			"task_role_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"volume": {
+			"network_mode": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ForceNew:     true,
+				ValidateFunc: validateAwsEcsTaskDefinitionNetworkMode,
+			},
+
+			"volume": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"host_path": {
+						"host_path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -73,6 +82,20 @@ func resourceAwsEcsTaskDefinition() *schema.Resource {
 			},
 		},
 	}
+}
+
+func validateAwsEcsTaskDefinitionNetworkMode(v interface{}, k string) (ws []string, errors []error) {
+	value := strings.ToLower(v.(string))
+	validTypes := map[string]struct{}{
+		"bridge": struct{}{},
+		"host":   struct{}{},
+		"none":   struct{}{},
+	}
+
+	if _, ok := validTypes[value]; !ok {
+		errors = append(errors, fmt.Errorf("ECS Task Definition network_mode %q is invalid, must be `bridge`, `host` or `none`", value))
+	}
+	return
 }
 
 func resourceAwsEcsTaskDefinitionCreate(d *schema.ResourceData, meta interface{}) error {
@@ -91,6 +114,10 @@ func resourceAwsEcsTaskDefinitionCreate(d *schema.ResourceData, meta interface{}
 
 	if v, ok := d.GetOk("task_role_arn"); ok {
 		input.TaskRoleArn = aws.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("network_mode"); ok {
+		input.NetworkMode = aws.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("volume"); ok {
@@ -113,7 +140,7 @@ func resourceAwsEcsTaskDefinitionCreate(d *schema.ResourceData, meta interface{}
 		*taskDefinition.TaskDefinitionArn, *taskDefinition.Revision)
 
 	d.SetId(*taskDefinition.Family)
-	d.Set("arn", *taskDefinition.TaskDefinitionArn)
+	d.Set("arn", taskDefinition.TaskDefinitionArn)
 
 	return resourceAwsEcsTaskDefinitionRead(d, meta)
 }
@@ -133,11 +160,12 @@ func resourceAwsEcsTaskDefinitionRead(d *schema.ResourceData, meta interface{}) 
 	taskDefinition := out.TaskDefinition
 
 	d.SetId(*taskDefinition.Family)
-	d.Set("arn", *taskDefinition.TaskDefinitionArn)
-	d.Set("family", *taskDefinition.Family)
-	d.Set("revision", *taskDefinition.Revision)
+	d.Set("arn", taskDefinition.TaskDefinitionArn)
+	d.Set("family", taskDefinition.Family)
+	d.Set("revision", taskDefinition.Revision)
 	d.Set("container_definitions", taskDefinition.ContainerDefinitions)
 	d.Set("task_role_arn", taskDefinition.TaskRoleArn)
+	d.Set("network_mode", taskDefinition.NetworkMode)
 	d.Set("volumes", flattenEcsVolumes(taskDefinition.Volumes))
 
 	return nil

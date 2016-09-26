@@ -21,71 +21,71 @@ func resourceAwsCloudWatchMetricAlarm() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"alarm_name": {
+			"alarm_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"comparison_operator": {
+			"comparison_operator": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"evaluation_periods": {
+			"evaluation_periods": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"metric_name": {
+			"metric_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"namespace": {
+			"namespace": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"period": {
+			"period": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"statistic": {
+			"statistic": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"threshold": {
+			"threshold": &schema.Schema{
 				Type:     schema.TypeFloat,
 				Required: true,
 			},
-			"actions_enabled": {
+			"actions_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"alarm_actions": {
+			"alarm_actions": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"alarm_description": {
+			"alarm_description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"dimensions": {
+			"dimensions": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 			},
-			"insufficient_data_actions": {
+			"insufficient_data_actions": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"ok_actions": {
+			"ok_actions": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"unit": {
+			"unit": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

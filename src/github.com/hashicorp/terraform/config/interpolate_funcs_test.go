@@ -823,18 +823,18 @@ func TestInterpolateFuncJoin(t *testing.T) {
 func TestInterpolateFuncJSONEncode(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Vars: map[string]ast.Variable{
-			"easy": {
+			"easy": ast.Variable{
 				Value: "test",
 				Type:  ast.TypeString,
 			},
-			"hard": {
+			"hard": ast.Variable{
 				Value: " foo \\ \n \t \" bar ",
 				Type:  ast.TypeString,
 			},
 			"list": interfaceToVariableSwallowError([]string{"foo", "bar\tbaz"}),
 			// XXX can't use InterfaceToVariable as it converts empty slice into empty
 			// map.
-			"emptylist": {
+			"emptylist": ast.Variable{
 				Value: []ast.Variable{},
 				Type:  ast.TypeList,
 			},
@@ -1064,7 +1064,7 @@ func TestInterpolateFuncSignum(t *testing.T) {
 func TestInterpolateFuncSort(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Vars: map[string]ast.Variable{
-			"var.strings": {
+			"var.strings": ast.Variable{
 				Type: ast.TypeList,
 				Value: []ast.Variable{
 					{Type: ast.TypeString, Value: "c"},
@@ -1072,7 +1072,7 @@ func TestInterpolateFuncSort(t *testing.T) {
 					{Type: ast.TypeString, Value: "b"},
 				},
 			},
-			"var.notstrings": {
+			"var.notstrings": ast.Variable{
 				Type: ast.TypeList,
 				Value: []ast.Variable{
 					{Type: ast.TypeList, Value: []ast.Variable{}},
@@ -1155,7 +1155,7 @@ func TestInterpolateFuncLookup(t *testing.T) {
 					},
 				},
 			},
-			"var.map_of_lists": {
+			"var.map_of_lists": ast.Variable{
 				Type: ast.TypeMap,
 				Value: map[string]ast.Variable{
 					"bar": {
@@ -1225,20 +1225,20 @@ func TestInterpolateFuncLookup(t *testing.T) {
 func TestInterpolateFuncKeys(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Vars: map[string]ast.Variable{
-			"var.foo": {
+			"var.foo": ast.Variable{
 				Type: ast.TypeMap,
 				Value: map[string]ast.Variable{
-					"bar": {
+					"bar": ast.Variable{
 						Value: "baz",
 						Type:  ast.TypeString,
 					},
-					"qux": {
+					"qux": ast.Variable{
 						Value: "quack",
 						Type:  ast.TypeString,
 					},
 				},
 			},
-			"var.str": {
+			"var.str": ast.Variable{
 				Value: "astring",
 				Type:  ast.TypeString,
 			},
@@ -1279,30 +1279,30 @@ func TestInterpolateFuncKeys(t *testing.T) {
 func TestInterpolateFuncKeyValOrder(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Vars: map[string]ast.Variable{
-			"var.foo": {
+			"var.foo": ast.Variable{
 				Type: ast.TypeMap,
 				Value: map[string]ast.Variable{
-					"D": {
+					"D": ast.Variable{
 						Value: "2",
 						Type:  ast.TypeString,
 					},
-					"C": {
+					"C": ast.Variable{
 						Value: "Y",
 						Type:  ast.TypeString,
 					},
-					"A": {
+					"A": ast.Variable{
 						Value: "X",
 						Type:  ast.TypeString,
 					},
-					"10": {
+					"10": ast.Variable{
 						Value: "Z",
 						Type:  ast.TypeString,
 					},
-					"1": {
+					"1": ast.Variable{
 						Value: "4",
 						Type:  ast.TypeString,
 					},
-					"3": {
+					"3": ast.Variable{
 						Value: "W",
 						Type:  ast.TypeString,
 					},
@@ -1328,20 +1328,20 @@ func TestInterpolateFuncKeyValOrder(t *testing.T) {
 func TestInterpolateFuncValues(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Vars: map[string]ast.Variable{
-			"var.foo": {
+			"var.foo": ast.Variable{
 				Type: ast.TypeMap,
 				Value: map[string]ast.Variable{
-					"bar": {
+					"bar": ast.Variable{
 						Value: "quack",
 						Type:  ast.TypeString,
 					},
-					"qux": {
+					"qux": ast.Variable{
 						Value: "baz",
 						Type:  ast.TypeString,
 					},
 				},
 			},
-			"var.str": {
+			"var.str": ast.Variable{
 				Value: "astring",
 				Type:  ast.TypeString,
 			},

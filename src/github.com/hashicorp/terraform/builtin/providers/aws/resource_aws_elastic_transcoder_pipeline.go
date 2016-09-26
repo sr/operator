@@ -20,18 +20,18 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 		Delete: resourceAwsElasticTranscoderPipelineDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"aws_kms_key_arn": {
+			"aws_kms_key_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
 			// ContentConfig also requires ThumbnailConfig
-			"content_config": {
+			"content_config": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -39,13 +39,13 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				Elem: &schema.Resource{
 					// elastictranscoder.PipelineOutputConfig
 					Schema: map[string]*schema.Schema{
-						"bucket": {
+						"bucket": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							// AWS may insert the bucket name here taken from output_bucket
 							Computed: true,
 						},
-						"storage_class": {
+						"storage_class": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -53,21 +53,21 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				},
 			},
 
-			"content_config_permissions": {
+			"content_config_permissions": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"access": {
+						"access": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"grantee": {
+						"grantee": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"grantee_type": {
+						"grantee_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -75,12 +75,12 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				},
 			},
 
-			"input_bucket": {
+			"input_bucket": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -98,25 +98,25 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				},
 			},
 
-			"notifications": {
+			"notifications": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"completed": {
+						"completed": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"error": {
+						"error": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"progressing": {
+						"progressing": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"warning": {
+						"warning": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -128,18 +128,18 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 			// and thumbnail_config.bucket.
 			// This is set as Computed, because the API may or may not return
 			// this as set based on the other 2 configurations.
-			"output_bucket": {
+			"output_bucket": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"role": {
+			"role": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"thumbnail_config": {
+			"thumbnail_config": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -147,13 +147,13 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				Elem: &schema.Resource{
 					// elastictranscoder.PipelineOutputConfig
 					Schema: map[string]*schema.Schema{
-						"bucket": {
+						"bucket": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							// AWS may insert the bucket name here taken from output_bucket
 							Computed: true,
 						},
-						"storage_class": {
+						"storage_class": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -161,21 +161,21 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 				},
 			},
 
-			"thumbnail_config_permissions": {
+			"thumbnail_config_permissions": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"access": {
+						"access": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
-						"grantee": {
+						"grantee": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"grantee_type": {
+						"grantee_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -233,18 +233,23 @@ func expandETNotifications(d *schema.ResourceData) *elastictranscoder.Notificati
 		return nil
 	}
 
-	s := set.(*schema.Set)
-	if s == nil || s.Len() == 0 {
+	s := set.(*schema.Set).List()
+	if s == nil || len(s) == 0 {
 		return nil
 	}
 
-	m := s.List()[0].(map[string]interface{})
+	if s[0] == nil {
+		log.Printf("[ERR] First element of Notifications set is nil")
+		return nil
+	}
+
+	rN := s[0].(map[string]interface{})
 
 	return &elastictranscoder.Notifications{
-		Completed:   getStringPtr(m, "completed"),
-		Error:       getStringPtr(m, "error"),
-		Progressing: getStringPtr(m, "progressing"),
-		Warning:     getStringPtr(m, "warning"),
+		Completed:   aws.String(rN["completed"].(string)),
+		Error:       aws.String(rN["error"].(string)),
+		Progressing: aws.String(rN["progressing"].(string)),
+		Warning:     aws.String(rN["warning"].(string)),
 	}
 }
 

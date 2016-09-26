@@ -18,90 +18,93 @@ func resourceDatadogMonitor() *schema.Resource {
 		Update: resourceDatadogMonitorUpdate,
 		Delete: resourceDatadogMonitorDelete,
 		Exists: resourceDatadogMonitorExists,
+		Importer: &schema.ResourceImporter{
+			State: resourceDatadogImport,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"message": {
+			"message": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace(val.(string))
 				},
 			},
-			"escalation_message": {
+			"escalation_message": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace(val.(string))
 				},
 			},
-			"query": {
+			"query": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace(val.(string))
 				},
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
 			// Options
-			"thresholds": {
+			"thresholds": &schema.Schema{
 				Type:     schema.TypeMap,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ok": {
+						"ok": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 						},
-						"warning": {
+						"warning": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Optional: true,
 						},
-						"critical": {
+						"critical": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Required: true,
 						},
 					},
 				},
 			},
-			"notify_no_data": {
+			"notify_no_data": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"no_data_timeframe": {
+			"no_data_timeframe": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"renotify_interval": {
+			"renotify_interval": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"notify_audit": {
+			"notify_audit": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"timeout_h": {
+			"timeout_h": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"require_full_window": {
+			"require_full_window": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"locked": {
+			"locked": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 			// TODO should actually be map[string]int
-			"silenced": {
+			"silenced": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Elem: &schema.Schema{
@@ -110,9 +113,18 @@ func resourceDatadogMonitor() *schema.Resource {
 						Type: schema.TypeInt},
 				},
 			},
-			"include_tags": {
+			"include_tags": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
+			},
+			"tags": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+					Elem: &schema.Schema{
+						Type: schema.TypeString},
+				},
 			},
 		},
 	}
@@ -147,7 +159,7 @@ func buildMonitorStruct(d *schema.ResourceData) *datadog.Monitor {
 		o.NotifyNoData = attr.(bool)
 	}
 	if attr, ok := d.GetOk("no_data_timeframe"); ok {
-		o.NoDataTimeframe = attr.(int)
+		o.NoDataTimeframe = datadog.NoDataTimeframe(attr.(int))
 	}
 	if attr, ok := d.GetOk("renotify_interval"); ok {
 		o.RenotifyInterval = attr.(int)
@@ -177,6 +189,14 @@ func buildMonitorStruct(d *schema.ResourceData) *datadog.Monitor {
 		Name:    d.Get("name").(string),
 		Message: d.Get("message").(string),
 		Options: o,
+	}
+
+	if attr, ok := d.GetOk("tags"); ok {
+		s := make([]string, 0)
+		for k, v := range attr.(map[string]interface{}) {
+			s = append(s, fmt.Sprintf("%s:%s", k, v.(string)))
+		}
+		m.Tags = s
 	}
 
 	return &m
@@ -230,12 +250,30 @@ func resourceDatadogMonitorRead(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
+	thresholds := make(map[string]string)
+	for k, v := range map[string]json.Number{
+		"ok":       m.Options.Thresholds.Ok,
+		"warning":  m.Options.Thresholds.Warning,
+		"critical": m.Options.Thresholds.Critical,
+	} {
+		s := v.String()
+		if s != "" {
+			thresholds[k] = s
+		}
+	}
+
+	tags := make(map[string]string)
+	for _, s := range m.Tags {
+		tag := strings.Split(s, ":")
+		tags[tag[0]] = tag[1]
+	}
+
 	log.Printf("[DEBUG] monitor: %v", m)
 	d.Set("name", m.Name)
 	d.Set("message", m.Message)
 	d.Set("query", m.Query)
 	d.Set("type", m.Type)
-	d.Set("thresholds", m.Options.Thresholds)
+	d.Set("thresholds", thresholds)
 	d.Set("notify_no_data", m.Options.NotifyNoData)
 	d.Set("no_data_timeframe", m.Options.NoDataTimeframe)
 	d.Set("renotify_interval", m.Options.RenotifyInterval)
@@ -244,6 +282,7 @@ func resourceDatadogMonitorRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("escalation_message", m.Options.EscalationMessage)
 	d.Set("silenced", m.Options.Silenced)
 	d.Set("include_tags", m.Options.IncludeTags)
+	d.Set("tags", tags)
 	d.Set("require_full_window", m.Options.RequireFullWindow)
 	d.Set("locked", m.Options.Locked)
 
@@ -271,6 +310,14 @@ func resourceDatadogMonitorUpdate(d *schema.ResourceData, meta interface{}) erro
 		m.Query = attr.(string)
 	}
 
+	if attr, ok := d.GetOk("tags"); ok {
+		s := make([]string, 0)
+		for k, v := range attr.(map[string]interface{}) {
+			s = append(s, fmt.Sprintf("%s:%s", k, v.(string)))
+		}
+		m.Tags = s
+	}
+
 	o := datadog.Options{}
 	if attr, ok := d.GetOk("thresholds"); ok {
 		thresholds := attr.(map[string]interface{})
@@ -289,7 +336,7 @@ func resourceDatadogMonitorUpdate(d *schema.ResourceData, meta interface{}) erro
 		o.NotifyNoData = attr.(bool)
 	}
 	if attr, ok := d.GetOk("no_data_timeframe"); ok {
-		o.NoDataTimeframe = attr.(int)
+		o.NoDataTimeframe = datadog.NoDataTimeframe(attr.(int))
 	}
 	if attr, ok := d.GetOk("renotify_interval"); ok {
 		o.RenotifyInterval = attr.(int)
@@ -343,4 +390,11 @@ func resourceDatadogMonitorDelete(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	return nil
+}
+
+func resourceDatadogImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	if err := resourceDatadogMonitorRead(d, meta); err != nil {
+		return nil, err
+	}
+	return []*schema.ResourceData{d}, nil
 }

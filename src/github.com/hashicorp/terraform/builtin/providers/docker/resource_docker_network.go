@@ -16,39 +16,39 @@ func resourceDockerNetwork() *schema.Resource {
 		Delete: resourceDockerNetworkDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"check_duplicate": {
+			"check_duplicate": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"driver": {
+			"driver": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"options": {
+			"options": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"ipam_driver": {
+			"ipam_driver": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ipam_config": {
+			"ipam_config": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -56,12 +56,12 @@ func resourceDockerNetwork() *schema.Resource {
 				Set:      resourceDockerIpamConfigHash,
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"scope": {
+			"scope": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -72,25 +72,25 @@ func resourceDockerNetwork() *schema.Resource {
 func getIpamConfigElem() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"subnet": {
+			"subnet": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ip_range": {
+			"ip_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"gateway": {
+			"gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"aux_address": {
+			"aux_address": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
@@ -120,7 +120,7 @@ func resourceDockerIpamConfigHash(v interface{}) int {
 
 		keys := make([]string, len(auxAddress))
 		i := 0
-		for k := range auxAddress {
+		for k, _ := range auxAddress {
 			keys[i] = k
 			i++
 		}

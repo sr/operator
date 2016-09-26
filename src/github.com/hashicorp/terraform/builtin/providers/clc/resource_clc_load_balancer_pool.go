@@ -19,29 +19,29 @@ func resourceCLCLoadBalancerPool() *schema.Resource {
 		Delete: resourceCLCLoadBalancerPoolDelete,
 		Schema: map[string]*schema.Schema{
 			// pool args
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"data_center": {
+			"data_center": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"load_balancer": {
+			"load_balancer": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"method": {
+			"method": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "roundRobin",
 			},
-			"persistence": {
+			"persistence": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "standard",
 			},
-			"nodes": {
+			"nodes": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeMap},

@@ -17,29 +17,29 @@ func resourceId() *schema.Resource {
 		Delete: stubDelete,
 
 		Schema: map[string]*schema.Schema{
-			"keepers": {
+			"keepers": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"byte_length": {
+			"byte_length": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"b64": {
+			"b64": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"hex": {
+			"hex": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"dec": {
+			"dec": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

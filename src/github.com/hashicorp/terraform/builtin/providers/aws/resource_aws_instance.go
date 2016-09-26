@@ -32,66 +32,66 @@ func resourceAwsInstance() *schema.Resource {
 		MigrateState:  resourceAwsInstanceMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"ami": {
+			"ami": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"associate_public_ip_address": {
+			"associate_public_ip_address": &schema.Schema{
 				Type:     schema.TypeBool,
 				ForceNew: true,
 				Optional: true,
 			},
 
-			"availability_zone": {
+			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"placement_group": {
+			"placement_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"instance_type": {
+			"instance_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"key_name": {
+			"key_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"private_ip": {
+			"private_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"source_dest_check": {
+			"source_dest_check": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -106,7 +106,7 @@ func resourceAwsInstance() *schema.Resource {
 				},
 			},
 
-			"security_groups": {
+			"security_groups": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -115,7 +115,7 @@ func resourceAwsInstance() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"vpc_security_group_ids": {
+			"vpc_security_group_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
@@ -123,59 +123,59 @@ func resourceAwsInstance() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"public_dns": {
+			"public_dns": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"network_interface_id": {
+			"network_interface_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"instance_state": {
+			"instance_state": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"private_dns": {
+			"private_dns": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ebs_optimized": {
+			"ebs_optimized": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"disable_api_termination": {
+			"disable_api_termination": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"instance_initiated_shutdown_behavior": {
+			"instance_initiated_shutdown_behavior": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"monitoring": {
+			"monitoring": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"iam_instance_profile": {
+			"iam_instance_profile": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
 
-			"tenancy": {
+			"tenancy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -184,60 +184,60 @@ func resourceAwsInstance() *schema.Resource {
 
 			"tags": tagsSchema(),
 
-			"block_device": {
+			"block_device": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				Removed:  "Split out into three sub-types; see Changelog and Docs",
 			},
 
-			"ebs_block_device": {
+			"ebs_block_device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 							ForceNew: true,
 						},
 
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"encrypted": {
+						"encrypted": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"snapshot_id": {
+						"snapshot_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_type": {
+						"volume_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -254,19 +254,19 @@ func resourceAwsInstance() *schema.Resource {
 				},
 			},
 
-			"ephemeral_block_device": {
+			"ephemeral_block_device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"device_name": {
+						"device_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"virtual_name": {
+						"virtual_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -281,7 +281,7 @@ func resourceAwsInstance() *schema.Resource {
 				},
 			},
 
-			"root_block_device": {
+			"root_block_device": &schema.Schema{
 				// TODO: This is a set because we don't support singleton
 				//       sub-resources today. We'll enforce that the set only ever has
 				//       length zero or one below. When TF gains support for
@@ -294,28 +294,28 @@ func resourceAwsInstance() *schema.Resource {
 					// Termination flag on the block device mapping entry for the root
 					// device volume." - bit.ly/ec2bdmap
 					Schema: map[string]*schema.Schema{
-						"delete_on_termination": {
+						"delete_on_termination": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 							ForceNew: true,
 						},
 
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_size": {
+						"volume_size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"volume_type": {
+						"volume_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -366,13 +366,18 @@ func resourceAwsInstanceCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Run configuration: %s", runOpts)
 
 	var runResp *ec2.Reservation
-	err = resource.Retry(10*time.Second, func() *resource.RetryError {
+	err = resource.Retry(15*time.Second, func() *resource.RetryError {
 		var err error
 		runResp, err = conn.RunInstances(runOpts)
-		// IAM profiles can take ~10 seconds to propagate in AWS:
+		// IAM instance profiles can take ~10 seconds to propagate in AWS:
 		// http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#launch-instance-with-role-console
 		if isAWSErr(err, "InvalidParameterValue", "Invalid IAM Instance Profile") {
 			log.Printf("[DEBUG] Invalid IAM Instance Profile referenced, retrying...")
+			return resource.RetryableError(err)
+		}
+		// IAM roles can also take time to propagate in AWS:
+		if isAWSErr(err, "InvalidParameterValue", " has no associated IAM Roles") {
+			log.Printf("[DEBUG] IAM Instance Profile appears to have no IAM roles, retrying...")
 			return resource.RetryableError(err)
 		}
 		return resource.NonRetryableError(err)
@@ -592,24 +597,25 @@ func resourceAwsInstanceUpdate(d *schema.ResourceData, meta interface{}) error {
 		d.SetPartial("tags")
 	}
 
-	// SourceDestCheck can only be set on VPC instances
-	// AWS will return an error of InvalidParameterCombination if we attempt
-	// to modify the source_dest_check of an instance in EC2 Classic
-	log.Printf("[INFO] Modifying instance %s", d.Id())
-	_, err := conn.ModifyInstanceAttribute(&ec2.ModifyInstanceAttributeInput{
-		InstanceId: aws.String(d.Id()),
-		SourceDestCheck: &ec2.AttributeBooleanValue{
-			Value: aws.Bool(d.Get("source_dest_check").(bool)),
-		},
-	})
-	if err != nil {
-		if ec2err, ok := err.(awserr.Error); ok {
-			// Toloerate InvalidParameterCombination error in Classic, otherwise
-			// return the error
-			if "InvalidParameterCombination" != ec2err.Code() {
-				return err
+	if d.HasChange("source_dest_check") || d.IsNewResource() {
+		// SourceDestCheck can only be set on VPC instances	// AWS will return an error of InvalidParameterCombination if we attempt
+		// to modify the source_dest_check of an instance in EC2 Classic
+		log.Printf("[INFO] Modifying `source_dest_check` on Instance %s", d.Id())
+		_, err := conn.ModifyInstanceAttribute(&ec2.ModifyInstanceAttributeInput{
+			InstanceId: aws.String(d.Id()),
+			SourceDestCheck: &ec2.AttributeBooleanValue{
+				Value: aws.Bool(d.Get("source_dest_check").(bool)),
+			},
+		})
+		if err != nil {
+			if ec2err, ok := err.(awserr.Error); ok {
+				// Toloerate InvalidParameterCombination error in Classic, otherwise
+				// return the error
+				if "InvalidParameterCombination" != ec2err.Code() {
+					return err
+				}
+				log.Printf("[WARN] Attempted to modify SourceDestCheck on non VPC instance: %s", ec2err.Message())
 			}
-			log.Printf("[WARN] Attempted to modify SourceDestCheck on non VPC instance: %s", ec2err.Message())
 		}
 	}
 

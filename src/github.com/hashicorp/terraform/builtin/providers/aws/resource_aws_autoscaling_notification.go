@@ -18,20 +18,20 @@ func resourceAwsAutoscalingNotification() *schema.Resource {
 		Delete: resourceAwsAutoscalingNotificationDelete,
 
 		Schema: map[string]*schema.Schema{
-			"topic_arn": {
+			"topic_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"group_names": {
+			"group_names": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
 
-			"notifications": {
+			"notifications": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -95,13 +95,13 @@ func resourceAwsAutoscalingNotificationRead(d *schema.ResourceData, meta interfa
 
 	// Grab the keys here as the list of Groups
 	var gList []string
-	for k := range gRaw {
+	for k, _ := range gRaw {
 		gList = append(gList, k)
 	}
 
 	// Grab the keys here as the list of Types
 	var nList []string
-	for k := range nRaw {
+	for k, _ := range nRaw {
 		nList = append(nList, k)
 	}
 

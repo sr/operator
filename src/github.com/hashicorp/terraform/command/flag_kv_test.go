@@ -47,6 +47,12 @@ func TestFlagStringKV(t *testing.T) {
 			nil,
 			true,
 		},
+
+		{
+			"key=/path",
+			map[string]string{"key": "/path"},
+			false,
+		},
 	}
 
 	for _, tc := range cases {
@@ -113,7 +119,7 @@ func TestFlagTypedKV(t *testing.T) {
 			`key={"hello" = "world", "foo" = "bar"}`,
 			map[string]interface{}{
 				"key": []map[string]interface{}{
-					{
+					map[string]interface{}{
 						"hello": "world",
 						"foo":   "bar",
 					},
@@ -126,6 +132,18 @@ func TestFlagTypedKV(t *testing.T) {
 			`key={"hello" = "world", "foo" = "bar"}\nkey2="invalid"`,
 			nil,
 			true,
+		},
+
+		{
+			"key=/path",
+			map[string]interface{}{"key": "/path"},
+			false,
+		},
+
+		{
+			"key=1234.dkr.ecr.us-east-1.amazonaws.com/proj:abcdef",
+			map[string]interface{}{"key": "1234.dkr.ecr.us-east-1.amazonaws.com/proj:abcdef"},
+			false,
 		},
 	}
 

@@ -14,7 +14,7 @@ func TestAddrToSchema(t *testing.T) {
 		"full object": {
 			[]string{},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Schema{Type: TypeInt},
 				},
@@ -25,7 +25,7 @@ func TestAddrToSchema(t *testing.T) {
 		"list": {
 			[]string{"list"},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Schema{Type: TypeInt},
 				},
@@ -36,7 +36,7 @@ func TestAddrToSchema(t *testing.T) {
 		"list.#": {
 			[]string{"list", "#"},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Schema{Type: TypeInt},
 				},
@@ -47,7 +47,7 @@ func TestAddrToSchema(t *testing.T) {
 		"list.0": {
 			[]string{"list", "0"},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Schema{Type: TypeInt},
 				},
@@ -58,11 +58,11 @@ func TestAddrToSchema(t *testing.T) {
 		"list.0 with resource": {
 			[]string{"list", "0"},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Resource{
 						Schema: map[string]*Schema{
-							"field": {Type: TypeString},
+							"field": &Schema{Type: TypeString},
 						},
 					},
 				},
@@ -73,11 +73,11 @@ func TestAddrToSchema(t *testing.T) {
 		"list.0.field": {
 			[]string{"list", "0", "field"},
 			map[string]*Schema{
-				"list": {
+				"list": &Schema{
 					Type: TypeList,
 					Elem: &Resource{
 						Schema: map[string]*Schema{
-							"field": {Type: TypeString},
+							"field": &Schema{Type: TypeString},
 						},
 					},
 				},
@@ -88,7 +88,7 @@ func TestAddrToSchema(t *testing.T) {
 		"set": {
 			[]string{"set"},
 			map[string]*Schema{
-				"set": {
+				"set": &Schema{
 					Type: TypeSet,
 					Elem: &Schema{Type: TypeInt},
 					Set: func(a interface{}) int {
@@ -102,7 +102,7 @@ func TestAddrToSchema(t *testing.T) {
 		"set.#": {
 			[]string{"set", "#"},
 			map[string]*Schema{
-				"set": {
+				"set": &Schema{
 					Type: TypeSet,
 					Elem: &Schema{Type: TypeInt},
 					Set: func(a interface{}) int {
@@ -116,7 +116,7 @@ func TestAddrToSchema(t *testing.T) {
 		"set.0": {
 			[]string{"set", "0"},
 			map[string]*Schema{
-				"set": {
+				"set": &Schema{
 					Type: TypeSet,
 					Elem: &Schema{Type: TypeInt},
 					Set: func(a interface{}) int {
@@ -130,11 +130,11 @@ func TestAddrToSchema(t *testing.T) {
 		"set.0 with resource": {
 			[]string{"set", "0"},
 			map[string]*Schema{
-				"set": {
+				"set": &Schema{
 					Type: TypeSet,
 					Elem: &Resource{
 						Schema: map[string]*Schema{
-							"field": {Type: TypeString},
+							"field": &Schema{Type: TypeString},
 						},
 					},
 				},
@@ -145,7 +145,7 @@ func TestAddrToSchema(t *testing.T) {
 		"mapElem": {
 			[]string{"map", "foo"},
 			map[string]*Schema{
-				"map": {Type: TypeMap},
+				"map": &Schema{Type: TypeMap},
 			},
 			[]ValueType{TypeMap, TypeString},
 		},
@@ -153,12 +153,12 @@ func TestAddrToSchema(t *testing.T) {
 		"setDeep": {
 			[]string{"set", "50", "index"},
 			map[string]*Schema{
-				"set": {
+				"set": &Schema{
 					Type: TypeSet,
 					Elem: &Resource{
 						Schema: map[string]*Schema{
-							"index": {Type: TypeInt},
-							"value": {Type: TypeString},
+							"index": &Schema{Type: TypeInt},
+							"value": &Schema{Type: TypeString},
 						},
 					},
 					Set: func(a interface{}) int {
@@ -188,21 +188,21 @@ func TestAddrToSchema(t *testing.T) {
 func testFieldReader(t *testing.T, f func(map[string]*Schema) FieldReader) {
 	schema := map[string]*Schema{
 		// Primitives
-		"bool":   {Type: TypeBool},
-		"float":  {Type: TypeFloat},
-		"int":    {Type: TypeInt},
-		"string": {Type: TypeString},
+		"bool":   &Schema{Type: TypeBool},
+		"float":  &Schema{Type: TypeFloat},
+		"int":    &Schema{Type: TypeInt},
+		"string": &Schema{Type: TypeString},
 
 		// Lists
-		"list": {
+		"list": &Schema{
 			Type: TypeList,
 			Elem: &Schema{Type: TypeString},
 		},
-		"listInt": {
+		"listInt": &Schema{
 			Type: TypeList,
 			Elem: &Schema{Type: TypeInt},
 		},
-		"listMap": {
+		"listMap": &Schema{
 			Type: TypeList,
 			Elem: &Schema{
 				Type: TypeMap,
@@ -210,29 +210,29 @@ func testFieldReader(t *testing.T, f func(map[string]*Schema) FieldReader) {
 		},
 
 		// Maps
-		"map": {Type: TypeMap},
+		"map": &Schema{Type: TypeMap},
 
 		// Sets
-		"set": {
+		"set": &Schema{
 			Type: TypeSet,
 			Elem: &Schema{Type: TypeInt},
 			Set: func(a interface{}) int {
 				return a.(int)
 			},
 		},
-		"setDeep": {
+		"setDeep": &Schema{
 			Type: TypeSet,
 			Elem: &Resource{
 				Schema: map[string]*Schema{
-					"index": {Type: TypeInt},
-					"value": {Type: TypeString},
+					"index": &Schema{Type: TypeInt},
+					"value": &Schema{Type: TypeString},
 				},
 			},
 			Set: func(a interface{}) int {
 				return a.(map[string]interface{})["index"].(int)
 			},
 		},
-		"setEmpty": {
+		"setEmpty": &Schema{
 			Type: TypeSet,
 			Elem: &Schema{Type: TypeInt},
 			Set: func(a interface{}) int {

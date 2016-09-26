@@ -20,19 +20,19 @@ import (
 func resourceAwsElasticBeanstalkOptionSetting() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"namespace": {
+			"namespace": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"value": {
+			"value": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"resource": {
+			"resource": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -54,30 +54,30 @@ func resourceAwsElasticBeanstalkEnvironment() *schema.Resource {
 		MigrateState:  resourceAwsElasticBeanstalkEnvironmentMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"application": {
+			"application": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"cname": {
+			"cname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"cname_prefix": {
+			"cname_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 				ForceNew: true,
 			},
-			"tier": {
+			"tier": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "WebServer",
@@ -94,30 +94,29 @@ func resourceAwsElasticBeanstalkEnvironment() *schema.Resource {
 				},
 				ForceNew: true,
 			},
-			"setting": {
+			"setting": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
-				Computed: true,
 				Elem:     resourceAwsElasticBeanstalkOptionSetting(),
 				Set:      optionSettingValueHash,
 			},
-			"all_settings": {
+			"all_settings": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
 				Elem:     resourceAwsElasticBeanstalkOptionSetting(),
 				Set:      optionSettingValueHash,
 			},
-			"solution_stack_name": {
+			"solution_stack_name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"template_name"},
 			},
-			"template_name": {
+			"template_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"wait_for_ready_timeout": {
+			"wait_for_ready_timeout": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "10m",
@@ -135,7 +134,7 @@ func resourceAwsElasticBeanstalkEnvironment() *schema.Resource {
 					return
 				},
 			},
-			"poll_interval": {
+			"poll_interval": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -152,32 +151,32 @@ func resourceAwsElasticBeanstalkEnvironment() *schema.Resource {
 					return
 				},
 			},
-			"autoscaling_groups": {
+			"autoscaling_groups": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"instances": {
+			"instances": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"launch_configurations": {
+			"launch_configurations": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"load_balancers": {
+			"load_balancers": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"queues": {
+			"queues": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"triggers": {
+			"triggers": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -329,7 +328,47 @@ func resourceAwsElasticBeanstalkEnvironmentUpdate(d *schema.ResourceData, meta i
 		os := o.(*schema.Set)
 		ns := n.(*schema.Set)
 
-		updateOpts.OptionSettings = extractOptionSettings(ns.Difference(os))
+		rm := extractOptionSettings(os.Difference(ns))
+		add := extractOptionSettings(ns.Difference(os))
+
+		// Additions and removals of options are done in a single API call, so we
+		// can't do our normal "remove these" and then later "add these", re-adding
+		// any updated settings.
+		// Because of this, we need to remove any settings in the "removable"
+		// settings that are also found in the "add" settings, otherwise they
+		// conflict. Here we loop through all the initial removables from the set
+		// difference, and delete from the slice any items found in both `add` and
+		// `rm` above
+		if len(add) > 0 {
+			for i, r := range rm {
+				for _, a := range add {
+					// ResourceNames are optional. Some defaults come with it, some do
+					// not. We need to guard against nil/empty in state as well as
+					// nil/empty from the API
+					if a.ResourceName != nil {
+						if r.ResourceName == nil {
+							continue
+						}
+						if *r.ResourceName != *a.ResourceName {
+							continue
+						}
+					}
+					if *r.Namespace == *a.Namespace && *r.OptionName == *a.OptionName {
+						log.Printf("[DEBUG] Removing Beanstalk setting: (%s::%s)", *a.Namespace, *a.OptionName)
+						rm = append(rm[:i], rm[i+1:]...)
+					}
+				}
+			}
+		}
+
+		for _, elem := range rm {
+			updateOpts.OptionsToRemove = append(updateOpts.OptionsToRemove, &elasticbeanstalk.OptionSpecification{
+				Namespace:  elem.Namespace,
+				OptionName: elem.OptionName,
+			})
+		}
+
+		updateOpts.OptionSettings = add
 	}
 
 	if d.HasChange("template_name") {

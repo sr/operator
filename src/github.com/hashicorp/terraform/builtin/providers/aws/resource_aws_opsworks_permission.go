@@ -20,26 +20,26 @@ func resourceAwsOpsworksPermission() *schema.Resource {
 		Read:   resourceAwsOpsworksPermissionRead,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"allow_ssh": {
+			"allow_ssh": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 				Optional: true,
 			},
-			"allow_sudo": {
+			"allow_sudo": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 				Optional: true,
 			},
-			"user_arn": {
+			"user_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			// one of deny, show, deploy, manage, iam_only
-			"level": {
+			"level": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
@@ -61,7 +61,7 @@ func resourceAwsOpsworksPermission() *schema.Resource {
 					return
 				},
 			},
-			"stack_id": {
+			"stack_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,

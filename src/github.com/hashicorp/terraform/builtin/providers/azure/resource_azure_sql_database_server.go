@@ -17,33 +17,33 @@ func resourceAzureSqlDatabaseServer() *schema.Resource {
 		Delete: resourceAzureSqlDatabaseServerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				ForceNew: true,
 			},
-			"location": {
+			"location": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"password": {
+			"password": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"version": {
+			"version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "12.0",
 				ForceNew: true,
 			},
-			"url": {
+			"url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

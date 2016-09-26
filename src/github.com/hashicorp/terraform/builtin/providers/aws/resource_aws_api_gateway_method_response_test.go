@@ -19,7 +19,7 @@ func TestAccAWSAPIGatewayMethodResponse_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSAPIGatewayMethodResponseDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSAPIGatewayMethodResponseConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAPIGatewayMethodResponseExists("aws_api_gateway_method_response.error", &conf),
@@ -31,7 +31,7 @@ func TestAccAWSAPIGatewayMethodResponse_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccAWSAPIGatewayMethodResponseConfigUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSAPIGatewayMethodResponseExists("aws_api_gateway_method_response.error", &conf),
@@ -184,11 +184,9 @@ resource "aws_api_gateway_method_response" "error" {
     "application/json" = "Error"
   }
 
-  response_parameters_in_json = <<PARAMS
-  {
-    "method.response.header.Content-Type": true
+  response_parameters = {
+    "method.response.header.Content-Type" = true
   }
-  PARAMS
 }
 `
 
@@ -224,11 +222,8 @@ resource "aws_api_gateway_method_response" "error" {
     "application/json" = "Empty"
   }
 
-  response_parameters_in_json = <<PARAMS
-  {
-    "method.response.header.Host": true
+  response_parameters = {
+    "method.response.header.Host" = true
   }
-  PARAMS
-
 }
 `

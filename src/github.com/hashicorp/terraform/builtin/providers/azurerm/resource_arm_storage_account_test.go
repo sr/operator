@@ -61,7 +61,7 @@ func TestAccAzureRMStorageAccount_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testCheckAzureRMStorageAccountDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: preConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMStorageAccountExists("azurerm_storage_account.testsa"),
@@ -71,7 +71,7 @@ func TestAccAzureRMStorageAccount_basic(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: postConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckAzureRMStorageAccountExists("azurerm_storage_account.testsa"),

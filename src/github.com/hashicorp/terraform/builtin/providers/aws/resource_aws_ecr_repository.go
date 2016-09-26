@@ -21,20 +21,20 @@ func resourceAwsEcrRepository() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"registry_id": {
+			"registry_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"repository_url": {
+			"repository_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -60,8 +60,8 @@ func resourceAwsEcrRepositoryCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] ECR repository created: %q", *repository.RepositoryArn)
 
 	d.SetId(*repository.RepositoryName)
-	d.Set("arn", *repository.RepositoryArn)
-	d.Set("registry_id", *repository.RegistryId)
+	d.Set("arn", repository.RepositoryArn)
+	d.Set("registry_id", repository.RegistryId)
 
 	return resourceAwsEcrRepositoryRead(d, meta)
 }
@@ -86,8 +86,8 @@ func resourceAwsEcrRepositoryRead(d *schema.ResourceData, meta interface{}) erro
 	log.Printf("[DEBUG] Received repository %s", out)
 
 	d.SetId(*repository.RepositoryName)
-	d.Set("arn", *repository.RepositoryArn)
-	d.Set("registry_id", *repository.RegistryId)
+	d.Set("arn", repository.RepositoryArn)
+	d.Set("registry_id", repository.RegistryId)
 	d.Set("name", repository.RepositoryName)
 
 	repositoryUrl := buildRepositoryUrl(repository, meta.(*AWSClient).region)

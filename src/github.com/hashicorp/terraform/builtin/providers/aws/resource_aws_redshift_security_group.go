@@ -27,37 +27,37 @@ func resourceAwsRedshiftSecurityGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateRedshiftSecurityGroupName,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "Managed by Terraform",
 			},
 
-			"ingress": {
+			"ingress": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"cidr": {
+						"cidr": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"security_group_name": {
+						"security_group_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"security_group_owner_id": {
+						"security_group_owner_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -347,7 +347,7 @@ func expandRedshiftSGAuthorizeIngress(configured []interface{}) ([]redshift.Auth
 	var ingress []redshift.AuthorizeClusterSecurityGroupIngressInput
 
 	// Loop over our configured parameters and create
-	// an array of aws-sdk-go compatabile objects
+	// an array of aws-sdk-go compatible objects
 	for _, pRaw := range configured {
 		data := pRaw.(map[string]interface{})
 
@@ -375,7 +375,7 @@ func expandRedshiftSGRevokeIngress(configured []interface{}) ([]redshift.RevokeC
 	var ingress []redshift.RevokeClusterSecurityGroupIngressInput
 
 	// Loop over our configured parameters and create
-	// an array of aws-sdk-go compatabile objects
+	// an array of aws-sdk-go compatible objects
 	for _, pRaw := range configured {
 		data := pRaw.(map[string]interface{})
 

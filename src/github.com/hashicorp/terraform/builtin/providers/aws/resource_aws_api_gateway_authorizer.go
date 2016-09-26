@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -18,39 +19,39 @@ func resourceAwsApiGatewayAuthorizer() *schema.Resource {
 		Delete: resourceAwsApiGatewayAuthorizerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"authorizer_uri": {
+			"authorizer_uri": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"identity_source": {
+			"identity_source": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "method.request.header.Authorization",
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"rest_api_id": {
+			"rest_api_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "TOKEN",
 			},
-			"authorizer_credentials": {
+			"authorizer_credentials": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"authorizer_result_ttl_in_seconds": {
+			"authorizer_result_ttl_in_seconds": &schema.Schema{
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validateIntegerInRange(0, 3600),
 			},
-			"identity_validation_expression": {
+			"identity_validation_expression": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -200,7 +201,11 @@ func resourceAwsApiGatewayAuthorizerDelete(d *schema.ResourceData, meta interfac
 	log.Printf("[INFO] Deleting API Gateway Authorizer: %s", input)
 	_, err := conn.DeleteAuthorizer(&input)
 	if err != nil {
-		return fmt.Errorf("Deleting API Gateway Authorizer failed: %s", err)
+		// XXX: Figure out a way to delete the method that depends on the authorizer first
+		// otherwise the authorizer will be dangling until the API is deleted
+		if !strings.Contains(err.Error(), "ConflictException") {
+			return fmt.Errorf("Deleting API Gateway Authorizer failed: %s", err)
+		}
 	}
 
 	return nil

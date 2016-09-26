@@ -45,7 +45,7 @@ func (c *Context) Import(opts *ImportOpts) (*State, error) {
 
 	// Get supported providers (for the graph builder)
 	providers := make([]string, 0, len(c.providers))
-	for k := range c.providers {
+	for k, _ := range c.providers {
 		providers = append(providers, k)
 	}
 

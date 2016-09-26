@@ -19,46 +19,46 @@ func resourceConsulKeys() *schema.Resource {
 		MigrateState:  resourceConsulKeysMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"key": {
+			"key": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:       schema.TypeString,
 							Optional:   true,
 							Deprecated: "Using consul_keys resource to *read* is deprecated; please use consul_keys data source instead",
 						},
 
-						"path": {
+						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"default": {
+						"default": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"delete": {
+						"delete": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
@@ -67,7 +67,7 @@ func resourceConsulKeys() *schema.Resource {
 				},
 			},
 
-			"var": {
+			"var": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},

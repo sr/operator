@@ -21,14 +21,14 @@ func resourceAwsCloudWatchEventTarget() *schema.Resource {
 		Delete: resourceAwsCloudWatchEventTargetDelete,
 
 		Schema: map[string]*schema.Schema{
-			"rule": {
+			"rule": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateCloudWatchEventRuleName,
 			},
 
-			"target_id": {
+			"target_id": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -36,12 +36,12 @@ func resourceAwsCloudWatchEventTarget() *schema.Resource {
 				ValidateFunc: validateCloudWatchEventTargetId,
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"input": {
+			"input": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"input_path"},
@@ -49,7 +49,7 @@ func resourceAwsCloudWatchEventTarget() *schema.Resource {
 				// but for built-in targets input may not be JSON
 			},
 
-			"input_path": {
+			"input_path": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"input"},
@@ -112,6 +112,13 @@ func resourceAwsCloudWatchEventTargetRead(d *schema.ResourceData, meta interface
 				d.SetId("")
 				return nil
 			}
+
+			if awsErr.Code() == "ResourceNotFoundException" {
+				log.Printf("[WARN] CloudWatch Event Target (%q) not found. Removing it from state.", d.Id())
+				d.SetId("")
+				return nil
+			}
+
 		}
 		return err
 	}

@@ -29,62 +29,62 @@ func resourceAwsRoute() *schema.Resource {
 		Exists: resourceAwsRouteExists,
 
 		Schema: map[string]*schema.Schema{
-			"destination_cidr_block": {
+			"destination_cidr_block": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"destination_prefix_list_id": {
+			"destination_prefix_list_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"gateway_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"nat_gateway_id": {
+			"gateway_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"instance_id": {
+			"nat_gateway_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"instance_owner_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-
-			"network_interface_id": {
+			"instance_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"origin": {
+			"instance_owner_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"state": {
+			"network_interface_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"origin": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"route_table_id": {
+			"state": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"route_table_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"vpc_peering_connection_id": {
+			"vpc_peering_connection_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -197,6 +197,11 @@ func resourceAwsRouteRead(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).ec2conn
 	route, err := findResourceRoute(conn, d.Get("route_table_id").(string), d.Get("destination_cidr_block").(string))
 	if err != nil {
+		if ec2err, ok := err.(awserr.Error); ok && ec2err.Code() == "InvalidRouteTableID.NotFound" {
+			log.Printf("[WARN] AWS RouteTable not found. Removing Route from state")
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	resourceAwsRouteSetResourceData(d, route)

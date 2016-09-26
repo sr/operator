@@ -15,19 +15,19 @@ func resourceHerokuDomain() *schema.Resource {
 		Delete: resourceHerokuDomainDelete,
 
 		Schema: map[string]*schema.Schema{
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"app": {
+			"app": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"cname": {
+			"cname": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

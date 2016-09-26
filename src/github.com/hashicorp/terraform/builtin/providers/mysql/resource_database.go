@@ -21,19 +21,19 @@ func resourceDatabase() *schema.Resource {
 		Delete: DeleteDatabase,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"default_character_set": {
+			"default_character_set": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "utf8",
 			},
 
-			"default_collation": {
+			"default_collation": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "utf8_general_ci",
@@ -43,7 +43,7 @@ func resourceDatabase() *schema.Resource {
 }
 
 func CreateDatabase(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	stmtSQL := databaseConfigSQL("CREATE", d)
 	log.Println("Executing statement:", stmtSQL)
@@ -59,7 +59,7 @@ func CreateDatabase(d *schema.ResourceData, meta interface{}) error {
 }
 
 func UpdateDatabase(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	stmtSQL := databaseConfigSQL("ALTER", d)
 	log.Println("Executing statement:", stmtSQL)
@@ -73,7 +73,7 @@ func UpdateDatabase(d *schema.ResourceData, meta interface{}) error {
 }
 
 func ReadDatabase(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	// This is kinda flimsy-feeling, since it depends on the formatting
 	// of the SHOW CREATE DATABASE output... but this data doesn't seem
@@ -124,7 +124,7 @@ func ReadDatabase(d *schema.ResourceData, meta interface{}) error {
 }
 
 func DeleteDatabase(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	name := d.Id()
 	stmtSQL := "DROP DATABASE " + quoteIdentifier(name)

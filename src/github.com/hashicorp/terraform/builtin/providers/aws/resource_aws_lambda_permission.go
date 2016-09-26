@@ -24,42 +24,42 @@ func resourceAwsLambdaPermission() *schema.Resource {
 		Delete: resourceAwsLambdaPermissionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"action": {
+			"action": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateLambdaPermissionAction,
 			},
-			"function_name": {
+			"function_name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateLambdaFunctionName,
 			},
-			"principal": {
+			"principal": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"qualifier": {
+			"qualifier": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateLambdaQualifier,
 			},
-			"source_account": {
+			"source_account": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateAwsAccountId,
 			},
-			"source_arn": {
+			"source_arn": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateArn,
 			},
-			"statement_id": {
+			"statement_id": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
@@ -144,7 +144,7 @@ func resourceAwsLambdaPermissionCreate(d *schema.ResourceData, meta interface{})
 						*input.FunctionName, err))
 			}
 
-			log.Printf("[ERROR] An actual error occured when expecting Lambda policy to be there: %s", err)
+			log.Printf("[ERROR] An actual error occurred when expecting Lambda policy to be there: %s", err)
 			return resource.NonRetryableError(err)
 		}
 		return nil

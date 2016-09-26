@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -69,24 +70,25 @@ func (p *Provider) InternalValidate() error {
 		return errors.New("provider is nil")
 	}
 
+	var validationErrors error
 	sm := schemaMap(p.Schema)
 	if err := sm.InternalValidate(sm); err != nil {
-		return err
+		validationErrors = multierror.Append(validationErrors, err)
 	}
 
 	for k, r := range p.ResourcesMap {
 		if err := r.InternalValidate(nil, true); err != nil {
-			return fmt.Errorf("resource %s: %s", k, err)
+			validationErrors = multierror.Append(validationErrors, fmt.Errorf("resource %s: %s", k, err))
 		}
 	}
 
 	for k, r := range p.DataSourcesMap {
 		if err := r.InternalValidate(nil, false); err != nil {
-			return fmt.Errorf("data source %s: %s", k, err)
+			validationErrors = multierror.Append(validationErrors, fmt.Errorf("data source %s: %s", k, err))
 		}
 	}
 
-	return nil
+	return validationErrors
 }
 
 // Meta returns the metadata associated with this provider that was
@@ -204,7 +206,7 @@ func (p *Provider) Refresh(
 // Resources implementation of terraform.ResourceProvider interface.
 func (p *Provider) Resources() []terraform.ResourceType {
 	keys := make([]string, 0, len(p.ResourcesMap))
-	for k := range p.ResourcesMap {
+	for k, _ := range p.ResourcesMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -318,7 +320,7 @@ func (p *Provider) ReadDataApply(
 // DataSources implementation of terraform.ResourceProvider interface.
 func (p *Provider) DataSources() []terraform.DataSource {
 	keys := make([]string, 0, len(p.DataSourcesMap))
-	for k := range p.DataSourcesMap {
+	for k, _ := range p.DataSourcesMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)

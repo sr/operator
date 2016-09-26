@@ -18,7 +18,7 @@ func resourceDockerContainer() *schema.Resource {
 		Delete: resourceDockerContainerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -39,7 +39,7 @@ func resourceDockerContainer() *schema.Resource {
 			// this will delete and re-create the container
 			// following the principle that the containers
 			// should be pristine when started.
-			"must_run": {
+			"must_run": &schema.Schema{
 				Type:     schema.TypeBool,
 				Default:  true,
 				Optional: true,
@@ -48,46 +48,46 @@ func resourceDockerContainer() *schema.Resource {
 			// ForceNew is not true for image because we need to
 			// sane this against Docker image IDs, as each image
 			// can have multiple names/tags attached do it.
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"domainname": {
+			"domainname": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"command": {
+			"command": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"entrypoint": {
+			"entrypoint": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"user": {
+			"user": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"dns": {
+			"dns": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -95,7 +95,7 @@ func resourceDockerContainer() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"dns_opts": {
+			"dns_opts": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -103,7 +103,7 @@ func resourceDockerContainer() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"dns_search": {
+			"dns_search": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -111,13 +111,13 @@ func resourceDockerContainer() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"publish_all_ports": {
+			"publish_all_ports": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"restart": {
+			"restart": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -132,31 +132,31 @@ func resourceDockerContainer() *schema.Resource {
 				},
 			},
 
-			"max_retry_count": {
+			"max_retry_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"volumes": {
+			"volumes": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"from_container": {
+						"from_container": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"container_path": {
+						"container_path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"host_path": {
+						"host_path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -170,13 +170,13 @@ func resourceDockerContainer() *schema.Resource {
 							},
 						},
 
-						"volume_name": {
+						"volume_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"read_only": {
+						"read_only": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							ForceNew: true,
@@ -186,31 +186,31 @@ func resourceDockerContainer() *schema.Resource {
 				Set: resourceDockerVolumesHash,
 			},
 
-			"ports": {
+			"ports": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"internal": {
+						"internal": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"external": {
+						"external": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"ip": {
+						"ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Default:  "tcp",
 							Optional: true,
@@ -221,19 +221,19 @@ func resourceDockerContainer() *schema.Resource {
 				Set: resourceDockerPortsHash,
 			},
 
-			"host": {
+			"host": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ip": {
+						"ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"host": {
+						"host": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -243,7 +243,7 @@ func resourceDockerContainer() *schema.Resource {
 				Set: resourceDockerHostsHash,
 			},
 
-			"env": {
+			"env": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -251,7 +251,7 @@ func resourceDockerContainer() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"links": {
+			"links": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -259,44 +259,44 @@ func resourceDockerContainer() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ip_prefix_length": {
+			"ip_prefix_length": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"gateway": {
+			"gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"bridge": {
+			"bridge": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"privileged": {
+			"privileged": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"destroy_grace_seconds": {
+			"destroy_grace_seconds": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"labels": {
+			"labels": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"memory": {
+			"memory": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -309,7 +309,7 @@ func resourceDockerContainer() *schema.Resource {
 				},
 			},
 
-			"memory_swap": {
+			"memory_swap": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -322,7 +322,7 @@ func resourceDockerContainer() *schema.Resource {
 				},
 			},
 
-			"cpu_shares": {
+			"cpu_shares": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
@@ -335,7 +335,7 @@ func resourceDockerContainer() *schema.Resource {
 				},
 			},
 
-			"log_driver": {
+			"log_driver": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -350,19 +350,19 @@ func resourceDockerContainer() *schema.Resource {
 				},
 			},
 
-			"log_opts": {
+			"log_opts": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"network_mode": {
+			"network_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"networks": {
+			"networks": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,

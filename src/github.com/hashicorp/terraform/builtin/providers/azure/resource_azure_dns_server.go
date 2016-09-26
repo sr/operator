@@ -20,13 +20,13 @@ func resourceAzureDnsServer() *schema.Resource {
 		Delete: resourceAzureDnsServerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 				Description: parameterDescriptions["name"],
 			},
-			"dns_address": {
+			"dns_address": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: parameterDescriptions["dns_address"],

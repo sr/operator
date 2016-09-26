@@ -17,105 +17,105 @@ func resourceRundeckJob() *schema.Resource {
 		Read:   ReadJob,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"group_name": {
+			"group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project_name": {
+			"project_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"log_level": {
+			"log_level": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "INFO",
 			},
 
-			"allow_concurrent_executions": {
+			"allow_concurrent_executions": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"max_thread_count": {
+			"max_thread_count": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
 			},
 
-			"continue_on_error": {
+			"continue_on_error": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"rank_order": {
+			"rank_order": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "ascending",
 			},
 
-			"rank_attribute": {
+			"rank_attribute": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"preserve_options_order": {
+			"preserve_options_order": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"command_ordering_strategy": {
+			"command_ordering_strategy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "node-first",
 			},
 
-			"node_filter_query": {
+			"node_filter_query": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"node_filter_exclude_precedence": {
+			"node_filter_exclude_precedence": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"option": {
+			"option": &schema.Schema{
 				// This is a list because order is important when preserve_options_order is
 				// set. When it's not set the order is unimportant but preserved by Rundeck/
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"default_value": {
+						"default_value": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"value_choices": {
+						"value_choices": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Schema{
@@ -123,47 +123,47 @@ func resourceRundeckJob() *schema.Resource {
 							},
 						},
 
-						"value_choices_url": {
+						"value_choices_url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"require_predefined_choice": {
+						"require_predefined_choice": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"validation_regex": {
+						"validation_regex": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"required": {
+						"required": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"allow_multiple_values": {
+						"allow_multiple_values": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"multi_value_delimiter": {
+						"multi_value_delimiter": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"obscure_input": {
+						"obscure_input": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"exposed_to_scripts": {
+						"exposed_to_scripts": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
@@ -171,49 +171,49 @@ func resourceRundeckJob() *schema.Resource {
 				},
 			},
 
-			"command": {
+			"command": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"shell_command": {
+						"shell_command": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"inline_script": {
+						"inline_script": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"script_file": {
+						"script_file": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"script_file_args": {
+						"script_file_args": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"job": {
+						"job": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"name": {
+									"name": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"group_name": {
+									"group_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
-									"run_for_each_node": {
+									"run_for_each_node": &schema.Schema{
 										Type:     schema.TypeBool,
 										Optional: true,
 									},
-									"args": {
+									"args": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
@@ -221,13 +221,13 @@ func resourceRundeckJob() *schema.Resource {
 							},
 						},
 
-						"step_plugin": {
+						"step_plugin": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     resourceRundeckJobPluginResource(),
 						},
 
-						"node_step_plugin": {
+						"node_step_plugin": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     resourceRundeckJobPluginResource(),
@@ -242,11 +242,11 @@ func resourceRundeckJob() *schema.Resource {
 func resourceRundeckJobPluginResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"config": {
+			"config": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 			},

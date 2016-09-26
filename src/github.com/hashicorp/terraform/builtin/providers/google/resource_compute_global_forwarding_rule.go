@@ -17,57 +17,57 @@ func resourceComputeGlobalForwardingRule() *schema.Resource {
 		Delete: resourceComputeGlobalForwardingRuleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"target": {
+			"target": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"ip_protocol": {
+			"ip_protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"port_range": {
+			"port_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please remove this attribute (it was never used)",
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -101,7 +101,7 @@ func resourceComputeGlobalForwardingRuleCreate(d *schema.ResourceData, meta inte
 	// It probably maybe worked, so store the ID now
 	d.SetId(frule.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Creating Global Fowarding Rule")
+	err = computeOperationWaitGlobal(config, op, project, "Creating Global Fowarding Rule")
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func resourceComputeGlobalForwardingRuleUpdate(d *schema.ResourceData, meta inte
 			return fmt.Errorf("Error updating target: %s", err)
 		}
 
-		err = computeOperationWaitGlobal(config, op, "Updating Global Forwarding Rule")
+		err = computeOperationWaitGlobal(config, op, project, "Updating Global Forwarding Rule")
 		if err != nil {
 			return err
 		}
@@ -186,7 +186,7 @@ func resourceComputeGlobalForwardingRuleDelete(d *schema.ResourceData, meta inte
 		return fmt.Errorf("Error deleting GlobalForwardingRule: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting GlobalForwarding Rule")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting GlobalForwarding Rule")
 	if err != nil {
 		return err
 	}

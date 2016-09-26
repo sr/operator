@@ -8,13 +8,13 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SOFTLAYER_USERNAME", nil),
 				Description: "The user name for SoftLayer API operations.",
 			},
-			"api_key": {
+			"api_key": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SOFTLAYER_API_KEY", nil),

@@ -5,8 +5,6 @@ import (
 	"log"
 	"strings"
 
-	mysqlc "github.com/ziutek/mymysql/mysql"
-
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -18,26 +16,26 @@ func resourceGrant() *schema.Resource {
 		Delete: DeleteGrant,
 
 		Schema: map[string]*schema.Schema{
-			"user": {
+			"user": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"host": {
+			"host": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "localhost",
 			},
 
-			"database": {
+			"database": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"privileges": {
+			"privileges": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				ForceNew: true,
@@ -45,7 +43,7 @@ func resourceGrant() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"grant": {
+			"grant": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
@@ -56,7 +54,7 @@ func resourceGrant() *schema.Resource {
 }
 
 func CreateGrant(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	// create a comma-delimited string of privileges
 	var privileges string
@@ -95,7 +93,7 @@ func ReadGrant(d *schema.ResourceData, meta interface{}) error {
 }
 
 func DeleteGrant(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(mysqlc.Conn)
+	conn := meta.(*providerConfiguration).Conn
 
 	stmtSQL := fmt.Sprintf("REVOKE GRANT OPTION ON %s.* FROM '%s'@'%s'",
 		d.Get("database").(string),

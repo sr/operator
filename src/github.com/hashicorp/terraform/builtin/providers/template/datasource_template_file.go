@@ -20,14 +20,14 @@ func dataSourceFile() *schema.Resource {
 		Read: dataSourceFileRead,
 
 		Schema: map[string]*schema.Schema{
-			"template": {
+			"template": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Description:   "Contents of the template",
 				ConflictsWith: []string{"filename"},
 				ValidateFunc:  validateTemplateAttribute,
 			},
-			"filename": {
+			"filename": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "file to read template from",
@@ -49,14 +49,14 @@ func dataSourceFile() *schema.Resource {
 				Deprecated:    "Use the 'template' attribute instead.",
 				ConflictsWith: []string{"template"},
 			},
-			"vars": {
+			"vars": &schema.Schema{
 				Type:         schema.TypeMap,
 				Optional:     true,
 				Default:      make(map[string]interface{}),
 				Description:  "variables to substitute",
 				ValidateFunc: validateVarsAttribute,
 			},
-			"rendered": {
+			"rendered": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "rendered template",

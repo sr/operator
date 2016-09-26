@@ -22,35 +22,35 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 		Delete: resourceAwsIAMServerCertificateDelete,
 
 		Schema: map[string]*schema.Schema{
-			"certificate_body": {
+			"certificate_body": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"certificate_chain": {
+			"certificate_chain": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
 
-			"private_key": {
+			"private_key": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: normalizeCert,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -66,7 +66,7 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -80,7 +80,7 @@ func resourceAwsIAMServerCertificate() *schema.Resource {
 				},
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -201,14 +201,30 @@ func normalizeCert(cert interface{}) string {
 		return ""
 	}
 
+	var rawCert string
 	switch cert.(type) {
 	case string:
-		hash := sha1.Sum([]byte(strings.TrimSpace(cert.(string))))
-		return hex.EncodeToString(hash[:])
+		rawCert = cert.(string)
 	case *string:
-		hash := sha1.Sum([]byte(strings.TrimSpace(*cert.(*string))))
-		return hex.EncodeToString(hash[:])
+		rawCert = *cert.(*string)
 	default:
 		return ""
 	}
+
+	cleanVal := sha1.Sum(stripCR([]byte(strings.TrimSpace(rawCert))))
+	return hex.EncodeToString(cleanVal[:])
+}
+
+// strip CRs from raw literals. Lifted from go/scanner/scanner.go
+// See https://github.com/golang/go/blob/release-branch.go1.6/src/go/scanner/scanner.go#L479
+func stripCR(b []byte) []byte {
+	c := make([]byte, len(b))
+	i := 0
+	for _, ch := range b {
+		if ch != '\r' {
+			c[i] = ch
+			i++
+		}
+	}
+	return c[:i]
 }

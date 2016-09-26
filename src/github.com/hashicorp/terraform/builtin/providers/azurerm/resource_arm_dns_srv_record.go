@@ -18,44 +18,44 @@ func resourceArmDnsSrvRecord() *schema.Resource {
 		Delete: resourceArmDnsSrvRecordDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone_name": {
+			"zone_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"record": {
+			"record": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"priority": {
+						"priority": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"weight": {
+						"weight": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"target": {
+						"target": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -64,7 +64,7 @@ func resourceArmDnsSrvRecord() *schema.Resource {
 				Set: resourceArmDnsSrvRecordHash,
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},

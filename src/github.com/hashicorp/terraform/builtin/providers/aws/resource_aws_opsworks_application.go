@@ -21,80 +21,80 @@ func resourceAwsOpsworksApplication() *schema.Resource {
 		Update: resourceAwsOpsworksApplicationUpdate,
 		Delete: resourceAwsOpsworksApplicationDelete,
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"short_name": {
+			"short_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 			},
 			// aws-flow-ruby | java | rails | php | nodejs | static | other
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stack_id": {
+			"stack_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			// TODO: the following 4 vals are really part of the Attributes array. We should validate that only ones relevant to the chosen type are set, perhaps. (what is the default type? how do they map?)
-			"document_root": {
+			"document_root": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				//Default:  "public",
 			},
-			"rails_env": {
+			"rails_env": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				//Default:  "production",
 			},
-			"auto_bundle_on_deploy": {
+			"auto_bundle_on_deploy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				//Default:  true,
 			},
-			"aws_flow_ruby_settings": {
+			"aws_flow_ruby_settings": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"app_source": {
+			"app_source": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"url": {
+						"url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"username": {
+						"username": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"password": {
+						"password": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"revision": {
+						"revision": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"ssh_key": {
+						"ssh_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -104,41 +104,41 @@ func resourceAwsOpsworksApplication() *schema.Resource {
 			// AutoSelectOpsworksMysqlInstance, OpsworksMysqlInstance, or RdsDbInstance.
 			// anything beside auto select will lead into failure in case the instance doesn't exist
 			// XXX: validation?
-			"data_source_type": {
+			"data_source_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"data_source_database_name": {
+			"data_source_database_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"data_source_arn": {
+			"data_source_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"domains": {
+			"domains": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"environment": {
+			"environment": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"value": {
+						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"secure": {
+						"secure": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
@@ -146,18 +146,18 @@ func resourceAwsOpsworksApplication() *schema.Resource {
 					},
 				},
 			},
-			"enable_ssl": {
+			"enable_ssl": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"ssl_configuration": {
+			"ssl_configuration": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				//Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"certificate": {
+						"certificate": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							StateFunc: func(v interface{}) string {
@@ -169,7 +169,7 @@ func resourceAwsOpsworksApplication() *schema.Resource {
 								}
 							},
 						},
-						"private_key": {
+						"private_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							StateFunc: func(v interface{}) string {
@@ -181,7 +181,7 @@ func resourceAwsOpsworksApplication() *schema.Resource {
 								}
 							},
 						},
-						"chain": {
+						"chain": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							StateFunc: func(v interface{}) string {

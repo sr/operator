@@ -21,61 +21,61 @@ func resourceAzureStorageService() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			// General attributes:
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 				// TODO(aznashwan): constrain name in description
 				Description: parameterDescriptions["name"],
 			},
-			"location": {
+			"location": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["location"],
 			},
-			"label": {
+			"label": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    true,
 				Default:     "Made by Terraform.",
 				Description: parameterDescriptions["label"],
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["description"],
 			},
 			// Functional attributes:
-			"account_type": {
+			"account_type": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["account_type"],
 			},
-			"affinity_group": {
+			"affinity_group": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["affinity_group"],
 			},
-			"properties": {
+			"properties": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 				Elem:     schema.TypeString,
 			},
 			// Computed attributes:
-			"url": {
+			"url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"primary_key": {
+			"primary_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"secondary_key": {
+			"secondary_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

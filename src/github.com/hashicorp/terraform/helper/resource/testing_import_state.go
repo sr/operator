@@ -46,7 +46,7 @@ func testStepImportState(
 		Module: mod,
 
 		Targets: []*terraform.ImportTarget{
-			{
+			&terraform.ImportTarget{
 				Addr: step.ResourceName,
 				ID:   importId,
 			},
@@ -78,7 +78,7 @@ func testStepImportState(
 			// Find the existing resource
 			var oldR *terraform.ResourceState
 			for _, r2 := range old {
-				if r2.Primary != nil && r2.Primary.ID == r.Primary.ID {
+				if r2.Primary != nil && r2.Primary.ID == r.Primary.ID && r2.Type == r.Type {
 					oldR = r2
 					break
 				}
@@ -101,12 +101,12 @@ func testStepImportState(
 
 			// Remove fields we're ignoring
 			for _, v := range step.ImportStateVerifyIgnore {
-				for k := range actual {
+				for k, _ := range actual {
 					if strings.HasPrefix(k, v) {
 						delete(actual, k)
 					}
 				}
-				for k := range expected {
+				for k, _ := range expected {
 					if strings.HasPrefix(k, v) {
 						delete(expected, k)
 					}

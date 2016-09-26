@@ -73,27 +73,27 @@ func TestExpandIPPerms(t *testing.T) {
 	}
 
 	expected := []ec2.IpPermission{
-		{
+		ec2.IpPermission{
 			IpProtocol: aws.String("icmp"),
 			FromPort:   aws.Int64(int64(1)),
 			ToPort:     aws.Int64(int64(-1)),
-			IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("0.0.0.0/0")}},
+			IpRanges:   []*ec2.IpRange{&ec2.IpRange{CidrIp: aws.String("0.0.0.0/0")}},
 			UserIdGroupPairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					UserId:  aws.String("foo"),
 					GroupId: aws.String("sg-22222"),
 				},
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("sg-11111"),
 				},
 			},
 		},
-		{
+		ec2.IpPermission{
 			IpProtocol: aws.String("icmp"),
 			FromPort:   aws.Int64(int64(1)),
 			ToPort:     aws.Int64(int64(-1)),
 			UserIdGroupPairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("foo"),
 				},
 			},
@@ -175,17 +175,17 @@ func TestExpandIPPerms_NegOneProtocol(t *testing.T) {
 	}
 
 	expected := []ec2.IpPermission{
-		{
+		ec2.IpPermission{
 			IpProtocol: aws.String("-1"),
 			FromPort:   aws.Int64(int64(0)),
 			ToPort:     aws.Int64(int64(0)),
-			IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("0.0.0.0/0")}},
+			IpRanges:   []*ec2.IpRange{&ec2.IpRange{CidrIp: aws.String("0.0.0.0/0")}},
 			UserIdGroupPairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					UserId:  aws.String("foo"),
 					GroupId: aws.String("sg-22222"),
 				},
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("sg-11111"),
 				},
 			},
@@ -271,26 +271,26 @@ func TestExpandIPPerms_nonVPC(t *testing.T) {
 	}
 
 	expected := []ec2.IpPermission{
-		{
+		ec2.IpPermission{
 			IpProtocol: aws.String("icmp"),
 			FromPort:   aws.Int64(int64(1)),
 			ToPort:     aws.Int64(int64(-1)),
-			IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("0.0.0.0/0")}},
+			IpRanges:   []*ec2.IpRange{&ec2.IpRange{CidrIp: aws.String("0.0.0.0/0")}},
 			UserIdGroupPairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupName: aws.String("sg-22222"),
 				},
-				{
+				&ec2.UserIdGroupPair{
 					GroupName: aws.String("sg-11111"),
 				},
 			},
 		},
-		{
+		ec2.IpPermission{
 			IpProtocol: aws.String("icmp"),
 			FromPort:   aws.Int64(int64(1)),
 			ToPort:     aws.Int64(int64(-1)),
 			UserIdGroupPairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupName: aws.String("foo"),
 				},
 			},
@@ -414,7 +414,7 @@ func TestFlattenHealthCheck(t *testing.T) {
 				Interval:           aws.Int64(int64(30)),
 			},
 			Output: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"unhealthy_threshold": int64(10),
 					"healthy_threshold":   int64(10),
 					"target":              "HTTP:80/",
@@ -562,13 +562,13 @@ func TestFlattenParameters(t *testing.T) {
 	}{
 		{
 			Input: []*rds.Parameter{
-				{
+				&rds.Parameter{
 					ParameterName:  aws.String("character_set_client"),
 					ParameterValue: aws.String("utf8"),
 				},
 			},
 			Output: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"name":  "character_set_client",
 					"value": "utf8",
 				},
@@ -591,13 +591,13 @@ func TestFlattenRedshiftParameters(t *testing.T) {
 	}{
 		{
 			Input: []*redshift.Parameter{
-				{
+				&redshift.Parameter{
 					ParameterName:  aws.String("character_set_client"),
 					ParameterValue: aws.String("utf8"),
 				},
 			},
 			Output: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"name":  "character_set_client",
 					"value": "utf8",
 				},
@@ -620,13 +620,13 @@ func TestFlattenElasticacheParameters(t *testing.T) {
 	}{
 		{
 			Input: []*elasticache.Parameter{
-				{
+				&elasticache.Parameter{
 					ParameterName:  aws.String("activerehashing"),
 					ParameterValue: aws.String("yes"),
 				},
 			},
 			Output: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"name":  "activerehashing",
 					"value": "yes",
 				},
@@ -645,8 +645,8 @@ func TestFlattenElasticacheParameters(t *testing.T) {
 func TestExpandInstanceString(t *testing.T) {
 
 	expected := []*elb.Instance{
-		{InstanceId: aws.String("test-one")},
-		{InstanceId: aws.String("test-two")},
+		&elb.Instance{InstanceId: aws.String("test-one")},
+		&elb.Instance{InstanceId: aws.String("test-two")},
 	}
 
 	ids := []interface{}{
@@ -663,8 +663,8 @@ func TestExpandInstanceString(t *testing.T) {
 
 func TestFlattenNetworkInterfacesPrivateIPAddresses(t *testing.T) {
 	expanded := []*ec2.NetworkInterfacePrivateIpAddress{
-		{PrivateIpAddress: aws.String("192.168.0.1")},
-		{PrivateIpAddress: aws.String("192.168.0.2")},
+		&ec2.NetworkInterfacePrivateIpAddress{PrivateIpAddress: aws.String("192.168.0.1")},
+		&ec2.NetworkInterfacePrivateIpAddress{PrivateIpAddress: aws.String("192.168.0.2")},
 	}
 
 	result := flattenNetworkInterfacesPrivateIPAddresses(expanded)
@@ -688,8 +688,8 @@ func TestFlattenNetworkInterfacesPrivateIPAddresses(t *testing.T) {
 
 func TestFlattenGroupIdentifiers(t *testing.T) {
 	expanded := []*ec2.GroupIdentifier{
-		{GroupId: aws.String("sg-001")},
-		{GroupId: aws.String("sg-002")},
+		&ec2.GroupIdentifier{GroupId: aws.String("sg-001")},
+		&ec2.GroupIdentifier{GroupId: aws.String("sg-002")},
 	}
 
 	result := flattenGroupIdentifiers(expanded)
@@ -776,7 +776,7 @@ func TestFlattenAttachmentWhenNoInstanceId(t *testing.T) {
 
 func TestFlattenStepAdjustments(t *testing.T) {
 	expanded := []*autoscaling.StepAdjustment{
-		{
+		&autoscaling.StepAdjustment{
 			MetricIntervalLowerBound: aws.Float64(1.0),
 			MetricIntervalUpperBound: aws.Float64(2.0),
 			ScalingAdjustment:        aws.Int64(int64(1)),
@@ -800,10 +800,10 @@ func TestFlattenStepAdjustments(t *testing.T) {
 
 func TestFlattenResourceRecords(t *testing.T) {
 	expanded := []*route53.ResourceRecord{
-		{
+		&route53.ResourceRecord{
 			Value: aws.String("127.0.0.1"),
 		},
-		{
+		&route53.ResourceRecord{
 			Value: aws.String("127.0.0.3"),
 		},
 	}
@@ -821,8 +821,8 @@ func TestFlattenResourceRecords(t *testing.T) {
 
 func TestFlattenAsgEnabledMetrics(t *testing.T) {
 	expanded := []*autoscaling.EnabledMetric{
-		{Granularity: aws.String("1Minute"), Metric: aws.String("GroupTotalInstances")},
-		{Granularity: aws.String("1Minute"), Metric: aws.String("GroupMaxSize")},
+		&autoscaling.EnabledMetric{Granularity: aws.String("1Minute"), Metric: aws.String("GroupTotalInstances")},
+		&autoscaling.EnabledMetric{Granularity: aws.String("1Minute"), Metric: aws.String("GroupMaxSize")},
 	}
 
 	result := flattenAsgEnabledMetrics(expanded)
@@ -842,7 +842,7 @@ func TestFlattenAsgEnabledMetrics(t *testing.T) {
 
 func TestFlattenKinesisShardLevelMetrics(t *testing.T) {
 	expanded := []*kinesis.EnhancedMetrics{
-		{
+		&kinesis.EnhancedMetrics{
 			ShardLevelMetrics: []*string{
 				aws.String("IncomingBytes"),
 				aws.String("IncomingRecords"),
@@ -871,12 +871,12 @@ func TestFlattenSecurityGroups(t *testing.T) {
 		{
 			ownerId: aws.String("user1234"),
 			pairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("sg-12345"),
 				},
 			},
 			expected: []*ec2.GroupIdentifier{
-				{
+				&ec2.GroupIdentifier{
 					GroupId: aws.String("sg-12345"),
 				},
 			},
@@ -886,31 +886,31 @@ func TestFlattenSecurityGroups(t *testing.T) {
 		{
 			ownerId: aws.String("user1234"),
 			pairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("sg-12345"),
 					UserId:  aws.String("user1234"),
 				},
 			},
 			expected: []*ec2.GroupIdentifier{
-				{
+				&ec2.GroupIdentifier{
 					GroupId: aws.String("sg-12345"),
 				},
 			},
 		},
 
 		// include the owner id, but from a different account. This is reflects
-		// EC2 Classic when refering to groups by name
+		// EC2 Classic when referring to groups by name
 		{
 			ownerId: aws.String("user1234"),
 			pairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupId:   aws.String("sg-12345"),
 					GroupName: aws.String("somegroup"), // GroupName is only included in Classic
 					UserId:    aws.String("user4321"),
 				},
 			},
 			expected: []*ec2.GroupIdentifier{
-				{
+				&ec2.GroupIdentifier{
 					GroupId:   aws.String("sg-12345"),
 					GroupName: aws.String("user4321/somegroup"),
 				},
@@ -918,17 +918,17 @@ func TestFlattenSecurityGroups(t *testing.T) {
 		},
 
 		// include the owner id, but from a different account. This reflects in
-		// EC2 VPC when refering to groups by id
+		// EC2 VPC when referring to groups by id
 		{
 			ownerId: aws.String("user1234"),
 			pairs: []*ec2.UserIdGroupPair{
-				{
+				&ec2.UserIdGroupPair{
 					GroupId: aws.String("sg-12345"),
 					UserId:  aws.String("user4321"),
 				},
 			},
 			expected: []*ec2.GroupIdentifier{
-				{
+				&ec2.GroupIdentifier{
 					GroupId: aws.String("user4321/sg-12345"),
 				},
 			},
@@ -993,11 +993,11 @@ func TestFlattenApiGatewayStageKeys(t *testing.T) {
 				aws.String("e5d4c3b2a1/test"),
 			},
 			Output: []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"stage_name":  "dev",
 					"rest_api_id": "a1b2c3d4e5",
 				},
-				{
+				map[string]interface{}{
 					"stage_name":  "test",
 					"rest_api_id": "e5d4c3b2a1",
 				},
@@ -1010,5 +1010,161 @@ func TestFlattenApiGatewayStageKeys(t *testing.T) {
 		if !reflect.DeepEqual(output, tc.Output) {
 			t.Fatalf("Got:\n\n%#v\n\nExpected:\n\n%#v", output, tc.Output)
 		}
+	}
+}
+
+func TestExpandPolicyAttributes(t *testing.T) {
+	expanded := []interface{}{
+		map[string]interface{}{
+			"name":  "Protocol-TLSv1",
+			"value": "false",
+		},
+		map[string]interface{}{
+			"name":  "Protocol-TLSv1.1",
+			"value": "false",
+		},
+		map[string]interface{}{
+			"name":  "Protocol-TLSv1.2",
+			"value": "true",
+		},
+	}
+	attributes, err := expandPolicyAttributes(expanded)
+	if err != nil {
+		t.Fatalf("bad: %#v", err)
+	}
+
+	if len(attributes) != 3 {
+		t.Fatalf("expected number of attributes to be 3, but got %d", len(attributes))
+	}
+
+	expected := &elb.PolicyAttribute{
+		AttributeName:  aws.String("Protocol-TLSv1.2"),
+		AttributeValue: aws.String("true"),
+	}
+
+	if !reflect.DeepEqual(attributes[2], expected) {
+		t.Fatalf(
+			"Got:\n\n%#v\n\nExpected:\n\n%#v\n",
+			attributes[2],
+			expected)
+	}
+}
+
+func TestExpandPolicyAttributes_invalid(t *testing.T) {
+	expanded := []interface{}{
+		map[string]interface{}{
+			"name":  "Protocol-TLSv1.2",
+			"value": "true",
+		},
+	}
+	attributes, err := expandPolicyAttributes(expanded)
+	if err != nil {
+		t.Fatalf("bad: %#v", err)
+	}
+
+	expected := &elb.PolicyAttribute{
+		AttributeName:  aws.String("Protocol-TLSv1.2"),
+		AttributeValue: aws.String("false"),
+	}
+
+	if reflect.DeepEqual(attributes[0], expected) {
+		t.Fatalf(
+			"Got:\n\n%#v\n\nExpected:\n\n%#v\n",
+			attributes[0],
+			expected)
+	}
+}
+
+func TestExpandPolicyAttributes_empty(t *testing.T) {
+	var expanded []interface{}
+
+	attributes, err := expandPolicyAttributes(expanded)
+	if err != nil {
+		t.Fatalf("bad: %#v", err)
+	}
+
+	if len(attributes) != 0 {
+		t.Fatalf("expected number of attributes to be 0, but got %d", len(attributes))
+	}
+}
+
+func TestFlattenPolicyAttributes(t *testing.T) {
+	cases := []struct {
+		Input  []*elb.PolicyAttributeDescription
+		Output []interface{}
+	}{
+		{
+			Input: []*elb.PolicyAttributeDescription{
+				&elb.PolicyAttributeDescription{
+					AttributeName:  aws.String("Protocol-TLSv1.2"),
+					AttributeValue: aws.String("true"),
+				},
+			},
+			Output: []interface{}{
+				map[string]string{
+					"name":  "Protocol-TLSv1.2",
+					"value": "true",
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		output := flattenPolicyAttributes(tc.Input)
+		if !reflect.DeepEqual(output, tc.Output) {
+			t.Fatalf("Got:\n\n%#v\n\nExpected:\n\n%#v", output, tc.Output)
+		}
+	}
+}
+
+func TestNormalizeJsonString(t *testing.T) {
+	var err error
+	var actual string
+
+	// Well formatted and valid.
+	validJson := `{
+   "abc": {
+      "def": 123,
+      "xyz": [
+         {
+            "a": "ホリネズミ"
+         },
+         {
+            "b": "1\\n2"
+         }
+      ]
+   }
+}`
+	expected := `{"abc":{"def":123,"xyz":[{"a":"ホリネズミ"},{"b":"1\\n2"}]}}`
+
+	actual, err = normalizeJsonString(validJson)
+	if err != nil {
+		t.Fatalf("Expected not to throw an error while parsing JSON, but got: %s", err)
+	}
+
+	if actual != expected {
+		t.Fatalf("Got:\n\n%s\n\nExpected:\n\n%s\n", actual, expected)
+	}
+
+	// Well formatted but not valid,
+	// missing closing squre bracket.
+	invalidJson := `{
+   "abc": {
+      "def": 123,
+      "xyz": [
+         {
+            "a": "1"
+         }
+      }
+   }
+}`
+	actual, err = normalizeJsonString(invalidJson)
+	if err == nil {
+		t.Fatalf("Expected to throw an error while parsing JSON, but got: %s", err)
+	}
+
+	// We expect the invalid JSON to be shown back to us again.
+	if actual != invalidJson {
+		t.Fatalf("Got:\n\n%s\n\nExpected:\n\n%s\n", expected, invalidJson)
 	}
 }

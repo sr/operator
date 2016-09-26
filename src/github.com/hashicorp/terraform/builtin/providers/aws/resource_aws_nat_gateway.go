@@ -23,31 +23,31 @@ func resourceAwsNatGateway() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"allocation_id": {
+			"allocation_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network_interface_id": {
+			"network_interface_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"private_ip": {
+			"private_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"public_ip": {
+			"public_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -101,7 +101,14 @@ func resourceAwsNatGatewayRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	if ngRaw == nil || strings.ToLower(state) == "deleted" {
+
+	status := map[string]bool{
+		"deleted":  true,
+		"deleting": true,
+		"failed":   true,
+	}
+
+	if _, ok := status[strings.ToLower(state)]; ngRaw == nil || ok {
 		log.Printf("[INFO] Removing %s from Terraform state as it is not found or in the deleted state.", d.Id())
 		d.SetId("")
 		return nil

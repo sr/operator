@@ -20,7 +20,7 @@ func TestAccComputeInstance_basic_deprecated_network(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic_deprecated_network(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -43,7 +43,7 @@ func TestAccComputeInstance_basic1(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -67,7 +67,7 @@ func TestAccComputeInstance_basic2(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic2(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -90,8 +90,54 @@ func TestAccComputeInstance_basic3(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic3(instanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(
+						"google_compute_instance.foobar", &instance),
+					testAccCheckComputeInstanceTag(&instance, "foo"),
+					testAccCheckComputeInstanceMetadata(&instance, "foo", "bar"),
+					testAccCheckComputeInstanceDisk(&instance, instanceName, true, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstance_basic4(t *testing.T) {
+	var instance compute.Instance
+	var instanceName = fmt.Sprintf("instance-test-%s", acctest.RandString(10))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckComputeInstanceDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccComputeInstance_basic4(instanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(
+						"google_compute_instance.foobar", &instance),
+					testAccCheckComputeInstanceTag(&instance, "foo"),
+					testAccCheckComputeInstanceMetadata(&instance, "foo", "bar"),
+					testAccCheckComputeInstanceDisk(&instance, instanceName, true, true),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstance_basic5(t *testing.T) {
+	var instance compute.Instance
+	var instanceName = fmt.Sprintf("instance-test-%s", acctest.RandString(10))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckComputeInstanceDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccComputeInstance_basic5(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
 						"google_compute_instance.foobar", &instance),
@@ -114,7 +160,7 @@ func TestAccComputeInstance_IP(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_ip(ipName, instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -136,7 +182,7 @@ func TestAccComputeInstance_disksWithoutAutodelete(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_disks(diskName, instanceName, false),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -159,7 +205,7 @@ func TestAccComputeInstance_disksWithAutodelete(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_disks(diskName, instanceName, true),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -181,7 +227,7 @@ func TestAccComputeInstance_local_ssd(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_local_ssd(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -202,14 +248,14 @@ func TestAccComputeInstance_update_deprecated_network(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic_deprecated_network(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
 						"google_compute_instance.foobar", &instance),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_update_deprecated_network(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -232,14 +278,14 @@ func TestAccComputeInstance_forceNewAndChangeMetadata(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
 						"google_compute_instance.foobar", &instance),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_forceNewAndChangeMetadata(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -261,14 +307,14 @@ func TestAccComputeInstance_update(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_basic(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
 						"google_compute_instance.foobar", &instance),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_update(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -292,7 +338,7 @@ func TestAccComputeInstance_service_account(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_service_account(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -318,7 +364,7 @@ func TestAccComputeInstance_scheduling(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_scheduling(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -338,7 +384,7 @@ func TestAccComputeInstance_subnet_auto(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_subnet_auto(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -359,7 +405,7 @@ func TestAccComputeInstance_subnet_custom(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckComputeInstanceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstance_subnet_custom(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckComputeInstanceExists(
@@ -371,6 +417,47 @@ func TestAccComputeInstance_subnet_custom(t *testing.T) {
 	})
 }
 
+func TestAccComputeInstance_address_auto(t *testing.T) {
+	var instance compute.Instance
+	var instanceName = fmt.Sprintf("instance-test-%s", acctest.RandString(10))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckComputeInstanceDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccComputeInstance_address_auto(instanceName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(
+						"google_compute_instance.foobar", &instance),
+					testAccCheckComputeInstanceHasAnyAddress(&instance),
+				),
+			},
+		},
+	})
+}
+
+func TestAccComputeInstance_address_custom(t *testing.T) {
+	var instance compute.Instance
+	var instanceName = fmt.Sprintf("instance-test-%s", acctest.RandString(10))
+	var address = "10.0.200.200"
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckComputeInstanceDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccComputeInstance_address_custom(instanceName, address),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckComputeInstanceExists(
+						"google_compute_instance.foobar", &instance),
+					testAccCheckComputeInstanceHasAddress(&instance, address),
+				),
+			},
+		},
+	})
+}
 func testAccCheckComputeInstanceDestroy(s *terraform.State) error {
 	config := testAccProvider.Meta().(*Config)
 
@@ -528,6 +615,30 @@ func testAccCheckComputeInstanceHasSubnet(instance *compute.Instance) resource.T
 	}
 }
 
+func testAccCheckComputeInstanceHasAnyAddress(instance *compute.Instance) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, i := range instance.NetworkInterfaces {
+			if i.NetworkIP == "" {
+				return fmt.Errorf("no address")
+			}
+		}
+
+		return nil
+	}
+}
+
+func testAccCheckComputeInstanceHasAddress(instance *compute.Instance, address string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, i := range instance.NetworkInterfaces {
+			if i.NetworkIP != address {
+				return fmt.Errorf("Wrong address found: expected %v, got %v", address, i.NetworkIP)
+			}
+		}
+
+		return nil
+	}
+}
+
 func testAccComputeInstance_basic_deprecated_network(instance string) string {
 	return fmt.Sprintf(`
 	resource "google_compute_instance" "foobar" {
@@ -538,7 +649,7 @@ func testAccComputeInstance_basic_deprecated_network(instance string) string {
 		tags = ["foo", "bar"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network {
@@ -560,7 +671,7 @@ func testAccComputeInstance_update_deprecated_network(instance string) string {
 		tags = ["baz"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network {
@@ -583,7 +694,7 @@ func testAccComputeInstance_basic(instance string) string {
 		tags = ["foo", "bar"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -609,13 +720,12 @@ func testAccComputeInstance_basic2(instance string) string {
 		tags = ["foo", "bar"]
 
 		disk {
-			image = "debian-cloud/debian-7-wheezy-v20160301"
+			image = "debian-8"
 		}
 
 		network_interface {
 			network = "default"
 		}
-
 
 		metadata {
 			foo = "bar"
@@ -633,7 +743,55 @@ func testAccComputeInstance_basic3(instance string) string {
 		tags = ["foo", "bar"]
 
 		disk {
-			image = "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-7-wheezy-v20160301"
+			image = "debian-cloud/debian-8-jessie-v20160803"
+		}
+
+		network_interface {
+			network = "default"
+		}
+
+
+		metadata {
+			foo = "bar"
+		}
+	}`, instance)
+}
+
+func testAccComputeInstance_basic4(instance string) string {
+	return fmt.Sprintf(`
+	resource "google_compute_instance" "foobar" {
+		name = "%s"
+		machine_type = "n1-standard-1"
+		zone = "us-central1-a"
+		can_ip_forward = false
+		tags = ["foo", "bar"]
+
+		disk {
+			image = "debian-cloud/debian-8"
+		}
+
+		network_interface {
+			network = "default"
+		}
+
+
+		metadata {
+			foo = "bar"
+		}
+	}`, instance)
+}
+
+func testAccComputeInstance_basic5(instance string) string {
+	return fmt.Sprintf(`
+	resource "google_compute_instance" "foobar" {
+		name = "%s"
+		machine_type = "n1-standard-1"
+		zone = "us-central1-a"
+		can_ip_forward = false
+		tags = ["foo", "bar"]
+
+		disk {
+			image = "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -658,7 +816,7 @@ func testAccComputeInstance_forceNewAndChangeMetadata(instance string) string {
 		tags = ["baz"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -682,7 +840,7 @@ func testAccComputeInstance_update(instance string) string {
 		tags = ["baz"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -709,7 +867,7 @@ func testAccComputeInstance_ip(ip, instance string) string {
 		tags = ["foo", "bar"]
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -740,7 +898,7 @@ func testAccComputeInstance_disks(disk, instance string, autodelete bool) string
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		disk {
@@ -766,7 +924,7 @@ func testAccComputeInstance_local_ssd(instance string) string {
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		disk {
@@ -789,7 +947,7 @@ func testAccComputeInstance_service_account(instance string) string {
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -814,7 +972,7 @@ func testAccComputeInstance_scheduling(instance string) string {
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -839,7 +997,7 @@ func testAccComputeInstance_subnet_auto(instance string) string {
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -870,7 +1028,7 @@ func testAccComputeInstance_subnet_custom(instance string) string {
 		zone = "us-central1-a"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -879,4 +1037,61 @@ func testAccComputeInstance_subnet_custom(instance string) string {
 		}
 
 	}`, acctest.RandString(10), acctest.RandString(10), instance)
+}
+
+func testAccComputeInstance_address_auto(instance string) string {
+	return fmt.Sprintf(`
+	resource "google_compute_network" "inst-test-network" {
+		name = "inst-test-network-%s"
+	}
+	resource "google_compute_subnetwork" "inst-test-subnetwork" {
+		name = "inst-test-subnetwork-%s"
+		ip_cidr_range = "10.0.0.0/16"
+		region = "us-central1"
+		network = "${google_compute_network.inst-test-network.self_link}"
+	}
+	resource "google_compute_instance" "foobar" {
+		name = "%s"
+		machine_type = "n1-standard-1"
+		zone = "us-central1-a"
+
+		disk {
+			image = "debian-8-jessie-v20160803"
+		}
+
+		network_interface {
+			subnetwork = "${google_compute_subnetwork.inst-test-subnetwork.name}"
+			access_config {	}
+		}
+
+	}`, acctest.RandString(10), acctest.RandString(10), instance)
+}
+
+func testAccComputeInstance_address_custom(instance, address string) string {
+	return fmt.Sprintf(`
+	resource "google_compute_network" "inst-test-network" {
+		name = "inst-test-network-%s"
+	}
+	resource "google_compute_subnetwork" "inst-test-subnetwork" {
+		name = "inst-test-subnetwork-%s"
+		ip_cidr_range = "10.0.0.0/16"
+		region = "us-central1"
+		network = "${google_compute_network.inst-test-network.self_link}"
+	}
+	resource "google_compute_instance" "foobar" {
+		name = "%s"
+		machine_type = "n1-standard-1"
+		zone = "us-central1-a"
+
+		disk {
+			image = "debian-8-jessie-v20160803"
+		}
+
+		network_interface {
+			subnetwork = "${google_compute_subnetwork.inst-test-subnetwork.name}"
+		    address = "%s"
+			access_config {	}
+		}
+
+	}`, acctest.RandString(10), acctest.RandString(10), instance, address)
 }

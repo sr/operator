@@ -15,26 +15,26 @@ func resourceConsulNode() *schema.Resource {
 		Delete: resourceConsulNodeDelete,
 
 		Schema: map[string]*schema.Schema{
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

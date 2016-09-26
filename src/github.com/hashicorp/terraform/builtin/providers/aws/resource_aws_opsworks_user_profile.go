@@ -18,28 +18,28 @@ func resourceAwsOpsworksUserProfile() *schema.Resource {
 		Delete: resourceAwsOpsworksUserProfileDelete,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"user_arn": {
+			"user_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"allow_self_management": {
+			"allow_self_management": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"ssh_username": {
+			"ssh_username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"ssh_public_key": {
+			"ssh_public_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

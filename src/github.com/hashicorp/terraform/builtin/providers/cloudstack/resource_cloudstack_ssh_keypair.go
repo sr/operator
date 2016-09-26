@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/pathorcontents"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/xanzy/go-cloudstack/cloudstack"
 )
@@ -17,30 +16,30 @@ func resourceCloudStackSSHKeyPair() *schema.Resource {
 		Delete: resourceCloudStackSSHKeyPairDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"public_key": {
+			"public_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"private_key": {
+			"private_key": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -56,19 +55,14 @@ func resourceCloudStackSSHKeyPairCreate(d *schema.ResourceData, meta interface{}
 
 	if publicKey != "" {
 		// Register supplied key
-		key, _, err := pathorcontents.Read(publicKey)
-		if err != nil {
-			return fmt.Errorf("Error reading the public key: %v", err)
-		}
-
-		p := cs.SSH.NewRegisterSSHKeyPairParams(name, string(key))
+		p := cs.SSH.NewRegisterSSHKeyPairParams(name, publicKey)
 
 		// If there is a project supplied, we retrieve and set the project id
 		if err := setProjectid(p, cs, d); err != nil {
 			return err
 		}
 
-		_, err = cs.SSH.RegisterSSHKeyPair(p)
+		_, err := cs.SSH.RegisterSSHKeyPair(p)
 		if err != nil {
 			return err
 		}

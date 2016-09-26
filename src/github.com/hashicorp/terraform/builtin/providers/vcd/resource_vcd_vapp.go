@@ -17,61 +17,61 @@ func resourceVcdVApp() *schema.Resource {
 		Delete: resourceVcdVAppDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"template_name": {
+			"template_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"catalog_name": {
+			"catalog_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"network_href": {
+			"network_href": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"network_name": {
+			"network_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"memory": {
+			"memory": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"cpus": {
+			"cpus": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"ip": {
+			"ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"initscript": {
+			"initscript": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 			},
-			"href": {
+			"href": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"power_on": {
+			"power_on": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,

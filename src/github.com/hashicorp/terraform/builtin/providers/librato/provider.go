@@ -10,14 +10,14 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"email": {
+			"email": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("LIBRATO_EMAIL", nil),
 				Description: "The email address for the Librato account.",
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("LIBRATO_TOKEN", nil),
@@ -28,6 +28,8 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"librato_space":       resourceLibratoSpace(),
 			"librato_space_chart": resourceLibratoSpaceChart(),
+			"librato_alert":       resourceLibratoAlert(),
+			"librato_service":     resourceLibratoService(),
 		},
 
 		ConfigureFunc: providerConfigure,

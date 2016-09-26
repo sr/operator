@@ -15,59 +15,64 @@ func resourceComputeForwardingRule() *schema.Resource {
 		Read:   resourceComputeForwardingRuleRead,
 		Delete: resourceComputeForwardingRuleDelete,
 		Update: resourceComputeForwardingRuleUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"target": {
+			"target": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ip_address": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
-			},
-
-			"ip_protocol": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"port_range": {
+			"ip_protocol": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+
+			"port_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -107,7 +112,7 @@ func resourceComputeForwardingRuleCreate(d *schema.ResourceData, meta interface{
 	// It probably maybe worked, so store the ID now
 	d.SetId(frule.Name)
 
-	err = computeOperationWaitRegion(config, op, region, "Creating Fowarding Rule")
+	err = computeOperationWaitRegion(config, op, project, region, "Creating Fowarding Rule")
 	if err != nil {
 		return err
 	}
@@ -139,7 +144,7 @@ func resourceComputeForwardingRuleUpdate(d *schema.ResourceData, meta interface{
 			return fmt.Errorf("Error updating target: %s", err)
 		}
 
-		err = computeOperationWaitRegion(config, op, region, "Updating Forwarding Rule")
+		err = computeOperationWaitRegion(config, op, project, region, "Updating Forwarding Rule")
 		if err != nil {
 			return err
 		}
@@ -179,10 +184,15 @@ func resourceComputeForwardingRuleRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error reading ForwardingRule: %s", err)
 	}
 
+	d.Set("name", frule.Name)
+	d.Set("target", frule.Target)
+	d.Set("description", frule.Description)
+	d.Set("port_range", frule.PortRange)
+	d.Set("project", project)
+	d.Set("region", region)
 	d.Set("ip_address", frule.IPAddress)
 	d.Set("ip_protocol", frule.IPProtocol)
 	d.Set("self_link", frule.SelfLink)
-
 	return nil
 }
 
@@ -207,7 +217,7 @@ func resourceComputeForwardingRuleDelete(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Error deleting ForwardingRule: %s", err)
 	}
 
-	err = computeOperationWaitRegion(config, op, region, "Deleting Forwarding Rule")
+	err = computeOperationWaitRegion(config, op, project, region, "Deleting Forwarding Rule")
 	if err != nil {
 		return err
 	}

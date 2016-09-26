@@ -56,10 +56,10 @@ func TestInterpolater_moduleVariable(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -67,10 +67,10 @@ func TestInterpolater_moduleVariable(t *testing.T) {
 					},
 				},
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "child"},
 				Outputs: map[string]*OutputState{
-					"foo": {
+					"foo": &OutputState{
 						Type:  "string",
 						Value: "bar",
 					},
@@ -145,10 +145,10 @@ func TestInterpolater_resourceVariableMap(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -189,10 +189,10 @@ func TestInterpolater_resourceVariableComplexMap(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -234,10 +234,10 @@ func TestInterpolater_resourceVariable(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -276,7 +276,7 @@ func TestInterpolater_resourceVariableMissingDuringInput(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path:      rootModulePath,
 				Resources: map[string]*ResourceState{
 				// No resources at all yet, because we're still dealing
@@ -325,10 +325,10 @@ func TestInterpolater_resourceVariableMulti(t *testing.T) {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -488,10 +488,10 @@ func TestInterpolator_resourceMultiAttributesComputed(t *testing.T) {
 	// it can/does exist that way in memory during the plan phase.
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_route53_zone.yada": {
+					"aws_route53_zone.yada": &ResourceState{
 						Type: "aws_route53_zone",
 						Primary: &InstanceState{
 							ID: "z-abc123",
@@ -542,10 +542,10 @@ func getInterpolaterFixture(t *testing.T) *Interpolater {
 	lock := new(sync.RWMutex)
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_route53_zone.terra.0": {
+					"aws_route53_zone.terra.0": &ResourceState{
 						Type:         "aws_route53_zone",
 						Dependencies: []string{},
 						Primary: &InstanceState{
@@ -564,7 +564,7 @@ func getInterpolaterFixture(t *testing.T) *Interpolater {
 							},
 						},
 					},
-					"aws_route53_zone.terra.1": {
+					"aws_route53_zone.terra.1": &ResourceState{
 						Type:         "aws_route53_zone",
 						Dependencies: []string{},
 						Primary: &InstanceState{

@@ -18,14 +18,14 @@ func resourceRundeckPrivateKey() *schema.Resource {
 		Read:   ReadPrivateKey,
 
 		Schema: map[string]*schema.Schema{
-			"path": {
+			"path": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Path to the key within the key store",
 				ForceNew:    true,
 			},
 
-			"key_material": {
+			"key_material": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The private key material to store, in PEM format",

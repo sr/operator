@@ -27,73 +27,73 @@ func resourceLBPoolV1() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"lb_method": {
+			"lb_method": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"lb_provider": {
+			"lb_provider": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"member": {
+			"member": &schema.Schema{
 				Type:       schema.TypeSet,
 				Deprecated: "Use openstack_lb_member_v1 instead. This attribute will be removed in a future version.",
 				Optional:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"region": {
+						"region": &schema.Schema{
 							Type:        schema.TypeString,
 							Required:    true,
 							ForceNew:    true,
 							DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 						},
-						"tenant_id": {
+						"tenant_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: true,
 						},
-						"admin_state_up": {
+						"admin_state_up": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 							ForceNew: false,
@@ -102,7 +102,7 @@ func resourceLBPoolV1() *schema.Resource {
 				},
 				Set: resourceLBMemberV1Hash,
 			},
-			"monitor_ids": {
+			"monitor_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: false,

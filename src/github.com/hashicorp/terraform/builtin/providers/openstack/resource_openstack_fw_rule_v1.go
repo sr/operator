@@ -20,55 +20,55 @@ func resourceFWRuleV1() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"protocol": {
+			"protocol": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"action": {
+			"action": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"ip_version": {
+			"ip_version": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  4,
 			},
-			"source_ip_address": {
+			"source_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"destination_ip_address": {
+			"destination_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"source_port": {
+			"source_port": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"destination_port": {
+			"destination_port": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"tenant_id": {
+			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,

@@ -20,48 +20,48 @@ func resourceAwsAutoscalingSchedule() *schema.Resource {
 		Delete: resourceAwsAutoscalingScheduleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"scheduled_action_name": {
+			"scheduled_action_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"autoscaling_group_name": {
+			"autoscaling_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"start_time": {
+			"start_time": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateASGScheduleTimestamp,
 			},
-			"end_time": {
+			"end_time": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateASGScheduleTimestamp,
 			},
-			"recurrence": {
+			"recurrence": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"min_size": {
+			"min_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"max_size": {
+			"max_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
-			"desired_capacity": {
+			"desired_capacity": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,

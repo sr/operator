@@ -18,36 +18,36 @@ func resourceDigitalOceanVolume() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"droplet_ids": {
+			"droplet_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 				Computed: true,
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true, // Update-ability Coming Soon ™
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true, // Update-ability Coming Soon ™

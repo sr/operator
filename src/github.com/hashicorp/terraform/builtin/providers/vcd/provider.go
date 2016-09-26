@@ -9,49 +9,49 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"user": {
+			"user": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_USER", nil),
 				Description: "The user name for vcd API operations.",
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_PASSWORD", nil),
 				Description: "The user password for vcd API operations.",
 			},
 
-			"org": {
+			"org": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_ORG", nil),
 				Description: "The vcd org for API operations",
 			},
 
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_URL", nil),
 				Description: "The vcd url for vcd API operations.",
 			},
 
-			"vdc": {
+			"vdc": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_VDC", ""),
 				Description: "The name of the VDC to run operations on",
 			},
 
-			"maxRetryTimeout": {
+			"maxRetryTimeout": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_MAX_RETRY_TIMEOUT", 60),
 				Description: "Max num seconds to wait for successful response when operating on resources within vCloud (defaults to 60)",
 			},
 
-			"allow_unverified_ssl": {
+			"allow_unverified_ssl": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("VCD_ALLOW_UNVERIFIED_SSL", false),

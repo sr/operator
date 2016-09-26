@@ -18,44 +18,46 @@ func resourceComputeUrlMap() *schema.Resource {
 		Delete: resourceComputeUrlMapDelete,
 
 		Schema: map[string]*schema.Schema{
-			"default_service": {
+			"default_service": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"fingerprint": {
+			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"host_rule": {
-				Type:     schema.TypeList,
+			"host_rule": &schema.Schema{
+				Type:     schema.TypeSet,
 				Optional: true,
+				// TODO(evandbrown): Enable when lists support validation
+				//ValidateFunc: validateHostRules,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"hosts": {
+						"hosts": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 
-						"path_matcher": {
+						"path_matcher": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -63,43 +65,43 @@ func resourceComputeUrlMap() *schema.Resource {
 				},
 			},
 
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"path_matcher": {
+			"path_matcher": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"default_service": {
+						"default_service": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"path_rule": {
+						"path_rule": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"paths": {
+									"paths": &schema.Schema{
 										Type:     schema.TypeList,
 										Required: true,
 										Elem:     &schema.Schema{Type: schema.TypeString},
 									},
 
-									"service": {
+									"service": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
@@ -110,38 +112,38 @@ func resourceComputeUrlMap() *schema.Resource {
 				},
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"test": {
+			"test": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"description": {
+						"description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"host": {
+						"host": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"path": {
+						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"service": {
+						"service": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -258,10 +260,10 @@ func resourceComputeUrlMapCreate(d *schema.ResourceData, meta interface{}) error
 		urlMap.Description = v.(string)
 	}
 
-	_hostRules := d.Get("host_rule").([]interface{})
-	urlMap.HostRules = make([]*compute.HostRule, len(_hostRules))
+	_hostRules := d.Get("host_rule").(*schema.Set)
+	urlMap.HostRules = make([]*compute.HostRule, _hostRules.Len())
 
-	for i, v := range _hostRules {
+	for i, v := range _hostRules.List() {
 		urlMap.HostRules[i] = createHostRule(v)
 	}
 
@@ -288,7 +290,7 @@ func resourceComputeUrlMapCreate(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Error, failed to insert Url Map %s: %s", name, err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Insert Url Map")
+	err = computeOperationWaitGlobal(config, op, project, "Insert Url Map")
 
 	if err != nil {
 		return fmt.Errorf("Error, failed waitng to insert Url Map %s: %s", name, err)
@@ -332,7 +334,7 @@ func resourceComputeUrlMapRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	/* Only read host rules into our TF state that we have defined */
-	_hostRules := d.Get("host_rule").([]interface{})
+	_hostRules := d.Get("host_rule").(*schema.Set).List()
 	_newHostRules := make([]interface{}, 0)
 	for _, v := range _hostRules {
 		_hostRule := v.(map[string]interface{})
@@ -463,12 +465,12 @@ func resourceComputeUrlMapUpdate(d *schema.ResourceData, meta interface{}) error
 		_oldHostRulesMap := make(map[string]interface{})
 		_newHostRulesMap := make(map[string]interface{})
 
-		for _, v := range _oldHostRules.([]interface{}) {
+		for _, v := range _oldHostRules.(*schema.Set).List() {
 			_hostRule := v.(map[string]interface{})
 			_oldHostRulesMap[_hostRule["path_matcher"].(string)] = v
 		}
 
-		for _, v := range _newHostRules.([]interface{}) {
+		for _, v := range _newHostRules.(*schema.Set).List() {
 			_hostRule := v.(map[string]interface{})
 			_newHostRulesMap[_hostRule["path_matcher"].(string)] = v
 		}
@@ -515,7 +517,7 @@ func resourceComputeUrlMapUpdate(d *schema.ResourceData, meta interface{}) error
 					}
 
 					/* Now add in the brand new entries */
-					for host := range _oldHostsSet {
+					for host, _ := range _newHostsSet {
 						hostRule.Hosts = append(hostRule.Hosts, host)
 					}
 
@@ -644,14 +646,13 @@ func resourceComputeUrlMapUpdate(d *schema.ResourceData, meta interface{}) error
 
 		urlMap.Tests = newTests
 	}
-
 	op, err := config.clientCompute.UrlMaps.Update(project, urlMap.Name, urlMap).Do()
 
 	if err != nil {
 		return fmt.Errorf("Error, failed to update Url Map %s: %s", name, err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Update Url Map")
+	err = computeOperationWaitGlobal(config, op, project, "Update Url Map")
 
 	if err != nil {
 		return fmt.Errorf("Error, failed waitng to update Url Map %s: %s", name, err)
@@ -676,11 +677,26 @@ func resourceComputeUrlMapDelete(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Error, failed to delete Url Map %s: %s", name, err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Delete Url Map")
+	err = computeOperationWaitGlobal(config, op, project, "Delete Url Map")
 
 	if err != nil {
 		return fmt.Errorf("Error, failed waitng to delete Url Map %s: %s", name, err)
 	}
 
 	return nil
+}
+
+func validateHostRules(v interface{}, k string) (ws []string, es []error) {
+	pathMatchers := make(map[string]bool)
+	hostRules := v.([]interface{})
+	for _, hri := range hostRules {
+		hr := hri.(map[string]interface{})
+		pm := hr["path_matcher"].(string)
+		if pathMatchers[pm] {
+			es = append(es, fmt.Errorf("Multiple host_rule entries with the same path_matcher are not allowed. Please collapse all hosts with the same path_matcher into one host_rule"))
+			return
+		}
+		pathMatchers[pm] = true
+	}
+	return
 }

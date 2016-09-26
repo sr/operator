@@ -28,20 +28,20 @@ func resourceAwsNetworkAcl() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"vpc_id": {
+			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 				Computed: false,
 			},
-			"subnet_id": {
+			"subnet_id": &schema.Schema{
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Computed:   false,
 				Deprecated: "Attribute subnet_id is deprecated on network_acl resources. Use subnet_ids instead",
 			},
-			"subnet_ids": {
+			"subnet_ids": &schema.Schema{
 				Type:          schema.TypeSet,
 				Optional:      true,
 				Computed:      true,
@@ -49,42 +49,42 @@ func resourceAwsNetworkAcl() *schema.Resource {
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				Set:           schema.HashString,
 			},
-			"ingress": {
+			"ingress": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: false,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"from_port": {
+						"from_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"to_port": {
+						"to_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"rule_no": {
+						"rule_no": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"action": {
+						"action": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"cidr_block": {
+						"cidr_block": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"icmp_type": {
+						"icmp_type": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"icmp_code": {
+						"icmp_code": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
@@ -92,42 +92,42 @@ func resourceAwsNetworkAcl() *schema.Resource {
 				},
 				Set: resourceAwsNetworkAclEntryHash,
 			},
-			"egress": {
+			"egress": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: false,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"from_port": {
+						"from_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"to_port": {
+						"to_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"rule_no": {
+						"rule_no": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
-						"action": {
+						"action": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"cidr_block": {
+						"cidr_block": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"icmp_type": {
+						"icmp_type": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"icmp_code": {
+						"icmp_code": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
@@ -539,11 +539,11 @@ func resourceAwsNetworkAclEntryHash(v interface{}) int {
 func getDefaultNetworkAcl(vpc_id string, conn *ec2.EC2) (defaultAcl *ec2.NetworkAcl, err error) {
 	resp, err := conn.DescribeNetworkAcls(&ec2.DescribeNetworkAclsInput{
 		Filters: []*ec2.Filter{
-			{
+			&ec2.Filter{
 				Name:   aws.String("default"),
 				Values: []*string{aws.String("true")},
 			},
-			{
+			&ec2.Filter{
 				Name:   aws.String("vpc-id"),
 				Values: []*string{aws.String(vpc_id)},
 			},
@@ -559,7 +559,7 @@ func getDefaultNetworkAcl(vpc_id string, conn *ec2.EC2) (defaultAcl *ec2.Network
 func findNetworkAclAssociation(subnetId string, conn *ec2.EC2) (networkAclAssociation *ec2.NetworkAclAssociation, err error) {
 	resp, err := conn.DescribeNetworkAcls(&ec2.DescribeNetworkAclsInput{
 		Filters: []*ec2.Filter{
-			{
+			&ec2.Filter{
 				Name:   aws.String("association.subnet-id"),
 				Values: []*string{aws.String(subnetId)},
 			},

@@ -154,7 +154,7 @@ func (r *Reader) read() {
 		// If no lines match, the data is lost.
 		var prefix string
 		r.l.Lock()
-		for p := range r.prefixes {
+		for p, _ := range r.prefixes {
 			if p == "" {
 				continue
 			}

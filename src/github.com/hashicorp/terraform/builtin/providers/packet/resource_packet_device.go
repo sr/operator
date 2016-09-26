@@ -18,78 +18,78 @@ func resourcePacketDevice() *schema.Resource {
 		Delete: resourcePacketDeviceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"project_id": {
+			"project_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"hostname": {
+			"hostname": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"operating_system": {
+			"operating_system": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"facility": {
+			"facility": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"plan": {
+			"plan": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"billing_cycle": {
+			"billing_cycle": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"state": {
+			"state": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"locked": {
+			"locked": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"gateway": {
+						"gateway": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"family": {
+						"family": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
 
-						"cidr": {
+						"cidr": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
 
-						"public": {
+						"public": &schema.Schema{
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
@@ -97,22 +97,22 @@ func resourcePacketDevice() *schema.Resource {
 				},
 			},
 
-			"created": {
+			"created": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"updated": {
+			"updated": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -208,13 +208,13 @@ func resourcePacketDeviceRead(d *schema.ResourceData, meta interface{}) error {
 		network := map[string]interface{}{
 			"address": ip.Address,
 			"gateway": ip.Gateway,
-			"family":  ip.Family,
+			"family":  ip.AddressFamily,
 			"cidr":    ip.Cidr,
 			"public":  ip.Public,
 		}
 		networks = append(networks, network)
 
-		if ip.Family == 4 && ip.Public == true {
+		if ip.AddressFamily == 4 && ip.Public == true {
 			host = ip.Address
 		}
 	}

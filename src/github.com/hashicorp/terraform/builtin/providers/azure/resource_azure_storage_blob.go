@@ -17,19 +17,19 @@ func resourceAzureStorageBlob() *schema.Resource {
 		Delete: resourceAzureStorageBlobDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["name"],
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: parameterDescriptions["type"],
 			},
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
@@ -37,7 +37,7 @@ func resourceAzureStorageBlob() *schema.Resource {
 					return int64(0), nil
 				},
 			},
-			"storage_container_name": {
+			"storage_container_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
@@ -49,7 +49,7 @@ func resourceAzureStorageBlob() *schema.Resource {
 				ForceNew:    true,
 				Description: parameterDescriptions["storage_service_name"],
 			},
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: parameterDescriptions["url"],

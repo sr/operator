@@ -17,69 +17,69 @@ func ResourceDataSource() *schema.Resource {
 		Read:   ReadDataSource,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"url": {
+			"url": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"is_default": {
+			"is_default": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"basic_auth_enabled": {
+			"basic_auth_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"basic_auth_username": {
+			"basic_auth_username": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
 
-			"basic_auth_password": {
+			"basic_auth_password": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
 
-			"database_name": {
+			"database_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
 
-			"access_mode": {
+			"access_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "proxy",

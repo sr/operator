@@ -21,17 +21,17 @@ func resourceAwsIamRole() *schema.Resource {
 		Delete: resourceAwsIamRoleDelete,
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"unique_id": {
+			"unique_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
@@ -52,7 +52,7 @@ func resourceAwsIamRole() *schema.Resource {
 				},
 			},
 
-			"name_prefix": {
+			"name_prefix": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -71,14 +71,14 @@ func resourceAwsIamRole() *schema.Resource {
 				},
 			},
 
-			"path": {
+			"path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "/",
 				ForceNew: true,
 			},
 
-			"assume_role_policy": {
+			"assume_role_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -105,11 +105,11 @@ func resourceAwsIamRoleCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	var createResp *iam.CreateRoleOutput
-	err := resource.Retry(10*time.Second, func() *resource.RetryError {
+	err := resource.Retry(30*time.Second, func() *resource.RetryError {
 		var err error
 		createResp, err = iamconn.CreateRole(request)
-		// IAM roles can take ~10 seconds to propagate in AWS:
-		// http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html#launch-instance-with-role-console
+		// IAM users (referenced in Principal field of assume policy)
+		// can take ~30 seconds to propagate in AWS
 		if isAWSErr(err, "MalformedPolicyDocument", "Invalid principal in policy") {
 			return resource.RetryableError(err)
 		}

@@ -18,7 +18,7 @@ func TestAccStatusCake_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccTestCheckDestroy(&test),
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccTestConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccTestCheckExists("statuscake_test.google", &test),
@@ -36,19 +36,20 @@ func TestAccStatusCake_withUpdate(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccTestCheckDestroy(&test),
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccTestConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccTestCheckExists("statuscake_test.google", &test),
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccTestConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccTestCheckExists("statuscake_test.google", &test),
 					resource.TestCheckResourceAttr("statuscake_test.google", "check_rate", "500"),
 					resource.TestCheckResourceAttr("statuscake_test.google", "paused", "true"),
+					resource.TestCheckResourceAttr("statuscake_test.google", "contact_id", "23456"),
 				),
 			},
 		},
@@ -97,19 +98,21 @@ func testAccTestCheckDestroy(test *statuscake.Test) resource.TestCheckFunc {
 
 const testAccTestConfig_basic = `
 resource "statuscake_test" "google" {
-  website_name = "google.com"
-  website_url = "www.google.com"
-  test_type = "HTTP"
-  check_rate = 300
+	website_name = "google.com"
+	website_url = "www.google.com"
+	test_type = "HTTP"
+	check_rate = 300
+	contact_id = 12345
 }
 `
 
 const testAccTestConfig_update = `
 resource "statuscake_test" "google" {
-  website_name = "google.com"
-  website_url = "www.google.com"
-  test_type = "HTTP"
-  check_rate = 500
-  paused = true
+	website_name = "google.com"
+	website_url = "www.google.com"
+	test_type = "HTTP"
+	check_rate = 500
+	paused = true
+	contact_id = 23456
 }
 `

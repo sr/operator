@@ -19,7 +19,7 @@ func resourceAwsEcsCluster() *schema.Resource {
 		Delete: resourceAwsEcsClusterDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -43,7 +43,7 @@ func resourceAwsEcsClusterCreate(d *schema.ResourceData, meta interface{}) error
 	log.Printf("[DEBUG] ECS cluster %s created", *out.Cluster.ClusterArn)
 
 	d.SetId(*out.Cluster.ClusterArn)
-	d.Set("name", *out.Cluster.ClusterName)
+	d.Set("name", out.Cluster.ClusterName)
 	return nil
 }
 

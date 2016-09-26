@@ -20,41 +20,41 @@ func dataSourceCloudinitConfig() *schema.Resource {
 		Read: dataSourceCloudinitConfigRead,
 
 		Schema: map[string]*schema.Schema{
-			"part": {
+			"part": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"content_type": {
+						"content_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"content": {
+						"content": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"filename": {
+						"filename": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"merge_type": {
+						"merge_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"gzip": {
+			"gzip": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"base64_encode": {
+			"base64_encode": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"rendered": {
+			"rendered": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "rendered cloudinit configuration",

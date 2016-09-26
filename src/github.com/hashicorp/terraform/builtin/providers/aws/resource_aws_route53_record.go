@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/errwrap"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -30,7 +31,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 		SchemaVersion: 2,
 		MigrateState:  resourceAwsRoute53RecordMigrateState,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -40,18 +41,18 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"fqdn": {
+			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone_id": {
+			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -64,41 +65,41 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"ttl": {
+			"ttl": &schema.Schema{
 				Type:          schema.TypeInt,
 				Optional:      true,
 				ConflictsWith: []string{"alias"},
 			},
 
-			"weight": {
+			"weight": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Removed:  "Now implemented as weighted_routing_policy; Please see https://www.terraform.io/docs/providers/aws/r/route53_record.html",
 			},
 
-			"set_identifier": {
+			"set_identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"alias": {
+			"alias": &schema.Schema{
 				Type:          schema.TypeSet,
 				Optional:      true,
 				ConflictsWith: []string{"records", "ttl"},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"zone_id": {
+						"zone_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"evaluate_target_health": {
+						"evaluate_target_health": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 						},
@@ -107,13 +108,13 @@ func resourceAwsRoute53Record() *schema.Resource {
 				Set: resourceAwsRoute53AliasRecordHash,
 			},
 
-			"failover": { // PRIMARY | SECONDARY
+			"failover": &schema.Schema{ // PRIMARY | SECONDARY
 				Type:     schema.TypeString,
 				Optional: true,
 				Removed:  "Now implemented as failover_routing_policy; see docs",
 			},
 
-			"failover_routing_policy": {
+			"failover_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -123,7 +124,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -138,7 +139,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"latency_routing_policy": {
+			"latency_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -148,7 +149,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"region": {
+						"region": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -156,7 +157,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"geolocation_routing_policy": { // AWS Geolocation
+			"geolocation_routing_policy": &schema.Schema{ // AWS Geolocation
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -166,15 +167,15 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"continent": {
+						"continent": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"country": {
+						"country": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"subdivision": {
+						"subdivision": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -182,7 +183,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"weighted_routing_policy": {
+			"weighted_routing_policy": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ConflictsWith: []string{
@@ -192,7 +193,7 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"weight": {
+						"weight": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -200,12 +201,12 @@ func resourceAwsRoute53Record() *schema.Resource {
 				},
 			},
 
-			"health_check_id": { // ID of health check
+			"health_check_id": &schema.Schema{ // ID of health check
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"records": {
+			"records": &schema.Schema{
 				Type:          schema.TypeSet,
 				ConflictsWith: []string{"alias"},
 				Elem:          &schema.Schema{Type: schema.TypeString},
@@ -254,7 +255,7 @@ func resourceAwsRoute53RecordCreate(d *schema.ResourceData, meta interface{}) er
 	changeBatch := &route53.ChangeBatch{
 		Comment: aws.String("Managed by Terraform"),
 		Changes: []*route53.Change{
-			{
+			&route53.Change{
 				Action:            aws.String("UPSERT"),
 				ResourceRecordSet: rec,
 			},
@@ -269,13 +270,41 @@ func resourceAwsRoute53RecordCreate(d *schema.ResourceData, meta interface{}) er
 	log.Printf("[DEBUG] Creating resource records for zone: %s, name: %s\n\n%s",
 		zone, *rec.Name, req)
 
+	respRaw, err := changeRoute53RecordSet(conn, req)
+	if err != nil {
+		return errwrap.Wrapf("[ERR]: Error building changeset: {{err}}", err)
+	}
+
+	changeInfo := respRaw.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo
+
+	// Generate an ID
+	vars := []string{
+		zone,
+		strings.ToLower(d.Get("name").(string)),
+		d.Get("type").(string),
+	}
+	if v, ok := d.GetOk("set_identifier"); ok {
+		vars = append(vars, v.(string))
+	}
+
+	d.SetId(strings.Join(vars, "_"))
+
+	err = waitForRoute53RecordSetToSync(conn, cleanChangeID(*changeInfo.Id))
+	if err != nil {
+		return err
+	}
+
+	return resourceAwsRoute53RecordRead(d, meta)
+}
+
+func changeRoute53RecordSet(conn *route53.Route53, input *route53.ChangeResourceRecordSetsInput) (interface{}, error) {
 	wait := resource.StateChangeConf{
 		Pending:    []string{"rejected"},
 		Target:     []string{"accepted"},
 		Timeout:    5 * time.Minute,
 		MinTimeout: 1 * time.Second,
 		Refresh: func() (interface{}, string, error) {
-			resp, err := conn.ChangeResourceRecordSets(req)
+			resp, err := conn.ChangeResourceRecordSets(input)
 			if err != nil {
 				if r53err, ok := err.(awserr.Error); ok {
 					if r53err.Code() == "PriorRequestNotComplete" {
@@ -292,26 +321,11 @@ func resourceAwsRoute53RecordCreate(d *schema.ResourceData, meta interface{}) er
 		},
 	}
 
-	respRaw, err := wait.WaitForState()
-	if err != nil {
-		return err
-	}
-	changeInfo := respRaw.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo
+	return wait.WaitForState()
+}
 
-	// Generate an ID
-	vars := []string{
-		zone,
-		strings.ToLower(d.Get("name").(string)),
-		d.Get("type").(string),
-	}
-	if v, ok := d.GetOk("set_identifier"); ok {
-		vars = append(vars, v.(string))
-	}
-
-	d.SetId(strings.Join(vars, "_"))
-
-	// Wait until we are done
-	wait = resource.StateChangeConf{
+func waitForRoute53RecordSetToSync(conn *route53.Route53, requestId string) error {
+	wait := resource.StateChangeConf{
 		Delay:      30 * time.Second,
 		Pending:    []string{"PENDING"},
 		Target:     []string{"INSYNC"},
@@ -319,17 +333,13 @@ func resourceAwsRoute53RecordCreate(d *schema.ResourceData, meta interface{}) er
 		MinTimeout: 5 * time.Second,
 		Refresh: func() (result interface{}, state string, err error) {
 			changeRequest := &route53.GetChangeInput{
-				Id: aws.String(cleanChangeID(*changeInfo.Id)),
+				Id: aws.String(requestId),
 			}
 			return resourceAwsGoRoute53Wait(conn, changeRequest)
 		},
 	}
-	_, err = wait.WaitForState()
-	if err != nil {
-		return err
-	}
-
-	return resourceAwsRoute53RecordRead(d, meta)
+	_, err := wait.WaitForState()
+	return err
 }
 
 func resourceAwsRoute53RecordRead(d *schema.ResourceData, meta interface{}) error {
@@ -504,7 +514,7 @@ func resourceAwsRoute53RecordDelete(d *schema.ResourceData, meta interface{}) er
 	changeBatch := &route53.ChangeBatch{
 		Comment: aws.String("Deleted by Terraform"),
 		Changes: []*route53.Change{
-			{
+			&route53.Change{
 				Action:            aws.String("DELETE"),
 				ResourceRecordSet: rec,
 			},
@@ -518,13 +528,29 @@ func resourceAwsRoute53RecordDelete(d *schema.ResourceData, meta interface{}) er
 		ChangeBatch:  changeBatch,
 	}
 
+	respRaw, err := deleteRoute53RecordSet(conn, req)
+	if err != nil {
+		return errwrap.Wrapf("[ERR]: Error building changeset: {{err}}", err)
+	}
+
+	changeInfo := respRaw.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo
+
+	err = waitForRoute53RecordSetToSync(conn, cleanChangeID(*changeInfo.Id))
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func deleteRoute53RecordSet(conn *route53.Route53, input *route53.ChangeResourceRecordSetsInput) (interface{}, error) {
 	wait := resource.StateChangeConf{
 		Pending:    []string{"rejected"},
 		Target:     []string{"accepted"},
 		Timeout:    5 * time.Minute,
 		MinTimeout: 1 * time.Second,
 		Refresh: func() (interface{}, string, error) {
-			_, err := conn.ChangeResourceRecordSets(req)
+			resp, err := conn.ChangeResourceRecordSets(input)
 			if err != nil {
 				if r53err, ok := err.(awserr.Error); ok {
 					if r53err.Code() == "PriorRequestNotComplete" {
@@ -535,22 +561,18 @@ func resourceAwsRoute53RecordDelete(d *schema.ResourceData, meta interface{}) er
 
 					if r53err.Code() == "InvalidChangeBatch" {
 						// This means that the record is already gone.
-						return 42, "accepted", nil
+						return resp, "accepted", nil
 					}
 				}
 
 				return 42, "failure", err
 			}
 
-			return 42, "accepted", nil
+			return resp, "accepted", nil
 		},
 	}
 
-	if _, err := wait.WaitForState(); err != nil {
-		return err
-	}
-
-	return nil
+	return wait.WaitForState()
 }
 
 func resourceAwsRoute53RecordBuildSet(d *schema.ResourceData, zoneName string) (*route53.ResourceRecordSet, error) {

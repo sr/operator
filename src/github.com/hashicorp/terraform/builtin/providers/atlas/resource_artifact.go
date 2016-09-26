@@ -21,32 +21,32 @@ func resourceArtifact() *schema.Resource {
 		Delete: resourceArtifactDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:       schema.TypeString,
 				Required:   true,
 				ForceNew:   true,
 				Deprecated: `atlas_artifact is now deprecated. Use the Atlas Artifact Data Source instead. See https://terraform.io/docs/providers/atlas/d/artifact.html`,
 			},
 
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"build": {
+			"build": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"version": {
+			"version": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"metadata_keys": {
+			"metadata_keys": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
@@ -54,28 +54,28 @@ func resourceArtifact() *schema.Resource {
 				Set:      schema.HashString,
 			},
 
-			"metadata": {
+			"metadata": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"file_url": {
+			"file_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"metadata_full": {
+			"metadata_full": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 			},
 
-			"slug": {
+			"slug": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"version_real": {
+			"version_real": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

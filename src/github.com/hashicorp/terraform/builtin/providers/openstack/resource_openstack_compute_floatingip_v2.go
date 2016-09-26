@@ -19,31 +19,31 @@ func resourceComputeFloatingIPV2() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
 
-			"pool": {
+			"pool": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_POOL_NAME", nil),
 			},
 
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"fixed_ip": {
+			"fixed_ip": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"instance_id": {
+			"instance_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

@@ -14,12 +14,12 @@ func resourceGithubMembership() *schema.Resource {
 		Delete: resourceGithubMembershipDelete,
 
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"role": {
+			"role": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateValueFunc([]string{"member", "admin"}),
@@ -53,11 +53,9 @@ func resourceGithubMembershipRead(d *schema.ResourceData, meta interface{}) erro
 		d.SetId("")
 		return nil
 	}
-	username := membership.User.Login
-	roleName := membership.Role
 
-	d.Set("username", *username)
-	d.Set("role", *roleName)
+	d.Set("username", membership.User.Login)
+	d.Set("role", membership.Role)
 	return nil
 }
 

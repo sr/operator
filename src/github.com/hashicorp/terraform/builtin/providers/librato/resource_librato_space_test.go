@@ -18,7 +18,7 @@ func TestAccLibratoSpace_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckLibratoSpaceDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckLibratoSpaceConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLibratoSpaceExists("librato_space.foobar", &space),

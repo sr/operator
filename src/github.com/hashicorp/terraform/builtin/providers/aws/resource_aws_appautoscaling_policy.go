@@ -20,7 +20,7 @@ func resourceAwsAppautoscalingPolicy() *schema.Resource {
 		Delete: resourceAwsAppautoscalingPolicyDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -33,67 +33,67 @@ func resourceAwsAppautoscalingPolicy() *schema.Resource {
 					return
 				},
 			},
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"policy_type": {
+			"policy_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "StepScaling",
 			},
-			"resource_id": {
+			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"scalable_dimension": {
+			"scalable_dimension": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "ecs:service:DesiredCount",
 				ForceNew: true,
 			},
-			"service_namespace": {
+			"service_namespace": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "ecs",
 				ForceNew: true,
 			},
-			"adjustment_type": {
+			"adjustment_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"cooldown": {
+			"cooldown": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"metric_aggregation_type": {
+			"metric_aggregation_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"min_adjustment_magnitude": {
+			"min_adjustment_magnitude": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"alarms": {
+			"alarms": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"step_adjustment": {
+			"step_adjustment": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"metric_interval_lower_bound": {
+						"metric_interval_lower_bound": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"metric_interval_upper_bound": {
+						"metric_interval_upper_bound": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"scaling_adjustment": {
+						"scaling_adjustment": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},

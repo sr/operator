@@ -22,50 +22,50 @@ func resourceCloudStackPortForward() *schema.Resource {
 		Delete: resourceCloudStackPortForwardDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_address_id": {
+			"ip_address_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"managed": {
+			"managed": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"forward": {
+			"forward": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"private_port": {
+						"private_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"public_port": {
+						"public_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"virtual_machine_id": {
+						"virtual_machine_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},

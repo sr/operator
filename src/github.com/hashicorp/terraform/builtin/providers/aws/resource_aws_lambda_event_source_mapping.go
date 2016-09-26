@@ -21,51 +21,51 @@ func resourceAwsLambdaEventSourceMapping() *schema.Resource {
 		Delete: resourceAwsLambdaEventSourceMappingDelete,
 
 		Schema: map[string]*schema.Schema{
-			"event_source_arn": {
+			"event_source_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"function_name": {
+			"function_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"starting_position": {
+			"starting_position": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"batch_size": {
+			"batch_size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  100,
 			},
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"function_arn": {
+			"function_arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"last_modified": {
+			"last_modified": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"last_processing_result": {
+			"last_processing_result": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"state": {
+			"state": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"state_transition_reason": {
+			"state_transition_reason": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"uuid": {
+			"uuid": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -134,6 +134,12 @@ func resourceAwsLambdaEventSourceMappingRead(d *schema.ResourceData, meta interf
 
 	eventSourceMappingConfiguration, err := conn.GetEventSourceMapping(params)
 	if err != nil {
+		if ec2err, ok := err.(awserr.Error); ok && ec2err.Code() == "ResourceNotFoundException" {
+			log.Printf("[DEBUG] Lambda event source mapping (%s) not found", d.Id())
+			d.SetId("")
+
+			return nil
+		}
 		return err
 	}
 

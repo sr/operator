@@ -22,98 +22,98 @@ func resourceLibratoSpaceChart() *schema.Resource {
 		Delete: resourceLibratoSpaceChartDelete,
 
 		Schema: map[string]*schema.Schema{
-			"space_id": {
+			"space_id": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"min": {
+			"min": &schema.Schema{
 				Type:     schema.TypeFloat,
 				Default:  math.NaN(),
 				Optional: true,
 			},
-			"max": {
+			"max": &schema.Schema{
 				Type:     schema.TypeFloat,
 				Default:  math.NaN(),
 				Optional: true,
 			},
-			"label": {
+			"label": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"related_space": {
+			"related_space": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"stream": {
+			"stream": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"metric": {
+						"metric": &schema.Schema{
 							Type:          schema.TypeString,
 							Optional:      true,
 							ConflictsWith: []string{"stream.composite"},
 						},
-						"source": {
+						"source": &schema.Schema{
 							Type:          schema.TypeString,
 							Optional:      true,
 							ConflictsWith: []string{"stream.composite"},
 						},
-						"group_function": {
+						"group_function": &schema.Schema{
 							Type:          schema.TypeString,
 							Optional:      true,
 							ConflictsWith: []string{"stream.composite"},
 						},
-						"composite": {
+						"composite": &schema.Schema{
 							Type:          schema.TypeString,
 							Optional:      true,
 							ConflictsWith: []string{"stream.metric", "stream.source", "stream.group_function"},
 						},
-						"summary_function": {
+						"summary_function": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"color": {
+						"color": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"units_short": {
+						"units_short": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"units_long": {
+						"units_long": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"min": {
+						"min": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Default:  math.NaN(),
 							Optional: true,
 						},
-						"max": {
+						"max": &schema.Schema{
 							Type:     schema.TypeFloat,
 							Default:  math.NaN(),
 							Optional: true,
 						},
-						"transform_function": {
+						"transform_function": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"period": {
+						"period": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},

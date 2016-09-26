@@ -16,13 +16,13 @@ func resourceComputeNetwork() *schema.Resource {
 		Delete: resourceComputeNetworkDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"auto_create_subnetworks": {
+			"auto_create_subnetworks": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
@@ -34,31 +34,31 @@ func resourceComputeNetwork() *schema.Resource {
 				ConflictsWith: []string{"ipv4_range"},
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"gateway_ipv4": {
+			"gateway_ipv4": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ipv4_range": {
+			"ipv4_range": &schema.Schema{
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use google_compute_subnetwork resources instead.",
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -110,7 +110,7 @@ func resourceComputeNetworkCreate(d *schema.ResourceData, meta interface{}) erro
 	// It probably maybe worked, so store the ID now
 	d.SetId(network.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Creating Network")
+	err = computeOperationWaitGlobal(config, op, project, "Creating Network")
 	if err != nil {
 		return err
 	}
@@ -161,7 +161,7 @@ func resourceComputeNetworkDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error deleting network: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting Network")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting Network")
 	if err != nil {
 		return err
 	}

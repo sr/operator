@@ -10,6 +10,42 @@ import (
 	"github.com/hashicorp/terraform/config"
 )
 
+func TestStateValidate(t *testing.T) {
+	cases := map[string]struct {
+		In  *State
+		Err bool
+	}{
+		"empty state": {
+			&State{},
+			false,
+		},
+
+		"multiple modules": {
+			&State{
+				Modules: []*ModuleState{
+					&ModuleState{
+						Path: []string{"root", "foo"},
+					},
+					&ModuleState{
+						Path: []string{"root", "foo"},
+					},
+				},
+			},
+			true,
+		},
+	}
+
+	for name, tc := range cases {
+		// Init the state
+		tc.In.init()
+
+		err := tc.In.Validate()
+		if (err != nil) != tc.Err {
+			t.Fatalf("%s: err: %s", name, err)
+		}
+	}
+}
+
 func TestStateAddModule(t *testing.T) {
 	cases := []struct {
 		In  [][]string
@@ -17,44 +53,44 @@ func TestStateAddModule(t *testing.T) {
 	}{
 		{
 			[][]string{
-				{"root"},
-				{"root", "child"},
+				[]string{"root"},
+				[]string{"root", "child"},
 			},
 			[][]string{
-				{"root"},
-				{"root", "child"},
+				[]string{"root"},
+				[]string{"root", "child"},
 			},
 		},
 
 		{
 			[][]string{
-				{"root", "foo", "bar"},
-				{"root", "foo"},
-				{"root"},
-				{"root", "bar"},
+				[]string{"root", "foo", "bar"},
+				[]string{"root", "foo"},
+				[]string{"root"},
+				[]string{"root", "bar"},
 			},
 			[][]string{
-				{"root"},
-				{"root", "bar"},
-				{"root", "foo"},
-				{"root", "foo", "bar"},
+				[]string{"root"},
+				[]string{"root", "bar"},
+				[]string{"root", "foo"},
+				[]string{"root", "foo", "bar"},
 			},
 		},
 		// Same last element, different middle element
 		{
 			[][]string{
-				{"root", "foo", "bar"}, // This one should sort after...
-				{"root", "foo"},
-				{"root"},
-				{"root", "bar", "bar"}, // ...this one.
-				{"root", "bar"},
+				[]string{"root", "foo", "bar"}, // This one should sort after...
+				[]string{"root", "foo"},
+				[]string{"root"},
+				[]string{"root", "bar", "bar"}, // ...this one.
+				[]string{"root", "bar"},
 			},
 			[][]string{
-				{"root"},
-				{"root", "bar"},
-				{"root", "foo"},
-				{"root", "bar", "bar"},
-				{"root", "foo", "bar"},
+				[]string{"root"},
+				[]string{"root", "bar"},
+				[]string{"root", "foo"},
+				[]string{"root", "bar", "bar"},
+				[]string{"root", "foo", "bar"},
 			},
 		},
 	}
@@ -79,10 +115,10 @@ func TestStateAddModule(t *testing.T) {
 func TestStateOutputTypeRoundTrip(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Outputs: map[string]*OutputState{
-					"string_output": {
+					"string_output": &OutputState{
 						Value: "String Value",
 						Type:  "string",
 					},
@@ -90,6 +126,7 @@ func TestStateOutputTypeRoundTrip(t *testing.T) {
 			},
 		},
 	}
+	state.init()
 
 	buf := new(bytes.Buffer)
 	if err := WriteState(state, buf); err != nil {
@@ -102,29 +139,32 @@ func TestStateOutputTypeRoundTrip(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(state, roundTripped) {
-		t.Fatalf("bad: %#v", roundTripped)
+		t.Logf("expected:\n%#v", state)
+		t.Fatalf("got:\n%#v", roundTripped)
 	}
 }
 
 func TestStateModuleOrphans(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "bar"},
 			},
 		},
 	}
 
+	state.init()
+
 	config := testModule(t, "state-module-orphans").Config()
 	actual := state.ModuleOrphans(RootModulePath, config)
 	expected := [][]string{
-		{RootModuleName, "foo"},
+		[]string{RootModuleName, "foo"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
@@ -135,18 +175,20 @@ func TestStateModuleOrphans(t *testing.T) {
 func TestStateModuleOrphans_nested(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo", "bar"},
 			},
 		},
 	}
 
+	state.init()
+
 	actual := state.ModuleOrphans(RootModulePath, nil)
 	expected := [][]string{
-		{RootModuleName, "foo"},
+		[]string{RootModuleName, "foo"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
@@ -157,22 +199,24 @@ func TestStateModuleOrphans_nested(t *testing.T) {
 func TestStateModuleOrphans_nilConfig(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "foo"},
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "bar"},
 			},
 		},
 	}
 
+	state.init()
+
 	actual := state.ModuleOrphans(RootModulePath, nil)
 	expected := [][]string{
-		{RootModuleName, "foo"},
-		{RootModuleName, "bar"},
+		[]string{RootModuleName, "foo"},
+		[]string{RootModuleName, "bar"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
@@ -183,21 +227,23 @@ func TestStateModuleOrphans_nilConfig(t *testing.T) {
 func TestStateModuleOrphans_deepNestedNilConfig(t *testing.T) {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "parent", "childfoo"},
 			},
-			{
+			&ModuleState{
 				Path: []string{RootModuleName, "parent", "childbar"},
 			},
 		},
 	}
 
+	state.init()
+
 	actual := state.ModuleOrphans(RootModulePath, nil)
 	expected := [][]string{
-		{RootModuleName, "parent"},
+		[]string{RootModuleName, "parent"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
@@ -264,7 +310,7 @@ func TestStateEqual(t *testing.T) {
 			false,
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: RootModulePath,
 					},
 				},
@@ -276,14 +322,14 @@ func TestStateEqual(t *testing.T) {
 			true,
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: RootModulePath,
 					},
 				},
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: RootModulePath,
 					},
 				},
@@ -295,10 +341,10 @@ func TestStateEqual(t *testing.T) {
 			false,
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Primary: &InstanceState{
 									Meta: map[string]string{
 										"schema_version": "1",
@@ -311,10 +357,10 @@ func TestStateEqual(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Primary: &InstanceState{
 									Meta: map[string]string{
 										"schema_version": "2",
@@ -507,7 +553,7 @@ func TestStateIncrementSerialMaybe(t *testing.T) {
 			&State{},
 			&State{
 				Modules: []*ModuleState{
-					{Path: rootModulePath},
+					&ModuleState{Path: rootModulePath},
 				},
 			},
 			1,
@@ -516,10 +562,10 @@ func TestStateIncrementSerialMaybe(t *testing.T) {
 			&State{
 				Serial: 3,
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Primary: &InstanceState{
 									Meta: map[string]string{},
 								},
@@ -531,10 +577,10 @@ func TestStateIncrementSerialMaybe(t *testing.T) {
 			&State{
 				Serial: 3,
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Primary: &InstanceState{
 									Meta: map[string]string{
 										"schema_version": "1",
@@ -552,7 +598,7 @@ func TestStateIncrementSerialMaybe(t *testing.T) {
 			&State{
 				Serial: 3,
 				Modules: []*ModuleState{
-					{Path: rootModulePath},
+					&ModuleState{Path: rootModulePath},
 				},
 			},
 			5,
@@ -581,10 +627,17 @@ func TestStateRemove(t *testing.T) {
 			"test_instance.foo",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -596,9 +649,16 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
-						Path:      rootModulePath,
-						Resources: map[string]*ResourceState{},
+					&ModuleState{
+						Path: rootModulePath,
+						Resources: map[string]*ResourceState{
+							"test_instance.bar": &ResourceState{
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+						},
 					},
 				},
 			},
@@ -608,10 +668,10 @@ func TestStateRemove(t *testing.T) {
 			"test_instance.foo.primary",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -623,7 +683,7 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path:      rootModulePath,
 						Resources: map[string]*ResourceState{},
 					},
@@ -635,17 +695,17 @@ func TestStateRemove(t *testing.T) {
 			"test_instance.foo[0]",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo.0": {
+							"test_instance.foo.0": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.foo.1": {
+							"test_instance.foo.1": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -657,10 +717,10 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo.1": {
+							"test_instance.foo.1": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -676,17 +736,17 @@ func TestStateRemove(t *testing.T) {
 			"test_instance.foo",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo.0": {
+							"test_instance.foo.0": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.foo.1": {
+							"test_instance.foo.1": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -698,7 +758,7 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path:      rootModulePath,
 						Resources: map[string]*ResourceState{},
 					},
@@ -710,10 +770,10 @@ func TestStateRemove(t *testing.T) {
 			"module.foo",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -722,17 +782,17 @@ func TestStateRemove(t *testing.T) {
 						},
 					},
 
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -744,10 +804,10 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -763,10 +823,10 @@ func TestStateRemove(t *testing.T) {
 			"module.foo",
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -775,17 +835,17 @@ func TestStateRemove(t *testing.T) {
 						},
 					},
 
-					{
+					&ModuleState{
 						Path: []string{"root", "foo"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -794,17 +854,17 @@ func TestStateRemove(t *testing.T) {
 						},
 					},
 
-					{
+					&ModuleState{
 						Path: []string{"root", "foo", "bar"},
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
 								},
 							},
 
-							"test_instance.bar": {
+							"test_instance.bar": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -816,10 +876,10 @@ func TestStateRemove(t *testing.T) {
 			},
 			&State{
 				Modules: []*ModuleState{
-					{
+					&ModuleState{
 						Path: rootModulePath,
 						Resources: map[string]*ResourceState{
-							"test_instance.foo": {
+							"test_instance.foo": &ResourceState{
 								Type: "test_instance",
 								Primary: &InstanceState{
 									ID: "foo",
@@ -1122,7 +1182,7 @@ func TestStateEmpty(t *testing.T) {
 		{
 			&State{
 				Modules: []*ModuleState{
-					{},
+					&ModuleState{},
 				},
 			},
 			false,
@@ -1203,20 +1263,20 @@ func TestInstanceState_MergeDiff(t *testing.T) {
 
 	diff := &InstanceDiff{
 		Attributes: map[string]*ResourceAttrDiff{
-			"foo": {
+			"foo": &ResourceAttrDiff{
 				Old: "bar",
 				New: "baz",
 			},
-			"bar": {
+			"bar": &ResourceAttrDiff{
 				Old: "",
 				New: "foo",
 			},
-			"baz": {
+			"baz": &ResourceAttrDiff{
 				Old:         "",
 				New:         "foo",
 				NewComputed: true,
 			},
-			"port": {
+			"port": &ResourceAttrDiff{
 				NewRemoved: true,
 			},
 		},
@@ -1240,7 +1300,7 @@ func TestInstanceState_MergeDiff_nil(t *testing.T) {
 
 	diff := &InstanceDiff{
 		Attributes: map[string]*ResourceAttrDiff{
-			"foo": {
+			"foo": &ResourceAttrDiff{
 				Old: "",
 				New: "baz",
 			},
@@ -1279,7 +1339,8 @@ func TestInstanceState_MergeDiff_nilDiff(t *testing.T) {
 
 func TestReadWriteState(t *testing.T) {
 	state := &State{
-		Serial: 9,
+		Serial:  9,
+		Lineage: "5d1ad1a1-4027-4665-a908-dbe6adff11d8",
 		Remote: &RemoteState{
 			Type: "http",
 			Config: map[string]string{
@@ -1287,13 +1348,13 @@ func TestReadWriteState(t *testing.T) {
 			},
 		},
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Dependencies: []string{
 					"aws_instance.bar",
 				},
 				Resources: map[string]*ResourceState{
-					"foo": {
+					"foo": &ResourceState{
 						Primary: &InstanceState{
 							ID: "bar",
 							Ephemeral: EphemeralState{
@@ -1309,6 +1370,7 @@ func TestReadWriteState(t *testing.T) {
 			},
 		},
 	}
+	state.init()
 
 	buf := new(bytes.Buffer)
 	if err := WriteState(state, buf); err != nil {
@@ -1328,9 +1390,11 @@ func TestReadWriteState(t *testing.T) {
 	// ReadState should not restore sensitive information!
 	mod := state.RootModule()
 	mod.Resources["foo"].Primary.Ephemeral = EphemeralState{}
+	mod.Resources["foo"].Primary.Ephemeral.init()
 
 	if !reflect.DeepEqual(actual, state) {
-		t.Fatalf("bad: %#v", actual)
+		t.Logf("expected:\n%#v", state)
+		t.Fatalf("got:\n%#v", actual)
 	}
 }
 

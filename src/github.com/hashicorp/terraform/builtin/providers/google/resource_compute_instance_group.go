@@ -19,41 +19,41 @@ func resourceComputeInstanceGroup() *schema.Resource {
 		Delete: resourceComputeInstanceGroupDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"zone": {
+			"zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"instances": {
+			"instances": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"named_port": {
+			"named_port": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -61,23 +61,23 @@ func resourceComputeInstanceGroup() *schema.Resource {
 				},
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -136,7 +136,7 @@ func resourceComputeInstanceGroupCreate(d *schema.ResourceData, meta interface{}
 	d.SetId(instanceGroup.Name)
 
 	// Wait for the operation to complete
-	err = computeOperationWaitZone(config, op, d.Get("zone").(string), "Creating InstanceGroup")
+	err = computeOperationWaitZone(config, op, project, d.Get("zone").(string), "Creating InstanceGroup")
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func resourceComputeInstanceGroupCreate(d *schema.ResourceData, meta interface{}
 		}
 
 		// Wait for the operation to complete
-		err = computeOperationWaitZone(config, op, d.Get("zone").(string), "Adding instances to InstanceGroup")
+		err = computeOperationWaitZone(config, op, project, d.Get("zone").(string), "Adding instances to InstanceGroup")
 		if err != nil {
 			return err
 		}
@@ -264,7 +264,7 @@ func resourceComputeInstanceGroupUpdate(d *schema.ResourceData, meta interface{}
 			}
 
 			// Wait for the operation to complete
-			err = computeOperationWaitZone(config, removeOp, d.Get("zone").(string), "Updating InstanceGroup")
+			err = computeOperationWaitZone(config, removeOp, project, d.Get("zone").(string), "Updating InstanceGroup")
 			if err != nil {
 				return err
 			}
@@ -284,7 +284,7 @@ func resourceComputeInstanceGroupUpdate(d *schema.ResourceData, meta interface{}
 			}
 
 			// Wait for the operation to complete
-			err = computeOperationWaitZone(config, addOp, d.Get("zone").(string), "Updating InstanceGroup")
+			err = computeOperationWaitZone(config, addOp, project, d.Get("zone").(string), "Updating InstanceGroup")
 			if err != nil {
 				return err
 			}
@@ -307,7 +307,7 @@ func resourceComputeInstanceGroupUpdate(d *schema.ResourceData, meta interface{}
 			return fmt.Errorf("Error updating named ports for InstanceGroup: %s", err)
 		}
 
-		err = computeOperationWaitZone(config, op, d.Get("zone").(string), "Updating InstanceGroup")
+		err = computeOperationWaitZone(config, op, project, d.Get("zone").(string), "Updating InstanceGroup")
 		if err != nil {
 			return err
 		}
@@ -333,7 +333,7 @@ func resourceComputeInstanceGroupDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Error deleting InstanceGroup: %s", err)
 	}
 
-	err = computeOperationWaitZone(config, op, zone, "Deleting InstanceGroup")
+	err = computeOperationWaitZone(config, op, project, zone, "Deleting InstanceGroup")
 	if err != nil {
 		return err
 	}

@@ -15,27 +15,27 @@ func resourceRundeckPublicKey() *schema.Resource {
 		Read:   ReadPublicKey,
 
 		Schema: map[string]*schema.Schema{
-			"path": {
+			"path": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Path to the key within the key store",
 				ForceNew:    true,
 			},
 
-			"key_material": {
+			"key_material": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 				Description: "The public key data to store, in the usual OpenSSH public key file format",
 			},
 
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "URL at which the key content can be retrieved",
 			},
 
-			"delete": {
+			"delete": &schema.Schema{
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "True if the key should be deleted when the resource is deleted. Defaults to true if key_material is provided in the configuration.",

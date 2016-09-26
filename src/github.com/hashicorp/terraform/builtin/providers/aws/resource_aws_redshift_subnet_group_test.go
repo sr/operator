@@ -19,7 +19,7 @@ func TestAccAWSRedshiftSubnetGroup_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckRedshiftSubnetGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRedshiftSubnetGroupConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRedshiftSubnetGroupExists("aws_redshift_subnet_group.foo", &v),
@@ -41,7 +41,7 @@ func TestAccAWSRedshiftSubnetGroup_updateSubnetIds(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckRedshiftSubnetGroupDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccRedshiftSubnetGroupConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRedshiftSubnetGroupExists("aws_redshift_subnet_group.foo", &v),
@@ -50,7 +50,7 @@ func TestAccAWSRedshiftSubnetGroup_updateSubnetIds(t *testing.T) {
 				),
 			},
 
-			{
+			resource.TestStep{
 				Config: testAccRedshiftSubnetGroupConfig_updateSubnetIds,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRedshiftSubnetGroupExists("aws_redshift_subnet_group.foo", &v),

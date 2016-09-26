@@ -23,18 +23,18 @@ func resourceDigitalOceanDroplet() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -44,7 +44,7 @@ func resourceDigitalOceanDroplet() *schema.Resource {
 				},
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				StateFunc: func(val interface{}) string {
@@ -53,70 +53,73 @@ func resourceDigitalOceanDroplet() *schema.Resource {
 				},
 			},
 
-			"status": {
+			"status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"locked": {
+			"locked": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"backups": {
+			"backups": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"ipv6": {
+			"ipv6": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"ipv6_address": {
+			"ipv6_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				StateFunc: func(val interface{}) string {
+					return strings.ToLower(val.(string))
+				},
+			},
+
+			"ipv6_address_private": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ipv6_address_private": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-
-			"private_networking": {
+			"private_networking": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"ipv4_address": {
+			"ipv4_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ipv4_address_private": {
+			"ipv4_address_private": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"ssh_keys": {
+			"ssh_keys": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"tags": {
+			"tags": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
-			"user_data": {
+			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"volume_ids": {
+			"volume_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
@@ -253,7 +256,7 @@ func resourceDigitalOceanDropletRead(d *schema.ResourceData, meta interface{}) e
 
 	if publicIPv6 := findIPv6AddrByType(droplet, "public"); publicIPv6 != "" {
 		d.Set("ipv6", true)
-		d.Set("ipv6_address", publicIPv6)
+		d.Set("ipv6_address", strings.ToLower(publicIPv6))
 		d.Set("ipv6_address_private", findIPv6AddrByType(droplet, "private"))
 	}
 

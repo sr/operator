@@ -19,14 +19,14 @@ func TestAccAWSUser_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSUserDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccAWSUserConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSUserExists("aws_iam_user.user", &conf),
 					testAccCheckAWSUserAttributes(&conf, "test-user", "/"),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccAWSUserConfig2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSUserExists("aws_iam_user.user", &conf),

@@ -14,43 +14,47 @@ func dataSourceAwsEcsContainerDefinition() *schema.Resource {
 		Read: dataSourceAwsEcsContainerDefinitionRead,
 
 		Schema: map[string]*schema.Schema{
-			"task_definition": {
+			"task_definition": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"container_name": {
+			"container_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 			// Computed values.
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"image_digest": {
+			"image_digest": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"cpu": {
+			"cpu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"memory": {
+			"memory": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"disable_networking": {
+			"memory_reservation": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"disable_networking": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"docker_labels": {
+			"docker_labels": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 				Elem:     schema.TypeString,
 			},
-			"environment": {
+			"environment": &schema.Schema{
 				Type:     schema.TypeMap,
 				Computed: true,
 				Elem:     schema.TypeString,
@@ -65,6 +69,7 @@ func dataSourceAwsEcsContainerDefinitionRead(d *schema.ResourceData, meta interf
 	desc, err := conn.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: aws.String(d.Get("task_definition").(string)),
 	})
+
 	if err != nil {
 		return err
 	}
@@ -77,9 +82,13 @@ func dataSourceAwsEcsContainerDefinitionRead(d *schema.ResourceData, meta interf
 
 		d.SetId(fmt.Sprintf("%s/%s", aws.StringValue(taskDefinition.TaskDefinitionArn), d.Get("container_name").(string)))
 		d.Set("image", aws.StringValue(def.Image))
-		d.Set("image_digest", strings.Split(aws.StringValue(def.Image), ":")[1])
+		image := aws.StringValue(def.Image)
+		if strings.Contains(image, ":") {
+			d.Set("image_digest", strings.Split(image, ":")[1])
+		}
 		d.Set("cpu", aws.Int64Value(def.Cpu))
 		d.Set("memory", aws.Int64Value(def.Memory))
+		d.Set("memory_reservation", aws.Int64Value(def.MemoryReservation))
 		d.Set("disable_networking", aws.BoolValue(def.DisableNetworking))
 		d.Set("docker_labels", aws.StringValueMap(def.DockerLabels))
 

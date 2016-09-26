@@ -21,20 +21,20 @@ func resourceAwsCloudWatchLogGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateLogGroupName,
 			},
 
-			"retention_in_days": {
+			"retention_in_days": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 			},
 
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -76,11 +76,11 @@ func resourceAwsCloudWatchLogGroupRead(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] Found Log Group: %#v", *lg)
 
-	d.Set("arn", *lg.Arn)
-	d.Set("name", *lg.LogGroupName)
+	d.Set("arn", lg.Arn)
+	d.Set("name", lg.LogGroupName)
 
 	if lg.RetentionInDays != nil {
-		d.Set("retention_in_days", *lg.RetentionInDays)
+		d.Set("retention_in_days", lg.RetentionInDays)
 	}
 
 	return nil

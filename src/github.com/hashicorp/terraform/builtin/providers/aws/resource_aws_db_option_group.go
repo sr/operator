@@ -26,68 +26,68 @@ func resourceAwsDbOptionGroup() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateDbOptionGroupName,
 			},
-			"engine_name": {
+			"engine_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"major_engine_version": {
+			"major_engine_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"option_group_description": {
+			"option_group_description": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"option": {
+			"option": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"option_name": {
+						"option_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"option_settings": {
+						"option_settings": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"name": {
+									"name": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"value": {
+									"value": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
 								},
 							},
 						},
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"db_security_group_memberships": {
+						"db_security_group_memberships": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
-						"vpc_security_group_memberships": {
+						"vpc_security_group_memberships": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},

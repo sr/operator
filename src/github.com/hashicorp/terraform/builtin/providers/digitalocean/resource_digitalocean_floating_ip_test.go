@@ -17,7 +17,7 @@ func TestAccDigitalOceanFloatingIP_Region(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDigitalOceanFloatingIPDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckDigitalOceanFloatingIPConfig_region,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDigitalOceanFloatingIPExists("digitalocean_floating_ip.foobar", &floatingIP),
@@ -37,7 +37,7 @@ func TestAccDigitalOceanFloatingIP_Droplet(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckDigitalOceanFloatingIPDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckDigitalOceanFloatingIPConfig_droplet,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDigitalOceanFloatingIPExists("digitalocean_floating_ip.foobar", &floatingIP),
@@ -113,7 +113,7 @@ resource "digitalocean_ssh_key" "foobar" {
 resource "digitalocean_droplet" "foobar" {
   name               = "baz"
   size               = "1gb"
-  image              = "centos-5-8-x32"
+  image              = "centos-7-x64"
   region             = "nyc3"
   ipv6               = true
   private_networking = true

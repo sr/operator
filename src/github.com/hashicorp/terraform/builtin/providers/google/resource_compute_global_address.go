@@ -16,24 +16,24 @@ func resourceComputeGlobalAddress() *schema.Resource {
 		Delete: resourceComputeGlobalAddressDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -60,7 +60,7 @@ func resourceComputeGlobalAddressCreate(d *schema.ResourceData, meta interface{}
 	// It probably maybe worked, so store the ID now
 	d.SetId(addr.Name)
 
-	err = computeOperationWaitGlobal(config, op, "Creating Global Address")
+	err = computeOperationWaitGlobal(config, op, project, "Creating Global Address")
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func resourceComputeGlobalAddressDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Error deleting address: %s", err)
 	}
 
-	err = computeOperationWaitGlobal(config, op, "Deleting Global Address")
+	err = computeOperationWaitGlobal(config, op, project, "Deleting Global Address")
 	if err != nil {
 		return err
 	}

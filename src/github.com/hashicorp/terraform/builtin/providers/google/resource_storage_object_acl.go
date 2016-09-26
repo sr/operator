@@ -18,25 +18,25 @@ func resourceStorageObjectAcl() *schema.Resource {
 		Delete: resourceStorageObjectAclDelete,
 
 		Schema: map[string]*schema.Schema{
-			"bucket": {
+			"bucket": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"object": {
+			"object": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"predefined_acl": {
+			"predefined_acl": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"role_entity": {
+			"role_entity": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -220,7 +220,7 @@ func resourceStorageObjectAclUpdate(d *schema.ResourceData, meta interface{}) er
 			}
 		}
 
-		for entity := range old_re_map {
+		for entity, _ := range old_re_map {
 			log.Printf("[DEBUG]: removing entity %s", entity)
 			err := config.clientStorage.ObjectAccessControls.Delete(bucket, object, entity).Do()
 

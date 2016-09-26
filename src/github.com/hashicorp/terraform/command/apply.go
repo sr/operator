@@ -232,12 +232,19 @@ func (c *ApplyCommand) Run(args []string) int {
 		return 1
 	}
 
-	c.Ui.Output(c.Colorize().Color(fmt.Sprintf(
-		"[reset][bold][green]\n"+
-			"Apply complete! Resources: %d added, %d changed, %d destroyed.",
-		countHook.Added,
-		countHook.Changed,
-		countHook.Removed)))
+	if c.Destroy {
+		c.Ui.Output(c.Colorize().Color(fmt.Sprintf(
+			"[reset][bold][green]\n"+
+				"Destroy complete! Resources: %d destroyed.",
+			countHook.Removed)))
+	} else {
+		c.Ui.Output(c.Colorize().Color(fmt.Sprintf(
+			"[reset][bold][green]\n"+
+				"Apply complete! Resources: %d added, %d changed, %d destroyed.",
+			countHook.Added,
+			countHook.Changed,
+			countHook.Removed)))
+	}
 
 	if countHook.Added > 0 || countHook.Changed > 0 {
 		c.Ui.Output(c.Colorize().Color(fmt.Sprintf(
@@ -399,7 +406,7 @@ func outputsAsString(state *terraform.State, modPath []string, schema []*config.
 		// Output the outputs in alphabetical order
 		keyLen := 0
 		ks := make([]string, 0, len(outputs))
-		for key := range outputs {
+		for key, _ := range outputs {
 			ks = append(ks, key)
 			if len(key) > keyLen {
 				keyLen = len(key)

@@ -125,150 +125,150 @@ func resourceVSphereVirtualMachine() *schema.Resource {
 		MigrateState:  resourceVSphereVirtualMachineMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"folder": {
+			"folder": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"vcpu": {
+			"vcpu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 
-			"memory": {
+			"memory": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
 
-			"memory_reservation": {
+			"memory_reservation": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
 				ForceNew: true,
 			},
 
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"cluster": {
+			"cluster": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"resource_pool": {
+			"resource_pool": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"linked_clone": {
+			"linked_clone": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
-			"gateway": {
+			"gateway": &schema.Schema{
 				Type:       schema.TypeString,
 				Optional:   true,
 				ForceNew:   true,
 				Deprecated: "Please use network_interface.ipv4_gateway",
 			},
 
-			"domain": {
+			"domain": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "vsphere.local",
 			},
 
-			"time_zone": {
+			"time_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  "Etc/UTC",
 			},
 
-			"dns_suffixes": {
+			"dns_suffixes": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
 
-			"dns_servers": {
+			"dns_servers": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
 
-			"skip_customization": {
+			"skip_customization": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  false,
 			},
 
-			"enable_disk_uuid": {
+			"enable_disk_uuid": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  false,
 			},
 
-			"uuid": {
+			"uuid": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"custom_configuration_parameters": {
+			"custom_configuration_parameters": &schema.Schema{
 				Type:     schema.TypeMap,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"windows_opt_config": {
+			"windows_opt_config": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"product_key": {
+						"product_key": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"admin_password": {
+						"admin_password": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"domain_user": {
+						"domain_user": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"domain": {
+						"domain": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"domain_user_password": {
+						"domain_user_password": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
@@ -277,75 +277,75 @@ func resourceVSphereVirtualMachine() *schema.Resource {
 				},
 			},
 
-			"network_interface": {
+			"network_interface": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"label": {
+						"label": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"ip_address": {
+						"ip_address": &schema.Schema{
 							Type:       schema.TypeString,
 							Optional:   true,
 							Computed:   true,
 							Deprecated: "Please use ipv4_address",
 						},
 
-						"subnet_mask": {
+						"subnet_mask": &schema.Schema{
 							Type:       schema.TypeString,
 							Optional:   true,
 							Computed:   true,
 							Deprecated: "Please use ipv4_prefix_length",
 						},
 
-						"ipv4_address": {
+						"ipv4_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ipv4_prefix_length": {
+						"ipv4_prefix_length": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ipv4_gateway": {
+						"ipv4_gateway": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ipv6_address": {
+						"ipv6_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ipv6_prefix_length": {
+						"ipv6_prefix_length": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
 						},
 
-						"ipv6_gateway": {
+						"ipv6_gateway": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"adapter_type": {
+						"adapter_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"mac_address": {
+						"mac_address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
@@ -354,77 +354,77 @@ func resourceVSphereVirtualMachine() *schema.Resource {
 				},
 			},
 
-			"disk": {
+			"disk": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"uuid": {
+						"uuid": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"key": {
+						"key": &schema.Schema{
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
 
-						"template": {
+						"template": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"type": {
+						"type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "eager_zeroed",
 							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 								value := v.(string)
-								if value != "thin" && value != "eager_zeroed" {
+								if value != "thin" && value != "eager_zeroed" && value != "lazy" {
 									errors = append(errors, fmt.Errorf(
-										"only 'thin' and 'eager_zeroed' are supported values for 'type'"))
+										"only 'thin', 'eager_zeroed', and 'lazy' are supported values for 'type'"))
 								}
 								return
 							},
 						},
 
-						"datastore": {
+						"datastore": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"size": {
+						"size": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"iops": {
+						"iops": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
 
-						"vmdk": {
+						"vmdk": &schema.Schema{
 							// TODO: Add ValidateFunc to confirm path exists
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 
-						"bootable": {
+						"bootable": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"keep_on_remove": {
+						"keep_on_remove": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 
-						"controller_type": {
+						"controller_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "scsi",
@@ -447,19 +447,19 @@ func resourceVSphereVirtualMachine() *schema.Resource {
 				},
 			},
 
-			"cdrom": {
+			"cdrom": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"datastore": {
+						"datastore": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"path": {
+						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
@@ -580,8 +580,15 @@ func resourceVSphereVirtualMachineUpdate(d *schema.ResourceData, meta interface{
 					return fmt.Errorf("[ERROR] resourceVSphereVirtualMachineUpdate - Neither vmdk path nor vmdk name was given")
 				}
 
+				var initType string
+				if disk["type"] != "" {
+					initType = disk["type"].(string)
+				} else {
+					initType = "thin"
+				}
+
 				log.Printf("[INFO] Attaching disk: %v", diskPath)
-				err = addHardDisk(vm, size, iops, "thin", datastore, diskPath, controller_type)
+				err = addHardDisk(vm, size, iops, initType, datastore, diskPath, controller_type)
 				if err != nil {
 					log.Printf("[ERROR] Add Hard Disk Failed: %v", err)
 					return err
@@ -918,10 +925,14 @@ func resourceVSphereVirtualMachineRead(d *schema.ResourceData, meta interface{})
 
 	if state == types.VirtualMachinePowerStatePoweredOn {
 		// wait for interfaces to appear
-		_, err = vm.WaitForNetIP(context.TODO(), true)
+		log.Printf("[DEBUG] Waiting for interfaces to appear")
+
+		_, err = vm.WaitForNetIP(context.TODO(), false)
 		if err != nil {
 			return err
 		}
+
+		log.Printf("[DEBUG] Successfully waited for interfaces to appear")
 	}
 
 	var mvm mo.VirtualMachine
@@ -1198,6 +1209,12 @@ func addHardDisk(vm *object.VirtualMachine, size, iops int64, diskType string, d
 	}
 
 	if err != nil || controller == nil {
+		// Check if max number of scsi controller are already used
+		diskControllers := getSCSIControllers(devices)
+		if len(diskControllers) >= 4 {
+			return fmt.Errorf("[ERROR] Maximum number of SCSI controllers created")
+		}
+
 		log.Printf("[DEBUG] Couldn't find a %v controller.  Creating one..", controller_type)
 
 		var c types.BaseVirtualDevice
@@ -1262,11 +1279,18 @@ func addHardDisk(vm *object.VirtualMachine, size, iops int64, diskType string, d
 	if diskPath == "" {
 		return fmt.Errorf("[ERROR] addHardDisk - No path proided")
 	} else {
-		// TODO Check if diskPath & datastore exist
-		diskPath = fmt.Sprintf("[%v] %v", datastore.Name(), diskPath)
+		diskPath = datastore.Path(diskPath)
 	}
 	log.Printf("[DEBUG] addHardDisk - diskPath: %v", diskPath)
 	disk := devices.CreateDisk(controller, datastore.Reference(), diskPath)
+
+	if strings.Contains(controller_type, "scsi") {
+		unitNumber, err := getNextUnitNumber(devices, controller)
+		if err != nil {
+			return err
+		}
+		*disk.UnitNumber = unitNumber
+	}
 
 	existing := devices.SelectByBackingInfo(disk.Backing)
 	log.Printf("[DEBUG] disk: %#v\n", disk)
@@ -1284,6 +1308,10 @@ func addHardDisk(vm *object.VirtualMachine, size, iops int64, diskType string, d
 			// eager zeroed thick virtual disk
 			backing.ThinProvisioned = types.NewBool(false)
 			backing.EagerlyScrub = types.NewBool(true)
+		} else if diskType == "lazy" {
+			// lazy zeroed thick virtual disk
+			backing.ThinProvisioned = types.NewBool(false)
+			backing.EagerlyScrub = types.NewBool(false)
 		} else if diskType == "thin" {
 			// thin provisioned virtual disk
 			backing.ThinProvisioned = types.NewBool(true)
@@ -1300,8 +1328,46 @@ func addHardDisk(vm *object.VirtualMachine, size, iops int64, diskType string, d
 	}
 }
 
+func getSCSIControllers(vmDevices object.VirtualDeviceList) []*types.VirtualController {
+	// get virtual scsi controllers of all supported types
+	var scsiControllers []*types.VirtualController
+	for _, device := range vmDevices {
+		devType := vmDevices.Type(device)
+		switch devType {
+		case "scsi", "lsilogic", "buslogic", "pvscsi", "lsilogic-sas":
+			if c, ok := device.(types.BaseVirtualController); ok {
+				scsiControllers = append(scsiControllers, c.GetVirtualController())
+			}
+		}
+	}
+	return scsiControllers
+}
+
+func getNextUnitNumber(devices object.VirtualDeviceList, c types.BaseVirtualController) (int32, error) {
+	key := c.GetVirtualController().Key
+
+	var unitNumbers [16]bool
+	unitNumbers[7] = true
+
+	for _, device := range devices {
+		d := device.GetVirtualDevice()
+
+		if d.ControllerKey == key {
+			if d.UnitNumber != nil {
+				unitNumbers[*d.UnitNumber] = true
+			}
+		}
+	}
+	for i, taken := range unitNumbers {
+		if !taken {
+			return int32(i), nil
+		}
+	}
+	return -1, fmt.Errorf("[ERROR] getNextUnitNumber - controller is full")
+}
+
 // addCdrom adds a new virtual cdrom drive to the VirtualMachine and attaches an image (ISO) to it from a datastore path.
-func addCdrom(vm *object.VirtualMachine, datastore, path string) error {
+func addCdrom(client *govmomi.Client, vm *object.VirtualMachine, datacenter *object.Datacenter, datastore, path string) error {
 	devices, err := vm.Device(context.TODO())
 	if err != nil {
 		return err
@@ -1343,7 +1409,14 @@ func addCdrom(vm *object.VirtualMachine, datastore, path string) error {
 		return err
 	}
 
-	c = devices.InsertIso(c, fmt.Sprintf("[%s] %s", datastore, path))
+	finder := find.NewFinder(client.Client, true)
+	finder = finder.SetDatacenter(datacenter)
+	ds, err := getDatastore(finder, datastore)
+	if err != nil {
+		return err
+	}
+
+	c = devices.InsertIso(c, ds.Path(path))
 	log.Printf("[DEBUG] addCdrom: %#v", c)
 
 	return vm.AddDevice(context.TODO(), c)
@@ -1425,6 +1498,7 @@ func buildVMRelocateSpec(rp *object.ResourcePool, ds *object.Datastore, vm *obje
 	}
 
 	isThin := initType == "thin"
+	eagerScrub := initType == "eager_zeroed"
 	rpr := rp.Reference()
 	dsr := ds.Reference()
 	return types.VirtualMachineRelocateSpec{
@@ -1437,7 +1511,7 @@ func buildVMRelocateSpec(rp *object.ResourcePool, ds *object.Datastore, vm *obje
 				DiskBackingInfo: &types.VirtualDiskFlatVer2BackingInfo{
 					DiskMode:        "persistent",
 					ThinProvisioned: types.NewBool(isThin),
-					EagerlyScrub:    types.NewBool(!isThin),
+					EagerlyScrub:    types.NewBool(eagerScrub),
 				},
 				DiskId: key,
 			},
@@ -1550,12 +1624,12 @@ func findDatastore(c *govmomi.Client, sps types.StoragePlacementSpec) (*object.D
 }
 
 // createCdroms is a helper function to attach virtual cdrom devices (and their attached disk images) to a virtual IDE controller.
-func createCdroms(vm *object.VirtualMachine, cdroms []cdrom) error {
+func createCdroms(client *govmomi.Client, vm *object.VirtualMachine, datacenter *object.Datacenter, cdroms []cdrom) error {
 	log.Printf("[DEBUG] add cdroms: %v", cdroms)
 	for _, cd := range cdroms {
 		log.Printf("[DEBUG] add cdrom (datastore): %v", cd.datastore)
 		log.Printf("[DEBUG] add cdrom (cd path): %v", cd.path)
-		err := addCdrom(vm, cd.datastore, cd.path)
+		err := addCdrom(client, vm, datacenter, cd.datastore, cd.path)
 		if err != nil {
 			return err
 		}
@@ -1872,7 +1946,7 @@ func (vm *virtualMachine) setupVirtualMachine(c *govmomi.Client) error {
 	}
 
 	// Create the cdroms if needed.
-	if err := createCdroms(newVM, vm.cdroms); err != nil {
+	if err := createCdroms(c, newVM, dc, vm.cdroms); err != nil {
 		return err
 	}
 
@@ -1899,9 +1973,12 @@ func (vm *virtualMachine) setupVirtualMachine(c *govmomi.Client) error {
 		default:
 			return fmt.Errorf("[ERROR] setupVirtualMachine - Neither vmdk path nor vmdk name was given: %#v", vm.hardDisks[i])
 		}
-
 		err = addHardDisk(newVM, vm.hardDisks[i].size, vm.hardDisks[i].iops, vm.hardDisks[i].initType, datastore, diskPath, vm.hardDisks[i].controller)
 		if err != nil {
+			err2 := addHardDisk(newVM, vm.hardDisks[i].size, vm.hardDisks[i].iops, vm.hardDisks[i].initType, datastore, diskPath, vm.hardDisks[i].controller)
+			if err2 != nil {
+				return err2
+			}
 			return err
 		}
 	}

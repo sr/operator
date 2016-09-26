@@ -10,19 +10,19 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"url": {
+			"url": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("RUNDECK_URL", nil),
 				Description: "URL of the root of the target Rundeck server.",
 			},
-			"auth_token": {
+			"auth_token": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("RUNDECK_AUTH_TOKEN", nil),
 				Description: "Auth token to use with the Rundeck API.",
 			},
-			"allow_unverified_ssl": {
+			"allow_unverified_ssl": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Description: "If set, the Rundeck client will permit unverifiable SSL certificates.",

@@ -23,20 +23,20 @@ func resourceAwsIamSamlProvider() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"arn": {
+			"arn": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"valid_until": {
+			"valid_until": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"saml_metadata_document": {
+			"saml_metadata_document": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},

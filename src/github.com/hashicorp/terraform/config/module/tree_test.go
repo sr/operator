@@ -183,7 +183,7 @@ func TestTreeModules(t *testing.T) {
 	actual := tree.Modules()
 
 	expected := []*Module{
-		{Name: "foo", Source: "./foo"},
+		&Module{Name: "foo", Source: "./foo"},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {

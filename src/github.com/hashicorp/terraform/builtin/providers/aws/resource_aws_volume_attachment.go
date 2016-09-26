@@ -21,25 +21,25 @@ func resourceAwsVolumeAttachment() *schema.Resource {
 		Delete: resourceAwsVolumeAttachmentDelete,
 
 		Schema: map[string]*schema.Schema{
-			"device_name": {
+			"device_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"instance_id": {
+			"instance_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"volume_id": {
+			"volume_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"force_detach": {
+			"force_detach": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -96,7 +96,7 @@ func volumeAttachmentStateRefreshFunc(conn *ec2.EC2, volumeID, instanceID string
 		request := &ec2.DescribeVolumesInput{
 			VolumeIds: []*string{aws.String(volumeID)},
 			Filters: []*ec2.Filter{
-				{
+				&ec2.Filter{
 					Name:   aws.String("attachment.instance-id"),
 					Values: []*string{aws.String(instanceID)},
 				},
@@ -129,7 +129,7 @@ func resourceAwsVolumeAttachmentRead(d *schema.ResourceData, meta interface{}) e
 	request := &ec2.DescribeVolumesInput{
 		VolumeIds: []*string{aws.String(d.Get("volume_id").(string))},
 		Filters: []*ec2.Filter{
-			{
+			&ec2.Filter{
 				Name:   aws.String("attachment.instance-id"),
 				Values: []*string{aws.String(d.Get("instance_id").(string))},
 			},
@@ -161,6 +161,10 @@ func resourceAwsVolumeAttachmentDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	_, err := conn.DetachVolume(opts)
+	if err != nil {
+		return fmt.Errorf("Failed to detach Volume (%s) from Instance (%s): %s",
+			vID, iID, err)
+	}
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"detaching"},
 		Target:     []string{"detached"},

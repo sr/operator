@@ -2,7 +2,9 @@ package azure
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"strings"
@@ -35,13 +37,13 @@ func resourceAzureInstance() *schema.Resource {
 		Delete: resourceAzureInstanceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"hosted_service_name": {
+			"hosted_service_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -53,114 +55,114 @@ func resourceAzureInstance() *schema.Resource {
 			// service and the instance despite their being created separately,
 			// we must maintain a flag to definitively denote whether this
 			// instance had a hosted service created for it or not:
-			"has_dedicated_service": {
+			"has_dedicated_service": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"image": {
+			"image": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"size": {
+			"size": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"subnet": {
+			"subnet": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"virtual_network": {
+			"virtual_network": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"storage_service_name": {
+			"storage_service_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"reverse_dns": {
+			"reverse_dns": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"automatic_updates": {
+			"automatic_updates": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"time_zone": {
+			"time_zone": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"ssh_key_thumbprint": {
+			"ssh_key_thumbprint": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"protocol": {
+						"protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "tcp",
 						},
 
-						"public_port": {
+						"public_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
 
-						"private_port": {
+						"private_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -169,44 +171,57 @@ func resourceAzureInstance() *schema.Resource {
 				Set: resourceAzureEndpointHash,
 			},
 
-			"security_group": {
+			"security_group": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"vip_address": {
+			"vip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"domain_name": {
+			"domain_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"domain_username": {
+			"domain_username": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"domain_password": {
+			"domain_password": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"domain_ou": {
+			"domain_ou": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+			},
+
+			"custom_data": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				StateFunc: func(v interface{}) string {
+					if s, ok := v.(string); ok && s != "" {
+						hash := sha1.Sum([]byte(s))
+						return hex.EncodeToString(hash[:])
+					}
+					return ""
+				},
 			},
 		},
 	}
@@ -277,6 +292,18 @@ func resourceAzureInstanceCreate(d *schema.ResourceData, meta interface{}) (err 
 		return fmt.Errorf("Error configuring the deployment for %s: %s", name, err)
 	}
 
+	var customData string
+	if data, ok := d.GetOk("custom_data"); ok {
+		data := data.(string)
+
+		// Ensure the custom_data is not double-encoded.
+		if _, err := base64.StdEncoding.DecodeString(data); err != nil {
+			customData = base64.StdEncoding.EncodeToString([]byte(data))
+		} else {
+			customData = data
+		}
+	}
+
 	if osType == linux {
 		// This is pretty ugly, but the Azure SDK leaves me no other choice...
 		if tp, ok := d.GetOk("ssh_key_thumbprint"); ok {
@@ -297,6 +324,13 @@ func resourceAzureInstanceCreate(d *schema.ResourceData, meta interface{}) (err 
 		}
 		if err != nil {
 			return fmt.Errorf("Error configuring %s for Linux: %s", name, err)
+		}
+
+		if customData != "" {
+			err = vmutils.ConfigureWithCustomDataForLinux(&role, customData)
+			if err != nil {
+				return fmt.Errorf("Error configuring custom data for %s: %s", name, err)
+			}
 		}
 	}
 
@@ -323,6 +357,13 @@ func resourceAzureInstanceCreate(d *schema.ResourceData, meta interface{}) (err 
 			)
 			if err != nil {
 				return fmt.Errorf("Error configuring %s for WindowsToJoinDomain: %s", name, err)
+			}
+		}
+
+		if customData != "" {
+			err = vmutils.ConfigureWithCustomDataForWindows(&role, customData)
+			if err != nil {
+				return fmt.Errorf("Error configuring custom data for %s: %s", name, err)
 			}
 		}
 	}

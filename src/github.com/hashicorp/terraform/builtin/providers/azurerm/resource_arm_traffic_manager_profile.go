@@ -150,13 +150,14 @@ func resourceArmTrafficManagerProfileRead(d *schema.ResourceData, meta interface
 	name := id.Path["trafficManagerProfiles"]
 
 	resp, err := client.Get(resGroup, name)
+	if err != nil {
+		return fmt.Errorf("Error making Read request on Traffic Manager Profile %s: %s", name, err)
+	}
 	if resp.StatusCode == http.StatusNotFound {
 		d.SetId("")
 		return nil
 	}
-	if err != nil {
-		return fmt.Errorf("Error making Read request on Traffic Manager Profile %s: %s", name, err)
-	}
+
 	profile := *resp.Properties
 
 	// update appropriate values
@@ -287,9 +288,9 @@ func validateAzureRMTrafficManagerStatus(i interface{}, k string) (s []string, e
 
 func validateAzureRMTrafficManagerRoutingMethod(i interface{}, k string) (s []string, errors []error) {
 	valid := map[string]struct{}{
-		"Performance": {},
-		"Weighted":    {},
-		"Priority":    {},
+		"Performance": struct{}{},
+		"Weighted":    struct{}{},
+		"Priority":    struct{}{},
 	}
 
 	if _, ok := valid[i.(string)]; !ok {

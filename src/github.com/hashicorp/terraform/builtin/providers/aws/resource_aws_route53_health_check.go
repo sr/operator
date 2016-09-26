@@ -24,7 +24,7 @@ func resourceAwsRoute53HealthCheck() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -32,57 +32,58 @@ func resourceAwsRoute53HealthCheck() *schema.Resource {
 					return strings.ToUpper(val.(string))
 				},
 			},
-			"failure_threshold": {
+			"failure_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"request_interval": {
+			"request_interval": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true, // todo this should be updateable but the awslabs route53 service doesnt have the ability
 			},
-			"ip_address": {
+			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"fqdn": {
+			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"port": {
+			"port": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 
-			"invert_healthcheck": {
+			"invert_healthcheck": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
 
-			"resource_path": {
+			"resource_path": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"search_string": {
+			"search_string": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"measure_latency": {
+
+			"measure_latency": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 				ForceNew: true,
 			},
 
-			"child_healthchecks": {
+			"child_healthchecks": &schema.Schema{
 				Type:     schema.TypeSet,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 				Set:      schema.HashString,
 			},
-			"child_health_threshold": {
+			"child_health_threshold": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, es []error) {
@@ -93,6 +94,21 @@ func resourceAwsRoute53HealthCheck() *schema.Resource {
 					}
 					return
 				},
+			},
+
+			"cloudwatch_alarm_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
+			"cloudwatch_alarm_region": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+
+			"insufficient_data_health_status": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 
 			"tags": tagsSchema(),
@@ -133,6 +149,19 @@ func resourceAwsRoute53HealthCheckUpdate(d *schema.ResourceData, meta interface{
 	}
 	if d.HasChange("child_health_threshold") {
 		updateHealthCheck.HealthThreshold = aws.Int64(int64(d.Get("child_health_threshold").(int)))
+	}
+
+	if d.HasChange("cloudwatch_alarm_name") || d.HasChange("cloudwatch_alarm_region") {
+		cloudwatchAlarm := &route53.AlarmIdentifier{
+			Name:   aws.String(d.Get("cloudwatch_alarm_name").(string)),
+			Region: aws.String(d.Get("cloudwatch_alarm_region").(string)),
+		}
+
+		updateHealthCheck.AlarmIdentifier = cloudwatchAlarm
+	}
+
+	if d.HasChange("insufficient_data_health_status") {
+		updateHealthCheck.InsufficientDataHealthStatus = aws.String(d.Get("insufficient_data_health_status").(string))
 	}
 
 	_, err := conn.UpdateHealthCheck(updateHealthCheck)
@@ -182,7 +211,7 @@ func resourceAwsRoute53HealthCheckCreate(d *schema.ResourceData, meta interface{
 		healthConfig.ResourcePath = aws.String(v.(string))
 	}
 
-	if *healthConfig.Type != route53.HealthCheckTypeCalculated {
+	if *healthConfig.Type != route53.HealthCheckTypeCalculated && *healthConfig.Type != route53.HealthCheckTypeCloudwatchMetric {
 		if v, ok := d.GetOk("measure_latency"); ok {
 			healthConfig.MeasureLatency = aws.Bool(v.(bool))
 		}
@@ -199,6 +228,24 @@ func resourceAwsRoute53HealthCheckCreate(d *schema.ResourceData, meta interface{
 
 		if v, ok := d.GetOk("child_health_threshold"); ok {
 			healthConfig.HealthThreshold = aws.Int64(int64(v.(int)))
+		}
+	}
+
+	if *healthConfig.Type == route53.HealthCheckTypeCloudwatchMetric {
+		cloudwatchAlarmIdentifier := &route53.AlarmIdentifier{}
+
+		if v, ok := d.GetOk("cloudwatch_alarm_name"); ok {
+			cloudwatchAlarmIdentifier.Name = aws.String(v.(string))
+		}
+
+		if v, ok := d.GetOk("cloudwatch_alarm_region"); ok {
+			cloudwatchAlarmIdentifier.Region = aws.String(v.(string))
+		}
+
+		healthConfig.AlarmIdentifier = cloudwatchAlarmIdentifier
+
+		if v, ok := d.GetOk("insufficient_data_health_status"); ok {
+			healthConfig.InsufficientDataHealthStatus = aws.String(v.(string))
 		}
 	}
 
@@ -252,6 +299,12 @@ func resourceAwsRoute53HealthCheckRead(d *schema.ResourceData, meta interface{})
 	d.Set("invert_healthcheck", updated.Inverted)
 	d.Set("child_healthchecks", updated.ChildHealthChecks)
 	d.Set("child_health_threshold", updated.HealthThreshold)
+	d.Set("insufficient_data_health_status", updated.InsufficientDataHealthStatus)
+
+	if updated.AlarmIdentifier != nil {
+		d.Set("cloudwatch_alarm_name", updated.AlarmIdentifier.Name)
+		d.Set("cloudwatch_alarm_region", updated.AlarmIdentifier.Region)
+	}
 
 	// read the tags
 	req := &route53.ListTagsForResourceInput{

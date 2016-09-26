@@ -13,12 +13,12 @@ func TestFormatPlan_rootDataSource(t *testing.T) {
 	plan := &terraform.Plan{
 		Diff: &terraform.Diff{
 			Modules: []*terraform.ModuleDiff{
-				{
+				&terraform.ModuleDiff{
 					Path: []string{"root"},
 					Resources: map[string]*terraform.InstanceDiff{
-						"data.type.name": {
+						"data.type.name": &terraform.InstanceDiff{
 							Attributes: map[string]*terraform.ResourceAttrDiff{
-								"A": {
+								"A": &terraform.ResourceAttrDiff{
 									New:         "B",
 									RequiresNew: true,
 								},
@@ -54,12 +54,12 @@ func TestFormatPlan_nestedDataSource(t *testing.T) {
 	plan := &terraform.Plan{
 		Diff: &terraform.Diff{
 			Modules: []*terraform.ModuleDiff{
-				{
+				&terraform.ModuleDiff{
 					Path: []string{"root", "nested"},
 					Resources: map[string]*terraform.InstanceDiff{
-						"data.type.name": {
+						"data.type.name": &terraform.InstanceDiff{
 							Attributes: map[string]*terraform.ResourceAttrDiff{
-								"A": {
+								"A": &terraform.ResourceAttrDiff{
 									New:         "B",
 									RequiresNew: true,
 								},

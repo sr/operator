@@ -20,7 +20,7 @@ func TestAccComputeInstanceGroup_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccComputeInstanceGroup_destroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstanceGroup_basic(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccComputeInstanceGroup_exists(
@@ -42,7 +42,7 @@ func TestAccComputeInstanceGroup_update(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccComputeInstanceGroup_destroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccComputeInstanceGroup_update(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccComputeInstanceGroup_exists(
@@ -53,7 +53,7 @@ func TestAccComputeInstanceGroup_update(t *testing.T) {
 						&instanceGroup),
 				),
 			},
-			{
+			resource.TestStep{
 				Config: testAccComputeInstanceGroup_update2(instanceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccComputeInstanceGroup_exists(
@@ -190,7 +190,7 @@ func testAccComputeInstanceGroup_basic(instance string) string {
 		zone = "us-central1-c"
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -238,7 +238,7 @@ func testAccComputeInstanceGroup_update(instance string) string {
 		count = 1
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {
@@ -273,7 +273,7 @@ func testAccComputeInstanceGroup_update2(instance string) string {
 		count = 3
 
 		disk {
-			image = "debian-7-wheezy-v20160301"
+			image = "debian-8-jessie-v20160803"
 		}
 
 		network_interface {

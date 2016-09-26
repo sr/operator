@@ -19,57 +19,57 @@ func resourceConsulCatalogEntry() *schema.Resource {
 		Delete: resourceConsulCatalogEntryDelete,
 
 		Schema: map[string]*schema.Schema{
-			"address": {
+			"address": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"datacenter": {
+			"datacenter": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
 			},
 
-			"node": {
+			"node": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"service": {
+			"service": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"address": {
+						"address": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
 						},
 
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
 
-						"port": {
+						"port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							ForceNew: true,
 						},
 
-						"tags": {
+						"tags": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							ForceNew: true,
@@ -81,7 +81,7 @@ func resourceConsulCatalogEntry() *schema.Resource {
 				Set: resourceConsulCatalogEntryServicesHash,
 			},
 
-			"token": {
+			"token": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},

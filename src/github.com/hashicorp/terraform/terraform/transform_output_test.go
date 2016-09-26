@@ -9,14 +9,14 @@ func TestAddOutputOrphanTransformer(t *testing.T) {
 	mod := testModule(t, "transform-orphan-output-basic")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: RootModulePath,
 				Outputs: map[string]*OutputState{
-					"foo": {
+					"foo": &OutputState{
 						Value: "bar",
 						Type:  "string",
 					},
-					"bar": {
+					"bar": &OutputState{
 						Value: "baz",
 						Type:  "string",
 					},

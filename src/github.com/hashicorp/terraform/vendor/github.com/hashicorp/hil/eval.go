@@ -23,19 +23,6 @@ type EvalConfig struct {
 // semantic check on an AST tree. This will be called with the root node.
 type SemanticChecker func(ast.Node) error
 
-// EvalType represents the type of the output returned from a HIL
-// evaluation.
-type EvalType uint32
-
-const (
-	TypeInvalid EvalType = 0
-	TypeString  EvalType = 1 << iota
-	TypeList
-	TypeMap
-)
-
-//go:generate stringer -type=EvalType
-
 // EvaluationResult is a struct returned from the hil.Eval function,
 // representing the result of an interpolation. Results are returned in their
 // "natural" Go structure rather than in terms of the HIL AST.  For the types
@@ -240,7 +227,7 @@ func (v *evalCall) Eval(s ast.Scope, stack *ast.Stack) (interface{}, ast.Type, e
 
 	// The arguments are on the stack in reverse order, so pop them off.
 	args := make([]interface{}, len(v.Args))
-	for i := range v.Args {
+	for i, _ := range v.Args {
 		node := stack.Pop().(*ast.LiteralNode)
 		args[len(v.Args)-1-i] = node.Value
 	}

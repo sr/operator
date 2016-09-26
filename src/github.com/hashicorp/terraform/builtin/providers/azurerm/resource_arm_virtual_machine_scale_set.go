@@ -20,43 +20,43 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 		Delete: resourceArmVirtualMachineScaleSetDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"location": {
+			"location": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
 				ForceNew:  true,
 				StateFunc: azureRMNormalizeLocation,
 			},
 
-			"resource_group_name": {
+			"resource_group_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"sku": {
+			"sku": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"tier": {
+						"tier": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"capacity": {
+						"capacity": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -65,33 +65,33 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetSkuHash,
 			},
 
-			"upgrade_policy_mode": {
+			"upgrade_policy_mode": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"os_profile": {
+			"os_profile": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"computer_name_prefix": {
+						"computer_name_prefix": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"admin_username": {
+						"admin_username": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"admin_password": {
+						"admin_password": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"custom_data": {
+						"custom_data": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -100,26 +100,26 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetsOsProfileHash,
 			},
 
-			"os_profile_secrets": {
+			"os_profile_secrets": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"source_vault_id": {
+						"source_vault_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"vault_certificates": {
+						"vault_certificates": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"certificate_url": {
+									"certificate_url": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"certificate_store": {
+									"certificate_store": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
@@ -130,54 +130,54 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				},
 			},
 
-			"os_profile_windows_config": {
+			"os_profile_windows_config": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"provision_vm_agent": {
+						"provision_vm_agent": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
-						"enable_automatic_upgrades": {
+						"enable_automatic_upgrades": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
-						"winrm": {
+						"winrm": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"protocol": {
+									"protocol": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"certificate_url": {
+									"certificate_url": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
 								},
 							},
 						},
-						"additional_unattend_config": {
+						"additional_unattend_config": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"pass": {
+									"pass": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"component": {
+									"component": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"setting_name": {
+									"setting_name": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"content": {
+									"content": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
@@ -189,29 +189,29 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetOsProfileLWindowsConfigHash,
 			},
 
-			"os_profile_linux_config": {
+			"os_profile_linux_config": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"disable_password_authentication": {
+						"disable_password_authentication": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
 							ForceNew: true,
 						},
-						"ssh_keys": {
+						"ssh_keys": &schema.Schema{
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"path": {
+									"path": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
-									"key_data": {
+									"key_data": &schema.Schema{
 										Type:     schema.TypeString,
 										Optional: true,
 									},
@@ -223,37 +223,37 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetOsProfileLinuxConfigHash,
 			},
 
-			"network_profile": {
+			"network_profile": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"primary": {
+						"primary": &schema.Schema{
 							Type:     schema.TypeBool,
 							Required: true,
 						},
 
-						"ip_configuration": {
+						"ip_configuration": &schema.Schema{
 							Type:     schema.TypeList,
 							Required: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"name": {
+									"name": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
 
-									"subnet_id": {
+									"subnet_id": &schema.Schema{
 										Type:     schema.TypeString,
 										Required: true,
 									},
 
-									"load_balancer_backend_address_pool_ids": {
+									"load_balancer_backend_address_pool_ids": &schema.Schema{
 										Type:     schema.TypeSet,
 										Optional: true,
 										Computed: true,
@@ -268,42 +268,42 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetNetworkConfigurationHash,
 			},
 
-			"storage_profile_os_disk": {
+			"storage_profile_os_disk": &schema.Schema{
 				Type:     schema.TypeSet,
 				Required: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"image": {
+						"image": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"vhd_containers": {
+						"vhd_containers": &schema.Schema{
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 						},
 
-						"caching": {
+						"caching": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"os_type": {
+						"os_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
-						"create_option": {
+						"create_option": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -312,29 +312,29 @@ func resourceArmVirtualMachineScaleSet() *schema.Resource {
 				Set: resourceArmVirtualMachineScaleSetStorageProfileOsDiskHash,
 			},
 
-			"storage_profile_image_reference": {
+			"storage_profile_image_reference": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"publisher": {
+						"publisher": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"offer": {
+						"offer": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"sku": {
+						"sku": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"version": {
+						"version": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -431,13 +431,13 @@ func resourceArmVirtualMachineScaleSetRead(d *schema.ResourceData, meta interfac
 	name := id.Path["virtualMachineScaleSets"]
 
 	resp, err := vmScaleSetClient.Get(resGroup, name)
+	if err != nil {
+		return fmt.Errorf("Error making Read request on Azure Virtual Machine Scale Set %s: %s", name, err)
+	}
 	if resp.StatusCode == http.StatusNotFound {
 		log.Printf("[INFO] AzureRM Virtual Machine Scale Set (%s) Not Found. Removing from State", name)
 		d.SetId("")
 		return nil
-	}
-	if err != nil {
-		return fmt.Errorf("Error making Read request on Azure Virtual Machine Scale Set %s: %s", name, err)
 	}
 
 	d.Set("location", resp.Location)

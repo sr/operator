@@ -18,40 +18,44 @@ func resourceStatusCakeTest() *schema.Resource {
 		Read:   ReadTest,
 
 		Schema: map[string]*schema.Schema{
-			"test_id": {
+			"test_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"website_name": {
+			"website_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"website_url": {
+			"website_url": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"check_rate": {
+			"check_rate": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  300,
 			},
 
-			"test_type": {
+			"test_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"paused": {
+			"paused": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"timeout": {
+			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
+			},
+			"contact_id": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
 		},
 	}
@@ -150,6 +154,9 @@ func getStatusCakeTestInput(d *schema.ResourceData) *statuscake.Test {
 	}
 	if v, ok := d.GetOk("timeout"); ok {
 		test.Timeout = v.(int)
+	}
+	if v, ok := d.GetOk("contact_id"); ok {
+		test.ContactID = v.(int)
 	}
 	return test
 }

@@ -14,7 +14,7 @@ func TestAccAWSAmiDataSource_natInstance(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckAwsAmiDataSourceConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsAmiDataSourceID("data.aws_ami.nat_ami"),
@@ -57,7 +57,7 @@ func TestAccAWSAmiDataSource_windowsInstance(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckAwsAmiDataSourceWindowsConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsAmiDataSourceID("data.aws_ami.windows_ami"),
@@ -95,7 +95,7 @@ func TestAccAWSAmiDataSource_instanceStore(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckAwsAmiDataSourceInstanceStoreConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsAmiDataSourceID("data.aws_ami.instance_store_ami"),
@@ -129,10 +129,26 @@ func TestAccAWSAmiDataSource_owners(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccCheckAwsAmiDataSourceOwnersConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAwsAmiDataSourceID("data.aws_ami.amazon_ami"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccAWSAmiDataSource_localNameFilter(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckAwsAmiDataSourceNameRegexConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsAmiDataSourceID("data.aws_ami.name_regex_filtered_ami"),
+					resource.TestMatchResourceAttr("data.aws_ami.name_regex_filtered_ami", "image_id", regexp.MustCompile("^ami-")),
 				),
 			},
 		},
@@ -243,5 +259,18 @@ const testAccCheckAwsAmiDataSourceOwnersConfig = `
 data "aws_ami" "amazon_ami" {
 	most_recent = true
 	owners = ["amazon"]
+}
+`
+
+// Testing name_regex parameter
+const testAccCheckAwsAmiDataSourceNameRegexConfig = `
+data "aws_ami" "name_regex_filtered_ami" {
+	most_recent = true
+	owners = ["amazon"]
+	filter {
+		name = "name"
+		values = ["amzn-ami-*"]
+	}
+	name_regex = "^amzn-ami-\\d{3}[5].*-ecs-optimized"
 }
 `

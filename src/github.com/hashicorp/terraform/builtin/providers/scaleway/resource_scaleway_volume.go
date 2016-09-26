@@ -17,11 +17,11 @@ func resourceScalewayVolume() *schema.Resource {
 		Update: resourceScalewayVolumeUpdate,
 		Delete: resourceScalewayVolumeDelete,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"size_in_gb": {
+			"size_in_gb": &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -32,7 +32,7 @@ func resourceScalewayVolume() *schema.Resource {
 					return
 				},
 			},
-			"type": {
+			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -43,7 +43,7 @@ func resourceScalewayVolume() *schema.Resource {
 					return
 				},
 			},
-			"server": {
+			"server": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},

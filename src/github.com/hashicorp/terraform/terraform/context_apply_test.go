@@ -3,7 +3,6 @@ package terraform
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -150,6 +149,39 @@ module.test:
 	}
 }
 
+func TestContext2Apply_refCount(t *testing.T) {
+	m := testModule(t, "apply-ref-count")
+	p := testProvider("aws")
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	if _, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	state, err := ctx.Apply()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	mod := state.RootModule()
+	if len(mod.Resources) < 2 {
+		t.Fatalf("bad: %#v", mod.Resources)
+	}
+
+	actual := strings.TrimSpace(state.String())
+	expected := strings.TrimSpace(testTerraformApplyRefCountStr)
+	if actual != expected {
+		t.Fatalf("bad: \n%s", actual)
+	}
+}
+
 func TestContext2Apply_providerAlias(t *testing.T) {
 	m := testModule(t, "apply-provider-alias")
 	p := testProvider("aws")
@@ -250,7 +282,7 @@ func TestContext2Apply_computedAttrRefTypeMismatch(t *testing.T) {
 			// Emulate a diff that says "we'll create this list and ids will be populated"
 			return &InstanceDiff{
 				Attributes: map[string]*ResourceAttrDiff{
-					"ids.#": {NewComputed: true},
+					"ids.#": &ResourceAttrDiff{NewComputed: true},
 				},
 			}, nil
 		case "aws_instance":
@@ -332,10 +364,10 @@ func TestContext2Apply_createBeforeDestroy(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -386,10 +418,10 @@ func TestContext2Apply_createBeforeDestroyUpdate(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -440,10 +472,10 @@ func TestContext2Apply_destroyComputed(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -483,10 +515,10 @@ func TestContext2Apply_destroyData(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"data.null_data_source.testing": {
+					"data.null_data_source.testing": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "-",
@@ -540,16 +572,16 @@ func TestContext2Apply_destroySkipsCBD(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
 						},
 					},
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -586,10 +618,10 @@ func TestContext2Apply_destroyModuleVarProviderConfig(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: []string{"root", "child"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "foo",
@@ -660,10 +692,10 @@ func getContextForApply_destroyCrossProviders(
 	providers map[string]ResourceProviderFactory) *Context {
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"terraform_remote_state.shared": {
+					"terraform_remote_state.shared": &ResourceState{
 						Type: "terraform_remote_state",
 						Primary: &InstanceState{
 							ID: "remote-2652591293",
@@ -674,10 +706,10 @@ func getContextForApply_destroyCrossProviders(
 					},
 				},
 			},
-			{
+			&ModuleState{
 				Path: []string{"root", "example"},
 				Resources: map[string]*ResourceState{
-					"aws_vpc.bar": {
+					"aws_vpc.bar": &ResourceState{
 						Type: "aws_vpc",
 						Primary: &InstanceState{
 							ID: "vpc-aaabbb12",
@@ -791,7 +823,7 @@ func TestContext2Apply_cancel(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"num": {
+				"num": &ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -863,10 +895,10 @@ func TestContext2Apply_countDecrease(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo.0": {
+					"aws_instance.foo.0": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -876,7 +908,7 @@ func TestContext2Apply_countDecrease(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.foo.1": {
+					"aws_instance.foo.1": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -886,7 +918,7 @@ func TestContext2Apply_countDecrease(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.foo.2": {
+					"aws_instance.foo.2": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -931,10 +963,10 @@ func TestContext2Apply_countDecreaseToOne(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo.0": {
+					"aws_instance.foo.0": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -944,13 +976,13 @@ func TestContext2Apply_countDecreaseToOne(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.foo.1": {
+					"aws_instance.foo.1": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
 						},
 					},
-					"aws_instance.foo.2": {
+					"aws_instance.foo.2": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -996,10 +1028,10 @@ func TestContext2Apply_countDecreaseToOneCorrupted(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -1009,7 +1041,7 @@ func TestContext2Apply_countDecreaseToOneCorrupted(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.foo.0": {
+					"aws_instance.foo.0": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -1054,10 +1086,10 @@ func TestContext2Apply_countTainted(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo.0": {
+					"aws_instance.foo.0": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -1124,6 +1156,34 @@ func TestContext2Apply_countVariable(t *testing.T) {
 	}
 }
 
+func TestContext2Apply_countVariableRef(t *testing.T) {
+	m := testModule(t, "apply-count-variable-ref")
+	p := testProvider("aws")
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	if _, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	state, err := ctx.Apply()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	actual := strings.TrimSpace(state.String())
+	expected := strings.TrimSpace(testTerraformApplyCountVariableRefStr)
+	if actual != expected {
+		t.Fatalf("bad: \n%s", actual)
+	}
+}
+
 func TestContext2Apply_mapVariableOverride(t *testing.T) {
 	m := testModule(t, "apply-map-var-override")
 	p := testProvider("aws")
@@ -1136,7 +1196,7 @@ func TestContext2Apply_mapVariableOverride(t *testing.T) {
 		},
 		Variables: map[string]interface{}{
 			"images": []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"us-west-2": "overridden",
 				},
 			},
@@ -1217,10 +1277,10 @@ func TestContext2Apply_moduleDestroyOrder(t *testing.T) {
 
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.b": {
+					"aws_instance.b": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "b",
@@ -1229,10 +1289,10 @@ func TestContext2Apply_moduleDestroyOrder(t *testing.T) {
 				},
 			},
 
-			{
+			&ModuleState{
 				Path: []string{"root", "child"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.a": {
+					"aws_instance.a": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "a",
@@ -1240,7 +1300,7 @@ func TestContext2Apply_moduleDestroyOrder(t *testing.T) {
 					},
 				},
 				Outputs: map[string]*OutputState{
-					"a_output": {
+					"a_output": &OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "a",
@@ -1299,10 +1359,10 @@ func TestContext2Apply_moduleOrphanProvider(t *testing.T) {
 	// Create a state with an orphan module
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: []string{"root", "child"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -1479,10 +1539,10 @@ func TestContext2Apply_moduleProviderCloseNested(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: []string{"root", "child", "subchild"},
 					Resources: map[string]*ResourceState{
-						"aws_instance.foo": {
+						"aws_instance.foo": &ResourceState{
 							Type: "aws_instance",
 							Primary: &InstanceState{
 								ID: "bar",
@@ -1710,15 +1770,15 @@ func TestContext2Apply_outputOrphan(t *testing.T) {
 
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Outputs: map[string]*OutputState{
-					"foo": {
+					"foo": &OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "bar",
 					},
-					"bar": {
+					"bar": &OutputState{
 						Type:      "string",
 						Sensitive: false,
 						Value:     "baz",
@@ -1974,10 +2034,10 @@ func TestContext2Apply_provisionerFail_createBeforeDestroy(t *testing.T) {
 
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -2022,10 +2082,10 @@ func TestContext2Apply_error_createBeforeDestroy(t *testing.T) {
 	p := testProvider("aws")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -2071,10 +2131,10 @@ func TestContext2Apply_errorDestroy_createBeforeDestroy(t *testing.T) {
 	p := testProvider("aws")
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -2131,10 +2191,10 @@ func TestContext2Apply_multiDepose_createBeforeDestroy(t *testing.T) {
 	ps := map[string]ResourceProviderFactory{"aws": testProviderFuncFixed(p)}
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type:    "aws_instance",
 						Primary: &InstanceState{ID: "foo"},
 					},
@@ -2406,6 +2466,59 @@ func TestContext2Apply_provisionerMultiSelfRef(t *testing.T) {
 	}
 }
 
+func TestContext2Apply_provisionerMultiSelfRefCount(t *testing.T) {
+	var lock sync.Mutex
+	commands := make([]string, 0, 5)
+
+	m := testModule(t, "apply-provisioner-multi-self-ref-count")
+	p := testProvider("aws")
+	pr := testProvisioner()
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	pr.ApplyFn = func(rs *InstanceState, c *ResourceConfig) error {
+		lock.Lock()
+		defer lock.Unlock()
+
+		val, ok := c.Config["command"]
+		if !ok {
+			t.Fatalf("bad value for command: %v %#v", val, c)
+		}
+
+		commands = append(commands, val.(string))
+		return nil
+	}
+
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+		Provisioners: map[string]ResourceProvisionerFactory{
+			"shell": testProvisionerFuncFixed(pr),
+		},
+	})
+
+	if _, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	if _, err := ctx.Apply(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	// Verify apply was invoked
+	if !pr.ApplyCalled {
+		t.Fatalf("provisioner not invoked")
+	}
+
+	// Verify our result
+	sort.Strings(commands)
+	expectedCommands := []string{"3", "3", "3"}
+	if !reflect.DeepEqual(commands, expectedCommands) {
+		t.Fatalf("bad: %#v", commands)
+	}
+}
+
 // Provisioner should NOT run on a diff, only create
 func TestContext2Apply_Provisioner_Diff(t *testing.T) {
 	m := testModule(t, "apply-provisioner-diff")
@@ -2488,10 +2601,10 @@ func TestContext2Apply_outputDiffVars(t *testing.T) {
 	p := testProvider("aws")
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.baz": {
+					"aws_instance.baz": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -2523,11 +2636,11 @@ func TestContext2Apply_outputDiffVars(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"foo": {
+				"foo": &ResourceAttrDiff{
 					NewComputed: true,
 					Type:        DiffAttrOutput,
 				},
-				"bar": {
+				"bar": &ResourceAttrDiff{
 					New: "baz",
 				},
 			},
@@ -2678,6 +2791,63 @@ func TestContext2Apply_destroy(t *testing.T) {
 	}
 }
 
+// https://github.com/hashicorp/terraform/issues/2767
+func TestContext2Apply_destroyModulePrefix(t *testing.T) {
+	m := testModule(t, "apply-destroy-module-resource-prefix")
+	h := new(MockHook)
+	p := testProvider("aws")
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Hooks:  []Hook{h},
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	// First plan and apply a create operation
+	if _, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	state, err := ctx.Apply()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	// Verify that we got the apply info correct
+	if v := h.PreApplyInfo.HumanId(); v != "module.child.aws_instance.foo" {
+		t.Fatalf("bad: %s", v)
+	}
+
+	// Next, plan and apply a destroy operation and reset the hook
+	h = new(MockHook)
+	ctx = testContext2(t, &ContextOpts{
+		Destroy: true,
+		State:   state,
+		Module:  m,
+		Hooks:   []Hook{h},
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	if _, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	state, err = ctx.Apply()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	// Test that things were destroyed
+	if v := h.PreApplyInfo.HumanId(); v != "module.child.aws_instance.foo" {
+		t.Fatalf("bad: %s", v)
+	}
+}
+
 func TestContext2Apply_destroyNestedModule(t *testing.T) {
 	m := testModule(t, "apply-destroy-nested-module")
 	p := testProvider("aws")
@@ -2686,10 +2856,10 @@ func TestContext2Apply_destroyNestedModule(t *testing.T) {
 
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: []string{"root", "child", "subchild"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -2734,10 +2904,10 @@ func TestContext2Apply_destroyDeeplyNestedModule(t *testing.T) {
 
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: []string{"root", "child", "subchild", "subsubchild"},
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3092,10 +3262,10 @@ func TestContext2Apply_destroyOrphan(t *testing.T) {
 	p := testProvider("aws")
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.baz": {
+					"aws_instance.baz": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3125,7 +3295,7 @@ func TestContext2Apply_destroyOrphan(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"num": {
+				"num": &ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -3162,10 +3332,10 @@ func TestContext2Apply_destroyTaintedProvisioner(t *testing.T) {
 
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3243,7 +3413,7 @@ func TestContext2Apply_error(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"num": {
+				"num": &ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -3273,10 +3443,10 @@ func TestContext2Apply_errorPartial(t *testing.T) {
 	p := testProvider("aws")
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3310,7 +3480,7 @@ func TestContext2Apply_errorPartial(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"num": {
+				"num": &ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -3380,10 +3550,10 @@ func TestContext2Apply_hookOrphan(t *testing.T) {
 
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3444,7 +3614,7 @@ func TestContext2Apply_idAttr(t *testing.T) {
 	p.DiffFn = func(*InstanceInfo, *InstanceState, *ResourceConfig) (*InstanceDiff, error) {
 		return &InstanceDiff{
 			Attributes: map[string]*ResourceAttrDiff{
-				"num": {
+				"num": &ResourceAttrDiff{
 					New: "bar",
 				},
 			},
@@ -3677,10 +3847,10 @@ func TestContext2Apply_taint(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -3730,10 +3900,10 @@ func TestContext2Apply_taintDep(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -3744,7 +3914,7 @@ func TestContext2Apply_taintDep(t *testing.T) {
 							Tainted: true,
 						},
 					},
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3792,10 +3962,10 @@ func TestContext2Apply_taintDepRequiresNew(t *testing.T) {
 	p.DiffFn = testDiffFn
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo": {
+					"aws_instance.foo": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -3806,7 +3976,7 @@ func TestContext2Apply_taintDepRequiresNew(t *testing.T) {
 							Tainted: true,
 						},
 					},
-					"aws_instance.bar": {
+					"aws_instance.bar": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -3954,7 +4124,7 @@ func TestContext2Apply_targetedDestroy(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo": resourceState("aws_instance", "i-bcd345"),
@@ -4000,14 +4170,14 @@ func TestContext2Apply_targetedDestroyModule(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo": resourceState("aws_instance", "i-bcd345"),
 						"aws_instance.bar": resourceState("aws_instance", "i-abc123"),
 					},
 				},
-				{
+				&ModuleState{
 					Path: []string{"root", "child"},
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo": resourceState("aws_instance", "i-bcd345"),
@@ -4053,7 +4223,7 @@ func TestContext2Apply_targetedDestroyCountIndex(t *testing.T) {
 		},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
 						"aws_instance.foo.0": resourceState("aws_instance", "i-bcd345"),
@@ -4281,7 +4451,7 @@ func TestContext2Apply_vars(t *testing.T) {
 				"Baz":   "Foo",
 			},
 			"amis": []map[string]interface{}{
-				{
+				map[string]interface{}{
 					"us-east-1": "override",
 				},
 			},
@@ -4314,13 +4484,9 @@ func TestContext2Apply_vars(t *testing.T) {
 
 func TestContext2Apply_varsEnv(t *testing.T) {
 	// Set the env var
-	old_ami := tempEnv(t, "TF_VAR_ami", "baz")
-	old_list := tempEnv(t, "TF_VAR_list", `["Hello", "World"]`)
-	old_map := tempEnv(t, "TF_VAR_map", `{"Hello" = "World", "Foo" = "Bar", "Baz" = "Foo"}`)
-
-	defer os.Setenv("TF_VAR_ami", old_ami)
-	defer os.Setenv("TF_VAR_list", old_list)
-	defer os.Setenv("TF_VAR_list", old_map)
+	defer tempEnv(t, "TF_VAR_ami", "baz")()
+	defer tempEnv(t, "TF_VAR_list", `["Hello", "World"]`)()
+	defer tempEnv(t, "TF_VAR_map", `{"Hello" = "World", "Foo" = "Bar", "Baz" = "Foo"}`)()
 
 	m := testModule(t, "apply-vars-env")
 	p := testProvider("aws")
@@ -4365,10 +4531,10 @@ func TestContext2Apply_createBefore_depends(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -4377,7 +4543,7 @@ func TestContext2Apply_createBefore_depends(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.lb": {
+					"aws_instance.lb": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -4474,10 +4640,10 @@ func TestContext2Apply_singleDestroy(t *testing.T) {
 	p.DiffFn = testDiffFn
 	state := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.web": {
+					"aws_instance.web": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "bar",
@@ -4486,7 +4652,7 @@ func TestContext2Apply_singleDestroy(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.lb": {
+					"aws_instance.lb": &ResourceState{
 						Type: "aws_instance",
 						Primary: &InstanceState{
 							ID: "baz",
@@ -4672,10 +4838,10 @@ func TestContext2Apply_targetedWithTaintedInState(t *testing.T) {
 		Targets: []string{"aws_instance.iambeingadded"},
 		State: &State{
 			Modules: []*ModuleState{
-				{
+				&ModuleState{
 					Path: rootModulePath,
 					Resources: map[string]*ResourceState{
-						"aws_instance.ifailedprovisioners": {
+						"aws_instance.ifailedprovisioners": &ResourceState{
 							Primary: &InstanceState{
 								ID:      "ifailedprovisioners",
 								Tainted: true,
@@ -4783,7 +4949,7 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 			newAmi, _ := c.Get("ami")
 			return &InstanceDiff{
 				Attributes: map[string]*ResourceAttrDiff{
-					"ami": {
+					"ami": &ResourceAttrDiff{
 						Old:         s.Attributes["ami"],
 						New:         newAmi.(string),
 						RequiresNew: true,
@@ -4799,10 +4965,10 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 	}
 	s := &State{
 		Modules: []*ModuleState{
-			{
+			&ModuleState{
 				Path: rootModulePath,
 				Resources: map[string]*ResourceState{
-					"aws_instance.foo.0": {
+					"aws_instance.foo.0": &ResourceState{
 						Primary: &InstanceState{
 							ID: "i-abc123",
 							Attributes: map[string]string{
@@ -4811,7 +4977,7 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 							},
 						},
 					},
-					"aws_instance.foo.1": {
+					"aws_instance.foo.1": &ResourceState{
 						Primary: &InstanceState{
 							ID: "i-bcd234",
 							Attributes: map[string]string{
@@ -4820,7 +4986,7 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 							},
 						},
 					},
-					"aws_eip.foo.0": {
+					"aws_eip.foo.0": &ResourceState{
 						Primary: &InstanceState{
 							ID: "eip-abc123",
 							Attributes: map[string]string{
@@ -4829,7 +4995,7 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 							},
 						},
 					},
-					"aws_eip.foo.1": {
+					"aws_eip.foo.1": &ResourceState{
 						Primary: &InstanceState{
 							ID: "eip-bcd234",
 							Attributes: map[string]string{
@@ -4865,6 +5031,47 @@ func TestContext2Apply_ignoreChangesWithDep(t *testing.T) {
 	expected := strings.TrimSpace(s.String())
 	if actual != expected {
 		t.Fatalf("bad: \n%s", actual)
+	}
+}
+
+func TestContext2Apply_ignoreChangesWildcard(t *testing.T) {
+	m := testModule(t, "apply-ignore-changes-wildcard")
+	p := testProvider("aws")
+	p.ApplyFn = testApplyFn
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	if p, err := ctx.Plan(); err != nil {
+		t.Fatalf("err: %s", err)
+	} else {
+		t.Logf(p.String())
+	}
+
+	state, err := ctx.Apply()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	mod := state.RootModule()
+	if len(mod.Resources) != 1 {
+		t.Fatalf("bad: %s", state)
+	}
+
+	actual := strings.TrimSpace(state.String())
+	// Expect no changes from original state
+	expected := strings.TrimSpace(`
+aws_instance.foo:
+  ID = foo
+  required_field = set
+  type = aws_instance
+`)
+	if actual != expected {
+		t.Fatalf("expected:\n%s\ngot:\n%s", expected, actual)
 	}
 }
 

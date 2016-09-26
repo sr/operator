@@ -4,16 +4,23 @@ import (
 	"fmt"
 	"strings"
 
-	mysqlc "github.com/ziutek/mymysql/thrsafe"
+	"github.com/hashicorp/go-version"
+	mysqlc "github.com/ziutek/mymysql/mysql"
+	mysqlts "github.com/ziutek/mymysql/thrsafe"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
 
+type providerConfiguration struct {
+	Conn          mysqlc.Conn
+	ServerVersion *version.Version
+}
+
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"endpoint": {
+			"endpoint": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_ENDPOINT", nil),
@@ -27,7 +34,7 @@ func Provider() terraform.ResourceProvider {
 				},
 			},
 
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_USERNAME", nil),
@@ -41,7 +48,7 @@ func Provider() terraform.ResourceProvider {
 				},
 			},
 
-			"password": {
+			"password": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("MYSQL_PASSWORD", nil),
@@ -69,21 +76,41 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		proto = "unix"
 	}
 
-	// mysqlc is the thread-safe implementation of mymysql, so we can
+	// mysqlts is the thread-safe implementation of mymysql, so we can
 	// safely re-use the same connection between multiple parallel
 	// operations.
-	conn := mysqlc.New(proto, "", endpoint, username, password)
+	conn := mysqlts.New(proto, "", endpoint, username, password)
 
 	err := conn.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	return conn, nil
+	ver, err := serverVersion(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	return &providerConfiguration{
+		Conn:          conn,
+		ServerVersion: ver,
+	}, nil
 }
 
 var identQuoteReplacer = strings.NewReplacer("`", "``")
 
 func quoteIdentifier(in string) string {
 	return fmt.Sprintf("`%s`", identQuoteReplacer.Replace(in))
+}
+
+func serverVersion(conn mysqlc.Conn) (*version.Version, error) {
+	rows, _, err := conn.Query("SELECT VERSION()")
+	if err != nil {
+		return nil, err
+	}
+	if len(rows) == 0 {
+		return nil, fmt.Errorf("SELECT VERSION() returned an empty set")
+	}
+
+	return version.NewVersion(rows[0].Str(0))
 }

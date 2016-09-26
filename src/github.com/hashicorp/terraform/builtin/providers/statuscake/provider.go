@@ -9,13 +9,13 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"username": {
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("STATUSCAKE_USERNAME", nil),
 				Description: "Username for StatusCake Account.",
 			},
-			"apikey": {
+			"apikey": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("STATUSCAKE_APIKEY", nil),

@@ -117,7 +117,7 @@ type EvalVariableBlock struct {
 // TODO: test
 func (n *EvalVariableBlock) Eval(ctx EvalContext) (interface{}, error) {
 	// Clear out the existing mapping
-	for k := range n.VariableValues {
+	for k, _ := range n.VariableValues {
 		delete(n.VariableValues, k)
 	}
 

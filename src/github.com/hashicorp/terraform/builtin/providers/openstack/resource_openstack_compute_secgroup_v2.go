@@ -25,48 +25,48 @@ func resourceComputeSecGroupV2() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"region": {
+			"region": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				DefaultFunc: schema.EnvDefaultFunc("OS_REGION_NAME", ""),
 			},
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"rule": {
+			"rule": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"from_port": {
+						"from_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: false,
 						},
-						"to_port": {
+						"to_port": &schema.Schema{
 							Type:     schema.TypeInt,
 							Required: true,
 							ForceNew: false,
 						},
-						"ip_protocol": {
+						"ip_protocol": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: false,
 						},
-						"cidr": {
+						"cidr": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: false,
@@ -74,12 +74,12 @@ func resourceComputeSecGroupV2() *schema.Resource {
 								return strings.ToLower(v.(string))
 							},
 						},
-						"from_group_id": {
+						"from_group_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: false,
 						},
-						"self": {
+						"self": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,

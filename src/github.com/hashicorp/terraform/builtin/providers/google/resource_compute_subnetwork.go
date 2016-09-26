@@ -18,48 +18,48 @@ func resourceComputeSubnetwork() *schema.Resource {
 		Delete: resourceComputeSubnetworkDelete,
 
 		Schema: map[string]*schema.Schema{
-			"ip_cidr_range": {
+			"ip_cidr_range": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"name": {
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"network": {
+			"network": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"description": {
+			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"gateway_address": {
+			"gateway_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"project": {
+			"project": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"region": {
+			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
 
-			"self_link": {
+			"self_link": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -91,12 +91,17 @@ func resourceComputeSubnetworkCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
+	network, err := getNetworkLink(d, config, "network")
+	if err != nil {
+		return err
+	}
+
 	// Build the subnetwork parameters
 	subnetwork := &compute.Subnetwork{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		IpCidrRange: d.Get("ip_cidr_range").(string),
-		Network:     d.Get("network").(string),
+		Network:     network,
 	}
 
 	log.Printf("[DEBUG] Subnetwork insert request: %#v", subnetwork)
@@ -115,7 +120,7 @@ func resourceComputeSubnetworkCreate(d *schema.ResourceData, meta interface{}) e
 	subnetwork.Region = region
 	d.SetId(createSubnetID(subnetwork))
 
-	err = computeOperationWaitRegion(config, op, region, "Creating Subnetwork")
+	err = computeOperationWaitRegion(config, op, project, region, "Creating Subnetwork")
 	if err != nil {
 		return err
 	}
@@ -178,7 +183,7 @@ func resourceComputeSubnetworkDelete(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error deleting subnetwork: %s", err)
 	}
 
-	err = computeOperationWaitRegion(config, op, region, "Deleting Subnetwork")
+	err = computeOperationWaitRegion(config, op, project, region, "Deleting Subnetwork")
 	if err != nil {
 		return err
 	}

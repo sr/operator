@@ -19,41 +19,40 @@ func resourceAwsDbEventSubscription() *schema.Resource {
 		Update: resourceAwsDbEventSubscriptionUpdate,
 		Delete: resourceAwsDbEventSubscriptionDelete,
 		Schema: map[string]*schema.Schema{
-			"name": {
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateDbEventSubscriptionName,
 			},
-			"sns_topic": {
+			"sns_topic": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"event_categories": {
+			"event_categories": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"source_ids": {
+			"source_ids": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 				// ValidateFunc: validateDbEventSubscriptionSourceIds,
 				// requires source_type to be set, does not seem to be a way to validate this
 			},
-			"source_type": {
+			"source_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"enabled": {
+			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"customer_aws_id": {
+			"customer_aws_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -265,6 +264,49 @@ func resourceAwsDbEventSubscriptionUpdate(d *schema.ResourceData, meta interface
 	} else {
 		d.SetPartial("tags")
 	}
+
+	if d.HasChange("source_ids") {
+		o, n := d.GetChange("source_ids")
+		if o == nil {
+			o = new(schema.Set)
+		}
+		if n == nil {
+			n = new(schema.Set)
+		}
+
+		os := o.(*schema.Set)
+		ns := n.(*schema.Set)
+		remove := expandStringList(os.Difference(ns).List())
+		add := expandStringList(ns.Difference(os).List())
+
+		if len(remove) > 0 {
+			for _, removing := range remove {
+				log.Printf("[INFO] Removing %s as a Source Identifier from %q", *removing, d.Id())
+				_, err := rdsconn.RemoveSourceIdentifierFromSubscription(&rds.RemoveSourceIdentifierFromSubscriptionInput{
+					SourceIdentifier: removing,
+					SubscriptionName: aws.String(d.Id()),
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		if len(add) > 0 {
+			for _, adding := range add {
+				log.Printf("[INFO] Adding %s as a Source Identifier to %q", *adding, d.Id())
+				_, err := rdsconn.AddSourceIdentifierToSubscription(&rds.AddSourceIdentifierToSubscriptionInput{
+					SourceIdentifier: adding,
+					SubscriptionName: aws.String(d.Id()),
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+		d.SetPartial("source_ids")
+	}
+
 	d.Partial(false)
 
 	return nil

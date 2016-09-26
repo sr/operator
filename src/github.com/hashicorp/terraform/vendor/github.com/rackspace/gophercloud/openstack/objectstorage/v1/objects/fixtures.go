@@ -28,14 +28,14 @@ func HandleDownloadObjectSuccessfully(t *testing.T) {
 // ExpectedListInfo is the result expected from a call to `List` when full
 // info is requested.
 var ExpectedListInfo = []Object{
-	{
+	Object{
 		Hash:         "451e372e48e0f6b1114fa0724aa79fa1",
 		LastModified: "2009-11-10 23:00:00 +0000 UTC",
 		Bytes:        14,
 		Name:         "goodbye",
 		ContentType:  "application/octet-stream",
 	},
-	{
+	Object{
 		Hash:         "451e372e48e0f6b1114fa0724aa79fa1",
 		LastModified: "2009-11-10 23:00:00 +0000 UTC",
 		Bytes:        14,
