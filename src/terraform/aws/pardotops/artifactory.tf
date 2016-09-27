@@ -1,6 +1,6 @@
-variable "num_afy_hosts" {
-  type = "string"
-  default = "3"
+resource "aws_route53_zone_association" "artifactory_integration_to_internal_apps_dns_association" {
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
 }
 
 resource "aws_security_group" "artifactory_instance_secgroup" {
@@ -415,7 +415,6 @@ cidr_block = "172.28.0.0/24"
   tags {
     Name = "artifactory_integration"
   }
-  enable_dns_hostnames = true
 }
 
 resource "aws_subnet" "artifactory_integration_us_east_1a" {
@@ -605,9 +604,6 @@ resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration
   peer_owner_id = "${var.pardotops_account_number}"
   peer_vpc_id = "${aws_vpc.internal_apps.id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
-  accepter {
-    allow_remote_vpc_dns_resolution = true
-  }
 }
 
 # Temporary peering with legacy pardot-ci account
