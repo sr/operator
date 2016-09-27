@@ -104,6 +104,7 @@
 #   hubot lemon - Get's a random image of Lemon
 #   hubot sysadmin - Gets random image of sysadmin trading deck
 #   hubot securityfail - Gets random image of securityfail
+#   hubot cookiecake - Request a cookie cake
 #
 _ = require "underscore"
 cycle = require "../lib/cycle"
@@ -116,6 +117,9 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
       "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
+
+  robot.respond /cookiecake$/i, (msg) ->
+    msg.reply "Great! (cupcake) Submit your request here: https://sfdc.co/cookie-cake"
 
   robot.respond /gus$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/252/6jIMiKPvXi17T0l/fuuuuuu_gus.jpg"
