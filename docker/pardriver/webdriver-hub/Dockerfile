@@ -43,10 +43,9 @@ RUN sudo useradd seluser --shell /bin/bash --create-home \
 EXPOSE 4444
 
 COPY config.json /opt/selenium/config.json
-COPY entry_point.sh /opt/bin/entry_point.sh
-RUN chmod +x /opt/bin/entry_point.sh
+COPY launch_hub.sh /opt/bin/launch_hub.sh
 RUN chown -R seluser /opt/selenium
 
 USER seluser
 
-CMD ["/opt/bin/entry_point.sh"]
+CMD ["/opt/bin/launch_hub.sh"]
