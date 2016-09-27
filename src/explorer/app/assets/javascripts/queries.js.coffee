@@ -9,6 +9,12 @@ ready = ->
     $(".viewoption").toggle()
     $("#query_view").val($t.attr('data-val'))
 
+  $(".datacenter > button").on "click", ->
+    $t = $(this)
+    return if $t.hasClass("active")
+    $t.addClass("active").siblings().removeClass("active")
+    $("#query_datacenter").val($t.attr('data-val'))
+
   $(".account_helper").on "click", (e) ->
     e.preventDefault()
     $("#sql").val("SELECT * FROM `"+$(this).html()+"`")
