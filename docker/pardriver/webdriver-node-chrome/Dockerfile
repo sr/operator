@@ -116,4 +116,4 @@ USER seluser
 # https://github.com/SeleniumHQ/docker-selenium/issues/87
 ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-CMD ["/opt/bin/entry_point.sh"]
+CMD ["/opt/bin/launch_node.sh"]
