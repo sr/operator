@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
 
   def require_oauth_authentication
     unless current_user.present?
+      session[:target_url] = request.original_url
       return redirect_to oauth_path
     end
 
