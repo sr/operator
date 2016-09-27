@@ -18,6 +18,10 @@ class Database
     activerecord_connection.data_sources
   end
 
+  def columns(table)
+    activerecord_connection.columns(table).map(&:name)
+  end
+
   def execute(sql, params = [])
     Instrumentation.log(
       database: name,

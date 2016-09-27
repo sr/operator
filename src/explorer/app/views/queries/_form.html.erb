@@ -11,8 +11,8 @@
   <%= hidden_field_tag :is_limited %>
   <%= hidden_field_tag :view, current_view %>
   <div class="btn-group view">
-    <button type="button" class="btn btn-default<%= active?(current_view, sql_view) %>" data-val="<%= sql_view %>">I like my SQL</button>
-    <button type="button" class="btn btn-default<%= active?(current_view, ui_view) %>" data-val="<%= ui_view %>">Pretty UI View</button>
+    <button type="button" class="btn btn-default<%= active?(current_view, sql_view) %>" data-val="<%= sql_view %>">Plain SQL</button>
+    <button type="button" class="btn btn-default<%= active?(current_view, ui_view) %>" data-val="<%= ui_view %>">Explore UI View</button>
   </div>
   <div class="viewoption" <%= active?(current_view, ui_view, 'style="display:none;"') %>>
     <%= text_area_tag(:sql, query.raw_sql, rows: 10, cols: 80) %>
