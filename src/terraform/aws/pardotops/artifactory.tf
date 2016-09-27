@@ -185,15 +185,10 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   }
 }
 
-resource "aws_eip" "elasticip_pardot0-artifactory1-1-ue1" {
-  vpc = true
-  instance = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
-}
-
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot0-artifactory1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}"]
+  records = ["${aws_instance.pardot0-artifactory1-1-ue1.private_ip}"]
   type = "A"
   ttl = 900
 }
@@ -220,15 +215,10 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   }
 }
 
-resource "aws_eip" "elasticip_pardot0-artifactory1-2-ue1" {
-  vpc = true
-  instance = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
-}
-
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot0-artifactory1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}"]
+  records = ["${aws_instance.pardot0-artifactory1-2-ue1.private_ip}"]
   type = "A"
   ttl = 900
 }
@@ -255,15 +245,10 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   }
 }
 
-resource "aws_eip" "elasticip_pardot0-artifactory1-3-ue1" {
-  vpc = true
-  instance = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
-}
-
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot0-artifactory1-3-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}"]
+  records = ["${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"]
   type = "A"
   ttl = 900
 }
