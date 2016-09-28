@@ -71,17 +71,11 @@ func (c *client) GetUser(ctx context.Context, id int) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := c.do(ctx, req)
+	resp, err := c.do(ctx, req, 200)
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != 200 {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("hipchat request failed with status %d and body: %s", resp.StatusCode, body)
-		}
-		return nil, fmt.Errorf("hipchat request failed with status %d", resp.StatusCode)
-	}
 	var user User
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&user); err != nil {
@@ -107,23 +101,25 @@ func (c *client) SendRoomNotification(ctx context.Context, notif *RoomNotificati
 	if err != nil {
 		return err
 	}
-	resp, err := c.do(ctx, req)
+	resp, err := c.do(ctx, req, 204)
 	if err != nil {
-		return err
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != 204 {
-		return fmt.Errorf("hipchat request failed with status %d", resp.StatusCode)
+		defer func() { _ = resp.Body.Close() }()
 	}
 	return err
 }
 
-func (c *client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
+func (c *client) do(ctx context.Context, req *http.Request, status int) (*http.Response, error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := ctxhttp.Do(ctx, c.httpclient, req)
 	if err != nil {
 		return nil, fmt.Errorf("hipchat request failed: %v", err)
+	}
+	if resp.StatusCode != status {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("hipchat request failed with status %d (expected %d) and body: %s", resp.StatusCode, status, body)
+		}
+		return nil, fmt.Errorf("hipchat request failed with status %d (expected %d)", resp.StatusCode, status)
 	}
 	return resp, err
 }
