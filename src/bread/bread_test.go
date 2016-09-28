@@ -88,19 +88,19 @@ func TestAuthorizer(t *testing.T) {
 		otpOK   bool
 		err     error
 	}{
-		{swe, "ping.pinger", "ping", "", true, nil},
-		{swe, "ping.pinger", "whoami", "", true, nil},
+		{swe, "bread.pinger", "ping", "", true, nil},
+		{swe, "bread.pinger", "whoami", "", true, nil},
 
-		{"", "ping.pinger", "ping", "", true, errors.New("unable to authorize request without an user email")},
-		{swe, "ping.pinger", "pong", "", true, errors.New("no ACL entry found for command `ping.pinger pong`")},
-		{unknown, "ping.pinger", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
+		{"", "bread.pinger", "ping", "", true, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.pinger", "pong", "", true, errors.New("no ACL entry found for command `bread.pinger pong`")},
+		{unknown, "bread.pinger", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
 
-		{swe, "ping.pinger", "otp", validOTP, true, nil},
+		{swe, "bread.pinger", "otp", validOTP, true, nil},
 
-		{noYubiKey, "ping.pinger", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
-		{swe, "ping.pinger", "otp", "", true, errors.New("command `ping.pinger otp` requires a Yubikey OTP")},
-		{swe, "ping.pinger", "otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
-		{swe, "ping.pinger", "otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
+		{noYubiKey, "bread.pinger", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
+		{swe, "bread.pinger", "otp", "", true, errors.New("command `bread.pinger otp` requires a Yubikey OTP")},
+		{swe, "bread.pinger", "otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.pinger", "otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
 	} {
 		if !tc.otpOK {
 			otpVerifier.fail()
@@ -124,7 +124,7 @@ func TestAuthorizer(t *testing.T) {
 			}
 		} else {
 			if tc.err == nil {
-				t.Fatalf("unexpected error: %#v %s", tc, err)
+				t.Fatalf("unexpected error: %s", err)
 			}
 			if err.Error() != tc.err.Error() {
 				t.Errorf("expected error message %#v, got %#v", tc.err.Error(), err.Error())
