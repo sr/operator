@@ -44,6 +44,10 @@ images:
   # Pardot/pardriver
   docker.dev.pardot.com/base/pardriver/pardriver:
     build: pardriver/pardriver
+  docker.dev.pardot.com/base/pardriver/webdriver-hub:
+    build: pardriver/webdriver-hub
+  docker.dev.pardot.com/base/pardriver/webdriver-node-chrome:
+    build: pardriver/webdriver-node-chrome
 
   # Pardot/internal-api
   docker.dev.pardot.com/base/internal-api/app:
