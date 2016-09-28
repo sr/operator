@@ -57,6 +57,22 @@ var (
 			Group: "sysadmin",
 			OTP:   false,
 		},
+		{
+			Call: &operator.Call{
+				Service: "bread.deploy",
+				Method:  "list-builds",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.deploy",
+				Method:  "trigger",
+			},
+			Group: "sysadmin",
+			OTP:   true,
+		},
 	}
 
 	DeployTargets = map[string]*DeployTarget{
