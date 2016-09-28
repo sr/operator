@@ -631,7 +631,13 @@ resource "aws_security_group" "appdev_rabbithost" {
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.appdev_toolsproxy.id}"
-    ]
+  }
+
+  ingress {
+    from_port = 5672
+    to_port = 5672
+    protocol = "tcp"
+    self = true
   }
 
   egress {
