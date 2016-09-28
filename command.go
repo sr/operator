@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/user"
+	"time"
 
 	"google.golang.org/grpc"
 
@@ -147,6 +148,8 @@ func (c *Command) getServiceUsage(svc ServiceCommand) (string, error) {
 	return executeTemplate(serviceUsageTemplate, data)
 }
 
+const dialTimeout = 5 * time.Second
+
 func (c *CommandContext) GetConn() (*grpc.ClientConn, error) {
 	if v, ok := os.LookupEnv(operatorAddr); ok && c.Address == "" {
 		c.Address = v
@@ -154,7 +157,12 @@ func (c *CommandContext) GetConn() (*grpc.ClientConn, error) {
 	if c.Address == "" {
 		c.Address = DefaultAddress
 	}
-	return grpc.Dial(c.Address, grpc.WithInsecure())
+	return grpc.Dial(
+		c.Address,
+		grpc.WithBlock(),
+		grpc.WithTimeout(dialTimeout),
+		grpc.WithInsecure(),
+	)
 }
 
 func getMethodUsage(m MethodCommand) string {
