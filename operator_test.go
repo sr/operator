@@ -155,6 +155,7 @@ func TestHandler(t *testing.T) {
 		otp    string
 	}{
 		{"!ping ping", 200, true, noArgs, ""},
+		{"!ping ping-pong", 200, true, noArgs, ""},
 		{"!ping ping foo=bar spam=\"boom town\" x='sup'", 200, true,
 			map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}, ""},
 		{"!ping ping", 400, false, noArgs, ""},
