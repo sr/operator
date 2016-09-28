@@ -101,10 +101,7 @@ func (c *client) SendRoomNotification(ctx context.Context, notif *RoomNotificati
 	if err != nil {
 		return err
 	}
-	resp, err := c.do(ctx, req, 204)
-	if err != nil {
-		defer func() { _ = resp.Body.Close() }()
-	}
+	_, err = c.do(ctx, req, 204)
 	return err
 }
 
@@ -116,6 +113,7 @@ func (c *client) do(ctx context.Context, req *http.Request, status int) (*http.R
 		return nil, fmt.Errorf("hipchat request failed: %v", err)
 	}
 	if resp.StatusCode != status {
+		defer func() { _ = resp.Body.Close() }()
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			return nil, fmt.Errorf("hipchat request failed with status %d (expected %d) and body: %s", resp.StatusCode, status, body)
 		}
