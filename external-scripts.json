@@ -6,7 +6,6 @@
   "hubot-redis-brain",
   "hubot-schedule",
   "hubot-twitter-stream",
-  "hubot-yubikey-invalidation",
   "hubot-frinkiac",
   "hubot-youtube"
 ]

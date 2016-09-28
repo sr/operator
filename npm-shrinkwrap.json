@@ -692,11 +692,6 @@
       "from": "https://registry.npmjs.org/hubot-youtube/-/hubot-youtube-1.0.2.tgz",
       "resolved": "https://registry.npmjs.org/hubot-youtube/-/hubot-youtube-1.0.2.tgz"
     },
-    "hubot-yubikey-invalidation": {
-      "version": "0.0.3",
-      "from": "https://registry.npmjs.org/hubot-yubikey-invalidation/-/hubot-yubikey-invalidation-0.0.3.tgz",
-      "resolved": "https://registry.npmjs.org/hubot-yubikey-invalidation/-/hubot-yubikey-invalidation-0.0.3.tgz"
-    },
     "iconv-lite": {
       "version": "0.4.11",
       "from": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.11.tgz",
