@@ -166,7 +166,7 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.138"
+  #private_ip="172.28.0.138" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
@@ -196,7 +196,7 @@ resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.209"
+  #private_ip="172.28.0.209" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
@@ -226,7 +226,7 @@ resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.182"
+  #private_ip="172.28.0.182" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
@@ -359,6 +359,8 @@ resource "aws_iam_user" "artifactory_sysacct" {
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
   bucket = "artifactory_s3_filestore"
   acl = "private"
+  # for more info on the Elastic Load Balancing Account Number:
+  # http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -373,6 +375,20 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Resource": [
         "arn:aws:s3:::artifactory_s3_filestore",
         "arn:aws:s3:::artifactory_s3_filestore/*"
+      ]
+    },
+    {
+      "Sid": "allow Elastic Load Balancing Account",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "${var.elastic_load_balancing_acct_number}"
+        ]
+      },
+      "Action": "s3:PutObject",
+      "Resource": [
+        "arn:aws:s3:::artifactory_s3_filestore/accesslogs",
+        "arn:aws:s3:::artifactory_s3_filestore/accesslogs/*"
       ]
     },
     {
@@ -659,7 +675,7 @@ resource "aws_alb" "artifactory_public_alb" {
 }
 
 resource "aws_alb_target_group" "artifactory_all_hosts_target_group" {
-  name = "artifactory_host_target_group"
+  name = "artifactory-host-target-group"
   port = 80
   protocol = "HTTP"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
@@ -723,7 +739,7 @@ resource "aws_alb_target_group_attachment" "pardot0-artifactory1-3-ue1-allhosts-
 }
 
 resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
-  name = "artifactory_host_target_group"
+  name = "artifactory1-1-only-target-group"
   port = 80
   protocol = "HTTP"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
@@ -751,7 +767,7 @@ resource "aws_alb_target_group_attachment" "pardot0-artifactory1-1-ue1-artifacto
 }
 
 resource "aws_alb_target_group" "artifactory_artifactory1_2_only_target_group" {
-  name = "artifactory_host_target_group"
+  name = "artifactory1-2-only-target-group"
   port = 80
   protocol = "HTTP"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
@@ -779,7 +795,7 @@ resource "aws_alb_target_group_attachment" "pardot0-artifactory1-2-ue1-artifacto
 }
 
 resource "aws_alb_target_group" "artifactory_artifactory1_3_only_target_group" {
-  name = "artifactory_host_target_group"
+  name = "artifactory1-3-only-target-group"
   port = 80
   protocol = "HTTP"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
