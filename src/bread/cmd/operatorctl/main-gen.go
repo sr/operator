@@ -193,6 +193,32 @@ var cmd = operator.NewCommand(
 					},
 				},
 				{
+					Name:     "slow-loris",
+					Synopsis: `Undocumented.`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewPingerClient(conn)
+						resp, err := client.SlowLoris(
+							context.Background(),
+							&breadpb.SlowLorisRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
 					Name:     "whoami",
 					Synopsis: `Undocumented.`,
 					Flags:    []*flag.Flag{},

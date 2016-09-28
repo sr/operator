@@ -21,6 +21,7 @@ It has these top-level messages:
 	TriggerRequest
 	OtpRequest
 	PingRequest
+	SlowLorisRequest
 	WhoamiRequest
 */
 package breadpb

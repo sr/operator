@@ -1,8 +1,8 @@
 package bread
 
 import (
-	"errors"
 	"fmt"
+	"time"
 
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -33,6 +33,17 @@ func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*oper
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.Otp",
+		},
+	})
+}
+
+func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
+	time.Sleep(time.Duration(10) * time.Second)
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "https://66.media.tumblr.com/500736338e23d5b5adb0201b6b74cbc9/tumblr_mmyemrrqkq1s1fx0zo1_500.gif",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "gray",
+			From:  "pinger.SlowLoris",
 		},
 	})
 }
