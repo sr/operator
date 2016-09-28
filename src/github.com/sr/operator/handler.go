@@ -1,52 +1,20 @@
 package operator
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 
 	"golang.org/x/net/context"
-
-	"google.golang.org/grpc"
 )
-
-const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
 	ctx     context.Context
-	timeout time.Duration
 	inst    Instrumenter
 	decoder Decoder
 	re      *regexp.Regexp
-	conn    *grpc.ClientConn
 	invoker Invoker
-}
-
-func newHandler(
-	ctx context.Context,
-	timeout time.Duration,
-	inst Instrumenter,
-	decoder Decoder,
-	prefix string,
-	conn *grpc.ClientConn,
-	invoker Invoker,
-) (*handler, error) {
-	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
-	if err != nil {
-		return nil, err
-	}
-	return &handler{
-		ctx,
-		timeout,
-		inst,
-		decoder,
-		re,
-		conn,
-		invoker,
-	}, nil
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -91,36 +59,18 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.In(c, unicode.Quotation_Mark)
 		})
 	}
-	req := &Request{
-		Call: &Call{
-			Service: matches[1],
-			Method:  matches[2],
-			Args:    args,
+	go h.invoker.Invoke(
+		h.ctx,
+		msg,
+		&Request{
+			Call: &Call{
+				Service: matches[1],
+				Method:  matches[2],
+				Args:    args,
+			},
+			Otp:       otp,
+			ReplierId: replierID,
+			Source:    msg.Source,
 		},
-		Otp:       otp,
-		ReplierId: replierID,
-		Source:    msg.Source,
-	}
-	ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
-	defer cancel()
-	go func(ctx context.Context, req *Request, msg *Message) {
-		if ok, err := h.invoker(ctx, h.conn, req); !ok || err != nil {
-			h.inst.Instrument(&Event{
-				Key:     "handler_invoker_error",
-				Message: msg,
-				Request: req,
-				Error:   err,
-			})
-		}
-	}(ctx, req, msg)
-	select {
-	case <-ctx.Done():
-		h.inst.Instrument(&Event{
-			Key:     "handler_timeout",
-			Message: msg,
-			Request: req,
-			Error:   ctx.Err(),
-		})
-	default:
-	}
+	)
 }
