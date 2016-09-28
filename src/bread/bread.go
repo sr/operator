@@ -35,7 +35,7 @@ var (
 		{
 			Call: &operator.Call{
 				// TODO(sr) Add Package field to operator.Call struct
-				Service: "ping.pinger",
+				Service: "bread.pinger",
 				Method:  "ping",
 			},
 			Group: "sysadmin",
@@ -43,7 +43,7 @@ var (
 		},
 		{
 			Call: &operator.Call{
-				Service: "ping.pinger",
+				Service: "bread.pinger",
 				Method:  "otp",
 			},
 			Group: "sysadmin",
@@ -51,7 +51,7 @@ var (
 		},
 		{
 			Call: &operator.Call{
-				Service: "ping.pinger",
+				Service: "bread.pinger",
 				Method:  "whoami",
 			},
 			Group: "sysadmin",
