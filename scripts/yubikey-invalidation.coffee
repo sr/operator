@@ -29,11 +29,11 @@ module.exports = (robot) ->
     crypto.pseudoRandomBytes(16).toString('hex')
 
   invalidateOtp = (msg, otp) ->
-    https.get "#{validationUrl}?id=#{apiId}&otp=#{otp}&nonce=#{generateNonce()}", (res) ->
-      if res.statusCode != 200
-        msg.reply "#{messagePrefix} I tried to invalidate that OTP for you, but I got a #{res.statusCode} error from the server 😢"
-      else
-        msg.reply "#{messagePrefix} I went ahead and invalidated that OTP for you 🔒"
+    setTimeout (->
+      https.get "#{validationUrl}?id=#{apiId}&otp=#{otp}&nonce=#{generateNonce()}", (res) ->
+        if res.statusCode == 200
+          msg.reply "#{messagePrefix} I went ahead and invalidated that OTP for you 🔒"
+    ), 5000
 
   invalidateDvorakOtp = (msg, dvorakOtp) ->
     otp = dvorakOtp
