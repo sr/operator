@@ -16,12 +16,13 @@ func newInstrumenter(logger protolog.Logger) *instrumenter {
 }
 
 func (i *instrumenter) Instrument(ev *operator.Event) {
+	if ev.Request == nil || ev.Request.Source == nil {
+		return
+	}
 	ev.Request.Otp = ""
 	ev.Request.ReplierId = ""
 	ev.Request.Source.User.RealName = ""
-	log := &breadpb.OperatorRequest{
-		Request: ev.Request,
-	}
+	log := &breadpb.OperatorRequest{Request: ev.Request}
 	if ev.Message != nil {
 		log.Message = &breadpb.OperatorMessage{
 			Source: ev.Message.Source,
