@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -23,9 +22,22 @@ var credentials = &operatorhipchat.ClientCredentials{
 	Secret: "rvHUrNmuAmJXW0liQo6CxF8Avj1kf5oy3BYE20Ju",
 }
 
-type noopInstrumenter struct{}
+type fakeInstrumenter struct {
+	events []*operator.Event
+}
 
-func (i *noopInstrumenter) Instrument(*operator.Event) {}
+func (i *fakeInstrumenter) Instrument(ev *operator.Event) {
+	i.events = append(i.events, ev)
+}
+
+func (i *fakeInstrumenter) pop() (ev *operator.Event) {
+	if len(i.events) == 0 {
+		panic("no event to pop")
+		return &operator.Event{}
+	}
+	ev, i.events = i.events[len(i.events)-1], i.events[:len(i.events)-1]
+	return ev
+}
 
 type fakeReplier struct{}
 
@@ -74,6 +86,20 @@ func (c *fakeHipchatClient) SendRoomNotification(_ context.Context, _ *operatorh
 	return nil
 }
 
+type invocation struct {
+	msg *operator.Message
+	req *operator.Request
+}
+
+type invoker struct {
+	conn  *grpc.ClientConn
+	invoC chan *invocation
+}
+
+func (i *invoker) Invoke(ctx context.Context, msg *operator.Message, req *operator.Request) {
+	i.invoC <- &invocation{msg, req}
+}
+
 func TestHandler(t *testing.T) {
 	addr := "localhost:0"
 	server := grpc.NewServer()
@@ -97,6 +123,10 @@ func TestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.Close()
+	inv := &invoker{
+		conn:  conn,
+		invoC: make(chan *invocation, 1),
+	}
 	config := &operatorhipchat.ClientConfig{
 		Hostname: "api.hipchat.test",
 		Credentials: &operatorhipchat.ClientCredentials{
@@ -105,20 +135,13 @@ func TestHandler(t *testing.T) {
 		},
 	}
 	store := &fakeStore{config}
-	tArgs := make(map[string]string)
-	tOTP := ""
+	instrumenter := &fakeInstrumenter{}
 	h, err := operator.NewHandler(
 		context.Background(),
-		3*time.Second,
-		&noopInstrumenter{},
+		instrumenter,
 		operatorhipchat.NewRequestDecoder(store),
+		inv,
 		"!",
-		conn,
-		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
-			tArgs = req.Call.Args
-			tOTP = req.Otp
-			return true, nil
-		},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -175,13 +198,13 @@ func TestHandler(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		req, err := http.NewRequest("POST", ts.URL, bytes.NewReader(data))
+		httpReq, err := http.NewRequest("POST", ts.URL, bytes.NewReader(data))
 		if err != nil {
 			t.Fatal(err)
 		}
-		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("Authorization", "JWT "+token)
-		resp, err := http.DefaultClient.Do(req)
+		httpReq.Header.Add("Content-Type", "application/json")
+		httpReq.Header.Add("Authorization", "JWT "+token)
+		resp, err := http.DefaultClient.Do(httpReq)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -189,18 +212,34 @@ func TestHandler(t *testing.T) {
 		if resp.StatusCode != tt.status {
 			t.Errorf("message `%s` expected status code %d, got %#v", tt.text, tt.status, resp.StatusCode)
 		}
-		if len(tt.args) != 0 {
-			for key, val := range tArgs {
-				s, ok := tt.args[key]
-				if !ok {
-					t.Errorf("message `%s` expected to have arg %s but didn't", tt.text, key)
-				} else if s != val {
-					t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
+		switch resp.StatusCode {
+		case 404:
+			ev := instrumenter.pop()
+			if ev.Key != "handler_unmatched_message" {
+				t.Errorf("message `%s` expected to produce instrumentation event `handler_unmatched_message`, got `%s`", tt.text, ev.Key)
+			}
+		case 400:
+			ev := instrumenter.pop()
+			if ev.Key != "handler_decode_error" {
+				t.Errorf("message `%s` expected to produce instrumentation event `handler_decode_error`, got `%s`", tt.text, ev.Key)
+			}
+		case 200:
+			invoc := <-inv.invoC
+			if len(tt.args) != 0 {
+				for key, val := range invoc.req.Call.Args {
+					s, ok := tt.args[key]
+					if !ok {
+						t.Errorf("message `%s` expected to have arg %s but didn't", tt.text, key)
+					} else if s != val {
+						t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
+					}
 				}
 			}
-		}
-		if tt.otp != "" && tOTP != tt.otp {
-			t.Errorf("message `%s` expected to have OTP `%s` got `%s`", tt.text, tt.otp, tOTP)
+			if tt.otp != "" && invoc.req.Otp != tt.otp {
+				t.Errorf("message `%s` expected to have OTP `%s` got `%s`", tt.text, tt.otp, invoc.req.Otp)
+			}
+		default:
+			t.Errorf("message `%s` with jwt=%v resulted in unhandled status code %d", tt.text, tt.jwt, resp.StatusCode)
 		}
 	}
 }

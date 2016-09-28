@@ -3,12 +3,13 @@ package operator
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -37,7 +38,9 @@ type Replier interface {
 	Reply(context.Context, *Source, string, *Message) error
 }
 
-type Invoker func(context.Context, *grpc.ClientConn, *Request) (bool, error)
+type Invoker interface {
+	Invoke(context.Context, *Message, *Request)
+}
 
 type Event struct {
 	Key     string
@@ -82,24 +85,44 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
+const reCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
+
 func NewHandler(
 	ctx context.Context,
-	timeout time.Duration,
-	instrumenter Instrumenter,
+	inst Instrumenter,
 	decoder Decoder,
-	prefix string,
-	conn *grpc.ClientConn,
 	invoker Invoker,
+	prefix string,
 ) (http.Handler, error) {
-	return newHandler(
+	re, err := regexp.Compile(fmt.Sprintf(reCommandMessage, regexp.QuoteMeta(prefix)))
+	if err != nil {
+		return nil, err
+	}
+	return &handler{
 		ctx,
-		timeout,
-		instrumenter,
+		inst,
 		decoder,
-		prefix,
-		conn,
+		re,
 		invoker,
-	)
+	}, nil
+}
+
+type InvokerFunc func(context.Context, *grpc.ClientConn, *Request) (bool, error)
+
+func NewInvoker(
+	conn *grpc.ClientConn,
+	inst Instrumenter,
+	replier Replier,
+	f InvokerFunc,
+	timeout time.Duration,
+) Invoker {
+	return &invoker{
+		conn,
+		timeout,
+		inst,
+		replier,
+		f,
+	}
 }
 
 func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
