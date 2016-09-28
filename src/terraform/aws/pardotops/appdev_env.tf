@@ -623,25 +623,31 @@ resource "aws_security_group" "appdev_rabbithost" {
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    security_groups = [
-      "${aws_security_group.appdev_apphost.id}"
-    ]
-  }
-
-  ingress {
     from_port = 15672
     to_port = 15672
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.appdev_toolsproxy.id}"
+    ]
   }
 
   ingress {
-    from_port = 5672
+    from_port = 5671
     to_port = 5672
+    protocol = "tcp"
+    self = true
+  }
+
+  ingress {
+    from_port = 4369
+    to_port = 4369
+    protocol = "tcp"
+    self = true
+  }
+
+  ingress {
+    from_port = 25672
+    to_port = 25672
     protocol = "tcp"
     self = true
   }
