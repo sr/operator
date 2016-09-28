@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"net/url"
 	"os"
 
 	"github.com/GeertJohan/yubigo"
@@ -108,12 +107,6 @@ type ACLEntry struct {
 	OTP   bool
 }
 
-type BambooConfig struct {
-	Username string
-	Password string
-	URL      string
-}
-
 type DeployConfig struct {
 	ArtifactoryAPIKey   string
 	ArtifactoryURL      string
@@ -187,19 +180,10 @@ func NewServer(
 	auth operator.Authorizer,
 	inst operator.Instrumenter,
 	repl operator.Replier,
-	bamboo *BambooConfig,
 	deploy *DeployConfig,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingerServer(server, &pingAPIServer{repl})
-	if bamboo.Username != "" && bamboo.Password != "" && bamboo.URL != "" {
-		u, err := url.Parse(bamboo.URL)
-		if err != nil {
-			return nil, err
-		}
-		t := &bambooTransport{Username: bamboo.Username, Password: bamboo.Password}
-		breadpb.RegisterBambooServer(server, &bambooAPIServer{repl, t.Client(), u})
-	}
 	if len(deploy.Targets) != 0 &&
 		deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&

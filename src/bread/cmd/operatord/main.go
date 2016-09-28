@@ -43,13 +43,11 @@ type config struct {
 	hipchatAddonURL   string
 	hipchatWebhookURL string
 
-	bamboo *bread.BambooConfig
 	deploy *bread.DeployConfig
 }
 
 func run(invoker operator.Invoker) error {
 	config := &config{
-		bamboo: &bread.BambooConfig{},
 		deploy: &bread.DeployConfig{Targets: bread.DeployTargets},
 		yubico: &bread.YubicoConfig{},
 	}
@@ -66,9 +64,6 @@ func run(invoker operator.Invoker) error {
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
 	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
 	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
-	flags.StringVar(&config.bamboo.Username, "bamboo-username", "", "TODO")
-	flags.StringVar(&config.bamboo.Password, "bamboo-password", "", "TODO")
-	flags.StringVar(&config.bamboo.URL, "bamboo-url", "", "TODO")
 	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "TODO")
 	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "")
 	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "TODO")
@@ -154,7 +149,6 @@ func run(invoker operator.Invoker) error {
 		auth,
 		inst,
 		replier,
-		config.bamboo,
 		config.deploy,
 	)
 	if err != nil {

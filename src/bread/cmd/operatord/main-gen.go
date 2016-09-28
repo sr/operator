@@ -10,8 +10,6 @@ import (
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
-	if req.Call.Service == "ci" {
-	}
 	if req.Call.Service == "deploy" {
 		if req.Call.Method == "listTargets" {
 			client := breadpb.NewDeployClient(conn)

@@ -19,12 +19,6 @@ var cmd = operator.NewCommand(
 	programName,
 	[]operator.ServiceCommand{
 		{
-			Name:     "ci",
-			Synopsis: `Undocumented.`,
-			Methods:  []operator.MethodCommand{},
-		},
-
-		{
 			Name:     "deploy",
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
