@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
-
 	"google.golang.org/grpc"
 
 	"github.com/dvsekhvalnov/jose2go"
@@ -108,12 +108,14 @@ func TestHandler(t *testing.T) {
 	tArgs := make(map[string]string)
 	tOTP := ""
 	h, err := operator.NewHandler(
+		context.Background(),
+		3*time.Second,
 		&noopInstrumenter{},
 		operatorhipchat.NewRequestDecoder(store),
 		"!",
 		conn,
-		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-			tArgs = args
+		func(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
+			tArgs = req.Call.Args
 			tOTP = req.Otp
 			return true, nil
 		},
