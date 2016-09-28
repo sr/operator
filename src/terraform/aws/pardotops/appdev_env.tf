@@ -39,6 +39,7 @@ variable "environment_appdev" {
     num_toolsproxy1_hosts = 1
     num_vault1_hosts = 3
     num_consul1_hosts = 2
+    num_indexer1_hosts = 1
   }
 }
 
@@ -75,7 +76,7 @@ variable "appdev_whoisdb1_ips" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["db_instance_type}"
-//  subnet_id = "${var.environment_appdev["subnet_id}"
+//  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_type = "gp2"
@@ -105,7 +106,7 @@ variable "appdev_whoisdb1_ips" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["app_instance_type"]}"
-//  subnet_id = "${var.environment_appdev["subnet_id"]}"
+//  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
 //  root_block_device {
 //    volume_type = "gp2"
 //    volume_size = "50"
@@ -128,7 +129,7 @@ variable "appdev_whoisdb1_ips" {
 //  count = "${var.environment_appdev["num_lbl1_hosts"]}"
 //  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
 //  instance_type = "${var.environment_appdev["job_instance_type"]}"
-//  subnet_id = "${var.environment_appdev["subnet_id"]}"
+//  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
 //  ebs_optimized = "true"
 //  root_block_device {
 //    volume_type = "gp2"
@@ -610,7 +611,6 @@ resource "aws_security_group" "appdev_rabbithost" {
     to_port = 0
     protocol = "-1"
     security_groups = [
-      "${aws_security_group.appdev_toolsproxy.id}",
       "${aws_security_group.appdev_apphost.id}"
     ]
   }
@@ -1261,5 +1261,48 @@ EOF
   tags {
     Name = "cephthumbs_s3_filestore"
     terraform = "true"
+  }
+}
+
+resource "aws_instance" "appdev_indexer1" {
+  key_name = "internal_apps"
+  count = "${var.environment_appdev["num_indexer1_hosts"]}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = "50"
+    delete_on_termination = true
+  }
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_indexerhost.id}"
+  ]
+  tags {
+    Name = "${var.environment_appdev["pardot_env_id"]}-indexer1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_indexerhost" {
+  name = "appdev_indexerhost"
+  description = "Allow access through the toolsproxy and from apphosts"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 5601
+    to_port = 5601
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
