@@ -64,6 +64,7 @@ var (
 			BambooPlan:    "BREAD",
 			BambooJob:     "CAN",
 			ECSCluster:    "canoe_production",
+			ECSService:    "canoe",
 			Image:         "build/bread/canoe/app",
 		},
 		"hal9000": &DeployTarget{
@@ -71,6 +72,7 @@ var (
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
 			ECSCluster:    "hal9000_production",
+			ECSService:    "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
 		"operator": &DeployTarget{
@@ -78,6 +80,7 @@ var (
 			BambooPlan:    "BREAD",
 			BambooJob:     "OP",
 			ECSCluster:    "operator_production",
+			ECSService:    "operator",
 			Image:         "build/bread/operatord/app",
 		},
 		"parbot": &DeployTarget{
@@ -85,6 +88,7 @@ var (
 			BambooPlan:    "PAR",
 			BambooJob:     "",
 			ECSCluster:    "parbot_production",
+			ECSService:    "parbot",
 			Image:         "build/bread/parbot/app",
 		},
 		"teampass": &DeployTarget{
@@ -92,6 +96,7 @@ var (
 			BambooPlan:    "BREAD",
 			BambooJob:     "TEAM",
 			ECSCluster:    "teampass",
+			ECSService:    "teampass",
 			Image:         "build/bread/tempass/app",
 		},
 	}
@@ -123,6 +128,7 @@ type DeployTarget struct {
 	BambooPlan    string
 	BambooJob     string
 	ECSCluster    string
+	ECSService    string
 	Image         string
 }
 
@@ -188,7 +194,8 @@ func NewServer(
 		deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&
 		deploy.ArtifactoryAPIKey != "" &&
-		deploy.ArtifactoryRepo != "" {
+		deploy.ArtifactoryRepo != "" &&
+		deploy.AWSRegion != "" {
 		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
 		breadpb.RegisterDeployServer(server, &deployAPIServer{
 			repl,

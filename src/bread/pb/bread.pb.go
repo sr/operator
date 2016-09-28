@@ -2,18 +2,45 @@
 // source: pb/bread.proto
 // DO NOT EDIT!
 
+/*
+Package breadpb is a generated protocol buffer package.
+
+It is generated from these files:
+	pb/bread.proto
+	pb/deploy.proto
+	pb/ping.proto
+
+It has these top-level messages:
+	OperatorRequest
+	OperatorMessage
+	HTTPRequest
+	ServerStartupNotice
+	ServiceStartupError
+	ListTargetsRequest
+	ListBuildsRequest
+	TriggerRequest
+	OtpRequest
+	PingRequest
+	WhoamiRequest
+*/
 package breadpb
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf "github.com/golang/protobuf/ptypes/duration"
 import operator "github.com/sr/operator"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type OperatorRequest struct {
 	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
@@ -24,7 +51,7 @@ type OperatorRequest struct {
 func (m *OperatorRequest) Reset()                    { *m = OperatorRequest{} }
 func (m *OperatorRequest) String() string            { return proto.CompactTextString(m) }
 func (*OperatorRequest) ProtoMessage()               {}
-func (*OperatorRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (*OperatorRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *OperatorRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -49,7 +76,7 @@ type OperatorMessage struct {
 func (m *OperatorMessage) Reset()                    { *m = OperatorMessage{} }
 func (m *OperatorMessage) String() string            { return proto.CompactTextString(m) }
 func (*OperatorMessage) ProtoMessage()               {}
-func (*OperatorMessage) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
+func (*OperatorMessage) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *OperatorMessage) GetSource() *operator.Source {
 	if m != nil {
@@ -59,18 +86,18 @@ func (m *OperatorMessage) GetSource() *operator.Source {
 }
 
 type HTTPRequest struct {
-	Method     string                     `protobuf:"bytes,1,opt,name=method" json:"method,omitempty"`
-	Path       string                     `protobuf:"bytes,2,opt,name=path" json:"path,omitempty"`
-	Query      map[string]string          `protobuf:"bytes,3,rep,name=query" json:"query,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	StatusCode uint32                     `protobuf:"varint,7,opt,name=status_code,json=statusCode" json:"status_code,omitempty"`
-	Duration   *google_protobuf1.Duration `protobuf:"bytes,8,opt,name=duration" json:"duration,omitempty"`
-	Error      string                     `protobuf:"bytes,9,opt,name=error" json:"error,omitempty"`
+	Method     string                    `protobuf:"bytes,1,opt,name=method" json:"method,omitempty"`
+	Path       string                    `protobuf:"bytes,2,opt,name=path" json:"path,omitempty"`
+	Query      map[string]string         `protobuf:"bytes,3,rep,name=query" json:"query,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	StatusCode uint32                    `protobuf:"varint,7,opt,name=status_code,json=statusCode" json:"status_code,omitempty"`
+	Duration   *google_protobuf.Duration `protobuf:"bytes,8,opt,name=duration" json:"duration,omitempty"`
+	Error      string                    `protobuf:"bytes,9,opt,name=error" json:"error,omitempty"`
 }
 
 func (m *HTTPRequest) Reset()                    { *m = HTTPRequest{} }
 func (m *HTTPRequest) String() string            { return proto.CompactTextString(m) }
 func (*HTTPRequest) ProtoMessage()               {}
-func (*HTTPRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
+func (*HTTPRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *HTTPRequest) GetQuery() map[string]string {
 	if m != nil {
@@ -79,7 +106,7 @@ func (m *HTTPRequest) GetQuery() map[string]string {
 	return nil
 }
 
-func (m *HTTPRequest) GetDuration() *google_protobuf1.Duration {
+func (m *HTTPRequest) GetDuration() *google_protobuf.Duration {
 	if m != nil {
 		return m.Duration
 	}
@@ -95,7 +122,7 @@ type ServerStartupNotice struct {
 func (m *ServerStartupNotice) Reset()                    { *m = ServerStartupNotice{} }
 func (m *ServerStartupNotice) String() string            { return proto.CompactTextString(m) }
 func (*ServerStartupNotice) ProtoMessage()               {}
-func (*ServerStartupNotice) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3} }
+func (*ServerStartupNotice) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 type ServiceStartupError struct {
 	Service string `protobuf:"bytes,1,opt,name=service" json:"service,omitempty"`
@@ -105,7 +132,7 @@ type ServiceStartupError struct {
 func (m *ServiceStartupError) Reset()                    { *m = ServiceStartupError{} }
 func (m *ServiceStartupError) String() string            { return proto.CompactTextString(m) }
 func (*ServiceStartupError) ProtoMessage()               {}
-func (*ServiceStartupError) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{4} }
+func (*ServiceStartupError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func init() {
 	proto.RegisterType((*OperatorRequest)(nil), "bread.OperatorRequest")
@@ -115,9 +142,9 @@ func init() {
 	proto.RegisterType((*ServiceStartupError)(nil), "bread.ServiceStartupError")
 }
 
-func init() { proto.RegisterFile("pb/bread.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("pb/bread.proto", fileDescriptor0) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor0 = []byte{
 	// 443 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x4c, 0x51, 0x4d, 0x6f, 0xd3, 0x40,
 	0x10, 0x95, 0x93, 0x26, 0x8e, 0x27, 0xa2, 0x94, 0x05, 0x55, 0x26, 0x12, 0x10, 0xf9, 0x64, 0x09,

@@ -3,11 +3,11 @@ package bread
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 
@@ -42,6 +42,7 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 		targets[i] = k
 		i = i + 1
 	}
+	sort.Strings(targets)
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "Deploy targets: " + strings.Join(targets, ", "),
 	})
@@ -67,30 +68,32 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	if err != nil {
 		return nil, err
 	}
+	if len(artifs) == 0 {
+		return nil, fmt.Errorf("No build found for %s", req.Target)
+	}
 	var out bytes.Buffer
 	for _, a := range artifs {
-		fmt.Fprintf(&out, "%s %s %s %s\n", req.Target, a.Repo, a.Path, a.Created)
+		fmt.Fprintf(&out, "%s %s\n", req.Target, a.Tag())
 	}
 	return operator.Reply(s, ctx, req, &operator.Message{Text: out.String()})
 }
 
-func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerRequest) (*operator.Response, error) {
-	var cluster string
-	_, ok := s.conf.Targets[in.Target]
+func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
+	t, ok := s.conf.Targets[req.Target]
 	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", in.Target)
+		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
 	}
 	svc, err := s.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
-			Services: []*string{aws.String(s.conf.CanoeECSService)},
-			Cluster:  aws.String(cluster),
+			Services: []*string{aws.String(t.ECSService)},
+			Cluster:  aws.String(t.ECSCluster),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if len(svc.Services) != 1 {
-		return nil, errors.New("bogus response")
+		return nil, fmt.Errorf("ECS cluster `%s` does not have a `%s` service", t.ECSCluster, t.ECSService)
 	}
 	out, err := s.ecs.DescribeTaskDefinition(
 		&ecs.DescribeTaskDefinitionInput{
@@ -101,45 +104,24 @@ func (s *deployAPIServer) Trigger(ctx context.Context, in *breadpb.TriggerReques
 		return nil, err
 	}
 	curImg, err := parseImage(*out.TaskDefinition.ContainerDefinitions[0].Image)
-	if curImg.tag == in.Build {
-		return nil, fmt.Errorf("build %s already deployed", in.Build)
+	if curImg.tag == req.Build {
+		return nil, fmt.Errorf("Build %s is already deployed", req.Build)
 	}
 	if err != nil {
 		return nil, err
 	}
-	img := fmt.Sprintf("%s/%s:%s", curImg.host, curImg.repo, in.Build)
-	var nextToken *string
-	found := false
-OuterLoop:
-	for {
-		images, err := s.ecr.ListImages(
-			&ecr.ListImagesInput{
-				MaxResults:     aws.Int64(100),
-				NextToken:      nextToken,
-				RegistryId:     aws.String(curImg.registryID),
-				RepositoryName: aws.String(curImg.repo),
-			},
-		)
-		if err != nil {
-			return nil, err
-		}
-		nextToken = images.NextToken
-		if err != nil || len(images.ImageIds) == 0 {
-			break OuterLoop
-		}
-		for _, i := range images.ImageIds {
-			if i.ImageTag == nil {
-				continue
-			}
-			if i.ImageTag != nil && *i.ImageTag == in.Build {
-				found = true
-				break OuterLoop
-			}
-		}
-
+	img := fmt.Sprintf("%s/%s:%s", curImg.host, curImg.repo, req.Build)
+	conds := []string{
+		`{"name":{"$eq":"manifest.json"}}`,
+		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
+		fmt.Sprintf(`{"path": {"$match": "%s/%s"}}`, t.Image, req.Build),
 	}
-	if !found {
-		return nil, fmt.Errorf("image for build %s not found in Docker repository", in.Build)
+	artifs, err := s.doAQL(fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")))
+	if err != nil {
+		return nil, err
+	}
+	if len(artifs) == 0 {
+		return nil, fmt.Errorf("No such build: %s", req.Build)
 	}
 	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(img)
 	task, err := s.ecs.RegisterTaskDefinition(
@@ -162,8 +144,8 @@ OuterLoop:
 	if err != nil {
 		return nil, err
 	}
-	return operator.Reply(s, ctx, in, &operator.Message{
-		Text: fmt.Sprintf("deployed %s to %s", in.Target, in.Build),
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: fmt.Sprintf("deployed %s to %s", req.Target, req.Build),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "yellow",
 		},
@@ -187,7 +169,12 @@ func (a *artifact) Tag() string {
 	if a == nil {
 		return ""
 	}
-	return ""
+	// build/bread/hal9000/app/BREAD-BREAD-480
+	parts := strings.Split(a.Path, "/")
+	if len(parts) != 5 {
+		return ""
+	}
+	return parts[4]
 }
 
 func (s *deployAPIServer) doAQL(q string) ([]*artifact, error) {
@@ -225,7 +212,7 @@ func (s *deployAPIServer) doAQL(q string) ([]*artifact, error) {
 
 // parseImage parses a ecs.ContainerDefinition string Image.
 func parseImage(img string) (*parsedImg, error) {
-	u, err := url.Parse("ecr://" + img)
+	u, err := url.Parse("docker://" + img)
 	if err != nil {
 		return nil, err
 	}

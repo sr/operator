@@ -68,7 +68,7 @@ func run(invoker operator.Invoker) error {
 	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "")
 	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "TODO")
 	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "TODO")
-	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "", "TODO")
+	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "TODO")
 	flags.StringVar(&config.deploy.CanoeECSService, "deploy-canoe-ecs-service", "", "TODO")
 	flags.IntVar(&config.deploy.Timeout, "deploy-timeout", 120, "TODO")
 	// Allow setting flags via environment variables
