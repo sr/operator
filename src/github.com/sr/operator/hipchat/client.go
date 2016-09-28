@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"golang.org/x/net/context"
@@ -76,6 +77,9 @@ func (c *client) GetUser(ctx context.Context, id int) (*User, error) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != 200 {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("hipchat request failed with status %d and body: %s", resp.StatusCode, body)
+		}
 		return nil, fmt.Errorf("hipchat request failed with status %d", resp.StatusCode)
 	}
 	var user User
