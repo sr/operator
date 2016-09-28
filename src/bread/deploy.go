@@ -150,7 +150,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if err != nil {
 		return nil, err
 	}
-	operator.Reply(s, ctx, req, &operator.Message{
+	_, _ = operator.Reply(s, ctx, req, &operator.Message{
 		Text: fmt.Sprintf("Build %s@%s deployed to service %s. Waiting for service to rollover...", req.Target, req.Build, t.ECSService),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "yellow",
@@ -186,11 +186,10 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			}
 			time.Sleep(5 * time.Second)
 		}
-		return
 	}()
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s: %s", req.Target, req.Build, s.conf.ECSTimeout)
+		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target, req.Build, s.conf.ECSTimeout)
 	case <-okC:
 		return operator.Reply(s, ctx, req, &operator.Message{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
@@ -199,7 +198,6 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	return nil, nil
 }
 
 type artifact struct {
@@ -243,7 +241,7 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			return nil, fmt.Errorf("Artifactory query failed with status %d and body: %s", resp.StatusCode, body)
