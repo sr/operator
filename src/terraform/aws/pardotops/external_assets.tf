@@ -17,3 +17,7 @@ variable "pardot_atlassian_vpc_id" {
 variable "pardot_ci_nat_gw_public_ip" {
   default = "52.200.146.253"
 }
+
+variable "elastic_load_balancing_acct_number" {
+  default = "127311923021"
+}
