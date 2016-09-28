@@ -8,12 +8,13 @@ class SessionsController < ApplicationController
   end
 
   def create
+    target_url = session[:target_url]
     session.destroy
 
     user = User.find_or_create_by_omniauth(request.env["omniauth.auth"])
     if user && user.persisted?
       self.current_user = user
-      redirect_to root_url
+      redirect_to target_url.blank? ? root_url : target_url
     else
       @errors = user.errors
       render action: "new"

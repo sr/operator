@@ -105,6 +105,7 @@ case "$action" in
         mkdir -p "src/github.com/hashicorp"
         curl -fsSL "$archiveurl" | tar -xvz -C "$archivedir"
         mv "${archivedir}/terraform-${arg1}" "$vendordir"
+        gofmt -w -s "$vendordir"
 
         echo "Vendored terraform version ${version} to $vendordir" 2>&1
         exit 0
