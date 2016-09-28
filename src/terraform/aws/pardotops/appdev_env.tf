@@ -167,6 +167,8 @@ variable "appdev_whoisdb1_ips" {
 
 resource "aws_security_group" "appdev_apphost" {
   name = "appdev_apphost"
+  # This description is not accurate, but we can't change it. Here's what it should be:
+  # "Allow all traffic from appdev vpc"
   description = "Allow HTTP/HTTPS traffic from appdev vpc"
   vpc_id = "${aws_vpc.appdev.id}"
 
@@ -175,16 +177,6 @@ resource "aws_security_group" "appdev_apphost" {
     to_port = 0
     protocol = "-1"
     self = true
-  }
-
-  # allow health check from ELBs
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
-    ]
   }
 
   egress {
@@ -412,11 +404,34 @@ resource "aws_instance" "appdev_app1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}"
+    "${aws_security_group.appdev_app1host.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-app1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_app1host" {
+  name = "appdev_app1host"
+  description = "Allow HTTP/HTTPS traffic from appdev vpc"
+  vpc_id = "${aws_vpc.appdev.id}"
+
+  # allow health check from ELBs
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -612,16 +627,6 @@ resource "aws_security_group" "appdev_rabbithost" {
     protocol = "-1"
     security_groups = [
       "${aws_security_group.appdev_apphost.id}"
-    ]
-  }
-
-  # allow health check from ELBs
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.appdev_sfdc_vpn_http_https.id}"
     ]
   }
 
