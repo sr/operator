@@ -22,6 +22,8 @@ import (
 	"bread/pb"
 )
 
+const smiley = "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png"
+
 type deployAPIServer struct {
 	operator.Replier
 	ecs  *ecs.ECS
@@ -75,6 +77,14 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 var ecsRunning = aws.String("RUNNING")
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
+	if req.Target == "smiley" {
+		return operator.Reply(s, ctx, req, &operator.Message{
+			Text: smiley,
+			Options: &operatorhipchat.MessageOptions{
+				Color: "green",
+			},
+		})
+	}
 	t, ok := s.conf.Targets[req.Target]
 	if !ok {
 		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
