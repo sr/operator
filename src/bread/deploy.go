@@ -190,7 +190,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}()
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("Deploy failed: %s", ctx.Err())
+		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s: %s", req.Target, req.Build, s.conf.ECSTimeout)
 	case <-okC:
 		return operator.Reply(s, ctx, req, &operator.Message{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),

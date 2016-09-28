@@ -24,7 +24,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const ldapTimeout = 3 * time.Second
+const (
+	ldapTimeout = 3 * time.Second
+	grpcTimeout = 3 * time.Second
+)
 
 type config struct {
 	grpcAddr string
@@ -46,7 +49,7 @@ type config struct {
 	deploy *bread.DeployConfig
 }
 
-func run(invoker operator.Invoker) error {
+func run(invoker operator.InvokerFunc) error {
 	config := &config{
 		deploy: &bread.DeployConfig{Targets: bread.DeployTargets},
 		yubico: &bread.YubicoConfig{},
@@ -169,20 +172,25 @@ func run(invoker operator.Invoker) error {
 	var webhookHandler http.Handler
 	conn, err := grpc.Dial(
 		config.grpcAddr,
+		grpc.WithBlock(),
+		grpc.WithTimeout(grpcTimeout),
 		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(bread.NewUnaryClientInterceptor(replier)),
 	)
 	if err != nil {
 		return err
 	}
 	if webhookHandler, err = operator.NewHandler(
 		context.Background(),
-		config.timeout,
 		inst,
 		operatorhipchat.NewRequestDecoder(store),
+		operator.NewInvoker(
+			conn,
+			inst,
+			replier,
+			invoker,
+			config.timeout,
+		),
 		config.prefix,
-		conn,
-		invoker,
 	); err != nil {
 		return err
 	}
