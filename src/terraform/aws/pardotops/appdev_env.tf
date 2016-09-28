@@ -404,6 +404,7 @@ resource "aws_instance" "appdev_app1" {
   }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_apphost.id}",
     "${aws_security_group.appdev_app1host.id}"
   ]
   tags {
