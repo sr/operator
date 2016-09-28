@@ -21,7 +21,3 @@ variable "pardot_ci_nat_gw_public_ip" {
 variable "elastic_load_balancing_acct_number" {
   default = "127311923021"
 }
-
-variable "app_load_balancing_acct_number" {
-  default = "127311923021"
-}
