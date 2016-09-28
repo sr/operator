@@ -19,6 +19,9 @@ func (i *instrumenter) Instrument(ev *operator.Event) {
 	if ev.Request == nil || ev.Request.Source == nil {
 		return
 	}
+	if ev.Key == "invoker" {
+		return
+	}
 	ev.Request.Otp = ""
 	ev.Request.ReplierId = ""
 	ev.Request.Source.User.RealName = ""
