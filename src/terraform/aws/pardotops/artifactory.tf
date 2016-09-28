@@ -302,56 +302,6 @@ resource "aws_elb" "artifactory_public_elb" {
   }
 }
 
-resource "aws_elb" "artifactory_private_elb" {
-  internal = true
-  name = "afy-prvt-elb-dev-pardot-com"
-  security_groups = [
-    "${aws_security_group.artifactory_internal_elb_secgroup.id}"
-  ]
-
-  subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e.id}"
-  ]
-  cross_zone_load_balancing = true
-  connection_draining = true
-  connection_draining_timeout = 30
-  instances = [
-    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-3-ue1.id}"
-  ]
-
-  listener {
-    lb_port = 443
-    lb_protocol = "https"
-    instance_port = 80
-    instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
-  }
-
-  listener {
-    lb_port = 80
-    lb_protocol = "http"
-    instance_port = 80
-    instance_protocol = "http"
-  }
-
-  health_check {
-    healthy_threshold = 4
-    unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/artifactory/api/system/ping"
-    interval = 5
-  }
-
-  tags {
-    Name = "artifactory-private-elb"
-  }
-}
-
 resource "aws_iam_user" "artifactory_sysacct" {
   name = "sa_artifactory"
 }
@@ -375,20 +325,6 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Resource": [
         "arn:aws:s3:::artifactory_s3_filestore",
         "arn:aws:s3:::artifactory_s3_filestore/*"
-      ]
-    },
-    {
-      "Sid": "allow Elastic Load Balancing Account",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": [
-          "${var.elastic_load_balancing_acct_number}"
-        ]
-      },
-      "Action": "s3:PutObject",
-      "Resource": [
-        "arn:aws:s3:::artifactory_s3_filestore/accesslogs",
-        "arn:aws:s3:::artifactory_s3_filestore/accesslogs/*"
       ]
     },
     {
@@ -638,22 +574,6 @@ resource "aws_route53_record" "artifactorylb_dev_pardot_com_CNAME" {
   ttl = 900
 }
 
-resource "aws_route53_record" "appdev_artifactorylb_aws_pardot_com_CNAME" {
-  name = "artifactorylb.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  type = "CNAME"
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.id}"
-  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
-  ttl = 900
-}
-
-resource "aws_route53_record" "internal_apps_artifactorylb_aws_pardot_com_CNAME" {
-  name = "artifactorylb.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
-  type = "CNAME"
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
-  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
-  ttl = 900
-}
-
 resource "aws_alb" "artifactory_public_alb" {
   name = "afy-pblc-alb-dev-pardot-com"
   internal = false
@@ -667,11 +587,6 @@ resource "aws_alb" "artifactory_public_alb" {
     "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
     "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
   ]
-
-  access_logs {
-    bucket = "${aws_s3_bucket.artifactory_s3_filestore.bucket}"
-    prefix = "accesslogs/afy-pblc-alb-dev-pardot-com"
-  }
 }
 
 resource "aws_alb_target_group" "artifactory_all_hosts_target_group" {
@@ -864,39 +779,5 @@ resource "aws_alb_listener_rule" "artifactory_host_1-3_alb_rule" {
   condition {
     field = "path-pattern"
     values = ["/artifactory3/*"]
-  }
-}
-
-resource "aws_alb" "artifactory_private_alb" {
-  name = "afy-prvt-alb-aws-pardot-com"
-  internal = true
-  security_groups = [
-    "${aws_security_group.artifactory_internal_elb_secgroup.id}"
-  ]
-
-  subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e.id}"
-  ]
-
-  access_logs {
-    bucket = "${aws_s3_bucket.artifactory_s3_filestore.bucket}"
-    prefix = "accesslogs/afy-prvt-alb-aws-pardot-com"
-  }
-}
-
-resource "aws_alb_listener" "private_artifactory_alb_all_hosts_https" {
-  #TODO: bind the right aws.pardot.com cert to this listener!
-  load_balancer_arn = "${aws_alb.artifactory_private_alb.arn}"
-  port = 443
-  protocol = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-2015-05"
-  certificate_arn = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
-
-  "default_action" {
-    target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
-    type = "forward"
   }
 }
