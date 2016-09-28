@@ -168,7 +168,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.138"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -198,7 +198,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.209"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -228,7 +228,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   instance_type = "c4.4xlarge"
   private_ip="172.28.0.182"
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -673,7 +673,7 @@ resource "aws_alb_target_group" "artifactory_all_hosts_target_group" {
     interval = "60"
     path = "/artifactory/api/system/ping"
     port = 80
-    protocol = HTTP
+    protocol = "HTTP"
     healthy_threshold = 5
     unhealthy_threshold = 5
     matcher = "200"
@@ -737,7 +737,7 @@ resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
     interval = "60"
     path = "/artifactory/api/system/ping"
     port = 80
-    protocol = HTTP
+    protocol = "HTTP"
     healthy_threshold = 5
     unhealthy_threshold = 5
     matcher = "200"
@@ -765,7 +765,7 @@ resource "aws_alb_target_group" "artifactory_artifactory1_2_only_target_group" {
     interval = "60"
     path = "/artifactory/api/system/ping"
     port = 80
-    protocol = HTTP
+    protocol = "HTTP"
     healthy_threshold = 5
     unhealthy_threshold = 5
     matcher = "200"
@@ -793,7 +793,7 @@ resource "aws_alb_target_group" "artifactory_artifactory1_3_only_target_group" {
     interval = "60"
     path = "/artifactory/api/system/ping"
     port = 80
-    protocol = HTTP
+    protocol = "HTTP"
     healthy_threshold = 5
     unhealthy_threshold = 5
     matcher = "200"
@@ -867,7 +867,7 @@ resource "aws_alb" "artifactory_private_alb" {
 
   access_logs {
     bucket = "${aws_s3_bucket.artifactory_s3_filestore.bucket}"
-    prefix = "accesslogs/afy-prvt-alb-dev-pardot-com"
+    prefix = "accesslogs/afy-prvt-alb-aws-pardot-com"
   }
 }
 
@@ -884,5 +884,3 @@ resource "aws_alb_listener" "private_artifactory_alb_all_hosts_https" {
     type = "forward"
   }
 }
-
-#TODO: to be continued next commit..
