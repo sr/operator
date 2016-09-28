@@ -12,13 +12,13 @@ It is generated from these files:
 	pb/ping.proto
 
 It has these top-level messages:
-	ListBuildsRequest
 	OperatorRequest
 	OperatorMessage
 	HTTPRequest
 	ServerStartupNotice
 	ServiceStartupError
-	ListAppsRequest
+	ListTargetsRequest
+	ListBuildsRequest
 	TriggerRequest
 	OtpRequest
 	PingRequest
@@ -29,7 +29,7 @@ package breadpb
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import operator "github.com/sr/operator"
+import _ "github.com/sr/operator"
 
 import (
 	context "golang.org/x/net/context"
@@ -47,27 +47,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type ListBuildsRequest struct {
-	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
-	Plan    string            `protobuf:"bytes,2,opt,name=plan" json:"plan,omitempty"`
-}
-
-func (m *ListBuildsRequest) Reset()                    { *m = ListBuildsRequest{} }
-func (m *ListBuildsRequest) String() string            { return proto.CompactTextString(m) }
-func (*ListBuildsRequest) ProtoMessage()               {}
-func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
-
-func (m *ListBuildsRequest) GetRequest() *operator.Request {
-	if m != nil {
-		return m.Request
-	}
-	return nil
-}
-
-func init() {
-	proto.RegisterType((*ListBuildsRequest)(nil), "bread.ListBuildsRequest")
-}
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -79,7 +58,6 @@ const _ = grpc.SupportPackageIsVersion3
 // Client API for Bamboo service
 
 type BambooClient interface {
-	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
 type bambooClient struct {
@@ -90,69 +68,31 @@ func NewBambooClient(cc *grpc.ClientConn) BambooClient {
 	return &bambooClient{cc}
 }
 
-func (c *bambooClient) ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*operator.Response, error) {
-	out := new(operator.Response)
-	err := grpc.Invoke(ctx, "/bread.Bamboo/ListBuilds", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for Bamboo service
 
 type BambooServer interface {
-	ListBuilds(context.Context, *ListBuildsRequest) (*operator.Response, error)
 }
 
 func RegisterBambooServer(s *grpc.Server, srv BambooServer) {
 	s.RegisterService(&_Bamboo_serviceDesc, srv)
 }
 
-func _Bamboo_ListBuilds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListBuildsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BambooServer).ListBuilds(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/bread.Bamboo/ListBuilds",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BambooServer).ListBuilds(ctx, req.(*ListBuildsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Bamboo_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "bread.Bamboo",
 	HandlerType: (*BambooServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ListBuilds",
-			Handler:    _Bamboo_ListBuilds_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: fileDescriptor0,
+	Methods:     []grpc.MethodDesc{},
+	Streams:     []grpc.StreamDesc{},
+	Metadata:    fileDescriptor0,
 }
 
 func init() { proto.RegisterFile("pb/bamboo.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 174 bytes of a gzipped FileDescriptorProto
+	// 88 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0x48, 0xd2, 0x4f,
 	0x4a, 0xcc, 0x4d, 0xca, 0xcf, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a,
-	0x4d, 0x4c, 0x91, 0xe2, 0xcb, 0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x2f, 0x82, 0x08, 0x2b, 0x85,
-	0x70, 0x09, 0xfa, 0x64, 0x16, 0x97, 0x38, 0x95, 0x66, 0xe6, 0xa4, 0x14, 0x07, 0xa5, 0x16, 0x96,
-	0xa6, 0x16, 0x97, 0x08, 0x69, 0x73, 0xb1, 0x17, 0x41, 0x98, 0x12, 0x8c, 0x0a, 0x8c, 0x1a, 0xdc,
-	0x46, 0x82, 0x7a, 0x70, 0x6d, 0x50, 0x35, 0x41, 0x30, 0x15, 0x42, 0x42, 0x5c, 0x2c, 0x05, 0x39,
-	0x89, 0x79, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x91, 0x0f, 0x17, 0x9b, 0x13,
-	0xd8, 0x72, 0x21, 0x2b, 0x2e, 0x2e, 0x84, 0xf9, 0x42, 0x12, 0x7a, 0x60, 0x57, 0xe8, 0x61, 0x58,
-	0x29, 0x25, 0x84, 0x6c, 0x43, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x14, 0xdb, 0xa4, 0x26, 0x49,
-	0xa6, 0xe4, 0x4c, 0x27, 0xce, 0x28, 0x76, 0xb0, 0xb6, 0x82, 0xa4, 0x24, 0x36, 0xb0, 0xab, 0x8d,
-	0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x4f, 0x82, 0xf8, 0xe3, 0xdf, 0x00, 0x00, 0x00,
+	0x4d, 0x4c, 0x91, 0xe2, 0xcb, 0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x2f, 0x82, 0x08, 0x1b, 0x09,
+	0x70, 0xb1, 0x39, 0x81, 0x95, 0x49, 0xb1, 0x4d, 0x6a, 0x92, 0x64, 0x4a, 0xce, 0x74, 0xe2, 0x8c,
+	0x62, 0x07, 0x2b, 0x2d, 0x48, 0x4a, 0x62, 0x03, 0xab, 0x31, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff,
+	0x51, 0x37, 0x87, 0xfa, 0x4d, 0x00, 0x00, 0x00,
 }

@@ -59,9 +59,42 @@ var (
 		},
 	}
 
-	ECSApps = map[string]string{
-		"canoe":   "canoe_production",
-		"hal9000": "hal9000_production",
+	DeployTargets = map[string]*DeployTarget{
+		"canoe": &DeployTarget{
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "CAN",
+			ECSCluster:    "canoe_production",
+			Image:         "build/bread/canoe/app",
+		},
+		"hal9000": &DeployTarget{
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "HAL",
+			ECSCluster:    "hal9000_production",
+			Image:         "build/bread/hal9000/app",
+		},
+		"operator": &DeployTarget{
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "OP",
+			ECSCluster:    "operator_production",
+			Image:         "build/bread/operatord/app",
+		},
+		"parbot": &DeployTarget{
+			BambooProject: "BREAD",
+			BambooPlan:    "PAR",
+			BambooJob:     "",
+			ECSCluster:    "parbot_production",
+			Image:         "build/bread/parbot/app",
+		},
+		"teampass": &DeployTarget{
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "TEAM",
+			ECSCluster:    "teampass",
+			Image:         "build/bread/tempass/app",
+		},
 	}
 )
 
@@ -82,10 +115,22 @@ type BambooConfig struct {
 }
 
 type DeployConfig struct {
-	Apps            map[string]string
-	AWSRegion       string
-	CanoeECSService string
-	Timeout         int
+	ArtifactoryAPIKey   string
+	ArtifactoryURL      string
+	ArtifactoryUsername string
+	ArtifactoryRepo     string
+	AWSRegion           string
+	CanoeECSService     string
+	Targets             map[string]*DeployTarget
+	Timeout             int
+}
+
+type DeployTarget struct {
+	BambooProject string
+	BambooPlan    string
+	BambooJob     string
+	ECSCluster    string
+	Image         string
 }
 
 type YubicoConfig struct {
@@ -155,7 +200,11 @@ func NewServer(
 		t := &bambooTransport{Username: bamboo.Username, Password: bamboo.Password}
 		breadpb.RegisterBambooServer(server, &bambooAPIServer{repl, t.Client(), u})
 	}
-	if len(deploy.Apps) != 0 {
+	if len(deploy.Targets) != 0 &&
+		deploy.ArtifactoryURL != "" &&
+		deploy.ArtifactoryUsername != "" &&
+		deploy.ArtifactoryAPIKey != "" &&
+		deploy.ArtifactoryRepo != "" {
 		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
 		breadpb.RegisterDeployServer(server, &deployAPIServer{
 			repl,

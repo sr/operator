@@ -11,13 +11,14 @@ import (
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
 	if req.Call.Service == "ci" {
-		if req.Call.Method == "listBuilds" {
-			client := breadpb.NewBambooClient(conn)
-			_, err := client.ListBuilds(
+	}
+	if req.Call.Service == "deploy" {
+		if req.Call.Method == "listTargets" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListTargets(
 				ctx,
-				&breadpb.ListBuildsRequest{
+				&breadpb.ListTargetsRequest{
 					Request: req,
-					Plan:    req.Call.Args["plan"],
 				},
 			)
 			if err != nil {
@@ -25,14 +26,14 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-	}
-	if req.Call.Service == "deploy" {
-		if req.Call.Method == "listApps" {
+		if req.Call.Method == "listBuilds" {
 			client := breadpb.NewDeployClient(conn)
-			_, err := client.ListApps(
+			_, err := client.ListBuilds(
 				ctx,
-				&breadpb.ListAppsRequest{
+				&breadpb.ListBuildsRequest{
 					Request: req,
+					Target:  req.Call.Args["target"],
+					Branch:  req.Call.Args["branch"],
 				},
 			)
 			if err != nil {
@@ -46,7 +47,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 				ctx,
 				&breadpb.TriggerRequest{
 					Request: req,
-					App:     req.Call.Args["app"],
+					Target:  req.Call.Args["target"],
 					Build:   req.Call.Args["build"],
 				},
 			)

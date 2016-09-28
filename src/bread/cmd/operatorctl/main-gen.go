@@ -21,41 +21,7 @@ var cmd = operator.NewCommand(
 		{
 			Name:     "ci",
 			Synopsis: `Undocumented.`,
-			Methods: []operator.MethodCommand{
-				{
-					Name:     "list-builds",
-					Synopsis: `Undocumented.`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "plan",
-							Usage: "Undocumented.",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						plan := ctx.Flags.String("plan", "", "")
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := breadpb.NewBambooClient(conn)
-						resp, err := client.ListBuilds(
-							context.Background(),
-							&breadpb.ListBuildsRequest{
-								Request: ctx.Request,
-								Plan:    *plan,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return resp.Message, nil
-					},
-				},
-			},
+			Methods:  []operator.MethodCommand{},
 		},
 
 		{
@@ -63,7 +29,7 @@ var cmd = operator.NewCommand(
 			Synopsis: `Undocumented.`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "list-apps",
+					Name:     "list-targets",
 					Synopsis: `Undocumented.`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
@@ -76,10 +42,49 @@ var cmd = operator.NewCommand(
 						}
 						defer conn.Close()
 						client := breadpb.NewDeployClient(conn)
-						resp, err := client.ListApps(
+						resp, err := client.ListTargets(
 							context.Background(),
-							&breadpb.ListAppsRequest{
+							&breadpb.ListTargetsRequest{
 								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
+					Name:     "list-builds",
+					Synopsis: `Undocumented.`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "target",
+							Usage: "Undocumented.",
+						},
+						{
+							Name:  "branch",
+							Usage: "Undocumented.",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						target := ctx.Flags.String("target", "", "")
+						branch := ctx.Flags.String("branch", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewDeployClient(conn)
+						resp, err := client.ListBuilds(
+							context.Background(),
+							&breadpb.ListBuildsRequest{
+								Request: ctx.Request,
+								Target:  *target,
+								Branch:  *branch,
 							},
 						)
 						if err != nil {
@@ -93,7 +98,7 @@ var cmd = operator.NewCommand(
 					Synopsis: `Undocumented.`,
 					Flags: []*flag.Flag{
 						{
-							Name:  "app",
+							Name:  "target",
 							Usage: "Undocumented.",
 						},
 						{
@@ -102,7 +107,7 @@ var cmd = operator.NewCommand(
 						},
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
-						app := ctx.Flags.String("app", "", "")
+						target := ctx.Flags.String("target", "", "")
 						build := ctx.Flags.String("build", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
@@ -117,7 +122,7 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&breadpb.TriggerRequest{
 								Request: ctx.Request,
-								App:     *app,
+								Target:  *target,
 								Build:   *build,
 							},
 						)
