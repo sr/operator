@@ -1,5 +1,7 @@
 FROM ubuntu:16.04
 
+ARG artifactory_host
+
 #================================================
 # Customize sources for apt-get
 #================================================
