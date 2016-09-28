@@ -85,7 +85,7 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
-const reCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
+const reCommandMessage = `\A%s(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`
 
 func NewHandler(
 	ctx context.Context,

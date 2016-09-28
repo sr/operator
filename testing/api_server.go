@@ -16,3 +16,10 @@ func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Respo
 		HTML: "<b>pong</b>",
 	})
 }
+
+func (s *apiServer) PingPong(ctx context.Context, req *PingRequest) (*operator.Response, error) {
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "pong",
+		HTML: "<b>pong</b>",
+	})
+}
