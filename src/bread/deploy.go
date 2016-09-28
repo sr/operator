@@ -17,6 +17,7 @@ import (
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
+	"golang.org/x/net/context/ctxhttp"
 
 	"bread/pb"
 )
@@ -28,17 +29,10 @@ type deployAPIServer struct {
 	conf *DeployConfig
 }
 
-type parsedImg struct {
-	host       string
-	registryID string
-	repo       string
-	tag        string
-}
-
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
 	targets := make([]string, len(s.conf.Targets))
 	i := 0
-	for k, _ := range s.conf.Targets {
+	for k := range s.conf.Targets {
 		targets[i] = k
 		i = i + 1
 	}
@@ -64,7 +58,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		`.sort({"$desc": ["created"]})`,
 		`.limit(10)`,
 	}
-	artifs, err := s.doAQL(strings.Join(q, ""))
+	artifs, err := s.doAQL(ctx, strings.Join(q, ""))
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +71,8 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	}
 	return operator.Reply(s, ctx, req, &operator.Message{Text: out.String()})
 }
+
+var ecsRunning = aws.String("RUNNING")
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
 	t, ok := s.conf.Targets[req.Target]
@@ -93,7 +89,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, err
 	}
 	if len(svc.Services) != 1 {
-		return nil, fmt.Errorf("ECS cluster `%s` does not have a `%s` service", t.ECSCluster, t.ECSService)
+		return nil, fmt.Errorf("Cluster %s has no service %s", t.ECSCluster, t.ECSService)
 	}
 	out, err := s.ecs.DescribeTaskDefinition(
 		&ecs.DescribeTaskDefinitionInput{
@@ -105,7 +101,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}
 	curImg, err := parseImage(*out.TaskDefinition.ContainerDefinitions[0].Image)
 	if curImg.tag == req.Build {
-		return nil, fmt.Errorf("Build %s is already deployed", req.Build)
+		return nil, fmt.Errorf("Build %s@%s already deployed to %s", req.Target, req.Build, t.ECSCluster)
 	}
 	if err != nil {
 		return nil, err
@@ -116,15 +112,15 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
 		fmt.Sprintf(`{"path": {"$match": "%s/%s"}}`, t.Image, req.Build),
 	}
-	artifs, err := s.doAQL(fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")))
+	artifs, err := s.doAQL(ctx, fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")))
 	if err != nil {
 		return nil, err
 	}
 	if len(artifs) == 0 {
-		return nil, fmt.Errorf("No such build: %s", req.Build)
+		return nil, fmt.Errorf("Build not found: %s@%s", req.Target, req.Build)
 	}
 	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(img)
-	task, err := s.ecs.RegisterTaskDefinition(
+	newTask, err := s.ecs.RegisterTaskDefinition(
 		&ecs.RegisterTaskDefinitionInput{
 			ContainerDefinitions: out.TaskDefinition.ContainerDefinitions,
 			Family:               out.TaskDefinition.Family,
@@ -138,18 +134,62 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		&ecs.UpdateServiceInput{
 			Cluster:        svc.Services[0].ClusterArn,
 			Service:        svc.Services[0].ServiceName,
-			TaskDefinition: task.TaskDefinition.TaskDefinitionArn,
+			TaskDefinition: newTask.TaskDefinition.TaskDefinitionArn,
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: fmt.Sprintf("deployed %s to %s", req.Target, req.Build),
+	operator.Reply(s, ctx, req, &operator.Message{
+		Text: fmt.Sprintf("Build %s@%s deployed to service %s. Waiting for service to rollover...", req.Target, req.Build, t.ECSService),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "yellow",
 		},
 	})
+	ctx, cancel := context.WithTimeout(ctx, s.conf.ECSTimeout)
+	defer cancel()
+	okC := make(chan struct{}, 1)
+	go func() {
+		for {
+			lout, err := s.ecs.ListTasks(&ecs.ListTasksInput{
+				Cluster:       svc.Services[0].ClusterArn,
+				ServiceName:   svc.Services[0].ServiceName,
+				DesiredStatus: ecsRunning,
+			})
+			if err != nil {
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			dout, err := s.ecs.DescribeTasks(&ecs.DescribeTasksInput{
+				Cluster: svc.Services[0].ClusterArn,
+				Tasks:   lout.TaskArns,
+			})
+			if err != nil {
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			for _, t := range dout.Tasks {
+				if *t.TaskDefinitionArn == *newTask.TaskDefinition.TaskDefinitionArn && *t.LastStatus == *ecsRunning {
+					okC <- struct{}{}
+					return
+				}
+			}
+			time.Sleep(5 * time.Second)
+		}
+		return
+	}()
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("Deploy failed: %s", ctx.Err())
+	case <-okC:
+		return operator.Reply(s, ctx, req, &operator.Message{
+			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
+			Options: &operatorhipchat.MessageOptions{
+				Color: "green",
+			},
+		})
+	}
+	return nil, nil
 }
 
 type artifact struct {
@@ -177,8 +217,8 @@ func (a *artifact) Tag() string {
 	return parts[4]
 }
 
-func (s *deployAPIServer) doAQL(q string) ([]*artifact, error) {
-	client := http.Client{}
+func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, error) {
+	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest(
 		"POST",
 		s.conf.ArtifactoryURL+"/api/search/aql",
@@ -189,7 +229,7 @@ func (s *deployAPIServer) doAQL(q string) ([]*artifact, error) {
 	}
 	req.Header.Set("Content-Type", "text/plain")
 	req.SetBasicAuth(s.conf.ArtifactoryUsername, s.conf.ArtifactoryAPIKey)
-	resp, err := client.Do(req)
+	resp, err := ctxhttp.Do(ctx, client, req)
 	if err != nil {
 		return nil, err
 	}
@@ -208,6 +248,13 @@ func (s *deployAPIServer) doAQL(q string) ([]*artifact, error) {
 		return nil, err
 	}
 	return data.Results, nil
+}
+
+type parsedImg struct {
+	host       string
+	registryID string
+	repo       string
+	tag        string
 }
 
 // parseImage parses a ecs.ContainerDefinition string Image.

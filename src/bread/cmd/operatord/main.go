@@ -69,8 +69,7 @@ func run(invoker operator.Invoker) error {
 	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "TODO")
 	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "TODO")
 	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "TODO")
-	flags.StringVar(&config.deploy.CanoeECSService, "deploy-canoe-ecs-service", "", "TODO")
-	flags.IntVar(&config.deploy.Timeout, "deploy-timeout", 120, "TODO")
+	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "TODO")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))

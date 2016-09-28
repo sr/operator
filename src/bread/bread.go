@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/GeertJohan/yubigo"
 	"github.com/aws/aws-sdk-go/aws"
@@ -59,7 +60,7 @@ var (
 	}
 
 	DeployTargets = map[string]*DeployTarget{
-		"canoe": &DeployTarget{
+		"canoe": {
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "CAN",
@@ -67,7 +68,7 @@ var (
 			ECSService:    "canoe",
 			Image:         "build/bread/canoe/app",
 		},
-		"hal9000": &DeployTarget{
+		"hal9000": {
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
@@ -75,7 +76,7 @@ var (
 			ECSService:    "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
-		"operator": &DeployTarget{
+		"operator": {
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "OP",
@@ -83,7 +84,7 @@ var (
 			ECSService:    "operator",
 			Image:         "build/bread/operatord/app",
 		},
-		"parbot": &DeployTarget{
+		"parbot": {
 			BambooProject: "BREAD",
 			BambooPlan:    "PAR",
 			BambooJob:     "",
@@ -91,7 +92,7 @@ var (
 			ECSService:    "parbot",
 			Image:         "build/bread/parbot/app",
 		},
-		"teampass": &DeployTarget{
+		"teampass": {
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "TEAM",
@@ -117,10 +118,9 @@ type DeployConfig struct {
 	ArtifactoryURL      string
 	ArtifactoryUsername string
 	ArtifactoryRepo     string
+	ECSTimeout          time.Duration
 	AWSRegion           string
-	CanoeECSService     string
 	Targets             map[string]*DeployTarget
-	Timeout             int
 }
 
 type DeployTarget struct {
