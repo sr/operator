@@ -36,9 +36,6 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
@@ -54,9 +51,6 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-1-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-2-ue1.public_ip}/32",
-      "${aws_eip.elasticip_pardot0-artifactory1-3-ue1.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",     # artifactory.dev.pardot.com
       "52.4.132.69/32",     # 1.git.dev.pardot.com
@@ -172,24 +166,6 @@ resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
 
 resource "aws_route53_record" "internal_apps_auth1-2_Arecord" {
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-auth1-2-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
-  type = "A"
-  ttl = "900"
-}
-
-#TODO: remove all artifactory-integration route53 records and replace w/ dns-sharing w/ internal_apps
-resource "aws_route53_record" "artifactory_integration_auth1-1_Arecord" {
-  zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot0-auth1-1-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
-  type = "A"
-  ttl = "900"
-}
-
-#TODO: remove all artifactory-integration route53 records and replace w/ dns-sharing w/ internal_apps
-resource "aws_route53_record" "artifactory_integration_auth1-2_Arecord" {
-  zone_id = "${aws_route53_zone.artifactory_integration_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot0-auth1-2-ue1.aws.pardot.com"
   records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
   type = "A"

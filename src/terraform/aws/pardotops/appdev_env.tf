@@ -206,6 +206,16 @@ resource "aws_security_group" "appdev_consulhost" {
     self = true
   }
 
+  # allow app.dev hosts access to vault port
+  ingress {
+    from_port = 8200
+    to_port = 8200
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}"
+    ]
+  }
+
   egress {
     from_port = 0
     to_port = 0

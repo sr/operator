@@ -6,6 +6,7 @@
 package command
 
 import (
+	archiveprovider "github.com/hashicorp/terraform/builtin/providers/archive"
 	atlasprovider "github.com/hashicorp/terraform/builtin/providers/atlas"
 	awsprovider "github.com/hashicorp/terraform/builtin/providers/aws"
 	azureprovider "github.com/hashicorp/terraform/builtin/providers/azure"
@@ -37,6 +38,7 @@ import (
 	packetprovider "github.com/hashicorp/terraform/builtin/providers/packet"
 	postgresqlprovider "github.com/hashicorp/terraform/builtin/providers/postgresql"
 	powerdnsprovider "github.com/hashicorp/terraform/builtin/providers/powerdns"
+	rabbitmqprovider "github.com/hashicorp/terraform/builtin/providers/rabbitmq"
 	randomprovider "github.com/hashicorp/terraform/builtin/providers/random"
 	rundeckprovider "github.com/hashicorp/terraform/builtin/providers/rundeck"
 	scalewayprovider "github.com/hashicorp/terraform/builtin/providers/scaleway"
@@ -60,6 +62,7 @@ import (
 )
 
 var InternalProviders = map[string]plugin.ProviderFunc{
+	"archive":      archiveprovider.Provider,
 	"atlas":        atlasprovider.Provider,
 	"aws":          awsprovider.Provider,
 	"azure":        azureprovider.Provider,
@@ -91,6 +94,7 @@ var InternalProviders = map[string]plugin.ProviderFunc{
 	"packet":       packetprovider.Provider,
 	"postgresql":   postgresqlprovider.Provider,
 	"powerdns":     powerdnsprovider.Provider,
+	"rabbitmq":     rabbitmqprovider.Provider,
 	"random":       randomprovider.Provider,
 	"rundeck":      rundeckprovider.Provider,
 	"scaleway":     scalewayprovider.Provider,

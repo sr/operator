@@ -59,13 +59,10 @@ func resourceAwsAutoscalingLifecycleHook() *schema.Resource {
 	}
 }
 
-func resourceAwsAutoscalingLifecycleHookPut(d *schema.ResourceData, meta interface{}) error {
-	conn := meta.(*AWSClient).autoscalingconn
-	params := getAwsAutoscalingPutLifecycleHookInput(d)
-
+func resourceAwsAutoscalingLifecycleHookPutOp(conn *autoscaling.AutoScaling, params *autoscaling.PutLifecycleHookInput) error {
 	log.Printf("[DEBUG] AutoScaling PutLifecyleHook: %s", params)
-	err := resource.Retry(5*time.Minute, func() *resource.RetryError {
-		_, err := conn.PutLifecycleHook(&params)
+	return resource.Retry(5*time.Minute, func() *resource.RetryError {
+		_, err := conn.PutLifecycleHook(params)
 
 		if err != nil {
 			if awsErr, ok := err.(awserr.Error); ok {
@@ -77,8 +74,13 @@ func resourceAwsAutoscalingLifecycleHookPut(d *schema.ResourceData, meta interfa
 		}
 		return nil
 	})
+}
 
-	if err != nil {
+func resourceAwsAutoscalingLifecycleHookPut(d *schema.ResourceData, meta interface{}) error {
+	conn := meta.(*AWSClient).autoscalingconn
+	params := getAwsAutoscalingPutLifecycleHookInput(d)
+
+	if err := resourceAwsAutoscalingLifecycleHookPutOp(conn, &params); err != nil {
 		return err
 	}
 

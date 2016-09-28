@@ -13,13 +13,6 @@ resource "aws_route53_zone" "internal_apps_aws_pardot_com_hosted_zone" {
   vpc_id = "${aws_vpc.internal_apps.id}"
 }
 
-#TODO: remove this and substitute w/ dns sharing across vpcs
-resource "aws_route53_zone" "artifactory_integration_aws_pardot_com_hosted_zone" {
-  name = "aws.pardot.com"
-  comment = "Managed by Terraform. Private DNS for VPC: ${aws_vpc.internal_apps.id} Only. Hosted solely in AWS."
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
-}
-
 resource "aws_subnet" "internal_apps_us_east_1a" {
   vpc_id = "${aws_vpc.internal_apps.id}"
   availability_zone = "us-east-1a"

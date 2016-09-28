@@ -654,6 +654,12 @@ func (c *ECR) ListImagesRequest(input *ListImagesInput) (req *request.Request, o
 }
 
 // Lists all the image IDs for a given repository.
+//
+// You can filter images based on whether or not they are tagged by setting
+// the tagStatus parameter to TAGGED or UNTAGGED. For example, you can filter
+// your results to return only UNTAGGED images and then pipe that result to
+// a BatchDeleteImage operation to delete them. Or, you can filter your results
+// to return only TAGGED images to list all of the tags in your repository.
 func (c *ECR) ListImages(input *ListImagesInput) (*ListImagesOutput, error) {
 	req, out := c.ListImagesRequest(input)
 	err := req.Send()
@@ -1159,7 +1165,7 @@ func (s *CreateRepositoryInput) Validate() error {
 type CreateRepositoryOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Object representing a repository.
+	// An object representing a repository.
 	Repository *Repository `locationName:"repository" type:"structure"`
 }
 
@@ -1216,7 +1222,7 @@ func (s *DeleteRepositoryInput) Validate() error {
 type DeleteRepositoryOutput struct {
 	_ struct{} `type:"structure"`
 
-	// Object representing a repository.
+	// An object representing a repository.
 	Repository *Repository `locationName:"repository" type:"structure"`
 }
 
@@ -1309,6 +1315,9 @@ type DescribeRepositoriesInput struct {
 	// parameter. Pagination continues from the end of the previous results that
 	// returned the nextToken value. This value is null when there are no more results
 	// to return.
+	//
+	//  This token should be treated as an opaque identifier that is only used
+	// to retrieve the next items in a list and not for other programmatic purposes.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
 	// The AWS account ID associated with the registry that contains the repositories
@@ -1543,7 +1552,7 @@ func (s GetRepositoryPolicyOutput) GoString() string {
 	return s.String()
 }
 
-// Object representing an image.
+// An object representing an Amazon ECR image.
 type Image struct {
 	_ struct{} `type:"structure"`
 
@@ -1570,6 +1579,7 @@ func (s Image) GoString() string {
 	return s.String()
 }
 
+// An object representing an Amazon ECR image failure.
 type ImageFailure struct {
 	_ struct{} `type:"structure"`
 
@@ -1593,6 +1603,7 @@ func (s ImageFailure) GoString() string {
 	return s.String()
 }
 
+// An object with identifying information for an Amazon ECR image.
 type ImageIdentifier struct {
 	_ struct{} `type:"structure"`
 
@@ -1672,6 +1683,7 @@ func (s InitiateLayerUploadOutput) GoString() string {
 	return s.String()
 }
 
+// An object representing an Amazon ECR image layer.
 type Layer struct {
 	_ struct{} `type:"structure"`
 
@@ -1696,6 +1708,7 @@ func (s Layer) GoString() string {
 	return s.String()
 }
 
+// An object representing an Amazon ECR image layer failure.
 type LayerFailure struct {
 	_ struct{} `type:"structure"`
 
@@ -1719,8 +1732,30 @@ func (s LayerFailure) GoString() string {
 	return s.String()
 }
 
+// An object representing a filter on a ListImages operation.
+type ListImagesFilter struct {
+	_ struct{} `type:"structure"`
+
+	// The tag status with which to filter your ListImages results. You can filter
+	// results based on whether they are TAGGED or UNTAGGED.
+	TagStatus *string `locationName:"tagStatus" type:"string" enum:"TagStatus"`
+}
+
+// String returns the string representation
+func (s ListImagesFilter) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ListImagesFilter) GoString() string {
+	return s.String()
+}
+
 type ListImagesInput struct {
 	_ struct{} `type:"structure"`
+
+	// The filter key and value with which to filter your ListImages results.
+	Filter *ListImagesFilter `locationName:"filter" type:"structure"`
 
 	// The maximum number of image results returned by ListImages in paginated output.
 	// When this parameter is used, ListImages only returns maxResults results in
@@ -1735,6 +1770,9 @@ type ListImagesInput struct {
 	// where maxResults was used and the results exceeded the value of that parameter.
 	// Pagination continues from the end of the previous results that returned the
 	// nextToken value. This value is null when there are no more results to return.
+	//
+	//  This token should be treated as an opaque identifier that is only used
+	// to retrieve the next items in a list and not for other programmatic purposes.
 	NextToken *string `locationName:"nextToken" type:"string"`
 
 	// The AWS account ID associated with the registry that contains the repository
@@ -1859,7 +1897,7 @@ func (s PutImageOutput) GoString() string {
 	return s.String()
 }
 
-// Object representing a repository.
+// An object representing a repository.
 type Repository struct {
 	_ struct{} `type:"structure"`
 
@@ -2076,4 +2114,11 @@ const (
 	LayerFailureCodeInvalidLayerDigest = "InvalidLayerDigest"
 	// @enum LayerFailureCode
 	LayerFailureCodeMissingLayerDigest = "MissingLayerDigest"
+)
+
+const (
+	// @enum TagStatus
+	TagStatusTagged = "TAGGED"
+	// @enum TagStatus
+	TagStatusUntagged = "UNTAGGED"
 )

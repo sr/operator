@@ -19,8 +19,8 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
       <th>
         <%= link_to field, "#", class: 'select_column' %>
         <%# TODO Bring this functionality back %>
-        <% if false && !query.parsed.select_all? && (i == results.fields.length-1) %>
-          <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
+        <% if !query.parsed.select_all? && (i == results.fields.length-1) %>
+          <%= select_tag(:add_column, options_for_select(query.database_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>
     <% end %>

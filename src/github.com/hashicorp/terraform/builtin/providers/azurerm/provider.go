@@ -56,6 +56,7 @@ func Provider() terraform.ResourceProvider {
 			"azurerm_public_ip":                 resourceArmPublicIp(),
 			"azurerm_route":                     resourceArmRoute(),
 			"azurerm_route_table":               resourceArmRouteTable(),
+			"azurerm_servicebus_namespace":      resourceArmServiceBusNamespace(),
 			"azurerm_storage_account":           resourceArmStorageAccount(),
 			"azurerm_storage_blob":              resourceArmStorageBlob(),
 			"azurerm_storage_container":         resourceArmStorageContainer(),
@@ -68,6 +69,7 @@ func Provider() terraform.ResourceProvider {
 			"azurerm_virtual_machine":           resourceArmVirtualMachine(),
 			"azurerm_virtual_machine_scale_set": resourceArmVirtualMachineScaleSet(),
 			"azurerm_virtual_network":           resourceArmVirtualNetwork(),
+			"azurerm_virtual_network_peering":   resourceArmVirtualNetworkPeering(),
 
 			// These resources use the Riviera SDK
 			"azurerm_dns_a_record":      resourceArmDnsARecord(),
@@ -157,7 +159,7 @@ func registerProviderWithSubscription(providerName string, client *riviera.Clien
 	}
 
 	if !response.IsSuccessful() {
-		return fmt.Errorf("Credentials for acessing the Azure Resource Manager API are likely " +
+		return fmt.Errorf("Credentials for accessing the Azure Resource Manager API are likely " +
 			"to be incorrect, or\n  the service principal does not have permission to use " +
 			"the Azure Service Management\n  API.")
 	}
@@ -175,7 +177,7 @@ func registerAzureResourceProvidersWithSubscription(client *riviera.Client) erro
 	var err error
 	providerRegistrationOnce.Do(func() {
 		// We register Microsoft.Compute during client initialization
-		providers := []string{"Microsoft.Network", "Microsoft.Cdn", "Microsoft.Storage", "Microsoft.Sql", "Microsoft.Search", "Microsoft.Resources"}
+		providers := []string{"Microsoft.Network", "Microsoft.Cdn", "Microsoft.Storage", "Microsoft.Sql", "Microsoft.Search", "Microsoft.Resources", "Microsoft.ServiceBus"}
 
 		var wg sync.WaitGroup
 		wg.Add(len(providers))
