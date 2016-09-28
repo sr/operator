@@ -16,7 +16,12 @@ if [ "$program" = "mysqld" ] && [ ! -e "/var/lib/mysql/DOCKER-SETUP" ]; then
 
   "$@" &
   pid="$!"
-  trap "kill -TERM ${pid}" SIGTERM
+  shutdown() {
+    echo "MySQL is shutting down ..."
+    mysqladmin -uroot -p"$MYSQL_ROOT_PASSWORD" --protocol=tcp -h127.0.0.1 shutdown
+  }
+  trap shutdown SIGTERM
+  trap shutdown SIGINT
 
   for i in {30..0}; do
     if echo "SELECT 1" | mysql --protocol=socket -uroot &> /dev/null; then
