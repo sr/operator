@@ -32,8 +32,7 @@ func (i *fakeInstrumenter) Instrument(ev *operator.Event) {
 
 func (i *fakeInstrumenter) pop() (ev *operator.Event) {
 	if len(i.events) == 0 {
-		panic("no event to pop")
-		return &operator.Event{}
+		panic("fakeInstrumenter: no event to pop")
 	}
 	ev, i.events = i.events[len(i.events)-1], i.events[:len(i.events)-1]
 	return ev
