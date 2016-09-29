@@ -7,6 +7,8 @@ var template = generator.NewTemplate("builder-gen.go",
 package main
 
 import (
+	"fmt"
+
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -16,11 +18,11 @@ import (
 {{end}}
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) (bool, error) {
 {{- range .Services}}
 	{{- $pkg := .Package }}
 	{{- $svc := .Name }}
-	if req.Call.Service == "{{.Name}}" {
+	if req.Call.Service == fmt.Sprintf("%s.{{.Name}}", pkg) {
 	{{- range .Methods }}
 		if req.Call.Method == "{{.Name}}" {
 			client := {{$pkg}}.New{{$svc}}Client(conn)
