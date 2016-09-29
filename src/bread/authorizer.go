@@ -79,7 +79,7 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	conn = ldap.NewConn(c, false)
 	conn.SetTimeout(ldapTimeout)
 	conn.Start()
