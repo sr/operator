@@ -44,10 +44,10 @@ class DeployRequest
       build_number: prov_deploy.build_number,
       artifact_url: prov_deploy.artifact_url,
       passed_ci: prov_deploy.passed_ci,
-      lock: (params[:lock] == "on"),
-      server_hostnames: (params[:servers] == "on" && params.fetch(:server_hostnames, [])),
+      lock: (@params[:lock] == "on"),
+      server_hostnames: (@params[:servers] == "on" && @params.fetch(:server_hostnames, [])),
       options_validator: prov_deploy.options_validator,
-      options: params[:options],
+      options: @params[:options],
     )
 
     if the_deploy
@@ -59,10 +59,6 @@ class DeployRequest
   end
 
   private
-
-  def params
-    @params
-  end
 
   def current_user
     @user
