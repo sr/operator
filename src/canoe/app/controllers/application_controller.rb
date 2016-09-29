@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
 
   force_ssl unless: :no_ssl_ok?
 
-  include Canoe::DeployLogic
   include PaginationHelper
 
   protect_from_forgery with: :null_session

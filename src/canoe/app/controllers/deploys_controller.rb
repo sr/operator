@@ -64,7 +64,13 @@ class DeploysController < ApplicationController
     prov_deploy = build_provisional_deploy
 
     if prov_deploy
-      deploy_response = deploy!(prov_deploy)
+      deploy_request = DeployRequest.new(
+        current_project,
+        current_target,
+        current_user,
+        params
+      )
+      deploy_response = deploy_request.handle(prov_deploy)
       if !deploy_response[:error] && deploy_response[:deploy]
         the_deploy = deploy_response[:deploy]
         redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")

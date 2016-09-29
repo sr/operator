@@ -13,7 +13,7 @@ class DeployRequest
     @params = params
   end
 
-  def deploy!(prov_deploy)
+  def handle(prov_deploy)
     # require a project and target
     return { error: true, reason: DEPLOYLOGIC_ERROR_NO_PROJECT } if !current_project
     return { error: true, reason: DEPLOYLOGIC_ERROR_NO_TARGET } if !current_target
