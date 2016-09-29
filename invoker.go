@@ -37,7 +37,7 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 	if i.inst != nil {
 		i.inst.Instrument(event)
 	}
-	if i.replier != nil && req.ReplierId != "" && req.GetSource() != nil {
+	if event.Error != nil && i.replier != nil && req.ReplierId != "" && req.GetSource() != nil {
 		if err := i.replier.Reply(
 			ctx,
 			req.GetSource(),
