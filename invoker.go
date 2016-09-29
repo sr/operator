@@ -13,6 +13,7 @@ type invoker struct {
 	inst    Instrumenter
 	replier Replier
 	f       InvokerFunc
+	pkg     string
 }
 
 func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
@@ -20,7 +21,7 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 	defer cancel()
 	errC := make(chan error, 1)
 	go func() {
-		_, err := i.f(ctx, i.conn, req)
+		_, err := i.f(ctx, i.conn, req, i.pkg)
 		errC <- err
 	}()
 	event := &Event{
