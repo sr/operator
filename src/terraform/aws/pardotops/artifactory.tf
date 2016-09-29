@@ -166,9 +166,9 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.138"
+  #private_ip="172.28.0.138" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -196,9 +196,9 @@ resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.209"
+  #private_ip="172.28.0.209" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -226,9 +226,9 @@ resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.182"
+  #private_ip="172.28.0.182" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}"
+  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
     "${aws_security_group.artifactory_instance_secgroup.id}",
@@ -302,56 +302,6 @@ resource "aws_elb" "artifactory_public_elb" {
   }
 }
 
-resource "aws_elb" "artifactory_private_elb" {
-  internal = true
-  name = "afy-prvt-elb-dev-pardot-com"
-  security_groups = [
-    "${aws_security_group.artifactory_internal_elb_secgroup.id}"
-  ]
-
-  subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}"
-  ]
-  cross_zone_load_balancing = true
-  connection_draining = true
-  connection_draining_timeout = 30
-  instances = [
-    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-3-ue1.id}"
-  ]
-
-  listener {
-    lb_port = 443
-    lb_protocol = "https"
-    instance_port = 80
-    instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
-  }
-
-  listener {
-    lb_port = 80
-    lb_protocol = "http"
-    instance_port = 80
-    instance_protocol = "http"
-  }
-
-  health_check {
-    healthy_threshold = 4
-    unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/artifactory/api/system/ping"
-    interval = 5
-  }
-
-  tags {
-    Name = "artifactory-private-elb"
-  }
-}
-
 resource "aws_iam_user" "artifactory_sysacct" {
   name = "sa_artifactory"
 }
@@ -359,6 +309,8 @@ resource "aws_iam_user" "artifactory_sysacct" {
 resource "aws_s3_bucket" "artifactory_s3_filestore" {
   bucket = "artifactory_s3_filestore"
   acl = "private"
+  # for more info on the Elastic Load Balancing Account Number:
+  # http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -622,18 +574,210 @@ resource "aws_route53_record" "artifactorylb_dev_pardot_com_CNAME" {
   ttl = 900
 }
 
-resource "aws_route53_record" "appdev_artifactorylb_aws_pardot_com_CNAME" {
-  name = "artifactorylb.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  type = "CNAME"
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.id}"
-  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
-  ttl = 900
+resource "aws_alb" "artifactory_public_alb" {
+  name = "afy-pblc-alb-dev-pardot-com"
+  internal = false
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}"
+  ]
+  subnets = [
+    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
+  ]
 }
 
-resource "aws_route53_record" "internal_apps_artifactorylb_aws_pardot_com_CNAME" {
-  name = "artifactorylb.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
-  type = "CNAME"
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
-  records = ["${aws_elb.artifactory_private_elb.dns_name}"]
-  ttl = 900
+resource "aws_alb_target_group" "artifactory_all_hosts_target_group" {
+  name = "artifactory-host-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  stickiness{
+    type = "lb_cookie"
+    cookie_duration = "86400" #1 DAY
+  }
+
+  health_check {
+    interval = "60"
+    path = "/artifactory/api/system/ping"
+    port = 80
+    protocol = "HTTP"
+    healthy_threshold = 5
+    unhealthy_threshold = 5
+    matcher = "200"
+  }
+}
+
+resource "aws_alb_listener" "public_alb_all_hosts_http" {
+  load_balancer_arn = "${aws_alb.artifactory_public_alb.arn}"
+  port = 80
+  protocol = "HTTP"
+
+  "default_action" {
+    target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+    type = "forward"
+  }
+}
+
+resource "aws_alb_listener" "public_alb_all_hosts_https" {
+  load_balancer_arn = "${aws_alb.artifactory_public_alb.arn}"
+  port = 443
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2015-05"
+  certificate_arn = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+
+  "default_action" {
+    target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+    type = "forward"
+  }
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-1-ue1-allhosts-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-2-ue1-allhosts-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-3-ue1-allhosts-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
+  name = "artifactory1-1-only-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  stickiness{
+    type = "lb_cookie"
+    cookie_duration = "86400" #1 DAY
+  }
+
+  health_check {
+    interval = "60"
+    path = "/artifactory/api/system/ping"
+    port = 80
+    protocol = "HTTP"
+    healthy_threshold = 5
+    unhealthy_threshold = 5
+    matcher = "200"
+  }
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-1-ue1-artifactory1_1_only-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_1_only_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_target_group" "artifactory_artifactory1_2_only_target_group" {
+  name = "artifactory1-2-only-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  stickiness{
+    type = "lb_cookie"
+    cookie_duration = "86400" #1 DAY
+  }
+
+  health_check {
+    interval = "60"
+    path = "/artifactory/api/system/ping"
+    port = 80
+    protocol = "HTTP"
+    healthy_threshold = 5
+    unhealthy_threshold = 5
+    matcher = "200"
+  }
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-2-ue1-artifactory1_2_only-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_2_only_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_target_group" "artifactory_artifactory1_3_only_target_group" {
+  name = "artifactory1-3-only-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = "${aws_vpc.artifactory_integration.id}"
+
+  stickiness{
+    type = "lb_cookie"
+    cookie_duration = "86400" #1 DAY
+  }
+
+  health_check {
+    interval = "60"
+    path = "/artifactory/api/system/ping"
+    port = 80
+    protocol = "HTTP"
+    healthy_threshold = 5
+    unhealthy_threshold = 5
+    matcher = "200"
+  }
+}
+
+resource "aws_alb_target_group_attachment" "pardot0-artifactory1-3-ue1-artifactory1_3_only-attachment" {
+  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_3_only_target_group.arn}"
+  target_id = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
+  port = 80
+}
+
+resource "aws_alb_listener_rule" "artifactory_host_1-1_alb_rule" {
+  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
+  priority = 100
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_1_only_target_group.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/artifactory1/*"]
+  }
+}
+
+resource "aws_alb_listener_rule" "artifactory_host_1-2_alb_rule" {
+  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
+  priority = 101
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_2_only_target_group.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/artifactory2/*"]
+  }
+}
+
+resource "aws_alb_listener_rule" "artifactory_host_1-3_alb_rule" {
+  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
+  priority = 102
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_3_only_target_group.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/artifactory3/*"]
+  }
 }
