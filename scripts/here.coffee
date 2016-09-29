@@ -3,7 +3,6 @@
 #
 # Configuration:
 #   HUBOT_HERE_WARNING_MINIMUM
-#   HUBOT_HERE_WARNING_ROOM_WHITELIST
 #
 
 _ = require "underscore"

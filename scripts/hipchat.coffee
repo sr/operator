@@ -185,7 +185,7 @@ module.exports = (robot) ->
   setTimeout(updateMappings, 0)
 
   hipchatRoomParticipants = (roomJid, cb) ->
-    if roomId = mapping.get(roomJid) || roomId = 479
+    if roomId = mapping.get(roomJid)
       hipchat.roomParticipants(roomId, cb)
     else
       cb(new Error("JID to ID mapping not found for '#{roomJid}'")) if cb
