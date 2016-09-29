@@ -8,32 +8,25 @@ import (
 	"io"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"text/template"
+	"unicode"
+	"unicode/utf8"
 
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 
 	"github.com/golang/protobuf/proto"
 )
 
-const (
-	DefaultBinaryName       = "operator"
-	undocumentedPlaceholder = "Undocumented."
-)
+const undocumentedPlaceholder = "Undocumented."
 
 type Descriptor struct {
-	Options  *Options
 	Imports  map[string]string
 	Services []*Service
 }
 
-type Options struct {
-	BinaryName     string
-	DefaultAddress string
-}
-
 type Service struct {
 	Name        string
-	FullName    string
 	Description string
 	Package     string
 	Methods     []*Method
@@ -115,4 +108,57 @@ func Compile(input io.Reader, output io.Writer, gen Generator) error {
 
 func NewTemplate(name string, content string) *template.Template {
 	return template.Must(template.New(name).Funcs(funcMap).Parse(content))
+}
+
+func Camelize(s string, sep string) string {
+	var result string
+	words := strings.Split(s, sep)
+	for _, word := range words {
+		if len(word) > 0 {
+			w := []rune(word)
+			w[0] = unicode.ToUpper(w[0])
+			result += string(w)
+		}
+	}
+	return result
+}
+
+var funcMap = template.FuncMap{
+	"inputField":  func(s string) string { return Camelize(s, "_") },
+	"serviceName": humanize,
+	"methodName":  humanize,
+	"argName":     humanize,
+	"flagName":    humanize,
+}
+
+func humanize(str string) string {
+	s := strings.Replace(camelToSnake(str), "_", "-", -1)
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToLower(r)) + s[n:]
+}
+
+func camelToSnake(s string) string {
+	var (
+		result  string
+		words   []string
+		lastPos int
+	)
+	rs := []rune(s)
+	for i := 0; i < len(rs); i++ {
+		if i > 0 && unicode.IsUpper(rs[i]) {
+			words = append(words, s[lastPos:i])
+			lastPos = i
+		}
+	}
+	// append the last word
+	if s[lastPos:] != "" {
+		words = append(words, s[lastPos:])
+	}
+	for k, word := range words {
+		if k > 0 {
+			result += "_"
+		}
+		result += strings.ToLower(word)
+	}
+	return result
 }

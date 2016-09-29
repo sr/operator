@@ -92,6 +92,7 @@ func NewHandler(
 	inst Instrumenter,
 	decoder Decoder,
 	invoker Invoker,
+	pkg string,
 	prefix string,
 ) (http.Handler, error) {
 	re, err := regexp.Compile(fmt.Sprintf(reCommandMessage, regexp.QuoteMeta(prefix)))
@@ -102,8 +103,9 @@ func NewHandler(
 		ctx,
 		inst,
 		decoder,
-		re,
 		invoker,
+		re,
+		pkg,
 	}, nil
 }
 
@@ -143,12 +145,9 @@ func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnarySer
 		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
 			return nil, ErrInvalidRequest
 		}
-		req.Call = &Call{
-			Service: strings.ToLower(s[1]),
-			Method:  strings.ToLower(s[2]),
-		}
+		req.Call = &Call{Service: s[1], Method: s[2]}
 		if err := auth.Authorize(ctx, req); err != nil {
-			inst.Instrument(&Event{Key: "unauthorized_request", Request: req, Error: err})
+			inst.Instrument(&Event{Key: "request_unauthorized", Request: req, Error: err})
 			return nil, err
 		}
 		start := time.Now()
@@ -157,7 +156,7 @@ func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnarySer
 			req.Call.Error = err.Error()
 		}
 		req.Call.Duration = ptypes.DurationProto(time.Since(start))
-		inst.Instrument(&Event{Key: "completed_request", Request: req, Error: err})
+		inst.Instrument(&Event{Key: "request_handled", Request: req, Error: err})
 		return resp, err
 	}
 }
