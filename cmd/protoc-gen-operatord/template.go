@@ -20,9 +20,9 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 {{- range .Services}}
 	{{- $pkg := .Package }}
 	{{- $svc := .FullName }}
-	if req.Call.Service == "{{lowerCase .Name}}" {
+	if req.Call.Service == "{{dasherize .Name}}" {
 	{{- range .Methods }}
-		if req.Call.Method == "{{lowerCase .Name}}" {
+		if req.Call.Method == "{{dasherize .Name}}" {
 			client := {{$pkg}}.New{{$svc}}Client(conn)
 			_, err := client.{{.Name}}(
 				ctx,
