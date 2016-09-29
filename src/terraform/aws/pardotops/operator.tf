@@ -161,6 +161,7 @@ resource "aws_iam_role_policy" "operator_ecs_cluster_role_policy" {
         "ecs:ListTaskDefinitions",
         "ecs:ListTasks",
         "ecs:RegisterTaskDefinition",
+        "ecs:UpdateService",
 
         "ecs:DeregisterContainerInstance",
         "ecs:DiscoverPollEndpoint",
