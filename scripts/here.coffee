@@ -26,4 +26,5 @@ module.exports = (robot) ->
         if err?
           console.log "Error getting room participants: #{err}"
         else if participants?.items?.length >= warningMinimum
+          console.log "Warned #{msg.envelope.user.jid} of @#{msg.match[1]} in #{roomName}/#{roomJid}"
           robot.send user: msg.envelope.user.jid, "(disapproval) Please take care using [@]#{msg.match[1]} in large channels. Up to #{participants.items.length} people received a ping just now. Instead, consider using an asynchronous form of communication if appropriate. Some suggestions: Chatter for discussion or announcements, JIRA or GUS for work items, Quip for collaborating on documents"
