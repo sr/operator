@@ -206,13 +206,6 @@ type artifact struct {
 	Created time.Time
 }
 
-func (a *artifact) Image() string {
-	if a == nil {
-		return ""
-	}
-	return ""
-}
-
 func (a *artifact) Tag() string {
 	if a == nil {
 		return ""
