@@ -7,8 +7,6 @@ import "operator.proto";
 option go_package = "breadpb";
 
 service Deploy {
-	option (operator.name) = "deploy";
-
 	rpc ListTargets(ListTargetsRequest) returns (operator.Response);
 	rpc ListBuilds(ListBuildsRequest) returns (operator.Response);
 	rpc Trigger(TriggerRequest) returns (operator.Response);
