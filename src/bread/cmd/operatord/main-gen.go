@@ -11,7 +11,7 @@ import (
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
 	if req.Call.Service == "deploy" {
-		if req.Call.Method == "listTargets" {
+		if req.Call.Method == "list-targets" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListTargets(
 				ctx,
@@ -24,7 +24,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "listBuilds" {
+		if req.Call.Method == "list-builds" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListBuilds(
 				ctx,
@@ -83,7 +83,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "slowLoris" {
+		if req.Call.Method == "slow-loris" {
 			client := breadpb.NewPingerClient(conn)
 			_, err := client.SlowLoris(
 				ctx,
