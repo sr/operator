@@ -39,7 +39,7 @@ func (s *replier) Reply(ctx context.Context, src *operator.Source, rep string, m
 		notif.MessageFormat = "html"
 		notif.Message = msg.HTML
 	} else {
-		notif.MessageFormat = "plain"
+		notif.MessageFormat = "text"
 		notif.Message = msg.Text
 	}
 	if v, ok := msg.Options.(*MessageOptions); ok {
