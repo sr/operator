@@ -19,7 +19,7 @@ func (i *instrumenter) Instrument(ev *operator.Event) {
 	if ev.Request != nil {
 		ev.Request.Otp = ""
 		ev.Request.ReplierId = ""
-		if ev.Request.Source != nil && ev.Request.User != nil {
+		if ev.Request.Source != nil && ev.Request.Source.User != nil {
 			ev.Request.Source.User.RealName = ""
 		}
 	}
