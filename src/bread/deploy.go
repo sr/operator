@@ -22,8 +22,6 @@ import (
 	"bread/pb"
 )
 
-const smiley = "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png"
-
 type deployAPIServer struct {
 	operator.Replier
 	ecs  *ecs.ECS
@@ -80,12 +78,18 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	})
 }
 
-var ecsRunning = aws.String("RUNNING")
+var (
+	ecsRunning = aws.String("RUNNING")
+	eggs       = map[string]string{
+		"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
+		"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
+	}
+)
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
-	if req.Target == "smiley" {
+	if v, ok := eggs[req.Target]; ok {
 		return operator.Reply(s, ctx, req, &operator.Message{
-			Text: smiley,
+			Text: v,
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
 			},
