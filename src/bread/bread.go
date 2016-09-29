@@ -67,6 +67,14 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
+				Method:  "ListTargets",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Deploy",
 				Method:  "ListBuilds",
 			},
 			Group: "sysadmin",
