@@ -76,8 +76,7 @@ class DeploysController < ApplicationController
     deploy_response = deploy_request.handle(prov_deploy)
 
     if deploy_response.error?
-      message = DeployRequest.error_message(deploy_response.code)
-      flash[:notice] = message
+      flash[:notice] = deploy_response.error_message
       redirect_to :back
       return
     end

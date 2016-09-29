@@ -26,25 +26,25 @@ class DeployRequest
     def error?
       @error
     end
-  end
 
-  def self.error_message(code)
-    missing_error_codes = [
-      ERROR_NO_PROJECT,
-      ERROR_NO_TARGET,
-      ERROR_NO_DEPLOY
-    ]
+    def error_message
+      missing_error_codes = [
+        ERROR_NO_PROJECT,
+        ERROR_NO_TARGET,
+        ERROR_NO_DEPLOY
+      ]
 
-    if missing_error_codes.include?(code)
-      return "We did not have everything needed to deploy. Try again."
-    end
+      if missing_error_codes.include?(code)
+        return "We did not have everything needed to deploy. Try again."
+      end
 
-    if code == ERROR_INVALID_SHA
-      return "Sorry, it appears you specified an unknown artifact."
-    end
+      if code == ERROR_INVALID_SHA
+        return "Sorry, it appears you specified an unknown artifact."
+      end
 
-    if code == ERROR_UNABLE_TO_DEPLOY
-      return "Sorry, it looks like #{current_target.name} is locked."
+      if code == ERROR_UNABLE_TO_DEPLOY
+        return "Sorry, it looks like #{current_target.name} is locked."
+      end
     end
   end
 
