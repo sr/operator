@@ -18,7 +18,7 @@ import (
 {{end}}
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
 {{- range .Services}}
 	{{- $pkg := .Package }}
 	{{- $svc := .Name }}
@@ -35,14 +35,11 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					{{- end}}
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 	{{- end }}
 	}
 {{- end }}
-	return false, nil
+	return fmt.Errorf("not found: service=%s method=%s", req.Call.Service, req.Call.Method)
 }
 `)
