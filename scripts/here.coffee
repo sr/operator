@@ -10,7 +10,7 @@ _ = require "underscore"
 warningMinimum = parseInt(process.env.HUBOT_HERE_WARNING_MINIMUM || "25")
 
 roomIsOkToUseHere = (roomJid, roomName) ->
-  if roomName.match(/(not_solutions_for_work|support|solutions_team)/i) # support folks use @here while on calls or chats
+  if roomName.match(/(support|solutions)/i) # support folks use @here while on calls or chats
     true
   else
     false
