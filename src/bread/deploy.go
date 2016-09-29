@@ -110,9 +110,6 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, err
 	}
 	curImg, err := parseImage(*out.TaskDefinition.ContainerDefinitions[0].Image)
-	if curImg.tag == req.Build {
-		return nil, fmt.Errorf("Build %s@%s already deployed to %s", req.Target, req.Build, t.ECSCluster)
-	}
 	if err != nil {
 		return nil, err
 	}
