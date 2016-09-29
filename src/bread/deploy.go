@@ -71,7 +71,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		fmt.Fprintf(html, `<li><a href="https://bamboo.dev.pardot.com/browse/%s">%s</a></li>`, a.Tag(), a.Tag())
 		fmt.Fprintf(&txt, "%s %s\n", req.Target, a.Tag())
 	}
-	html.WriteString("</ul>")
+	_, _ = html.WriteString("</ul>")
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: txt.String(),
 		HTML: html.String(),
