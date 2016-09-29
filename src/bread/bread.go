@@ -3,6 +3,7 @@ package bread
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -163,6 +163,11 @@ type DeployTarget struct {
 	Image         string
 }
 
+type LDAPConfig struct {
+	Addr string
+	Base string
+}
+
 type YubicoConfig struct {
 	ID  string
 	Key string
@@ -238,14 +243,20 @@ func NewServer(
 	return server, nil
 }
 
-// NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps
-// commands using LDAP for authN/authZ, and verifies 2FA tokens via Yubikey's
-// YubiCloud web service. See: https://developers.yubico.com/OTP/
-func NewAuthorizer(conn *ldap.Conn, base string, verifier OTPVerifier) (operator.Authorizer, error) {
-	if base == "" {
-		base = LDAPBase
+// NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
+// for authN/authZ, and verifies 2FA tokens via Yubico's YubiCloud web service.
+//
+// See: https://developers.yubico.com/OTP/
+func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (operator.Authorizer, error) {
+	if ldap.Base == "" {
+		ldap.Base = LDAPBase
 	}
-	return newAuthorizer(conn, base, verifier, ACL)
+	for _, e := range acl {
+		if e.Call == nil || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
+			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
+		}
+	}
+	return &authorizer{ldap, verifier, acl}, nil
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the

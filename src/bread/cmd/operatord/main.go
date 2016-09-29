@@ -15,7 +15,6 @@ import (
 	"bread"
 	"bread/pb"
 
-	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -25,10 +24,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	ldapTimeout = 3 * time.Second
-	grpcTimeout = 3 * time.Second
-)
+const grpcTimeout = 3 * time.Second
 
 type config struct {
 	dev             bool
@@ -39,10 +35,8 @@ type config struct {
 	httpAddr string
 	timeout  time.Duration
 
-	ldapAddr string
-	ldapBase string
-
 	yubico *bread.YubicoConfig
+	ldap   *bread.LDAPConfig
 
 	databaseURL string
 	prefix      string
@@ -57,6 +51,7 @@ type config struct {
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
 		deploy: &bread.DeployConfig{Targets: bread.DeployTargets},
+		ldap:   &bread.LDAPConfig{},
 		yubico: &bread.YubicoConfig{},
 	}
 	flags := flag.CommandLine
@@ -66,8 +61,8 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 5*time.Second, "TODO")
-	flags.StringVar(&config.ldapAddr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
-	flags.StringVar(&config.ldapBase, "ldap-base", bread.LDAPBase, "LDAP Base DN")
+	flags.StringVar(&config.ldap.Addr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
+	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
 	flags.StringVar(&config.prefix, "prefix", "!", "Prefix used to indicate commands in chat messages")
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
@@ -163,18 +158,7 @@ func run(invoker operator.InvokerFunc) error {
 		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
 			return err
 		}
-		var lconn *ldap.Conn
-		c, err := net.DialTimeout("tcp", config.ldapAddr, ldapTimeout)
-		if err != nil {
-			return err
-		}
-		lconn = ldap.NewConn(c, false)
-		lconn.SetTimeout(ldapTimeout)
-		lconn.Start()
-		if err := lconn.Bind("", ""); err != nil {
-			return err
-		}
-		if auth, err = bread.NewAuthorizer(lconn, bread.LDAPBase, verifier); err != nil {
+		if auth, err = bread.NewAuthorizer(config.ldap, verifier, bread.ACL); err != nil {
 			return err
 		}
 	}

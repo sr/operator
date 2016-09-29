@@ -3,6 +3,8 @@ package bread
 import (
 	"errors"
 	"fmt"
+	"net"
+	"time"
 
 	"github.com/GeertJohan/yubigo"
 	"github.com/go-ldap/ldap"
@@ -10,9 +12,10 @@ import (
 	"golang.org/x/net/context"
 )
 
+const ldapTimeout = 3 * time.Second
+
 type authorizer struct {
-	conn     *ldap.Conn
-	base     string
+	ldap     *LDAPConfig
 	verifier OTPVerifier
 	acl      []*ACLEntry
 }
@@ -20,20 +23,6 @@ type authorizer struct {
 type ldapUser struct {
 	groups    []string
 	yubikeyID string
-}
-
-func newAuthorizer(
-	conn *ldap.Conn,
-	base string,
-	verifier OTPVerifier,
-	acl []*ACLEntry,
-) (*authorizer, error) {
-	for _, e := range acl {
-		if e.Call == nil || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
-			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
-		}
-	}
-	return &authorizer{conn, base, verifier, acl}, nil
 }
 
 func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {
@@ -85,9 +74,22 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 }
 
 func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
+	var conn *ldap.Conn
+	c, err := net.DialTimeout("tcp", a.ldap.Addr, ldapTimeout)
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+	conn = ldap.NewConn(c, false)
+	conn.SetTimeout(ldapTimeout)
+	conn.Start()
+	defer conn.Close()
+	if err := conn.Bind("", ""); err != nil {
+		return nil, err
+	}
 	var uid string
-	res, err := a.conn.Search(ldap.NewSearchRequest(
-		a.base,
+	res, err := conn.Search(ldap.NewSearchRequest(
+		a.ldap.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(mail=%s)", ldap.EscapeFilter(email)),
 		[]string{"cn", "yubiKeyId"},
@@ -107,8 +109,8 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 		return nil, errors.New("received an invalid response from the LDAP server")
 	}
 	yubikeyID := res.Entries[0].GetAttributeValue("yubiKeyId")
-	res, err = a.conn.Search(ldap.NewSearchRequest(
-		a.base,
+	res, err = conn.Search(ldap.NewSearchRequest(
+		a.ldap.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(memberUid=%s)", ldap.EscapeFilter(uid)),
 		[]string{"cn"},

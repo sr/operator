@@ -50,13 +50,14 @@ func TestAuthorizer(t *testing.T) {
 		}
 		t.Skip("ldap flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 	}
+	ldapAddr := fmt.Sprintf("%s:%s", host, port)
 	var (
 		i    int
 		conn *ldap.Conn
 		err  error
 	)
 	for {
-		conn, err = ldap.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
+		conn, err = ldap.Dial("tcp", ldapAddr)
 		if err != nil {
 			continue
 		}
@@ -72,7 +73,7 @@ func TestAuthorizer(t *testing.T) {
 	}
 	defer conn.Close()
 	otpVerifier := &fakeOTPVerifier{true}
-	auth, err := bread.NewAuthorizer(conn, bread.LDAPBase, otpVerifier)
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, bread.ACL)
 	if err != nil {
 		t.Fatal(err)
 	}
