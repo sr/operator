@@ -105,6 +105,8 @@ func run(invoker operator.InvokerFunc) error {
 		store    operatorhipchat.ClientCredentialsStore
 		verifier bread.OTPVerifier
 		db       *sql.DB
+
+		err error
 	)
 	logger = bread.NewLogger()
 	inst = bread.NewInstrumenter(logger)
@@ -149,7 +151,7 @@ func run(invoker operator.InvokerFunc) error {
 		if config.databaseURL == "" {
 			return fmt.Errorf("required flag missing: database-url")
 		}
-		db, err := sql.Open("mysql", config.databaseURL)
+		db, err = sql.Open("mysql", config.databaseURL)
 		if err != nil {
 			return err
 		}
@@ -177,13 +179,12 @@ func run(invoker operator.InvokerFunc) error {
 		}
 	}
 	var grpcServer *grpc.Server
-	grpcServer, err := bread.NewServer(
+	if grpcServer, err = bread.NewServer(
 		auth,
 		inst,
 		replier,
 		config.deploy,
-	)
-	if err != nil {
+	); err != nil {
 		return err
 	}
 	msg := &breadpb.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
