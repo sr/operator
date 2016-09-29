@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -13,8 +14,9 @@ type handler struct {
 	ctx     context.Context
 	inst    Instrumenter
 	decoder Decoder
-	re      *regexp.Regexp
 	invoker Invoker
+	re      *regexp.Regexp
+	pkg     string
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -64,9 +66,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		msg,
 		&Request{
 			Call: &Call{
-				Service: matches[1],
-				Method:  matches[2],
-				Args:    args,
+				// TODO(sr) multi package support
+				Service: fmt.Sprintf("%s.%s", h.pkg, matches[1]),
+				// TODO(sr) support for operator.name
+				Method: matches[2],
+				Args:   args,
 			},
 			Otp:       otp,
 			ReplierId: replierID,

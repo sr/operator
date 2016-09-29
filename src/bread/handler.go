@@ -55,6 +55,25 @@ func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h.handler.ServeHTTP(wrappedW, req)
 }
 
+type pingHandler struct {
+	db *sql.DB
+}
+
+func (h *pingHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var payload string
+	if req.URL.Query().Get("boomtown") != "" {
+		panic("boomtown")
+	}
+	if err := h.db.Ping(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		payload = `{"now": %d, "status": "failures"}`
+	} else {
+		payload = `{"now": %d, "status": "ok"}`
+	}
+	_, _ = w.Write([]byte(fmt.Sprintf(payload+"\n", time.Now().Unix())))
+}
+
 type responseWriter struct {
 	http.ResponseWriter
 	statusCode int

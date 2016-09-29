@@ -195,7 +195,7 @@ func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 // NewPingHandler returns an http.Handler that implements a simple health
 // check endpoint for use with ELB.
 func NewPingHandler(db *sql.DB) http.Handler {
-	return newPingHandler(db)
+	return &pingHandler{db}
 }
 
 func NewServer(
