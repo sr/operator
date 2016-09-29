@@ -174,6 +174,7 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
+	fmt.Printf("DEBUG operator.Reply %#v\n", msg)
 	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
 }
 
