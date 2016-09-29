@@ -139,20 +139,20 @@ class DeploysController < ApplicationController
   def render_deploy_error(deploy_response)
     # missing pieces
     missing_error_codes = \
-      [DEPLOYLOGIC_ERROR_NO_PROJECT, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_DEPLOY]
+      [DeployRequest::ERROR_NO_PROJECT, DeployRequest::ERROR_NO_TARGET, DeployRequest::ERROR_NO_DEPLOY]
     if missing_error_codes.include?(deploy_response[:reason])
       flash[:notice] = "We did not have everything needed to deploy. Try again."
       redirect_to :back
     end
 
     # check for invalid
-    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_SHA
+    if deploy_response[:reason] == DeployRequest::ERROR_INVALID_SHA
       flash[:notice] = "Sorry, it appears you specified an unknown artifact."
       redirect_to :back
     end
 
     # check for locked target, allow user who has it locked to deploy again
-    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
+    if deploy_response[:reason] == DeployRequest::ERROR_UNABLE_TO_DEPLOY
       flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
       redirect_to :back
     end
