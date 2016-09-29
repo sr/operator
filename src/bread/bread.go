@@ -98,8 +98,9 @@ var (
 		},
 	}
 
-	DeployTargets = map[string]*DeployTarget{
-		"canoe": {
+	DeployTargets = []*DeployTarget{
+		{
+			Name:          "canoe",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "CAN",
@@ -107,7 +108,8 @@ var (
 			ECSService:    "canoe",
 			Image:         "build/bread/canoe/app",
 		},
-		"hal9000": {
+		{
+			Name:          "canoe",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
@@ -115,7 +117,8 @@ var (
 			ECSService:    "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
-		"operator": {
+		{
+			Name:          "operator",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "OP",
@@ -123,7 +126,8 @@ var (
 			ECSService:    "operator",
 			Image:         "build/bread/operatord/app",
 		},
-		"parbot": {
+		{
+			Name:          "parbot",
 			BambooProject: "BREAD",
 			BambooPlan:    "PAR",
 			BambooJob:     "",
@@ -131,7 +135,8 @@ var (
 			ECSService:    "parbot",
 			Image:         "build/bread/parbot/app",
 		},
-		"teampass": {
+		{
+			Name:          "teampass",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "TEAM",
@@ -157,12 +162,15 @@ type DeployConfig struct {
 	ArtifactoryURL      string
 	ArtifactoryUsername string
 	ArtifactoryRepo     string
+	CanoeURL            string
+	CanoeAPIKey         string
 	ECSTimeout          time.Duration
 	AWSRegion           string
-	Targets             map[string]*DeployTarget
+	Targets             []*DeployTarget
 }
 
 type DeployTarget struct {
+	Name          string
 	BambooProject string
 	BambooPlan    string
 	BambooJob     string
@@ -239,6 +247,8 @@ func NewServer(
 		deploy.ArtifactoryUsername != "" &&
 		deploy.ArtifactoryAPIKey != "" &&
 		deploy.ArtifactoryRepo != "" &&
+		deploy.CanoeURL != "" &&
+		deploy.CanoeAPIKey != "" &&
 		deploy.AWSRegion != "" {
 		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
 		breadpb.RegisterDeployServer(server, &deployAPIServer{

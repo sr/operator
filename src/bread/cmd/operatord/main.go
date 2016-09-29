@@ -73,6 +73,8 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "Artifactory username")
 	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
+	flags.StringVar(&config.deploy.CanoeURL, "deploy-canoe-url", "https://canoe.dev.pardot.com", "")
+	flags.StringVar(&config.deploy.CanoeAPIKey, "deploy-canoe-api-key", "", "Canoe API key")
 	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
 	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "AWS Region")
 	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")

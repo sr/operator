@@ -22,6 +22,8 @@ import (
 	"bread/pb"
 )
 
+const bambooURL = "https://bamboo.dev.pardot.com"
+
 type deployAPIServer struct {
 	operator.Replier
 	ecs  *ecs.ECS
@@ -31,10 +33,8 @@ type deployAPIServer struct {
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
 	targets := make([]string, len(s.conf.Targets))
-	i := 0
-	for k := range s.conf.Targets {
-		targets[i] = k
-		i = i + 1
+	for i, t := range s.conf.Targets {
+		targets[i] = t.Name
 	}
 	sort.Strings(targets)
 	return operator.Reply(s, ctx, req, &operator.Message{
@@ -43,10 +43,28 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 }
 
 func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	var (
+		msg *operator.Message
+		err error
+	)
+	var target *DeployTarget
+	for _, t := range s.conf.Targets {
+		if t.Name == req.Target {
+			target = t
+		}
 	}
+	if target != nil {
+		msg, err = s.listECSBuilds(ctx, target)
+	} else {
+		msg, err = s.listCanoeBuilds(ctx, req)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return operator.Reply(s, ctx, req, msg)
+}
+
+func (s *deployAPIServer) listECSBuilds(ctx context.Context, t *DeployTarget) (*operator.Message, error) {
 	conds := []string{
 		`{"name":{"$eq":"manifest.json"}}`,
 		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
@@ -63,19 +81,72 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		return nil, err
 	}
 	if len(artifs) == 0 {
-		return nil, fmt.Errorf("No build found for %s", req.Target)
+		return nil, fmt.Errorf("No build found for %s", t.Name)
 	}
 	var txt bytes.Buffer
 	html := bytes.NewBufferString("<ul>")
 	for _, a := range artifs {
-		fmt.Fprintf(html, `<li><a href="https://bamboo.dev.pardot.com/browse/%s">%s</a></li>`, a.Tag(), a.Tag())
-		fmt.Fprintf(&txt, "%s %s\n", req.Target, a.Tag())
+		fmt.Fprintf(html, `<li><a href="%s/browse/%s">%s</a></li>`, bambooURL, a.Tag(), a.Tag())
+		fmt.Fprintf(&txt, "%s\n", a.Tag())
 	}
 	_, _ = html.WriteString("</ul>")
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return &operator.Message{
 		Text: txt.String(),
 		HTML: html.String(),
-	})
+	}, nil
+}
+
+type canoeBuild struct {
+	ArtifactURL string    `json:"artifact_url"`
+	Repo        string    `json:"repo"`
+	Branch      string    `json:"branch"`
+	BuildNumber int       `json:"build_number"`
+	SHA         string    `json:"sha"`
+	PassedCI    bool      `json:"passed_ci"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Message, error) {
+	client := &http.Client{Timeout: 10 * time.Second}
+	if req.Branch == "" {
+		req.Branch = "master"
+	}
+	url := fmt.Sprintf("%s/api/projects/%s/branches/%s/builds", s.conf.CanoeURL, req.Target, req.Branch)
+	httpReq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
+	resp, err := ctxhttp.Do(ctx, client, httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	}
+	var data []*canoeBuild
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	var txt, html bytes.Buffer
+	html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	for _, b := range data {
+		// https://git.dev.pardot.com/Pardot/bread.git
+		repoURL := strings.Replace(b.Repo, ".git", "", -1)
+		fmt.Fprintf(&txt, "%d %s %v\n", b.BuildNumber, b.Branch, b.PassedCI)
+		fmt.Fprintf(
+			&html,
+			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+			fmt.Sprintf(`<a href="%s/browse/%d">%d</a>`, bambooURL, b.BuildNumber, b.BuildNumber),
+			fmt.Sprintf(`<a href="%s/compare/%s">%s@%s</a>`, repoURL, b.Branch, b.Branch, b.SHA[0:7]),
+			b.CreatedAt,
+		)
+	}
+	return &operator.Message{Text: txt.String(), HTML: html.String()}, nil
 }
 
 var (
@@ -95,8 +166,13 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
+	var t *DeployTarget
+	for _, tt := range s.conf.Targets {
+		if tt.Name == req.Target {
+			t = tt
+		}
+	}
+	if t == nil {
 		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
 	}
 	svc, err := s.ecs.DescribeServices(
