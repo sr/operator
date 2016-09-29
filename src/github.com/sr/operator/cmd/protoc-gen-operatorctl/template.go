@@ -20,33 +20,33 @@ import (
 {{end}}
 )
 
-const programName = "{{.Options.BinaryName}}"
+const program = "operatorctl"
 
 var cmd = operator.NewCommand(
-	programName,
+	program,
 	[]operator.ServiceCommand{
 {{- range .Services}}
 		{
 {{- $pkg := .Package }}
-{{- $svc := .FullName }}
-			Name:     "{{ .Name }}",
+{{- $svc := .Name }}
+			Name:     "{{serviceName .Name}}",
 			Synopsis: `+"`"+`{{ .Description }}`+"`"+`,
 			Methods: []operator.MethodCommand{
 	{{- range .Methods}}
 				{
-					Name: "{{dasherize .Name}}",
+					Name: "{{methodName .Name}}",
 					Synopsis: `+"`"+`{{.Description}}`+"`"+`,
 					Flags: []*flag.Flag{
 					{{- range .Arguments }}
 						{
-							Name:  "{{dasherize .Name}}",
+							Name:  "{{argName .Name}}",
 							Usage: "{{.Description}}",
 						},
 					{{- end }}
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 			{{- range .Arguments}}
-						{{.Name}} := ctx.Flags.String("{{dasherize .Name}}", "", "")
+						{{.Name}} := ctx.Flags.String("{{flagName .Name}}", "", "")
 			{{- end}}
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
@@ -62,7 +62,7 @@ var cmd = operator.NewCommand(
 							&{{$pkg}}.{{.Input}}{
 								Request: ctx.Request,
 								{{- range .Arguments}}
-								{{camelCase .Name}}: *{{.Name}},
+								{{inputField .Name}}: *{{.Name}},
 								{{- end}}
 							},
 						)
@@ -82,7 +82,7 @@ var cmd = operator.NewCommand(
 func main() {
 	status, output := cmd.Run(os.Args)
 	if status != 0 {
-		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output); err != nil {
+		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", program, output); err != nil {
 			panic(err)
 		}
 	} else {

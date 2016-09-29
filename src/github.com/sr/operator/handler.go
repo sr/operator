@@ -7,6 +7,8 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/sr/operator/generator"
+
 	"golang.org/x/net/context"
 )
 
@@ -67,10 +69,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		&Request{
 			Call: &Call{
 				// TODO(sr) multi package support
-				Service: fmt.Sprintf("%s.%s", h.pkg, matches[1]),
-				// TODO(sr) support for operator.name
-				Method: matches[2],
-				Args:   args,
+				Service: fmt.Sprintf("%s.%s", h.pkg, generator.Camelize(matches[1], "-")),
+				Method:  generator.Camelize(matches[2], "-"),
+				Args:    args,
 			},
 			Otp:       otp,
 			ReplierId: replierID,

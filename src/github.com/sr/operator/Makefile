@@ -26,7 +26,7 @@ clean:
 
 proto: $(PROTOC) $(PROTOC_GEN_GO)
 	$< -I. --go_out=Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:. operator.proto
-	$< -I. --go_out=Moperator.proto=github.com/sr/operator,plugins=grpc,import_path=testing:. testing/ping.proto
+	$< -I. --go_out=Moperator.proto=github.com/sr/operator,plugins=grpc,import_path=testing:. testing/*.proto
 
 deps:
 	$(GO) get \

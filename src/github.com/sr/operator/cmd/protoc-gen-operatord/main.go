@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	executable = "protoc-gen-operatord"
-	filename   = "main-gen.go"
+	program  = "protoc-gen-operatord"
+	filename = "main-gen.go"
 )
 
 func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 	var buffer bytes.Buffer
-	if err := builderTemplate.Execute(&buffer, descriptor); err != nil {
+	if err := template.Execute(&buffer, descriptor); err != nil {
 		return nil, err
 	}
 	return []*generator.File{
@@ -28,7 +28,7 @@ func generate(descriptor *generator.Descriptor) ([]*generator.File, error) {
 
 func main() {
 	if err := generator.Compile(os.Stdin, os.Stdout, generate); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", executable, err)
+		fmt.Fprintf(os.Stderr, "%s: %s\n", program, err)
 		os.Exit(1)
 	}
 }
