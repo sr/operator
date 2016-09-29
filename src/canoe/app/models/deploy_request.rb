@@ -56,19 +56,22 @@ class DeployRequest
   end
 
   def handle(prov_deploy)
-    # require a project and target
-    return Response.error(ERROR_NO_PROJECT) if !@project
-    return Response.error(ERROR_NO_TARGET) if !@target
-    # confirm user can deploy
+    if !@project
+      return Response.error(ERROR_NO_PROJECT)
+    end
+
+    if !@target
+      return Response.error(ERROR_NO_TARGET)
+    end
+
     if !@target.user_can_deploy?(@project, @user)
       return Response.error(ERROR_UNABLE_TO_DEPLOY)
     end
-    # confirm again there is no active deploy
+
     if !@target.active_deploy(@project).nil?
       return Response.error(ERROR_DUPLICATE)
     end
 
-    # validate that provisional deploy was included and is a real thing
     if prov_deploy.nil?
       return Response.error(ERROR_NO_DEPLOY)
     end
