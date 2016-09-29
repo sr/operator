@@ -636,6 +636,9 @@ resource "aws_security_group" "appdev_rabbithost" {
     to_port = 5672
     protocol = "tcp"
     self = true
+    security_groups = [
+      "${aws_security_group.appdev_apphost.id}"
+    ]
   }
 
   ingress {
