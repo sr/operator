@@ -182,8 +182,6 @@ This file should be added to your `.gitignore`, don't reveal it!
 # Make sure hubot alias is different than '!', that's what Parbot uses
 # and you don't want your bot to respond whenever people call Parbot
 export HUBOT_ALIAS="<some alias>"
-export HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
-export HUBOT_HIPCHAT_HOST="hipchat.dev.pardot.com"
 export HUBOT_HIPCHAT_JID="<your JabberId>"
 export HUBOT_HIPCHAT_PASSWORD="<your password>"
 export HUBOT_HIPCHAT_ROOMS="<JabberId of rooms you want the bot to join>"
