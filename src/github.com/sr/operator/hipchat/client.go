@@ -89,6 +89,7 @@ func (c *client) SendRoomNotification(ctx context.Context, notif *RoomNotificati
 	if err != nil {
 		return err
 	}
+	fmt.Printf("DEBUG: SendRoomNotification data: %s\n", string(data))
 	req, err := http.NewRequest(
 		"POST",
 		fmt.Sprintf(
