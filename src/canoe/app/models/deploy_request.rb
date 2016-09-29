@@ -57,14 +57,14 @@ class DeployRequest
 
   def handle(prov_deploy)
     # require a project and target
-    return Response.error(ERROR_NO_PROJECT) if !current_project
-    return Response.error(ERROR_NO_TARGET) if !current_target
+    return Response.error(ERROR_NO_PROJECT) if !@project
+    return Response.error(ERROR_NO_TARGET) if !@target
     # confirm user can deploy
-    if !current_target.user_can_deploy?(current_project, current_user)
+    if !@target.user_can_deploy?(@project, @user)
       return Response.error(ERROR_UNABLE_TO_DEPLOY)
     end
     # confirm again there is no active deploy
-    if !current_target.active_deploy(current_project).nil?
+    if !@target.active_deploy(@project).nil?
       return Response.error(ERROR_DUPLICATE)
     end
 
@@ -78,9 +78,9 @@ class DeployRequest
     end
 
     the_deploy = deployer.deploy(
-      target: current_target,
-      user: current_user,
-      project: current_project,
+      target: @target,
+      user: @user,
+      project: @project,
       branch: prov_deploy.branch,
       sha: prov_deploy.sha,
       build_number: prov_deploy.build_number,
@@ -100,18 +100,6 @@ class DeployRequest
   end
 
   private
-
-  def current_user
-    @user
-  end
-
-  def current_project
-    @project
-  end
-
-  def current_target
-    @target
-  end
 
   def deployer
     @deployer ||= Canoe::Deployer.new
