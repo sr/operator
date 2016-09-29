@@ -8,14 +8,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/sr/operator"
 )
 
 const (
-	binaryParam     = "binary"
 	importPathParam = "import_path"
 	sourceField     = "request"
 )
@@ -47,16 +44,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 	if !ok {
 		return nil, fmt.Errorf("%s parameter is required", importPathParam)
 	}
-	binaryName := DefaultBinaryName
-	if val, ok := params[binaryParam]; ok {
-		binaryName = val
-	}
-	desc := &Descriptor{
-		Options: &Options{
-			BinaryName: binaryName,
-		},
-		Imports: map[string]string{},
-	}
+	desc := &Descriptor{Imports: map[string]string{}}
 	i := 0
 	sort.Strings(request.FileToGenerate)
 	for _, fileName := range request.FileToGenerate {
@@ -67,14 +55,6 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 			messagesByName[message.GetName()] = message
 		}
 		for j, service := range file.Service {
-			if service.Options == nil {
-				return nil, fmt.Errorf("options name for service %s is missing", service.GetName())
-			}
-			name, err := proto.GetExtension(service.Options, operator.E_Name)
-			if err != nil {
-				return nil, err
-			}
-			nameStr := *name.(*string)
 			pkg := file.GetPackage()
 			// Check for overriden go package
 			if gopkg := file.GetOptions().GetGoPackage(); gopkg != "" {
@@ -85,8 +65,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				desc.Imports[pkg] = filepath.Join(importPathPrefix, path.Dir(fn))
 			}
 			services[j] = &Service{
-				Name:        nameStr,
-				FullName:    service.GetName(),
+				Name:        service.GetName(),
 				Package:     pkg,
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
@@ -148,8 +127,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 						continue
 					}
 					services[j].Methods[k].Arguments[l-1] = &Argument{
-						// TODO(sr) deal with ID => Id etc better
-						Name:        strings.Replace(field.GetName(), "ID", "Id", 1),
+						Name:        field.GetName(),
 						Description: undocumentedPlaceholder,
 					}
 				}
