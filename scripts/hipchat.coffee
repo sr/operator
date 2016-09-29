@@ -33,6 +33,8 @@ class Hipchat
       .get() (err, resp, body) ->
         if err?
           cb(err, null) if cb
+        else if resp.statusCode < 200 or resp.statusCode >= 400
+          cb(new Error("HTTP #{resp.statusCode}")) if cb
         else
           try
             cb(null, JSON.parse(body)) if cb
@@ -44,6 +46,21 @@ class Hipchat
       .get() (err, resp, body) ->
         if err?
           cb(err, null) if cb
+        else if resp.statusCode < 200 or resp.statusCode >= 400
+          cb(new Error("HTTP #{resp.statusCode}")) if cb
+        else
+          try
+            cb(null, JSON.parse(body)) if cb
+          catch err
+            cb(err, null) if cb
+
+  roomParticipants: (id, cb) ->
+    @client.path("/v2/room/#{id}/participant")
+      .get() (err, resp, body) ->
+        if err?
+          cb(err, null) if cb
+        else if resp.statusCode < 200 or resp.statusCode >= 400
+          cb(new Error("HTTP #{resp.statusCode}")) if cb
         else
           try
             cb(null, JSON.parse(body)) if cb
@@ -56,6 +73,8 @@ class Hipchat
       .post(JSON.stringify(message: text)) (err, resp, body) ->
         if err?
           cb(err, null) if cb
+        else if resp.statusCode < 200 or resp.statusCode >= 400
+          cb(new Error("HTTP #{resp.statusCode}")) if cb
         else
           try
             cb(null, JSON.parse(body)) if cb
@@ -67,7 +86,10 @@ class Hipchat
     @client.path("/v2/room/#{id}/notification")
       .header("content-type", "application/json")
       .post(JSON.stringify(params)) (err, resp, body) ->
-        cb(err) if cb
+        if resp.statusCode < 200 or resp.statusCode >= 400
+          cb(new Error("HTTP #{resp.statusCode}")) if cb
+        else
+          cb(err) if cb
 
   roomShareFile: (id, name, contentType, body, message, cb) ->
     boundary = "boundaryb01de47883263ba880ae8e"
@@ -162,6 +184,12 @@ module.exports = (robot) ->
   setInterval(updateMappings, 1000 * 60 * 10)
   setTimeout(updateMappings, 0)
 
+  hipchatRoomParticipants = (roomJid, cb) ->
+    if roomId = mapping.get(roomJid)
+      hipchat.roomParticipants(roomId, cb)
+    else
+      cb(new Error("JID to ID mapping not found for '#{roomJid}'")) if cb
+
   hipchatRoomNotify = (robot, roomJid, text, options, cb) ->
     if roomId = mapping.get(roomJid)
       hipchat.notifyRoom roomId, _.extend({}, options || {}, message: text), cb
@@ -193,5 +221,8 @@ module.exports = (robot) ->
     # Adds the hipchatShareFile function to the msg object in listeners
     context.response.hipchatShareFile = (name, contentType, body, message, cb = null) ->
       hipchatRoomShareFile(robot, context.response.envelope?.user?.reply_to, name, contentType, body, message, cb)
+
+    context.response.hipchatRoomParticipants = (roomJid, cb = null) ->
+      hipchatRoomParticipants(roomJid, cb)
 
     next(done)
