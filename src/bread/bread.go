@@ -34,9 +34,8 @@ var (
 	ACL = []*ACLEntry{
 		{
 			Call: &operator.Call{
-				// TODO(sr) Add Package field to operator.Call struct
 				Service: "bread.Ping",
-				Method:  "ping",
+				Method:  "Ping",
 			},
 			Group: "sysadmin",
 			OTP:   false,
@@ -44,7 +43,7 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "pingPong",
+				Method:  "PingPong",
 			},
 			Group: "sysadmin",
 			OTP:   false,
@@ -52,7 +51,7 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "otp",
+				Method:  "Otp",
 			},
 			Group: "sysadmin",
 			OTP:   true,
@@ -60,7 +59,7 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "whoami",
+				Method:  "Whoami",
 			},
 			Group: "sysadmin",
 			OTP:   false,
@@ -68,7 +67,7 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
-				Method:  "listBuilds",
+				Method:  "ListBuilds",
 			},
 			Group: "sysadmin",
 			OTP:   false,
@@ -76,7 +75,7 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
-				Method:  "trigger",
+				Method:  "Trigger",
 			},
 			Group: "sysadmin",
 			OTP:   true,
