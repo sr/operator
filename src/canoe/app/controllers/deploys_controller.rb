@@ -63,26 +63,27 @@ class DeploysController < ApplicationController
   def create
     prov_deploy = build_provisional_deploy
 
-    if prov_deploy
-      deploy_request = DeployRequest.new(
-        current_project,
-        current_target,
-        current_user,
-        params
-      )
-      deploy_response = deploy_request.handle(prov_deploy)
-      if !deploy_response[:error] && deploy_response[:deploy]
-        the_deploy = deploy_response[:deploy]
-        redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
-      else
-        if message = DeployRequest.error_message(deploy_response[:reason])
-          flash[:notice] = message
-          redirect_to :back
-        end
-      end
-    else
-      render_invalid_provisional_deploy
+    if !prov_deploy
+      return render_invalid_provisional_deploy
     end
+
+    deploy_request = DeployRequest.new(
+      current_project,
+      current_target,
+      current_user,
+      params
+    )
+    deploy_response = deploy_request.handle(prov_deploy)
+
+    if deploy_response[:error]
+      message = DeployRequest.error_message(deploy_response[:reason])
+      flash[:notice] = message
+      redirect_to :back
+      return
+    end
+
+    the_deploy = deploy_response[:deploy]
+    redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
   end
 
   def force_to_complete
