@@ -224,8 +224,8 @@ func run(invoker operator.InvokerFunc) error {
 				config.timeout,
 				pkg,
 			),
-			config.prefix,
 			pkg,
+			config.prefix,
 		); err != nil {
 			return err
 		}
