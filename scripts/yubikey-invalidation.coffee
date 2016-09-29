@@ -30,9 +30,11 @@ module.exports = (robot) ->
 
   invalidateOtp = (msg, otp) ->
     setTimeout (->
-      https.get "#{validationUrl}?id=#{apiId}&otp=#{otp}&nonce=#{generateNonce()}", (res) ->
-        if res.statusCode == 200
+      robot.http("#{validationUrl}?id=#{apiId}&otp=#{otp}&nonce=#{generateNonce()}").get() (err, res, body) ->
+        if res.statusCode == 200 && body.match(/status=OK/)
           msg.reply "#{messagePrefix} I went ahead and invalidated that OTP for you 🔒"
+        else
+          console.log("otp verification error: #{body}")
     ), 5000
 
   invalidateDvorakOtp = (msg, dvorakOtp) ->
