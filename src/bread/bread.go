@@ -35,6 +35,14 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
+				Method:  "Otp",
+			},
+			Group: "sysadmin",
+			OTP:   true,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
 				Method:  "Ping",
 			},
 			Group: "sysadmin",
@@ -51,10 +59,10 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "Otp",
+				Method:  "SlowLoris",
 			},
 			Group: "sysadmin",
-			OTP:   true,
+			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
