@@ -21,8 +21,7 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 	defer cancel()
 	errC := make(chan error, 1)
 	go func() {
-		_, err := i.f(ctx, i.conn, req, i.pkg)
-		errC <- err
+		errC <- i.f(ctx, i.conn, req, i.pkg)
 	}()
 	event := &Event{
 		Key:     "invoker",

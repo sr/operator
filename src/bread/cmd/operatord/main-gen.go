@@ -11,7 +11,7 @@ import (
 	breadpb "bread/pb"
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) (bool, error) {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
 	if req.Call.Service == fmt.Sprintf("%s.Deploy", pkg) {
 		if req.Call.Method == "ListTargets" {
 			client := breadpb.NewDeployClient(conn)
@@ -21,10 +21,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 		if req.Call.Method == "ListBuilds" {
 			client := breadpb.NewDeployClient(conn)
@@ -36,10 +33,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Branch:  req.Call.Args["branch"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 		if req.Call.Method == "Trigger" {
 			client := breadpb.NewDeployClient(conn)
@@ -51,10 +45,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Build:   req.Call.Args["build"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 	}
 	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
@@ -66,10 +57,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 		if req.Call.Method == "Ping" {
 			client := breadpb.NewPingClient(conn)
@@ -80,10 +68,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Arg1:    req.Call.Args["arg1"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 		if req.Call.Method == "SlowLoris" {
 			client := breadpb.NewPingClient(conn)
@@ -93,10 +78,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 		if req.Call.Method == "Whoami" {
 			client := breadpb.NewPingClient(conn)
@@ -106,11 +88,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 	}
-	return false, nil
+	return fmt.Errorf("not found: service=%s method=%s", req.Call.Service, req.Call.Method)
 }
