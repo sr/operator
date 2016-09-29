@@ -9,22 +9,22 @@ based on [gb-vendor](https://github.com/constabulary/gb).
 It lets you easily and "idiomatically" include external dependencies in your repository to get
 reproducible builds.
 
-  * No need to learn a new tool or format!  
+  * No need to learn a new tool or format!
     You already know how to use `gvt`: just run `gvt fetch` when and like you would run `go get`.
     You can imagine what `gvt update` and `gvt delete` do. In addition, `gvt` [also allows](https://godoc.org/github.com/FiloSottile/gvt#hdr-Fetch_a_remote_dependency)
-    fetching specific commits or branch versions in packages, and fully accommodates private repos. 
+    fetching specific commits or branch versions in packages, and fully accommodates private repos.
 
-  * No need to change how you build your project!  
+  * No need to change how you build your project!
     `gvt` downloads packages to `./vendor/...`. The stock Go compiler will find and use those
-    dependencies automatically without import path rewriting or GOPATH changes.  
+    dependencies automatically without import path rewriting or GOPATH changes.
     (Go 1.6+, or Go 1.5 with `GO15VENDOREXPERIMENT=1` set required.)
 
-  * No need to manually chase, copy or cleanup dependencies!  
+  * No need to manually chase, copy or cleanup dependencies!
     `gvt` works recursively as you would expect, and lets you update vendored dependencies. It also
     writes a manifest to `./vendor/manifest` and never touches your system GOPATH. Finally, it
     strips the VCS metadata so that you can commit the vendored source cleanly.
 
-  * No need for your users and occasional contributors to install **or even know about** gvt!  
+  * No need for your users and occasional contributors to install **or even know about** gvt!
     Packages whose dependencies are vendored with `gvt` are `go build`-able and `go get`-able out of
     the box by Go 1.6+, or Go 1.5 with `GO15VENDOREXPERIMENT=1` set.
 
