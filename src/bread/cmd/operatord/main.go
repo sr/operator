@@ -56,11 +56,11 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	flags := flag.CommandLine
 	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
-	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "TODO")
-	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "TODO")
+	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "Room ID where to send messages")
+	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "HipChat user token")
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
-	flags.DurationVar(&config.timeout, "timeout", 5*time.Second, "TODO")
+	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.ldap.Addr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
@@ -70,12 +70,12 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
 	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
 	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
-	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "TODO")
-	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "")
-	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "TODO")
-	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "TODO")
-	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "TODO")
-	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "TODO")
+	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
+	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "Artifactory username")
+	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
+	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
+	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "AWS Region")
+	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
