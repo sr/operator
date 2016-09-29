@@ -138,12 +138,50 @@ resource "template_file" "operator_production_user_data" {
   }
 }
 
+resource "aws_iam_role" "operator_ecs_cluster_role" {
+  assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
+}
+
+resource "aws_iam_role_policy" "operator_ecs_cluster_role_policy" {
+  name = "operator_ecs_cluster_role_policy"
+  role = "${aws_iam_role.operator_ecs_cluster_role.id}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:DescribeClusters",
+        "ecs:DescribeContainerInstances",
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListServices",
+        "ecs:ListTaskDefinitions",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "operator_ecs_instance_profile" {
+  roles = [
+    "${aws_iam_role.ecs_cluster_role.id}",
+    "${aws_iam_role.operator_ecs_cluster_role.id}"
+  ]
+}
+
 resource "aws_launch_configuration" "operator_production" {
   name_prefix = "operator_production"
   image_id = "${var.ecs_ami_id}"
   instance_type = "t2.small"
   key_name = "internal_apps"
-  iam_instance_profile = "${aws_iam_instance_profile.ecs_instance_profile.id}"
+  iam_instance_profile = "${aws_iam_instance_profile.operator_ecs_instance_profile.id}"
   security_groups = ["${aws_security_group.operator_app_production.id}"]
   associate_public_ip_address = false
   user_data = "${template_file.operator_production_user_data.rendered}"
