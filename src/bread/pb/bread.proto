@@ -8,24 +8,25 @@ import "operator.proto";
 option go_package = "breadpb";
 
 message OperatorRequest {
-    operator.Request request = 1;
-    OperatorMessage message = 2;
-    string error = 4;
+	string event = 1;
+	operator.Request request = 2;
+	OperatorMessage message = 3;
+	string error = 4;
 }
 
 message OperatorMessage {
-    operator.Source source = 1;
-    string text = 2;
-    string html = 3;
+	operator.Source source = 1;
+	string text = 2;
+	string html = 3;
 }
 
 message HTTPRequest {
-  string method = 1;
-  string path = 2;
-  map<string, string> query = 3;
-  uint32 status_code = 7;
-  google.protobuf.Duration duration = 8;
-  string error = 9;
+	string method = 1;
+	string path = 2;
+	map<string, string> query = 3;
+	uint32 status_code = 7;
+	google.protobuf.Duration duration = 8;
+	string error = 9;
 }
 
 message ServerStartupNotice {
