@@ -109,7 +109,7 @@ func NewHandler(
 	}, nil
 }
 
-type InvokerFunc func(context.Context, *grpc.ClientConn, *Request) (bool, error)
+type InvokerFunc func(context.Context, *grpc.ClientConn, *Request, string) (bool, error)
 
 func NewInvoker(
 	conn *grpc.ClientConn,
@@ -117,6 +117,7 @@ func NewInvoker(
 	replier Replier,
 	f InvokerFunc,
 	timeout time.Duration,
+	pkg string,
 ) Invoker {
 	return &invoker{
 		conn,
@@ -124,6 +125,7 @@ func NewInvoker(
 		inst,
 		replier,
 		f,
+		pkg,
 	}
 }
 

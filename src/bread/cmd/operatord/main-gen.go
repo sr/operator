@@ -2,6 +2,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -9,8 +11,8 @@ import (
 	breadpb "bread/pb"
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
-	if req.Call.Service == "Deploy" {
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) (bool, error) {
+	if req.Call.Service == fmt.Sprintf("%s.Deploy", pkg) {
 		if req.Call.Method == "ListTargets" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListTargets(
@@ -55,7 +57,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			return true, nil
 		}
 	}
-	if req.Call.Service == "Ping" {
+	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
 		if req.Call.Method == "Otp" {
 			client := breadpb.NewPingClient(conn)
 			_, err := client.Otp(

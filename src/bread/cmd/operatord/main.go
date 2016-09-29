@@ -211,6 +211,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
+		const pkg = "bread"
 		if webhookHandler, err = operator.NewHandler(
 			context.Background(),
 			inst,
@@ -221,9 +222,10 @@ func run(invoker operator.InvokerFunc) error {
 				replier,
 				invoker,
 				config.timeout,
+				pkg,
 			),
 			config.prefix,
-			"bread",
+			pkg,
 		); err != nil {
 			return err
 		}
