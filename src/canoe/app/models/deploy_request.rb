@@ -6,6 +6,26 @@ class DeployRequest
   ERROR_INVALID_SHA = 5
   ERROR_DUPLICATE = 6
 
+  def self.error_message(code)
+    missing_error_codes = [
+      ERROR_NO_PROJECT,
+      ERROR_NO_TARGET,
+      ERROR_NO_DEPLOY
+    ]
+
+    if missing_error_codes.include?(code)
+      return "We did not have everything needed to deploy. Try again."
+    end
+
+    if code == ERROR_INVALID_SHA
+      return "Sorry, it appears you specified an unknown artifact."
+    end
+
+    if code == ERROR_UNABLE_TO_DEPLOY
+      return "Sorry, it looks like #{current_target.name} is locked."
+    end
+  end
+
   def initialize(project, target, user, params)
     @project = project
     @target = target

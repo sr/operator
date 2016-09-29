@@ -75,7 +75,10 @@ class DeploysController < ApplicationController
         the_deploy = deploy_response[:deploy]
         redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
       else
-        render_deploy_error(deploy_response)
+        if message = DeployRequest.error_message(deploy_response[:reason])
+          flash[:notice] = message
+          redirect_to :back
+        end
       end
     else
       render_invalid_provisional_deploy
@@ -134,27 +137,5 @@ class DeploysController < ApplicationController
 
   def render_invalid_provisional_deploy
     render status: :unprocessable_entity, text: "Unknown deploy type: #{params[:what]}"
-  end
-
-  def render_deploy_error(deploy_response)
-    # missing pieces
-    missing_error_codes = \
-      [DeployRequest::ERROR_NO_PROJECT, DeployRequest::ERROR_NO_TARGET, DeployRequest::ERROR_NO_DEPLOY]
-    if missing_error_codes.include?(deploy_response[:reason])
-      flash[:notice] = "We did not have everything needed to deploy. Try again."
-      redirect_to :back
-    end
-
-    # check for invalid
-    if deploy_response[:reason] == DeployRequest::ERROR_INVALID_SHA
-      flash[:notice] = "Sorry, it appears you specified an unknown artifact."
-      redirect_to :back
-    end
-
-    # check for locked target, allow user who has it locked to deploy again
-    if deploy_response[:reason] == DeployRequest::ERROR_UNABLE_TO_DEPLOY
-      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-      redirect_to :back
-    end
   end
 end
