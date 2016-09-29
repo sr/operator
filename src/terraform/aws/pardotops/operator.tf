@@ -161,8 +161,37 @@ resource "aws_iam_role_policy" "operator_ecs_cluster_role_policy" {
         "ecs:ListTaskDefinitions",
         "ecs:ListTasks",
         "ecs:RegisterTaskDefinition",
+
+        "ecs:DeregisterContainerInstance",
+        "ecs:DiscoverPollEndpoint",
+        "ecs:Poll",
+        "ecs:RegisterContainerInstance",
+        "ecs:StartTelemetrySession",
+        "ecs:Submit*",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${aws_s3_bucket.pardotops_configuration.bucket}/production/ecs/*"
+      ]
     }
   ]
 }
@@ -171,7 +200,6 @@ EOF
 
 resource "aws_iam_instance_profile" "operator_ecs_instance_profile" {
   roles = [
-    "${aws_iam_role.ecs_cluster_role.id}",
     "${aws_iam_role.operator_ecs_cluster_role.id}"
   ]
 }
