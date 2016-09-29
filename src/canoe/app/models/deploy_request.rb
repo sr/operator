@@ -6,6 +6,28 @@ class DeployRequest
   ERROR_INVALID_SHA = 5
   ERROR_DUPLICATE = 6
 
+  class Response
+    def self.error(code)
+      new(true, code, nil)
+    end
+
+    def self.success(deploy)
+      new(false, 0, deploy)
+    end
+
+    def initialize(error, code, deploy)
+      @error = error
+      @code = code
+      @deploy = deploy
+    end
+
+    attr_reader :code, :deploy
+
+    def error?
+      @error
+    end
+  end
+
   def self.error_message(code)
     missing_error_codes = [
       ERROR_NO_PROJECT,
@@ -35,24 +57,24 @@ class DeployRequest
 
   def handle(prov_deploy)
     # require a project and target
-    return { error: true, reason: ERROR_NO_PROJECT } if !current_project
-    return { error: true, reason: ERROR_NO_TARGET } if !current_target
+    return Response.error(ERROR_NO_PROJECT) if !current_project
+    return Response.error(ERROR_NO_TARGET) if !current_target
     # confirm user can deploy
     if !current_target.user_can_deploy?(current_project, current_user)
-      return { error: true, reason: ERROR_UNABLE_TO_DEPLOY }
+      return Response.error(ERROR_UNABLE_TO_DEPLOY)
     end
     # confirm again there is no active deploy
     if !current_target.active_deploy(current_project).nil?
-      return { error: true, reason: ERROR_DUPLICATE }
+      return Response.error(ERROR_DUPLICATE)
     end
 
     # validate that provisional deploy was included and is a real thing
     if prov_deploy.nil?
-      return { error: true, reason: ERROR_NO_DEPLOY }
-    elsif !prov_deploy.valid?
-      return { error: true,
-               reason: ERROR_INVALID_SHA,
-               what: prov_deploy.sha }
+      return Response.error(ERROR_NO_DEPLOY)
+    end
+
+    if !prov_deploy.valid?
+      return Response.error(ERROR_INVALID_SHA)
     end
 
     the_deploy = deployer.deploy(
@@ -71,11 +93,10 @@ class DeployRequest
     )
 
     if the_deploy
-      { error: false, deploy: the_deploy }
-    else
-      # likely cause of nil response is a duplicate deploy (another guard)
-      { error: true, reason: ERROR_DUPLICATE }
+      return Response.success(the_deploy)
     end
+
+    Response.error(ERROR_DUPLICATE)
   end
 
   private

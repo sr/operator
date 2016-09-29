@@ -75,15 +75,14 @@ class DeploysController < ApplicationController
     )
     deploy_response = deploy_request.handle(prov_deploy)
 
-    if deploy_response[:error]
-      message = DeployRequest.error_message(deploy_response[:reason])
+    if deploy_response.error?
+      message = DeployRequest.error_message(deploy_response.code)
       flash[:notice] = message
       redirect_to :back
       return
     end
 
-    the_deploy = deploy_response[:deploy]
-    redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
+    redirect_to project_deploy_path(current_project.name, deploy_response.deploy, watching: "1")
   end
 
   def force_to_complete
