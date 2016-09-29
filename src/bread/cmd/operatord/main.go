@@ -1,8 +1,8 @@
 package main
 
 import (
-	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -19,6 +19,7 @@ import (
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -30,6 +31,10 @@ const (
 )
 
 type config struct {
+	dev             bool
+	devRoomID       int
+	devHipchatToken string
+
 	grpcAddr string
 	httpAddr string
 	timeout  time.Duration
@@ -55,6 +60,9 @@ func run(invoker operator.InvokerFunc) error {
 		yubico: &bread.YubicoConfig{},
 	}
 	flags := flag.CommandLine
+	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
+	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "TODO")
+	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "TODO")
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 5*time.Second, "TODO")
@@ -88,66 +96,88 @@ func run(invoker operator.InvokerFunc) error {
 	if config.grpcAddr == "" {
 		return fmt.Errorf("required flag missing: addr-grpc")
 	}
-	if config.httpAddr == "" {
-		return fmt.Errorf("required flag missing: addr-http")
-	}
-	if config.databaseURL == "" {
-		return fmt.Errorf("required flag missing: database-url")
-	}
-	if config.prefix == "" {
-		return fmt.Errorf("required flag missing: prefix")
-	}
-	if config.hipchatNamespace == "" {
-		return fmt.Errorf("required flag missing: hipchat-namespace")
-	}
-	if config.hipchatAddonURL == "" {
-		return fmt.Errorf("required flag missing: hipchat-addon-url")
-	}
-	if config.hipchatWebhookURL == "" {
-		return fmt.Errorf("required flag missing: hipchat-webhook-url")
-	}
-	if config.yubico.ID == "" {
-		return fmt.Errorf("required flag missing: yubico-api-id")
-	}
-	if config.yubico.Key == "" {
-		return fmt.Errorf("required flag missing: yubico-api-key")
-	}
-	db, err := sql.Open("mysql", config.databaseURL)
-	if err != nil {
-		return err
-	}
-	if err := db.Ping(); err != nil {
-		return err
-	}
-	var logger protolog.Logger
+	var (
+		logger  protolog.Logger
+		inst    operator.Instrumenter
+		auth    operator.Authorizer
+		replier operator.Replier
+
+		store    operatorhipchat.ClientCredentialsStore
+		verifier bread.OTPVerifier
+		db       *sql.DB
+	)
 	logger = bread.NewLogger()
-	var inst operator.Instrumenter
 	inst = bread.NewInstrumenter(logger)
-	var store operatorhipchat.ClientCredentialsStore
-	store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
-	var replier operator.Replier
-	replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
-	var verifier bread.OTPVerifier
-	if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
-		return err
-	}
-	var lconn *ldap.Conn
-	c, err := net.DialTimeout("tcp", config.ldapAddr, ldapTimeout)
-	if err != nil {
-		return err
-	}
-	lconn = ldap.NewConn(c, false)
-	lconn.SetTimeout(ldapTimeout)
-	lconn.Start()
-	if err := lconn.Bind("", ""); err != nil {
-		return err
-	}
-	var auth operator.Authorizer
-	if auth, err = bread.NewAuthorizer(lconn, bread.LDAPBase, verifier); err != nil {
-		return err
+	if config.dev {
+		auth = &noopAuthorizer{}
+		if config.devRoomID == 0 {
+			return errors.New("dev mode enabled but required flag missing: dev-room-id")
+		}
+		if config.devHipchatToken == "" {
+			return errors.New("dev mode enabled but required flag missing: dev-hipchat-token")
+		}
+		cl, err := bread.NewHipchatClient(&operatorhipchat.ClientConfig{
+			Hostname: bread.HipchatHost,
+			Token:    config.devHipchatToken,
+		})
+		if err != nil {
+			return err
+		}
+		replier = &devReplier{client: cl, roomID: config.devRoomID}
+	} else {
+		if config.httpAddr == "" {
+			return fmt.Errorf("required flag missing: addr-http")
+		}
+		if config.prefix == "" {
+			return fmt.Errorf("required flag missing: prefix")
+		}
+		if config.hipchatNamespace == "" {
+			return fmt.Errorf("required flag missing: hipchat-namespace")
+		}
+		if config.hipchatAddonURL == "" {
+			return fmt.Errorf("required flag missing: hipchat-addon-url")
+		}
+		if config.hipchatWebhookURL == "" {
+			return fmt.Errorf("required flag missing: hipchat-webhook-url")
+		}
+		if config.yubico.ID == "" {
+			return fmt.Errorf("required flag missing: yubico-api-id")
+		}
+		if config.yubico.Key == "" {
+			return fmt.Errorf("required flag missing: yubico-api-key")
+		}
+		if config.databaseURL == "" {
+			return fmt.Errorf("required flag missing: database-url")
+		}
+		db, err := sql.Open("mysql", config.databaseURL)
+		if err != nil {
+			return err
+		}
+		if err := db.Ping(); err != nil {
+			return err
+		}
+		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
+		replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
+		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
+			return err
+		}
+		var lconn *ldap.Conn
+		c, err := net.DialTimeout("tcp", config.ldapAddr, ldapTimeout)
+		if err != nil {
+			return err
+		}
+		lconn = ldap.NewConn(c, false)
+		lconn.SetTimeout(ldapTimeout)
+		lconn.Start()
+		if err := lconn.Bind("", ""); err != nil {
+			return err
+		}
+		if auth, err = bread.NewAuthorizer(lconn, bread.LDAPBase, verifier); err != nil {
+			return err
+		}
 	}
 	var grpcServer *grpc.Server
-	grpcServer, err = bread.NewServer(
+	grpcServer, err := bread.NewServer(
 		auth,
 		inst,
 		replier,
@@ -169,64 +199,66 @@ func run(invoker operator.InvokerFunc) error {
 		errC <- grpcServer.Serve(grpcList)
 	}()
 	logger.Info(msg)
-	var webhookHandler http.Handler
-	conn, err := grpc.Dial(
-		config.grpcAddr,
-		grpc.WithBlock(),
-		grpc.WithTimeout(grpcTimeout),
-		grpc.WithInsecure(),
-	)
-	if err != nil {
-		return err
-	}
-	if webhookHandler, err = operator.NewHandler(
-		context.Background(),
-		inst,
-		operatorhipchat.NewRequestDecoder(store),
-		operator.NewInvoker(
-			conn,
+	if !config.dev {
+		var webhookHandler http.Handler
+		conn, err := grpc.Dial(
+			config.grpcAddr,
+			grpc.WithBlock(),
+			grpc.WithTimeout(grpcTimeout),
+			grpc.WithInsecure(),
+		)
+		if err != nil {
+			return err
+		}
+		if webhookHandler, err = operator.NewHandler(
+			context.Background(),
 			inst,
-			replier,
-			invoker,
-			config.timeout,
-		),
-		config.prefix,
-	); err != nil {
-		return err
-	}
-	httpServer := http.NewServeMux()
-	httpServer.Handle(
-		"/_ping",
-		bread.NewHandler(logger, bread.NewPingHandler(db)),
-	)
-	addonURL, err := url.Parse(config.hipchatAddonURL)
-	if err != nil {
-		return err
-	}
-	webhookURL, err := url.Parse(config.hipchatWebhookURL)
-	if err != nil {
-		return err
-	}
-	httpServer.Handle(
-		"/hipchat/addon",
-		bread.NewHandler(
-			logger,
-			operatorhipchat.NewAddonHandler(
-				store,
-				&operatorhipchat.AddonConfig{
-					Namespace:  config.hipchatNamespace,
-					URL:        addonURL,
-					Homepage:   bread.RepoURL,
-					WebhookURL: webhookURL,
-				},
+			operatorhipchat.NewRequestDecoder(store),
+			operator.NewInvoker(
+				conn,
+				inst,
+				replier,
+				invoker,
+				config.timeout,
 			),
-		),
-	)
-	httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
-	logger.Info(&breadpb.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
-	go func() {
-		errC <- http.ListenAndServe(config.httpAddr, httpServer)
-	}()
+			config.prefix,
+		); err != nil {
+			return err
+		}
+		httpServer := http.NewServeMux()
+		httpServer.Handle(
+			"/_ping",
+			bread.NewHandler(logger, bread.NewPingHandler(db)),
+		)
+		addonURL, err := url.Parse(config.hipchatAddonURL)
+		if err != nil {
+			return err
+		}
+		webhookURL, err := url.Parse(config.hipchatWebhookURL)
+		if err != nil {
+			return err
+		}
+		httpServer.Handle(
+			"/hipchat/addon",
+			bread.NewHandler(
+				logger,
+				operatorhipchat.NewAddonHandler(
+					store,
+					&operatorhipchat.AddonConfig{
+						Namespace:  config.hipchatNamespace,
+						URL:        addonURL,
+						Homepage:   bread.RepoURL,
+						WebhookURL: webhookURL,
+					},
+				),
+			),
+		)
+		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
+		logger.Info(&breadpb.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+		go func() {
+			errC <- http.ListenAndServe(config.httpAddr, httpServer)
+		}()
+	}
 	return <-errC
 }
 
@@ -235,4 +267,30 @@ func main() {
 		fmt.Fprintf(os.Stderr, "operatord: %s\n", err)
 		os.Exit(1)
 	}
+}
+
+type noopAuthorizer struct{}
+
+func (a *noopAuthorizer) Authorize(_ context.Context, _ *operator.Request) error {
+	return nil
+}
+
+type devReplier struct {
+	client operatorhipchat.Client
+	roomID int
+}
+
+func (r *devReplier) Reply(ctx context.Context, src *operator.Source, rep string, msg *operator.Message) error {
+	notif := &operatorhipchat.RoomNotification{RoomID: int64(r.roomID)}
+	if msg.HTML != "" {
+		notif.MessageFormat = "html"
+		notif.Message = msg.HTML
+	} else {
+		notif.MessageFormat = "text"
+		notif.Message = msg.Text
+	}
+	if v, ok := msg.Options.(*operatorhipchat.MessageOptions); ok {
+		notif.MessageOptions = v
+	}
+	return r.client.SendRoomNotification(ctx, notif)
 }
