@@ -67,11 +67,17 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	if len(artifs) == 0 {
 		return nil, fmt.Errorf("No build found for %s", req.Target)
 	}
-	var out bytes.Buffer
+	var txt bytes.Buffer
+	html := bytes.NewBufferString("<ul>")
 	for _, a := range artifs {
-		fmt.Fprintf(&out, "%s %s\n", req.Target, a.Tag())
+		fmt.Fprintf(html, `<li><a href="https://bamboo.dev.pardot.com/browse/%s">%s</a></li>`, a.Tag(), a.Tag())
+		fmt.Fprintf(&txt, "%s %s\n", req.Target, a.Tag())
 	}
-	return operator.Reply(s, ctx, req, &operator.Message{Text: out.String()})
+	html.WriteString("</ul>")
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: txt.String(),
+		HTML: html.String(),
+	})
 }
 
 var ecsRunning = aws.String("RUNNING")
