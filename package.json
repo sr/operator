@@ -24,7 +24,6 @@
     "hubot-scripts": "^2.16.2",
     "hubot-twitter-stream": "0.0.4",
     "hubot-youtube": "^1.0.2",
-    "hubot-yubikey-invalidation": "0.0.3",
     "markov": "0.0.7",
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.0",
