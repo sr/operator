@@ -133,7 +133,7 @@ func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, req *breadpb.List
 		return nil, err
 	}
 	var txt, html bytes.Buffer
-	html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
 	for _, b := range data {
 		// https://git.dev.pardot.com/Pardot/bread.git
 		repoURL := strings.Replace(b.Repo, ".git", "", -1)
