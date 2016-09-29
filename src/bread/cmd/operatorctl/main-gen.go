@@ -13,10 +13,10 @@ import (
 	breadpb "bread/pb"
 )
 
-const programName = "operator"
+const program = "operatorctl"
 
 var cmd = operator.NewCommand(
-	programName,
+	program,
 	[]operator.ServiceCommand{
 		{
 			Name:     "deploy",
@@ -146,7 +146,7 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadpb.NewPingerClient(conn)
+						client := breadpb.NewPingClient(conn)
 						resp, err := client.Otp(
 							context.Background(),
 							&breadpb.OtpRequest{
@@ -178,7 +178,7 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadpb.NewPingerClient(conn)
+						client := breadpb.NewPingClient(conn)
 						resp, err := client.Ping(
 							context.Background(),
 							&breadpb.PingRequest{
@@ -205,7 +205,7 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadpb.NewPingerClient(conn)
+						client := breadpb.NewPingClient(conn)
 						resp, err := client.SlowLoris(
 							context.Background(),
 							&breadpb.SlowLorisRequest{
@@ -231,7 +231,7 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := breadpb.NewPingerClient(conn)
+						client := breadpb.NewPingClient(conn)
 						resp, err := client.Whoami(
 							context.Background(),
 							&breadpb.WhoamiRequest{
@@ -252,7 +252,7 @@ var cmd = operator.NewCommand(
 func main() {
 	status, output := cmd.Run(os.Args)
 	if status != 0 {
-		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output); err != nil {
+		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", program, output); err != nil {
 			panic(err)
 		}
 	} else {

@@ -88,19 +88,17 @@ func TestAuthorizer(t *testing.T) {
 		otpOK   bool
 		err     error
 	}{
-		{swe, "bread.pinger", "ping", "", true, nil},
-		{swe, "bread.pinger", "whoami", "", true, nil},
-
-		{"", "bread.pinger", "ping", "", true, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.pinger", "pong", "", true, errors.New("no ACL entry found for command `bread.pinger pong`")},
-		{unknown, "bread.pinger", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
-
-		{swe, "bread.pinger", "otp", validOTP, true, nil},
-
-		{noYubiKey, "bread.pinger", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
-		{swe, "bread.pinger", "otp", "", true, errors.New("command `bread.pinger otp` requires a Yubikey OTP")},
-		{swe, "bread.pinger", "otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
-		{swe, "bread.pinger", "otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.Ping", "ping", "", true, nil},
+		{swe, "bread.Ping", "pingPong", "", true, nil},
+		{swe, "bread.Ping", "whoami", "", true, nil},
+		{"", "bread.Ping", "ping", "", true, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.Ping", "pong", "", true, errors.New("no ACL entry found for command `bread.Ping pong`")},
+		{unknown, "bread.Ping", "ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "otp", validOTP, true, nil},
+		{noYubiKey, "bread.Ping", "otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
+		{swe, "bread.Ping", "otp", "", true, errors.New("command `bread.Ping otp` requires a Yubikey OTP")},
+		{swe, "bread.Ping", "otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.Ping", "otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
 	} {
 		if !tc.otpOK {
 			otpVerifier.fail()

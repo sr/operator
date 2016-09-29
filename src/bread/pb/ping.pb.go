@@ -99,163 +99,163 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion3
 
-// Client API for Pinger service
+// Client API for Ping service
 
-type PingerClient interface {
+type PingClient interface {
 	Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error)
 	SlowLoris(ctx context.Context, in *SlowLorisRequest, opts ...grpc.CallOption) (*operator.Response, error)
 	Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
-type pingerClient struct {
+type pingClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewPingerClient(cc *grpc.ClientConn) PingerClient {
-	return &pingerClient{cc}
+func NewPingClient(cc *grpc.ClientConn) PingClient {
+	return &pingClient{cc}
 }
 
-func (c *pingerClient) Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+func (c *pingClient) Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error) {
 	out := new(operator.Response)
-	err := grpc.Invoke(ctx, "/bread.Pinger/Otp", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/bread.Ping/Otp", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pingerClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+func (c *pingClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error) {
 	out := new(operator.Response)
-	err := grpc.Invoke(ctx, "/bread.Pinger/Ping", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/bread.Ping/Ping", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pingerClient) SlowLoris(ctx context.Context, in *SlowLorisRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+func (c *pingClient) SlowLoris(ctx context.Context, in *SlowLorisRequest, opts ...grpc.CallOption) (*operator.Response, error) {
 	out := new(operator.Response)
-	err := grpc.Invoke(ctx, "/bread.Pinger/SlowLoris", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/bread.Ping/SlowLoris", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pingerClient) Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+func (c *pingClient) Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error) {
 	out := new(operator.Response)
-	err := grpc.Invoke(ctx, "/bread.Pinger/Whoami", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/bread.Ping/Whoami", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for Pinger service
+// Server API for Ping service
 
-type PingerServer interface {
+type PingServer interface {
 	Otp(context.Context, *OtpRequest) (*operator.Response, error)
 	Ping(context.Context, *PingRequest) (*operator.Response, error)
 	SlowLoris(context.Context, *SlowLorisRequest) (*operator.Response, error)
 	Whoami(context.Context, *WhoamiRequest) (*operator.Response, error)
 }
 
-func RegisterPingerServer(s *grpc.Server, srv PingerServer) {
-	s.RegisterService(&_Pinger_serviceDesc, srv)
+func RegisterPingServer(s *grpc.Server, srv PingServer) {
+	s.RegisterService(&_Ping_serviceDesc, srv)
 }
 
-func _Pinger_Otp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Ping_Otp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(OtpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PingerServer).Otp(ctx, in)
+		return srv.(PingServer).Otp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bread.Pinger/Otp",
+		FullMethod: "/bread.Ping/Otp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingerServer).Otp(ctx, req.(*OtpRequest))
+		return srv.(PingServer).Otp(ctx, req.(*OtpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Pinger_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Ping_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PingerServer).Ping(ctx, in)
+		return srv.(PingServer).Ping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bread.Pinger/Ping",
+		FullMethod: "/bread.Ping/Ping",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingerServer).Ping(ctx, req.(*PingRequest))
+		return srv.(PingServer).Ping(ctx, req.(*PingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Pinger_SlowLoris_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Ping_SlowLoris_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SlowLorisRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PingerServer).SlowLoris(ctx, in)
+		return srv.(PingServer).SlowLoris(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bread.Pinger/SlowLoris",
+		FullMethod: "/bread.Ping/SlowLoris",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingerServer).SlowLoris(ctx, req.(*SlowLorisRequest))
+		return srv.(PingServer).SlowLoris(ctx, req.(*SlowLorisRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Pinger_Whoami_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Ping_Whoami_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WhoamiRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PingerServer).Whoami(ctx, in)
+		return srv.(PingServer).Whoami(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bread.Pinger/Whoami",
+		FullMethod: "/bread.Ping/Whoami",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingerServer).Whoami(ctx, req.(*WhoamiRequest))
+		return srv.(PingServer).Whoami(ctx, req.(*WhoamiRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Pinger_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "bread.Pinger",
-	HandlerType: (*PingerServer)(nil),
+var _Ping_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "bread.Ping",
+	HandlerType: (*PingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Otp",
-			Handler:    _Pinger_Otp_Handler,
+			Handler:    _Ping_Otp_Handler,
 		},
 		{
 			MethodName: "Ping",
-			Handler:    _Pinger_Ping_Handler,
+			Handler:    _Ping_Ping_Handler,
 		},
 		{
 			MethodName: "SlowLoris",
-			Handler:    _Pinger_SlowLoris_Handler,
+			Handler:    _Ping_SlowLoris_Handler,
 		},
 		{
 			MethodName: "Whoami",
-			Handler:    _Pinger_Whoami_Handler,
+			Handler:    _Ping_Whoami_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -265,7 +265,7 @@ var _Pinger_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("pb/ping.proto", fileDescriptor2) }
 
 var fileDescriptor2 = []byte{
-	// 249 bytes of a gzipped FileDescriptorProto
+	// 235 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2d, 0x48, 0xd2, 0x2f,
 	0xc8, 0xcc, 0x4b, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a, 0x4d, 0x4c,
 	0x91, 0xe2, 0xcb, 0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x2f, 0x82, 0x08, 0x2b, 0x59, 0x72, 0x71,
@@ -274,12 +274,11 @@ var fileDescriptor2 = []byte{
 	0x15, 0x4a, 0x7e, 0x5c, 0xdc, 0x01, 0x99, 0x79, 0xe9, 0xe4, 0xe8, 0x15, 0x12, 0xe2, 0x62, 0x49,
 	0x2c, 0x4a, 0x37, 0x94, 0x60, 0x52, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3, 0x95, 0xec, 0xb9, 0x04,
 	0x82, 0x73, 0xf2, 0xcb, 0x7d, 0xf2, 0x8b, 0x32, 0x8b, 0xc9, 0x72, 0x90, 0x0d, 0x17, 0x6f, 0x78,
-	0x46, 0x7e, 0x62, 0x6e, 0x26, 0x39, 0xba, 0x8d, 0xee, 0x31, 0x72, 0xb1, 0x81, 0xfc, 0x93, 0x5a,
-	0x24, 0xa4, 0xc3, 0xc5, 0xec, 0x5f, 0x52, 0x20, 0x24, 0xa8, 0x07, 0x0e, 0x33, 0x3d, 0x44, 0x00,
-	0x49, 0x09, 0x21, 0x1b, 0x50, 0x5c, 0x90, 0x9f, 0x57, 0x9c, 0x2a, 0xa4, 0xc7, 0xc5, 0x02, 0xd2,
-	0x27, 0x24, 0x04, 0x55, 0x8e, 0x14, 0x28, 0x58, 0xd5, 0x5b, 0x70, 0x71, 0xc2, 0xfd, 0x29, 0x24,
-	0x0e, 0xd5, 0x84, 0xee, 0x73, 0xac, 0x3a, 0x8d, 0xb8, 0xd8, 0x20, 0x1e, 0x14, 0x12, 0x81, 0x6a,
-	0x43, 0xf1, 0x2f, 0x36, 0x3d, 0x52, 0x1c, 0x93, 0x9a, 0x24, 0x59, 0x40, 0xe9, 0xc0, 0x89, 0x33,
-	0x8a, 0x1d, 0xac, 0xa9, 0x20, 0x29, 0x89, 0x0d, 0x1c, 0xf9, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0xda, 0x44, 0xea, 0xd0, 0x24, 0x02, 0x00, 0x00,
+	0x46, 0x7e, 0x62, 0x6e, 0x26, 0x39, 0xba, 0x8d, 0x2e, 0x31, 0x72, 0xb1, 0x80, 0xfc, 0x23, 0xa4,
+	0xc3, 0xc5, 0xec, 0x5f, 0x52, 0x20, 0x24, 0xa8, 0x07, 0x0e, 0x31, 0x3d, 0x44, 0xf0, 0x48, 0x09,
+	0x21, 0x6b, 0x2f, 0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0xd2, 0x83, 0xea, 0x12, 0x82, 0x2a, 0x47,
+	0x0a, 0x12, 0xac, 0xea, 0x2d, 0xb8, 0x38, 0xe1, 0xbe, 0x14, 0x12, 0x87, 0x6a, 0x42, 0xf7, 0x37,
+	0x56, 0x9d, 0x46, 0x5c, 0x6c, 0x10, 0xef, 0x09, 0x89, 0x40, 0xb5, 0xa1, 0xf8, 0x16, 0x9b, 0x1e,
+	0x27, 0xce, 0x28, 0x76, 0xb0, 0xd2, 0x82, 0xa4, 0x24, 0x36, 0x70, 0x84, 0x1b, 0x03, 0x02, 0x00,
+	0x00, 0xff, 0xff, 0x91, 0x39, 0x29, 0x3f, 0x18, 0x02, 0x00, 0x00,
 }

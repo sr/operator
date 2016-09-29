@@ -35,7 +35,7 @@ var (
 		{
 			Call: &operator.Call{
 				// TODO(sr) Add Package field to operator.Call struct
-				Service: "bread.pinger",
+				Service: "bread.Ping",
 				Method:  "ping",
 			},
 			Group: "sysadmin",
@@ -43,7 +43,15 @@ var (
 		},
 		{
 			Call: &operator.Call{
-				Service: "bread.pinger",
+				Service: "bread.Ping",
+				Method:  "pingPong",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
 				Method:  "otp",
 			},
 			Group: "sysadmin",
@@ -51,7 +59,7 @@ var (
 		},
 		{
 			Call: &operator.Call{
-				Service: "bread.pinger",
+				Service: "bread.Ping",
 				Method:  "whoami",
 			},
 			Group: "sysadmin",
@@ -59,15 +67,15 @@ var (
 		},
 		{
 			Call: &operator.Call{
-				Service: "bread.deploy",
-				Method:  "list-builds",
+				Service: "bread.Deploy",
+				Method:  "listBuilds",
 			},
 			Group: "sysadmin",
 			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
-				Service: "bread.deploy",
+				Service: "bread.Deploy",
 				Method:  "trigger",
 			},
 			Group: "sysadmin",
@@ -205,7 +213,7 @@ func NewServer(
 	deploy *DeployConfig,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
-	breadpb.RegisterPingerServer(server, &pingAPIServer{repl})
+	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
 	if len(deploy.Targets) != 0 &&
 		deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&

@@ -10,8 +10,8 @@ import (
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) (bool, error) {
-	if req.Call.Service == "deploy" {
-		if req.Call.Method == "list-targets" {
+	if req.Call.Service == "Deploy" {
+		if req.Call.Method == "ListTargets" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListTargets(
 				ctx,
@@ -24,7 +24,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "list-builds" {
+		if req.Call.Method == "ListBuilds" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.ListBuilds(
 				ctx,
@@ -39,7 +39,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "trigger" {
+		if req.Call.Method == "Trigger" {
 			client := breadpb.NewDeployClient(conn)
 			_, err := client.Trigger(
 				ctx,
@@ -55,9 +55,9 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			return true, nil
 		}
 	}
-	if req.Call.Service == "ping" {
-		if req.Call.Method == "otp" {
-			client := breadpb.NewPingerClient(conn)
+	if req.Call.Service == "Ping" {
+		if req.Call.Method == "Otp" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.Otp(
 				ctx,
 				&breadpb.OtpRequest{
@@ -69,8 +69,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "ping" {
-			client := breadpb.NewPingerClient(conn)
+		if req.Call.Method == "Ping" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.Ping(
 				ctx,
 				&breadpb.PingRequest{
@@ -83,8 +83,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "slow-loris" {
-			client := breadpb.NewPingerClient(conn)
+		if req.Call.Method == "SlowLoris" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.SlowLoris(
 				ctx,
 				&breadpb.SlowLorisRequest{
@@ -96,8 +96,8 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request) 
 			}
 			return true, nil
 		}
-		if req.Call.Method == "whoami" {
-			client := breadpb.NewPingerClient(conn)
+		if req.Call.Method == "Whoami" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.Whoami(
 				ctx,
 				&breadpb.WhoamiRequest{

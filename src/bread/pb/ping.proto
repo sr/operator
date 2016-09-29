@@ -6,9 +6,7 @@ import "operator.proto";
 
 option go_package = "breadpb";
 
-service Pinger {
-	option (operator.name) = "ping";
-
+service Ping {
 	rpc Otp(OtpRequest) returns (operator.Response);
 	rpc Ping(PingRequest) returns (operator.Response);
 	rpc SlowLoris(SlowLorisRequest) returns (operator.Response);
