@@ -132,7 +132,7 @@ func TestOperator(t *testing.T) {
 	t.Run("UnaryServerInterceptor", func(t *testing.T) {
 		client := operatortesting.NewPingerClient(conn)
 		authErr := errors.New("unauthorized")
-		pingReq := &operatortesting.PingRequest{&operator.Request{}}
+		pingReq := &operatortesting.PingRequest{Request: &operator.Request{}}
 		for _, tc := range []struct {
 			call    *operator.Call
 			req     *operatortesting.PingRequest
