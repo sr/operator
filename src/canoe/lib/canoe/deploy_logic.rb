@@ -56,14 +56,6 @@ module Canoe
       end
     end
 
-    def lock_target!
-      deployer.lock(target: current_target, user: current_user)
-    end
-
-    def unlock_target!(force: false)
-      deployer.unlock(target: current_target, user: current_user, force: force)
-    end
-
     private
 
     def deployer
