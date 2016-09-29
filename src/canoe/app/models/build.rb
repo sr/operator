@@ -82,6 +82,10 @@ class Build
     @project.name
   end
 
+  def repo
+    @properties["gitRepo"]
+  end
+
   def show_single_servers?
     !@project.all_servers_default
   end
