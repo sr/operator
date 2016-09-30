@@ -118,6 +118,7 @@ func NewInvoker(
 	f InvokerFunc,
 	timeout time.Duration,
 	pkg string,
+	errMsgOpts interface{},
 ) Invoker {
 	return &invoker{
 		conn,
@@ -126,6 +127,7 @@ func NewInvoker(
 		replier,
 		f,
 		pkg,
+		errMsgOpts,
 	}
 }
 
