@@ -98,12 +98,13 @@ var (
 		},
 	}
 
-	DeployTargets = []*DeployTarget{
+	ECSDeployTargets = []*DeployTarget{
 		{
 			Name:          "canoe",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "CAN",
+			Canoe:         false,
 			ECSCluster:    "canoe_production",
 			ECSService:    "canoe",
 			Image:         "build/bread/canoe/app",
@@ -113,6 +114,7 @@ var (
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
+			Canoe:         false,
 			ECSCluster:    "hal9000_production",
 			ECSService:    "hal9000",
 			Image:         "build/bread/hal9000/app",
@@ -122,6 +124,7 @@ var (
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "OP",
+			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
 			Image:         "build/bread/operatord/app",
@@ -131,6 +134,7 @@ var (
 			BambooProject: "BREAD",
 			BambooPlan:    "PAR",
 			BambooJob:     "",
+			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
 			Image:         "build/bread/parbot/app",
@@ -140,6 +144,7 @@ var (
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "TEAM",
+			Canoe:         false,
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
 			Image:         "build/bread/tempass/app",
@@ -166,7 +171,6 @@ type DeployConfig struct {
 	CanoeAPIKey         string
 	ECSTimeout          time.Duration
 	AWSRegion           string
-	Targets             []*DeployTarget
 }
 
 type DeployTarget struct {
@@ -174,6 +178,7 @@ type DeployTarget struct {
 	BambooProject string
 	BambooPlan    string
 	BambooJob     string
+	Canoe         bool
 	ECSCluster    string
 	ECSService    string
 	Image         string
@@ -242,8 +247,7 @@ func NewServer(
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
-	if len(deploy.Targets) != 0 &&
-		deploy.ArtifactoryURL != "" &&
+	if deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&
 		deploy.ArtifactoryAPIKey != "" &&
 		deploy.ArtifactoryRepo != "" &&
@@ -257,6 +261,7 @@ func NewServer(
 			ecr.New(sess),
 			deploy,
 			&http.Client{},
+			ECSDeployTargets,
 		})
 	}
 	return server, nil

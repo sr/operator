@@ -31,18 +31,19 @@ const (
 
 type deployAPIServer struct {
 	operator.Replier
-	ecs  *ecs.ECS
-	ecr  *ecr.ECR
-	conf *DeployConfig
-	http *http.Client
+	ecs        *ecs.ECS
+	ecr        *ecr.ECR
+	conf       *DeployConfig
+	http       *http.Client
+	ecsTargets []*DeployTarget
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
-	targets := make([]string, len(s.conf.Targets))
-	for i, t := range s.conf.Targets {
-		targets[i] = t.Name
+	targets, err := s.listTargets(ctx)
+	names := make([]string, len(targets))
+	for i, t := range targets {
+		names[i] = t.Name
 	}
-	resp, err := s.doCanoe(ctx, "GET", "/api/projects", "")
 	if err != nil {
 		_, _ = operator.Reply(s, ctx, req, &operator.Message{
 			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
@@ -51,20 +52,11 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 				Color: "red",
 			},
 		})
-	} else {
-		defer func() { _ = resp.Body.Close() }()
-		var projs []*canoeProject
-		if err := json.NewDecoder(resp.Body).Decode(&projs); err != nil {
-			return nil, err
-		}
-		for _, p := range projs {
-			targets = append(targets, p.Name)
-		}
 	}
-	sort.Strings(targets)
+	sort.Strings(names)
 	return operator.Reply(s, ctx, req, &operator.Message{
-		HTML: "Deployment targets: " + strings.Join(targets, ", "),
-		Text: strings.Join(targets, " "),
+		HTML: "Deployment targets: " + strings.Join(names, ", "),
+		Text: strings.Join(names, " "),
 	})
 }
 
@@ -74,7 +66,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		err    error
 		target *DeployTarget
 	)
-	for _, t := range s.conf.Targets {
+	for _, t := range s.ecsTargets {
 		if t.Name == req.Target {
 			target = t
 		}
@@ -127,16 +119,20 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		msg    *operator.Message
 		err    error
 	)
-	for _, t := range s.conf.Targets {
+	targets, err := s.listTargets(ctx)
+	for _, t := range targets {
 		if t.Name == req.Target {
 			target = t
+			break
 		}
-		break
 	}
-	if target != nil {
-		msg, err = s.triggerECSDeploy(ctx, req, target)
-	} else {
+	if target == nil {
+		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
+	}
+	if target.Canoe {
 		msg, err = s.triggerCanoeDeploy(ctx, req)
+	} else {
+		msg, err = s.triggerECSDeploy(ctx, req, target)
 	}
 	if err != nil {
 		return nil, err
@@ -240,9 +236,10 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	_, _ = operator.Reply(s, ctx, req, &operator.Message{
 		Text: *newTask.TaskDefinition.TaskDefinitionArn,
 		HTML: fmt.Sprintf(
-			"Updated service %s on ECS cluster %s to run build %s. Waiting up to %s for service rollover...",
+			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
 			*svc.Services[0].ServiceName,
 			t.ECSCluster,
+			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, req.Build, req.Build),
 			s.conf.ECSTimeout,
 		),
 		Options: &operatorhipchat.MessageOptions{
@@ -293,6 +290,21 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	}
 }
 
+func (s *deployAPIServer) listTargets(ctx context.Context) (targets []*DeployTarget, err error) {
+	var resp *http.Response
+	if resp, err = s.doCanoe(ctx, "GET", "/api/projects", ""); err == nil {
+		defer func() { _ = resp.Body.Close() }()
+		var projs []*canoeProject
+		if err := json.NewDecoder(resp.Body).Decode(&projs); err == nil {
+			for _, p := range projs {
+				targets = append(targets, &DeployTarget{Name: p.Name, Canoe: true})
+			}
+		}
+	}
+	_ = copy(targets, s.ecsTargets)
+	return targets, err
+}
+
 type canoeBuild struct {
 	ArtifactURL string    `json:"artifact_url"`
 	RepoURL     string    `json:"repo_url"`
@@ -327,7 +339,6 @@ func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, bran
 }
 
 func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Message, error) {
-	// https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/BREAD/BREAD/BREAD-EX-494.tar.gz
 	buildID, err := strconv.Atoi(req.Build)
 	if err != nil {
 		return nil, err

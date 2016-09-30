@@ -50,7 +50,7 @@ type config struct {
 
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
-		deploy: &bread.DeployConfig{Targets: bread.DeployTargets},
+		deploy: &bread.DeployConfig{},
 		ldap:   &bread.LDAPConfig{},
 		yubico: &bread.YubicoConfig{},
 	}
