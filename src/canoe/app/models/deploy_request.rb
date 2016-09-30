@@ -46,6 +46,10 @@ class DeployRequest
         return "Sorry, it looks like #{current_target.name} is locked."
       end
     end
+
+    def to_json(_)
+      JSON.dump(error: @error, message: error_message, deploy: @deploy.attributes)
+    end
   end
 
   def initialize(project, target, user, artifact_url, lock, servers, options)
