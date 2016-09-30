@@ -20,6 +20,8 @@
 #   hubot reversenuggets - Get nuggets
 #   hubot bread - developers HATE them! Operations guys find ONE EASY TRICK to write code!
 #   hubot puppies - Get puppies
+#   hubot beningo - Get beningo classic
+#   hubot beningo generator - Get generated beningo cards
 #   hubot beyonce - Get charisma
 #   hubot waffles - Get waffles
 #   hubot chikin - Get chicken noises
@@ -176,6 +178,9 @@ module.exports = (robot) ->
     msg.send "http://i.giphy.com/ohBeIPJ4MEuas.gif"
 
   robot.respond /beningo$/i, (msg) ->
+    msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
+
+  robot.respond /beningo(\s)?generator$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
 
   robot.respond /cookiecakes$/i, (msg) ->
