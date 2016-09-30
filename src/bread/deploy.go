@@ -36,6 +36,7 @@ type deployAPIServer struct {
 	conf       *DeployConfig
 	http       *http.Client
 	ecsTargets []*DeployTarget
+	tz         *time.Location
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
@@ -86,13 +87,13 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		var txt, html bytes.Buffer
 		_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
 		for _, b := range builds[0:10] {
-			fmt.Fprintf(&txt, "%d %s %v\n", b.BuildNumber, b.Branch, b.PassedCI)
+			fmt.Fprintf(&txt, "%d %s@%s %s\n", b.BuildNumber, b.Branch, b.SHA[0:7], b.CreatedAt)
 			fmt.Fprintf(
 				&html,
 				"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
 				fmt.Sprintf(`<a href="%s">%d</a>`, b.URL, b.BuildNumber),
 				fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.RepoURL, b.Branch, b.Branch, b.SHA[0:7]),
-				b.CreatedAt,
+				b.CreatedAt.In(s.tz),
 			)
 		}
 		msg = &operator.Message{Text: txt.String(), HTML: html.String()}

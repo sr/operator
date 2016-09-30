@@ -34,6 +34,7 @@ type config struct {
 	grpcAddr string
 	httpAddr string
 	timeout  time.Duration
+	timezone string
 
 	yubico *bread.YubicoConfig
 	ldap   *bread.LDAPConfig
@@ -61,6 +62,7 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
+	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
 	flags.StringVar(&config.ldap.Addr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
@@ -164,12 +166,17 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 	}
+	tz, err := time.LoadLocation(config.timezone)
+	if err != nil {
+		return err
+	}
 	var grpcServer *grpc.Server
 	if grpcServer, err = bread.NewServer(
 		auth,
 		inst,
 		replier,
 		config.deploy,
+		tz,
 	); err != nil {
 		return err
 	}

@@ -244,6 +244,7 @@ func NewServer(
 	inst operator.Instrumenter,
 	repl operator.Replier,
 	deploy *DeployConfig,
+	timezone *time.Location,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
@@ -262,6 +263,7 @@ func NewServer(
 			deploy,
 			&http.Client{},
 			ECSDeployTargets,
+			timezone,
 		})
 	}
 	return server, nil
