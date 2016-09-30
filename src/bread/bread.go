@@ -256,6 +256,7 @@ func NewServer(
 			ecs.New(sess),
 			ecr.New(sess),
 			deploy,
+			&http.Client{},
 		})
 	}
 	return server, nil

@@ -34,6 +34,7 @@ type deployAPIServer struct {
 	ecs  *ecs.ECS
 	ecr  *ecr.ECR
 	conf *DeployConfig
+	http *http.Client
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
@@ -132,23 +133,15 @@ type canoeBuild struct {
 }
 
 func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, branch string) ([]*canoeBuild, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
-	url := fmt.Sprintf("%s/api/projects/%s/branches/%s/builds", s.conf.CanoeURL, proj, branch)
-	httpReq, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
-	resp, err := ctxhttp.Do(ctx, client, httpReq)
-	if err != nil {
-		return nil, err
-	}
+	resp, err := s.doCanoe(
+		ctx,
+		"GET",
+		fmt.Sprintf("/api/projects/%s/branches/%s/builds", proj, branch),
+		"",
+	)
 	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
-		}
-		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	if err != nil {
+		return nil, err
 	}
 	var data []*canoeBuild
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -327,30 +320,20 @@ func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.T
 	if build == nil {
 		return nil, fmt.Errorf("Build not found: %d", buildID)
 	}
-	client := &http.Client{Timeout: 10 * time.Second}
-	///api/targets/:target_name/deploys
-	reqURL := fmt.Sprintf("%s/api/targets/production/deploys", s.conf.CanoeURL)
 	params := url.Values{}
 	params.Add("project_name", req.Target)
 	params.Add("artifact_url", build.ArtifactURL)
 	params.Add("user_email", req.Request.UserEmail())
-	httpReq, err := http.NewRequest("POST", reqURL, strings.NewReader(params.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	httpReq.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
-	resp, err := ctxhttp.Do(ctx, client, httpReq)
+	resp, err := s.doCanoe(
+		ctx,
+		"POST",
+		"/api/targets/production/deploys",
+		params.Encode(),
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
-		}
-		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
-	}
 	type canoeDeploy struct {
 		ID int `json:"id"`
 	}
@@ -407,7 +390,6 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			return nil, fmt.Errorf("Artifactory query failed with status %d and body: %s", resp.StatusCode, body)
@@ -422,6 +404,29 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 		return nil, err
 	}
 	return data.Results, nil
+}
+
+func (s *deployAPIServer) doCanoe(ctx context.Context, meth, path, body string) (*http.Response, error) {
+	req, err := http.NewRequest(meth, s.conf.CanoeURL+path, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	resp, err := ctxhttp.Do(ctx, s.http, req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	}
+	return resp, nil
 }
 
 type parsedImg struct {
