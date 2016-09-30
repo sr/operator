@@ -27,6 +27,7 @@ import (
 const (
 	bambooURL = "https://bamboo.dev.pardot.com"
 	master    = "master"
+	pardot    = "pardot"
 )
 
 type deployAPIServer struct {
@@ -67,6 +68,9 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		err    error
 		target *DeployTarget
 	)
+	if req.Target == "" {
+		req.Target = pardot
+	}
 	for _, t := range s.ecsTargets {
 		if t.Name == req.Target {
 			target = t
