@@ -371,7 +371,10 @@ func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.T
 	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", s.conf.CanoeURL, req.Target, data.Deploy.ID)
 	return &operator.Message{
 		Text: deployURL,
-		HTML: fmt.Sprintf(`<a href="%s">Watch %s deploy #%d</a>`, deployURL, req.Target, data.Deploy.ID),
+		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target, deployURL, data.Deploy.ID),
+		Options: &operatorhipchat.MessageOptions{
+			Color: "green",
+		},
 	}, nil
 }
 
