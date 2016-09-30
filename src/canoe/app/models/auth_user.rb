@@ -7,4 +7,33 @@ class AuthUser < ApplicationRecord
       user.save!
     end
   end
+
+  def deploy_authorized?(project, target)
+    if !project
+      raise ArgumentError, "invalid project: #{project.inspect}"
+    end
+
+    if !target
+      raise ArgumentError, "invalid target: #{target.inspect}"
+    end
+
+    acl = DeployACLEntry.for_project_and_deploy_target(project, target)
+
+    if !acl
+      return false
+    end
+
+    if !acl.authorized?
+      event = {
+        current_user: current_user.uid,
+        project: current_project.name,
+        target: current_target.name
+      }
+      Instrumentation.error("unauthorized-deploy", event)
+
+      return false
+    end
+
+    true
+  end
 end
