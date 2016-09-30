@@ -209,6 +209,7 @@ func run(invoker operator.InvokerFunc) error {
 				invoker,
 				config.timeout,
 				pkg,
+				&operatorhipchat.MessageOptions{Color: "red"},
 			),
 			pkg,
 			config.prefix,

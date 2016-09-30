@@ -1,6 +1,7 @@
 package operator
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -14,6 +15,7 @@ type invoker struct {
 	replier Replier
 	f       InvokerFunc
 	pkg     string
+	msgOpts interface{}
 }
 
 func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
@@ -23,30 +25,28 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 	go func() {
 		errC <- i.f(ctx, i.conn, req, i.pkg)
 	}()
-	event := &Event{
-		Key:     "invoker",
-		Request: req,
-		Message: msg,
-	}
+	event := &Event{Key: "invoker", Request: req, Message: msg}
 	select {
 	case <-ctx.Done():
-		event.Error = ctx.Err()
+		event.Error = fmt.Errorf("RPC request failed to complete within %s", i.timeout)
 	case err := <-errC:
 		event.Error = err
 	}
+	if event.Error != nil && i.replier != nil && req != nil {
+		if err := i.replier.Reply(ctx, req.GetSource(), req.ReplierId, &Message{
+			Text:    grpc.ErrorDesc(event.Error),
+			HTML:    fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(event.Error)),
+			Options: i.msgOpts,
+		}); err != nil {
+			i.inst.Instrument(&Event{
+				Key:     "invoker_replier_error",
+				Request: req,
+				Message: msg,
+				Error:   err,
+			})
+		}
+	}
 	if i.inst != nil {
 		i.inst.Instrument(event)
-	}
-	if event.Error != nil && i.replier != nil && req.ReplierId != "" && req.GetSource() != nil {
-		if err := i.replier.Reply(
-			ctx,
-			req.GetSource(),
-			req.ReplierId,
-			&Message{Text: grpc.ErrorDesc(event.Error)},
-		); err != nil {
-			event.Key = "invoker_replier_error"
-			event.Error = err
-			i.inst.Instrument(event)
-		}
 	}
 }
