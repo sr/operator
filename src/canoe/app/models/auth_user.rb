@@ -20,7 +20,7 @@ class AuthUser < ApplicationRecord
     acl = DeployACLEntry.for_project_and_deploy_target(project, target)
 
     if !acl
-      return false
+      return true
     end
 
     if !acl.authorized?

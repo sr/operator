@@ -151,11 +151,14 @@ class ApplicationController < ActionController::Base
   end
 
   def require_deploy_acl_satisfied
-    if current_user && current_user.deploy_authorized?(current_project, current_target)
-      render template: "application/not_authorized_for_deploy", status: :unauthorized
-      false
-    else
+    if !current_user
+      raise "No current_user"
+    end
+
+    if current_user.deploy_authorized?(current_project, current_target)
       true
+    else
+      render template: "application/not_authorized_for_deploy", status: :unauthorized
     end
   end
 
