@@ -1,0 +1,140 @@
+#!/bin/bash -e
+
+function usage() {
+  echo
+  echo "$0 [-h] [-F 'CentOS_version'] [-K '<artifactory-api-key>'] [-T '<hipchat-token>'] <path/to/package*.rpm>"
+  echo
+  echo "-F 'el6/el7' : optional - forces the CentOS version ('el6' or 'el7')"
+  echo "-K '<artifactory-api-key>' : specify API key (or set via ENV VAR ARTIFACTORY_API_KEY)"
+  echo "-T '<hipchat-token>' : specify HipChat Token (or set via ENV VAR HIPCHAT_TOKEN)"
+  echo "-h: usage/help"
+  echo "Example: script/upload-rpm -K 'MY_API_STRING' RPMS/x86_64/package*.rpm"
+  exit 0
+}
+
+function alert() {
+  ROOM_ID="6"
+  AUTH_TOKEN="${HIPCHAT_TOKEN}"
+  MESSAGE="Uploaded RPM <code>$RPM_FILE</code> to Yum Repo: <a href='$BASE_URL/$CENTOS_VERSION-pardot-rpms/'>$BASE_URL/$CENTOS_VERSION-pardot-rpms/</a>"
+  UTIL="RPM Upload"
+  curl -H "Content-Type: application/json" \
+     -X POST \
+     -d "{\"from\": \"$UTIL\", \"message_format\": \"html\", \"message\": \"$MESSAGE\" }" \
+     https://hipchat.dev.pardot.com/v2/room/$ROOM_ID/notification?auth_token=$AUTH_TOKEN
+}
+
+if [ $# -lt 1 ]; then
+  usage
+  exit 1
+fi
+
+OPTIND=1
+CENTOS_VERSION=""
+BASE_URL="https://artifactory.dev.pardot.com/artifactory"
+
+while getopts :F:K:T:h opt; do
+  case "$opt" in
+    F)
+      CENTOS_VERSION="$OPTARG"
+      ;;
+    K)
+      ARTIFACTORY_API_KEY="$OPTARG"
+      ;;
+    T)
+      HIPCHAT_TOKEN="$OPTARG"
+      ;;
+    h)
+      usage
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+    esac
+done
+shift $((OPTIND-1))
+
+
+for fullpath in "$@"; do
+  RPM_PATH="${fullpath}"
+  RPM_FILE="${fullpath##*/}"
+done
+
+if [ -z "$CENTOS_VERSION" ]; then
+  if [[ $(echo "$RPM_FILE" | rev | cut -d '.' -f3 | rev) == *el6* ]]; then
+    CENTOS_VERSION="el6"
+  elif [[ $(echo "$RPM_FILE" | rev | cut -d '.' -f3 | rev) == *el7* ]]; then
+    CENTOS_VERSION="el7"
+  else
+    echo
+    echo "Unable to determine Centos version:"
+    echo
+    echo "please force a version on the command line via the -F flag"
+    exit 1
+  fi
+fi
+
+if $(curl -o /dev/null -s -I -f "$BASE_URL/$CENTOS_VERSION-pardot-rpms/$RPM_FILE"); then
+  echo
+  echo "$RPM_FILE exists!"
+  echo
+  echo "################### ERROR ####################"
+  echo "### Please check the rpm file/version you are attempting to upload."
+  echo "### It appears the file already exists in the repo at URL:"
+  echo "### $BASE_URL/$CENTOS_VERSION-pardot-rpms/"
+  exit 1
+fi
+
+if [ -z "$ARTIFACTORY_API_KEY" ]; then
+  echo
+  echo "\$ARTIFACTORY_API_KEY is required"
+  echo
+  echo "This can be specified with -K '<artifactory-api-key>' on the command line,"
+  echo "or added to your shell environment."
+  echo
+  echo "Your Artifactory API key can be generated at $BASE_URL/webapp/#/profile"
+  exit 1
+fi
+
+if [ -z "$HIPCHAT_TOKEN" ]; then
+  echo
+  echo "\$HIPCHAT_TOKEN is required"
+  echo
+  echo "This can be specified with -T '<hipchat-token>' on the command line,"
+  echo "or added to your shell environment."
+  echo
+  echo "You may create a token here https://hipchat.dev.pardot.com/account/api"
+  echo "and add it to your shell environment (see README at: https://git.dev.pardot.com/Pardot/rpms)"
+  echo
+  exit 1
+fi
+
+SHA1_SUM=$(shasum -a 1 "$RPM_PATH" | awk '{print $1}')
+if [ -z "$SHA1_SUM" ]; then
+  echo
+  echo "Failed to calculate SHA checksum"
+  exit 1
+fi
+
+MD5_SUM=$(md5 -q "$RPM_PATH")
+if [ -z "$MD5_SUM" ]; then
+  echo
+  echo "Failed to calculate MD5 checksum"
+  exit 1
+fi
+
+echo -n "Uploading RPM to Artifactory Yum Repo..."
+results=$(curl -s -H "X-JFrog-Art-Api: $ARTIFACTORY_API_KEY" -H "X-Checksum-Sha1: $SHA1_SUM" -H "X-Checksum-Md5: $MD5_SUM" -T "$RPM_PATH" "$BASE_URL/$CENTOS_VERSION-pardot-rpms/$RPM_FILE")
+if [ "$?" -ne 0 ]; then
+  printf " \033[0;31mfailed\033[0m\n"
+  echo
+  echo "$results"
+  exit 1
+else
+  alert
+  printf " \033[0;32msuccess\033[0m\n"
+fi

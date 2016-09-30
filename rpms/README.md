@@ -9,7 +9,10 @@ A buildroot for building custom RPMs.
 
 ## Usage
 
-### tl;dr
+### Building a new package
+
+1. Create a `<package>.spec` file in the `SPECS/` directory.
+1. Run `script/build <package>`.
 
 ```
 script/build <package>
@@ -21,12 +24,28 @@ script/build brubeck
 MACHINE=el5 script/build brubeck
 ```
 
-### Building a new package
+Submit a PR for your spec file, then after +1 and merging, upload your RPM via:
 
-1. Create a `<package>.spec` file in the `SPECS/` directory.
-1. Run `script/build <package>`.
-1. Copy `RPMS/x86_64/package*.rpm` to the RPM server.
-1. Have a cool beverage of your choice.
+### Uploading a new package
+1. Run `script/upload <package>`.
+1. *You will need an Artifactory and HipChat Token to upload, details below
+
+```
+script/upload </path/to/package*.rpm>
+
+# example
+script/upload RPMS/x86_64/php-tideways-7.0.8-1.pardot.el6.x86_64.rpm
+```
+
+#### Artifactory and HipChat Tokens
+* [Create an Artifactory API Token](https://artifactory.dev.pardot.com/artifactory/webapp/#/profile) and add it to your shell environment as `ARTIFACTORY_API_KEY`.
+* [Create a HipChat API Token](https://hipchat.dev.pardot.com/account/api) and add it to your shell environment as `HIPCHAT_TOKEN`.
+
+```
+# example, adding the values to your ~/.bash_profile
+export HIPCHAT_TOKEN="MY-HIPCHAT-TOKEN-STRING"
+export ARTIFACTORY_API_KEY="MY-ARTIFACTORY-TOKEN-STRING"
+```
 
 ## Caveats
 
