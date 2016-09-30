@@ -73,15 +73,13 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		}
 		var txt, html bytes.Buffer
 		_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
-		for _, b := range builds {
-			// https://git.dev.pardot.com/Pardot/bread.git
-			repoURL := strings.Replace(b.Repo, ".git", "", -1)
+		for _, b := range builds[0:10] {
 			fmt.Fprintf(&txt, "%d %s %v\n", b.BuildNumber, b.Branch, b.PassedCI)
 			fmt.Fprintf(
 				&html,
 				"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-				fmt.Sprintf(`<a href="%s/browse/%d">%d</a>`, bambooURL, b.BuildNumber, b.BuildNumber),
-				fmt.Sprintf(`<a href="%s/compare/%s">%s@%s</a>`, repoURL, b.Branch, b.Branch, b.SHA[0:7]),
+				fmt.Sprintf(`<a href="%s">%d</a>`, b.URL, b.BuildNumber),
+				fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.RepoURL, b.Branch, b.Branch, b.SHA[0:7]),
 				b.CreatedAt,
 			)
 		}
@@ -124,7 +122,8 @@ func (s *deployAPIServer) listECSBuilds(ctx context.Context, t *DeployTarget) (*
 
 type canoeBuild struct {
 	ArtifactURL string    `json:"artifact_url"`
-	Repo        string    `json:"repo"`
+	RepoURL     string    `json:"repo_url"`
+	URL         string    `json:"url"`
 	Branch      string    `json:"branch"`
 	BuildNumber int       `json:"build_number"`
 	SHA         string    `json:"sha"`
@@ -309,9 +308,7 @@ func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.T
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("BUILD ID: %d", buildID)
 	for _, b := range builds {
-		fmt.Printf("BUILD: %#v\n", b)
 		if b.BuildNumber == buildID {
 			build = b
 			break

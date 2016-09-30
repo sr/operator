@@ -82,8 +82,12 @@ class Build
     @project.name
   end
 
-  def repo
-    @properties["gitRepo"]
+  def repo_url
+    @properties["gitRepo"].gsub(/\.git$/, "")
+  end
+
+  def url
+    @properties["buildResults"]
   end
 
   def show_single_servers?
