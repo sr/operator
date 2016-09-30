@@ -86,7 +86,11 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		}
 		var txt, html bytes.Buffer
 		_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
-		for _, b := range builds[0:10] {
+		i := 0
+		for _, b := range builds {
+			if i >= i {
+				break
+			}
 			fmt.Fprintf(&txt, "%d %s@%s %s\n", b.BuildNumber, b.Branch, b.SHA[0:7], b.CreatedAt)
 			fmt.Fprintf(
 				&html,
@@ -95,6 +99,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 				fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.RepoURL, b.Branch, b.Branch, b.SHA[0:7]),
 				b.CreatedAt.In(s.tz),
 			)
+			i += 1
 		}
 		msg = &operator.Message{Text: txt.String(), HTML: html.String()}
 	}
