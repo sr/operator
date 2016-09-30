@@ -247,13 +247,17 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	if err != nil {
 		return nil, err
 	}
-	var html string
+	var (
+		html    string
+		fingers = `<img class="remoticon" aria-label="(fingerscrossed)" alt="(fingerscrossed)" height="30" width="30" src="https://hipchat.dev.pardot.com/files/img/emoticons/1/fingerscrossed-1459185721@2x.png">`
+	)
 	if req.Target == "operator" {
 		html = fmt.Sprintf(
-			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon (fingerscrossed)",
+			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
 			t.ECSCluster,
 			t.ECSCluster,
+			fingers,
 		)
 	} else {
 		html = fmt.Sprintf(
