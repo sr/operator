@@ -108,6 +108,8 @@ docker_push() {
     curl -f -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" -X PUT \
       "${ARTIFACTORY_URL}/${apipath}"
     test -n "$DEBUG" && set -x
+
+    true
 }
 
 tarball_upload() {
