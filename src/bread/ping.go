@@ -1,18 +1,21 @@
-package breadping
+package bread
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
+
+	"bread/pb"
 )
 
-type apiServer struct {
+type pingAPIServer struct {
 	operator.Replier
 }
 
-func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Response, error) {
+func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
@@ -23,7 +26,7 @@ func (s *apiServer) Ping(ctx context.Context, req *PingRequest) (*operator.Respo
 	})
 }
 
-func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Response, error) {
+func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "ok",
 		HTML: "<b>ok</b>",
@@ -34,7 +37,18 @@ func (s *apiServer) Otp(ctx context.Context, req *OtpRequest) (*operator.Respons
 	})
 }
 
-func (s *apiServer) Whoami(ctx context.Context, req *WhoamiRequest) (*operator.Response, error) {
+func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
+	time.Sleep(time.Duration(10) * time.Second)
+	return operator.Reply(s, ctx, req, &operator.Message{
+		Text: "https://66.media.tumblr.com/500736338e23d5b5adb0201b6b74cbc9/tumblr_mmyemrrqkq1s1fx0zo1_500.gif",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "gray",
+			From:  "pinger.SlowLoris",
+		},
+	})
+}
+
+func (s *pingAPIServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
 	email := req.Request.UserEmail()
 	if email == "" {
 		email = "unknown"

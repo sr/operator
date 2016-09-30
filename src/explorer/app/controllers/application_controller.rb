@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
 
   def require_oauth_authentication
     unless current_user.present?
-      session[:target_url] = request.original_url
+      session[:target_url] = target_url
       return redirect_to oauth_path
     end
 
@@ -74,7 +74,6 @@ class ApplicationController < ActionController::Base
       return User.find_by_id(session[:user_id])
     end
 
-    session.destroy
     nil
   end
 
@@ -115,5 +114,10 @@ class ApplicationController < ActionController::Base
     else
       false
     end
+  end
+
+  def target_url
+    # After auth we'll want to reconfirm before submitting a POST
+    request.method == "GET" ? request.original_url : request.referer
   end
 end
