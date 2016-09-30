@@ -250,7 +250,7 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	var html string
 	if req.Target == "operator" {
 		html = fmt.Sprintf(
-			"Updated self (<code>%s@%s</code> to run build %s. Restarting... should be back soon (fingerscrossed)",
+			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon (fingerscrossed)",
 			*svc.Services[0].ServiceName,
 			t.ECSCluster,
 			t.ECSCluster,
