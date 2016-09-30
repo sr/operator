@@ -52,6 +52,7 @@ class DeployRequest
     end
   end
 
+  # rubocop:disable Metrics/ParameterLists
   def initialize(project, target, user, artifact_url, lock, servers, options)
     @project = project
     @target = target

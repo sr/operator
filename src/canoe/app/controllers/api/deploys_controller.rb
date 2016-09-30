@@ -15,7 +15,7 @@ module Api
       user = AuthUser.find_by_email(params[:user_email])
 
       if !user
-        render json: {error: true, message: "No user with email #{params[:user_email].inspect}. You may need to sign into Canoe first."}
+        render json: { error: true, message: "No user with email #{params[:user_email].inspect}. You may need to sign into Canoe first." }
         return
       end
 

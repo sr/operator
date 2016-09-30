@@ -26,9 +26,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
 
   describe "POST /api/targets/:target_name/deploys" do
     it "requires a user" do
-      api_post "/api/targets/#{@target.name}/deploys", {
-        project_name: @project.name,
-      }
+      api_post "/api/targets/#{@target.name}/deploys", project_name: @project.name
       expect(json_response["error"]).to eq(true)
       expect(json_response["message"]).to match(/No user with email/)
     end
@@ -36,7 +34,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
     it "creates a deploy" do
       FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
       allow(Artifactory.client).to receive(:get)
-        .with(%r{pd-canoe/PDT/PPANT/build1234.tar.gz}, properties: nil)
+        .with(/pd-canoe\/PDT\/PPANT\/build1234\.tar\.gz/, properties: nil)
         .and_return(
           "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
           "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
@@ -48,10 +46,9 @@ RSpec.describe "/api/targets/:target_name/deploys" do
           },
         )
 
-      api_post "/api/targets/#{@target.name}/deploys", {
+      api_post "/api/targets/#{@target.name}/deploys",
         artifact_url: "https://artifactory/pd-canoe/PDT/PPANT/build1234.tar.gz",
-        project_name: @project.name,
-      }
+        project_name: @project.name
 
       expect(json_response["error"]).to eq(false)
       expect(json_response["message"]).to eq(nil)
