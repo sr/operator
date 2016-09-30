@@ -84,24 +84,28 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		if err != nil {
 			return nil, err
 		}
-		var txt, html bytes.Buffer
-		_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
-		i := 0
-		for _, b := range builds {
-			if i >= i {
-				break
+		if len(builds) == 0 {
+			msg = &operator.Message{Text: "", HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch)}
+		} else {
+			var txt, html bytes.Buffer
+			_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+			i := 0
+			for _, b := range builds {
+				if i >= 10 {
+					break
+				}
+				fmt.Fprintf(&txt, "%d %s@%s %s\n", b.BuildNumber, b.Branch, b.SHA[0:7], b.CreatedAt)
+				fmt.Fprintf(
+					&html,
+					"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+					fmt.Sprintf(`<a href="%s">%d</a>`, b.URL, b.BuildNumber),
+					fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.RepoURL, b.Branch, b.Branch, b.SHA[0:7]),
+					b.CreatedAt.In(s.tz),
+				)
+				i++
 			}
-			fmt.Fprintf(&txt, "%d %s@%s %s\n", b.BuildNumber, b.Branch, b.SHA[0:7], b.CreatedAt)
-			fmt.Fprintf(
-				&html,
-				"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-				fmt.Sprintf(`<a href="%s">%d</a>`, b.URL, b.BuildNumber),
-				fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.RepoURL, b.Branch, b.Branch, b.SHA[0:7]),
-				b.CreatedAt.In(s.tz),
-			)
-			i += 1
+			msg = &operator.Message{Text: txt.String(), HTML: html.String()}
 		}
-		msg = &operator.Message{Text: txt.String(), HTML: html.String()}
 	}
 	return operator.Reply(s, ctx, req, msg)
 }
