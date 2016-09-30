@@ -304,6 +304,12 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	case <-okC:
 		return &operator.Message{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
+			HTML: fmt.Sprintf(
+				"Deployed build %s to ECS service <code>%s@%s</code>",
+				fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, req.Build, req.Build),
+				*svc.Services[0].ServiceName,
+				t.ECSCluster,
+			),
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
 			},
