@@ -166,15 +166,28 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	var t *DeployTarget
-	for _, tt := range s.conf.Targets {
-		if tt.Name == req.Target {
-			t = tt
+	var (
+		target *DeployTarget
+		msg    *operator.Message
+		err    error
+	)
+	for _, t := range s.conf.Targets {
+		if t.Name == req.Target {
+			target = t
 		}
 	}
-	if t == nil {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	if target != nil {
+		msg, err = s.triggerECSDeploy(ctx, req, target)
+	} else {
+		msg, err = s.triggerCanoeDeploy(ctx, req)
 	}
+	if err != nil {
+		return nil, err
+	}
+	return operator.Reply(s, ctx, req, msg)
+}
+
+func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.TriggerRequest, t *DeployTarget) (*operator.Message, error) {
 	svc, err := s.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
 			Services: []*string{aws.String(t.ECSService)},
@@ -274,13 +287,17 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	case <-ctx.Done():
 		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target, req.Build, s.conf.ECSTimeout)
 	case <-okC:
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return &operator.Message{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
 			},
-		})
+		}, nil
 	}
+}
+
+func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Message, error) {
+	return nil, nil
 }
 
 type artifact struct {
