@@ -181,7 +181,7 @@ module.exports = (robot) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/261/ta4Tpwhuc8PCr8L/upload.png"
 
   robot.respond /beningo(\s)?generator$/i, (msg) ->
-    msg.send "http://osric.com/bingo-card-generator/?title=Beningo&words=%23TRUST,+Impact,+AI/Artificial+Intelligence,+Synergy,+Transform,+Xest+Y+in+the+industry,+Mobile,+Quip,+Journey,+Leading,+Lightning,+Deep+Learning,+Apps,+Enable,+Innovation,+Platform,+Customer,+Diversity,+10+Billion,+Dreamforce,+Closing,+1/1/1,+Run+your+business+from+your+phone,+Accelerate,+Success,+Component(s),+Mindfulness,+Incredible,+San+Francisco,+Miro$oft,+Ecosystem,+Cloud+%3E2x+in+10+seconds,+Action,+Trailhead,+Toothbrush,+Opportunity,+Email,+Pipeline,+Interactive,+Delivering+Value,+(Stop)+Collaborate+(%26+Listen),+Industry,+Analytics,+Process,+Integrated,+Real-Time,+Data,+Wave&freespace=true&freespaceValue=Chatty!&freespaceRandom=false&width=7&height=7&number=10#results"
+    msg.send "http://bit.ly/2ddnlM4"
 
   robot.respond /cookiecakes$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/233/RdkTKW0cD8dGQ2e/ezgif.com-add-text.gif"
