@@ -2,6 +2,7 @@ package operator
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -32,7 +33,10 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 	case err := <-errC:
 		event.Error = err
 	}
-	if event.Error != nil && i.replier != nil && req != nil {
+	if event.Error != nil &&
+		i.replier != nil &&
+		req != nil &&
+		!strings.Contains(event.Error.Error(), "no such service:") {
 		if err := i.replier.Reply(ctx, req.GetSource(), req.ReplierId, &Message{
 			Text:    grpc.ErrorDesc(event.Error),
 			HTML:    fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(event.Error)),
