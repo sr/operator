@@ -103,7 +103,6 @@ docker_push() {
 
     manifest="pd-docker/build/bread/$app/app/$(docker-image-tag)/manifest.json"
     apipath="api/storage/$manifest?properties=$props"
-    echo "DEBUG: ${ARTIFACTORY_URL}/${apipath}" 2>&1
     set +x
     curl -f -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" -X PUT \
       "${ARTIFACTORY_URL}/${apipath}"
