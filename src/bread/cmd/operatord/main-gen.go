@@ -92,5 +92,5 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return err
 		}
 	}
-	return fmt.Errorf("not found: service=%s method=%s", req.Call.Service, req.Call.Method)
+	return fmt.Errorf("no such service: `%s %s`", req.Call.Service, req.Call.Method)
 }
