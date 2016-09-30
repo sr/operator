@@ -3,11 +3,13 @@ package bread
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,7 +24,10 @@ import (
 	"bread/pb"
 )
 
-const bambooURL = "https://bamboo.dev.pardot.com"
+const (
+	bambooURL = "https://bamboo.dev.pardot.com"
+	master    = "master"
+)
 
 type deployAPIServer struct {
 	operator.Replier
@@ -44,22 +49,42 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 
 func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
 	var (
-		msg *operator.Message
-		err error
+		msg    *operator.Message
+		err    error
+		target *DeployTarget
 	)
-	var target *DeployTarget
 	for _, t := range s.conf.Targets {
 		if t.Name == req.Target {
 			target = t
 		}
 	}
 	if target != nil {
-		msg, err = s.listECSBuilds(ctx, target)
+		if msg, err = s.listECSBuilds(ctx, target); err != nil {
+			return nil, err
+		}
 	} else {
-		msg, err = s.listCanoeBuilds(ctx, req)
-	}
-	if err != nil {
-		return nil, err
+		if req.Branch == "" {
+			req.Branch = master
+		}
+		builds, err := s.listCanoeBuilds(ctx, req.Target, req.Branch)
+		if err != nil {
+			return nil, err
+		}
+		var txt, html bytes.Buffer
+		_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+		for _, b := range builds {
+			// https://git.dev.pardot.com/Pardot/bread.git
+			repoURL := strings.Replace(b.Repo, ".git", "", -1)
+			fmt.Fprintf(&txt, "%d %s %v\n", b.BuildNumber, b.Branch, b.PassedCI)
+			fmt.Fprintf(
+				&html,
+				"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+				fmt.Sprintf(`<a href="%s/browse/%d">%d</a>`, bambooURL, b.BuildNumber, b.BuildNumber),
+				fmt.Sprintf(`<a href="%s/compare/%s">%s@%s</a>`, repoURL, b.Branch, b.Branch, b.SHA[0:7]),
+				b.CreatedAt,
+			)
+		}
+		msg = &operator.Message{Text: txt.String(), HTML: html.String()}
 	}
 	return operator.Reply(s, ctx, req, msg)
 }
@@ -106,12 +131,9 @@ type canoeBuild struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Message, error) {
+func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, branch string) ([]*canoeBuild, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	if req.Branch == "" {
-		req.Branch = "master"
-	}
-	url := fmt.Sprintf("%s/api/projects/%s/branches/%s/builds", s.conf.CanoeURL, req.Target, req.Branch)
+	url := fmt.Sprintf("%s/api/projects/%s/branches/%s/builds", s.conf.CanoeURL, proj, branch)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -132,21 +154,7 @@ func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, req *breadpb.List
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	var txt, html bytes.Buffer
-	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
-	for _, b := range data {
-		// https://git.dev.pardot.com/Pardot/bread.git
-		repoURL := strings.Replace(b.Repo, ".git", "", -1)
-		fmt.Fprintf(&txt, "%d %s %v\n", b.BuildNumber, b.Branch, b.PassedCI)
-		fmt.Fprintf(
-			&html,
-			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-			fmt.Sprintf(`<a href="%s/browse/%d">%d</a>`, bambooURL, b.BuildNumber, b.BuildNumber),
-			fmt.Sprintf(`<a href="%s/compare/%s">%s@%s</a>`, repoURL, b.Branch, b.Branch, b.SHA[0:7]),
-			b.CreatedAt,
-		)
-	}
-	return &operator.Message{Text: txt.String(), HTML: html.String()}, nil
+	return data, nil
 }
 
 var (
@@ -175,6 +183,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		if t.Name == req.Target {
 			target = t
 		}
+		break
 	}
 	if target != nil {
 		msg, err = s.triggerECSDeploy(ctx, req, target)
@@ -297,7 +306,71 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 }
 
 func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Message, error) {
-	return nil, nil
+	// https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/BREAD/BREAD/BREAD-EX-494.tar.gz
+	buildID, err := strconv.Atoi(req.Build)
+	if err != nil {
+		return nil, err
+	}
+	var build *canoeBuild
+	builds, err := s.listCanoeBuilds(ctx, req.Target, master)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("BUILD ID: %d", buildID)
+	for _, b := range builds {
+		fmt.Printf("BUILD: %#v\n", b)
+		if b.BuildNumber == buildID {
+			build = b
+			break
+		}
+	}
+	if build == nil {
+		return nil, fmt.Errorf("Build not found: %d", buildID)
+	}
+	client := &http.Client{Timeout: 10 * time.Second}
+	///api/targets/:target_name/deploys
+	reqURL := fmt.Sprintf("%s/api/targets/production/deploys", s.conf.CanoeURL)
+	params := url.Values{}
+	params.Add("project_name", req.Target)
+	params.Add("artifact_url", build.ArtifactURL)
+	params.Add("user_email", req.Request.UserEmail())
+	httpReq, err := http.NewRequest("POST", reqURL, strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	httpReq.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
+	resp, err := ctxhttp.Do(ctx, client, httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	}
+	type canoeDeploy struct {
+		ID int `json:"id"`
+	}
+	type canoeResp struct {
+		Error   bool         `json:"error"`
+		Message string       `json:"message"`
+		Deploy  *canoeDeploy `json:"deploy"`
+	}
+	var data canoeResp
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	if data.Error {
+		return nil, errors.New(data.Message)
+	}
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", s.conf.CanoeURL, req.Target, data.Deploy.ID)
+	return &operator.Message{
+		Text: deployURL,
+		HTML: fmt.Sprintf(`<a href="%s">Watch %s deploy #%d</a>`, deployURL, req.Target, data.Deploy.ID),
+	}, nil
 }
 
 type artifact struct {
