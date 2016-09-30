@@ -42,9 +42,28 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 	for i, t := range s.conf.Targets {
 		targets[i] = t.Name
 	}
+	resp, err := s.doCanoe(ctx, "GET", "/api/projects", "")
+	if err != nil {
+		_, _ = operator.Reply(s, ctx, req, &operator.Message{
+			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
+			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
+			Options: &operatorhipchat.MessageOptions{
+				Color: "red",
+			},
+		})
+	} else {
+		defer func() { _ = resp.Body.Close() }()
+		var projs []*canoeProject
+		if err := json.NewDecoder(resp.Body).Decode(&projs); err != nil {
+			return nil, err
+		}
+		for _, p := range projs {
+			targets = append(targets, p.Name)
+		}
+	}
 	sort.Strings(targets)
 	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: "Deploy targets: " + strings.Join(targets, ", "),
+		Text: "Deployment targets: " + strings.Join(targets, ", "),
 	})
 }
 
@@ -88,74 +107,10 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	return operator.Reply(s, ctx, req, msg)
 }
 
-func (s *deployAPIServer) listECSBuilds(ctx context.Context, t *DeployTarget) (*operator.Message, error) {
-	conds := []string{
-		`{"name":{"$eq":"manifest.json"}}`,
-		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
-		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
-	}
-	q := []string{
-		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
-		`.include("repo","path","name","created")`,
-		`.sort({"$desc": ["created"]})`,
-		`.limit(10)`,
-	}
-	artifs, err := s.doAQL(ctx, strings.Join(q, ""))
-	if err != nil {
-		return nil, err
-	}
-	if len(artifs) == 0 {
-		return nil, fmt.Errorf("No build found for %s", t.Name)
-	}
-	var txt bytes.Buffer
-	html := bytes.NewBufferString("<ul>")
-	for _, a := range artifs {
-		fmt.Fprintf(html, `<li><a href="%s/browse/%s">%s</a></li>`, bambooURL, a.Tag(), a.Tag())
-		fmt.Fprintf(&txt, "%s\n", a.Tag())
-	}
-	_, _ = html.WriteString("</ul>")
-	return &operator.Message{
-		Text: txt.String(),
-		HTML: html.String(),
-	}, nil
+var eggs = map[string]string{
+	"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
+	"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
 }
-
-type canoeBuild struct {
-	ArtifactURL string    `json:"artifact_url"`
-	RepoURL     string    `json:"repo_url"`
-	URL         string    `json:"url"`
-	Branch      string    `json:"branch"`
-	BuildNumber int       `json:"build_number"`
-	SHA         string    `json:"sha"`
-	PassedCI    bool      `json:"passed_ci"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, branch string) ([]*canoeBuild, error) {
-	resp, err := s.doCanoe(
-		ctx,
-		"GET",
-		fmt.Sprintf("/api/projects/%s/branches/%s/builds", proj, branch),
-		"",
-	)
-	defer func() { _ = resp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-	var data []*canoeBuild
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	return data, nil
-}
-
-var (
-	ecsRunning = aws.String("RUNNING")
-	eggs       = map[string]string{
-		"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
-		"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
-	}
-)
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
 	if v, ok := eggs[req.Target]; ok {
@@ -186,6 +141,40 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, err
 	}
 	return operator.Reply(s, ctx, req, msg)
+}
+
+var ecsRunning = aws.String("RUNNING")
+
+func (s *deployAPIServer) listECSBuilds(ctx context.Context, t *DeployTarget) (*operator.Message, error) {
+	conds := []string{
+		`{"name":{"$eq":"manifest.json"}}`,
+		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
+		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
+	}
+	q := []string{
+		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
+		`.include("repo","path","name","created")`,
+		`.sort({"$desc": ["created"]})`,
+		`.limit(10)`,
+	}
+	artifs, err := s.doAQL(ctx, strings.Join(q, ""))
+	if err != nil {
+		return nil, err
+	}
+	if len(artifs) == 0 {
+		return nil, fmt.Errorf("No build found for %s", t.Name)
+	}
+	var txt bytes.Buffer
+	html := bytes.NewBufferString("<ul>")
+	for _, a := range artifs {
+		fmt.Fprintf(html, `<li><a href="%s/browse/%s">%s</a></li>`, bambooURL, a.Tag(), a.Tag())
+		fmt.Fprintf(&txt, "%s\n", a.Tag())
+	}
+	_, _ = html.WriteString("</ul>")
+	return &operator.Message{
+		Text: txt.String(),
+		HTML: html.String(),
+	}, nil
 }
 
 func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.TriggerRequest, t *DeployTarget) (*operator.Message, error) {
@@ -297,6 +286,39 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 	}
 }
 
+type canoeBuild struct {
+	ArtifactURL string    `json:"artifact_url"`
+	RepoURL     string    `json:"repo_url"`
+	URL         string    `json:"url"`
+	Branch      string    `json:"branch"`
+	BuildNumber int       `json:"build_number"`
+	SHA         string    `json:"sha"`
+	PassedCI    bool      `json:"passed_ci"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+type canoeProject struct {
+	Name string `json:"name"`
+}
+
+func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, branch string) ([]*canoeBuild, error) {
+	resp, err := s.doCanoe(
+		ctx,
+		"GET",
+		fmt.Sprintf("/api/projects/%s/branches/%s/builds", proj, branch),
+		"",
+	)
+	defer func() { _ = resp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+	var data []*canoeBuild
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Message, error) {
 	// https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/BREAD/BREAD/BREAD-EX-494.tar.gz
 	buildID, err := strconv.Atoi(req.Build)
@@ -353,6 +375,29 @@ func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.T
 	}, nil
 }
 
+func (s *deployAPIServer) doCanoe(ctx context.Context, meth, path, body string) (*http.Response, error) {
+	req, err := http.NewRequest(meth, s.conf.CanoeURL+path, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	resp, err := ctxhttp.Do(ctx, s.http, req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	}
+	return resp, nil
+}
+
 type artifact struct {
 	Path    string
 	Repo    string
@@ -401,29 +446,6 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 		return nil, err
 	}
 	return data.Results, nil
-}
-
-func (s *deployAPIServer) doCanoe(ctx context.Context, meth, path, body string) (*http.Response, error) {
-	req, err := http.NewRequest(meth, s.conf.CanoeURL+path, strings.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
-	if body != "" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
-	resp, err := ctxhttp.Do(ctx, s.http, req)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
-		}
-		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
-	}
-	return resp, nil
 }
 
 type parsedImg struct {
