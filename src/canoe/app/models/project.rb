@@ -4,6 +4,10 @@ class Project < ApplicationRecord
 
   has_many :deploy_notifications
 
+  def self.enabled
+    where("name != ?", "chef")
+  end
+
   def test_list
     case name
     when "pardot"
