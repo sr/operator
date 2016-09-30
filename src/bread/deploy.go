@@ -63,7 +63,8 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 	}
 	sort.Strings(targets)
 	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: "Deployment targets: " + strings.Join(targets, ", "),
+		HTML: "Deployment targets: " + strings.Join(targets, ", "),
+		Text: strings.Join(targets, " "),
 	})
 }
 
@@ -237,7 +238,13 @@ func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.Tri
 		return nil, err
 	}
 	_, _ = operator.Reply(s, ctx, req, &operator.Message{
-		Text: fmt.Sprintf("Build %s@%s deployed to service %s. Waiting for service to rollover...", req.Target, req.Build, t.ECSService),
+		Text: *newTask.TaskDefinition.TaskDefinitionArn,
+		HTML: fmt.Sprintf(
+			"Updated service %s on ECS cluster %s to run build %s. Waiting up to %s for service rollover...",
+			*svc.Services[0].ServiceName,
+			t.ECSCluster,
+			s.conf.ECSTimeout,
+		),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "yellow",
 		},
@@ -391,7 +398,6 @@ func (s *deployAPIServer) doCanoe(ctx context.Context, meth, path, body string) 
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)

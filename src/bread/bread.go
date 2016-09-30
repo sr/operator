@@ -109,7 +109,7 @@ var (
 			Image:         "build/bread/canoe/app",
 		},
 		{
-			Name:          "canoe",
+			Name:          "hal9000",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
