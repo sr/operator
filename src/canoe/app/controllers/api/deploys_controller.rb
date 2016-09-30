@@ -19,6 +19,11 @@ module Api
         return
       end
 
+      if !user.deploy_authorized?(current_project, current_target)
+        render json: { error: true, message: "User #{params[:user_email]} is not authorized to deploy" }
+        return
+      end
+
       deploy_request = DeployRequest.new(
         current_project,
         current_target,
