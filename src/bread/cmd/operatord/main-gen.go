@@ -76,6 +76,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				ctx,
 				&breadpb.SlowLorisRequest{
 					Request: req,
+					Wait:    req.Call.Args["wait"],
 				},
 			)
 			return err

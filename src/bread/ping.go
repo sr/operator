@@ -2,6 +2,7 @@ package bread
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/sr/operator"
@@ -38,7 +39,17 @@ func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*oper
 }
 
 func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
-	time.Sleep(time.Duration(10) * time.Second)
+	var dur time.Duration
+	if req.Wait == "" {
+		dur = 10 * time.Second
+	} else {
+		i, err := strconv.Atoi(req.Wait)
+		if err != nil {
+			return nil, err
+		}
+		dur = time.Duration(i) * time.Second
+	}
+	time.Sleep(dur)
 	return operator.Reply(s, ctx, req, &operator.Message{
 		Text: "https://66.media.tumblr.com/500736338e23d5b5adb0201b6b74cbc9/tumblr_mmyemrrqkq1s1fx0zo1_500.gif",
 		Options: &operatorhipchat.MessageOptions{

@@ -195,8 +195,14 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "slow-loris",
 					Synopsis: `Undocumented.`,
-					Flags:    []*flag.Flag{},
+					Flags: []*flag.Flag{
+						{
+							Name:  "wait",
+							Usage: "Undocumented.",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
+						wait := ctx.Flags.String("wait", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -210,6 +216,7 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&breadpb.SlowLorisRequest{
 								Request: ctx.Request,
+								Wait:    *wait,
 							},
 						)
 						if err != nil {
