@@ -61,19 +61,24 @@ class DeploysController < ApplicationController
   end
 
   def create
-    prov_deploy = build_provisional_deploy
-
-    if !prov_deploy
-      return render_invalid_provisional_deploy
-    end
+    servers =
+      if params[:servers] == "on"
+        params.fetch(:server_hostnames, [])
+      else
+        []
+      end
 
     deploy_request = DeployRequest.new(
       current_project,
       current_target,
       current_user,
-      params
+      params[:artifact_url],
+      (params[:lock] == "on"),
+      servers,
+      params[:options]
     )
-    deploy_response = deploy_request.handle(prov_deploy)
+
+    deploy_response = deploy_request.handle
 
     if deploy_response.error?
       flash[:notice] = deploy_response.error_message

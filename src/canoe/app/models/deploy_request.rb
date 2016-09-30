@@ -48,14 +48,17 @@ class DeployRequest
     end
   end
 
-  def initialize(project, target, user, params)
+  def initialize(project, target, user, artifact_url, lock, servers, options)
     @project = project
     @target = target
     @user = user
-    @params = params
+    @artifact_url = artifact_url
+    @lock = lock
+    @servers = servers
+    @options = options
   end
 
-  def handle(prov_deploy)
+  def handle
     if !@project
       return Response.error(ERROR_NO_PROJECT)
     end
@@ -72,11 +75,11 @@ class DeployRequest
       return Response.error(ERROR_DUPLICATE)
     end
 
-    if prov_deploy.nil?
+    if !build
       return Response.error(ERROR_NO_DEPLOY)
     end
 
-    if !prov_deploy.valid?
+    if !build.valid?
       return Response.error(ERROR_INVALID_SHA)
     end
 
@@ -84,15 +87,15 @@ class DeployRequest
       target: @target,
       user: @user,
       project: @project,
-      branch: prov_deploy.branch,
-      sha: prov_deploy.sha,
-      build_number: prov_deploy.build_number,
-      artifact_url: prov_deploy.artifact_url,
-      passed_ci: prov_deploy.passed_ci,
-      lock: (@params[:lock] == "on"),
-      server_hostnames: (@params[:servers] == "on" && @params.fetch(:server_hostnames, [])),
-      options_validator: prov_deploy.options_validator,
-      options: @params[:options],
+      branch: build.branch,
+      sha: build.sha,
+      build_number: build.build_number,
+      artifact_url: build.artifact_url,
+      passed_ci: build.passed_ci,
+      lock: @lock,
+      server_hostnames: @servers,
+      options_validator: build.options_validator,
+      options: @options,
     )
 
     if the_deploy
@@ -103,6 +106,10 @@ class DeployRequest
   end
 
   private
+
+  def build
+    @build ||= Build.from_artifact_url(@project, @artifact_url)
+  end
 
   def deployer
     @deployer ||= Canoe::Deployer.new
