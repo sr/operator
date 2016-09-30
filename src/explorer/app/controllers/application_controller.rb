@@ -116,8 +116,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   def target_url
     # After auth we'll want to reconfirm before submitting a POST
     request.method == "GET" ? request.original_url : request.referer
