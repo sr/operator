@@ -56,6 +56,7 @@ Rails.application.routes.draw do
   post "/api/chef/complete_deploy", to: "api/chef_deploys#complete_deploy"
   post "/api/chef/knife", to: "api/chef_deploys#knife"
   post "/api/targets/:target_name/deploys", to: "api/deploys#create"
+  get "/api/projects", to: "api/projects#index"
 
   get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"
