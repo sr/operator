@@ -172,6 +172,9 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	if req == nil {
 		return nil, errors.New("unable to reply to request with a source")
 	}
+	if msg == nil {
+		return nil, errors.New("unable to reply without a message")
+	}
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
