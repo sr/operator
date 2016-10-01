@@ -11,7 +11,6 @@ import (
 	"github.com/GeertJohan/yubigo"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -255,15 +254,33 @@ func NewServer(
 		deploy.CanoeURL != "" &&
 		deploy.CanoeAPIKey != "" &&
 		deploy.AWSRegion != "" {
-		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
 		breadpb.RegisterDeployServer(server, &deployAPIServer{
 			repl,
-			ecs.New(sess),
-			ecr.New(sess),
 			deploy,
 			&http.Client{},
-			ECSDeployTargets,
 			timezone,
+			&canoeDeployer{
+				repl,
+				deploy.CanoeURL,
+				deploy.CanoeAPIKey,
+				&http.Client{},
+			},
+			&ecsDeployer{
+				repl,
+				deploy.ArtifactoryURL,
+				deploy.ArtifactoryRepo,
+				deploy.ArtifactoryUsername,
+				deploy.ArtifactoryAPIKey,
+				ecs.New(
+					session.New(
+						&aws.Config{
+							Region: aws.String(deploy.AWSRegion),
+						},
+					),
+				),
+				ECSDeployTargets,
+				deploy.ECSTimeout,
+			},
 		})
 	}
 	return server, nil
