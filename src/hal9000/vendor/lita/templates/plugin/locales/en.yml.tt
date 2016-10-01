@@ -1,4 +1,0 @@
-en:
-  lita:
-    <%= config[:namespace] %>:
-      <%= config[:name] %>:

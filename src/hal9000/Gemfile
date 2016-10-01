@@ -3,7 +3,7 @@ source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 gem "activesupport", "~> 5.0"
 gem "grpc", "~> 1.0.0"
 gem "hipchat", "~> 1.5.4"
-gem "lita",  path: "vendor/lita"
+gem "lita",  "~> 4.7.0"
 gem "pagerduty", "~> 2.1.0"
 gem "zabbixapi", "~> 2.4"
 
