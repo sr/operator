@@ -85,7 +85,7 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
-const reCommandMessage = `\A%s(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`
+const ReCommandMessage = `\A%s(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`
 
 func NewHandler(
 	ctx context.Context,
@@ -95,7 +95,7 @@ func NewHandler(
 	pkg string,
 	prefix string,
 ) (http.Handler, error) {
-	re, err := regexp.Compile(fmt.Sprintf(reCommandMessage, regexp.QuoteMeta(prefix)))
+	re, err := regexp.Compile(fmt.Sprintf(ReCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
 		return nil, err
 	}
