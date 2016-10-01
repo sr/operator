@@ -16,19 +16,19 @@ import (
 )
 
 {{- range .Services}}
-type {{.FullName}}Client struct {
-	server {{.PackageName}}.{{.FullName}}Server
+type {{.Name}}Client struct {
+	server {{.PackageName}}.{{.Name}}Server
 }
 {{end}}
 
 {{- range .Services}}
-func New{{.FullName}}Client(server {{.PackageName}}.{{.FullName}}Server) {{.PackageName}}.{{.FullName}}Client {
-	return &{{.FullName}}Client{server: server}
+func New{{.Name}}Client(server {{.PackageName}}.{{.Name}}Server) {{.PackageName}}.{{.Name}}Client {
+	return &{{.Name}}Client{server: server}
 }
 {{end}}
 
 {{- range .Services}}
-{{- $svc := .FullName }}
+{{- $svc := .Name }}
 {{- $pkg := .PackageName }}
 {{- range .Methods }}
 func (c *{{$svc}}Client) {{camelCase .Name}}(

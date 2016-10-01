@@ -5,8 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"regexp"
+	"strings"
+	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -20,12 +23,7 @@ type Authorizer interface {
 }
 
 type Instrumenter interface {
-	Instrument(*Request)
-}
-
-type Logger interface {
-	Info(proto.Message)
-	Error(proto.Message)
+	Instrument(*Event)
 }
 
 type Requester interface {
@@ -40,9 +38,16 @@ type Replier interface {
 	Reply(context.Context, *Source, string, *Message) error
 }
 
-type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
+type Invoker interface {
+	Invoke(context.Context, *Message, *Request)
+}
 
-type ServerBuilder func(Replier, *grpc.Server, *flag.FlagSet) (map[string]error, error)
+type Event struct {
+	Key     string
+	Message *Message
+	Request *Request
+	Error   error
+}
 
 type Message struct {
 	Source  *Source
@@ -80,32 +85,82 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
-func NewLogger() Logger {
-	return newLogger()
-}
-
-func NewInstrumenter(logger Logger) Instrumenter {
-	return newInstrumenter(logger)
-}
+const reCommandMessage = `\A%s(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`
 
 func NewHandler(
-	logger Logger,
-	instrumenter Instrumenter,
-	authorizer Authorizer,
+	ctx context.Context,
+	inst Instrumenter,
 	decoder Decoder,
-	prefix string,
-	conn *grpc.ClientConn,
 	invoker Invoker,
+	pkg string,
+	prefix string,
 ) (http.Handler, error) {
-	return newHandler(
-		logger,
-		instrumenter,
-		authorizer,
+	re, err := regexp.Compile(fmt.Sprintf(reCommandMessage, regexp.QuoteMeta(prefix)))
+	if err != nil {
+		return nil, err
+	}
+	return &handler{
+		ctx,
+		inst,
 		decoder,
-		prefix,
-		conn,
 		invoker,
-	)
+		re,
+		pkg,
+	}, nil
+}
+
+type InvokerFunc func(context.Context, *grpc.ClientConn, *Request, string) error
+
+func NewInvoker(
+	conn *grpc.ClientConn,
+	inst Instrumenter,
+	replier Replier,
+	f InvokerFunc,
+	timeout time.Duration,
+	pkg string,
+) Invoker {
+	return &invoker{
+		conn,
+		timeout,
+		inst,
+		replier,
+		f,
+		pkg,
+	}
+}
+
+func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		in interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		requester, ok := in.(interface {
+			GetRequest() *Request
+		})
+		req := requester.GetRequest()
+		if !ok || req == nil {
+			return nil, ErrInvalidRequest
+		}
+		s := strings.Split(info.FullMethod, "/")
+		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
+			return nil, ErrInvalidRequest
+		}
+		req.Call = &Call{Service: s[1], Method: s[2]}
+		if err := auth.Authorize(ctx, req); err != nil {
+			inst.Instrument(&Event{Key: "request_unauthorized", Request: req, Error: err})
+			return nil, err
+		}
+		start := time.Now()
+		resp, err := handler(ctx, in)
+		if err != nil {
+			req.Call.Error = err.Error()
+		}
+		req.Call.Duration = ptypes.DurationProto(time.Since(start))
+		inst.Instrument(&Event{Key: "request_handled", Request: req, Error: err})
+		return resp, err
+	}
 }
 
 func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {
@@ -120,11 +175,7 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
 	}
-	err := rep.Reply(ctx, src, req.ReplierId, msg)
-	if err != nil {
-		fmt.Printf("DEBUG reply err: %s\n", err)
-	}
-	return &Response{Message: msg.Text}, err
+	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
 }
 
 func (r *Request) UserEmail() string {

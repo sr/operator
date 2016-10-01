@@ -2,6 +2,8 @@ class Project < ApplicationRecord
   ARTIFACTORY_REPO = "pd-canoe".freeze
   GITHUB_URL = "https://git.dev.pardot.com".freeze
 
+  has_many :deploy_notifications
+
   def test_list
     case name
     when "pardot"
@@ -15,6 +17,10 @@ class Project < ApplicationRecord
     else
       {}
     end
+  end
+
+  def titleized_name
+    @friendly_name ||= name.titleize
   end
 
   def to_param

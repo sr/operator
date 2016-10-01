@@ -1,6 +1,6 @@
 <h1>
   <%= content_tag :i, "", class: "icon-#{current_project.icon}" %>
-  <%= current_project.name.capitalize %>
+  <%= current_project.titleized_name %>
 </h1>
 
 <h2 class="steps-count">Step 2 of 3</h2>
@@ -14,7 +14,7 @@
 <br>
 
 <p class="lead muted">
-  Select the <i class="icon-bullseye"></i> for <span class='project'><%= @prov_deploy.project_name %></span> deployment.
+  Select the <i class="icon-bullseye"></i> for <span class='project'><%= @prov_deploy.project_name.titleize %></span> deployment.
 </p>
 
 <% @targets.each do |target| %>

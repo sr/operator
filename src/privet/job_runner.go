@@ -101,6 +101,8 @@ func (r *JobRunner) NotifyQueueEmpty(ch chan<- bool) {
 			// the queue is empty.
 			close(ch)
 			break
+		} else if err != nil {
+			log.Printf("error checking queue stats; retrying in a few seconds: %v", err)
 		} else if queueStats.UnitsInQueue == 0 {
 			close(ch)
 			break

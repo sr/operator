@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#/ Usage: tarball-upload <git-sha1> <build-green> <tarball>
+#/ Uploads the tarball to Artifactory.
+#/ This requires the JFrog CLI to be available in the PATH.
+set -euo pipefail
+cd "$(dirname "$0")/../../.."
+
+test $# -eq 3 || {
+  grep ^#/ < "$0" | cut -c4-
+  exit 1
+}
+sha1="${1:-""}"
+green="${2:-"false"}"
+tarball="${3:-""}"
+
+props="bambooProject=${CI_PROJECT};"
+props+="bambooPlan=${CI_PLAN};"
+props+="bambooJob=${CI_JOB};"
+props+="gitBranch=${CI_BRANCH};"
+props+="gitRepo=${BAMBOO_REPO_URL};"
+props+="gitSha=${sha1};"
+props+="buildNumber=${CI_BUILD_NUMBER};"
+props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP};"
+props+="buildResults=${BAMBOO_BUILD_RESULTS_URL};"
+props+="passedCI=${green};"
+
+gzip --stdout "$tarball" > "${tarball}.gz"
+
+# Upload the tarball to Artifactory using the official CLI
+jfrog rt upload \
+    --url "$ARTIFACTORY_URL" \
+    --user "$ARTIFACTORY_USERNAME" \
+    --password "$ARTIFACTORY_PASSWORD" \
+    --props  "$props" \
+    "${tarball}.gz" \
+    "${CANOE_ARTIFACTORY_REPO}/${CI_PROJECT}/${CI_PLAN}/${CI_PLAN}-${CI_JOB}-${CI_BUILD_NUMBER}.tar.gz"

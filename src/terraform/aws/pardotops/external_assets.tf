@@ -1,7 +1,3 @@
-variable "pardot_ci_vpc_cidr" {
-  default = "172.27.0.0/16"
-}
-
 variable "pardot_ci_to_pardotops_appdev_vpc_peering_connection_id" {
   default = "pcx-70fc7219"
 }
@@ -20,4 +16,8 @@ variable "pardot_atlassian_vpc_id" {
 
 variable "pardot_ci_nat_gw_public_ip" {
   default = "52.200.146.253"
+}
+
+variable "elastic_load_balancing_acct_number" {
+  default = "127311923021"
 }

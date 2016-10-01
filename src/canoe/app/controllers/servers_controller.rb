@@ -1,6 +1,6 @@
 class ServersController < ApplicationController
   def index
-    @servers = Server.includes(:projects, :server_tags).order(hostname: :asc)
+    @servers = Server.active.includes(:projects, :server_tags).order(hostname: :asc)
   end
 
   def new

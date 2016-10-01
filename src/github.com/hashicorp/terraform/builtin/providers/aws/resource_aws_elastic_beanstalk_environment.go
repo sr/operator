@@ -97,7 +97,6 @@ func resourceAwsElasticBeanstalkEnvironment() *schema.Resource {
 			"setting": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				Computed: true,
 				Elem:     resourceAwsElasticBeanstalkOptionSetting(),
 				Set:      optionSettingValueHash,
 			},
@@ -329,7 +328,47 @@ func resourceAwsElasticBeanstalkEnvironmentUpdate(d *schema.ResourceData, meta i
 		os := o.(*schema.Set)
 		ns := n.(*schema.Set)
 
-		updateOpts.OptionSettings = extractOptionSettings(ns.Difference(os))
+		rm := extractOptionSettings(os.Difference(ns))
+		add := extractOptionSettings(ns.Difference(os))
+
+		// Additions and removals of options are done in a single API call, so we
+		// can't do our normal "remove these" and then later "add these", re-adding
+		// any updated settings.
+		// Because of this, we need to remove any settings in the "removable"
+		// settings that are also found in the "add" settings, otherwise they
+		// conflict. Here we loop through all the initial removables from the set
+		// difference, and delete from the slice any items found in both `add` and
+		// `rm` above
+		if len(add) > 0 {
+			for i, r := range rm {
+				for _, a := range add {
+					// ResourceNames are optional. Some defaults come with it, some do
+					// not. We need to guard against nil/empty in state as well as
+					// nil/empty from the API
+					if a.ResourceName != nil {
+						if r.ResourceName == nil {
+							continue
+						}
+						if *r.ResourceName != *a.ResourceName {
+							continue
+						}
+					}
+					if *r.Namespace == *a.Namespace && *r.OptionName == *a.OptionName {
+						log.Printf("[DEBUG] Removing Beanstalk setting: (%s::%s)", *a.Namespace, *a.OptionName)
+						rm = append(rm[:i], rm[i+1:]...)
+					}
+				}
+			}
+		}
+
+		for _, elem := range rm {
+			updateOpts.OptionsToRemove = append(updateOpts.OptionsToRemove, &elasticbeanstalk.OptionSpecification{
+				Namespace:  elem.Namespace,
+				OptionName: elem.OptionName,
+			})
+		}
+
+		updateOpts.OptionSettings = add
 	}
 
 	if d.HasChange("template_name") {

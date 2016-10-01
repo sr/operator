@@ -48,12 +48,12 @@ module ReplicationFixing
     end
 
     def current_fixes
-      @redis.keys([SHARD_NAMESPACE, @datacenter, "*"].join(":")).sort.map do |key|
+      @redis.keys([SHARD_NAMESPACE, @datacenter, "*"].join(":")).sort.map { |key|
         _, datacenter, prefix, shard_id = key.split(":")
 
         shard = Shard.new(prefix, shard_id.to_i, datacenter)
         status(shard: shard)
-      end.select(&:fixing?)
+      }.select(&:fixing?)
     end
   end
 end

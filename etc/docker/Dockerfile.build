@@ -1,1 +1,2 @@
 FROM docker.dev.pardot.com/base/bread/bread
+ENV PATH "/data/src/build:$PATH"

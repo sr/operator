@@ -10,9 +10,7 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
 <%= distance_of_time_in_words(rate_limit.resets_in) %> before refreshing.
 </p>
 <%- end %>
-<p>
-<pre><%= query.parsed.sql %></pre>
-</p>
+<label id="parsed_label">Parsed Query</label><pre id="parsed_sql"><%= query.parsed.to_sql %></pre>
 <div>
   <table class="table table-striped">
     <thead>
@@ -20,8 +18,9 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
     <% results.fields.each_with_index do |field, i| %>
       <th>
         <%= link_to field, "#", class: 'select_column' %>
+        <%# TODO Bring this functionality back %>
         <% if !query.parsed.select_all? && (i == results.fields.length-1) %>
-          <%= select_tag(:add_column, options_for_select(table_columns.unshift("Add column", "Show all"))) %>
+          <%= select_tag(:add_column, options_for_select(query.database_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>
     <% end %>
@@ -38,4 +37,5 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
     </tbody>
   </table>
 </div>
-<%= link_to("Show All Rows", "#", class: "all_rows") if false %> <!-- TODO(sr) Sup ->
+<%# Only enabling this for shards right now. Will see what the query usage is on global before enabling %>
+<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !@show_all_rows %>

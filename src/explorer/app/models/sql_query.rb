@@ -1,24 +1,29 @@
 class SQLQuery
-  class ParseError < StandardError
+  def initialize(query)
+    @ast = SQLParser::Parser.new.scan_str(query.sub(/;$/, ""))
+  rescue Racc::ParseError, SQLParser::Parser::ScanError
+    raise ArgumentError, $!.message
   end
 
-  def self.parse(query)
-    ast = SQLParser::Parser.new.scan_str(query)
-    new(ast)
-  rescue Racc::ParseError
-    raise ParseError, $!.message
-  end
-
-  def initialize(ast)
-    @ast = ast
-  end
-
-  def sql
+  def to_sql
     @ast.to_sql
   end
 
   def select_all?
     @ast.to_sql.starts_with?("SELECT *")
+  end
+
+  def first_table
+    table = @ast.query_expression.table_expression.from_clause.tables.first
+    levels = 0
+    begin
+      levels += 1
+      table.name
+    rescue NoMethodError
+      table = table.left.left.value
+      retry unless levels > 3
+      raise NoMethodError, $!.message
+    end
   end
 
   def limit(count)

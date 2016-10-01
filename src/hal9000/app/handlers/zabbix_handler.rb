@@ -9,13 +9,15 @@ require "zabbix/test_pager"
 class ZabbixHandler < ApplicationHandler
   module HumanTime
     def self.parse(str, now: Time.now)
-      if /^([+-]?\d+)(d|day|day)$/ =~ str
+      if /^([+-]?\d+)(w|wk|wks|week|weeks)$/i =~ str
+        Time.now + Regexp.last_match(1).to_i * 60 * 60 * 24 * 7
+      elsif /^([+-]?\d+)(d|day|day)$/i =~ str
         Time.now + Regexp.last_match(1).to_i * 60 * 60 * 24
-      elsif /^([+-]?\d+)(h|hr|hrs|hour|hours)$/ =~ str
+      elsif /^([+-]?\d+)(h|hr|hrs|hour|hours)$/i =~ str
         Time.now + Regexp.last_match(1).to_i * 60 * 60
-      elsif /^([+-]?\d+)(m|min|mins|minute|minutes)$/ =~ str
+      elsif /^([+-]?\d+)(m|min|mins|minute|minutes)$/i =~ str
         Time.now + Regexp.last_match(1).to_i * 60
-      elsif /^([+-]?\d+)(s|sec|secs|second|seconds)$/ =~ str
+      elsif /^([+-]?\d+)(s|sec|secs|second|seconds)$/i =~ str
         Time.now + Regexp.last_match(1).to_i
       else
         Time.parse(str)
@@ -37,7 +39,7 @@ class ZabbixHandler < ApplicationHandler
   config :zabbix_password, required: "changeme"
 
   # config: datacenters
-  config :datacenters, default: ["dfw"]
+  config :datacenters, default: %w[dfw phx]
   config :default_datacenter, default: "dfw"
 
   # config: hal9000's "home room"

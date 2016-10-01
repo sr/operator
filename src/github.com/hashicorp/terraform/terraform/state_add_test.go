@@ -194,6 +194,90 @@ func TestStateAdd(t *testing.T) {
 			nil,
 		},
 
+		"ModuleState with children => Module Addr (new)": {
+			false,
+			"module.foo",
+			"module.bar",
+
+			[]*ModuleState{
+				{
+					Path:      []string{"root", "foo"},
+					Resources: map[string]*ResourceState{},
+				},
+
+				{
+					Path: []string{"root", "foo", "child1"},
+					Resources: map[string]*ResourceState{
+						"test_instance.foo": {
+							Type: "test_instance",
+							Primary: &InstanceState{
+								ID: "foo",
+							},
+						},
+					},
+				},
+
+				{
+					Path: []string{"root", "foo", "child2"},
+					Resources: map[string]*ResourceState{
+						"test_instance.foo": {
+							Type: "test_instance",
+							Primary: &InstanceState{
+								ID: "foo",
+							},
+						},
+					},
+				},
+
+				// Should be ignored
+				{
+					Path: []string{"root", "baz", "child2"},
+					Resources: map[string]*ResourceState{
+						"test_instance.foo": {
+							Type: "test_instance",
+							Primary: &InstanceState{
+								ID: "foo",
+							},
+						},
+					},
+				},
+			},
+
+			&State{},
+			&State{
+				Modules: []*ModuleState{
+					{
+						Path:      []string{"root", "bar"},
+						Resources: map[string]*ResourceState{},
+					},
+
+					{
+						Path: []string{"root", "bar", "child1"},
+						Resources: map[string]*ResourceState{
+							"test_instance.foo": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+						},
+					},
+
+					{
+						Path: []string{"root", "bar", "child2"},
+						Resources: map[string]*ResourceState{
+							"test_instance.foo": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
 		"ResourceState => Resource Addr (new)": {
 			false,
 			"aws_instance.bar",
@@ -279,6 +363,135 @@ func TestStateAdd(t *testing.T) {
 								Primary: &InstanceState{
 									ID:      "foo",
 									Tainted: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		"ResourceState with count unspecified => Resource Addr (new)": {
+			false,
+			"aws_instance.bar",
+			"aws_instance.foo",
+			[]*ResourceState{
+				{
+					Type: "test_instance",
+					Primary: &InstanceState{
+						ID: "foo",
+					},
+				},
+
+				{
+					Type: "test_instance",
+					Primary: &InstanceState{
+						ID: "bar",
+					},
+				},
+			},
+
+			&State{},
+			&State{
+				Modules: []*ModuleState{
+					{
+						Path: []string{"root"},
+						Resources: map[string]*ResourceState{
+							"aws_instance.foo.0": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+
+							"aws_instance.foo.1": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "bar",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		"ResourceState with count unspecified => Resource Addr (new with count)": {
+			true,
+			"aws_instance.bar",
+			"aws_instance.foo[0]",
+			[]*ResourceState{
+				{
+					Type: "test_instance",
+					Primary: &InstanceState{
+						ID: "foo",
+					},
+				},
+
+				{
+					Type: "test_instance",
+					Primary: &InstanceState{
+						ID: "bar",
+					},
+				},
+			},
+
+			&State{},
+			nil,
+		},
+
+		"ResourceState with single count unspecified => Resource Addr (new with count)": {
+			false,
+			"aws_instance.bar",
+			"aws_instance.foo[0]",
+			[]*ResourceState{
+				{
+					Type: "test_instance",
+					Primary: &InstanceState{
+						ID: "foo",
+					},
+				},
+			},
+
+			&State{},
+			&State{
+				Modules: []*ModuleState{
+					{
+						Path: []string{"root"},
+						Resources: map[string]*ResourceState{
+							"aws_instance.foo.0": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		"ResourceState => Resource Addr (new with count)": {
+			false,
+			"aws_instance.bar",
+			"aws_instance.foo[0]",
+			&ResourceState{
+				Type: "test_instance",
+				Primary: &InstanceState{
+					ID: "foo",
+				},
+			},
+
+			&State{},
+			&State{
+				Modules: []*ModuleState{
+					{
+						Path: []string{"root"},
+						Resources: map[string]*ResourceState{
+							"aws_instance.foo.0": {
+								Type: "test_instance",
+								Primary: &InstanceState{
+									ID: "foo",
 								},
 							},
 						},
@@ -420,8 +633,8 @@ func TestStateAdd(t *testing.T) {
 
 		// Verify equality
 		if !tc.One.Equal(tc.Two) {
-			t.Fatalf("Bad: %s\n\n%#v\n\n%#v", k, tc.One, tc.Two)
-			//t.Fatalf("Bad: %s\n\n%s\n\n%s", k, tc.One.String(), tc.Two.String())
+			//t.Fatalf("Bad: %s\n\n%#v\n\n%#v", k, tc.One, tc.Two)
+			t.Fatalf("Bad: %s\n\n%s\n\n%s", k, tc.One.String(), tc.Two.String())
 		}
 	}
 }

@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/../.."
+exec rubocop \
+  --config "$(pwd)/etc/rubocop.yml" \
+  --format "emacs" \
+  --fail-level "C" \
+  --rails \
+  --display-style-guide \
+  --display-cop-names \
+  "$@"

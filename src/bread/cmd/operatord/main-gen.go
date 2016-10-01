@@ -2,68 +2,94 @@
 package main
 
 import (
-	"errors"
-	"flag"
-	"os"
-	"strings"
+	"fmt"
 
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	ping "bread/ping"
+	breadpb "bread/pb"
 )
 
-func buildOperatorServer(replier operator.Replier, server *grpc.Server, flags *flag.FlagSet) (map[string]error, error) {
-	pingConfig := &ping.PingerConfig{}
-	services := make(map[string]error)
-	if err := flags.Parse(os.Args[1:]); err != nil {
-		return services, err
-	}
-	errs := make(map[string][]string)
-	if len(errs["ping"]) != 0 {
-		services["ping"] = errors.New("required flag(s) missing: " + strings.Join(errs["ping"], ", "))
-	} else {
-		pingServer, err := ping.NewAPIServer(replier, pingConfig)
-		if err != nil {
-			services["ping"] = err
-		} else {
-			ping.RegisterPingerServer(server, pingServer)
-			services["ping"] = nil
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
+	if req.Call.Service == fmt.Sprintf("%s.Deploy", pkg) {
+		if req.Call.Method == "ListTargets" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListTargets(
+				ctx,
+				&breadpb.ListTargetsRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "ListBuilds" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListBuilds(
+				ctx,
+				&breadpb.ListBuildsRequest{
+					Request: req,
+					Target:  req.Call.Args["target"],
+					Branch:  req.Call.Args["branch"],
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "Trigger" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.Trigger(
+				ctx,
+				&breadpb.TriggerRequest{
+					Request: req,
+					Target:  req.Call.Args["target"],
+					Build:   req.Call.Args["build"],
+				},
+			)
+			return err
 		}
 	}
-	return services, nil
-}
-
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "ping" {
-		if req.Call.Method == "ping" {
-			client := ping.NewPingerClient(conn)
+	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
+		if req.Call.Method == "Otp" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.Otp(
+				ctx,
+				&breadpb.OtpRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "Ping" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.Ping(
 				ctx,
-				&ping.PingRequest{
+				&breadpb.PingRequest{
 					Request: req,
-					Arg1:    args["arg1"],
+					Arg1:    req.Call.Args["arg1"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
-		if req.Call.Method == "whoami" {
-			client := ping.NewPingerClient(conn)
+		if req.Call.Method == "SlowLoris" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.SlowLoris(
+				ctx,
+				&breadpb.SlowLorisRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "Whoami" {
+			client := breadpb.NewPingClient(conn)
 			_, err := client.Whoami(
 				ctx,
-				&ping.WhoamiRequest{
+				&breadpb.WhoamiRequest{
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 	}
-	return false, nil
+	return fmt.Errorf("not found: service=%s method=%s", req.Call.Service, req.Call.Method)
 }

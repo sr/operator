@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
@@ -73,21 +71,10 @@ func resourceAwsSqsQueue() *schema.Resource {
 				Default:  30,
 			},
 			"policy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				StateFunc: func(v interface{}) string {
-					s, ok := v.(string)
-					if !ok || s == "" {
-						return ""
-					}
-					jsonb := []byte(s)
-					buffer := new(bytes.Buffer)
-					if err := json.Compact(buffer, jsonb); err != nil {
-						log.Printf("[WARN] Error compacting JSON for Policy in SNS Queue, using raw string: %s", err)
-						return s
-					}
-					return buffer.String()
-				},
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressEquivalentAwsPolicyDiffs,
+				Computed:         true,
 			},
 			"redrive_policy": {
 				Type:      schema.TypeString,
@@ -169,7 +156,9 @@ func resourceAwsSqsQueueUpdate(d *schema.ResourceData, meta interface{}) error {
 			QueueUrl:   aws.String(d.Id()),
 			Attributes: attributes,
 		}
-		sqsconn.SetQueueAttributes(req)
+		if _, err := sqsconn.SetQueueAttributes(req); err != nil {
+			return fmt.Errorf("[ERR] Error updating SQS attributes: %s", err)
+		}
 	}
 
 	return resourceAwsSqsQueueRead(d, meta)

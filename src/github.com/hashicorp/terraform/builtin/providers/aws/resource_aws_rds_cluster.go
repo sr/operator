@@ -85,6 +85,11 @@ func resourceAwsRDSCluster() *schema.Resource {
 				Computed: true,
 			},
 
+			"reader_endpoint": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
 			"engine": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -274,7 +279,7 @@ func resourceAwsRDSClusterCreate(d *schema.ResourceData, meta interface{}) error
 				Pending:    []string{"creating", "backing-up", "modifying"},
 				Target:     []string{"available"},
 				Refresh:    resourceAwsRDSClusterStateRefreshFunc(d, meta),
-				Timeout:    15 * time.Minute,
+				Timeout:    40 * time.Minute,
 				MinTimeout: 3 * time.Second,
 				Delay:      30 * time.Second, // Wait 30 secs before starting
 			}
@@ -373,7 +378,7 @@ func resourceAwsRDSClusterCreate(d *schema.ResourceData, meta interface{}) error
 		Pending:    []string{"creating", "backing-up", "modifying"},
 		Target:     []string{"available"},
 		Refresh:    resourceAwsRDSClusterStateRefreshFunc(d, meta),
-		Timeout:    15 * time.Minute,
+		Timeout:    40 * time.Minute,
 		MinTimeout: 3 * time.Second,
 	}
 
@@ -443,6 +448,7 @@ func resourceAwsRDSClusterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("preferred_backup_window", dbc.PreferredBackupWindow)
 	d.Set("preferred_maintenance_window", dbc.PreferredMaintenanceWindow)
 	d.Set("kms_key_id", dbc.KmsKeyId)
+	d.Set("reader_endpoint", dbc.ReaderEndpoint)
 
 	var vpcg []string
 	for _, g := range dbc.VpcSecurityGroups {

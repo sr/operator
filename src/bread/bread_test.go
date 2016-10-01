@@ -3,15 +3,40 @@ package bread_test
 import (
 	"bread"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 )
 
-func TestLDAPAuthorizer(t *testing.T) {
+var ldapEnabled bool
+
+func init() {
+	flag.BoolVar(&ldapEnabled, "ldap", false, "")
+	flag.Parse()
+}
+
+type fakeOTPVerifier struct {
+	ok bool
+}
+
+func (v *fakeOTPVerifier) Verify(otp string) error {
+	if !v.ok {
+		return errors.New("boomtown")
+	}
+	return nil
+}
+
+func (v *fakeOTPVerifier) fail() {
+	v.ok = false
+}
+
+func TestAuthorizer(t *testing.T) {
 	var host, port string
 	if v, ok := os.LookupEnv("LDAP_PORT_389_TCP_ADDR"); ok {
 		host = v
@@ -20,33 +45,76 @@ func TestLDAPAuthorizer(t *testing.T) {
 		port = v
 	}
 	if host == "" || port == "" {
-		t.Skip("LDAP_PORT_389_TCP_{ADDR,PORT} not set")
+		if ldapEnabled {
+			t.Fatal("ldap flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
+		}
+		t.Skip("ldap flag set but LDAP_PORT_389_TCP_{ADDR,PORT} not set")
 	}
-	auth := bread.NewLDAPAuthorizer(&bread.LDAPConfig{
-		Address: fmt.Sprintf("%s:%s", host, port),
-	})
-	sr := "srozet@salesforce.com"
+	ldapAddr := fmt.Sprintf("%s:%s", host, port)
+	var (
+		i    int
+		conn *ldap.Conn
+		err  error
+	)
+	for {
+		conn, err = ldap.Dial("tcp", ldapAddr)
+		if err != nil {
+			continue
+		}
+		err = conn.Bind("", "")
+		if err == nil {
+			break
+		}
+		if i >= 500 {
+			t.Fatal(err)
+		}
+		time.Sleep(1 * time.Millisecond)
+		i = i + 1
+	}
+	defer conn.Close()
+	otpVerifier := &fakeOTPVerifier{true}
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, bread.ACL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	swe := "srozet@salesforce.com" // yubiKeyId: ccccccdluefe
+	noYubiKey := "mlockhart@salesforce.com"
+	unknown := "boom@gmail.com"
+	validOTP := "ccccccdluefelbvvgdbehnlutdbbnnfgggvgbbjcdltu"
 	for _, tc := range []struct {
 		user    string
 		service string
 		method  string
+		otp     string
+		otpOK   bool
 		err     error
 	}{
-		{sr, "ping", "ping", nil},
-		{"", "ping", "ping", errors.New("unable to authorize request without an user email")},
-		{sr, "ping", "pong", errors.New("no ACL defined for ping.pong")},
-		{"boom@gmail.com", "ping", "ping", errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "Ping", "", true, nil},
+		{swe, "bread.Ping", "PingPong", "", true, nil},
+		{swe, "bread.Ping", "Whoami", "", true, nil},
+		{"", "bread.Ping", "Ping", "", true, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.Ping", "Pong", "", true, errors.New("no ACL entry found for command `bread.Ping Pong`")},
+		{unknown, "bread.Ping", "Ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "Otp", validOTP, true, nil},
+		{noYubiKey, "bread.Ping", "Otp", validOTP, true, fmt.Errorf("user `%s` does not have a Yubikey ID", noYubiKey)},
+		{swe, "bread.Ping", "Otp", "", true, errors.New("command `bread.Ping Otp` requires a Yubikey OTP")},
+		{swe, "bread.Ping", "Otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.Ping", "Otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
 	} {
+		if !tc.otpOK {
+			otpVerifier.fail()
+		}
 		err := auth.Authorize(context.Background(), &operator.Request{
+			Call: &operator.Call{
+				Service: tc.service,
+				Method:  tc.method,
+			},
+			Otp: tc.otp,
 			Source: &operator.Source{
 				Type: operator.SourceType_HUBOT,
 				User: &operator.User{
 					Email: tc.user,
 				},
-			},
-			Call: &operator.Call{
-				Service: tc.service,
-				Method:  tc.method,
 			},
 		})
 		if err == nil {

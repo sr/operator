@@ -39,16 +39,10 @@ func main() {
 	if bindAddress != "" {
 		go exitAfterTimeout(time.Duration(timeout) * time.Second)
 
-		listener, err := net.Listen("tcp", bindAddress)
-		if err != nil {
-			log.Fatalf("failed to bind: %v", err)
-		}
-
 		server := grpc.NewServer()
 		master := privet.NewJobMaster(privetDir)
 		master.EnvVars = envVarsList
-
-		if err = master.EnqueueUnits(); err != nil {
+		if err := master.EnqueueUnits(); err != nil {
 			log.Fatalf("failed to populate units: %v", err)
 		}
 
@@ -60,6 +54,11 @@ func main() {
 				time.Sleep(1 * time.Second)
 			}
 		}(master)
+
+		listener, err := net.Listen("tcp", bindAddress)
+		if err != nil {
+			log.Fatalf("failed to bind: %v", err)
+		}
 
 		privet.RegisterJobMasterServer(server, master)
 		panic(server.Serve(listener))
