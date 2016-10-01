@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"bread"
+	"bread/hal"
 	"bread/pb"
 
 	"github.com/sr/operator"
@@ -204,20 +205,26 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
+		var hal breadhal.RobotClient
+		if cc, err := grpc.Dial(
+			config.halAddr,
+			grpc.WithBlock(),
+			grpc.WithTimeout(grpcTimeout),
+			grpc.WithInsecure(),
+		); err == nil {
+			hal = breadhal.NewRobotClient(cc)
+		} else {
+			return err
+		}
 		const pkg = "bread"
 		if webhookHandler, err = bread.NewHipchatHandler(
 			context.Background(),
 			inst,
 			operatorhipchat.NewRequestDecoder(store),
-			operator.NewInvoker(
-				conn,
-				inst,
-				replier,
-				invoker,
-				config.timeout,
-				pkg,
-				&operatorhipchat.MessageOptions{Color: "red"},
-			),
+			invoker,
+			conn,
+			hal,
+			config.timeout,
 			pkg,
 			config.prefix,
 		); err != nil {

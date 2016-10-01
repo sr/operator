@@ -20,6 +20,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"bread/hal"
 	"bread/pb"
 )
 
@@ -240,9 +241,12 @@ func NewHipchatHandler(
 	ctx context.Context,
 	inst operator.Instrumenter,
 	decoder operator.Decoder,
-	invoker operator.Invoker,
-	pkg string,
+	invoker operator.InvokerFunc,
+	conn *grpc.ClientConn,
+	hal breadhal.RobotClient,
+	timeout time.Duration,
 	prefix string,
+	pkg string,
 ) (http.Handler, error) {
 	re, err := regexp.Compile(fmt.Sprintf(operator.ReCommandMessage, regexp.QuoteMeta(prefix)))
 	if err != nil {
@@ -253,6 +257,9 @@ func NewHipchatHandler(
 		inst,
 		decoder,
 		invoker,
+		conn,
+		hal,
+		timeout,
 		re,
 		pkg,
 	}, nil
