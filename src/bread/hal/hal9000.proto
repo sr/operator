@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package hal;
+
+option go_package = "breadhal";
+
+import "google/protobuf/empty.proto";
+
+service Robot {
+	rpc IsMatch(Message) returns (IsMatchResponse);
+	rpc Dispatch(Message) returns (google.protobuf.Empty);
+}
+
+message Message {
+	string text = 1;
+}
+
+message IsMatchResponse {
+	bool match = 1;
+}
