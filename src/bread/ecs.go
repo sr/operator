@@ -123,9 +123,9 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 	)
 	if t.Name == "operator" {
 		html = fmt.Sprintf(
-			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
+			"Updated <code>%s@%s</code> to run build %d. Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
-			t.ECSCluster,
+			b.GetNumber(),
 			t.ECSCluster,
 			fingers,
 		)
