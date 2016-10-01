@@ -14,6 +14,8 @@ require "lita/cli"
 require "lita/handler"
 require "lita/adapters/nothing"
 
+require "bread_lita_adapter"
+
 module HAL9000
   class Application
     def self.configure
@@ -38,6 +40,12 @@ module HAL9000
         ]
 
         config.robot.adapter = ENV.fetch("LITA_ADAPTER", "shell").to_sym
+
+        if config.adapters.respond_to?(:bread)
+          config.adapters.bread.token = ENV.fetch("HIPCHAT_TOKEN")
+          config.adapters.bread.server = ENV.fetch("HIPCHAT_SERVER", "hipchat.dev.pardot.com")
+          config.adapters.bread.address = "0.0.0.0:9000"
+        end
 
         config.http.host = "0.0.0.0"
         config.http.port = 8080
