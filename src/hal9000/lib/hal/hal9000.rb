@@ -6,6 +6,8 @@ require 'google/protobuf'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "hal.Message" do
     optional :text, :string, 1
+    optional :user_email, :string, 2
+    optional :room, :string, 3
   end
   add_message "hal.IsMatchResponse" do
     optional :match, :bool, 1

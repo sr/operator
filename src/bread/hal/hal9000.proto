@@ -5,17 +5,16 @@ package hal;
 option go_package = "breadhal";
 
 service Robot {
-	rpc IsMatch(Message) returns (IsMatchResponse);
-	rpc Dispatch(Message) returns (DispatchResponse);
+	rpc IsMatch(Message) returns (Response);
+	rpc Dispatch(Message) returns (Response);
 }
 
 message Message {
 	string text = 1;
+	string user_email = 2;
+	string room = 3;
 }
 
-message IsMatchResponse {
+message Response {
 	bool match = 1;
-}
-
-message DispatchResponse {
 }
