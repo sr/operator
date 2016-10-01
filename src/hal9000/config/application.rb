@@ -45,20 +45,22 @@ module HAL9000
         ## Example: Set options for the chosen adapter.
         # config.adapter.username = "myname"
         # config.adapter.password = "secret"
-        config.adapters.hipchat.server = ENV.fetch("HIPCHAT_SERVER", "hipchat.dev.pardot.com")
-        config.adapters.hipchat.jid = ENV.fetch("HIPCHAT_JID", "1_342@chat.btf.hipchat.com")
-        config.adapters.hipchat.muc_domain = ENV.fetch("HIPCHAT_MUC_DOMAIN", "conf.btf.hipchat.com")
-        config.adapters.hipchat.password = ENV.fetch("HIPCHAT_PASSWORD", "")
-        config.adapters.hipchat.rooms = [
-          "1_build__automate@conf.btf.hipchat.com",
-          "1_bread_privileged@conf.btf.hipchat.com",
-          "1_opsbros@conf.btf.hipchat.com",
-          "1_ops@conf.btf.hipchat.com",
-          "1_project_terminus@conf.btf.hipchat.com",
-          "1_engineering@conf.btf.hipchat.com",
-          "1_bottest@conf.btf.hipchat.com"
-        ]
-        config.adapters.hipchat.debug = true
+        if config.adapters.respond_to?(:hipchat)
+          config.adapters.hipchat.server = ENV.fetch("HIPCHAT_SERVER", "hipchat.dev.pardot.com")
+          config.adapters.hipchat.jid = ENV.fetch("HIPCHAT_JID", "1_342@chat.btf.hipchat.com")
+          config.adapters.hipchat.muc_domain = ENV.fetch("HIPCHAT_MUC_DOMAIN", "conf.btf.hipchat.com")
+          config.adapters.hipchat.password = ENV.fetch("HIPCHAT_PASSWORD", "")
+          config.adapters.hipchat.rooms = [
+            "1_build__automate@conf.btf.hipchat.com",
+            "1_bread_privileged@conf.btf.hipchat.com",
+            "1_opsbros@conf.btf.hipchat.com",
+            "1_ops@conf.btf.hipchat.com",
+            "1_project_terminus@conf.btf.hipchat.com",
+            "1_engineering@conf.btf.hipchat.com",
+            "1_bottest@conf.btf.hipchat.com"
+          ]
+          config.adapters.hipchat.debug = true
+        end
 
         # Replication fixing
         config.handlers.replication_fixing_handler.pagerduty_service_key = ENV.fetch("REPFIX_PAGERDUTY_SERVICE_KEY", "")
