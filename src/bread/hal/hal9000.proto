@@ -4,11 +4,9 @@ package hal;
 
 option go_package = "breadhal";
 
-import "google/protobuf/empty.proto";
-
 service Robot {
 	rpc IsMatch(Message) returns (IsMatchResponse);
-	rpc Dispatch(Message) returns (google.protobuf.Empty);
+	rpc Dispatch(Message) returns (DispatchResponse);
 }
 
 message Message {
@@ -17,4 +15,7 @@ message Message {
 
 message IsMatchResponse {
 	bool match = 1;
+}
+
+message DispatchResponse {
 }

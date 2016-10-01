@@ -15,7 +15,7 @@ module Hal
       self.service_name = 'hal.Robot'
 
       rpc :IsMatch, Message, IsMatchResponse
-      rpc :Dispatch, Message, Google::Protobuf::Empty
+      rpc :Dispatch, Message, DispatchResponse
     end
 
     Stub = Service.rpc_stub_class
