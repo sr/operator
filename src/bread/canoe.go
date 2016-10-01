@@ -178,7 +178,7 @@ func (a *canoeBuild) GetURL() string {
 	if a == nil {
 		return ""
 	}
-	return a.URL
+	return a.ArtifactURL
 }
 
 func (a *canoeBuild) GetRepoURL() string {

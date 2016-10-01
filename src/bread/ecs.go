@@ -125,8 +125,8 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 		html = fmt.Sprintf(
 			"Updated <code>%s@%s</code> to run build %d. Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
-			b.GetNumber(),
 			t.ECSCluster,
+			b.GetNumber(),
 			fingers,
 		)
 	} else {
