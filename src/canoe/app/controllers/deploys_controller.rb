@@ -61,19 +61,32 @@ class DeploysController < ApplicationController
   end
 
   def create
-    prov_deploy = build_provisional_deploy
-
-    if prov_deploy
-      deploy_response = deploy!(prov_deploy)
-      if !deploy_response[:error] && deploy_response[:deploy]
-        the_deploy = deploy_response[:deploy]
-        redirect_to project_deploy_path(current_project.name, the_deploy.id, watching: "1")
+    servers =
+      if params[:servers] == "on"
+        params.fetch(:server_hostnames, [])
       else
-        render_deploy_error(deploy_response)
+        []
       end
-    else
-      render_invalid_provisional_deploy
+
+    deploy_request = DeployRequest.new(
+      current_project,
+      current_target,
+      current_user,
+      params[:artifact_url],
+      (params[:lock] == "on"),
+      servers,
+      params[:options]
+    )
+
+    deploy_response = deploy_request.handle
+
+    if deploy_response.error?
+      flash[:notice] = deploy_response.error_message
+      redirect_to :back
+      return
     end
+
+    redirect_to project_deploy_path(current_project.name, deploy_response.deploy, watching: "1")
   end
 
   def force_to_complete
@@ -128,27 +141,5 @@ class DeploysController < ApplicationController
 
   def render_invalid_provisional_deploy
     render status: :unprocessable_entity, text: "Unknown deploy type: #{params[:what]}"
-  end
-
-  def render_deploy_error(deploy_response)
-    # missing pieces
-    missing_error_codes = \
-      [DEPLOYLOGIC_ERROR_NO_PROJECT, DEPLOYLOGIC_ERROR_NO_TARGET, DEPLOYLOGIC_ERROR_NO_DEPLOY]
-    if missing_error_codes.include?(deploy_response[:reason])
-      flash[:notice] = "We did not have everything needed to deploy. Try again."
-      redirect_to :back
-    end
-
-    # check for invalid
-    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_INVALID_SHA
-      flash[:notice] = "Sorry, it appears you specified an unknown artifact."
-      redirect_to :back
-    end
-
-    # check for locked target, allow user who has it locked to deploy again
-    if deploy_response[:reason] == DEPLOYLOGIC_ERROR_UNABLE_TO_DEPLOY
-      flash[:notice] = "Sorry, it looks like #{current_target.name} is locked."
-      redirect_to :back
-    end
   end
 end

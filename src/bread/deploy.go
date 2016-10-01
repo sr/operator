@@ -3,11 +3,13 @@ package bread
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,69 +24,114 @@ import (
 	"bread/pb"
 )
 
+const (
+	bambooURL = "https://bamboo.dev.pardot.com"
+	master    = "master"
+	pardot    = "pardot"
+)
+
 type deployAPIServer struct {
 	operator.Replier
-	ecs  *ecs.ECS
-	ecr  *ecr.ECR
-	conf *DeployConfig
+	ecs        *ecs.ECS
+	ecr        *ecr.ECR
+	conf       *DeployConfig
+	http       *http.Client
+	ecsTargets []*DeployTarget
+	tz         *time.Location
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
-	targets := make([]string, len(s.conf.Targets))
-	i := 0
-	for k := range s.conf.Targets {
-		targets[i] = k
-		i = i + 1
+	targets, err := s.listTargets(ctx)
+	names := make([]string, len(targets))
+	for i, t := range targets {
+		names[i] = t.Name
 	}
-	sort.Strings(targets)
+	if err != nil {
+		_, _ = operator.Reply(s, ctx, req, &operator.Message{
+			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
+			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
+			Options: &operatorhipchat.MessageOptions{
+				Color: "red",
+			},
+		})
+	}
+	sort.Strings(names)
 	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: "Deploy targets: " + strings.Join(targets, ", "),
+		HTML: "Deployment targets: " + strings.Join(names, ", "),
+		Text: strings.Join(names, " "),
 	})
+}
+
+type build interface {
+	GetNumber() int
+	GetBranch() string
+	GetSHA() string
+	GetShortSHA() string
+	GetURL() string
+	GetRepoURL() string
+	GetCreated() time.Time
 }
 
 func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	if req.Target == "" {
+		req.Target = pardot
 	}
-	conds := []string{
-		`{"name":{"$eq":"manifest.json"}}`,
-		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
-		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
+	var (
+		err    error
+		target *DeployTarget
+		builds []build
+	)
+	targets, err := s.listTargets(ctx)
+	for _, t := range targets {
+		if t.Name == req.Target {
+			target = t
+			break
+		}
 	}
-	q := []string{
-		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
-		`.include("repo","path","name","created")`,
-		`.sort({"$desc": ["created"]})`,
-		`.limit(10)`,
+	if target == nil {
+		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
 	}
-	artifs, err := s.doAQL(ctx, strings.Join(q, ""))
+	if target.Canoe {
+		if req.Branch == "" {
+			req.Branch = master
+		}
+		builds, err = s.listCanoeBuilds(ctx, req.Target, req.Branch)
+	} else {
+		builds, err = s.listECSBuilds(ctx, target)
+	}
 	if err != nil {
 		return nil, err
 	}
-	if len(artifs) == 0 {
-		return nil, fmt.Errorf("No build found for %s", req.Target)
+	if len(builds) == 0 {
+		return operator.Reply(s, ctx, req, &operator.Message{
+			Text: "",
+			HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch),
+		})
 	}
-	var txt bytes.Buffer
-	html := bytes.NewBufferString("<ul>")
-	for _, a := range artifs {
-		fmt.Fprintf(html, `<li><a href="https://bamboo.dev.pardot.com/browse/%s">%s</a></li>`, a.Tag(), a.Tag())
-		fmt.Fprintf(&txt, "%s %s\n", req.Target, a.Tag())
+	var txt, html bytes.Buffer
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	i := 0
+	for _, b := range builds {
+		if i >= 10 {
+			break
+		}
+		fmt.Fprintf(&txt, "%d %s@%s %s\n", b.GetNumber(), b.GetBranch(), b.GetShortSHA(), b.GetCreated())
+		fmt.Fprintf(
+			&html,
+			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+			fmt.Sprintf(`<a href="%s">%d</a>`, b.GetURL(), b.GetNumber()),
+			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetSHA()),
+			b.GetCreated().In(s.tz),
+		)
+		i++
 	}
-	_, _ = html.WriteString("</ul>")
-	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: txt.String(),
-		HTML: html.String(),
-	})
+	return operator.Reply(s, ctx, req, &operator.Message{Text: txt.String(), HTML: html.String()})
 }
 
-var (
-	ecsRunning = aws.String("RUNNING")
-	eggs       = map[string]string{
-		"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
-		"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
-	}
-)
+var eggs = map[string]string{
+	"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
+	"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
+}
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
 	if v, ok := eggs[req.Target]; ok {
@@ -95,10 +142,58 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	var (
+		target *DeployTarget
+		msg    *operator.Message
+		err    error
+	)
+	targets, err := s.listTargets(ctx)
+	for _, t := range targets {
+		if t.Name == req.Target {
+			target = t
+			break
+		}
 	}
+	if target == nil {
+		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
+	}
+	if target.Canoe {
+		msg, err = s.triggerCanoeDeploy(ctx, req)
+	} else {
+		msg, err = s.triggerECSDeploy(ctx, req, target)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return operator.Reply(s, ctx, req, msg)
+}
+
+var ecsRunning = aws.String("RUNNING")
+
+func (s *deployAPIServer) listECSBuilds(ctx context.Context, t *DeployTarget) ([]build, error) {
+	conds := []string{
+		`{"name":{"$eq":"manifest.json"}}`,
+		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
+		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
+	}
+	q := []string{
+		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
+		`.include("repo","path","name","created","property.*")`,
+	}
+	resp, err := s.doAQL(ctx, strings.Join(q, ""))
+	if err != nil {
+		return nil, err
+	}
+	sorted := artifacts(resp)
+	sort.Sort(sort.Reverse(sorted))
+	var builds []build
+	for _, a := range sorted {
+		builds = append(builds, build(a))
+	}
+	return builds, nil
+}
+
+func (s *deployAPIServer) triggerECSDeploy(ctx context.Context, req *breadpb.TriggerRequest, t *DeployTarget) (*operator.Message, error) {
 	svc, err := s.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
 			Services: []*string{aws.String(t.ECSService)},
@@ -157,8 +252,30 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if err != nil {
 		return nil, err
 	}
+	var (
+		html    string
+		fingers = `<img class="remoticon" aria-label="(fingerscrossed)" alt="(fingerscrossed)" height="30" width="30" src="https://hipchat.dev.pardot.com/files/img/emoticons/1/fingerscrossed-1459185721@2x.png">`
+	)
+	if req.Target == "operator" {
+		html = fmt.Sprintf(
+			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
+			*svc.Services[0].ServiceName,
+			t.ECSCluster,
+			t.ECSCluster,
+			fingers,
+		)
+	} else {
+		html = fmt.Sprintf(
+			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
+			*svc.Services[0].ServiceName,
+			t.ECSCluster,
+			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, req.Build, req.Build),
+			s.conf.ECSTimeout,
+		)
+	}
 	_, _ = operator.Reply(s, ctx, req, &operator.Message{
-		Text: fmt.Sprintf("Build %s@%s deployed to service %s. Waiting for service to rollover...", req.Target, req.Build, t.ECSService),
+		Text: *newTask.TaskDefinition.TaskDefinitionArn,
+		HTML: html,
 		Options: &operatorhipchat.MessageOptions{
 			Color: "yellow",
 		},
@@ -198,19 +315,308 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	case <-ctx.Done():
 		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target, req.Build, s.conf.ECSTimeout)
 	case <-okC:
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return &operator.Message{
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
+			HTML: fmt.Sprintf(
+				"Deployed build %s to ECS service <code>%s@%s</code>",
+				fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, req.Build, req.Build),
+				*svc.Services[0].ServiceName,
+				t.ECSCluster,
+			),
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
 			},
-		})
+		}, nil
 	}
 }
 
+func (s *deployAPIServer) listTargets(ctx context.Context) (targets []*DeployTarget, err error) {
+	var resp *http.Response
+	if resp, err = s.doCanoe(ctx, "GET", "/api/projects", ""); err == nil {
+		defer func() { _ = resp.Body.Close() }()
+		var projs []*canoeProject
+		if err := json.NewDecoder(resp.Body).Decode(&projs); err == nil {
+			for _, p := range projs {
+				targets = append(targets, &DeployTarget{Name: p.Name, Canoe: true})
+			}
+		}
+	}
+	_ = copy(targets, s.ecsTargets)
+	return targets, err
+}
+
+type canoeBuild struct {
+	ArtifactURL string    `json:"artifact_url"`
+	RepoURL     string    `json:"repo_url"`
+	URL         string    `json:"url"`
+	Branch      string    `json:"branch"`
+	BuildNumber int       `json:"build_number"`
+	SHA         string    `json:"sha"`
+	PassedCI    bool      `json:"passed_ci"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (a *canoeBuild) GetNumber() int {
+	if a == nil {
+		return 0
+	}
+	return a.BuildNumber
+}
+
+func (a *canoeBuild) GetBranch() string {
+	if a == nil {
+		return ""
+	}
+	return a.Branch
+}
+
+func (a *canoeBuild) GetSHA() string {
+	if a == nil {
+		return ""
+	}
+	return a.SHA
+}
+
+func (a *canoeBuild) GetShortSHA() string {
+	if a == nil {
+		return ""
+	}
+	if len(a.SHA) < 7 {
+		return a.SHA
+	}
+	return a.SHA[0:7]
+}
+
+func (a *canoeBuild) GetURL() string {
+	if a == nil {
+		return ""
+	}
+	return a.URL
+}
+
+func (a *canoeBuild) GetRepoURL() string {
+	if a == nil {
+		return ""
+	}
+	return a.RepoURL
+}
+
+func (a *canoeBuild) GetCreated() time.Time {
+	if a == nil {
+		return time.Unix(0, 0)
+	}
+	return time.Now()
+}
+
+type canoeProject struct {
+	Name string `json:"name"`
+}
+
+func (s *deployAPIServer) listCanoeBuilds(ctx context.Context, proj string, branch string) ([]build, error) {
+	resp, err := s.doCanoe(
+		ctx,
+		"GET",
+		fmt.Sprintf("/api/projects/%s/branches/%s/builds", proj, branch),
+		"",
+	)
+	defer func() { _ = resp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+	var data []*canoeBuild
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	var builds []build
+	for _, b := range data {
+		builds = append(builds, build(b))
+	}
+	return builds, nil
+}
+
+func (s *deployAPIServer) triggerCanoeDeploy(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Message, error) {
+	buildID, err := strconv.Atoi(req.Build)
+	if err != nil {
+		return nil, err
+	}
+	var build *canoeBuild
+	builds, err := s.listCanoeBuilds(ctx, req.Target, master)
+	if err != nil {
+		return nil, err
+	}
+	for _, b := range builds {
+		if v, ok := b.(*canoeBuild); ok && b.GetNumber() == buildID {
+			build = v
+			break
+		}
+	}
+	if build == nil {
+		return nil, fmt.Errorf("Build not found: %d", buildID)
+	}
+	params := url.Values{}
+	params.Add("project_name", req.Target)
+	params.Add("artifact_url", build.ArtifactURL)
+	params.Add("user_email", req.Request.UserEmail())
+	resp, err := s.doCanoe(
+		ctx,
+		"POST",
+		"/api/targets/production/deploys",
+		params.Encode(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	type canoeDeploy struct {
+		ID int `json:"id"`
+	}
+	type canoeResp struct {
+		Error   bool         `json:"error"`
+		Message string       `json:"message"`
+		Deploy  *canoeDeploy `json:"deploy"`
+	}
+	var data canoeResp
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	if data.Error {
+		return nil, errors.New(data.Message)
+	}
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", s.conf.CanoeURL, req.Target, data.Deploy.ID)
+	return &operator.Message{
+		Text: deployURL,
+		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target, deployURL, data.Deploy.ID),
+		Options: &operatorhipchat.MessageOptions{
+			Color: "green",
+		},
+	}, nil
+}
+
+func (s *deployAPIServer) doCanoe(ctx context.Context, meth, path, body string) (*http.Response, error) {
+	req, err := http.NewRequest(meth, s.conf.CanoeURL+path, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-Api-Token", s.conf.CanoeAPIKey)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	resp, err := ctxhttp.Do(ctx, s.http, req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		if body, err := ioutil.ReadAll(resp.Body); err == nil {
+			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+	}
+	return resp, nil
+}
+
 type artifact struct {
-	Path    string
-	Repo    string
-	Created time.Time
+	Path       string      `json:"path"`
+	Repo       string      `json:"repo"`
+	Created    time.Time   `json:"created"`
+	Properties []*property `json:"properties"`
+}
+
+type property struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type artifacts []*artifact
+
+func (s artifacts) Len() int {
+	return len(s)
+}
+
+func (s artifacts) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s artifacts) Less(i, j int) bool {
+	return s[i].Created.Before(s[j].Created)
+}
+
+func (a *artifact) GetNumber() int {
+	if a == nil {
+		return 0
+	}
+	for _, p := range a.Properties {
+		if p.Key == "buildNumber" {
+			if i, err := strconv.Atoi(p.Value); err == nil {
+				return i
+			}
+		}
+	}
+	return 0
+}
+
+func (a *artifact) GetBranch() string {
+	if a == nil {
+		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "gitBranch" {
+			return p.Value
+		}
+	}
+	return ""
+}
+
+func (a *artifact) GetSHA() string {
+	if a == nil {
+		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "gitSha" {
+			return p.Value
+		}
+	}
+	return ""
+}
+
+func (a *artifact) GetShortSHA() string {
+	if a == nil {
+		return ""
+	}
+	if len(a.GetSHA()) < 7 {
+		return a.GetSHA()
+	}
+	return a.GetSHA()[0:7]
+}
+
+func (a *artifact) GetURL() string {
+	if a == nil {
+		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "buildResults" {
+			return p.Value
+		}
+	}
+	return ""
+}
+
+func (a *artifact) GetRepoURL() string {
+	if a == nil {
+		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "gitRepo" {
+			return strings.Replace(p.Value, ".git", "", -1)
+		}
+	}
+	return ""
+}
+
+func (a *artifact) GetCreated() time.Time {
+	if a == nil {
+		return time.Unix(0, 0)
+	}
+	return time.Now()
 }
 
 func (a *artifact) Tag() string {
@@ -241,7 +647,6 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
 			return nil, fmt.Errorf("Artifactory query failed with status %d and body: %s", resp.StatusCode, body)
@@ -251,8 +656,9 @@ func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, err
 	type results struct {
 		Results []*artifact
 	}
+	body, err := ioutil.ReadAll(resp.Body)
 	var data results
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(strings.NewReader(string(body))).Decode(&data); err != nil {
 		return nil, err
 	}
 	return data.Results, nil

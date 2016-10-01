@@ -34,6 +34,7 @@ type config struct {
 	grpcAddr string
 	httpAddr string
 	timeout  time.Duration
+	timezone string
 
 	yubico *bread.YubicoConfig
 	ldap   *bread.LDAPConfig
@@ -50,7 +51,7 @@ type config struct {
 
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
-		deploy: &bread.DeployConfig{Targets: bread.DeployTargets},
+		deploy: &bread.DeployConfig{},
 		ldap:   &bread.LDAPConfig{},
 		yubico: &bread.YubicoConfig{},
 	}
@@ -61,6 +62,7 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
+	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
 	flags.StringVar(&config.ldap.Addr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
@@ -73,6 +75,8 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "Artifactory username")
 	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
+	flags.StringVar(&config.deploy.CanoeURL, "deploy-canoe-url", "https://canoe.dev.pardot.com", "")
+	flags.StringVar(&config.deploy.CanoeAPIKey, "deploy-canoe-api-key", "", "Canoe API key")
 	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
 	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "AWS Region")
 	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
@@ -162,12 +166,17 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 	}
+	tz, err := time.LoadLocation(config.timezone)
+	if err != nil {
+		return err
+	}
 	var grpcServer *grpc.Server
 	if grpcServer, err = bread.NewServer(
 		auth,
 		inst,
 		replier,
 		config.deploy,
+		tz,
 	); err != nil {
 		return err
 	}
@@ -207,6 +216,7 @@ func run(invoker operator.InvokerFunc) error {
 				invoker,
 				config.timeout,
 				pkg,
+				&operatorhipchat.MessageOptions{Color: "red"},
 			),
 			pkg,
 			config.prefix,
