@@ -16,7 +16,6 @@ require "pinglish"
 require "instrumentation"
 
 require "canoe/deployer"
-require "canoe/deploy_logic"
 require "canoe/ldap_authorizer"
 
 # Require the gems listed in Gemfile, including any gems

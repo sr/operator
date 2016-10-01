@@ -2,91 +2,125 @@ package bread
 
 import (
 	"bytes"
-	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
-	"golang.org/x/net/context/ctxhttp"
 
 	"bread/pb"
 )
 
+const (
+	bambooURL = "https://bamboo.dev.pardot.com"
+	master    = "master"
+	pardot    = "pardot"
+)
+
+type deployer interface {
+	listTargets(context.Context) ([]*DeployTarget, error)
+	listBuilds(context.Context, *DeployTarget, string) ([]build, error)
+	deploy(context.Context, *operator.Request, *DeployTarget, build) (*operator.Message, error)
+}
+
+type build interface {
+	GetNumber() int
+	GetBambooID() string
+	GetBranch() string
+	GetSHA() string
+	GetShortSHA() string
+	GetURL() string
+	GetRepoURL() string
+	GetCreated() time.Time
+}
+
 type deployAPIServer struct {
 	operator.Replier
-	ecs  *ecs.ECS
-	ecr  *ecr.ECR
-	conf *DeployConfig
+	conf  *DeployConfig
+	http  *http.Client
+	tz    *time.Location
+	canoe deployer
+	ecs   deployer
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
-	targets := make([]string, len(s.conf.Targets))
-	i := 0
-	for k := range s.conf.Targets {
-		targets[i] = k
-		i = i + 1
+	targets := s.listTargets(ctx, req)
+	names := make([]string, len(targets))
+	for i, t := range targets {
+		names[i] = t.Name
 	}
-	sort.Strings(targets)
+	sort.Strings(names)
 	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: "Deploy targets: " + strings.Join(targets, ", "),
+		HTML: "Deployment targets: " + strings.Join(names, ", "),
+		Text: strings.Join(names, " "),
 	})
 }
 
 func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuildsRequest) (*operator.Response, error) {
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	if req.Target == "" {
+		req.Target = pardot
 	}
-	conds := []string{
-		`{"name":{"$eq":"manifest.json"}}`,
-		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
-		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
+	var (
+		err    error
+		target *DeployTarget
+		builds []build
+	)
+	targets := s.listTargets(ctx, req)
+	for _, t := range targets {
+		if t.Name == req.Target {
+			target = t
+			break
+		}
 	}
-	q := []string{
-		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
-		`.include("repo","path","name","created")`,
-		`.sort({"$desc": ["created"]})`,
-		`.limit(10)`,
+	if target == nil {
+		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
 	}
-	artifs, err := s.doAQL(ctx, strings.Join(q, ""))
+	builds, err = s.listBuilds(ctx, target, req.Branch)
 	if err != nil {
 		return nil, err
 	}
-	if len(artifs) == 0 {
-		return nil, fmt.Errorf("No build found for %s", req.Target)
+	if len(builds) == 0 {
+		return operator.Reply(s, ctx, req, &operator.Message{
+			Text: "",
+			HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch),
+		})
 	}
-	var txt bytes.Buffer
-	html := bytes.NewBufferString("<ul>")
-	for _, a := range artifs {
-		fmt.Fprintf(html, `<li><a href="https://bamboo.dev.pardot.com/browse/%s">%s</a></li>`, a.Tag(), a.Tag())
-		fmt.Fprintf(&txt, "%s %s\n", req.Target, a.Tag())
+	var txt, html bytes.Buffer
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	i := 0
+	for _, b := range builds {
+		if i >= 10 {
+			break
+		}
+		fmt.Fprintf(&txt, "%d %s@%s %s\n", b.GetNumber(), b.GetBranch(), b.GetShortSHA(), b.GetCreated())
+		fmt.Fprintf(
+			&html,
+			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+			fmt.Sprintf(`<a href="%s">%d</a>`, b.GetURL(), b.GetNumber()),
+			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetShortSHA()),
+			b.GetCreated().In(s.tz),
+		)
+		i++
 	}
-	_, _ = html.WriteString("</ul>")
-	return operator.Reply(s, ctx, req, &operator.Message{
-		Text: txt.String(),
-		HTML: html.String(),
-	})
+	return operator.Reply(s, ctx, req, &operator.Message{Text: txt.String(), HTML: html.String()})
 }
 
-var (
-	ecsRunning = aws.String("RUNNING")
-	eggs       = map[string]string{
-		"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
-		"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
-	}
-)
+var eggs = map[string]string{
+	"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
+	"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
+}
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
+	if req.GetRequest() == nil {
+		return nil, errors.New("invalid request")
+	}
 	if v, ok := eggs[req.Target]; ok {
 		return operator.Reply(s, ctx, req, &operator.Message{
 			Text: v,
@@ -95,188 +129,71 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	t, ok := s.conf.Targets[req.Target]
-	if !ok {
-		return nil, fmt.Errorf("No such deploy target: %s", req.Target)
+	buildID, err := strconv.Atoi(req.Build)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid build: %#v", req.Build)
 	}
-	svc, err := s.ecs.DescribeServices(
-		&ecs.DescribeServicesInput{
-			Services: []*string{aws.String(t.ECSService)},
-			Cluster:  aws.String(t.ECSCluster),
-		},
+	var (
+		target *DeployTarget
+		msg    *operator.Message
 	)
-	if err != nil {
-		return nil, err
-	}
-	if len(svc.Services) != 1 {
-		return nil, fmt.Errorf("Cluster %s has no service %s", t.ECSCluster, t.ECSService)
-	}
-	out, err := s.ecs.DescribeTaskDefinition(
-		&ecs.DescribeTaskDefinitionInput{
-			TaskDefinition: svc.Services[0].TaskDefinition,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	curImg, err := parseImage(*out.TaskDefinition.ContainerDefinitions[0].Image)
-	if err != nil {
-		return nil, err
-	}
-	img := fmt.Sprintf("%s/%s:%s", curImg.host, curImg.repo, req.Build)
-	conds := []string{
-		`{"name":{"$eq":"manifest.json"}}`,
-		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, s.conf.ArtifactoryRepo),
-		fmt.Sprintf(`{"path": {"$match": "%s/%s"}}`, t.Image, req.Build),
-	}
-	artifs, err := s.doAQL(ctx, fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")))
-	if err != nil {
-		return nil, err
-	}
-	if len(artifs) == 0 {
-		return nil, fmt.Errorf("Build not found: %s@%s", req.Target, req.Build)
-	}
-	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(img)
-	newTask, err := s.ecs.RegisterTaskDefinition(
-		&ecs.RegisterTaskDefinitionInput{
-			ContainerDefinitions: out.TaskDefinition.ContainerDefinitions,
-			Family:               out.TaskDefinition.Family,
-			Volumes:              out.TaskDefinition.Volumes,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = s.ecs.UpdateService(
-		&ecs.UpdateServiceInput{
-			Cluster:        svc.Services[0].ClusterArn,
-			Service:        svc.Services[0].ServiceName,
-			TaskDefinition: newTask.TaskDefinition.TaskDefinitionArn,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, _ = operator.Reply(s, ctx, req, &operator.Message{
-		Text: fmt.Sprintf("Build %s@%s deployed to service %s. Waiting for service to rollover...", req.Target, req.Build, t.ECSService),
-		Options: &operatorhipchat.MessageOptions{
-			Color: "yellow",
-		},
-	})
-	ctx, cancel := context.WithTimeout(ctx, s.conf.ECSTimeout)
-	defer cancel()
-	okC := make(chan struct{}, 1)
-	go func() {
-		for {
-			lout, err := s.ecs.ListTasks(&ecs.ListTasksInput{
-				Cluster:       svc.Services[0].ClusterArn,
-				ServiceName:   svc.Services[0].ServiceName,
-				DesiredStatus: ecsRunning,
-			})
-			if err != nil {
-				time.Sleep(5 * time.Second)
-				continue
-			}
-			dout, err := s.ecs.DescribeTasks(&ecs.DescribeTasksInput{
-				Cluster: svc.Services[0].ClusterArn,
-				Tasks:   lout.TaskArns,
-			})
-			if err != nil {
-				time.Sleep(5 * time.Second)
-				continue
-			}
-			for _, t := range dout.Tasks {
-				if *t.TaskDefinitionArn == *newTask.TaskDefinition.TaskDefinitionArn && *t.LastStatus == *ecsRunning {
-					okC <- struct{}{}
-					return
-				}
-			}
-			time.Sleep(5 * time.Second)
+	targets := s.listTargets(ctx, req)
+	for _, t := range targets {
+		if t.Name == req.Target {
+			target = t
+			break
 		}
-	}()
-	select {
-	case <-ctx.Done():
-		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target, req.Build, s.conf.ECSTimeout)
-	case <-okC:
-		return operator.Reply(s, ctx, req, &operator.Message{
-			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target, req.Build, t.ECSCluster),
+	}
+	if target == nil {
+		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
+	}
+	var build build
+	builds, err := s.listBuilds(ctx, target, "")
+	for _, b := range builds {
+		if b.GetNumber() == buildID {
+			build = b
+		}
+	}
+	if build == nil {
+		return nil, fmt.Errorf("No such build %s", req.Build)
+	}
+	if target.Canoe {
+		msg, err = s.canoe.deploy(ctx, req.GetRequest(), target, build)
+	} else {
+		msg, err = s.ecs.deploy(ctx, req.GetRequest(), target, build)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return operator.Reply(s, ctx, req, msg)
+}
+
+var ecsRunning = aws.String("RUNNING")
+
+func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requester) (targets []*DeployTarget) {
+	targets, _ = s.ecs.listTargets(ctx)
+	if t, err := s.canoe.listTargets(ctx); err == nil {
+		targets = append(targets, t...)
+	} else {
+		_, _ = operator.Reply(s, ctx, req, &operator.Message{
+			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
+			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
 			Options: &operatorhipchat.MessageOptions{
-				Color: "green",
+				Color: "red",
 			},
 		})
 	}
+	return targets
 }
 
-type artifact struct {
-	Path    string
-	Repo    string
-	Created time.Time
-}
-
-func (a *artifact) Tag() string {
-	if a == nil {
-		return ""
-	}
-	// build/bread/hal9000/app/BREAD-BREAD-480
-	parts := strings.Split(a.Path, "/")
-	if len(parts) != 5 {
-		return ""
-	}
-	return parts[4]
-}
-
-func (s *deployAPIServer) doAQL(ctx context.Context, q string) ([]*artifact, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest(
-		"POST",
-		s.conf.ArtifactoryURL+"/api/search/aql",
-		strings.NewReader(q),
-	)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "text/plain")
-	req.SetBasicAuth(s.conf.ArtifactoryUsername, s.conf.ArtifactoryAPIKey)
-	resp, err := ctxhttp.Do(ctx, client, req)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("Artifactory query failed with status %d and body: %s", resp.StatusCode, body)
+func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) (builds []build, err error) {
+	if t.Canoe {
+		if branch == "" {
+			branch = master
 		}
-		return nil, fmt.Errorf("Artifactory query failed with status %d", resp.StatusCode)
+		builds, err = s.canoe.listBuilds(ctx, t, branch)
+	} else {
+		builds, err = s.ecs.listBuilds(ctx, t, "")
 	}
-	type results struct {
-		Results []*artifact
-	}
-	var data results
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	return data.Results, nil
-}
-
-type parsedImg struct {
-	host       string
-	registryID string
-	repo       string
-	tag        string
-}
-
-// parseImage parses a ecs.ContainerDefinition string Image.
-func parseImage(img string) (*parsedImg, error) {
-	u, err := url.Parse("docker://" + img)
-	if err != nil {
-		return nil, err
-	}
-	host := strings.Split(u.Host, ".")
-	path := strings.Split(u.Path, ":")
-	return &parsedImg{
-		host:       u.Host,
-		registryID: host[0],
-		repo:       path[0][1:],
-		tag:        path[1],
-	}, nil
+	return builds, err
 }

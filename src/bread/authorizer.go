@@ -37,10 +37,10 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 		}
 	}
 	if entry == nil {
-		return fmt.Errorf("no ACL entry found for command `%s %s`", req.Call.Service, req.Call.Method)
+		return fmt.Errorf("no ACL entry found for service `%s %s`", req.Call.Service, req.Call.Method)
 	}
 	if entry.OTP == true && req.Otp == "" {
-		return fmt.Errorf("command `%s %s` requires a Yubikey OTP", req.Call.Service, req.Call.Method)
+		return fmt.Errorf("service `%s %s` requires a Yubikey OTP", req.Call.Service, req.Call.Method)
 	}
 	user, err := a.getLDAPUser(req.UserEmail())
 	if err != nil {
@@ -53,11 +53,11 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 		}
 	}
 	if !ok {
-		return fmt.Errorf("command `%s %s` requires to be a member of group `%s`", req.Call.Service, req.Call.Method, entry.Group)
+		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
 	}
 	if entry.OTP {
 		if user.yubikeyID == "" {
-			return fmt.Errorf("user `%s` does not have a Yubikey ID", req.UserEmail())
+			return fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", req.UserEmail())
 		}
 		if err := a.verifier.Verify(req.Otp); err != nil {
 			return fmt.Errorf("could not verify Yubikey OTP: %s", err)

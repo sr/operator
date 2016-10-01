@@ -11,7 +11,6 @@ import (
 	"github.com/GeertJohan/yubigo"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -98,43 +97,53 @@ var (
 		},
 	}
 
-	DeployTargets = map[string]*DeployTarget{
-		"canoe": {
+	ECSDeployTargets = []*DeployTarget{
+		{
+			Name:          "canoe",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "CAN",
+			Canoe:         false,
 			ECSCluster:    "canoe_production",
 			ECSService:    "canoe",
 			Image:         "build/bread/canoe/app",
 		},
-		"hal9000": {
+		{
+			Name:          "hal9000",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
+			Canoe:         false,
 			ECSCluster:    "hal9000_production",
 			ECSService:    "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
-		"operator": {
+		{
+			Name:          "operator",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "OP",
+			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
 			Image:         "build/bread/operatord/app",
 		},
-		"parbot": {
+		{
+			Name:          "parbot",
 			BambooProject: "BREAD",
 			BambooPlan:    "PAR",
 			BambooJob:     "",
+			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
 			Image:         "build/bread/parbot/app",
 		},
-		"teampass": {
+		{
+			Name:          "teampass",
 			BambooProject: "BREAD",
 			BambooPlan:    "BREAD",
 			BambooJob:     "TEAM",
+			Canoe:         false,
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
 			Image:         "build/bread/tempass/app",
@@ -157,15 +166,18 @@ type DeployConfig struct {
 	ArtifactoryURL      string
 	ArtifactoryUsername string
 	ArtifactoryRepo     string
+	CanoeURL            string
+	CanoeAPIKey         string
 	ECSTimeout          time.Duration
 	AWSRegion           string
-	Targets             map[string]*DeployTarget
 }
 
 type DeployTarget struct {
+	Name          string
 	BambooProject string
 	BambooPlan    string
 	BambooJob     string
+	Canoe         bool
 	ECSCluster    string
 	ECSService    string
 	Image         string
@@ -231,21 +243,44 @@ func NewServer(
 	inst operator.Instrumenter,
 	repl operator.Replier,
 	deploy *DeployConfig,
+	timezone *time.Location,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
-	if len(deploy.Targets) != 0 &&
-		deploy.ArtifactoryURL != "" &&
+	if deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&
 		deploy.ArtifactoryAPIKey != "" &&
 		deploy.ArtifactoryRepo != "" &&
+		deploy.CanoeURL != "" &&
+		deploy.CanoeAPIKey != "" &&
 		deploy.AWSRegion != "" {
-		sess := session.New(&aws.Config{Region: aws.String(deploy.AWSRegion)})
 		breadpb.RegisterDeployServer(server, &deployAPIServer{
 			repl,
-			ecs.New(sess),
-			ecr.New(sess),
 			deploy,
+			&http.Client{},
+			timezone,
+			&canoeDeployer{
+				repl,
+				deploy.CanoeURL,
+				deploy.CanoeAPIKey,
+				&http.Client{},
+			},
+			&ecsDeployer{
+				repl,
+				deploy.ArtifactoryURL,
+				deploy.ArtifactoryRepo,
+				deploy.ArtifactoryUsername,
+				deploy.ArtifactoryAPIKey,
+				ecs.New(
+					session.New(
+						&aws.Config{
+							Region: aws.String(deploy.AWSRegion),
+						},
+					),
+				),
+				ECSDeployTargets,
+				deploy.ECSTimeout,
+			},
 		})
 	}
 	return server, nil
