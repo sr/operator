@@ -10,28 +10,37 @@ images:
     build: php/7.0.8
   docker.dev.pardot.com/base/java:8u102-jdk:
     build: java/8u102-jdk
+    common: true
   docker.dev.pardot.com/base/percona-server:5.5:
     build: percona-server/5.5
   docker.dev.pardot.com/base/percona-server:5.7:
     build: percona-server/5.7
+    common: true
   docker.dev.pardot.com/base/ruby:2.3.0:
     build: ruby/2.3.0
+    common: true
   docker.dev.pardot.com/base/ssh-forwarder:
     build: ssh-forwarder
   docker.dev.pardot.com/base/chefdk:0.17.17:
     build: chefdk/0.17.17
+    common: true
 
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
     build: pardot/app
+    common: true
   docker.dev.pardot.com/base/pardot/redis:
     build: pardot/redis
+    common: true
   docker.dev.pardot.com/base/pardot/rmux:
     build: pardot/rmux
+    common: true
   docker.dev.pardot.com/base/pardot/proxyout:
     build: pardot/proxyout
+    common: true
   docker.dev.pardot.com/base/pardot/kafka:
     build: pardot/kafka
+    common: true
 
   # Pardot/salesforce-package
   docker.dev.pardot.com/base/salesforce-package/app:

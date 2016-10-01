@@ -8,6 +8,7 @@ REGISTRY = "docker.dev.pardot.com"
 THREADS = 3
 
 all = false
+common = false
 mirror = REGISTRY
 parser = OptionParser.new { |opts|
   opts.banner = "Usage: pull [--all] image [image...]"
@@ -15,19 +16,29 @@ parser = OptionParser.new { |opts|
   opts.on("-a", "--all", "Pull all images") do
     all = true
   end
+  opts.on("-c", "--common", "Pull commonly used images") do
+    common = true
+  end
   opts.on("-mMIRROR", "--mirror=MIRROR", "Uses the given mirror as an alias") do |m|
     mirror = m
   end
 }
 parser.parse!
 
-if !all && ARGV.length == 0
+if (!all && !common) && ARGV.length == 0
   puts parser.help
   abort
 end
 
 all_images = YAML.load_file(File.join(File.dirname(__FILE__), "..", "images.yml")).fetch("images")
-images = all ? all_images.keys : ARGV
+images = \
+  if all
+    all_images.keys
+  elsif common
+    all_images.select { |image, attributes| attributes["common"] }.map { |image, _| image }
+  else
+    ARGV
+  end
 
 images.each do |image|
   unless all_images.key?(image)
