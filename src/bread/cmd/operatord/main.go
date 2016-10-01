@@ -205,7 +205,7 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 		const pkg = "bread"
-		if webhookHandler, err = operator.NewHandler(
+		if webhookHandler, err = bread.NewHipchatHandler(
 			context.Background(),
 			inst,
 			operatorhipchat.NewRequestDecoder(store),

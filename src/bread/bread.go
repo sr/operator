@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/GeertJohan/yubigo"
@@ -231,6 +232,30 @@ func NewInstrumenter(logger protolog.Logger) operator.Instrumenter {
 // NewHandler returns an http.Handler that logs all requests.
 func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 	return &wrapperHandler{logger, handler}
+}
+
+// NewHipchatHandler returns an http.Handler that handles incoming HipChat
+// webhook requests.
+func NewHipchatHandler(
+	ctx context.Context,
+	inst operator.Instrumenter,
+	decoder operator.Decoder,
+	invoker operator.Invoker,
+	pkg string,
+	prefix string,
+) (http.Handler, error) {
+	re, err := regexp.Compile(fmt.Sprintf(operator.ReCommandMessage, regexp.QuoteMeta(prefix)))
+	if err != nil {
+		return nil, err
+	}
+	return &hipchat{
+		ctx,
+		inst,
+		decoder,
+		invoker,
+		re,
+		pkg,
+	}, nil
 }
 
 // NewPingHandler returns an http.Handler that implements a simple health
