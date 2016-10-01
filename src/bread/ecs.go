@@ -246,7 +246,12 @@ func (a *afyItem) GetBambooID() string {
 	if a == nil {
 		return ""
 	}
-	return ""
+	// build/bread/hal9000/app/BREAD-BREAD-480
+	parts := strings.Split(a.Path, "/")
+	if len(parts) != 5 {
+		return ""
+	}
+	return parts[4]
 }
 
 func (a *afyItem) GetBranch() string {
@@ -312,18 +317,6 @@ func (a *afyItem) GetCreated() time.Time {
 		return time.Unix(0, 0)
 	}
 	return time.Now()
-}
-
-func (a *afyItem) Tag() string {
-	if a == nil {
-		return ""
-	}
-	// build/bread/hal9000/app/BREAD-BREAD-480
-	parts := strings.Split(a.Path, "/")
-	if len(parts) != 5 {
-		return ""
-	}
-	return parts[4]
 }
 
 type afyItems []*afyItem
