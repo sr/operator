@@ -22,8 +22,10 @@ type hipchat struct {
 	ctx     context.Context
 	inst    operator.Instrumenter
 	decoder operator.Decoder
+	repli   operator.Replier
 	invoker operator.InvokerFunc
 	conn    *grpc.ClientConn
+	svcInfo map[string]grpc.ServiceInfo
 	hal     breadhal.RobotClient
 	timeout time.Duration
 	re      *regexp.Regexp
@@ -38,17 +40,27 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var (
-		req    *operator.Request
-		halMsg = &breadhal.Message{Text: msg.Text}
+		opMatch, halMatch bool
+		req               = h.getRequest(msg, replierID)
+		halMsg            = &breadhal.Message{Text: msg.Text}
 	)
-	req = h.getRequest(msg, replierID)
-	if resp, err := h.hal.IsMatch(h.ctx, halMsg); err != nil || !resp.Match {
-		halMsg = nil
+	if req != nil {
+		if svc, ok := h.svcInfo[req.Call.Service]; ok {
+			for _, m := range svc.Methods {
+				if m.Name == req.Call.Method {
+					opMatch = true
+					break
+				}
+			}
+		}
 	}
-	if req != nil && halMsg != nil {
+	if r, err := h.hal.IsMatch(h.ctx, halMsg); err != nil && r.Match {
+		halMatch = true
+	}
+	if opMatch && halMatch {
 		fmt.Println("WARN: both HAL9K and Operator match. HAL9K will be ignored")
 	}
-	if req == nil && halMsg == nil {
+	if !opMatch && halMsg == nil {
 		h.inst.Instrument(&operator.Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -64,7 +76,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				_, err := h.hal.Dispatch(ctx, msg)
 				errC <- err
 			}
-			errC <- errors.New("not found")
+			errC <- errors.New("unhandled request")
 		}()
 		var err error
 		select {
