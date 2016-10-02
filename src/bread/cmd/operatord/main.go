@@ -33,6 +33,7 @@ type config struct {
 	devHipchatToken string
 
 	grpcAddr string
+	halAddr  string
 	httpAddr string
 	timeout  time.Duration
 	timezone string
@@ -60,7 +61,8 @@ func run(invoker operator.InvokerFunc) error {
 	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
 	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "Room ID where to send messages")
 	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "HipChat user token")
-	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
+	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9009", "Listen address of the gRPC server")
+	flags.StringVar(&config.halAddr, "addr-hal", "localhost:9000", "Address of the HAL9000 gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
@@ -114,6 +116,9 @@ func run(invoker operator.InvokerFunc) error {
 		auth = &noopAuthorizer{}
 		if config.devRoomID == 0 {
 			return errors.New("dev mode enabled but required flag missing: dev-room-id")
+		}
+		if v, ok := os.LookupEnv("HIPCHAT_TOKEN"); ok && config.devHipchatToken == "" {
+			config.devHipchatToken = v
 		}
 		if config.devHipchatToken == "" {
 			return errors.New("dev mode enabled but required flag missing: dev-hipchat-token")
@@ -221,8 +226,10 @@ func run(invoker operator.InvokerFunc) error {
 			context.Background(),
 			inst,
 			operatorhipchat.NewRequestDecoder(store),
+			replier,
 			invoker,
 			conn,
+			grpcServer.GetServiceInfo(),
 			hal,
 			config.timeout,
 			pkg,
@@ -259,7 +266,11 @@ func run(invoker operator.InvokerFunc) error {
 			),
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
-		logger.Info(&breadpb.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+		logger.Info(&breadpb.ServerStartupNotice{
+			Protocol:   "http",
+			Address:    config.httpAddr,
+			HalAddress: config.halAddr,
+		})
 		go func() {
 			errC <- http.ListenAndServe(config.httpAddr, httpServer)
 		}()
