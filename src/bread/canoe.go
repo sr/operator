@@ -136,18 +136,21 @@ func (d *canoeDeployer) doCanoe(ctx context.Context, meth, path, body string) (*
 	return resp, nil
 }
 
-func (a *canoeBuild) GetNumber() int {
-	if a == nil {
-		return 0
-	}
-	return a.BuildNumber
-}
-
-func (a *canoeBuild) GetBambooID() string {
-	if a == nil {
+// TODO(sr) This should be a property in Artifactory
+func (a *canoeBuild) GetID() string {
+	if a == nil || a.GetURL() == "" {
 		return ""
 	}
-	return ""
+	u, err := url.Parse(a.GetURL())
+	if err != nil {
+		return ""
+	}
+	// https://bamboo.dev.pardot.com/browse/BREAD-BREAD327-GOL-10
+	parts := strings.Split(u.Path, "/")
+	if len(parts) != 3 {
+		return ""
+	}
+	return parts[2]
 }
 
 func (a *canoeBuild) GetBranch() string {
@@ -175,6 +178,13 @@ func (a *canoeBuild) GetShortSHA() string {
 }
 
 func (a *canoeBuild) GetURL() string {
+	if a == nil {
+		return ""
+	}
+	return a.URL
+}
+
+func (a *canoeBuild) GetArtifactURL() string {
 	if a == nil {
 		return ""
 	}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -31,12 +30,12 @@ type deployer interface {
 }
 
 type build interface {
-	GetNumber() int
-	GetBambooID() string
+	GetID() string
+	GetURL() string
+	GetArtifactURL() string
 	GetBranch() string
 	GetSHA() string
 	GetShortSHA() string
-	GetURL() string
 	GetRepoURL() string
 	GetCreated() time.Time
 }
@@ -99,11 +98,11 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		if i >= 10 {
 			break
 		}
-		fmt.Fprintf(&txt, "%d %s@%s %s\n", b.GetNumber(), b.GetBranch(), b.GetShortSHA(), b.GetCreated())
+		fmt.Fprintf(&txt, "%s\t%s\n", b.GetID(), b.GetArtifactURL())
 		fmt.Fprintf(
 			&html,
 			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-			fmt.Sprintf(`<a href="%s">%d</a>`, b.GetURL(), b.GetNumber()),
+			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetID(), b.GetID()),
 			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetShortSHA()),
 			b.GetCreated().In(s.tz),
 		)
@@ -129,10 +128,6 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
-	buildID, err := strconv.Atoi(req.Build)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid build: %#v", req.Build)
-	}
 	var (
 		target *DeployTarget
 		msg    *operator.Message
@@ -150,7 +145,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	var build build
 	builds, err := s.listBuilds(ctx, target, "")
 	for _, b := range builds {
-		if b.GetNumber() == buildID {
+		if b.GetID() == req.Build {
 			build = b
 		}
 	}
