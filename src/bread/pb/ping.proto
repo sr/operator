@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package bread;
+
+import "operator.proto";
+
+option go_package = "breadpb";
+
+service Ping {
+	rpc Otp(OtpRequest) returns (operator.Response);
+	rpc Ping(PingRequest) returns (operator.Response);
+	rpc SlowLoris(SlowLorisRequest) returns (operator.Response);
+	rpc Whoami(WhoamiRequest) returns (operator.Response);
+}
+
+message OtpRequest {
+	operator.Request request = 1;
+}
+
+message PingRequest {
+	operator.Request request = 1;
+	string arg1 = 2;
+}
+
+message SlowLorisRequest {
+	operator.Request request = 1;
+	string wait = 2;
+}
+
+message WhoamiRequest {
+	operator.Request request = 1;
+}

@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
 
   force_ssl unless: :no_ssl_ok?
 
-  include Canoe::DeployLogic
   include PaginationHelper
 
   protect_from_forgery with: :null_session
@@ -127,7 +126,7 @@ class ApplicationController < ActionController::Base
   helper_method :all_targets
 
   def all_projects
-    @all_projects ||= Project.order(:name).where("name != ?", "chef")
+    @all_projects ||= Project.enabled.order(:name)
   end
   helper_method :all_projects
 
@@ -152,25 +151,14 @@ class ApplicationController < ActionController::Base
   end
 
   def require_deploy_acl_satisfied
-    if current_user.nil?
-      raise "No current user"
-    elsif current_project.nil?
-      raise "No current project"
-    elsif current_target.nil?
-      raise "No current target"
+    if !current_user
+      raise "No current_user"
+    end
+
+    if current_user.deploy_authorized?(current_project, current_target)
+      true
     else
-      acl = DeployACLEntry.for_project_and_deploy_target(current_project, current_target)
-      if acl && !acl.authorized?(current_user)
-        Instrumentation.error("unauthorized-deploy",
-          current_user: current_user.uid,
-          project: current_project.name,
-          target: current_target.name
-        )
-        render template: "application/not_authorized_for_deploy", status: :unauthorized
-        false
-      else
-        true
-      end
+      render template: "application/not_authorized_for_deploy", status: :unauthorized
     end
   end
 

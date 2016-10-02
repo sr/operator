@@ -2,55 +2,95 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	breadping "bread/ping"
+	breadpb "bread/pb"
 )
 
-func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, args map[string]string) (bool, error) {
-	if req.Call.Service == "breadping" {
-		if req.Call.Method == "otp" {
-			client := breadping.NewPingerClient(conn)
-			_, err := client.Otp(
+func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
+	if req.Call.Service == fmt.Sprintf("%s.Deploy", pkg) {
+		if req.Call.Method == "ListTargets" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListTargets(
 				ctx,
-				&breadping.OtpRequest{
+				&breadpb.ListTargetsRequest{
 					Request: req,
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
-		if req.Call.Method == "ping" {
-			client := breadping.NewPingerClient(conn)
-			_, err := client.Ping(
+		if req.Call.Method == "ListBuilds" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.ListBuilds(
 				ctx,
-				&breadping.PingRequest{
+				&breadpb.ListBuildsRequest{
 					Request: req,
-					Arg1:    args["arg1"],
+					Target:  req.Call.Args["target"],
+					Branch:  req.Call.Args["branch"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
-		if req.Call.Method == "whoami" {
-			client := breadping.NewPingerClient(conn)
-			_, err := client.Whoami(
+		if req.Call.Method == "Trigger" {
+			client := breadpb.NewDeployClient(conn)
+			_, err := client.Trigger(
 				ctx,
-				&breadping.WhoamiRequest{
+				&breadpb.TriggerRequest{
 					Request: req,
+					Target:  req.Call.Args["target"],
+					Build:   req.Call.Args["build"],
 				},
 			)
-			if err != nil {
-				return true, err
-			}
-			return true, nil
+			return err
 		}
 	}
-	return false, nil
+	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
+		if req.Call.Method == "Otp" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.Otp(
+				ctx,
+				&breadpb.OtpRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "Ping" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.Ping(
+				ctx,
+				&breadpb.PingRequest{
+					Request: req,
+					Arg1:    req.Call.Args["arg1"],
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "SlowLoris" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.SlowLoris(
+				ctx,
+				&breadpb.SlowLorisRequest{
+					Request: req,
+					Wait:    req.Call.Args["wait"],
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "Whoami" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.Whoami(
+				ctx,
+				&breadpb.WhoamiRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
+	}
+	return fmt.Errorf("no such service: `%s %s`", req.Call.Service, req.Call.Method)
 }

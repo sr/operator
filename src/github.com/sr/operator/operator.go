@@ -3,12 +3,13 @@ package operator
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -37,13 +38,14 @@ type Replier interface {
 	Reply(context.Context, *Source, string, *Message) error
 }
 
-type Invoker func(context.Context, *grpc.ClientConn, *Request, map[string]string) (bool, error)
+type Invoker interface {
+	Invoke(context.Context, *Message, *Request)
+}
 
 type Event struct {
 	Key     string
 	Message *Message
 	Request *Request
-	Args    map[string]string
 	Error   error
 }
 
@@ -83,23 +85,53 @@ func NewCommand(name string, services []ServiceCommand) Command {
 	return Command{name, services}
 }
 
+const reCommandMessage = `\A%s(?P<service>[\w|-]+)\s+(?P<method>[\w|\-]+)(?:\s+(?P<options>.*))?\z`
+
 func NewHandler(
-	instrumenter Instrumenter,
+	ctx context.Context,
+	inst Instrumenter,
 	decoder Decoder,
-	prefix string,
-	conn *grpc.ClientConn,
 	invoker Invoker,
+	pkg string,
+	prefix string,
 ) (http.Handler, error) {
-	return newHandler(
-		instrumenter,
+	re, err := regexp.Compile(fmt.Sprintf(reCommandMessage, regexp.QuoteMeta(prefix)))
+	if err != nil {
+		return nil, err
+	}
+	return &handler{
+		ctx,
+		inst,
 		decoder,
-		prefix,
-		conn,
 		invoker,
-	)
+		re,
+		pkg,
+	}, nil
 }
 
-func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
+type InvokerFunc func(context.Context, *grpc.ClientConn, *Request, string) error
+
+func NewInvoker(
+	conn *grpc.ClientConn,
+	inst Instrumenter,
+	replier Replier,
+	f InvokerFunc,
+	timeout time.Duration,
+	pkg string,
+	errMsgOpts interface{},
+) Invoker {
+	return &invoker{
+		conn,
+		timeout,
+		inst,
+		replier,
+		f,
+		pkg,
+		errMsgOpts,
+	}
+}
+
+func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		in interface{},
@@ -117,12 +149,9 @@ func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInt
 		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
 			return nil, ErrInvalidRequest
 		}
-		req.Call = &Call{
-			Service: strings.ToLower(s[1]),
-			Method:  strings.ToLower(s[2]),
-		}
+		req.Call = &Call{Service: s[1], Method: s[2]}
 		if err := auth.Authorize(ctx, req); err != nil {
-			inst.Instrument(&Event{Key: "unauthorized_request", Request: req, Error: err})
+			inst.Instrument(&Event{Key: "request_unauthorized", Request: req, Error: err})
 			return nil, err
 		}
 		start := time.Now()
@@ -131,7 +160,7 @@ func NewUnaryInterceptor(auth Authorizer, inst Instrumenter) grpc.UnaryServerInt
 			req.Call.Error = err.Error()
 		}
 		req.Call.Duration = ptypes.DurationProto(time.Since(start))
-		inst.Instrument(&Event{Key: "completed_request", Request: req, Error: err})
+		inst.Instrument(&Event{Key: "request_handled", Request: req, Error: err})
 		return resp, err
 	}
 }
@@ -144,6 +173,9 @@ func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Respon
 	src := req.GetSource()
 	if req == nil {
 		return nil, errors.New("unable to reply to request with a source")
+	}
+	if msg == nil {
+		return nil, errors.New("unable to reply without a message")
 	}
 	if msg.HTML == "" && msg.Text == "" {
 		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")

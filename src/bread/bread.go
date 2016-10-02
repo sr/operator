@@ -3,18 +3,22 @@ package bread
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/GeertJohan/yubigo"
-	"github.com/go-ldap/ldap"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"bread/ping"
+	"bread/pb"
 )
 
 const (
@@ -25,33 +29,127 @@ const (
 	LDAPBase    = "dc=pardot,dc=com"
 )
 
-var ACL = []*ACLEntry{
-	{
-		Call: &operator.Call{
-			// TODO(sr) Add Package field to operator.Call struct
-			Service: "ping.pinger",
-			Method:  "ping",
+var (
+	ACL = []*ACLEntry{
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "Otp",
+			},
+			Group: "sysadmin",
+			OTP:   true,
 		},
-		Group: "sysadmin",
-		OTP:   false,
-	},
-	{
-		Call: &operator.Call{
-			Service: "ping.pinger",
-			Method:  "otp",
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "Ping",
+			},
+			Group: "sysadmin",
+			OTP:   false,
 		},
-		Group: "sysadmin",
-		OTP:   true,
-	},
-	{
-		Call: &operator.Call{
-			Service: "ping.pinger",
-			Method:  "whoami",
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "PingPong",
+			},
+			Group: "sysadmin",
+			OTP:   false,
 		},
-		Group: "sysadmin",
-		OTP:   false,
-	},
-}
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "SlowLoris",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "Whoami",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Deploy",
+				Method:  "ListTargets",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Deploy",
+				Method:  "ListBuilds",
+			},
+			Group: "sysadmin",
+			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Deploy",
+				Method:  "Trigger",
+			},
+			Group: "sysadmin",
+			OTP:   true,
+		},
+	}
+
+	ECSDeployTargets = []*DeployTarget{
+		{
+			Name:          "canoe",
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "CAN",
+			Canoe:         false,
+			ECSCluster:    "canoe_production",
+			ECSService:    "canoe",
+			Image:         "build/bread/canoe/app",
+		},
+		{
+			Name:          "hal9000",
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "HAL",
+			Canoe:         false,
+			ECSCluster:    "hal9000_production",
+			ECSService:    "hal9000",
+			Image:         "build/bread/hal9000/app",
+		},
+		{
+			Name:          "operator",
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "OP",
+			Canoe:         false,
+			ECSCluster:    "operator_production",
+			ECSService:    "operator",
+			Image:         "build/bread/operatord/app",
+		},
+		{
+			Name:          "parbot",
+			BambooProject: "BREAD",
+			BambooPlan:    "PAR",
+			BambooJob:     "",
+			Canoe:         false,
+			ECSCluster:    "parbot_production",
+			ECSService:    "parbot",
+			Image:         "build/bread/parbot/app",
+		},
+		{
+			Name:          "teampass",
+			BambooProject: "BREAD",
+			BambooPlan:    "BREAD",
+			BambooJob:     "TEAM",
+			Canoe:         false,
+			ECSCluster:    "teampass",
+			ECSService:    "teampass",
+			Image:         "build/bread/tempass/app",
+		},
+	}
+)
 
 type OTPVerifier interface {
 	Verify(otp string) error
@@ -61,6 +159,33 @@ type ACLEntry struct {
 	Call  *operator.Call
 	Group string
 	OTP   bool
+}
+
+type DeployConfig struct {
+	ArtifactoryAPIKey   string
+	ArtifactoryURL      string
+	ArtifactoryUsername string
+	ArtifactoryRepo     string
+	CanoeURL            string
+	CanoeAPIKey         string
+	ECSTimeout          time.Duration
+	AWSRegion           string
+}
+
+type DeployTarget struct {
+	Name          string
+	BambooProject string
+	BambooPlan    string
+	BambooJob     string
+	Canoe         bool
+	ECSCluster    string
+	ECSService    string
+	Image         string
+}
+
+type LDAPConfig struct {
+	Addr string
+	Base string
 }
 
 type YubicoConfig struct {
@@ -110,33 +235,71 @@ func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 // NewPingHandler returns an http.Handler that implements a simple health
 // check endpoint for use with ELB.
 func NewPingHandler(db *sql.DB) http.Handler {
-	return newPingHandler(db)
+	return &pingHandler{db}
 }
 
 func NewServer(
 	auth operator.Authorizer,
 	inst operator.Instrumenter,
 	repl operator.Replier,
+	deploy *DeployConfig,
+	timezone *time.Location,
 ) (*grpc.Server, error) {
-	server := grpc.NewServer(
-		grpc.UnaryInterceptor(operator.NewUnaryInterceptor(auth, inst)),
-	)
-	pinger, err := breadping.NewAPIServer(repl)
-	if err != nil {
-		return nil, err
+	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
+	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
+	if deploy.ArtifactoryURL != "" &&
+		deploy.ArtifactoryUsername != "" &&
+		deploy.ArtifactoryAPIKey != "" &&
+		deploy.ArtifactoryRepo != "" &&
+		deploy.CanoeURL != "" &&
+		deploy.CanoeAPIKey != "" &&
+		deploy.AWSRegion != "" {
+		breadpb.RegisterDeployServer(server, &deployAPIServer{
+			repl,
+			deploy,
+			&http.Client{},
+			timezone,
+			&canoeDeployer{
+				repl,
+				deploy.CanoeURL,
+				deploy.CanoeAPIKey,
+				&http.Client{},
+			},
+			&ecsDeployer{
+				repl,
+				deploy.ArtifactoryURL,
+				deploy.ArtifactoryRepo,
+				deploy.ArtifactoryUsername,
+				deploy.ArtifactoryAPIKey,
+				ecs.New(
+					session.New(
+						&aws.Config{
+							Region: aws.String(deploy.AWSRegion),
+						},
+					),
+				),
+				ECSDeployTargets,
+				deploy.ECSTimeout,
+			},
+		})
 	}
-	breadping.RegisterPingerServer(server, pinger)
 	return server, nil
 }
 
-// NewAuthorizer returns an operator.Authorizer that enforces ACLs for ChatOps
-// commands using LDAP for authN/authZ, and verifies 2FA tokens via Yubikey's
-// YubiCloud web service. See: https://developers.yubico.com/OTP/
-func NewAuthorizer(conn *ldap.Conn, base string, verifier OTPVerifier) (operator.Authorizer, error) {
-	if base == "" {
-		base = LDAPBase
+// NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
+// for authN/authZ, and verifies 2FA tokens via Yubico's YubiCloud web service.
+//
+// See: https://developers.yubico.com/OTP/
+func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (operator.Authorizer, error) {
+	if ldap.Base == "" {
+		ldap.Base = LDAPBase
 	}
-	return newAuthorizer(conn, base, verifier, ACL)
+	for _, e := range acl {
+		if e.Call == nil || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
+			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
+		}
+	}
+	return &authorizer{ldap, verifier, acl}, nil
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the
