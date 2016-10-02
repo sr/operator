@@ -258,7 +258,7 @@ resource "aws_elb" "artifactory_public_elb" {
   listener {
     lb_port = 443
     lb_protocol = "https"
-    instance_port = 80
+    instance_port = 8081
     instance_protocol = "http"
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
