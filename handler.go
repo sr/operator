@@ -22,7 +22,7 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msg, replierID, err := h.decoder.Decode(h.ctx, r)
+	msg, senderID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
 		h.inst.Instrument(&Event{Key: "handler_decode_error", Error: err})
 		w.WriteHeader(http.StatusBadRequest)
@@ -73,9 +73,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Method:  generator.Camelize(matches[2], "-"),
 				Args:    args,
 			},
-			Otp:       otp,
-			ReplierId: replierID,
-			Source:    msg.Source,
+			Otp:      otp,
+			SenderId: senderID,
+			Source:   msg.Source,
 		},
 	)
 }

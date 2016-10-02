@@ -7,16 +7,12 @@ import (
 	"golang.org/x/net/context"
 )
 
-type replier struct {
+type sender struct {
 	store    ClientCredentialsStore
 	hostname string
 }
 
-func newReplier(store ClientCredentialsStore, hostname string) *replier {
-	return &replier{store, hostname}
-}
-
-func (s *replier) Reply(ctx context.Context, src *operator.Source, rep string, msg *operator.Message) error {
+func (s *sender) Send(ctx context.Context, src *operator.Source, rep string, msg *operator.Message) error {
 	if src.Type != operator.SourceType_HUBOT {
 		return nil
 	}

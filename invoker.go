@@ -13,7 +13,7 @@ type invoker struct {
 	conn    *grpc.ClientConn
 	timeout time.Duration
 	inst    Instrumenter
-	replier Replier
+	sender  Sender
 	f       InvokerFunc
 	pkg     string
 	msgOpts interface{}
@@ -34,16 +34,16 @@ func (i *invoker) Invoke(ctx context.Context, msg *Message, req *Request) {
 		event.Error = err
 	}
 	if event.Error != nil &&
-		i.replier != nil &&
+		i.sender != nil &&
 		req != nil &&
 		!strings.Contains(event.Error.Error(), "no such service:") {
-		if err := i.replier.Reply(ctx, req.GetSource(), req.ReplierId, &Message{
+		if err := i.sender.Send(ctx, req.GetSource(), req.SenderId, &Message{
 			Text:    grpc.ErrorDesc(event.Error),
 			HTML:    fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(event.Error)),
 			Options: i.msgOpts,
 		}); err != nil {
 			i.inst.Instrument(&Event{
-				Key:     "invoker_replier_error",
+				Key:     "invoker_sender_error",
 				Request: req,
 				Message: msg,
 				Error:   err,
