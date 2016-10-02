@@ -91,7 +91,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		})
 	}
 	var txt, html bytes.Buffer
-	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th><th></th></tr>")
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Commit</th><th>Completed</th><th></th></tr>")
 	i := 0
 	for _, b := range builds {
 		if i >= 10 {
