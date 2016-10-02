@@ -646,9 +646,9 @@ resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
   }
 
   health_check {
-    interval = "60"
-    path = "/artifactory/api/system/ping"
-    port = 80
+    interval = "20"
+    path = "/artifactory/webapp/"
+    port = 8081
     protocol = "HTTP"
     healthy_threshold = 5
     unhealthy_threshold = 5
