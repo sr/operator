@@ -202,5 +202,5 @@ func (a *canoeBuild) GetCreated() time.Time {
 	if a == nil {
 		return time.Unix(0, 0)
 	}
-	return time.Now()
+	return a.CreatedAt
 }

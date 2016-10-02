@@ -320,7 +320,7 @@ func (a *afyItem) GetCreated() time.Time {
 	if a == nil {
 		return time.Unix(0, 0)
 	}
-	return time.Now()
+	return a.Created
 }
 
 type afyItems []*afyItem
