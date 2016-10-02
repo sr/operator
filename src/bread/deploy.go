@@ -25,7 +25,7 @@ const (
 type deployer interface {
 	listTargets(context.Context) ([]*DeployTarget, error)
 	listBuilds(context.Context, *DeployTarget, string) ([]build, error)
-	deploy(context.Context, *operator.Request, *DeployTarget, build) (*operator.Message, error)
+	deploy(context.Context, *operator.RequestSender, *DeployTarget, build, string) (*operator.Message, error)
 }
 
 type build interface {
@@ -40,7 +40,7 @@ type build interface {
 }
 
 type deployAPIServer struct {
-	operator.Replier
+	operator.Sender
 	conf  *DeployConfig
 	http  *http.Client
 	tz    *time.Location
@@ -55,7 +55,7 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 		names[i] = t.Name
 	}
 	sort.Strings(names)
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		HTML: "Deployment targets: " + strings.Join(names, ", "),
 		Text: strings.Join(names, " "),
 	})
@@ -85,7 +85,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		return nil, err
 	}
 	if len(builds) == 0 {
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return operator.Reply(ctx, s, req, &operator.Message{
 			Text: "",
 			HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch),
 		})
@@ -108,7 +108,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		)
 		i++
 	}
-	return operator.Reply(s, ctx, req, &operator.Message{Text: txt.String(), HTML: html.String()})
+	return operator.Reply(ctx, s, req, &operator.Message{Text: txt.String(), HTML: html.String()})
 }
 
 var eggs = map[string]string{
@@ -121,7 +121,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, errors.New("invalid request")
 	}
 	if v, ok := eggs[req.Target]; ok {
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return operator.Reply(ctx, s, req, &operator.Message{
 			Text: v,
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
@@ -153,14 +153,14 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, fmt.Errorf("No such build %s", req.Build)
 	}
 	if target.Canoe {
-		msg, err = s.canoe.deploy(ctx, req.GetRequest(), target, build)
+		msg, err = s.canoe.deploy(ctx, operator.GetSender(s, req), target, build, operator.GetUserEmail(req))
 	} else {
-		msg, err = s.ecs.deploy(ctx, req.GetRequest(), target, build)
+		msg, err = s.ecs.deploy(ctx, operator.GetSender(s, req), target, build, operator.GetUserEmail(req))
 	}
 	if err != nil {
 		return nil, err
 	}
-	return operator.Reply(s, ctx, req, msg)
+	return operator.Reply(ctx, s, req, msg)
 }
 
 var ecsRunning = aws.String("RUNNING")
@@ -170,7 +170,7 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	if t, err := s.canoe.listTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
-		_, _ = operator.Reply(s, ctx, req, &operator.Message{
+		operator.Send(ctx, s, req, &operator.Message{
 			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
 			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
 			Options: &operatorhipchat.MessageOptions{

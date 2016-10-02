@@ -17,7 +17,6 @@ import (
 )
 
 type canoeDeployer struct {
-	operator.Replier
 	canoeURL string
 	apiToken string
 	http     *http.Client
@@ -74,11 +73,14 @@ func (d *canoeDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch 
 	return builds, nil
 }
 
-func (d *canoeDeployer) deploy(ctx context.Context, req *operator.Request, t *DeployTarget, reqBuild build) (*operator.Message, error) {
+func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSender, t *DeployTarget, reqBuild build, email string) (*operator.Message, error) {
+	if email == "" {
+		return nil, errors.New("unable to deploy without a user")
+	}
 	params := url.Values{}
 	params.Add("project_name", t.Name)
 	params.Add("artifact_url", reqBuild.GetURL())
-	params.Add("user_email", req.UserEmail())
+	params.Add("user_email", email)
 	resp, err := d.doCanoe(
 		ctx,
 		"POST",

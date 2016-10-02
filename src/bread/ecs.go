@@ -16,12 +16,9 @@ import (
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
-
-	"bread/pb"
 )
 
 type ecsDeployer struct {
-	operator.Replier
 	afyURL    string
 	afyRepo   string
 	afyUser   string
@@ -70,7 +67,7 @@ func (d *ecsDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch st
 	return builds, nil
 }
 
-func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *DeployTarget, b build) (*operator.Message, error) {
+func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender, t *DeployTarget, b build, _ string) (*operator.Message, error) {
 	svc, err := d.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
 			Services: []*string{aws.String(t.ECSService)},
@@ -133,8 +130,7 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 			d.timeout,
 		)
 	}
-	// TODO(sr) Figure out a nicer interface for sending non-final messages
-	_, _ = operator.Reply(d, ctx, &breadpb.TriggerRequest{Request: req}, &operator.Message{
+	_ = sender.Send(ctx, &operator.Message{
 		Text: *newTask.TaskDefinition.TaskDefinitionArn,
 		HTML: html,
 		Options: &operatorhipchat.MessageOptions{

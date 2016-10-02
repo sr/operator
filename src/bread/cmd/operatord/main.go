@@ -96,10 +96,10 @@ func run(invoker operator.InvokerFunc) error {
 		return fmt.Errorf("required flag missing: addr-grpc")
 	}
 	var (
-		logger  protolog.Logger
-		inst    operator.Instrumenter
-		auth    operator.Authorizer
-		replier operator.Replier
+		logger protolog.Logger
+		inst   operator.Instrumenter
+		auth   operator.Authorizer
+		sender operator.Sender
 
 		store    operatorhipchat.ClientCredentialsStore
 		verifier bread.OTPVerifier
@@ -124,7 +124,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
-		replier = &devReplier{client: cl, roomID: config.devRoomID}
+		sender = &devSender{client: cl, roomID: config.devRoomID}
 	} else {
 		if config.httpAddr == "" {
 			return fmt.Errorf("required flag missing: addr-http")
@@ -158,7 +158,7 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
-		replier = operatorhipchat.NewReplier(store, bread.HipchatHost)
+		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
 		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
 			return err
 		}
@@ -174,7 +174,7 @@ func run(invoker operator.InvokerFunc) error {
 	if grpcServer, err = bread.NewServer(
 		auth,
 		inst,
-		replier,
+		sender,
 		config.deploy,
 		tz,
 	); err != nil {
@@ -212,7 +212,7 @@ func run(invoker operator.InvokerFunc) error {
 			operator.NewInvoker(
 				conn,
 				inst,
-				replier,
+				sender,
 				invoker,
 				config.timeout,
 				pkg,
@@ -273,12 +273,12 @@ func (a *noopAuthorizer) Authorize(_ context.Context, _ *operator.Request) error
 	return nil
 }
 
-type devReplier struct {
+type devSender struct {
 	client operatorhipchat.Client
 	roomID int
 }
 
-func (r *devReplier) Reply(ctx context.Context, src *operator.Source, rep string, msg *operator.Message) error {
+func (r *devSender) Send(ctx context.Context, src *operator.Source, rep string, msg *operator.Message) error {
 	notif := &operatorhipchat.RoomNotification{RoomID: int64(r.roomID)}
 	if msg.HTML != "" {
 		notif.MessageFormat = "html"
