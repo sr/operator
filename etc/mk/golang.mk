@@ -10,7 +10,7 @@ UNUSED = $(GOBIN)/unused
 PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/... | grep -Ev '^bread/vendor/|devenv/vendor')
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
-all: install test fmt lint deadleaves vet errcheck interfacer unused
+all: install test fmt lint vet errcheck interfacer unused deadleaves
 
 install:
 	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
