@@ -18,9 +18,8 @@ import (
 )
 
 const (
-	bambooURL = "https://bamboo.dev.pardot.com"
-	master    = "master"
-	pardot    = "pardot"
+	master = "master"
+	pardot = "pardot"
 )
 
 type deployer interface {
@@ -102,7 +101,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		fmt.Fprintf(
 			&html,
 			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetID(), b.GetID()),
+			fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
 			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetShortSHA()),
 			b.GetCreated().In(s.tz),
 		)

@@ -129,7 +129,7 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
 			*svc.Services[0].ServiceName,
 			t.ECSCluster,
-			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetID(), b.GetID()),
+			fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
 			d.timeout,
 		)
 	}
@@ -180,7 +180,7 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 			Text: fmt.Sprintf("Deployed build %s@%s to %s", t.Name, b.GetID(), t.ECSCluster),
 			HTML: fmt.Sprintf(
 				"Deployed build %s to ECS service <code>%s@%s</code>",
-				fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetID(), b.GetID()),
+				fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
 				*svc.Services[0].ServiceName,
 				t.ECSCluster,
 			),
