@@ -192,14 +192,12 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	return targets
 }
 
-func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) (builds []build, err error) {
+func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]build, error) {
 	if t.Canoe {
 		if branch == "" {
 			branch = master
 		}
-		builds, err = s.canoe.listBuilds(ctx, t, branch)
-	} else {
-		builds, err = s.ecs.listBuilds(ctx, t, "")
+		return s.canoe.listBuilds(ctx, t, branch)
 	}
-	return builds, err
+	return s.ecs.listBuilds(ctx, t, "")
 }
