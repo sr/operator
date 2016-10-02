@@ -23,31 +23,16 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "172.31.0.0/16", # pardot-atlassian: default vpc
-      "192.168.128.0/22" # pardot-ci: default vpc
+    security_groups = [
+      "${aws_security_group.artifactory_dc_only_http_lb.id}",
+      "${aws_security_group.artifactory_http_lb.id}",
+      "${aws_security_group.artifactory_internal_elb_secgroup.id}"
     ]
   }
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_vpc.appdev.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "172.31.0.0/16", # pardot-atlassian: default vpc
-      "192.168.128.0/22" # pardot-ci: default vpc
-    ]
-  }
-
-  ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 8081
+    to_port = 8081
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.artifactory_dc_only_http_lb.id}",
@@ -171,8 +156,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
-    "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_http_lb.id}"
+    "${aws_security_group.artifactory_instance_secgroup.id}"
   ]
   root_block_device {
     volume_type = "gp2"
@@ -201,8 +185,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
-    "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_http_lb.id}"
+    "${aws_security_group.artifactory_instance_secgroup.id}"
   ]
   root_block_device {
     volume_type = "gp2"
@@ -231,8 +214,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
   vpc_security_group_ids = [
-    "${aws_security_group.artifactory_instance_secgroup.id}",
-    "${aws_security_group.artifactory_http_lb.id}"
+    "${aws_security_group.artifactory_instance_secgroup.id}"
   ]
   root_block_device {
     volume_type = "gp2"
@@ -254,7 +236,6 @@ resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
 }
 
 resource "aws_elb" "artifactory_public_elb" {
-  name = "afy-pblc-elb-dev-pardot-com"
   security_groups = [
     "${aws_security_group.artifactory_dc_only_http_lb.id}",
     "${aws_security_group.artifactory_http_lb.id}"
@@ -293,8 +274,8 @@ resource "aws_elb" "artifactory_public_elb" {
     healthy_threshold = 4
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:80/artifactory/api/system/ping"
-    interval = 5
+    target = "HTTP:8081/artifactory/webapp/"
+    interval = 20
   }
 
   tags {
