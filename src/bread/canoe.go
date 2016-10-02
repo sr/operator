@@ -204,26 +204,3 @@ func (a *canoeBuild) GetCreated() time.Time {
 	}
 	return time.Now()
 }
-
-type parsedImg struct {
-	host       string
-	registryID string
-	repo       string
-	tag        string
-}
-
-// parseImage parses a ecs.ContainerDefinition string Image.
-func parseImage(img string) (*parsedImg, error) {
-	u, err := url.Parse("docker://" + img)
-	if err != nil {
-		return nil, err
-	}
-	host := strings.Split(u.Host, ".")
-	path := strings.Split(u.Path, ":")
-	return &parsedImg{
-		host:       u.Host,
-		registryID: host[0],
-		repo:       path[0][1:],
-		tag:        path[1],
-	}, nil
-}
