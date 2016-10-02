@@ -67,18 +67,18 @@ func (d *ecsDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch st
 	return builds, nil
 }
 
-func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender, t *DeployTarget, b build, _ string) (*operator.Message, error) {
+func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
 	svc, err := d.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
-			Services: []*string{aws.String(t.ECSService)},
-			Cluster:  aws.String(t.ECSCluster),
+			Services: []*string{aws.String(req.Target.ECSService)},
+			Cluster:  aws.String(req.Target.ECSCluster),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if len(svc.Services) != 1 {
-		return nil, fmt.Errorf("Cluster %s has no service %s", t.ECSCluster, t.ECSService)
+		return nil, fmt.Errorf("Cluster %s has no service %s", req.Target.ECSCluster, req.Target.ECSService)
 	}
 	out, err := d.ecs.DescribeTaskDefinition(
 		&ecs.DescribeTaskDefinitionInput{
@@ -88,7 +88,7 @@ func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender
 	if err != nil {
 		return nil, err
 	}
-	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(b.GetArtifactURL())
+	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(req.Build.GetArtifactURL())
 	newTask, err := d.ecs.RegisterTaskDefinition(
 		&ecs.RegisterTaskDefinitionInput{
 			ContainerDefinitions: out.TaskDefinition.ContainerDefinitions,
@@ -113,20 +113,20 @@ func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender
 		html    string
 		fingers = `<img class="remoticon" aria-label="(fingerscrossed)" alt="(fingerscrossed)" height="30" width="30" src="https://hipchat.dev.pardot.com/files/img/emoticons/1/fingerscrossed-1459185721@2x.png">`
 	)
-	if t.Name == "operator" {
+	if req.Target.Name == "operator" {
 		html = fmt.Sprintf(
 			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
-			t.ECSCluster,
-			b.GetID(),
+			req.Target.ECSCluster,
+			req.Build.GetID(),
 			fingers,
 		)
 	} else {
 		html = fmt.Sprintf(
 			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
 			*svc.Services[0].ServiceName,
-			t.ECSCluster,
-			fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
+			req.Target.ECSCluster,
+			fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
 			d.timeout,
 		)
 	}
@@ -170,15 +170,15 @@ func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender
 	}()
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", t.Name, b.GetID(), d.timeout)
+		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target.Name, req.Build.GetID(), d.timeout)
 	case <-okC:
 		return &operator.Message{
-			Text: fmt.Sprintf("Deployed build %s@%s to %s", t.Name, b.GetID(), t.ECSCluster),
+			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target.Name, req.Build.GetID(), req.Target.ECSCluster),
 			HTML: fmt.Sprintf(
 				"Deployed build %s to ECS service <code>%s@%s</code>",
-				fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
+				fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
 				*svc.Services[0].ServiceName,
-				t.ECSCluster,
+				req.Target.ECSCluster,
 			),
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",

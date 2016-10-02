@@ -25,7 +25,7 @@ const (
 type deployer interface {
 	listTargets(context.Context) ([]*DeployTarget, error)
 	listBuilds(context.Context, *DeployTarget, string) ([]build, error)
-	deploy(context.Context, *operator.RequestSender, *DeployTarget, build, string) (*operator.Message, error)
+	deploy(context.Context, *operator.RequestSender, *deployRequest) (*operator.Message, error)
 }
 
 type build interface {
@@ -37,6 +37,12 @@ type build interface {
 	GetShortSHA() string
 	GetRepoURL() string
 	GetCreated() time.Time
+}
+
+type deployRequest struct {
+	Target    *DeployTarget
+	Build     build
+	UserEmail string
 }
 
 type deployAPIServer struct {
@@ -152,10 +158,15 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if build == nil {
 		return nil, fmt.Errorf("No such build %s", req.Build)
 	}
+	deploy := &deployRequest{
+		Target:    target,
+		Build:     build,
+		UserEmail: operator.GetUserEmail(req),
+	}
 	if target.Canoe {
-		msg, err = s.canoe.deploy(ctx, operator.GetSender(s, req), target, build, operator.GetUserEmail(req))
+		msg, err = s.canoe.deploy(ctx, operator.GetSender(s, req), deploy)
 	} else {
-		msg, err = s.ecs.deploy(ctx, operator.GetSender(s, req), target, build, operator.GetUserEmail(req))
+		msg, err = s.ecs.deploy(ctx, operator.GetSender(s, req), deploy)
 	}
 	if err != nil {
 		return nil, err

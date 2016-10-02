@@ -73,14 +73,14 @@ func (d *canoeDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch 
 	return builds, nil
 }
 
-func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSender, t *DeployTarget, reqBuild build, email string) (*operator.Message, error) {
-	if email == "" {
+func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
+	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
 	}
 	params := url.Values{}
-	params.Add("project_name", t.Name)
-	params.Add("artifact_url", reqBuild.GetURL())
-	params.Add("user_email", email)
+	params.Add("project_name", req.Target.Name)
+	params.Add("artifact_url", req.Build.GetURL())
+	params.Add("user_email", req.UserEmail)
 	resp, err := d.doCanoe(
 		ctx,
 		"POST",
@@ -106,10 +106,10 @@ func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSend
 	if data.Error {
 		return nil, errors.New(data.Message)
 	}
-	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoeURL, t.Name, data.Deploy.ID)
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoeURL, req.Target.Name, data.Deploy.ID)
 	return &operator.Message{
 		Text: deployURL,
-		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, t.Name, deployURL, data.Deploy.ID),
+		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target.Name, deployURL, data.Deploy.ID),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "green",
 		},
