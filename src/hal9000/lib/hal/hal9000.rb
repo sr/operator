@@ -9,15 +9,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :user_email, :string, 2
     optional :room, :string, 3
   end
-  add_message "hal.IsMatchResponse" do
+  add_message "hal.Response" do
     optional :match, :bool, 1
-  end
-  add_message "hal.DispatchResponse" do
   end
 end
 
 module Hal
   Message = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal.Message").msgclass
-  IsMatchResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal.IsMatchResponse").msgclass
-  DispatchResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal.DispatchResponse").msgclass
+  Response = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal.Response").msgclass
 end

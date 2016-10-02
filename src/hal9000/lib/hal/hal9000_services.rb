@@ -14,8 +14,8 @@ module Hal
       self.unmarshal_class_method = :decode
       self.service_name = 'hal.Robot'
 
-      rpc :IsMatch, Message, IsMatchResponse
-      rpc :Dispatch, Message, DispatchResponse
+      rpc :IsMatch, Message, Response
+      rpc :Dispatch, Message, Response
     end
 
     Stub = Service.rpc_stub_class
