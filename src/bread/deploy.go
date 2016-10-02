@@ -91,7 +91,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		})
 	}
 	var txt, html bytes.Buffer
-	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th><th></th></tr>")
 	i := 0
 	for _, b := range builds {
 		if i >= 10 {
@@ -100,10 +100,11 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		fmt.Fprintf(&txt, "%s\t%s\n", b.GetID(), b.GetArtifactURL())
 		fmt.Fprintf(
 			&html,
-			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-			fmt.Sprintf(`<a href="%s">%s</a>`, b.GetURL(), b.GetID()),
+			"<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+			fmt.Sprintf("<code>%s</code>", b.GetID()),
 			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetShortSHA()),
-			b.GetCreated().In(s.tz),
+			b.GetCreated().In(s.tz).Format("2006-01-02 15:04:05 MST"),
+			fmt.Sprintf(`<a href="%s">View details</a>`, b.GetURL()),
 		)
 		i++
 	}
