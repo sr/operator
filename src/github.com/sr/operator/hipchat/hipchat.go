@@ -88,8 +88,8 @@ func (c *ClientConfig) Secret() string {
 	return c.Credentials.Secret
 }
 
-func NewReplier(store ClientCredentialsStore, hostname string) operator.Replier {
-	return newReplier(store, hostname)
+func NewSender(store ClientCredentialsStore, hostname string) operator.Sender {
+	return &sender{store, hostname}
 }
 
 func NewRequestDecoder(store ClientCredentialsStore) operator.Decoder {
