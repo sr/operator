@@ -181,7 +181,7 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	if t, err := s.canoe.listTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
-		operator.Send(ctx, s, req, &operator.Message{
+		_ = operator.Send(ctx, s, req, &operator.Message{
 			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
 			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
 			Options: &operatorhipchat.MessageOptions{
