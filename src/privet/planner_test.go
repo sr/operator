@@ -1,7 +1,6 @@
 package privet_test
 
 import (
-	"fmt"
 	"privet"
 	"reflect"
 	"testing"
@@ -16,6 +15,11 @@ func expectPlan(t *testing.T, opts *privet.PlanCreationOpts, expectedPlan *prive
 
 	if len(plan.Workers) != len(expectedPlan.Workers) {
 		t.Fatalf("expected plan to have %d workers, but got %d", len(expectedPlan.Workers), len(plan.Workers))
+	}
+	for i, _ := range expectedPlan.Workers {
+		if _, ok := plan.Workers[i]; !ok {
+			t.Fatalf("expected plan to have worker %d, but was missing", i)
+		}
 	}
 
 	// A plan has many workers
@@ -36,17 +40,21 @@ func expectPlan(t *testing.T, opts *privet.PlanCreationOpts, expectedPlan *prive
 
 			for executionIndex, execution := range batch.TestExecutions {
 				expectedExecution := expectedBatch.TestExecutions[executionIndex]
-				fmt.Printf("%#v\n", execution)
-				fmt.Printf("%#v\n", expectedExecution)
-				if !reflect.DeepEqual(execution, expectedExecution) {
-					t.Fatalf("expected worker %d, batch %d, test execution %d to be %#v, but was %#v", workerIndex, batchIndex, executionIndex, expectedExecution, execution)
+				if execution.File != expectedExecution.File {
+					t.Fatalf("expected worker %d, batch %d, test execution %d to have file %v, but was %v", workerIndex, batchIndex, executionIndex, expectedExecution.File, execution.File)
+				}
+				if !reflect.DeepEqual(execution.TestCaseNames, expectedExecution.TestCaseNames) {
+					t.Fatalf("expected worker %d, batch %d, test execution %d to have test case names %v, but was %v", workerIndex, batchIndex, executionIndex, expectedExecution.TestCaseNames, execution.TestCaseNames)
 				}
 			}
 		}
 	}
 }
 
-func TestBasicPlan(t *testing.T) {
+func TestBasicPlanChunkedByDuration(t *testing.T) {
+	// If each test is expected to take 30 seconds by default, and the
+	// target duration is 1 minute, the first two tests should get chunked into
+	// the first worker
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
@@ -63,28 +71,20 @@ func TestBasicPlan(t *testing.T) {
 			},
 		},
 		PreviousResults:     nil,
-		NumWorkers:          3,
+		NumWorkers:          2,
 		TargetDuration:      1 * time.Minute,
-		DefaultTestDuration: 1 * time.Minute,
+		DefaultTestDuration: 30 * time.Second,
 	}
 
 	expectedPlan := &privet.Plan{
 		Workers: map[int]*privet.PlanWorker{
-			0: &privet.PlanWorker{
+			0: {
 				TestBatches: []*privet.PlanTestBatch{
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
 								File: "/test1.php",
 							},
-						},
-					},
-				},
-			},
-			1: &privet.PlanWorker{
-				TestBatches: []*privet.PlanTestBatch{
-					{
-						TestExecutions: []*privet.PlanTestExecution{
 							{
 								File: "/test2.php",
 							},
@@ -92,7 +92,7 @@ func TestBasicPlan(t *testing.T) {
 					},
 				},
 			},
-			2: &privet.PlanWorker{
+			1: {
 				TestBatches: []*privet.PlanTestBatch{
 					{
 						TestExecutions: []*privet.PlanTestExecution{
@@ -108,61 +108,3 @@ func TestBasicPlan(t *testing.T) {
 
 	expectPlan(t, planOpts, expectedPlan)
 }
-
-// func TestPlanWithPreviousResults(t *testing.T) {
-//	planOpts := &privet.PlanCreationOpts{
-//		TestFiles: []*privet.TestFile{
-//			{
-//				File:  "/test1.php",
-//				Suite: "suite1",
-//			},
-//			{
-//				File:  "/test2.php",
-//				Suite: "suite1",
-//			},
-//			{
-//				File:  "/test3.php",
-//				Suite: "suite1",
-//			},
-//		},
-//		PreviousResults: []*privet.TestFileResult{
-//			{
-//				{
-//					Name:     "Test1",
-//					File:     "/app/test1.class.php",
-//					Duration: 1 * time.Minute,
-//				},
-//				{
-//					Name:     "Test2",
-//					Filename: "/app/test2.class.php",
-//					Time:     30 * time.Second,
-//				},
-//				{
-//					Name:     "test3",
-//					Filename: "/app/test3.class.php",
-//					Time:     30 * time.Second,
-//				},
-//			},
-//		},
-//		NumWorkers:          2,
-//		TargetDuration:      1 * time.Minute,
-//		DefaultTestDuration: 1 * time.Minute,
-//	}
-
-//	plan, err := planner.Plan()
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	if len(plan.Workers) != 2 {
-//		t.Errorf("expected len(plan.Workers) to be %d, but was %d", 2, len(plan.Workers))
-//	}
-
-//	worker0 := plan.Workers[0]
-//	if len(worker0) != 1 {
-//		t.Errorf("expected worker 0 to be assigned %d tasks, but was assigned %d", 1, len(worker0))
-//	}
-//	worker1 := plan.Workers[1]
-//	if len(worker1) != 2 {
-//		t.Errorf("expected worker 1 to be assigned %d tasks, but was assigned %d", 2, len(worker1))
-//	}
-// }

@@ -5,6 +5,8 @@ import "time"
 type PlanTestExecution struct {
 	File string `json:"file"`
 
+	ExpectedDuration time.Duration `json:"-"`
+
 	// If present, Privet has determined that only the specified test cases
 	// should be run because running the entire file would take much longer
 	// than the TargetDuration. If not present, the entire file should be
@@ -42,35 +44,64 @@ type PlanCreationOpts struct {
 	DefaultTestDuration time.Duration
 }
 
-// newPlanWorker creates a new PlanWorker with the first test batch initialized
-func newPlanWorker() *PlanWorker {
-	return &PlanWorker{
-		TestBatches: []*PlanTestBatch{
-			&PlanTestBatch{},
-		},
-	}
-}
-
 func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 	plan := &Plan{
 		Workers: make(map[int]*PlanWorker),
 	}
 
-	currentWorkerIndex := 0
+	batches := []*PlanTestBatch{}
+	currentBatchIndex := 0
+	currentBatchDuration := time.Duration(0)
+	totalRemainingDuration := time.Duration(0)
 	for _, testFile := range opts.TestFiles {
+		currentTestFileDuration := opts.DefaultTestDuration
+		if currentBatchDuration+currentTestFileDuration > opts.TargetDuration {
+			currentBatchIndex++
+			currentBatchDuration = time.Duration(0)
+		}
+
+		for currentBatchIndex >= len(batches) {
+			batches = append(batches, &PlanTestBatch{
+				TestExecutions: []*PlanTestExecution{},
+			})
+		}
+		currentBatch := batches[currentBatchIndex]
+		currentBatch.TestExecutions = append(currentBatch.TestExecutions, &PlanTestExecution{
+			File:             testFile.File,
+			ExpectedDuration: currentTestFileDuration,
+		})
+
+		currentBatchDuration += currentTestFileDuration
+		totalRemainingDuration += currentTestFileDuration
+	}
+
+	approxDurationPerRemainingWorker := totalRemainingDuration / time.Duration(opts.NumWorkers)
+	currentWorkerIndex := 0
+	currentWorkerDuration := time.Duration(0)
+	for _, batch := range batches {
+		currentBatchDuration = time.Duration(0)
+		for _, execution := range batch.TestExecutions {
+			currentBatchDuration += execution.ExpectedDuration
+		}
+		if _, ok := plan.Workers[currentWorkerIndex]; ok &&
+			currentWorkerDuration+currentBatchDuration > approxDurationPerRemainingWorker {
+			currentWorkerIndex++
+			currentWorkerDuration = 0
+			approxDurationPerRemainingWorker = totalRemainingDuration / time.Duration(opts.NumWorkers-currentWorkerIndex)
+		}
+
 		currentWorker, ok := plan.Workers[currentWorkerIndex]
 		if !ok {
-			currentWorker = newPlanWorker()
+			currentWorker = &PlanWorker{
+				TestBatches: []*PlanTestBatch{},
+			}
 			plan.Workers[currentWorkerIndex] = currentWorker
 		}
-		currentBatch := currentWorker.TestBatches[len(currentWorker.TestBatches)-1]
 
-		testExecution := &PlanTestExecution{
-			File: testFile.File,
-		}
-		currentBatch.TestExecutions = append(currentBatch.TestExecutions, testExecution)
+		currentWorker.TestBatches = append(currentWorker.TestBatches, batch)
 
-		currentWorkerIndex++
+		currentWorkerDuration += currentBatchDuration
+		totalRemainingDuration -= currentBatchDuration
 	}
 
 	return plan, nil
