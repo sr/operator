@@ -47,9 +47,9 @@ func (a *fakeAuthorizer) Authorize(context.Context, *operator.Request) error {
 	return a.err
 }
 
-type fakeReplier struct{}
+type fakeSender struct{}
 
-func (c *fakeReplier) Reply(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
+func (c *fakeSender) Send(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
 	return nil
 }
 
@@ -113,7 +113,7 @@ func TestOperator(t *testing.T) {
 	inst := &fakeInstrumenter{}
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	defer server.GracefulStop()
-	operatortesting.RegisterPingerServer(server, operatortesting.NewServer(&fakeReplier{}))
+	operatortesting.RegisterPingerServer(server, operatortesting.NewServer(&fakeSender{}))
 	listener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to listen: %v", err)
@@ -132,7 +132,7 @@ func TestOperator(t *testing.T) {
 	t.Run("UnaryServerInterceptor", func(t *testing.T) {
 		client := operatortesting.NewPingerClient(conn)
 		authErr := errors.New("unauthorized")
-		pingReq := &operatortesting.PingRequest{Request: &operator.Request{}}
+		pingReq := &operatortesting.PingRequest{Request: &operator.Request{Source: &operator.Source{}}}
 		for _, tc := range []struct {
 			call    *operator.Call
 			req     *operatortesting.PingRequest
@@ -148,7 +148,7 @@ func TestOperator(t *testing.T) {
 			{&operator.Call{Service: "testing.Pinger", Method: "Ping"},
 				pingReq, authErr, authErr, "request_unauthorized", false},
 			{&operator.Call{Service: "testing.Pinger", Method: "Ping"},
-				&operatortesting.PingRequest{}, nil, operator.ErrInvalidRequest, "", false},
+				&operatortesting.PingRequest{Request: &operator.Request{}}, nil, operator.ErrInvalidRequest, "", false},
 		} {
 			auth.err = tc.authErr
 			switch tc.call.Method {
@@ -175,7 +175,7 @@ func TestOperator(t *testing.T) {
 						tc.call.Method, ev.Request.Call.Service, ev.Request.Call.Method)
 				}
 			} else if ev != nil {
-				t.Fatalf("expected no event, got event.Key = %s", ev.Key)
+				t.Errorf("expected no event, got event.Key = %s", ev.Key)
 			}
 		}
 	})

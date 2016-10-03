@@ -23,11 +23,11 @@ class AuthUser < ApplicationRecord
       return true
     end
 
-    if !acl.authorized?
+    if !acl.authorized?(self)
       event = {
-        current_user: current_user.uid,
-        project: current_project.name,
-        target: current_target.name
+        current_user: uid,
+        project: project.name,
+        target: target.name
       }
       Instrumentation.error("unauthorized-deploy", event)
 

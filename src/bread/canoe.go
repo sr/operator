@@ -17,7 +17,6 @@ import (
 )
 
 type canoeDeployer struct {
-	operator.Replier
 	canoeURL string
 	apiToken string
 	http     *http.Client
@@ -74,11 +73,14 @@ func (d *canoeDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch 
 	return builds, nil
 }
 
-func (d *canoeDeployer) deploy(ctx context.Context, req *operator.Request, t *DeployTarget, reqBuild build) (*operator.Message, error) {
+func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
+	if req.UserEmail == "" {
+		return nil, errors.New("unable to deploy without a user")
+	}
 	params := url.Values{}
-	params.Add("project_name", t.Name)
-	params.Add("artifact_url", reqBuild.GetURL())
-	params.Add("user_email", req.UserEmail())
+	params.Add("project_name", req.Target.Name)
+	params.Add("artifact_url", req.Build.GetURL())
+	params.Add("user_email", req.UserEmail)
 	resp, err := d.doCanoe(
 		ctx,
 		"POST",
@@ -104,10 +106,10 @@ func (d *canoeDeployer) deploy(ctx context.Context, req *operator.Request, t *De
 	if data.Error {
 		return nil, errors.New(data.Message)
 	}
-	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoeURL, t.Name, data.Deploy.ID)
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoeURL, req.Target.Name, data.Deploy.ID)
 	return &operator.Message{
 		Text: deployURL,
-		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, t.Name, deployURL, data.Deploy.ID),
+		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target.Name, deployURL, data.Deploy.ID),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "green",
 		},
@@ -136,18 +138,21 @@ func (d *canoeDeployer) doCanoe(ctx context.Context, meth, path, body string) (*
 	return resp, nil
 }
 
-func (a *canoeBuild) GetNumber() int {
-	if a == nil {
-		return 0
-	}
-	return a.BuildNumber
-}
-
-func (a *canoeBuild) GetBambooID() string {
-	if a == nil {
+// TODO(sr) This should be a property in Artifactory
+func (a *canoeBuild) GetID() string {
+	if a == nil || a.GetURL() == "" {
 		return ""
 	}
-	return ""
+	u, err := url.Parse(a.GetURL())
+	if err != nil {
+		return ""
+	}
+	// https://bamboo.dev.pardot.com/browse/BREAD-BREAD327-GOL-10
+	parts := strings.Split(u.Path, "/")
+	if len(parts) != 3 {
+		return ""
+	}
+	return parts[2]
 }
 
 func (a *canoeBuild) GetBranch() string {
@@ -178,6 +183,13 @@ func (a *canoeBuild) GetURL() string {
 	if a == nil {
 		return ""
 	}
+	return a.URL
+}
+
+func (a *canoeBuild) GetArtifactURL() string {
+	if a == nil {
+		return ""
+	}
 	return a.ArtifactURL
 }
 
@@ -192,28 +204,5 @@ func (a *canoeBuild) GetCreated() time.Time {
 	if a == nil {
 		return time.Unix(0, 0)
 	}
-	return time.Now()
-}
-
-type parsedImg struct {
-	host       string
-	registryID string
-	repo       string
-	tag        string
-}
-
-// parseImage parses a ecs.ContainerDefinition string Image.
-func parseImage(img string) (*parsedImg, error) {
-	u, err := url.Parse("docker://" + img)
-	if err != nil {
-		return nil, err
-	}
-	host := strings.Split(u.Host, ".")
-	path := strings.Split(u.Path, ":")
-	return &parsedImg{
-		host:       u.Host,
-		registryID: host[0],
-		repo:       path[0][1:],
-		tag:        path[1],
-	}, nil
+	return a.CreatedAt
 }

@@ -26,7 +26,8 @@ type ldapUser struct {
 }
 
 func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {
-	if req.UserEmail() == "" {
+	email := req.GetUserEmail()
+	if email == "" {
 		return fmt.Errorf("unable to authorize request without an user email")
 	}
 	var entry *ACLEntry
@@ -42,7 +43,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	if entry.OTP == true && req.Otp == "" {
 		return fmt.Errorf("service `%s %s` requires a Yubikey OTP", req.Call.Service, req.Call.Method)
 	}
-	user, err := a.getLDAPUser(req.UserEmail())
+	user, err := a.getLDAPUser(email)
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	}
 	if entry.OTP {
 		if user.yubikeyID == "" {
-			return fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", req.UserEmail())
+			return fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", email)
 		}
 		if err := a.verifier.Verify(req.Otp); err != nil {
 			return fmt.Errorf("could not verify Yubikey OTP: %s", err)

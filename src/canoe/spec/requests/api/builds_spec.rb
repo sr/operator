@@ -36,6 +36,7 @@ RSpec.describe "/api/projects/:project_name/branches/:branch_name/builds" do
       expect(json_response[0]["build_number"]).to eq(1234)
       expect(json_response[0]["repo_url"]).to eq("https://git.dev.pardot.com/Pardot/bread")
       expect(json_response[0]["url"]).to eq("https://bamboo.dev.pardot.com/browse/BREAD-BREAD327-GOL-10")
+      expect(json_response[0]["artifact_url"]).to eq("https://artifactory.dev.pardot.com/artifactory/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz")
     end
   end
 end

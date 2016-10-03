@@ -241,12 +241,12 @@ func NewPingHandler(db *sql.DB) http.Handler {
 func NewServer(
 	auth operator.Authorizer,
 	inst operator.Instrumenter,
-	repl operator.Replier,
+	sender operator.Sender,
 	deploy *DeployConfig,
 	timezone *time.Location,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
-	breadpb.RegisterPingServer(server, &pingAPIServer{repl})
+	breadpb.RegisterPingServer(server, &pingAPIServer{sender})
 	if deploy.ArtifactoryURL != "" &&
 		deploy.ArtifactoryUsername != "" &&
 		deploy.ArtifactoryAPIKey != "" &&
@@ -255,18 +255,16 @@ func NewServer(
 		deploy.CanoeAPIKey != "" &&
 		deploy.AWSRegion != "" {
 		breadpb.RegisterDeployServer(server, &deployAPIServer{
-			repl,
+			sender,
 			deploy,
 			&http.Client{},
 			timezone,
 			&canoeDeployer{
-				repl,
 				deploy.CanoeURL,
 				deploy.CanoeAPIKey,
 				&http.Client{},
 			},
 			&ecsDeployer{
-				repl,
 				deploy.ArtifactoryURL,
 				deploy.ArtifactoryRepo,
 				deploy.ArtifactoryUsername,

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,30 +18,35 @@ import (
 )
 
 const (
-	bambooURL = "https://bamboo.dev.pardot.com"
-	master    = "master"
-	pardot    = "pardot"
+	master = "master"
+	pardot = "pardot"
 )
 
 type deployer interface {
 	listTargets(context.Context) ([]*DeployTarget, error)
 	listBuilds(context.Context, *DeployTarget, string) ([]build, error)
-	deploy(context.Context, *operator.Request, *DeployTarget, build) (*operator.Message, error)
+	deploy(context.Context, *operator.RequestSender, *deployRequest) (*operator.Message, error)
 }
 
 type build interface {
-	GetNumber() int
-	GetBambooID() string
+	GetID() string
+	GetURL() string
+	GetArtifactURL() string
 	GetBranch() string
 	GetSHA() string
 	GetShortSHA() string
-	GetURL() string
 	GetRepoURL() string
 	GetCreated() time.Time
 }
 
+type deployRequest struct {
+	Target    *DeployTarget
+	Build     build
+	UserEmail string
+}
+
 type deployAPIServer struct {
-	operator.Replier
+	operator.Sender
 	conf  *DeployConfig
 	http  *http.Client
 	tz    *time.Location
@@ -57,7 +61,7 @@ func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTarg
 		names[i] = t.Name
 	}
 	sort.Strings(names)
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		HTML: "Deployment targets: " + strings.Join(names, ", "),
 		Text: strings.Join(names, " "),
 	})
@@ -87,29 +91,30 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 		return nil, err
 	}
 	if len(builds) == 0 {
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return operator.Reply(ctx, s, req, &operator.Message{
 			Text: "",
 			HTML: fmt.Sprintf("No build for %s@%s", req.Target, req.Branch),
 		})
 	}
 	var txt, html bytes.Buffer
-	_, _ = html.WriteString("<table><tr><th>Build</th><th>Branch</th><th>Completed</th></tr>")
+	_, _ = html.WriteString("<table><tr><th>Build</th><th>Commit</th><th>Completed</th><th></th></tr>")
 	i := 0
 	for _, b := range builds {
 		if i >= 10 {
 			break
 		}
-		fmt.Fprintf(&txt, "%d %s@%s %s\n", b.GetNumber(), b.GetBranch(), b.GetShortSHA(), b.GetCreated())
+		fmt.Fprintf(&txt, "%s\t%s\n", b.GetID(), b.GetArtifactURL())
 		fmt.Fprintf(
 			&html,
-			"<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-			fmt.Sprintf(`<a href="%s">%d</a>`, b.GetURL(), b.GetNumber()),
+			"<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n",
+			fmt.Sprintf("<code>%s</code>", b.GetID()),
 			fmt.Sprintf(`<a href="%s/tree/%s">%s@%s</a>`, b.GetRepoURL(), b.GetBranch(), b.GetBranch(), b.GetShortSHA()),
-			b.GetCreated().In(s.tz),
+			b.GetCreated().In(s.tz).Format("2006-01-02 15:04:05 MST"),
+			fmt.Sprintf(`<a href="%s">View details</a>`, b.GetURL()),
 		)
 		i++
 	}
-	return operator.Reply(s, ctx, req, &operator.Message{Text: txt.String(), HTML: html.String()})
+	return operator.Reply(ctx, s, req, &operator.Message{Text: txt.String(), HTML: html.String()})
 }
 
 var eggs = map[string]string{
@@ -122,16 +127,12 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, errors.New("invalid request")
 	}
 	if v, ok := eggs[req.Target]; ok {
-		return operator.Reply(s, ctx, req, &operator.Message{
+		return operator.Reply(ctx, s, req, &operator.Message{
 			Text: v,
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
 			},
 		})
-	}
-	buildID, err := strconv.Atoi(req.Build)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid build: %#v", req.Build)
 	}
 	var (
 		target *DeployTarget
@@ -150,22 +151,27 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	var build build
 	builds, err := s.listBuilds(ctx, target, "")
 	for _, b := range builds {
-		if b.GetNumber() == buildID {
+		if b.GetID() == req.Build {
 			build = b
 		}
 	}
 	if build == nil {
 		return nil, fmt.Errorf("No such build %s", req.Build)
 	}
+	deploy := &deployRequest{
+		Target:    target,
+		Build:     build,
+		UserEmail: operator.GetUserEmail(req),
+	}
 	if target.Canoe {
-		msg, err = s.canoe.deploy(ctx, req.GetRequest(), target, build)
+		msg, err = s.canoe.deploy(ctx, operator.GetSender(s, req), deploy)
 	} else {
-		msg, err = s.ecs.deploy(ctx, req.GetRequest(), target, build)
+		msg, err = s.ecs.deploy(ctx, operator.GetSender(s, req), deploy)
 	}
 	if err != nil {
 		return nil, err
 	}
-	return operator.Reply(s, ctx, req, msg)
+	return operator.Reply(ctx, s, req, msg)
 }
 
 var ecsRunning = aws.String("RUNNING")
@@ -175,7 +181,7 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	if t, err := s.canoe.listTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
-		_, _ = operator.Reply(s, ctx, req, &operator.Message{
+		_ = operator.Send(ctx, s, req, &operator.Message{
 			Text: fmt.Sprintf("Could not get list of projects from Canoe: %v", err),
 			HTML: fmt.Sprintf("Could not get list of projects from Canoe: <code>%v</code>", err),
 			Options: &operatorhipchat.MessageOptions{
@@ -186,14 +192,12 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	return targets
 }
 
-func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) (builds []build, err error) {
+func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]build, error) {
 	if t.Canoe {
 		if branch == "" {
 			branch = master
 		}
-		builds, err = s.canoe.listBuilds(ctx, t, branch)
-	} else {
-		builds, err = s.ecs.listBuilds(ctx, t, "")
+		return s.canoe.listBuilds(ctx, t, branch)
 	}
-	return builds, err
+	return s.ecs.listBuilds(ctx, t, "")
 }
