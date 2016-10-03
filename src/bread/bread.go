@@ -161,15 +161,19 @@ type ACLEntry struct {
 	OTP   bool
 }
 
+type ArtifactoryConfig struct {
+	URL      string
+	Username string
+	APIKey   string
+}
+
 type DeployConfig struct {
-	ArtifactoryAPIKey   string
-	ArtifactoryURL      string
-	ArtifactoryUsername string
-	ArtifactoryRepo     string
-	CanoeURL            string
-	CanoeAPIKey         string
-	ECSTimeout          time.Duration
-	AWSRegion           string
+	Artifactory     *ArtifactoryConfig
+	ArtifactoryRepo string
+	CanoeURL        string
+	CanoeAPIKey     string
+	ECSTimeout      time.Duration
+	AWSRegion       string
 }
 
 type DeployTarget struct {
@@ -247,9 +251,10 @@ func NewServer(
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingServer(server, &pingAPIServer{sender})
-	if deploy.ArtifactoryURL != "" &&
-		deploy.ArtifactoryUsername != "" &&
-		deploy.ArtifactoryAPIKey != "" &&
+	if deploy.Artifactory != nil &&
+		deploy.Artifactory.URL != "" &&
+		deploy.Artifactory.Username != "" &&
+		deploy.Artifactory.APIKey != "" &&
 		deploy.ArtifactoryRepo != "" &&
 		deploy.CanoeURL != "" &&
 		deploy.CanoeAPIKey != "" &&
@@ -265,10 +270,10 @@ func NewServer(
 				&http.Client{},
 			},
 			&ecsDeployer{
-				deploy.ArtifactoryURL,
+				deploy.Artifactory.URL,
 				deploy.ArtifactoryRepo,
-				deploy.ArtifactoryUsername,
-				deploy.ArtifactoryAPIKey,
+				deploy.Artifactory.Username,
+				deploy.Artifactory.APIKey,
 				ecs.New(
 					session.New(
 						&aws.Config{
