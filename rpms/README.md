@@ -37,6 +37,9 @@ script/upload </path/to/package*.rpm>
 script/upload RPMS/x86_64/php-tideways-7.0.8-1.pardot.el6.x86_64.rpm
 ```
 
+#### What happens after upload?
+Once your RPM is successfully uploaded to the Artifactory server, it will be available to environments *outside* SFDC (test-kitchen, AWS servers, etc) within about 1-2 minutes. Next it will be mirrored and available locally within the SFDC datacenters (DFW/PHX) within 10 minutes.
+
 #### Artifactory and HipChat Tokens
 * [Create an Artifactory API Token](https://artifactory.dev.pardot.com/artifactory/webapp/#/profile) and add it to your shell environment as `ARTIFACTORY_API_KEY`.
 * [Create a HipChat API Token](https://hipchat.dev.pardot.com/account/api) and add it to your shell environment as `HIPCHAT_TOKEN`.
