@@ -12,6 +12,8 @@ import (
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
+
+	"bread/pb"
 )
 
 var ldapEnabled bool
@@ -127,6 +129,152 @@ func TestAuthorizer(t *testing.T) {
 			}
 			if err.Error() != tc.err.Error() {
 				t.Errorf("expected error message %#v, got %#v", tc.err.Error(), err.Error())
+			}
+		}
+	}
+}
+
+type fakeBuild struct {
+	ID          string
+	URL         string
+	ArtifactURL string
+	Branch      string
+	SHA         string
+	RepoURL     string
+	Created     time.Time
+}
+
+func (b *fakeBuild) GetID() string {
+	return b.ID
+}
+
+func (b *fakeBuild) GetURL() string {
+	return b.URL
+}
+
+func (b *fakeBuild) GetArtifactURL() string {
+	return b.ArtifactURL
+}
+
+func (b *fakeBuild) GetBranch() string {
+	return b.Branch
+}
+
+func (b *fakeBuild) GetSHA() string {
+	return b.SHA
+}
+
+func (b *fakeBuild) GetShortSHA() string {
+	if len(b.SHA) <= 7 {
+		return b.SHA
+	}
+	return b.SHA[0:7]
+}
+
+func (b *fakeBuild) GetRepoURL() string {
+	return b.RepoURL
+}
+
+func (b *fakeBuild) GetCreated() time.Time {
+	return b.Created
+}
+
+type fakeAuthorizer struct {
+	err error
+}
+
+func (a *fakeAuthorizer) Authorize(context.Context, *operator.Request) error {
+	return a.err
+}
+
+type fakeInstrumenter struct {
+	events []*operator.Event
+}
+
+func (i *fakeInstrumenter) Instrument(ev *operator.Event) {
+	i.events = append(i.events, ev)
+}
+
+func (i *fakeInstrumenter) pop() (ev *operator.Event) {
+	if len(i.events) == 0 {
+		return nil
+	}
+	ev, i.events = i.events[len(i.events)-1], i.events[:len(i.events)-1]
+	return ev
+}
+
+type fakeSender struct{}
+
+func (c *fakeSender) Send(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
+	return nil
+}
+
+type fakeDeployer struct {
+	builds         []bread.Build
+	targets        []*bread.DeployTarget
+	deployResponse *operator.Message
+}
+
+func (d *fakeDeployer) ListTargets(context.Context) ([]*bread.DeployTarget, error) {
+	return d.targets, nil
+}
+
+func (d *fakeDeployer) ListBuilds(context.Context, *bread.DeployTarget, string) ([]bread.Build, error) {
+	return d.builds, nil
+}
+
+func (d *fakeDeployer) Deploy(context.Context, *operator.RequestSender, *bread.DeployRequest) (*operator.Message, error) {
+	return d.deployResponse, nil
+}
+
+func TestDeploy(t *testing.T) {
+	sender := &fakeSender{}
+	deployer := &fakeDeployer{
+		targets: []*bread.DeployTarget{
+			{
+				Name: "pardot",
+			},
+		},
+		builds: []bread.Build{
+			&fakeBuild{
+				ID: "1",
+			},
+			&fakeBuild{
+				ID:      "old",
+				Created: time.Now().Add(-36 * time.Hour),
+			},
+		},
+		deployResponse: &operator.Message{
+			Text: "deploy BIJ",
+		},
+	}
+	server := bread.NewDeployServer(sender, deployer, deployer, nil)
+	for _, tc := range []struct {
+		target string
+		build  string
+		resp   string
+		err    error
+	}{
+		{"pardot", "1", "deploy BIJ", nil},
+		{"bread", "1", "", errors.New("No such deployment target: bread")},
+	} {
+		resp, err := server.Trigger(context.Background(), &breadpb.TriggerRequest{
+			Request: &operator.Request{Source: &operator.Source{}},
+			Target:  tc.target,
+			Build:   tc.build,
+		})
+		if tc.err == nil {
+			if err != nil {
+				t.Fatalf("expected no error for target=%s build=%s, got: %s", tc.target, tc.build, tc.build, err)
+			}
+		} else {
+			if err == nil {
+				t.Errorf("expect an error for target=%s build=%s but got none", tc.target, tc.build)
+				if resp.Message != tc.resp {
+					t.Fatalf("expected response message `%s` for target=%s build=%s but got: %#v", tc.resp, tc.target, tc.build, resp.Message)
+				}
+			} else if err.Error() != tc.err.Error() {
+				t.Errorf("expected error `%s` for target=%s build=%s but got: %s", tc.err, tc.target, tc.build, err)
 			}
 		}
 	}

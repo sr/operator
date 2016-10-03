@@ -18,14 +18,23 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
+type ECSConfig struct {
+	AWSRegion string
+	Timeout   time.Duration
+}
+
+type ArtifactoryConfig struct {
+	URL    string
+	User   string
+	APIKey string
+	Repo   string
+}
+
 type ecsDeployer struct {
-	afyURL    string
-	afyRepo   string
-	afyUser   string
-	afyAPIKey string
-	ecs       *ecs.ECS
-	targets   []*DeployTarget
-	timeout   time.Duration
+	ecs     *ecs.ECS
+	afy     *ArtifactoryConfig
+	timeout time.Duration
+	targets []*DeployTarget
 }
 
 type afyItem struct {
@@ -40,14 +49,14 @@ type property struct {
 	Value string `json:"value"`
 }
 
-func (d *ecsDeployer) listTargets(ctx context.Context) ([]*DeployTarget, error) {
+func (d *ecsDeployer) ListTargets(ctx context.Context) ([]*DeployTarget, error) {
 	return d.targets, nil
 }
 
-func (d *ecsDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]build, error) {
+func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch string) ([]Build, error) {
 	conds := []string{
 		`{"name":{"$eq":"manifest.json"}}`,
-		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, d.afyRepo),
+		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, d.afy.Repo),
 		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
 	}
 	q := []string{
@@ -60,14 +69,14 @@ func (d *ecsDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch st
 	}
 	sorted := afyItems(items)
 	sort.Sort(sort.Reverse(sorted))
-	var builds []build
+	var builds []Build
 	for _, a := range sorted {
-		builds = append(builds, build(a))
+		builds = append(builds, Build(a))
 	}
 	return builds, nil
 }
 
-func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
+func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
 	svc, err := d.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
 			Services: []*string{aws.String(req.Target.ECSService)},
@@ -191,14 +200,14 @@ func (d *ecsDeployer) doAQL(ctx context.Context, q string) ([]*afyItem, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	req, err := http.NewRequest(
 		"POST",
-		d.afyURL+"/api/search/aql",
+		d.afy.URL+"/api/search/aql",
 		strings.NewReader(q),
 	)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "text/plain")
-	req.SetBasicAuth(d.afyUser, d.afyAPIKey)
+	req.SetBasicAuth(d.afy.User, d.afy.APIKey)
 	resp, err := ctxhttp.Do(ctx, client, req)
 	if err != nil {
 		return nil, err
