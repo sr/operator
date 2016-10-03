@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,12 +16,9 @@ import (
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
-
-	"bread/pb"
 )
 
 type ecsDeployer struct {
-	operator.Replier
 	afyURL    string
 	afyRepo   string
 	afyUser   string
@@ -70,18 +67,18 @@ func (d *ecsDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch st
 	return builds, nil
 }
 
-func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *DeployTarget, b build) (*operator.Message, error) {
+func (d *ecsDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
 	svc, err := d.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
-			Services: []*string{aws.String(t.ECSService)},
-			Cluster:  aws.String(t.ECSCluster),
+			Services: []*string{aws.String(req.Target.ECSService)},
+			Cluster:  aws.String(req.Target.ECSCluster),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if len(svc.Services) != 1 {
-		return nil, fmt.Errorf("Cluster %s has no service %s", t.ECSCluster, t.ECSService)
+		return nil, fmt.Errorf("Cluster %s has no service %s", req.Target.ECSCluster, req.Target.ECSService)
 	}
 	out, err := d.ecs.DescribeTaskDefinition(
 		&ecs.DescribeTaskDefinitionInput{
@@ -91,12 +88,7 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 	if err != nil {
 		return nil, err
 	}
-	curImg, err := parseImage(*out.TaskDefinition.ContainerDefinitions[0].Image)
-	if err != nil {
-		return nil, err
-	}
-	img := fmt.Sprintf("%s/%s:%s", curImg.host, curImg.repo, b.GetBambooID())
-	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(img)
+	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(req.Build.GetArtifactURL())
 	newTask, err := d.ecs.RegisterTaskDefinition(
 		&ecs.RegisterTaskDefinitionInput{
 			ContainerDefinitions: out.TaskDefinition.ContainerDefinitions,
@@ -121,25 +113,24 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 		html    string
 		fingers = `<img class="remoticon" aria-label="(fingerscrossed)" alt="(fingerscrossed)" height="30" width="30" src="https://hipchat.dev.pardot.com/files/img/emoticons/1/fingerscrossed-1459185721@2x.png">`
 	)
-	if t.Name == "operator" {
+	if req.Target.Name == "operator" {
 		html = fmt.Sprintf(
-			"Updated <code>%s@%s</code> to run build %d. Restarting... should be back soon %s",
+			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
-			t.ECSCluster,
-			b.GetNumber(),
+			req.Target.ECSCluster,
+			req.Build.GetID(),
 			fingers,
 		)
 	} else {
 		html = fmt.Sprintf(
 			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
 			*svc.Services[0].ServiceName,
-			t.ECSCluster,
-			fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetBambooID(), b.GetBambooID()),
+			req.Target.ECSCluster,
+			fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
 			d.timeout,
 		)
 	}
-	// TODO(sr) Figure out a nicer interface for sending non-final messages
-	_, _ = operator.Reply(d, ctx, &breadpb.TriggerRequest{Request: req}, &operator.Message{
+	_ = sender.Send(ctx, &operator.Message{
 		Text: *newTask.TaskDefinition.TaskDefinitionArn,
 		HTML: html,
 		Options: &operatorhipchat.MessageOptions{
@@ -179,15 +170,15 @@ func (d *ecsDeployer) deploy(ctx context.Context, req *operator.Request, t *Depl
 	}()
 	select {
 	case <-ctx.Done():
-		return nil, fmt.Errorf("Deploy of build %s@%d failed. Service did not rollover within %s", t.Name, b.GetNumber(), d.timeout)
+		return nil, fmt.Errorf("Deploy of build %s@%s failed. Service did not rollover within %s", req.Target.Name, req.Build.GetID(), d.timeout)
 	case <-okC:
 		return &operator.Message{
-			Text: fmt.Sprintf("Deployed build %s@%d to %s", t.Name, b.GetNumber(), t.ECSCluster),
+			Text: fmt.Sprintf("Deployed build %s@%s to %s", req.Target.Name, req.Build.GetID(), req.Target.ECSCluster),
 			HTML: fmt.Sprintf(
 				"Deployed build %s to ECS service <code>%s@%s</code>",
-				fmt.Sprintf(`<a href="%s/browse/%s">%s</a>`, bambooURL, b.GetBambooID(), b.GetBambooID()),
+				fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
 				*svc.Services[0].ServiceName,
-				t.ECSCluster,
+				req.Target.ECSCluster,
 			),
 			Options: &operatorhipchat.MessageOptions{
 				Color: "green",
@@ -228,22 +219,43 @@ func (d *ecsDeployer) doAQL(ctx context.Context, q string) ([]*afyItem, error) {
 	return data.Results, nil
 }
 
-func (a *afyItem) GetNumber() int {
-	if a == nil {
-		return 0
+// TODO(sr) This should be a property in Artifactory
+func (a *afyItem) GetID() string {
+	if a == nil || a.GetURL() == "" {
+		return ""
 	}
-	for _, p := range a.Properties {
-		if p.Key == "buildNumber" {
-			if i, err := strconv.Atoi(p.Value); err == nil {
-				return i
-			}
-		}
+	u, err := url.Parse(a.GetURL())
+	if err != nil {
+		return ""
 	}
-	return 0
+	// https://bamboo.dev.pardot.com/browse/BREAD-BREAD327-GOL-10
+	parts := strings.Split(u.Path, "/")
+	if len(parts) != 3 {
+		return ""
+	}
+	return parts[2]
 }
 
-func (a *afyItem) GetBambooID() string {
+func (a *afyItem) GetURL() string {
 	if a == nil {
+		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "buildResults" {
+			return p.Value
+		}
+	}
+	return ""
+}
+
+const dockerRegistry = "docker.dev.pardot.com"
+
+// TODO(sr) This should be a property in Artifactory
+func (a *afyItem) GetArtifactURL() string {
+	if a == nil {
+		return ""
+	}
+	if a.GetID() == "" {
 		return ""
 	}
 	// build/bread/hal9000/app/BREAD-BREAD-480
@@ -251,7 +263,7 @@ func (a *afyItem) GetBambooID() string {
 	if len(parts) != 5 {
 		return ""
 	}
-	return parts[4]
+	return fmt.Sprintf("%s/%s:%s", dockerRegistry, strings.Replace(a.Path, "/"+parts[4], "", -1), parts[4])
 }
 
 func (a *afyItem) GetBranch() string {
@@ -288,18 +300,6 @@ func (a *afyItem) GetShortSHA() string {
 	return a.GetSHA()[0:7]
 }
 
-func (a *afyItem) GetURL() string {
-	if a == nil {
-		return ""
-	}
-	for _, p := range a.Properties {
-		if p.Key == "buildResults" {
-			return p.Value
-		}
-	}
-	return ""
-}
-
 func (a *afyItem) GetRepoURL() string {
 	if a == nil {
 		return ""
@@ -316,7 +316,7 @@ func (a *afyItem) GetCreated() time.Time {
 	if a == nil {
 		return time.Unix(0, 0)
 	}
-	return time.Now()
+	return a.Created
 }
 
 type afyItems []*afyItem

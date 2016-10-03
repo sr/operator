@@ -13,11 +13,11 @@ import (
 )
 
 type pingAPIServer struct {
-	operator.Replier
+	operator.Sender
 }
 
 func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		Text: "pong",
 		HTML: "<b>pong</b>",
 		Options: &operatorhipchat.MessageOptions{
@@ -28,7 +28,7 @@ func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*op
 }
 
 func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		Text: "ok",
 		HTML: "<b>ok</b>",
 		Options: &operatorhipchat.MessageOptions{
@@ -50,7 +50,7 @@ func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisReq
 		dur = time.Duration(i) * time.Second
 	}
 	time.Sleep(dur)
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		Text: "https://66.media.tumblr.com/500736338e23d5b5adb0201b6b74cbc9/tumblr_mmyemrrqkq1s1fx0zo1_500.gif",
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
@@ -60,11 +60,11 @@ func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisReq
 }
 
 func (s *pingAPIServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
-	email := req.Request.UserEmail()
+	email := operator.GetUserEmail(req)
 	if email == "" {
 		email = "unknown"
 	}
-	return operator.Reply(s, ctx, req, &operator.Message{
+	return operator.Reply(ctx, s, req, &operator.Message{
 		Text: email,
 		HTML: fmt.Sprintf(`<a href="mailto:%s">%s</a>`, email, email),
 		Options: &operatorhipchat.MessageOptions{

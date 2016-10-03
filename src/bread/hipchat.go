@@ -22,7 +22,7 @@ type hipchat struct {
 	ctx     context.Context
 	inst    operator.Instrumenter
 	decoder operator.Decoder
-	repli   operator.Replier
+	sender  operator.Sender
 	invoker operator.InvokerFunc
 	conn    *grpc.ClientConn
 	svcInfo map[string]grpc.ServiceInfo
@@ -33,7 +33,7 @@ type hipchat struct {
 }
 
 func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msg, replierID, err := h.decoder.Decode(h.ctx, r)
+	msg, senderID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil || msg.Text == "" {
 		h.inst.Instrument(&operator.Event{Key: "handler_decode_error", Error: err})
 		w.WriteHeader(http.StatusBadRequest)
@@ -41,7 +41,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var (
 		opMatch, halMatch bool
-		req               = h.getRequest(msg, replierID)
+		req               = h.getRequest(msg, senderID)
 		halMsg            = &breadhal.Message{Text: msg.Text}
 	)
 	if req != nil {
@@ -85,10 +85,11 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case err := <-errC:
 			err = err
 		}
+		fmt.Printf("DEBUG: %s\n", err)
 	}(req, halMsg)
 }
 
-func (h *hipchat) getRequest(msg *operator.Message, replierID string) *operator.Request {
+func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.Request {
 	matches := h.re.FindStringSubmatch(msg.Text)
 	if matches != nil {
 		return nil
@@ -129,8 +130,8 @@ func (h *hipchat) getRequest(msg *operator.Message, replierID string) *operator.
 			Method:  generator.Camelize(matches[2], "-"),
 			Args:    args,
 		},
-		Otp:       otp,
-		ReplierId: replierID,
-		Source:    msg.Source,
+		Otp:      otp,
+		SenderId: senderID,
+		Source:   msg.Source,
 	}
 }

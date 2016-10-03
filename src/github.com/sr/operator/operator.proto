@@ -10,7 +10,7 @@ option go_package = "operator";
 message Request {
 	Source source = 1;
 	Call call = 2;
-    string replier_id = 3;
+    string sender_id = 3;
     string otp = 4;
 }
 

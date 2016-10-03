@@ -34,10 +34,6 @@ type Decoder interface {
 	Decode(context.Context, *http.Request) (*Message, string, error)
 }
 
-type Replier interface {
-	Reply(context.Context, *Source, string, *Message) error
-}
-
 type Invoker interface {
 	Invoke(context.Context, *Message, *Request)
 }
@@ -114,7 +110,7 @@ type InvokerFunc func(context.Context, *grpc.ClientConn, *Request, string) error
 func NewInvoker(
 	conn *grpc.ClientConn,
 	inst Instrumenter,
-	replier Replier,
+	sender Sender,
 	f InvokerFunc,
 	timeout time.Duration,
 	pkg string,
@@ -124,7 +120,7 @@ func NewInvoker(
 		conn,
 		timeout,
 		inst,
-		replier,
+		sender,
 		f,
 		pkg,
 		errMsgOpts,
@@ -143,6 +139,9 @@ func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnarySer
 		})
 		req := requester.GetRequest()
 		if !ok || req == nil {
+			return nil, ErrInvalidRequest
+		}
+		if req.GetSource() == nil {
 			return nil, ErrInvalidRequest
 		}
 		s := strings.Split(info.FullMethod, "/")
@@ -165,27 +164,72 @@ func NewUnaryServerInterceptor(auth Authorizer, inst Instrumenter) grpc.UnarySer
 	}
 }
 
-func Reply(rep Replier, ctx context.Context, r Requester, msg *Message) (*Response, error) {
-	req := r.GetRequest()
-	if req == nil {
-		return nil, errors.New("unable to reply without a request")
-	}
-	src := req.GetSource()
-	if req == nil {
-		return nil, errors.New("unable to reply to request with a source")
-	}
-	if msg == nil {
-		return nil, errors.New("unable to reply without a message")
-	}
-	if msg.HTML == "" && msg.Text == "" {
-		return nil, errors.New("unable to reply when neither msg.HTML or msg.Text are set")
-	}
-	return &Response{Message: msg.Text}, rep.Reply(ctx, src, req.ReplierId, msg)
+type Sender interface {
+	Send(context.Context, *Source, string, *Message) error
 }
 
-func (r *Request) UserEmail() string {
-	if r != nil && r.Source != nil && r.Source.User != nil {
-		return r.Source.User.Email
+type RequestSender struct {
+	sender Sender
+	req    Requester
+}
+
+func (s *RequestSender) Send(ctx context.Context, msg *Message) error {
+	return Send(ctx, s.sender, s.req, msg)
+}
+
+func GetSender(s Sender, r Requester) *RequestSender {
+	if s == nil || r == nil {
+		return &RequestSender{}
 	}
-	return ""
+	return &RequestSender{s, r}
+}
+
+func Send(ctx context.Context, s Sender, r Requester, msg *Message) error {
+	if s == nil {
+		return errors.New("unable to send message without a sender")
+	}
+	req := r.GetRequest()
+	if req == nil {
+		return errors.New("unable to send a message without a request")
+	}
+	src := req.GetSource()
+	if src == nil {
+		return errors.New("unable to send a message without a request source")
+	}
+	if msg == nil {
+		return errors.New("unable to send a nil message")
+	}
+	if msg.HTML == "" && msg.Text == "" {
+		return errors.New("unable to send a message with neither msg.HTML or msg.Text are set")
+	}
+	return s.Send(ctx, src, req.SenderId, msg)
+}
+
+func Reply(ctx context.Context, s Sender, req Requester, msg *Message) (*Response, error) {
+	return &Response{Message: msg.Text}, Send(ctx, s, req, msg)
+}
+
+func GetUserEmail(r Requester) string {
+	if r == nil {
+		return ""
+	}
+	req := r.GetRequest()
+	if req == nil {
+		return ""
+	}
+	return req.GetUserEmail()
+}
+
+func (req *Request) GetUserEmail() string {
+	if req == nil {
+		return ""
+	}
+	src := req.Source
+	if src == nil {
+		return ""
+	}
+	if src.User == nil {
+		return ""
+	}
+	return src.User.Email
 }
