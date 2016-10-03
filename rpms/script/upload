@@ -64,6 +64,17 @@ for fullpath in "$@"; do
   RPM_FILE="${fullpath##*/}"
 done
 
+if [ ! -f "$RPM_PATH" ] || ! [[ "$RPM_FILE" =~ \.rpm$ ]]; then
+  echo
+  echo "$RPM_PATH does not appear to be an RPM file!"
+  echo
+  echo "################### ERROR ####################"
+  echo "### Please check the rpm file you are attempting to upload."
+  echo "### RPM files must be uploaded one at a time and specified like:"
+  echo "### script/upload-rpm RPMS/x86_64/my-rpm-package.rpm"
+  exit 1
+fi
+
 if [ -z "$CENTOS_VERSION" ]; then
   if [[ $(echo "$RPM_FILE" | rev | cut -d '.' -f3 | rev) == *el6* ]]; then
     CENTOS_VERSION="el6"
