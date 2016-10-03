@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	master = "master"
-	pardot = "pardot"
+	master      = "master"
+	pardot      = "pardot"
+	maxBuildAge = 36 * time.Hour
 )
 
 type Deployer interface {
@@ -155,6 +156,14 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}
 	if build == nil {
 		return nil, fmt.Errorf("No such build %s", req.Build)
+	}
+	if time.Since(build.GetCreated()) > maxBuildAge {
+		return nil, fmt.Errorf(
+			"refusing to deploy build %s because it was created on %s which is more than %s ago",
+			build.GetID(),
+			build.GetCreated().In(s.tz).Format("2006-01-02 at 15:04:05 MST"),
+			maxBuildAge,
+		)
 	}
 	deploy := &DeployRequest{
 		Target:    target,

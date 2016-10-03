@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -237,7 +238,8 @@ func TestDeploy(t *testing.T) {
 		},
 		builds: []bread.Build{
 			&fakeBuild{
-				ID: "1",
+				ID:      "1",
+				Created: time.Now(),
 			},
 			&fakeBuild{
 				ID:      "old",
@@ -245,7 +247,7 @@ func TestDeploy(t *testing.T) {
 			},
 		},
 		deployResponse: &operator.Message{
-			Text: "deploy BIJ",
+			Text: "deployed",
 		},
 	}
 	server := bread.NewDeployServer(sender, deployer, deployer, nil)
@@ -255,7 +257,8 @@ func TestDeploy(t *testing.T) {
 		resp   string
 		err    error
 	}{
-		{"pardot", "1", "deploy BIJ", nil},
+		{"pardot", "1", "deployed", nil},
+		{"pardot", "old", "", errors.New("refusing to deploy build")},
 		{"bread", "1", "", errors.New("No such deployment target: bread")},
 	} {
 		resp, err := server.Trigger(context.Background(), &breadpb.TriggerRequest{
@@ -265,7 +268,10 @@ func TestDeploy(t *testing.T) {
 		})
 		if tc.err == nil {
 			if err != nil {
-				t.Fatalf("expected no error for target=%s build=%s, got: %s", tc.target, tc.build, tc.build, err)
+				t.Fatalf("expected no error for target=%s build=%s, got: %s", tc.target, tc.build, err)
+			}
+			if resp.Message != tc.resp {
+				t.Fatalf("expected response message `%s` for target=%s build=%s but got: %#v", tc.resp, tc.target, tc.build, resp.Message)
 			}
 		} else {
 			if err == nil {
@@ -273,8 +279,8 @@ func TestDeploy(t *testing.T) {
 				if resp.Message != tc.resp {
 					t.Fatalf("expected response message `%s` for target=%s build=%s but got: %#v", tc.resp, tc.target, tc.build, resp.Message)
 				}
-			} else if err.Error() != tc.err.Error() {
-				t.Errorf("expected error `%s` for target=%s build=%s but got: %s", tc.err, tc.target, tc.build, err)
+			} else if !strings.Contains(err.Error(), tc.err.Error()) {
+				t.Errorf("expected error for target=%s build=%s to match `%s` but got: %s", tc.target, tc.build, tc.err, err)
 			}
 		}
 	}
