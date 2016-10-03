@@ -64,7 +64,7 @@ for fullpath in "$@"; do
   RPM_FILE="${fullpath##*/}"
 done
 
-if [ ! -f "$RPM_PATH" ] || [[ $(echo "$RPM_FILE" | rev | cut -d '.' -f1 | rev) != "rpm" ]]; then
+if [ ! -f "$RPM_PATH" ] || ! [[ "$RPM_FILE" =~ \.rpm$ ]]; then
   echo
   echo "$RPM_PATH does not appear to be an RPM file!"
   echo
