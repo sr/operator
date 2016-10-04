@@ -95,30 +95,6 @@ resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
 
-resource "aws_ecs_service" "operator" {
-  name = "operator"
-  cluster = "${aws_ecs_cluster.operator_production.id}"
-  task_definition = "${aws_ecs_task_definition.operator.arn}"
-  desired_count = 2
-  iam_role = "arn:aws:iam::364709603225:role/ecsServiceRole"
-
-  load_balancer {
-    target_group_arn = "${aws_alb_target_group.operator.arn}"
-    container_name = "operatord"
-    container_port = 8080
-  }
-}
-
-resource "aws_ecs_task_definition" "operator" {
-  family = "operator"
-  container_definitions = "${file("operator.json")}"
-
-  volume {
-    name = "zoneinfo"
-    host_path = "/usr/share/zoneinfo"
-  }
-}
-
 resource "aws_security_group" "operator_app_production" {
   name = "operator_app_production"
   vpc_id = "${aws_vpc.internal_apps.id}"
