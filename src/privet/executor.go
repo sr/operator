@@ -25,8 +25,8 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 	env := []string{
 		fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")),
 		fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")),
-		fmt.Sprintf("PRIVET_TEST_WORKER=%d", opts.Worker),
 		fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
+		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
 	}
 	if opts.Env != nil {
 		env = append(env, opts.Env...)
@@ -59,9 +59,9 @@ type PlanExecutionOpts struct {
 	// use to execute the requested test case(s):
 	// * PRIVET_TEST_FILES: Test files (separated by \0)
 	// * PRIVET_TEST_CASE_NAMES: Test cases (separated by \0)
-	// * PRIVET_TEST_WORKER: Worker identifier
 	// * PRIVET_TEST_BATCH: Strictly increasing integer identifier of the
 	//                      test batch
+	// * PRIVET_WORKER: Worker identifier
 	//
 	// If PRIVET_TEST_CASE_NAMES is specified, only one test file will be
 	// present in PRIVET_TEST_FILES.
