@@ -7,7 +7,6 @@ resource "aws_security_group" "internal_apps_operator_http_lb" {
     to_port = 443
     protocol = "tcp"
     cidr_blocks = [
-      "${aws_security_group.internal_apps_dc_only_http_lb.id}",
       "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32"
     ]
   }
@@ -21,7 +20,10 @@ resource "aws_security_group" "internal_apps_operator_http_lb" {
 }
 
 resource "aws_alb" "operator_production" {
-  security_groups = ["${aws_security_group.internal_apps_operator_http_lb.id}"]
+  security_groups = [
+    "${aws_security_group.internal_apps_operator_http_lb.id}",
+    "${aws_security_group.internal_apps_dc_only_http_lb.id}"
+  ]
   subnets = [
     "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
     "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
