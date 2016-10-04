@@ -175,3 +175,141 @@ func TestBasicPlanChunkedByDurationFromPreviousResults(t *testing.T) {
 
 	expectPlan(t, planOpts, expectedPlan)
 }
+
+func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
+	// If a test file's expected duration is so long that it by itself would
+	// exceed the target duration, Privet will attempt to break it up even
+	// further.
+	planOpts := &privet.PlanCreationOpts{
+		TestFiles: []*privet.TestFile{
+			{
+				File:  "/test1.php",
+				Suite: "suite1",
+			},
+		},
+		PreviousResults: privet.TestRunResults{
+			"/test1.php": {
+				Name:        "Test1",
+				File:        "/test1.php",
+				Fingerprint: "abc123",
+				Duration:    2 * time.Minute,
+				TestCases: []*privet.TestCaseResult{
+					{
+						Name:     "Test1-1",
+						Duration: 1 * time.Minute,
+					},
+					{
+						Name:     "Test1-2",
+						Duration: 30 * time.Second,
+					},
+					{
+						Name:     "Test1-3",
+						Duration: 30 * time.Second,
+					},
+				},
+			},
+		},
+		Fingerprinter: func(string) (string, error) {
+			return "abc123", nil
+		},
+		NumWorkers:          2,
+		TargetDuration:      1 * time.Minute,
+		DefaultTestDuration: 30 * time.Second,
+	}
+
+	expectedPlan := &privet.Plan{
+		Workers: map[int]*privet.PlanWorker{
+			0: {
+				TestBatches: []*privet.PlanTestBatch{
+					{
+						TestExecutions: []*privet.PlanTestExecution{
+							{
+								File: "/test1.php",
+								TestCaseNames: []string{
+									"Test1-1",
+								},
+							},
+						},
+					},
+				},
+			},
+			1: {
+				TestBatches: []*privet.PlanTestBatch{
+					{
+						TestExecutions: []*privet.PlanTestExecution{
+							{
+								File: "/test1.php",
+								TestCaseNames: []string{
+									"Test1-2",
+									"Test1-3",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	expectPlan(t, planOpts, expectedPlan)
+}
+
+func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
+	// If a long test file has changed since our previous results, we cannot
+	// bust it up because new test cases might have been introduced that the
+	// previous results don't reflect
+	planOpts := &privet.PlanCreationOpts{
+		TestFiles: []*privet.TestFile{
+			{
+				File:  "/test1.php",
+				Suite: "suite1",
+			},
+		},
+		PreviousResults: privet.TestRunResults{
+			"/test1.php": {
+				Name:        "Test1",
+				File:        "/test1.php",
+				Fingerprint: "abc123",
+				Duration:    2 * time.Minute,
+				TestCases: []*privet.TestCaseResult{
+					{
+						Name:     "Test1-1",
+						Duration: 1 * time.Minute,
+					},
+					{
+						Name:     "Test1-2",
+						Duration: 30 * time.Second,
+					},
+					{
+						Name:     "Test1-3",
+						Duration: 30 * time.Second,
+					},
+				},
+			},
+		},
+		Fingerprinter: func(string) (string, error) {
+			return "xyz987", nil
+		},
+		NumWorkers:          2,
+		TargetDuration:      1 * time.Minute,
+		DefaultTestDuration: 30 * time.Second,
+	}
+
+	expectedPlan := &privet.Plan{
+		Workers: map[int]*privet.PlanWorker{
+			0: {
+				TestBatches: []*privet.PlanTestBatch{
+					{
+						TestExecutions: []*privet.PlanTestExecution{
+							{
+								File: "/test1.php",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	expectPlan(t, planOpts, expectedPlan)
+}

@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
+	"log"
 	"os"
 	"time"
 )
@@ -51,7 +52,7 @@ var sha256Fingerprinter = func(filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	hash := sha256.New()
 	if _, err := io.Copy(hash, file); err != nil {
@@ -71,6 +72,12 @@ type PlanCreationOpts struct {
 	// Fingerprinter specifies a function to generate a collision-resistent
 	// hash of the given test file. If left unspecified, a SHA256 hash is used.
 	Fingerprinter Fingerprinter
+}
+
+func newPlanTestBatch() *PlanTestBatch {
+	return &PlanTestBatch{
+		TestExecutions: []*PlanTestExecution{},
+	}
 }
 
 func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
@@ -93,25 +100,79 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 			testResult = opts.PreviousResults[testFile.File]
 		}
 
-		currentTestFileDuration := expectedTestDurationOrDefault(testResult, fingerprinter, opts.DefaultTestDuration)
-		if currentBatchDuration+currentTestFileDuration > opts.TargetDuration {
-			currentBatchIndex++
-			currentBatchDuration = time.Duration(0)
+		currentTestFileDuration := opts.DefaultTestDuration
+		if testResult != nil {
+			currentTestFileDuration = testResult.Duration
 		}
 
-		for currentBatchIndex >= len(batches) {
-			batches = append(batches, &PlanTestBatch{
-				TestExecutions: []*PlanTestExecution{},
+		// If this test file by itself exceeds TargetDuration and the
+		// fingerprint matches, we use the previous test result information
+		// to bust it up into ranges of test cases within the file
+		if currentTestFileDuration > opts.TargetDuration &&
+			testResult != nil && testResult.TestCases != nil && fingerprintMatches(testResult, fingerprinter) {
+			executions := []*PlanTestExecution{}
+			currentExecutionIndex := 0
+			currentExecutionDuration := time.Duration(0)
+			for _, testCase := range testResult.TestCases {
+				currentCaseDuration := testCase.Duration
+				if currentExecutionDuration > 0 && currentExecutionDuration+currentCaseDuration > opts.TargetDuration {
+					currentExecutionIndex++
+					currentExecutionDuration = time.Duration(0)
+				}
+				for currentExecutionIndex >= len(executions) {
+					executions = append(executions, &PlanTestExecution{
+						File:             testFile.File,
+						ExpectedDuration: time.Duration(0),
+						TestCaseNames:    []string{},
+					})
+				}
+				currentTestExecution := executions[currentExecutionIndex]
+
+				currentTestExecution.TestCaseNames = append(currentTestExecution.TestCaseNames, testCase.Name)
+				currentTestExecution.ExpectedDuration += testCase.Duration
+
+				currentExecutionDuration += testCase.Duration
+			}
+
+			// With the batches of _test cases_ created, create _test_ batches of them
+			// And first of all, make sure we start in our own batch.
+			if currentBatchDuration > 0 {
+				currentBatchIndex++
+				currentBatchDuration = time.Duration(0)
+			}
+
+			for _, execution := range executions {
+				for currentBatchIndex >= len(batches) {
+					batches = append(batches, newPlanTestBatch())
+				}
+				currentBatch := batches[currentBatchIndex]
+
+				currentBatch.TestExecutions = []*PlanTestExecution{execution}
+
+				currentBatchDuration += execution.ExpectedDuration
+				totalRemainingDuration += execution.ExpectedDuration
+
+				currentBatchIndex++
+				currentBatchDuration = time.Duration(0)
+			}
+		} else {
+			if currentBatchDuration > 0 && currentBatchDuration+currentTestFileDuration > opts.TargetDuration {
+				currentBatchIndex++
+				currentBatchDuration = time.Duration(0)
+			}
+			for currentBatchIndex >= len(batches) {
+				batches = append(batches, newPlanTestBatch())
+			}
+
+			currentBatch := batches[currentBatchIndex]
+			currentBatch.TestExecutions = append(currentBatch.TestExecutions, &PlanTestExecution{
+				File:             testFile.File,
+				ExpectedDuration: currentTestFileDuration,
 			})
-		}
-		currentBatch := batches[currentBatchIndex]
-		currentBatch.TestExecutions = append(currentBatch.TestExecutions, &PlanTestExecution{
-			File:             testFile.File,
-			ExpectedDuration: currentTestFileDuration,
-		})
 
-		currentBatchDuration += currentTestFileDuration
-		totalRemainingDuration += currentTestFileDuration
+			currentBatchDuration += currentTestFileDuration
+			totalRemainingDuration += currentTestFileDuration
+		}
 	}
 
 	approxDurationPerRemainingWorker := totalRemainingDuration / time.Duration(opts.NumWorkers)
@@ -146,15 +207,12 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 	return plan, nil
 }
 
-func expectedTestDurationOrDefault(testResult *TestFileResult, fingerprinter Fingerprinter, defaultDuration time.Duration) time.Duration {
-	if testResult != nil {
-		fingerprint, err := fingerprinter(testResult.File)
-		if err != nil || fingerprint != testResult.Fingerprint {
-			return defaultDuration
-		} else {
-			return testResult.Duration
-		}
-	} else {
-		return defaultDuration
+func fingerprintMatches(testResult *TestFileResult, fingerprinter Fingerprinter) bool {
+	fingerprint, err := fingerprinter(testResult.File)
+	if err != nil {
+		log.Printf("unable to fingerprint file %s: %v", testResult.File, err)
+		return false
 	}
+
+	return fingerprint == testResult.Fingerprint
 }
