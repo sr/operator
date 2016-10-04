@@ -235,7 +235,7 @@ func TestDeploy(t *testing.T) {
 		err    error
 	}{
 		{"pardot", "1", "deployed", nil},
-		{"pardot", "old", "", errors.New("refusing to deploy build")},
+		{"pardot", "old", "", errors.New("Unable to deploy build")},
 		{"bread", "1", "", errors.New("No such deployment target: bread")},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tc.target, tc.build), func(t *testing.T) {

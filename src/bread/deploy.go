@@ -159,7 +159,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	}
 	if time.Since(build.GetCreated()) > maxBuildAge {
 		return nil, fmt.Errorf(
-			"refusing to deploy build %s because it was created on %s which is more than %s ago",
+			"Unable to deploy build %s because it was created on %s which is more than %s ago",
 			build.GetID(),
 			build.GetCreated().In(s.tz).Format("2006-01-02 at 15:04:05 MST"),
 			maxBuildAge,
