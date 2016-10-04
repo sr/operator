@@ -1,11 +1,7 @@
 package privet
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"io"
-	"log"
-	"os"
+	"sort"
 	"time"
 )
 
@@ -38,28 +34,9 @@ type Plan struct {
 }
 
 type TestFile struct {
-	File        string
-	Suite       string
-	Fingerprint string
-}
-
-// Fingerprinter is expected to return a collision-resistent hash of the file
-// given as its argument.
-type Fingerprinter func(string) (string, error)
-
-var sha256Fingerprinter = func(filename string) (string, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = file.Close() }()
-
-	hash := sha256.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-
-	return hex.EncodeToString(hash.Sum(nil)), nil
+	File        string `json:"file"`
+	Suite       string `json:"suite"`
+	Fingerprint string `json:"fingerprint"`
 }
 
 type PlanCreationOpts struct {
@@ -68,11 +45,17 @@ type PlanCreationOpts struct {
 	NumWorkers          int
 	TargetDuration      time.Duration
 	DefaultTestDuration time.Duration
-
-	// Fingerprinter specifies a function to generate a collision-resistent
-	// hash of the given test file. If left unspecified, a SHA256 hash is used.
-	Fingerprinter Fingerprinter
 }
+
+// https://talks.golang.org/2014/go4gophers.slide#15
+type testFileSlice []*TestFile
+
+func (s testFileSlice) Len() int      { return len(s) }
+func (s testFileSlice) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+type bySuite struct{ testFileSlice }
+
+func (s bySuite) Less(i, j int) bool { return s.testFileSlice[i].Suite < s.testFileSlice[j].Suite }
 
 func newPlanTestBatch() *PlanTestBatch {
 	return &PlanTestBatch{
@@ -81,16 +64,14 @@ func newPlanTestBatch() *PlanTestBatch {
 }
 
 func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
-	fingerprinter := opts.Fingerprinter
-	if fingerprinter == nil {
-		fingerprinter = sha256Fingerprinter
-	}
-
 	plan := &Plan{
 		Workers: make(map[int]*PlanWorker),
 	}
 
+	sort.Sort(bySuite{opts.TestFiles})
+
 	batches := []*PlanTestBatch{}
+	currentSuite := ""
 	currentBatchIndex := 0
 	currentBatchDuration := time.Duration(0)
 	totalRemainingDuration := time.Duration(0)
@@ -109,7 +90,8 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 		// fingerprint matches, we use the previous test result information
 		// to bust it up into ranges of test cases within the file
 		if currentTestFileDuration > opts.TargetDuration &&
-			testResult != nil && testResult.TestCases != nil && fingerprintMatches(testResult, fingerprinter) {
+			testResult != nil && testResult.TestCases != nil &&
+			testResult.Fingerprint != "" && testResult.Fingerprint == testFile.Fingerprint {
 			executions := []*PlanTestExecution{}
 			currentExecutionIndex := 0
 			currentExecutionDuration := time.Duration(0)
@@ -156,7 +138,9 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 				currentBatchDuration = time.Duration(0)
 			}
 		} else {
-			if currentBatchDuration > 0 && currentBatchDuration+currentTestFileDuration > opts.TargetDuration {
+			if currentBatchDuration > 0 &&
+				(currentSuite != "" && currentSuite != testFile.Suite ||
+					currentBatchDuration+currentTestFileDuration > opts.TargetDuration) {
 				currentBatchIndex++
 				currentBatchDuration = time.Duration(0)
 			}
@@ -172,6 +156,7 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 
 			currentBatchDuration += currentTestFileDuration
 			totalRemainingDuration += currentTestFileDuration
+			currentSuite = testFile.Suite
 		}
 	}
 
@@ -205,14 +190,4 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 	}
 
 	return plan, nil
-}
-
-func fingerprintMatches(testResult *TestFileResult, fingerprinter Fingerprinter) bool {
-	fingerprint, err := fingerprinter(testResult.File)
-	if err != nil {
-		log.Printf("unable to fingerprint file %s: %v", testResult.File, err)
-		return false
-	}
-
-	return fingerprint == testResult.Fingerprint
 }
