@@ -272,7 +272,7 @@ resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
 resource "aws_route53_record" "go_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "go.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["lba-s1.dev.pardot.com."]
+  records = ["app.dev.pardot.com."]
   type = "CNAME"
   ttl = "900"
 }
