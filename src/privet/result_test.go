@@ -2,6 +2,7 @@ package privet_test
 
 import (
 	"bytes"
+	"fmt"
 	"privet"
 	"testing"
 	"time"
@@ -29,17 +30,24 @@ func TestParseJunitResults(t *testing.T) {
 	if len(results) != 1 {
 		t.Errorf("len(results): expected %d, got %d", 1, len(results))
 	}
+	fmt.Printf("%#v\n", results)
 	if results["/app/test/piUserTest.php"].Name != "piUserTest" {
-		t.Errorf("results[/app/test/piUserTest.php].Name: expected %s, got %s", "piUserTest", results["/app/test/piUserTest.php"].Name)
+		t.Fatalf("results[/app/test/piUserTest.php].Name: expected %s, got %s", "piUserTest", results["/app/test/piUserTest.php"].Name)
 	}
 	if results["/app/test/piUserTest.php"].Filename != "/app/test/piUserTest.php" {
-		t.Errorf("results[/app/test/piUserTest.php].File: expected %s, got %s", "/app/test/piUserTest.php", results["/app/test/piUserTest.php"].Filename)
+		t.Fatalf("results[/app/test/piUserTest.php].File: expected %s, got %s", "/app/test/piUserTest.php", results["/app/test/piUserTest.php"].Filename)
 	}
 	if results["/app/test/piUserTest.php"].Duration != 21*time.Second {
-		t.Errorf("results[/app/test/piUserTest.php].Duration: expected %s, got %s", 21*time.Second, results["/app/test/piUserTest.php"].Duration)
+		t.Fatalf("results[/app/test/piUserTest.php].Duration: expected %s, got %s", 21*time.Second, results["/app/test/piUserTest.php"].Duration)
 	}
 	if len(results["/app/test/piUserTest.php"].TestCases) != 2 {
-		t.Errorf("len(results[/app/test/piUserTest.php].TestCases): expected %d, got %d", 2, len(results["/app/test/piUserTest.php"].TestCases))
+		t.Fatalf("len(results[/app/test/piUserTest.php].TestCases): expected %d, got %d", 2, len(results["/app/test/piUserTest.php"].TestCases))
+	}
+	if results["/app/test/piUserTest.php"].TestCases[0].Name != "testSendActivationEmail" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[0].Name: expected %s, got %s", "testSendActivationEmail", results["/app/test/piUserTest.php"].TestCases[0].Name)
+	}
+	if results["/app/test/piUserTest.php"].TestCases[1].Name != "test_setIsArchived with data set #0" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[1].Name: expected %s, got %s", "test_setIsArchived with data set #0", results["/app/test/piUserTest.php"].TestCases[1].Name)
 	}
 }
 

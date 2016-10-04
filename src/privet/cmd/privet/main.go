@@ -16,6 +16,7 @@ var (
 	numWorkers          int
 	targetDuration      time.Duration
 	defaultTestDuration time.Duration
+	planFile            string
 	commandPath         string
 	worker              int
 )
@@ -37,6 +38,7 @@ func main() {
 	flag.IntVar(&numWorkers, "num-workers", 0, "The number of workers to plan (required for plan)")
 	flag.DurationVar(&targetDuration, "target-duration", 30*time.Second, "The target duration for one test batch. Should be balanced between too short (where startup/teardown time becomes an issue) and too long (where one worker might run much longer than the rest)")
 	flag.DurationVar(&defaultTestDuration, "default-test-duration", 1*time.Second, "The default duration assumed for a test, if it cannot be found in the previous results")
+	flag.StringVar(&planFile, "plan-file", "", "Path to the plan file (required for execute)")
 	flag.StringVar(&commandPath, "command-path", "", "Command to execute for each test batch (required for execute)")
 	flag.IntVar(&worker, "worker", -1, "Worker identifier (required for execute)")
 	flag.Parse()
@@ -103,7 +105,51 @@ func doPlan() error {
 }
 
 func doExecute() error {
+	opts := &privet.PlanExecutionOpts{}
+
+	if commandPath == "" {
+		return fmt.Errorf("command-path is required")
+	}
+	opts.CommandPath = commandPath
+
+	if planFile == "" {
+		return fmt.Errorf("plan-file is required")
+	}
+	plan, err := loadPlan(planFile)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%#v\n", plan)
+
+	if worker < 0 {
+		return fmt.Errorf("worker is required")
+	}
+	opts.Worker = worker
+
+	success, err := privet.ExecutePlan(plan, opts)
+	if err != nil {
+		return err
+	} else if !success {
+		return fmt.Errorf("executing the test plan resulted in at least one test failure")
+	}
+
 	return nil
+}
+
+func loadPlan(file string) (*privet.Plan, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = f.Close() }()
+
+	decoder := json.NewDecoder(f)
+
+	var plan privet.Plan
+	if err := decoder.Decode(&plan); err != nil {
+		return nil, err
+	}
+	return &plan, nil
 }
 
 func loadTestFilesFile(file string) ([]*privet.TestFile, error) {
@@ -129,7 +175,6 @@ func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
 		return nil, err
 	}
 
-	fmt.Printf("started parsing results\n")
 	results := privet.TestRunResults{}
 	for _, file := range files {
 		f, err := os.Open(file)
@@ -149,7 +194,6 @@ func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
 
 		_ = f.Close()
 	}
-	fmt.Printf("finished parsing results\n")
 
 	return results, nil
 }

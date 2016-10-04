@@ -10,6 +10,11 @@ import (
 type TestBatchExecutor func(commandPath string, worker int, batchIndex int, batch *PlanTestBatch) (bool, error)
 
 var execTestExecutor = func(commandPath string, worker int, batchIndex int, batch *PlanTestBatch) (bool, error) {
+	fullCommandPath, err := exec.LookPath(commandPath)
+	if err != nil {
+		return false, err
+	}
+
 	testFiles := []string{}
 	testCaseNames := []string{}
 	for _, execution := range batch.TestExecutions {
@@ -18,7 +23,7 @@ var execTestExecutor = func(commandPath string, worker int, batchIndex int, batc
 	}
 
 	cmd := &exec.Cmd{
-		Path: commandPath,
+		Path: fullCommandPath,
 		Env: []string{
 			fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")),
 			fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")),
@@ -29,7 +34,7 @@ var execTestExecutor = func(commandPath string, worker int, batchIndex int, batc
 		Stderr: os.Stderr,
 	}
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if _, ok := err.(*exec.ExitError); ok {
 		// The command exited non-zero
 		return false, nil

@@ -2,12 +2,11 @@ package privet
 
 import (
 	"bufio"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"regexp"
 	"time"
-
-	"gopkg.in/xmlpath.v2"
 )
 
 type TestCaseResult struct {
@@ -25,62 +24,74 @@ type TestFileResult struct {
 
 type TestRunResults map[string]*TestFileResult
 
-var (
-	junitResultTestSuitePath     = xmlpath.MustCompile(`//testsuite[@file]`)
-	junitResultTestCasePath      = xmlpath.MustCompile(`//testcase`)
-	junitResultFileAttributePath = xmlpath.MustCompile(`@file`)
-	junitResultNameAttributePath = xmlpath.MustCompile(`@name`)
-	junitResultTimeAttributePath = xmlpath.MustCompile(`@time`)
-)
-
 // ParseJunitResult parses a JUnit result file into a list of TestFileResult
 // structs, describing the attributes of a previous test run.
 func ParseJunitResult(r io.Reader) (TestRunResults, error) {
-	node, err := xmlpath.Parse(r)
-	if err != nil {
-		return nil, err
-	}
+	results := TestRunResults{}
 
-	results := make(TestRunResults)
-	suiteFileNodes := junitResultTestSuitePath.Iter(node)
-	for suiteFileNodes.Next() {
-		fileNode := suiteFileNodes.Node()
-		file, _ := junitResultFileAttributePath.String(fileNode)
-		name, _ := junitResultNameAttributePath.String(fileNode)
-		timeStr, _ := junitResultTimeAttributePath.String(fileNode)
-		timeDuration, err := time.ParseDuration(fmt.Sprintf("%ss", timeStr))
-		if err != nil {
-			timeDuration = 0
+	decoder := xml.NewDecoder(r)
+	var currentResult *TestFileResult
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
 		}
 
-		result := &TestFileResult{
-			Filename:  file,
-			Name:      name,
-			Duration:  timeDuration,
-			TestCases: []*TestCaseResult{},
-		}
+		switch element := token.(type) {
+		case xml.StartElement:
+			if element.Name.Local == "testsuite" {
+				attrMap := xmlAttributeListToMap(element.Attr)
 
-		testCaseNodes := junitResultTestCasePath.Iter(fileNode)
-		for testCaseNodes.Next() {
-			testCaseNode := testCaseNodes.Node()
-			name, _ = junitResultNameAttributePath.String(testCaseNode)
-			timeStr, _ = junitResultTimeAttributePath.String(testCaseNode)
-			timeDuration, err := time.ParseDuration(fmt.Sprintf("%ss", timeStr))
-			if err != nil {
-				timeDuration = 0
+				// If the <testcase> doesn't have a file
+				// attribute, we're not interested in it. It's
+				// either the outermost <testsuite> representing a
+				// --group or it's an innermost <testsuite>
+				// representing a group of test cases with data
+				// sets
+				if attrMap["name"] == "" || attrMap["file"] == "" {
+					continue
+				}
+
+				currentResult = &TestFileResult{
+					Name:      attrMap["name"],
+					Filename:  attrMap["file"],
+					TestCases: []*TestCaseResult{},
+				}
+				if timeValue, ok := attrMap["time"]; ok {
+					currentResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
+				}
+				results[currentResult.Filename] = currentResult
+			} else if element.Name.Local == "testcase" {
+				attrMap := xmlAttributeListToMap(element.Attr)
+
+				if attrMap["name"] == "" {
+					continue
+				} else if currentResult == nil {
+					continue
+				}
+
+				testCaseResult := &TestCaseResult{
+					Name: attrMap["name"],
+				}
+				if timeValue, ok := attrMap["time"]; ok {
+					testCaseResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
+				}
+				currentResult.TestCases = append(currentResult.TestCases, testCaseResult)
 			}
-
-			testCase := &TestCaseResult{
-				Name:     name,
-				Duration: timeDuration,
-			}
-			result.TestCases = append(result.TestCases, testCase)
 		}
-
-		results[file] = result
 	}
 
 	return results, nil
+}
+
+func xmlAttributeListToMap(attr []xml.Attr) map[string]string {
+	result := map[string]string{}
+	for _, attr := range attr {
+		result[attr.Name.Local] = attr.Value
+	}
+	return result
 }
 
 // PopulateFingerprintsFromShasumsFile populates the Fingerprint of each test
