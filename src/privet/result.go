@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -113,6 +114,7 @@ func PopulateFingerprintsFromShasumsFile(results TestRunResults, r io.Reader) er
 		} else if err != nil {
 			return err
 		}
+		line = strings.TrimRight(line, "\r\n")
 
 		fields := whitespace.Split(line, 2)
 		if len(fields) < 2 {
@@ -121,6 +123,12 @@ func PopulateFingerprintsFromShasumsFile(results TestRunResults, r io.Reader) er
 
 		fingerprint := fields[0]
 		filename := fields[1]
+
+		// TODO: Temporary hack until SHASUMS contains absolute paths
+		if !strings.HasPrefix(filename, "/") {
+			filename = fmt.Sprintf("%s/%s", "/app", filename)
+		}
+
 		if result, ok := results[filename]; ok {
 			result.Fingerprint = fingerprint
 		}

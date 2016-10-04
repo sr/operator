@@ -196,7 +196,7 @@ func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
 	}
 
 	shasumFile := filepath.Join(directory, "SHASUMS")
-	if _, err := os.Stat(shasumFile); err != nil {
+	if _, err := os.Stat(shasumFile); err == nil {
 		f, err := os.Open(shasumFile)
 		if err != nil {
 			return nil, err
