@@ -1,3 +1,96 @@
+resource "aws_security_group" "internal_apps_operator_http_lb" {
+  name = "internal_apps_operator_http_lb"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32"
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_alb" "operator_production" {
+  security_groups = [
+    "${aws_security_group.internal_apps_operator_http_lb.id}",
+    "${aws_security_group.internal_apps_dc_only_http_lb.id}"
+  ]
+  subnets = [
+    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
+    "${aws_subnet.internal_apps_us_east_1e_dmz.id}"
+  ]
+  enable_deletion_protection = true
+
+  tags {
+    Name = "operator_production"
+  }
+}
+
+resource "aws_alb_target_group" "operator" {
+  name     = "operator-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.internal_apps.id}"
+
+  health_check {
+    path = "/_ping"
+  }
+}
+
+resource "aws_alb_listener" "operator" {
+  load_balancer_arn = "${aws_alb.operator_production.arn}"
+  port = "443"
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2015-05"
+  certificate_arn = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+
+  default_action {
+    target_group_arn = "${aws_alb_target_group.operator.arn}"
+    type = "forward"
+  }
+}
+
+resource "aws_alb_listener_rule" "operator_healthcheck" {
+  listener_arn = "${aws_alb_listener.operator.arn}"
+  priority = 1
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.operator.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/_ping"]
+  }
+}
+
+resource "aws_alb_listener_rule" "operator_hipchat" {
+  listener_arn = "${aws_alb_listener.operator.arn}"
+  priority = 2
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.operator.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/hipchat/*"]
+  }
+}
+
 resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
@@ -47,61 +140,6 @@ resource "aws_security_group" "operator_db_production" {
     to_port = 0
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "internal_apps_operator_http_lb" {
-  name = "internal_apps_operator_http_lb"
-  vpc_id = "${aws_vpc.internal_apps.id}"
-
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [
-      "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32"
-    ]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_elb" "operator_production" {
-  name = "operator-production"
-  security_groups = ["${aws_security_group.internal_apps_operator_http_lb.id}"]
-  subnets = [
-    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1e_dmz.id}"
-  ]
-  cross_zone_load_balancing = true
-  connection_draining = true
-  connection_draining_timeout = 30
-
-  listener {
-    lb_port = 443
-    lb_protocol = "https"
-    instance_port = 80
-    instance_protocol = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
-  }
-
-  health_check {
-    healthy_threshold = 2
-    unhealthy_threshold = 2
-    timeout = 3
-    target = "HTTP:80/_ping"
-    interval = 5
-  }
-
-  tags {
-    Name = "operator_production"
   }
 }
 
@@ -227,8 +265,8 @@ resource "aws_launch_configuration" "operator_production" {
 }
 
 resource "aws_autoscaling_group" "operator_production" {
-  max_size = 1
-  min_size = 1
+  max_size = 2
+  min_size = 2
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
   vpc_zone_identifier = [
     "${aws_subnet.internal_apps_us_east_1a.id}",
