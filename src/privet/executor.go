@@ -22,14 +22,19 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 		testCaseNames = append(testCaseNames, execution.TestCaseNames...)
 	}
 
-	env := []string{
-		fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")),
-		fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")),
-		fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
-		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
-	}
+	env := []string{}
 	if opts.Env != nil {
 		env = append(env, opts.Env...)
+	}
+	env = append(env, []string{
+		fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
+		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
+	}...)
+	if len(testFiles) > 0 {
+		env = append(env, fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")))
+	}
+	if len(testCaseNames) > 0 {
+		env = append(env, fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")))
 	}
 
 	cmd := &exec.Cmd{
@@ -39,6 +44,7 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
+	fmt.Printf("%#v\n", cmd)
 
 	err = cmd.Run()
 	if _, ok := err.(*exec.ExitError); ok {
