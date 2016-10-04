@@ -44,7 +44,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
 
   # Notes on why "aws_vpc.artifactory_integration.cidr_block" above and below
   # see: https://www.jfrog.com/confluence/display/RTF/HA+Installation+and+Setup#InstallationandSetup-ConfiguringArtifactoryHA
-  # "If there is a firewall between the cluster nodes, both the Hazelcast port (10001) and the Tomcat port (default 8081) should be open between all nodes."
+  # "both the Hazelcast port (10001) and the Tomcat port (default 8081) should be open between all nodes."
 
   ingress {
     from_port = 10001
