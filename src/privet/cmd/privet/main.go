@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -67,7 +68,7 @@ func doPlan() error {
 	opts := &privet.PlanCreationOpts{}
 
 	if testFilesFile == "" {
-		return fmt.Errorf("test-files-file is required")
+		return errors.New("test-files-file is required")
 	}
 	testFiles, err := loadTestFilesFile(testFilesFile)
 	if err != nil {
@@ -84,7 +85,7 @@ func doPlan() error {
 	}
 
 	if numWorkers <= 0 {
-		return fmt.Errorf("num-workers is required")
+		return errors.New("num-workers is required")
 	}
 	opts.NumWorkers = numWorkers
 
@@ -108,12 +109,12 @@ func doExecute() error {
 	opts := &privet.PlanExecutionOpts{}
 
 	if commandPath == "" {
-		return fmt.Errorf("command-path is required")
+		return errors.New("command-path is required")
 	}
 	opts.CommandPath = commandPath
 
 	if planFile == "" {
-		return fmt.Errorf("plan-file is required")
+		return errors.New("plan-file is required")
 	}
 	plan, err := loadPlan(planFile)
 	if err != nil {
@@ -122,7 +123,7 @@ func doExecute() error {
 	fmt.Printf("%#v\n", plan)
 
 	if worker < 0 {
-		return fmt.Errorf("worker is required")
+		return errors.New("worker is required")
 	}
 	opts.Worker = worker
 
@@ -130,7 +131,7 @@ func doExecute() error {
 	if err != nil {
 		return err
 	} else if !success {
-		return fmt.Errorf("executing the test plan resulted in at least one test failure")
+		return errors.New("executing the test plan resulted in at least one test failure")
 	}
 
 	return nil
