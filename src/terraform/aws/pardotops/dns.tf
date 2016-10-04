@@ -328,7 +328,7 @@ resource "aws_route53_record" "hal9000_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "operator_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "operator.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_elb.operator_production.dns_name}"]
+  records = ["${aws_alb.operator_production.dns_name}"]
   type = "CNAME"
   ttl = "900"
 }

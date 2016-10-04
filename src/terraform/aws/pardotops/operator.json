@@ -1,0 +1,38 @@
+[
+  {
+    "portMappings": [
+      {
+        "hostPort": 80,
+        "containerPort": 8080,
+        "protocol": "tcp"
+      }
+    ],
+    "essential": true,
+    "mountPoints": [
+      {
+        "containerPath": "/usr/share/zoneinfo",
+        "sourceVolume": "zoneinfo",
+        "readOnly": null
+      }
+    ],
+    "name": "operatord",
+    "links": [
+      "hal9000:hal9000"
+    ],
+    "image": "docker.dev.pardot.com/build/bread/operatord/app:BREAD-BREAD334-5",
+    "logConfiguration": {
+      "logDriver": "syslog",
+      "options": null
+    },
+  },
+  {
+    "essential": true,
+    "name": "hal9000",
+    "links": null,
+    "image": "docker.dev.pardot.com/build/bread/hal9000/app:BREAD-BREAD334-5",
+    "logConfiguration": {
+      "logDriver": "syslog",
+      "options": null
+    },
+  }
+]
