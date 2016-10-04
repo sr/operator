@@ -191,7 +191,8 @@ resource "aws_security_group" "appdev_vpc_default" {
     protocol = "tcp"
     cidr_blocks = [
       "${aws_eip.appdev_bastion_eip.public_ip}/32",
-      "${aws_instance.appdev_bastion.private_ip}/32"
+      "${aws_instance.appdev_bastion.private_ip}/32",
+      "${aws_instance.appdev_tools_server.private_ip}/32"
     ]
   }
 
@@ -296,4 +297,3 @@ resource "aws_vpc_peering_connection" "appdev_and_pardot_atlassian_vpc_peering" 
   peer_vpc_id = "${var.pardot_atlassian_vpc_id}"
   vpc_id = "${aws_vpc.appdev.id}"
 }
-
