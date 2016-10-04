@@ -181,30 +181,6 @@ func (b *fakeBuild) GetCreated() time.Time {
 	return b.Created
 }
 
-type fakeAuthorizer struct {
-	err error
-}
-
-func (a *fakeAuthorizer) Authorize(context.Context, *operator.Request) error {
-	return a.err
-}
-
-type fakeInstrumenter struct {
-	events []*operator.Event
-}
-
-func (i *fakeInstrumenter) Instrument(ev *operator.Event) {
-	i.events = append(i.events, ev)
-}
-
-func (i *fakeInstrumenter) pop() (ev *operator.Event) {
-	if len(i.events) == 0 {
-		return nil
-	}
-	ev, i.events = i.events[len(i.events)-1], i.events[:len(i.events)-1]
-	return ev
-}
-
 type fakeSender struct{}
 
 func (c *fakeSender) Send(_ context.Context, _ *operator.Source, _ string, _ *operator.Message) error {
@@ -270,7 +246,7 @@ func TestDeploy(t *testing.T) {
 			})
 			if tc.err == nil {
 				if err != nil {
-					t.Errorf("expected no error bit got %s", tc.build, err)
+					t.Errorf("expected no error bit got %s", err)
 				} else if resp.Message != tc.resp {
 					t.Errorf("expected response message `%s` but got %s", tc.resp, resp.Message)
 				}
