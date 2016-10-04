@@ -23,7 +23,7 @@
     "logConfiguration": {
       "logDriver": "syslog",
       "options": null
-    },
+    }
   },
   {
     "essential": true,
@@ -33,6 +33,6 @@
     "logConfiguration": {
       "logDriver": "syslog",
       "options": null
-    },
+    }
   }
 ]
