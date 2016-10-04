@@ -51,9 +51,16 @@ func main() {
 			os.Exit(1)
 		}
 	case "execute":
-		if err := doExecute(); err != nil {
+		success, err := doExecute()
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "privet error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "The build failed due to an unexpected failure. Please open a ticket on https://jira.dev.pardot.com/browse/BREAD for the BREAD team to look into.")
 			os.Exit(1)
+		} else if !success {
+			fmt.Fprintf(os.Stderr, "The build failed because at least one test job failed.")
+			os.Exit(1)
+		} else {
+			os.Exit(0)
 		}
 	case "help":
 		flag.Usage()
@@ -105,35 +112,28 @@ func doPlan() error {
 	return nil
 }
 
-func doExecute() error {
+func doExecute() (bool, error) {
 	opts := &privet.PlanExecutionOpts{}
 
 	if commandPath == "" {
-		return errors.New("command-path is required")
+		return false, errors.New("command-path is required")
 	}
 	opts.CommandPath = commandPath
 
 	if planFile == "" {
-		return errors.New("plan-file is required")
+		return false, errors.New("plan-file is required")
 	}
 	plan, err := loadPlan(planFile)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if worker < 0 {
-		return errors.New("worker is required")
+		return false, errors.New("worker is required")
 	}
 	opts.Worker = worker
 
-	success, err := privet.ExecutePlan(plan, opts)
-	if err != nil {
-		return err
-	} else if !success {
-		return errors.New("executing the test plan resulted in at least one test failure")
-	}
-
-	return nil
+	return privet.ExecutePlan(plan, opts)
 }
 
 func loadPlan(file string) (*privet.Plan, error) {
