@@ -15,7 +15,7 @@ variable "sfdc_proxyout_cidr_blocks" {
     "136.147.104.20/30", # pardot0-proxyout1-{1,2,3,4}-dfw
     "136.147.96.20/30",  # pardot0-proxyout1-{1,2,3,4}-phx
     "136.147.104.40/30", # pardot1-proxyout1-{1,2}-dfw
-    "136.147.96.40/30"   # pardot0-proxyout1-{1,2}-phx
+    "136.147.96.40/30"   # pardot1-proxyout1-{1,2}-phx
   ]
 }
 
