@@ -93,7 +93,7 @@ resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
 
-resource "aws_ecs_service" "operator_production" {
+resource "aws_ecs_service" "operator" {
   name = "operator"
   cluster = "${aws_ecs_cluster.operator_production.id}"
   task_definition = "${aws_ecs_task_definition.operator.arn}"
