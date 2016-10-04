@@ -37,7 +37,15 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     security_groups = [
       "${aws_security_group.artifactory_dc_only_http_lb.id}",
       "${aws_security_group.artifactory_http_lb.id}",
-      "${aws_security_group.artifactory_internal_elb_secgroup.id}",
+      "${aws_security_group.artifactory_internal_elb_secgroup.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 8081
+    to_port = 8081
+    protocol = "tcp"
+    security_groups = [
       "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
