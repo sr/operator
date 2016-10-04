@@ -1,10 +1,11 @@
 package privet
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 type TestBatchExecutor func(opts *PlanExecutionOpts, batchIndex int, batch *PlanTestBatch) (bool, error)
@@ -15,37 +16,29 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 		return false, err
 	}
 
-	testFiles := []string{}
-	testCaseNames := []string{}
-	for _, execution := range batch.TestExecutions {
-		testFiles = append(testFiles, execution.Filename)
-		testCaseNames = append(testCaseNames, execution.TestCaseNames...)
-	}
-
 	env := []string{}
 	if opts.Env != nil {
 		env = append(env, opts.Env...)
 	}
 	env = append(env, []string{
-		fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
 		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
+		fmt.Sprintf("PRIVET_BATCH_INDEX=%d", batchIndex),
 	}...)
-	if len(testFiles) > 0 {
-		env = append(env, fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")))
-	}
-	if len(testCaseNames) > 0 {
-		env = append(env, fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")))
+
+	in := new(bytes.Buffer)
+	encoder := json.NewEncoder(in)
+	if err := encoder.Encode(batch); err != nil {
+		return false, err
 	}
 
 	cmd := &exec.Cmd{
 		Path:   fullCommandPath,
 		Args:   []string{fullCommandPath},
 		Env:    env,
-		Stdin:  nil,
+		Stdin:  in,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
-	fmt.Printf("%#v\n", cmd)
 
 	err = cmd.Run()
 	if _, ok := err.(*exec.ExitError); ok {
@@ -62,16 +55,8 @@ type PlanExecutionOpts struct {
 	// CommandPath is the path of the command to run as part of plan
 	// execution.
 	//
-	// The command will receive two environment variables which it should
-	// use to execute the requested test case(s):
-	// * PRIVET_TEST_FILES: Test files (separated by \0)
-	// * PRIVET_TEST_CASE_NAMES: Test cases (separated by \0)
-	// * PRIVET_TEST_BATCH: Strictly increasing integer identifier of the
-	//                      test batch
-	// * PRIVET_WORKER: Worker identifier
-	//
-	// If PRIVET_TEST_CASE_NAMES is specified, only one test file will be
-	// present in PRIVET_TEST_FILES.
+	// The command will receive the JSOn representation of the test batch as
+	// standard in.
 	CommandPath string
 
 	Worker int
