@@ -45,7 +45,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 8081
     to_port = 8081
     protocol = "tcp"
-    security_groups = [
+    cidr_blocks = [
       "${aws_vpc.artifactory_integration.cidr_block}"
     ]
   }
