@@ -27,6 +27,10 @@ import (
 const grpcTimeout = 3 * time.Second
 
 type config struct {
+	afy   *bread.ArtifactoryConfig
+	canoe *bread.CanoeConfig
+	ecs   *bread.ECSConfig
+
 	dev             bool
 	devRoomID       int
 	devHipchatToken string
@@ -45,24 +49,24 @@ type config struct {
 	hipchatNamespace  string
 	hipchatAddonURL   string
 	hipchatWebhookURL string
-
-	deploy *bread.DeployConfig
 }
 
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
-		deploy: &bread.DeployConfig{},
+		afy:    &bread.ArtifactoryConfig{},
+		canoe:  &bread.CanoeConfig{},
+		ecs:    &bread.ECSConfig{},
 		ldap:   &bread.LDAPConfig{},
 		yubico: &bread.YubicoConfig{},
 	}
 	flags := flag.CommandLine
-	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
-	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "Room ID where to send messages")
-	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "HipChat user token")
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
+	flags.BoolVar(&config.dev, "dev", false, "Enable development mode")
+	flags.IntVar(&config.devRoomID, "dev-room-id", bread.TestingRoom, "Room ID where to send messages")
+	flags.StringVar(&config.devHipchatToken, "dev-hipchat-token", "", "HipChat user token")
 	flags.StringVar(&config.ldap.Addr, "ldap-addr", "localhost:389", "Address of the LDAP server used to authenticate and authorize commands")
 	flags.StringVar(&config.ldap.Base, "ldap-base", bread.LDAPBase, "LDAP Base DN")
 	flags.StringVar(&config.databaseURL, "database-url", "", "database/sql connection string to the database where OAuth credentials are stored")
@@ -72,14 +76,14 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
 	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
 	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
-	flags.StringVar(&config.deploy.ArtifactoryURL, "deploy-artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
-	flags.StringVar(&config.deploy.ArtifactoryUsername, "deploy-artifactory-username", "", "Artifactory username")
-	flags.StringVar(&config.deploy.ArtifactoryAPIKey, "deploy-artifactory-api-key", "", "Artifactory API key")
-	flags.StringVar(&config.deploy.CanoeURL, "deploy-canoe-url", "https://canoe.dev.pardot.com", "")
-	flags.StringVar(&config.deploy.CanoeAPIKey, "deploy-canoe-api-key", "", "Canoe API key")
-	flags.StringVar(&config.deploy.ArtifactoryRepo, "deploy-artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
-	flags.StringVar(&config.deploy.AWSRegion, "deploy-aws-region", "us-east-1", "AWS Region")
-	flags.DurationVar(&config.deploy.ECSTimeout, "deploy-ecs-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
+	flags.StringVar(&config.afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
+	flags.StringVar(&config.afy.User, "artifactory-user", "", "Artifactory username")
+	flags.StringVar(&config.afy.APIKey, "artifactory-api-key", "", "Artifactory API key")
+	flags.StringVar(&config.afy.Repo, "artifactory-repo", "pd-docker", "Name of the Artifactory repository where deployable artifacts are stored")
+	flags.StringVar(&config.canoe.URL, "canoe-url", "https://canoe.dev.pardot.com", "")
+	flags.StringVar(&config.canoe.APIKey, "canoe-api-key", "", "Canoe API key")
+	flags.StringVar(&config.ecs.AWSRegion, "ecs-aws-region", "us-east-1", "AWS Region")
+	flags.DurationVar(&config.ecs.Timeout, "ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -175,8 +179,12 @@ func run(invoker operator.InvokerFunc) error {
 		auth,
 		inst,
 		sender,
-		config.deploy,
-		tz,
+		bread.NewDeployServer(
+			sender,
+			bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets),
+			bread.NewCanoeDeployer(config.canoe),
+			tz,
+		),
 	); err != nil {
 		return err
 	}
