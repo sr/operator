@@ -36,7 +36,7 @@ resource "aws_alb" "operator_production" {
 }
 
 resource "aws_alb_target_group" "operator" {
-  name     = "operator_target_group"
+  name     = "operator-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.internal_apps.id}"
