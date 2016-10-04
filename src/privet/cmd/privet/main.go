@@ -120,7 +120,6 @@ func doExecute() error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%#v\n", plan)
 
 	if worker < 0 {
 		return errors.New("worker is required")
