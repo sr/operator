@@ -39,6 +39,7 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 
 	cmd := &exec.Cmd{
 		Path:   fullCommandPath,
+		Args:   []string{fullCommandPath},
 		Env:    env,
 		Stdin:  nil,
 		Stdout: os.Stdout,
