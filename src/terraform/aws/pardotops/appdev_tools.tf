@@ -3,16 +3,6 @@ resource "aws_security_group" "appdev_tools_server" {
   description = "Tools Server for the AWS environment"
   vpc_id = "${aws_vpc.appdev.id}"
 
-  # SSH from bastion
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    security_groups = [
-      "${aws_security_group.appdev_vpc_default.id}"
-    ]
-  }
-
   egress {
     from_port = 0
     to_port = 0
