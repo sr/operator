@@ -46,12 +46,12 @@ func main() {
 	switch flag.Arg(0) {
 	case "plan":
 		if err := doPlan(); err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "privet error: %v\n", err)
 			os.Exit(1)
 		}
 	case "execute":
 		if err := doExecute(); err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "privet error: %v\n", err)
 			os.Exit(1)
 		}
 	case "help":
