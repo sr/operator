@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-type TestBatchExecutor func(commandPath string, worker int, batchIndex int, batch *PlanTestBatch) (bool, error)
+type TestBatchExecutor func(opts *PlanExecutionOpts, batchIndex int, batch *PlanTestBatch) (bool, error)
 
-var execTestExecutor = func(commandPath string, worker int, batchIndex int, batch *PlanTestBatch) (bool, error) {
-	fullCommandPath, err := exec.LookPath(commandPath)
+var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *PlanTestBatch) (bool, error) {
+	fullCommandPath, err := exec.LookPath(opts.CommandPath)
 	if err != nil {
 		return false, err
 	}
@@ -22,13 +22,18 @@ var execTestExecutor = func(commandPath string, worker int, batchIndex int, batc
 		testCaseNames = append(testCaseNames, execution.TestCaseNames...)
 	}
 
+	env := []string{
+		fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")),
+		fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")),
+		fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
+	}
+	if opts.Env != nil {
+		env = append(env, opts.Env...)
+	}
+
 	cmd := &exec.Cmd{
-		Path: fullCommandPath,
-		Env: []string{
-			fmt.Sprintf("PRIVET_TEST_FILES=%s", strings.Join(testFiles, "\x00")),
-			fmt.Sprintf("PRIVET_TEST_CASE_NAMES=%s", strings.Join(testCaseNames, "\x00")),
-			fmt.Sprintf("PRIVET_TEST_BATCH=%d", batchIndex),
-		},
+		Path:   fullCommandPath,
+		Env:    env,
 		Stdin:  nil,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -62,6 +67,8 @@ type PlanExecutionOpts struct {
 
 	Worker int
 
+	Env []string
+
 	TestBatchExecutor TestBatchExecutor
 }
 
@@ -82,7 +89,7 @@ func ExecutePlan(plan *Plan, opts *PlanExecutionOpts) (bool, error) {
 
 	overallSuccess := true
 	for batchIndex, batch := range worker.TestBatches {
-		success, err := executor(opts.CommandPath, opts.Worker, batchIndex, batch)
+		success, err := executor(opts, batchIndex, batch)
 		if err != nil {
 			return false, err
 		} else if !success {

@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+type stringListFlag []string
+
+func (f *stringListFlag) String() string {
+	return fmt.Sprintf("%v", *f)
+}
+func (f *stringListFlag) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
+
 var (
 	testFilesFile       string
 	previousResultsDir  string
@@ -20,6 +30,7 @@ var (
 	planFile            string
 	commandPath         string
 	worker              int
+	envVars             stringListFlag
 )
 
 func main() {
@@ -41,6 +52,7 @@ func main() {
 	flag.DurationVar(&defaultTestDuration, "default-test-duration", 1*time.Second, "The default duration assumed for a test, if it cannot be found in the previous results")
 	flag.StringVar(&planFile, "plan-file", "", "Path to the plan file (required for execute)")
 	flag.StringVar(&commandPath, "command-path", "", "Command to execute for each test batch (required for execute)")
+	flag.Var(&envVars, "env", "Environment variable (foo=bar) to pass to the command (can be specified multiple times)")
 	flag.IntVar(&worker, "worker", -1, "Worker identifier (required for execute)")
 	flag.Parse()
 
@@ -132,6 +144,7 @@ func doExecute() (bool, error) {
 		return false, errors.New("worker is required")
 	}
 	opts.Worker = worker
+	opts.Env = envVars
 
 	return privet.ExecutePlan(plan, opts)
 }
