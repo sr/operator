@@ -195,5 +195,20 @@ func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
 		_ = f.Close()
 	}
 
+	shasumFile := filepath.Join(directory, "SHASUMS")
+	if _, err := os.Stat(shasumFile); err != nil {
+		f, err := os.Open(shasumFile)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := privet.PopulateFingerprintsFromShasumsFile(results, f); err != nil {
+			_ = f.Close()
+			return nil, err
+		}
+
+		_ = f.Close()
+	}
+
 	return results, nil
 }
