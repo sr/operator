@@ -40,8 +40,8 @@ func expectPlan(t *testing.T, opts *privet.PlanCreationOpts, expectedPlan *prive
 
 			for executionIndex, execution := range batch.TestExecutions {
 				expectedExecution := expectedBatch.TestExecutions[executionIndex]
-				if execution.File != expectedExecution.File {
-					t.Fatalf("expected worker %d, batch %d, test execution %d to have file %v, but was %v", workerIndex, batchIndex, executionIndex, expectedExecution.File, execution.File)
+				if execution.Filename != expectedExecution.Filename {
+					t.Fatalf("expected worker %d, batch %d, test execution %d to have file %v, but was %v", workerIndex, batchIndex, executionIndex, expectedExecution.Filename, execution.Filename)
 				}
 				if !reflect.DeepEqual(execution.TestCaseNames, expectedExecution.TestCaseNames) {
 					t.Fatalf("expected worker %d, batch %d, test execution %d to have test case names %v, but was %v", workerIndex, batchIndex, executionIndex, expectedExecution.TestCaseNames, execution.TestCaseNames)
@@ -58,16 +58,16 @@ func TestBasicPlanChunkedByDefaultDuration(t *testing.T) {
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
-				File:  "/test1.php",
-				Suite: "suite1",
+				Filename: "/test1.php",
+				Suite:    "suite1",
 			},
 			{
-				File:  "/test2.php",
-				Suite: "suite1",
+				Filename: "/test2.php",
+				Suite:    "suite1",
 			},
 			{
-				File:  "/test3.php",
-				Suite: "suite1",
+				Filename: "/test3.php",
+				Suite:    "suite1",
 			},
 		},
 		PreviousResults:     nil,
@@ -83,10 +83,10 @@ func TestBasicPlanChunkedByDefaultDuration(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 							},
 							{
-								File: "/test2.php",
+								Filename: "/test2.php",
 							},
 						},
 					},
@@ -97,7 +97,7 @@ func TestBasicPlanChunkedByDefaultDuration(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test3.php",
+								Filename: "/test3.php",
 							},
 						},
 					},
@@ -115,16 +115,16 @@ func TestBasicPlanSplitBySuite(t *testing.T) {
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
-				File:  "/test1.php",
-				Suite: "suite1",
+				Filename: "/test1.php",
+				Suite:    "suite1",
 			},
 			{
-				File:  "/test2.php",
-				Suite: "suite2",
+				Filename: "/test2.php",
+				Suite:    "suite2",
 			},
 			{
-				File:  "/test3.php",
-				Suite: "suite1",
+				Filename: "/test3.php",
+				Suite:    "suite1",
 			},
 		},
 		PreviousResults:     nil,
@@ -140,10 +140,10 @@ func TestBasicPlanSplitBySuite(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 							},
 							{
-								File: "/test3.php",
+								Filename: "/test3.php",
 							},
 						},
 					},
@@ -154,7 +154,7 @@ func TestBasicPlanSplitBySuite(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test2.php",
+								Filename: "/test2.php",
 							},
 						},
 					},
@@ -172,17 +172,17 @@ func TestBasicPlanChunkedByDurationFromPreviousResults(t *testing.T) {
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Suite:       "suite1",
 				Fingerprint: "abc123",
 			},
 			{
-				File:        "/test2.php",
+				Filename:    "/test2.php",
 				Suite:       "suite1",
 				Fingerprint: "bcd234",
 			},
 			{
-				File:        "/test3.php",
+				Filename:    "/test3.php",
 				Suite:       "suite1",
 				Fingerprint: "cde345",
 			},
@@ -190,7 +190,7 @@ func TestBasicPlanChunkedByDurationFromPreviousResults(t *testing.T) {
 		PreviousResults: privet.TestRunResults{
 			"/test1.php": {
 				Name:        "Test1",
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Fingerprint: "abc123",
 				Duration:    1 * time.Minute,
 			},
@@ -207,7 +207,7 @@ func TestBasicPlanChunkedByDurationFromPreviousResults(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 							},
 						},
 					},
@@ -218,10 +218,10 @@ func TestBasicPlanChunkedByDurationFromPreviousResults(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test2.php",
+								Filename: "/test2.php",
 							},
 							{
-								File: "/test3.php",
+								Filename: "/test3.php",
 							},
 						},
 					},
@@ -240,7 +240,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Suite:       "suite1",
 				Fingerprint: "abc123",
 			},
@@ -248,7 +248,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 		PreviousResults: privet.TestRunResults{
 			"/test1.php": {
 				Name:        "Test1",
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Fingerprint: "abc123",
 				Duration:    2 * time.Minute,
 				TestCases: []*privet.TestCaseResult{
@@ -279,7 +279,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 								TestCaseNames: []string{
 									"Test1-1",
 								},
@@ -293,7 +293,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 								TestCaseNames: []string{
 									"Test1-2",
 									"Test1-3",
@@ -316,7 +316,7 @@ func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
 	planOpts := &privet.PlanCreationOpts{
 		TestFiles: []*privet.TestFile{
 			{
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Suite:       "suite1",
 				Fingerprint: "abc123",
 			},
@@ -324,7 +324,7 @@ func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
 		PreviousResults: privet.TestRunResults{
 			"/test1.php": {
 				Name:        "Test1",
-				File:        "/test1.php",
+				Filename:    "/test1.php",
 				Fingerprint: "xyz987",
 				Duration:    2 * time.Minute,
 				TestCases: []*privet.TestCaseResult{
@@ -355,7 +355,7 @@ func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
 					{
 						TestExecutions: []*privet.PlanTestExecution{
 							{
-								File: "/test1.php",
+								Filename: "/test1.php",
 							},
 						},
 					},

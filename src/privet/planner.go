@@ -6,7 +6,7 @@ import (
 )
 
 type PlanTestExecution struct {
-	File string `json:"file"`
+	Filename string `json:"filename"`
 
 	ExpectedDuration time.Duration `json:"-"`
 
@@ -14,7 +14,7 @@ type PlanTestExecution struct {
 	// should be run because running the entire file would take much longer
 	// than the TargetDuration. If not present, the entire file should be
 	// run without a filter.
-	TestCaseNames []string `json:"test_case_names"`
+	TestCaseNames []string `json:"test_case_names,omitempty"`
 }
 
 // PlanTestBatch is a set of test files and test case names that can be executed
@@ -34,7 +34,7 @@ type Plan struct {
 }
 
 type TestFile struct {
-	File        string `json:"file"`
+	Filename    string `json:"filename"`
 	Suite       string `json:"suite"`
 	Fingerprint string `json:"fingerprint"`
 }
@@ -78,7 +78,7 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 	for _, testFile := range opts.TestFiles {
 		var testResult *TestFileResult
 		if opts.PreviousResults != nil {
-			testResult = opts.PreviousResults[testFile.File]
+			testResult = opts.PreviousResults[testFile.Filename]
 		}
 
 		currentTestFileDuration := opts.DefaultTestDuration
@@ -103,7 +103,7 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 				}
 				for currentExecutionIndex >= len(executions) {
 					executions = append(executions, &PlanTestExecution{
-						File:             testFile.File,
+						Filename:         testFile.Filename,
 						ExpectedDuration: time.Duration(0),
 						TestCaseNames:    []string{},
 					})
@@ -150,7 +150,7 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 
 			currentBatch := batches[currentBatchIndex]
 			currentBatch.TestExecutions = append(currentBatch.TestExecutions, &PlanTestExecution{
-				File:             testFile.File,
+				Filename:         testFile.Filename,
 				ExpectedDuration: currentTestFileDuration,
 			})
 

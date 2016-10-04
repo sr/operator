@@ -32,8 +32,8 @@ func TestParseJunitResults(t *testing.T) {
 	if results["/app/test/piUserTest.php"].Name != "piUserTest" {
 		t.Errorf("results[/app/test/piUserTest.php].Name: expected %s, got %s", "piUserTest", results["/app/test/piUserTest.php"].Name)
 	}
-	if results["/app/test/piUserTest.php"].File != "/app/test/piUserTest.php" {
-		t.Errorf("results[/app/test/piUserTest.php].File: expected %s, got %s", "/app/test/piUserTest.php", results["/app/test/piUserTest.php"].File)
+	if results["/app/test/piUserTest.php"].Filename != "/app/test/piUserTest.php" {
+		t.Errorf("results[/app/test/piUserTest.php].File: expected %s, got %s", "/app/test/piUserTest.php", results["/app/test/piUserTest.php"].Filename)
 	}
 	if results["/app/test/piUserTest.php"].Duration != 21*time.Second {
 		t.Errorf("results[/app/test/piUserTest.php].Duration: expected %s, got %s", 21*time.Second, results["/app/test/piUserTest.php"].Duration)
@@ -47,7 +47,7 @@ func TestPopulateFingerprintsFromShasumsFile(t *testing.T) {
 	shasumsStr := `b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c /app/test1.php`
 	results := privet.TestRunResults{
 		"/app/test1.php": {
-			File: "/app/test1.php",
+			Filename: "/app/test1.php",
 		},
 	}
 

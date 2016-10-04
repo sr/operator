@@ -17,7 +17,7 @@ type TestCaseResult struct {
 
 type TestFileResult struct {
 	Name        string
-	File        string
+	Filename    string
 	Fingerprint string
 	Duration    time.Duration
 	TestCases   []*TestCaseResult
@@ -54,7 +54,7 @@ func ParseJunitResult(r io.Reader) (TestRunResults, error) {
 		}
 
 		result := &TestFileResult{
-			File:      file,
+			Filename:  file,
 			Name:      name,
 			Duration:  timeDuration,
 			TestCases: []*TestCaseResult{},

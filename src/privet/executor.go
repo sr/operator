@@ -13,7 +13,7 @@ var execTestExecutor = func(commandPath string, worker int, batchIndex int, batc
 	testFiles := []string{}
 	testCaseNames := []string{}
 	for _, execution := range batch.TestExecutions {
-		testFiles = append(testFiles, execution.File)
+		testFiles = append(testFiles, execution.Filename)
 		testCaseNames = append(testCaseNames, execution.TestCaseNames...)
 	}
 
