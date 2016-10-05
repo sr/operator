@@ -16,6 +16,11 @@ resource "aws_instance" "appdev_tools_server" {
   instance_type = "t2.medium"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+	volume_type = "gp2"
+	volume_size = "50"
+	delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_tools_server.id}",
     "${aws_security_group.appdev_vpc_default.id}"
