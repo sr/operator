@@ -96,6 +96,9 @@ func run(invoker operator.InvokerFunc) error {
 			}
 		}
 	})
+	if v, ok := os.LookupEnv("HAL9000_PORT_9090_TCP_PORT"); ok {
+		config.halAddr = ":" + v
+	}
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
