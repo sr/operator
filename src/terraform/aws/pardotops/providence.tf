@@ -27,7 +27,7 @@ resource "aws_security_group" "providence_db_production" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    security_groups = ["${aws_security_group.providence_app_production.id}"]
+    security_groups = ["${aws_security_group.internal_apps_providence_server.id}"]
   }
   egress {
     from_port = 0
