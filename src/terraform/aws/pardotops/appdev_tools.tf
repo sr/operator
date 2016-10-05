@@ -12,7 +12,7 @@ resource "aws_security_group" "appdev_tools_server" {
 }
 
 resource "aws_instance" "appdev_tools_server" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
