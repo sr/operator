@@ -17,7 +17,10 @@ resource "aws_security_group" "hal9000_redis_production" {
     from_port = 6379
     to_port = 6379
     protocol = "tcp"
-    security_groups = ["${aws_security_group.hal9000_app_production.id}"]
+    security_groups = [
+      "${aws_security_group.hal9000_app_production.id}",
+      "${aws_security_group.operator_app_production.id}"
+    ]
   }
   egress {
     from_port = 0
