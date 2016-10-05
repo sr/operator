@@ -13,30 +13,6 @@ resource "aws_route53_zone" "aws_pardot_com_restricted_use_public_zone" {
   comment = "This is the public face of aws.pardot.com, and it should be used as VERY LITTLE as possible. Seek BREAD approval before use!"
 }
 
-resource "aws_route53_record" "app-s1_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "app-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["173.192.166.59"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "app-s2_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "app-s2.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["173.192.166.58"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "app-s3_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "app-s3.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.27"]
-  type = "A"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "artifactory_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
@@ -397,22 +373,6 @@ resource "aws_route53_record" "jump_dev_pardot_com_Arecord" {
   ttl = "900"
 }
 
-resource "aws_route53_record" "lb-s1_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "lb-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.14"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "lba-s1_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "lba-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.6"]
-  type = "A"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "ldap_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "ldap.${aws_route53_zone.dev_pardot_com.name}"
@@ -493,22 +453,6 @@ resource "aws_route53_record" "push_dev_pardot_com_Arecord" {
   ttl = "900"
 }
 
-resource "aws_route53_record" "push-s1_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "push-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.4"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "push-s2_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "push-s2.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.5"]
-  type = "A"
-  ttl = "900"
-}
-
 resource "aws_route53_record" "qetunnel_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "qetunnel.${aws_route53_zone.dev_pardot_com.name}"
@@ -539,22 +483,6 @@ resource "aws_route53_record" "stash_dev_pardot_com_Arecord" {
   records = ["52.5.210.41"]
   type = "A"
   ttl = "900"
-}
-
-resource "aws_route53_record" "thumb-s1_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name = "thumb-s1.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.29"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "thumbnail-s1_dev_pardot_com_Arecord" {
- zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
- name = "thumbnail-s1.${aws_route53_zone.dev_pardot_com.name}"
- records = ["174.37.191.3"]
- type = "A"
- ttl = "900"
 }
 
 resource "aws_route53_record" "tools-dfw_dev_pardot_com_Arecord" {
