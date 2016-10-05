@@ -25,6 +25,21 @@ type TestFileResult struct {
 
 type TestRunResults map[string]*TestFileResult
 
+// Merge merges test run tests. Because we might bust up individual files into
+// smaller chunks of test cases, to get an accurate sense of duration and the
+// number of test cases in each file, we must merge individual test cases batch
+// together after parsing the results.
+func (r TestRunResults) Merge(o TestRunResults) {
+	for key, otherResult := range o {
+		if result, ok := r[key]; ok {
+			result.Duration += otherResult.Duration
+			result.TestCases = append(result.TestCases, otherResult.TestCases...)
+		} else {
+			r[key] = otherResult
+		}
+	}
+}
+
 // ParseJunitResult parses a JUnit result file into a list of TestFileResult
 // structs, describing the attributes of a previous test run.
 func ParseJunitResult(r io.Reader) (TestRunResults, error) {
@@ -123,12 +138,6 @@ func PopulateFingerprintsFromShasumsFile(results TestRunResults, r io.Reader) er
 
 		fingerprint := fields[0]
 		filename := fields[1]
-
-		// TODO: Temporary hack until SHASUMS contains absolute paths
-		if !strings.HasPrefix(filename, "/") {
-			filename = fmt.Sprintf("%s/%s", "/app", filename)
-		}
-
 		if result, ok := results[filename]; ok {
 			result.Fingerprint = fingerprint
 		}

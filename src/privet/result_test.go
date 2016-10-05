@@ -51,6 +51,45 @@ func TestParseJunitResults(t *testing.T) {
 	}
 }
 
+func TestMergeTestRunResults(t *testing.T) {
+	result := privet.TestRunResults{
+		"/app/test1.php": {
+			Name:        "Test1",
+			Filename:    "/app/test1.php",
+			Fingerprint: "abc123",
+			Duration:    30 * time.Second,
+			TestCases: []*privet.TestCaseResult{
+				{
+					Name:     "Test1-1",
+					Duration: 30 * time.Second,
+				},
+			},
+		},
+	}
+	result2 := privet.TestRunResults{
+		"/app/test1.php": {
+			Name:        "Test1",
+			Filename:    "/app/test1.php",
+			Fingerprint: "abc123",
+			Duration:    15 * time.Second,
+			TestCases: []*privet.TestCaseResult{
+				{
+					Name:     "Test1-2",
+					Duration: 15 * time.Second,
+				},
+			},
+		},
+	}
+
+	result.Merge(result2)
+	if result["/app/test1.php"].Duration != 45*time.Second {
+		t.Fatalf("results[/app/test1.php].Duration: expected %v, got %v", 45*time.Second, result["/app/test1.php"].Duration)
+	}
+	if len(result["/app/test1.php"].TestCases) != 2 {
+		t.Fatalf("len(results[/app1/test1.php].TestCases): expected %d, got %d", 2, len(result["/app/test1.php"].TestCases))
+	}
+}
+
 func TestPopulateFingerprintsFromShasumsFile(t *testing.T) {
 	shasumsStr := `b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c /app/test1.php`
 	results := privet.TestRunResults{

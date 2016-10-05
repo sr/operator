@@ -201,10 +201,7 @@ func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
 			return nil, err
 		}
 
-		for k, v := range fileResults {
-			results[k] = v
-		}
-
+		results.Merge(fileResults)
 		_ = f.Close()
 	}
 
