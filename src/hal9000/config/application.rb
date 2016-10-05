@@ -44,7 +44,7 @@ module HAL9000
         end
 
         config.http.host = "0.0.0.0"
-        config.http.port = 8080
+        config.http.port = Integer(ENV.fetch("HAL9000_HTTP_PORT", 8080))
 
         ## Example: Set options for the chosen adapter.
         # config.adapter.username = "myname"
