@@ -7,16 +7,17 @@ module Hal9000
       @robot = robot
     end
 
+    # rubocop:disable Style/PredicateName
     def is_match(request, _call)
       exception_logger do
         message = build_message(request)
 
-        ok = @robot.handlers.map do |handler|
+        ok = @robot.handlers.any? { |handler|
           next unless handler.respond_to?(:dispatch)
           handler.routes.any? do |route|
             handler.__send__(:route_applies?, route, message, @robot)
           end
-        end.any?
+        }
 
         Hal9000::IsMatchResponse.new(match: ok)
       end

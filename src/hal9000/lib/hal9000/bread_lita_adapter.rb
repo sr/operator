@@ -12,10 +12,10 @@ module Hal9000
     def initialize(robot)
       super
 
-      @hipchat = HipChat::Client.new(config.token,  {
+      @hipchat = HipChat::Client.new(config.token,
         api_version: "v2",
         server_url: config.server
-      })
+      )
     end
 
     def run
@@ -27,10 +27,11 @@ module Hal9000
 
     def send_messages(source, messages)
       messages.each do |message|
-        @hipchat[source.room].send(robot.name, message, {
+        # rubocop:disable Style/Send
+        @hipchat[source.room].send(robot.name, message,
           color: "yellow",
-          message_format: "html",
-        })
+          message_format: "html"
+        )
       end
     end
 
