@@ -19,6 +19,9 @@ images:
   docker.dev.pardot.com/base/ruby:2.3.0:
     build: ruby/2.3.0
     common: true
+  docker.dev.pardot.com/base/ruby:2.3.0-centos6:
+    build: ruby/2.3.0-centos6
+    common: true
   docker.dev.pardot.com/base/ssh-forwarder:
     build: ssh-forwarder
   docker.dev.pardot.com/base/chefdk:0.17.17:
