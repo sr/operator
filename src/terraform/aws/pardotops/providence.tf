@@ -2,7 +2,7 @@
 resource "aws_db_instance" "providence_production" {
   identifier = "providence-production"
   allocated_storage = 20
-  engine = "postgresql"
+  engine = "postgres"
   engine_version = "9.5.4"
   instance_class = "db.t2.small"
   storage_type = "standard"
