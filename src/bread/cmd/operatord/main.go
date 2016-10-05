@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"bread"
-	"bread/hal"
+	"bread/hal9000"
 	"bread/pb"
 
 	"github.com/sr/operator"
@@ -63,7 +63,7 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
-	flags.StringVar(&config.halAddr, "addr-hal", ":9001", "Address of the HAL9000 gRPC server")
+	flags.StringVar(&config.halAddr, "addr-hal9000", ":9001", "Address of the HAL9000 gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
@@ -218,14 +218,14 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
-		var hal breadhal.RobotClient
+		var hal hal9000.RobotClient
 		if cc, err := grpc.Dial(
 			config.halAddr,
 			grpc.WithBlock(),
 			grpc.WithTimeout(grpcTimeout),
 			grpc.WithInsecure(),
 		); err == nil {
-			hal = breadhal.NewRobotClient(cc)
+			hal = hal9000.NewRobotClient(cc)
 		} else {
 			return err
 		}
@@ -275,9 +275,9 @@ func run(invoker operator.InvokerFunc) error {
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
 		logger.Info(&breadpb.ServerStartupNotice{
-			Protocol:   "http",
-			Address:    config.httpAddr,
-			HalAddress: config.halAddr,
+			Protocol: "http",
+			Address:  config.httpAddr,
+			Hal9000:  config.halAddr,
 		})
 		go func() {
 			errC <- http.ListenAndServe(config.httpAddr, httpServer)

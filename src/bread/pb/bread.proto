@@ -33,7 +33,7 @@ message ServerStartupNotice {
 	string Address = 1;
 	string Protocol = 2;
 	repeated string services = 3;
-	string HalAddress = 4;
+	string Hal9000 = 4;
 }
 
 message ServiceStartupError {

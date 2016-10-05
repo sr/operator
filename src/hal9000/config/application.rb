@@ -9,12 +9,8 @@ else
   Bundler.require(:default)
 end
 
-require "lita"
+require "hal9000"
 require "lita/cli"
-require "lita/handler"
-require "lita/adapters/nothing"
-
-require "bread_lita_adapter"
 
 module HAL9000
   class Application

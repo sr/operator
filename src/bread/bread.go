@@ -19,7 +19,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"bread/hal"
+	"bread/hal9000"
 	"bread/pb"
 )
 
@@ -233,7 +233,7 @@ func NewHipchatHandler(
 	invoker operator.InvokerFunc,
 	conn *grpc.ClientConn,
 	svcInfo map[string]grpc.ServiceInfo,
-	hal breadhal.RobotClient,
+	hal9000 hal9000.RobotClient,
 	timeout time.Duration,
 	prefix string,
 	pkg string,
@@ -250,7 +250,7 @@ func NewHipchatHandler(
 		invoker,
 		conn,
 		svcInfo,
-		hal,
+		hal9000,
 		timeout,
 		re,
 		pkg,

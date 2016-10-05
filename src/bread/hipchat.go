@@ -10,12 +10,11 @@ import (
 	"time"
 	"unicode"
 
-	"google.golang.org/grpc"
-
 	"github.com/sr/operator"
 	"github.com/sr/operator/generator"
+	"google.golang.org/grpc"
 
-	"bread/hal"
+	"bread/hal9000"
 )
 
 type hipchat struct {
@@ -26,7 +25,7 @@ type hipchat struct {
 	invoker operator.InvokerFunc
 	conn    *grpc.ClientConn
 	svcInfo map[string]grpc.ServiceInfo
-	hal     breadhal.RobotClient
+	hal9000 hal9000.RobotClient
 	timeout time.Duration
 	re      *regexp.Regexp
 	pkg     string
@@ -42,7 +41,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var (
 		opMatch, halMatch bool
 		req               = h.getRequest(msg, senderID)
-		halMsg            = &breadhal.Message{Text: msg.Text}
+		halMsg            = &hal9000.Message{Text: msg.Text}
 	)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
@@ -54,7 +53,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	if r, err := h.hal.IsMatch(h.ctx, halMsg); err != nil && r.Match {
+	if r, err := h.hal9000.IsMatch(h.ctx, halMsg); err != nil && r.Match {
 		halMatch = true
 	}
 	if opMatch && halMatch {
@@ -65,7 +64,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	go func(req *operator.Request, msg *breadhal.Message) {
+	go func(req *operator.Request, msg *hal9000.Message) {
 		ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
 		defer cancel()
 		errC := make(chan error, 1)
@@ -73,7 +72,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if req != nil {
 				errC <- h.invoker(ctx, h.conn, req, h.pkg)
 			} else if msg != nil {
-				_, err := h.hal.Dispatch(ctx, msg)
+				_, err := h.hal9000.Dispatch(ctx, msg)
 				errC <- err
 			}
 			errC <- errors.New("unhandled request")
