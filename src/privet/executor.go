@@ -78,7 +78,8 @@ func ExecutePlan(plan *Plan, opts *PlanExecutionOpts) (bool, error) {
 
 	worker, ok := plan.Workers[opts.Worker]
 	if !ok {
-		return false, fmt.Errorf("worker %d not found in plan", opts.Worker)
+		fmt.Fprintf(os.Stderr, "worker %d not found in plan; nothing to do", opts.Worker)
+		return true, nil
 	}
 
 	overallSuccess := true
