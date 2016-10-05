@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-for i in $(seq 1 10); do
-  echo "{\"data\": \"file${i}\", \"expected_runtime_in_seconds\": ${i}}"
-done
