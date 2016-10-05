@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 )
 
-type TestBatchExecutor func(opts *PlanExecutionOpts, batchIndex int, batch *PlanTestBatch) (bool, error)
+type TestBatchExecutor func(opts *PlanExecutionOpts, parallelIndex int, batch *PlanTestBatch) (bool, error)
 
-var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *PlanTestBatch) (bool, error) {
+var execTestExecutor = func(opts *PlanExecutionOpts, parallelIndex int, batch *PlanTestBatch) (bool, error) {
 	fullCommandPath, err := exec.LookPath(opts.CommandPath)
 	if err != nil {
 		return false, err
@@ -22,7 +23,7 @@ var execTestExecutor = func(opts *PlanExecutionOpts, batchIndex int, batch *Plan
 	}
 	env = append(env, []string{
 		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
-		fmt.Sprintf("PRIVET_BATCH_INDEX=%d", batchIndex),
+		fmt.Sprintf("PRIVET_PARALLEL_INDEX=%d", parallelIndex),
 	}...)
 
 	in := new(bytes.Buffer)
@@ -55,11 +56,20 @@ type PlanExecutionOpts struct {
 	// CommandPath is the path of the command to run as part of plan
 	// execution.
 	//
-	// The command will receive the JSOn representation of the test batch as
+	// The command will receive the JSON representation of the test batch as
 	// standard in.
 	CommandPath string
 
+	// Worker is the index in the plan that this worker will consume as its
+	// queue.
 	Worker int
+
+	// Parallelism is the number of processes that are spun up to process
+	// this worker's queue. Parallelism adds an additional way to work to be
+	// balanced as evenly as possible. The environment variable
+	// PRIVET_PARALLEL_INDEX will be set to a counter starting at 0 to uniquely
+	// identify each parallel process.
+	Parallelism int
 
 	Env []string
 
@@ -76,20 +86,43 @@ func ExecutePlan(plan *Plan, opts *PlanExecutionOpts) (bool, error) {
 		executor = execTestExecutor
 	}
 
+	parallelism := opts.Parallelism
+	if parallelism <= 0 {
+		parallelism = 1
+	}
+
 	worker, ok := plan.Workers[opts.Worker]
 	if !ok {
 		fmt.Fprintf(os.Stderr, "worker %d not found in plan; nothing to do", opts.Worker)
 		return true, nil
 	}
 
-	overallSuccess := true
-	for batchIndex, batch := range worker.TestBatches {
-		success, err := executor(opts, batchIndex, batch)
-		if err != nil {
-			return false, err
-		} else if !success {
-			overallSuccess = false
+	batches := make(chan *PlanTestBatch)
+	go func() {
+		for _, batch := range worker.TestBatches {
+			batches <- batch
 		}
+		close(batches)
+	}()
+
+	var wg sync.WaitGroup
+	var overallError error
+	overallSuccess := true
+	for i := 0; i < parallelism; i++ {
+		wg.Add(1)
+		go func(i int) {
+			for batch := range batches {
+				success, err := executor(opts, i, batch)
+				if err != nil {
+					overallError = err
+				} else if !success {
+					overallSuccess = false
+				}
+			}
+			wg.Done()
+		}(i)
 	}
-	return overallSuccess, nil
+
+	wg.Wait()
+	return overallSuccess, overallError
 }

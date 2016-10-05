@@ -8,7 +8,7 @@ import (
 type PlanTestExecution struct {
 	Filename string `json:"filename"`
 
-	ExpectedDuration time.Duration `json:"-"`
+	ExpectedDuration time.Duration `json:"expected_duration"`
 
 	// If present, Privet has determined that only the specified test cases
 	// should be run because running the entire file would take much longer

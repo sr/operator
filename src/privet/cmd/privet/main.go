@@ -30,6 +30,7 @@ var (
 	planFile            string
 	commandPath         string
 	worker              int
+	parallelism         int
 	envVars             stringListFlag
 )
 
@@ -52,8 +53,9 @@ func main() {
 	flag.DurationVar(&defaultTestDuration, "default-test-duration", 1*time.Second, "The default duration assumed for a test, if it cannot be found in the previous results")
 	flag.StringVar(&planFile, "plan-file", "", "Path to the plan file (required for execute)")
 	flag.StringVar(&commandPath, "command-path", "", "Command to execute for each test batch (required for execute)")
-	flag.Var(&envVars, "env", "Environment variable (foo=bar) to pass to the command (can be specified multiple times)")
 	flag.IntVar(&worker, "worker", -1, "Worker identifier (required for execute)")
+	flag.IntVar(&parallelism, "parallelism", 1, "Number of independent processes to spawn to process this worker's queue")
+	flag.Var(&envVars, "env", "Environment variable (foo=bar) to pass to the command (can be specified multiple times)")
 	flag.Parse()
 
 	switch flag.Arg(0) {
@@ -144,6 +146,7 @@ func doExecute() (bool, error) {
 		return false, errors.New("worker is required")
 	}
 	opts.Worker = worker
+	opts.Parallelism = parallelism
 	opts.Env = envVars
 
 	return privet.ExecutePlan(plan, opts)
