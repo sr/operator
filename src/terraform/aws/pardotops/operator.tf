@@ -45,6 +45,10 @@ resource "aws_alb_target_group" "operator" {
 
   health_check {
     path = "/_ping"
+    interval = 10
+    timeout = 5
+    unhealthy_threshold = 2
+    healthy_threshold = 5
   }
 }
 
@@ -91,6 +95,21 @@ resource "aws_alb_listener_rule" "operator_hipchat" {
   }
 }
 
+resource "aws_alb_listener_rule" "operator_hal9000_replication" {
+  listener_arn = "${aws_alb_listener.operator.arn}"
+  priority = 3
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.operator.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/replication/*"]
+  }
+}
+
 resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
@@ -109,8 +128,8 @@ resource "aws_security_group" "operator_app_production" {
   }
 
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 32768
+    to_port = 61000
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.internal_apps_operator_http_lb.id}"
