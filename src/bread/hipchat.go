@@ -12,6 +12,7 @@ import (
 
 	"github.com/sr/operator"
 	"github.com/sr/operator/generator"
+	"github.com/sr/operator/hipchat"
 	"google.golang.org/grpc"
 
 	"bread/hal9000"
@@ -81,10 +82,15 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-ctx.Done():
 			err = fmt.Errorf("RPC request failed to complete within %s", h.timeout)
-		case err := <-errC:
-			err = err
+		case err = <-errC:
 		}
-		fmt.Printf("DEBUG: %s\n", err)
+		if err != nil && req != nil && h.sender != nil && !strings.Contains(err.Error(), "no such service:") {
+			_ = h.sender.Send(ctx, req.GetSource(), req.SenderId, &operator.Message{
+				Text:    grpc.ErrorDesc(err),
+				HTML:    fmt.Sprintf("Request failed: <code>%s</code>", grpc.ErrorDesc(err)),
+				Options: &operatorhipchat.MessageOptions{Color: "red"},
+			})
+		}
 	}(req, halMsg)
 }
 
