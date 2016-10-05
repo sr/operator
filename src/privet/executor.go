@@ -9,9 +9,9 @@ import (
 	"sync"
 )
 
-type TestBatchExecutor func(opts *PlanExecutionOpts, parallelIndex int, batch *PlanTestBatch) (bool, error)
+type TestBatchExecutor func(opts *PlanExecutionOpts, parallelIndex int, sequenceIndex int, batch *PlanTestBatch) (bool, error)
 
-var execTestExecutor = func(opts *PlanExecutionOpts, parallelIndex int, batch *PlanTestBatch) (bool, error) {
+var execTestExecutor = func(opts *PlanExecutionOpts, parallelIndex int, sequenceIndex int, batch *PlanTestBatch) (bool, error) {
 	fullCommandPath, err := exec.LookPath(opts.CommandPath)
 	if err != nil {
 		return false, err
@@ -24,6 +24,7 @@ var execTestExecutor = func(opts *PlanExecutionOpts, parallelIndex int, batch *P
 	env = append(env, []string{
 		fmt.Sprintf("PRIVET_WORKER=%d", opts.Worker),
 		fmt.Sprintf("PRIVET_PARALLEL_INDEX=%d", parallelIndex),
+		fmt.Sprintf("PRIVET_SEQUENCE_INDEX=%d", sequenceIndex),
 	}...)
 
 	in := new(bytes.Buffer)
@@ -110,14 +111,16 @@ func ExecutePlan(plan *Plan, opts *PlanExecutionOpts) (bool, error) {
 	overallSuccess := true
 	for i := 0; i < parallelism; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func(parallelIndex int) {
+			sequenceIndex := 0
 			for batch := range batches {
-				success, err := executor(opts, i, batch)
+				success, err := executor(opts, parallelIndex, sequenceIndex, batch)
 				if err != nil {
 					overallError = err
 				} else if !success {
 					overallSuccess = false
 				}
+				sequenceIndex++
 			}
 			wg.Done()
 		}(i)
