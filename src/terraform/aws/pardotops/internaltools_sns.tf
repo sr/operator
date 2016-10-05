@@ -25,7 +25,8 @@ resource "aws_sns_topic" "internaltools" {
 resource "aws_autoscaling_notification" "internaltools_asg_events_notifier" {
   group_names = [
     "${aws_autoscaling_group.canoe_production.name}",
-    "${aws_autoscaling_group.hal9000_production.name}"
+    "${aws_autoscaling_group.hal9000_production.name}",
+    "${aws_autoscaling_group.operator_production.name}"
   ]
   notifications  = [
     "autoscaling:EC2_INSTANCE_LAUNCH",

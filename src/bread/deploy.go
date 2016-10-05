@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -18,17 +17,18 @@ import (
 )
 
 const (
-	master = "master"
-	pardot = "pardot"
+	master      = "master"
+	pardot      = "pardot"
+	maxBuildAge = 36 * time.Hour
 )
 
-type deployer interface {
-	listTargets(context.Context) ([]*DeployTarget, error)
-	listBuilds(context.Context, *DeployTarget, string) ([]build, error)
-	deploy(context.Context, *operator.RequestSender, *deployRequest) (*operator.Message, error)
+type Deployer interface {
+	ListTargets(context.Context) ([]*DeployTarget, error)
+	ListBuilds(context.Context, *DeployTarget, string) ([]Build, error)
+	Deploy(context.Context, *operator.RequestSender, *DeployRequest) (*operator.Message, error)
 }
 
-type build interface {
+type Build interface {
 	GetID() string
 	GetURL() string
 	GetArtifactURL() string
@@ -39,19 +39,17 @@ type build interface {
 	GetCreated() time.Time
 }
 
-type deployRequest struct {
+type DeployRequest struct {
 	Target    *DeployTarget
-	Build     build
+	Build     Build
 	UserEmail string
 }
 
 type deployAPIServer struct {
 	operator.Sender
-	conf  *DeployConfig
-	http  *http.Client
+	ecs   Deployer
+	canoe Deployer
 	tz    *time.Location
-	canoe deployer
-	ecs   deployer
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {
@@ -74,7 +72,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	var (
 		err    error
 		target *DeployTarget
-		builds []build
+		builds []Build
 	)
 	targets := s.listTargets(ctx, req)
 	for _, t := range targets {
@@ -120,6 +118,7 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 var eggs = map[string]string{
 	"smiley": "https://pbs.twimg.com/profile_images/2799017051/9b51b94ade9d8a509b28ee291a2dba86_400x400.png",
 	"hunter": "https://hipchat.dev.pardot.com/files/1/3/IynoW4Fx0zPhtVX/Screen%20Shot%202016-09-28%20at%206.11.57%20PM.png",
+	"BIJ":    "http://abload.de/img/gowron1eykyk.gif",
 }
 
 func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerRequest) (*operator.Response, error) {
@@ -148,7 +147,7 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if target == nil {
 		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
 	}
-	var build build
+	var build Build
 	builds, err := s.listBuilds(ctx, target, "")
 	for _, b := range builds {
 		if b.GetID() == req.Build {
@@ -158,15 +157,23 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 	if build == nil {
 		return nil, fmt.Errorf("No such build %s", req.Build)
 	}
-	deploy := &deployRequest{
+	if time.Since(build.GetCreated()) > maxBuildAge {
+		return nil, fmt.Errorf(
+			"Unable to deploy build %s because it was created on %s which is more than %s ago",
+			build.GetID(),
+			build.GetCreated().In(s.tz).Format("2006-01-02 at 15:04:05 MST"),
+			maxBuildAge,
+		)
+	}
+	deploy := &DeployRequest{
 		Target:    target,
 		Build:     build,
 		UserEmail: operator.GetUserEmail(req),
 	}
 	if target.Canoe {
-		msg, err = s.canoe.deploy(ctx, operator.GetSender(s, req), deploy)
+		msg, err = s.canoe.Deploy(ctx, operator.GetSender(s, req), deploy)
 	} else {
-		msg, err = s.ecs.deploy(ctx, operator.GetSender(s, req), deploy)
+		msg, err = s.ecs.Deploy(ctx, operator.GetSender(s, req), deploy)
 	}
 	if err != nil {
 		return nil, err
@@ -177,8 +184,8 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 var ecsRunning = aws.String("RUNNING")
 
 func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requester) (targets []*DeployTarget) {
-	targets, _ = s.ecs.listTargets(ctx)
-	if t, err := s.canoe.listTargets(ctx); err == nil {
+	targets, _ = s.ecs.ListTargets(ctx)
+	if t, err := s.canoe.ListTargets(ctx); err == nil {
 		targets = append(targets, t...)
 	} else {
 		_ = operator.Send(ctx, s, req, &operator.Message{
@@ -192,12 +199,12 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 	return targets
 }
 
-func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]build, error) {
+func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]Build, error) {
 	if t.Canoe {
 		if branch == "" {
 			branch = master
 		}
-		return s.canoe.listBuilds(ctx, t, branch)
+		return s.canoe.ListBuilds(ctx, t, branch)
 	}
-	return s.ecs.listBuilds(ctx, t, "")
+	return s.ecs.ListBuilds(ctx, t, "")
 }

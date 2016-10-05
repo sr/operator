@@ -13,10 +13,28 @@ resource "aws_db_instance" "providence_production" {
   multi_az = true
   publicly_accessible = false
   db_subnet_group_name = "${aws_db_subnet_group.internal_apps.name}"
-  vpc_security_group_ids = ["${aws_security_group.parbot_db_production.id}"]
+  vpc_security_group_ids = ["${aws_security_group.providence_db_production.id}"]
   storage_encrypted = false
-  backup_retention_period = 5
+  backup_retention_period = 30
   apply_immediately = true
+}
+
+resource "aws_security_group" "providence_db_production" {
+  name = "providence_db_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.providence_app_production.id}"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group" "internal_apps_providence_server" {
