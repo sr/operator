@@ -45,6 +45,10 @@ resource "aws_alb_target_group" "operator" {
 
   health_check {
     path = "/_ping"
+    interval = 10
+    timeout = 5
+    unhealthy_threshold = 2
+    healthy_threshold = 5
   }
 }
 
