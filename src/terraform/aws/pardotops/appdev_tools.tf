@@ -20,11 +20,6 @@ resource "aws_instance" "appdev_tools_server" {
     "${aws_security_group.appdev_tools_server.id}",
     "${aws_security_group.appdev_vpc_default.id}"
   ]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = "40"
-    delete_on_termination = false
-  }
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-tools1-1-${var.environment_appdev["dc_id"]}"
     terraform = true
