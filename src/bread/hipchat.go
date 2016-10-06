@@ -44,7 +44,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		req               = h.getRequest(msg, senderID)
 		halMsg            = &hal9000.Message{Text: msg.Text}
 	)
-	fmt.Printf("DEBUG1: halMsg=%#v req=%#v opMatch=%#v\n", halMsg, req, opMatch)
+	fmt.Printf("DEBUG1: hal9000=%#v halMsg=%#v req=%#v opMatch=%#v\n", h.hal9000, halMsg, req, opMatch)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
 			for _, m := range svc.Methods {
@@ -98,7 +98,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.Request {
 	matches := h.re.FindStringSubmatch(msg.Text)
-	if matches == nil || len(matches) < 4 {
+	if matches == nil || len(matches) < 3 {
 		return nil
 	}
 	args := make(map[string]string)
