@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+#/ Send a message to the HAL9000 gRPC server. For testing only.
+require "hal9000/hal9000_services"
+s = Hal9000::Robot::Stub.new("localhost:9001", :this_channel_is_insecure)
+s.dispatch(Hal9000::Message.new(room: "BREAD Testing", text: ARGV.join(" ")))
