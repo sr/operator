@@ -24,22 +24,9 @@ resource "aws_instance" "appdev_zabbix1" {
   }
 }
 
-resource "aws_eip" "appdev_zabbix_host_eip" {
-  vpc = true
-  instance = "${aws_instance.appdev_zabbix1.id}"
-}
-
 resource "aws_route53_record" "appdev_zabbix1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-monitor1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.appdev_zabbix_host_eip.public_ip}"]
-  type = "A"
-  ttl = "900"
-}
-
-resource "aws_route53_record" "appdev_zabbix-internal1_arecord" {
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
-  name = "pardot2-monitor-internal1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.appdev_zabbix1.private_ip}"]
   type = "A"
   ttl = "900"
@@ -54,10 +41,17 @@ resource "aws_security_group" "appdev_zabbix_host" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = [
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
-      "${aws_vpc.appdev.cidr_block}",
-      "${var.aloha_vpn_cidr_blocks}"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}"
+    ]
+  }
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}"
     ]
   }
 
@@ -69,3 +63,10 @@ resource "aws_security_group" "appdev_zabbix_host" {
   }
 }
 
+resource "aws_route53_record" "zabbix_dev_dev_pardot_com" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "zabbix-dev.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
+  type = "A"
+  ttl = "900"
+}
