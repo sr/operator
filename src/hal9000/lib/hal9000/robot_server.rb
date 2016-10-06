@@ -21,7 +21,7 @@ module Hal9000
           end
         }
 
-        Hal9000::IsMatchResponse.new(match: ok)
+        Hal9000::Response.new(match: ok)
       end
     end
 
