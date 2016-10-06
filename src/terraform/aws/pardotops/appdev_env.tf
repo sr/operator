@@ -842,7 +842,7 @@ resource "aws_instance" "appdev_zkkafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["kafka_instance_type"]}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
@@ -902,7 +902,7 @@ resource "aws_instance" "appdev_zkstorm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["storm_instance_type"]}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
