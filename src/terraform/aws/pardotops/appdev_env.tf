@@ -1224,8 +1224,8 @@ resource "aws_iam_user" "cephthumbs_sysacct" {
   name = "sa_cephthumbs"
 }
 
-resource "aws_s3_bucket" "cephthumbs_s3_filestore" {
-  bucket = "cephthumbs_s3_filestore"
+resource "aws_s3_bucket" "cephthumbs-s3-filestore" {
+  bucket = "cephthumbs-s3-filestore"
   lifecycle_rule {
     prefix = "/"
     enabled = true
@@ -1245,21 +1245,21 @@ resource "aws_s3_bucket" "cephthumbs_s3_filestore" {
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::cephthumbs_s3_filestore",
-        "arn:aws:s3:::cephthumbs_s3_filestore/*"
+        "arn:aws:s3:::cephthumbs-s3-filestore",
+        "arn:aws:s3:::cephthumbs-s3-filestore/*"
       ]
     }
   ]
 }
 EOF
   tags {
-    Name = "cephthumbs_s3_filestore"
+    Name = "cephthumbs-s3-filestore"
     terraform = "true"
   }
 }
 
-resource "aws_s3_bucket" "cephthumbs_s3_filestore_long" {
-  bucket = "cephthumbs_s3_filestore_long"
+resource "aws_s3_bucket" "cephthumbs-s3-filestore-long" {
+  bucket = "cephthumbs-s3-filestore-long"
   acl = "private"
   policy = <<EOF
 {
@@ -1273,15 +1273,15 @@ resource "aws_s3_bucket" "cephthumbs_s3_filestore_long" {
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::cephthumbs_s3_filestore_long",
-        "arn:aws:s3:::cephthumbs_s3_filestore_long/*"
+        "arn:aws:s3:::cephthumbs-s3-filestore-long",
+        "arn:aws:s3:::cephthumbs-s3-filestore-long/*"
       ]
     }
   ]
 }
 EOF
   tags {
-    Name = "cephthumbs_s3_filestore"
+    Name = "cephthumbs-s3-filestore"
     terraform = "true"
   }
 }
