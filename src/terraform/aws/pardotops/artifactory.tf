@@ -324,8 +324,8 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::artifactory_s3_filestore",
-        "arn:aws:s3:::artifactory_s3_filestore/*"
+        "arn:aws:s3:::artifactory-s3-filestore",
+        "arn:aws:s3:::artifactory-s3-filestore/*"
       ]
     },
     {
@@ -333,7 +333,7 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "AES256"
@@ -345,7 +345,7 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
       "Condition": {
         "Null": {
           "s3:x-amz-server-side-encryption": "true"
@@ -356,7 +356,7 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
 }
 EOF
   tags {
-    Name = "artifactory_s3_filestore"
+    Name = "artifactory-s3-filestore"
     terraform = "true"
   }
 }
