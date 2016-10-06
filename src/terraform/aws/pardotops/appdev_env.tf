@@ -13,6 +13,8 @@ variable "environment_appdev" {
     app_instance_type = "m4.large"
     job_instance_type = "m4.large"
     db_instance_type = "m4.2xlarge"
+    kafka_instance_type = "m4.2xlarge"
+    storm_instance_type = "m4.4xlarge"
     db_volume_device_name = "/dev/xvdf"
     num_globaldb1_hosts = 2
     num_dbshard1_hosts = 4
@@ -44,6 +46,7 @@ variable "environment_appdev" {
 }
 
 variable "appdev_globaldb1_ips" {
+  type = "map"
   default = {
     "0" = "172.26.80.125"
     "1" = "172.26.81.47"
@@ -51,6 +54,7 @@ variable "appdev_globaldb1_ips" {
 }
 
 variable "appdev_dbshard1_ips" {
+  type = "map"
   default = {
     "0" = "172.26.92.23"
     "1" = "172.26.93.40"
@@ -60,6 +64,7 @@ variable "appdev_dbshard1_ips" {
 }
 
 variable "appdev_whoisdb1_ips" {
+  type = "map"
   default = {
     "0" = "172.26.66.54"
     "1" = "172.26.66.55"
@@ -777,7 +782,7 @@ resource "aws_instance" "appdev_storm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_storm1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["storm_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
@@ -807,7 +812,7 @@ resource "aws_instance" "appdev_kafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_kafka1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["kafka_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
@@ -837,7 +842,7 @@ resource "aws_instance" "appdev_zkkafka1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkkafka1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["kafka_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
@@ -897,7 +902,7 @@ resource "aws_instance" "appdev_zkstorm1" {
   key_name = "internal_apps"
   count = "${var.environment_appdev["num_zkstorm1_hosts"]}"
   ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["storm_instance_type"]}"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
   root_block_device {
     volume_type = "gp2"
