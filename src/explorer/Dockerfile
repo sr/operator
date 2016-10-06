@@ -1,4 +1,4 @@
-FROM docker.dev.pardot.com/base/ruby:2.3.0
+FROM docker.dev.pardot.com/base/ruby:2.3.0-centos6
 
 RUN \
   yum install -y \

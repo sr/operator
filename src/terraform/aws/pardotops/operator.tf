@@ -42,9 +42,29 @@ resource "aws_alb_target_group" "operator" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.internal_apps.id}"
+  deregistration_delay = 30
 
   health_check {
     path = "/_ping"
+    interval = 10
+    timeout = 5
+    unhealthy_threshold = 2
+    healthy_threshold = 5
+  }
+}
+
+resource "aws_alb_target_group" "hal9000" {
+  name     = "hal9000-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.internal_apps.id}"
+
+  health_check {
+    path = "/replication/_ping"
+    interval = 10
+    timeout = 5
+    unhealthy_threshold = 2
+    healthy_threshold = 5
   }
 }
 
@@ -91,6 +111,21 @@ resource "aws_alb_listener_rule" "operator_hipchat" {
   }
 }
 
+resource "aws_alb_listener_rule" "operator_hal9000_replication" {
+  listener_arn = "${aws_alb_listener.operator.arn}"
+  priority = 3
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.hal9000.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/replication/*"]
+  }
+}
+
 resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
@@ -109,8 +144,8 @@ resource "aws_security_group" "operator_app_production" {
   }
 
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 32768
+    to_port = 61000
     protocol = "tcp"
     security_groups = [
       "${aws_security_group.internal_apps_operator_http_lb.id}"
@@ -265,7 +300,7 @@ resource "aws_launch_configuration" "operator_production" {
 }
 
 resource "aws_autoscaling_group" "operator_production" {
-  max_size = 2
+  max_size = 3
   min_size = 2
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
   vpc_zone_identifier = [

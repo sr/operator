@@ -12,19 +12,19 @@ resource "aws_security_group" "appdev_tools_server" {
 }
 
 resource "aws_instance" "appdev_tools_server" {
-  ami = "${var.centos_6_hvm_ebs_ami}"
+  ami = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.medium"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.appdev_us_east_1d.id}"
+  root_block_device {
+	volume_type = "gp2"
+	volume_size = "50"
+	delete_on_termination = true
+  }
   vpc_security_group_ids = [
     "${aws_security_group.appdev_tools_server.id}",
     "${aws_security_group.appdev_vpc_default.id}"
   ]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = "40"
-    delete_on_termination = false
-  }
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-tools1-1-${var.environment_appdev["dc_id"]}"
     terraform = true
