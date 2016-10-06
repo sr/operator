@@ -44,6 +44,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		req               = h.getRequest(msg, senderID)
 		halMsg            = &hal9000.Message{Text: msg.Text}
 	)
+	fmt.Printf("DEBUG1: halMsg=%#v req=%#v opMatch=%#v\n", halMsg, req, opMatch)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
 			for _, m := range svc.Methods {
@@ -54,6 +55,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	fmt.Printf("DEBUG2: halMsg=%#v req=%#v opMatch=%#v\n", halMsg, req, opMatch)
 	if r, err := h.hal9000.IsMatch(h.ctx, halMsg); err != nil && r.Match {
 		halMatch = true
 	}
