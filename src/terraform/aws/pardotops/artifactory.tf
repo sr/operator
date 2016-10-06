@@ -173,7 +173,6 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  #private_ip="172.28.0.138" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
@@ -202,7 +201,6 @@ resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  #private_ip="172.28.0.209" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
@@ -231,7 +229,6 @@ resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  #private_ip="172.28.0.182" #TODO:fill out w/ actual IP when instantiated
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
@@ -309,9 +306,10 @@ resource "aws_iam_user" "artifactory_sysacct" {
   name = "sa_artifactory"
 }
 
-resource "aws_s3_bucket" "artifactory_s3_filestore" {
-  bucket = "artifactory_s3_filestore"
+resource "aws_s3_bucket" "artifactory-s3-filestore" {
+  bucket = "artifactory-s3-filestore"
   acl = "private"
+  acceleration_status = "Enabled"
   # for more info on the Elastic Load Balancing Account Number:
   # http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
   policy = <<EOF
@@ -326,8 +324,8 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       },
       "Action": "s3:*",
       "Resource": [
-        "arn:aws:s3:::artifactory_s3_filestore",
-        "arn:aws:s3:::artifactory_s3_filestore/*"
+        "arn:aws:s3:::artifactory-s3-filestore",
+        "arn:aws:s3:::artifactory-s3-filestore/*"
       ]
     },
     {
@@ -335,7 +333,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
       "Condition": {
         "StringNotEquals": {
           "s3:x-amz-server-side-encryption": "AES256"
@@ -347,7 +345,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
       "Effect": "Deny",
       "Principal": "*",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory_s3_filestore/*",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
       "Condition": {
         "Null": {
           "s3:x-amz-server-side-encryption": "true"
@@ -358,7 +356,7 @@ resource "aws_s3_bucket" "artifactory_s3_filestore" {
 }
 EOF
   tags {
-    Name = "artifactory_s3_filestore"
+    Name = "artifactory-s3-filestore"
     terraform = "true"
   }
 }
@@ -458,17 +456,14 @@ resource "aws_route_table" "artifactory_integration_route_dmz" {
     vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_artifactory_integration_vpc_peering.id}"
   }
   route {
-    #TODO: delete
     cidr_block = "192.168.128.0/22" 
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.legacy_pardot_ci_and_artifactory_integration_vpc_peering.id}"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
   }
-
 }
 
 resource "aws_route" "artifactory_integration_to_legacy_pardot_ci" {
-  #TODO: delete
   destination_cidr_block = "192.168.128.0/22"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.legacy_pardot_ci_and_artifactory_integration_vpc_peering.id}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_artifactory_integration_vpc_peering.id}"
   route_table_id = "${aws_vpc.artifactory_integration.main_route_table_id}"
 }
 
@@ -561,9 +556,7 @@ resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 
-# Temporary peering with legacy pardot-ci account
-resource "aws_vpc_peering_connection" "legacy_pardot_ci_and_artifactory_integration_vpc_peering" {
-  #TODO: delete when old artifactory 'goes away'
+resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
   peer_owner_id = "096113534078"
   peer_vpc_id = "vpc-4d96a928"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
@@ -574,6 +567,14 @@ resource "aws_route53_record" "artifactorylb_dev_pardot_com_CNAME" {
   type = "CNAME"
   zone_id = "${aws_route53_zone.dev_pardot_com.id}"
   records = ["${aws_elb.artifactory_public_elb.dns_name}"]
+  ttl = 900
+}
+
+resource "aws_route53_record" "artifactory_alb_dev_pardot_com_CNAME" {
+  name = "artifactory_alb.${aws_route53_zone.dev_pardot_com.name}"
+  type = "CNAME"
+  zone_id = "${aws_route53_zone.dev_pardot_com.id}"
+  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
   ttl = 900
 }
 
@@ -783,4 +784,11 @@ resource "aws_alb_listener_rule" "artifactory_host_1-3_alb_rule" {
     field = "path-pattern"
     values = ["/artifactory3/*"]
   }
+}
+
+resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
+  name = "duration-based-elb-cookie-policy"
+  load_balancer = "${aws_elb.artifactory_public_elb.id}"
+  lb_port = 443
+  cookie_expiration_period = 3600
 }
