@@ -98,7 +98,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.Request {
 	matches := h.re.FindStringSubmatch(msg.Text)
-	if matches == nil || len(matches) < 3 {
+	if matches == nil {
 		return nil
 	}
 	args := make(map[string]string)
