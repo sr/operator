@@ -27,11 +27,11 @@ variable "environment_appdev" {
     num_rabbit2_hosts = 3
     num_redisrules1_hosts = 2
     num_autojob1_hosts = 4
-    num_storm1_hosts = 1
-    num_kafka1_hosts = 1
+    num_storm1_hosts = 3
+    num_kafka1_hosts = 3
     num_zkkafka1_hosts = 1
     num_pubsub1_hosts = 2
-    num_zkstorm1_hosts = 3
+    num_zkstorm1_hosts = 1
     num_nimbus1_hosts = 1
     num_appcache1_hosts = 2
     num_discovery1_hosts = 3
@@ -1322,4 +1322,13 @@ resource "aws_security_group" "appdev_indexerhost" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_route53_record" "appdev_indexer1_arecord" {
+  count = "${var.environment_appdev["num_indexer1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name = "${var.environment_appdev["pardot_env_id"]}-indexer1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_indexer1.*.private_ip, count.index)}"]
+  type = "A"
+  ttl = "900"
 }

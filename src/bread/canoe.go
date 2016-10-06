@@ -16,10 +16,14 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
+type CanoeConfig struct {
+	URL    string
+	APIKey string
+}
+
 type canoeDeployer struct {
-	canoeURL string
-	apiToken string
-	http     *http.Client
+	http  *http.Client
+	canoe *CanoeConfig
 }
 
 type canoeProject struct {
@@ -37,7 +41,7 @@ type canoeBuild struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-func (d *canoeDeployer) listTargets(ctx context.Context) (targets []*DeployTarget, err error) {
+func (d *canoeDeployer) ListTargets(ctx context.Context) (targets []*DeployTarget, err error) {
 	var resp *http.Response
 	if resp, err = d.doCanoe(ctx, "GET", "/api/projects", ""); err == nil {
 		defer func() { _ = resp.Body.Close() }()
@@ -51,29 +55,29 @@ func (d *canoeDeployer) listTargets(ctx context.Context) (targets []*DeployTarge
 	return targets, err
 }
 
-func (d *canoeDeployer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]build, error) {
+func (d *canoeDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch string) ([]Build, error) {
 	resp, err := d.doCanoe(
 		ctx,
 		"GET",
 		fmt.Sprintf("/api/projects/%s/branches/%s/builds", t.Name, branch),
 		"",
 	)
-	defer func() { _ = resp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
+	defer func() { _ = resp.Body.Close() }()
 	var data []*canoeBuild
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	var builds []build
+	var builds []Build
 	for _, b := range data {
-		builds = append(builds, build(b))
+		builds = append(builds, Build(b))
 	}
 	return builds, nil
 }
 
-func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSender, req *deployRequest) (*operator.Message, error) {
+func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
 	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
 	}
@@ -106,7 +110,7 @@ func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSend
 	if data.Error {
 		return nil, errors.New(data.Message)
 	}
-	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoeURL, req.Target.Name, data.Deploy.ID)
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, data.Deploy.ID)
 	return &operator.Message{
 		Text: deployURL,
 		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target.Name, deployURL, data.Deploy.ID),
@@ -117,11 +121,11 @@ func (d *canoeDeployer) deploy(ctx context.Context, sender *operator.RequestSend
 }
 
 func (d *canoeDeployer) doCanoe(ctx context.Context, meth, path, body string) (*http.Response, error) {
-	req, err := http.NewRequest(meth, d.canoeURL+path, strings.NewReader(body))
+	req, err := http.NewRequest(meth, d.canoe.URL+path, strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("X-Api-Token", d.apiToken)
+	req.Header.Set("X-Api-Token", d.canoe.APIKey)
 	if body != "" {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}

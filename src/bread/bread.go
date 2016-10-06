@@ -161,17 +161,6 @@ type ACLEntry struct {
 	OTP   bool
 }
 
-type DeployConfig struct {
-	ArtifactoryAPIKey   string
-	ArtifactoryURL      string
-	ArtifactoryUsername string
-	ArtifactoryRepo     string
-	CanoeURL            string
-	CanoeAPIKey         string
-	ECSTimeout          time.Duration
-	AWSRegion           string
-}
-
 type DeployTarget struct {
 	Name          string
 	BambooProject string
@@ -238,48 +227,44 @@ func NewPingHandler(db *sql.DB) http.Handler {
 	return &pingHandler{db}
 }
 
+func NewDeployServer(sender operator.Sender, ecs Deployer, canoe Deployer, tz *time.Location) breadpb.DeployServer {
+	if tz == nil {
+		tz = time.UTC
+	}
+	return &deployAPIServer{sender, ecs, canoe, tz}
+}
+
+// NewECSDeployer returs a Deployer that deploys to AWS ECS
+func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget) Deployer {
+	return &ecsDeployer{
+		ecs.New(
+			session.New(
+				&aws.Config{
+					Region: aws.String(config.AWSRegion),
+				},
+			),
+		),
+		afy,
+		config.Timeout,
+		targets,
+	}
+}
+
+// NewCanoeDeployer returns a Deployer that deploys via Canoe
+func NewCanoeDeployer(config *CanoeConfig) Deployer {
+	return &canoeDeployer{&http.Client{}, config}
+}
+
 func NewServer(
 	auth operator.Authorizer,
 	inst operator.Instrumenter,
 	sender operator.Sender,
-	deploy *DeployConfig,
-	timezone *time.Location,
+	deploy breadpb.DeployServer,
 ) (*grpc.Server, error) {
 	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
 	breadpb.RegisterPingServer(server, &pingAPIServer{sender})
-	if deploy.ArtifactoryURL != "" &&
-		deploy.ArtifactoryUsername != "" &&
-		deploy.ArtifactoryAPIKey != "" &&
-		deploy.ArtifactoryRepo != "" &&
-		deploy.CanoeURL != "" &&
-		deploy.CanoeAPIKey != "" &&
-		deploy.AWSRegion != "" {
-		breadpb.RegisterDeployServer(server, &deployAPIServer{
-			sender,
-			deploy,
-			&http.Client{},
-			timezone,
-			&canoeDeployer{
-				deploy.CanoeURL,
-				deploy.CanoeAPIKey,
-				&http.Client{},
-			},
-			&ecsDeployer{
-				deploy.ArtifactoryURL,
-				deploy.ArtifactoryRepo,
-				deploy.ArtifactoryUsername,
-				deploy.ArtifactoryAPIKey,
-				ecs.New(
-					session.New(
-						&aws.Config{
-							Region: aws.String(deploy.AWSRegion),
-						},
-					),
-				),
-				ECSDeployTargets,
-				deploy.ECSTimeout,
-			},
-		})
+	if deploy != nil {
+		breadpb.RegisterDeployServer(server, deploy)
 	}
 	return server, nil
 }

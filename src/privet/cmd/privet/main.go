@@ -1,152 +1,227 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
-	"log"
-	"net"
 	"os"
-	"strings"
-	"time"
-
+	"path/filepath"
 	"privet"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
+	"time"
 )
 
+type stringListFlag []string
+
+func (f *stringListFlag) String() string {
+	return fmt.Sprintf("%v", *f)
+}
+func (f *stringListFlag) Set(value string) error {
+	*f = append(*f, value)
+	return nil
+}
+
 var (
-	bindAddress                       string
-	connectAddress                    string
-	privetDir                         string
-	approximateBatchDurationInSeconds float64
-	envVars                           string
-	timeout                           int
-	overlookStartupHookFailure        bool
+	testFilesFile       string
+	previousResultsDir  string
+	numWorkers          int
+	targetDuration      time.Duration
+	defaultTestDuration time.Duration
+	planFile            string
+	commandPath         string
+	worker              int
+	parallelism         int
+	envVars             stringListFlag
 )
 
 func main() {
-	flag.StringVar(&bindAddress, "bind", "", "The address:port to bind as a server")
-	flag.StringVar(&connectAddress, "connect", "", "The address:port to connect as a client")
-	flag.StringVar(&privetDir, "privet-dir", "./test/privet", "Path to where privet scripts reside")
-	flag.Float64Var(&approximateBatchDurationInSeconds, "approximate-batch-duration", 0, "Run multiple units at a time, totaling approximately this number of seconds. If zero (default), only one test will be run per invocation of runner-run-units.")
-	flag.StringVar(&envVars, "env-vars", "", "Space-separated list of environment variables that will be forwarded on to any child processes run in the privet-dir")
-	flag.IntVar(&timeout, "timeout", 3600, "Number of seconds before the process will exit, assuming there is a hung test run")
-	flag.BoolVar(&overlookStartupHookFailure, "overlook-startup-hook-failure", false, "If true, Privet will exit with status 0 if a startup hook fails. No tests will be run, but the failure will be essentially ignored")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [options] COMMAND\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\n")
+		fmt.Fprintf(os.Stderr, "Commands:\n")
+		fmt.Fprintf(os.Stderr, "  plan    Creates a plan\n")
+		fmt.Fprintf(os.Stderr, "  execute Executes a plan\n")
+		fmt.Fprintf(os.Stderr, "  help    Shows this help\n")
+		fmt.Fprintf(os.Stderr, "\n")
+		fmt.Fprintf(os.Stderr, "Options:\n")
+		flag.PrintDefaults()
+	}
+	flag.StringVar(&testFilesFile, "test-files-file", "", "A file containing a JSON array of test files to be run. The format is documented in the Privet examples directory.")
+	flag.StringVar(&previousResultsDir, "previous-results-dir", "", "A directory containing JUnit-formatted XML files from a previous build. A SHASUMS file is also expected to exist containing fingerprints of the test files from this previous build. (optional, but helpful for plan)")
+	flag.IntVar(&numWorkers, "num-workers", 0, "The number of workers to plan (required for plan)")
+	flag.DurationVar(&targetDuration, "target-duration", 30*time.Second, "The target duration for one test batch. Should be balanced between too short (where startup/teardown time becomes an issue) and too long (where one worker might run much longer than the rest)")
+	flag.DurationVar(&defaultTestDuration, "default-test-duration", 1*time.Second, "The default duration assumed for a test, if it cannot be found in the previous results")
+	flag.StringVar(&planFile, "plan-file", "", "Path to the plan file (required for execute)")
+	flag.StringVar(&commandPath, "command-path", "", "Command to execute for each test batch (required for execute)")
+	flag.IntVar(&worker, "worker", -1, "Worker identifier (required for execute)")
+	flag.IntVar(&parallelism, "parallelism", 1, "Number of independent processes to spawn to process this worker's queue")
+	flag.Var(&envVars, "env", "Environment variable (foo=bar) to pass to the command (can be specified multiple times)")
 	flag.Parse()
 
-	envVarsList := strings.Split(envVars, " ")
-	if bindAddress != "" {
-		go exitAfterTimeout(time.Duration(timeout) * time.Second)
-
-		server := grpc.NewServer()
-		master := privet.NewJobMaster(privetDir)
-		master.EnvVars = envVarsList
-		if err := master.EnqueueUnits(); err != nil {
-			log.Fatalf("failed to populate units: %v", err)
-		}
-
-		go func(master *privet.JobMaster) {
-			for {
-				if master.IsWorkFullyCompleted() {
-					os.Exit(master.ExitCode())
-				}
-				time.Sleep(1 * time.Second)
-			}
-		}(master)
-
-		listener, err := net.Listen("tcp", bindAddress)
-		if err != nil {
-			log.Fatalf("failed to bind: %v", err)
-		}
-
-		privet.RegisterJobMasterServer(server, master)
-		panic(server.Serve(listener))
-	} else if connectAddress != "" {
-		go exitAfterTimeout(time.Duration(timeout) * time.Second)
-
-		conn, err := grpc.Dial(connectAddress, grpc.WithInsecure())
-		if err != nil {
-			log.Fatalf("failed to connect: %v", err)
-		}
-
-		masterClient := privet.NewJobMasterClient(conn)
-		jobRunner := privet.NewJobRunner(privetDir, masterClient)
-		jobRunner.EnvVars = envVarsList
-		jobRunner.ApproximateBatchDurationInSeconds = approximateBatchDurationInSeconds
-
-		startupErrCh := make(chan error)
-		go func() {
-			startupErrCh <- jobRunner.RunStartupHook()
-		}()
-		queueEmptyCh := make(chan bool)
-		go jobRunner.NotifyQueueEmpty(queueEmptyCh)
-
-		select {
-		case err = <-startupErrCh:
-			if err != nil {
-				log.Printf("error running startup hook: %v", err)
-				if overlookStartupHookFailure {
-					os.Exit(0)
-				} else {
-					os.Exit(1)
-				}
-			}
-		case <-queueEmptyCh:
-			log.Printf("queue became empty, exiting")
-			os.Exit(0)
-		}
-
-		firstIteration := true
-		success := true
-		for {
-			units, err := jobRunner.PopUnits()
-			if err != nil {
-				// If this is the first iteration and the exit code is a
-				// DeadlineExceeded, it's likely that an anomalous startup hook run took
-				// so long that other Privet workers have completed all of the work and
-				// the Privet master has shut down. We allow this as a special case.
-				if !firstIteration || grpc.Code(err) != codes.DeadlineExceeded {
-					log.Printf("error fetching units: %v", err)
-					success = false
-				}
-				break
-			} else if len(units) <= 0 {
-				break
-			}
-
-			err = jobRunner.RunUnits(units)
-			if err != nil {
-				log.Printf("error running units: %v", err)
-				success = false
-				break
-			}
-
-			firstIteration = false
-		}
-
-		if err = jobRunner.RunCleanupHook(); err != nil {
-			log.Fatalf("error running cleanup hook: %v", err)
-		}
-
-		if success {
-			os.Exit(0)
-		} else {
+	switch flag.Arg(0) {
+	case "plan":
+		if err := doPlan(); err != nil {
+			fmt.Fprintf(os.Stderr, "privet error: %v\n", err)
 			os.Exit(1)
 		}
-	} else {
-		fmt.Fprintf(os.Stderr, "-bind or -connect must be specified\n")
+	case "execute":
+		success, err := doExecute()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "privet error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "The build failed due to an unexpected failure. Please open a ticket on https://jira.dev.pardot.com/browse/BREAD for the BREAD team to look into.")
+			os.Exit(1)
+		} else if !success {
+			fmt.Fprintf(os.Stderr, "The build failed because at least one test job failed.")
+			os.Exit(1)
+		} else {
+			os.Exit(0)
+		}
+	case "help":
+		flag.Usage()
+		os.Exit(0)
+	default:
+		flag.Usage()
 		os.Exit(1)
 	}
 }
 
-func exitAfterTimeout(timeout time.Duration) {
-	startTime := time.Now()
-	for {
-		if time.Now().Sub(startTime) > timeout {
-			log.Fatalf("timeout after %d", timeout)
-		} else {
-			time.Sleep(1 * time.Second)
-		}
+func doPlan() error {
+	opts := &privet.PlanCreationOpts{}
+
+	if testFilesFile == "" {
+		return errors.New("test-files-file is required")
 	}
+	testFiles, err := loadTestFilesFile(testFilesFile)
+	if err != nil {
+		return err
+	}
+	opts.TestFiles = testFiles
+
+	if previousResultsDir != "" {
+		testRunResults, err := loadResultsDirectory(previousResultsDir)
+		if err != nil {
+			return err
+		}
+		opts.PreviousResults = testRunResults
+	}
+
+	if numWorkers <= 0 {
+		return errors.New("num-workers is required")
+	}
+	opts.NumWorkers = numWorkers
+
+	opts.TargetDuration = targetDuration
+	opts.DefaultTestDuration = defaultTestDuration
+
+	plan, err := privet.CreatePlan(opts)
+	if err != nil {
+		return err
+	}
+
+	encoder := json.NewEncoder(os.Stdout)
+	if err := encoder.Encode(plan); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func doExecute() (bool, error) {
+	opts := &privet.PlanExecutionOpts{}
+
+	if commandPath == "" {
+		return false, errors.New("command-path is required")
+	}
+	opts.CommandPath = commandPath
+
+	if planFile == "" {
+		return false, errors.New("plan-file is required")
+	}
+	plan, err := loadPlan(planFile)
+	if err != nil {
+		return false, err
+	}
+
+	if worker < 0 {
+		return false, errors.New("worker is required")
+	}
+	opts.Worker = worker
+	opts.Parallelism = parallelism
+	opts.Env = envVars
+
+	return privet.ExecutePlan(plan, opts)
+}
+
+func loadPlan(file string) (*privet.Plan, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = f.Close() }()
+
+	decoder := json.NewDecoder(f)
+
+	var plan privet.Plan
+	if err := decoder.Decode(&plan); err != nil {
+		return nil, err
+	}
+	return &plan, nil
+}
+
+func loadTestFilesFile(file string) ([]*privet.TestFile, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = f.Close() }()
+
+	decoder := json.NewDecoder(f)
+
+	var testFiles []*privet.TestFile
+	if err := decoder.Decode(&testFiles); err != nil {
+		return nil, err
+	}
+
+	return testFiles, nil
+}
+
+func loadResultsDirectory(directory string) (privet.TestRunResults, error) {
+	files, err := filepath.Glob(filepath.Join(directory, "*.xml"))
+	if err != nil {
+		return nil, err
+	}
+
+	results := privet.TestRunResults{}
+	for _, file := range files {
+		f, err := os.Open(file)
+		if err != nil {
+			return nil, err
+		}
+
+		fileResults, err := privet.ParseJunitResult(f)
+		if err != nil {
+			_ = f.Close()
+			return nil, err
+		}
+
+		results.Merge(fileResults)
+		_ = f.Close()
+	}
+
+	shasumFile := filepath.Join(directory, "SHASUMS")
+	if _, err := os.Stat(shasumFile); err == nil {
+		f, err := os.Open(shasumFile)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := privet.PopulateFingerprintsFromShasumsFile(results, f); err != nil {
+			_ = f.Close()
+			return nil, err
+		}
+
+		_ = f.Close()
+	}
+
+	return results, nil
 }
