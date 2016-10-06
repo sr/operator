@@ -7,4 +7,6 @@ RUN bundler install --local
 
 ADD . /app
 
+ENV RUBYLIB "/usr/local/bundle/extensions/x86_64-linux/2.3.0-static/grpc-1.0.0/grpc:$RUBYLIB"
+RUN echo 'require "grpc_c"' > /usr/local/bundle/gems/grpc-1.0.0/src/ruby/lib/grpc/grpc.rb
 CMD ["script/server"]
