@@ -51,8 +51,8 @@ class UserQuery < ApplicationRecord
     database.tables
   end
 
-  def database_columns
-    database.columns(@parsed.first_table)
+  def database_columns(query = parsed)
+    database.columns(query.first_table)
   end
 
   def parsed
@@ -70,11 +70,15 @@ class UserQuery < ApplicationRecord
       sql_query = sql_query.limit(DEFAULT_LIMIT)
     end
 
-    if for_account?
+    if for_account? && scopable?(sql_query)
       sql_query = sql_query.scope_to(account_id)
     end
 
     @parsed = sql_query
+  end
+
+  def scopable?(sql_query)
+    database_columns(sql_query).include?("account_id") || sql_query.first_table == "account"
   end
 
   def database

@@ -20,7 +20,8 @@ class SQLQuery
       levels += 1
       table.name
     rescue NoMethodError
-      table = table.left.left.value
+      table = table.left
+      table = table.left.value if table.respond_to?(:left)
       retry unless levels > 3
       raise NoMethodError, $!.message
     end
