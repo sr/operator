@@ -52,7 +52,7 @@ class UserQuery < ApplicationRecord
   end
 
   def database_columns(query = parsed)
-    database.columns(query.first_table)
+    database.columns(query.tables.first)
   end
 
   def parsed
@@ -78,7 +78,7 @@ class UserQuery < ApplicationRecord
   end
 
   def scopable?(sql_query)
-    database_columns(sql_query).include?("account_id") || sql_query.first_table == "account"
+    database_columns(sql_query).include?("account_id") || sql_query.tables.first == "account"
   end
 
   def database

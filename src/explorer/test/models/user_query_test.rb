@@ -72,17 +72,15 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal 1, row[:id]
   end
 
-  test "trying to get data without account_id" do
-    query = @user.account_query("SELECT * FROM visitor_parameter LEFT JOIN account ON visitor_parameter.created_at <> account.created_at", 1)
+  test "trying to get access to data from other account id" do
+    query = @user.account_query("SELECT * FROM account LEFT JOIN visitor_parameter ON visitor_parameter.created_at <> account.created_at WHERE account.id = 3", 1)
     results = query.execute(@user)
-    row = results.first
-    assert_equal 2, row[:id]
+    assert_nil results.first
   end
 
-  test "trying2 to get data without account_id" do
-    query = @user.account_query("SELECT * FROM account LEFT JOIN visitor_parameter ON visitor_parameter.created_at <> account.created_at", 1)
+  test "trying to get access to data from other account id using table without account_id" do
+    query = @user.account_query("SELECT * FROM visitor_parameter LEFT JOIN account ON visitor_parameter.created_at <> account.created_at WHERE account.id = 3", 1)
     results = query.execute(@user)
-    row = results.first
-    assert_equal 2, row[:id]
+    assert_nil results.first
   end
 end

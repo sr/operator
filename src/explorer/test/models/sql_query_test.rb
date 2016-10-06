@@ -79,25 +79,25 @@ class SQLQueryTest < ActiveSupport::TestCase
     assert_equal expect, parse(input).to_sql
   end
 
-  # Test first_table
+  # Test table parsing
 
   test "Parse table name" do
     input = "select prospect_id from piListxProspect where (listx_id=1 or listx_id=2) and account_id=1 and is_mailable=1 order by rand() limit 10"
-    assert_equal "piListxProspect", parse(input).first_table
+    assert_equal "piListxProspect", parse(input).tables.first
   end
 
   test "Parse table from join" do
     input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va left join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
-    assert_equal "visitor_activity", parse(input).first_table
+    assert_equal "visitor_activity", parse(input).tables.first
   end
 
   test "Parse table from join without name" do
     input = 'select * from visitor_activity left join prospect on prospect.id=visitor_activity.prospect_id'
-    assert_equal "visitor_activity", parse(input).first_table
+    assert_equal "visitor_activity", parse(input).tables.first
   end
 
   test "Parse table from inner join" do
     input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va INNER join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
-    assert_equal "visitor_activity", parse(input).first_table
+    assert_equal "visitor_activity", parse(input).tables.first
   end
 end

@@ -1,17 +1,13 @@
-class ScopedSQLQuery
+class ScopedSQLQuery < SQLQuery
   ACCOUNT_TABLE = "account".freeze
 
   def initialize(ast, account_id)
     @ast = ast
     @account_id = account_id
-  end
 
-  def ast
     if !scoped?
       scope!
     end
-
-    @ast
   end
 
   private
@@ -50,7 +46,7 @@ class ScopedSQLQuery
   end
 
   def account_id_column
-    if table_name == ACCOUNT_TABLE
+    if tables.first == ACCOUNT_TABLE
       SQLParser::Statement::QualifiedColumn.new(
         SQLParser::Statement::Table.new(ACCOUNT_TABLE),
         SQLParser::Statement::Column.new("id")
@@ -58,14 +54,5 @@ class ScopedSQLQuery
     else
       SQLParser::Statement::Column.new("account_id")
     end
-  end
-
-  # TODO(sr) Make this more robust and handle more than basic queries
-  def table_name
-    @ast.query_expression
-        .table_expression
-        .from_clause
-        .tables[0]
-        .name
   end
 end

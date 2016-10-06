@@ -13,15 +13,21 @@ class SQLQuery
     @ast.to_sql.starts_with?("SELECT *")
   end
 
-  def first_table
-    table = @ast.query_expression.table_expression.from_clause.tables.first
+  def tables
+    tables = @ast.query_expression.table_expression.from_clause.tables
+    tables.map { |table_ast|
+      table_name(table_ast)
+    }
+  end
+
+  def table_name(ast)
     levels = 0
     begin
       levels += 1
-      table.name
+      ast.name
     rescue NoMethodError
-      table = table.left
-      table = table.left.value if table.respond_to?(:left)
+      ast = ast.left
+      ast = ast.left.value if ast.respond_to?(:left)
       retry unless levels > 3
       raise NoMethodError, $!.message
     end
@@ -37,7 +43,6 @@ class SQLQuery
   end
 
   def scope_to(account_id)
-    @ast = ScopedSQLQuery.new(@ast, account_id).ast
-    self
+    ScopedSQLQuery.new(@ast, account_id)
   end
 end
