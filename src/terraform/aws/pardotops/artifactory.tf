@@ -173,7 +173,6 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
 resource "aws_instance" "pardot0-artifactory1-1-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.21"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
   associate_public_ip_address = false
@@ -202,7 +201,6 @@ resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-2-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.83"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
   associate_public_ip_address = false
@@ -231,7 +229,6 @@ resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
 resource "aws_instance" "pardot0-artifactory1-3-ue1" {
   ami = "${var.centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY}"
   instance_type = "c4.4xlarge"
-  private_ip="172.28.0.54"
   key_name = "internal_apps"
   subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
   associate_public_ip_address = false
