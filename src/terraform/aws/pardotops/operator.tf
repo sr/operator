@@ -42,6 +42,7 @@ resource "aws_alb_target_group" "operator" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.internal_apps.id}"
+  deregistration_delay = 30
 
   health_check {
     path = "/_ping"
@@ -299,7 +300,7 @@ resource "aws_launch_configuration" "operator_production" {
 }
 
 resource "aws_autoscaling_group" "operator_production" {
-  max_size = 2
+  max_size = 3
   min_size = 2
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
   vpc_zone_identifier = [
