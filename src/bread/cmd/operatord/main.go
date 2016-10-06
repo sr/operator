@@ -96,8 +96,15 @@ func run(invoker operator.InvokerFunc) error {
 			}
 		}
 	})
+	var host, port string
+	if v, ok := os.LookupEnv("HAL9000_PORT_9001_TCP_ADDR"); ok {
+		host = v
+	}
 	if v, ok := os.LookupEnv("HAL9000_PORT_9001_TCP_PORT"); ok {
-		config.halAddr = ":" + v
+		port = v
+	}
+	if host != "" && port != "" {
+		config.halAddr = fmt.Sprintf("%s:%s", host, port)
 	}
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
