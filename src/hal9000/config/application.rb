@@ -40,7 +40,7 @@ module HAL9000
         if config.adapters.respond_to?(:bread)
           config.adapters.bread.token = ENV.fetch("HIPCHAT_TOKEN")
           config.adapters.bread.server = ENV.fetch("HIPCHAT_SERVER", "hipchat.dev.pardot.com")
-          config.adapters.bread.address = "0.0.0.0:#{ENV.fetch("HAL9000_GRPC_PORT", "9090")}"
+          config.adapters.bread.address = "0.0.0.0:#{ENV.fetch("HAL9000_GRPC_PORT", "9001")}"
         end
 
         config.http.host = "0.0.0.0"
