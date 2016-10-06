@@ -83,4 +83,11 @@ class UserQueryTest < ActiveSupport::TestCase
     results = query.execute(@user)
     assert_nil results.first
   end
+
+  test "other account data using ||" do
+    query = @user.account_query("select account_id, last_name, first_name, updated_at, is_archived from prospect where is_archived=1 OR is_archived=0", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal 1, row[:account_id]
+  end
 end
