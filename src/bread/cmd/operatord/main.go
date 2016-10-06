@@ -25,7 +25,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const grpcTimeout = 3 * time.Second
+const grpcTimeout = 10 * time.Second
 
 type config struct {
 	afy   *bread.ArtifactoryConfig
