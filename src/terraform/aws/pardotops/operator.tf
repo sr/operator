@@ -299,7 +299,7 @@ resource "aws_launch_configuration" "operator_production" {
 }
 
 resource "aws_autoscaling_group" "operator_production" {
-  max_size = 2
+  max_size = 3
   min_size = 2
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
   vpc_zone_identifier = [
