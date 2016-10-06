@@ -16,13 +16,20 @@ module Hal9000
         api_version: "v2",
         server_url: config.server
       )
+
+      @server = GRPC::RpcServer.new
+      @server.add_http2_port(config.address, :this_port_is_insecure)
+      @server.handle(RobotServer.new(robot))
     end
 
     def run
-      server = GRPC::RpcServer.new
-      server.add_http2_port(config.address, :this_port_is_insecure)
-      server.handle(RobotServer.new(robot))
-      server.run_till_terminated
+      Lita.logger.info "HAL9000 gRPC server starting on #{config.address} ..."
+
+      @server.run_till_terminated
+    end
+
+    def shut_down
+      @server.stop
     end
 
     def send_messages(source, messages)

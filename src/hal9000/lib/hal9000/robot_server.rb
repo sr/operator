@@ -10,6 +10,8 @@ module Hal9000
     # rubocop:disable Style/PredicateName
     def is_match(request, _call)
       exception_logger do
+        Lita.logger.info "Received hal9000.IsMatch request: #{request.inspect}"
+
         message = build_message(request)
 
         ok = @robot.handlers.any? { |handler|
@@ -25,9 +27,11 @@ module Hal9000
 
     def dispatch(request, _call)
       exception_logger do
+        Lita.logger.info "Received hal9000.Dispatch request: #{request.inspect}"
+
         @robot.receive(build_message(request))
 
-        Hal9000::DispatchResponse.new
+        Hal9000::Response.new
       end
     end
 
@@ -36,8 +40,10 @@ module Hal9000
     def exception_logger
       yield
     rescue
-      @robot.logger.error "Got an exception in RobotServer: #{$!.inspect}"
-      @robot.logger.error $!.backtrace.join("\n")
+      Lita.logger.error "Got an exception in RobotServer: #{$!.inspect}"
+      Lita.logger.error $!.backtrace.join("\n")
+
+      raise
     end
 
     def build_message(request)
