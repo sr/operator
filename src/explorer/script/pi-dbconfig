@@ -27,7 +27,7 @@ path="config/databaseConnections/${filename}"
 download_url="$(
   curl -fs -u"${GITHUB_USER}:${GITHUB_TOKEN}" \
   "https://git.dev.pardot.com/api/v3/repos/Pardot/pardot/contents/${path}" |
-  jq -cr '.download_url'
+  jq -c -r '.download_url'
 )"
 
 mkdir -p "config/pi"
