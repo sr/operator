@@ -64,4 +64,30 @@ class UserQueryTest < ActiveSupport::TestCase
       Rails.application.config.x.rate_limit_max = old_val
     end
   end
+
+  test "tables without account_id" do
+    query = @user.account_query("SELECT * FROM visitor_parameter", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal 1, row[:id]
+  end
+
+  test "trying to get access to data from other account id" do
+    query = @user.account_query("SELECT * FROM account LEFT JOIN visitor_parameter ON visitor_parameter.created_at <> account.created_at WHERE account.id = 3", 1)
+    results = query.execute(@user)
+    assert_nil results.first
+  end
+
+  test "trying to get access to data from other account id using table without account_id" do
+    query = @user.account_query("SELECT * FROM visitor_parameter LEFT JOIN account ON visitor_parameter.created_at <> account.created_at WHERE account.id = 3", 1)
+    results = query.execute(@user)
+    assert_nil results.first
+  end
+
+  test "other account data using ||" do
+    query = @user.account_query("select account_id, last_name, first_name, updated_at, is_archived from prospect where is_archived=1 OR is_archived=0", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal 1, row[:account_id]
+  end
 end

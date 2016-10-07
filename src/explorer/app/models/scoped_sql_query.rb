@@ -1,22 +1,25 @@
-class ScopedSQLQuery
-  ACCOUNT_TABLE = "account".freeze
-
-  def initialize(ast, account_id)
+class ScopedSQLQuery < SQLQuery
+  def initialize(ast, account_id, user_query)
+    @user_query = user_query
     @ast = ast
     @account_id = account_id
-  end
 
-  def ast
-    if !scoped?
-      scope!
+    tables.each do |table|
+      if !scoped?(table)
+        scope!(table)
+      end
     end
-
-    @ast
   end
 
   private
 
-  def scoped?
+  def scopable?(table)
+    table.is_account? || @user_query.database_columns(table).include?("account_id")
+  end
+
+  def scoped?(table)
+    return true unless scopable?(table)
+
     where = @ast.query_expression.table_expression.where_clause
 
     if !where
@@ -24,48 +27,41 @@ class ScopedSQLQuery
     end
 
     if where.search_condition.is_a?(SQLParser::Statement::And)
-      return where.search_condition.left.to_sql == condition.to_sql ||
-             where.search_condition.right.to_sql == condition.to_sql
+      return where.search_condition.left.to_sql == condition(table).to_sql ||
+             where.search_condition.right.to_sql == condition(table).to_sql
     end
 
-    where.search_condition.to_sql == condition.to_sql
+    where.search_condition.to_sql == condition(table).to_sql
   end
 
-  def scope!
+  def scope!(table)
     where = @ast.query_expression.table_expression.where_clause
 
     if !where
-      where = SQLParser::Statement::WhereClause.new(condition)
+      where = SQLParser::Statement::WhereClause.new(condition(table))
     else
-      and_condition = SQLParser::Statement::And.new(where.search_condition, condition)
+      and_condition = SQLParser::Statement::And.new(where.search_condition, condition(table))
       where = SQLParser::Statement::WhereClause.new(and_condition)
     end
 
     @ast.query_expression.table_expression.where_clause = where
   end
 
-  def condition
+  def condition(table)
     account_id = SQLParser::Statement::Integer.new(@account_id)
-    SQLParser::Statement::Equals.new(account_id_column, account_id)
+    SQLParser::Statement::Equals.new(account_id_column(table), account_id)
   end
 
-  def account_id_column
-    if table_name == ACCOUNT_TABLE
-      SQLParser::Statement::QualifiedColumn.new(
-        SQLParser::Statement::Table.new(ACCOUNT_TABLE),
-        SQLParser::Statement::Column.new("id")
-      )
+  def account_id_column(table)
+    if table.is_account?
+      column_name = "id"
     else
-      SQLParser::Statement::Column.new("account_id")
+      column_name = "account_id"
     end
-  end
 
-  # TODO(sr) Make this more robust and handle more than basic queries
-  def table_name
-    @ast.query_expression
-        .table_expression
-        .from_clause
-        .tables[0]
-        .name
+    SQLParser::Statement::QualifiedColumn.new(
+      SQLParser::Statement::Table.new(table.name),
+      SQLParser::Statement::Column.new(column_name)
+    )
   end
 end
