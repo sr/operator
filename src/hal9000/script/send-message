@@ -22,7 +22,7 @@ parser = OptionParser.new { |opts|
 }
 parser.parse!
 
-if ARGV.length == 0 || (user == "" && room == "") || ARGV.empty?
+if ARGV.empty? || (user == "" && room == "")
   puts parser.help
   abort
 end

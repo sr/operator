@@ -402,7 +402,7 @@ class ZabbixHandler < ApplicationHandler
     options = {
       url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
       user: config.zabbix_user,
-      password: config.zabbix_password,
+      password: config.zabbix_password
     }
 
     proxy = ENV.fetch("HAL9000_HTTP_PROXY", nil)
