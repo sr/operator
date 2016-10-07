@@ -3,6 +3,9 @@ require "grpc"
 
 module Hal9000
   class BreadLitaAdapter < Lita::Adapter
+    class Error < StandardError
+    end
+
     namespace :bread
 
     config :token, type: String, required: true
@@ -32,13 +35,25 @@ module Hal9000
       @server.stop
     end
 
+    # rubocop:disable Style/Send
     def send_messages(source, messages)
+      if source.private_message? && source.user.id.to_s.empty?
+        raise Error, "Unable to send private message without a source user: #{source.inspect}"
+      end
+
+      if !source.private_message? && source.room.to_s.empty?
+        raise Error, "Unable to send room message without a source room: #{source.inspect}"
+      end
+
       messages.each do |message|
-        # rubocop:disable Style/Send
-        @hipchat[source.room].send("", message,
-          color: "yellow",
-          message_format: "html"
-        )
+        formatted_message = message.gsub("\n", "<br>")
+        options = { message_format: "html", color: "yellow" }
+
+        if source.private_message?
+          @hipchat.user(source.user.id).send(formatted_message, options)
+        else
+          @hipchat[source.room].send("", formatted_message, options)
+        end
       end
     end
 
