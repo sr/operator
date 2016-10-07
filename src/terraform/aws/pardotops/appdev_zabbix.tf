@@ -62,11 +62,3 @@ resource "aws_security_group" "appdev_zabbix_host" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-resource "aws_route53_record" "zabbix_dev_dev_pardot_com" {
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
-  name = "zabbix-dev.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
-  type = "A"
-  ttl = "900"
-}

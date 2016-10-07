@@ -51,8 +51,15 @@ class UserQuery < ApplicationRecord
     database.tables
   end
 
-  def database_columns
-    database.columns(@parsed.first_table)
+  def database_columns(tables = parsed)
+    if tables.is_a? SQLQuery
+      tables = tables.tables
+    else
+      tables = [tables]
+    end
+    tables.map{ |t|
+      database.columns(t.name)
+    }.flatten
   end
 
   def parsed
@@ -71,7 +78,7 @@ class UserQuery < ApplicationRecord
     end
 
     if for_account?
-      sql_query = sql_query.scope_to(account_id)
+      sql_query = sql_query.scope_to(self, account_id)
     end
 
     @parsed = sql_query
