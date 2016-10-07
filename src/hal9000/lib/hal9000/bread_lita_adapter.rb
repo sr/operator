@@ -50,7 +50,7 @@ module Hal9000
         options = { message_format: "html", color: "yellow" }
 
         if source.private_message?
-          @hipchat.user(source.user.id).send(formatted_message, options)
+          @hipchat.user(source.user.id).send(formatted_message, options.merge(notify: true))
         else
           @hipchat[source.room].send("", formatted_message, options)
         end
