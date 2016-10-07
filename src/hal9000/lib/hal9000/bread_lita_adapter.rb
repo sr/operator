@@ -35,7 +35,7 @@ module Hal9000
     def send_messages(source, messages)
       messages.each do |message|
         # rubocop:disable Style/Send
-        @hipchat[source.room].send(robot.name, message,
+        @hipchat[source.room].send("", message,
           color: "yellow",
           message_format: "html"
         )
