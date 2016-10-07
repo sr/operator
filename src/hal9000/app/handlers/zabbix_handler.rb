@@ -405,14 +405,17 @@ class ZabbixHandler < ApplicationHandler
       password: config.zabbix_password
     }
 
+    client = Zabbix::Client.new(options)
+
     proxy = ENV.fetch("HAL9000_HTTP_PROXY", nil)
     if proxy
       proxy_url = URI(proxy)
-      options[:proxy_host] = proxy_url.host
-      options[:proxy_port] = proxy_url.port
+      client.set_instance_variable(:@proxy_uri, proxy_url)
+      client.set_instance_variable(:@proxy_host, proxy_url.host)
+      client.set_instance_variable(:@proxy_port, proxy_url.port)
     end
 
-    Zabbix::Client.new(options)
+    client
   end
 
   def parse_options(options)
