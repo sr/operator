@@ -35,6 +35,14 @@ module Hal9000
       @server.stop
     end
 
+    def mention_format(name)
+      if name.empty?
+        return ""
+      end
+
+      "@#{name}"
+    end
+
     # rubocop:disable Style/Send
     def send_messages(source, messages)
       if source.private_message? && source.user.id.to_s.empty?

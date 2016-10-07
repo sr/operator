@@ -47,7 +47,7 @@ module Hal9000
     end
 
     def build_message(request)
-      user = Lita::User.new(request.user_email.dup)
+      user = Lita::User.new(request.user.email.dup, { "name": request.user.name.dup })
       source = Lita::Source.new(user: user, room: request.room.dup)
 
       Lita::Message.new(@robot, request.text.dup, source)

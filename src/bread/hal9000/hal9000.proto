@@ -11,8 +11,13 @@ service Robot {
 
 message Message {
 	string text = 1;
-	string user_email = 2;
+	User user = 2;
 	string room = 3;
+}
+
+message User {
+	string email = 1;
+	string name = 2;
 }
 
 message Response {

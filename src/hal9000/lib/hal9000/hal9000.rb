@@ -7,8 +7,12 @@ require 'google/protobuf'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "hal9000.Message" do
     optional :text, :string, 1
-    optional :user_email, :string, 2
+    optional :user, :message, 2, "hal9000.User"
     optional :room, :string, 3
+  end
+  add_message "hal9000.User" do
+    optional :email, :string, 1
+    optional :name, :string, 2
   end
   add_message "hal9000.Response" do
     optional :match, :bool, 1
@@ -17,5 +21,6 @@ end
 
 module Hal9000
   Message = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal9000.Message").msgclass
+  User = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal9000.User").msgclass
   Response = Google::Protobuf::DescriptorPool.generated_pool.lookup("hal9000.Response").msgclass
 end

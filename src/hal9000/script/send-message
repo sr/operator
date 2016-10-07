@@ -27,6 +27,7 @@ if ARGV.empty? || (user == "" && room == "")
   abort
 end
 
-message = Hal9000::Message.new(room: room, user_email: user, text: ARGV.join(" "))
+user = Hal9000::User.new(email: user, name: user.split("@")[0])
+message = Hal9000::Message.new(room: room, user: user, text: ARGV.join(" "))
 client = Hal9000::Robot::Stub.new(address, :this_channel_is_insecure)
 client.dispatch(message)
