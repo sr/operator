@@ -46,13 +46,13 @@ module Hal9000
       end
 
       messages.each do |message|
-        formatted_message = message.gsub("\n", "<br>")
-        options = { message_format: "html", color: "yellow" }
-
+        # If it's a private message, force format to be text. For some reason
+        # only plain text private messages open a new conversation tab.
         if source.private_message?
-          @hipchat.user(source.user.id).send(formatted_message, options.merge(notify: true))
+          options = { message_format: "text", color: "yellow", notify: true }
+          @hipchat.user(source.user.id).send(message, options.merge(notify: true))
         else
-          @hipchat[source.room].send("", formatted_message, options)
+          @hipchat[source.room].send("", message.gsub("\n", "<br>"), options)
         end
       end
     end
