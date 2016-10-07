@@ -38,7 +38,7 @@ module HAL9000
         config.robot.adapter = ENV.fetch("LITA_ADAPTER", "shell").to_sym
 
         if config.adapters.respond_to?(:bread)
-          config.adapters.bread.token = ENV.fetch("HIPCHAT_TOKEN")
+          config.adapters.bread.token = ENV.fetch("HIPCHAT_TOKEN", "")
           config.adapters.bread.server = ENV.fetch("HIPCHAT_SERVER", "https://hipchat.dev.pardot.com")
           config.adapters.bread.address = "0.0.0.0:#{ENV.fetch("HAL9000_GRPC_PORT", "9001")}"
         end
