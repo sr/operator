@@ -43,7 +43,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		opMatch, halMatch bool
 		req               = h.getRequest(msg, senderID)
 	)
-	halMsg := &hal9000.Message{Text: msg.Text}
+	halMsg := &hal9000.Message{Text: msg.Text, User: &hal9000.User{}}
 	if msg.Source != nil && msg.Source.User != nil && msg.Source.Room != nil {
 		halMsg.User.Email = msg.Source.User.Email
 		halMsg.User.Name = msg.Source.User.Login
