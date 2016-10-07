@@ -150,8 +150,11 @@ case "$project" in
         fi
         ;;
     devenv)
-        docker run --rm -w /go -v "$BREAD/src:/go/src" \
-            -e "GOOS=darwin" -e "GOARCH=amd64" build/build \
+        docker run --rm -w /go \
+            -v "$BREAD/src:/go/src" \
+            -v "$BREAD/etc/mk:/go/etc/mk" \
+            -e "GOOS=darwin" -e "GOARCH=amd64" \
+            build/build \
             make -f etc/mk/golang.mk install-devenv
         ;;
     explorer)
