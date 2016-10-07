@@ -399,9 +399,20 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def build_zabbix_client(datacenter:)
-    ::Zabbix::Client.new(url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
+    options = {
+      url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
       user: config.zabbix_user,
-      password: config.zabbix_password)
+      password: config.zabbix_password,
+    }
+
+    proxy = ENV.fetch("HAL9000_HTTP_PROXY", nil)
+    if proxy
+      proxy_url = URI(proxy)
+      options[:proxy_host] = proxy_url.host
+      options[:proxy_port] = proxy_url.port
+    end
+
+    Zabbix::Client.new(options)
   end
 
   def parse_options(options)
