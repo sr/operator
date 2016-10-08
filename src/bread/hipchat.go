@@ -47,7 +47,6 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		halMsg.Room = msg.Source.Room.Name
 	}
 	req := h.getRequest(msg, senderID)
-	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v req=%#v halMsg=%#v \n", breadMatch, halMatch, req, halMsg)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
 			for _, m := range svc.Methods {
@@ -64,6 +63,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if breadMatch && halMatch {
 		fmt.Println("WARN: both HAL9000 and Operator match. HAL9000 will be ignored")
 	}
+	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v req=%#v halMsg=%#v \n", breadMatch, halMatch, req, halMsg)
 	if !breadMatch && !halMatch {
 		h.inst.Instrument(&operator.Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
