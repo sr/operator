@@ -3,7 +3,7 @@ syntax = "proto3";
 package bread;
 
 import "google/protobuf/duration.proto";
-import "operator.proto";
+import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bread;
 
-import "operator.proto";
+import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
