@@ -78,6 +78,11 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				errC <- h.invoker(ctx, h.conn, req, h.pkg)
 			} else if hal {
 				_, err := h.hal9000.Dispatch(ctx, halMsg)
+				h.inst.Instrument(&operator.Event{
+					Key:     "hal9000_request_dispatched",
+					Request: req,
+					Error:   err,
+				})
 				errC <- err
 			} else {
 				errC <- errors.New("unhandled request")
