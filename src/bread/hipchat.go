@@ -39,21 +39,19 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	var (
-		opMatch, halMatch bool
-		req               = h.getRequest(msg, senderID)
-	)
+	var breadMatch, halMatch bool
 	halMsg := &hal9000.Message{Text: msg.Text, User: &hal9000.User{}}
 	if msg.Source != nil && msg.Source.User != nil && msg.Source.Room != nil {
 		halMsg.User.Email = msg.Source.User.Email
 		halMsg.User.Name = msg.Source.User.Login
 		halMsg.Room = msg.Source.Room.Name
 	}
+	req := h.getRequest(msg, senderID)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
 			for _, m := range svc.Methods {
 				if m.Name == req.Call.Method {
-					opMatch = true
+					breadMatch = true
 					break
 				}
 			}
@@ -62,26 +60,28 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r, err := h.hal9000.IsMatch(h.ctx, halMsg); err != nil && r != nil && r.Match {
 		halMatch = true
 	}
-	if opMatch && halMatch {
-		fmt.Println("WARN: both HAL9K and Operator match. HAL9K will be ignored")
+	if breadMatch && halMatch {
+		fmt.Println("WARN: both HAL9000 and Operator match. HAL9000 will be ignored")
 	}
-	if !opMatch && halMsg == nil {
+	if !breadMatch && !halMatch {
 		h.inst.Instrument(&operator.Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	go func(req *operator.Request, msg *hal9000.Message) {
+	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v\n", breadMatch, halMatch)
+	go func(bread bool, hal bool, req *operator.Request, halMsg *hal9000.Message) {
 		ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
 		defer cancel()
 		errC := make(chan error, 1)
 		go func() {
-			if req != nil {
+			if bread {
 				errC <- h.invoker(ctx, h.conn, req, h.pkg)
-			} else if msg != nil {
-				_, err := h.hal9000.Dispatch(ctx, msg)
+			} else if hal {
+				_, err := h.hal9000.Dispatch(ctx, halMsg)
 				errC <- err
+			} else {
+				errC <- errors.New("unhandled request")
 			}
-			errC <- errors.New("unhandled request")
 		}()
 		var err error
 		select {
@@ -96,7 +96,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Options: &operatorhipchat.MessageOptions{Color: "red"},
 			})
 		}
-	}(req, halMsg)
+	}(breadMatch, halMatch, req, halMsg)
 }
 
 func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.Request {
