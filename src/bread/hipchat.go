@@ -57,7 +57,9 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	if r, err := h.hal9000.IsMatch(h.ctx, halMsg); err != nil && r != nil && r.Match {
+	if r, err := h.hal9000.IsMatch(h.ctx, halMsg); err != nil {
+		fmt.Printf("DEBUG: hal9000 service error: %s\n", err)
+	} else if r != nil && r.Match {
 		halMatch = true
 	}
 	if breadMatch && halMatch {
