@@ -65,13 +65,12 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if breadMatch && halMatch {
 		fmt.Println("WARN: both HAL9000 and Operator match. HAL9000 will be ignored")
 	}
-	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v req=%#v halMsg=%#v \n", breadMatch, halMatch, req, halMsg)
 	if !breadMatch && !halMatch {
 		h.inst.Instrument(&operator.Event{Key: "handler_unmatched_message", Message: msg})
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	go func(bread bool, hal bool, req *operator.Request, halMsg *hal9000.Message) {
+	go func(bread bool, hal bool, req *operator.Request, msg *operator.Message, halMsg *hal9000.Message) {
 		ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
 		defer cancel()
 		errC := make(chan error, 1)
@@ -81,8 +80,8 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			} else if hal {
 				_, err := h.hal9000.Dispatch(ctx, halMsg)
 				h.inst.Instrument(&operator.Event{
-					Key:     "hal9000_request_dispatched",
-					Request: req,
+					Key:     "hal9000",
+					Message: msg,
 					Error:   err,
 				})
 				errC <- err
@@ -103,7 +102,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Options: &operatorhipchat.MessageOptions{Color: "red"},
 			})
 		}
-	}(breadMatch, halMatch, req, halMsg)
+	}(breadMatch, halMatch, req, msg, halMsg)
 }
 
 func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.Request {
