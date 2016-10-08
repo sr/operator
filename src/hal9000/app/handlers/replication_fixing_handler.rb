@@ -2,8 +2,8 @@ class ReplicationFixingHandler < ApplicationHandler
   config :repfix_url, default: "https://repfix-%datacenter%.pardot.com"
   config :datacenters, default: %w[dfw phx]
   config :default_datacenter, default: "dfw"
-  config :status_room, default: "1_ops@conf.btf.hipchat.com"
-  config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
+  config :status_room, default: ENV.fetch("REPFIX_STATUS_ROOM", "1_ops@conf.btf.hipchat.com")
+  config :replication_room, default: ENV.fetch("REPFIX_REPLICATION_ROOM", "1_ops-replication@conf.btf.hipchat.com")
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
 

@@ -72,7 +72,7 @@ module HAL9000
         config.handlers.zabbix_handler.pagerduty_service_key = ENV.fetch("ZABBIX_PAGERDUTY_SERVICE_KEY", "")
 
         # Set the Hipchat Chatroom
-        config.handlers.zabbix_handler.status_room = "1_ops@conf.btf.hipchat.com"
+        config.handlers.zabbix_handler.status_room = ENV.fetch("ZABBIX_STATUS_ROOM", "1_ops@conf.btf.hipchat.com")
 
         # Set the datacenters
         # config.handlers.zabbix_handler.datacenters = ['dfw','phx']
