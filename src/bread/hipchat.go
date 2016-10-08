@@ -47,6 +47,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		halMsg.Room = msg.Source.Room.Name
 	}
 	req := h.getRequest(msg, senderID)
+	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v req=%#v halMsg=%#v \n", breadMatch, halMatch, req, halMsg)
 	if req != nil {
 		if svc, ok := h.svcInfo[req.Call.Service]; ok {
 			for _, m := range svc.Methods {
@@ -68,7 +69,6 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	fmt.Printf("DEBUG: breadMatch=%v halMatch=%v\n", breadMatch, halMatch)
 	go func(bread bool, hal bool, req *operator.Request, halMsg *hal9000.Message) {
 		ctx, cancel := context.WithTimeout(h.ctx, h.timeout)
 		defer cancel()
