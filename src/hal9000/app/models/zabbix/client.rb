@@ -10,7 +10,7 @@ module Zabbix
     def initialize(url:, user:, password:)
       orig_http_proxy = ENV["http_proxy"]
       ENV["http_proxy"] = ENV.fetch("HAL9000_HTTP_PROXY", nil)
-      @client = ZabbixApi.new(
+      @client = ZabbixApi.connect(
         url: url,
         user: user,
         password: password,
