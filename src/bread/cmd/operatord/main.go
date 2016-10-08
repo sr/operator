@@ -250,8 +250,8 @@ func run(invoker operator.InvokerFunc) error {
 			grpcServer.GetServiceInfo(),
 			hal,
 			config.timeout,
-			pkg,
 			config.prefix,
+			pkg,
 		); err != nil {
 			return err
 		}
