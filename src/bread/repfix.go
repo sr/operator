@@ -20,9 +20,9 @@ func (h *repfixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte(err.Error()))
 		} else {
 			resp, err := h.hal.CreateRepfixError(context.TODO(), &hal9000.CreateRepfixErrorRequest{
-				Hostname:       r.PostForm.Get("hostname"),
-				Error:          r.PostForm.Get("error"),
-				MysqlLastError: r.PostForm.Get("mysql_last_error"),
+				Hostname:       r.FormValue("hostname"),
+				Error:          r.FormValue("error"),
+				MysqlLastError: r.FormValue("mysql_last_error"),
 			})
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
