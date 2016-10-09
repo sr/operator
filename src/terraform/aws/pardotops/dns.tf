@@ -296,7 +296,7 @@ resource "aws_route53_record" "graphite-phx_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "hal9000_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name = "hal9000.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["hal9000-production-1569842332.us-east-1.elb.amazonaws.com."]
+  records = ["${aws_alb.operator_production.dns_name}"]
   type = "CNAME"
   ttl = "900"
 }
