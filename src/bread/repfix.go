@@ -3,7 +3,6 @@ package bread
 import (
 	"bread/hal9000"
 	"context"
-	"fmt"
 	"net/http"
 )
 
@@ -20,7 +19,6 @@ func (h *repfixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 		} else {
-			fmt.Printf("DEBUG: %#v\n", r.PostForm)
 			resp, err := h.hal.CreateRepfixError(context.TODO(), &hal9000.CreateRepfixErrorRequest{
 				Hostname:       r.FormValue("hostname"),
 				Error:          r.FormValue("error"),
