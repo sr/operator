@@ -42,7 +42,7 @@ module Hal9000
         request = {
           hostname: request.hostname.dup,
           error: request.error.dup,
-          mysql_last_error: request.mysql_last_error.dup,
+          mysql_last_error: request.mysql_last_error.dup
         }
         status, body = repfix_handler.create_replication_error(request)
         Hal9000::CreateRepfixErrorResponse.new(status: status, body: body)
