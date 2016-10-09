@@ -10,7 +10,7 @@ module Hal9000
     # rubocop:disable Style/PredicateName
     def is_match(request, _call)
       exception_logger do
-        Lita.logger.info "Received hal9000.IsMatch request: #{request.inspect}"
+        Lita.logger.info "rpc=\"hal9000.IsMatch\" request=#{request.inspect}"
 
         message = build_message(request)
 
@@ -27,11 +27,25 @@ module Hal9000
 
     def dispatch(request, _call)
       exception_logger do
-        Lita.logger.info "Received hal9000.Dispatch request: #{request.inspect}"
+        Lita.logger.info "rpc=\"hal9000.Dispatch\" request=#{request.inspect}"
 
         @robot.receive(build_message(request))
 
         Hal9000::Response.new
+      end
+    end
+
+    def create_repfix_error(request, _call)
+      exception_logger do
+        Lita.logger.info "rpc=\"hal9000.CreateRepfixError\" request=#{request.inspect}"
+
+        request = {
+          hostname: request.hostname.dup,
+          error: request.error.dup,
+          mysql_last_error: request.mysql_last_error.dup,
+        }
+        status, body = repfix_handler.create_replication_error(request)
+        Hal9000::CreateRepfixErrorResponse.new(status: status, body: body)
       end
     end
 
@@ -40,7 +54,7 @@ module Hal9000
     def exception_logger
       yield
     rescue
-      Lita.logger.error "Got an exception in RobotServer: #{$!.inspect}"
+      Lita.logger.error "at=exception Got an exception in RobotServer: #{$!.inspect}"
       Lita.logger.error $!.backtrace.join("\n")
 
       raise
@@ -53,8 +67,8 @@ module Hal9000
       Lita::Message.new(@robot, request.text.dup, source)
     end
 
-    def adapter
-      @robot.__send__(:adapter)
+    def repfix_handler
+      @repfix_handler ||= ReplicationFixingHandler.new(@robot)
     end
   end
 end

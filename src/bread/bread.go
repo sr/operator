@@ -223,6 +223,10 @@ func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 	return &wrapperHandler{logger, handler}
 }
 
+func NewRepfixHandler(hal hal9000.RobotClient) http.Handler {
+	return &repfixHandler{hal}
+}
+
 // NewHipchatHandler returns an http.Handler that handles incoming HipChat
 // webhook requests.
 func NewHipchatHandler(

@@ -7,6 +7,7 @@ option go_package = "hal9000";
 service Robot {
 	rpc IsMatch(Message) returns (Response);
 	rpc Dispatch(Message) returns (Response);
+	rpc CreateRepfixError(CreateRepfixErrorRequest) returns (CreateRepfixErrorResponse);
 }
 
 message Message {
@@ -22,4 +23,15 @@ message User {
 
 message Response {
 	bool match = 1;
+}
+
+message CreateRepfixErrorRequest {
+	string hostname = 1;
+	string error = 2;
+	string mysql_last_error = 3;
+}
+
+message CreateRepfixErrorResponse {
+	int64 status = 1;
+	string body = 2;
 }

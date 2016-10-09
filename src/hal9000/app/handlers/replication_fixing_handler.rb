@@ -7,9 +7,6 @@ class ReplicationFixingHandler < ApplicationHandler
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
 
-  http.get "/replication/_ping", :ping
-  http.post "/replication/errors", :create_replication_error
-
   # http://rubular.com/r/Aos770vcM3
   route /^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?(?:\s+(?<minutes>\d+))?/i, :create_ignore, command: true, help: {
     "ignore SHARD_ID" => "Ignores db-SHARD_ID for 15 minutes in the default datacenter",
@@ -118,14 +115,7 @@ class ReplicationFixingHandler < ApplicationHandler
     robot.join(config.replication_room)
   end
 
-  def ping(_request, response)
-    response.status = 200
-    response.body << ""
-  end
-
-  def create_replication_error(request, response)
-    body = request.POST
-    log.debug("repfix create-error request=#{request.inspect} body=#{body.inspect} status_room=#{@status_room.inspect} repl_room=#{@replication_room.inspect}")
+  def create_replication_error(body)
     if body["hostname"]
       begin
         hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
@@ -165,17 +155,14 @@ class ReplicationFixingHandler < ApplicationHandler
           end
         end
 
-        response.status = 201
+        [201, ""]
       rescue ::ReplicationFixing::Hostname::MalformedHostname
-        response.status = 400
-        response.body << JSON.dump("error" => "malformed hostname")
+        [400, JSON.dump("error" => "malformed hostname")]
       rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
-        response.status = 400
-        response.body << JSON.dump("error" => e.to_s)
+        [400, JSON.dump("error" => e.to_s)]
       end
     else
-      response.status = 400
-      response.body << JSON.dump("error" => "hostname missing")
+      [400, JSON.dump("error" => "hostname missing")]
     end
   end
 

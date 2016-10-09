@@ -17,6 +17,7 @@ module Hal9000
 
       rpc :IsMatch, Message, Response
       rpc :Dispatch, Message, Response
+      rpc :CreateRepfixError, CreateRepfixErrorRequest, CreateRepfixErrorResponse
     end
 
     Stub = Service.rpc_stub_class

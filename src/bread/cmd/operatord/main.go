@@ -284,6 +284,7 @@ func run(invoker operator.InvokerFunc) error {
 			),
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
+		httpServer.Handle("/replication", bread.NewHandler(logger, bread.NewRepfixHandler(hal)))
 		logger.Info(&breadpb.ServerStartupNotice{
 			Protocol: "http",
 			Address:  config.httpAddr,
