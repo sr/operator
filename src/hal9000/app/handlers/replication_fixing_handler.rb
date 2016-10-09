@@ -125,7 +125,7 @@ class ReplicationFixingHandler < ApplicationHandler
 
   def create_replication_error(request, response)
     body = request.POST
-    log.debug("repfix create-error request=#{request.inspect} body=#{body.inspecy} status_room=#{@status_room.inspect} repl_room=#{@replication_room.inspect}")
+    log.debug("repfix create-error request=#{request.inspect} body=#{body.inspect} status_room=#{@status_room.inspect} repl_room=#{@replication_room.inspect}")
     if body["hostname"]
       begin
         hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
