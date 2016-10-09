@@ -399,9 +399,13 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def build_zabbix_client(datacenter:)
-    ::Zabbix::Client.new(url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
+    options = {
+      url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
       user: config.zabbix_user,
-      password: config.zabbix_password)
+      password: config.zabbix_password
+    }
+
+    Zabbix::Client.new(options)
   end
 
   def parse_options(options)

@@ -1,8 +1,9 @@
 source "https://artifactory.dev.pardot.com/artifactory/api/gems/pd-gem/"
 
 gem "activesupport", "~> 5.0"
-gem "lita", "4.7.0"
-gem "lita-hipchat", "3.0.2"
+gem "grpc", "~> 1.0.0"
+gem "hipchat", "~> 1.5.4"
+gem "lita", "~> 4.7.0"
 gem "pagerduty", "~> 2.1.0"
 gem "zabbixapi", "~> 2.4"
 
@@ -11,8 +12,3 @@ group :test do
   gem "rspec", "~> 3.4"
   gem "webmock", "~> 1.23"
 end
-
-# Add handlers to give Lita new functionality.
-# For example:
-# gem "lita-google-images"
-# gem "lita-karma"

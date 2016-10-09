@@ -8,11 +8,15 @@ module Zabbix
     MAINTENANCE_GROUP_NAME = "zMaintenance".freeze
 
     def initialize(url:, user:, password:)
+      orig_http_proxy = ENV["http_proxy"]
+      ENV["http_proxy"] = ENV.fetch("HAL9000_HTTP_PROXY", nil)
       @client = ZabbixApi.connect(
         url: url,
         user: user,
         password: password,
       )
+    ensure
+      ENV["http_proxy"] = orig_http_proxy
     end
 
     def ensure_host_in_zabbix_maintenance_group(host)

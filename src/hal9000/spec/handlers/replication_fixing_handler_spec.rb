@@ -8,6 +8,7 @@ describe ReplicationFixingHandler, lita_handler: true do
 
   describe "POST /replication/errors" do
     it "attempts to fix the error and notifies the ops room" do
+      pending "This needs to be migrated to gRPC"
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/1")
         .and_return(
           { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
@@ -28,6 +29,7 @@ describe ReplicationFixingHandler, lita_handler: true do
     end
 
     it "notifies the ops-replication room with a sanitized error messages" do
+      pending "This needs to be migrated to gRPC"
       stub_request(:get, "https://repfix-dfw.pardot.com/replication/fixes/for/db/1/1")
         .and_return(
           { body: JSON.dump("is_erroring" => true, "is_fixable" => true) },
@@ -48,6 +50,7 @@ describe ReplicationFixingHandler, lita_handler: true do
     end
 
     it "responds with HTTP 400 if hostname is missing" do
+      pending "This needs to be migrated to gRPC"
       response = http.post("/replication/errors",
                            URI.encode_www_form({}),
                            "Content-Type" => "application/x-www-form-urlencoded")

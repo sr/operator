@@ -15,7 +15,17 @@ module ReplicationFixing
       @fixing_status_client = fixing_status_client
       @log = log
 
-      @repfix = Faraday.new(url: @repfix_url, ssl: { verify: true }) do |faraday|
+      options = {
+        url: @repfix_url,
+        ssl: { verify: true }
+      }
+
+      proxy = ENV.fetch("HAL9000_HTTP_PROXY", nil)
+      if proxy
+        options[:proxy] = { uri: proxy }
+      end
+
+      @repfix = Faraday.new(options) do |faraday|
         faraday.request :url_encoded
         faraday.adapter Faraday.default_adapter
       end
