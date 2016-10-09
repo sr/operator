@@ -53,21 +53,6 @@ resource "aws_alb_target_group" "operator" {
   }
 }
 
-resource "aws_alb_target_group" "hal9000" {
-  name     = "hal9000-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = "${aws_vpc.internal_apps.id}"
-
-  health_check {
-    path = "/replication/_ping"
-    interval = 10
-    timeout = 5
-    unhealthy_threshold = 2
-    healthy_threshold = 5
-  }
-}
-
 resource "aws_alb_listener" "operator" {
   load_balancer_arn = "${aws_alb.operator_production.arn}"
   port = "443"
@@ -108,21 +93,6 @@ resource "aws_alb_listener_rule" "operator_hipchat" {
   condition {
     field = "path-pattern"
     values = ["/hipchat/*"]
-  }
-}
-
-resource "aws_alb_listener_rule" "operator_hal9000_replication" {
-  listener_arn = "${aws_alb_listener.operator.arn}"
-  priority = 3
-
-  action {
-    type = "forward"
-    target_group_arn = "${aws_alb_target_group.hal9000.arn}"
-  }
-
-  condition {
-    field = "path-pattern"
-    values = ["/replication/*"]
   }
 }
 
