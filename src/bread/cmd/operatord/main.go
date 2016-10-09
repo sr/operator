@@ -113,17 +113,20 @@ func run(invoker operator.InvokerFunc) error {
 		return fmt.Errorf("required flag missing: addr-grpc")
 	}
 	var (
-		logger protolog.Logger
-		inst   operator.Instrumenter
-		auth   operator.Authorizer
-		sender operator.Sender
+		httpServer *http.ServeMux
+		logger     protolog.Logger
+		inst       operator.Instrumenter
+		auth       operator.Authorizer
+		sender     operator.Sender
 
 		store    operatorhipchat.ClientCredentialsStore
 		verifier bread.OTPVerifier
 		db       *sql.DB
+		hal      hal9000.RobotClient
 
 		err error
 	)
+	httpServer = http.NewServeMux()
 	logger = bread.NewLogger()
 	inst = bread.NewInstrumenter(logger)
 	if config.dev {
@@ -177,6 +180,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err := db.Ping(); err != nil {
 			return err
 		}
+		httpServer.Handle("/_ping", bread.NewHandler(logger, bread.NewPingHandler(db)))
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
 		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
@@ -217,6 +221,19 @@ func run(invoker operator.InvokerFunc) error {
 		errC <- grpcServer.Serve(grpcList)
 	}()
 	logger.Info(msg)
+	if config.halAddr != "" {
+		if cc, err := grpc.Dial(
+			config.halAddr,
+			grpc.WithBlock(),
+			grpc.WithTimeout(grpcTimeout),
+			grpc.WithInsecure(),
+		); err == nil {
+			hal = hal9000.NewRobotClient(cc)
+		} else {
+			return err
+		}
+		httpServer.Handle("/replication/", bread.NewHandler(logger, bread.NewRepfixHandler(hal)))
+	}
 	if !config.dev {
 		var webhookHandler http.Handler
 		conn, err := grpc.Dial(
@@ -226,17 +243,6 @@ func run(invoker operator.InvokerFunc) error {
 			grpc.WithInsecure(),
 		)
 		if err != nil {
-			return err
-		}
-		var hal hal9000.RobotClient
-		if cc, err := grpc.Dial(
-			config.halAddr,
-			grpc.WithBlock(),
-			grpc.WithTimeout(grpcTimeout),
-			grpc.WithInsecure(),
-		); err == nil {
-			hal = hal9000.NewRobotClient(cc)
-		} else {
 			return err
 		}
 		const pkg = "bread"
@@ -255,11 +261,6 @@ func run(invoker operator.InvokerFunc) error {
 		); err != nil {
 			return err
 		}
-		httpServer := http.NewServeMux()
-		httpServer.Handle(
-			"/_ping",
-			bread.NewHandler(logger, bread.NewPingHandler(db)),
-		)
 		addonURL, err := url.Parse(config.hipchatAddonURL)
 		if err != nil {
 			return err
@@ -284,7 +285,8 @@ func run(invoker operator.InvokerFunc) error {
 			),
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
-		httpServer.Handle("/replication/", bread.NewHandler(logger, bread.NewRepfixHandler(hal)))
+	}
+	if config.httpAddr != "" {
 		logger.Info(&breadpb.ServerStartupNotice{
 			Protocol: "http",
 			Address:  config.httpAddr,

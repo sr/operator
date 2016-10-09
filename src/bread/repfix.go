@@ -3,6 +3,7 @@ package bread
 import (
 	"bread/hal9000"
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -15,17 +16,23 @@ func (h *repfixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		w.WriteHeader(http.StatusOK)
 	case "POST":
-		resp, err := h.hal.CreateRepfixError(context.TODO(), &hal9000.CreateRepfixErrorRequest{
-			Hostname:       r.FormValue("hostname"),
-			Error:          r.FormValue("error"),
-			MysqlLastError: r.FormValue("mysql_last_error"),
-		})
-		if err != nil {
+		if err := r.ParseMultipartForm(1000000); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 		} else {
-			w.WriteHeader(int(resp.Status))
-			_, _ = w.Write([]byte(resp.Body))
+			fmt.Printf("DEBUG: %#v\n", r.PostForm)
+			resp, err := h.hal.CreateRepfixError(context.TODO(), &hal9000.CreateRepfixErrorRequest{
+				Hostname:       r.FormValue("hostname"),
+				Error:          r.FormValue("error"),
+				MysqlLastError: r.FormValue("mysql_last_error"),
+			})
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(err.Error()))
+			} else {
+				w.WriteHeader(int(resp.Status))
+				_, _ = w.Write([]byte(resp.Body))
+			}
 		}
 	default:
 		w.WriteHeader(http.StatusNotFound)
