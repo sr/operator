@@ -96,6 +96,21 @@ resource "aws_alb_listener_rule" "operator_hipchat" {
   }
 }
 
+resource "aws_alb_listener_rule" "operator_replication" {
+  listener_arn = "${aws_alb_listener.operator.arn}"
+  priority = 3
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.operator.arn}"
+  }
+
+  condition {
+    field = "path-pattern"
+    values = ["/replication*"]
+  }
+}
+
 resource "aws_ecs_cluster" "operator_production" {
   name = "operator_production"
 }
