@@ -125,6 +125,7 @@ class ReplicationFixingHandler < ApplicationHandler
 
   def create_replication_error(request, response)
     body = request.POST
+    log.debug("repfix create-error request=#{request.inspect} body=#{body.inspecy} status_room=#{@status_room.inspect} repl_room=#{@replication_room.inspect}")
     if body["hostname"]
       begin
         hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
@@ -141,6 +142,7 @@ class ReplicationFixingHandler < ApplicationHandler
             @alerting_manager.notify_replication_disabled_but_many_errors
           end
         else
+          log.debug("Shard is NOT ignored: #{shard}")
           error = body["error"].to_s
           unless error.empty?
             robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
@@ -148,6 +150,7 @@ class ReplicationFixingHandler < ApplicationHandler
 
           mysql_last_error = body["mysql_last_error"].to_s
           unless mysql_last_error.empty?
+            log.debug("sending message to #{@replication_room.inspect}")
             sanitized_error = @sanitizer.sanitize(mysql_last_error)
             robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
           end
