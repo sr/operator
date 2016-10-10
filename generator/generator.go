@@ -18,7 +18,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-const undocumentedPlaceholder = "Undocumented."
+const undocumentedPlaceholder = "Undocumented"
 
 type Descriptor struct {
 	Imports  map[string]string
