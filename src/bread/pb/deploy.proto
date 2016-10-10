@@ -6,6 +6,7 @@ import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
+// Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS
 service Deploy {
 	// List what can be deployed
 	rpc ListTargets(ListTargetsRequest) returns (operator.Response);

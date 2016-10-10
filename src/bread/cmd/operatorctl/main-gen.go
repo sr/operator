@@ -20,7 +20,7 @@ var cmd = operator.NewCommand(
 	[]operator.ServiceCommand{
 		{
 			Name:     "deploy",
-			Synopsis: `Undocumented.`,
+			Synopsis: `Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS`,
 			Methods: []operator.MethodCommand{
 				{
 					Name:     "list-targets",
