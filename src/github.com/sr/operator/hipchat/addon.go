@@ -58,9 +58,12 @@ func newAddonHandler(store ClientCredentialsStore, config *AddonConfig) *addonHa
 func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" && req.URL.Path == h.config.URL.Path {
 		var name, key, avatarURL string
-		name = req.URL.Query().Get("name")
-		key = req.URL.Query().Get("key")
-		avatarURL = req.URL.Query().Get("avatar")
+		// name = req.URL.Query().Get("name")
+		// key = req.URL.Query().Get("key")
+		// avatarURL = req.URL.Query().Get("avatar")
+		name = "HAL9000"
+		avatarURL = "https://hipchat.dev.pardot.com/files/photos/342/NLK9uGk1ixT70wk.png"
+		key = "operator-aws"
 		if name == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("name query param is required\n"))
