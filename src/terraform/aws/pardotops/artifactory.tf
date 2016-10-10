@@ -188,6 +188,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
     Name = "pardot0-artifactory1-1-ue1"
     terraform = "true"
   }
+  private_ip="172.28.0.21"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
@@ -216,6 +217,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
     Name = "pardot0-artifactory1-2-ue1"
     terraform = "true"
   }
+  private_ip="172.28.0.83"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
@@ -244,6 +246,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
     Name = "pardot0-artifactory1-3-ue1"
     terraform = "true"
   }
+  private_ip="172.28.0.54"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
