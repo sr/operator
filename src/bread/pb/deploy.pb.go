@@ -88,8 +88,11 @@ const _ = grpc.SupportPackageIsVersion3
 // Client API for Deploy service
 
 type DeployClient interface {
+	// List what can be deployed
 	ListTargets(ctx context.Context, in *ListTargetsRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// List the ten most recent builds for a given target
 	ListBuilds(ctx context.Context, in *ListBuildsRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// Trigger a deploy of a build to given target
 	Trigger(ctx context.Context, in *TriggerRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
@@ -131,8 +134,11 @@ func (c *deployClient) Trigger(ctx context.Context, in *TriggerRequest, opts ...
 // Server API for Deploy service
 
 type DeployServer interface {
+	// List what can be deployed
 	ListTargets(context.Context, *ListTargetsRequest) (*operator.Response, error)
+	// List the ten most recent builds for a given target
 	ListBuilds(context.Context, *ListBuildsRequest) (*operator.Response, error)
+	// Trigger a deploy of a build to given target
 	Trigger(context.Context, *TriggerRequest) (*operator.Response, error)
 }
 

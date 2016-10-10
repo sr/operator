@@ -31,6 +31,7 @@ generate: $(PROTOC) $(GRPC_RUBY_PLUGIN) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCT
 		-I$(GOPATH)/src \
 		--operatorctl_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORCTL_DIR) \
 		--operatord_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORD_DIR) \
+		--operatorlitahelp_out=import_path=$(SVC_IMPORT_PATH):src/hal9000/config \
 		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) \
 		$(GOPATH)/src/bread/pb/*.proto
 	$< \

@@ -103,9 +103,13 @@ const _ = grpc.SupportPackageIsVersion3
 // Client API for Ping service
 
 type PingClient interface {
+	// Test OTP verification
 	Otp(ctx context.Context, in *OtpRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// Reply with PONG if everything is working
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// Trigger a slow request, for testing timeout handling
 	SlowLoris(ctx context.Context, in *SlowLorisRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// Reply with the email of the current authenticated user
 	Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
@@ -156,9 +160,13 @@ func (c *pingClient) Whoami(ctx context.Context, in *WhoamiRequest, opts ...grpc
 // Server API for Ping service
 
 type PingServer interface {
+	// Test OTP verification
 	Otp(context.Context, *OtpRequest) (*operator.Response, error)
+	// Reply with PONG if everything is working
 	Ping(context.Context, *PingRequest) (*operator.Response, error)
+	// Trigger a slow request, for testing timeout handling
 	SlowLoris(context.Context, *SlowLorisRequest) (*operator.Response, error)
+	// Reply with the email of the current authenticated user
 	Whoami(context.Context, *WhoamiRequest) (*operator.Response, error)
 }
 

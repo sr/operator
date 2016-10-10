@@ -9,8 +9,9 @@ else
   Bundler.require(:default)
 end
 
-require "hal9000"
 require "lita/cli"
+require "hal9000"
+require "hal9000/lita_help"
 
 module HAL9000
   class Application

@@ -7,8 +7,11 @@ import "github.com/sr/operator/operator.proto";
 option go_package = "breadpb";
 
 service Deploy {
+	// List what can be deployed
 	rpc ListTargets(ListTargetsRequest) returns (operator.Response);
+	// List the ten most recent builds for a given target
 	rpc ListBuilds(ListBuildsRequest) returns (operator.Response);
+	// Trigger a deploy of a build to given target
 	rpc Trigger(TriggerRequest) returns (operator.Response);
 }
 
