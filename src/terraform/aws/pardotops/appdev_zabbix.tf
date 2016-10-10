@@ -24,10 +24,18 @@ resource "aws_instance" "appdev_zabbix1" {
   }
 }
 
-resource "aws_route53_record" "appdev_zabbix1_arecord" {
+resource "aws_route53_record" "appdev_zabbix1_Arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name = "pardot2-monitor1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.appdev_zabbix1.private_ip}"]
+  type = "A"
+  ttl = "900"
+}
+
+resource "aws_route53_record" "zabbix_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "zabbix.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
   type = "A"
   ttl = "900"
 }
