@@ -2,6 +2,7 @@ package operatorhipchat
 
 import (
 	"database/sql"
+	"errors"
 )
 
 type sqlStore struct {
@@ -14,6 +15,9 @@ func newSQLStore(db *sql.DB, hostname string) *sqlStore {
 }
 
 func (s *sqlStore) Create(client *ClientCredentials) error {
+	if client.ID == "" || client.Secret == "" {
+		return errors.New("client ID and/or secret is null")
+	}
 	_, err := s.db.Exec(`
 		INSERT INTO hipchat_client_credentials (
 			created_at,
