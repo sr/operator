@@ -276,10 +276,11 @@ func run(invoker operator.InvokerFunc) error {
 				operatorhipchat.NewAddonHandler(
 					store,
 					&operatorhipchat.AddonConfig{
-						Namespace:  config.hipchatNamespace,
-						URL:        addonURL,
-						Homepage:   bread.RepoURL,
-						WebhookURL: webhookURL,
+						Namespace:     config.hipchatNamespace,
+						URL:           addonURL,
+						Homepage:      bread.RepoURL,
+						WebhookURL:    webhookURL,
+						WebhookPrefix: config.prefix,
 					},
 				),
 			),

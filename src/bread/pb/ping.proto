@@ -7,9 +7,13 @@ import "github.com/sr/operator/operator.proto";
 option go_package = "breadpb";
 
 service Ping {
+	// Test OTP verification
 	rpc Otp(OtpRequest) returns (operator.Response);
+	// Reply with PONG if everything is working
 	rpc Ping(PingRequest) returns (operator.Response);
+	// Trigger a slow request, for testing timeout handling
 	rpc SlowLoris(SlowLorisRequest) returns (operator.Response);
+	// Reply with the email of the current authenticated user
 	rpc Whoami(WhoamiRequest) returns (operator.Response);
 }
 

@@ -108,6 +108,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "canoe_production",
 			ECSService:    "canoe",
+			ContainerName: "canoe",
 			Image:         "build/bread/canoe/app",
 		},
 		{
@@ -118,6 +119,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "hal9000_production",
 			ECSService:    "hal9000",
+			ContainerName: "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
 		{
@@ -128,6 +130,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
+			ContainerName: "operatord",
 			Image:         "build/bread/operatord/app",
 		},
 		{
@@ -138,6 +141,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
+			ContainerName: "parbot",
 			Image:         "build/bread/parbot/app",
 		},
 		{
@@ -148,6 +152,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
+			ContainerName: "teampass",
 			Image:         "build/bread/tempass/app",
 		},
 	}
@@ -171,6 +176,7 @@ type DeployTarget struct {
 	Canoe         bool
 	ECSCluster    string
 	ECSService    string
+	ContainerName string
 	Image         string
 }
 

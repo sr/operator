@@ -122,7 +122,7 @@ class ZabbixHandler < ApplicationHandler
         maintenance_supervisor.on_host_maintenance_expired = proc { |host| host_maintenance_expired(host) }
         maintenance_supervisor.ensure_supervising
       rescue => e
-        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, "**************"))
+        log_error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
       end
 
       begin
@@ -134,7 +134,7 @@ class ZabbixHandler < ApplicationHandler
         monitor_supervisor.on_monitor_unpaused = proc { |monitor| monitor_expired(monitor) }
         monitor_supervisor.ensure_supervising
       rescue => e
-        log.error("Error creating Zabbix monitor supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, "**************"))
+        log_error "Error creating Zabbix monitor supervisor for #{datacenter}: #{e}"
       end
     end
     @status_room = ::Lita::Source.new(room: config.status_room)
@@ -162,7 +162,7 @@ class ZabbixHandler < ApplicationHandler
     response.reply_with_mention(msg.to_s)
   rescue => e
     response.reply_with_mention(CHAT_ERRMSG)
-    log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, "**************"))
+    log_error "Sorry, something went wrong: #{e}"
   end
 
   def monitor_info(response)
@@ -227,7 +227,7 @@ class ZabbixHandler < ApplicationHandler
     end
   rescue => e
     response.reply_with_mention(CHAT_ERRMSG)
-    log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, "**************"))
+    log_error("Sorry, something went wrong: #{e}")
   end
 
   def pause_monitor(response)
@@ -260,7 +260,7 @@ class ZabbixHandler < ApplicationHandler
     response.reply_with_mention("OK, I've paused zabbixmon for the #{datacenter} datacenter until #{until_time}")
   rescue => e
     response.reply_with_mention(CHAT_ERRMSG)
-    log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, "**************"))
+    log_error("Sorry, something went wrong: #{e}")
   end
 
   def stop_maintenance(response)
@@ -287,7 +287,7 @@ class ZabbixHandler < ApplicationHandler
     end
   rescue => e
     response.reply_with_mention(CHAT_ERRMSG)
-    log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, "**************"))
+    log_error("Sorry, something went wrong: #{e}")
   end
 
   def unpause_monitor(response)
@@ -302,7 +302,7 @@ class ZabbixHandler < ApplicationHandler
     response.reply_with_mention("OK, I've unpaused zabbixmon for datacenter #{datacenter}. Monitoring will resume.")
   rescue => e
     response.reply_with_mention(CHAT_ERRMSG)
-    log.error("Sorry, something went wrong: #{e}".gsub(config.zabbix_password, "**************"))
+    log_error("Sorry, something went wrong: #{e}")
   end
 
   def host_maintenance_expired(hostname)
@@ -360,7 +360,7 @@ class ZabbixHandler < ApplicationHandler
         end
       end
     rescue => e
-      log.error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})".gsub(config.zabbix_password, "**************"))
+      log_error("::Lita::Handlers::Zabbix::run_monitors has failed (internal loop) (#{e})")
     end
     success
   end
@@ -417,7 +417,7 @@ class ZabbixHandler < ApplicationHandler
       log.info("Paging sequence initiated. Paging pagerduty.")
       page_r_doodie(error_msg, data_center)
     end
-    whining = "#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}. Details: #{error_msg}".gsub(config.zabbix_password, "**************")
+    whining = scrub_password("#{monitorname} has encountered an error verifying the status of Zabbix-#{data_center}. Details: #{error_msg}")
     log.info("Telling hipchat channel #{@status_room}: #{whining}: #{error_msg}")
     whining = "@all : #{whining}" if notify_hipchat_channel
     robot.send_message(@status_room, whining)
@@ -433,12 +433,26 @@ class ZabbixHandler < ApplicationHandler
         robot.send_message(@status_room, errmsg)
       end
     rescue => e # error and report
-      log.error("[lita-zabbix] error sending page: #{e}".gsub(config.zabbix_password, "**************"))
+      log_error("[lita-zabbix] error sending page: #{e}")
     end
   rescue ::Lita::Handlers::Zabbix::PagerFailed # but consume the error and keep on truckin'
     errmsg = "[lita-zabbix] Error sending page: ::Zabbix::PagerFailed"
     log.error(errmsg)
     errmsg = "@all : #{errmsg}" if config.monitor_hipchat_notify
     robot.send_message(@status_room, errmsg)
+  end
+
+  def log_error(msg)
+    unless `hostname`.chomp.include?("internal.salesforce.com")
+      log.error(scrub_password(msg))
+    end
+  end
+
+  def scrub_password(str)
+    if config.zabbix_password.empty?
+      str
+    else
+      str.gsub(config.zabbix_password, "****")
+    end
   end
 end

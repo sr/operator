@@ -97,7 +97,17 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 	if err != nil {
 		return nil, err
 	}
-	out.TaskDefinition.ContainerDefinitions[0].Image = aws.String(req.Build.GetArtifactURL())
+	var container *ecs.ContainerDefinition
+	for _, c := range out.TaskDefinition.ContainerDefinitions {
+		if *c.Name == req.Target.ContainerName {
+			container = c
+			break
+		}
+	}
+	if container == nil {
+		return nil, fmt.Errorf(`No container "%s" found in task definition for %s`, req.Target.ContainerName, req.Target.Name)
+	}
+	container.Image = aws.String(req.Build.GetArtifactURL())
 	newTask, err := d.ecs.RegisterTaskDefinition(
 		&ecs.RegisterTaskDefinitionInput{
 			ContainerDefinitions: out.TaskDefinition.ContainerDefinitions,
