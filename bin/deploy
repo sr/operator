@@ -1,4 +1,0 @@
-#!/bin/sh
-PATH="$(dirname "$0")/../src/build:$PATH"
-export PATH
-exec deploy "$@"
