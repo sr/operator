@@ -3,6 +3,15 @@ resource "aws_security_group" "appdev_tools_server" {
   description = "Tools Server for the AWS environment"
   vpc_id = "${aws_vpc.appdev.id}"
 
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
+        "${aws_eip.appdev_bastion_eip.public_ip}/32",
+        "${aws_instance.appdev_bastion.private_ip}/32"
+    ]
+  }
   egress {
     from_port = 0
     to_port = 0
@@ -22,8 +31,7 @@ resource "aws_instance" "appdev_tools_server" {
 	delete_on_termination = true
   }
   vpc_security_group_ids = [
-    "${aws_security_group.appdev_tools_server.id}",
-    "${aws_security_group.appdev_vpc_default.id}"
+    "${aws_security_group.appdev_tools_server.id}"
   ]
   tags {
     Name = "${var.environment_appdev["pardot_env_id"]}-tools1-1-${var.environment_appdev["dc_id"]}"
