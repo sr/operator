@@ -4,13 +4,13 @@ resource "aws_security_group" "appdev_tools_server" {
   vpc_id = "${aws_vpc.appdev.id}"
 
   ingress {
-      from_port = 22
-      to_port = 22
-      protocol = "tcp"
-      cidr_blocks = [
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [
         "${aws_eip.appdev_bastion_eip.public_ip}/32",
         "${aws_instance.appdev_bastion.private_ip}/32"
-      ]
+    ]
     }
   egress {
     from_port = 0
