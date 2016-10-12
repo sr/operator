@@ -21,3 +21,7 @@ variable "pardot_ci_nat_gw_public_ip" {
 variable "elastic_load_balancing_acct_number" {
   default = "127311923021"
 }
+
+variable "pardot_ci_vpc_id" {
+  default = "vpc-6d80c40a"
+}

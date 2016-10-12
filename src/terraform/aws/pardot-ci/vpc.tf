@@ -1,3 +1,7 @@
+variable "pardot_ci_to_artifactory_integration_vpc_link_id" {
+  default = "pcx-a03cb7c9"
+}
+
 resource "aws_vpc" "pardot_ci" {
   cidr_block           = "172.27.0.0/16"
   enable_dns_support   = true
@@ -100,6 +104,11 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
     cidr_block                = "172.26.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.pardotops_appdev_and_pardot_ci_vpc_peering.id}"
   }
+
+  route {
+    cidr_block                = "172.28.0.0/24"
+    vpc_peering_connection_id = "${var.pardot_ci_to_artifactory_integration_vpc_link_id}"
+  }
 }
 
 resource "aws_route" "pardot_ci_to_atlassian_tools" {
@@ -111,6 +120,12 @@ resource "aws_route" "pardot_ci_to_atlassian_tools" {
 resource "aws_route" "pardot_ci_to_pardotops_appdev" {
   destination_cidr_block    = "172.26.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.pardotops_appdev_and_pardot_ci_vpc_peering.id}"
+  route_table_id            = "${aws_vpc.pardot_ci.main_route_table_id}"
+}
+
+resource "aws_route" "pardot_ci_to_artifactory_integration" {
+  destination_cidr_block    = "172.28.0.0/24"
+  vpc_peering_connection_id = "${var.pardot_ci_to_artifactory_integration_vpc_link_id}"
   route_table_id            = "${aws_vpc.pardot_ci.main_route_table_id}"
 }
 

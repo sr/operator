@@ -15,7 +15,7 @@ variable "centos_6_hvm_50gb_chefdev_ami" {
 }
 
 variable "centos_7_hvm_50gb_chefdev_ami" {
-  default = "ami-20125c37"
+  default = "ami-b883c8af"
 }
 
 variable "centos_6_hvm_50gb_chefdev_ami_LDAP_AUTH_HOST_ONLY" {
