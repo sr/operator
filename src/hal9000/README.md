@@ -4,39 +4,30 @@ Hal reincarnated as a Lita bot. Lita is stable, maintained, and written in Ruby.
 
 ## Development
 
-HAL9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
+HAL9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run this command to get an interactive session:
 
 ```bash
-devenv compose up
+script/console
 ```
 
-* If you get an error like this while running locally:
+If everything worked, you can type `!info`:
 
-```bash
+```
+$ script/console
+Type "exit" or "quit" to end the session.
+HAL9000 > !info
+[2016-10-12 17:31:47 UTC] DEBUG: Dispatching message to Lita::Handlers::Info#chat.
+Lita 4.7.0 - https://www.lita.io/
+Redis 2.6.17 - Memory used: 837.19K
+```
+
+**NOTE:** If you get an error like this:
+
+```
 ERROR: Service 'app' failed to build: Get https://docker.dev.pardot.com/v2/base/ruby/manifests/2.3.0: unauthorized: BAD_CREDENTIAL
 ```
 
-* You may need to checkout [this confluence article](https://confluence.dev.pardot.com/display/PTechops/Using+the+Docker+Registry+locally)
-
-In another shell, connect to the bot:
-
-```bash
-devenv compose run -e LITA_ADAPTER=shell app
-```
-
-You should be connect to an interactive session with Hal9000:
-
-```
-Type "exit" or "quit" to end the session.
-Hal >
-```
-
-If everything worked, you can type `!help`:
-
-```
-Hal > !help
-Hal: help - Lists help information for terms and command the robot will respond to.
-```
+You may need to checkout [this page on Confluence](https://confluence.dev.pardot.com/display/PTechops/Using+the+Docker+Registry+locally)
 
 ### Tests
 
