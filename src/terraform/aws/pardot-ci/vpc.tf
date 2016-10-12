@@ -1,5 +1,5 @@
 variable "pardot_ci_to_artifactory_integration_vpc_link_id" {
-  default = "pcx-a03cb7c9"
+  default = "pcx-e95ed480"
 }
 
 resource "aws_vpc" "pardot_ci" {
