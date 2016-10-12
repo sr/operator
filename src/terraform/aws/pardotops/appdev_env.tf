@@ -220,6 +220,17 @@ resource "aws_security_group" "appdev_consulhost" {
     ]
   }
 
+  # allow app.dev hosts access to consul server port
+  ingress {
+    from_port = 8300
+    to_port   = 8300
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
