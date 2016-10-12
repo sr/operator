@@ -2,6 +2,7 @@
 #/ Usage: terra [--help] [arguments...]
 #/        terra plan <account>
 #/        terra apply <account>
+#/        terra fmt
 #/        terra pull <account>
 #/        terra push <account>
 #/        terra vendor <version>
@@ -84,6 +85,11 @@ case "$action" in
         fi
         make -f ../../etc/mk/terraform.mk "$action" |
         grep -vi password
+        ;;
+    fmt)
+        go install github.com/hashicorp/terraform
+        terraform fmt -write src/terraform
+        exit "$?"
         ;;
     validate)
         cd src/terraform && make -f ../../etc/mk/terraform.mk validate
