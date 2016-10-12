@@ -83,7 +83,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 	}
 	params := url.Values{}
 	params.Add("project_name", req.Target.Name)
-	params.Add("artifact_url", req.Build.GetURL())
+	params.Add("artifact_url", req.Build.GetArtifactURL())
 	params.Add("user_email", req.UserEmail)
 	resp, err := d.doCanoe(
 		ctx,
