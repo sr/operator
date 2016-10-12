@@ -20,7 +20,7 @@ type TestFileResult struct {
 	Filename    string
 	Fingerprint string
 	Duration    time.Duration
-	TestCases   []*TestCaseResult
+	TestCases   map[string]*TestCaseResult
 }
 
 type TestRunResults map[string]*TestFileResult
@@ -33,7 +33,9 @@ func (r TestRunResults) Merge(o TestRunResults) {
 	for key, otherResult := range o {
 		if result, ok := r[key]; ok {
 			result.Duration += otherResult.Duration
-			result.TestCases = append(result.TestCases, otherResult.TestCases...)
+			for name, testCase := range otherResult.TestCases {
+				result.TestCases[name] = testCase
+			}
 		} else {
 			r[key] = otherResult
 		}
@@ -73,7 +75,7 @@ func ParseJunitResult(r io.Reader) (TestRunResults, error) {
 				currentResult = &TestFileResult{
 					Name:      attrMap["name"],
 					Filename:  attrMap["file"],
-					TestCases: []*TestCaseResult{},
+					TestCases: map[string]*TestCaseResult{},
 				}
 				if timeValue, ok := attrMap["time"]; ok {
 					currentResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
@@ -94,7 +96,7 @@ func ParseJunitResult(r io.Reader) (TestRunResults, error) {
 				if timeValue, ok := attrMap["time"]; ok {
 					testCaseResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
 				}
-				currentResult.TestCases = append(currentResult.TestCases, testCaseResult)
+				currentResult.TestCases[testCaseResult.Name] = testCaseResult
 			}
 		}
 	}

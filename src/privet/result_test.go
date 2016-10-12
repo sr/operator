@@ -43,11 +43,11 @@ func TestParseJunitResults(t *testing.T) {
 	if len(results["/app/test/piUserTest.php"].TestCases) != 2 {
 		t.Fatalf("len(results[/app/test/piUserTest.php].TestCases): expected %d, got %d", 2, len(results["/app/test/piUserTest.php"].TestCases))
 	}
-	if results["/app/test/piUserTest.php"].TestCases[0].Name != "testSendActivationEmail" {
-		t.Fatalf("results[/app/test/piUserTest.php].TestCases[0].Name: expected %s, got %s", "testSendActivationEmail", results["/app/test/piUserTest.php"].TestCases[0].Name)
+	if results["/app/test/piUserTest.php"].TestCases["testSendActivationEmail"].Name != "testSendActivationEmail" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[testSendActivationEmail].Name: expected %s, got %s", "testSendActivationEmail", results["/app/test/piUserTest.php"].TestCases["testSendActivationEmail"].Name)
 	}
-	if results["/app/test/piUserTest.php"].TestCases[1].Name != "test_setIsArchived with data set #0" {
-		t.Fatalf("results[/app/test/piUserTest.php].TestCases[1].Name: expected %s, got %s", "test_setIsArchived with data set #0", results["/app/test/piUserTest.php"].TestCases[1].Name)
+	if results["/app/test/piUserTest.php"].TestCases["test_setIsArchived with data set #0"].Name != "test_setIsArchived with data set #0" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[test_setIsArchived with data set #0].Name: expected %s, got %s", "test_setIsArchived with data set #0", results["/app/test/piUserTest.php"].TestCases["test_setIsArchived with data set #0"].Name)
 	}
 }
 
@@ -58,22 +58,28 @@ func TestMergeTestRunResults(t *testing.T) {
 			Filename:    "/app/test1.php",
 			Fingerprint: "abc123",
 			Duration:    30 * time.Second,
-			TestCases: []*privet.TestCaseResult{
-				{
+			TestCases: map[string]*privet.TestCaseResult{
+				"Test1-1": {
 					Name:     "Test1-1",
 					Duration: 30 * time.Second,
 				},
 			},
 		},
 	}
+	// Due to a bug or misconfiguration, Test1-1 is represented twice. It
+	// should only show up once in the merged results though.
 	result2 := privet.TestRunResults{
 		"/app/test1.php": {
 			Name:        "Test1",
 			Filename:    "/app/test1.php",
 			Fingerprint: "abc123",
 			Duration:    15 * time.Second,
-			TestCases: []*privet.TestCaseResult{
-				{
+			TestCases: map[string]*privet.TestCaseResult{
+				"Test1-1": {
+					Name:     "Test1-1",
+					Duration: 30 * time.Second,
+				},
+				"Test1-2": {
 					Name:     "Test1-2",
 					Duration: 15 * time.Second,
 				},
