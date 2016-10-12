@@ -5,6 +5,7 @@ resource "aws_iam_user" "bamboo_sysacct" {
 resource "aws_iam_user_policy" "bamboo_sysacct_access_rights" {
   name = "BambooServerSysAcctPolicy"
   user = "${aws_iam_user.bamboo_sysacct.name}"
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
