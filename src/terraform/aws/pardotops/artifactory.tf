@@ -561,7 +561,7 @@ resource "aws_vpc_peering_connection" "internal_apps_and_artifactory_integration
 
 resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc_peering" {
   peer_owner_id = "096113534078"
-  peer_vpc_id = "vpc-4d96a928"
+  peer_vpc_id = "${var.pardot_ci_vpc_id}"
   vpc_id = "${aws_vpc.artifactory_integration.id}"
 }
 
