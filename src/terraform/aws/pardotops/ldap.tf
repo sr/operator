@@ -4,16 +4,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
   vpc_id      = "${aws_vpc.internal_apps.id}"
 
   # We run LDAP over port 443 to allow SFDC datacenters to connect to us, since
-
-
   # only 80, 443, and 25 are allowed outbound.
-
-
-  #
-
-
   # LDAPS is run on port 443.
-
   ingress {
     from_port = 80
     to_port   = 80
@@ -21,9 +13,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
 
     cidr_blocks = [
       "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",
-    ] # pardot-proxyout1-{1,2,3,4}-phx
+      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+    ]
   }
+
   ingress {
     from_port = 443
     to_port   = 443
@@ -31,9 +24,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
 
     cidr_blocks = [
       "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",
-    ] # pardot-proxyout1-{1,2,3,4}-phx
+      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+    ]
   }
+
   ingress {
     from_port = 389
     to_port   = 389
@@ -47,9 +41,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",                                         # artifactory.dev.pardot.com
       "52.4.132.69/32",                                         # 1.git.dev.pardot.com
-      "52.3.83.197/32",
-    ] # 2.git.dev.pardot.com
+      "52.3.83.197/32",                                         # 2.git.dev.pardot.com
+    ]
   }
+
   ingress {
     from_port = 636
     to_port   = 636
@@ -63,9 +58,10 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "52.21.58.50/32",                                         # artifactory.dev.pardot.com
       "52.4.132.69/32",                                         # 1.git.dev.pardot.com
-      "52.3.83.197/32",
-    ] # 2.git.dev.pardot.com
+      "52.3.83.197/32",                                         # 2.git.dev.pardot.com
+    ]
   }
+
   # SSH from bastion
   ingress {
     from_port = 22
@@ -76,6 +72,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
       "${aws_security_group.internal_apps_bastion.id}",
     ]
   }
+
   egress {
     from_port   = 0
     to_port     = 0

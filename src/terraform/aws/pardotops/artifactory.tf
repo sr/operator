@@ -55,13 +55,8 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   # Notes on why "aws_vpc.artifactory_integration.cidr_block" above and below
-
-
   # see: https://www.jfrog.com/confluence/display/RTF/HA+Installation+and+Setup#InstallationandSetup-ConfiguringArtifactoryHA
-
-
   # "both the Hazelcast port (10001) and the Tomcat port (default 8081) should be open between all nodes."
-
   ingress {
     from_port = 10001
     to_port   = 10001
@@ -71,6 +66,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
     ]
   }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -119,8 +115,8 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
 
     cidr_blocks = [
       "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",
-    ] # pardot-proxyout1-{1,2,3,4}-phx
+      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+    ]
   }
 
   ingress {
@@ -130,8 +126,8 @@ resource "aws_security_group" "artifactory_dc_only_http_lb" {
 
     cidr_blocks = [
       "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",
-    ] # pardot-proxyout1-{1,2,3,4}-phx
+      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+    ]
   }
 
   egress {
@@ -157,8 +153,8 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "172.31.0.0/16",                                 # pardot-atlassian: default vpc
-      "192.168.128.0/22",
-    ] # pardot-ci: default vpc
+      "192.168.128.0/22",                              # pardot-ci: default vpc
+    ]
   }
 
   ingress {
@@ -171,8 +167,8 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
       "${aws_vpc.artifactory_integration.cidr_block}",
       "${aws_vpc.internal_apps.cidr_block}",
       "172.31.0.0/16",                                 # pardot-atlassian: default vpc
-      "192.168.128.0/22",
-    ] # pardot-ci: default vpc
+      "192.168.128.0/22",                              # pardot-ci: default vpc
+    ]
   }
 
   egress {

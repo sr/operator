@@ -20,8 +20,8 @@ resource "aws_security_group" "tools_egress_proxy" {
 
     cidr_blocks = [
       "${aws_vpc.tools_egress.cidr_block}",
-      "172.30.0.0/16",
-    ] # internal_apps from pardotops
+      "172.30.0.0/16",                      # internal_apps from pardotops
+    ]
   }
 
   egress {

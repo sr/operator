@@ -15,8 +15,8 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
 
   cidr_blocks = [
     "204.14.236.0/24", # aloha-east
-    "204.14.239.0/24",
-  ] # aloha-west
+    "204.14.239.0/24", # aloha-west
+  ]
 }
 
 resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
