@@ -31,7 +31,7 @@ resource "aws_route53_record" "pardot2_bastion1_1_ue1_Arecord" {
 resource "aws_route53_record" "docker_cache_aws_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.zone_id}"
   name    = "docker-cache.${aws_route53_zone.pardot_ci_aws_pardot_com_hosted_zone.name}"
-  records = ["${var.pardot0_artifactcache_elb_public_dns}"]
+  records = ["${var.pardot0_artifactcache_elb_dns_name}"]
   type    = "CNAME"
   ttl     = "900"
 }

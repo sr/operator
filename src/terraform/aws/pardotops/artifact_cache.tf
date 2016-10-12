@@ -13,7 +13,7 @@ resource "aws_security_group" "artifact_cache_http_lb" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "192.168.128.0/22", # Bamboo instances in pardot-artifactory
+      "${var.pardot_ci_vpc_cidr}",
     ]
   }
 
