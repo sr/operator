@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-bundler exec rspec
+export HAL9000_ENV=test
+bundler exec rspec 2>&1 | grep -v "already initialized constant Readline"
