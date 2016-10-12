@@ -40,14 +40,14 @@ func TestParseJunitResults(t *testing.T) {
 	if results["/app/test/piUserTest.php"].Duration != 21*time.Second {
 		t.Fatalf("results[/app/test/piUserTest.php].Duration: expected %s, got %s", 21*time.Second, results["/app/test/piUserTest.php"].Duration)
 	}
-	if len(results["/app/test/piUserTest.php"].TestCases) != 2 {
-		t.Fatalf("len(results[/app/test/piUserTest.php].TestCases): expected %d, got %d", 2, len(results["/app/test/piUserTest.php"].TestCases))
+	if len(results["/app/test/piUserTest.php"].TestCases.Flattened()) != 2 {
+		t.Fatalf("len(results[/app/test/piUserTest.php].TestCases): expected %d, got %d", 2, len(results["/app/test/piUserTest.php"].TestCases.Flattened()))
 	}
-	if results["/app/test/piUserTest.php"].TestCases["testSendActivationEmail"].Name != "testSendActivationEmail" {
-		t.Fatalf("results[/app/test/piUserTest.php].TestCases[testSendActivationEmail].Name: expected %s, got %s", "testSendActivationEmail", results["/app/test/piUserTest.php"].TestCases["testSendActivationEmail"].Name)
+	if results["/app/test/piUserTest.php"].TestCases.Flattened()[0].Name != "testSendActivationEmail" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[0].Name: expected %s, got %s", "testSendActivationEmail", results["/app/test/piUserTest.php"].TestCases.Flattened()[0].Name)
 	}
-	if results["/app/test/piUserTest.php"].TestCases["test_setIsArchived with data set #0"].Name != "test_setIsArchived with data set #0" {
-		t.Fatalf("results[/app/test/piUserTest.php].TestCases[test_setIsArchived with data set #0].Name: expected %s, got %s", "test_setIsArchived with data set #0", results["/app/test/piUserTest.php"].TestCases["test_setIsArchived with data set #0"].Name)
+	if results["/app/test/piUserTest.php"].TestCases.Flattened()[1].Name != "test_setIsArchived with data set #0" {
+		t.Fatalf("results[/app/test/piUserTest.php].TestCases[1].Name: expected %s, got %s", "test_setIsArchived with data set #0", results["/app/test/piUserTest.php"].TestCases.Flattened()[1].Name)
 	}
 }
 
@@ -58,12 +58,12 @@ func TestMergeTestRunResults(t *testing.T) {
 			Filename:    "/app/test1.php",
 			Fingerprint: "abc123",
 			Duration:    30 * time.Second,
-			TestCases: map[string]*privet.TestCaseResult{
-				"Test1-1": {
+			TestCases: privet.NewTestCaseResultSetWithResults([]*privet.TestCaseResult{
+				{
 					Name:     "Test1-1",
 					Duration: 30 * time.Second,
 				},
-			},
+			}),
 		},
 	}
 	// Due to a bug or misconfiguration, Test1-1 is represented twice. It
@@ -74,16 +74,16 @@ func TestMergeTestRunResults(t *testing.T) {
 			Filename:    "/app/test1.php",
 			Fingerprint: "abc123",
 			Duration:    15 * time.Second,
-			TestCases: map[string]*privet.TestCaseResult{
-				"Test1-1": {
+			TestCases: privet.NewTestCaseResultSetWithResults([]*privet.TestCaseResult{
+				{
 					Name:     "Test1-1",
 					Duration: 30 * time.Second,
 				},
-				"Test1-2": {
+				{
 					Name:     "Test1-2",
 					Duration: 15 * time.Second,
 				},
-			},
+			}),
 		},
 	}
 
@@ -91,8 +91,8 @@ func TestMergeTestRunResults(t *testing.T) {
 	if result["/app/test1.php"].Duration != 45*time.Second {
 		t.Fatalf("results[/app/test1.php].Duration: expected %v, got %v", 45*time.Second, result["/app/test1.php"].Duration)
 	}
-	if len(result["/app/test1.php"].TestCases) != 2 {
-		t.Fatalf("len(results[/app1/test1.php].TestCases): expected %d, got %d", 2, len(result["/app/test1.php"].TestCases))
+	if len(result["/app/test1.php"].TestCases.Flattened()) != 2 {
+		t.Fatalf("len(results[/app1/test1.php].TestCases): expected %d, got %d", 2, len(result["/app/test1.php"].TestCases.Flattened()))
 	}
 }
 
