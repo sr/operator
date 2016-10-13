@@ -7,14 +7,15 @@
 
 _ = require "underscore"
 
-warningMinimum = parseInt(process.env.HUBOT_HERE_WARNING_MINIMUM || "25")
+warningMinimum = parseInt(process.env.HUBOT_HERE_WARNING_MINIMUM || "40")
 
 roomIsOkToUseHere = (roomJid, roomName) ->
   # support folks use @here while on calls or chats
   # salesforce managed package room has requested it be disabled
   roomName.match(/(support|solutions)/i) || \
     roomName.match(/salesedge/i) || \
-    roomName.match(/missile_command/i)
+    roomName.match(/missile_command/i) || \
+    roomName.match(/(#trust|apollo_13|cassandra)/i) # BREAD-1497
 
 module.exports = (robot) ->
   robot.hear /@(here|all)/, (msg) ->
