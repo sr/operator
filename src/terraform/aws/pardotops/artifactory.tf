@@ -830,3 +830,29 @@ resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
   lb_port                  = 443
   cookie_expiration_period = 3600
 }
+
+resource "aws_efs_file_system" "afy_efs_storage" {
+  tags {
+    Name = "afy_efs_storage"
+  }
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1a" {
+  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1c" {
+  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1c.id}"
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1d" {
+  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1d.id}"
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
+  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
+}
