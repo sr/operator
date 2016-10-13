@@ -839,17 +839,20 @@ resource "aws_efs_file_system" "afy_efs_storage" {
 
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1a" {
   file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1a.id}"
 }
+
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1c" {
   file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1c.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1c.id}"
 }
+
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1d" {
   file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1d.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1d.id}"
 }
+
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
   file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
-  subnet_id = "${aws_subnet.artifactory_integration_us_east_1e.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }
