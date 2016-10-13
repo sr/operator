@@ -831,28 +831,51 @@ resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
   cookie_expiration_period = 3600
 }
 
-resource "aws_efs_file_system" "afy_efs_storage" {
+resource "aws_security_group" "artifactory_efs_access_security_group" {
+  description = "artifactory_efs_access_security_group"
+  vpc_id      = "${aws_vpc.artifactory_integration.id}"
+
+  ingress {
+    from_port = -1
+    to_port   = -1
+    protocol  = "tcp"
+    security_groups= [
+      "${aws_security_group.artifactory_instance_secgroup.id}"
+    ]
+  }
+
   tags {
-    Name = "afy_efs_storage"
+    Name = "artifactory_efs_storage"
+    terraform = "true"
+  }
+}
+
+resource "aws_efs_file_system" "artifactory_efs_storage" {
+  tags {
+    Name = "artifactory_efs_storage"
+    terraform = "true"
   }
 }
 
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1a" {
-  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+  security_groups = [
+    "${aws_security_group.artifactory_efs_access_security_group.id}"
+  ]
 }
 
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1c" {
-  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1c.id}"
 }
 
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1d" {
-  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1d.id}"
 }
 
 resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
-  file_system_id = "${aws_efs_file_system.afy_efs_storage.id}"
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }
