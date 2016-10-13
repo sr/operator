@@ -3,7 +3,7 @@ syntax = "proto3";
 package bread;
 
 import "google/protobuf/duration.proto";
-import "operator.proto";
+import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
@@ -33,6 +33,7 @@ message ServerStartupNotice {
 	string Address = 1;
 	string Protocol = 2;
 	repeated string services = 3;
+	string Hal9000 = 4;
 }
 
 message ServiceStartupError {

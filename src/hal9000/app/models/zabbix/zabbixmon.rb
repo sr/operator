@@ -95,8 +95,8 @@ module Zabbix
     def deliver_zabbixmon_payload(url, timeout_seconds = 30)
       @log.debug("[#{monitor_name}] deliver_zabbixmon_payload url = #{url}")
       uri = URI url
-      unless ENV["http_proxy"].nil?
-        @proxy_uri = URI.parse(ENV["http_proxy"])
+      unless ENV["HAL9000_HTTP_PROXY"].nil?
+        @proxy_uri = URI.parse(ENV["HAL9000_HTTP_PROXY"])
         @proxy_host = @proxy_uri.host
         @proxy_port = @proxy_uri.port
         @proxy_user, @proxy_pass = @proxy_uri.userinfo.split(/:/) if @proxy_uri.userinfo

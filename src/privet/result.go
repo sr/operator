@@ -15,12 +15,53 @@ type TestCaseResult struct {
 	Duration time.Duration
 }
 
+type TestCaseResultSet struct {
+	names   map[string]bool
+	results []*TestCaseResult
+}
+
+func NewTestCaseResultSet() *TestCaseResultSet {
+	return &TestCaseResultSet{
+		names:   map[string]bool{},
+		results: []*TestCaseResult{},
+	}
+}
+
+func NewTestCaseResultSetWithResults(results []*TestCaseResult) *TestCaseResultSet {
+	set := NewTestCaseResultSet()
+	for _, result := range results {
+		set.ConditionalAdd(result)
+	}
+	return set
+}
+
+// ConditionalAdd adds a result to the set if a result with the same name does not already exist in the set
+func (s *TestCaseResultSet) ConditionalAdd(result *TestCaseResult) bool {
+	if s.names[result.Name] {
+		return false
+	}
+
+	s.results = append(s.results, result)
+	s.names[result.Name] = true
+	return true
+}
+
+func (s *TestCaseResultSet) Flattened() []*TestCaseResult {
+	return s.results
+}
+
+func (s *TestCaseResultSet) Merge(other *TestCaseResultSet) {
+	for _, result := range other.Flattened() {
+		s.ConditionalAdd(result)
+	}
+}
+
 type TestFileResult struct {
 	Name        string
 	Filename    string
 	Fingerprint string
 	Duration    time.Duration
-	TestCases   []*TestCaseResult
+	TestCases   *TestCaseResultSet
 }
 
 type TestRunResults map[string]*TestFileResult
@@ -33,7 +74,7 @@ func (r TestRunResults) Merge(o TestRunResults) {
 	for key, otherResult := range o {
 		if result, ok := r[key]; ok {
 			result.Duration += otherResult.Duration
-			result.TestCases = append(result.TestCases, otherResult.TestCases...)
+			result.TestCases.Merge(otherResult.TestCases)
 		} else {
 			r[key] = otherResult
 		}
@@ -73,7 +114,7 @@ func ParseJunitResult(r io.Reader) (TestRunResults, error) {
 				currentResult = &TestFileResult{
 					Name:      attrMap["name"],
 					Filename:  attrMap["file"],
-					TestCases: []*TestCaseResult{},
+					TestCases: NewTestCaseResultSet(),
 				}
 				if timeValue, ok := attrMap["time"]; ok {
 					currentResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
@@ -94,7 +135,7 @@ func ParseJunitResult(r io.Reader) (TestRunResults, error) {
 				if timeValue, ok := attrMap["time"]; ok {
 					testCaseResult.Duration, _ = time.ParseDuration(fmt.Sprintf("%ss", timeValue))
 				}
-				currentResult.TestCases = append(currentResult.TestCases, testCaseResult)
+				currentResult.TestCases.ConditionalAdd(testCaseResult)
 			}
 		}
 	}

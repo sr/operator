@@ -1,6 +1,7 @@
 DOCKER ?= docker
 GO ?= go
 WATCHMAN_MAKE ?= watchman-make
+GRPC_RUBY_PLUGIN ?= $(shell which grpc_ruby_plugin)
 
 GOBIN ?= $(GOPATH)/bin
 BREAD ?= $(GOPATH)
@@ -24,13 +25,23 @@ OPERATORD_DIR ?= $(GOPATH)/src/bread/cmd/operatord
 SVC_DIR ?= $(GOPATH)/src/bread
 SVC_IMPORT_PATH ?= bread
 
-generate: $(PROTOC) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD)
+generate: $(PROTOC) $(GRPC_RUBY_PLUGIN) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCTL) $(PROTOC_GEN_OPERATORD)
 	$< \
 		-I$(GOPATH)/src/bread \
-		-I$(GOPATH)/src/github.com/sr/operator \
+		-I$(GOPATH)/src \
 		--operatorctl_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORCTL_DIR) \
 		--operatord_out=import_path=$(SVC_IMPORT_PATH):$(OPERATORD_DIR) \
-		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) $(GOPATH)/src/bread/pb/*.proto
+		--operatorlitahelp_out=import_path=$(SVC_IMPORT_PATH):src/hal9000/config \
+		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) \
+		$(GOPATH)/src/bread/pb/*.proto
+	$< \
+		-I$(GOPATH)/src/bread \
+		-I$(GOPATH)/src \
+		--ruby_out=src/hal9000/lib \
+		--grpc_out=src/hal9000/lib \
+		--plugin=protoc-gen-grpc=$(GRPC_RUBY_PLUGIN) \
+		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) \
+		$(GOPATH)/src/bread/hal9000/*.proto
 
 ldap-dev: docker-build-ldap
 	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true

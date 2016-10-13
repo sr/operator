@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/GeertJohan/yubigo"
@@ -18,6 +19,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"bread/hal9000"
 	"bread/pb"
 )
 
@@ -106,6 +108,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "canoe_production",
 			ECSService:    "canoe",
+			ContainerName: "canoe",
 			Image:         "build/bread/canoe/app",
 		},
 		{
@@ -116,6 +119,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "hal9000_production",
 			ECSService:    "hal9000",
+			ContainerName: "hal9000",
 			Image:         "build/bread/hal9000/app",
 		},
 		{
@@ -126,6 +130,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
+			ContainerName: "operatord",
 			Image:         "build/bread/operatord/app",
 		},
 		{
@@ -136,6 +141,7 @@ var (
 			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
+			ContainerName: "parbot",
 			Image:         "build/bread/parbot/app",
 		},
 		{
@@ -146,7 +152,8 @@ var (
 			Canoe:         false,
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
-			Image:         "build/bread/tempass/app",
+			ContainerName: "teampass",
+			Image:         "build/bread/teampass/app",
 		},
 	}
 )
@@ -169,6 +176,7 @@ type DeployTarget struct {
 	Canoe         bool
 	ECSCluster    string
 	ECSService    string
+	ContainerName string
 	Image         string
 }
 
@@ -219,6 +227,44 @@ func NewInstrumenter(logger protolog.Logger) operator.Instrumenter {
 // NewHandler returns an http.Handler that logs all requests.
 func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
 	return &wrapperHandler{logger, handler}
+}
+
+func NewRepfixHandler(hal hal9000.RobotClient) http.Handler {
+	return &repfixHandler{hal}
+}
+
+// NewHipchatHandler returns an http.Handler that handles incoming HipChat
+// webhook requests.
+func NewHipchatHandler(
+	ctx context.Context,
+	inst operator.Instrumenter,
+	decoder operator.Decoder,
+	sender operator.Sender,
+	invoker operator.InvokerFunc,
+	conn *grpc.ClientConn,
+	svcInfo map[string]grpc.ServiceInfo,
+	hal9000 hal9000.RobotClient,
+	timeout time.Duration,
+	prefix string,
+	pkg string,
+) (http.Handler, error) {
+	re, err := regexp.Compile(fmt.Sprintf(operator.ReCommandMessage, regexp.QuoteMeta(prefix)))
+	if err != nil {
+		return nil, err
+	}
+	return &hipchat{
+		ctx,
+		inst,
+		decoder,
+		sender,
+		invoker,
+		conn,
+		svcInfo,
+		hal9000,
+		timeout,
+		re,
+		pkg,
+	}, nil
 }
 
 // NewPingHandler returns an http.Handler that implements a simple health

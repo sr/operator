@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+# Send a message to the HAL9000 gRPC server. For testing only.
+require File.expand_path("../../config/application", __FILE__)
+
+address = "0.0.0.0:9001"
+room = "BREAD Testing"
+user = ""
+parser = OptionParser.new { |opts|
+  opts.banner = "Usage: send-message [options] message"
+
+  opts.on("-a", "--addr ADDRESS", "Address of the HAL9000 gRPC server (default: 0.0.0.0:9001)") do |arg|
+    address = arg
+  end
+
+  opts.on("-u", "--user USER", "User email the message comes from") do |arg|
+    user = arg
+  end
+
+  opts.on("-r", "--room ROOM", "Send message to the given room name (default: \"BREAD Testing\")") do |arg|
+    room = arg
+  end
+}
+parser.parse!
+
+if ARGV.empty? || (user == "" && room == "")
+  puts parser.help
+  abort
+end
+
+user = Hal9000::User.new(email: user, name: user.split("@")[0])
+message = Hal9000::Message.new(room: room, user: user, text: ARGV.join(" "))
+client = Hal9000::Robot::Stub.new(address, :this_channel_is_insecure)
+client.dispatch(message)

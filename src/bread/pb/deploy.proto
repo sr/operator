@@ -2,13 +2,17 @@ syntax = "proto3";
 
 package bread;
 
-import "operator.proto";
+import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
+// Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS
 service Deploy {
+	// List what can be deployed
 	rpc ListTargets(ListTargetsRequest) returns (operator.Response);
+	// List the ten most recent builds for a given target
 	rpc ListBuilds(ListBuildsRequest) returns (operator.Response);
+	// Trigger a deploy of a build to given target
 	rpc Trigger(TriggerRequest) returns (operator.Response);
 }
 

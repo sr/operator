@@ -20,11 +20,11 @@ var cmd = operator.NewCommand(
 	[]operator.ServiceCommand{
 		{
 			Name:     "deploy",
-			Synopsis: `Undocumented.`,
+			Synopsis: `Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS`,
 			Methods: []operator.MethodCommand{
 				{
 					Name:     "list-targets",
-					Synopsis: `Undocumented.`,
+					Synopsis: `List what can be deployed`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
@@ -50,7 +50,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "list-builds",
-					Synopsis: `Undocumented.`,
+					Synopsis: `List the ten most recent builds for a given target`,
 					Flags: []*flag.Flag{
 						{
 							Name:  "target",
@@ -89,7 +89,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "trigger",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Trigger a deploy of a build to given target`,
 					Flags: []*flag.Flag{
 						{
 							Name:  "target",
@@ -135,7 +135,7 @@ var cmd = operator.NewCommand(
 			Methods: []operator.MethodCommand{
 				{
 					Name:     "otp",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Test OTP verification`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
@@ -161,7 +161,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "ping",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Reply with PONG if everything is working`,
 					Flags: []*flag.Flag{
 						{
 							Name:  "arg1",
@@ -194,7 +194,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "slow-loris",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Trigger a slow request, for testing timeout handling`,
 					Flags: []*flag.Flag{
 						{
 							Name:  "wait",
@@ -227,7 +227,7 @@ var cmd = operator.NewCommand(
 				},
 				{
 					Name:     "whoami",
-					Synopsis: `Undocumented.`,
+					Synopsis: `Reply with the email of the current authenticated user`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {

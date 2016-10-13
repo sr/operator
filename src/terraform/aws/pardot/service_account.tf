@@ -5,6 +5,7 @@ resource "aws_iam_user" "pardot_sysacct" {
 resource "aws_iam_user_policy" "pardot_sysacct_access_rights" {
   name = "PardotServerSysAcctPolicy"
   user = "${aws_iam_user.pardot_sysacct.name}"
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -46,6 +47,7 @@ resource "aws_iam_user" "pardot_sysacct_dev" {
 resource "aws_iam_user_policy" "pardot_sysacct_dev_access_rights" {
   name = "PardotServerSysAcctDevPolicy"
   user = "${aws_iam_user.pardot_sysacct_dev.name}"
+
   policy = <<EOF
 {
   "Version": "2012-10-17",

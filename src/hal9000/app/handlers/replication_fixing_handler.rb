@@ -2,13 +2,10 @@ class ReplicationFixingHandler < ApplicationHandler
   config :repfix_url, default: "https://repfix-%datacenter%.pardot.com"
   config :datacenters, default: %w[dfw phx]
   config :default_datacenter, default: "dfw"
-  config :status_room, default: "1_ops@conf.btf.hipchat.com"
-  config :replication_room, default: "1_ops-replication@conf.btf.hipchat.com"
+  config :status_room, default: ENV.fetch("REPFIX_STATUS_ROOM", "1_ops@conf.btf.hipchat.com")
+  config :replication_room, default: ENV.fetch("REPFIX_REPLICATION_ROOM", "1_ops-replication@conf.btf.hipchat.com")
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
-
-  http.get "/replication/_ping", :ping
-  http.post "/replication/errors", :create_replication_error
 
   # http://rubular.com/r/Aos770vcM3
   route /^ignore\s+(?:(?<prefix>db|whoisdb)-)?(?<shard_id>\d+)(?:-(?<datacenter>\S+))?(?:\s+(?<minutes>\d+))?/i, :create_ignore, command: true, help: {
@@ -118,13 +115,7 @@ class ReplicationFixingHandler < ApplicationHandler
     robot.join(config.replication_room)
   end
 
-  def ping(_request, response)
-    response.status = 200
-    response.body << ""
-  end
-
-  def create_replication_error(request, response)
-    body = request.POST
+  def create_replication_error(body)
     if body["hostname"]
       begin
         hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
@@ -141,6 +132,7 @@ class ReplicationFixingHandler < ApplicationHandler
             @alerting_manager.notify_replication_disabled_but_many_errors
           end
         else
+          log.debug("Shard is NOT ignored: #{shard}")
           error = body["error"].to_s
           unless error.empty?
             robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
@@ -148,6 +140,7 @@ class ReplicationFixingHandler < ApplicationHandler
 
           mysql_last_error = body["mysql_last_error"].to_s
           unless mysql_last_error.empty?
+            log.debug("sending message to #{@replication_room.inspect}")
             sanitized_error = @sanitizer.sanitize(mysql_last_error)
             robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
           end
@@ -162,17 +155,14 @@ class ReplicationFixingHandler < ApplicationHandler
           end
         end
 
-        response.status = 201
+        [201, ""]
       rescue ::ReplicationFixing::Hostname::MalformedHostname
-        response.status = 400
-        response.body << JSON.dump("error" => "malformed hostname")
+        [400, JSON.dump("error" => "malformed hostname")]
       rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
-        response.status = 400
-        response.body << JSON.dump("error" => e.to_s)
+        [400, JSON.dump("error" => e.to_s)]
       end
     else
-      response.status = 400
-      response.body << JSON.dump("error" => "hostname missing")
+      [400, JSON.dump("error" => "hostname missing")]
     end
   end
 

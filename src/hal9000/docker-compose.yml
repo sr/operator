@@ -9,7 +9,7 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
-      LITA_ADAPTER: "nothing"
+      LITA_ADAPTER: "blank"
     ports:
       - "8082:8080"
     volumes:

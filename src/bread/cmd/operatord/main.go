@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"bread"
+	"bread/hal9000"
 	"bread/pb"
 
 	"github.com/sr/operator"
@@ -24,7 +25,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const grpcTimeout = 3 * time.Second
+const grpcTimeout = 10 * time.Second
 
 type config struct {
 	afy   *bread.ArtifactoryConfig
@@ -36,6 +37,7 @@ type config struct {
 	devHipchatToken string
 
 	grpcAddr string
+	halAddr  string
 	httpAddr string
 	timeout  time.Duration
 	timezone string
@@ -61,6 +63,7 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
+	flags.StringVar(&config.halAddr, "addr-hal9000", ":9001", "Address of the HAL9000 gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
@@ -93,6 +96,16 @@ func run(invoker operator.InvokerFunc) error {
 			}
 		}
 	})
+	var host, port string
+	if v, ok := os.LookupEnv("HAL9000_PORT_9001_TCP_ADDR"); ok {
+		host = v
+	}
+	if v, ok := os.LookupEnv("HAL9000_PORT_9001_TCP_PORT"); ok {
+		port = v
+	}
+	if host != "" && port != "" {
+		config.halAddr = fmt.Sprintf("%s:%s", host, port)
+	}
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return err
 	}
@@ -100,23 +113,29 @@ func run(invoker operator.InvokerFunc) error {
 		return fmt.Errorf("required flag missing: addr-grpc")
 	}
 	var (
-		logger protolog.Logger
-		inst   operator.Instrumenter
-		auth   operator.Authorizer
-		sender operator.Sender
+		httpServer *http.ServeMux
+		logger     protolog.Logger
+		inst       operator.Instrumenter
+		auth       operator.Authorizer
+		sender     operator.Sender
 
 		store    operatorhipchat.ClientCredentialsStore
 		verifier bread.OTPVerifier
 		db       *sql.DB
+		hal      hal9000.RobotClient
 
 		err error
 	)
+	httpServer = http.NewServeMux()
 	logger = bread.NewLogger()
 	inst = bread.NewInstrumenter(logger)
 	if config.dev {
 		auth = &noopAuthorizer{}
 		if config.devRoomID == 0 {
 			return errors.New("dev mode enabled but required flag missing: dev-room-id")
+		}
+		if v, ok := os.LookupEnv("HIPCHAT_TOKEN"); ok && config.devHipchatToken == "" {
+			config.devHipchatToken = v
 		}
 		if config.devHipchatToken == "" {
 			return errors.New("dev mode enabled but required flag missing: dev-hipchat-token")
@@ -161,6 +180,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err := db.Ping(); err != nil {
 			return err
 		}
+		httpServer.Handle("/_ping", bread.NewHandler(logger, bread.NewPingHandler(db)))
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
 		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
@@ -201,6 +221,19 @@ func run(invoker operator.InvokerFunc) error {
 		errC <- grpcServer.Serve(grpcList)
 	}()
 	logger.Info(msg)
+	if config.halAddr != "" {
+		if cc, err := grpc.Dial(
+			config.halAddr,
+			grpc.WithBlock(),
+			grpc.WithTimeout(grpcTimeout),
+			grpc.WithInsecure(),
+		); err == nil {
+			hal = hal9000.NewRobotClient(cc)
+		} else {
+			return err
+		}
+		httpServer.Handle("/replication/", bread.NewHandler(logger, bread.NewRepfixHandler(hal)))
+	}
 	if !config.dev {
 		var webhookHandler http.Handler
 		conn, err := grpc.Dial(
@@ -213,29 +246,21 @@ func run(invoker operator.InvokerFunc) error {
 			return err
 		}
 		const pkg = "bread"
-		if webhookHandler, err = operator.NewHandler(
+		if webhookHandler, err = bread.NewHipchatHandler(
 			context.Background(),
 			inst,
 			operatorhipchat.NewRequestDecoder(store),
-			operator.NewInvoker(
-				conn,
-				inst,
-				sender,
-				invoker,
-				config.timeout,
-				pkg,
-				&operatorhipchat.MessageOptions{Color: "red"},
-			),
-			pkg,
+			sender,
+			invoker,
+			conn,
+			grpcServer.GetServiceInfo(),
+			hal,
+			config.timeout,
 			config.prefix,
+			pkg,
 		); err != nil {
 			return err
 		}
-		httpServer := http.NewServeMux()
-		httpServer.Handle(
-			"/_ping",
-			bread.NewHandler(logger, bread.NewPingHandler(db)),
-		)
 		addonURL, err := url.Parse(config.hipchatAddonURL)
 		if err != nil {
 			return err
@@ -251,16 +276,23 @@ func run(invoker operator.InvokerFunc) error {
 				operatorhipchat.NewAddonHandler(
 					store,
 					&operatorhipchat.AddonConfig{
-						Namespace:  config.hipchatNamespace,
-						URL:        addonURL,
-						Homepage:   bread.RepoURL,
-						WebhookURL: webhookURL,
+						Namespace:     config.hipchatNamespace,
+						URL:           addonURL,
+						Homepage:      bread.RepoURL,
+						WebhookURL:    webhookURL,
+						WebhookPrefix: config.prefix,
 					},
 				),
 			),
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
-		logger.Info(&breadpb.ServerStartupNotice{Protocol: "http", Address: config.httpAddr})
+	}
+	if config.httpAddr != "" {
+		logger.Info(&breadpb.ServerStartupNotice{
+			Protocol: "http",
+			Address:  config.httpAddr,
+			Hal9000:  config.halAddr,
+		})
 		go func() {
 			errC <- http.ListenAndServe(config.httpAddr, httpServer)
 		}()
