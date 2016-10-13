@@ -8,19 +8,6 @@ resource "aws_security_group" "appdev_cephrgw1" {
   description = "Allow traffic to Ceph RGW and Mon services"
   vpc_id      = "${aws_vpc.appdev.id}"
 
-  // Allow port 80 from the ELB and the RGW host(s) from the second cluster for
-  // replication
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephelb1.id}",
-      "${aws_security_group.appdev_cephrgw2.id}",
-    ]
-  }
-
   // Need to be able to talk to itself on the Ceph Monitor port since the RGW
   // service checks in with the mon over the configured IP and not through localhost
   ingress {
@@ -28,17 +15,6 @@ resource "aws_security_group" "appdev_cephrgw1" {
     to_port   = 6789
     protocol  = "tcp"
     self      = true
-  }
-
-  // the OSDs need to be able to check in to the monitor service(s)
-  ingress {
-    from_port = 6789
-    to_port   = 6789
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephosd1.id}",
-    ]
   }
 
   egress {
@@ -49,22 +25,42 @@ resource "aws_security_group" "appdev_cephrgw1" {
   }
 }
 
+// Allow port 80 from the ELB and the RGW host(s) from the second cluster for
+// replication
+resource "aws_security_group_rule" "cephrgw1_http_allow_from_elb" {
+  security_group_id        = "${aws_security_group.appdev_cephrgw1.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephelb1.id}"
+}
+
+resource "aws_security_group_rule" "cephrgw1_http_allow_from_rgw2" {
+  security_group_id        = "${aws_security_group.appdev_cephrgw1.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephrgw2.id}"
+}
+
+// the OSDs need to be able to check in to the monitor service(s)
+resource "aws_security_group_rule" "cephrgw1_osd_to_mon_allows" {
+  security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
+  type              = "ingress"
+  from_port         = 6789
+  to_port           = 6789
+  protocol          = "tcp"
+
+  source_security_group_id = "${aws_security_group.appdev_cephosd1.id}"
+}
+
 // Security group for the OSD servers
 resource "aws_security_group" "appdev_cephosd1" {
   name        = "appdev_cephosd1"
   description = "Allow traffic to Ceph OSD service"
   vpc_id      = "${aws_vpc.appdev.id}"
-
-  // RGWs need to be able to talk to the OSD services
-  ingress {
-    from_port = 6800
-    to_port   = 7300
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephrgw1.id}",
-    ]
-  }
 
   // The OSDs need to be able to talk with each other for health checks and data
   // replication
@@ -81,6 +77,16 @@ resource "aws_security_group" "appdev_cephosd1" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+// RGWs need to be able to talk to the OSD services
+resource "aws_security_group_rule" "cephosd1_rgw_to_osd_allows" {
+  security_group_id        = "${aws_security_group.appdev_cephosd1.id}"
+  type                     = "ingress"
+  from_port                = 6800
+  to_port                  = 7300
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
 }
 
 // ELB Security Group
@@ -115,32 +121,30 @@ resource "aws_security_group" "appdev_cephelb1" {
     ]
   }
 
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_vpc_default.id}",
-    ]
-  }
-
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_vpc_default.id}",
-    ]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group_rule" "rgw1_elb_http" {
+  security_group_id        = "${aws_security_group.appdev_cephelb1.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
+}
+
+resource "aws_security_group_rule" "rgw1_elb_https" {
+  security_group_id        = "${aws_security_group.appdev_cephelb1.id}"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
 }
 
 // Create the actual ELB
@@ -275,31 +279,10 @@ resource "aws_security_group" "appdev_cephrgw2" {
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephelb2.id}",
-      "${aws_security_group.appdev_cephrgw1.id}",
-    ]
-  }
-
-  ingress {
     from_port = 6789
     to_port   = 6789
     protocol  = "tcp"
     self      = true
-  }
-
-  ingress {
-    from_port = 6789
-    to_port   = 6789
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephosd2.id}",
-    ]
   }
 
   egress {
@@ -308,6 +291,36 @@ resource "aws_security_group" "appdev_cephrgw2" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+// Allow port 80 from the ELB and the RGW host(s) from the second cluster for
+// replication
+resource "aws_security_group_rule" "cephrgw2_http_allow_from_elb" {
+  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephelb2.id}"
+}
+
+resource "aws_security_group_rule" "cephrgw2_http_allow_from_rgw" {
+  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
+}
+
+// the OSDs need to be able to check in to the monitor service(s)
+resource "aws_security_group_rule" "cephrgw2_osd_to_mon_allows" {
+  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
+  type                     = "ingress"
+  from_port                = 6789
+  to_port                  = 6789
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephosd2.id}"
 }
 
 resource "aws_security_group" "appdev_cephosd2" {
@@ -319,27 +332,7 @@ resource "aws_security_group" "appdev_cephosd2" {
     from_port = 6800
     to_port   = 7300
     protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephrgw1.id}",
-    ]
-  }
-
-  ingress {
-    from_port = 6800
-    to_port   = 7300
-    protocol  = "tcp"
     self      = true
-  }
-
-  ingress {
-    from_port = 6789
-    to_port   = 6789
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_cephrgw2.id}",
-    ]
   }
 
   egress {
@@ -348,6 +341,16 @@ resource "aws_security_group" "appdev_cephosd2" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+// RGWs need to be able to talk to the OSD services
+resource "aws_security_group_rule" "cephosd2_rgw_to_osd_allows" {
+  security_group_id        = "${aws_security_group.appdev_cephosd2.id}"
+  type                     = "ingress"
+  from_port                = 6800
+  to_port                  = 7300
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
 }
 
 resource "aws_security_group" "appdev_cephelb2" {
@@ -379,32 +382,30 @@ resource "aws_security_group" "appdev_cephelb2" {
     ]
   }
 
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_vpc_default.id}",
-    ]
-  }
-
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-
-    security_groups = [
-      "${aws_security_group.appdev_vpc_default.id}",
-    ]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group_rule" "rgw2_elb_http" {
+  security_group_id        = "${aws_security_group.appdev_cephelb2.id}"
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
+}
+
+resource "aws_security_group_rule" "rgw2_elb_https" {
+  security_group_id        = "${aws_security_group.appdev_cephelb2.id}"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
 }
 
 resource "aws_elb" "appdev_rgw2_elb" {
