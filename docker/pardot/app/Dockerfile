@@ -3,6 +3,8 @@ FROM docker.dev.pardot.com/base/php:7.0.8
 ARG dist=el6
 ARG percona_major_version=55
 ARG nodejs_version=4.4.2
+ARG npm_version=3
+ARG yarn_version=0.15.1
 ARG bower_version=1.7.2
 ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
@@ -24,9 +26,11 @@ RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-
   yum install -y Percona-Server-client-${percona_major_version} Percona-Server-devel-${percona_major_version} && \
   yum clean all
 
-# Node.JS & Bower
+# Node.JS and friends
 RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.xz" | tar -xJ -C /usr --strip-components=1 && \
+  npm install -g npm@${npm_version} && \
   npm install -g bower@${bower_version} && \
+  npm install -g yarn@${yarn_version} && \
   npm install -g grunt-cli
 
 # GeoIP
