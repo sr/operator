@@ -1395,13 +1395,12 @@ EOF
   }
 }
 
-resource "aws_instance" "logs_dev_pardot_com_arecord" {
-  count   = "1"
-  zone_id = "${aws_route53_zone.dev_parrdot_com.zone_id}"
-  name    = "logs{count.idex +1{-app.${aws_route53_zone.dev_pardot_com.name}"
+resource "aws_route53_record" "logs_dev_pardot_com_arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "logs.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_eip.appdev_toolsproxy1.public_ip}"]
   type    = "A"
-  ttl     = "9000"
+  ttl     = "900"
 }
 
 resource "aws_instance" "appdev_indexer1" {
