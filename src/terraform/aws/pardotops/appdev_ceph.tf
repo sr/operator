@@ -92,16 +92,42 @@ resource "aws_security_group" "appdev_cephelb1" {
   // Allow for people on the VPN to access the ELB for "aws s3" cli access as well
   // as for web browsers to be able to view static assets where needed
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+    ]
   }
 
-  // Allow for hosts in the VPC to consume the service.
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+    ]
+  }
+
   ingress {
     from_port = 80
     to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
     protocol  = "tcp"
 
     security_groups = [
@@ -330,15 +356,42 @@ resource "aws_security_group" "appdev_cephelb2" {
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+    ]
   }
 
   ingress {
     from_port = 80
     to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
     protocol  = "tcp"
 
     security_groups = [
