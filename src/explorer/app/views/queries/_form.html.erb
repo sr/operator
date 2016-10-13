@@ -15,7 +15,9 @@
     <button type="button" class="btn btn-default<%= active?(current_view, ui_view) %>" data-val="<%= ui_view %>">Explore UI View</button>
   </div>
   <div class="viewoption" <%= active?(current_view, ui_view, 'style="display:none;"') %>>
-    <%= text_area_tag(:sql, query.raw_sql, rows: 10, cols: 80) %>
+    <div class="form-group">
+      <%= text_area_tag(:sql, query.raw_sql, rows: 10, cols: 80) %>
+    </div>
     <%= submit_tag "Run Query", class: "btn btn-primary" %>
   </div>
 
