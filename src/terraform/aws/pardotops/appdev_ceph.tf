@@ -104,8 +104,8 @@ resource "aws_security_group" "appdev_cephelb1" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
-      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
   }
 
@@ -116,8 +116,8 @@ resource "aws_security_group" "appdev_cephelb1" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
-      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
   }
 
@@ -365,8 +365,8 @@ resource "aws_security_group" "appdev_cephelb2" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
-      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
   }
 
@@ -377,8 +377,8 @@ resource "aws_security_group" "appdev_cephelb2" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}",
-      "${aws_nat_gateway.appdev_nat_gw.private_ip}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
   }
 
