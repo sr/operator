@@ -81,12 +81,12 @@ resource "aws_security_group" "appdev_cephosd1" {
 
 // RGWs need to be able to talk to the OSD services
 resource "aws_security_group_rule" "cephosd1_rgw_to_osd_allows" {
-  security_group_id = "${aws_security_group.appdev_cephosd1.id}"
-  type              = "ingress"
-  from_port         = 6800
-  to_port           = 7300
-  protocol          = "tcp"
-  source_security_group_id   = "${aws_security_group.appdev_cephrgw1.id}"
+  security_group_id        = "${aws_security_group.appdev_cephosd1.id}"
+  type                     = "ingress"
+  from_port                = 6800
+  to_port                  = 7300
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
 }
 
 // ELB Security Group
