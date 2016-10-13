@@ -1400,6 +1400,14 @@ EOF
   }
 }
 
+resource "aws_route53_record" "logs_dev_pardot_com_arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "logs.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_eip.appdev_toolsproxy1.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
 resource "aws_instance" "appdev_indexer1" {
   key_name      = "internal_apps"
   count         = "${var.environment_appdev["num_indexer1_hosts"]}"
