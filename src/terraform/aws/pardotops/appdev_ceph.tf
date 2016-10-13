@@ -144,6 +144,14 @@ resource "aws_elb" "appdev_rgw1_elb" {
     instance_protocol = "http"
   }
 
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = 80
+    instance_protocol  = "http"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
   health_check {
     healthy_threshold   = 4
     unhealthy_threshold = 2
@@ -155,6 +163,14 @@ resource "aws_elb" "appdev_rgw1_elb" {
   tags {
     Name = "appdev_rgw1_elb"
   }
+}
+
+resource "aws_route53_record" "files_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "files.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.appdev_rgw1_elb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
 }
 
 // CEPH RGW/Monitor instance(s)
@@ -364,6 +380,14 @@ resource "aws_elb" "appdev_rgw2_elb" {
     instance_protocol = "http"
   }
 
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = 80
+    instance_protocol  = "http"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
   health_check {
     healthy_threshold   = 4
     unhealthy_threshold = 2
@@ -375,6 +399,14 @@ resource "aws_elb" "appdev_rgw2_elb" {
   tags {
     Name = "appdev_rgw2_elb"
   }
+}
+
+resource "aws_route53_record" "files2_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "files2.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.appdev_rgw2_elb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
 }
 
 resource "aws_instance" "appdev_cephrgw2" {
