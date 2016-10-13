@@ -836,9 +836,10 @@ resource "aws_security_group" "artifactory_efs_access_security_group" {
   vpc_id      = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
     security_groups = [
       "${aws_security_group.artifactory_instance_secgroup.id}",
     ]
