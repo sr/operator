@@ -16,7 +16,7 @@
   </div>
   <div class="viewoption" <%= active?(current_view, ui_view, 'style="display:none;"') %>>
     <%= text_area_tag(:sql, query.raw_sql, rows: 10, cols: 80) %>
-    <%= submit_tag "Run Query" %>
+    <%= submit_tag "Run Query", class: "btn btn-primary" %>
   </div>
 
   <div class="viewoption" <%= active?(current_view, sql_view, 'style="display:none;"') %>>
