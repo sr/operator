@@ -381,14 +381,6 @@ resource "aws_route53_record" "ldap_dev_pardot_com_Arecord" {
   ttl     = "900"
 }
 
-resource "aws_route53_record" "logs_dev_pardot_com_CNAMErecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "logs.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["jump.dev.pardot.com."]
-  type    = "CNAME"
-  ttl     = "900"
-}
-
 resource "aws_route53_record" "logs-dfw_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "logs-dfw.${aws_route53_zone.dev_pardot_com.name}"
