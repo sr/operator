@@ -836,13 +836,20 @@ resource "aws_security_group" "artifactory_efs_access_security_group" {
   vpc_id      = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
-    from_port = -1
-    to_port   = -1
-    protocol  = "tcp"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
 
     security_groups = [
       "${aws_security_group.artifactory_instance_secgroup.id}",
     ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags {
