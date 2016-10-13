@@ -15,6 +15,7 @@ variable "environment_appdev" {
     db_instance_type          = "m4.2xlarge"
     kafka_instance_type       = "m4.2xlarge"
     storm_instance_type       = "m4.4xlarge"
+    ceph_instance_type        = "m4.xlarge"
     db_volume_device_name     = "/dev/xvdf"
     num_globaldb1_hosts       = 2
     num_dbshard1_hosts        = 4
@@ -42,6 +43,10 @@ variable "environment_appdev" {
     num_vault1_hosts          = 3
     num_consul1_hosts         = 2
     num_indexer1_hosts        = 1
+    num_cephrgw1_hosts        = 1
+    num_cephosd1_hosts        = 3
+    num_cephrgw2_hosts        = 1
+    num_cephosd2_hosts        = 3
   }
 }
 
