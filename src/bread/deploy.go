@@ -206,5 +206,5 @@ func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branc
 		}
 		return s.canoe.ListBuilds(ctx, t, branch)
 	}
-	return s.ecs.ListBuilds(ctx, t, "")
+	return s.ecs.ListBuilds(ctx, t, branch)
 }

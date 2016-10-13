@@ -59,6 +59,9 @@ func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch st
 		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, d.afy.Repo),
 		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
 	}
+	if branch != "" {
+		conds = append(conds, fmt.Sprintf(`{"@gitBranch": {"$eq": "%s"}}`, branch))
+	}
 	q := []string{
 		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
 		`.include("repo","path","name","created","property.*")`,
