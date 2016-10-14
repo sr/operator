@@ -207,14 +207,14 @@ resource "aws_route53_record" "files_dev_pardot_com_CNAMErecord" {
 resource "aws_instance" "appdev_cephrgw1" {
   key_name      = "internal_apps"
   count         = "${var.environment_appdev["num_cephrgw1_hosts"]}"
-  ami           = "${var.ceph-chef-ami}"
+  ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["ceph_instance_type"]}"
   subnet_id     = "${aws_subnet.appdev_us_east_1d.id}"
   ebs_optimized = "true"
 
   root_block_device {
     volume_type           = "gp2"
-    volume_size           = "8"
+    volume_size           = "50"
     delete_on_termination = true
   }
 
@@ -466,14 +466,14 @@ resource "aws_route53_record" "files2_dev_pardot_com_CNAMErecord" {
 resource "aws_instance" "appdev_cephrgw2" {
   key_name      = "internal_apps"
   count         = "${var.environment_appdev["num_cephrgw2_hosts"]}"
-  ami           = "${var.ceph-chef-ami}"
+  ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "${var.environment_appdev["ceph_instance_type"]}"
   subnet_id     = "${aws_subnet.appdev_us_east_1c.id}"
   ebs_optimized = "true"
 
   root_block_device {
     volume_type           = "gp2"
-    volume_size           = "8"
+    volume_size           = "50"
     delete_on_termination = true
   }
 
