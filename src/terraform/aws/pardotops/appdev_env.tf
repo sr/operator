@@ -236,6 +236,17 @@ resource "aws_security_group" "appdev_consulhost" {
     ]
   }
 
+  # allow toolsproxy to access consul UI
+  ingress {
+    from_port = 8500
+    to_port   = 8500
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -1324,6 +1335,14 @@ resource "aws_route53_record" "appdev_consul1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name    = "${var.environment_appdev["pardot_env_id"]}-consul1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${element(aws_instance.appdev_consul1.*.private_ip, count.index)}"]
+  type    = "A"
+  ttl     = "900"
+}
+
+resource "aws_route53_record" "consul_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "consul.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
   type    = "A"
   ttl     = "900"
 }
