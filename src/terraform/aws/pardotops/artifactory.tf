@@ -355,30 +355,6 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
         "arn:aws:s3:::artifactory-s3-filestore",
         "arn:aws:s3:::artifactory-s3-filestore/*"
       ]
-    },
-    {
-      "Sid": "DenyIncorrectEncryptionHeader",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
-      "Condition": {
-        "StringNotEquals": {
-          "s3:x-amz-server-side-encryption": "AES256"
-        }
-      }
-    },
-    {
-      "Sid": "DenyUnEncryptedObjectUploads",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
-      "Condition": {
-        "Null": {
-          "s3:x-amz-server-side-encryption": "true"
-        }
-      }
     }
   ]
 }
