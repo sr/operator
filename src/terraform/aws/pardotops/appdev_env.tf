@@ -47,6 +47,7 @@ variable "environment_appdev" {
     num_cephosd1_hosts        = 3
     num_cephrgw2_hosts        = 1
     num_cephosd2_hosts        = 3
+    num_ns1_hosts             = 1
   }
 }
 
@@ -1479,6 +1480,74 @@ resource "aws_route53_record" "appdev_indexer1_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name    = "${var.environment_appdev["pardot_env_id"]}-indexer1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${element(aws_instance.appdev_indexer1.*.private_ip, count.index)}"]
+  type    = "A"
+  ttl     = "900"
+}
+
+resource "aws_instance" "appdev_ns1" {
+  key_name      = "internal_apps"
+  count         = "${var.environment_appdev["num_ns1_hosts"]}"
+  ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id     = "${aws_subnet.appdev_us_east_1d.id}"
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = "50"
+    delete_on_termination = true
+  }
+
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_nshost.id}",
+  ]
+
+  tags {
+    Name      = "${var.environment_appdev["pardot_env_id"]}-ns1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_nshost" {
+  name        = "appdev_nshost"
+  description = "Allow access from apphosts"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  # allow app.dev hosts access to tcp/53
+  ingress {
+    from_port = 53
+    to_port   = 53
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+    ]
+  }
+
+  # allow app.dev hosts access to udp/53
+  ingress {
+    from_port = 53
+    to_port   = 53
+    protocol  = "udp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_route53_record" "appdev_ns1_arecord" {
+  count   = "${var.environment_appdev["num_ns1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "${var.environment_appdev["pardot_env_id"]}-ns1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_ns1.*.private_ip, count.index)}"]
   type    = "A"
   ttl     = "900"
 }
