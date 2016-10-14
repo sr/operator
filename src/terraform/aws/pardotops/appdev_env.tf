@@ -243,7 +243,7 @@ resource "aws_security_group" "appdev_consulhost" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.appdev_toolsproxy.id}"
+      "${aws_security_group.appdev_toolsproxy.id}",
     ]
   }
 
