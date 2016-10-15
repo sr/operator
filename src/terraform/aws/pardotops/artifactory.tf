@@ -11,6 +11,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
+
     cidr_blocks = [
       "${aws_instance.internal_apps_bastion.public_ip}/32",
       "${aws_instance.internal_apps_bastion_2.public_ip}/32",
@@ -23,6 +24,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
+
     security_groups = [
       "${aws_security_group.artifactory_dc_only_http_lb.id}",
       "${aws_security_group.artifactory_http_lb.id}",
@@ -34,6 +36,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
+
     cidr_blocks = [
       "${aws_vpc.artifactory_integration.cidr_block}",
     ]
@@ -45,6 +48,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     protocol  = "tcp"
     self      = true
   }
+
   # Notes on why "aws_vpc.artifactory_integration.cidr_block" above and below
   # see: https://www.jfrog.com/confluence/display/RTF/HA+Installation+and+Setup#InstallationandSetup-ConfiguringArtifactoryHA
   # "both the Hazelcast port (10001) and the Tomcat port (default 8081) should be open between all nodes."
@@ -52,6 +56,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 10001
     to_port   = 10001
     protocol  = "tcp"
+
     cidr_blocks = [
       "${aws_vpc.artifactory_integration.cidr_block}",
     ]
