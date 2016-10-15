@@ -33,14 +33,12 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   ingress {
-    from_port = 8081
-    to_port   = 8081
+    from_port = 80
+    to_port   = 80
     protocol  = "tcp"
 
-    security_groups = [
-      "${aws_security_group.artifactory_dc_only_http_lb.id}",
-      "${aws_security_group.artifactory_http_lb.id}",
-      "${aws_security_group.artifactory_internal_elb_secgroup.id}",
+    cidr_blocks = [
+      "${aws_vpc.artifactory_integration.cidr_block}",
     ]
   }
 
@@ -48,10 +46,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 8081
     to_port   = 8081
     protocol  = "tcp"
-
-    cidr_blocks = [
-      "${aws_vpc.artifactory_integration.cidr_block}",
-    ]
+    self      = true
   }
 
   # Notes on why "aws_vpc.artifactory_integration.cidr_block" above and below
@@ -304,7 +299,7 @@ resource "aws_elb" "artifactory_public_elb" {
   listener {
     lb_port            = 443
     lb_protocol        = "https"
-    instance_port      = 8081
+    instance_port      = 80
     instance_protocol  = "http"
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
@@ -320,7 +315,7 @@ resource "aws_elb" "artifactory_public_elb" {
     healthy_threshold   = 4
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:8081/artifactory/webapp/"
+    target              = "HTTP:80/artifactory/webapp/"
     interval            = 20
   }
 
@@ -685,7 +680,7 @@ resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
   health_check {
     interval            = "20"
     path                = "/artifactory/webapp/"
-    port                = 8081
+    port                = 80
     protocol            = "HTTP"
     healthy_threshold   = 5
     unhealthy_threshold = 5
