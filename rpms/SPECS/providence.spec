@@ -31,7 +31,6 @@ git clone https://git.soma.salesforce.com/AcqSec/Providence.git --recursive (or 
 %build
 
 %install
-rm -rf $RPM_BUILD_ROOT
 install -d -m 0755 $RPM_BUILD_ROOT/opt/providence
 cp -r . $RPM_BUILD_ROOT/opt/providence
 
