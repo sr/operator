@@ -1,5 +1,26 @@
 // Ceph configuration for appdev
 
+// Security group for all RGWs (allows cross-cluster replication)
+resource "aws_security_group" "appdev_ceph_global_rgw" {
+  name        = "appdev_ceph_global_rgw"
+  description = "Allow cross-cluster replication"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    self      = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 // CLUSTER 1
 
 // Ceph RGW/Monitor hosts Security Group
@@ -17,6 +38,17 @@ resource "aws_security_group" "appdev_cephrgw1" {
     self      = true
   }
 
+  // Allow port 80 from the ELB to the RGW host(s)
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_cephelb1.id}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -25,35 +57,31 @@ resource "aws_security_group" "appdev_cephrgw1" {
   }
 }
 
-// Allow port 80 from the ELB and the RGW host(s) from the second cluster for
-// replication
-resource "aws_security_group_rule" "cephrgw1_http_allow_from_elb" {
-  security_group_id        = "${aws_security_group.appdev_cephrgw1.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephelb1.id}"
-}
+resource "aws_security_group" "appdev_ceph_cluster1" {
+  name        = "appdev_ceph_cluster1"
+  description = "Allow specific ports within the cluster for each type"
+  vpc_id      = "${aws_vpc.appdev.id}"
 
-resource "aws_security_group_rule" "cephrgw1_http_allow_from_rgw2" {
-  security_group_id        = "${aws_security_group.appdev_cephrgw1.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephrgw2.id}"
-}
+  ingress {
+    from_port = 6789
+    to_port   = 6789
+    protocol  = "tcp"
+    self      = true
+  }
 
-// the OSDs need to be able to check in to the monitor service(s)
-resource "aws_security_group_rule" "cephrgw1_osd_to_mon_allows" {
-  security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
-  type              = "ingress"
-  from_port         = 6789
-  to_port           = 6789
-  protocol          = "tcp"
+  ingress {
+    from_port = 6800
+    to_port   = 7300
+    protocol  = "tcp"
+    self      = true
+  }
 
-  source_security_group_id = "${aws_security_group.appdev_cephosd1.id}"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 // Security group for the OSD servers
@@ -79,16 +107,6 @@ resource "aws_security_group" "appdev_cephosd1" {
   }
 }
 
-// RGWs need to be able to talk to the OSD services
-resource "aws_security_group_rule" "cephosd1_rgw_to_osd_allows" {
-  security_group_id        = "${aws_security_group.appdev_cephosd1.id}"
-  type                     = "ingress"
-  from_port                = 6800
-  to_port                  = 7300
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
-}
-
 // ELB Security Group
 resource "aws_security_group" "appdev_cephelb1" {
   name        = "appdev_cephelb1"
@@ -110,6 +128,16 @@ resource "aws_security_group" "appdev_cephelb1" {
   }
 
   ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
+  ingress {
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -121,30 +149,22 @@ resource "aws_security_group" "appdev_cephelb1" {
     ]
   }
 
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group_rule" "rgw1_elb_http" {
-  security_group_id        = "${aws_security_group.appdev_cephelb1.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
-}
-
-resource "aws_security_group_rule" "rgw1_elb_https" {
-  security_group_id        = "${aws_security_group.appdev_cephelb1.id}"
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
 }
 
 // Create the actual ELB
@@ -220,12 +240,27 @@ resource "aws_instance" "appdev_cephrgw1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_ceph_global_rgw.id}",
+    "${aws_security_group.appdev_ceph_cluster1.id}",
     "${aws_security_group.appdev_cephrgw1.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephrgw1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "zfs set xattr=sa data",
+      "zfs set atime=off data",
+      "zfs set compression=lz4 data",
+      "zfs create -V 93G data/ceph",
+      "mkfs.xfs /dev/zvol/data/ceph",
+      "mkdir -p /var/lib/ceph",
+      "mount /dev/zvol/data/ceph /var/lib/ceph",
+      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
+    ]
   }
 }
 
@@ -254,12 +289,26 @@ resource "aws_instance" "appdev_cephosd1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_ceph_cluster1.id}",
     "${aws_security_group.appdev_cephosd1.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephosd1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "zfs set xattr=sa data",
+      "zfs set atime=off data",
+      "zfs set compression=lz4 data",
+      "zfs create -V 93G data/ceph",
+      "mkfs.xfs /dev/zvol/data/ceph",
+      "mkdir -p /var/lib/ceph",
+      "mount /dev/zvol/data/ceph /var/lib/ceph",
+      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
+    ]
   }
 }
 
@@ -273,14 +322,21 @@ resource "aws_route53_record" "appdev_cephosd1_arecord" {
 }
 
 // CLUSTER 2
-resource "aws_security_group" "appdev_cephrgw2" {
-  name        = "appdev_cephrgw2"
-  description = "Allow traffic to Ceph RGW and Mon services"
+resource "aws_security_group" "appdev_ceph_cluster2" {
+  name        = "appdev_ceph_cluster2"
+  description = "Allow specific ports within the cluster for each type"
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
     from_port = 6789
     to_port   = 6789
+    protocol  = "tcp"
+    self      = true
+  }
+
+  ingress {
+    from_port = 6800
+    to_port   = 7300
     protocol  = "tcp"
     self      = true
   }
@@ -293,34 +349,35 @@ resource "aws_security_group" "appdev_cephrgw2" {
   }
 }
 
-// Allow port 80 from the ELB and the RGW host(s) from the second cluster for
-// replication
-resource "aws_security_group_rule" "cephrgw2_http_allow_from_elb" {
-  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephelb2.id}"
-}
+resource "aws_security_group" "appdev_cephrgw2" {
+  name        = "appdev_cephrgw2"
+  description = "Allow traffic to Ceph RGW and Mon services"
+  vpc_id      = "${aws_vpc.appdev.id}"
 
-resource "aws_security_group_rule" "cephrgw2_http_allow_from_rgw" {
-  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
-}
+  ingress {
+    from_port = 6789
+    to_port   = 6789
+    protocol  = "tcp"
+    self      = true
+  }
 
-// the OSDs need to be able to check in to the monitor service(s)
-resource "aws_security_group_rule" "cephrgw2_osd_to_mon_allows" {
-  security_group_id        = "${aws_security_group.appdev_cephrgw2.id}"
-  type                     = "ingress"
-  from_port                = 6789
-  to_port                  = 6789
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephosd2.id}"
+  // Allow port 80 from the ELB to the RGW host(s)
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_cephelb2.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group" "appdev_cephosd2" {
@@ -343,16 +400,6 @@ resource "aws_security_group" "appdev_cephosd2" {
   }
 }
 
-// RGWs need to be able to talk to the OSD services
-resource "aws_security_group_rule" "cephosd2_rgw_to_osd_allows" {
-  security_group_id        = "${aws_security_group.appdev_cephosd2.id}"
-  type                     = "ingress"
-  from_port                = 6800
-  to_port                  = 7300
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_cephrgw1.id}"
-}
-
 resource "aws_security_group" "appdev_cephelb2" {
   name        = "appdev_cephelb2"
   description = "Allow MYSQL traffic from appdev apphosts"
@@ -371,6 +418,16 @@ resource "aws_security_group" "appdev_cephelb2" {
   }
 
   ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
+  ingress {
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
@@ -382,30 +439,22 @@ resource "aws_security_group" "appdev_cephelb2" {
     ]
   }
 
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_vpc_default.id}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group_rule" "rgw2_elb_http" {
-  security_group_id        = "${aws_security_group.appdev_cephelb2.id}"
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
-}
-
-resource "aws_security_group_rule" "rgw2_elb_https" {
-  security_group_id        = "${aws_security_group.appdev_cephelb2.id}"
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.appdev_vpc_default.id}"
 }
 
 resource "aws_elb" "appdev_rgw2_elb" {
@@ -479,12 +528,27 @@ resource "aws_instance" "appdev_cephrgw2" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_ceph_global_rgw.id}",
+    "${aws_security_group.appdev_ceph_cluster2.id}",
     "${aws_security_group.appdev_cephrgw2.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephrgw2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "zfs set xattr=sa data",
+      "zfs set atime=off data",
+      "zfs set compression=lz4 data",
+      "zfs create -V 93G data/ceph",
+      "mkfs.xfs /dev/zvol/data/ceph",
+      "mkdir -p /var/lib/ceph",
+      "mount /dev/zvol/data/ceph /var/lib/ceph",
+      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
+    ]
   }
 }
 
@@ -513,12 +577,26 @@ resource "aws_instance" "appdev_cephosd2" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev_ceph_cluster2.id}",
     "${aws_security_group.appdev_cephosd2.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephosd2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "zfs set xattr=sa data",
+      "zfs set atime=off data",
+      "zfs set compression=lz4 data",
+      "zfs create -V 93G data/ceph",
+      "mkfs.xfs /dev/zvol/data/ceph",
+      "mkdir -p /var/lib/ceph",
+      "mount /dev/zvol/data/ceph /var/lib/ceph",
+      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
+    ]
   }
 }
 
