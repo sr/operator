@@ -249,19 +249,6 @@ resource "aws_instance" "appdev_cephrgw1" {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephrgw1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-
-  provisioner "remote-exec" {
-    inline = [
-      "zfs set xattr=sa data",
-      "zfs set atime=off data",
-      "zfs set compression=lz4 data",
-      "zfs create -V 93G data/ceph",
-      "mkfs.xfs /dev/zvol/data/ceph",
-      "mkdir -p /var/lib/ceph",
-      "mount /dev/zvol/data/ceph /var/lib/ceph",
-      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
-    ]
-  }
 }
 
 resource "aws_route53_record" "appdev_cephrgw1_arecord" {
@@ -296,19 +283,6 @@ resource "aws_instance" "appdev_cephosd1" {
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephosd1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "zfs set xattr=sa data",
-      "zfs set atime=off data",
-      "zfs set compression=lz4 data",
-      "zfs create -V 93G data/ceph",
-      "mkfs.xfs /dev/zvol/data/ceph",
-      "mkdir -p /var/lib/ceph",
-      "mount /dev/zvol/data/ceph /var/lib/ceph",
-      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
-    ]
   }
 }
 
@@ -537,19 +511,6 @@ resource "aws_instance" "appdev_cephrgw2" {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephrgw2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
   }
-
-  provisioner "remote-exec" {
-    inline = [
-      "zfs set xattr=sa data",
-      "zfs set atime=off data",
-      "zfs set compression=lz4 data",
-      "zfs create -V 93G data/ceph",
-      "mkfs.xfs /dev/zvol/data/ceph",
-      "mkdir -p /var/lib/ceph",
-      "mount /dev/zvol/data/ceph /var/lib/ceph",
-      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
-    ]
-  }
 }
 
 resource "aws_route53_record" "appdev_cephrgw2_arecord" {
@@ -584,19 +545,6 @@ resource "aws_instance" "appdev_cephosd2" {
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-cephosd2-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "zfs set xattr=sa data",
-      "zfs set atime=off data",
-      "zfs set compression=lz4 data",
-      "zfs create -V 93G data/ceph",
-      "mkfs.xfs /dev/zvol/data/ceph",
-      "mkdir -p /var/lib/ceph",
-      "mount /dev/zvol/data/ceph /var/lib/ceph",
-      "echo '/dev/zd0        /var/lib/ceph   xfs     defaults,noatime        0 0' | tee -a /ec/fstab",
-    ]
   }
 }
 
