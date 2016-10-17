@@ -34,7 +34,7 @@ class QueriesController < ApplicationController
           query.errors.add(:SQL, "is not parsable. #{$!.message}")
           query.blank
         rescue Mysql2::Error
-          query.errors.add(:SQL, "is executable. #{$!.message}")
+          query.errors.add(:SQL, "is not executable. #{$!.message}")
           query.blank
         end
       end
