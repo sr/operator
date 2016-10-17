@@ -196,7 +196,7 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.21" #Required by HA-Artifactory
+  private_ip           = "172.28.0.21"                                                 #Required by HA-Artifactory
   iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
@@ -230,7 +230,7 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.83" #Required by HA-Artifactory
+  private_ip           = "172.28.0.83"                                                 #Required by HA-Artifactory
   iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
@@ -264,7 +264,7 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.54" #Required by HA-Artifactory
+  private_ip           = "172.28.0.54"                                                 #Required by HA-Artifactory
   iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
@@ -346,7 +346,7 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "artifactory_instance_profile" {
-  name = "web_instance_profile"
+  name  = "web_instance_profile"
   roles = ["${aws_iam_role.artifactory_s3_access_iam_role.name}"]
 }
 
