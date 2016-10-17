@@ -27,5 +27,5 @@ variable "centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY" {
 }
 
 variable "ceph-chef-ami" {
-  default = "ami-9d6c268a"
+  default = "ami-7297c165"
 }
