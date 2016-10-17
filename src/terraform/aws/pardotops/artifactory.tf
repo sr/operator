@@ -196,7 +196,8 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.21"
+  private_ip = "172.28.0.21" #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
@@ -229,7 +230,8 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.83"
+  private_ip = "172.28.0.83" #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
@@ -262,7 +264,8 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.54"
+  private_ip = "172.28.0.54" #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
@@ -324,8 +327,27 @@ resource "aws_elb" "artifactory_public_elb" {
   }
 }
 
-resource "aws_iam_user" "artifactory_sysacct" {
-  name = "sa_artifactory"
+resource "aws_iam_role" "artifactory_s3_access_iam_role" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "artifactory_instance_profile" {
+  name = "web_instance_profile"
+  roles = ["${aws_iam_role.artifactory_s3_access_iam_role.name}"]
 }
 
 resource "aws_s3_bucket" "artifactory-s3-filestore" {
@@ -340,16 +362,40 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "allow artifactory sysacct",
+      "Sid": "allow artifactory iam role",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
+        "AWS": "${aws_iam_role.artifactory_s3_access_iam_role.arn}"
       },
       "Action": "s3:*",
       "Resource": [
         "arn:aws:s3:::artifactory-s3-filestore",
         "arn:aws:s3:::artifactory-s3-filestore/*"
       ]
+    },
+    {
+      "Sid": "DenyIncorrectEncryptionHeader",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnEncryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::artifactory-s3-filestore/*",
+      "Condition": {
+        "Null": {
+          "s3:x-amz-server-side-encryption": "true"
+        }
+      }
     }
   ]
 }
