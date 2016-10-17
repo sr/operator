@@ -43,6 +43,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 					Request: req,
 					Target:  req.Call.Args["target"],
 					Build:   req.Call.Args["build"],
+					Branch:  req.Call.Args["branch"],
 				},
 			)
 			return err

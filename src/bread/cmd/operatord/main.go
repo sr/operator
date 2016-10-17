@@ -63,7 +63,7 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
-	flags.StringVar(&config.halAddr, "addr-hal9000", ":9001", "Address of the HAL9000 gRPC server")
+	flags.StringVar(&config.halAddr, "addr-hal9000", "", "Address of the HAL9000 gRPC server")
 	flags.StringVar(&config.httpAddr, "addr-http", ":8080", "Listen address of the HipChat addon and webhook HTTP server")
 	flags.DurationVar(&config.timeout, "timeout", 10*time.Minute, "Timeout for gRPC requests")
 	flags.StringVar(&config.timezone, "timezone", "America/New_York", "Display dates and times in this timezone")
