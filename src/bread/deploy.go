@@ -84,6 +84,9 @@ func (s *deployAPIServer) ListBuilds(ctx context.Context, req *breadpb.ListBuild
 	if target == nil {
 		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
 	}
+	if target.Canoe && req.Branch == "" {
+		req.Branch = master
+	}
 	builds, err = s.listBuilds(ctx, target, req.Branch)
 	if err != nil {
 		return nil, err
@@ -133,6 +136,12 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 			},
 		})
 	}
+	if req.Build == "" && req.Branch == "" {
+		req.Branch = master
+	}
+	if req.Build != "" && req.Branch != "" {
+		return nil, errors.New("Please specify either a branch or a build to deploy, but not both")
+	}
 	var (
 		target *DeployTarget
 		msg    *operator.Message
@@ -148,19 +157,27 @@ func (s *deployAPIServer) Trigger(ctx context.Context, req *breadpb.TriggerReque
 		return nil, fmt.Errorf("No such deployment target: %s", req.Target)
 	}
 	var build Build
-	builds, err := s.listBuilds(ctx, target, "")
-	for _, b := range builds {
-		if b.GetID() == req.Build {
-			build = b
+	builds, err := s.listBuilds(ctx, target, req.Branch)
+	if req.Build == "" {
+		if len(builds) == 0 {
+			return nil, fmt.Errorf("No build found for branch %s of %s", req.Branch, req.Target)
 		}
-	}
-	if build == nil {
-		return nil, fmt.Errorf("No such build %s", req.Build)
+		build = builds[0]
+	} else {
+		for _, b := range builds {
+			if b.GetID() == req.Build {
+				build = b
+			}
+		}
+		if build == nil {
+			return nil, fmt.Errorf("No such build %s", req.Build)
+		}
 	}
 	if time.Since(build.GetCreated()) > maxBuildAge {
 		return nil, fmt.Errorf(
-			"Unable to deploy build %s because it was created on %s which is more than %s ago",
+			"Unable to deploy build %s (branch %s) because it was created on %s which is more than %s ago",
 			build.GetID(),
+			build.GetBranch(),
 			build.GetCreated().In(s.tz).Format("2006-01-02 at 15:04:05 MST"),
 			maxBuildAge,
 		)
@@ -201,10 +218,7 @@ func (s *deployAPIServer) listTargets(ctx context.Context, req operator.Requeste
 
 func (s *deployAPIServer) listBuilds(ctx context.Context, t *DeployTarget, branch string) ([]Build, error) {
 	if t.Canoe {
-		if branch == "" {
-			branch = master
-		}
 		return s.canoe.ListBuilds(ctx, t, branch)
 	}
-	return s.ecs.ListBuilds(ctx, t, "")
+	return s.ecs.ListBuilds(ctx, t, branch)
 }
