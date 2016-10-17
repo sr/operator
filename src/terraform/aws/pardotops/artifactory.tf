@@ -338,7 +338,7 @@ resource "aws_iam_role" "artifactory_s3_access_iam_role" {
         "Service": "ec2.amazonaws.com"
       },
       "Effect": "Allow",
-      "Sid": ""
+      "Sid": "artifactory_s3_access_iam_role"
     }
   ]
 }
