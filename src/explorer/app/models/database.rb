@@ -30,7 +30,17 @@ class Database
       params: params
     )
     statement = connection.prepare(sql)
-    statement.execute(*params)
+    begin
+      statement.execute(*params)
+    rescue ArgumentError => e
+      # BREAD-1428 Handle 0000-00-00 00:00:00 invalid dates already in our db
+      if e.message == "invalid date"
+        connection.query_options[:cast] = false
+        connection.query(sql)
+      else
+        raise e
+      end
+    end
   end
 
   private

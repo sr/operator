@@ -91,10 +91,10 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal 1, row[:account_id]
   end
 
-  test "bad datetime data in table" do
+  test "bad datetime data in table is not parsed" do
     query = @user.account_query("select * from account_extras", 1)
     results = query.execute(@user)
     row = results.first
-    assert_equal 1, row[:account_id]
+    assert_equal "1", row[:account_id]
   end
 end
