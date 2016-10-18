@@ -113,7 +113,14 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, data.Deploy.ID)
 	return &operator.Message{
 		Text: deployURL,
-		HTML: fmt.Sprintf(`Deployment of %s triggered. Watch it here: <a href="%s">#%d</a>`, req.Target.Name, deployURL, data.Deploy.ID),
+		HTML: fmt.Sprintf(
+			`Deployment of %s (branch %s) to %s progress. Follow along here: <a href="%s">#%d</a>`,
+			fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
+			req.Build.GetBranch(),
+			req.Target.Name,
+			deployURL,
+			data.Deploy.ID,
+		),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "green",
 		},

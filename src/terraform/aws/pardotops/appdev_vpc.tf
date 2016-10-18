@@ -219,6 +219,28 @@ resource "aws_security_group" "appdev_vpc_default" {
     ]
   }
 
+  # allow all app.dev hosts access communicate over TCP 8301 (consul agents)
+  ingress {
+    from_port = 8301
+    to_port   = 8301
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+    ]
+  }
+
+  # allow all app.dev hosts access communicate over UDP 8301 (consul agents)
+  ingress {
+    from_port = 8301
+    to_port   = 8301
+    protocol  = "udp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

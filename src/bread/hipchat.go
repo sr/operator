@@ -1,7 +1,6 @@
 package bread
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"github.com/sr/operator"
 	"github.com/sr/operator/generator"
 	"github.com/sr/operator/hipchat"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"bread/hal9000"

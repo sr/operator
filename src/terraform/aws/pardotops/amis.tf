@@ -25,3 +25,7 @@ variable "centos_6_hvm_50gb_chefdev_ami_LDAP_AUTH_HOST_ONLY" {
 variable "centos_7_hvm_ebs_ami_2TB_ENH_NTWK_CHEF_UE1_PROD_AFY_ONLY" {
   default = "ami-00bcd817" # CentOS 7 with Updates / Enhanced Networking / 2TB / Production Chef Bootstrap Ready
 }
+
+variable "ceph-chef-ami" {
+  default = "ami-7297c165"
+}

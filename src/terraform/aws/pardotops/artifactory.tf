@@ -33,14 +33,12 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
   }
 
   ingress {
-    from_port = 8081
-    to_port   = 8081
+    from_port = 80
+    to_port   = 80
     protocol  = "tcp"
 
-    security_groups = [
-      "${aws_security_group.artifactory_dc_only_http_lb.id}",
-      "${aws_security_group.artifactory_http_lb.id}",
-      "${aws_security_group.artifactory_internal_elb_secgroup.id}",
+    cidr_blocks = [
+      "${aws_vpc.artifactory_integration.cidr_block}",
     ]
   }
 
@@ -48,10 +46,7 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     from_port = 8081
     to_port   = 8081
     protocol  = "tcp"
-
-    cidr_blocks = [
-      "${aws_vpc.artifactory_integration.cidr_block}",
-    ]
+    self      = true
   }
 
   # Notes on why "aws_vpc.artifactory_integration.cidr_block" above and below
@@ -201,7 +196,8 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.21"
+  private_ip           = "172.28.0.21"                                                 #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
@@ -234,7 +230,8 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.83"
+  private_ip           = "172.28.0.83"                                                 #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
@@ -267,7 +264,8 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
     terraform = "true"
   }
 
-  private_ip = "172.28.0.54"
+  private_ip           = "172.28.0.54"                                                 #Required by HA-Artifactory
+  iam_instance_profile = "${aws_iam_instance_profile.artifactory_instance_profile.id}"
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
@@ -304,7 +302,7 @@ resource "aws_elb" "artifactory_public_elb" {
   listener {
     lb_port            = 443
     lb_protocol        = "https"
-    instance_port      = 8081
+    instance_port      = 80
     instance_protocol  = "http"
     ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
   }
@@ -320,7 +318,7 @@ resource "aws_elb" "artifactory_public_elb" {
     healthy_threshold   = 4
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:8081/artifactory/webapp/"
+    target              = "HTTP:80/artifactory/webapp/"
     interval            = 20
   }
 
@@ -329,8 +327,27 @@ resource "aws_elb" "artifactory_public_elb" {
   }
 }
 
-resource "aws_iam_user" "artifactory_sysacct" {
-  name = "sa_artifactory"
+resource "aws_iam_role" "artifactory_s3_access_iam_role" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "artifactory_instance_profile" {
+  name  = "web_instance_profile"
+  roles = ["${aws_iam_role.artifactory_s3_access_iam_role.name}"]
 }
 
 resource "aws_s3_bucket" "artifactory-s3-filestore" {
@@ -345,10 +362,10 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "allow artifactory sysacct",
+      "Sid": "allow artifactory iam role",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "${aws_iam_user.artifactory_sysacct.arn}"
+        "AWS": "${aws_iam_role.artifactory_s3_access_iam_role.arn}"
       },
       "Action": "s3:*",
       "Resource": [
@@ -709,7 +726,7 @@ resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
   health_check {
     interval            = "20"
     path                = "/artifactory/webapp/"
-    port                = 8081
+    port                = 80
     protocol            = "HTTP"
     healthy_threshold   = 5
     unhealthy_threshold = 5
@@ -829,4 +846,62 @@ resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
   load_balancer            = "${aws_elb.artifactory_public_elb.id}"
   lb_port                  = 443
   cookie_expiration_period = 3600
+}
+
+resource "aws_security_group" "artifactory_efs_access_security_group" {
+  description = "artifactory_efs_access_security_group"
+  vpc_id      = "${aws_vpc.artifactory_integration.id}"
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    security_groups = [
+      "${aws_security_group.artifactory_instance_secgroup.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name      = "artifactory_efs_storage"
+    terraform = "true"
+  }
+}
+
+resource "aws_efs_file_system" "artifactory_efs_storage" {
+  tags {
+    Name      = "artifactory_efs_storage"
+    terraform = "true"
+  }
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1a" {
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+
+  security_groups = [
+    "${aws_security_group.artifactory_efs_access_security_group.id}",
+  ]
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1c" {
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1c.id}"
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1d" {
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1d.id}"
+}
+
+resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
+  file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
+  subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }

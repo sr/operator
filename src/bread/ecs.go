@@ -59,6 +59,9 @@ func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch st
 		fmt.Sprintf(`{"repo": {"$eq": "%s"}}`, d.afy.Repo),
 		fmt.Sprintf(`{"path": {"$match": "%s/*"}}`, t.Image),
 	}
+	if branch != "" {
+		conds = append(conds, fmt.Sprintf(`{"@gitBranch": {"$eq": "%s"}}`, branch))
+	}
 	q := []string{
 		fmt.Sprintf(`items.find({"$and": [%s]})`, strings.Join(conds, ",")),
 		`.include("repo","path","name","created","property.*")`,
@@ -134,18 +137,20 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 	)
 	if req.Target.Name == "operator" {
 		html = fmt.Sprintf(
-			"Updated <code>%s@%s</code> to run build %s. Restarting... should be back soon %s",
+			"Updated <code>%s@%s</code> to run build %s (branch %s). Restarting... should be back soon %s",
 			*svc.Services[0].ServiceName,
 			req.Target.ECSCluster,
 			req.Build.GetID(),
+			req.Build.GetBranch(),
 			fingers,
 		)
 	} else {
 		html = fmt.Sprintf(
-			"Updated ECS service <code>%s@%s</code> to run build %s. Waiting up to %s for service to rollover...",
+			"Updated ECS service <code>%s@%s</code> to run build %s (branch %s). Waiting up to %s for service to rollover...",
 			*svc.Services[0].ServiceName,
 			req.Target.ECSCluster,
 			fmt.Sprintf(`<a href="%s">%s</a>`, req.Build.GetURL(), req.Build.GetID()),
+			req.Build.GetBranch(),
 			d.timeout,
 		)
 	}
