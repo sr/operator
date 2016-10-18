@@ -2,6 +2,7 @@
 #/ Usage: terra [--help] [arguments...]
 #/        terra plan <account>
 #/        terra apply <account>
+#/        terra fmt
 #/        terra pull <account>
 #/        terra push <account>
 #/        terra vendor <version>
@@ -85,9 +86,26 @@ case "$action" in
         make -f ../../etc/mk/terraform.mk "$action" |
         grep -vi password
         ;;
+    fmt)
+        go install github.com/hashicorp/terraform
+        terraform fmt -write src/terraform
+        exit "$?"
+        ;;
     validate)
-        cd src/terraform && make -f ../../etc/mk/terraform.mk validate
-        exit 0
+        go install github.com/hashicorp/terraform
+        cd src/terraform && make -s -f ../../etc/mk/terraform.mk validate
+        cd ../..
+        out="$(terraform fmt -write=false -list=true src/terraform)"
+        if [ -z "$out" ]; then
+          exit 0
+        else
+          echo "The following files are not formatted properly:"
+          echo
+          echo "${out}"
+          echo
+          echo "Run \"terra fmt"\" to automatically format the Terraform code.""
+          exit 1
+        fi
         ;;
     vendor)
         if [ -z "$arg1" ]; then

@@ -251,7 +251,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 				Filename:    "/test1.php",
 				Fingerprint: "abc123",
 				Duration:    2 * time.Minute,
-				TestCases: []*privet.TestCaseResult{
+				TestCases: privet.NewTestCaseResultSetWithResults([]*privet.TestCaseResult{
 					{
 						Name:     "Test1-1",
 						Duration: 1 * time.Minute,
@@ -264,7 +264,7 @@ func TestPlanWithLongTestFilesBrokenUpByTestCase(t *testing.T) {
 						Name:     "Test1-3",
 						Duration: 30 * time.Second,
 					},
-				},
+				}),
 			},
 		},
 		NumWorkers:          2,
@@ -327,7 +327,7 @@ func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
 				Filename:    "/test1.php",
 				Fingerprint: "xyz987",
 				Duration:    2 * time.Minute,
-				TestCases: []*privet.TestCaseResult{
+				TestCases: privet.NewTestCaseResultSetWithResults([]*privet.TestCaseResult{
 					{
 						Name:     "Test1-1",
 						Duration: 1 * time.Minute,
@@ -340,7 +340,7 @@ func TestPlanCannotBreakUpTestFilesThatHaveChanged(t *testing.T) {
 						Name:     "Test1-3",
 						Duration: 30 * time.Second,
 					},
-				},
+				}),
 			},
 		},
 		NumWorkers:          2,

@@ -54,11 +54,11 @@ var cmd = operator.NewCommand(
 					Flags: []*flag.Flag{
 						{
 							Name:  "target",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
 						},
 						{
 							Name:  "branch",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
 						},
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
@@ -93,16 +93,21 @@ var cmd = operator.NewCommand(
 					Flags: []*flag.Flag{
 						{
 							Name:  "target",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
 						},
 						{
 							Name:  "build",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
+						},
+						{
+							Name:  "branch",
+							Usage: "Undocumented",
 						},
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 						target := ctx.Flags.String("target", "", "")
 						build := ctx.Flags.String("build", "", "")
+						branch := ctx.Flags.String("branch", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -118,6 +123,7 @@ var cmd = operator.NewCommand(
 								Request: ctx.Request,
 								Target:  *target,
 								Build:   *build,
+								Branch:  *branch,
 							},
 						)
 						if err != nil {
@@ -131,7 +137,7 @@ var cmd = operator.NewCommand(
 
 		{
 			Name:     "ping",
-			Synopsis: `Undocumented.`,
+			Synopsis: `Undocumented`,
 			Methods: []operator.MethodCommand{
 				{
 					Name:     "otp",
@@ -165,7 +171,7 @@ var cmd = operator.NewCommand(
 					Flags: []*flag.Flag{
 						{
 							Name:  "arg1",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
 						},
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
@@ -198,7 +204,7 @@ var cmd = operator.NewCommand(
 					Flags: []*flag.Flag{
 						{
 							Name:  "wait",
-							Usage: "Undocumented.",
+							Usage: "Undocumented",
 						},
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
