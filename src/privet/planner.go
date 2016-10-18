@@ -95,7 +95,7 @@ func CreatePlan(opts *PlanCreationOpts) (*Plan, error) {
 			executions := []*PlanTestExecution{}
 			currentExecutionIndex := 0
 			currentExecutionDuration := time.Duration(0)
-			for _, testCase := range testResult.TestCases {
+			for _, testCase := range testResult.TestCases.Flattened() {
 				currentCaseDuration := testCase.Duration
 				if currentExecutionDuration > 0 && currentExecutionDuration+currentCaseDuration > opts.TargetDuration {
 					currentExecutionIndex++

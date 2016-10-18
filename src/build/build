@@ -82,7 +82,8 @@ build_rubygem() {
 docker_push() {
     app="$1"
     sha1="$(git rev-parse HEAD)"
-    repo="$DOCKER_REPO_BREAD/$app/app:$(docker-image-tag)"
+    tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
+    repo="${DOCKER_REPO_BREAD}/${app}/app:${tag}"
 
     echo "Pushing container image to ${repo}..." 2>&1
     docker tag "${app}_app" "$repo"
@@ -101,7 +102,7 @@ docker_push() {
     props+="buildResults=${BAMBOO_BUILD_RESULTS_URL}|"
     props+="passedCI=true"
 
-    manifest="pd-docker/build/bread/$app/app/$(docker-image-tag)/manifest.json"
+    manifest="pd-docker/build/bread/${app}/app/${tag}/manifest.json"
     apipath="api/storage/$manifest?properties=$props"
     set +x
     curl -f -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" -X PUT \

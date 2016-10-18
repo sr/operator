@@ -42,6 +42,8 @@ generate: $(PROTOC) $(GRPC_RUBY_PLUGIN) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCT
 		--plugin=protoc-gen-grpc=$(GRPC_RUBY_PLUGIN) \
 		--go_out=plugins=grpc,import_path=$(SVC_IMPORT_PATH),Moperator.proto=$(OPERATOR_PKG),Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:$(SVC_DIR) \
 		$(GOPATH)/src/bread/hal9000/*.proto
+	echo "0a\n# rubocop:disable all\n.\nw" | ed src/hal9000/lib/hal9000/hal9000_services.rb >/dev/null
+	echo "0a\n# rubocop:disable all\n.\nw" | ed src/hal9000/lib/hal9000/hal9000.rb >/dev/null
 
 ldap-dev: docker-build-ldap
 	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true
