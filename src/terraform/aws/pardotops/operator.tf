@@ -307,3 +307,52 @@ resource "aws_autoscaling_group" "operator_production" {
     create_before_destroy = true
   }
 }
+
+resource "aws_elasticache_subnet_group" "hal9000_production" {
+  name        = "hal9000-production"
+  description = "hal9000 production"
+
+  subnet_ids = [
+    "${aws_subnet.internal_apps_us_east_1a.id}",
+    "${aws_subnet.internal_apps_us_east_1c.id}",
+    "${aws_subnet.internal_apps_us_east_1d.id}",
+    "${aws_subnet.internal_apps_us_east_1e.id}",
+  ]
+}
+
+resource "aws_security_group" "hal9000_redis_production" {
+  name   = "hal9000_redis_production"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  ingress {
+    from_port = 6379
+    to_port   = 6379
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.operator_app_production.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_elasticache_cluster" "hal9000_production" {
+  cluster_id               = "hal9000-production"
+  engine                   = "redis"
+  engine_version           = "2.8.24"
+  maintenance_window       = "Tue:00:00-Tue:04:00"
+  node_type                = "cache.m3.medium"
+  num_cache_nodes          = 1
+  parameter_group_name     = "default.redis2.8"
+  port                     = 6379
+  subnet_group_name        = "${aws_elasticache_subnet_group.hal9000_production.name}"
+  security_group_ids       = ["${aws_security_group.hal9000_redis_production.id}"]
+  snapshot_retention_limit = 30
+  snapshot_window          = "04:00-06:00"
+}
