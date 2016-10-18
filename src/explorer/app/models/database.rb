@@ -38,7 +38,7 @@ class Database
         connection.query_options[:cast] = false
         connection.query(sql)
       else
-        raise e
+        raise
       end
     end
   end
