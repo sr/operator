@@ -134,4 +134,4 @@ Par Bot has served us well but we have found it difficult to maintain and keep s
 
 Parbot is part of the BREAD repository:
 
-[https://git.dev.pardot.com/Pardot/bread/tree/master/src/parbot#README](https://git.dev.pardot.com/Pardot/bread/tree/master/src)
+[https://git.dev.pardot.com/Pardot/bread/tree/master/src/parbot#README](https://git.dev.pardot.com/Pardot/bread/tree/master/src/parbot)
