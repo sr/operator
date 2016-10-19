@@ -30,7 +30,7 @@ module.exports = (robot) ->
     msg.send "(beer)"
 
 beer_handler = (msg, key, url) ->
-  
+
   unless msg.match?[1]?.trim()?
     return
 
@@ -40,12 +40,12 @@ beer_handler = (msg, key, url) ->
 
   query =
     format: "json",
-    key: key, 
+    key: key,
     withBreweries: "Y"
 
   if msg.match?[1]?.trim().toLowerCase() != 'random'
-    _.extend query, 
-      q: msg.match[1].trim(), 
+    _.extend query,
+      q: msg.match[1].trim(),
       type: "beer"
   else
     url="http://api.brewerydb.com/v2/beer/random"
@@ -61,7 +61,7 @@ beer_handler = (msg, key, url) ->
     else
       msg.send "Unfortunately, my knowledge still has limits."
       return
-    
+
     html = "<strong><i>#{beer.name}</i></strong><br />"
     if beer.breweries?[0]?
       html += "<strong>Brewery:</strong> #{beer.breweries[0].name}<br />"
@@ -77,7 +77,7 @@ beer_handler = (msg, key, url) ->
     msg.hipchatNotify(html, {color: "gray"})
 
 brewery_handler = (msg, key, url) ->
-  
+
   unless msg.match?[1]?.trim()?
     return
 
@@ -90,12 +90,12 @@ brewery_handler = (msg, key, url) ->
     key: key
 
   if msg.match?[1]?.trim().toLowerCase() != 'random'
-    _.extend query, 
-      q: msg.match[1].trim(), 
+    _.extend query,
+      q: msg.match[1].trim(),
       type: "brewery"
   else
     url="http://api.brewerydb.com/v2/brewery/random"
-  
+
   msg.http(url).query(query).get() (err, res, body) ->
     data = JSON.parse(body).data
 

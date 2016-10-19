@@ -27,7 +27,6 @@ GithubApiWrapper = require "../lib/github/github_api_wrapper"
 GithubRobotBrain = require "../lib/github/github_robot_brain"
 
 module.exports = (robot) ->
-
   robot.respond /pr$/i, (msg) ->
     robotBrain = new GithubRobotBrain
     github = new GithubApiWrapper()
@@ -106,4 +105,4 @@ module.exports = (robot) ->
     msg.send("All repos for this room's pr list have been removed")
 
 prCallback = (prTable, msg) ->
-    msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}
+  msg.hipchatNotify "<strong>Pull Requests: </strong>#{prTable}", {color: "green"}

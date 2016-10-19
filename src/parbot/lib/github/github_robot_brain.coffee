@@ -63,9 +63,9 @@ class GithubRobotBrain
     if !rooms[roomId]
       rooms[roomId] = []
     else
-      index = rooms[roomId].indexOf(value);
+      index = rooms[roomId].indexOf(value)
       if index != -1
-        rooms[roomId].splice(index, 1);
+        rooms[roomId].splice(index, 1)
     robot.brain.set(key, rooms)
 
 module.exports = GithubRobotBrain

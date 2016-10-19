@@ -216,8 +216,8 @@ module.exports = (robot) ->
 
   robot.respond /pieces$/i, (msg) ->
     msg.send msg.random [
-    	"https://hipchat.dev.pardot.com/files/1/260/YB1QIGT1uFmyaLy/upload.png",
-    	"https://dl.dropboxusercontent.com/u/2103751/rhys-meme.png"
+      "https://hipchat.dev.pardot.com/files/1/260/YB1QIGT1uFmyaLy/upload.png",
+      "https://dl.dropboxusercontent.com/u/2103751/rhys-meme.png"
     ]
 
   robot.respond /bees$/i, (msg) ->
@@ -858,7 +858,7 @@ module.exports = (robot) ->
       msg.send "#{url}"
 
   robot.respond /(?:(please|pls),?\s*)?(don(?:')?t|do not)\s*(touch|pet|scratch|mess with)\s*doge(?:!*)?(.*)?$/i, (msg) ->
-     msg.send "http://media3.giphy.com/media/jUSrFvui8Pfpe/giphy.gif"
+    msg.send "http://media3.giphy.com/media/jUSrFvui8Pfpe/giphy.gif"
 
   robot.respond /doge(\sme)?$/i, (msg) ->
     imageMe msg, "doge", (url) ->

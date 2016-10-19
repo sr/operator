@@ -339,7 +339,7 @@ module.exports = (robot) ->
               else
                 msg.reply "Override scheduled for '#{schedule.name}' until #{override.end}"
           else
-              msg.reply "😬 I couldn't find any schedule that matched '#{scheduleName}'. Try running !oncall to see a list of schedules."
+            msg.reply "😬 I couldn't find any schedule that matched '#{scheduleName}'. Try running !oncall to see a list of schedules."
 
   if serviceApiKey = process.env.HUBOT_PAGERDUTY_SERVICE_API_KEY
     robot.respond /pager\s+(?:trigger|send|alert)\s+(.+)$/i, (msg) ->

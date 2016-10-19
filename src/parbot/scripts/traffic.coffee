@@ -17,7 +17,6 @@ scopedHttpClient = require "scoped-http-client"
 BING_KEY = process.env.HUBOT_BING_API_KEY
 
 module.exports = (robot) ->
-
   robot.respond /traffic(?:\s+(map|incidents))?\s*$/i, (msg) ->
     if not BING_KEY or BING_KEY is ''
       msg.send "Missing Hubot configuration HUBOT_BING_API_KEY"
@@ -37,7 +36,7 @@ module.exports = (robot) ->
       sendTrafficIncidents(severity, msg)
     if mode isnt 'incidents'
       shareImage(imageHost, imagePath, msg)
-  
+
   # share the traffic image!
   shareImage = (host, path, msg) ->
     renderImage host, path, (err, buff) ->
@@ -65,53 +64,49 @@ module.exports = (robot) ->
   sendTrafficIncidents = (severity, msg) ->
     # traffic descriptions
     url = "http://dev.virtualearth.net/REST/v1/Traffic/Incidents/33.45,-84.70,34.11,-83.91"
-    msg.http(url)
-      .query({
-        severity: "#{severity}",
-        key: "#{BING_KEY}"})
-      .get() (err, res, body) ->
-        if err
-          msg.send "Error: #{err}"
-          return
-        data = JSON.parse body
-        if data?.resourceSets[0]?.resources?
-          incidents = data.resourceSets[0].resources
+    msg.http(url).query({severity: "#{severity}", key: "#{BING_KEY}"}).get() (err, res, body) ->
+      if err
+        msg.send "Error: #{err}"
+        return
+      data = JSON.parse body
+      if data?.resourceSets[0]?.resources?
+        incidents = data.resourceSets[0].resources
 
-          incidentArr = []
-          for i in [0..incidents.length - 1]
-            incidentArr.push getIncidentDescription(incidents[i])
+        incidentArr = []
+        for i in [0..incidents.length - 1]
+          incidentArr.push getIncidentDescription(incidents[i])
 
-          incidentArr = incidentArr.sort (arg1, arg2) ->
-            if arg1.sev < arg2.sev
-              -1
-            else if arg1.sev is arg2.sev
-              0
-            else
-              1
-
-          incidentStr = ''
-          for i in [0..incidentArr.length - 1]
-            incidentStr += incidentArr[i].string
-
-          html = ''
-          if incidentStr isnt ''
-            html = "#{incidentStr}"
-            color = 'red'
+        incidentArr = incidentArr.sort (arg1, arg2) ->
+          if arg1.sev < arg2.sev
+            -1
+          else if arg1.sev is arg2.sev
+            0
           else
-            html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\">"
-            color = 'green'
+            1
 
-          msg.hipchatNotify("#{html}", {
-            notify: false,
-            color: "#{color}"
-          })
+        incidentStr = ''
+        for i in [0..incidentArr.length - 1]
+          incidentStr += incidentArr[i].string
+
+        html = ''
+        if incidentStr isnt ''
+          html = "#{incidentStr}"
+          color = 'red'
         else
-          msg.send "Not able to parse JSON for traffic incidents"
- 
+          html = "No major traffic incidents in Atlanta! <img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/buttrock-1423164525.gif\">"
+          color = 'green'
+
+        msg.hipchatNotify("#{html}", {
+          notify: false,
+          color: "#{color}"
+        })
+      else
+        msg.send "Not able to parse JSON for traffic incidents"
+
   getIncidentDescription = (incident) ->
     # check all requirements for this method
-    if not incident or 
-       not incident.verified or 
+    if not incident or
+       not incident.verified or
        not incident.description or
        incident.description == ""
       return ''
@@ -129,14 +124,14 @@ module.exports = (robot) ->
       when 10 then "Alert"
       when 11 then "Weather"
       else "Unknown"
-                    
+
     description = incident.description
-    
+
     # add extra info in parentheses
     # don'r re-add type if it's already contained in description
     search = description.search "#{type}"
     info = if search == -1 then "#{type}" else ''
-    if incident.lane and incident.lane != "" 
+    if incident.lane and incident.lane != ""
       info += if info == '' then "Lane: #{incident.lane}" else ", Lane: #{incident.lane}"
     if incident.roadClosed
       info += if info == '' then "Road is closed" else ", Road is closed"
@@ -151,14 +146,14 @@ module.exports = (robot) ->
 
     obj = {}
     obj.sev = sev
-    
+
     # link to a google maps traffic view if available
     if incident?.point?.coordinates
       lat = incident.point.coordinates[0]
       lon = incident.point.coordinates[1]
       url = "https://www.google.com/maps/place/#{lat},#{lon}/data=!5m1!1e1"
       obj.string = "<a title=\"Google Maps Traffic Overview\" href=\"#{url}\">#{description}</a><br>"
-    else 
+    else
       obj.string = "#{description}<br>"
     return obj
 
@@ -199,69 +194,68 @@ module.exports = (robot) ->
 
     firstloc = '950+East+Paces+Ferry+Road,Atlanta,GA'
 
-    msg.http("https://maps.googleapis.com/maps/api/distancematrix/json")
-       .query({
-          origins: "#{firstloc}",
-          destinations: "#{secondloc}",
-          mode: 'driving',
-          departure_time: "#{departure}",
-          key: process.env.HUBOT_TRAFFIC_GOOGLE_API_KEY,
-          traffic_model: 'best_guess'})
-       .header('Accept', 'application/json')
-       .get() (err, res, body) ->
-          if err
-            msg.send "Error: #{err}"
-            return
+    params = {
+      origins: "#{firstloc}"
+      destinations: "#{secondloc}"
+      mode: 'driving'
+      departure_time: "#{departure}"
+      key: process.env.HUBOT_TRAFFIC_GOOGLE_API_KEY
+      traffic_model: 'best_guess'
+    }
+    msg.http("https://maps.googleapis.com/maps/api/distancematrix/json").query(params).header('Accept', 'application/json').get() (err, res, body) ->
+      if err
+        msg.send "Error: #{err}"
+        return
 
-          data = JSON.parse body
-          if data.error_message
-            msg.send "Error: #{data.error_message}"
-            return
+      data = JSON.parse body
+      if data.error_message
+        msg.send "Error: #{data.error_message}"
+        return
 
-          disttext = data?.rows[0]?.elements[0]?.distance?.text
-          distance = data?.rows[0]?.elements[0]?.distance?.value
+      disttext = data?.rows[0]?.elements[0]?.distance?.text
+      distance = data?.rows[0]?.elements[0]?.distance?.value
 
-          if data?.rows[0]?.elements[0]?.duration_in_traffic
-            # get duration in traffic if available
-            duration = data?.rows[0]?.elements[0]?.duration_in_traffic?.text
-          else
-            duration = data?.rows[0]?.elements[0]?.duration?.text
+      if data?.rows[0]?.elements[0]?.duration_in_traffic
+        # get duration in traffic if available
+        duration = data?.rows[0]?.elements[0]?.duration_in_traffic?.text
+      else
+        duration = data?.rows[0]?.elements[0]?.duration?.text
 
-          if sol and typeof duration isnt 'undefined'
-            solconst = 299792458
-            # calculate time from speed of light
-            duration = distance / solconst
-            duration = "#{duration}".substring(0,7)
+      if sol and typeof duration isnt 'undefined'
+        solconst = 299792458
+        # calculate time from speed of light
+        duration = distance / solconst
+        duration = "#{duration}".substring(0,7)
 
-          if duration == null
-            msg.send "Unable to retrieve travel time to #{secondloc}. (sadpanda)"
-          else if typeof duration is 'undefined'
-            msg.send "There is no #{if sol then '(lightning)' else 'driving'} route between #{secondloc} and the office. (sadpanda)"
-          else
-            # create google maps direction url
-            start = data.origin_addresses[0].replace(/\s/g, '+')
-            end = data.destination_addresses[0].replace(/\s/g, '+')
-            dirurl = "https://www.google.com/maps/dir/#{start}/#{end}"
+      if duration == null
+        msg.send "Unable to retrieve travel time to #{secondloc}. (sadpanda)"
+      else if typeof duration is 'undefined'
+        msg.send "There is no #{if sol then '(lightning)' else 'driving'} route between #{secondloc} and the office. (sadpanda)"
+      else
+        # create google maps direction url
+        start = data.origin_addresses[0].replace(/\s/g, '+')
+        end = data.destination_addresses[0].replace(/\s/g, '+')
+        dirurl = "https://www.google.com/maps/dir/#{start}/#{end}"
 
-            # build up reply message
-            reply = 'To get to '
+        # build up reply message
+        reply = 'To get to '
 
-            reply += "<a name=\"Google Maps Directions\" href=\"#{dirurl}\">"
-            reply += "#{data.destination_addresses[0]} from the office"
-            reply += "</a>"
+        reply += "<a name=\"Google Maps Directions\" href=\"#{dirurl}\">"
+        reply += "#{data.destination_addresses[0]} from the office"
+        reply += "</a>"
 
-            if sol
-              reply += " (#{disttext}) at the speed of light "
-              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/fastparrot-1462906216.gif\">"
-              reply += " it will take #{duration} seconds. "
-              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/lightning-1448383433.png\">"
-            else
-              reply += if departurereply then ", leaving at #{departurereply}" else ''
-              reply += ", it will take #{duration}. "
-              reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/drivinginmytruck-1452626743.png\">"
+        if sol
+          reply += " (#{disttext}) at the speed of light "
+          reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/fastparrot-1462906216.gif\">"
+          reply += " it will take #{duration} seconds. "
+          reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/lightning-1448383433.png\">"
+        else
+          reply += if departurereply then ", leaving at #{departurereply}" else ''
+          reply += ", it will take #{duration}. "
+          reply += "<img src=\"https://hipchat.dev.pardot.com/files/img/emoticons/1/drivinginmytruck-1452626743.png\">"
 
-            msg.hipchatNotify("#{reply}", {
-              notify: false,
-              color: "yellow"
-            })
+        msg.hipchatNotify("#{reply}", {
+          notify: false,
+          color: "yellow"
+        })
 
