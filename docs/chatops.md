@@ -1,12 +1,12 @@
 # Chat bots and ChatOps
 
-Whether you're to looking to expose complex production workflows or simply share quality GIFs, the BREAD team wants to help. We maintain the HAL9000 chat bot and welcome all contributions.
+Whether you're to looking to expose complex production workflows through chat or simply share quality GIFs, the BREAD team wants to help. We maintain the HAL9000 chat bot and welcome all contributions.
 
 ## Implementing a chat command for HAL9000
 
 HAL9000 is built on top of the  [Lita](https://www.lita.io/) framework, and commands are written in Ruby. There are hundreds of existing community plugins which are generally of good quality.  We suggest checking out the plugins catalog before going any further:
 
-https://plugins.lita.io/#handlers
+<https://plugins.lita.io/#handlers>
 
 To install a plugin, add it to HAL9000's [Gemfile](https://git.dev.pardot.com/Pardot/bread/blob/master/src/hal9000/Gemfile), run `bundler update`, and create a pull request.
 
@@ -21,7 +21,7 @@ The official Lita documentation is great and should cover everything needed for 
 * [Helper methods](https://docs.lita.io/plugin-authoring/handlers/#helper-methods)
 * [Configuration](https://docs.lita.io/plugin-authoring/handlers/#configuration)
 
-We highly recommend that new HAL9000 commands come with at least one happy-path test case. This helps us maintain and support  commands in the long term, making sure they keeps working for years to come. Checkout the [testing guide](https://docs.lita.io/plugin-authoring/testing/#testing-handlers) or in depth documentation or one of the existing test cases for examples:
+We highly recommend that new HAL9000 commands come with at least one happy-path test case. This helps us maintain and support  commands in the long term, making sure they keeps working for years to come. Checkout the [testing guide](https://docs.lita.io/plugin-authoring/testing/#testing-handlers) for in depth documentation or one of the existing test cases for examples:
 
 https://git.dev.pardot.com/Pardot/bread/tree/master/src/hal9000/spec/handlers
 
@@ -35,7 +35,7 @@ Then run this command to get an interactive session:
 
 `$ script/console`
 
-If everything worked, you can type `!info` and you should get a reply:
+If everything worked, you should be able to type `!info` and get a reply from HAL90000:
 
 ```
 $ script/console
@@ -52,23 +52,19 @@ Redis 2.6.17 - Memory used: 837.19K`
 ERROR: Service 'app' failed to build: Get https://docker.dev.pardot.com/v2/base/ruby/manifests/2.3.0: unauthorized: BAD_CREDENTIAL
 ```
 
-Checkout [this page on Confluence](https://confluence.dev.pardot.com/display/PTechops/Using+the+Docker+Registry+locally) for help. It means you docker client has not been setup properly.
+Checkout [this page on Confluence](https://confluence.dev.pardot.com/display/PTechops/Using+the+Docker+Registry+locally) for help. It means your docker client has not been setup properly.
 
-Run the tests with this command:
-
-`$ script/test`
-
-https://git.dev.pardot.com/Pardot/bread/blob/master/src/hal9000/README.md#development
+Run the tests using the `script/test` command.
 
 ### Deployment
 
-[Open a pull request](https://help.github.com/articles/creating-a-pull-request/) and, once it has been reviewed and approved, use the `!deploy` command to deploy your branch:
+[Open a pull request](https://help.github.com/articles/creating-a-pull-request/) on the BREAD repo and, once it has been reviewed and approved, use the `!deploy` command to deploy your branch:
 
 ```
 !deploy trigger target=hal9000 branch=my-great-branch <insert-yubikey-otp>
 ```
 
-Confirm everything is working as expected, then merge your branch. Otherwise rollback to master, fix any problem on you branch, and repeat the process until you are satisfied with the changes and HAL9000 is in a good state.
+Confirm everything is working as expected, then merge your branch. Otherwise rollback to master, fix your branch, and repeat the process until you are satisfied with your changes and HAL9000 is in a good state.
 
 **NOTE:** If you do not have a YubiKey, please ask in the Build & Automate room and we will deploy the branch for you. We're working on a better solution.
 
@@ -76,28 +72,28 @@ Confirm everything is working as expected, then merge your branch. Otherwise rol
 
 We also support implementing chat commands as  [gRPC](http://www.grpc.io/) methods. This biggest difference with those implemented as Lita handlers  is the invocation syntax. Since they directly map to RPC (Remote Procedure Call) methods, commands always take the `service method [arg1=value]` form. This constraint may not be appropriate for all use cases.
 
-Additionally, access to commands implemented this way is authorized based on LDAP group membership and allows requiring 2FA where needed. The ACL is defined in code here:
+Additionally, access to commands implemented this way is authorized based on LDAP group membership and allows requiring 2FA where needed. The ACL is defined as code here:
 
-https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/bread.go#L35
+<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/bread.go#L35>
 
-Note that commands implemented this way must be written in [Go](https://golang.org/),  a statically compiled language. We may add support for other languages such as Java in the future.
+Note that commands implemented this way must be written in [Go](https://golang.org/), a statically compiled language. We may add support for other languages such as Java in the future.
 
 Documentation is rather sparse at this time, and reading the code is the best suggestion we have. The implementation of the `!deploy` command is a good starting point:
 
-https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/pb/deploy.proto
-https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/deploy.go
+<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/pb/deploy.proto>
+<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/deploy.go>
 
 We also recommend reading `godoc bread`.
 
 ### Running the chatops server locally
 
-The gRPC server that exposes chatops commands is part of the `operatord` command.  Building it requires installing the Go toolchain. On a macOS machine this should be easy as `brew install go`. Otherwise checkout the [official install documentation](https://golang.org/doc/install).
+The gRPC server that exposes chatops commands is part of the `operatord` command.  Building it requires installing the Go toolchain. On a macOS machine this should be as easy as running `brew install go`. Otherwise checkout the [official install documentation](https://golang.org/doc/install).
 
 To build the client and server, run:
 
 `$ go install -v bread/cmd/...`
 
-If everything worked you can now run a development server like so:
+If everything worked you should be able to run a development server like so:
 
 ````
 $ operatord -dev
