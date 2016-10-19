@@ -136,8 +136,8 @@ var (
 		{
 			Name:          "parbot",
 			BambooProject: "BREAD",
-			BambooPlan:    "PAR",
-			BambooJob:     "",
+			BambooPlan:    "BREAD",
+			BambooJob:     "PAR",
 			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
