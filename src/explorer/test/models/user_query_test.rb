@@ -96,5 +96,6 @@ class UserQueryTest < ActiveSupport::TestCase
     results = query.execute(@user)
     row = results.first
     assert_equal "1", row[:account_id]
+    assert_equal "0000-00-00 00:00:00", row[:created_at]
   end
 end
