@@ -117,7 +117,7 @@ var (
 			BambooPlan:    "BREAD",
 			BambooJob:     "HAL",
 			Canoe:         false,
-			ECSCluster:    "hal9000_production",
+			ECSCluster:    "operator_production",
 			ECSService:    "hal9000",
 			ContainerName: "hal9000",
 			Image:         "build/bread/hal9000/app",
