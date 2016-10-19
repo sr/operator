@@ -9,14 +9,14 @@ class UserQueryTest < ActiveSupport::TestCase
     query = @user.account_query("SELECT * FROM object_audit", 1)
     results = query.execute(@user)
     row = results.first
-    assert_equal 1, row[:id]
-    assert_equal 1, row[:account_id]
+    assert_equal "1", row[:id]
+    assert_equal "1", row[:account_id]
     assert_equal "Account", row[:object_type]
 
     query = @user.global_query("SELECT * FROM global_account WHERE id = 1")
     results = query.execute(@user)
     row = results.first
-    assert_equal 1, row[:id]
+    assert_equal "1", row[:id]
   end
 
   test "global query audit log" do
@@ -69,7 +69,7 @@ class UserQueryTest < ActiveSupport::TestCase
     query = @user.account_query("SELECT * FROM visitor_parameter", 1)
     results = query.execute(@user)
     row = results.first
-    assert_equal 1, row[:id]
+    assert_equal "1", row[:id]
   end
 
   test "trying to get access to data from other account id" do
@@ -88,7 +88,7 @@ class UserQueryTest < ActiveSupport::TestCase
     query = @user.account_query("select account_id, last_name, first_name, updated_at, is_archived from prospect where is_archived=1 OR is_archived=0", 1)
     results = query.execute(@user)
     row = results.first
-    assert_equal 1, row[:account_id]
+    assert_equal "1", row[:account_id]
   end
 
   test "bad datetime data in table is not parsed" do

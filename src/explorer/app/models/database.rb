@@ -29,18 +29,7 @@ class Database
       query: sql,
       params: params
     )
-    statement = connection.prepare(sql)
-    begin
-      statement.execute(*params)
-    rescue ArgumentError => e
-      # BREAD-1428 Handle 0000-00-00 00:00:00 invalid dates already in our db
-      if e.message == "invalid date"
-        connection.query_options[:cast] = false
-        connection.query(sql)
-      else
-        raise
-      end
-    end
+    connection.query(sql)
   end
 
   private
@@ -62,6 +51,9 @@ class Database
   def establish_connection
     connection = Mysql2::Client.new(connection_config)
     connection.query_options[:symbolize_keys] = true
+    # BREAD-1428 Since we have invalid dates already in our db, such as 0000-00-00 00:00:00
+    # we're disabling casting for all queries
+    connection.query_options[:cast] = false
     connection
   end
 
