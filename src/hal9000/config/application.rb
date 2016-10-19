@@ -2,6 +2,7 @@ require File.expand_path("../boot", __FILE__)
 
 require "json"
 require "active_support/core_ext/class/subclasses"
+require "active_support/string_inquirer"
 
 if ENV["RAILS_ENV"] == "test"
   Bundler.require(:default, :test)
@@ -14,11 +15,11 @@ require "hal9000"
 require "hal9000/lita_help"
 
 module HAL9000
-  class Application
-    def self.hal_env
-      ENV["HAL9000_ENV"] || "development"
-    end
+  def self.env
+    ActiveSupport::StringInquirer.new(ENV["HAL9000_ENV"] || "development")
+  end
 
+  class Application
     def self.configure
       Lita.configure do |config|
         config.robot.name = "HAL9000"
@@ -113,7 +114,7 @@ module HAL9000
           next
         end
 
-        if file.basename.to_s == "zabbix_handler.rb" && hal_env == "development"
+        if file.basename.to_s == "zabbix_handler.rb" && HAL9000.env.development?
           next
         end
 
@@ -126,6 +127,7 @@ module HAL9000
     end
 
     def self.start
+      $stderr.puts "HAL9000 starting in #{HAL9000.env}..."
       Lita::CLI.start
     end
   end
