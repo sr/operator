@@ -233,18 +233,7 @@ case "$project" in
         fi
         ;;
     parbot)
-        # This expects PARBOT_DIR to be pointing to a checkout of the
-        # Pardot/parbot repository.
-        parbotdir="${PARBOT_DIR:-""}"
-        echo "$parbotdir"
-        if [ -z "$parbotdir" ] || [ ! -d "$parbotdir" ]; then
-            echo "PARBOT_DIR not set or directory does not exists" 2>&1
-            exit 1
-        fi
-
-        trap 'rm -f $parbotdir/Dockerfile' EXIT
-        cp etc/docker/Dockerfile.parbot "$parbotdir/Dockerfile"
-        docker build $pullopts -f "$parbotdir/Dockerfile" -t parbot_app "$parbotdir"
+        docker build $pullopts -f "$BREAD/src/parbot/Dockerfile" -t parbot_app "$BREAD/src/parbot"
 
         if [ -n "$CI" ]; then
             docker_push "$project"
