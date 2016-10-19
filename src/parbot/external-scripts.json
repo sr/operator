@@ -1,0 +1,11 @@
+[
+  "hubot-diagnostics",
+  "hubot-help",
+  "hubot-itunes-search",
+  "hubot-meme",
+  "hubot-redis-brain",
+  "hubot-schedule",
+  "hubot-twitter-stream",
+  "hubot-frinkiac",
+  "hubot-youtube"
+]
