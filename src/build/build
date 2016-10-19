@@ -239,7 +239,7 @@ case "$project" in
         echo "$parbotdir"
         if [ -z "$parbotdir" ] || [ ! -d "$parbotdir" ]; then
             echo "PARBOT_DIR not set or directory does not exists" 2>&1
-            exit 1
+            exit 0
         fi
 
         trap 'rm -f $parbotdir/Dockerfile' EXIT
