@@ -19,7 +19,7 @@ class CommitHandler < ApplicationHandler
     repo = response.match_data["repo"] || DEFAULT_REPO
 
     url = "https://git.dev.pardot.com/Pardot/#{repo}/commit/#{sha}"
-    response.reply(%Q{<a href="#{url}">Parbot/#{repo}@#{sha[0,7]}</a>})
+    response.reply(%(<a href="#{url}">Parbot/#{repo}@#{sha[0, 7]}</a>))
   end
 
   def diff(response)
@@ -27,9 +27,9 @@ class CommitHandler < ApplicationHandler
     sha1 = response.match_data["sha1"] || DEFAULT_BRANCH
     sha2 = response.match_data["sha2"]
 
-    diff = "#{sha1[0,7]}...#{sha2[0,7]}"
+    diff = "#{sha1[0, 7]}...#{sha2[0, 7]}"
     url = "https://git.dev.pardot.com/Pardot/#{repo}/compare/#{diff}?w=1"
     response.reply(url)
-    response.reply(%Q{<a href="#{url}">Parbot/#{repo}@#{diff}</a>})
+    response.reply(%(<a href="#{url}">Parbot/#{repo}@#{diff}</a>))
   end
 end
