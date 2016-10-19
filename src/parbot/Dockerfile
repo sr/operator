@@ -7,11 +7,12 @@ RUN apt-get update \
       libicu-dev \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache
+RUN npm install -g coffeelint jslint
 RUN mkdir -p /app
 WORKDIR /app
 COPY package.json /app/package.json
 COPY npm-shrinkwrap.json /app/npm-shrinkwrap.json
 COPY script/bootstrap /app/script/bootstrap
 RUN npm install
-ENTRYPOINT ["script/server"]
+CMD ["script/server"]
 COPY . /app
