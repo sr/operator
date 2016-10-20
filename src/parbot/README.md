@@ -1,6 +1,6 @@
 # Parbot is deprecated
 
-Parbot is deprecated. Please read the [ChatOps documentation](https://git.dev.pardot.com/Pardot/bread/blob/master/doc/chatops.md#par-bot).
+Parbot is deprecated. Please read the [ChatOps documentation](https://git.dev.pardot.com/Pardot/bread/blob/master/doc/chatops.md#par-bot) for more details.
 
 * * *
 
