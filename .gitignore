@@ -19,6 +19,7 @@ coverage
 !/bin/cibuild
 !/bin/dailyjob
 !/bin/deploy
+!/bin/godoc
 !/bin/terra
 .idea
 **/.idea

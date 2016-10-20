@@ -2,6 +2,7 @@ require File.expand_path("../boot", __FILE__)
 
 require "json"
 require "active_support/core_ext/class/subclasses"
+require "active_support/string_inquirer"
 
 if ENV["RAILS_ENV"] == "test"
   Bundler.require(:default, :test)
@@ -14,6 +15,10 @@ require "hal9000"
 require "hal9000/lita_help"
 
 module HAL9000
+  def self.env
+    ActiveSupport::StringInquirer.new(ENV["HAL9000_ENV"] || "development")
+  end
+
   class Application
     def self.configure
       Lita.configure do |config|
@@ -70,24 +75,18 @@ module HAL9000
         # Replication fixing
         config.handlers.replication_fixing_handler.pagerduty_service_key = ENV.fetch("REPFIX_PAGERDUTY_SERVICE_KEY", "")
 
-        config.handlers.zabbix_handler.pagerduty_service_key = ENV.fetch("ZABBIX_PAGERDUTY_SERVICE_KEY", "")
-
-        # Set the Hipchat Chatroom
-        config.handlers.zabbix_handler.status_room = ENV.fetch("ZABBIX_STATUS_ROOM", "1_ops@conf.btf.hipchat.com")
-
-        # Set the datacenters
-        # config.handlers.zabbix_handler.datacenters = ['dfw','phx']
-
-        # Zabbix Setup
-        config.handlers.zabbix_handler.zabbix_user = ENV.fetch("ZABBIX_USER", "")
-        config.handlers.zabbix_handler.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
-
-        # Zabbix Monitor Config
-        config.handlers.zabbix_handler.monitor_hipchat_notify = true
-        config.handlers.zabbix_handler.monitor_interval_seconds = 60
-        config.handlers.zabbix_handler.monitor_retries = 5
-        config.handlers.zabbix_handler.monitor_retry_interval_seconds = 5
-        config.handlers.zabbix_handler.monitor_http_timeout_seconds = 30
+        # Setup Zabbix handler
+        if config.handlers.respond_to?(:zabbix_handler)
+          config.handlers.zabbix_handler.pagerduty_service_key = ENV.fetch("ZABBIX_PAGERDUTY_SERVICE_KEY", "")
+          config.handlers.zabbix_handler.status_room = ENV.fetch("ZABBIX_STATUS_ROOM", "1_ops@conf.btf.hipchat.com")
+          config.handlers.zabbix_handler.zabbix_user = ENV.fetch("ZABBIX_USER", "")
+          config.handlers.zabbix_handler.zabbix_password = ENV.fetch("ZABBIX_PASSWORD", "")
+          config.handlers.zabbix_handler.monitor_hipchat_notify = true
+          config.handlers.zabbix_handler.monitor_interval_seconds = 60
+          config.handlers.zabbix_handler.monitor_retries = 5
+          config.handlers.zabbix_handler.monitor_retry_interval_seconds = 5
+          config.handlers.zabbix_handler.monitor_http_timeout_seconds = 30
+        end
 
         ## Example: Set options for the Redis connection.
         config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
@@ -115,6 +114,10 @@ module HAL9000
           next
         end
 
+        if file.basename.to_s == "zabbix_handler.rb" && HAL9000.env.development?
+          next
+        end
+
         require file.sub(".rb", "")
       end
 
@@ -124,6 +127,7 @@ module HAL9000
     end
 
     def self.start
+      $stderr.puts "HAL9000 starting in #{HAL9000.env}..."
       Lita::CLI.start
     end
   end
