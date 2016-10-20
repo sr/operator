@@ -58,7 +58,7 @@ Run the tests using the `script/test` command.
 
 ### Deployment
 
-[Open a pull request](https://help.github.com/articles/creating-a-pull-request/) on the BREAD repo and, once it has been reviewed and approved, use the `!deploy` command to deploy your branch:
+[Open a pull request](https://help.github.com/articles/creating-a-pull-request/) on the BREAD repo and, get reviewed it and approved, then use the `!deploy` command to deploy your branch:
 
 ```
 !deploy trigger target=hal9000 branch=my-great-branch <insert-yubikey-otp>
@@ -72,13 +72,13 @@ Confirm everything is working as expected, then merge your branch. Otherwise rol
 
 We also support implementing chat commands as  [gRPC](http://www.grpc.io/) methods. This biggest difference with those implemented as Lita handlers  is the invocation syntax. Since they directly map to RPC (Remote Procedure Call) methods, commands always take the `service method [arg1=value]` form. This constraint may not be appropriate for all use cases.
 
-Additionally, access to commands implemented this way is authorized based on LDAP group membership and allows requiring 2FA where needed. The ACL is defined as code here:
+Additionally, access to commands implemented this way is authorized based on LDAP group membership and allows to require 2FA (Two-factor Authentication) where needed. The ACL (Access Control List) is defined as code here:
 
 <https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/bread.go#L35>
 
 Note that commands implemented this way must be written in [Go](https://golang.org/), a statically compiled language. We may add support for other languages such as Java in the future.
 
-Documentation is rather sparse at this time, and reading the code is the best suggestion we have. The implementation of the `!deploy` command is a good starting point:
+Documentation is rather sparse at this time, and reading the code is the best we have. The implementation of the `!deploy` command is a good starting point:
 
 <https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/pb/deploy.proto>
 <https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/deploy.go>
@@ -87,7 +87,7 @@ We also recommend reading `godoc bread`.
 
 ### Running the chatops server locally
 
-The gRPC server that exposes chatops commands is part of the `operatord` command.  Building it requires installing the Go toolchain. On a macOS machine this should be as easy as running `brew install go`. Otherwise checkout the [official install documentation](https://golang.org/doc/install).
+The gRPC server that exposes chatops commands is part of the `operatord` command.  Building it requires installing the Go toolchain. On a macOS machine this should be as easy as running `brew install go`. Otherwise checkout the [official install documentation](https://golang.org/doc/install) for help.
 
 To build the client and server, run:
 
@@ -110,7 +110,7 @@ pong
 
 Rich HTML-formatted messages are sent to the [BREAD Testing](hipchat://hipchat.dev.pardot.com/room/882) room on HipChat.
 
-Use the normal Go tooling to run test the tests:
+Use the normal Go tooling to run the tests:
 
 `$ go test -v bread/...`
 
@@ -118,9 +118,11 @@ To run the entire battery of tests, including various lint checks and whatnot, r
 
 `$ make -f etc/mk/golang.mk`
 
+This is what gets run on CI.
+
 ### Adding new RPC methods
 
-All RPC methods are defined in the protobuf files located here:
+All RPC services and their methods are defined in the protobuf files located in the `src/bread/pb` directory:
 
 <https://git.dev.pardot.com/Pardot/bread/tree/master/src/bread/pb>
 
@@ -132,6 +134,6 @@ The implementation for the various services lives under the `bread` Go package. 
 
 Par Bot has served us well but we have found it difficult to maintain and keep stable, and therefore have decided to deprecate it. We still accept bug fixes and minor contributions, but please implement all new commands in HAL9000 going forward. We will be migrating existing commands over to HAL9000 in the coming months. 
 
-Parbot is part of the BREAD repository:
+Par Bot is part of the BREAD repository:
 
 [https://git.dev.pardot.com/Pardot/bread/tree/master/src/parbot#README](https://git.dev.pardot.com/Pardot/bread/tree/master/src/parbot)
