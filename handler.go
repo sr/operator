@@ -7,45 +7,22 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/sr/operator/generator"
+
 	"golang.org/x/net/context"
-
-	"google.golang.org/grpc"
 )
-
-const rCommandMessage = `\A%s(?P<service>\w+)\s+(?P<method>\w+)(?:\s+(?P<options>.*))?\z`
 
 type handler struct {
 	ctx     context.Context
 	inst    Instrumenter
 	decoder Decoder
-	re      *regexp.Regexp
-	conn    *grpc.ClientConn
 	invoker Invoker
-}
-
-func newHandler(
-	inst Instrumenter,
-	decoder Decoder,
-	prefix string,
-	conn *grpc.ClientConn,
-	invoker Invoker,
-) (*handler, error) {
-	re, err := regexp.Compile(fmt.Sprintf(rCommandMessage, regexp.QuoteMeta(prefix)))
-	if err != nil {
-		return nil, err
-	}
-	return &handler{
-		context.Background(),
-		inst,
-		decoder,
-		re,
-		conn,
-		invoker,
-	}, nil
+	re      *regexp.Regexp
+	pkg     string
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msg, replierID, err := h.decoder.Decode(h.ctx, r)
+	msg, senderID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil {
 		h.inst.Instrument(&Event{Key: "handler_decode_error", Error: err})
 		w.WriteHeader(http.StatusBadRequest)
@@ -86,30 +63,19 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.In(c, unicode.Quotation_Mark)
 		})
 	}
-	req := &Request{
-		Call: &Call{
-			Service: matches[1],
-			Method:  matches[2],
+	go h.invoker.Invoke(
+		h.ctx,
+		msg,
+		&Request{
+			Call: &Call{
+				// TODO(sr) multi package support
+				Service: fmt.Sprintf("%s.%s", h.pkg, generator.Camelize(matches[1], "-")),
+				Method:  generator.Camelize(matches[2], "-"),
+				Args:    args,
+			},
+			Otp:      otp,
+			SenderId: senderID,
+			Source:   msg.Source,
 		},
-		Otp:       otp,
-		ReplierId: replierID,
-		Source:    msg.Source,
-	}
-	if ok, err := h.invoker(h.ctx, h.conn, req, args); !ok || err != nil {
-		h.inst.Instrument(&Event{
-			Key:     "handler_invoker_error",
-			Message: msg,
-			Request: req,
-			Args:    args,
-			Error:   err,
-		})
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	h.inst.Instrument(&Event{
-		Key:     "handler_message_handled",
-		Message: msg,
-		Request: req,
-		Args:    args,
-	})
+	)
 }

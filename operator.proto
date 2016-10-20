@@ -10,7 +10,7 @@ option go_package = "operator";
 message Request {
 	Source source = 1;
 	Call call = 2;
-    string replier_id = 3;
+    string sender_id = 3;
     string otp = 4;
 }
 
@@ -23,8 +23,9 @@ message Response {
 message Call {
 	string service = 1;
 	string method = 2;
-	string error = 3;
-	google.protobuf.Duration duration = 4;
+	map<string, string> args = 3;
+	string error = 4;
+	google.protobuf.Duration duration = 5;
 }
 
 message Source {

@@ -66,6 +66,9 @@ func (d *requestDecoder) Decode(ctx context.Context, req *http.Request) (*operat
 		if err != nil {
 			return err
 		}
+		if cfg == nil {
+			return ""
+		}
 		config = cfg
 		return []byte(cfg.Secret())
 	})

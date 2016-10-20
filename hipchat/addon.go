@@ -34,6 +34,11 @@ var descriptorTmpl = template.Must(template.New("descriptor.json").Parse(`{
 		],
 		"hipchatApiConsumer": {
 			"scopes": [{{.Scopes}}]
+			{{ if .AvatarURL }}
+			, "avatar": {
+				"url": "{{.AvatarURL}}"
+			}
+			{{ end }}
 		}
 	}
 }`))
@@ -52,11 +57,18 @@ func newAddonHandler(store ClientCredentialsStore, config *AddonConfig) *addonHa
 
 func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "GET" && req.URL.Path == h.config.URL.Path {
-		var key string
+		var name, key, avatarURL string
+		name = req.URL.Query().Get("name")
 		key = req.URL.Query().Get("key")
+		avatarURL = req.URL.Query().Get("avatar")
+		if name == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("name query param is required\n"))
+			return
+		}
 		if key == "" {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("?key query param is required"))
+			_, _ = w.Write([]byte("key query param is required\n"))
 			return
 		}
 		scopes := make([]string, len(h.config.APIConsumerScopes))
@@ -69,14 +81,16 @@ func (h *addonHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			URL        string
 			Homepage   string
 			WebhookURL string
+			AvatarURL  string
 			Pattern    string
 			Scopes     string
 		}{
-			fmt.Sprintf("%s.%s", h.config.Namespace, key),
+			name,
 			fmt.Sprintf("%s.%s", h.config.Namespace, key),
 			fmt.Sprintf("%s?%s", h.config.URL, req.URL.Query().Encode()),
 			h.config.Homepage,
 			h.config.WebhookURL.String(),
+			avatarURL,
 			"^" + h.config.WebhookPrefix,
 			strings.Join(scopes, ", "),
 		}

@@ -15,38 +15,38 @@ import (
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
-	{{- range .Services}}
-	{{.PackageName}} "{{.ImportPath}}"
-	{{- end}}
+{{range $k, $v := .Imports}}
+	{{$k}} "{{$v}}"
+{{end}}
 )
 
-const programName = "{{.Options.BinaryName}}"
+const program = "operatorctl"
 
 var cmd = operator.NewCommand(
-	programName,
+	program,
 	[]operator.ServiceCommand{
 {{- range .Services}}
 		{
-{{- $serviceName := .PackageName }}
-{{- $serviceFullName := .FullName }}
-			Name:     "{{ $serviceName }}",
+{{- $pkg := .Package }}
+{{- $svc := .Name }}
+			Name:     "{{serviceName .Name}}",
 			Synopsis: `+"`"+`{{ .Description }}`+"`"+`,
 			Methods: []operator.MethodCommand{
 	{{- range .Methods}}
 				{
-					Name: "{{dasherize .Name}}",
+					Name: "{{methodName .Name}}",
 					Synopsis: `+"`"+`{{.Description}}`+"`"+`,
 					Flags: []*flag.Flag{
 					{{- range .Arguments }}
 						{
-							Name:  "{{dasherize .Name}}",
+							Name:  "{{argName .Name}}",
 							Usage: "{{.Description}}",
 						},
 					{{- end }}
 					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
 			{{- range .Arguments}}
-						{{.Name}} := ctx.Flags.String("{{dasherize .Name}}", "", "")
+						{{.Name}} := ctx.Flags.String("{{flagName .Name}}", "", "")
 			{{- end}}
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
@@ -56,13 +56,13 @@ var cmd = operator.NewCommand(
 							return "", err
 						}
 						defer conn.Close()
-						client := {{$serviceName}}.New{{$serviceFullName}}Client(conn)
+						client := {{$pkg}}.New{{$svc}}Client(conn)
 						resp, err := client.{{.Name}}(
 							context.Background(),
-							&{{$serviceName}}.{{.Input}}{
+							&{{$pkg}}.{{.Input}}{
 								Request: ctx.Request,
 								{{- range .Arguments}}
-								{{camelCase .Name}}: *{{.Name}},
+								{{inputField .Name}}: *{{.Name}},
 								{{- end}}
 							},
 						)
@@ -82,7 +82,7 @@ var cmd = operator.NewCommand(
 func main() {
 	status, output := cmd.Run(os.Args)
 	if status != 0 {
-		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", programName, output); err != nil {
+		if _, err := fmt.Fprintf(os.Stderr, "%s: %s\n", program, output); err != nil {
 			panic(err)
 		}
 	} else {
