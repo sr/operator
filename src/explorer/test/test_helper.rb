@@ -31,10 +31,20 @@ module ActiveSupport
     def authorize_access(account_id, role = nil, expires_at = nil)
       role ||= Rails.application.config.x.support_role
 
-      Datacenter.current.global.execute(<<-SQL, [role, account_id, expires_at])
+      Datacenter.current.global.execute("
         INSERT INTO global_account_access (role, account_id, created_by, expires_at)
-        VALUES (?, ?, 1, ?)
-      SQL
+        VALUES (#{role}, #{account_id}, 1, #{format_date(expires_at)})
+      ".gsub(/\s+/, " ").strip)
+    end
+
+    private
+
+    def format_date(date)
+      if date.nil?
+        "NULL"
+      else
+        "'#{date}'"
+      end
     end
   end
 end
