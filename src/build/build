@@ -284,6 +284,15 @@ case "$project" in
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$BREAD:/data" build/build \
             terra validate
+
+        tarball="$(mktemp -t "bread-terraformXXXXX").tar"
+        trap 'rm $tarball' EXIT
+        docker run --rm -v "$BREAD:/data" -w "/data" build/build \
+          git archive "$(git rev-parse HEAD)" src/terraform > "$tarball"
+
+        if [ -n "$CI" ]; then
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+        fi
         ;;
     *)
         exit 1
