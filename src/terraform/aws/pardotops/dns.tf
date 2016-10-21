@@ -365,6 +365,14 @@ resource "aws_route53_record" "jobs_dev_pardot_com_Arecord" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "storm_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "storm.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_eip.appdev_toolsproxy1.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
 resource "aws_route53_record" "jump_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "jump.${aws_route53_zone.dev_pardot_com.name}"
