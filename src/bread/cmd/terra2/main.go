@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 )
 
@@ -75,6 +76,15 @@ func apply(state *localState) error {
 	cmd := exec.Command("terraform", "apply", state.planFile)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			if cmd.Process != nil {
+				cmd.Process.Signal(sig)
+			}
+		}
+	}()
 	terraErr := cmd.Run()
 	if terraErr != nil {
 		_ = os.Remove(state.planFile)
