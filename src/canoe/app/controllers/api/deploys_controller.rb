@@ -3,6 +3,7 @@ module Api
     before_action :require_project, only: [:create, :index, :latest]
     before_action :require_target, only: [:create, :index, :latest]
     before_action :require_deploy, only: [:show, :completed_server]
+    before_action :require_email_authentication, only: [:create]
 
     def index
       @deploys = current_target.deploys
@@ -12,22 +13,15 @@ module Api
     end
 
     def create
-      user = AuthUser.find_by_email(params[:user_email])
-
-      if !user
-        render json: { error: true, message: "No user with email #{params[:user_email].inspect}. You may need to sign into Canoe first." }
-        return
-      end
-
-      if !user.deploy_authorized?(current_project, current_target)
-        render json: { error: true, message: "User #{params[:user_email]} is not authorized to deploy" }
+      if !current_user.deploy_authorized?(current_project, current_target)
+        render json: { error: true, message: "User #{current_user.email} is not authorized to deploy" }
         return
       end
 
       deploy_request = DeployRequest.new(
         current_project,
         current_target,
-        user,
+        current_user,
         params[:artifact_url],
         false,
         [],

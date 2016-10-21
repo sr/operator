@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+const program = "terra2"
+
 type localState struct {
 	userEmail    string
 	estate       string
@@ -35,7 +37,7 @@ func main() {
 	flag.StringVar(&state.canoeURL, "canoe-url", "https://canoe.dev.pardot.com", "")
 	flag.Parse()
 	if err := apply(state); err != nil {
-		fmt.Fprintf(os.Stderr, "terr2: %v\n", err)
+		fmt.Fprintf(os.Stderr, "%s: %v\n", program, err)
 		os.Exit(1)
 	}
 }
@@ -96,7 +98,7 @@ func apply(state *localState) error {
 		payload.Set("successful", "false")
 	}
 	if _, err = doCanoeAPI("POST", state.canoeURL+"/api/terraform/complete_deploy", payload.Encode()); err != nil {
-		fmt.Fprintf(os.Stderr, "terra2: could not unlock Terraform deploys\n")
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform estate %s\n", program, state.estate)
 	}
 	return terraErr
 }
@@ -116,9 +118,9 @@ func doCanoeAPI(meth, url, body string) (*http.Response, error) {
 	}
 	if resp.StatusCode != http.StatusOK {
 		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("canoe API request failed with status %d and body: %s", resp.StatusCode, body)
+			return nil, fmt.Errorf("Canoe API request failed with status %d and body: %s", resp.StatusCode, body)
 		}
-		return nil, fmt.Errorf("canoe API request failed with status %d", resp.StatusCode)
+		return nil, fmt.Errorf("Canoe API request failed with status %d", resp.StatusCode)
 	}
 	return resp, nil
 }

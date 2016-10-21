@@ -49,7 +49,7 @@ RSpec.describe "Terraform API" do
     expect(json_response["message"]).to include("locked by John Doe")
   end
 
-  it "notifies of successful deploys" do
+  it "notifies HipChat of successful deploys" do
     @project.deploy_notifications.create!(hipchat_room_id: 42)
 
     create_deploy estate: "aws/pardotops"
@@ -64,7 +64,7 @@ RSpec.describe "Terraform API" do
     expect(m.message).to include("is done")
   end
 
-  it "notifies of failed deploys" do
+  it "notifies HipChat of failed deploys" do
     @project.deploy_notifications.create!(hipchat_room_id: 42)
 
     create_deploy estate: "aws/pardotops"
@@ -88,7 +88,7 @@ RSpec.describe "Terraform API" do
     expect(json_response["deploy_id"]).to_not be(nil)
   end
 
-  it "notifies HipChat ongoing deploys" do
+  it "notifies HipChat of ongoing deploys" do
     @project.deploy_notifications.create!(hipchat_room_id: 42)
 
     expect(@notifier.messages.size).to eq(0)
