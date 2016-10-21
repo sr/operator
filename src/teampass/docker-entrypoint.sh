@@ -35,6 +35,9 @@ sed -i "s/self::\$config\['jsUrl'\]/'\/includes\/libraries\/csrfp\/js\/csrfprote
 # Fix really short password show timeout 50ms to 10s
 sed -i "s/, 50/, 10000/" $ROOTTP/items.load.php
 
+# PHP sessions need to be garbage collected, otherwise we run out of inodes
+echo "session.gc_probability = 1" >> /etc/php5/php.ini
+
 # Make ops managers the default managers (this should be taken out if it's a db without an ops role)
 sed -i "s/'fonction_id' => '0',/'fonction_id' => '0','isAdministratedByRole' => '1',/" $ROOTTP/sources/identify.php
 
