@@ -95,7 +95,7 @@ resource "aws_internet_gateway" "tools_egress_internet_gw" {
 resource "aws_route" "tools_egress_to_internal_tools" {
   route_table_id            = "${aws_vpc.tools_egress.main_route_table_id}"
   destination_cidr_block    = "172.30.0.0/16"
-  vpc_peering_connection_id = "pcx-fbf25a92"                                # pardotops/internal_apps
+  vpc_peering_connection_id = "pcx-d026a4b9"                                # pardotops/internal_apps
 }
 
 resource "aws_route_table" "tools_egress_route_dmz" {
@@ -108,7 +108,7 @@ resource "aws_route_table" "tools_egress_route_dmz" {
 
   route {
     cidr_block                = "172.30.0.0/16"
-    vpc_peering_connection_id = "pcx-fbf25a92"  # pardotops/internal_apps
+    vpc_peering_connection_id = "pcx-d026a4b9"  # pardotops/internal_apps
   }
 }
 
