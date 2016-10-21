@@ -84,6 +84,9 @@ namespace :canoe do
     }.tap(&:save!)
 
     terraform = TerraformProject.create!
+    terraform.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
+    terraform.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
+
     repfix = Project.find_or_initialize_by(name: "repfix").tap { |project|
       project.icon = "wrench"
       project.bamboo_project = "BREAD"

@@ -7,6 +7,7 @@ class CreateTerraformDeploys < ActiveRecord::Migration[5.0]
       t.string :commit_sha1, null: false
       t.string :estate_name, null: false
       t.string :terraform_version, null: false
+      t.boolean :successful, null: false, default: false
       t.datetime :completed_at
       t.timestamps
     end

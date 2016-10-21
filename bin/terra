@@ -76,13 +76,33 @@ case "$action" in
 
         cd src/terraform
         go install bread/cmd/breadsignal github.com/hashicorp/terraform
-        if [ "$action" != "pull" ]; then
-          breadsignal -terraform "$action" \
-              -terraform-version "$(terraform version)" \
-              -branch "$branch" \
-              -terraform-path "${account}" \
-              -testing=false
-        fi
+
+        case "$(whoami)" in
+          srozet)
+            go install bread/cmd/terra2
+
+            if [ "$action" = "apply" ]; then
+              make -f ../../etc/mk/terraform.mk remote-state
+              exec terra2 \
+                -user "$(whoami)@salesforce.com" \
+                -estate "$TERRAFORM_DIR" \
+                -branch "$(git rev-parse --abbrev-ref HEAD)" \
+                -commit "$(git rev-parse HEAD)" \
+                -terraform-version "$(terraform version)" \
+                -plan "$(pwd)/${TERRAFORM_DIR}/plan.out"
+            fi
+            ;;
+          *)
+            if [ "$action" != "pull" ]; then
+              breadsignal -terraform "$action" \
+                  -terraform-version "$(terraform version)" \
+                  -branch "$branch" \
+                  -terraform-path "${account}" \
+                  -testing=false
+            fi
+            ;;
+        esac
+
         make -f ../../etc/mk/terraform.mk "$action" |
         grep -vi password
         ;;

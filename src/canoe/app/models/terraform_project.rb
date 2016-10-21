@@ -18,18 +18,13 @@ class TerraformProject
   end
 
   def self.create!
-    project = Project.find_or_create_by!(name: NAME) do |project|
+    Project.find_or_create_by!(name: NAME) do |project|
       project.icon = "server"
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "BREAD"
       project.bamboo_job = "TER"
       project.repository = "Pardot/bread"
     end
-
-    project.deploy_notifications.find_or_create_by!(hipchat_room_id: 6)
-    project.deploy_notifications.find_or_create_by!(hipchat_room_id: 42)
-
-    project
   end
 
   def initialize(project, notifier)
@@ -60,6 +55,23 @@ class TerraformProject
     end
 
     notification.deploy_started(deploy)
+
+    TerraformDeployResponse.success(deploy)
+  end
+
+  def complete_deploy(deploy_id, successful)
+    deploy = TerraformDeploy.find_by(id: deploy_id)
+
+    unless deploy
+      return TerraformDeployResponse.new(nil, "No such deploy: #{deploy_id.inspect}")
+    end
+
+    unless deploy.completed_at.nil?
+      return TerraformDeployResponse.new(deploy, "Deploy is already complete")
+    end
+
+    deploy.update!(completed_at: Time.current, successful: successful)
+    notification.deploy_complete(deploy)
 
     TerraformDeployResponse.success(deploy)
   end

@@ -7,6 +7,12 @@ class TerraformDeploy < ActiveRecord::Base
   end
 
   def user_name
-    auth_user.name
+    name = auth_user.name
+
+    if name.empty?
+      return auth_user.email
+    end
+
+    name
   end
 end

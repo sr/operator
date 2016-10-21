@@ -171,15 +171,16 @@ ActiveRecord::Schema.define(version: 20161021082004) do
   end
 
   create_table "terraform_deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "project_id",        null: false
-    t.integer  "auth_user_id",      null: false
-    t.string   "branch_name",       null: false
-    t.string   "commit_sha1",       null: false
-    t.string   "estate_name",       null: false
-    t.string   "terraform_version", null: false
+    t.integer  "project_id",                        null: false
+    t.integer  "auth_user_id",                      null: false
+    t.string   "branch_name",                       null: false
+    t.string   "commit_sha1",                       null: false
+    t.string   "estate_name",                       null: false
+    t.string   "terraform_version",                 null: false
+    t.boolean  "successful",        default: false, null: false
     t.datetime "completed_at"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.index ["auth_user_id"], name: "fk_rails_1c5e040a85", using: :btree
     t.index ["project_id"], name: "fk_rails_f61031aa1f", using: :btree
   end
