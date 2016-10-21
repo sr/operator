@@ -133,6 +133,14 @@ var (
 			Image:         "build/bread/parbot/app",
 		},
 		{
+			Name:          "refocus",
+			Canoe:         false,
+			ECSCluster:    "refocus_production",
+			ECSService:    "refocus",
+			ContainerName: "refocus",
+			Image:         "build/pardot-refocus/app",
+		},
+		{
 			Name:          "teampass",
 			Canoe:         false,
 			ECSCluster:    "teampass",
