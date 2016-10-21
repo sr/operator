@@ -83,6 +83,7 @@ namespace :canoe do
       project.repository = "Pardot/chef"
     }.tap(&:save!)
 
+    terraform = TerraformProject.create!
     repfix = Project.find_or_initialize_by(name: "repfix").tap { |project|
       project.icon = "wrench"
       project.bamboo_project = "BREAD"
