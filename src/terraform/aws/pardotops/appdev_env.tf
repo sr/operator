@@ -1037,12 +1037,45 @@ resource "aws_instance" "appdev_nimbus1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_nimbushost.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-nimbus1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_nimbushost" {
+  name        = "appdev_nimbushost"
+  description = "Allow access through the toolsproxy and from apphosts"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+    self      = true
+
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [
+      "${aws_security_group.appdev_apphost.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
