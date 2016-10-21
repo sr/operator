@@ -83,7 +83,7 @@ func apply(state *localState) error {
 	go func() {
 		for sig := range c {
 			if cmd.Process != nil {
-				cmd.Process.Signal(sig)
+				_ = cmd.Process.Signal(sig)
 			}
 		}
 	}()

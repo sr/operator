@@ -18,7 +18,7 @@ class TerraformDeployResponse
 
   def to_json(_)
     JSON.dump(
-      error: @error_message.to_s.size > 0,
+      error: !@error_message.to_s.empty?,
       message: @error_message,
       deploy_id: @deploy_id
     )

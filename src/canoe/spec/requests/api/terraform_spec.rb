@@ -20,7 +20,7 @@ RSpec.describe "Terraform API" do
   end
 
   def complete_deploy(deploy_id, successful)
-    api_post "/api/terraform/complete_deploy", { deploy_id: deploy_id, successful: successful }
+    api_post "/api/terraform/complete_deploy", deploy_id: deploy_id, successful: successful
   end
 
   it "returns an error for unknown user" do

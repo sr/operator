@@ -7,7 +7,7 @@ class TerraformProject
     "aws/pardot-ci",
     "aws/pardot-qe",
     "aws/pardotops",
-    "aws/pardotpublic",
+    "aws/pardotpublic"
   ].freeze
 
   def self.find!(notifier = nil)
@@ -83,6 +83,6 @@ class TerraformProject
   end
 
   def room_ids
-    @project.deploy_notifications.map { |n| n.hipchat_room_id }
+    @project.deploy_notifications.map(&:hipchat_room_id)
   end
 end
