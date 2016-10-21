@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-bundler exec rspec
+
+HAL9000_ENV="test"
+export HAL9000_ENV
+
+if command -v devenv >/dev/null; then
+  devenv compose run app script/test
+else
+  bundler exec rspec 2>&1 | grep -v "already initialized constant Readline"
+fi

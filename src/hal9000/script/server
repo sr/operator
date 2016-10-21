@@ -2,6 +2,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+: "${HAL9000_ENV:="development"}"
+export HAL9000_ENV
+
 PATH="$(pwd)/bin:$PATH"
 export PATH
 

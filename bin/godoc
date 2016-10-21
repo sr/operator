@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+: "${GOROOT:="$(go env GOROOT)"}"
+"$GOROOT/bin/godoc" "$@" | $PAGER
