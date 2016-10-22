@@ -31,88 +31,99 @@ fi
 action="${1:-""}"
 arg1="${2:-""}"
 
+go install github.com/hashicorp/terraform
+
 case "$action" in
     apply|plan|pull|push)
-        account="$arg1"
-        if [ -z "$account" ]; then
-            printf "%s: required argument missing: account\n" "$PROGRAM" 2>&1
-            exit 1
-        fi
+      account="$arg1"
+      if [ -z "$account" ]; then
+        printf "%s: required argument missing: account\n" "$PROGRAM" 2>&1
+        exit 1
+      fi
 
-        if [ -z "$HIPCHAT_TOKEN" ]; then
+      TERRAFORM_BASEDIR="$(pwd)/src/terraform"
+      TERRAFORM_DIR="$account"
+      TERRAFORM_PLAN="${TERRAFORM_BASEDIR}/${TERRAFORM_DIR}/plan.out"
+      TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
+      export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
+
+      GIT_DIR="$(pwd)/.git"
+      export GIT_DIR
+      GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+      GIT_COMMIT="$(git rev-parse HEAD)"
+
+      case "$(whoami)" in
+        srozet)
+          go install bread/cmd/terra2
+
+          artifactoryenv="src/terraform/artifactory.env"
+          if ! test -f "$artifactoryenv"; then
+            printf "%s: file %s is required. Please see %s.sample for an example.\n" \
+              "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
+            exit 1
+          fi
+
+          # TODO(sr) What to do about "terra push"?
+          exec terra2 \
+            -artifactory-user "$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | head -1)" \
+            -artifactory-password "$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | tail -1)" \
+            -canoe-user "$(whoami)@salesforce.com" \
+            -git-branch "$GIT_BRANCH" \
+            -git-commit "$GIT_COMMIT" \
+            -terraform-command "$action" \
+            -terraform-basedir "$TERRAFORM_BASEDIR" \
+            -terraform-dir "$TERRAFORM_DIR" \
+            -terraform-exec "$GOPATH/bin/terraform" \
+            -terraform-plan "$TERRAFORM_PLAN" \
+            -terraform-var-file "$TERRAFORM_VAR_FILE"
+          ;;
+        *)
+          go install bread/cmd/breadsignal
+
+          if [ -z "$HIPCHAT_TOKEN" ]; then
             printf "%s: required environment variable missing: HIPCHAT_TOKEN\n" "$PROGRAM" 2>&1
             printf "Please create one here and it to the shell environment: %s\n" \
-                "https://hipchat.dev.pardot.com/account/api" 2>&1
+              "https://hipchat.dev.pardot.com/account/api" 2>&1
             exit 1
-        fi
+          fi
 
-        if ! test -d "src/terraform/${account}"; then
+          if ! test -d "src/terraform/${account}"; then
             printf "%s: %s is not managed in terraform.\n" "$PROGRAM" "$account" 2>&1
             exit 1
-        fi
+          fi
 
-        artifactoryenv="src/terraform/artifactory.env"
-        if ! test -f "$artifactoryenv"; then
+          artifactoryenv="src/terraform/artifactory.env"
+          if ! test -f "$artifactoryenv"; then
             printf "%s: file %s is required. Please see %s.sample for an example.\n" \
-                "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
+              "$PROGRAM" "$artifactoryenv" "$artifactoryenv" 2>&1
             exit 1
-        fi
+          fi
 
-        tfvars="src/terraform/terraform.tfvars"
-        if ! test -f "$tfvars"; then
+          tfvars="src/terraform/terraform.tfvars"
+          if ! test -f "$tfvars"; then
             printf "%s: file %s is required. Please see %s.sample for an example.\n" \
-                "$PROGRAM" "$tfvars" "$tfvars" 2>&1
+              "$PROGRAM" "$tfvars" "$tfvars" 2>&1
             exit 1
-        fi
+          fi
 
-        TERRAFORM_DIR="$account"
-        TERRAFORM_PLAN="$(pwd)/src/terraform/$TERRAFORM_DIR/plan.out"
-        TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
-        export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_VAR_FILE
+          if [ "$action" != "pull" ]; then
+            breadsignal -terraform "$action" \
+              -terraform-version "$(terraform version)" \
+              -branch "$GIT_BRANCH" \
+              -terraform-path "${account}" \
+              -testing=false
+          fi
 
-        GIT_DIR="$(pwd)/.git"
-        export GIT_DIR
-        branch="$(git rev-parse --abbrev-ref HEAD)"
-
-        cd src/terraform
-        go install bread/cmd/breadsignal github.com/hashicorp/terraform
-
-        case "$(whoami)" in
-          srozet)
-            go install bread/cmd/terra2
-
-            if [ "$action" = "apply" ]; then
-              make -f ../../etc/mk/terraform.mk remote-state
-              exec terra2 \
-                -user "$(whoami)@salesforce.com" \
-                -estate "$TERRAFORM_DIR" \
-                -branch "$(git rev-parse --abbrev-ref HEAD)" \
-                -commit "$(git rev-parse HEAD)" \
-                -terraform-version "$(terraform version)" \
-                -plan "$(pwd)/${TERRAFORM_DIR}/plan.out"
-            fi
-            ;;
-          *)
-            if [ "$action" != "pull" ]; then
-              breadsignal -terraform "$action" \
-                  -terraform-version "$(terraform version)" \
-                  -branch "$branch" \
-                  -terraform-path "${account}" \
-                  -testing=false
-            fi
-            ;;
-        esac
-
-        make -f ../../etc/mk/terraform.mk "$action" |
-        grep -vi password
-        ;;
+          make -f ../../etc/mk/terraform.mk "$action" |
+          grep -vi password
+          ;;
+      esac
+      ;;
     fmt)
-        go install github.com/hashicorp/terraform
-        terraform fmt -write src/terraform
-        exit "$?"
-        ;;
+      terraform fmt -write src/terraform
+      exit "$?"
+      ;;
     validate)
-        go install github.com/hashicorp/terraform
         cd src/terraform && make -s -f ../../etc/mk/terraform.mk validate
         cd ../..
         out="$(terraform fmt -write=false -list=true src/terraform)"
