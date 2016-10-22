@@ -146,6 +146,20 @@ case "$project" in
     canoe)
         build-ruby "$project"
 
+        file="${BREAD}/src/github.com/hashicorp/terraform/terraform/version.go"
+        vendored="$(
+          grep "const Version " "$file" |
+          sed -e 's/^.*"\(.*\)".*$/\1/'
+        )"
+        canoe="$(cat src/canoe/config/terraform-version)"
+
+        if [ "$vendored" != "$canoe" ]; then
+          err="Vendored Terraform version (%s) does not match version "
+          err+="required by Canoe: %s\n"
+          printf "$err" "$vendored" "$canoe"
+          exit 1
+        fi
+
         if [ -n "$CI" ]; then
             docker_push "$project"
         fi

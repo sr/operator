@@ -10,6 +10,15 @@ class TerraformProject
     "aws/pardotpublic"
   ].freeze
 
+  def self.required_version
+    @required_version ||= Pathname("../../../config/terraform-version").
+      expand_path(__FILE__).read
+  end
+
+  class << self
+    attr_writer :required_version
+  end
+
   def self.find!(notifier = nil)
     notifier ||= HipchatNotifier.new
     project = Project.find_by!(name: NAME)
@@ -35,6 +44,12 @@ class TerraformProject
   def deploy(user, estate, build)
     unless ESTATES.include?(estate)
       return TerraformDeployResponse.unknown_estate(estate)
+    end
+
+    if build.terraform_version != TerraformProject.required_version
+      error = "Terraform version #{build.terraform_version} does not " \
+        "match required version: #{TerraformProject.required_version}"
+      return TerraformDeployResponse.new(nil, error)
     end
 
     deploy = TerraformDeploy.transaction do

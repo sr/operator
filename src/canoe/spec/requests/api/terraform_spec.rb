@@ -6,6 +6,7 @@ RSpec.describe "Terraform API" do
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @notifier = FakeHipchatNotifier.new
     Api::TerraformDeploysController.notifier = @notifier
+    TerraformProject.required_version = nil
   end
 
   def create_deploy(params)
@@ -13,7 +14,7 @@ RSpec.describe "Terraform API" do
       user_email: @user.email,
       branch: "master",
       commit: "deadbeef",
-      terraform_version: "0.7.4"
+      terraform_version: TerraformProject.required_version
     }
 
     api_post "/api/terraform/deploys", default_params.merge(params)
@@ -28,6 +29,13 @@ RSpec.describe "Terraform API" do
 
     expect(json_response["error"]).to eq(true)
     expect(json_response["message"]).to match(/No user with email/)
+  end
+
+  it "returns an error if the current version doesn't match the required terraform version" do
+    create_deploy estate: "aws/pardot-ci", terraform_version: "0"
+
+    expect(json_response["error"]).to eq(true)
+    expect(json_response["message"]).to match(/Terraform version/)
   end
 
   it "returns an error for unknown estates" do
