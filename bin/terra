@@ -157,7 +157,7 @@ case "$action" in
         gofmt -w -s "$vendordir"
 
         echo "Vendored terraform version ${version} to $vendordir" 2>&1
-        printf "$version" > src/canoe/config/terraform-version
+        echo "$version" > src/canoe/config/terraform-version
         exit 0
         ;;
     *)

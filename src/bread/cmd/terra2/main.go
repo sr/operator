@@ -1,12 +1,11 @@
 package main
 
 import (
-	"encoding/json"
+	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -14,6 +13,9 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 )
 
 const program = "terra2"
@@ -175,7 +177,11 @@ func terra() (int, string) {
 		if _, err := os.Stat(tf.PlanFile); os.IsNotExist(err) {
 			return 1, fmt.Sprintf(`Plan file "%s" is missing. Please run "terra plan %s" first`, tf.PlanFile, tf.PlanFile)
 		}
-		if err := apply(&tf, &git, canoeURL, canoeUser); err != nil {
+		u, err := url.Parse(canoeURL)
+		if err != nil {
+			return 1, "flag canoe-url is invalid: " + err.Error()
+		}
+		if err := apply(&tf, &git, u, canoeUser); err != nil {
 			return 1, err.Error()
 		}
 		return 0, ""
@@ -218,34 +224,28 @@ func plan(tf *terraform) (int, string) {
 	return 0, ""
 }
 
-func apply(tf *terraform, git *gitRepo, canoeURL string, canoeUser string) error {
-	payload := url.Values{}
-	payload.Set("user_email", canoeURL)
-	payload.Set("estate", tf.Dir)
-	payload.Set("branch", git.Branch)
-	payload.Set("commit", git.SHA1)
-	payload.Set("terraform_version", string(tf.Version))
-	resp, err := doCanoeAPI(
-		"POST",
-		canoeURL+"/api/terraform/deploys",
-		payload.Encode(),
+func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) error {
+	t := httptransport.New(canoeURL.Host, "", []string{canoeURL.Scheme})
+	t.DefaultAuthentication = httptransport.APIKeyAuth("X-Api-Token", "header", os.Getenv("CANOE_API_TOKEN"))
+	client := canoe.New(t, strfmt.Default)
+	resp, err := client.CreateTerraformDeploy(
+		canoe.NewCreateTerraformDeployParams().WithBody(
+			&models.CanoeCreateTerraformDeployRequest{
+				UserEmail:        canoeUser,
+				Estate:           tf.Dir,
+				Branch:           git.Branch,
+				Commit:           git.SHA1,
+				TerraformVersion: strings.TrimSpace(string(tf.Version)),
+			},
+		),
 	)
 	if err != nil {
 		return fmt.Errorf("canoe request failed: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
-	var data struct {
-		Error    bool   `json:"error"`
-		Message  string `json:"message"`
-		DeployID int    `json:"deploy_id"`
+	if resp.Payload.Error {
+		return errors.New(resp.Payload.Message)
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return err
-	}
-	if data.Error {
-		return errors.New(data.Message)
-	}
-	if data.DeployID == 0 {
+	if resp.Payload.DeployID == 0 {
 		return errors.New("canoe API response did not include a URL for completing the deploy")
 	}
 	cmd := exec.Command(tf.Exec, "apply", tf.PlanFile)
@@ -260,40 +260,23 @@ func apply(tf *terraform, git *gitRepo, canoeURL string, canoeUser string) error
 			}
 		}
 	}()
+	var success bool
 	terraErr := cmd.Run()
 	if terraErr != nil {
 		_ = os.Remove(tf.PlanFile)
-	}
-	payload.Set("deploy_id", fmt.Sprintf("%d", data.DeployID))
-	if terraErr == nil {
-		payload.Set("successful", "true")
 	} else {
-		payload.Set("successful", "false")
+		success = true
 	}
-	if _, err = doCanoeAPI("POST", canoeURL+"/api/terraform/complete_deploy", payload.Encode()); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform estate %s\n", program, "TODO")
+	if _, err := client.CompleteTerraformDeploy(
+		canoe.NewCompleteTerraformDeployParams().WithBody(
+			&models.CanoeCompleteTerraformDeployRequest{
+				UserEmail:  canoeUser,
+				DeployID:   resp.Payload.DeployID,
+				Successful: success,
+			},
+		),
+	); err != nil {
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform estate: %s\n", program, err)
 	}
 	return terraErr
-}
-
-func doCanoeAPI(meth, url, body string) (*http.Response, error) {
-	req, err := http.NewRequest(meth, url, strings.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("X-Api-Token", os.Getenv("CANOE_API_TOKEN"))
-	if body != "" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode != http.StatusOK {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return nil, fmt.Errorf("Canoe API request failed with status %d and body: %s", resp.StatusCode, body)
-		}
-		return nil, fmt.Errorf("Canoe API request failed with status %d", resp.StatusCode)
-	}
-	return resp, nil
 }

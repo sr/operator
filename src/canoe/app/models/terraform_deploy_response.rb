@@ -1,6 +1,6 @@
 class TerraformDeployResponse
   def self.locked(deploy)
-    new(nil, "Terraform estate #{deploy.estate_name.inspect} is locked by #{deploy.user_name}")
+    new(deploy.id, "Terraform estate #{deploy.estate_name.inspect} is locked by #{deploy.user_name}")
   end
 
   def self.unknown_estate(name)
@@ -17,10 +17,20 @@ class TerraformDeployResponse
   end
 
   def to_json(_)
-    JSON.dump(
+    JSON.dump(as_json)
+  end
+
+  def as_json
+    proto_response.as_json
+  end
+
+  private
+
+  def proto_response
+    Canoe::CreateTerraformDeployResponse.new(
       error: !@error_message.to_s.empty?,
       message: @error_message,
-      deploy_id: @deploy_id
+      deploy_id: @deploy_id.to_i
     )
   end
 end

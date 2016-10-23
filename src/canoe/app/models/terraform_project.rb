@@ -11,8 +11,8 @@ class TerraformProject
   ].freeze
 
   def self.required_version
-    @required_version ||= Pathname("../../../config/terraform-version").
-      expand_path(__FILE__).read
+    @required_version ||= Pathname("../../../config/terraform-version")
+      .expand_path(__FILE__).read.chomp
   end
 
   class << self
@@ -82,7 +82,7 @@ class TerraformProject
     end
 
     unless deploy.completed_at.nil?
-      return TerraformDeployResponse.new(deploy, "Deploy is already complete")
+      return TerraformDeployResponse.new(deploy.id, "Deploy is already complete")
     end
 
     deploy.update!(completed_at: Time.current, successful: successful)

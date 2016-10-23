@@ -5,7 +5,7 @@ RSpec.describe "Terraform API" do
     @project = TerraformProject.create!
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @notifier = FakeHipchatNotifier.new
-    Api::TerraformDeploysController.notifier = @notifier
+    Api::TerraformController.notifier = @notifier
     TerraformProject.required_version = nil
   end
 
@@ -17,54 +17,75 @@ RSpec.describe "Terraform API" do
       terraform_version: TerraformProject.required_version
     }
 
-    api_post "/api/terraform/deploys", default_params.merge(params)
+    request = Canoe::CreateTerraformDeployRequest.new(default_params.merge(params))
+
+    post "/api/grpc/create_terraform_deploy",
+      params: request.as_json,
+      as: :json,
+      headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
   end
 
   def complete_deploy(deploy_id, successful)
-    api_post "/api/terraform/complete_deploy", deploy_id: deploy_id, successful: successful
+    request = Canoe::CompleteTerraformDeployRequest.new(
+      user_email: @user.email,
+      deploy_id: deploy_id.to_i,
+      successful: successful
+    )
+
+    post "/api/grpc/complete_terraform_deploy",
+      params: request.as_json,
+      as: :json,
+      headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
+  end
+
+  def create_deploy_response
+    Canoe::CreateTerraformDeployResponse.decode_json(response.body)
+  end
+
+  def complete_deploy_response
+    Canoe::CompleteTerraformDeployResponse.decode_json(response.body)
   end
 
   it "returns an error for unknown user" do
     create_deploy user_email: "unknown@salesforce.com"
 
-    expect(json_response["error"]).to eq(true)
-    expect(json_response["message"]).to match(/No user with email/)
+    expect(create_deploy_response["error"]).to eq(true)
+    expect(create_deploy_response["message"]).to match(/No user with email/)
   end
 
   it "returns an error if the current version doesn't match the required terraform version" do
     create_deploy estate: "aws/pardot-ci", terraform_version: "0"
 
-    expect(json_response["error"]).to eq(true)
-    expect(json_response["message"]).to match(/Terraform version/)
+    expect(create_deploy_response["error"]).to eq(true)
+    expect(create_deploy_response["message"]).to match(/Terraform version/)
   end
 
   it "returns an error for unknown estates" do
     create_deploy estate: "aws/boomtown"
 
-    expect(json_response["error"]).to eq(true)
-    expect(json_response["message"]).to eq("Unknown Terraform estate: \"aws/boomtown\"")
+    expect(create_deploy_response["error"]).to eq(true)
+    expect(create_deploy_response["message"]).to eq("Unknown Terraform estate: \"aws/boomtown\"")
   end
 
   it "returns an error if the estate is locked" do
     create_deploy estate: "aws/pardotops"
-    expect(json_response["error"]).to eq(false)
-    expect(json_response["message"]).to eq("")
+    expect(create_deploy_response["error"]).to eq(false)
+    expect(create_deploy_response["message"]).to eq("")
 
     create_deploy estate: "aws/pardotops"
-    json_response = JSON.parse(response.body)
-    expect(json_response["error"]).to eq(true)
-    expect(json_response["message"]).to include("aws/pardotops")
-    expect(json_response["message"]).to include("locked by John Doe")
+    expect(create_deploy_response["error"]).to eq(true)
+    expect(create_deploy_response["message"]).to include("aws/pardotops")
+    expect(create_deploy_response["message"]).to include("locked by John Doe")
   end
 
   it "notifies HipChat of successful deploys" do
     @project.deploy_notifications.create!(hipchat_room_id: 42)
 
     create_deploy estate: "aws/pardotops"
-    complete_deploy(json_response["deploy_id"], true)
+    complete_deploy(create_deploy_response["deploy_id"], true)
 
-    expect(json_response["error"]).to eq(false)
-    expect(json_response["deploy_id"]).to_not be_nil
+    expect(complete_deploy_response["error"]).to eq(false)
+    expect(complete_deploy_response["deploy_id"]).to_not be_nil
 
     m = @notifier.messages.pop
     expect(m.message).to include("John Doe")
@@ -78,8 +99,8 @@ RSpec.describe "Terraform API" do
     create_deploy estate: "aws/pardotops"
     complete_deploy(json_response["deploy_id"], false)
 
-    expect(json_response["error"]).to eq(false)
-    expect(json_response["deploy_id"]).to_not be_nil
+    expect(complete_deploy_response["error"]).to eq(false)
+    expect(complete_deploy_response["deploy_id"]).to_not be_nil
 
     m = @notifier.messages.pop
     expect(m.message).to include("failed")
@@ -90,10 +111,9 @@ RSpec.describe "Terraform API" do
     complete_deploy(json_response["deploy_id"], true)
     complete_deploy(json_response["deploy_id"], true)
 
-    json_response = JSON.parse(response.body)
-    expect(json_response["error"]).to eq(true)
-    expect(json_response["message"]).to eq("Deploy is already complete")
-    expect(json_response["deploy_id"]).to_not be(nil)
+    expect(complete_deploy_response["error"]).to eq(true)
+    expect(complete_deploy_response["message"]).to eq("Deploy is already complete")
+    expect(complete_deploy_response["deploy_id"]).to_not be(nil)
   end
 
   it "notifies HipChat of ongoing deploys" do

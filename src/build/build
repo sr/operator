@@ -154,9 +154,8 @@ case "$project" in
         canoe="$(cat src/canoe/config/terraform-version)"
 
         if [ "$vendored" != "$canoe" ]; then
-          err="Vendored Terraform version (%s) does not match version "
-          err+="required by Canoe: %s\n"
-          printf "$err" "$vendored" "$canoe"
+          printf "Vendored Terraform version (%s) does not match version required by Canoe: %s\n" \
+            "$vendored" "$canoe"
           exit 1
         fi
 
