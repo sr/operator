@@ -1060,7 +1060,6 @@ resource "aws_security_group" "appdev_zkstormhost" {
 
     security_groups = [
       "${aws_security_group.appdev_nimbushost.id}",
-      "${aws_security_group.appdev_zkkafkahost.id}",
     ]
   }
 
