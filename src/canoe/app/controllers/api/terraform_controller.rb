@@ -1,6 +1,8 @@
 module Api
   class TerraformController < Controller
+    skip_before_action :require_api_authentication
     before_action :require_email_authentication
+    before_action :require_phone_authentication
 
     class << self
       attr_accessor :notifier
@@ -27,6 +29,13 @@ module Api
     end
 
     private
+
+    def require_phone_authentication
+      if !current_user.phone.authentication
+        render status: 401
+        return false
+      end
+    end
 
     def current_user
       @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
