@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161021082004) do
+ActiveRecord::Schema.define(version: 20161024101143) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -131,6 +131,15 @@ ActiveRecord::Schema.define(version: 20161021082004) do
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
+  create_table "salesforce_authenticator_pairings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "auth_user_id", null: false
+    t.string   "pairing_id",   null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["auth_user_id"], name: "fk_rails_6dbdb597a7", using: :btree
+    t.index ["pairing_id"], name: "index_salesforce_authenticator_pairings_on_pairing_id", unique: true, using: :btree
+  end
+
   create_table "server_taggings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "server_id",     null: false
     t.integer  "server_tag_id", null: false
@@ -185,6 +194,7 @@ ActiveRecord::Schema.define(version: 20161021082004) do
     t.index ["project_id"], name: "fk_rails_f61031aa1f", using: :btree
   end
 
+  add_foreign_key "salesforce_authenticator_pairings", "auth_users"
   add_foreign_key "terraform_deploys", "auth_users"
   add_foreign_key "terraform_deploys", "projects"
 end
