@@ -131,15 +131,6 @@ func terra() (int, string) {
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for sig := range c {
-			if cmd.Process != nil {
-				_ = cmd.Process.Signal(sig)
-			}
-		}
-	}()
 	if err := cmd.Run(); err != nil {
 		return 1, ""
 	}
@@ -179,7 +170,7 @@ func terra() (int, string) {
 		}
 		u, err := url.Parse(canoeURL)
 		if err != nil {
-			return 1, "flag canoe-url is invalid: " + err.Error()
+			return 1, "flag canoe-url is not a valid URL: " + err.Error()
 		}
 		if err := apply(&tf, &git, u, canoeUser); err != nil {
 			return 1, err.Error()
