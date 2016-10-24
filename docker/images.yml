@@ -27,6 +27,8 @@ images:
   docker.dev.pardot.com/base/chefdk:0.17.17:
     build: chefdk/0.17.17
     common: true
+  docker.dev.pardot.com/base/node:4:
+    build: node/4
 
   # Pardot/pardot base images
   docker.dev.pardot.com/base/pardot/app:
@@ -43,6 +45,11 @@ images:
     common: true
   docker.dev.pardot.com/base/pardot/kafka:
     build: pardot/kafka
+    common: true
+
+  # Pardot/engagement-studio
+  docker.dev.pardot.com/base/engagement-studio/app:
+    build: engagement-studio/app
     common: true
 
   # Pardot/salesforce-package
