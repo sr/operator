@@ -7,19 +7,6 @@ class SessionsController < ApplicationController
   def new
   end
 
-  def phone_pairing
-  end
-
-  def create_phone_pairing
-    response = current_user.create_pairing(params[:pairing_phrase])
-
-    unless response.success?
-      flash[:alert] = "Salesforce Authenticator pairing request failed: #{response.error_message}"
-    end
-
-    redirect_to "/auth/phone"
-  end
-
   def create
     session.destroy
 
@@ -42,5 +29,26 @@ class SessionsController < ApplicationController
     session.destroy
     @auth_hash = request.env["omniauth.auth"]
     @failure_message = params[:message]
+  end
+
+  def phone_pairing
+  end
+
+  def create_phone_pairing
+    response = current_user.phone.create_pairing(params[:pairing_phrase])
+
+    unless response.success?
+      flash[:alert] = "Salesforce Authenticator pairing request failed: #{response.error_message}"
+    end
+
+    redirect_to "/auth/phone"
+  end
+
+  def destroy_phone_pairing
+    if !current_user.phone.new_record?
+      current_user.phone.destroy!
+    end
+
+    redirect_to "/auth/phone"
   end
 end

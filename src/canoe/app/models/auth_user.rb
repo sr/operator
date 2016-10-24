@@ -10,22 +10,9 @@ class AuthUser < ApplicationRecord
     end
   end
 
-  def phone_paired?
-    !salesforce_authenticator_pairing.nil?
-  end
-
-  def create_pairing(phrase)
-    if phone_paired?
-      raise RuntimeError, "phone already paired"
-    end
-
-    response = Canoe.salesforce_authenticator.create_pairing(email, phrase)
-
-    if response.success?
-      SalesforceAuthenticatorPairing.create!(auth_user_id: id, pairing_id: response["id"])
-    end
-
-    response
+  def phone
+    salesforce_authenticator_pairing ||
+      SalesforceAuthenticatorPairing.new(auth_user_id: id)
   end
 
   def deploy_authorized?(project, target)

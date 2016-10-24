@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "sessions#failure"
   get "/auth/phone", to: "sessions#phone_pairing"
   post "/auth/phone", to: "sessions#create_phone_pairing"
+  delete "/auth/phone", to: "sessions#destroy_phone_pairing"
 
   resources :projects, param: :name, only: [:index] do
     resources :branches, param: :name, constraints: { name: /.*/ }, only: [:index] do

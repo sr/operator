@@ -34,7 +34,11 @@ class SalesforceAuthenticatorAPI
   end
 
   BASE_URL = "https://login.salesforce.com/services/verify/v1".freeze
-  JSON_CONTENT_TYPE = "application/json".freeze
+
+  HEADERS = {
+    "Accept": "application/json",
+    "Content-Type" => "application/json"
+  }.freeze
 
   def initialize(id, key)
     @consumer = OAuth::Consumer.new(id, key)
@@ -44,8 +48,42 @@ class SalesforceAuthenticatorAPI
     response = access_token.post(
       BASE_URL + "/pairings/create",
       { user_name: username, pairing_phrase: phrase },
-      { "Content-Type" => JSON_CONTENT_TYPE, "Accept" => JSON_CONTENT_TYPE }
+      HEADERS,
     )
+
+    Response.new(response)
+  end
+
+  def pairing_status(pairing_id)
+    if pairing_id.to_s.empty?
+      raise ArgumentError, "malformed pairing_id: #{pairing_id.inspect}"
+    end
+
+    response = access_token.get(BASE_URL + "/pairings/#{pairing_id}", HEADERS)
+
+    Response.new(response)
+  end
+
+  def initiate_authentication(pairing_id)
+    if pairing_id.to_s.empty?
+      raise ArgumentError, "malformed pairing_id: #{pairing_id.inspect}"
+    end
+
+    response = access_token.post(
+      BASE_URL + "/authentication_requests/initiate",
+      { pairing_id: pairing_id },
+      HEADERS
+    )
+
+    Response.new(response)
+  end
+
+  def authentication_status(request_id)
+    if request_id.to_s.empty?
+      raise ArgumentError, "malformed authentication request_id: #{request_id.inspect}"
+    end
+
+    response = access_token.get(BASE_URL + "/authentication_requests/#{request_id}", HEADERS)
 
     Response.new(response)
   end
