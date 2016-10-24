@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "sessions#create"
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
+  get "/auth/phone", to: "sessions#phone_pairing"
+  post "/auth/phone", to: "sessions#create_phone_pairing"
 
   resources :projects, param: :name, only: [:index] do
     resources :branches, param: :name, constraints: { name: /.*/ }, only: [:index] do
