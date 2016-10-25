@@ -37,13 +37,11 @@ type terraform struct {
 	Exec string
 	// Cmd is the terraform subcommand to run
 	Cmd string
-	// Basedir is the directory within the repository where all terraform
-	// files are located
-	Basedir string
-	// Basedir is the directory relative to Basedir under which the *.tf files
-	// describing a particular infrastructure estate (such as an AWS account) are
-	// located
+	// Dir is the directory within the repository where configuration for all
+	// terraform projects is
 	Dir string
+	// Project is the name of a Terraform project, such as aws/pardotops
+	Project string
 	// PlanFile is the terraform plan file to create or apply
 	PlanFile string
 	// VarFile is the is the *.tfvars given to terraform as the -var-file flag
@@ -77,8 +75,8 @@ func terra() (int, string) {
 	flag.StringVar(&git.Branch, "git-branch", "", "The current git branch")
 	flag.StringVar(&git.SHA1, "git-commit", "", "The SHA1 of the current commit (HEAD)")
 	flag.StringVar(&tf.Cmd, "terraform-command", "plan", "Terraform action to execute. Must be one of \"plan\" or \"apply\"")
-	flag.StringVar(&tf.Basedir, "terraform-basedir", "", "Terraform base directory")
-	flag.StringVar(&tf.Dir, "terraform-dir", "aws/pardotops", "Terraform directory, relative to the base directory")
+	flag.StringVar(&tf.Dir, "terraform-dir", "", "Terraform base directory")
+	flag.StringVar(&tf.Project, "terraform-project", "aws/pardotops", "Terraform project")
 	flag.StringVar(&tf.Exec, "terraform-exec", "terraform", "Path to the terraform executable")
 	flag.StringVar(&tf.PlanFile, "terraform-plan", "", "")
 	flag.StringVar(&tf.VarFile, "terraform-var-file", "", "")
@@ -123,7 +121,7 @@ func terra() (int, string) {
 		"-backend=artifactory",
 		fmt.Sprintf("-backend-config=url=%s", afy.URL),
 		fmt.Sprintf(`-backend-config=repo=%s`, afy.RepoName),
-		fmt.Sprintf(`-backend-config=subpath=%s`, tf.Dir),
+		fmt.Sprintf(`-backend-config=subpath=%s`, tf.Project),
 	)
 	cmd.Env = []string{
 		fmt.Sprintf("ARTIFACTORY_USERNAME=%s", afy.User),
@@ -137,23 +135,23 @@ func terra() (int, string) {
 	var err error
 	switch tf.Cmd {
 	case "plan":
-		if tf.Basedir == "" {
-			return 1, "required flag missing: terraform-basedir"
-		}
 		if tf.Dir == "" {
 			return 1, "required flag missing: terraform-dir"
+		}
+		if tf.Project == "" {
+			return 1, "required flag missing: terraform-project"
 		}
 		if tf.VarFile == "" {
 			return 1, "required flag missing: terraform-var-file"
 		}
-		if _, err := os.Stat(tf.Basedir); os.IsNotExist(err) {
-			return 1, fmt.Sprintf("Terraform base directory \"%s\" does not exist.", tf.Basedir)
+		if _, err := os.Stat(tf.Dir); os.IsNotExist(err) {
+			return 1, fmt.Sprintf("Terraform directory \"%s\" does not exist.", tf.Dir)
 		}
-		if _, err := os.Stat(filepath.Join(tf.Basedir, tf.Dir)); os.IsNotExist(err) {
-			return 1, fmt.Sprintf("Terraform directory \"%s\" not present in base directory.", tf.Basedir)
+		if _, err := os.Stat(filepath.Join(tf.Dir, tf.Project)); os.IsNotExist(err) {
+			return 1, fmt.Sprintf("Terraform project \"%s\" not present in base directory.", tf.Project)
 		}
 		var relPath string
-		if relPath, err = filepath.Rel(tf.Basedir, tf.VarFile); err != nil {
+		if relPath, err = filepath.Rel(tf.Dir, tf.VarFile); err != nil {
 			relPath = tf.VarFile
 		}
 		if _, err := os.Stat(tf.VarFile); os.IsNotExist(err) {
@@ -189,9 +187,9 @@ func plan(tf *terraform) (int, string) {
 		"-input=false",
 		"-var-file="+tf.VarFile,
 		"-out="+tf.PlanFile,
-		filepath.Join(tf.Basedir, tf.Dir),
+		filepath.Join(tf.Dir, tf.Project),
 	)
-	cmd.Dir = filepath.Join(tf.Basedir, tf.Dir)
+	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	c := make(chan os.Signal, 1)
@@ -223,7 +221,7 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 		canoe.NewCreateTerraformDeployParams().WithBody(
 			&models.CanoeCreateTerraformDeployRequest{
 				UserEmail:        canoeUser,
-				Project:          tf.Dir,
+				Project:          tf.Project,
 				Branch:           git.Branch,
 				Commit:           git.SHA1,
 				TerraformVersion: strings.TrimSpace(string(tf.Version)),
