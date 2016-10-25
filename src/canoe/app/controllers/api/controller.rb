@@ -1,5 +1,6 @@
 module Api
   class Controller < ApplicationController
+    skip_before_action :verify_authenticity_token
     skip_before_action :require_oauth_authentication
     before_action :require_api_authentication
 

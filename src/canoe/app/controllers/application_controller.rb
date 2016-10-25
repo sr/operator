@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
   include PaginationHelper
 
-  protect_from_forgery with: :null_session
+  protect_from_forgery with: :exception
 
   before_action :require_oauth_authentication
 
