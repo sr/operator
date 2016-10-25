@@ -2,16 +2,12 @@ resource "aws_ecs_cluster" "parbot_production" {
   name = "parbot_production"
 }
 
-resource "template_file" "parbot_production_user_data" {
+data "template_file" "parbot_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
     configuration_environment = "production"
     ecs_cluster               = "parbot_production"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -46,7 +42,7 @@ resource "aws_launch_configuration" "parbot_production" {
   iam_instance_profile        = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   security_groups             = ["${aws_security_group.parbot_app_production.id}"]
   associate_public_ip_address = false
-  user_data                   = "${template_file.parbot_production_user_data.rendered}"
+  user_data                   = "${data.template_file.parbot_production_user_data.rendered}"
 
   root_block_device {
     volume_type           = "gp2"

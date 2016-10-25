@@ -189,16 +189,12 @@ resource "aws_db_instance" "operator_production" {
   apply_immediately       = true
 }
 
-resource "template_file" "operator_production_user_data" {
+data "template_file" "operator_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
     configuration_environment = "production"
     ecs_cluster               = "operator_production"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -278,7 +274,7 @@ resource "aws_launch_configuration" "operator_production" {
   iam_instance_profile        = "${aws_iam_instance_profile.operator_ecs_instance_profile.id}"
   security_groups             = ["${aws_security_group.operator_app_production.id}"]
   associate_public_ip_address = false
-  user_data                   = "${template_file.operator_production_user_data.rendered}"
+  user_data                   = "${data.template_file.operator_production_user_data.rendered}"
 
   root_block_device {
     volume_type           = "gp2"
