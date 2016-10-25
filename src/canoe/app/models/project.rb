@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   has_many :deploy_notifications
 
   def self.enabled
-    where.not(name: [ChefDelivery::PROJECT, TerraformProject::NAME])
+    where.not(name: [ChefDelivery::PROJECT], id: TerraformProject.select(:id).all)
   end
 
   def test_list

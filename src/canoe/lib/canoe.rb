@@ -9,7 +9,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :user_email, :string, 1
     optional :branch, :string, 2
     optional :commit, :string, 3
-    optional :estate, :string, 4
+    optional :project, :string, 4
     optional :terraform_version, :string, 5
   end
   add_message "canoe.CompleteTerraformDeployRequest" do
@@ -17,12 +17,14 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :deploy_id, :int64, 2
     optional :successful, :bool, 3
     optional :request_id, :string, 4
+    optional :project, :string, 5
   end
   add_message "canoe.TerraformDeployResponse" do
     optional :error, :bool, 1
     optional :message, :string, 2
     optional :deploy_id, :int64, 3
     optional :request_id, :string, 4
+    optional :project, :string, 5
   end
 end
 

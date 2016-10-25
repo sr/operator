@@ -23,7 +23,7 @@ message CreateTerraformDeployRequest {
 	string user_email = 1;
 	string branch = 2;
 	string commit = 3;
-	string estate = 4;
+	string project = 4;
 	string terraform_version = 5;
 }
 
@@ -32,6 +32,7 @@ message CompleteTerraformDeployRequest {
 	int64 deploy_id = 2;
 	bool successful = 3;
 	string request_id = 4;
+	string project = 5;
 }
 
 message TerraformDeployResponse {
@@ -39,4 +40,5 @@ message TerraformDeployResponse {
 	string message = 2;
 	int64 deploy_id = 3;
 	string request_id = 4;
+	string project = 5;
 }

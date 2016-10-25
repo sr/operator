@@ -223,7 +223,7 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 		canoe.NewCreateTerraformDeployParams().WithBody(
 			&models.CanoeCreateTerraformDeployRequest{
 				UserEmail:        canoeUser,
-				Estate:           tf.Dir,
+				Project:          tf.Dir,
 				Branch:           git.Branch,
 				Commit:           git.SHA1,
 				TerraformVersion: strings.TrimSpace(string(tf.Version)),

@@ -16,6 +16,9 @@ type CanoeCompleteTerraformDeployRequest struct {
 	// deploy id
 	DeployID int64 `json:"deploy_id,omitempty"`
 
+	// project
+	Project string `json:"project,omitempty"`
+
 	// request id
 	RequestID string `json:"request_id,omitempty"`
 

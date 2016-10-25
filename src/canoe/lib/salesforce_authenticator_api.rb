@@ -8,20 +8,20 @@ class SalesforceAuthenticatorAPI
   end
 
   class Fake
-    def create_pairing(username, phrase)
-      return Response.new(fake_response(id: SecureRandom.uuid))
+    def create_pairing(_username, _phrase)
+      Response.new(fake_response(id: SecureRandom.uuid))
     end
 
-    def pairing_status(pairing_id)
-      return Response.new(fake_response)
+    def pairing_status(_pairing_id)
+      Response.new(fake_response)
     end
 
-    def initiate_authentication(pairing_id)
-      return Response.new(fake_response)
+    def initiate_authentication(_pairing_id)
+      Response.new(fake_response)
     end
 
-    def authentication_status(request_id)
-      return Response.new(fake_response(granted: true))
+    def authentication_status(_request_id)
+      Response.new(fake_response(granted: true))
     end
 
     private

@@ -46,7 +46,6 @@ class SalesforceAuthenticatorPairing < ActiveRecord::Base
     response
   end
 
-
   def pairing_in_progress?
     if pairing_id.nil?
       return false

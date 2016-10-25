@@ -76,6 +76,10 @@
           "type": "string",
           "format": "int64"
         },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
         "request_id": {
           "type": "string",
           "format": "string"
@@ -101,7 +105,7 @@
           "type": "string",
           "format": "string"
         },
-        "estate": {
+        "project": {
           "type": "string",
           "format": "string"
         },
@@ -127,6 +131,10 @@
           "format": "boolean"
         },
         "message": {
+          "type": "string",
+          "format": "string"
+        },
+        "project": {
           "type": "string",
           "format": "string"
         },

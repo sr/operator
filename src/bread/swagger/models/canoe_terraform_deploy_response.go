@@ -22,6 +22,9 @@ type CanoeTerraformDeployResponse struct {
 	// message
 	Message string `json:"message,omitempty"`
 
+	// project
+	Project string `json:"project,omitempty"`
+
 	// request id
 	RequestID string `json:"request_id,omitempty"`
 }
