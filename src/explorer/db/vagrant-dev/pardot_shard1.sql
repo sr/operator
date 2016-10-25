@@ -181,7 +181,9 @@ CREATE TABLE `account_extras` (
 
 LOCK TABLES `account_extras` WRITE;
 /*!40000 ALTER TABLE `account_extras` DISABLE KEYS */;
-INSERT INTO `account_extras` VALUES (1,1,0,1,NULL,0,1,0,NULL,NULL,'2016-03-24 16:06:09','2016-03-24 16:06:09',NULL,NULL,NULL,NULL,NULL,NULL,0,1,1,0,0,NULL,NULL,0,NULL,NULL);
+# This table contains some invalid date entries just like our production database
+# The 0000-00-00 date entry should be NULL to be valid
+INSERT INTO `account_extras` VALUES (1,1,0,1,NULL,0,1,0,NULL,NULL,'0000-00-00 00:00:00','2016-03-24 16:06:09',NULL,NULL,NULL,NULL,NULL,NULL,0,1,1,0,0,NULL,NULL,0,NULL,NULL);
 /*!40000 ALTER TABLE `account_extras` ENABLE KEYS */;
 UNLOCK TABLES;
 
