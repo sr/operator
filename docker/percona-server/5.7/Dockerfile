@@ -2,7 +2,7 @@ FROM docker.dev.pardot.com/base/centos:6
 
 ARG artifactory_host
 ARG percona_major_version=57
-ARG percona_version=5.7.14-8.1.el6
+ARG percona_version=5.7.15-9.1.el6
 ARG jemalloc_version=3.6.0-1.el6
 
 RUN \
