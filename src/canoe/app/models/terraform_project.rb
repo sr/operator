@@ -65,7 +65,8 @@ class TerraformProject
         estate_name: estate,
         branch_name: build.branch,
         commit_sha1: build.commit,
-        terraform_version: build.terraform_version
+        terraform_version: build.terraform_version,
+        request_id: SecureRandom.uuid,
       )
     end
 
@@ -74,11 +75,11 @@ class TerraformProject
     TerraformDeployResponse.success(deploy)
   end
 
-  def complete_deploy(deploy_id, successful)
-    deploy = TerraformDeploy.find_by(id: deploy_id)
+  def complete_deploy(request_id, successful)
+    deploy = TerraformDeploy.find_by(request_id: request_id)
 
     unless deploy
-      return TerraformDeployResponse.new(nil, "No such deploy: #{deploy_id.inspect}")
+      return TerraformDeployResponse.new(nil, "No such deploy request: #{request_id.inspect}")
     end
 
     unless deploy.completed_at.nil?

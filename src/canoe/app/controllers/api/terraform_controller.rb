@@ -2,7 +2,7 @@ module Api
   class TerraformController < Controller
     skip_before_action :require_api_authentication
     before_action :require_email_authentication
-    before_action :require_phone_authentication
+    before_action :require_phone_authentication, only: [:create]
 
     class << self
       attr_accessor :notifier
@@ -21,7 +21,7 @@ module Api
 
     def complete
       response = project.complete_deploy(
-        proto_request.deploy_id,
+        proto_request.request_id,
         proto_request.successful
       )
 
@@ -31,8 +31,8 @@ module Api
     private
 
     def require_phone_authentication
-      if !current_user.phone.authentication
-        render status: 401
+      if !current_user.phone.authenticate
+        render status: 401, json: { error: true, message: "Phone authentication required" }
         return false
       end
     end

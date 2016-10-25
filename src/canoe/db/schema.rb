@@ -182,6 +182,7 @@ ActiveRecord::Schema.define(version: 20161024101143) do
   create_table "terraform_deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "project_id",                        null: false
     t.integer  "auth_user_id",                      null: false
+    t.string   "request_id",                        null: false
     t.string   "branch_name",                       null: false
     t.string   "commit_sha1",                       null: false
     t.string   "estate_name",                       null: false
@@ -192,6 +193,7 @@ ActiveRecord::Schema.define(version: 20161024101143) do
     t.datetime "updated_at",                        null: false
     t.index ["auth_user_id"], name: "fk_rails_1c5e040a85", using: :btree
     t.index ["project_id"], name: "fk_rails_f61031aa1f", using: :btree
+    t.index ["request_id"], name: "index_terraform_deploys_on_request_id", unique: true, using: :btree
   end
 
   add_foreign_key "salesforce_authenticator_pairings", "auth_users"

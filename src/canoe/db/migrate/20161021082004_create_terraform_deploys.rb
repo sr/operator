@@ -3,6 +3,7 @@ class CreateTerraformDeploys < ActiveRecord::Migration[5.0]
     create_table :terraform_deploys do |t|
       t.integer :project_id, null: false
       t.integer :auth_user_id, null: false
+      t.string :request_id, null: false
       t.string :branch_name, null: false
       t.string :commit_sha1, null: false
       t.string :estate_name, null: false
@@ -12,6 +13,7 @@ class CreateTerraformDeploys < ActiveRecord::Migration[5.0]
       t.timestamps
     end
 
+    add_index :terraform_deploys, :request_id, unique: true
     add_foreign_key :terraform_deploys, :projects
     add_foreign_key :terraform_deploys, :auth_users
   end

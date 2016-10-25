@@ -22,7 +22,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeCompleteTerraformDeployResponse"
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
             }
           }
         },
@@ -48,7 +48,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeCreateTerraformDeployResponse"
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
             }
           }
         },
@@ -76,28 +76,15 @@
           "type": "string",
           "format": "int64"
         },
+        "request_id": {
+          "type": "string",
+          "format": "string"
+        },
         "successful": {
           "type": "boolean",
           "format": "boolean"
         },
         "user_email": {
-          "type": "string",
-          "format": "string"
-        }
-      }
-    },
-    "canoeCompleteTerraformDeployResponse": {
-      "type": "object",
-      "properties": {
-        "deploy_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "error": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "message": {
           "type": "string",
           "format": "string"
         }
@@ -128,7 +115,7 @@
         }
       }
     },
-    "canoeCreateTerraformDeployResponse": {
+    "canoeTerraformDeployResponse": {
       "type": "object",
       "properties": {
         "deploy_id": {
@@ -140,6 +127,10 @@
           "format": "boolean"
         },
         "message": {
+          "type": "string",
+          "format": "string"
+        },
+        "request_id": {
           "type": "string",
           "format": "string"
         }
