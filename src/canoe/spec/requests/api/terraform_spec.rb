@@ -2,8 +2,10 @@ require "rails_helper"
 
 RSpec.describe "Terraform API" do
   before do
+    Canoe.salesforce_authenticator = SalesforceAuthenticatorAPI::Fake.new
     @project = TerraformProject.create!
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
+    @user.phone.create_pairing("boom town")
     @notifier = FakeHipchatNotifier.new
     Api::TerraformController.notifier = @notifier
     TerraformProject.required_version = nil

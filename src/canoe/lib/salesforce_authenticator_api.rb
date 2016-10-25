@@ -7,6 +7,32 @@ class SalesforceAuthenticatorAPI
     end
   end
 
+  class Fake
+    def create_pairing(username, phrase)
+      return Response.new(fake_response(id: SecureRandom.uuid))
+    end
+
+    def pairing_status(pairing_id)
+      return Response.new(fake_response)
+    end
+
+    def initiate_authentication(pairing_id)
+      return Response.new(fake_response)
+    end
+
+    def authentication_status(request_id)
+      return Response.new(fake_response(granted: true))
+    end
+
+    private
+
+    HTTPResponse = Struct.new(:code, :body)
+
+    def fake_response(body = {})
+      HTTPResponse.new("200", JSON.dump(body))
+    end
+  end
+
   class Response
     OK = "200".freeze
 

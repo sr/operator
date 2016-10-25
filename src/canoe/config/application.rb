@@ -25,8 +25,8 @@ require "canoe"
 Bundler.require(*Rails.groups)
 
 module Canoe
-  def self.salesforce_authenticator
-    @salesforce_authenticator ||= SalesforceAuthenticatorAPI.new(
+  cattr_accessor :salesforce_authenticator do
+    SalesforceAuthenticatorAPI.new(
       ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_ID"],
       ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_KEY"]
     )
