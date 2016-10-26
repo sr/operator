@@ -13,7 +13,7 @@ class SalesforceAuthenticatorAPI
     end
 
     def pairing_status(_pairing_id)
-      Response.new(fake_response)
+      Response.new(fake_response(enabled: true))
     end
 
     def initiate_authentication(_pairing_id)
@@ -21,7 +21,12 @@ class SalesforceAuthenticatorAPI
     end
 
     def authentication_status(_request_id)
-      Response.new(fake_response(granted: true))
+      @authentication_status ||
+        Response.new(fake_response(granted: true))
+    end
+
+    def authentication_status=(data)
+      @authentication_status = Response.new(fake_response(data))
     end
 
     private

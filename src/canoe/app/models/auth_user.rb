@@ -15,6 +15,33 @@ class AuthUser < ApplicationRecord
       SalesforceAuthenticatorPairing.new(auth_user_id: id)
   end
 
+  def authenticate_phone(max_tries = 13, sleep_interval = 2)
+    if !phone.paired?
+      return false
+    end
+
+    auth = Canoe.salesforce_authenticator.initiate_authentication(phone.pairing_id)
+
+    if !auth.success?
+      return false
+    end
+
+    tries = 0
+
+    until tries >= max_tries
+      response = Canoe.salesforce_authenticator.authentication_status(auth["id"])
+
+      if response["granted"]
+        return true
+      end
+
+      tries += 1
+      sleep(sleep_interval)
+    end
+
+    false
+  end
+
   def deploy_authorized?(project, target)
     if !project
       raise ArgumentError, "invalid project: #{project.inspect}"

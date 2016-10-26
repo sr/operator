@@ -3,6 +3,10 @@ class TerraformDeployResponse
     new(deploy, "Terraform estate #{deploy.project_name.inspect} is locked by #{deploy.user_name}")
   end
 
+  def self.authentication_required
+    new(nil, "Phone authentication required")
+  end
+
   def self.unknown_project(name)
     new(nil, "Unknown Terraform project: #{name.inspect}")
   end

@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe "Terraform API" do
   before do
-    Canoe.salesforce_authenticator = SalesforceAuthenticatorAPI::Fake.new
     @notifier = FakeHipchatNotifier.new
     TerraformProject.notifier = @notifier
     TerraformProject.required_version = "0.7.4"
@@ -45,6 +44,14 @@ RSpec.describe "Terraform API" do
 
   def deploy_response
     Canoe::TerraformDeployResponse.decode_json(response.body)
+  end
+
+  it "requires phone authentication" do
+    SalesforceAuthenticatorPairing.delete_all
+
+    create_deploy project: "aws/pardotops"
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to eq("Phone authentication required")
   end
 
   it "returns an error for unknown user" do
