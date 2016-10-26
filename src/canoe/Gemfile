@@ -36,5 +36,3 @@ group :development, :test do
   gem "spring"
   gem "webmock", "~> 1.21", ">= 1.21.0", require: false
 end
-
-gem "web-console", "~> 3.0", group: :development
