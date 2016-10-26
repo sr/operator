@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20161024101143) do
     t.string   "pairing_id",   null: false
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
-    t.index ["auth_user_id"], name: "fk_rails_6dbdb597a7", using: :btree
+    t.index ["auth_user_id"], name: "index_salesforce_authenticator_pairings_on_auth_user_id", unique: true, using: :btree
     t.index ["pairing_id"], name: "index_salesforce_authenticator_pairings_on_pairing_id", unique: true, using: :btree
   end
 
