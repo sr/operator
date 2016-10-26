@@ -215,7 +215,6 @@ func plan(tf *terraform) (int, string) {
 
 func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) error {
 	t := httptransport.New(canoeURL.Host, "", []string{canoeURL.Scheme})
-	t.DefaultAuthentication = httptransport.APIKeyAuth("X-Api-Token", "header", os.Getenv("CANOE_API_TOKEN"))
 	client := canoe.New(t, strfmt.Default)
 	resp, err := client.CreateTerraformDeploy(
 		canoe.NewCreateTerraformDeployParams().WithBody(
@@ -262,6 +261,7 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 				UserEmail:  canoeUser,
 				DeployID:   resp.Payload.DeployID,
 				Successful: success,
+				RequestID:  resp.Payload.RequestID,
 			},
 		),
 	); err != nil {
