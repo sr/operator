@@ -75,16 +75,12 @@ resource "aws_security_group" "teampass_app" {
   }
 }
 
-resource "template_file" "teampass_user_data" {
+data "template_file" "teampass_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
     configuration_environment = "production"
     ecs_cluster               = "teampass"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -96,7 +92,7 @@ resource "aws_launch_configuration" "teampass" {
   iam_instance_profile        = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   security_groups             = ["${aws_security_group.teampass_app.id}"]
   associate_public_ip_address = false
-  user_data                   = "${template_file.teampass_user_data.rendered}"
+  user_data                   = "${data.template_file.teampass_user_data.rendered}"
 
   root_block_device {
     volume_type           = "gp2"

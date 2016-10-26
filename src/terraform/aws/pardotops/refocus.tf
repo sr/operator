@@ -2,16 +2,12 @@ resource "aws_ecs_cluster" "refocus_production" {
   name = "refocus_production"
 }
 
-resource "template_file" "refocus_production_user_data" {
+data "template_file" "refocus_production_user_data" {
   template = "${file("ecs_user_data.tpl")}"
 
   vars {
     configuration_environment = "production"
     ecs_cluster               = "refocus_production"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -46,7 +42,7 @@ resource "aws_launch_configuration" "refocus_production" {
   iam_instance_profile        = "${aws_iam_instance_profile.ecs_instance_profile.id}"
   security_groups             = ["${aws_security_group.refocus_app_production.id}"]
   associate_public_ip_address = false
-  user_data                   = "${template_file.refocus_production_user_data.rendered}"
+  user_data                   = "${data.template_file.refocus_production_user_data.rendered}"
 
   root_block_device {
     volume_type           = "gp2"
