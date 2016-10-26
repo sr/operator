@@ -1574,7 +1574,7 @@ resource "aws_security_group" "appdev_indexerhost" {
     to_port   = 6379
     protocol  = "tcp"
     cidr_blocks = [
-      "{aws_vpc.appdev.cidr_block}"
+      "${aws_vpc.appdev.cidr_block}"
     ]
   }
   egress {
