@@ -1,5 +1,6 @@
 module Api
   class Controller < ApplicationController
+    skip_before_action :verify_authenticity_token
     skip_before_action :require_oauth_authentication
     before_action :require_api_authentication
 
@@ -11,6 +12,18 @@ module Api
         render status: 401, json: { error: true, message: "Invalid auth token" }
         false
       end
+    end
+
+    def require_email_authentication
+      unless current_user
+        message = "No user with email #{params[:user_email].inspect}. " \
+          "You may need to sign into Canoe first."
+        render status: 401, json: { error: true, message: message }
+
+        return false
+      end
+
+      true
     end
 
     # Overrides current_user from ApplicationController to do API-specific authentication

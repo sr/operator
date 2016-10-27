@@ -1,4 +1,5 @@
 class ChefDelivery
+  PROJECT = "chef".freeze
   SUCCESS = "success".freeze
   FAILURE = "failure".freeze
   PENDING = "pending".freeze

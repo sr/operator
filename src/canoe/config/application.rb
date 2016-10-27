@@ -17,6 +17,7 @@ require "instrumentation"
 
 require "canoe/deployer"
 require "canoe/ldap_authorizer"
+require "canoe"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
