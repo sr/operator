@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"syscall"
 
@@ -19,6 +20,8 @@ import (
 )
 
 const program = "terra2"
+
+var reTerraVersion = regexp.MustCompile("v([0-9.]*)")
 
 type afyRepo struct {
 	RepoName string
@@ -47,7 +50,7 @@ type terraform struct {
 	// VarFile is the is the *.tfvars given to terraform as the -var-file flag
 	VarFile string
 	// Version is the version of the terraform the executable
-	Version []byte
+	Version string
 }
 
 func main() {
@@ -67,7 +70,7 @@ func terra() (int, string) {
 		tf        terraform
 	)
 	flag.StringVar(&afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Full URL of the Artifactory server")
-	flag.StringVar(&afy.RepoName, "artifactory-repo", "pd-terraform", "Name of the Artifactory repository where Terraform configs, remote state, and plans are stored")
+	flag.StringVar(&afy.RepoName, "artifactory-repo", "pd-terraform", "Name of the Artifactory repository where Terraform configs, remote project, and plans are stored")
 	flag.StringVar(&afy.User, "artifactory-user", "", "User used for accessing the Artifactory API")
 	flag.StringVar(&afy.Password, "artifactory-password", "", "Encrypted password of the Artifactory API user")
 	flag.StringVar(&canoeUser, "canoe-user", "", "The email address used for authenticating Canoe API requests")
@@ -99,20 +102,11 @@ func terra() (int, string) {
 	if canoeUser == "" {
 		return 1, "required flag missing: canoe-user"
 	}
-	if git.Branch == "" {
-		return 1, "required flag missing: git-branch"
-	}
-	if git.SHA1 == "" {
-		return 1, "required flag missing: git-commit"
-	}
 	if tf.Cmd == "" {
 		return 1, "required flag missing: terraform-command"
 	}
 	if tf.Exec == "" {
 		return 1, "required flag missing: terraform-exec"
-	}
-	if tf.PlanFile == "" {
-		return 1, "required flag missing: terraform-plan"
 	}
 	cmd := exec.Command(
 		tf.Exec,
@@ -132,7 +126,6 @@ func terra() (int, string) {
 	if err := cmd.Run(); err != nil {
 		return 1, ""
 	}
-	var err error
 	switch tf.Cmd {
 	case "plan":
 		if tf.Dir == "" {
@@ -144,14 +137,17 @@ func terra() (int, string) {
 		if tf.VarFile == "" {
 			return 1, "required flag missing: terraform-var-file"
 		}
+		if tf.PlanFile == "" {
+			return 1, "required flag missing: terraform-plan"
+		}
 		if _, err := os.Stat(tf.Dir); os.IsNotExist(err) {
 			return 1, fmt.Sprintf("Terraform directory \"%s\" does not exist.", tf.Dir)
 		}
 		if _, err := os.Stat(filepath.Join(tf.Dir, tf.Project)); os.IsNotExist(err) {
 			return 1, fmt.Sprintf("Terraform project \"%s\" not present in base directory.", tf.Project)
 		}
-		var relPath string
-		if relPath, err = filepath.Rel(tf.Dir, tf.VarFile); err != nil {
+		relPath, err := filepath.Rel(tf.Dir, tf.VarFile)
+		if err != nil {
 			relPath = tf.VarFile
 		}
 		if _, err := os.Stat(tf.VarFile); os.IsNotExist(err) {
@@ -159,10 +155,22 @@ func terra() (int, string) {
 		}
 		return plan(&tf)
 	case "apply":
+		if tf.PlanFile == "" {
+			return 1, "required flag missing: terraform-plan"
+		}
+		if git.Branch == "" {
+			return 1, "required flag missing: git-branch"
+		}
+		if git.SHA1 == "" {
+			return 1, "required flag missing: git-commit"
+		}
 		cmd := exec.Command(tf.Exec, "version")
-		if tf.Version, err = cmd.CombinedOutput(); err != nil {
+		v, err := cmd.CombinedOutput()
+		matches := reTerraVersion.FindStringSubmatch(string(v))
+		if err != nil && len(matches) != 2 {
 			return 1, "Unable to determine local Terraform version"
 		}
+		tf.Version = matches[1]
 		if _, err := os.Stat(tf.PlanFile); os.IsNotExist(err) {
 			return 1, fmt.Sprintf(`Plan file "%s" is missing. Please run "terra plan %s" first`, tf.PlanFile, tf.PlanFile)
 		}
@@ -172,6 +180,27 @@ func terra() (int, string) {
 		}
 		if err := apply(&tf, &git, u, canoeUser); err != nil {
 			return 1, err.Error()
+		}
+		return 0, ""
+	case "unlock":
+		if tf.Project == "" {
+			return 1, "required flag missing: terraform-project"
+		}
+		u, err := url.Parse(canoeURL)
+		if err != nil {
+			return 1, "flag canoe-url is not a valid URL: " + err.Error()
+		}
+		t := httptransport.New(u.Host, "", []string{u.Scheme})
+		client := canoe.New(t, strfmt.Default)
+		if x, err := client.UnlockTerraformProject(
+			canoe.NewUnlockTerraformProjectParams().WithBody(
+				&models.CanoeUnlockTerraformProjectRequest{
+					UserEmail: canoeUser,
+					Project:   tf.Project,
+				},
+			),
+		); err != nil {
+			return 1, fmt.Sprintf("Could not unlock Terraform project: %#v %s\n", x, err)
 		}
 		return 0, ""
 	default:
@@ -223,7 +252,7 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 				Project:          tf.Project,
 				Branch:           git.Branch,
 				Commit:           git.SHA1,
-				TerraformVersion: strings.TrimSpace(string(tf.Version)),
+				TerraformVersion: strings.TrimSpace(tf.Version),
 			},
 		),
 	)
@@ -262,10 +291,11 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 				DeployID:   resp.Payload.DeployID,
 				Successful: success,
 				RequestID:  resp.Payload.RequestID,
+				Project:    resp.Payload.Project,
 			},
 		),
 	); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform estate: %s\n", program, err)
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project: %s\n", program, err)
 	}
 	return terraErr
 }

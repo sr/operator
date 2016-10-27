@@ -63,6 +63,7 @@ Rails.application.routes.draw do
 
   post "/api/grpc/create_terraform_deploy", to: "api/terraform#create"
   post "/api/grpc/complete_terraform_deploy", to: "api/terraform#complete"
+  post "/api/grpc/unlock_terraform_project", to: "api/terraform#unlock"
 
   get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"

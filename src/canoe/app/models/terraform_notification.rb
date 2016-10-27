@@ -33,6 +33,14 @@ class TerraformNotification
     notify(message, color)
   end
 
+  def unlock(user, deploy)
+    message = "#{user.name.presence || user.email} unlocked Terraform project " \
+      "<code>#{deploy.project_name}</code> previously locked by " \
+      "#{deploy.user_name}"
+
+    notify(message, RED)
+  end
+
   private
 
   def notify(message, color)

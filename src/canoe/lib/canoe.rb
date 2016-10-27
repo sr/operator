@@ -19,6 +19,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :request_id, :string, 4
     optional :project, :string, 5
   end
+  add_message "canoe.UnlockTerraformProjectRequest" do
+    optional :user_email, :string, 1
+    optional :project, :string, 2
+  end
   add_message "canoe.TerraformDeployResponse" do
     optional :error, :bool, 1
     optional :message, :string, 2
@@ -31,5 +35,6 @@ end
 module Canoe
   CreateTerraformDeployRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CreateTerraformDeployRequest").msgclass
   CompleteTerraformDeployRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CompleteTerraformDeployRequest").msgclass
+  UnlockTerraformProjectRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.UnlockTerraformProjectRequest").msgclass
   TerraformDeployResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.TerraformDeployResponse").msgclass
 end

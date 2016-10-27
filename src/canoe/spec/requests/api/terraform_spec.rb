@@ -21,11 +21,13 @@ RSpec.describe "Terraform API" do
     }
 
     request = Canoe::CreateTerraformDeployRequest.new(default_params.merge(params))
+    post "/api/grpc/create_terraform_deploy", params: request.as_json, as: :json
+  end
 
-    post "/api/grpc/create_terraform_deploy",
-      params: request.as_json,
-      as: :json,
-      headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
+  def unlock_project(params)
+    default_params = { user_email: @user.email }
+    request = Canoe::UnlockTerraformProjectRequest.new(default_params.merge(params))
+    post "/api/grpc/unlock_terraform_project", params: request.as_json, as: :json
   end
 
   def complete_deploy(project, request_id, successful)
@@ -36,10 +38,7 @@ RSpec.describe "Terraform API" do
       successful: successful
     )
 
-    post "/api/grpc/complete_terraform_deploy",
-      params: request.as_json,
-      as: :json,
-      headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] }
+    post "/api/grpc/complete_terraform_deploy", params: request.as_json, as: :json
   end
 
   def deploy_response
@@ -140,5 +139,24 @@ RSpec.describe "Terraform API" do
     expect(m.message).to include("master")
     expect(m.message).to include("aws/pardotops")
     expect(m.message).to include("John Doe")
+  end
+
+  it "unlocks project" do
+    @project.deploy_notifications.create!(hipchat_room_id: 42)
+
+    unlock_project project: "aws/pardotops"
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to eq("Terraform project \"aws/pardotops\" is not locked")
+
+    create_deploy project: "aws/pardotops"
+    expect(deploy_response.error).to eq(false)
+    expect(deploy_response.message).to eq("")
+
+    unlock_project project: "aws/pardotops"
+    expect(@notifier.messages.size).to eq(2)
+    m = @notifier.messages.pop
+    expect(m.room_id).to eq(42)
+    expect(m.message).to include("aws/pardotops")
+    expect(m.message).to include("unlocked")
   end
 end

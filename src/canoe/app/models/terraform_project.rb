@@ -54,6 +54,21 @@ class TerraformProject < ActiveRecord::Base
     TerraformDeployResponse.success(deploy)
   end
 
+  def unlock(user)
+    deploy = transaction do
+      deploy = terraform_deploys.pending.first
+
+      if !deploy
+        return TerraformDeployResponse.new(nil, "Terraform project #{name.inspect} is not locked")
+      end
+
+      deploy.update!(completed_at: Time.current, successful: false)
+      deploy
+    end
+
+    notification.unlock(user, deploy)
+  end
+
   def deploy_notifications
     project.deploy_notifications
   end

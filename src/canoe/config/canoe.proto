@@ -17,6 +17,12 @@ service Canoe {
 			body: "*"
 		};
 	}
+	rpc UnlockTerraformProject(UnlockTerraformProjectRequest) returns (TerraformDeployResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/unlock_terraform_project"
+			body: "*"
+		};
+	}
 }
 
 message CreateTerraformDeployRequest {
@@ -33,6 +39,11 @@ message CompleteTerraformDeployRequest {
 	bool successful = 3;
 	string request_id = 4;
 	string project = 5;
+}
+
+message UnlockTerraformProjectRequest {
+	string user_email = 1;
+	string project = 2;
 }
 
 message TerraformDeployResponse {

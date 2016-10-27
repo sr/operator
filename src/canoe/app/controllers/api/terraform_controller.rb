@@ -2,7 +2,7 @@ module Api
   class TerraformController < Controller
     skip_before_action :require_api_authentication
     before_action :require_email_authentication
-    before_action :require_phone_authentication, only: [:create]
+    before_action :require_phone_authentication, only: [:create, :unlock]
     before_action :require_terraform_project
 
     def create
@@ -22,6 +22,11 @@ module Api
         proto_request.successful
       )
 
+      render json: response.as_json
+    end
+
+    def unlock
+      response = terraform_project.unlock(current_user)
       render json: response.as_json
     end
 
@@ -59,6 +64,8 @@ module Api
           Canoe::CreateTerraformDeployRequest.decode_json(request.body.read)
         when "complete"
           Canoe::CompleteTerraformDeployRequest.decode_json(request.body.read)
+        when "unlock"
+          Canoe::UnlockTerraformProjectRequest.decode_json(request.body.read)
         else
           raise "Unable to handle RPC call: #{params[:action].inspect}"
         end

@@ -66,6 +66,32 @@
           "Canoe"
         ]
       }
+    },
+    "/api/grpc/unlock_terraform_project": {
+      "post": {
+        "operationId": "UnlockTerraformProject",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoeUnlockTerraformProjectRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
     }
   },
   "definitions": {
@@ -139,6 +165,19 @@
           "format": "string"
         },
         "request_id": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoeUnlockTerraformProjectRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "user_email": {
           "type": "string",
           "format": "string"
         }
