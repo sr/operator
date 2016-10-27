@@ -91,7 +91,7 @@ namespace :canoe do
       "aws/pardotops",
       "aws/pardotpublic"
     ].each do |name|
-      project = Project.find_or_initialize(name: "terraform-#{name}").tap { |p|
+      project = Project.find_or_initialize_by(name: "terraform-#{name}").tap { |p|
         p.icon = "server"
         p.bamboo_project = "BREAD"
         p.bamboo_plan = "BREAD"
@@ -100,7 +100,7 @@ namespace :canoe do
       }
       project.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
       project.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
-      TerraformProject.find_or_initialize_by(project_id: project.id).tap(&:save!)
+      TerraformProject.find_or_initialize_by(project_id: project.id).tap { |p| p.name = name }.save!
     end
 
     repfix = Project.find_or_initialize_by(name: "repfix").tap { |project|
