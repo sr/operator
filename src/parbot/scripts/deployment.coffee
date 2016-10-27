@@ -111,7 +111,7 @@ module.exports = (robot) ->
           else
             cb(null, builds[0])
       inProgressBuilds: (cb) ->
-        bamboo.inProgressBuilds 'PDT-P3PANT', (err, builds) ->
+        bamboo.inProgressBuilds 'PDT-PPANT', (err, builds) ->
           if err?
             cb(err, null)
           else

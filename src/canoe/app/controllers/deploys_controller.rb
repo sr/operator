@@ -140,6 +140,6 @@ class DeploysController < ApplicationController
   end
 
   def render_invalid_provisional_deploy
-    render status: :unprocessable_entity, text: "Unknown deploy type: #{params[:what]}"
+    render status: :unprocessable_entity, text: "Unknown deploy type: #{h(params[:what])}"
   end
 end

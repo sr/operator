@@ -28,7 +28,7 @@ install-devenv:
 	$(GO) install -v $$($(GO) list devenv/...)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -Ev '(github.com/hashicorp/terraform|^bread/vendor/|^devenv/vendor|^github.com/sr/operator/testing$')')"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/go-swagger/go-swagger|github.com/hashicorp/terraform|^bread/swagger|^bread/vendor/|^devenv/vendor|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
@@ -64,7 +64,7 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
+			out="$$($< $$pkg | grep -v -E '^src/bread/swagger|main-gen\.go|_test\.go')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				fail=true; \

@@ -5,14 +5,14 @@ class ApplicationController < ActionController::Base
 
   include PaginationHelper
 
-  protect_from_forgery with: :null_session
+  protect_from_forgery with: :exception
 
   before_action :require_oauth_authentication
 
   around_action :log_context
 
   rescue_from Exception do |exception|
-    if !Rails.env.development?
+    if !Rails.env.test? && !Rails.env.development?
       Instrumentation.log_exception(exception)
       render file: "public/500.html", layout: false, status: 500
     else

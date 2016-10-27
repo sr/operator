@@ -938,12 +938,46 @@ resource "aws_instance" "appdev_zkkafka1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_zkkafkahost.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-zkkafka1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_zkkafkahost" {
+  name        = "appdev_zkkafkahost"
+  description = "Allow access from appdev and the other zkstorm"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 2181
+    to_port   = 2181
+    protocol  = "tcp"
+    self      = true
+
+    security_groups = [
+      "${aws_security_group.appdev_zkstormhost.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    security_groups = [
+      "${aws_security_group.appdev_apphost.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -1004,12 +1038,46 @@ resource "aws_instance" "appdev_zkstorm1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev_zkstormhost.id}",
   ]
 
   tags {
     Name      = "${var.environment_appdev["pardot_env_id"]}-zkstorm1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
     terraform = "true"
+  }
+}
+
+resource "aws_security_group" "appdev_zkstormhost" {
+  name        = "appdev_zkstormhost"
+  description = "Allow access from nimbus"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 2181
+    to_port   = 2181
+    protocol  = "tcp"
+    self      = true
+
+    security_groups = [
+      "${aws_security_group.appdev_nimbushost.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    security_groups = [
+      "${aws_security_group.appdev_apphost.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -1498,6 +1566,16 @@ resource "aws_security_group" "appdev_indexerhost" {
 
     security_groups = [
       "${aws_security_group.appdev_toolsproxy.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 6379
+    to_port   = 6379
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${aws_vpc.appdev.cidr_block}",
     ]
   }
 
