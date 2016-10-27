@@ -1,5 +1,5 @@
 %define maven_version 3.3.9
-%define srcver 1.1
+%define srcver 2.0
 
 Name: pardot-kafka-tools
 Version: %{srcver}
