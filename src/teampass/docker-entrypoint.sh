@@ -1,7 +1,12 @@
 #!/bin/bash
 set -e
 
+# From /start.sh to bypass dual /teampassinit and /teampass dirs
+mkdir -p /teampass/sk
+chown -Rf www-data.www-data /teampass/sk
 ROOTTP="/teampass/www"
+[ -d /teampassinit ] && mv /teampassinit /$ROOTTP
+chown -Rf www-data.www-data $ROOTTP
 
 # To get db config from docker env
 echo "<?php

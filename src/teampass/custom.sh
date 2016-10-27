@@ -1,12 +1,7 @@
 #!/bin/bash
 set -e
 
-# From /start.sh to bypass dual /teampassinit and /teampass dirs
-mkdir -p /teampass/sk
-chown -Rf www-data.www-data /teampass/sk
-ROOTTP="/teampass/www"
-[ -d /teampassinit ] && mv /teampassinit /$ROOTTP
-chown -Rf www-data.www-data $ROOTTP
+ROOTTP="/teampassinit"
 
 rm -rf $ROOTTP/install
 
@@ -45,5 +40,3 @@ return array(
 
 # Add apache http redirect entry
 ln -sf /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
-
-cd /teampass/www
