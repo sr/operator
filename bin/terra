@@ -114,6 +114,7 @@ case "$action" in
               -testing=false
           fi
 
+          cd src/terraform
           make -f ../../etc/mk/terraform.mk "$action" |
           grep -vi password
           ;;
