@@ -13,7 +13,7 @@ resource "aws_instance" "appdev_cljobmanager1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev.id}",
   ]
 
   tags {
@@ -46,7 +46,7 @@ resource "aws_instance" "appdev_clredisjob1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev.id}",
   ]
 
   tags {
@@ -79,7 +79,7 @@ resource "aws_instance" "appdev_cledgecache1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.appdev_vpc_default.id}",
-    "${aws_security_group.appdev_apphost.id}",
+    "${aws_security_group.appdev.id}",
   ]
 
   tags {
