@@ -1,9 +1,9 @@
-def full_image_url(tag)
-  "#{DOCKER_BASE_IMAGE_PATH}/#{tag}"
+def full_base_image_url(tag, mirror = nil)
+  "#{mirror || DOCKER_HOST}/base/#{tag}"
 end
 
 def docker_build(tag, directory, opts = {})
-  image_url = full_image_url(tag)
+  image_url = full_base_image_url(tag)
 
   if File.exist?("#{directory}/Rakefile")
     # Build has its own Rakefile for custom build steps
@@ -28,13 +28,14 @@ def docker_build(tag, directory, opts = {})
     ].compact
   end
 
-  docker_push(image_url) if PUSH
+  docker_push(tag) if PUSH
 end
 
-def docker_push(image_url)
-  sh "docker", "push", image_url
+def docker_push(tag)
+  sh "docker", "push", full_base_image_url(tag)
 end
 
-def docker_pull(image_url)
-  sh "docker", "pull", image_url
+def docker_pull(tag, mirror = nil)
+  sh "docker", "pull", full_base_image_url(tag, mirror)
+  sh "docker", "tag", full_base_image_url(tag, mirror), full_base_image_url(tag)
 end

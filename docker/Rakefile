@@ -3,9 +3,9 @@ require_relative "build_functions.rb"
 
 Build = Struct.new(:dir, :opts)
 
-ARTIFACTORY_HOST       = ENV.fetch("ARTIFACTORY_HOST", "artifactory.dev.pardot.com")
-DOCKER_BASE_IMAGE_PATH = ENV.fetch("DOCKER_BASE_IMAGE_PATH", "docker.dev.pardot.com/base")
-PUSH                   = !ENV.fetch("PUSH", "").empty?
+ARTIFACTORY_HOST = ENV.fetch("ARTIFACTORY_HOST", "artifactory.dev.pardot.com")
+DOCKER_HOST      = ENV.fetch("DOCKER_HOST", "docker.dev.pardot.com")
+PUSH             = !ENV.fetch("PUSH", "").empty?
 
 BUILDS = {
   # Officially supported CentOS-based base images
@@ -60,7 +60,9 @@ desc "Builds all images"
 task :default => BUILDS.map { |tag, _| tag }
 
 desc "Pulls common images"
-task :pull do
+task :pull, [:mirror] do |t, args|
+  args.with_defaults(mirror: "docker.dev.pardot.com")
+
   queue = Queue.new
   BUILDS.select { |_, b| b.opts && b.opts[:common] }.each { |tag, _| queue << tag }
 
@@ -69,7 +71,7 @@ task :pull do
     threads << Thread.new do
       begin
         while tag = queue.pop(true)
-          docker_pull(full_image_url(tag))
+          docker_pull(full_image_url(tag), args.mirror)
         end
       rescue ThreadError
         # queue empty
