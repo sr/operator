@@ -1,6 +1,10 @@
 FROM docker.dev.pardot.com/base/node:4
 
+ARG dist=el6
+ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
+
+RUN yum --nogpgcheck localinstall -y "https://${artifactory_host}/artifactory/pd-yum/phantomjs-${phantomjs_version}.${dist}.x86_64.rpm"
 
 RUN mkdir -p /app && \
   groupadd -r app -g 533 && \
