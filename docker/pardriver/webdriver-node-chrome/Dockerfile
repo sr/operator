@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM docker.dev.pardot.com/base/ubuntu:16.04
 
 ARG artifactory_host
 

@@ -11,7 +11,7 @@ Periodically, and also on any commit pushed to master for this repository, Bambo
 ### Adding a new base image
 
 1. Create a `Dockerfile`. Follow the directory structure of the existing images in the repository.
-1. Add the image to `images.yml`. The key name is the URL where the image will be pushed, and the `build` key is the path where the `Dockerfile` resides.
+1. Add the images to the `BUILDS` array in `Rakefile`. The key is the tag name and the value is a `Build` object whose first argument is the first to build from. Additional options can be specified if needed.
 1. Make a pull request and get a +1.
 1. Merge away! Bamboo will build the base image once it lands in the master branch.
 
