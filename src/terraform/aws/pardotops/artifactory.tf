@@ -84,10 +84,14 @@ resource "aws_security_group" "artifactory_http_lb" {
   }
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${var.legacy_artifactory_instance_ip}/32", # legacy artifactory.dev.pardot.com
+    ]
   }
 
   egress {
