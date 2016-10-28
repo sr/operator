@@ -2,7 +2,8 @@ def full_base_image_url(tag, mirror = nil)
   "#{mirror || DOCKER_HOST}/base/#{tag}"
 end
 
-def docker_build(tag, directory, opts = {})
+def docker_build(tag, directory, opts = nil)
+  opts ||= {}
   image_url = full_base_image_url(tag)
 
   if File.exist?("#{directory}/Rakefile")
