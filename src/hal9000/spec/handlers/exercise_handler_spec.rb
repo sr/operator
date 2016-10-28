@@ -10,18 +10,18 @@ describe ExerciseHandler, lita_handler: true do
   end
 end
 
-def check_validity input
-    allowed_phrases.each do |phrase|
-        return true if input.include? phrase
-    end
-    return false
+def check_validity(input)
+  allowed_phrases.each do |phrase|
+    return true if input.include? phrase
+  end
+  false
 end
 
 def allowed_phrases
-    [
-        "Drop and give me",
-        "Plank! Hold it for",
-        "Squats! Give me",
-        "Pullups! Go to failure or"
-    ]
+  [
+    "Drop and give me",
+    "Plank! Hold it for",
+    "Squats! Give me",
+    "Pullups! Go to failure or"
+  ]
 end
