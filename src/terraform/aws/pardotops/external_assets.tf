@@ -25,3 +25,7 @@ variable "elastic_load_balancing_acct_number" {
 variable "pardot_ci_vpc_id" {
   default = "vpc-6d80c40a"
 }
+
+variable "legacy_artifactory_instance_ip" {
+  default = "52.21.58.50"
+}
