@@ -1,9 +1,9 @@
 %define maven_version 3.3.9
-%define srcver 1.2.0
+%define srcver 1.3.0
 
 Name: storm-metrics-statsd
 Version: %{srcver}
-Release: 6%{?dist}
+Release: 1%{?dist}
 Summary: Storm plugin for reporting metrics to statsd
 Group: Applications/Internet
 License: Apache License v2.0
