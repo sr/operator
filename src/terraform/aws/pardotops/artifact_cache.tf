@@ -25,7 +25,7 @@ resource "aws_security_group" "artifact_cache_http_lb" {
   }
 }
 
-resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
+resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy-artifact-cache" {
   name                     = "duration-based-elb-cookie-policy-artifact-cache"
   load_balancer            = "${aws_elb.artifact_cache_lb.id}"
   lb_port                  = 443
