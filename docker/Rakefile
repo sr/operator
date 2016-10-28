@@ -61,7 +61,7 @@ task :default => BUILDS.map { |tag, _| tag }
 
 desc "Pulls common images"
 task :pull, [:mirror] do |t, args|
-  args.with_defaults(mirror: "docker.dev.pardot.com")
+  args.with_defaults(mirror: DOCKER_HOST)
 
   queue = Queue.new
   BUILDS.select { |_, b| b.opts && b.opts[:common] }.each { |tag, _| queue << tag }
@@ -71,7 +71,7 @@ task :pull, [:mirror] do |t, args|
     threads << Thread.new do
       begin
         while tag = queue.pop(true)
-          docker_pull(full_image_url(tag), args.mirror)
+          docker_pull(tag, args.mirror)
         end
       rescue ThreadError
         # queue empty
