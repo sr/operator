@@ -56,4 +56,11 @@ RSpec.describe Project do
       end
     end
   end
+
+  it "excludes terraform from list of enabled projects" do
+    project = FactoryGirl.create(:project)
+    expect(Project.enabled).to eq([project])
+    TerraformProject.create!(name: "aws/pardotops", project: project)
+    expect(Project.enabled).to eq([])
+  end
 end

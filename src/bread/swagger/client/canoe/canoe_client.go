@@ -76,6 +76,33 @@ func (a *Client) CreateTerraformDeploy(params *CreateTerraformDeployParams) (*Cr
 
 }
 
+/*
+UnlockTerraformProject unlock terraform project API
+*/
+func (a *Client) UnlockTerraformProject(params *UnlockTerraformProjectParams) (*UnlockTerraformProjectOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUnlockTerraformProjectParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "UnlockTerraformProject",
+		Method:             "POST",
+		PathPattern:        "/api/grpc/unlock_terraform_project",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &UnlockTerraformProjectReader{formats: a.formats},
+		Context:            params.Context,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*UnlockTerraformProjectOK), nil
+
+}
+
 // SetTransport changes the transport on the client
 func (a *Client) SetTransport(transport runtime.ClientTransport) {
 	a.transport = transport

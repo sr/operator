@@ -19,8 +19,8 @@ type CanoeCreateTerraformDeployRequest struct {
 	// commit
 	Commit string `json:"commit,omitempty"`
 
-	// estate
-	Estate string `json:"estate,omitempty"`
+	// project
+	Project string `json:"project,omitempty"`
 
 	// terraform version
 	TerraformVersion string `json:"terraform_version,omitempty"`

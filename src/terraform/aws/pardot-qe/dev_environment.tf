@@ -153,7 +153,7 @@ resource "aws_nat_gateway" "dev_environment_nat_gw" {
 # All Artifactory requests get NATed so the source IP is constant
 resource "aws_route" "dev_environment_artifactory_route" {
   route_table_id         = "${aws_vpc.dev_environment.main_route_table_id}"
-  destination_cidr_block = "52.21.58.50/32"                                 # artifactory.dev.pardot.com
+  destination_cidr_block = "${var.legacy_artifactory_instance_ip}/32"       # artifactory.dev.pardot.com
   nat_gateway_id         = "${aws_nat_gateway.dev_environment_nat_gw.id}"
 }
 

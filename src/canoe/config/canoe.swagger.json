@@ -22,7 +22,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeCompleteTerraformDeployResponse"
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
             }
           }
         },
@@ -48,7 +48,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeCreateTerraformDeployResponse"
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
             }
           }
         },
@@ -66,6 +66,32 @@
           "Canoe"
         ]
       }
+    },
+    "/api/grpc/unlock_terraform_project": {
+      "post": {
+        "operationId": "UnlockTerraformProject",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoeUnlockTerraformProjectRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
     }
   },
   "definitions": {
@@ -76,28 +102,19 @@
           "type": "string",
           "format": "int64"
         },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "string"
+        },
         "successful": {
           "type": "boolean",
           "format": "boolean"
         },
         "user_email": {
-          "type": "string",
-          "format": "string"
-        }
-      }
-    },
-    "canoeCompleteTerraformDeployResponse": {
-      "type": "object",
-      "properties": {
-        "deploy_id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "error": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "message": {
           "type": "string",
           "format": "string"
         }
@@ -114,7 +131,7 @@
           "type": "string",
           "format": "string"
         },
-        "estate": {
+        "project": {
           "type": "string",
           "format": "string"
         },
@@ -128,7 +145,7 @@
         }
       }
     },
-    "canoeCreateTerraformDeployResponse": {
+    "canoeTerraformDeployResponse": {
       "type": "object",
       "properties": {
         "deploy_id": {
@@ -140,6 +157,27 @@
           "format": "boolean"
         },
         "message": {
+          "type": "string",
+          "format": "string"
+        },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoeUnlockTerraformProjectRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "user_email": {
           "type": "string",
           "format": "string"
         }
