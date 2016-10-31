@@ -12,6 +12,7 @@ class ExerciseHandler < ApplicationHandler
       { phrase: "Drop and give me", function: :reps },
       { phrase: "Plank! Hold it for", function: :time },
       { phrase: "Squats! Give me", function: :reps },
+      { phrase: "Lunges! Give me", function: :reps },
       # { "Pullups! Go to failure or", function: :reps }
     ]
   end

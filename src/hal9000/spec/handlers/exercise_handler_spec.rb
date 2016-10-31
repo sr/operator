@@ -22,6 +22,7 @@ def allowed_phrases
     "Drop and give me",
     "Plank! Hold it for",
     "Squats! Give me",
+    "Lunges! Give me",
     "Pullups! Go to failure or"
   ]
 end
