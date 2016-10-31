@@ -12,7 +12,7 @@ class TerraformNotification
     message = "#{deploy.user_name} is deploying terraform " \
       "<code>#{deploy.commit_sha1[0, 7]}@#{deploy.branch_name}</code> with " \
       "<code>#{deploy.terraform_version}</code> to " \
-      "<code>#{deploy.estate_name}</code>"
+      "<code>#{deploy.project_name}</code>"
 
     notify(message, YELLOW)
   end
@@ -20,7 +20,7 @@ class TerraformNotification
   def deploy_complete(deploy)
     message = "#{deploy.user_name}'s terraform deployment of " \
       "<code>#{deploy.commit_sha1[0, 7]}@#{deploy.branch_name}</code> to " \
-      "<code>#{deploy.estate_name}</code> "
+      "<code>#{deploy.project_name}</code> "
 
     if deploy.successful?
       color = GREEN
@@ -31,6 +31,14 @@ class TerraformNotification
     end
 
     notify(message, color)
+  end
+
+  def unlock(user, deploy)
+    message = "#{user.name.presence || user.email} unlocked Terraform project " \
+      "<code>#{deploy.project_name}</code> previously locked by " \
+      "#{deploy.user_name}"
+
+    notify(message, RED)
   end
 
   private

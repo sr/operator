@@ -45,7 +45,7 @@ func NewCreateTerraformDeployOK() *CreateTerraformDeployOK {
 CreateTerraformDeployOK create terraform deploy o k
 */
 type CreateTerraformDeployOK struct {
-	Payload *models.CanoeCreateTerraformDeployResponse
+	Payload *models.CanoeTerraformDeployResponse
 }
 
 func (o *CreateTerraformDeployOK) Error() string {
@@ -54,7 +54,7 @@ func (o *CreateTerraformDeployOK) Error() string {
 
 func (o *CreateTerraformDeployOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CanoeCreateTerraformDeployResponse)
+	o.Payload = new(models.CanoeTerraformDeployResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

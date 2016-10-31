@@ -45,7 +45,7 @@ func NewCompleteTerraformDeployOK() *CompleteTerraformDeployOK {
 CompleteTerraformDeployOK complete terraform deploy o k
 */
 type CompleteTerraformDeployOK struct {
-	Payload *models.CanoeCompleteTerraformDeployResponse
+	Payload *models.CanoeTerraformDeployResponse
 }
 
 func (o *CompleteTerraformDeployOK) Error() string {
@@ -54,7 +54,7 @@ func (o *CompleteTerraformDeployOK) Error() string {
 
 func (o *CompleteTerraformDeployOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.CanoeCompleteTerraformDeployResponse)
+	o.Payload = new(models.CanoeTerraformDeployResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
