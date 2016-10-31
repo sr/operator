@@ -2,7 +2,7 @@ class ExerciseHandler < ApplicationHandler
   route(/^exercise time$/i, :exercise_time, command: false, help: { "exercise_time" => "returns a random exercise and a time-based intensity" })
 
   def exercise_time(request)
-    exercise = exercises[rand(0..exercises.length)]
+    exercise = exercises[rand(0..exercises.length - 1)]
     intensity = public_send(exercise[:function], Time.now.getlocal("-05:00").hour)
     request.reply "#{exercise[:phrase]} #{intensity}"
   end
