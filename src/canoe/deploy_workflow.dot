@@ -1,0 +1,6 @@
+digraph deploy_workflow {
+  start -> initiated
+  initiated -> deployed [label="deploy (if restart server)"]
+  initiated -> completed [label="deploy"]
+  deployed -> completed [label="restart (if restart server)"]
+}

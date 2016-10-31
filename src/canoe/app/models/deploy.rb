@@ -111,7 +111,7 @@ class Deploy < ApplicationRecord
   end
 
   def sync_done?
-    !results.initiated.any?
+    !results.undeployed.any?
   end
 
   def options_are_valid
