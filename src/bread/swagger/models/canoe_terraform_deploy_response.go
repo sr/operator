@@ -9,28 +9,28 @@ import (
 	"github.com/go-openapi/errors"
 )
 
-// CanoeCompleteTerraformDeployRequest canoe complete terraform deploy request
-// swagger:model canoeCompleteTerraformDeployRequest
-type CanoeCompleteTerraformDeployRequest struct {
+// CanoeTerraformDeployResponse canoe terraform deploy response
+// swagger:model canoeTerraformDeployResponse
+type CanoeTerraformDeployResponse struct {
 
 	// deploy id
 	DeployID int64 `json:"deploy_id,omitempty"`
+
+	// error
+	Error bool `json:"error,omitempty"`
+
+	// message
+	Message string `json:"message,omitempty"`
 
 	// project
 	Project string `json:"project,omitempty"`
 
 	// request id
 	RequestID string `json:"request_id,omitempty"`
-
-	// successful
-	Successful bool `json:"successful,omitempty"`
-
-	// user email
-	UserEmail string `json:"user_email,omitempty"`
 }
 
-// Validate validates this canoe complete terraform deploy request
-func (m *CanoeCompleteTerraformDeployRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this canoe terraform deploy response
+func (m *CanoeTerraformDeployResponse) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

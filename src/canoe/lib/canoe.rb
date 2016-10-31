@@ -9,29 +9,32 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :user_email, :string, 1
     optional :branch, :string, 2
     optional :commit, :string, 3
-    optional :estate, :string, 4
+    optional :project, :string, 4
     optional :terraform_version, :string, 5
-  end
-  add_message "canoe.CreateTerraformDeployResponse" do
-    optional :error, :bool, 1
-    optional :message, :string, 2
-    optional :deploy_id, :int64, 3
   end
   add_message "canoe.CompleteTerraformDeployRequest" do
     optional :user_email, :string, 1
     optional :deploy_id, :int64, 2
     optional :successful, :bool, 3
+    optional :request_id, :string, 4
+    optional :project, :string, 5
   end
-  add_message "canoe.CompleteTerraformDeployResponse" do
+  add_message "canoe.UnlockTerraformProjectRequest" do
+    optional :user_email, :string, 1
+    optional :project, :string, 2
+  end
+  add_message "canoe.TerraformDeployResponse" do
     optional :error, :bool, 1
     optional :message, :string, 2
     optional :deploy_id, :int64, 3
+    optional :request_id, :string, 4
+    optional :project, :string, 5
   end
 end
 
 module Canoe
   CreateTerraformDeployRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CreateTerraformDeployRequest").msgclass
-  CreateTerraformDeployResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CreateTerraformDeployResponse").msgclass
   CompleteTerraformDeployRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CompleteTerraformDeployRequest").msgclass
-  CompleteTerraformDeployResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CompleteTerraformDeployResponse").msgclass
+  UnlockTerraformProjectRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.UnlockTerraformProjectRequest").msgclass
+  TerraformDeployResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.TerraformDeployResponse").msgclass
 end

@@ -48,7 +48,7 @@ remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
 			-backend-config="password=$(ARTIFACTORY_ENCRYPTED_PASSWORD)" \
 			-backend-config="url=$(ARTIFACTORY_URL)" \
 			-backend-config="repo=$(ARTIFACTORY_REPO)" \
-			-backend-config="subpath=$(TERRAFORM_DIR)"
+			-backend-config="subpath=$(TERRAFORM_PROJECT)"
 
 validate: $(TERRAFORM)
 	find . -type d -mindepth 2 -not -name '.terraform' -print0 | \

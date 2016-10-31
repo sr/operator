@@ -14,6 +14,7 @@ require "sprockets/railtie"
 
 require "pinglish"
 require "instrumentation"
+require "salesforce_authenticator_api"
 
 require "canoe/deployer"
 require "canoe/ldap_authorizer"
@@ -24,6 +25,13 @@ require "canoe"
 Bundler.require(*Rails.groups)
 
 module Canoe
+  cattr_accessor :salesforce_authenticator do
+    SalesforceAuthenticatorAPI.new(
+      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_ID"],
+      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_KEY"]
+    )
+  end
+
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

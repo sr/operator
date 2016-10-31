@@ -1,10 +1,9 @@
 module Api
   class TerraformController < Controller
+    skip_before_action :require_api_authentication
     before_action :require_email_authentication
-
-    class << self
-      attr_accessor :notifier
-    end
+    before_action :require_phone_authentication, only: [:create, :unlock]
+    before_action :require_terraform_project
 
     def create
       build = TerraformBuild.new(
@@ -12,21 +11,47 @@ module Api
         proto_request.commit,
         proto_request.terraform_version
       )
-      response = project.deploy(current_user, proto_request.estate, build)
+      response = terraform_project.deploy(current_user, build)
 
       render json: response.as_json
     end
 
     def complete
-      response = project.complete_deploy(
-        proto_request.deploy_id,
+      response = terraform_project.complete_deploy(
+        proto_request.request_id,
         proto_request.successful
       )
 
       render json: response.as_json
     end
 
+    def unlock
+      response = terraform_project.unlock(current_user)
+      render json: response.as_json
+    end
+
     private
+
+    def require_phone_authentication
+      if !current_user.authenticate_phone
+        render status: 401, json: TerraformDeployResponse.authentication_required.as_json
+        return false
+      end
+    end
+
+    def require_terraform_project
+      unless terraform_project
+        render status: 404, json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
+      end
+    end
+
+    def terraform_project
+      if defined?(@terraform_project)
+        return @terraform_project
+      end
+
+      @terraform_project = TerraformProject.find_by_name(proto_request.project)
+    end
 
     def current_user
       @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
@@ -39,13 +64,11 @@ module Api
           Canoe::CreateTerraformDeployRequest.decode_json(request.body.read)
         when "complete"
           Canoe::CompleteTerraformDeployRequest.decode_json(request.body.read)
+        when "unlock"
+          Canoe::UnlockTerraformProjectRequest.decode_json(request.body.read)
         else
           raise "Unable to handle RPC call: #{params[:action].inspect}"
         end
-    end
-
-    def project
-      @project ||= TerraformProject.find!(TerraformController.notifier)
     end
   end
 end
