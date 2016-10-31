@@ -18,7 +18,7 @@ With this test manifest, Privet can generate a plan:
 
 ```
 privet \
-  -test-files-file="/path/to/test/files/file.txt" \
+  -test-manifest="/path/to/test/manifest/file.txt" \
   -num-workers="15" \
   -target-duration="30s"
   plan

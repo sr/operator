@@ -22,7 +22,7 @@ func (f *stringListFlag) Set(value string) error {
 }
 
 var (
-	testFilesFile       string
+	testManifest        string
 	previousResultsDir  string
 	numWorkers          int
 	targetDuration      time.Duration
@@ -46,7 +46,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Options:\n")
 		flag.PrintDefaults()
 	}
-	flag.StringVar(&testFilesFile, "test-files-file", "", "A file containing a JSON array of test files to be run. The format is documented in the Privet examples directory.")
+	flag.StringVar(&testManifest, "test-files-file", "", "A file containing a JSON array of test files to be run. The format is documented in the Privet examples directory.")
+	flag.StringVar(&testManifest, "test-manifest", "", "A file containing a JSON array of test files to be run. The format is documented in the Privet examples directory.")
 	flag.StringVar(&previousResultsDir, "previous-results-dir", "", "A directory containing JUnit-formatted XML files from a previous build. A SHASUMS file is also expected to exist containing fingerprints of the test files from this previous build. (optional, but helpful for plan)")
 	flag.IntVar(&numWorkers, "num-workers", 0, "The number of workers to plan (required for plan)")
 	flag.DurationVar(&targetDuration, "target-duration", 30*time.Second, "The target duration for one test batch. Should be balanced between too short (where startup/teardown time becomes an issue) and too long (where one worker might run much longer than the rest)")
@@ -88,10 +89,10 @@ func main() {
 func doPlan() error {
 	opts := &privet.PlanCreationOpts{}
 
-	if testFilesFile == "" {
-		return errors.New("test-files-file is required")
+	if testManifest == "" {
+		return errors.New("test-manifest is required")
 	}
-	testFiles, err := loadTestFilesFile(testFilesFile)
+	testFiles, err := loadTestManifest(testManifest)
 	if err != nil {
 		return err
 	}
@@ -168,7 +169,7 @@ func loadPlan(file string) (*privet.Plan, error) {
 	return &plan, nil
 }
 
-func loadTestFilesFile(file string) ([]*privet.TestFile, error) {
+func loadTestManifest(file string) ([]*privet.TestFile, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
