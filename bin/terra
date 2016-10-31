@@ -41,10 +41,11 @@ case "$action" in
       exit 1
     fi
 
-    TERRAFORM_DIR="$(pwd)/src/terraform"
     TERRAFORM_PROJECT="$account"
-    TERRAFORM_PLAN="${TERRAFORM_DIR}/${TERRAFORM_PROJECT}/plan.out"
-    TERRAFORM_VAR_FILE="$(pwd)/src/terraform/terraform.tfvars"
+    TERRAFORM_BASEDIR="$(pwd)/src/terraform"
+    TERRAFORM_DIR="${TERRAFORM_BASEDIR}/${TERRAFORM_PROJECT}"
+    TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
+    TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
     export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
 
     GIT_DIR="$(pwd)/.git"
@@ -71,7 +72,7 @@ case "$action" in
           -git-branch "$GIT_BRANCH" \
           -git-commit "$GIT_COMMIT" \
           -terraform-command "$action" \
-          -terraform-dir "$TERRAFORM_DIR" \
+          -terraform-dir "$TERRAFORM_BASEDIR" \
           -terraform-project "$TERRAFORM_PROJECT" \
           -terraform-exec "$GOPATH/bin/terraform" \
           -terraform-plan "$TERRAFORM_PLAN" \
