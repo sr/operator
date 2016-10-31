@@ -13,7 +13,7 @@ USER app
 WORKDIR /app
 
 ADD pom.xml /app/pom.xml
-RUN mvn clean compile -Dartifactory_base=${artifactory_host}
+RUN mvn clean compile test -Dartifactory_base=${artifactory_host}
 
 # Fixes permissions on any ADDed files
 USER root

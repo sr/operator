@@ -45,7 +45,6 @@ BUILDS = {
   "bread/bread"                     => Build.new("bread/bread", common: true),
   "bread/node:0.10"                 => Build.new("bread/node"),
   "bread/teampass:2.1.25.2"         => Build.new("bread/teampass"),
-  "bread/ubuntu:wily"               => Build.new("bread/ubuntu", common: true),
   "pwm:1.7.1"                       => Build.new("pwm/1.7.1"),
 }
 
