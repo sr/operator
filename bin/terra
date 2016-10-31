@@ -13,6 +13,7 @@ cd "$(dirname "$0")/.."
 
 : "${PROGRAM:="$(basename "$0")"}"
 : "${HIPCHAT_TOKEN:=""}"
+: "${USER:="$(whoami)"}"
 
 # Prevent Terraform from making a remote API call to HashiCorp's servers.
 # See https://github.com/hashicorp/go-checkpoint for details.
@@ -53,8 +54,8 @@ case "$action" in
     GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
     GIT_COMMIT="$(git rev-parse HEAD)"
 
-    case "$(whoami)" in
-      srozet)
+    case "$USER" in
+      alindeman|julrich|rkiefer|srozet)
         go install bread/cmd/terra2
 
         artifactoryenv="src/terraform/artifactory.env"
@@ -68,7 +69,7 @@ case "$action" in
         exec terra2 \
           -artifactory-user "$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | head -1)" \
           -artifactory-password "$(sed 's,ARTIFACTORY.*=[[:space:]],,g' "$artifactoryenv" | tail -1)" \
-          -canoe-user "$(whoami)@salesforce.com" \
+          -canoe-user "$USER@salesforce.com" \
           -git-branch "$GIT_BRANCH" \
           -git-commit "$GIT_COMMIT" \
           -terraform-command "$action" \
