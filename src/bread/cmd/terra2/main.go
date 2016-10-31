@@ -123,6 +123,7 @@ func terra() (int, string) {
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
 	if err := cmd.Run(); err != nil {
 		return 1, ""
 	}
@@ -268,6 +269,7 @@ func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) err
 	cmd := exec.Command(tf.Exec, "apply", tf.PlanFile)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
