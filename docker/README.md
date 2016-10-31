@@ -8,6 +8,14 @@ Periodically, and also on any commit pushed to master for this repository, Bambo
 
 ## HOWTOs
 
+### Building a base image locally
+
+```
+# Some images require a git.dev.pardot.com personal access token
+export GIT_DEV_TOKEN='...'
+rake pardriver/pardriver # image name
+```
+
 ### Adding a new base image
 
 1. Create a `Dockerfile`. Follow the directory structure of the existing images in the repository.
