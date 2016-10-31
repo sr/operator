@@ -18,4 +18,20 @@ RSpec.describe DeployTarget do
     expect_any_instance_of(DeployACLEntry).to receive(:ldap_group_authorized?).with(user).and_return(false)
     expect(user.deploy_authorized?(project, target)).to eq(false)
   end
+
+  it "authenticates using paired phone" do
+    user = FactoryGirl.create(:user)
+
+    expect(user.authenticate_phone).to eq(false)
+    expect(user.phone.paired?).to eq(false)
+
+    user.phone.create_pairing("boom town")
+    user.reload
+    expect(user.phone.paired?).to eq(true)
+
+    Canoe.salesforce_authenticator.authentication_status = { granted: false }
+    expect(user.authenticate_phone(1, 0)).to eq(false)
+    Canoe.salesforce_authenticator.authentication_status = { granted: true }
+    expect(user.authenticate_phone(1, 0)).to eq(true)
+  end
 end

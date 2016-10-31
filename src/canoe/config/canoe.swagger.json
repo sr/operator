@@ -1,0 +1,187 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "config/canoe.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/grpc/complete_terraform_deploy": {
+      "post": {
+        "operationId": "CompleteTerraformDeploy",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoeCompleteTerraformDeployRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/create_terraform_deploy": {
+      "post": {
+        "operationId": "CreateTerraformDeploy",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoeCreateTerraformDeployRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/unlock_terraform_project": {
+      "post": {
+        "operationId": "UnlockTerraformProject",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoeTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoeUnlockTerraformProjectRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "canoeCompleteTerraformDeployRequest": {
+      "type": "object",
+      "properties": {
+        "deploy_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "successful": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "user_email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoeCreateTerraformDeployRequest": {
+      "type": "object",
+      "properties": {
+        "branch": {
+          "type": "string",
+          "format": "string"
+        },
+        "commit": {
+          "type": "string",
+          "format": "string"
+        },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "terraform_version": {
+          "type": "string",
+          "format": "string"
+        },
+        "user_email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoeTerraformDeployResponse": {
+      "type": "object",
+      "properties": {
+        "deploy_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "error": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string",
+          "format": "string"
+        },
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoeUnlockTerraformProjectRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "format": "string"
+        },
+        "user_email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    }
+  }
+}

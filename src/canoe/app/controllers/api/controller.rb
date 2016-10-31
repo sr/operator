@@ -14,6 +14,18 @@ module Api
       end
     end
 
+    def require_email_authentication
+      unless current_user
+        message = "No user with email #{params[:user_email].inspect}. " \
+          "You may need to sign into Canoe first."
+        render status: 401, json: { error: true, message: message }
+
+        return false
+      end
+
+      true
+    end
+
     # Overrides current_user from ApplicationController to do API-specific authentication
     def current_user
       return @current_user if defined?(@current_user)

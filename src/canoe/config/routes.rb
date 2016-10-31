@@ -5,6 +5,9 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "sessions#create"
   post "/auth/:provider/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
+  get "/auth/phone", to: "sessions#phone_pairing"
+  post "/auth/phone", to: "sessions#create_phone_pairing"
+  delete "/auth/phone", to: "sessions#destroy_phone_pairing"
 
   resources :projects, param: :name, only: [:index] do
     resources :branches, param: :name, constraints: { name: /.*/ }, only: [:index] do
@@ -57,6 +60,10 @@ Rails.application.routes.draw do
   post "/api/chef/knife", to: "api/chef_deploys#knife"
   post "/api/targets/:target_name/deploys", to: "api/deploys#create"
   get "/api/projects", to: "api/projects#index"
+
+  post "/api/grpc/create_terraform_deploy", to: "api/terraform#create"
+  post "/api/grpc/complete_terraform_deploy", to: "api/terraform#complete"
+  post "/api/grpc/unlock_terraform_project", to: "api/terraform#unlock"
 
   get "/_boomtown", to: "projects#boomtown"
   root to: "projects#index"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160909171321) do
+ActiveRecord::Schema.define(version: 20161024101143) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -131,6 +131,15 @@ ActiveRecord::Schema.define(version: 20160909171321) do
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
+  create_table "salesforce_authenticator_pairings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "auth_user_id", null: false
+    t.string   "pairing_id",   null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["auth_user_id"], name: "index_salesforce_authenticator_pairings_on_auth_user_id", unique: true, using: :btree
+    t.index ["pairing_id"], name: "index_salesforce_authenticator_pairings_on_pairing_id", unique: true, using: :btree
+  end
+
   create_table "server_taggings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "server_id",     null: false
     t.integer  "server_tag_id", null: false
@@ -170,4 +179,33 @@ ActiveRecord::Schema.define(version: 20160909171321) do
     t.index ["deploy_target_id"], name: "index_target_jobs_on_deploy_target_id", using: :btree
   end
 
+  create_table "terraform_deploys", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "terraform_project_id",                 null: false
+    t.integer  "auth_user_id",                         null: false
+    t.string   "request_id",                           null: false
+    t.string   "branch_name",                          null: false
+    t.string   "commit_sha1",                          null: false
+    t.string   "terraform_version",                    null: false
+    t.boolean  "successful",           default: false, null: false
+    t.datetime "completed_at"
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.index ["auth_user_id"], name: "fk_rails_1c5e040a85", using: :btree
+    t.index ["request_id"], name: "index_terraform_deploys_on_request_id", unique: true, using: :btree
+    t.index ["terraform_project_id"], name: "fk_rails_f0c94d960b", using: :btree
+  end
+
+  create_table "terraform_projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "project_id", null: false
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_terraform_projects_on_name", unique: true, using: :btree
+    t.index ["project_id"], name: "index_terraform_projects_on_project_id", unique: true, using: :btree
+  end
+
+  add_foreign_key "salesforce_authenticator_pairings", "auth_users"
+  add_foreign_key "terraform_deploys", "auth_users"
+  add_foreign_key "terraform_deploys", "terraform_projects"
+  add_foreign_key "terraform_projects", "projects"
 end
