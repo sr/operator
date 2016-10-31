@@ -116,11 +116,9 @@ func terra() (int, string) {
 		fmt.Sprintf("-backend-config=url=%s", afy.URL),
 		fmt.Sprintf(`-backend-config=repo=%s`, afy.RepoName),
 		fmt.Sprintf(`-backend-config=subpath=%s`, tf.Project),
+		fmt.Sprintf(`-backend-config=username=%s`, afy.User),
+		fmt.Sprintf(`-backend-config=password=%s`, afy.Password),
 	)
-	cmd.Env = []string{
-		fmt.Sprintf("ARTIFACTORY_USERNAME=%s", afy.User),
-		fmt.Sprintf("ARTIFACTORY_PASSWORD=%s", afy.Password),
-	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
