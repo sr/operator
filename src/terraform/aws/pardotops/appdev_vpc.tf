@@ -282,9 +282,10 @@ resource "aws_security_group" "appdev_sfdc_provisioning_https" {
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
       "${var.sfdc_org62_sandbox_cidr_blocks}",
