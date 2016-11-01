@@ -90,7 +90,7 @@ resource "aws_security_group" "artifactory_http_lb" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${var.legacy_artifactory_instance_ip}/32", # legacy artifactory.dev.pardot.com
+      "${var.legacy_artifactory_instance_ip}/32", # TODO: deleteme post switchover
       "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
