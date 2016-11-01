@@ -7,7 +7,7 @@ class DeployResult < ApplicationRecord
     presence: true,
     inclusion: { in: STAGES }
 
-  scope :undeployed, -> { where("stage IN (?)", %w[start initiated]) }
+  scope :undeployed, -> { where("stage NOT IN (?)", %w[deployed completed failed]) }
   scope :incomplete, -> { where("stage NOT IN (?)", %w[completed failed]) }
   scope :completed, -> { where("stage IN (?)", %w[completed]) }
   scope :failed, -> { where("stage IN (?)", %w[failed]) }
