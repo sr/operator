@@ -38,38 +38,33 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "Otp",
-			},
-			Group: "sysadmin",
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
 				Method:  "Ping",
 			},
-			Group:             "sysadmin",
-			PhoneAuthRequired: true,
+			Group: "sysadmin",
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
 				Method:  "SlowLoris",
 			},
-			Group: "sysadmin",
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
 				Method:  "ListTargets",
 			},
-			Group: "sysadmin",
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
 				Method:  "ListBuilds",
 			},
-			Group: "sysadmin",
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
@@ -135,7 +130,7 @@ var (
 type ACLEntry struct {
 	Call              *operator.Call
 	Group             string
-	PhoneAuthRequired bool
+	PhoneAuthOptional bool
 }
 
 type DeployTarget struct {
