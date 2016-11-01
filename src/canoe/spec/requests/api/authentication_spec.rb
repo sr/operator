@@ -36,7 +36,8 @@ RSpec.describe "Authentication API" do
     authenticate @user.email
     expect(auth_response["error"]).to eq(true)
     expect(auth_response["user_email"]).to eq(@user.email)
-    expect(auth_response["message"]).to eq("Phone authentication failed")
+    expect(auth_response["message"]).to include("Phone authentication failed")
+    expect(auth_response["message"]).to include(@user.email)
   end
 
   it "returns a successful response" do

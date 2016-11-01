@@ -13,8 +13,9 @@ module Api
       end
 
       if !current_user.authenticate_phone(max_tries, sleep_interval)
+        message = "Phone authentication failed for #{current_user.email.inspect}"
         return render \
-          json: build_response(error: true, message: "Phone authentication failed")
+          json: build_response(error: true, message: message)
       end
 
       render json: build_response(error: false, message: "")
