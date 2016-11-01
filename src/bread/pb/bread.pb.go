@@ -19,7 +19,6 @@ It has these top-level messages:
 	ListTargetsRequest
 	ListBuildsRequest
 	TriggerRequest
-	OtpRequest
 	SalesforceAuthRequest
 	PingRequest
 	SlowLorisRequest

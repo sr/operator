@@ -27,17 +27,6 @@ func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*op
 	})
 }
 
-func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
-	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: "ok",
-		HTML: "<b>ok</b>",
-		Options: &operatorhipchat.MessageOptions{
-			Color: "gray",
-			From:  "pinger.Otp",
-		},
-	})
-}
-
 func (s *pingAPIServer) SalesforceAuth(ctx context.Context, req *breadpb.SalesforceAuthRequest) (*operator.Response, error) {
 	return operator.Reply(ctx, s, req, &operator.Message{
 		Text: "ok",

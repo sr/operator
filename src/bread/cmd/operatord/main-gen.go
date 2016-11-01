@@ -50,16 +50,6 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 		}
 	}
 	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
-		if req.Call.Method == "Otp" {
-			client := breadpb.NewPingClient(conn)
-			_, err := client.Otp(
-				ctx,
-				&breadpb.OtpRequest{
-					Request: req,
-				},
-			)
-			return err
-		}
 		if req.Call.Method == "SalesforceAuth" {
 			client := breadpb.NewPingClient(conn)
 			_, err := client.SalesforceAuth(

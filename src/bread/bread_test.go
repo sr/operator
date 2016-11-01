@@ -25,21 +25,6 @@ func init() {
 	flag.Parse()
 }
 
-type fakeOTPVerifier struct {
-	ok bool
-}
-
-func (v *fakeOTPVerifier) Verify(otp string) error {
-	if !v.ok {
-		return errors.New("boomtown")
-	}
-	return nil
-}
-
-func (v *fakeOTPVerifier) fail() {
-	v.ok = false
-}
-
 type fakeCanoeClient struct{}
 
 func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
@@ -86,45 +71,32 @@ func TestAuthorizer(t *testing.T) {
 		i = i + 1
 	}
 	defer conn.Close()
-	otpVerifier := &fakeOTPVerifier{true}
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, &fakeCanoeClient{}, bread.ACL)
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, &fakeCanoeClient{}, bread.ACL)
 	if err != nil {
 		t.Fatal(err)
 	}
-	swe := "srozet@salesforce.com" // yubiKeyId: ccccccdluefe
-	noYubiKey := "mlockhart@salesforce.com"
+	swe := "srozet@salesforce.com"
 	unknown := "boom@gmail.com"
-	validOTP := "ccccccdluefelbvvgdbehnlutdbbnnfgggvgbbjcdltu"
 	for _, tc := range []struct {
-		user    string
-		service string
-		method  string
-		otp     string
-		otpOK   bool
-		err     error
+		user        string
+		service     string
+		method      string
+		twoFactorOK bool
+		err         error
 	}{
-		{swe, "bread.Ping", "Ping", "", true, nil},
-		{swe, "bread.Ping", "PingPong", "", true, nil},
-		{swe, "bread.Ping", "Whoami", "", true, nil},
-		{"", "bread.Ping", "Ping", "", true, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.Ping", "Pong", "", true, errors.New("no ACL entry found for service `bread.Ping Pong`")},
-		{unknown, "bread.Ping", "Ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
-		{swe, "bread.Ping", "Otp", validOTP, true, nil},
-		{noYubiKey, "bread.Ping", "Otp", validOTP, true, fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", noYubiKey)},
-		{swe, "bread.Ping", "Otp", "", true, errors.New("service `bread.Ping Otp` requires a Yubikey OTP")},
-		{swe, "bread.Ping", "Otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
-		{swe, "bread.Ping", "Otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.Ping", "Ping", true, nil},
+		{swe, "bread.Ping", "PingPong", true, nil},
+		{swe, "bread.Ping", "Whoami", true, nil},
+		{"", "bread.Ping", "Ping", true, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.Ping", "Pong", true, errors.New("no ACL entry found for service `bread.Ping Pong`")},
+		{unknown, "bread.Ping", "Ping", true, errors.New("no user matching email `boom@gmail.com`")},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tc.service, tc.method), func(t *testing.T) {
-			if !tc.otpOK {
-				otpVerifier.fail()
-			}
 			err := auth.Authorize(context.Background(), &operator.Request{
 				Call: &operator.Call{
 					Service: tc.service,
 					Method:  tc.method,
 				},
-				Otp: tc.otp,
 				Source: &operator.Source{
 					Type: operator.SourceType_HUBOT,
 					User: &operator.User{

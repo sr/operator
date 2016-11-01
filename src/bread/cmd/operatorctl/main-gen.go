@@ -140,32 +140,6 @@ var cmd = operator.NewCommand(
 			Synopsis: `Undocumented`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "otp",
-					Synopsis: `Test OTP verification`,
-					Flags:    []*flag.Flag{},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := breadpb.NewPingClient(conn)
-						resp, err := client.Otp(
-							context.Background(),
-							&breadpb.OtpRequest{
-								Request: ctx.Request,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return resp.Message, nil
-					},
-				},
-				{
 					Name:     "salesforce-auth",
 					Synopsis: `Test authentication via Salesforce Authenticator push notification`,
 					Flags:    []*flag.Flag{},

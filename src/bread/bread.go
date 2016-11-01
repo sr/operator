@@ -2,7 +2,6 @@ package bread
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,7 +9,6 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/GeertJohan/yubigo"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
@@ -43,7 +41,6 @@ var (
 				Method:  "Otp",
 			},
 			Group: "sysadmin",
-			OTP:   true,
 		},
 		{
 			Call: &operator.Call{
@@ -51,7 +48,6 @@ var (
 				Method:  "Ping",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -59,7 +55,6 @@ var (
 				Method:  "PingPong",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -67,7 +62,6 @@ var (
 				Method:  "SalesforceAuth",
 			},
 			Group:     "sysadmin",
-			OTP:       false,
 			CanoeAuth: true,
 		},
 		{
@@ -76,7 +70,6 @@ var (
 				Method:  "SlowLoris",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -84,7 +77,6 @@ var (
 				Method:  "Whoami",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -92,7 +84,6 @@ var (
 				Method:  "ListTargets",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -100,7 +91,6 @@ var (
 				Method:  "ListBuilds",
 			},
 			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
@@ -108,7 +98,6 @@ var (
 				Method:  "Trigger",
 			},
 			Group: "sysadmin",
-			OTP:   true,
 		},
 	}
 
@@ -164,15 +153,10 @@ var (
 	}
 )
 
-type OTPVerifier interface {
-	Verify(otp string) error
-}
-
 type ACLEntry struct {
 	Call      *operator.Call
 	Group     string
-	OTP       bool
-	CanoeAuth bool // whether auth via Canoe is required
+	CanoeAuth bool // whether this RPC requires 2FA
 }
 
 type DeployTarget struct {
@@ -187,34 +171,6 @@ type DeployTarget struct {
 type LDAPConfig struct {
 	Addr string
 	Base string
-}
-
-type YubicoConfig struct {
-	ID  string
-	Key string
-}
-
-type yubicoVerifier struct {
-	yubico *yubigo.YubiAuth
-}
-
-func NewYubicoVerifier(config *YubicoConfig) (OTPVerifier, error) {
-	auth, err := yubigo.NewYubiAuth(config.ID, config.Key)
-	if err != nil {
-		return nil, err
-	}
-	return &yubicoVerifier{auth}, nil
-}
-
-func (v *yubicoVerifier) Verify(otp string) error {
-	_, ok, err := v.yubico.Verify(otp)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return errors.New("OTP verification failed")
-	}
-	return nil
 }
 
 // NewLogger returns a logger that writes protobuf messages marshalled as JSON
@@ -300,6 +256,7 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 	}
 }
 
+// NewCanoeClient returns a client for interacting with the Canoe gRPC API
 func NewCanoeClient(url *url.URL) CanoeClient {
 	return canoe.New(httptransport.New(url.Host, "", []string{url.Scheme}), strfmt.Default)
 }
@@ -324,10 +281,8 @@ func NewServer(
 }
 
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
-// for authN/authZ, and verifies 2FA tokens via Yubico's YubiCloud web service.
-//
-// See: https://developers.yubico.com/OTP/
-func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, canoer CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
+// for authentication and LDAP group membership for authorization.
+func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
 	if ldap.Base == "" {
 		ldap.Base = LDAPBase
 	}
@@ -336,7 +291,7 @@ func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, canoer CanoeClient, a
 			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
 		}
 	}
-	return &authorizer{ldap, verifier, canoer, acl}, nil
+	return &authorizer{ldap, canoe, acl}, nil
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the
