@@ -27,11 +27,11 @@ class ExerciseHandler < ApplicationHandler
   end
 
   def reps(current_hour)
+    return 24 if current_hour == 0
     current_hour
   end
 
   def time(current_hour)
-    return 24 if current_hour == 0
-    current_hour * 5
+    reps(current_hour) * 5
   end
 end
