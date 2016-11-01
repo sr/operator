@@ -115,9 +115,6 @@ var (
 	ECSDeployTargets = []*DeployTarget{
 		{
 			Name:          "canoe",
-			BambooProject: "BREAD",
-			BambooPlan:    "BREAD",
-			BambooJob:     "CAN",
 			Canoe:         false,
 			ECSCluster:    "canoe_production",
 			ECSService:    "canoe",
@@ -126,9 +123,6 @@ var (
 		},
 		{
 			Name:          "hal9000",
-			BambooProject: "BREAD",
-			BambooPlan:    "BREAD",
-			BambooJob:     "HAL",
 			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
@@ -137,9 +131,6 @@ var (
 		},
 		{
 			Name:          "operator",
-			BambooProject: "BREAD",
-			BambooPlan:    "BREAD",
-			BambooJob:     "OP",
 			Canoe:         false,
 			ECSCluster:    "operator_production",
 			ECSService:    "operator",
@@ -148,9 +139,6 @@ var (
 		},
 		{
 			Name:          "parbot",
-			BambooProject: "BREAD",
-			BambooPlan:    "BREAD",
-			BambooJob:     "PAR",
 			Canoe:         false,
 			ECSCluster:    "parbot_production",
 			ECSService:    "parbot",
@@ -158,10 +146,15 @@ var (
 			Image:         "build/bread/parbot/app",
 		},
 		{
+			Name:          "refocus",
+			Canoe:         false,
+			ECSCluster:    "refocus_production",
+			ECSService:    "refocus",
+			ContainerName: "refocus",
+			Image:         "build/pardot-refocus/app",
+		},
+		{
 			Name:          "teampass",
-			BambooProject: "BREAD",
-			BambooPlan:    "BREAD",
-			BambooJob:     "TEAM",
 			Canoe:         false,
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
@@ -184,9 +177,6 @@ type ACLEntry struct {
 
 type DeployTarget struct {
 	Name          string
-	BambooProject string
-	BambooPlan    string
-	BambooJob     string
 	Canoe         bool
 	ECSCluster    string
 	ECSService    string
