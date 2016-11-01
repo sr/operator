@@ -14,11 +14,18 @@ import (
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
+
+	"bread/swagger/client/canoe"
 )
 
 type CanoeConfig struct {
 	URL    string
 	APIKey string
+}
+
+type CanoeClient interface {
+	UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error)
+	PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error)
 }
 
 type canoeDeployer struct {

@@ -15,6 +15,7 @@ import (
 	"golang.org/x/net/context"
 
 	"bread/pb"
+	"bread/swagger/client/canoe"
 )
 
 var ldapEnabled bool
@@ -37,6 +38,16 @@ func (v *fakeOTPVerifier) Verify(otp string) error {
 
 func (v *fakeOTPVerifier) fail() {
 	v.ok = false
+}
+
+type fakeCanoeClient struct{}
+
+func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
+	panic("not implemented")
+}
+
+func (c *fakeCanoeClient) PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error) {
+	panic("not implemented")
 }
 
 func TestAuthorizer(t *testing.T) {
@@ -76,7 +87,7 @@ func TestAuthorizer(t *testing.T) {
 	}
 	defer conn.Close()
 	otpVerifier := &fakeOTPVerifier{true}
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, bread.ACL)
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, &fakeCanoeClient{}, bread.ACL)
 	if err != nil {
 		t.Fatal(err)
 	}

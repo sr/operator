@@ -166,6 +166,32 @@ var cmd = operator.NewCommand(
 					},
 				},
 				{
+					Name:     "salesforce-auth",
+					Synopsis: `Test authentication via Salesforce Authenticator push notification`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewPingClient(conn)
+						resp, err := client.SalesforceAuth(
+							context.Background(),
+							&breadpb.SalesforceAuthRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
 					Name:     "ping",
 					Synopsis: `Reply with PONG if everything is working`,
 					Flags: []*flag.Flag{

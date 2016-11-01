@@ -60,6 +60,16 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			)
 			return err
 		}
+		if req.Call.Method == "SalesforceAuth" {
+			client := breadpb.NewPingClient(conn)
+			_, err := client.SalesforceAuth(
+				ctx,
+				&breadpb.SalesforceAuthRequest{
+					Request: req,
+				},
+			)
+			return err
+		}
 		if req.Call.Method == "Ping" {
 			client := breadpb.NewPingClient(conn)
 			_, err := client.Ping(

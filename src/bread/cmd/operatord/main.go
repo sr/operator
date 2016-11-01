@@ -186,7 +186,11 @@ func run(invoker operator.InvokerFunc) error {
 		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
 			return err
 		}
-		if auth, err = bread.NewAuthorizer(config.ldap, verifier, bread.ACL); err != nil {
+		canoeURL, err := url.Parse(config.canoe.URL)
+		if err != nil {
+			return err
+		}
+		if auth, err = bread.NewAuthorizer(config.ldap, verifier, bread.NewCanoeClient(canoeURL), bread.ACL); err != nil {
 			return err
 		}
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bread"
 	"bread/swagger/client/canoe"
 	"bread/swagger/models"
 	"errors"
@@ -189,9 +190,8 @@ func terra() (int, string) {
 		if err != nil {
 			return 1, "flag canoe-url is not a valid URL: " + err.Error()
 		}
-		t := httptransport.New(u.Host, "", []string{u.Scheme})
-		client := canoe.New(t, strfmt.Default)
-		if x, err := client.UnlockTerraformProject(
+		client := bread.NewCanoeClient(u)
+		if _, err := client.UnlockTerraformProject(
 			canoe.NewUnlockTerraformProjectParams().WithBody(
 				&models.CanoeUnlockTerraformProjectRequest{
 					UserEmail: canoeUser,
@@ -199,7 +199,7 @@ func terra() (int, string) {
 				},
 			),
 		); err != nil {
-			return 1, fmt.Sprintf("Could not unlock Terraform project: %#v %s\n", x, err)
+			return 1, fmt.Sprintf("Could not unlock Terraform project: %s\n", err)
 		}
 		return 0, ""
 	default:

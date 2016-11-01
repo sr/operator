@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"time"
@@ -13,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -21,6 +24,7 @@ import (
 
 	"bread/hal9000"
 	"bread/pb"
+	"bread/swagger/client/canoe"
 )
 
 const (
@@ -56,6 +60,15 @@ var (
 			},
 			Group: "sysadmin",
 			OTP:   false,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Ping",
+				Method:  "SalesforceAuth",
+			},
+			Group:     "sysadmin",
+			OTP:       false,
+			CanoeAuth: true,
 		},
 		{
 			Call: &operator.Call{
@@ -163,9 +176,10 @@ type OTPVerifier interface {
 }
 
 type ACLEntry struct {
-	Call  *operator.Call
-	Group string
-	OTP   bool
+	Call      *operator.Call
+	Group     string
+	OTP       bool
+	CanoeAuth bool // whether auth via Canoe is required
 }
 
 type DeployTarget struct {
@@ -296,6 +310,10 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 	}
 }
 
+func NewCanoeClient(url *url.URL) CanoeClient {
+	return canoe.New(httptransport.New(url.Host, "", []string{url.Scheme}), strfmt.Default)
+}
+
 // NewCanoeDeployer returns a Deployer that deploys via Canoe
 func NewCanoeDeployer(config *CanoeConfig) Deployer {
 	return &canoeDeployer{&http.Client{}, config}
@@ -319,7 +337,7 @@ func NewServer(
 // for authN/authZ, and verifies 2FA tokens via Yubico's YubiCloud web service.
 //
 // See: https://developers.yubico.com/OTP/
-func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (operator.Authorizer, error) {
+func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, canoer CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
 	if ldap.Base == "" {
 		ldap.Base = LDAPBase
 	}
@@ -328,7 +346,7 @@ func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (ope
 			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
 		}
 	}
-	return &authorizer{ldap, verifier, acl}, nil
+	return &authorizer{ldap, verifier, canoer, acl}, nil
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the

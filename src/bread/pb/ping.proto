@@ -9,6 +9,8 @@ option go_package = "breadpb";
 service Ping {
 	// Test OTP verification
 	rpc Otp(OtpRequest) returns (operator.Response);
+	// Test authentication via Salesforce Authenticator push notification
+	rpc SalesforceAuth(SalesforceAuthRequest) returns (operator.Response);
 	// Reply with PONG if everything is working
 	rpc Ping(PingRequest) returns (operator.Response);
 	// Trigger a slow request, for testing timeout handling
@@ -18,6 +20,10 @@ service Ping {
 }
 
 message OtpRequest {
+	operator.Request request = 1;
+}
+
+message SalesforceAuthRequest {
 	operator.Request request = 1;
 }
 

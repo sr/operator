@@ -10,6 +10,9 @@ import (
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
+
+	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 )
 
 const ldapTimeout = 3 * time.Second
@@ -17,6 +20,7 @@ const ldapTimeout = 3 * time.Second
 type authorizer struct {
 	ldap     *LDAPConfig
 	verifier OTPVerifier
+	canoe    CanoeClient
 	acl      []*ACLEntry
 }
 
@@ -55,6 +59,21 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	}
 	if !ok {
 		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
+	}
+	if entry.CanoeAuth {
+		resp, err := a.canoe.PhoneAuthentication(
+			canoe.NewPhoneAuthenticationParams().WithBody(
+				&models.CanoePhoneAuthenticationRequest{
+					UserEmail: email,
+				},
+			),
+		)
+		if err != nil || resp.Payload == nil {
+			return fmt.Errorf("Canoe phone authentication request failed: %s", err)
+		}
+		if resp.Payload.Error {
+			return fmt.Errorf("Canoe phone authentication failed: %s", resp.Payload.Message)
+		}
 	}
 	if entry.OTP {
 		if user.yubikeyID == "" {

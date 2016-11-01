@@ -38,6 +38,17 @@ func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*oper
 	})
 }
 
+func (s *pingAPIServer) SalesforceAuth(ctx context.Context, req *breadpb.SalesforceAuthRequest) (*operator.Response, error) {
+	return operator.Reply(ctx, s, req, &operator.Message{
+		Text: "ok",
+		HTML: "<b>ok</b>",
+		Options: &operatorhipchat.MessageOptions{
+			Color: "green",
+			From:  "pinger.SalesforceAuth",
+		},
+	})
+}
+
 func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
 	var dur time.Duration
 	if req.Wait == "" {
