@@ -1,6 +1,7 @@
 package bread
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -16,9 +17,13 @@ type pingAPIServer struct {
 }
 
 func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+	email := operator.GetUserEmail(req)
+	if email == "" {
+		email = "unknown"
+	}
 	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: "pong",
-		HTML: "<b>pong</b>",
+		Text: fmt.Sprintf("PONG %s", email),
+		HTML: fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.Ping",
