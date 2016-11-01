@@ -131,7 +131,7 @@
         </td>
       </tr>
     <%- end %>
-    <%- unless current_deploy.completed? || current_deploy.sync_done? %>
+    <%- if !current_deploy.completed? && !current_deploy.all_servers_deployed? %>
       <tr>
         <td>
           <%= form_tag force_to_complete_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to force this deploy to complete?"} do %>
@@ -147,7 +147,7 @@
         </td>
       </tr>
     <%- end %>
-    <%- if !current_deploy.completed? && current_deploy.sync_done? %>
+    <%- if !current_deploy.completed? && current_deploy.all_servers_deployed? %>
       <tr>
         <td>
           <%= form_tag pick_new_restart_servers_project_deploy_path(current_project.name, current_deploy), method: "post", role: "form", data: {confirm: "Are you sure you want to pick new restart servers?"} do %>

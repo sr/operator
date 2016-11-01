@@ -413,14 +413,6 @@ resource "aws_route53_record" "preview_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
-resource "aws_route53_record" "provisioning_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "provisioning.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.22"]
-  type    = "A"
-  ttl     = "900"
-}
-
 resource "aws_route53_record" "push_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "push.${aws_route53_zone.dev_pardot_com.name}"
