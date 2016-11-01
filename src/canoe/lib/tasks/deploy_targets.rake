@@ -64,6 +64,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "WFST"
       project.repository = "Pardot/workflow-stats"
+      project.maximum_unavailable_percentage_per_datacenter = "0.5"
     }.tap(&:save!)
     wfst.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
 
