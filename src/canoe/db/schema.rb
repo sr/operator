@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161024101143) do
+ActiveRecord::Schema.define(version: 20161031203534) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -64,9 +64,9 @@ ActiveRecord::Schema.define(version: 20161024101143) do
   end
 
   create_table "deploy_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "server_id",                                     null: false
-    t.integer "deploy_id",                                     null: false
-    t.string  "stage",                   default: "initiated", null: false
+    t.integer "server_id",                                 null: false
+    t.integer "deploy_id",                                 null: false
+    t.string  "stage",                   default: "start", null: false
     t.text    "logs",      limit: 65535
     t.index ["deploy_id", "stage"], name: "index_deploy_results_on_deploy_id_and_stage", using: :btree
     t.index ["server_id", "deploy_id"], name: "index_deploy_results_on_server_id_and_deploy_id", unique: true, using: :btree
@@ -121,13 +121,14 @@ ActiveRecord::Schema.define(version: 20161024101143) do
   end
 
   create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string  "name",                               null: false
-    t.string  "icon",                               null: false
+    t.string  "name",                                                                                  null: false
+    t.string  "icon",                                                                                  null: false
     t.string  "bamboo_project"
     t.string  "bamboo_plan"
-    t.string  "repository",                         null: false
+    t.string  "repository",                                                                            null: false
     t.string  "bamboo_job"
-    t.boolean "all_servers_default", default: true, null: false
+    t.boolean "all_servers_default",                                                   default: true,  null: false
+    t.decimal "maximum_unavailable_percentage_per_datacenter", precision: 5, scale: 2, default: "1.0", null: false
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 

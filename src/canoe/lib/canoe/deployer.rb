@@ -26,7 +26,11 @@ module Canoe
           options_validator: options_validator,
           options: options,
         )
-        DeployWorkflow.initiate(deploy: new_deploy, servers: servers)
+        DeployWorkflow.initiate(
+          deploy: new_deploy,
+          servers: servers,
+          maximum_unavailable_percentage_per_datacenter: project.maximum_unavailable_percentage_per_datacenter,
+        )
         new_deploy
       end
 

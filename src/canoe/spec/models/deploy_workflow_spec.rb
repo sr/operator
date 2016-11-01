@@ -11,6 +11,18 @@ RSpec.describe DeployWorkflow do
       DeployWorkflow.initiate(deploy: deploy, servers: servers)
       expect(deploy.results.length).to eq(3)
     end
+
+    context "with a maximum unavailable percentage less than 100%" do
+      it "leaves some servers in stage: started until the rest of the servers have deployed" do
+        servers = FactoryGirl.create_list(:server, 3)
+
+        DeployWorkflow.initiate(deploy: deploy, servers: servers, maximum_unavailable_percentage_per_datacenter: 0.5)
+        expect(deploy.results.length).to eq(3)
+        expect(deploy.results[0].stage).to eq("initiated")
+        expect(deploy.results[1].stage).to eq("start")
+        expect(deploy.results[2].stage).to eq("start")
+      end
+    end
   end
 
   context "initiated -> deployed" do
@@ -24,6 +36,21 @@ RSpec.describe DeployWorkflow do
       deploy.reload
       expect(deploy.results.for_server(server).stage).to eq("deployed")
       expect(deploy.restart_servers).to eq([server])
+    end
+
+    context "with maximum available percentage less than 100%" do
+      it "allows a server in the 'start' stage to proceed to 'initiated'" do
+        servers = FactoryGirl.create_list(:server, 3)
+        workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers, maximum_unavailable_percentage_per_datacenter: 0.5)
+
+        server = servers.first
+        workflow.notify_action_successful(server: server, action: "deploy")
+
+        deploy.reload
+        expect(deploy.results.for_server(server).stage).to eq("deployed")
+        expect(deploy.results.for_server(servers[1]).stage).to eq("initiated")
+        expect(deploy.results.for_server(servers[2]).stage).to eq("start")
+      end
     end
   end
 
@@ -138,12 +165,12 @@ RSpec.describe DeployWorkflow do
     end
   end
 
-  describe "#fail_deploy_on_initiated_servers" do
+  describe "#fail_deploy_on_undeployed_servers" do
     it "moves any servers in the initiated stage to the failed stage" do
       server = FactoryGirl.create(:server)
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [server])
 
-      workflow.fail_deploy_on_initiated_servers
+      workflow.fail_deploy_on_undeployed_servers
       expect(deploy.results.for_server(server).stage).to eq("failed")
       expect(deploy.completed?).to be_truthy
     end
@@ -153,7 +180,7 @@ RSpec.describe DeployWorkflow do
       workflow = DeployWorkflow.initiate(deploy: deploy, servers: [restart_server, other_server])
 
       workflow.notify_action_successful(server: restart_server, action: "deploy")
-      workflow.fail_deploy_on_initiated_servers
+      workflow.fail_deploy_on_undeployed_servers
 
       expect(deploy.completed?).to be_falsey
       expect(workflow.next_action_for(server: restart_server)).to eq("restart")
