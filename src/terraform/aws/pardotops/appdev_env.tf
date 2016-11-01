@@ -719,7 +719,7 @@ resource "aws_elb" "appdev_provisioning_elb" {
     healthy_threshold   = 4
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:80/services/data/v30.0/test"
+    target              = "HTTP:8095/services/data/v30.0/test"
     interval            = 5
   }
 
