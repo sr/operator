@@ -62,11 +62,13 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	}
 	if entry.CanoeAuth {
 		resp, err := a.canoe.PhoneAuthentication(
-			canoe.NewPhoneAuthenticationParams().WithBody(
-				&models.CanoePhoneAuthenticationRequest{
-					UserEmail: email,
-				},
-			),
+			canoe.NewPhoneAuthenticationParams().
+				WithTimeout(30 * time.Second).
+				WithBody(
+					&models.CanoePhoneAuthenticationRequest{
+						UserEmail: email,
+					},
+				),
 		)
 		if err != nil || resp.Payload == nil {
 			return fmt.Errorf("Canoe phone authentication request failed: %s", err)
