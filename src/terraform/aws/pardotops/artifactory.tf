@@ -91,8 +91,7 @@ resource "aws_security_group" "artifactory_http_lb" {
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
       "${var.legacy_artifactory_instance_ip}/32", # legacy artifactory.dev.pardot.com
-      "${aws_instance.appdev_proxyout1.public_ip}/32",
-      "${aws_instance.appdev_toolsproxy1.public_ip}/32",
+      "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
 
