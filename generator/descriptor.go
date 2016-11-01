@@ -51,8 +51,10 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		file := filesByName[fileName]
 		services := make([]*Service, len(file.Service))
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
-		for _, message := range file.MessageType {
+		messagesIdxByName := make(map[string]int)
+		for i, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
+			messagesIdxByName[message.GetName()] = i
 		}
 		for j, service := range file.Service {
 			pkg := file.GetPackage()
@@ -128,7 +130,10 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 					}
 					services[j].Methods[k].Arguments[l-1] = &Argument{
 						Name:        field.GetName(),
+						Type:        field.GetType(),
 						Description: undocumentedPlaceholder,
+						fieldNum:    *field.Number,
+						messageIdx:  messagesIdxByName[input.GetName()],
 					}
 				}
 			}
@@ -139,11 +144,25 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
+				// message_type && service
 				services[loc.Path[1]].Description = clean(*loc.LeadingComments)
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
+				// field declaration && service && field
 				s := services[loc.Path[1]]
 				m := s.Methods[loc.Path[3]]
 				m.Description = clean(*loc.LeadingComments)
+			} else if len(loc.Path) == 4 && loc.Path[0] == 4 && loc.Path[2] == 2 {
+				// field declaration && message_type && field
+				for _, s := range services {
+					for _, m := range s.Methods {
+						for _, a := range m.Arguments {
+							// need the number of the field (loc[3]) and it's enclosing message?
+							if a.messageIdx == int(loc.Path[1]) && a.fieldNum-1 == loc.Path[3] {
+								a.Description = clean(*loc.LeadingComments)
+							}
+						}
+					}
+				}
 			}
 		}
 		desc.Services = append(desc.Services, services...)

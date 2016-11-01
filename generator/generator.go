@@ -16,6 +16,7 @@ import (
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 )
 
 const undocumentedPlaceholder = "Undocumented"
@@ -50,6 +51,9 @@ type Method struct {
 type Argument struct {
 	Name        string
 	Description string
+	Type        descriptor.FieldDescriptorProto_Type
+	messageIdx  int
+	fieldNum    int32
 }
 
 type File struct {
