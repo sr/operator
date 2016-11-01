@@ -74,7 +74,10 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 			return fmt.Errorf("Canoe phone authentication request failed: %s", err)
 		}
 		if resp.Payload.Error {
-			return fmt.Errorf("Canoe phone authentication failed: %s", resp.Payload.Message)
+			if resp.Payload.Message == "" {
+				return errors.New("Canoe phone authenticated failed for unknown reason")
+			}
+			return errors.New(resp.Payload.Message)
 		}
 	}
 	if entry.OTP {
