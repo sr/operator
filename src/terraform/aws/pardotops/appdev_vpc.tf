@@ -276,6 +276,30 @@ resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
   }
 }
 
+resource "aws_security_group" "appdev_sfdc_provisioning_https" {
+  name        = "appdev_sfdc_provisioning_https"
+  description = "Allow HTTPS traffic from SFDC VPN and ORG62 Sandbox"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${var.sfdc_org62_sandbox_cidr_blocks}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "appdev_sfdc_vpn_ssh" {
   name        = "appdev_sfdc_vpn_ssh"
   description = "Allow SSH traffic from SFDC VPN"

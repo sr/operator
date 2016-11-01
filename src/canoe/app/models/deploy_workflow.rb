@@ -1,12 +1,21 @@
 class DeployWorkflow
   TransitionError = Class.new(StandardError)
 
-  def self.initiate(deploy:, servers:)
-    servers.each do |server|
-      deploy.results.create!(server: server, stage: "initiated")
-    end
-    servers.group_by(&:datacenter).keys.each do |dc|
+  def self.initiate(deploy:, servers:, maximum_unavailable_percentage_per_datacenter: 1.0)
+    servers_by_dc = servers.group_by(&:datacenter)
+    servers_by_dc.each do |dc, dc_servers|
       deploy.deploy_restart_servers.create!(datacenter: dc)
+
+      # At least 1 server must be deployable to start
+      max_unavailable_servers = [
+        (maximum_unavailable_percentage_per_datacenter * dc_servers.length).floor,
+        1
+      ].max
+
+      dc_servers.each_with_index do |server, index|
+        stage = index < max_unavailable_servers ? "initiated" : "start"
+        deploy.results.create!(server: server, stage: stage)
+      end
     end
 
     new(deploy: deploy)
@@ -30,8 +39,8 @@ class DeployWorkflow
 
   # Moves any servers still deploying code to the "failed" stage so the restart
   # phase can complete immediately.
-  def fail_deploy_on_initiated_servers
-    @deploy.results.initiated.update_all(stage: "failed")
+  def fail_deploy_on_undeployed_servers
+    @deploy.results.undeployed.update_all(stage: "failed")
     @deploy.check_completed_status!
   end
 
@@ -63,7 +72,7 @@ class DeployWorkflow
     result ||= require_result_for(server: server)
     if result.initiated?
       "deploy"
-    elsif @deploy.restart_servers.include?(server) && @deploy.results.initiated.empty?
+    elsif @deploy.restart_servers.include?(server) && @deploy.results.undeployed.empty?
       "restart"
     end
   end
@@ -85,6 +94,11 @@ class DeployWorkflow
     else
       result.update(stage: "completed")
     end
+
+    # Handle case where maximum_available_percentage_per_datacenter is less than
+    # 1.0: if this server deployed successfully, we can allow another server in
+    # the 'start' stage to proceed
+    @deploy.results.where(stage: "start").limit(1).update_all(stage: "initiated")
 
     @deploy.check_completed_status!
   end

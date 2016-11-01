@@ -657,6 +657,85 @@ resource "aws_instance" "appdev_provisioning1" {
   }
 }
 
+resource "aws_security_group" "appdev_provisioning1host" {
+  name        = "appdev_provisioning1host"
+  description = "Allow HTTPS traffic from appdev vpc"
+  vpc_id      = "${aws_vpc.appdev.id}"
+
+  # allow health check from ELBs
+  ingress {
+    from_port = 8095
+    to_port   = 8095
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_sfdc_provisioning_https.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_elb" "appdev_provisioning_elb" {
+  name = "${var.environment_appdev["env_name"]}-provisioning-elb"
+
+  security_groups = [
+    "${aws_security_group.appdev_sfdc_provisioning_https.id}",
+  ]
+
+  subnets = [
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.appdev_us_east_1c_dmz.id}",
+    "${aws_subnet.appdev_us_east_1d_dmz.id}",
+    "${aws_subnet.appdev_us_east_1e_dmz.id}",
+  ]
+
+  cross_zone_load_balancing   = true
+  connection_draining         = true
+  connection_draining_timeout = 30
+  instances                   = ["${aws_instance.appdev_provisioning1.*.id}"]
+
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = 8095
+    instance_protocol  = "http"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
+  listener {
+    lb_port           = 80
+    lb_protocol       = "http"
+    instance_port     = 8095
+    instance_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold   = 4
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:8095/services/data/v30.0/test"
+    interval            = 5
+  }
+
+  tags {
+    Name = "appdev_provisioning_elb"
+  }
+}
+
+resource "aws_route53_record" "provisioning_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "provisioning.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.appdev_provisioning_elb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
 resource "aws_route53_record" "appdev_provisioning1_arecord" {
   count   = "${var.environment_appdev["num_provisioning1_hosts"]}"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
