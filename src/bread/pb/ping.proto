@@ -7,30 +7,17 @@ import "github.com/sr/operator/operator.proto";
 option go_package = "breadpb";
 
 service Ping {
-	// Test authentication via Salesforce Authenticator push notification
-	rpc SalesforceAuth(SalesforceAuthRequest) returns (operator.Response);
-	// Reply with PONG if everything is working
+	// Reply with the email of the authenticated user. Requires 2FA
 	rpc Ping(PingRequest) returns (operator.Response);
 	// Trigger a slow request, for testing timeout handling
 	rpc SlowLoris(SlowLorisRequest) returns (operator.Response);
-	// Reply with the email of the current authenticated user
-	rpc Whoami(WhoamiRequest) returns (operator.Response);
-}
-
-message SalesforceAuthRequest {
-	operator.Request request = 1;
 }
 
 message PingRequest {
 	operator.Request request = 1;
-	string arg1 = 2;
 }
 
 message SlowLorisRequest {
 	operator.Request request = 1;
 	string wait = 2;
-}
-
-message WhoamiRequest {
-	operator.Request request = 1;
 }

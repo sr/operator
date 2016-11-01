@@ -50,7 +50,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	if !ok {
 		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
 	}
-	if entry.CanoeAuth {
+	if entry.PhoneAuthRequired {
 		resp, err := a.canoe.PhoneAuthentication(
 			canoe.NewPhoneAuthenticationParams().
 				WithTimeout(30 * time.Second).

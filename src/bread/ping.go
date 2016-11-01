@@ -1,7 +1,6 @@
 package bread
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -27,17 +26,6 @@ func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*op
 	})
 }
 
-func (s *pingAPIServer) SalesforceAuth(ctx context.Context, req *breadpb.SalesforceAuthRequest) (*operator.Response, error) {
-	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: "ok",
-		HTML: "<b>ok</b>",
-		Options: &operatorhipchat.MessageOptions{
-			Color: "green",
-			From:  "pinger.SalesforceAuth",
-		},
-	})
-}
-
 func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
 	var dur time.Duration
 	if req.Wait == "" {
@@ -55,21 +43,6 @@ func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisReq
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.SlowLoris",
-		},
-	})
-}
-
-func (s *pingAPIServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
-	email := operator.GetUserEmail(req)
-	if email == "" {
-		email = "unknown"
-	}
-	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: email,
-		HTML: fmt.Sprintf(`<a href="mailto:%s">%s</a>`, email, email),
-		Options: &operatorhipchat.MessageOptions{
-			Color: "gray",
-			From:  "pinger.Ping",
 		},
 	})
 }

@@ -47,34 +47,13 @@ var (
 				Service: "bread.Ping",
 				Method:  "Ping",
 			},
-			Group: "sysadmin",
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
-				Method:  "PingPong",
-			},
-			Group: "sysadmin",
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
-				Method:  "SalesforceAuth",
-			},
-			Group:     "sysadmin",
-			CanoeAuth: true,
+			Group:             "sysadmin",
+			PhoneAuthRequired: true,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
 				Method:  "SlowLoris",
-			},
-			Group: "sysadmin",
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
-				Method:  "Whoami",
 			},
 			Group: "sysadmin",
 		},
@@ -154,9 +133,9 @@ var (
 )
 
 type ACLEntry struct {
-	Call      *operator.Call
-	Group     string
-	CanoeAuth bool // whether this RPC requires 2FA
+	Call              *operator.Call
+	Group             string
+	PhoneAuthRequired bool
 }
 
 type DeployTarget struct {

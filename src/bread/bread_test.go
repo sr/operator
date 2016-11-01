@@ -16,6 +16,7 @@ import (
 
 	"bread/pb"
 	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 )
 
 var ldapEnabled bool
@@ -25,14 +26,17 @@ func init() {
 	flag.Parse()
 }
 
-type fakeCanoeClient struct{}
+type fakeCanoeClient struct {
+	authErr  error
+	authResp *canoe.PhoneAuthenticationOK
+}
 
 func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
 	panic("not implemented")
 }
 
 func (c *fakeCanoeClient) PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error) {
-	panic("not implemented")
+	return c.authResp, c.authErr
 }
 
 func TestAuthorizer(t *testing.T) {
@@ -71,27 +75,41 @@ func TestAuthorizer(t *testing.T) {
 		i = i + 1
 	}
 	defer conn.Close()
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, &fakeCanoeClient{}, bread.ACL)
+	canoeClient := &fakeCanoeClient{}
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, canoeClient, bread.ACL)
 	if err != nil {
 		t.Fatal(err)
 	}
 	swe := "srozet@salesforce.com"
 	unknown := "boom@gmail.com"
+	authOK := &canoe.PhoneAuthenticationOK{
+		Payload: &models.CanoePhoneAuthenticationResponse{
+			Error: false,
+		},
+	}
 	for _, tc := range []struct {
-		user        string
-		service     string
-		method      string
-		twoFactorOK bool
-		err         error
+		user     string
+		service  string
+		method   string
+		authResp *canoe.PhoneAuthenticationOK
+		authErr  error
+		err      error
 	}{
-		{swe, "bread.Ping", "Ping", true, nil},
-		{swe, "bread.Ping", "PingPong", true, nil},
-		{swe, "bread.Ping", "Whoami", true, nil},
-		{"", "bread.Ping", "Ping", true, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.Ping", "Pong", true, errors.New("no ACL entry found for service `bread.Ping Pong`")},
-		{unknown, "bread.Ping", "Ping", true, errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "Ping", authOK, nil, nil},
+		{"", "bread.Ping", "Ping", authOK, nil, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.Ping", "Pong", authOK, nil, errors.New("no ACL entry found for service `bread.Ping Pong`")},
+		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed: panic")},
+		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
+			Payload: &models.CanoePhoneAuthenticationResponse{
+				Error:   true,
+				Message: "denied",
+			},
+		}, nil, errors.New("denied")},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tc.service, tc.method), func(t *testing.T) {
+			canoeClient.authErr = tc.authErr
+			canoeClient.authResp = tc.authResp
 			err := auth.Authorize(context.Background(), &operator.Request{
 				Call: &operator.Call{
 					Service: tc.service,

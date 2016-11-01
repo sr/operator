@@ -210,22 +210,18 @@ func TestOperator(t *testing.T) {
 			status int
 			jwt    bool
 			args   map[string]string
-			otp    string
 			call   *operator.Call
 		}{
-			{"!ping ping", 200, true, noArgs, "", &operator.Call{Service: "testing.Ping", Method: "Ping"}},
-			{"!ping ping-pong", 200, true, noArgs, "", &operator.Call{Service: "testing.Ping", Method: "PingPong"}},
+			{"!ping ping", 200, true, noArgs, &operator.Call{Service: "testing.Ping", Method: "Ping"}},
+			{"!ping ping-pong", 200, true, noArgs, &operator.Call{Service: "testing.Ping", Method: "PingPong"}},
 			{"!ping ping foo=bar spam=\"boom town\" x='sup'", 200, true,
-				map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}, "", nil},
-			{"!ping ping", 400, false, noArgs, "", nil},
-			{"!ping ping deadbeef", 200, true, noArgs, "deadbeef", nil},
-			{"!ping ping x=\"y\" z=w deadbeef", 200, true,
-				map[string]string{"x": "y", "z": "w"}, "deadbeef", nil},
-			{"!ping", 404, true, noArgs, "", nil},
-			{"!", 404, true, noArgs, "", nil},
-			{" !ping ping", 404, true, noArgs, "", nil},
-			{"ping", 404, true, noArgs, "", nil},
-			{"", 404, true, noArgs, "", nil},
+				map[string]string{"foo": "bar", "spam": "boom town", "x": "sup"}, nil},
+			{"!ping ping", 400, false, noArgs, nil},
+			{"!ping", 404, true, noArgs, nil},
+			{"!", 404, true, noArgs, nil},
+			{" !ping ping", 404, true, noArgs, nil},
+			{"ping", 404, true, noArgs, nil},
+			{"", 404, true, noArgs, nil},
 		} {
 			webhook := &operatorhipchat.Payload{
 				Event: "room_message",
@@ -293,9 +289,6 @@ func TestOperator(t *testing.T) {
 							t.Errorf("message `%s` expected to have arg `%s=\"%s\"` got %s", tt.text, key, val, s)
 						}
 					}
-				}
-				if tt.otp != "" && invoc.req.Otp != tt.otp {
-					t.Errorf("message `%s` expected to have OTP `%s` got `%s`", tt.text, tt.otp, invoc.req.Otp)
 				}
 				if tt.call != nil {
 					if invoc.req.Call.Service != tt.call.Service || invoc.req.Call.Method != tt.call.Method {
