@@ -24,3 +24,19 @@ variable "sfdc_proxyout_cidr_blocks" {
 variable "pardot_ci_vpc_cidr" {
   default = "172.27.0.0/16"
 }
+
+variable "sfdc_org62_sandbox_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "13.108.0.0/14", # CS46 POD - Org62QA1 sandbox subnet1
+    "96.43.144.0/20", # CS46 POD - Org62QA1 sandbox subnet2
+    "136.146.0.0/15", # CS46 POD - Org62QA1 sandbox subnet3
+    "204.14.232.0/21", # CS46 POD - Org62QA1 sandbox subnet4
+    "85.222.128.0/19", # CS46 POD - Org62QA1 sandbox subnet5
+    "185.79.140.0/22", # CS46 POD - Org62QA1 sandbox subnet6
+    "101.53.160.0/19", # CS46 POD - Org62QA1 sandbox subnet7
+    "182.50.76.0/22", # CS46 POD - Org62QA1 sandbox subnet8
+    "202.129.242.0/23", # CS46 POD - Org62QA1 sandbox subnet9
+  ]
+}
