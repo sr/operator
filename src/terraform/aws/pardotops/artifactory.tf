@@ -909,3 +909,22 @@ resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
   file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }
+
+#TODO: DELETE LEGACY
+resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${var.legacy_artifactory_instance_ip}"]
+  type    = "A"
+  ttl     = "15"
+}
+
+#TODO: UNCOMMENT THE NEW STUFF
+//resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
+//  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+//  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+//  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
+//  type    = "CNAME"
+//  ttl     = "900"
+//}
+

@@ -316,3 +316,11 @@ resource "aws_route53_record" "artifact_cache_server_4_Arecord" {
   type    = "A"
   ttl     = "900"
 }
+
+resource "aws_route53_record" "artifactory_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.external_artifact_cache_lb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
+}
