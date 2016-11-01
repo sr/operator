@@ -110,7 +110,7 @@ class Deploy < ApplicationRecord
     results.incomplete.any?
   end
 
-  def sync_done?
+  def all_servers_deployed?
     !results.undeployed.any?
   end
 
