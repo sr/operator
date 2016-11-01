@@ -137,6 +137,9 @@ ul.nav {
     color: #000000;
   }
 
+  &[data-stage="start"] {
+    background-color: #888888;
+  }
   &[data-stage="initiated"] {
     background-color: #cccccc;
   }

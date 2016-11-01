@@ -7,7 +7,7 @@ RSpec.describe "/targets/:target_name/deploys/:deploy_id/results/:server_hostnam
   let(:server) { FactoryGirl.create(:server) }
 
   before do
-    deploy.results.create!(server: server)
+    deploy.results.create!(server: server, stage: "initiated")
     deploy.deploy_restart_servers.create!(datacenter: server.datacenter)
   end
 

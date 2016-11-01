@@ -5,7 +5,9 @@
       <%- slice.each do |result| %>
         <%= content_tag :div, class: "col-xs-3" do %>
           <%= content_tag :div, class: "deploy-result", data: {stage: result.stage}, title: result.stage do %>
-            <%- if result.initiated? %>
+            <%- if result.start? %>
+              <i class="icon-check-empty"></i>
+            <%- elsif result.initiated? %>
               <i class="icon-spinner"></i>
             <%- elsif result.deployed? %>
               <%- next_action = deploy_workflow_for(deploy).next_action_for(server: result.server, result: result) %>
