@@ -262,10 +262,15 @@ resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
   }
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
+    ]
   }
 
   egress {
@@ -289,8 +294,6 @@ resource "aws_security_group" "appdev_sfdc_provisioning_https" {
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
       "${var.sfdc_org62_sandbox_cidr_blocks}",
-      "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
-      "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
   }
 
