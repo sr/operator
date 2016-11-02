@@ -15,9 +15,6 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
-
-	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/strfmt"
 )
 
 const program = "terra2"
@@ -109,6 +106,11 @@ func terra() (int, string) {
 	if tf.Exec == "" {
 		return 1, "required flag missing: terraform-exec"
 	}
+	u, err := url.Parse(canoeURL)
+	if err != nil {
+		return 1, "flag canoe-url is not a valid URL: " + err.Error()
+	}
+	client := bread.NewCanoeClient(u, "")
 	cmd := exec.Command(
 		tf.Exec,
 		"remote",
@@ -174,11 +176,7 @@ func terra() (int, string) {
 		if _, err := os.Stat(tf.PlanFile); os.IsNotExist(err) {
 			return 1, fmt.Sprintf(`Plan file "%s" is missing. Please run "terra plan %s" first`, tf.PlanFile, tf.PlanFile)
 		}
-		u, err := url.Parse(canoeURL)
-		if err != nil {
-			return 1, "flag canoe-url is not a valid URL: " + err.Error()
-		}
-		if err := apply(&tf, &git, u, canoeUser); err != nil {
+		if err := apply(client, &tf, &git, canoeUser); err != nil {
 			return 1, err.Error()
 		}
 		return 0, ""
@@ -186,11 +184,6 @@ func terra() (int, string) {
 		if tf.Project == "" {
 			return 1, "required flag missing: terraform-project"
 		}
-		u, err := url.Parse(canoeURL)
-		if err != nil {
-			return 1, "flag canoe-url is not a valid URL: " + err.Error()
-		}
-		client := bread.NewCanoeClient(u)
 		if _, err := client.UnlockTerraformProject(
 			canoe.NewUnlockTerraformProjectParams().WithBody(
 				&models.CanoeUnlockTerraformProjectRequest{
@@ -241,9 +234,7 @@ func plan(tf *terraform) (int, string) {
 	return 0, ""
 }
 
-func apply(tf *terraform, git *gitRepo, canoeURL *url.URL, canoeUser string) error {
-	t := httptransport.New(canoeURL.Host, "", []string{canoeURL.Scheme})
-	client := canoe.New(t, strfmt.Default)
+func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser string) error {
 	resp, err := client.CreateTerraformDeploy(
 		canoe.NewCreateTerraformDeployParams().WithBody(
 			&models.CanoeCreateTerraformDeployRequest{

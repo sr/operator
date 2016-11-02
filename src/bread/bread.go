@@ -127,10 +127,22 @@ var (
 	}
 )
 
+type CanoeClient interface {
+	UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error)
+	PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error)
+	CreateTerraformDeploy(*canoe.CreateTerraformDeployParams) (*canoe.CreateTerraformDeployOK, error)
+	CompleteTerraformDeploy(*canoe.CompleteTerraformDeployParams) (*canoe.CompleteTerraformDeployOK, error)
+}
+
 type ACLEntry struct {
 	Call              *operator.Call
 	Group             string
 	PhoneAuthOptional bool
+}
+
+type CanoeConfig struct {
+	URL    string
+	APIKey string
 }
 
 type DeployTarget struct {
@@ -230,9 +242,13 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 	}
 }
 
-// NewCanoeClient returns a client for interacting with the Canoe gRPC API
-func NewCanoeClient(url *url.URL) CanoeClient {
-	return canoe.New(httptransport.New(url.Host, "", []string{url.Scheme}), strfmt.Default)
+// NewCanoeClient returns a client for interacting with the Canoe API
+func NewCanoeClient(url *url.URL, token string) CanoeClient {
+	tr := httptransport.New(url.Host, "", []string{url.Scheme})
+	if token != "" {
+		tr.DefaultAuthentication = httptransport.APIKeyAuth("X-Api-Token", "header", token)
+	}
+	return canoe.New(tr, strfmt.Default)
 }
 
 // NewCanoeDeployer returns a Deployer that deploys via Canoe

@@ -176,7 +176,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
-		if auth, err = bread.NewAuthorizer(config.ldap, bread.NewCanoeClient(canoeURL), bread.ACL); err != nil {
+		if auth, err = bread.NewAuthorizer(config.ldap, bread.NewCanoeClient(canoeURL, config.canoe.APIKey), bread.ACL); err != nil {
 			return err
 		}
 	}
