@@ -77,6 +77,33 @@ func (a *Client) CreateTerraformDeploy(params *CreateTerraformDeployParams) (*Cr
 }
 
 /*
+PhoneAuthentication phone authentication API
+*/
+func (a *Client) PhoneAuthentication(params *PhoneAuthenticationParams) (*PhoneAuthenticationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPhoneAuthenticationParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PhoneAuthentication",
+		Method:             "POST",
+		PathPattern:        "/api/grpc/phone_authentication",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &PhoneAuthenticationReader{formats: a.formats},
+		Context:            params.Context,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PhoneAuthenticationOK), nil
+
+}
+
+/*
 UnlockTerraformProject unlock terraform project API
 */
 func (a *Client) UnlockTerraformProject(params *UnlockTerraformProjectParams) (*UnlockTerraformProjectOK, error) {

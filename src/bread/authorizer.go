@@ -6,23 +6,20 @@ import (
 	"net"
 	"time"
 
-	"github.com/GeertJohan/yubigo"
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
+
+	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 )
 
 const ldapTimeout = 3 * time.Second
 
 type authorizer struct {
-	ldap     *LDAPConfig
-	verifier OTPVerifier
-	acl      []*ACLEntry
-}
-
-type ldapUser struct {
-	groups    []string
-	yubikeyID string
+	ldap  *LDAPConfig
+	canoe CanoeClient
+	acl   []*ACLEntry
 }
 
 func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {
@@ -40,15 +37,12 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	if entry == nil {
 		return fmt.Errorf("no ACL entry found for service `%s %s`", req.Call.Service, req.Call.Method)
 	}
-	if entry.OTP == true && req.Otp == "" {
-		return fmt.Errorf("service `%s %s` requires a Yubikey OTP", req.Call.Service, req.Call.Method)
-	}
-	user, err := a.getLDAPUser(email)
+	groups, err := a.getLDAPUserGroups(email)
 	if err != nil {
 		return err
 	}
 	ok := false
-	for _, grp := range user.groups {
+	for _, grp := range groups {
 		if grp == entry.Group {
 			ok = true
 		}
@@ -56,25 +50,28 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	if !ok {
 		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
 	}
-	if entry.OTP {
-		if user.yubikeyID == "" {
-			return fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", email)
+	if !entry.PhoneAuthOptional {
+		resp, err := a.canoe.PhoneAuthentication(
+			canoe.NewPhoneAuthenticationParams().
+				WithTimeout(30 * time.Second).
+				WithBody(&models.CanoePhoneAuthenticationRequest{
+					UserEmail: email,
+				}),
+		)
+		if err != nil || resp.Payload == nil {
+			return fmt.Errorf("Canoe phone authentication request failed: %s", err)
 		}
-		if err := a.verifier.Verify(req.Otp); err != nil {
-			return fmt.Errorf("could not verify Yubikey OTP: %s", err)
-		}
-		id, _, err := yubigo.ParseOTP(req.Otp)
-		if err != nil {
-			return err
-		}
-		if id != user.yubikeyID {
-			return errors.New("could not verify Yubikey OTP: IDs mismatch")
+		if resp.Payload.Error {
+			if resp.Payload.Message == "" {
+				return errors.New("Canoe phone authenticated failed for unknown reason")
+			}
+			return errors.New(resp.Payload.Message)
 		}
 	}
 	return nil
 }
 
-func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
+func (a *authorizer) getLDAPUserGroups(email string) ([]string, error) {
 	var conn *ldap.Conn
 	c, err := net.DialTimeout("tcp", a.ldap.Addr, ldapTimeout)
 	if err != nil {
@@ -93,7 +90,7 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 		a.ldap.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		fmt.Sprintf("(mail=%s)", ldap.EscapeFilter(email)),
-		[]string{"cn", "yubiKeyId"},
+		[]string{"cn"},
 		nil,
 	))
 	if err != nil {
@@ -109,7 +106,6 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 	if uid == "" {
 		return nil, errors.New("received an invalid response from the LDAP server")
 	}
-	yubikeyID := res.Entries[0].GetAttributeValue("yubiKeyId")
 	res, err = conn.Search(ldap.NewSearchRequest(
 		a.ldap.Base,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
@@ -124,8 +120,5 @@ func (a *authorizer) getLDAPUser(email string) (*ldapUser, error) {
 	for _, entry := range res.Entries {
 		groups = append(groups, entry.GetAttributeValue("cn"))
 	}
-	return &ldapUser{
-		groups:    groups,
-		yubikeyID: yubikeyID,
-	}, nil
+	return groups, nil
 }

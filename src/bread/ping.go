@@ -17,23 +17,16 @@ type pingAPIServer struct {
 }
 
 func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+	email := operator.GetUserEmail(req)
+	if email == "" {
+		email = "unknown"
+	}
 	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: "pong",
-		HTML: "<b>pong</b>",
+		Text: fmt.Sprintf("PONG %s", email),
+		HTML: fmt.Sprintf(`PONG <a href="mailto:%s">%s</a>`, email, email),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.Ping",
-		},
-	})
-}
-
-func (s *pingAPIServer) Otp(ctx context.Context, req *breadpb.OtpRequest) (*operator.Response, error) {
-	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: "ok",
-		HTML: "<b>ok</b>",
-		Options: &operatorhipchat.MessageOptions{
-			Color: "gray",
-			From:  "pinger.Otp",
 		},
 	})
 }
@@ -55,21 +48,6 @@ func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisReq
 		Options: &operatorhipchat.MessageOptions{
 			Color: "gray",
 			From:  "pinger.SlowLoris",
-		},
-	})
-}
-
-func (s *pingAPIServer) Whoami(ctx context.Context, req *breadpb.WhoamiRequest) (*operator.Response, error) {
-	email := operator.GetUserEmail(req)
-	if email == "" {
-		email = "unknown"
-	}
-	return operator.Reply(ctx, s, req, &operator.Message{
-		Text: email,
-		HTML: fmt.Sprintf(`<a href="mailto:%s">%s</a>`, email, email),
-		Options: &operatorhipchat.MessageOptions{
-			Color: "gray",
-			From:  "pinger.Ping",
 		},
 	})
 }

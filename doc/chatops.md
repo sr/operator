@@ -61,7 +61,7 @@ Run the tests using the `script/test` command.
 [Open a pull request](https://help.github.com/articles/creating-a-pull-request/) on the BREAD repo and, get reviewed it and approved, then use the `!deploy` command to deploy your branch:
 
 ```
-!deploy trigger target=hal9000 branch=my-great-branch <insert-yubikey-otp>
+!deploy trigger target=hal9000 branch=my-great-branch
 ```
 
 Confirm everything is working as expected, then merge your branch. Otherwise rollback to master, fix your branch, and repeat the process until you are satisfied with your changes and HAL9000 is in a good state.

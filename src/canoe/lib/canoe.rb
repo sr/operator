@@ -30,6 +30,14 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :request_id, :string, 4
     optional :project, :string, 5
   end
+  add_message "canoe.PhoneAuthenticationRequest" do
+    optional :user_email, :string, 1
+  end
+  add_message "canoe.PhoneAuthenticationResponse" do
+    optional :error, :bool, 1
+    optional :message, :string, 2
+    optional :user_email, :string, 3
+  end
 end
 
 module Canoe
@@ -37,4 +45,6 @@ module Canoe
   CompleteTerraformDeployRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.CompleteTerraformDeployRequest").msgclass
   UnlockTerraformProjectRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.UnlockTerraformProjectRequest").msgclass
   TerraformDeployResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.TerraformDeployResponse").msgclass
+  PhoneAuthenticationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.PhoneAuthenticationRequest").msgclass
+  PhoneAuthenticationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("canoe.PhoneAuthenticationResponse").msgclass
 end

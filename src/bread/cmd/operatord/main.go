@@ -42,8 +42,7 @@ type config struct {
 	timeout  time.Duration
 	timezone string
 
-	yubico *bread.YubicoConfig
-	ldap   *bread.LDAPConfig
+	ldap *bread.LDAPConfig
 
 	databaseURL string
 	prefix      string
@@ -55,11 +54,10 @@ type config struct {
 
 func run(invoker operator.InvokerFunc) error {
 	config := &config{
-		afy:    &bread.ArtifactoryConfig{},
-		canoe:  &bread.CanoeConfig{},
-		ecs:    &bread.ECSConfig{},
-		ldap:   &bread.LDAPConfig{},
-		yubico: &bread.YubicoConfig{},
+		afy:   &bread.ArtifactoryConfig{},
+		canoe: &bread.CanoeConfig{},
+		ecs:   &bread.ECSConfig{},
+		ldap:  &bread.LDAPConfig{},
 	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
@@ -77,8 +75,6 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
-	flags.StringVar(&config.yubico.ID, "yubico-api-id", "", "Yubico API ID")
-	flags.StringVar(&config.yubico.Key, "yubico-api-key", "", "Yubico API key")
 	flags.StringVar(&config.afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flags.StringVar(&config.afy.User, "artifactory-user", "", "Artifactory username")
 	flags.StringVar(&config.afy.APIKey, "artifactory-api-key", "", "Artifactory API key")
@@ -119,10 +115,9 @@ func run(invoker operator.InvokerFunc) error {
 		auth       operator.Authorizer
 		sender     operator.Sender
 
-		store    operatorhipchat.ClientCredentialsStore
-		verifier bread.OTPVerifier
-		db       *sql.DB
-		hal      hal9000.RobotClient
+		store operatorhipchat.ClientCredentialsStore
+		db    *sql.DB
+		hal   hal9000.RobotClient
 
 		err error
 	)
@@ -164,12 +159,6 @@ func run(invoker operator.InvokerFunc) error {
 		if config.hipchatWebhookURL == "" {
 			return fmt.Errorf("required flag missing: hipchat-webhook-url")
 		}
-		if config.yubico.ID == "" {
-			return fmt.Errorf("required flag missing: yubico-api-id")
-		}
-		if config.yubico.Key == "" {
-			return fmt.Errorf("required flag missing: yubico-api-key")
-		}
 		if config.databaseURL == "" {
 			return fmt.Errorf("required flag missing: database-url")
 		}
@@ -183,10 +172,11 @@ func run(invoker operator.InvokerFunc) error {
 		httpServer.Handle("/_ping", bread.NewHandler(logger, bread.NewPingHandler(db)))
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
-		if verifier, err = bread.NewYubicoVerifier(config.yubico); err != nil {
+		canoeURL, err := url.Parse(config.canoe.URL)
+		if err != nil {
 			return err
 		}
-		if auth, err = bread.NewAuthorizer(config.ldap, verifier, bread.ACL); err != nil {
+		if auth, err = bread.NewAuthorizer(config.ldap, bread.NewCanoeClient(canoeURL, config.canoe.APIKey), bread.ACL); err != nil {
 			return err
 		}
 	}

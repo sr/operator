@@ -15,6 +15,8 @@ import (
 	"golang.org/x/net/context"
 
 	"bread/pb"
+	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 )
 
 var ldapEnabled bool
@@ -24,19 +26,25 @@ func init() {
 	flag.Parse()
 }
 
-type fakeOTPVerifier struct {
-	ok bool
+type fakeCanoeClient struct {
+	authErr  error
+	authResp *canoe.PhoneAuthenticationOK
 }
 
-func (v *fakeOTPVerifier) Verify(otp string) error {
-	if !v.ok {
-		return errors.New("boomtown")
-	}
-	return nil
+func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
+	panic("not implemented")
 }
 
-func (v *fakeOTPVerifier) fail() {
-	v.ok = false
+func (c *fakeCanoeClient) PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error) {
+	return c.authResp, c.authErr
+}
+
+func (c *fakeCanoeClient) CreateTerraformDeploy(*canoe.CreateTerraformDeployParams) (*canoe.CreateTerraformDeployOK, error) {
+	panic("not implemented")
+}
+
+func (c *fakeCanoeClient) CompleteTerraformDeploy(*canoe.CompleteTerraformDeployParams) (*canoe.CompleteTerraformDeployOK, error) {
+	panic("not implemented")
 }
 
 func TestAuthorizer(t *testing.T) {
@@ -75,45 +83,46 @@ func TestAuthorizer(t *testing.T) {
 		i = i + 1
 	}
 	defer conn.Close()
-	otpVerifier := &fakeOTPVerifier{true}
-	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, otpVerifier, bread.ACL)
+	canoeClient := &fakeCanoeClient{}
+	auth, err := bread.NewAuthorizer(&bread.LDAPConfig{Addr: ldapAddr}, canoeClient, bread.ACL)
 	if err != nil {
 		t.Fatal(err)
 	}
-	swe := "srozet@salesforce.com" // yubiKeyId: ccccccdluefe
-	noYubiKey := "mlockhart@salesforce.com"
+	swe := "srozet@salesforce.com"
 	unknown := "boom@gmail.com"
-	validOTP := "ccccccdluefelbvvgdbehnlutdbbnnfgggvgbbjcdltu"
+	authOK := &canoe.PhoneAuthenticationOK{
+		Payload: &models.CanoePhoneAuthenticationResponse{
+			Error: false,
+		},
+	}
 	for _, tc := range []struct {
-		user    string
-		service string
-		method  string
-		otp     string
-		otpOK   bool
-		err     error
+		user     string
+		service  string
+		method   string
+		authResp *canoe.PhoneAuthenticationOK
+		authErr  error
+		err      error
 	}{
-		{swe, "bread.Ping", "Ping", "", true, nil},
-		{swe, "bread.Ping", "PingPong", "", true, nil},
-		{swe, "bread.Ping", "Whoami", "", true, nil},
-		{"", "bread.Ping", "Ping", "", true, errors.New("unable to authorize request without an user email")},
-		{swe, "bread.Ping", "Pong", "", true, errors.New("no ACL entry found for service `bread.Ping Pong`")},
-		{unknown, "bread.Ping", "Ping", "", true, errors.New("no user matching email `boom@gmail.com`")},
-		{swe, "bread.Ping", "Otp", validOTP, true, nil},
-		{noYubiKey, "bread.Ping", "Otp", validOTP, true, fmt.Errorf("LDAP user `%s` does not have a Yubikey ID", noYubiKey)},
-		{swe, "bread.Ping", "Otp", "", true, errors.New("service `bread.Ping Otp` requires a Yubikey OTP")},
-		{swe, "bread.Ping", "Otp", validOTP, false, errors.New("could not verify Yubikey OTP: boomtown")},
-		{swe, "bread.Ping", "Otp", "garbage", true, errors.New("could not verify Yubikey OTP: boomtown")},
+		{swe, "bread.Ping", "Ping", authOK, nil, nil},
+		{"", "bread.Ping", "Ping", authOK, nil, errors.New("unable to authorize request without an user email")},
+		{swe, "bread.Ping", "Pong", authOK, nil, errors.New("no ACL entry found for service `bread.Ping Pong`")},
+		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
+		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed: panic")},
+		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
+			Payload: &models.CanoePhoneAuthenticationResponse{
+				Error:   true,
+				Message: "denied",
+			},
+		}, nil, errors.New("denied")},
 	} {
 		t.Run(fmt.Sprintf("%s %s", tc.service, tc.method), func(t *testing.T) {
-			if !tc.otpOK {
-				otpVerifier.fail()
-			}
+			canoeClient.authErr = tc.authErr
+			canoeClient.authResp = tc.authResp
 			err := auth.Authorize(context.Background(), &operator.Request{
 				Call: &operator.Call{
 					Service: tc.service,
 					Method:  tc.method,
 				},
-				Otp: tc.otp,
 				Source: &operator.Source{
 					Type: operator.SourceType_HUBOT,
 					User: &operator.User{

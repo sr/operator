@@ -50,10 +50,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.IsSpace(c)
 		}
 	})
-	var otp string
-	if len(words) != 0 && !strings.Contains(words[len(words)-1], "=") {
-		otp, words = words[len(words)-1], words[:len(words)-1]
-	}
 	for _, arg := range words {
 		parts := strings.Split(arg, "=")
 		if len(parts) != 2 {
@@ -73,7 +69,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Method:  generator.Camelize(matches[2], "-"),
 				Args:    args,
 			},
-			Otp:      otp,
 			SenderId: senderID,
 			Source:   msg.Source,
 		},

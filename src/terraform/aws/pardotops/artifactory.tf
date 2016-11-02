@@ -882,4 +882,3 @@ resource "aws_route53_record" "artifa ctory-origin_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 */
-

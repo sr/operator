@@ -19,10 +19,8 @@ It has these top-level messages:
 	ListTargetsRequest
 	ListBuildsRequest
 	TriggerRequest
-	OtpRequest
 	PingRequest
 	SlowLorisRequest
-	WhoamiRequest
 */
 package breadpb
 
