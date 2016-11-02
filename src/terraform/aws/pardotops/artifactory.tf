@@ -118,7 +118,7 @@ resource "aws_security_group" "artifactory_http_lb_internal" {
   description = "Allow HTTP/HTTPS from SFDC VPN only"
   vpc_id      = "${aws_vpc.artifactory_integration.id}"
 
-ingress {
+  ingress {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
