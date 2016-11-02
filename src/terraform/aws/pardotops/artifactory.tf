@@ -638,7 +638,7 @@ resource "aws_alb" "artifactory_public_alb" {
 }
 
 resource "aws_alb_target_group" "public_artifactory_all_hosts_target_group" {
-  name     = "artifactory-host-target-group"
+  name     = "public-artifactory-host-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.artifactory_integration.id}"
@@ -718,7 +718,7 @@ resource "aws_alb" "artifactory_private_alb" {
 }
 
 resource "aws_alb_target_group" "private_artifactory_all_hosts_target_group" {
-  name     = "artifactory-host-target-group"
+  name     = "private-artifactory-host-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.artifactory_integration.id}"
