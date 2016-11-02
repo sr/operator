@@ -113,6 +113,39 @@ resource "aws_security_group" "artifactory_http_lb" {
   }
 }
 
+resource "aws_security_group" "artifactory_http_lb_internal" {
+  name        = "artifactory_http_lb_internal"
+  description = "Allow HTTP/HTTPS from SFDC VPN only"
+  vpc_id      = "${aws_vpc.artifactory_integration.id}"
+
+ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.artifact_cache_server.id}",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.artifact_cache_server.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "artifactory_dc_only_http_lb" {
   name        = "artifactory_dc_only_http_lb"
   description = "Allow HTTP/HTTPS from SFDC datacenters only"
@@ -673,8 +706,7 @@ resource "aws_alb" "artifactory_private_alb" {
   internal = true
 
   security_groups = [
-    "${aws_security_group.artifactory_dc_only_http_lb.id}",
-    "${aws_security_group.artifactory_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb_internal.id}",
   ]
 
   subnets = [
@@ -829,7 +861,7 @@ resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" 
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
+  records = ["${aws_alb.artifactory_private_alb.dns_name}"]
   type    = "CNAME"
   ttl     = "900"
 }
