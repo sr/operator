@@ -28,9 +28,13 @@ require "pardot/pull_agent/payload"
 require "pardot/pull_agent/proxy_selector"
 require "pardot/pull_agent/redis"
 require "pardot/pull_agent/shell_helper"
+require "pardot/pull_agent/shell_executor"
 require "pardot/pull_agent/strategies/deploy/base"
 require "pardot/pull_agent/strategies/fetch/base"
 require "pardot/pull_agent/strategies"
+require "pardot/pull_agent/play_dead_controller"
+require "pardot/pull_agent/upstart_service_controller"
+require "pardot/pull_agent/dropwizard_service_controller"
 
 module Pardot
   module PullAgent

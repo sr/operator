@@ -211,7 +211,10 @@ module Pardot
         end
 
         def restart_workflowstats_service
-          restart_upstart_job("workflowstats")
+          DropwizardServiceController.new(
+            UpstartServiceController.new("workflowstats"),
+            play_dead_controller: PlayDeadController.new,
+          ).restart
         end
 
         def deploy_topology(deploy)
@@ -235,21 +238,7 @@ module Pardot
         end
 
         def restart_upstart_job(job)
-          result = ShellHelper.execute(["sudo", "/sbin/restart", job], err: [:child, :out])
-          if result.include?("#{job} start/running")
-            Logger.log(:info, "Restarted #{job} service")
-          elsif result.include?("Unknown instance")
-            Logger.log(:info, "#{job} service was not running, attempting start")
-
-            start_result = ShellHelper.execute(["sudo", "/sbin/start", job], err: [:child, :out])
-            if start_result.include?("#{job} start/running")
-              Logger.log(:info, "Started #{job} service")
-            else
-              Logger.log(:err, "Unable to start #{job} service: #{start_result}")
-            end
-          else
-            Logger.log(:err, "Unable to restart #{job} service: #{result}")
-          end
+          UpstartServiceController.new(job).restart
         end
 
         def restart_puma(pid_file)
