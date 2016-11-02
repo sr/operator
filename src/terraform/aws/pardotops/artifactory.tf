@@ -90,7 +90,18 @@ resource "aws_security_group" "artifactory_http_lb" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${var.legacy_artifactory_instance_ip}/32", # legacy artifactory.dev.pardot.com
+      "${var.legacy_artifactory_instance_ip}/32", # TODO: deleteme post switchover
+      "${var.pardot_ci_nat_gw_public_ip}/32",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.artifact_cache_server.id}",
     ]
   }
 
@@ -278,57 +289,6 @@ resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
   records = ["${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"]
   type    = "A"
   ttl     = 900
-}
-
-resource "aws_elb" "artifactory_public_elb" {
-  security_groups = [
-    "${aws_security_group.artifactory_dc_only_http_lb.id}",
-    "${aws_security_group.artifactory_http_lb.id}",
-  ]
-
-  subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
-  ]
-
-  cross_zone_load_balancing   = true
-  connection_draining         = true
-  connection_draining_timeout = 30
-
-  instances = [
-    "${aws_instance.pardot0-artifactory1-1-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-2-ue1.id}",
-    "${aws_instance.pardot0-artifactory1-3-ue1.id}",
-  ]
-
-  listener {
-    lb_port            = 443
-    lb_protocol        = "https"
-    instance_port      = 80
-    instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
-  }
-
-  listener {
-    lb_port           = 80
-    lb_protocol       = "http"
-    instance_port     = 80
-    instance_protocol = "http"
-  }
-
-  health_check {
-    healthy_threshold   = 4
-    unhealthy_threshold = 2
-    timeout             = 3
-    target              = "HTTP:80/artifactory/webapp/"
-    interval            = 20
-  }
-
-  tags {
-    Name = "artifactory-public-elb"
-  }
 }
 
 resource "aws_iam_role" "artifactory_s3_access_iam_role" {
@@ -619,14 +579,6 @@ resource "aws_vpc_peering_connection" "pardot_ci_and_artifactory_integration_vpc
   vpc_id        = "${aws_vpc.artifactory_integration.id}"
 }
 
-resource "aws_route53_record" "artifactorylb_dev_pardot_com_CNAME" {
-  name    = "artifactorylb.${aws_route53_zone.dev_pardot_com.name}"
-  type    = "CNAME"
-  zone_id = "${aws_route53_zone.dev_pardot_com.id}"
-  records = ["${aws_elb.artifactory_public_elb.dns_name}"]
-  ttl     = 900
-}
-
 resource "aws_route53_record" "artifactory_alb_dev_pardot_com_CNAME" {
   name    = "artifactory_alb.${aws_route53_zone.dev_pardot_com.name}"
   type    = "CNAME"
@@ -845,13 +797,6 @@ resource "aws_alb_listener_rule" "artifactory_host_1-3_alb_rule" {
   }
 }
 
-resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy" {
-  name                     = "duration-based-elb-cookie-policy"
-  load_balancer            = "${aws_elb.artifactory_public_elb.id}"
-  lb_port                  = 443
-  cookie_expiration_period = 3600
-}
-
 resource "aws_security_group" "artifactory_efs_access_security_group" {
   description = "artifactory_efs_access_security_group"
   vpc_id      = "${aws_vpc.artifactory_integration.id}"
@@ -909,3 +854,33 @@ resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
   file_system_id = "${aws_efs_file_system.artifactory_efs_storage.id}"
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }
+
+#TODO: DELETE LEGACY
+resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${var.legacy_artifactory_instance_ip}"]
+  type    = "A"
+  ttl     = "15"
+}
+
+#TODO: REMOVE ALL REFERENCES TO THIS ADDRESS
+resource "aws_route53_record" "artifactory-internal_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["172.31.1.93"]
+  type    = "A"
+  ttl     = "15"
+}
+
+/*
+#TODO: UNCOMMENT THE NEW STUFF
+resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
+}
+*/
+

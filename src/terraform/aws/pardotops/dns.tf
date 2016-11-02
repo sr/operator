@@ -13,30 +13,6 @@ resource "aws_route53_zone" "aws_pardot_com_restricted_use_public_zone" {
   comment = "This is the public face of aws.pardot.com, and it should be used as VERY LITTLE as possible. Seek BREAD approval before use!"
 }
 
-resource "aws_route53_record" "artifactory_dev_pardot_com_CNAMErecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_elb.external_artifact_cache_lb.dns_name}"]
-  type    = "CNAME"
-  ttl     = "900"
-}
-
-resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${var.legacy_artifactory_instance_ip}"]
-  type    = "A"
-  ttl     = "900"
-}
-
-resource "aws_route53_record" "artifactory-internal_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["172.31.1.93"]
-  type    = "A"
-  ttl     = "900"
-}
-
 resource "aws_route53_record" "awstools_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "awstools.${aws_route53_zone.dev_pardot_com.name}"
