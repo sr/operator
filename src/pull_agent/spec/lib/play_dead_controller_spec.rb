@@ -19,7 +19,7 @@ module Pardot
           controller = PlayDeadController.new(8090)
           expect {
             controller.make_play_dead
-          }.to raise_error
+          }.to raise_error(Net::HTTPFatalError)
         end
       end
 
@@ -39,7 +39,7 @@ module Pardot
           controller = PlayDeadController.new(8090)
           expect {
             controller.make_alive
-          }.to raise_error
+          }.to raise_error(Net::HTTPFatalError)
         end
       end
     end
