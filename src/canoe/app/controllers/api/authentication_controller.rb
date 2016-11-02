@@ -7,8 +7,8 @@ module Api
 
     def phone
       if !current_user.phone.paired?
-        message = "Your Canoe account is not paired. Please go to " \
-          "https://canoe.dev.pardot.com/auth/phone to pair your phone"
+        message = "Your Canoe account is not paired with your phone. Please  " \
+          "go to https://canoe.dev.pardot.com/auth/phone to setup your phone"
         return render(json: build_response(error: true, message: message))
       end
 
