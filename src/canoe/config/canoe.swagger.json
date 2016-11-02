@@ -67,6 +67,32 @@
         ]
       }
     },
+    "/api/grpc/phone_authentication": {
+      "post": {
+        "operationId": "PhoneAuthentication",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/canoePhoneAuthenticationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/canoePhoneAuthenticationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
     "/api/grpc/unlock_terraform_project": {
       "post": {
         "operationId": "UnlockTerraformProject",
@@ -136,6 +162,32 @@
           "format": "string"
         },
         "terraform_version": {
+          "type": "string",
+          "format": "string"
+        },
+        "user_email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoePhoneAuthenticationRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "canoePhoneAuthenticationResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
           "type": "string",
           "format": "string"
         },

@@ -50,23 +50,12 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 		}
 	}
 	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
-		if req.Call.Method == "Otp" {
-			client := breadpb.NewPingClient(conn)
-			_, err := client.Otp(
-				ctx,
-				&breadpb.OtpRequest{
-					Request: req,
-				},
-			)
-			return err
-		}
 		if req.Call.Method == "Ping" {
 			client := breadpb.NewPingClient(conn)
 			_, err := client.Ping(
 				ctx,
 				&breadpb.PingRequest{
 					Request: req,
-					Arg1:    req.Call.Args["arg1"],
 				},
 			)
 			return err
@@ -78,16 +67,6 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				&breadpb.SlowLorisRequest{
 					Request: req,
 					Wait:    req.Call.Args["wait"],
-				},
-			)
-			return err
-		}
-		if req.Call.Method == "Whoami" {
-			client := breadpb.NewPingClient(conn)
-			_, err := client.Whoami(
-				ctx,
-				&breadpb.WhoamiRequest{
-					Request: req,
 				},
 			)
 			return err

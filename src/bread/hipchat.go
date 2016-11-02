@@ -126,10 +126,6 @@ func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.R
 			return unicode.IsSpace(c)
 		}
 	})
-	var otp string
-	if len(words) != 0 && !strings.Contains(words[len(words)-1], "=") {
-		otp, words = words[len(words)-1], words[:len(words)-1]
-	}
 	for _, arg := range words {
 		parts := strings.Split(arg, "=")
 		if len(parts) != 2 {
@@ -146,7 +142,6 @@ func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.R
 			Method:  generator.Camelize(matches[2], "-"),
 			Args:    args,
 		},
-		Otp:      otp,
 		SenderId: senderID,
 		Source:   msg.Source,
 	}

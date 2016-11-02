@@ -2,17 +2,18 @@ package bread
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"time"
 
-	"github.com/GeertJohan/yubigo"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"github.com/sr/operator/protolog"
@@ -21,6 +22,7 @@ import (
 
 	"bread/hal9000"
 	"bread/pb"
+	"bread/swagger/client/canoe"
 )
 
 const (
@@ -36,58 +38,33 @@ var (
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
-				Method:  "Otp",
-			},
-			Group: "sysadmin",
-			OTP:   true,
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
 				Method:  "Ping",
 			},
 			Group: "sysadmin",
-			OTP:   false,
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
-				Method:  "PingPong",
-			},
-			Group: "sysadmin",
-			OTP:   false,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
 				Method:  "SlowLoris",
 			},
-			Group: "sysadmin",
-			OTP:   false,
-		},
-		{
-			Call: &operator.Call{
-				Service: "bread.Ping",
-				Method:  "Whoami",
-			},
-			Group: "sysadmin",
-			OTP:   false,
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
 				Method:  "ListTargets",
 			},
-			Group: "sysadmin",
-			OTP:   false,
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Deploy",
 				Method:  "ListBuilds",
 			},
-			Group: "sysadmin",
-			OTP:   false,
+			Group:             "sysadmin",
+			PhoneAuthOptional: true,
 		},
 		{
 			Call: &operator.Call{
@@ -95,7 +72,6 @@ var (
 				Method:  "Trigger",
 			},
 			Group: "sysadmin",
-			OTP:   true,
 		},
 	}
 
@@ -151,14 +127,22 @@ var (
 	}
 )
 
-type OTPVerifier interface {
-	Verify(otp string) error
+type CanoeClient interface {
+	UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error)
+	PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error)
+	CreateTerraformDeploy(*canoe.CreateTerraformDeployParams) (*canoe.CreateTerraformDeployOK, error)
+	CompleteTerraformDeploy(*canoe.CompleteTerraformDeployParams) (*canoe.CompleteTerraformDeployOK, error)
 }
 
 type ACLEntry struct {
-	Call  *operator.Call
-	Group string
-	OTP   bool
+	Call              *operator.Call
+	Group             string
+	PhoneAuthOptional bool
+}
+
+type CanoeConfig struct {
+	URL    string
+	APIKey string
 }
 
 type DeployTarget struct {
@@ -173,34 +157,6 @@ type DeployTarget struct {
 type LDAPConfig struct {
 	Addr string
 	Base string
-}
-
-type YubicoConfig struct {
-	ID  string
-	Key string
-}
-
-type yubicoVerifier struct {
-	yubico *yubigo.YubiAuth
-}
-
-func NewYubicoVerifier(config *YubicoConfig) (OTPVerifier, error) {
-	auth, err := yubigo.NewYubiAuth(config.ID, config.Key)
-	if err != nil {
-		return nil, err
-	}
-	return &yubicoVerifier{auth}, nil
-}
-
-func (v *yubicoVerifier) Verify(otp string) error {
-	_, ok, err := v.yubico.Verify(otp)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return errors.New("OTP verification failed")
-	}
-	return nil
 }
 
 // NewLogger returns a logger that writes protobuf messages marshalled as JSON
@@ -286,6 +242,15 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 	}
 }
 
+// NewCanoeClient returns a client for interacting with the Canoe API
+func NewCanoeClient(url *url.URL, token string) CanoeClient {
+	tr := httptransport.New(url.Host, "", []string{url.Scheme})
+	if token != "" {
+		tr.DefaultAuthentication = httptransport.APIKeyAuth("X-Api-Token", "header", token)
+	}
+	return canoe.New(tr, strfmt.Default)
+}
+
 // NewCanoeDeployer returns a Deployer that deploys via Canoe
 func NewCanoeDeployer(config *CanoeConfig) Deployer {
 	return &canoeDeployer{&http.Client{}, config}
@@ -306,10 +271,8 @@ func NewServer(
 }
 
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
-// for authN/authZ, and verifies 2FA tokens via Yubico's YubiCloud web service.
-//
-// See: https://developers.yubico.com/OTP/
-func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (operator.Authorizer, error) {
+// for authentication and LDAP group membership for authorization.
+func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
 	if ldap.Base == "" {
 		ldap.Base = LDAPBase
 	}
@@ -318,7 +281,7 @@ func NewAuthorizer(ldap *LDAPConfig, verifier OTPVerifier, acl []*ACLEntry) (ope
 			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
 		}
 	}
-	return &authorizer{ldap, verifier, acl}, nil
+	return &authorizer{ldap, canoe, acl}, nil
 }
 
 // NewHipchatClient returns a client implementing a very limited subset of the

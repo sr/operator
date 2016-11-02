@@ -1,4 +1,7 @@
 class AuthUser < ApplicationRecord
+  DEFAULT_MAX_AUTH_TRIES = 13
+  DEFAULT_MAX_AUTH_SLEEP_INTERVAL = 2
+
   has_one :salesforce_authenticator_pairing
 
   def self.find_or_create_by_omniauth(auth_hash)
@@ -15,7 +18,10 @@ class AuthUser < ApplicationRecord
       SalesforceAuthenticatorPairing.new(auth_user_id: id)
   end
 
-  def authenticate_phone(max_tries = 13, sleep_interval = 2)
+  def authenticate_phone(max_tries = nil, sleep_interval = nil)
+    max_tries ||= DEFAULT_MAX_AUTH_TRIES
+    sleep_interval ||= DEFAULT_MAX_AUTH_SLEEP_INTERVAL
+
     if !phone.paired?
       return false
     end

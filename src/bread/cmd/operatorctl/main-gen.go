@@ -140,42 +140,10 @@ var cmd = operator.NewCommand(
 			Synopsis: `Undocumented`,
 			Methods: []operator.MethodCommand{
 				{
-					Name:     "otp",
-					Synopsis: `Test OTP verification`,
+					Name:     "ping",
+					Synopsis: `Reply with the email of the authenticated user. Requires 2FA`,
 					Flags:    []*flag.Flag{},
 					Run: func(ctx *operator.CommandContext) (string, error) {
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := breadpb.NewPingClient(conn)
-						resp, err := client.Otp(
-							context.Background(),
-							&breadpb.OtpRequest{
-								Request: ctx.Request,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return resp.Message, nil
-					},
-				},
-				{
-					Name:     "ping",
-					Synopsis: `Reply with PONG if everything is working`,
-					Flags: []*flag.Flag{
-						{
-							Name:  "arg1",
-							Usage: "Undocumented",
-						},
-					},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						arg1 := ctx.Flags.String("arg1", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -189,7 +157,6 @@ var cmd = operator.NewCommand(
 							context.Background(),
 							&breadpb.PingRequest{
 								Request: ctx.Request,
-								Arg1:    *arg1,
 							},
 						)
 						if err != nil {
@@ -223,32 +190,6 @@ var cmd = operator.NewCommand(
 							&breadpb.SlowLorisRequest{
 								Request: ctx.Request,
 								Wait:    *wait,
-							},
-						)
-						if err != nil {
-							return "", err
-						}
-						return resp.Message, nil
-					},
-				},
-				{
-					Name:     "whoami",
-					Synopsis: `Reply with the email of the current authenticated user`,
-					Flags:    []*flag.Flag{},
-					Run: func(ctx *operator.CommandContext) (string, error) {
-						if err := ctx.Flags.Parse(ctx.Args); err != nil {
-							return "", err
-						}
-						conn, err := ctx.GetConn()
-						if err != nil {
-							return "", err
-						}
-						defer conn.Close()
-						client := breadpb.NewPingClient(conn)
-						resp, err := client.Whoami(
-							context.Background(),
-							&breadpb.WhoamiRequest{
-								Request: ctx.Request,
 							},
 						)
 						if err != nil {

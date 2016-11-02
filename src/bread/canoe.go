@@ -16,11 +16,6 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-type CanoeConfig struct {
-	URL    string
-	APIKey string
-}
-
 type canoeDeployer struct {
 	http  *http.Client
 	canoe *CanoeConfig

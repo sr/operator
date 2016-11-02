@@ -17,7 +17,6 @@ func newInstrumenter(logger protolog.Logger) *instrumenter {
 
 func (i *instrumenter) Instrument(ev *operator.Event) {
 	if ev.Request != nil {
-		ev.Request.Otp = ""
 		ev.Request.SenderId = ""
 		if ev.Request.Source != nil && ev.Request.Source.User != nil {
 			ev.Request.Source.User.RealName = ""
