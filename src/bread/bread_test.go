@@ -39,6 +39,14 @@ func (c *fakeCanoeClient) PhoneAuthentication(*canoe.PhoneAuthenticationParams) 
 	return c.authResp, c.authErr
 }
 
+func (c *fakeCanoeClient) CreateTerraformDeploy(*canoe.CreateTerraformDeployParams) (*canoe.CreateTerraformDeployOK, error) {
+	panic("not implemented")
+}
+
+func (c *fakeCanoeClient) CompleteTerraformDeploy(*canoe.CompleteTerraformDeployParams) (*canoe.CompleteTerraformDeployOK, error) {
+	panic("not implemented")
+}
+
 func TestAuthorizer(t *testing.T) {
 	var host, port string
 	if v, ok := os.LookupEnv("LDAP_PORT_389_TCP_ADDR"); ok {
