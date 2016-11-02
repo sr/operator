@@ -864,6 +864,15 @@ resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
   ttl     = "15"
 }
 
+#TODO: REMOVE ALL REFERENCES TO THIS ADDRESS
+resource "aws_route53_record" "artifactory-internal_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["172.31.1.93"]
+  type = "A"
+  ttl = "15"
+}
+
 /*
 #TODO: UNCOMMENT THE NEW STUFF
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
