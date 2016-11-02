@@ -702,7 +702,7 @@ resource "aws_alb_target_group_attachment" "public_pardot0-artifactory1-3-ue1_al
 }
 
 resource "aws_alb" "artifactory_private_alb" {
-  name     = "afy-pblc-alb-dev-pardot-com"
+  name     = "afy-prvt-alb-dev-pardot-com"
   internal = true
 
   security_groups = [
