@@ -604,7 +604,7 @@ resource "aws_alb" "artifactory_public_alb" {
   ]
 }
 
-resource "aws_alb_target_group" "artifactory_all_hosts_target_group" {
+resource "aws_alb_target_group" "public_artifactory_all_hosts_target_group" {
   name     = "artifactory-host-target-group"
   port     = 80
   protocol = "HTTP"
@@ -632,7 +632,7 @@ resource "aws_alb_listener" "public_alb_all_hosts_http" {
   protocol          = "HTTP"
 
   "default_action" {
-    target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+    target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
     type             = "forward"
   }
 }
@@ -645,59 +645,48 @@ resource "aws_alb_listener" "public_alb_all_hosts_https" {
   certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
 
   "default_action" {
-    target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+    target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
     type             = "forward"
   }
 }
 
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-1-ue1-allhosts-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+resource "aws_alb_target_group_attachment" "public_pardot0-artifactory1-1-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
   target_id        = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-2-ue1-allhosts-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+resource "aws_alb_target_group_attachment" "public_pardot0-artifactory1-2-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
   target_id        = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
   port             = 80
 }
 
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-3-ue1-allhosts-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_all_hosts_target_group.arn}"
+resource "aws_alb_target_group_attachment" "public_pardot0-artifactory1-3-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.public_artifactory_all_hosts_target_group.arn}"
   target_id        = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
   port             = 80
 }
 
-resource "aws_alb_target_group" "artifactory_artifactory1_1_only_target_group" {
-  name     = "artifactory1-1-only-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = "${aws_vpc.artifactory_integration.id}"
+resource "aws_alb" "artifactory_private_alb" {
+  name     = "afy-pblc-alb-dev-pardot-com"
+  internal = true
 
-  stickiness {
-    type            = "lb_cookie"
-    cookie_duration = "86400"     #1 DAY
-  }
+  security_groups = [
+    "${aws_security_group.artifactory_dc_only_http_lb.id}",
+    "${aws_security_group.artifactory_http_lb.id}",
+  ]
 
-  health_check {
-    interval            = "20"
-    path                = "/artifactory/webapp/"
-    port                = 80
-    protocol            = "HTTP"
-    healthy_threshold   = 5
-    unhealthy_threshold = 5
-    matcher             = "200"
-  }
+  subnets = [
+    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
+  ]
 }
 
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-1-ue1-artifactory1_1_only-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_1_only_target_group.arn}"
-  target_id        = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
-  port             = 80
-}
-
-resource "aws_alb_target_group" "artifactory_artifactory1_2_only_target_group" {
-  name     = "artifactory1-2-only-target-group"
+resource "aws_alb_target_group" "private_artifactory_all_hosts_target_group" {
+  name     = "artifactory-host-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.artifactory_integration.id}"
@@ -718,83 +707,46 @@ resource "aws_alb_target_group" "artifactory_artifactory1_2_only_target_group" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-2-ue1-artifactory1_2_only-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_2_only_target_group.arn}"
+resource "aws_alb_listener" "private_alb_all_hosts_http" {
+  load_balancer_arn = "${aws_alb.artifactory_private_alb.arn}"
+  port              = 80
+  protocol          = "HTTP"
+
+  "default_action" {
+    target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_listener" "private_alb_all_hosts_https" {
+  load_balancer_arn = "${aws_alb.artifactory_private_alb.arn}"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2015-05"
+  certificate_arn   = "arn:aws:iam::364709603225:server-certificate/dev.pardot.com-2016-with-intermediate"
+
+  "default_action" {
+    target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_target_group_attachment" "private_pardot0-artifactory1-1-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
+  target_id        = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
+  port             = 80
+}
+
+resource "aws_alb_target_group_attachment" "private_pardot0-artifactory1-2-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
   target_id        = "${aws_instance.pardot0-artifactory1-2-ue1.id}"
   port             = 80
 }
 
-resource "aws_alb_target_group" "artifactory_artifactory1_3_only_target_group" {
-  name     = "artifactory1-3-only-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = "${aws_vpc.artifactory_integration.id}"
-
-  stickiness {
-    type            = "lb_cookie"
-    cookie_duration = "86400"     #1 DAY
-  }
-
-  health_check {
-    interval            = "60"
-    path                = "/artifactory/api/system/ping"
-    port                = 80
-    protocol            = "HTTP"
-    healthy_threshold   = 5
-    unhealthy_threshold = 5
-    matcher             = "200"
-  }
-}
-
-resource "aws_alb_target_group_attachment" "pardot0-artifactory1-3-ue1-artifactory1_3_only-attachment" {
-  target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_3_only_target_group.arn}"
+resource "aws_alb_target_group_attachment" "private_pardot0-artifactory1-3-ue1_allhosts_attachment" {
+  target_group_arn = "${aws_alb_target_group.private_artifactory_all_hosts_target_group.arn}"
   target_id        = "${aws_instance.pardot0-artifactory1-3-ue1.id}"
   port             = 80
-}
-
-resource "aws_alb_listener_rule" "artifactory_host_1-1_alb_rule" {
-  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
-  priority     = 100
-
-  action {
-    type             = "forward"
-    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_1_only_target_group.arn}"
-  }
-
-  condition {
-    field  = "path-pattern"
-    values = ["/artifactory1/*"]
-  }
-}
-
-resource "aws_alb_listener_rule" "artifactory_host_1-2_alb_rule" {
-  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
-  priority     = 101
-
-  action {
-    type             = "forward"
-    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_2_only_target_group.arn}"
-  }
-
-  condition {
-    field  = "path-pattern"
-    values = ["/artifactory2/*"]
-  }
-}
-
-resource "aws_alb_listener_rule" "artifactory_host_1-3_alb_rule" {
-  listener_arn = "${aws_alb_listener.public_alb_all_hosts_https.arn}"
-  priority     = 102
-
-  action {
-    type             = "forward"
-    target_group_arn = "${aws_alb_target_group.artifactory_artifactory1_3_only_target_group.arn}"
-  }
-
-  condition {
-    field  = "path-pattern"
-    values = ["/artifactory3/*"]
-  }
 }
 
 resource "aws_security_group" "artifactory_efs_access_security_group" {
