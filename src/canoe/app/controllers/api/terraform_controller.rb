@@ -33,7 +33,7 @@ module Api
     private
 
     def require_phone_authentication
-      if !current_user.authenticate_phone
+      if !current_user.authenticate_phone(action: phone_auth_action)
         render status: 401, json: TerraformDeployResponse.authentication_required.as_json
         return false
       end
@@ -42,6 +42,15 @@ module Api
     def require_terraform_project
       unless terraform_project
         render status: 404, json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
+      end
+    end
+
+    def phone_auth_action
+      case params[:action]
+      when "deploy"
+        "Deploy terraform project #{terraform_project.name}"
+      when "unlock"
+        "Unlock terraform project #{terraform_project.name}"
       end
     end
 

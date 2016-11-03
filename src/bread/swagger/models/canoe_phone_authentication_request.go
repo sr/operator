@@ -13,6 +13,9 @@ import (
 // swagger:model canoePhoneAuthenticationRequest
 type CanoePhoneAuthenticationRequest struct {
 
+	// action
+	Action string `json:"action,omitempty"`
+
 	// user email
 	UserEmail string `json:"user_email,omitempty"`
 }
