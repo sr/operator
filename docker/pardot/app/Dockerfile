@@ -30,6 +30,7 @@ RUN yum install -y https://www.percona.com/downloads/percona-release/redhat/0.1-
 RUN curl -s "https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.xz" | tar -xJ -C /usr --strip-components=1 && \
   npm install -g npm@${npm_version} && \
   npm install -g bower@${bower_version} && \
+  npm install -g bower-art-resolver@2.0.7 && \
   npm install -g yarn@${yarn_version} && \
   npm install -g grunt-cli
 

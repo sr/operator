@@ -12,6 +12,7 @@ RUN mkdir -p /app && \
   chown -R app: /app
 
 RUN npm install -g bower@1.7.9 && \
+  npm install -g bower-art-resolver@2.0.7 && \
   npm install -g yarn@0.16.1
 
 USER app
