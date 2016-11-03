@@ -1,3 +1,11 @@
 FROM docker.dev.pardot.com/base/bread/bread
 ENV PATH "/data/src/build:$PATH"
 RUN yum install -y which && yum clean all
+ENV BRAKEMAN_VERSION 3.4.1
+ENV RUBOCOP_VERSION 0.45.0
+RUN \
+  gem install \
+    --no-ri --no-rdoc \
+    --source "${RUBYGEMS_SOURCE}" \
+    "brakeman:${BRAKEMAN_VERSION}" \
+    "rubocop:${RUBOCOP_VERSION}"
