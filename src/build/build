@@ -101,6 +101,7 @@ docker_push() {
     props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP}|"
     props+="buildResults=${BAMBOO_BUILD_RESULTS_URL}|"
     props+="passedCI=true"
+    props+="dockerImage=${DOCKER_REPO_BREAD}/${app}/app:${tag}"
 
     manifest="pd-docker/build/bread/${app}/app/${tag}/manifest.json"
     apipath="api/storage/$manifest?properties=$props"
