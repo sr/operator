@@ -839,10 +839,10 @@ resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
   subnet_id      = "${aws_subnet.artifactory_integration_us_east_1e.id}"
 }
 
-#TODO: DELETE LEGACY AFTER SWITCHOVER
+#TODO: DELETE LEGACY AFTER SWITCHOVER IS FINAL
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
+  name    = "artifactory-legacy.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${var.legacy_artifactory_instance_ip}"]
   type    = "A"
   ttl     = "15"
@@ -856,8 +856,6 @@ resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" 
   ttl     = "15"
 }
 
-/*
-#TODO: UNCOMMENT THE NEW STUFF AFTER SWITCHOVER
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
@@ -865,5 +863,3 @@ resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
   type    = "CNAME"
   ttl     = "900"
 }
-*/
-
