@@ -33,7 +33,7 @@ module Api
 
     def require_terraform_project
       unless terraform_project
-        render status: 404, json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
+        render json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
       end
     end
 
