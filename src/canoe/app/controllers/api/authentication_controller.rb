@@ -1,7 +1,6 @@
 module Api
   class AuthenticationController < Controller
     skip_before_action :require_api_authentication
-    before_action :require_email_authentication
 
     cattr_accessor :max_tries, :sleep_interval
 
@@ -12,7 +11,13 @@ module Api
         return render(json: build_response(error: true, message: message))
       end
 
-      if !current_user.authenticate_phone(max_tries: max_tries, sleep_interval: sleep_interval)
+      options = {
+        action: proto_request.action,
+        max_tries: max_tries,
+        sleep_interval: sleep_interval
+      }
+
+      if !current_user.authenticate_phone(options)
         message = "Phone authentication failed for #{current_user.email.inspect}"
         return render \
           json: build_response(error: true, message: message)
@@ -22,6 +27,14 @@ module Api
     end
 
     private
+
+    def current_user
+      @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
+    end
+
+    def proto_request
+      @proto_request ||= Canoe::PhoneAuthenticationRequest.decode_json(request.body.read)
+    end
 
     def build_response(params)
       Canoe::PhoneAuthenticationResponse.new(params.merge(user_email: current_user.email)).as_json

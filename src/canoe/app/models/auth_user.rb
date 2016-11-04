@@ -22,7 +22,7 @@ class AuthUser < ApplicationRecord
   def authenticate_phone(options = {})
     max_tries = Integer(options[:max_tries] || DEFAULT_MAX_AUTH_TRIES)
     sleep_interval = Integer(options[:sleep_interval] || DEFAULT_MAX_AUTH_SLEEP_INTERVAL)
-    action = options.fetch(:action, DEFAULT_2FA_ACTION)
+    action = options[:action] || DEFAULT_2FA_ACTION
 
     if !phone.paired?
       return false
