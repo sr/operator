@@ -55,7 +55,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 			canoe.NewPhoneAuthenticationParams().
 				WithTimeout(30 * time.Second).
 				WithBody(&models.CanoePhoneAuthenticationRequest{
-					Action:    fmt.Sprintf("ChatOps command \"!%s %s\"", req.Call.Service, req.Call.Method),
+					Action:    "Chat command",
 					UserEmail: email,
 				}),
 		)
