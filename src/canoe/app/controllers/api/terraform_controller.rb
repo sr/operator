@@ -39,7 +39,7 @@ module Api
 
     def phone_auth_action
       case params[:action]
-      when "deploy"
+      when "create"
         "Deploy terraform project #{terraform_project.name}"
       when "unlock"
         "Unlock terraform project #{terraform_project.name}"
