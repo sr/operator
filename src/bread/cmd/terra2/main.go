@@ -126,7 +126,7 @@ func terra() (int, string) {
 	cmd.Stderr = os.Stderr
 	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
 	if err := cmd.Run(); err != nil {
-		return 1, ""
+		return 1, err.Error()
 	}
 	switch tf.Cmd {
 	case "plan":
