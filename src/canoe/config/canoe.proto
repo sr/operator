@@ -62,6 +62,7 @@ message TerraformDeployResponse {
 
 message PhoneAuthenticationRequest {
 	string user_email = 1;
+	string action = 2;
 }
 
 message PhoneAuthenticationResponse {

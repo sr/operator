@@ -30,8 +30,8 @@ RSpec.describe DeployTarget do
     expect(user.phone.paired?).to eq(true)
 
     Canoe.salesforce_authenticator.authentication_status = { granted: false }
-    expect(user.authenticate_phone(1, 0)).to eq(false)
+    expect(user.authenticate_phone(max_interval: 1, sleep_interval: 0)).to eq(false)
     Canoe.salesforce_authenticator.authentication_status = { granted: true }
-    expect(user.authenticate_phone(1, 0)).to eq(true)
+    expect(user.authenticate_phone(max_interval: 1, sleep_interval: 0)).to eq(true)
   end
 end
