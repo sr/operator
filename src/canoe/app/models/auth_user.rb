@@ -28,7 +28,7 @@ class AuthUser < ApplicationRecord
       return false
     end
 
-    auth = Canoe.salesforce_authenticator.initiate_authentication(phone.pairing_id, action: action)
+    auth = Canoe.salesforce_authenticator.initiate_authentication(phone.pairing_id, action_name: action)
 
     if !auth.success?
       return false
