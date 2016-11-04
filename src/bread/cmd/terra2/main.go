@@ -185,12 +185,12 @@ func terra() (int, string) {
 			return 1, "required flag missing: terraform-project"
 		}
 		if _, err := client.UnlockTerraformProject(
-			canoe.NewUnlockTerraformProjectParams().WithBody(
-				&models.CanoeUnlockTerraformProjectRequest{
+			canoe.NewUnlockTerraformProjectParams().
+				WithTimeout(bread.CanoeTimeout).
+				WithBody(&models.CanoeUnlockTerraformProjectRequest{
 					UserEmail: canoeUser,
 					Project:   tf.Project,
-				},
-			),
+				}),
 		); err != nil {
 			return 1, fmt.Sprintf("Could not unlock Terraform project: %s\n", err)
 		}
@@ -236,15 +236,15 @@ func plan(tf *terraform) (int, string) {
 
 func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser string) error {
 	resp, err := client.CreateTerraformDeploy(
-		canoe.NewCreateTerraformDeployParams().WithBody(
-			&models.CanoeCreateTerraformDeployRequest{
+		canoe.NewCreateTerraformDeployParams().
+			WithTimeout(bread.CanoeTimeout).
+			WithBody(&models.CanoeCreateTerraformDeployRequest{
 				UserEmail:        canoeUser,
 				Project:          tf.Project,
 				Branch:           git.Branch,
 				Commit:           git.SHA1,
 				TerraformVersion: strings.TrimSpace(tf.Version),
-			},
-		),
+			}),
 	)
 	if err != nil {
 		return fmt.Errorf("canoe request failed: %v", err)
@@ -276,15 +276,15 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 		success = true
 	}
 	if _, err := client.CompleteTerraformDeploy(
-		canoe.NewCompleteTerraformDeployParams().WithBody(
-			&models.CanoeCompleteTerraformDeployRequest{
+		canoe.NewCompleteTerraformDeployParams().
+			WithTimeout(bread.CanoeTimeout).
+			WithBody(&models.CanoeCompleteTerraformDeployRequest{
 				UserEmail:  canoeUser,
 				DeployID:   resp.Payload.DeployID,
 				Successful: success,
 				RequestID:  resp.Payload.RequestID,
 				Project:    resp.Payload.Project,
-			},
-		),
+			}),
 	); err != nil {
 		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project: %s\n", program, err)
 	}

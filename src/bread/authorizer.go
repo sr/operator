@@ -53,7 +53,7 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 	if !entry.PhoneAuthOptional {
 		resp, err := a.canoe.PhoneAuthentication(
 			canoe.NewPhoneAuthenticationParams().
-				WithTimeout(30 * time.Second).
+				WithTimeout(CanoeTimeout).
 				WithBody(&models.CanoePhoneAuthenticationRequest{
 					Action:    "Chat command",
 					UserEmail: email,
