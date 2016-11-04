@@ -90,7 +90,7 @@ class DeploysController < ApplicationController
   end
 
   def force_to_complete
-    deploy_workflow_for(current_deploy).fail_deploy_on_initiated_servers
+    deploy_workflow_for(current_deploy).fail_deploy_on_undeployed_servers
     redirect_to project_deploy_path(current_project.name, current_deploy.id, watching: "1")
   end
 
