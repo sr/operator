@@ -1,3 +1,7 @@
+ENV["CANOE_URL"] = "http://canoe.test"
+ENV["CANOE_API_TOKEN"] = "faketoken"
+ENV["ARTIFACTORY_TOKEN"] = "faketoken"
+
 $LOAD_PATH.unshift File.realpath(File.join(File.dirname(__FILE__), "..", "lib"))
 require "pardot/pull_agent"
 require "tmpdir"

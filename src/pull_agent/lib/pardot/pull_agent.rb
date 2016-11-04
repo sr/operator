@@ -36,6 +36,15 @@ require "pardot/pull_agent/play_dead_controller"
 require "pardot/pull_agent/upstart_service_controller"
 require "pardot/pull_agent/dropwizard_service_controller"
 
+require "pardot/pull_agent/errors"
+require "pardot/pull_agent/global_configuration"
+require "pardot/pull_agent/artifact_fetcher"
+require "pardot/pull_agent/release_directory"
+require "pardot/pull_agent/quick_rollback"
+require "pardot/pull_agent/directory_synchronizer"
+require "pardot/pull_agent/deployer_registry"
+require "pardot/pull_agent/deployers/pardot"
+
 module Pardot
   module PullAgent
   end

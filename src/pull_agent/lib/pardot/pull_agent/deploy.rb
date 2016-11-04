@@ -24,6 +24,10 @@ module Pardot
         end
       end
 
+      def to_build_version
+        BuildVersion.new(build_number, sha, artifact_url)
+      end
+
       def servers
         server_actions.keys
       end

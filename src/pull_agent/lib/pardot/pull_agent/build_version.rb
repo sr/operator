@@ -13,6 +13,12 @@
 module Pardot
   module PullAgent
     BuildVersion = Struct.new(:build_number, :sha, :artifact_url) do
+      TYPICAL_FILENAME = "build.version".freeze
+
+      def self.load_from_directory(directory)
+        load(File.join(directory.to_s, TYPICAL_FILENAME))
+      end
+
       # Loads the current build version information from a file
       def self.load(filename)
         File.open(filename, "r") do |f|
@@ -30,6 +36,10 @@ module Pardot
 
       def to_s
         ["build#{build_number}", sha, artifact_url].join("\n")
+      end
+
+      def save_to_directory(directory)
+        save_to_file(File.join(directory, TYPICAL_FILENAME))
       end
 
       def save_to_file(filename)

@@ -5,7 +5,7 @@ describe "pull-agent executable" do
 
   it "exits non-zero and shows usage when environment is not given" do
     _r, w = IO.pipe
-    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, out: w, err: w)
+    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_NO_SLEEP" => "1", "PULL_AGENT_ENV" => "test"), BIN, out: w, err: w)
     w.close
     _, status = Process.wait2(pid)
 
@@ -14,7 +14,7 @@ describe "pull-agent executable" do
 
   it "exits non-zero and shows usage when app is not given" do
     _r, w = IO.pipe
-    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, "dev", out: w, err: w)
+    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_NO_SLEEP" => "1", "PULL_AGENT_ENV" => "test"), BIN, "dev", out: w, err: w)
     w.close
     _, status = Process.wait2(pid)
 
@@ -23,7 +23,7 @@ describe "pull-agent executable" do
 
   it "exits successfully when both environment and app are given" do
     _r, w = IO.pipe
-    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_ENV" => "test"), BIN, "dev", "pardot", out: w, err: w)
+    pid = Process.spawn(ENV.to_hash.merge("PULL_AGENT_NO_SLEEP" => "1", "PULL_AGENT_ENV" => "test"), BIN, "dev", "pardot", out: w, err: w)
     w.close
     _, status = Process.wait2(pid)
 
@@ -33,6 +33,7 @@ describe "pull-agent executable" do
   it "exists non-zero if PULL_AGENT_CONFIG_FILE is set and points to a non-existing file" do
     r, w = IO.pipe
     env = ENV.to_hash.merge(
+      "PULL_AGENT_NO_SLEEP" => "1",
       "PULL_AGENT_ENV" => "test",
       "PULL_AGENT_CONFIG_FILE" => "/boom/town.yml"
     )

@@ -14,8 +14,6 @@ describe "ignoring deploys marked completed" do
 
   it "exits immediately without changing anything" do
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
-    cli.parse_arguments!
-    cli.environment.payload.options[:repo_path] = tempdir
 
     output = capturing_stdout { cli.checkin }
     expect(output).to match(/Nothing to do for this deploy/)

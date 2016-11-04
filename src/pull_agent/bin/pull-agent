@@ -8,16 +8,14 @@ proxy_selector = Pardot::PullAgent::ProxySelector.new
 proxy_selector.configure_random_proxy
 
 cli = Pardot::PullAgent::CLI.new
-cli.parse_arguments!
-environment = cli.environment
 
 # Wait a random number of seconds, since cron can't be set by second
-if !environment.dev? && !ENV.key?("PULL_AGENT_NO_SLEEP")
+if cli.environment == "dev" && !ENV.key?("PULL_AGENT_NO_SLEEP")
   sleep(rand * 60)
 end
 
 # TODO(sr) Remove this and setup a real end-to-end test that hits a Canoe server
-if environment.dev? && ENV["PULL_AGENT_ENV"] == "test"
+if cli.environment == "dev" && ENV["PULL_AGENT_ENV"] == "test"
   exit 0
 end
 

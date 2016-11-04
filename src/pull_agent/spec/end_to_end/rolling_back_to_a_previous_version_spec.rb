@@ -13,6 +13,8 @@ describe "rollback back to a previous version" do
 
   # The second build is deployed, and we're stubbing out a revert deploy back to the first build.
   before do
+    ENV["RELEASE_DIRECTORY"] = tempdir
+
     stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{first_artifact_url}","build_number":#{first_build_number},"created_at":"2015-12-20T14:26:29-05:00", "servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
@@ -31,11 +33,9 @@ describe "rollback back to a previous version" do
 
   it "rapidly changes the symlink back to the previous version" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-                    .to_return(status: 200)
+      .to_return(status: 200)
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])
-    cli.parse_arguments!
-    cli.environment.payload.options[:repo_path] = tempdir
 
     expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
     _output = capturing_stdout { cli.checkin }
