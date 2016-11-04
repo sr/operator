@@ -861,5 +861,5 @@ resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
   name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_alb.artifactory_private_alb.dns_name}"]
   type    = "CNAME"
-  ttl     = "900"
+  ttl     = "15"
 }
