@@ -852,9 +852,10 @@ resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" 
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_elb.artifact_cache_lb.dns_name}"]
-#  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
-  type    = "CNAME"
-  ttl     = "15"
+
+  #  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
+  type = "CNAME"
+  ttl  = "15"
 }
 
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
@@ -874,3 +875,4 @@ resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
   ttl     = "15"
 }
 */
+
