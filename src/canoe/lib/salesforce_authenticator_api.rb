@@ -16,7 +16,7 @@ class SalesforceAuthenticatorAPI
       Response.new(fake_response(enabled: true))
     end
 
-    def initiate_authentication(_pairing_id)
+    def initiate_authentication(_pairing_id, _options = {})
       Response.new(fake_response)
     end
 
@@ -95,14 +95,14 @@ class SalesforceAuthenticatorAPI
     Response.new(response)
   end
 
-  def initiate_authentication(pairing_id)
+  def initiate_authentication(pairing_id, options = {})
     if pairing_id.to_s.empty?
       raise ArgumentError, "malformed pairing_id: #{pairing_id.inspect}"
     end
 
     response = access_token.post(
       BASE_URL + "/authentication_requests/initiate",
-      { pairing_id: pairing_id },
+      options.merge(pairing_id: pairing_id),
       HEADERS
     )
 
