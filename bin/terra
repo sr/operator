@@ -2,6 +2,7 @@
 #/ Usage: terra [--help] [arguments...]
 #/        terra plan <account>
 #/        terra apply <account>
+#/        terra unlock <account>
 #/        terra fmt
 #/        terra pull <account>
 #/        terra push <account>
@@ -50,7 +51,7 @@ export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
 go install github.com/hashicorp/terraform
 
 case "$action" in
-  apply|plan)
+  apply|unlock|plan)
     go install bread/cmd/terra2
 
     artifactoryenv="src/terraform/artifactory.env"
