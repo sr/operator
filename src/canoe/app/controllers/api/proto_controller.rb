@@ -8,7 +8,7 @@ module Api
     private
 
     def require_api_authentication
-      provided_api_token = request.headers["X-Api-Token"].presence || params[:api_token].presence
+      provided_api_token = request.headers["X-Api-Token"]
       if ENV["API_AUTH_TOKEN"].nil? || provided_api_token.nil? || !Rack::Utils.secure_compare(ENV["API_AUTH_TOKEN"], provided_api_token)
         render status: 401, json: { error: true, message: "Invalid auth token" }
         false
@@ -17,7 +17,7 @@ module Api
 
     def require_email_authentication
       unless current_user
-        message = "No user with email #{params[:user_email].inspect}. " \
+        message = "No user with email #{proto_request.user_email.inspect}. " \
           "You may need to sign into Canoe first."
         render status: 401, json: { error: true, message: message }
 
