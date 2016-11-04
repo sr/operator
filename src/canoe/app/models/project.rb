@@ -97,8 +97,11 @@ class Project < ApplicationRecord
     conditions = [
       { "repo"       => { "$eq"    => ARTIFACTORY_REPO } },
       { "@gitRepo"   => { "$match" => "*/#{repository}.git" } },
-      { "@gitBranch" => { "$eq"    => branch } },
     ]
+
+    if branch.present?
+      conditions << { "@gitBranch" => { "$eq" => branch } }
+    end
 
     if bamboo_project
       conditions << { "@bambooProject" => { "$eq"    => bamboo_project } }
