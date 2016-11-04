@@ -31,7 +31,7 @@ const (
 	TestingRoom  = 882 // BREAD Testing
 	PublicRoom   = 42  // Build & Automate
 	LDAPBase     = "dc=pardot,dc=com"
-	CanoeTimeout = 30 * time.Second
+	CanoeTimeout = 35 * time.Second
 )
 
 var (
