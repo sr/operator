@@ -184,15 +184,19 @@ func terra() (int, string) {
 		if tf.Project == "" {
 			return 1, "required flag missing: terraform-project"
 		}
-		if _, err := client.UnlockTerraformProject(
-			canoe.NewUnlockTerraformProjectParams().
-				WithTimeout(bread.CanoeTimeout).
-				WithBody(&models.CanoeUnlockTerraformProjectRequest{
+		resp, err := client.UnlockTerraformProject(
+			canoe.NewUnlockTerraformProjectParams().WithBody(
+				&models.CanoeUnlockTerraformProjectRequest{
 					UserEmail: canoeUser,
 					Project:   tf.Project,
-				}),
-		); err != nil {
-			return 1, fmt.Sprintf("Could not unlock Terraform project: %s\n", err)
+				},
+			),
+		)
+		if err != nil {
+			return 1, "Could not unlock Terraform project"
+		}
+		if resp.Payload.Error {
+			return 1, resp.Payload.Message
 		}
 		return 0, ""
 	default:
@@ -247,13 +251,13 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 			}),
 	)
 	if err != nil {
-		return fmt.Errorf("canoe request failed: %v", err)
+		return errors.New("Could not lock terraform project")
 	}
 	if resp.Payload.Error {
 		return errors.New(resp.Payload.Message)
 	}
 	if resp.Payload.DeployID == 0 {
-		return errors.New("canoe API response did not include a URL for completing the deploy")
+		return errors.New("Canoe API response did not include a URL for completing the deploy")
 	}
 	cmd := exec.Command(tf.Exec, "apply", tf.PlanFile)
 	cmd.Stdout = os.Stdout
@@ -275,7 +279,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 	} else {
 		success = true
 	}
-	if _, err := client.CompleteTerraformDeploy(
+	completeResp, err := client.CompleteTerraformDeploy(
 		canoe.NewCompleteTerraformDeployParams().
 			WithTimeout(bread.CanoeTimeout).
 			WithBody(&models.CanoeCompleteTerraformDeployRequest{
@@ -285,8 +289,11 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 				RequestID:  resp.Payload.RequestID,
 				Project:    resp.Payload.Project,
 			}),
-	); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project: %s\n", program, err)
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project\n", program)
+	} else if completeResp.Payload.Error {
+		fmt.Fprintf(os.Stderr, "%s: %s\n", program, completeResp.Payload.Message)
 	}
 	return terraErr
 }
