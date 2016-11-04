@@ -17,7 +17,7 @@ import (
 	"syscall"
 )
 
-const program = "terra2"
+const program = "terra"
 
 var reTerraVersion = regexp.MustCompile("v([0-9.]*)")
 
