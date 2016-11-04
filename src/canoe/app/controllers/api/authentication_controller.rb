@@ -1,7 +1,5 @@
 module Api
-  class AuthenticationController < Controller
-    skip_before_action :require_api_authentication
-
+  class AuthenticationController < ProtoController
     cattr_accessor :max_tries, :sleep_interval
 
     def phone
@@ -27,10 +25,6 @@ module Api
     end
 
     private
-
-    def current_user
-      @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
-    end
 
     def proto_request
       @proto_request ||= Canoe::PhoneAuthenticationRequest.decode_json(request.body.read)

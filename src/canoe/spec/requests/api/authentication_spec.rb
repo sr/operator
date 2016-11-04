@@ -10,7 +10,10 @@ RSpec.describe "Authentication API" do
 
   def authenticate(email)
     request = Canoe::PhoneAuthenticationRequest.new(user_email: email)
-    post "/api/grpc/phone_authentication", params: request.as_json, as: :json
+    post "/api/grpc/phone_authentication",
+      headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] },
+      params: request.as_json,
+      as: :json
   end
 
   def auth_response

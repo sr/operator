@@ -1,7 +1,6 @@
 module Api
-  class TerraformController < Controller
+  class TerraformController < ProtoController
     skip_before_action :require_api_authentication
-    before_action :require_email_authentication
     before_action :require_phone_authentication, only: [:create, :unlock]
     before_action :require_terraform_project
 
@@ -32,13 +31,6 @@ module Api
 
     private
 
-    def require_phone_authentication
-      if !current_user.authenticate_phone(action: phone_auth_action)
-        render status: 401, json: TerraformDeployResponse.authentication_required.as_json
-        return false
-      end
-    end
-
     def require_terraform_project
       unless terraform_project
         render status: 404, json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
@@ -60,10 +52,6 @@ module Api
       end
 
       @terraform_project = TerraformProject.find_by_name(proto_request.project)
-    end
-
-    def current_user
-      @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
     end
 
     def proto_request
