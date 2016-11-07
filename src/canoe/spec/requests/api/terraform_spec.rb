@@ -20,7 +20,8 @@ RSpec.describe "Terraform API" do
       sha: "sha1",
       branch: "master",
       state: GithubRepository::SUCCESS,
-      updated_at: Time.current
+      updated_at: Time.current,
+      compare_status: GithubRepository::AHEAD
     }
     GithubRepository::Build.new(defaults.merge(attributes))
   end
@@ -88,16 +89,25 @@ RSpec.describe "Terraform API" do
     expect(deploy_response["message"]).to eq("Unknown Terraform project: \"aws/boomtown\"")
   end
 
-  it "returns an error non-successful commit status" do
+  it "returns an error if the commit status is pending" do
     @github_repo.current_build = build_build(state: GithubRepository::PENDING)
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
+  end
 
+  it "returns an error if the commit status is failure" do
     @github_repo.current_build = build_build(state: GithubRepository::FAILURE)
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
+  end
+
+  it "returns an error if the commit is behind master" do
+    @github_repo.current_build = build_build(compare_status: GithubRepository::BEHIND)
+    create_deploy project: "aws/pardotops"
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to include("is not up to date")
   end
 
   it "returns an error if the project is locked" do
