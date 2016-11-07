@@ -13,15 +13,16 @@ module Pardot
     #   |- A
     #   |- B
     class ReleaseDirectory
-      def initialize(parent_directory)
+      def initialize(parent_directory, current_symlink: "current")
         @parent_directory = Pathname.new(parent_directory)
+        @current_symlink = current_symlink
 
         @a_directory = @parent_directory.join("releases/A")
         @b_directory = @parent_directory.join("releases/B")
       end
 
       def current_symlink
-        @parent_directory.join("current")
+        @parent_directory.join(@current_symlink)
       end
 
       def live_directory
@@ -36,9 +37,15 @@ module Pardot
       end
 
       def make_standby_directory_live
-        temp_current_symlink = @parent_directory.join("current_temp")
-        FileUtils.ln_sf(standby_directory, temp_current_symlink)
-        File.rename(temp_current_symlink, current_symlink)
+        AtomicSymlink.create!(standby_directory, current_symlink)
+      end
+
+      def to_s
+        @parent_directory.to_s
+      end
+
+      def to_str
+        @parent_directory.to_s
       end
     end
   end

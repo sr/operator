@@ -1,6 +1,6 @@
 module Pardot
   module PullAgent
-    class UpstartServiceController
+    class UpstartService
       def initialize(service_name, shell_executor: ShellExecutor.new)
         @service_name = service_name
         @shell_executor = shell_executor

@@ -34,9 +34,7 @@ module Pardot
 
         def perform_deploy
           quick_rollback = QuickRollback.new(release_directory, @deploy)
-          if quick_rollback.perform_if_applicable
-            # Quick rollback performed. Nothing else to do
-          else
+          unless quick_rollback.perform_if_applicable
             Dir.mktmpdir do |temp_dir|
               fetcher = ArtifactFetcher.new(@deploy.artifact_url)
               fetcher.fetch_into(temp_dir)

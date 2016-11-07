@@ -1,14 +1,5 @@
 module Pardot
   module PullAgent
-    # module to include in the proper environments for required hooks
-    module SalesEdgeEnvModule
-      def restart_salesedge
-        se = SalesEdge.new
-        se.debugging = true
-        se.restart!
-      end
-    end
-
     class SalesEdge
       attr_accessor :debugging
 
