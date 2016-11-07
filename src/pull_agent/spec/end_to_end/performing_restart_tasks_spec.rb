@@ -22,13 +22,12 @@ describe "performing restart tasks" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)
 
-
     # Restarting redisjobs
     stub_request(:get, "http://127.0.0.1:8383/v1/service/redis-job-1")
       .to_return(body: %([{"payload":{"role":"master"},"address":"redis.example","port":1234}]))
     expect(Pardot::PullAgent::Redis).to receive(:bounce_redis_jobs)
       .with("redis.example", 1234)
-    stub_request(:get, %r{http://127.0.0.1:8383/v1/service/redis-job-[2-9]})
+    stub_request(:get, /http:\/\/127.0.0.1:8383\/v1\/service\/redis-job-[2-9]/)
       .to_return(body: %([]))
 
     # Restarting old style jobs
@@ -38,11 +37,11 @@ describe "performing restart tasks" do
     # Restarting autojobs
     stub_request(:get, "http://127.0.0.1:8383/v1/service/redis-rules-cache-1")
       .to_return(body: %([{"payload":{"role":"master"},"address":"redis.example","port":1234}]))
-    %w(PerAccountAutomationWorker PerAccountAutomationWorker-timed automationRelatedObjectWorkers previewWorkers).each do |worker_type|
+    %w[PerAccountAutomationWorker PerAccountAutomationWorker-timed automationRelatedObjectWorkers previewWorkers].each do |worker_type|
       expect(Pardot::PullAgent::Redis).to receive(:bounce_workers)
         .with(worker_type, ["redis.example:1234"])
     end
-    stub_request(:get, %r{http://127.0.0.1:8383/v1/service/redis-rules-cache-[2-9]})
+    stub_request(:get, /http:\/\/127.0.0.1:8383\/v1\/service\/redis-rules-cache-[2-9]/)
       .to_return(body: %([]))
 
     cli = Pardot::PullAgent::CLI.new(%w[test pardot])

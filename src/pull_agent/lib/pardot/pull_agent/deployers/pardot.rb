@@ -73,7 +73,7 @@ module Pardot
           disco = DiscoveryClient.new
           found = false
           (1..9).each do |i|
-            masters = disco.service("redis-job-#{i}").select { |s| p s; s["payload"] && s["payload"]["role"] == "master" }
+            masters = disco.service("redis-job-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
             masters.each do |master|
               found = true
               Redis.bounce_redis_jobs(master["address"], master["port"])
@@ -107,7 +107,6 @@ module Pardot
           # Restart automation preview workers
           redis.bounce_workers("previewWorkers", autojob_disco_master)
         end
-
 
         def release_directory
           @release_directory ||=
