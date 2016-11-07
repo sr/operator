@@ -50,11 +50,11 @@ module Api
         return @terraform_project
       end
 
-      @terraform_project = TerraformProject.find_by_name(proto_request.project)
+      @terraform_project = TerraformProject.find_by(name: proto_request.project)
     end
 
     def current_user
-      @terraform_current_user ||= AuthUser.find_by_email(proto_request.user_email)
+      @terraform_current_user ||= AuthUser.find_by(email: proto_request.user_email)
     end
 
     def proto_request

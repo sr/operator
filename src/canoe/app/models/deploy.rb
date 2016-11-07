@@ -98,7 +98,7 @@ class Deploy < ApplicationRecord
 
   # TODO: Replace the project_name column with project_id
   def project
-    Project.find_by_name(project_name)
+    Project.find_by(name: project_name)
   end
 
   def check_completed_status!
