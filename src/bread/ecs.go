@@ -247,10 +247,14 @@ func (d *ecsDeployer) doAQL(ctx context.Context, q string) ([]*afyItem, error) {
 	return data.Results, nil
 }
 
-// TODO(sr) This should be a property in Artifactory
 func (a *afyItem) GetID() string {
 	if a == nil || a.GetURL() == "" {
 		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "buildID" {
+			return p.Value
+		}
 	}
 	u, err := url.Parse(a.GetURL())
 	if err != nil {
@@ -278,7 +282,6 @@ func (a *afyItem) GetURL() string {
 
 const dockerRegistry = "docker.dev.pardot.com"
 
-// TODO(sr) This should be a property in Artifactory
 func (a *afyItem) GetArtifactURL() string {
 	if a == nil {
 		return ""
@@ -287,8 +290,8 @@ func (a *afyItem) GetArtifactURL() string {
 		return ""
 	}
 	for _, p := range a.Properties {
-		if p.Key == "dockerImage" {
-			return p.Value
+		if p.Key == "dockerImageRepository" {
+			return fmt.Sprintf("%s/%s:%s", dockerRegistry, p.Value, a.GetID())
 		}
 	}
 	// build/bread/hal9000/app/BREAD-BREAD-480

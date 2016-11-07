@@ -94,6 +94,7 @@ docker_push() {
     props="bambooProject=${CI_PROJECT}|"
     props+="bambooPlan=${CI_PLAN}|"
     props+="bambooJob=${CI_JOB}|"
+    props+="buildID=${CI_PROJECT}-${CI_PLAN}-${CI_JOB}-${CI_BUILD_NUMBER}|"
     props+="gitBranch=${CI_BRANCH}|"
     props+="gitRepo=${BAMBOO_REPO_URL}|"
     props+="gitSha=${sha1}|"
@@ -101,7 +102,7 @@ docker_push() {
     props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP}|"
     props+="buildResults=${BAMBOO_BUILD_RESULTS_URL}|"
     props+="passedCI=true"
-    props+="dockerImage=${DOCKER_REPO_BREAD}/${app}/app:${tag}"
+    props+="dockerImageRepository=${DOCKER_REPO_BREAD}/${app}/app"
 
     manifest="pd-docker/build/bread/${app}/app/${tag}/manifest.json"
     apipath="api/storage/$manifest?properties=$props"

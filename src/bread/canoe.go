@@ -27,6 +27,7 @@ type canoeProject struct {
 
 type canoeBuild struct {
 	ArtifactURL string    `json:"artifact_url"`
+	BuildID     string    `json:"build_id"`
 	RepoURL     string    `json:"repo_url"`
 	URL         string    `json:"url"`
 	Branch      string    `json:"branch"`
@@ -144,10 +145,12 @@ func (d *canoeDeployer) doCanoe(ctx context.Context, meth, path, body string) (*
 	return resp, nil
 }
 
-// TODO(sr) This should be a property in Artifactory
 func (a *canoeBuild) GetID() string {
 	if a == nil || a.GetURL() == "" {
 		return ""
+	}
+	if a.BuildID != "" {
+		return a.BuildID
 	}
 	u, err := url.Parse(a.GetURL())
 	if err != nil {
