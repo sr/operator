@@ -119,7 +119,7 @@ module Pardot
               "prod-s"
             elsif @environment == "production"
               "prod"
-            elsif @environment == "staging" && ShellHelper.datacenter = "dfw"
+            elsif @environment == "staging" && ShellHelper.datacenter == "dfw"
               "staging-s"
             elsif @environment == "staging"
               "staging"
