@@ -29,7 +29,7 @@ class ChefDeliveryNotification
       color = RED
       message = "chef/master #{link_to(deploy)} failed to deploy to " \
         "#{deploy.datacenter}/#{deploy.environment} " \
-        "on host #{deploy.hostname} /cc @sr" \
+        "on host #{deploy.hostname}" \
         "<br/><pre>#{error_message}</pre>"
     end
 

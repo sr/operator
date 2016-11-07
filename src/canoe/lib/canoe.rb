@@ -32,6 +32,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "canoe.PhoneAuthenticationRequest" do
     optional :user_email, :string, 1
+    optional :action, :string, 2
   end
   add_message "canoe.PhoneAuthenticationResponse" do
     optional :error, :bool, 1

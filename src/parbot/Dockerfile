@@ -1,12 +1,6 @@
-FROM docker.dev.pardot.com/base/bread/node:0.10
+FROM docker.dev.pardot.com/base/node:4
 MAINTAINER pd-bread@salesforce.com
-RUN apt-get update \
-  && \
-    apt-get install -y --no-install-recommends \
-      build-essential \
-      libicu-dev \
-  && rm -rf /var/lib/apt/lists/* \
-  && rm -rf /var/cache
+
 RUN npm install -g coffeelint jslint
 RUN mkdir -p /app
 WORKDIR /app
