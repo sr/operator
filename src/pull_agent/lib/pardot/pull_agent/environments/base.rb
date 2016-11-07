@@ -165,47 +165,6 @@ module Pardot
           Canoe.notify_server(self, deploy)
         end
 
-        def restart_autojobs(_deploy, disco = DiscoveryClient.new, redis = ::Pardot::PullAgent::Redis)
-          Logger.log(:info, "Querying the disco service to find redis rule cache masters")
-
-          autojob_disco_master = (1..9).flat_map { |i|
-            disco.service("redis-rules-cache-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-          }.map { |s| [s["address"], s["port"]].join(":") }
-
-          # Restart per account automation workers
-          redis.bounce_workers("PerAccountAutomationWorker", autojob_disco_master)
-          # Restart timed automation workers
-          redis.bounce_workers("PerAccountAutomationWorker-timed", autojob_disco_master)
-          # Restart related object workers
-          redis.bounce_workers("automationRelatedObjectWorkers", autojob_disco_master)
-          # Restart automation preview workers
-          redis.bounce_workers("previewWorkers", autojob_disco_master)
-        end
-
-        def restart_old_style_jobs
-          cmd = ["#{payload.current_link}/symfony-#{symfony_env}", "restart-old-jobs"]
-          output = ShellHelper.execute(cmd)
-          Logger.log(:info, "Restarted old style jobs (#{cmd}): #{output}")
-        end
-
-        def restart_redis_jobs
-          Logger.log(:info, "Querying the disco service to find redis job manager masters")
-
-          disco = DiscoveryClient.new
-          found = false
-          (1..9).each do |i|
-            masters = disco.service("redis-job-#{i}").select { |s| s["payload"] && s["payload"]["role"] == "master" }
-            masters.each do |master|
-              found = true
-              Redis.bounce_redis_jobs(master["address"], master["port"])
-            end
-          end
-
-          unless found
-            Logger.log(:warn, "No redis job manager masters were found")
-          end
-        end
-
         def restart_pithumbs_service
           restart_upstart_job("pithumbs")
         end

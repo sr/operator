@@ -6,7 +6,8 @@ module Pardot
       def initialize(args = ARGV)
         @arguments = args
         parse_arguments!
-        load_environment_configuration!
+
+        GlobalConfiguration.load(@environment).merge_into_environment
       end
 
       def checkin
@@ -18,7 +19,12 @@ module Pardot
         Logger.context[:deploy_id] = deploy.id
 
         if deploy.applies_to_this_server?
-          client_action(deploy)
+          if deploy.action.nil?
+            Logger.log(:debug, "Nothing to do for this deploy at this time")
+          else
+            deployer = DeployerRegistry.fetch(@project).new(@environment, deploy)
+            deployer.perform
+          end
         else
           Logger.log(:debug, "The deploy does not apply to this server")
         end
@@ -147,31 +153,6 @@ module Pardot
         else
           @environment, @project = @arguments
         end
-      end
-
-      def load_environment_configuration!
-        config = GlobalConfiguration.load(@environment)
-        [:canoe_api_token, :canoe_url, :artifactory_token].each do |option|
-          ENV[option.to_s.upcase] = config[option] if config[option]
-        end
-      end
-
-      def client_action(deploy)
-        case deploy.action
-        when "restart"
-          Logger.log(:info, "Executing restart tasks")
-          environment.conductor.restart!(deploy)
-          Canoe.notify_server(environment, deploy)
-        when "deploy"
-          deploy_action(deploy)
-        else
-          Logger.log(:debug, "Nothing to do for this deploy")
-        end
-      end
-
-      def deploy_action(deploy)
-        deployer = DeployerRegistry.fetch(@project).new(@environment, deploy)
-        deployer.perform
       end
 
       def usage
