@@ -1,4 +1,8 @@
 class GithubRepository
+  FAILURE = "failure".freeze
+  PENDING = "pending".freeze
+  SUCCESS = "success".freeze
+
   class Build
     def self.none
       new(url: nil, branch: nil, sha: nil, state: nil, updated_at: nil)
@@ -17,6 +21,10 @@ class GithubRepository
 
   class Fake
     attr_writer :current_build
+
+    def initialize(build = nil)
+      @current_build = build
+    end
 
     def current_build(_branch)
       @current_build

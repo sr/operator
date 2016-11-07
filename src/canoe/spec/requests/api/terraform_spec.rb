@@ -3,12 +3,26 @@ require "rails_helper"
 RSpec.describe "Terraform API" do
   before do
     @notifier = FakeHipchatNotifier.new
+    @github_repo = GithubRepository::Fake.new(build_build)
+
     TerraformProject.notifier = @notifier
     TerraformProject.required_version = "0.7.4"
+    TerraformProject.github_repository = @github_repo
 
     @project = TerraformProject.create!(name: "aws/pardotops", project: FactoryGirl.create(:project))
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @user.phone.create_pairing("boom town")
+  end
+
+  def build_build(attributes = {})
+    defaults = {
+      url: "https://github.com/builds/1",
+      sha: "sha1",
+      branch: "master",
+      state: GithubRepository::SUCCESS,
+      updated_at: Time.current
+    }
+    GithubRepository::Build.new(defaults.merge(attributes))
   end
 
   def create_deploy(params)
@@ -72,6 +86,18 @@ RSpec.describe "Terraform API" do
 
     expect(deploy_response["error"]).to eq(true)
     expect(deploy_response["message"]).to eq("Unknown Terraform project: \"aws/boomtown\"")
+  end
+
+  it "returns an error non-successful commit status" do
+    @github_repo.current_build = build_build(state: GithubRepository::PENDING)
+    create_deploy project: "aws/pardotops"
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
+
+    @github_repo.current_build = build_build(state: GithubRepository::FAILURE)
+    create_deploy project: "aws/pardotops"
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
   end
 
   it "returns an error if the project is locked" do
