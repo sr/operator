@@ -1,4 +1,5 @@
 module ApplicationHelper
+  # rubocop:disable Rails/OutputSafety
   def active?(type, value, output = " active")
     if type == value
       output.html_safe

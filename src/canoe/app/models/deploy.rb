@@ -40,6 +40,7 @@ class Deploy < ApplicationRecord
     IO.popen(["tail", "-n", lines.to_s, log_path], &:read)
   end
 
+  # rubocop:disable Rails/OutputSafety
   def log_contents_htmlized(show_all = false)
     contents = show_all ? log_contents : some_log_contents
     contents.gsub(/\n/, "<br>").html_safe

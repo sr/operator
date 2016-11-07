@@ -33,10 +33,12 @@ module Api
     private
 
     def require_phone_authentication
-      if !current_user.authenticate_phone
-        render status: 401, json: TerraformDeployResponse.authentication_required.as_json
-        return false
+      if current_user.authenticate_phone
+        return true
       end
+
+      render status: 401, json: TerraformDeployResponse.authentication_required.as_json
+      false
     end
 
     def require_terraform_project

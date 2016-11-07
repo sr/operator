@@ -71,7 +71,7 @@ module Pardot
                 request.basic_auth(::Artifactory.client.username, ::Artifactory.client.password)
               end
 
-              File.open(filename, "wb", 00600) do |f|
+              File.open(filename, "wb", 0o0600) do |f|
                 http.request(request) do |response|
                   if response.is_a?(Net::HTTPSuccess)
                     response.read_body do |fragment|

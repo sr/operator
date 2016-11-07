@@ -37,7 +37,7 @@ describe Pardot::PullAgent::Environments::Production do
     end
   end
 
-  describe '#restart_autojobs' do
+  describe "#restart_autojobs" do
     it "restarts autojob masters found via disco client" do
       env = Pardot::PullAgent::Environments.build(:production)
 

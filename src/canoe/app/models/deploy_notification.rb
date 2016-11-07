@@ -22,9 +22,12 @@ class DeployNotification < ApplicationRecord
       "#{build_link(deploy)} [#{server_msg}]"
 
     previous_deploy = deploy.deploy_target.previous_deploy(deploy)
-    msg += "<br>GitHub Diff: <a href='#{deploy.project.diff_url(previous_deploy, deploy)}'>" \
-      "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" \
-      "</a>" if previous_deploy
+
+    if previous_deploy
+      msg += "<br>GitHub Diff: <a href='#{deploy.project.diff_url(previous_deploy, deploy)}'>" \
+        "#{build_link(previous_deploy, false)} ... #{build_link(deploy, false)}" \
+        "</a>"
+    end
 
     notifier.notify_room(
       hipchat_room_id,
