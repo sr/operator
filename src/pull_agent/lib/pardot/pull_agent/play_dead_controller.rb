@@ -12,6 +12,9 @@ module Pardot
           req = Net::HTTP::Put.new("/admin-tools/ready")
           http.request(req).value
         end
+      rescue Errno::ECONNREFUSED
+        # The service is already dead as far as we know
+        true
       end
 
       def make_alive
