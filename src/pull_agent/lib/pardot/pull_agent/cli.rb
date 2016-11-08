@@ -6,11 +6,11 @@ module Pardot
       def initialize(args = ARGV)
         @arguments = args
         parse_arguments!
+
+        GlobalConfiguration.load(@environment).merge_into_environment
       end
 
       def checkin
-        GlobalConfiguration.load(@environment).merge_into_environment
-
         ENV["LOG_LEVEL"] = "7"
         Instrumentation.setup("pull-agent", @environment, log_stream: Logger)
 
