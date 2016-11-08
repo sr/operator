@@ -26,11 +26,12 @@ import (
 )
 
 const (
-	HipchatHost = "https://hipchat.dev.pardot.com"
-	RepoURL     = "https://git.dev.pardot.com/Pardot/bread"
-	TestingRoom = 882 // BREAD Testing
-	PublicRoom  = 42  // Build & Automate
-	LDAPBase    = "dc=pardot,dc=com"
+	HipchatHost  = "https://hipchat.dev.pardot.com"
+	RepoURL      = "https://git.dev.pardot.com/Pardot/bread"
+	TestingRoom  = 882 // BREAD Testing
+	PublicRoom   = 42  // Build & Automate
+	LDAPBase     = "dc=pardot,dc=com"
+	CanoeTimeout = 35 * time.Second
 )
 
 var (

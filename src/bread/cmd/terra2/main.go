@@ -17,7 +17,7 @@ import (
 	"syscall"
 )
 
-const program = "terra2"
+const program = "terra"
 
 var reTerraVersion = regexp.MustCompile("v([0-9.]*)")
 
@@ -126,7 +126,7 @@ func terra() (int, string) {
 	cmd.Stderr = os.Stderr
 	cmd.Dir = filepath.Join(tf.Dir, tf.Project)
 	if err := cmd.Run(); err != nil {
-		return 1, ""
+		return 1, err.Error()
 	}
 	switch tf.Cmd {
 	case "plan":
@@ -184,15 +184,19 @@ func terra() (int, string) {
 		if tf.Project == "" {
 			return 1, "required flag missing: terraform-project"
 		}
-		if _, err := client.UnlockTerraformProject(
+		resp, err := client.UnlockTerraformProject(
 			canoe.NewUnlockTerraformProjectParams().WithBody(
 				&models.CanoeUnlockTerraformProjectRequest{
 					UserEmail: canoeUser,
 					Project:   tf.Project,
 				},
 			),
-		); err != nil {
-			return 1, fmt.Sprintf("Could not unlock Terraform project: %s\n", err)
+		)
+		if err != nil {
+			return 1, "Could not unlock Terraform project"
+		}
+		if resp.Payload.Error {
+			return 1, resp.Payload.Message
 		}
 		return 0, ""
 	default:
@@ -236,24 +240,24 @@ func plan(tf *terraform) (int, string) {
 
 func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser string) error {
 	resp, err := client.CreateTerraformDeploy(
-		canoe.NewCreateTerraformDeployParams().WithBody(
-			&models.CanoeCreateTerraformDeployRequest{
+		canoe.NewCreateTerraformDeployParams().
+			WithTimeout(bread.CanoeTimeout).
+			WithBody(&models.CanoeCreateTerraformDeployRequest{
 				UserEmail:        canoeUser,
 				Project:          tf.Project,
 				Branch:           git.Branch,
 				Commit:           git.SHA1,
 				TerraformVersion: strings.TrimSpace(tf.Version),
-			},
-		),
+			}),
 	)
 	if err != nil {
-		return fmt.Errorf("canoe request failed: %v", err)
+		return errors.New("Could not lock terraform project")
 	}
 	if resp.Payload.Error {
 		return errors.New(resp.Payload.Message)
 	}
 	if resp.Payload.DeployID == 0 {
-		return errors.New("canoe API response did not include a URL for completing the deploy")
+		return errors.New("Canoe API response does not include a deploy ID")
 	}
 	cmd := exec.Command(tf.Exec, "apply", tf.PlanFile)
 	cmd.Stdout = os.Stdout
@@ -275,18 +279,21 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 	} else {
 		success = true
 	}
-	if _, err := client.CompleteTerraformDeploy(
-		canoe.NewCompleteTerraformDeployParams().WithBody(
-			&models.CanoeCompleteTerraformDeployRequest{
+	completeResp, err := client.CompleteTerraformDeploy(
+		canoe.NewCompleteTerraformDeployParams().
+			WithTimeout(bread.CanoeTimeout).
+			WithBody(&models.CanoeCompleteTerraformDeployRequest{
 				UserEmail:  canoeUser,
 				DeployID:   resp.Payload.DeployID,
 				Successful: success,
 				RequestID:  resp.Payload.RequestID,
 				Project:    resp.Payload.Project,
-			},
-		),
-	); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project: %s\n", program, err)
+			}),
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project\n", program)
+	} else if completeResp.Payload.Error {
+		fmt.Fprintf(os.Stderr, "%s: %s\n", program, completeResp.Payload.Message)
 	}
 	return terraErr
 }

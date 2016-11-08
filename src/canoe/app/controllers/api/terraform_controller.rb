@@ -33,16 +33,24 @@ module Api
 
     def require_terraform_project
       unless terraform_project
-        render status: 404, json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
+        render json: TerraformDeployResponse.unknown_project(proto_request.project).as_json
       end
     end
 
     def phone_auth_action
       case params[:action]
-      when "deploy"
-        "Deploy terraform project #{terraform_project.name}"
+      when "create"
+        if terraform_project
+          "Deploy terraform project #{terraform_project.name}"
+        else
+          "Terraform deploy"
+        end
       when "unlock"
-        "Unlock terraform project #{terraform_project.name}"
+        if terraform_project
+          "Unlock terraform project #{terraform_project.name}"
+        else
+          "Unlock terraform"
+        end
       end
     end
 
