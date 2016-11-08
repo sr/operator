@@ -6,11 +6,11 @@ module Pardot
       def initialize(args = ARGV)
         @arguments = args
         parse_arguments!
-
-        GlobalConfiguration.load(@environment).merge_into_environment
       end
 
       def checkin
+        GlobalConfiguration.load(@environment).merge_into_environment
+
         ENV["LOG_LEVEL"] = "7"
         Instrumentation.setup("pull-agent", @environment, log_stream: Logger)
 
@@ -51,18 +51,20 @@ module Pardot
             hostname.split("-")[3]
           end
 
+        GlobalConfiguration.load(environment).merge_into_environment
+
         request = {
           payload: JSON.dump(
             command: args,
             server: {
               datacenter: datacenter,
-              environment: environment.name,
+              environment: environment,
               hostname: hostname
             }
           )
         }
 
-        Canoe.knife(environment, request)
+        Canoe.knife(request)
       end
 
       private
