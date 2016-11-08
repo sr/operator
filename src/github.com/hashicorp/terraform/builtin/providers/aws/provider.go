@@ -144,7 +144,9 @@ func Provider() terraform.ResourceProvider {
 
 		DataSourcesMap: map[string]*schema.Resource{
 			"aws_ami":                      dataSourceAwsAmi(),
+			"aws_availability_zone":        dataSourceAwsAvailabilityZone(),
 			"aws_availability_zones":       dataSourceAwsAvailabilityZones(),
+			"aws_billing_service_account":  dataSourceAwsBillingServiceAccount(),
 			"aws_caller_identity":          dataSourceAwsCallerIdentity(),
 			"aws_cloudformation_stack":     dataSourceAwsCloudFormationStack(),
 			"aws_ecs_container_definition": dataSourceAwsEcsContainerDefinition(),
@@ -152,7 +154,10 @@ func Provider() terraform.ResourceProvider {
 			"aws_iam_policy_document":      dataSourceAwsIamPolicyDocument(),
 			"aws_ip_ranges":                dataSourceAwsIPRanges(),
 			"aws_redshift_service_account": dataSourceAwsRedshiftServiceAccount(),
+			"aws_region":                   dataSourceAwsRegion(),
 			"aws_s3_bucket_object":         dataSourceAwsS3BucketObject(),
+			"aws_subnet":                   dataSourceAwsSubnet(),
+			"aws_vpc":                      dataSourceAwsVpc(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -169,6 +174,7 @@ func Provider() terraform.ResourceProvider {
 			"aws_api_gateway_api_key":                      resourceAwsApiGatewayApiKey(),
 			"aws_api_gateway_authorizer":                   resourceAwsApiGatewayAuthorizer(),
 			"aws_api_gateway_base_path_mapping":            resourceAwsApiGatewayBasePathMapping(),
+			"aws_api_gateway_client_certificate":           resourceAwsApiGatewayClientCertificate(),
 			"aws_api_gateway_deployment":                   resourceAwsApiGatewayDeployment(),
 			"aws_api_gateway_domain_name":                  resourceAwsApiGatewayDomainName(),
 			"aws_api_gateway_integration":                  resourceAwsApiGatewayIntegration(),
@@ -233,6 +239,8 @@ func Provider() terraform.ResourceProvider {
 			"aws_elastictranscoder_preset":                 resourceAwsElasticTranscoderPreset(),
 			"aws_elb":                                      resourceAwsElb(),
 			"aws_elb_attachment":                           resourceAwsElbAttachment(),
+			"aws_emr_cluster":                              resourceAwsEMRCluster(),
+			"aws_emr_instance_group":                       resourceAwsEMRInstanceGroup(),
 			"aws_flow_log":                                 resourceAwsFlowLog(),
 			"aws_glacier_vault":                            resourceAwsGlacierVault(),
 			"aws_iam_access_key":                           resourceAwsIamAccessKey(),
