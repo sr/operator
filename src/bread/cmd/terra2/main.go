@@ -257,7 +257,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 		return errors.New(resp.Payload.Message)
 	}
 	if resp.Payload.DeployID == 0 {
-		return errors.New("Canoe API response did not include a URL for completing the deploy")
+		return errors.New("Canoe API response does not include a deploy ID")
 	}
 	cmd := exec.Command(tf.Exec, "apply", tf.PlanFile)
 	cmd.Stdout = os.Stdout
