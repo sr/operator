@@ -51,7 +51,7 @@ module Api
         return @terraform_project
       end
 
-      @terraform_project = TerraformProject.find_by_name(proto_request.project)
+      @terraform_project = TerraformProject.find_by(name: proto_request.project)
     end
 
     def proto_request

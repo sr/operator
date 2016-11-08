@@ -1,3 +1,4 @@
+# rubocop:disable Rails/OutputSafety
 module PaginationHelper
   def current_page
     @current_page ||= params.fetch(:page, "1").to_i
@@ -8,7 +9,7 @@ module PaginationHelper
   end
 
   def page_button(page_number, link)
-    css_class = (current_page == page_number) ? "active" : ""
+    css_class = current_page == page_number ? "active" : ""
     link_address = link_plus_page_param(link, page_number)
     onclick_action = (current_page == page_number ? "return false;" : "")
 

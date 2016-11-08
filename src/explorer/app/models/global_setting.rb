@@ -10,7 +10,7 @@ class GlobalSetting < ApplicationRecord
   SERVER_SETTING_2_ONLY = 4
 
   def self.secondary_db_id(shard_id)
-    setting = find_by_setting_key("#{Datacenter.current.symfony_name} shard#{shard_id} datacenter")
+    setting = find_by(setting_key: "#{Datacenter.current.symfony_name} shard#{shard_id} datacenter")
     db_state = Integer(setting.setting_value) if setting
 
     # The idea is to run Pardot Explorer on the secondary database, so the opposite of what the main

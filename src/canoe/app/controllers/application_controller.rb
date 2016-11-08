@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
     @current_user = \
       if session[:user_id]
         if session[:created_at] && Time.at(session[:created_at]) >= SESSION_EXPIRATION.ago
-          AuthUser.find_by_id(session[:user_id])
+          AuthUser.find_by(id: session[:user_id])
         else
           session.destroy
           nil
@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
     return @current_deploy if defined?(@current_deploy)
     @current_deploy =
       if id = params[:deploy_id] || params[:id]
-        deploy = Deploy.find_by_id(id.to_i)
+        deploy = Deploy.find_by(id: id.to_i)
         if deploy && params[:project_name].blank?
           # set the project name if it's not in the params hash already
           params[:project_name] = deploy.project_name
@@ -96,13 +96,13 @@ class ApplicationController < ActionController::Base
     return @current_project if defined?(@current_project)
     @current_project =
       if params[:project_name].present?
-        Project.find_by_name(params[:project_name].to_s)
+        Project.find_by(name: params[:project_name].to_s)
       elsif params[:repo_name].present? # backwards compatibility
-        Project.find_by_name(params[:repo_name].to_s)
+        Project.find_by(name: params[:repo_name].to_s)
       elsif params[:name].present?
-        Project.find_by_name(params[:name].to_s)
+        Project.find_by(name: params[:name].to_s)
       elsif current_deploy
-        Project.find_by_name(current_deploy.project_name)
+        Project.find_by(name: current_deploy.project_name)
       end
   end
   helper_method :current_project
