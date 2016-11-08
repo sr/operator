@@ -4,8 +4,9 @@ module Pardot
   module PullAgent
     class AtomicSymlink
       def self.create!(source, target)
-        source = source.to_s
-        target = target.to_s
+        source, target = source.to_s, target.to_s
+        raise ArgumentError, "source is empty" if source.empty?
+        raise ArgumentError, "target is empty" if target.empty?
 
         retries = 0
         begin
