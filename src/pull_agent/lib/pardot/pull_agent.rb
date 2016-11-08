@@ -6,7 +6,6 @@ require "securerandom"
 require "socket"
 require "yaml"
 
-require "artifactory"
 require "instrumentation"
 require "redis"
 
