@@ -11,6 +11,9 @@ module Pardot
       end
 
       def checkin
+        ENV["LOG_LEVEL"] = "7"
+        Instrumentation.setup("pull-agent", @environment, log_stream: Logger)
+
         if @project == "chef"
           return checkin_chef
         end
@@ -31,89 +34,7 @@ module Pardot
       end
 
       def checkin_chef
-        ENV["LOG_LEVEL"] = "7"
-        Instrumentation.setup("pull-agent", @environment, log_stream: Logger)
-
-        hostname = ShellHelper.hostname
-        repo_path = Pathname(payload.repo_path)
-        script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
-
-        datacenter =
-          if @environment
-            "local"
-          else
-            hostname.split("-")[3]
-          end
-
-        if !datacenter
-          Instrumentation.error(at: "chef", hostname: hostname)
-          return
-        end
-
-        env = {
-          "PATH" => "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch("PATH")}"
-        }
-
-        command = [script, "-d", repo_path.to_s, "status"]
-        output = ShellHelper.execute([env] + command)
-
-        if !$?.success?
-          Instrumentation.error(
-            at: "chef",
-            command: command,
-            output: output
-          )
-          return
-        end
-
-        payload = {
-          server: {
-            datacenter: datacenter,
-            environment: @environment,
-            hostname: hostname
-          },
-          checkout: JSON.parse(output)
-        }
-
-        request = { payload: JSON.dump(payload) }
-        response = Canoe.chef_checkin(@environment, request)
-
-        if response.code != "200"
-          Instrumentation.error(
-            at: "chef",
-            code: response.code,
-            body: response.body[0..100]
-          )
-          return
-        end
-
-        payload = JSON.parse(response.body)
-
-        if payload.fetch("action") != "deploy"
-          Instrumentation.debug(at: "chef", action: "noop")
-          return
-        end
-
-        deploy = payload.fetch("deploy")
-        result = ChefDeploy.new(script, repo_path, deploy).apply(env, datacenter, hostname)
-        payload = {
-          deploy_id: deploy.fetch("id"),
-          success: result.success,
-          error_message: result.message
-        }
-        request = { payload: JSON.dump(payload) }
-
-        Instrumentation.debug(at: "chef", completed: payload)
-        response = Canoe.complete_chef_deploy(@environment, request)
-
-        if response.code != "200"
-          Instrumentation.error(
-            at: "chef",
-            complete: "error",
-            code: response.code,
-            body: response.body[0..100]
-          )
-        end
+        Pardot::PullAgent::Deployers::Chef.new(@environment).perform
       end
 
       def self.knife(args)
