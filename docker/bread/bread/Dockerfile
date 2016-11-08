@@ -1,6 +1,6 @@
 FROM docker.dev.pardot.com/base/ruby:2.3.0
 ARG artifactory_host
-ENV BRAKEMAN_VERSION=3.2.1
+ENV BRAKEMAN_VERSION=3.4.1
 ENV BUNDLER_AUDIT_VERSION=0.5.0
 ENV GOLANG_VERSION=1.7.3
 ENV GOLANG_DOWNLOAD_URL=https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
@@ -8,7 +8,7 @@ ENV GOLANG_DOWNLOAD_SHA256=508028aac0654e993564b6e2014bf2d4a9751e3b286661b0b0040
 ENV JFROG_CLI_VERSION=1.3.2
 ENV JFROG_CLI_SHA256=806b06c9240d6dc28492ee28c7c3f14881c3fb05268329b47fee93e7b7210476
 ENV JFROG_CLI_URL=https://bintray.com/jfrog/jfrog-cli-go/download_file?file_path=${JFROG_CLI_VERSION}%2Fjfrog-cli-linux-amd64%2Fjfrog
-ENV RUBOCOP_VERSION=0.40.0
+ENV RUBOCOP_VERSION=0.45.0
 ENV RUBYGEMS_SOURCE=https://${artifactory_host}/artifactory/api/gems/pd-gem/
 ENV GOPATH=/go
 ENV PATH=/data/bin:/data/src/build/docker:$GOPATH/bin:/usr/local/go/bin:$PATH
