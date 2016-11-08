@@ -2,6 +2,7 @@ package bread
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -109,6 +110,9 @@ func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender
 	}
 	if container == nil {
 		return nil, fmt.Errorf(`No container "%s" found in task definition for %s`, req.Target.ContainerName, req.Target.Name)
+	}
+	if req.Build.GetArtifactURL() == "" {
+		return nil, errors.New("Build artifact is invalid. One or more property is likely missing or malformed")
 	}
 	container.Image = aws.String(req.Build.GetArtifactURL())
 	newTask, err := d.ecs.RegisterTaskDefinition(
@@ -243,10 +247,14 @@ func (d *ecsDeployer) doAQL(ctx context.Context, q string) ([]*afyItem, error) {
 	return data.Results, nil
 }
 
-// TODO(sr) This should be a property in Artifactory
 func (a *afyItem) GetID() string {
 	if a == nil || a.GetURL() == "" {
 		return ""
+	}
+	for _, p := range a.Properties {
+		if p.Key == "buildID" {
+			return p.Value
+		}
 	}
 	u, err := url.Parse(a.GetURL())
 	if err != nil {
@@ -274,7 +282,6 @@ func (a *afyItem) GetURL() string {
 
 const dockerRegistry = "docker.dev.pardot.com"
 
-// TODO(sr) This should be a property in Artifactory
 func (a *afyItem) GetArtifactURL() string {
 	if a == nil {
 		return ""
@@ -282,12 +289,19 @@ func (a *afyItem) GetArtifactURL() string {
 	if a.GetID() == "" {
 		return ""
 	}
+	for _, p := range a.Properties {
+		if p.Key == "dockerImageRepository" {
+			return fmt.Sprintf("%s/%s:%s", dockerRegistry, p.Value, a.GetID())
+		}
+	}
 	// build/bread/hal9000/app/BREAD-BREAD-480
+	// build/pardot-refocus/app/SRE-REFO-23
 	parts := strings.Split(a.Path, "/")
-	if len(parts) != 5 {
+	if len(parts) != 5 && len(parts) != 4 {
 		return ""
 	}
-	return fmt.Sprintf("%s/%s:%s", dockerRegistry, strings.Replace(a.Path, "/"+parts[4], "", -1), parts[4])
+	tag := parts[len(parts)-1]
+	return fmt.Sprintf("%s/%s:%s", dockerRegistry, strings.Replace(a.Path, "/"+tag, "", -1), tag)
 }
 
 func (a *afyItem) GetBranch() string {

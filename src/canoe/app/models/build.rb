@@ -82,6 +82,10 @@ class Build
     @project.name
   end
 
+  def build_id
+    @properties["buildID"]
+  end
+
   def repo_url
     @properties["gitRepo"].gsub(/\.git$/, "")
   end
