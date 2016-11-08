@@ -31,6 +31,10 @@ describe "rollback back to a previous version" do
     File.write(File.join(tempdir, "current", "build.version"), current_version.to_s)
   end
 
+  after do
+    ENV.delete("RELEASE_DIRECTORY")
+  end
+
   it "rapidly changes the symlink back to the previous version" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)

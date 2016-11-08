@@ -18,6 +18,10 @@ describe "performing restart tasks" do
     version.save_to_directory(File.join(tempdir, "current"))
   end
 
+  after do
+    ENV.delete("RELEASE_DIRECTORY")
+  end
+
   it "performs restart task" do
     canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)

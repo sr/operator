@@ -25,6 +25,10 @@ describe "deploying a new build" do
     File.write(File.join(tempdir, "current", "build.version"), current_version.to_s)
   end
 
+  after do
+    ENV.delete("RELEASE_DIRECTORY")
+  end
+
   it "downloads the artifact, unpacks it, and switches over the symlink" do
     # API request for the Artifact
     stub_request(:get, artifact_url)
