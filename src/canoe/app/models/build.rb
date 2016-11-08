@@ -82,6 +82,10 @@ class Build
     @project.name
   end
 
+  def build_id
+    @properties["buildID"]
+  end
+
   def repo_url
     @properties["gitRepo"].gsub(/\.git$/, "")
   end
@@ -103,7 +107,7 @@ class Build
   end
 
   def test_state(test)
-    key = (test == :PPANT) ? "passedCI" : "ciJob[#{test}]"
+    key = test == :PPANT ? "passedCI" : "ciJob[#{test}]"
     state = properties[key]
     build_time = DateTime.parse(properties["buildTimeStamp"]).iso8601
 

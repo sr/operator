@@ -57,9 +57,8 @@ class UserQuery < ApplicationRecord
     else
       tables = [tables]
     end
-    tables.map{ |t|
-      database.columns(t.name)
-    }.flatten
+
+    tables.map { |t| database.columns(t.name) }.flatten
   end
 
   def parsed

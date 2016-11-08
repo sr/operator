@@ -11,13 +11,13 @@ class DeployResult < ApplicationRecord
   scope :incomplete, -> { where("stage NOT IN (?)", %w[completed failed]) }
   scope :completed, -> { where("stage IN (?)", %w[completed]) }
   scope :failed, -> { where("stage IN (?)", %w[failed]) }
-  scope :for_server, -> (server) { where(server: server).first }
-  scope :for_server_hostnames, -> (hostnames) { joins(:server).where(servers: { hostname: hostnames }) }
+  scope :for_server, ->(server) { where(server: server).first }
+  scope :for_server_hostnames, ->(hostnames) { joins(:server).where(servers: { hostname: hostnames }) }
 
   scope :sort_by_server_hostname, -> { joins(:server).order("servers.hostname ASC") }
 
   STAGES.each do |stage|
-    define_method("#{stage}?") { self.stage == stage }
+    define_method("#{stage}?") { read_attribute(:stage) == stage }
   end
 
   def self.for_server_hostname(hostname)

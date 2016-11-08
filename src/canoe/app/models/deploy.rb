@@ -40,6 +40,7 @@ class Deploy < ApplicationRecord
     IO.popen(["tail", "-n", lines.to_s, log_path], &:read)
   end
 
+  # rubocop:disable Rails/OutputSafety
   def log_contents_htmlized(show_all = false)
     contents = show_all ? log_contents : some_log_contents
     contents.gsub(/\n/, "<br>").html_safe
@@ -98,7 +99,7 @@ class Deploy < ApplicationRecord
 
   # TODO: Replace the project_name column with project_id
   def project
-    Project.find_by_name(project_name)
+    Project.find_by(name: project_name)
   end
 
   def check_completed_status!

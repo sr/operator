@@ -1,5 +1,6 @@
 require "cgi"
 
+# rubocop:disable Rails/OutputSafety
 module CanoeHelper
   def protocol_for_includes
     request.scheme

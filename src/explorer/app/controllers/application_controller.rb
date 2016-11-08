@@ -71,7 +71,7 @@ class ApplicationController < ActionController::Base
 
     created_at = session[:created_at]
     if created_at && Time.zone.at(created_at) >= Rails.application.config.x.session_ttl.ago
-      return User.find_by_id(session[:user_id])
+      return User.find_by(id: session[:user_id])
     end
 
     nil
