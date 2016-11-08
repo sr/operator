@@ -1,8 +1,8 @@
 class ChefDelivery
   PROJECT = "chef".freeze
-  SUCCESS = "success".freeze
-  FAILURE = "failure".freeze
-  PENDING = "pending".freeze
+  SUCCESS = GithubRepository::SUCCESS
+  FAILURE = GithubRepository::FAILURE
+  PENDING = GithubRepository::PENDING
   LOCKED  = "locked".freeze
   NONE = "none".freeze
 

@@ -1,6 +1,17 @@
 class TerraformProject < ActiveRecord::Base
+  BREAD = "Pardot/bread".freeze
+
   belongs_to :project
   has_many :terraform_deploys
+
+  cattr_accessor :github_repository do
+    client = Octokit::Client.new(
+      api_endpoint: "#{Project::GITHUB_URL}/api/v3",
+      access_token: ENV.fetch("GITHUB_PASSWORD")
+    )
+
+    GithubRepository.new(client, BREAD)
+  end
 
   cattr_accessor :required_version do
     Pathname("../../../config/terraform-version")
@@ -16,6 +27,20 @@ class TerraformProject < ActiveRecord::Base
       error = "Terraform version #{build.terraform_version} does not " \
         "match required version: #{required_version}"
       return TerraformDeployResponse.new(nil, error)
+    end
+
+    github_build = github_repository.current_build(build.commit)
+
+    if github_build.compare_status != GithubRepository::AHEAD
+      message = "Current branch #{github_build.branch.inspect} is not " \
+        "up to date. Please merge master before continuing"
+      return TerraformDeployResponse.new(nil, message)
+    end
+
+    if github_build.state != GithubRepository::SUCCESS
+      message = "Current build status #{github_build.state.inspect} for " \
+        "#{github_build.branch}@#{github_build.sha[0, 7]} is not successful"
+      return TerraformDeployResponse.new(nil, message)
     end
 
     deploy = transaction do
