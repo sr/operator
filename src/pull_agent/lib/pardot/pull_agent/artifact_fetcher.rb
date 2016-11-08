@@ -5,6 +5,7 @@ module Pardot
   module PullAgent
     # ArtifactFetcher fetches tarballs from Artifactory and uncompresses them
     class ArtifactFetcher
+      FetchError = Class.new(StandardError)
       DecompressionError = Class.new(StandardError)
 
       def initialize(artifact_url)
@@ -42,18 +43,18 @@ module Pardot
           request = Net::HTTP::Get.new(download_path)
           request["X-JFrog-Art-Api"] = artifactory_token
 
-          response = http.request(request)
-          response.value # raise error if non-successful
+          http.request(request) do |response|
+            response.value # raise error if non-successful
 
-          output = IO.popen(["tar", "-xzf", "-", "-C", directory], "r+", err: [:child, :out]) { |io|
-            response.read_body do |chunk|
-              io.write(chunk)
-            end
-            io.close_write
-            io.read
-          }
-
-          raise DecompressionError, "Unable to uncompress artifact: #{output}" unless $?.success?
+            output = IO.popen(["tar", "-xzf", "-", "-C", directory], "r+", err: [:child, :out]) { |io|
+              response.read_body do |chunk|
+                io.write(chunk)
+              end
+              io.close_write
+              io.read
+            }
+            raise DecompressionError, "Unable to uncompress artifact: #{output}" unless $?.success?
+          end
         end
       end
 

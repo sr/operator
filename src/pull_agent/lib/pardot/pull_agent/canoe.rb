@@ -9,7 +9,7 @@ module Pardot
         result = call_api("GET", "/api/targets/#{environment}/deploys/latest", repo_name: project, server: ShellHelper.hostname)
 
         json = JSON.parse(result.body)
-        Logger.log(:warn, json) unless json["id"]
+        Logger.log(:warn, "Malformed JSON: #{json.inspect}") unless json["id"]
         Deploy.from_hash(json)
       end
 

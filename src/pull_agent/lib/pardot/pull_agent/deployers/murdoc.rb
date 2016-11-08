@@ -58,7 +58,7 @@ module Pardot
 
         def release_directory
           @release_directory ||=
-            ReleaseDirectory.new(ENV.fetch("RELEASE_DIRECTORY", "/opt/blue-mesh"))
+            ReleaseDirectory.new(ENV.fetch("RELEASE_DIRECTORY", "/opt/murdoc"))
         end
       end
     end

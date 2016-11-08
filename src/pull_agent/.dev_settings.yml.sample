@@ -1,3 +1,3 @@
 :canoe_api_token: canoe123
-:artifactory_user: fill_me_in
+:canoe_url: http://canoe:4000 # or http://localhost:400 for running locally outside Docker
 :artifactory_token: fill_me_in

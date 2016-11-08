@@ -16,11 +16,11 @@ module Pardot
       end
 
       def self.load_from_file(file)
-        new(YAML.load(ERB.new(File.read(file))))
+        new(YAML.load(ERB.new(File.read(file)).result))
       end
 
-      def initialize(options = {})
-        @options = options
+      def initialize(options = nil)
+        @options = options || {}
       end
 
       def [](option)

@@ -27,6 +27,8 @@ module Pardot
 
       def live_directory
         current_symlink.realpath
+      rescue Errno::ENOENT
+        nil
       end
 
       def standby_directory
