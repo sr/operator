@@ -29,7 +29,7 @@ module Api
     # Overrides current_user from ApplicationController to do API-specific authentication
     def current_user
       return @current_user if defined?(@current_user)
-      @current_user = params[:user_email] && AuthUser.find_by_email(params[:user_email].to_s)
+      @current_user = params[:user_email] && AuthUser.find_by(email: params[:user_email].to_s)
     end
 
     def require_target

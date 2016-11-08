@@ -37,7 +37,7 @@ module Api
     end
 
     def current_user
-      @proto_current_user ||= AuthUser.find_by_email(proto_request.user_email)
+      @proto_current_user ||= AuthUser.find_by(email: proto_request.user_email)
     end
 
     def phone_auth_action

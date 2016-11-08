@@ -25,7 +25,7 @@ module Pardot
         @_artifacts_path ||= \
           begin
             path = File.join(Dir.tmpdir, "pull-agent")
-            FileUtils.mkdir_p(path, mode: 01777)
+            FileUtils.mkdir_p(path, mode: 0o1777)
             path
           end
       end

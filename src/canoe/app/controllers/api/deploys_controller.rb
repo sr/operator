@@ -53,7 +53,7 @@ module Api
 
     def completed_server
       if current_deploy
-        server = Server.find_by_hostname(params[:server])
+        server = Server.find_by(hostname: params[:server])
 
         if !server
           render status: :not_found, json: { success: false }
