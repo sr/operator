@@ -9,6 +9,7 @@
 /src/pd-sync-chef/Gemfile.lock
 /src/pull_agent/.dev_settings.yml
 /src/pull_agent/Gemfile.lock
+/src/pull_agent/supervisord.pid
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
 /bin/*
