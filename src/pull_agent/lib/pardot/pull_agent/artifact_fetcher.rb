@@ -72,7 +72,7 @@ module Pardot
       end
 
       def artifactory_host
-        "artifactory.dev.pardot.com"
+        ENV.fetch("ARTIFACTORY_HOST", "artifactory.dev.pardot.com")
       end
 
       def artifactory_token
