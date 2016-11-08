@@ -28,9 +28,7 @@ module Pardot
           quick_rollback = QuickRollback.new(release_directory, @deploy)
           unless quick_rollback.perform_if_applicable
             Dir.mktmpdir do |temp_dir|
-              fetcher = ArtifactFetcher.new(@deploy.artifact_url)
-              fetcher.fetch_into(temp_dir)
-
+              ArtifactFetcher.new(@deploy.artifact_url).fetch_into(temp_dir)
               DirectorySynchronizer.new(temp_dir, release_directory.standby_directory).synchronize
 
               @deploy.to_build_version.save_to_directory(release_directory.standby_directory)
@@ -50,7 +48,7 @@ module Pardot
 
           AtomicSymlink.create!(
             File.join(release_directory, "shared", "log"),
-            File.join(relesae_directory.current_symlink, "log"),
+            File.join(release_directory.current_symlink, "log"),
           )
 
           PumaService.new("/var/run/internal_api/puma.pid").restart

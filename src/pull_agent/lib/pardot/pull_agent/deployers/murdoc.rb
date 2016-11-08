@@ -28,9 +28,7 @@ module Pardot
           quick_rollback = QuickRollback.new(release_directory, @deploy)
           unless quick_rollback.perform_if_applicable
             Dir.mktmpdir do |temp_dir|
-              fetcher = ArtifactFetcher.new(@deploy.artifact_url)
-              fetcher.fetch_into(temp_dir)
-
+              ArtifactFetcher.new(@deploy.artifact_url).fetch_into(temp_dir)
               DirectorySynchronizer.new(temp_dir, release_directory.standby_directory).synchronize
 
               @deploy.to_build_version.save_to_directory(release_directory.standby_directory)
@@ -43,8 +41,8 @@ module Pardot
           elsif @deploy.options["topo_env"].nil?
             Logger.log(:err, "deploy[topo_env] not present, can't restart topology")
           else
-            jarfile = ShellHelper.execute(["find", "#{release_directory.current_symlink}/", "-name", "*.jar"]).to_s # trailing slash is necessary
-            if jarfile.empty?
+            jarfile = Dir[File.join(release_directory.current_symlink, "*.jar")].first
+            if jarfile.nil?
               Logger.log(:err, "no *.jar file found in deployment, can't load topology")
             else
               Logger.log(:info, "Topology Deployment Param: #{@deploy.options["topology"]}")

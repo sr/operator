@@ -3,7 +3,7 @@ require "fileutils"
 module Pardot
   module PullAgent
     class DirectorySynchronizer
-      SynchronizationFailedError = StandardError.new
+      SynchronizationFailedError = Class.new(StandardError)
 
       def initialize(source, destination)
         @source = source

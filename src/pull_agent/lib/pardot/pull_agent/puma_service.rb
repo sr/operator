@@ -9,13 +9,7 @@ module Pardot
         pid = File.read(pid_file).chomp
 
         # Killing puma with USR1 performs a rolling restart
-        output = ShellHelper.execute(["kill", "-USR1", pid])
-        if $?.success?
-          Logger.log(:info, "restarted puma service: #{output}")
-          true
-        else
-          raise DeploymentError, "error restarting puma service: #{output}"
-        end
+        Process.kill("USR1", pid.to_i)
       end
     end
   end

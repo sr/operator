@@ -2,13 +2,15 @@ module Pardot
   module PullAgent
     module Deployers
       class Chef
+        DeployerRegistry["chef"] = self
+
         def initialize(environment)
           @environment = environment
         end
 
         def perform
           hostname = ShellHelper.hostname
-          script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
+          script = File.expand_path("../../../../../bin/pa-deploy-chef", __FILE__)
 
           datacenter =
             if @environment

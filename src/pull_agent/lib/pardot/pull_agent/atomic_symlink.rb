@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Pardot
   module PullAgent
     class AtomicSymlink
