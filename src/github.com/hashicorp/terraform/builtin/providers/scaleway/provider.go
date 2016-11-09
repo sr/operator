@@ -21,6 +21,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("SCALEWAY_ORGANIZATION", nil),
 				Description: "The Organization ID for Scaleway API operations.",
 			},
+			"region": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SCALEWAY_REGION", "par1"),
+				Description: "The Scaleway API region to use.",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -32,6 +38,11 @@ func Provider() terraform.ResourceProvider {
 			"scaleway_volume_attachment":   resourceScalewayVolumeAttachment(),
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"scaleway_bootscript": dataSourceScalewayBootscript(),
+			"scaleway_image":      dataSourceScalewayImage(),
+		},
+
 		ConfigureFunc: providerConfigure,
 	}
 }
@@ -40,6 +51,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Organization: d.Get("organization").(string),
 		APIKey:       d.Get("access_key").(string),
+		Region:       d.Get("region").(string),
 	}
 
 	return config.Client()

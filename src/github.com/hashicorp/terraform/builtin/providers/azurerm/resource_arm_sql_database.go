@@ -245,13 +245,13 @@ func resourceArmSqlDatabaseDelete(d *schema.ResourceData, meta interface{}) erro
 
 func validateArmSqlDatabaseEdition(v interface{}, k string) (ws []string, errors []error) {
 	editions := map[string]bool{
-		"Basic":    true,
-		"Standard": true,
-		"Premium":  true,
+		"Basic":         true,
+		"Standard":      true,
+		"Premium":       true,
+		"DataWarehouse": true,
 	}
-
 	if !editions[v.(string)] {
-		errors = append(errors, fmt.Errorf("SQL Database Edition can only be Basic, Standard or Premium"))
+		errors = append(errors, fmt.Errorf("SQL Database Edition can only be Basic, Standard, Premium or DataWarehouse"))
 	}
 	return
 }
