@@ -8,7 +8,7 @@ module Pardot
           @environment = environment
         end
 
-        def perform
+        def deploy
           hostname = ShellHelper.hostname
           script = File.expand_path("../../../../../bin/pa-deploy-chef", __FILE__)
 

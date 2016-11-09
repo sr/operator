@@ -26,7 +26,16 @@ module Pardot
             Logger.log(:debug, "Nothing to do for this deploy at this time")
           else
             deployer = DeployerRegistry.fetch(@project).new(@environment, deploy)
-            deployer.perform
+            case deploy.action
+            when "deploy"
+              deployer.deploy
+            when "restart"
+              deployer.restart
+            else
+              Logger.log(:error, "Unknown deployment action: #{@deploy.action}")
+              return false
+            end
+            Canoe.notify_server(@environment, deploy)
           end
         else
           Logger.log(:debug, "The deploy does not apply to this server")
@@ -34,7 +43,7 @@ module Pardot
       end
 
       def checkin_chef
-        Pardot::PullAgent::Deployers::Chef.new(@environment).perform
+        Pardot::PullAgent::Deployers::Chef.new(@environment).deploy
       end
 
       def self.knife(args)

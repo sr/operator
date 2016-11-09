@@ -17,22 +17,7 @@ module Pardot
           @deploy = deploy
         end
 
-        def perform
-          case @deploy.action
-          when "deploy"
-            perform_deploy
-          when "restart"
-            perform_restart
-          else
-            raise DeploymentError, "unknown action: #{@deploy.action}"
-          end
-
-          Canoe.notify_server(@environment, @deploy)
-        end
-
-        private
-
-        def perform_deploy
+        def deploy
           quick_rollback = QuickRollback.new(release_directory, @deploy)
           unless quick_rollback.perform
             Dir.mktmpdir do |temp_dir|
@@ -45,12 +30,14 @@ module Pardot
           end
         end
 
-        def perform_restart
+        def restart
           add_graphite_annotation
           restart_redis_jobs
           restart_old_style_jobs
           restart_autojobs
         end
+
+        private
 
         def add_graphite_annotation
           host = GRAPHITE_HOST.fetch(ShellHelper.datacenter)
