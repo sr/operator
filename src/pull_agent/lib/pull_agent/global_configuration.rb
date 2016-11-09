@@ -5,7 +5,7 @@ module PullAgent
       if !config_file.empty?
         load_from_file(config_file)
       else
-        environment_config_file = File.join(File.dirname(__FILE__), "..", "..", "..", ".#{environment}_settings.yml")
+        environment_config_file = File.join(File.dirname(__FILE__), "..", "..", ".#{environment}_settings.yml")
         if File.file?(environment_config_file)
           load_from_file(environment_config_file)
         else
