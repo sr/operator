@@ -845,7 +845,7 @@ resource "aws_route53_record" "artifactory-legacy_dev_pardot_com_Arecord" {
   name    = "artifactory-legacy.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${var.legacy_artifactory_instance_ip}"]
   type    = "A"
-  ttl     = "15"
+  ttl     = "900"
 }
 
 resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" {
@@ -855,7 +855,7 @@ resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" 
 
   #  records = ["${aws_alb.artifactory_public_alb.dns_name}"]
   type = "CNAME"
-  ttl  = "15"
+  ttl  = "900"
 }
 
 resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
@@ -863,16 +863,67 @@ resource "aws_route53_record" "artifactory-origin_dev_pardot_com_CNAMErecord" {
   name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_alb.artifactory_private_alb.dns_name}"]
   type    = "CNAME"
-  ttl     = "15"
+  ttl     = "900"
 }
 
-/*
-resource "aws_route53_record" "artifactory-origin_dev_pardot_com_Arecord" {
+resource "aws_elb" "artifactory_primary_machine_access_elb" {
+  security_groups = [
+    "${aws_security_group.artifactory_http_lb.id}",
+  ]
+
+  subnets = [
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+  ]
+
+  connection_draining         = true
+  connection_draining_timeout = 30
+  instances                   = ["${aws_instance.pardot0-artifactory1-1-ue1.id}"]
+
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = 80
+    instance_protocol  = "http"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
+  listener {
+    lb_port           = 80
+    lb_protocol       = "http"
+    instance_port     = 80
+    instance_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold   = 4
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:80/artifactory/webapp/"
+    interval            = 5
+  }
+
+  tags {
+    Name = "artifactory_primary_host_only"
+  }
+}
+
+resource "aws_route53_record" "artifactory-primary_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory-origin.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${var.legacy_artifactory_instance_ip}"]
-  type    = "A"
-  ttl     = "15"
+  name    = "artifactory-primary.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.artifactory_primary_machine_access_elb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
 }
-*/
 
+resource "aws_ebs_volume" "artifactory_primary_host_backup_drive" {
+  snapshot_id       = "${var.blank_6tb_ext4_ebs_volume_snapshot_id}"
+  availability_zone = "us-east-1a"
+  type           = "gp2"
+  size           = "6144"
+}
+
+resource "aws_volume_attachment" "artifactory_primary_host_backup_drive_attachment" {
+  device_name           = "/dev/xvdf"
+  volume_id             = "${aws_ebs_volume.artifactory_primary_host_backup_drive.id}"
+  instance_id           = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
+}
