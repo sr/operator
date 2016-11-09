@@ -32,6 +32,7 @@ describe "deploying a new build" do
   it "downloads the artifact, unpacks it, and switches over the symlink" do
     # API request for the Artifact
     stub_request(:get, artifact_url)
+      .with(basic_auth: [ENV.fetch("ARTIFACTORY_USER"), ENV.fetch("ARTIFACTORY_TOKEN")])
       .to_return(
         status: 200,
         body: JSON.dump(
@@ -44,6 +45,7 @@ describe "deploying a new build" do
 
     # Download request for the Artifact
     stub_request(:get, artifact_download_url)
+      .with(basic_auth: [ENV.fetch("ARTIFACTORY_USER"), ENV.fetch("ARTIFACTORY_TOKEN")])
       .to_return(
         status: 200,
         body: empty_tar_gz_contents,

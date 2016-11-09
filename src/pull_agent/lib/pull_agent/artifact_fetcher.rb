@@ -28,7 +28,7 @@ module PullAgent
     def fetch_into(directory)
       object = with_http_client do |http|
         request = Net::HTTP::Get.new(@artifact_url.path)
-        request["X-JFrog-Art-Api"] = artifactory_token
+        request.basic_auth(artifactory_user, artifactory_token)
 
         response = http.request(request)
         response.value # raise error if non-successful
@@ -40,7 +40,7 @@ module PullAgent
 
       with_http_client do |http|
         request = Net::HTTP::Get.new(download_path)
-        request["X-JFrog-Art-Api"] = artifactory_token
+        request.basic_auth(artifactory_user, artifactory_token)
 
         http.request(request) do |response|
           response.value # raise error if non-successful
@@ -72,6 +72,10 @@ module PullAgent
 
     def artifactory_host
       ENV.fetch("ARTIFACTORY_HOST", "artifactory.dev.pardot.com")
+    end
+
+    def artifactory_user
+      ENV.fetch("ARTIFACTORY_USER")
     end
 
     def artifactory_token

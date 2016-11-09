@@ -27,7 +27,7 @@ module PullAgent
     end
 
     def merge_into_environment
-      [:canoe_api_token, :canoe_url, :artifactory_token].each do |option|
+      [:canoe_api_token, :canoe_url, :artifactory_user, :artifactory_token].each do |option|
         ENV[option.to_s.upcase] = self[option] if self[option]
       end
     end
