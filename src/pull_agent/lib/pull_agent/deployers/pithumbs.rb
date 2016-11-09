@@ -20,6 +20,11 @@ module PullAgent
           end
         end
 
+        # FIXME: Pull Agent should run as the node user so permissions fixup is
+        # not necessary
+        ShellHelper.execute(["chown", "-R", "pi:node", release_directory.live_directory])
+        ShellHelper.execute(["chmod", "-R", "u=rwX,g=rwX", release_directory.live_directory])
+
         UpstartService.new("pithumbs").restart
       end
 
