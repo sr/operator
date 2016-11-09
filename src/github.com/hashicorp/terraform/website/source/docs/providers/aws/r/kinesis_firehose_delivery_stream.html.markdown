@@ -165,7 +165,7 @@ The `elasticsearch_configuration` object supports the following:
 
 The `cloudwatch_logging_options` object supports the following:
 
-* `enabled` - (Optional) Enables or disables the logging. Defaults to `false`.
+* `enabled` - (Optional) Enables or disables the logging. Defaults to `false`. 
 * `log_group_name` - (Optional) The CloudWatch group name for logging. This value is required if `enabled` is true`.
 * `log_stream_name` - (Optional) The CloudWatch log stream name for logging. This value is required if `enabled` is true`.
 

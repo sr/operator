@@ -22,7 +22,7 @@ When remote storage is enabled, the existing local state file will be migrated. 
 
 When remote storage is disabled, the existing remote state is migrated back to a local file. The location of the new local state file defaults to the path specified in the `-state` flag.
 
-When enabling remote storage, we use the `-backend-config` flag to set any required configuration variables.
+When enabling remote storage, we use the `-backend-config` flag to set any required configuration variables. 
 
 Supported storage backends and supported features of each backend are documented in the [Remote State](/docs/state/remote/index.html) section.
 
@@ -50,7 +50,7 @@ The command-line flags are all optional. The list of available flags are:
 
 ## Example: Consul
 
-This example below will push your remote state to a Consul server.
+This example below will push your remote state to a Consul server. 
 
 ```
 $ terraform remote config \

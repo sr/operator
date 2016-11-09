@@ -15,7 +15,7 @@ SDK Bug Fixes
 
 SDK Feature Updates
 ---
-`aws/ec2metadata`: Add support for EC2 User Data #872
+`aws/ec2metadata`: Add support for EC2 User Data #872 
 `aws/signer/v4`: Remove logic determining if request needs to be resigned #876
 
 Release v1.4.14 (2016-09-29)

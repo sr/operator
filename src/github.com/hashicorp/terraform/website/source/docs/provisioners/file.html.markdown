@@ -81,6 +81,6 @@ of `/foo` on the local machine will be uploaded to `/tmp/foo` on the remote mach
 If the source, however, is `/foo/` (a trailing slash is present), and the destination is
 `/tmp`, then the contents of `/foo` will be uploaded directly into `/tmp` directly.
 
-This behavior was adopted from the standard behavior of rsync.
+This behavior was adopted from the standard behavior of rsync. 
 
 **Note:** Under the covers, rsync may or may not be used.

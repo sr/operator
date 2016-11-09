@@ -73,7 +73,7 @@ The following arguments are supported:
     Subscription is automatically deleted, minimum of 5 minutes. Provided in the
     [TimeSpan](#timespan-format) format.
 
-* `default_message_ttl` - (Optional) The TTL of messages sent to this Subscription
+* `default_message_ttl` - (Optional) The TTL of messages sent to this Subscription 
     if no TTL value is set on the message itself. Provided in the [TimeSpan](#timespan-format)
     format.
 

@@ -85,7 +85,7 @@ resource "aws_default_security_group" "default" {
 
 The arguments of an `aws_default_security_group` differ slightly from `aws_security_group` 
 resources. Namely, the `name` argument is computed, and the `name_prefix` attribute
-removed. The following arguments are still supported:
+removed. The following arguments are still supported: 
 
 * `ingress` - (Optional) Can be specified multiple times for each
    ingress rule. Each ingress block supports fields documented below.

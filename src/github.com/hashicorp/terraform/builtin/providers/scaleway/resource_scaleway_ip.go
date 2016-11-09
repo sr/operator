@@ -13,6 +13,10 @@ func resourceScalewayIP() *schema.Resource {
 		Read:   resourceScalewayIPRead,
 		Update: resourceScalewayIPUpdate,
 		Delete: resourceScalewayIPDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"server": {
 				Type:     schema.TypeString,

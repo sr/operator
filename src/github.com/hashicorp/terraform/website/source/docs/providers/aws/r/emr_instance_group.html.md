@@ -8,9 +8,9 @@ description: |-
 
 # aws\_emr\_instance\_group
 
-Provides an Elastic MapReduce Cluster Instance Group configuration.
-See [Amazon Elastic MapReduce Documentation](http://docs.aws.amazon.com/en_en/ElasticMapReduce/latest/ManagementGuide/InstanceGroups.html)
-for more information.
+Provides an Elastic MapReduce Cluster Instance Group configuration. 
+See [Amazon Elastic MapReduce Documentation](http://docs.aws.amazon.com/en_en/ElasticMapReduce/latest/ManagementGuide/InstanceGroups.html) 
+for more information. 
 
 ~> **NOTE:** At this time, Instance Groups cannot be destroyed through the API nor
 web interface. Instance Groups are destroyed when the EMR Cluster is destroyed.
