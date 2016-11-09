@@ -41,16 +41,9 @@ func resourceAwsApiGatewayIntegration() *schema.Resource {
 			},
 
 			"type": {
-				Type:     schema.TypeString,
-				Required: true,
-				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-					value := v.(string)
-					if value != "MOCK" && value != "AWS" && value != "HTTP" {
-						errors = append(errors, fmt.Errorf(
-							"%q must be one of 'AWS', 'MOCK', 'HTTP'", k))
-					}
-					return
-				},
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateApiGatewayIntegrationType,
 			},
 
 			"uri": {

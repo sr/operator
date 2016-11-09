@@ -3,6 +3,7 @@ package awspolicy
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/errwrap"
 )
@@ -104,7 +105,7 @@ func (statement *awsPolicyStatement) equals(other *awsPolicyStatement) bool {
 		return false
 	}
 
-	if statement.Effect != other.Effect {
+	if strings.ToLower(statement.Effect) != strings.ToLower(other.Effect) {
 		return false
 	}
 

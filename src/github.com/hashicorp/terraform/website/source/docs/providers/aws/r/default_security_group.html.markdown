@@ -41,7 +41,7 @@ resource "aws_vpc" "mainvpc" {
 }
 
 resource "aws_default_security_group" "default" {
-  vpc_id = "${aws_vpc.mainvpc.vpc_id}"
+  vpc_id = "${aws_vpc.mainvpc.id}"
 
   ingress {
     protocol  = -1
@@ -70,7 +70,7 @@ resource "aws_vpc" "mainvpc" {
 }
 
 resource "aws_default_security_group" "default" {
-  vpc_id = "${aws_vpc.mainvpc.vpc_id}"
+  vpc_id = "${aws_vpc.mainvpc.vpc}"
 
   ingress {
     protocol  = -1
@@ -84,13 +84,9 @@ resource "aws_default_security_group" "default" {
 ## Argument Reference
 
 The arguments of an `aws_default_security_group` differ slightly from `aws_security_group` 
-resources. Namely, the `name` arguement is computed, and the `name_prefix` attribute
-removed. The following arguements are still supported: 
+resources. Namely, the `name` argument is computed, and the `name_prefix` attribute
+removed. The following arguments are still supported: 
 
-* `description` - (Optional, Forces new resource) The security group description. Defaults to
-  "Managed by Terraform". Cannot be "". __NOTE__: This field maps to the AWS
-  `GroupDescription` attribute, for which there is no Update API. If you'd like
-  to classify your security groups in a way that can be updated, use `tags`.
 * `ingress` - (Optional) Can be specified multiple times for each
    ingress rule. Each ingress block supports fields documented below.
 * `egress` - (Optional, VPC only) Can be specified multiple times for each
@@ -107,7 +103,7 @@ With the exceptions mentioned above, `aws_default_security_group` should
 identical behavior to `aws_security_group`. Please consult [AWS_SECURITY_GROUP](/docs/providers/aws/r/security_group.html)
 for further usage documentation.
 
-Removing `aws_default_security_group` from your configuration
+### Removing `aws_default_security_group` from your configuration
 
 Each AWS VPC (or region, if using EC2 Classic) comes with a Default Security 
 Group that cannot be deleted. The `aws_default_security_group` allows you to 
@@ -128,4 +124,4 @@ The following attributes are exported:
 * `ingress` - The ingress rules. See above for more.
 * `egress` - The egress rules. See above for more.
 
-[aws-default-security-groups]: http://docs.aws.amazon.com/fr_fr/AWSEC2/latest/UserGuide/using-network-security.html#default-security-group
+[aws-default-security-groups]: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#default-security-group

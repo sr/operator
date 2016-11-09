@@ -33,6 +33,10 @@ func resourceAwsLambdaAlias() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"arn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -84,6 +88,7 @@ func resourceAwsLambdaAliasRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("description", aliasConfiguration.Description)
 	d.Set("function_version", aliasConfiguration.FunctionVersion)
 	d.Set("name", aliasConfiguration.Name)
+	d.Set("arn", aliasConfiguration.AliasArn)
 
 	return nil
 }
