@@ -918,12 +918,12 @@ resource "aws_route53_record" "artifactory-primary_dev_pardot_com_CNAMErecord" {
 resource "aws_ebs_volume" "artifactory_primary_host_backup_drive" {
   snapshot_id       = "${var.blank_6tb_ext4_ebs_volume_snapshot_id}"
   availability_zone = "us-east-1a"
-  type           = "gp2"
-  size           = "6144"
+  type              = "gp2"
+  size              = "6144"
 }
 
 resource "aws_volume_attachment" "artifactory_primary_host_backup_drive_attachment" {
-  device_name           = "/dev/xvdf"
-  volume_id             = "${aws_ebs_volume.artifactory_primary_host_backup_drive.id}"
-  instance_id           = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
+  device_name = "/dev/xvdf"
+  volume_id   = "${aws_ebs_volume.artifactory_primary_host_backup_drive.id}"
+  instance_id = "${aws_instance.pardot0-artifactory1-1-ue1.id}"
 }
