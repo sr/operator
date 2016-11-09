@@ -31,7 +31,7 @@ class TerraformProject < ActiveRecord::Base
 
     github_build = github_repository.current_build(build.commit)
 
-    if github_build.compare_status != GithubRepository::AHEAD
+    if github_build.compare_status == GithubRepository::BEHIND
       message = "Current branch #{build.branch.inspect} is not " \
         "up to date. Please merge master before continuing"
       return TerraformDeployResponse.new(nil, message)
