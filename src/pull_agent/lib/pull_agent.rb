@@ -4,6 +4,7 @@ require "json"
 require "net/http"
 require "securerandom"
 require "socket"
+require "tmpdir"
 require "yaml"
 
 require "instrumentation"
