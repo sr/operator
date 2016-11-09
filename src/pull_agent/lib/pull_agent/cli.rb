@@ -19,6 +19,7 @@ module PullAgent
 
       deploy = Canoe.latest_deploy(@environment, @project)
       Logger.context[:deploy_id] = deploy.id
+      Logger.context[:project] = @project
       Logger.context[:environment] = @environment
 
       if deploy.applies_to_this_server?
