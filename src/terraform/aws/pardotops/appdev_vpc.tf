@@ -332,7 +332,7 @@ resource "aws_instance" "appdev_bastion" {
   subnet_id                   = "${aws_subnet.appdev_us_east_1d_dmz.id}"
   vpc_security_group_ids      = ["${aws_security_group.appdev_sfdc_vpn_ssh.id}"]
   private_ip                  = "172.26.220.43"
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   root_block_device {
     volume_type           = "gp2"
