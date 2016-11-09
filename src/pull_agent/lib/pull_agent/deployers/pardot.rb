@@ -30,7 +30,7 @@ module PullAgent
       end
 
       def restart
-        add_graphite_annotation
+        add_graphite_annotation if @environment == "production"
         restart_redis_jobs
         restart_old_style_jobs
         restart_autojobs
