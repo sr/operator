@@ -34,9 +34,19 @@ require "pardot/pull_agent/quick_rollback"
 require "pardot/pull_agent/directory_synchronizer"
 
 require "pardot/pull_agent/deployer_registry"
-Dir[File.join(File.dirname(__FILE__), "pull_agent", "deployers", "*.rb")].each do |deployer|
-  require deployer
-end
+require "pardot/pull_agent/deployers/ansible"
+require "pardot/pull_agent/deployers/blue_mesh"
+require "pardot/pull_agent/deployers/chef"
+require "pardot/pull_agent/deployers/engagement_history_topology"
+require "pardot/pull_agent/deployers/explorer"
+require "pardot/pull_agent/deployers/internal_api"
+require "pardot/pull_agent/deployers/mesh"
+require "pardot/pull_agent/deployers/murdoc"
+require "pardot/pull_agent/deployers/pardot"
+require "pardot/pull_agent/deployers/pithumbs"
+require "pardot/pull_agent/deployers/realtime_frontend"
+require "pardot/pull_agent/deployers/repfix"
+require "pardot/pull_agent/deployers/workflow_stats"
 
 module Pardot
   module PullAgent
