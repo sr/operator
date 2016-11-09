@@ -50,6 +50,8 @@ type config struct {
 	hipchatNamespace  string
 	hipchatAddonURL   string
 	hipchatWebhookURL string
+
+	githubWebhookSecret string
 }
 
 func run(invoker operator.InvokerFunc) error {
@@ -75,6 +77,7 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
+	flags.StringVar(&config.githubWebhookSecret, "github-webhook-secret", "", "Shared secret used to verify the signature of webhook requests received from GitHub")
 	flags.StringVar(&config.afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flags.StringVar(&config.afy.User, "artifactory-user", "", "Artifactory username")
 	flags.StringVar(&config.afy.APIKey, "artifactory-api-key", "", "Artifactory API key")
@@ -276,6 +279,18 @@ func run(invoker operator.InvokerFunc) error {
 			),
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
+	}
+	if config.githubWebhookSecret != "" {
+		httpServer.Handle(
+			"/github",
+			bread.NewHandler(
+				logger,
+				bread.NewGithubHandler(
+					logger,
+					config.githubWebhookSecret,
+				),
+			),
+		)
 	}
 	if config.httpAddr != "" {
 		logger.Info(&breadpb.ServerStartupNotice{
