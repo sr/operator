@@ -17,11 +17,11 @@ describe "deploying a new build" do
   before do
     ENV["RELEASE_DIRECTORY"] = tempdir
 
-    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
+    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{PullAgent::ShellHelper.hostname}")
+      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
     bootstrap_repo_path(tempdir)
-    current_version = Pardot::PullAgent::BuildVersion.new(build_number, sha, current_artifact_url)
+    current_version = PullAgent::BuildVersion.new(build_number, sha, current_artifact_url)
     File.write(File.join(tempdir, "current", "build.version"), current_version.to_s)
   end
 
@@ -50,10 +50,10 @@ describe "deploying a new build" do
         headers: { "Content-Type" => "application/x-gzip" }
       )
 
-    canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
+    canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{PullAgent::ShellHelper.hostname}")
       .to_return(status: 200)
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
+    cli = PullAgent::CLI.new(%w[test pardot])
 
     expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
     _output = capturing_stdout { cli.checkin }

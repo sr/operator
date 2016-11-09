@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-require "pardot/pull_agent"
+require "pull_agent"
 
-proxy_selector = Pardot::PullAgent::ProxySelector.new
+proxy_selector = PullAgent::ProxySelector.new
 proxy_selector.configure_random_proxy
 
-Pardot::PullAgent::CLI.knife(ARGV)
+PullAgent::CLI.knife(ARGV)
