@@ -19,11 +19,13 @@ module PullAgent
 
       deploy = Canoe.latest_deploy(@environment, @project)
       Logger.context[:deploy_id] = deploy.id
+      Logger.context[:environment] = @environment
 
       if deploy.applies_to_this_server?
         if deploy.action.nil?
           Logger.log(:debug, "Nothing to do for this deploy at this time")
         else
+          Logger.log(:info, "Starting '#{deploy.action}' phase")
           deployer = DeployerRegistry.fetch(@project).new(@environment, deploy)
           case deploy.action
           when "deploy"
@@ -34,6 +36,7 @@ module PullAgent
             Logger.log(:error, "Unknown deployment action: #{@deploy.action}")
             return false
           end
+          Logger.log(:info, "Finished '#{deploy.action}' phase")
           Canoe.notify_server(@environment, deploy)
         end
       else
