@@ -26,7 +26,7 @@ module Pardot
 
         def perform_deploy
           quick_rollback = QuickRollback.new(release_directory, @deploy)
-          unless quick_rollback.perform_if_applicable
+          unless quick_rollback.perform
             Dir.mktmpdir do |temp_dir|
               ArtifactFetcher.new(@deploy.artifact_url).fetch_into(temp_dir)
               DirectorySynchronizer.new(temp_dir, release_directory.standby_directory).synchronize
