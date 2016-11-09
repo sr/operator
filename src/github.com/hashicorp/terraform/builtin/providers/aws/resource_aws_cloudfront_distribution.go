@@ -1,11 +1,13 @@
 package aws
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/hashicorp/errwrap"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -21,6 +23,10 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			"arn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"aliases": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -86,6 +92,11 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 									"query_string": {
 										Type:     schema.TypeBool,
 										Required: true,
+									},
+									"query_string_cache_keys": {
+										Type:     schema.TypeList,
+										Optional: true,
+										Elem:     &schema.Schema{Type: schema.TypeString},
 									},
 								},
 							},
@@ -212,6 +223,11 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 										Type:     schema.TypeBool,
 										Required: true,
 									},
+									"query_string_cache_keys": {
+										Type:     schema.TypeList,
+										Optional: true,
+										Elem:     &schema.Schema{Type: schema.TypeString},
+									},
 								},
 							},
 						},
@@ -250,6 +266,12 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 			"enabled": {
 				Type:     schema.TypeBool,
 				Required: true,
+			},
+			"http_version": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "http2",
+				ValidateFunc: validateHTTP,
 			},
 			"logging_config": {
 				Type:     schema.TypeSet,
@@ -348,8 +370,7 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 								Schema: map[string]*schema.Schema{
 									"origin_access_identity": {
 										Type:     schema.TypeString,
-										Optional: true,
-										Default:  "",
+										Required: true,
 									},
 								},
 							},
@@ -469,17 +490,23 @@ func resourceAwsCloudFrontDistribution() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+
+			"tags": tagsSchema(),
 		},
 	}
 }
 
 func resourceAwsCloudFrontDistributionCreate(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).cloudfrontconn
-	params := &cloudfront.CreateDistributionInput{
-		DistributionConfig: expandDistributionConfig(d),
+
+	params := &cloudfront.CreateDistributionWithTagsInput{
+		DistributionConfigWithTags: &cloudfront.DistributionConfigWithTags{
+			DistributionConfig: expandDistributionConfig(d),
+			Tags:               tagsFromMapCloudFront(d.Get("tags").(map[string]interface{})),
+		},
 	}
 
-	resp, err := conn.CreateDistribution(params)
+	resp, err := conn.CreateDistributionWithTags(params)
 	if err != nil {
 		return err
 	}
@@ -514,6 +541,22 @@ func resourceAwsCloudFrontDistributionRead(d *schema.ResourceData, meta interfac
 	d.Set("last_modified_time", aws.String(resp.Distribution.LastModifiedTime.String()))
 	d.Set("in_progress_validation_batches", resp.Distribution.InProgressInvalidationBatches)
 	d.Set("etag", resp.ETag)
+	d.Set("arn", resp.Distribution.ARN)
+
+	tagResp, err := conn.ListTagsForResource(&cloudfront.ListTagsForResourceInput{
+		Resource: aws.String(d.Get("arn").(string)),
+	})
+
+	if err != nil {
+		return errwrap.Wrapf(fmt.Sprintf(
+			"Error retrieving EC2 tags for CloudFront Distribution %q (ARN: %q): {{err}}",
+			d.Id(), d.Get("arn").(string)), err)
+	}
+
+	if err := d.Set("tags", tagsToMapCloudFront(tagResp.Tags)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -526,6 +569,10 @@ func resourceAwsCloudFrontDistributionUpdate(d *schema.ResourceData, meta interf
 	}
 	_, err := conn.UpdateDistribution(params)
 	if err != nil {
+		return err
+	}
+
+	if err := setTagsCloudFront(conn, d, d.Get("arn").(string)); err != nil {
 		return err
 	}
 
@@ -544,7 +591,7 @@ func resourceAwsCloudFrontDistributionDelete(d *schema.ResourceData, meta interf
 
 	// skip delete if retain_on_delete is enabled
 	if d.Get("retain_on_delete").(bool) {
-		log.Printf("[WARN] Removing Distributions ID %s with retain_on_delete set. Please delete this distribution manually.", d.Id())
+		log.Printf("[WARN] Removing CloudFront Distribution ID %q with `retain_on_delete` set. Please delete this distribution manually.", d.Id())
 		d.SetId("")
 		return nil
 	}
@@ -598,7 +645,7 @@ func resourceAwsCloudFrontWebDistributionStateRefreshFunc(id string, meta interf
 
 		resp, err := conn.GetDistribution(params)
 		if err != nil {
-			log.Printf("Error on retrieving CloudFront distribution when waiting: %s", err)
+			log.Printf("[WARN] Error retrieving CloudFront Distribution %q details: %s", id, err)
 			return nil, "", err
 		}
 
@@ -608,4 +655,17 @@ func resourceAwsCloudFrontWebDistributionStateRefreshFunc(id string, meta interf
 
 		return resp.Distribution, *resp.Distribution.Status, nil
 	}
+}
+
+// validateHTTP ensures that the http_version resource parameter is
+// correct.
+func validateHTTP(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if value != "http1.1" && value != "http2" {
+		errors = append(errors, fmt.Errorf(
+			"%q contains an invalid HTTP version parameter %q. Valid parameters are either %q or %q.",
+			k, value, "http1.1", "http2"))
+	}
+	return
 }
