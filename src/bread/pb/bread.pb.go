@@ -8,6 +8,7 @@ Package breadpb is a generated protocol buffer package.
 It is generated from these files:
 	pb/bread.proto
 	pb/deploy.proto
+	pb/event.proto
 	pb/ping.proto
 
 It has these top-level messages:
@@ -19,6 +20,7 @@ It has these top-level messages:
 	ListTargetsRequest
 	ListBuildsRequest
 	TriggerRequest
+	GithubEvent
 	PingRequest
 	SlowLorisRequest
 */

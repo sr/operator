@@ -27,7 +27,7 @@ https://git.dev.pardot.com/Pardot/bread/tree/master/src/hal9000/spec/handlers
 
 ### Running HAL9000 locally
 
-HAL9000 requires [devenv](https://git.dev.pardot.com/Pardot/deven). After installing devenv, move into the hal9000 root directory:
+HAL9000 requires [devenv](https://git.dev.pardot.com/Pardot/bread/tree/master/src/devenv). After installing devenv, move into the hal9000 root directory:
 
 `$ cd src/hal9000`
 
