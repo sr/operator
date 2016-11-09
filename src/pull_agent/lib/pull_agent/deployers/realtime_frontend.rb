@@ -34,9 +34,9 @@ module PullAgent
       def release_directory
         @release_directory ||=
           ReleaseDirectory.new(
-          ENV.fetch("RELEASE_DIRECTORY", "/opt/realtime_frontend"),
-          current_symlink: "realtime-frontend",
-        )
+            ENV.fetch("RELEASE_DIRECTORY", "/opt/realtime_frontend"),
+            current_symlink: "realtime-frontend",
+          )
       end
     end
   end

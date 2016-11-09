@@ -34,9 +34,9 @@ module PullAgent
       def release_directory
         @release_directory ||=
           ReleaseDirectory.new(
-          ENV.fetch("RELEASE_DIRECTORY", "/etc/ansible-releases"),
-          current_directory: "../ansible",
-        )
+            ENV.fetch("RELEASE_DIRECTORY", "/etc/ansible-releases"),
+            current_directory: "../ansible",
+          )
       end
     end
   end

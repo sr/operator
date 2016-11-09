@@ -22,10 +22,10 @@ module PullAgent
       def bounce_workers(type, redis_hosts = [])
         valid_types = \
           %w[ PerAccountAutomationWorker
-          PerAccountAutomationWorker-timed
-          automationRelatedObjectWorkers
-          previewWorkers
-          PerAccountAutomationWorker ]
+              PerAccountAutomationWorker-timed
+              automationRelatedObjectWorkers
+              previewWorkers
+              PerAccountAutomationWorker ]
         return false if !valid_types.include?(type)
 
         key = "#{type}-manager-config"
