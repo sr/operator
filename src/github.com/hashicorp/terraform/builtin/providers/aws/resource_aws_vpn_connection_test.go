@@ -45,6 +45,29 @@ func TestAccAWSVpnConnection_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSVpnConnection_withoutStaticRoutes(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:      func() { testAccPreCheck(t) },
+		IDRefreshName: "aws_vpn_connection.foo",
+		Providers:     testAccProviders,
+		CheckDestroy:  testAccAwsVpnConnectionDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAwsVpnConnectionConfigUpdate,
+				Check: resource.ComposeTestCheckFunc(
+					testAccAwsVpnConnection(
+						"aws_vpc.vpc",
+						"aws_vpn_gateway.vpn_gateway",
+						"aws_customer_gateway.customer_gateway",
+						"aws_vpn_connection.foo",
+					),
+					resource.TestCheckResourceAttr("aws_vpn_connection.foo", "static_routes_only", "false"),
+				),
+			},
+		},
+	})
+}
+
 func testAccAwsVpnConnectionDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*AWSClient).ec2conn
 	for _, rs := range s.RootModule().Resources {

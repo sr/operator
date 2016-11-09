@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/mitchellh/copystructure"
 )
 
 // DiffChangeType is an enum with the kind of changes a diff has planned.
@@ -28,6 +30,30 @@ const (
 type Diff struct {
 	// Modules contains all the modules that have a diff
 	Modules []*ModuleDiff
+}
+
+// Prune cleans out unused structures in the diff without affecting
+// the behavior of the diff at all.
+//
+// This is not safe to call concurrently. This is safe to call on a
+// nil Diff.
+func (d *Diff) Prune() {
+	if d == nil {
+		return
+	}
+
+	// Prune all empty modules
+	newModules := make([]*ModuleDiff, 0, len(d.Modules))
+	for _, m := range d.Modules {
+		// If the module isn't empty, we keep it
+		if !m.Empty() {
+			newModules = append(newModules, m)
+		}
+	}
+	if len(newModules) == 0 {
+		newModules = nil
+	}
+	d.Modules = newModules
 }
 
 // AddModule adds the module with the given path to the diff.
@@ -70,6 +96,10 @@ func (d *Diff) RootModule() *ModuleDiff {
 
 // Empty returns true if the diff has no changes.
 func (d *Diff) Empty() bool {
+	if d == nil {
+		return true
+	}
+
 	for _, m := range d.Modules {
 		if !m.Empty() {
 			return false
@@ -77,6 +107,48 @@ func (d *Diff) Empty() bool {
 	}
 
 	return true
+}
+
+// Equal compares two diffs for exact equality.
+//
+// This is different from the Same comparison that is supported which
+// checks for operation equality taking into account computed values. Equal
+// instead checks for exact equality.
+func (d *Diff) Equal(d2 *Diff) bool {
+	// If one is nil, they must both be nil
+	if d == nil || d2 == nil {
+		return d == d2
+	}
+
+	// Sort the modules
+	sort.Sort(moduleDiffSort(d.Modules))
+	sort.Sort(moduleDiffSort(d2.Modules))
+
+	// Copy since we have to modify the module destroy flag to false so
+	// we don't compare that. TODO: delete this when we get rid of the
+	// destroy flag on modules.
+	dCopy := d.DeepCopy()
+	d2Copy := d2.DeepCopy()
+	for _, m := range dCopy.Modules {
+		m.Destroy = false
+	}
+	for _, m := range d2Copy.Modules {
+		m.Destroy = false
+	}
+
+	// Use DeepEqual
+	return reflect.DeepEqual(dCopy, d2Copy)
+}
+
+// DeepCopy performs a deep copy of all parts of the Diff, making the
+// resulting Diff safe to use without modifying this one.
+func (d *Diff) DeepCopy() *Diff {
+	copy, err := copystructure.Config{Lock: true}.Copy(d)
+	if err != nil {
+		panic(err)
+	}
+
+	return copy.(*Diff)
 }
 
 func (d *Diff) String() string {
@@ -164,6 +236,10 @@ func (d *ModuleDiff) ChangeType() DiffChangeType {
 
 // Empty returns true if the diff has no changes within this module.
 func (d *ModuleDiff) Empty() bool {
+	if d.Destroy {
+		return false
+	}
+
 	if len(d.Resources) == 0 {
 		return true
 	}
@@ -201,10 +277,6 @@ func (d *ModuleDiff) IsRoot() bool {
 // format that users can read to quickly inspect a diff.
 func (d *ModuleDiff) String() string {
 	var buf bytes.Buffer
-
-	if d.Destroy {
-		buf.WriteString("DESTROY MODULE\n")
-	}
 
 	names := make([]string, 0, len(d.Resources))
 	for name := range d.Resources {
@@ -287,6 +359,9 @@ type InstanceDiff struct {
 	DestroyTainted bool
 }
 
+func (d *InstanceDiff) Lock()   { d.mu.Lock() }
+func (d *InstanceDiff) Unlock() { d.mu.Unlock() }
+
 // ResourceAttrDiff is the diff of a single attribute of a resource.
 type ResourceAttrDiff struct {
 	Old         string      // Old Value
@@ -331,6 +406,19 @@ func NewInstanceDiff() *InstanceDiff {
 	return &InstanceDiff{Attributes: make(map[string]*ResourceAttrDiff)}
 }
 
+func (d *InstanceDiff) Copy() (*InstanceDiff, error) {
+	if d == nil {
+		return nil, nil
+	}
+
+	dCopy, err := copystructure.Config{Lock: true}.Copy(d)
+	if err != nil {
+		return nil, err
+	}
+
+	return dCopy.(*InstanceDiff), nil
+}
+
 // ChangeType returns the DiffChangeType represented by the diff
 // for this single instance.
 func (d *InstanceDiff) ChangeType() DiffChangeType {
@@ -362,6 +450,31 @@ func (d *InstanceDiff) Empty() bool {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	return !d.Destroy && !d.DestroyTainted && len(d.Attributes) == 0
+}
+
+// Equal compares two diffs for exact equality.
+//
+// This is different from the Same comparison that is supported which
+// checks for operation equality taking into account computed values. Equal
+// instead checks for exact equality.
+func (d *InstanceDiff) Equal(d2 *InstanceDiff) bool {
+	// If one is nil, they must both be nil
+	if d == nil || d2 == nil {
+		return d == d2
+	}
+
+	// Use DeepEqual
+	return reflect.DeepEqual(d, d2)
+}
+
+// DeepCopy performs a deep copy of all parts of the InstanceDiff
+func (d *InstanceDiff) DeepCopy() *InstanceDiff {
+	copy, err := copystructure.Config{Lock: true}.Copy(d)
+	if err != nil {
+		panic(err)
+	}
+
+	return copy.(*InstanceDiff)
 }
 
 func (d *InstanceDiff) GoString() string {
@@ -542,6 +655,13 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 				continue
 			}
 
+			// If the last diff was a computed value then the absense of
+			// that value is allowed since it may mean the value ended up
+			// being the same.
+			if diffOld.NewComputed {
+				ok = true
+			}
+
 			// No exact match, but maybe this is a set containing computed
 			// values. So check if there is an approximate hash in the key
 			// and if so, try to match the key.
@@ -631,4 +751,22 @@ func (d *InstanceDiff) Same(d2 *InstanceDiff) (bool, string) {
 	}
 
 	return true, ""
+}
+
+// moduleDiffSort implements sort.Interface to sort module diffs by path.
+type moduleDiffSort []*ModuleDiff
+
+func (s moduleDiffSort) Len() int      { return len(s) }
+func (s moduleDiffSort) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s moduleDiffSort) Less(i, j int) bool {
+	a := s[i]
+	b := s[j]
+
+	// If the lengths are different, then the shorter one always wins
+	if len(a.Path) != len(b.Path) {
+		return len(a.Path) < len(b.Path)
+	}
+
+	// Otherwise, compare lexically
+	return strings.Join(a.Path, ".") < strings.Join(b.Path, ".")
 }

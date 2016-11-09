@@ -77,7 +77,8 @@ func resourceAwsVpnConnection() *schema.Resource {
 
 			"static_routes_only": {
 				Type:     schema.TypeBool,
-				Required: true,
+				Optional: true,
+				Computed: true,
 				ForceNew: true,
 			},
 
@@ -304,6 +305,9 @@ func resourceAwsVpnConnectionRead(d *schema.ResourceData, meta interface{}) erro
 		if err := d.Set("static_routes_only", vpnConnection.Options.StaticRoutesOnly); err != nil {
 			return err
 		}
+	} else {
+		//If there no Options on the connection then we do not support *static_routes*
+		d.Set("static_routes_only", false)
 	}
 
 	// Set read only attributes.
