@@ -17,7 +17,6 @@ func TestAccAWSVpnConnection_importBasic(t *testing.T) {
 			{
 				Config: testAccAwsVpnConnectionConfig,
 			},
-
 			{
 				ResourceName:      resourceName,
 				ImportState:       true,

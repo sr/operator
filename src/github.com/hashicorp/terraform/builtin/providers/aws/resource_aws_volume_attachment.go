@@ -44,6 +44,11 @@ func resourceAwsVolumeAttachment() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"skip_destroy": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -155,6 +160,12 @@ func resourceAwsVolumeAttachmentRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceAwsVolumeAttachmentDelete(d *schema.ResourceData, meta interface{}) error {
 	conn := meta.(*AWSClient).ec2conn
+
+	if _, ok := d.GetOk("skip_destroy"); ok {
+		log.Printf("[INFO] Found skip_destroy to be true, removing attachment %q from state", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	vID := d.Get("volume_id").(string)
 	iID := d.Get("instance_id").(string)

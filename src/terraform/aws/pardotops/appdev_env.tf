@@ -1207,7 +1207,7 @@ resource "aws_instance" "appdev_proxyout1" {
   ami                         = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type               = "${var.environment_appdev["app_instance_type"]}"
   subnet_id                   = "${aws_subnet.appdev_us_east_1d_dmz.id}"
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   root_block_device {
     volume_type           = "gp2"
@@ -1321,7 +1321,7 @@ resource "aws_instance" "appdev_toolsproxy1" {
   ami                         = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type               = "${var.environment_appdev["lightweight_instance_type"]}"
   subnet_id                   = "${aws_subnet.appdev_us_east_1d_dmz.id}"
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   root_block_device {
     volume_type           = "gp2"

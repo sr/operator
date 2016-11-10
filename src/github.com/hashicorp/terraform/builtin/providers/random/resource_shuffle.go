@@ -7,8 +7,8 @@ import (
 func resourceShuffle() *schema.Resource {
 	return &schema.Resource{
 		Create: CreateShuffle,
-		Read:   stubRead,
-		Delete: stubDelete,
+		Read:   schema.Noop,
+		Delete: schema.RemoveFromState,
 
 		Schema: map[string]*schema.Schema{
 			"keepers": {
@@ -49,7 +49,7 @@ func resourceShuffle() *schema.Resource {
 	}
 }
 
-func CreateShuffle(d *schema.ResourceData, meta interface{}) error {
+func CreateShuffle(d *schema.ResourceData, _ interface{}) error {
 	input := d.Get("input").([]interface{})
 	seed := d.Get("seed").(string)
 

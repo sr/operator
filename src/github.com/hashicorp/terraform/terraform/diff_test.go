@@ -7,7 +7,12 @@ import (
 )
 
 func TestDiffEmpty(t *testing.T) {
-	diff := new(Diff)
+	var diff *Diff
+	if !diff.Empty() {
+		t.Fatal("should be empty")
+	}
+
+	diff = new(Diff)
 	if !diff.Empty() {
 		t.Fatal("should be empty")
 	}
@@ -37,6 +42,111 @@ func TestDiffEmpty_taintedIsNotEmpty(t *testing.T) {
 
 	if diff.Empty() {
 		t.Fatal("should not be empty, since DestroyTainted was set")
+	}
+}
+
+func TestDiffEqual(t *testing.T) {
+	cases := map[string]struct {
+		D1, D2 *Diff
+		Equal  bool
+	}{
+		"nil": {
+			nil,
+			new(Diff),
+			false,
+		},
+
+		"empty": {
+			new(Diff),
+			new(Diff),
+			true,
+		},
+
+		"different module order": {
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}},
+					{Path: []string{"root", "bar"}},
+				},
+			},
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "bar"}},
+					{Path: []string{"root", "foo"}},
+				},
+			},
+			true,
+		},
+
+		"different module diff destroys": {
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}, Destroy: true},
+				},
+			},
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}, Destroy: false},
+				},
+			},
+			true,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			actual := tc.D1.Equal(tc.D2)
+			if actual != tc.Equal {
+				t.Fatalf("expected: %v\n\n%#v\n\n%#v", tc.Equal, tc.D1, tc.D2)
+			}
+		})
+	}
+}
+
+func TestDiffPrune(t *testing.T) {
+	cases := map[string]struct {
+		D1, D2 *Diff
+	}{
+		"nil": {
+			nil,
+			nil,
+		},
+
+		"empty": {
+			new(Diff),
+			new(Diff),
+		},
+
+		"empty module": {
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}},
+				},
+			},
+			&Diff{},
+		},
+
+		"destroy module": {
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}, Destroy: true},
+				},
+			},
+			&Diff{
+				Modules: []*ModuleDiff{
+					{Path: []string{"root", "foo"}, Destroy: true},
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			tc.D1.Prune()
+			if !tc.D1.Equal(tc.D2) {
+				t.Fatalf("bad:\n\n%#v\n\n%#v", tc.D1, tc.D2)
+			}
+		})
 	}
 }
 
@@ -112,6 +222,39 @@ func TestModuleDiff_ChangeType(t *testing.T) {
 		if actual != tc.Result {
 			t.Fatalf("%d: %#v", i, actual)
 		}
+	}
+}
+
+func TestDiff_DeepCopy(t *testing.T) {
+	cases := map[string]*Diff{
+		"empty": {},
+
+		"basic diff": {
+			Modules: []*ModuleDiff{
+				{
+					Path: []string{"root"},
+					Resources: map[string]*InstanceDiff{
+						"aws_instance.foo": {
+							Attributes: map[string]*ResourceAttrDiff{
+								"num": {
+									Old: "0",
+									New: "2",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			dup := tc.DeepCopy()
+			if !reflect.DeepEqual(dup, tc) {
+				t.Fatalf("\n%#v\n\n%#v", dup, tc)
+			}
+		})
 	}
 }
 
@@ -469,6 +612,75 @@ func TestInstanceDiffSame(t *testing.T) {
 			},
 			false,
 			"diff RequiresNew; old: true, new: false",
+		},
+
+		// NewComputed on primitive
+		{
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo": {
+						Old:         "",
+						New:         "${var.foo}",
+						NewComputed: true,
+					},
+				},
+			},
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo": {
+						Old: "0",
+						New: "1",
+					},
+				},
+			},
+			true,
+			"",
+		},
+
+		// NewComputed on primitive, removed
+		{
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo": {
+						Old:         "",
+						New:         "${var.foo}",
+						NewComputed: true,
+					},
+				},
+			},
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{},
+			},
+			true,
+			"",
+		},
+
+		// NewComputed on set, removed
+		{
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.#": {
+						Old:         "",
+						New:         "",
+						NewComputed: true,
+					},
+				},
+			},
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.1": {
+						Old:        "foo",
+						New:        "",
+						NewRemoved: true,
+					},
+					"foo.2": {
+						Old: "",
+						New: "bar",
+					},
+				},
+			},
+			true,
+			"",
 		},
 
 		{
