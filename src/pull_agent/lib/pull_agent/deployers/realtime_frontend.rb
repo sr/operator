@@ -20,7 +20,7 @@ module PullAgent
           end
         end
 
-        Salesedge.new.tap do |salesedge|
+        SalesEdge.new.tap do |salesedge|
           salesedge.debugging = true
           salesedge.restart!
         end
