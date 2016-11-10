@@ -21,12 +21,12 @@ module PullAgent
         end
 
         AtomicSymlink.create!(
-          File.join(release_directory, "shared", "env.rb"),
+          File.join(release_directory, "env.rb"),
           File.join(release_directory.current_symlink, "env.rb"),
         )
 
         AtomicSymlink.create!(
-          File.join(release_directory, "shared", ".envvars_#{@environment}.rb"),
+          File.join(release_directory, ".envvars_#{@environment}.rb"),
           File.join(release_directory.current_symlink, ".envvars_#{@environment}.rb"),
         )
 
