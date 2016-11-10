@@ -872,7 +872,7 @@ resource "aws_elb" "artifactory_primary_machine_access_elb" {
   ]
 
   subnets = [
-    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
   ]
 
   connection_draining         = true
