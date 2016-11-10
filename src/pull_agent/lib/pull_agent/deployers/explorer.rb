@@ -31,7 +31,7 @@ module PullAgent
         )
 
         AtomicSymlink.create!(
-          File.join(release_directory, "shared", "log"),
+          File.join(release_directory, "log"),
           File.join(release_directory.current_symlink, "log"),
         )
 
