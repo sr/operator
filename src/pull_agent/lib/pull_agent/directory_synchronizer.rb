@@ -11,8 +11,11 @@ module PullAgent
 
     def synchronize
       FileUtils.mkdir_p(@destination.to_s)
-      output = IO.popen(["rsync", "--recursive", "--checksum", "--links", "--perms", "--verbose", "--delete", @source.to_s + "/", @destination.to_s], &:read)
 
+      command = ["rsync", "--recursive", "--checksum", "--links", "--perms", "--verbose", "--delete", @source.to_s + "/", @destination.to_s]
+      Logger.log(:info, "Synchronizing directory: #{command.inspect}")
+
+      output = IO.popen(command, &:read)
       raise SynchronizationFailedError, "synchronization failed: #{output}" unless $?.success?
       true
     end
