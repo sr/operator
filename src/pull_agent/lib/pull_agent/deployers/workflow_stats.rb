@@ -5,7 +5,7 @@ module PullAgent
 
       # How long to wait before restarting the service to give the load balancer
       # time to notice the node is down
-      PLAY_DEAD_WAIT_TIME = 30
+      PLAY_DEAD_WAIT_TIME = 45
 
       # How long to wait for the service to start back up until we give up
       RESTART_WAIT_TIME = 180
