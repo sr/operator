@@ -48,7 +48,7 @@ module PullAgent
     end
 
     def add_topology(topo, topo_env, jar)
-      add_topo_command = [STORM_BIN, "jar", jar, "com.pardot.storm.topology.TopologyRunner", "--topo-def=#{topo_class(topo)}", "--name=#{topo_name(topo)}", "--remote", "--config-file=config/environments/#{topo_env}.yaml,config/topologies/#{topo_name(topo)}.yaml"]
+      add_topo_command = [STORM_BIN, "jar", jar, "com.pardot.storm.topology.TopologyRunner", "--topo-def=#{topo_class(topo)}", "--name=#{topo_name(topo)}", "--remote", "--config-file=config/topologies/#{topo_name(topo)}.yaml,config/environments/#{topo_env}.yaml"]
       add_topo_output = ShellHelper.execute(add_topo_command, err: [:child, :out])
       Logger.log(:info, "Topology Deploy Routine Command: #{add_topo_command.inspect}")
       Logger.log(:info, "Topology Deploy Routine Output: #{add_topo_output.gsub(/^/, "  ")}")
