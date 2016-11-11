@@ -12,7 +12,7 @@ module PullAgent
         script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
         datacenter =
-          if @environment
+          if @environment == "dev"
             "local"
           else
             hostname.split("-")[3]
