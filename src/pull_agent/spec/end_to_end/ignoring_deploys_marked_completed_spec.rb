@@ -8,14 +8,12 @@ describe "ignoring deploys marked completed" do
   after { FileUtils.rm_rf(tempdir) }
 
   before do
-    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"completed","action":null}}}))
+    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{PullAgent::ShellHelper.hostname}")
+      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{artifact_url}","build_number":#{build_number},"servers":{"#{PullAgent::ShellHelper.hostname}":{"stage":"completed","action":null}}}))
   end
 
   it "exits immediately without changing anything" do
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
-    cli.parse_arguments!
-    cli.environment.payload.options[:repo_path] = tempdir
+    cli = PullAgent::CLI.new(%w[test pardot])
 
     output = capturing_stdout { cli.checkin }
     expect(output).to match(/Nothing to do for this deploy/)

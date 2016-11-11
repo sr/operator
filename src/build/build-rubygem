@@ -44,11 +44,11 @@ export RUBYGEMS_HOST
 
 # Determine gem version. Bamboo does not provide a build number that is global
 # accross branches. So we use the build number only when building the master
-# branch. Otherwise we prefix the version by 0 to make sure that non-master
+# branch. Otherwise we prefix the version by 0.1 to make sure that non-master
 # builds are never considered newer. Example versions:
 #
 # * Master branch: pardot_pull-agent-123
-# * Topic branch: pardot-pull_agent-0.PUL36.10
+# * Topic branch: pardot-pull_agent-0.1.PUL36.10
 #
 # One consequence of including the plan key (which includes letters) in the
 # version string is that it is considered a prerelease version meaning that
@@ -59,7 +59,7 @@ export RUBYGEMS_HOST
 # shellcheck disable=SC2154
 if [ "$CI_BRANCH" = "master" ]
 then RUBYGEM_VERSION="$((CI_BUILD_NUMBER))"
-else RUBYGEM_VERSION="0.${CI_PLAN}.${CI_BUILD_NUMBER}"
+else RUBYGEM_VERSION="0.1.${CI_PLAN}.${CI_BUILD_NUMBER}"
 fi
 export RUBYGEM_VERSION
 

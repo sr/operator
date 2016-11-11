@@ -45,6 +45,7 @@ Style/BlockDelimiters:
     - transaction
     - capturing_stdout
     - multi
+    - with_http_client
   FunctionalMethods:
     - let
     - let!

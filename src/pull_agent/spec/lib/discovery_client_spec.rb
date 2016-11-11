@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Pardot::PullAgent::DiscoveryClient do
+describe PullAgent::DiscoveryClient do
   describe "#service" do
     it "retrieves a list for the specified service" do
       stub_request(:get, "http://127.0.0.1:8383/v1/service/redis-job-1")
@@ -25,7 +25,7 @@ describe Pardot::PullAgent::DiscoveryClient do
           ])
         )
 
-      servers = Pardot::PullAgent::DiscoveryClient.new.service("redis-job-1")
+      servers = PullAgent::DiscoveryClient.new.service("redis-job-1")
       expect(servers.length).to eq(1)
       expect(servers[0]["address"]).to eq("job-d1.dev")
     end
@@ -35,8 +35,8 @@ describe Pardot::PullAgent::DiscoveryClient do
         .to_return(status: 503)
 
       expect {
-        Pardot::PullAgent::DiscoveryClient.new.service("redis-job-1")
-      }.to raise_error(Pardot::PullAgent::DiscoveryClient::Error)
+        PullAgent::DiscoveryClient.new.service("redis-job-1")
+      }.to raise_error(PullAgent::DiscoveryClient::Error)
     end
   end
 end

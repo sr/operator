@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Pardot::PullAgent::BuildVersion do
+describe PullAgent::BuildVersion do
   it "loads a build version file from disk" do
     Tempfile.open("build.version") do |tmpfile|
       tmpfile.write("build1234\nbfa9aac\nhttps://artifactory.example/build1234.tar.gz\n")
       tmpfile.flush
 
-      build_version = Pardot::PullAgent::BuildVersion.load(tmpfile.path)
+      build_version = PullAgent::BuildVersion.load(tmpfile.path)
       expect(build_version.build_number).to eq(1234)
       expect(build_version.sha).to eq("bfa9aac")
       expect(build_version.artifact_url).to eq("https://artifactory.example/build1234.tar.gz")
@@ -14,7 +14,7 @@ describe Pardot::PullAgent::BuildVersion do
   end
 
   it "saves a build.version file to disk" do
-    v = Pardot::PullAgent::BuildVersion.new(1234, "bfa9aac", "https://artifactory.example/build1234.tar.gz")
+    v = PullAgent::BuildVersion.new(1234, "bfa9aac", "https://artifactory.example/build1234.tar.gz")
     Tempfile.open("build.version") do |tmpfile|
       v.save_to_file(tmpfile)
       tmpfile.flush

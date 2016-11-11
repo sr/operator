@@ -1,5 +1,10 @@
+ENV["CANOE_URL"] = "http://canoe.test"
+ENV["CANOE_API_TOKEN"] = "faketoken"
+ENV["ARTIFACTORY_USER"] = "fakeuser"
+ENV["ARTIFACTORY_TOKEN"] = "faketoken"
+
 $LOAD_PATH.unshift File.realpath(File.join(File.dirname(__FILE__), "..", "lib"))
-require "pardot/pull_agent"
+require "pull_agent"
 require "tmpdir"
 require_relative "helpers/stdout"
 require_relative "helpers/fixtures"
@@ -28,6 +33,9 @@ RSpec.configure do |config|
     # ...rather than:
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+
+    # Avoids false positives in expect { }.to_raise
+    expectations.on_potential_false_positives = :raise
   end
 
   # rspec-mocks config goes here. You can use an alternate test double

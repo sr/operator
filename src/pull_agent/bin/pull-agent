@@ -1,23 +1,21 @@
 #!/usr/bin/env ruby
-require "pardot/pull_agent"
+require "pull_agent"
 
 default_lockfile = "/var/lock/pull-agent/deploy.lock"
 LOCKFILE = ENV.fetch("PULL_AGENT_LOCKFILE", default_lockfile)
 
-proxy_selector = Pardot::PullAgent::ProxySelector.new
+proxy_selector = PullAgent::ProxySelector.new
 proxy_selector.configure_random_proxy
 
-cli = Pardot::PullAgent::CLI.new
-cli.parse_arguments!
-environment = cli.environment
+cli = PullAgent::CLI.new
 
 # Wait a random number of seconds, since cron can't be set by second
-if !environment.dev? && !ENV.key?("PULL_AGENT_NO_SLEEP")
+if cli.environment != "dev" && !ENV.key?("PULL_AGENT_NO_SLEEP")
   sleep(rand * 60)
 end
 
 # TODO(sr) Remove this and setup a real end-to-end test that hits a Canoe server
-if environment.dev? && ENV["PULL_AGENT_ENV"] == "test"
+if cli.environment == "dev" && ENV["PULL_AGENT_ENV"] == "test"
   exit 0
 end
 
@@ -27,10 +25,10 @@ begin
   if lockfile.flock(File::LOCK_NB | File::LOCK_EX)
     cli.checkin
   else
-    Pardot::PullAgent::Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
+    PullAgent::Logger.log(:error, "#{LOCKFILE} is locked. Is another process already running?")
   end
 rescue => e
-  Pardot::PullAgent::Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
+  PullAgent::Logger.log(:alert, e.to_s + "\n" + e.backtrace.join("\n"))
   raise e
 ensure
   lockfile.close

@@ -13,29 +13,33 @@ describe "rollback back to a previous version" do
 
   # The second build is deployed, and we're stubbing out a revert deploy back to the first build.
   before do
-    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{Pardot::PullAgent::ShellHelper.hostname}")
-      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{first_artifact_url}","build_number":#{first_build_number},"created_at":"2015-12-20T14:26:29-05:00", "servers":{"#{Pardot::PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
+    ENV["RELEASE_DIRECTORY"] = tempdir
+
+    stub_request(:get, "http://canoe.test/api/targets/test/deploys/latest?repo_name=pardot&server=#{PullAgent::ShellHelper.hostname}")
+      .to_return(body: %({"id":445,"branch":"master","artifact_url":"#{first_artifact_url}","build_number":#{first_build_number},"created_at":"2015-12-20T14:26:29-05:00", "servers":{"#{PullAgent::ShellHelper.hostname}":{"stage":"pending","action":"deploy"}}}))
 
     bootstrap_repo_path(tempdir)
 
-    first_version = Pardot::PullAgent::BuildVersion.new(first_build_number, first_sha, first_artifact_url)
+    first_version = PullAgent::BuildVersion.new(first_build_number, first_sha, first_artifact_url)
     FileUtils.mkdir_p(File.join(tempdir, "releases", "B"))
     File.write(
       File.join(tempdir, "releases", "B", "build.version"),
       first_version.to_s
     )
 
-    current_version = Pardot::PullAgent::BuildVersion.new(current_build_number, current_sha, current_artifact_url)
+    current_version = PullAgent::BuildVersion.new(current_build_number, current_sha, current_artifact_url)
     File.write(File.join(tempdir, "current", "build.version"), current_version.to_s)
   end
 
-  it "rapidly changes the symlink back to the previous version" do
-    canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{Pardot::PullAgent::ShellHelper.hostname}")
-                    .to_return(status: 200)
+  after do
+    ENV.delete("RELEASE_DIRECTORY")
+  end
 
-    cli = Pardot::PullAgent::CLI.new(%w[test pardot])
-    cli.parse_arguments!
-    cli.environment.payload.options[:repo_path] = tempdir
+  it "rapidly changes the symlink back to the previous version" do
+    canoe_request = stub_request(:put, "http://canoe.test/api/targets/test/deploys/445/results/#{PullAgent::ShellHelper.hostname}")
+      .to_return(status: 200)
+
+    cli = PullAgent::CLI.new(%w[test pardot])
 
     expect(File.readlink(File.join(tempdir, "current"))).to match(/releases\/A$/)
     _output = capturing_stdout { cli.checkin }
