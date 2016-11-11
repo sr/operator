@@ -9,7 +9,7 @@ module PullAgent
 
       def deploy
         hostname = ShellHelper.hostname
-        script = File.expand_path("../../../../../bin/pa-deploy-chef", __FILE__)
+        script = File.expand_path("../../../../bin/pa-deploy-chef", __FILE__)
 
         datacenter =
           if @environment
