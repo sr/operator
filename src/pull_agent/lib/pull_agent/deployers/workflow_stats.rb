@@ -34,7 +34,7 @@ module PullAgent
 
         play_dead_controller = PlayDeadController.new
         play_dead_controller.make_play_dead
-        sleep(PLAY_DEAD_WAIT_TIME)
+        sleep(PLAY_DEAD_WAIT_TIME) # wait for load balancer to notice service is down
 
         UpstartService.new("workflowstats").restart
 
@@ -54,6 +54,7 @@ module PullAgent
 
           raise DeploymentError, "Service did not start within #{@restart_wait_time} seconds"
         end
+        sleep(PLAY_DEAD_WAIT_TIME) # wait for load balancer to notice service is up
       end
 
       def restart
