@@ -49,7 +49,7 @@ module PullAgent
         }
 
         request = { payload: JSON.dump(payload) }
-        response = Canoe.chef_checkin(@environment, request)
+        response = Canoe.chef_checkin(request)
 
         if response.code != "200"
           Instrumentation.error(
@@ -77,7 +77,7 @@ module PullAgent
         request = { payload: JSON.dump(payload) }
 
         Instrumentation.debug(at: "chef", completed: payload)
-        response = Canoe.complete_chef_deploy(@environment, request)
+        response = Canoe.complete_chef_deploy(request)
 
         if response.code != "200"
           Instrumentation.error(
