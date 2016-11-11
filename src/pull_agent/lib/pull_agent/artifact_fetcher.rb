@@ -63,8 +63,8 @@ module PullAgent
       Net::HTTP.start(
         @artifact_url.host,
         @artifact_url.scheme == "https" ? 443 : 80,
-        @proxy&.hostname,
-        @proxy&.port,
+        (@proxy && @proxy.hostname),
+        (@proxy && @proxy.port),
         use_ssl: (@artifact_url.scheme == "https"),
         &Proc.new
       )
