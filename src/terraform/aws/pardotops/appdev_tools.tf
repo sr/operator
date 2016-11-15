@@ -52,7 +52,7 @@ resource "aws_route53_record" "appdev_tools1_arecord" {
   ttl     = "900"
 }
 
-resource "aws_instance" "appdev_tools_server" {
+resource "aws_instance" "appdev_tools1-2_server" {
   ami           = "${var.centos_7_hvm_50gb_chefdev_ami}"
   instance_type = "t2.medium"
   key_name      = "internal_apps"
@@ -74,11 +74,10 @@ resource "aws_instance" "appdev_tools_server" {
   }
 }
 
-resource "aws_route53_record" "appdev_tools1_arecord" {
+resource "aws_route53_record" "appdev_tools1-2_arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot2-tools1-2-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.appdev_tools_server.private_ip}"]
   type    = "A"
   ttl     = "900"
 }
-
