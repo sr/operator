@@ -51,3 +51,34 @@ resource "aws_route53_record" "appdev_tools1_arecord" {
   type    = "A"
   ttl     = "900"
 }
+
+resource "aws_instance" "appdev_tools_server" {
+  ami           = "${var.centos_7_hvm_50gb_chefdev_ami}"
+  instance_type = "t2.medium"
+  key_name      = "internal_apps"
+  subnet_id     = "${aws_subnet.appdev_us_east_1d.id}"
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = "50"
+    delete_on_termination = true
+  }
+
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_tools_server.id}",
+  ]
+
+  tags {
+    Name      = "${var.environment_appdev["pardot_env_id"]}-tools1-2-${var.environment_appdev["dc_id"]}"
+    terraform = true
+  }
+}
+
+resource "aws_route53_record" "appdev_tools1_arecord" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot2-tools1-2-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.appdev_tools_server.private_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
