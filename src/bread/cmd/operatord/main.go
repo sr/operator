@@ -27,6 +27,14 @@ import (
 
 const grpcTimeout = 10 * time.Second
 
+func mustParseURL(s string) *url.URL {
+	u, err := url.Parse(s)
+	if err != nil {
+		panic(err)
+	}
+	return u
+}
+
 type config struct {
 	afy   *bread.ArtifactoryConfig
 	canoe *bread.CanoeConfig
@@ -51,7 +59,7 @@ type config struct {
 	hipchatAddonURL   string
 	hipchatWebhookURL string
 
-	githubWebhookSecret string
+	github *bread.GithubHandlerConfig
 }
 
 func run(invoker operator.InvokerFunc) error {
@@ -59,7 +67,15 @@ func run(invoker operator.InvokerFunc) error {
 		afy:   &bread.ArtifactoryConfig{},
 		canoe: &bread.CanoeConfig{},
 		ecs:   &bread.ECSConfig{},
-		ldap:  &bread.LDAPConfig{},
+		github: &bread.GithubHandlerConfig{
+			Endpoints: []*url.URL{
+				mustParseURL("https://compliance.dev.pardot.com/webhooks"),
+			},
+			RequestTimeout: 2.0 * time.Second,
+			MaxRetries:     5,
+			RetryDelay:     1.0 * time.Second,
+		},
+		ldap: &bread.LDAPConfig{},
 	}
 	flags := flag.CommandLine
 	flags.StringVar(&config.grpcAddr, "addr-grpc", ":9000", "Listen address of the gRPC server")
@@ -77,7 +93,7 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.hipchatNamespace, "hipchat-namespace", "com.pardot.dev.operator", "Namespace used for all installations created via this server")
 	flags.StringVar(&config.hipchatAddonURL, "hipchat-addon-url", "https://operator.dev.pardot.com/hipchat/addon", "HipChat addon installation endpoint URL")
 	flags.StringVar(&config.hipchatWebhookURL, "hipchat-webhook-url", "https://operator.dev.pardot.com/hipchat/webhook", "HipChat webhook endpoint URL")
-	flags.StringVar(&config.githubWebhookSecret, "github-webhook-secret", "", "Shared secret used to verify the signature of webhook requests received from GitHub")
+	flags.StringVar(&config.github.SecretToken, "github-webhook-secret", "", "Shared secret used to verify the signature of webhook requests received from GitHub")
 	flags.StringVar(&config.afy.URL, "artifactory-url", "https://artifactory.dev.pardot.com/artifactory", "Artifactory URL")
 	flags.StringVar(&config.afy.User, "artifactory-user", "", "Artifactory username")
 	flags.StringVar(&config.afy.APIKey, "artifactory-api-key", "", "Artifactory API key")
@@ -280,16 +296,10 @@ func run(invoker operator.InvokerFunc) error {
 		)
 		httpServer.Handle("/hipchat/webhook", bread.NewHandler(logger, webhookHandler))
 	}
-	if config.githubWebhookSecret != "" {
+	if config.github.SecretToken != "" {
 		httpServer.Handle(
 			"/github",
-			bread.NewHandler(
-				logger,
-				bread.NewGithubHandler(
-					logger,
-					config.githubWebhookSecret,
-				),
-			),
+			bread.NewHandler(logger, bread.NewGithubHandler(logger, config.github)),
 		)
 	}
 	if config.httpAddr != "" {

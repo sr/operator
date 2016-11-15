@@ -20,6 +20,13 @@ message OperatorMessage {
 	string html = 3;
 }
 
+message GithubEvent {
+	string id = 1;
+	string type = 2;
+	bytes payload = 3;
+	repeated HTTPRequest forwarded = 4;
+}
+
 message HTTPRequest {
 	string method = 1;
 	string path = 2;
