@@ -32,7 +32,7 @@ module PullAgent
 
         AtomicSymlink.create!(
           File.join(release_directory, ".envvars_#{@environment}.rb"),
-          File.join(release_directory.current_symlink, ".envvars_#{@environment}.rb"),
+          File.join(release_directory.current_symlink, "api", ".envvars_#{@environment}.rb"),
         )
 
         AtomicSymlink.create!(
