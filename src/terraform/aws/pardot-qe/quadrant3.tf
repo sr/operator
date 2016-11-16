@@ -1,7 +1,6 @@
 resource "aws_db_instance" "q3db" {
   allocated_storage    = 50
-  engine               = "mysql"
-  engine_version       = "5.6.17"
+  engine               = "postgres"
   instance_class       = "db.t1.micro"
   name                 = "mydb"
   username             = "pardottandp"
