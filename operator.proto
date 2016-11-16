@@ -2,10 +2,7 @@ syntax = "proto3";
 
 package operator;
 
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/duration.proto";
-
-option go_package = "operator";
 
 message Request {
 	Source source = 1;
@@ -50,8 +47,4 @@ message User {
 	string login = 2;
 	string real_name = 3;
 	string email = 4;
-}
-
-extend google.protobuf.ServiceOptions {
-	string name = 51234;
 }

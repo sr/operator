@@ -4,7 +4,8 @@ import "operator.proto";
 
 package testing;
 
-option go_package = "operatortesting";
+// TODO(sr) https://github.com/bazelbuild/rules_go/blob/2e6cbd84edeedaeb4eb05187230a1b12913b217e/examples/proto/dep/useful.proto#L5
+// option go_package = "operatortesting";
 
 service Pinger {
 	rpc Ping(PingRequest) returns (operator.Response);
