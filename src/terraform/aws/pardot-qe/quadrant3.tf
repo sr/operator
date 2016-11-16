@@ -6,7 +6,6 @@ resource "aws_db_instance" "q3db" {
   name                 = "mydb"
   username             = "pardottandp"
   password             = "thisIsNotThePasswordAnymore" # once changed, this is no longer tracked by TF. See secrets.ops.pardot.com for latest PW
-  db_subnet_group_name = "q3db_db_subnet_group"
   parameter_group_name = "default.mysql5.6"
 
   vpc_security_group_ids = [
@@ -14,18 +13,8 @@ resource "aws_db_instance" "q3db" {
   ]
 }
 
-resource "aws_db_subnet_group" "q3db_db_subnet_group" {
-  name = "q3db_db_subnet_group"
-
-  subnet_ids = [
-    "${aws_subnet.appdev_us_east_1a_dmz.id}",
-  ]
-}
-
 resource "aws_security_group" "q3_secgroup" {
-  vpc_id      = "${aws_vpc.appdev}"
   description = "q3_secgroup"
-  vpc_id      = "${aws_vpc.artifactory_integration.id}"
 
   ingress {
     from_port = 3306
@@ -33,7 +22,7 @@ resource "aws_security_group" "q3_secgroup" {
     protocol  = "mysql"
 
     cidr_blocks = [
-      "${var.aloha_vpn_cidr_blocks}",
+      "${var.jump_dot_dev_ip_address}",
     ]
   }
 
