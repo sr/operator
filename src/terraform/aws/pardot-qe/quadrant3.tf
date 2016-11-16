@@ -1,11 +1,11 @@
 resource "aws_db_instance" "q3db" {
   allocated_storage    = 50
   engine               = "postgres"
-  instance_class       = "db.t1.micro"
+  instance_class       = "db.t2.small"
   name                 = "mydb"
   username             = "pardottandp"
   password             = "thisIsNotThePasswordAnymore" # once changed, this is no longer tracked by TF. See secrets.ops.pardot.com for latest PW
-  parameter_group_name = "default.mysql5.6"
+  parameter_group_name = "default.postgres9.5"
 
   vpc_security_group_ids = [
     "${aws_security_group.q3_secgroup.id}",
@@ -18,10 +18,10 @@ resource "aws_security_group" "q3_secgroup" {
   ingress {
     from_port = 3306
     to_port   = 3306
-    protocol  = "mysql"
+    protocol  = "TCP"
 
     cidr_blocks = [
-      "${var.jump_dot_dev_ip_address}",
+      "${var.jump_dot_dev_ip_address}/32",
     ]
   }
 
