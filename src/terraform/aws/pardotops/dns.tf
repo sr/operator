@@ -301,6 +301,14 @@ resource "aws_route53_record" "bread_sentry_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "crammer_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "crammer.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["guarded-journey-4135.whispering-wildwood-3486.herokuspace.com"]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
 resource "aws_route53_record" "compliance_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "compliance.${aws_route53_zone.dev_pardot_com.name}"
