@@ -16,8 +16,8 @@ resource "aws_security_group" "q3_secgroup" {
   description = "q3_secgroup"
 
   ingress {
-    from_port = 3306
-    to_port   = 3306
+    from_port = 5432
+    to_port   = 5432
     protocol  = "TCP"
 
     cidr_blocks = [
