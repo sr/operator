@@ -70,6 +70,33 @@ module Zabbix
       )
     end
 
+    def get_problem_triggers_by_app_name(app_name)
+      app_ids = @client.query(
+        method: "application.get",
+        params: {
+          putput: "extend",
+          filter: {
+            name: app_name
+          }
+        }
+      ).map { |a| a["applicationid"] }
+
+      @client.query(
+        method: "trigger.get",
+        params: {
+          output: "extend",
+          selectHosts: "extend",
+          expandDescription: true,
+          active: true,
+          monitored: true,
+          applicationids: app_ids,
+          filter: {
+            value: 1 # problem
+          }
+        }
+      )
+    end
+
     def get_item_by_name_and_lastvalue(name, lastvalue)
       @client.items.get(name: name, lastvalue: lastvalue) unless name.nil? || lastvalue.nil?
     end

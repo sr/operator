@@ -1,0 +1,26 @@
+<strong>Chef Problems in <%= @datacenter %></strong>
+<table>
+  <tr>
+    <th>
+      Hostname
+    </th>
+    <th>
+      Problem
+    </th>
+  </tr>
+  <% @problems.each do |problem| %>
+    <% host = problem.fetch("hosts", []).first %>
+    <tr>
+      <td>
+        <% if host %>
+          <%= host["host"] %>
+        <% else %>
+          <i>unknown host</i>
+        <% end %>
+      </td>
+      <td>
+        <%= problem["description"] %>
+      </td>
+    </tr>
+  <% end %>
+</table>

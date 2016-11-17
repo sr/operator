@@ -7,6 +7,8 @@ require "zabbix/pagerduty_pager"
 require "zabbix/test_pager"
 
 class ZabbixHandler < ApplicationHandler
+  template_root File.expand_path("../../templates/zabbix", __FILE__)
+
   module HumanTime
     def self.parse(str, now: Time.now)
       if /^([+-]?\d+)(w|wk|wks|week|weeks)$/i =~ str
@@ -31,6 +33,7 @@ class ZabbixHandler < ApplicationHandler
   PagerFailed = Class.new(StandardError)
   MONITOR_FAIL_ERRMSG = "::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause".freeze
   CHAT_ERRMSG = "Sorry, something went wrong.".freeze
+  ZABBIX_CHEF_APP_NAME = "app:chef".freeze
 
   # config: zabbix
   config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
@@ -44,6 +47,9 @@ class ZabbixHandler < ApplicationHandler
 
   # config: hal9000's "home room"
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
+
+  # config: chef monitoring
+  config :chef_monitor_interval_seconds, default: 3600
 
   # config: zabbix monitor
   config :monitor_hipchat_notify, default: false
@@ -327,6 +333,27 @@ class ZabbixHandler < ApplicationHandler
   def start_monitoring(_payload)
     every(config.monitor_interval_seconds) do |_timer|
       run_monitors
+    end
+
+    check_for_chef_problems
+    every(config.chef_monitor_interval_seconds) do
+      check_for_chef_problems
+    end
+  end
+
+  def check_for_chef_problems
+    @clients.each do |datacenter, client|
+      begin
+        problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
+        if problems && !problems.empty?
+          robot.send_message(
+            @status_root,
+            render_template("chef_problems", datacenter: datacenter, problems: problems)
+          )
+        end
+      rescue => e
+        robot.send_message(@status_room, "Something went wrong when I tried to check for problems with Chef in #{datacenter}: #{e}")
+      end
     end
   end
 
