@@ -1,11 +1,18 @@
 git_repository(
     name = "io_bazel_rules_go",
-    remote = "https://github.com/bazelbuild/rules_go.git",
     commit = "878185a8d66cb4a3fb93602d8e8bc2f50cd69616",
+    remote = "https://github.com/bazelbuild/rules_go.git",
 )
-load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "new_go_repository")
+
+load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository", "new_go_repository")
 
 go_repositories()
+
+go_repository(
+    name = "com_github_bazelbuild_buildifier",
+    commit = "31c314a5d60d94f6c67de61e9228d1aeb1f6c8e5",
+    importpath = "github.com/bazelbuild/buildifier",
+)
 
 new_go_repository(
     name = "com_github_acsellers_inflections",
