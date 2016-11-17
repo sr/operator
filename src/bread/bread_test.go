@@ -2,9 +2,16 @@ package bread_test
 
 import (
 	"bread"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -12,6 +19,7 @@ import (
 
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
+	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 
 	"bread/pb"
@@ -306,5 +314,116 @@ func TestDeploy(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestGithub(t *testing.T) {
+	const secret = "shared secret"
+	endpoint := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		body, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			panic(err)
+		}
+		if string(body) == "{fail: true}" {
+			w.WriteHeader(418)
+		} else {
+			w.WriteHeader(200)
+		}
+	}))
+	defer endpoint.Close()
+	endpointURL, err := url.Parse(endpoint.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	handler := bread.NewGithubHandler(protolog.DiscardLogger, &bread.GithubHandlerConfig{
+		RequestTimeout: 10 * time.Millisecond,
+		Endpoints:      []*url.URL{endpointURL},
+		SecretToken:    secret,
+	})
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+	for _, tc := range []struct {
+		status   int
+		respBody string
+		reqBody  string
+		f        func(*http.Request) *http.Request
+	}{
+		{
+			405,
+			"unsupported method: GET",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.Method = "GET"
+				return req
+			},
+		},
+		{
+			400,
+			"unsupported content-type: application/xml",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.Header.Set("Content-Type", "application/xml")
+				return req
+			},
+		},
+		{
+			400,
+			"",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.Header.Del("X-Hub-Signature")
+				return req
+			},
+		},
+		{
+			400,
+			"",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.Header.Set("X-Hub-Signature", "badsig")
+				return req
+			},
+		},
+		{
+			400,
+			"signature does not match",
+			"{x: true}",
+			func(req *http.Request) *http.Request {
+				req.Header.Set("X-Hub-Signature", "sha1=f7b12f2256197f54286357418bff5d6230f821bf")
+				return req
+			},
+		},
+		{
+			500,
+			"could not proxy to all endpoints",
+			"{fail: true}",
+			func(req *http.Request) *http.Request {
+				return req
+			},
+		},
+	} {
+		hash := hmac.New(sha1.New, []byte(secret))
+		if _, err := hash.Write([]byte(tc.reqBody)); err != nil {
+			t.Fatal(err)
+		}
+		req, err := http.NewRequest(http.MethodPost, ts.URL, strings.NewReader(tc.reqBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("X-GitHub-Event", "push")
+		req.Header.Add("X-Hub-Signature", "sha1="+hex.EncodeToString(hash.Sum(nil)))
+		resp, err := http.DefaultClient.Do(tc.f(req))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != tc.status {
+			t.Errorf("expected status code %d, got %d", tc.status, resp.StatusCode)
+		}
+		if b, err := ioutil.ReadAll(resp.Body); err != nil {
+			t.Error(err)
+		} else if strings.TrimSpace(string(b)) != tc.respBody {
+			t.Errorf("expected response body `%s`, got `%s`", tc.respBody, strings.TrimSpace(string(b)))
+		}
 	}
 }
