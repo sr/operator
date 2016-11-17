@@ -64,6 +64,8 @@ class ZabbixHandler < ApplicationHandler
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
 
+  route /^zabbix chef problems/, :check_for_chef_problems, command: true
+
   route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
     "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
     "zabbix maintenance start HOST until=24h" => "Puts hosts matching HOST in maintenance mode for 24 hours"
@@ -341,7 +343,7 @@ class ZabbixHandler < ApplicationHandler
     end
   end
 
-  def check_for_chef_problems
+  def check_for_chef_problems(*)
     @clients.each do |datacenter, client|
       begin
         problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
