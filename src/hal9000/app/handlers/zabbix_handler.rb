@@ -49,7 +49,7 @@ class ZabbixHandler < ApplicationHandler
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
   # config: chef monitoring
-  config :chef_monitor_interval_seconds, default: 3600
+  config :chef_problem_report_interval_seconds, default: 3600
 
   # config: zabbix monitor
   config :monitor_hipchat_notify, default: false
@@ -64,7 +64,9 @@ class ZabbixHandler < ApplicationHandler
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
 
-  route /^zabbix chef problems/, :check_for_chef_problems, command: true
+  route /^(?:zabbix )?chef problems/, :report_chef_problems, command: true, help: {
+    "zabbix chef problems" => "Lists hosts that haven't recently run Chef successfully"
+  }
 
   route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
     "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
@@ -332,30 +334,56 @@ class ZabbixHandler < ApplicationHandler
     end
   end
 
-  def start_monitoring(_payload)
+  def start_monitoring(*)
     every(config.monitor_interval_seconds) do |_timer|
       run_monitors
     end
 
-    check_for_chef_problems
-    every(config.chef_monitor_interval_seconds) do
-      check_for_chef_problems
+    every(60) do
+      report_chef_problems_at_interval
     end
   end
 
-  def check_for_chef_problems(*)
+  def report_chef_problems_at_interval
     @clients.each do |datacenter, client|
-      begin
+      coordinator = ::Zabbix::ChefProblemReportCoordinator.new(
+        datacenter: datacenter,
+        redis: redis,
+        interval_seconds: config.chef_problem_report_interval_seconds,
+      )
+
+      coordinator.perform_exclusive do
         problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
         if problems && !problems.empty?
           robot.send_message(
-            @status_root,
-            render_template("chef_problems", datacenter: datacenter, problems: problems)
+            @status_room,
+            render_template("chef_problems_report", datacenter: datacenter, problems: problems)
           )
         end
-      rescue => e
-        robot.send_message(@status_room, "Something went wrong when I tried to check for problems with Chef in #{datacenter}: #{e}")
       end
+    end
+  rescue => e
+    robot.send_message(
+      @status_room,
+      "Error while attempting to report Chef problems: #{e}"
+    )
+  end
+
+  def report_chef_problems(response)
+    problems_found = false
+
+    @clients.each do |datacenter, client|
+      problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
+      next unless problems && !problems.empty?
+      problems_found = true
+
+      response.reply(
+        render_template("chef_problems_report", datacenter: datacenter, problems: problems)
+      )
+    end
+
+    unless problems_found
+      response.reply_with_mention("Everything seems in order! All hosts are running Chef successfully.")
     end
   end
 
