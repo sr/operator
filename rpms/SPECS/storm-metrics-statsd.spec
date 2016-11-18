@@ -1,5 +1,5 @@
 %define maven_version 3.3.9
-%define srcver 1.3.0
+%define srcver 1.4.0
 
 Name: storm-metrics-statsd
 Version: %{srcver}
