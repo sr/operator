@@ -1,0 +1,2 @@
+<%= unique_actor_fields(actor: :peer_reviewer, checked: multipass.peer_reviewer.present?, visible: multipass.change_type != 'emergency') %>
+<%= unique_actor_fields(actor: :sre_approver, checked: multipass.sre_approver.present?, visible: multipass.change_type == 'major') %>

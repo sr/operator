@@ -1,0 +1,5 @@
+<div class='checkbox emergency_approver'>
+  <label>
+    <%= check_box_tag 'multipass[emergency_approver]', true, @multipass.emergency_approver.present?, disabled: checked_by_current_user?(:emergency_approver) %><%= unique_actor_label(:emergency_approver) %>
+  </label>
+</div>

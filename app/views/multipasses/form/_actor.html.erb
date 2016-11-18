@@ -1,0 +1,21 @@
+<% html = { id: "multipass_#{field}_form", class: "text-center col-md-" + (12 / (multipass.conditional_fields.length + 2)).to_s } %>
+<% existing_actor = multipass.send(field) %>
+<% url = url_for_field(field, multipass) %>
+<% method = existing_actor ? :delete : :post %>
+
+<%= form_tag(url, { method: method, label_errors: true }.merge(html)) do |f| %>
+  <% if existing_actor %>
+    <%= existing_actor_button field, multipass, current_user %>
+    <div class="small actor-message">By <%= existing_actor %></div>
+  <% else %>
+    <%= new_actor_button field, multipass %>
+  <% end %>
+
+  <% if unnecessary_field?(field, multipass) %>
+    <div class="small actor-message">
+      Not needed for this change type
+    </div>
+  <% elsif multipass.locking_field?(field, 2) %>
+    <span class="unlock-message">Click to unlock</span>
+  <% end %>
+<% end%>
