@@ -344,12 +344,12 @@ class ReplicationFixingHandler < ApplicationHandler
           @alerting_manager.notify_fixing_a_long_while(shard: shard, started_at: result.started_at)
           @throttler.send_message(@status_room, "(failed) I've been trying to fix replication on #{shard} for #{ongoing_minutes.to_i} minutes now")
         else
-          @throttler.send_message(@status_room, "/me is fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
+          @throttler.send_message(@status_room, "I am fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
         end
       when ::ReplicationFixing::FixingClient::FixableErrorOccurring
-        @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{shard}")
+        @throttler.send_message(@status_room, "I am noticing a fixable replication error on #{shard}")
       when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-        @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{shard}: #{result.error}")
+        @throttler.send_message(@status_room, "I am getting an error while trying to check the fixability of #{shard}: #{result.error}")
       else
         log.error("Got unknown response from client: #{result}")
       end

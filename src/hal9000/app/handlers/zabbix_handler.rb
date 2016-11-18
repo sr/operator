@@ -316,11 +316,11 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def host_maintenance_expired(hostname)
-    robot.send_message(@status_room, "/me is bringing #{hostname} out of maintenance")
+    robot.send_message(@status_room, "I am bringing #{hostname} out of maintenance")
   end
 
   def monitor_expired(monitorname)
-    robot.send_message(@status_room, "/me is unpausing #{monitorname} (warning)")
+    robot.send_message(@status_room, "I am unpausing #{monitorname} (warning)")
   end
 
   def manually_run_monitor(response)
@@ -375,8 +375,8 @@ class ZabbixHandler < ApplicationHandler
     @clients.each do |datacenter, client|
       problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
       next unless problems && !problems.empty?
-      problems_found = true
 
+      problems_found = true
       response.reply(
         render_template("chef_problems_report", datacenter: datacenter, problems: problems)
       )
