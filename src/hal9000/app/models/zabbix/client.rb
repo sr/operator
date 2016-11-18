@@ -97,6 +97,29 @@ module Zabbix
       )
     end
 
+    # Fetches hosts without data for given application name. This is necessary
+    # to catch hosts that aren't reporting data at all, possibly because Chef
+    # hasn't run. In Zabbix >= 3.2, a function like this will not be necessary
+    # because functions like `nodata` will work correctly on unsupported items.
+    def get_hosts_without_item_data_by_app_name(app_name)
+      results = @client.query(
+        method: "item.get",
+        params: {
+          output: "extend",
+          selectHosts: "extend",
+          application: app_name,
+          monitored: true,
+          filter: {
+            showWithoutData: 1
+          }
+        }
+      )
+
+      results.select { |result| result["lastclock"] == "0" } # no data
+        .flat_map { |result| result["hosts"] }
+        .uniq { |host| host["hostid"] }
+    end
+
     def get_item_by_name_and_lastvalue(name, lastvalue)
       @client.items.get(name: name, lastvalue: lastvalue) unless name.nil? || lastvalue.nil?
     end

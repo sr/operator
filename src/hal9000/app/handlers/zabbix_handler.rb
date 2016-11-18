@@ -355,10 +355,16 @@ class ZabbixHandler < ApplicationHandler
 
         coordinator.perform_exclusive do
           problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
-          if problems && !problems.empty?
+          hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
+          if !problems.empty? || !hosts_without_data.empty?
             robot.send_message(
               @status_room,
-              render_template("chef_problems_report", datacenter: datacenter, problems: problems)
+              render_template(
+                "chef_problem_report",
+                datacenter: datacenter,
+                problems: problems,
+                hosts_without_data: hosts_without_data
+              )
             )
           end
         end
@@ -376,11 +382,17 @@ class ZabbixHandler < ApplicationHandler
 
     @clients.each do |datacenter, client|
       problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
-      next unless problems && !problems.empty?
+      hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
+      next unless !problems.empty? || !hosts_without_data.empty?
 
       problems_found = true
       response.reply(
-        render_template("chef_problems_report", datacenter: datacenter, problems: problems)
+        render_template(
+          "chef_problem_report",
+          datacenter: datacenter,
+          problems: problems,
+          hosts_without_data: hosts_without_data
+        )
       )
     end
 

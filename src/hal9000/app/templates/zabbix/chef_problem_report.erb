@@ -24,4 +24,14 @@
       </td>
     </tr>
   <% end %>
+  <% @hosts_without_data.each do |host| %>
+    <tr>
+      <td>
+        <%= host["host"] %>
+      </td>
+      <td>
+        No data. Chef may not be running at all or Zabbix base template (t_linux) may not be applied.
+      </td>
+    </tr>
+  <% end %>
 </table>
