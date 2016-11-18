@@ -33,7 +33,7 @@ module Hal9000
       end
 
       @server.wait_till_running
-      Logger.log.info "HAL9000 gRPC server started on #{config.address}"
+      Lita.logger.info "HAL9000 gRPC server started on #{config.address}"
       robot.trigger(:connected)
     end
 
