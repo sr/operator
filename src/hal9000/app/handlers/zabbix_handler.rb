@@ -104,7 +104,7 @@ class ZabbixHandler < ApplicationHandler
 
   route /^zabbix monitor (pause|unpause).*$/i, :invalid_zabbixmon_syntax, command: true
 
-  on :connected, :start_monitoring
+  on :connected, :on_connected
 
   def invalid_zabbixmon_syntax(response)
     response.reply_with_mention('Invalid syntax; try "zabbix monitor <datacenter> pause/unpause"')
@@ -148,10 +148,6 @@ class ZabbixHandler < ApplicationHandler
       end
     end
     @status_room = ::Lita::Source.new(room: config.status_room)
-  end
-
-  on(:connected) do
-    robot.join(config.status_room)
   end
 
   def monitor_status(response)
@@ -334,7 +330,9 @@ class ZabbixHandler < ApplicationHandler
     end
   end
 
-  def start_monitoring(*)
+  def on_connected(*)
+    log.info("#{self.class}: connected. Starting jobs that run at intervals.")
+
     every(config.monitor_interval_seconds) do |_timer|
       run_monitors
     end
@@ -347,6 +345,7 @@ class ZabbixHandler < ApplicationHandler
   def report_chef_problems_at_interval
     @clients.each do |datacenter, client|
       begin
+        log.info("#{self.class}: Starting Chef reporting check for the #{datacenter} datacenter")
         coordinator = ::Zabbix::ChefProblemReportCoordinator.new(
           datacenter: datacenter,
           redis: redis,
