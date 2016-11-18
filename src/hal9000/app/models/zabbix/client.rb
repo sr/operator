@@ -120,7 +120,7 @@ module Zabbix
         .flat_map { |result| result["hosts"] }
         .select { |host| host["maintenance_status"] == "0" } # not in maintenance
         .uniq { |host| host["hostid"] }
-        .sort { |host| host["host"] }
+        .sort_by { |host| host["host"] }
     end
 
     def get_item_by_name_and_lastvalue(name, lastvalue)
