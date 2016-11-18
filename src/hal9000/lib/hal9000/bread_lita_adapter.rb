@@ -60,7 +60,11 @@ module Hal9000
           options = { message_format: "text", color: "yellow", notify: true }
           @hipchat.user(source.user.id).send(message, options.merge(notify: true))
         else
-          @hipchat[source.room].send("", message.gsub("\n", "<br>"), options)
+          if !message.start_with?("<!-- #html -->")
+            message = message.gsub("\n", "<br>")
+          end
+
+          @hipchat[source.room].send("", message, options)
         end
       end
     end
