@@ -58,7 +58,7 @@
       <ul class="nav nav-stacked targets">
       <% all_targets.each do |target| %>
         <li>
-        <a href="<%= target_path(target) %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.capitalize %></a>
+        <a href="<%= target_path(target) %>" <%= active_target target.name %>><i class="icon-bullseye"></i><%= target.name.camelize %></a>
         </li>
       <% end %>
       </li>
