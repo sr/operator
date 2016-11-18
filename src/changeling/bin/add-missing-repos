@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+APP_PATH = File.expand_path('../../config/application', __FILE__)
+require_relative '../config/boot'
+require "rails/all"
+require "json"
+require "faraday"
+
+csv_file     = "tmp/component-inventory.csv"
+repo_file    = "config/repositories.json"
+github_token = ENV["GITHUB_TOKEN"]
+dataclip_url = "https://dataclips.heroku.com/gxsqmyzklvorpjpskndnsmdoejhe-All-production-components-by-team"
+
+unless File.exists?(csv_file)
+  puts "#{csv_file} is missing, download from #{dataclip_url}"
+  exit 1
+end
+
+csv_data = File.read(csv_file).split("\n")
+csv_repos = csv_data.map do |line|
+  team, name, repo = line.split(",")
+  next if repo =~ /^\s*$/
+  repo && repo.sub(/(https:\/\/)?github\.com\//, "")
+end.compact.sort
+
+blacklisted_repos = %w(htcat/htcat n/a repo wal-e/wal-e http://heroku/heroku-pg-extras)
+
+csv_repos.reject! { |repo| blacklisted_repos.include?(repo) }
+
+repo_data  = JSON.parse(File.read(repo_file))
+prod_repos = repo_data["production"]
+
+missing_repos = csv_repos - prod_repos
+
+connection = Faraday.new(url: "https://api.github.com")
+
+public_repos  = [ ]
+tested_public_repos  = [ ]
+private_repos = [ ]
+tested_private_repos = [ ]
+
+puts "Checking #{missing_repos.size} repos"
+missing_repos.each do |repo|
+  response = connection.get "/repos/#{repo}", access_token: github_token
+  data = JSON.parse(response.body)
+
+  if response.status == 200 && data["private"] == false
+    puts "Found public #{repo}"
+    response = connection.get "/repos/#{repo}/statuses/master", access_token: github_token
+    if response.status == 200 && JSON.parse(response.body).size > 0
+      tested_public_repos << repo
+    else
+      public_repos << repo
+    end
+  else
+    puts "Found private #{repo}"
+    response = connection.get "/repos/#{repo}/statuses/master", access_token: github_token
+    if response.status == 200 && JSON.parse(response.body).size > 0
+      tested_private_repos << repo
+    else
+      private_repos << repo
+    end
+  end
+end
+
+puts "Writing missing untested-public repos to public-untested.txt"
+File.open("public-untested.txt", "w")  { |fp| fp.puts public_repos.join("\n") }
+puts "Writing missing public repos to public.txt"
+File.open("public.txt", "w")  { |fp| fp.puts tested_public_repos.join("\n") }
+puts "Writing missing untested-private repos to private-untested.txt"
+File.open("private-untested.txt", "w") { |fp| fp.puts private_repos.join("\n") }
+puts "Writing missing private repos to private.txt"
+File.open("private.txt", "w") { |fp| fp.puts tested_private_repos.join("\n") }

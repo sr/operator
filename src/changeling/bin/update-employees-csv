@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+echo "Latest file: https://docs.google.com/spreadsheets/d/19R9mq-cGjNePlNQX4d1JldW3-W4c0pw-cGehDLDxmyg/edit#gid=0"
+echo "Be sure to grab the latest file, sort by name, and download as csv."
+
+perl -p -i -e "s/\r//" config/employees.csv
