@@ -49,7 +49,7 @@ class ZabbixHandler < ApplicationHandler
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
   # config: chef monitoring
-  config :chef_problem_report_interval_seconds, default: 3600
+  config :chef_problem_report_interval_seconds, default: 7200
 
   # config: zabbix monitor
   config :monitor_hipchat_notify, default: false
