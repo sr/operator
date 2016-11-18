@@ -1,0 +1,59 @@
+{
+  "_internal": {
+    "actor": {
+      "api_id": 3182401.0,
+      "legacy_id": "user3182401@heroku.com"
+    },
+    "auth_mechanism": "http_basic",
+    "data": {
+      "api_id": 251467201.0,
+      "legacy_id": "release251467201@heroku.com"
+    },
+    "oauth_authorization": {
+      "description": "Heroku CLI",
+      "id": "5549b54d-8e87-4694-b48f-2d76ee6d2cc5"
+    },
+    "request": {
+      "ip_address": "10.184.74.185",
+      "method": "DELETE",
+      "path": "/apps/51f5b5d0-4a3c-41fb-bc67-d67dfb5ced6c/addons/f7fad4c7-ba15-49cd-9e21-236eecbf5dc3",
+      "signature": "/apps/:id/addons/:addon",
+      "user_agent": "heroku-toolbelt/3.42.42 (x86_64-darwin10.8.0) ruby/1.9.3"
+    },
+    "request_id": "fb34560a-e579-48fe-861a-72474c81cfc5,5c8e9c55-b5f1-4a5b-4559-9db85b1cf34e",
+    "sudo": false
+  },
+  "action": "create",
+  "actor": {
+    "email": "s@vk.ai",
+    "id": "f5b0faf4-93e0-499d-9cc0-9b66fda048d1"
+  },
+  "created_at": "2016-03-17T03:32:24Z",
+  "data": {
+    "app": {
+      "id": "51f5b5d0-4a3c-41fb-bc67-d67dfb5ced6c",
+      "name": "blooming-reaches-27706"
+    },
+    "created_at": "2016-03-17T03:32:24Z",
+    "description": "Detach REDIS (@ref:redis-vertical-72332)",
+    "id": "a816e425-b63d-41bc-967e-1c87775dbacf",
+    "slug": {
+      "id": "97e49e80-c1b7-41f0-85f1-f9630b9642c1"
+    },
+    "updated_at": "2016-03-17T03:32:24Z",
+    "user": {
+      "email": "s@vk.ai",
+      "id": "f5b0faf4-93e0-499d-9cc0-9b66fda048d1"
+    },
+    "version": 15
+  },
+  "id": "667c4e1a-dd65-4e24-98be-b068af4a5a7c",
+  "partition_key": "51f5b5d0-4a3c-41fb-bc67-d67dfb5ced6c",
+  "previous_data": {
+  },
+  "published_at": "2016-03-17T03:32:24Z",
+  "resource": "release",
+  "sequence": null,
+  "updated_at": "2016-03-17T03:32:24Z",
+  "version": "application/vnd.heroku+json; version=3"
+}

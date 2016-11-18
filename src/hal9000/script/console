@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "${BASH_SOURCE[0]}/.."
+
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")"/..; pwd)"
 devenv compose run -e LITA_ADAPTER=shell app

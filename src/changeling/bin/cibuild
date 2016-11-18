@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -x
+if [ -d "./.git" ]; then
+  git log -n 1 HEAD | cat
+fi
+node -v
+ruby -v
+bundle -v
+set +x
+set -e
+
+export RACK_ENV=test
+export RAILS_ENV=test
+
+bundle exec rake db:migrate
+bundle exec rubocop
+bundle exec rake assets:precompile >/dev/null 2>&1
+if [ "$HEROKU_SETUP_STREAM_URL" = "" ]; then
+  bundle exec rspec spec
+else
+  bundle exec rspec spec --format RSpec::TapY | bin/bundle exec tapout tap
+fi

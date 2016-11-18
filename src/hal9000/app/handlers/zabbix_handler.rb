@@ -7,6 +7,8 @@ require "zabbix/pagerduty_pager"
 require "zabbix/test_pager"
 
 class ZabbixHandler < ApplicationHandler
+  template_root File.expand_path("../../templates/zabbix", __FILE__)
+
   module HumanTime
     def self.parse(str, now: Time.now)
       if /^([+-]?\d+)(w|wk|wks|week|weeks)$/i =~ str
@@ -31,6 +33,7 @@ class ZabbixHandler < ApplicationHandler
   PagerFailed = Class.new(StandardError)
   MONITOR_FAIL_ERRMSG = "::Lita::Handlers::Zabbix::run_monitors has failed, triggering its rescue clause".freeze
   CHAT_ERRMSG = "Sorry, something went wrong.".freeze
+  ZABBIX_CHEF_APP_NAME = "app:chef".freeze
 
   # config: zabbix
   config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
@@ -45,6 +48,9 @@ class ZabbixHandler < ApplicationHandler
   # config: hal9000's "home room"
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
 
+  # config: chef monitoring
+  config :chef_problem_report_interval_seconds, default: 7200
+
   # config: zabbix monitor
   config :monitor_hipchat_notify, default: false
   config :monitor_interval_seconds, default: 60
@@ -57,6 +63,10 @@ class ZabbixHandler < ApplicationHandler
   # config: page-r-doodie
   config :pager, default: "pagerduty"
   config :pagerduty_service_key
+
+  route /^(?:zabbix )?chef problems/, :report_chef_problems, command: true, help: {
+    "zabbix chef problems" => "Lists hosts that haven't recently run Chef successfully"
+  }
 
   route /^zabbix(?:-(?<datacenter>\S+))?\s+maintenance\s+(?:start)\s+(?<host>\S+)(?:\s+(?<options>.*))?$/i, :start_maintenance, command: true, help: {
     "zabbix maintenance start HOST" => "Puts hosts matching HOST in maintenance mode for 1 hour",
@@ -94,7 +104,7 @@ class ZabbixHandler < ApplicationHandler
 
   route /^zabbix monitor (pause|unpause).*$/i, :invalid_zabbixmon_syntax, command: true
 
-  on :connected, :start_monitoring
+  on :connected, :on_connected
 
   def invalid_zabbixmon_syntax(response)
     response.reply_with_mention('Invalid syntax; try "zabbix monitor <datacenter> pause/unpause"')
@@ -138,10 +148,6 @@ class ZabbixHandler < ApplicationHandler
       end
     end
     @status_room = ::Lita::Source.new(room: config.status_room)
-  end
-
-  on(:connected) do
-    robot.join(config.status_room)
   end
 
   def monitor_status(response)
@@ -306,11 +312,11 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def host_maintenance_expired(hostname)
-    robot.send_message(@status_room, "/me is bringing #{hostname} out of maintenance")
+    robot.send_message(@status_room, "I am bringing #{hostname} out of maintenance")
   end
 
   def monitor_expired(monitorname)
-    robot.send_message(@status_room, "/me is unpausing #{monitorname} (warning)")
+    robot.send_message(@status_room, "I am unpausing #{monitorname} (warning)")
   end
 
   def manually_run_monitor(response)
@@ -324,9 +330,75 @@ class ZabbixHandler < ApplicationHandler
     end
   end
 
-  def start_monitoring(_payload)
+  def on_connected(*)
+    log.info("#{self.class}: connected. Starting jobs that run at intervals.")
+
     every(config.monitor_interval_seconds) do |_timer|
       run_monitors
+    end
+
+    every(60) do
+      report_chef_problems_at_interval
+    end
+  end
+
+  def report_chef_problems_at_interval
+    @clients.each do |datacenter, client|
+      begin
+        log.info("#{self.class}: Starting Chef reporting check for the #{datacenter} datacenter")
+        coordinator = ::Zabbix::ChefProblemReportCoordinator.new(
+          datacenter: datacenter,
+          redis: redis,
+          interval_seconds: config.chef_problem_report_interval_seconds,
+        )
+
+        coordinator.perform_exclusive do
+          problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
+          hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
+          if !problems.empty? || !hosts_without_data.empty?
+            robot.send_message(
+              @status_room,
+              render_template(
+                "chef_problem_report",
+                datacenter: datacenter,
+                problems: problems,
+                hosts_without_data: hosts_without_data
+              )
+            )
+          end
+        end
+      rescue => e
+        robot.send_message(
+          @status_room,
+          "Error while attempting to report Chef problems for #{datacenter}: #{e}"
+        )
+      end
+    end
+  end
+
+  def report_chef_problems(response)
+    replies = []
+    @clients.each do |datacenter, client|
+      begin
+        problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
+        hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
+        if !problems.empty? || !hosts_without_data.empty?
+          replies << render_template(
+            "chef_problem_report",
+            datacenter: datacenter,
+            problems: problems,
+            hosts_without_data: hosts_without_data
+          )
+        end
+      rescue => e
+        replies << "Something went wrong checking for Chef problems in #{datacenter}: #{e}"
+      end
+    end
+
+    if replies.empty?
+      response.reply_with_mention("Everything seems in order! All hosts are running Chef successfully.")
+    else
+      response.reply(*replies)
     end
   end
 

@@ -170,7 +170,7 @@ func terra() (int, string) {
 		v, err := cmd.CombinedOutput()
 		matches := reTerraVersion.FindStringSubmatch(string(v))
 		if err != nil && len(matches) != 2 {
-			return 1, "Unable to determine local Terraform version"
+			return 1, fmt.Sprintf("Unable to determine local Terraform version: %s", err)
 		}
 		tf.Version = matches[1]
 		if _, err := os.Stat(tf.PlanFile); os.IsNotExist(err) {
@@ -193,7 +193,7 @@ func terra() (int, string) {
 			),
 		)
 		if err != nil {
-			return 1, "Could not unlock Terraform project"
+			return 1, fmt.Sprintf("Could not unlock Terraform project: %s", err)
 		}
 		if resp.Payload.Error {
 			return 1, resp.Payload.Message
@@ -251,7 +251,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 			}),
 	)
 	if err != nil {
-		return errors.New("Could not lock terraform project")
+		return fmt.Errorf("Could not lock terraform project: %s", err)
 	}
 	if resp.Payload.Error {
 		return errors.New(resp.Payload.Message)
@@ -291,7 +291,7 @@ func apply(client bread.CanoeClient, tf *terraform, git *gitRepo, canoeUser stri
 			}),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project\n", program)
+		fmt.Fprintf(os.Stderr, "%s: Could not unlock Terraform project: %s\n", program, err)
 	} else if completeResp.Payload.Error {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", program, completeResp.Payload.Message)
 	}

@@ -14,6 +14,9 @@ resource "aws_security_group" "artifact_cache_http_lb" {
 
     cidr_blocks = [
       "${var.pardot_ci_vpc_cidr}",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.appdev.cidr_block}",
     ]
   }
 
