@@ -13,11 +13,13 @@
     <% host = problem.fetch("hosts", []).first %>
     <tr>
       <td>
-        <% if host %>
-          <%= host["host"] %>
-        <% else %>
-          <i>unknown host</i>
-        <% end %>
+        <code>
+          <% if host %>
+            <%= host["host"] %>
+          <% else %>
+            <i>unknown host</i>
+          <% end %>
+        </code>
       </td>
       <td>
         <%= problem["description"] %>
@@ -27,7 +29,9 @@
   <% @hosts_without_data.each do |host| %>
     <tr>
       <td>
-        <%= host["host"] %>
+        <code>
+          <%= host["host"] %>
+        </code>
       </td>
       <td>
         No data. Chef may not be running at all or Zabbix base template (t_linux) may not be applied.
