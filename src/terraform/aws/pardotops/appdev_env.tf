@@ -1734,3 +1734,19 @@ resource "aws_route53_record" "appdev_metrics1_arecord" {
   type    = "A"
   ttl     = "900"
 }
+
+resource "aws_route53_record" "graphite_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "graphite.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
+resource "aws_route53_record" "grafana_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "grafana.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
