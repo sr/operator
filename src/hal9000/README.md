@@ -5,6 +5,7 @@ Hal reincarnated as a Lita bot. Lita is stable, maintained, and written in Ruby.
 HAL9000 encourages the use of [devenv](https://git.dev.pardot.com/Pardot/devenv). After installing devenv, run:
 
 ```bash
+cp .env_sample .env # edit .env if you wish to use real secrets
 script/console
 ```
 
