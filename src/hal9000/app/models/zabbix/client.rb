@@ -117,6 +117,7 @@ module Zabbix
 
       results.select { |result| result["lastclock"] == "0" } # no data
         .flat_map { |result| result["hosts"] }
+        .select { |host| host["maintenance_status"] == "0" } # not in maintenance
         .uniq { |host| host["hostid"] }
     end
 
