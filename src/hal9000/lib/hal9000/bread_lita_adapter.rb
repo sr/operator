@@ -28,13 +28,14 @@ module Hal9000
     def run
       Lita.logger.info "HAL9000 gRPC server starting on #{config.address} ..."
 
-      Thread.new do
-        @server.run_till_terminated
+      run_thread = Thread.new do
+        @server.run
       end
 
       @server.wait_till_running
       Lita.logger.info "HAL9000 gRPC server started on #{config.address}"
       robot.trigger(:connected)
+      run_thread.join
     end
 
     def shut_down
