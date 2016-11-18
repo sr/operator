@@ -1,28 +1,9 @@
 <!-- #html -->
-<strong><%= @datacenter %>: Hosts without data about the last Chef run</strong><br>
-<em>Chef may not be running at all or Zabbix base template (t_linux) may not be applied</em>
-<table>
-  <tr>
-    <th>
-      Host
-    </th>
-  </tr>
-  <% @hosts_without_data.each do |host| %>
-    <tr>
-      <td>
-        <code>
-          <%= host["host"] %>
-        </code>
-      </td>
-    </tr>
-  <% end %>
-</table>
-
 <strong><%= @datacenter %>: Hosts without a recent successful Chef run</strong><br>
 <table>
   <tr>
     <th>
-      Hostname
+      Host
     </th>
     <th>
       Problem
@@ -42,6 +23,18 @@
       </td>
       <td>
         <%= problem["description"] %>
+      </td>
+    </tr>
+  <% end %>
+  <% @hosts_without_data.each do |host| %>
+    <tr>
+      <td>
+        <code>
+          <%= host["host"] %>
+        </code>
+      </td>
+      <td>
+        No data about the latest Chef run. Chef may not be running at all or the t_linux template may not be applied to the host.
       </td>
     </tr>
   <% end %>
