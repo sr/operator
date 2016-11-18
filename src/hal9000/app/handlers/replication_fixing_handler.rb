@@ -126,10 +126,12 @@ class ReplicationFixingHandler < ApplicationHandler
         if ignoring
           log.debug("Shard is ignored: #{shard}")
 
-          count = ignore_client.incr_skipped_errors_count
-          if (count % 200).zero?
-            @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
-            @alerting_manager.notify_replication_disabled_but_many_errors
+          if ignoring == :all
+            count = ignore_client.incr_skipped_errors_count
+            if (count % 200).zero?
+              @throttler.send_message(@status_room, "@here FYI: Replication fixing has been globally stopped, but I've seen about #{count} errors go by.")
+              @alerting_manager.notify_replication_disabled_but_many_errors
+            end
           end
         else
           log.debug("Shard is NOT ignored: #{shard}")
