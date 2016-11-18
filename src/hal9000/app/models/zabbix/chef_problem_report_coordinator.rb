@@ -2,7 +2,7 @@ require "thread"
 
 module Zabbix
   class ChefProblemReportCoordinator
-    REDIS_NAMESPACE = "chef_problem_report_coordinator".freeze
+    REDIS_NAMESPACE = "chef_problem_report_coordinator2".freeze
 
     def initialize(datacenter:, redis:, interval_seconds:)
       @datacenter = datacenter

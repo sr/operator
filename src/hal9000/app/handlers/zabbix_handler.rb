@@ -346,27 +346,29 @@ class ZabbixHandler < ApplicationHandler
 
   def report_chef_problems_at_interval
     @clients.each do |datacenter, client|
-      coordinator = ::Zabbix::ChefProblemReportCoordinator.new(
-        datacenter: datacenter,
-        redis: redis,
-        interval_seconds: config.chef_problem_report_interval_seconds,
-      )
+      begin
+        coordinator = ::Zabbix::ChefProblemReportCoordinator.new(
+          datacenter: datacenter,
+          redis: redis,
+          interval_seconds: config.chef_problem_report_interval_seconds,
+        )
 
-      coordinator.perform_exclusive do
-        problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
-        if problems && !problems.empty?
-          robot.send_message(
-            @status_room,
-            render_template("chef_problems_report", datacenter: datacenter, problems: problems)
-          )
+        coordinator.perform_exclusive do
+          problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
+          if problems && !problems.empty?
+            robot.send_message(
+              @status_room,
+              render_template("chef_problems_report", datacenter: datacenter, problems: problems)
+            )
+          end
         end
+      rescue => e
+        robot.send_message(
+          @status_room,
+          "Error while attempting to report Chef problems for #{datacenter}: #{e}"
+        )
       end
     end
-  rescue => e
-    robot.send_message(
-      @status_room,
-      "Error while attempting to report Chef problems: #{e}"
-    )
   end
 
   def report_chef_problems(response)
