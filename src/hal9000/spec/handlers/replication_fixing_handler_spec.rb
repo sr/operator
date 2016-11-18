@@ -25,7 +25,7 @@ describe ReplicationFixingHandler, lita_handler: true do
 
       expect(response.status).to eq(201)
       expect(fix_request).to have_been_made
-      expect(replies.last).to match(/\/me is fixing replication on db-1/)
+      expect(replies.last).to match(/I am fixing replication on db-1/)
     end
 
     it "notifies the ops-replication room with a sanitized error messages" do

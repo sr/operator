@@ -1,0 +1,7 @@
+<h1>Settings</h1>
+<div class='purple-box u-padding-Al'>
+  <%= bootstrap_form_for(current_user, url: account_path, label_errors: true) do |f| %>
+    <%= f.select 'team', options_for_select(Multipass.teams, current_user.team), include_blank: "Choose a team", class: 'form-control' %>
+    <%= f.submit %>
+  <% end %>
+</div>

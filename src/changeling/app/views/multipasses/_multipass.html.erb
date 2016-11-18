@@ -1,0 +1,51 @@
+<tr class="<%= multipass.complete? ? "complete" : "" %>">
+  <td>
+    <h4>
+      <strong>
+      <%= multipass_title(multipass) %>
+      </strong>
+    </h4>
+    <h5 class='normal-weight'>
+      <div class="hidden-sm hidden-xs">
+        <%= tooltip "Created #{time_ago_in_words multipass.created_at.to_s(:short)} ago" do %>
+          By <%= multipass.requester %> • Owned by <%= multipass.team %> • At <%= multipass.created_at %>
+        <% end %>
+      </div>
+    </h5>
+  </td>
+  <td>
+    <% if multipass.emergency_approver %>
+      <i title="EMERGENCY" class="text-danger glyphicon glyphicon-alert"></i>
+    <% end %>
+  </td>
+  <td><%= change_type_label(multipass.change_type) %></td>
+  <td class='multipass-complete text-center'>
+    <% if multipass.complete? %>
+      <%= tooltip "Complete" do %>
+        <i class='complete glyphicon glyphicon-ok'></i>
+      <% end %>
+    <% elsif multipass.rejected? %>
+      <%= tooltip "Rejected" do %>
+        <i class='incomplete glyphicon glyphicon-remove'></i>
+      <% end %>
+    <% else %>
+      <%= tooltip "Pending" do %>
+        <i class='incomplete glyphicon glyphicon-circle'></i>
+      <% end %>
+    <% end %>
+  </td>
+  <td class='multipass-actions text-center'>
+    <div class="btn-group show">
+      <%= link_to multipass_path(multipass), class: "btn btn-default" do %>
+        <i class="glyphicon glyphicon-eye-open"></i> Show
+      <% end %>
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right" role="menu">
+        <li><%= unique_actor_update_link(multipass, "Peer review", :peer_reviewer) %></li>
+        <li><%= unique_actor_update_link(multipass, "SRE Approve", :sre_approver) %></li>
+      </ul>
+    </div>
+  </td>
+</tr>
