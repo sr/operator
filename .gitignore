@@ -10,6 +10,7 @@
 /src/pull_agent/.dev_settings.yml
 /src/pull_agent/Gemfile.lock
 /src/pull_agent/supervisord.pid
+/src/hal9000/.env
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
 /bin/*

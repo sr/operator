@@ -116,54 +116,54 @@ class ReplicationFixingHandler < ApplicationHandler
   end
 
   def create_replication_error(body)
-    if body["hostname"]
-      begin
-        hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
-        shard = hostname.shard
+    if !body["hostname"]
+      return [400, JSON.dump("error" => "hostname missing")]
+    end
 
-        ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
-        ignoring = ignore_client.ignoring?(shard)
-        if ignoring
-          log.debug("Shard is ignored: #{shard}")
+    hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
+    shard = hostname.shard
 
-          count = ignore_client.incr_skipped_errors_count
-          if (count % 200).zero?
-            @throttler.send_message(@status_room, "@here FYI: Replication fixing has been stopped, but I've seen about #{result.skipped_errors_count} go by.")
-            @alerting_manager.notify_replication_disabled_but_many_errors
-          end
-        else
-          log.debug("Shard is NOT ignored: #{shard}")
-          error = body["error"].to_s
-          unless error.empty?
-            robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
-          end
+    ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+    ignoring = ignore_client.ignoring?(shard)
+    if ignoring
+      log.debug("Shard is ignored: #{shard}")
 
-          mysql_last_error = body["mysql_last_error"].to_s
-          unless mysql_last_error.empty?
-            log.debug("sending message to #{@replication_room.inspect}")
-            sanitized_error = @sanitizer.sanitize(mysql_last_error)
-            robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
-          end
-
-          fixing_client = @fixing_clients.for_datacenter(hostname.datacenter)
-          result = fixing_client.fix(shard: hostname)
-          @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
-
-          unless result.is_a?(::ReplicationFixing::FixingClient::NoErrorDetected)
-            reply_with_fix_result(shard: shard, result: result)
-            ensure_monitoring(shard: shard)
-          end
+      if ignoring == :all
+        count = ignore_client.incr_skipped_errors_count
+        if (count % 200).zero?
+          @throttler.send_message(@status_room, "@here FYI: Replication fixing has been globally stopped, but I've seen about #{count} errors go by.")
+          @alerting_manager.notify_replication_disabled_but_many_errors
         end
-
-        [201, ""]
-      rescue ::ReplicationFixing::Hostname::MalformedHostname
-        [400, JSON.dump("error" => "malformed hostname")]
-      rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
-        [400, JSON.dump("error" => e.to_s)]
       end
     else
-      [400, JSON.dump("error" => "hostname missing")]
+      log.debug("Shard is NOT ignored: #{shard}")
+      error = body["error"].to_s
+      unless error.empty?
+        robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
+      end
+
+      mysql_last_error = body["mysql_last_error"].to_s
+      unless mysql_last_error.empty?
+        log.debug("sending message to #{@replication_room.inspect}")
+        sanitized_error = @sanitizer.sanitize(mysql_last_error)
+        robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
+      end
+
+      fixing_client = @fixing_clients.for_datacenter(hostname.datacenter)
+      result = fixing_client.fix(shard: hostname)
+      @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
+
+      unless result.is_a?(::ReplicationFixing::FixingClient::NoErrorDetected)
+        reply_with_fix_result(shard: shard, result: result)
+        ensure_monitoring(shard: shard)
+      end
     end
+
+    [201, ""]
+  rescue ::ReplicationFixing::Hostname::MalformedHostname
+    [400, JSON.dump("error" => "malformed hostname")]
+  rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
+    [400, JSON.dump("error" => e.to_s)]
   end
 
   def create_ignore(response)
@@ -344,12 +344,12 @@ class ReplicationFixingHandler < ApplicationHandler
           @alerting_manager.notify_fixing_a_long_while(shard: shard, started_at: result.started_at)
           @throttler.send_message(@status_room, "(failed) I've been trying to fix replication on #{shard} for #{ongoing_minutes.to_i} minutes now")
         else
-          @throttler.send_message(@status_room, "/me is fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
+          @throttler.send_message(@status_room, "I am fixing replication on #{shard} (ongoing for #{ongoing_minutes.to_i} minutes)")
         end
       when ::ReplicationFixing::FixingClient::FixableErrorOccurring
-        @throttler.send_message(@status_room, "/me is noticing a fixable replication error on #{shard}")
+        @throttler.send_message(@status_room, "I am noticing a fixable replication error on #{shard}")
       when ::ReplicationFixing::FixingClient::ErrorCheckingFixability
-        @throttler.send_message(@status_room, "/me is getting an error while trying to check the fixability of #{shard}: #{result.error}")
+        @throttler.send_message(@status_room, "I am getting an error while trying to check the fixability of #{shard}: #{result.error}")
       else
         log.error("Got unknown response from client: #{result}")
       end

@@ -28,11 +28,19 @@ module Hal9000
     def run
       Lita.logger.info "HAL9000 gRPC server starting on #{config.address} ..."
 
-      @server.run_till_terminated
+      run_thread = Thread.new do
+        @server.run
+      end
+
+      @server.wait_till_running
+      Lita.logger.info "HAL9000 gRPC server started on #{config.address}"
+      robot.trigger(:connected)
+      run_thread.join
     end
 
     def shut_down
       @server.stop
+      robot.trigger(:disconnected)
     end
 
     def mention_format(name)
@@ -60,7 +68,11 @@ module Hal9000
           options = { message_format: "text", color: "yellow", notify: true }
           @hipchat.user(source.user.id).send(message, options.merge(notify: true))
         else
-          @hipchat[source.room].send("", message.gsub("\n", "<br>"), options)
+          if !message.start_with?("<!-- #html -->")
+            message = message.gsub("\n", "<br>")
+          end
+
+          @hipchat[source.room].send("", message, options)
         end
       end
     end
