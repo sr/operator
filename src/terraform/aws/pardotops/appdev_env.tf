@@ -12,6 +12,7 @@ variable "environment_appdev" {
     lightweight_instance_type = "c4.large"
     app_instance_type         = "m4.large"
     job_instance_type         = "m4.large"
+    metrics_instance_type     = "m4.xlarge"
     db_instance_type          = "m4.2xlarge"
     kafka_instance_type       = "m4.2xlarge"
     storm_instance_type       = "m4.4xlarge"
@@ -1705,7 +1706,7 @@ resource "aws_instance" "appdev_metrics1" {
   key_name      = "internal_apps"
   count         = "${var.environment_appdev["num_metrics1_hosts"]}"
   ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
-  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  instance_type = "${var.environment_appdev["metrics_instance_type"]}"
   subnet_id     = "${aws_subnet.appdev_us_east_1d.id}"
 
   root_block_device {
