@@ -116,56 +116,54 @@ class ReplicationFixingHandler < ApplicationHandler
   end
 
   def create_replication_error(body)
-    if body["hostname"]
-      begin
-        hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
-        shard = hostname.shard
+    if !body["hostname"]
+      return [400, JSON.dump("error" => "hostname missing")]
+    end
 
-        ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
-        ignoring = ignore_client.ignoring?(shard)
-        if ignoring
-          log.debug("Shard is ignored: #{shard}")
+    hostname = ::ReplicationFixing::Hostname.new(body["hostname"])
+    shard = hostname.shard
 
-          if ignoring == :all
-            count = ignore_client.incr_skipped_errors_count
-            if (count % 200).zero?
-              @throttler.send_message(@status_room, "@here FYI: Replication fixing has been globally stopped, but I've seen about #{count} errors go by.")
-              @alerting_manager.notify_replication_disabled_but_many_errors
-            end
-          end
-        else
-          log.debug("Shard is NOT ignored: #{shard}")
-          error = body["error"].to_s
-          unless error.empty?
-            robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
-          end
+    ignore_client = @ignore_clients.for_datacenter(shard.datacenter)
+    ignoring = ignore_client.ignoring?(shard)
+    if ignoring
+      log.debug("Shard is ignored: #{shard}")
 
-          mysql_last_error = body["mysql_last_error"].to_s
-          unless mysql_last_error.empty?
-            log.debug("sending message to #{@replication_room.inspect}")
-            sanitized_error = @sanitizer.sanitize(mysql_last_error)
-            robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
-          end
-
-          fixing_client = @fixing_clients.for_datacenter(hostname.datacenter)
-          result = fixing_client.fix(shard: hostname)
-          @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
-
-          unless result.is_a?(::ReplicationFixing::FixingClient::NoErrorDetected)
-            reply_with_fix_result(shard: shard, result: result)
-            ensure_monitoring(shard: shard)
-          end
+      if ignoring == :all
+        count = ignore_client.incr_skipped_errors_count
+        if (count % 200).zero?
+          @throttler.send_message(@status_room, "@here FYI: Replication fixing has been globally stopped, but I've seen about #{count} errors go by.")
+          @alerting_manager.notify_replication_disabled_but_many_errors
         end
-
-        [201, ""]
-      rescue ::ReplicationFixing::Hostname::MalformedHostname
-        [400, JSON.dump("error" => "malformed hostname")]
-      rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
-        [400, JSON.dump("error" => e.to_s)]
       end
     else
-      [400, JSON.dump("error" => "hostname missing")]
+      log.debug("Shard is NOT ignored: #{shard}")
+      error = body["error"].to_s
+      unless error.empty?
+        robot.send_message(@replication_room, "#{hostname}: #{body["error"]}")
+      end
+
+      mysql_last_error = body["mysql_last_error"].to_s
+      unless mysql_last_error.empty?
+        log.debug("sending message to #{@replication_room.inspect}")
+        sanitized_error = @sanitizer.sanitize(mysql_last_error)
+        robot.send_message(@replication_room, "#{hostname}: #{sanitized_error}")
+      end
+
+      fixing_client = @fixing_clients.for_datacenter(hostname.datacenter)
+      result = fixing_client.fix(shard: hostname)
+      @alerting_manager.ingest_fix_result(shard_or_hostname: hostname, result: result)
+
+      unless result.is_a?(::ReplicationFixing::FixingClient::NoErrorDetected)
+        reply_with_fix_result(shard: shard, result: result)
+        ensure_monitoring(shard: shard)
+      end
     end
+
+    [201, ""]
+  rescue ::ReplicationFixing::Hostname::MalformedHostname
+    [400, JSON.dump("error" => "malformed hostname")]
+  rescue ::ReplicationFixing::DatacenterAwareRegistry::NoSuchDatacenter => e
+    [400, JSON.dump("error" => e.to_s)]
   end
 
   def create_ignore(response)
