@@ -1,3 +1,5 @@
+workspace(name = "com_github_sr_operator")
+
 git_repository(
     name = "io_bazel_rules_go",
     commit = "878185a8d66cb4a3fb93602d8e8bc2f50cd69616",
