@@ -31,7 +31,7 @@ filegroup(
 )
 
 go_test(
-    name = "go_default_xtest",
+    name = "go_default_test",
     srcs = ["operator_test.go"],
     deps = [
         "//:go_default_library",
