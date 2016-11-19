@@ -6,6 +6,12 @@ git_repository(
     remote = "https://github.com/bazelbuild/rules_go.git",
 )
 
+git_repository(
+    name = "com_github_google_protobuf",
+    commit = "cd315dcbadc02569e145bde16e3f66c2fbb08e31",
+    remote = "https://github.com/google/protobuf",
+)
+
 load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository", "new_go_repository")
 
 go_repositories()

@@ -5,14 +5,14 @@ package operator;
 import "google/protobuf/duration.proto";
 
 message Request {
-	Source source = 1;
-	Call call = 2;
-    string sender_id = 3;
-    string otp = 4;
+  Source source = 1;
+  Call call = 2;
+  string sender_id = 3;
+  string otp = 4;
 }
 
 message Response {
-    string message = 1;
+  string message = 1;
 }
 
 // Call represents a completed gRPC call. The Error field will be non-nil if
@@ -22,7 +22,7 @@ message Call {
 	string method = 2;
 	map<string, string> args = 3;
 	string error = 4;
-	google.protobuf.Duration duration = 5;
+  google.protobuf.Duration duration = 5;
 }
 
 message Source {
