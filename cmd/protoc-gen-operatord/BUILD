@@ -6,7 +6,7 @@ go_library(
         "main.go",
         "template.go",
     ],
-    visibility = ["//visibility:private"],
+    visibility = ["//testing:__pkg__"],
     deps = ["//generator:go_default_library"],
 )
 

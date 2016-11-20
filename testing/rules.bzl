@@ -135,3 +135,45 @@ Args:
   plugin_options: a list of options to be passed to the plugin
   outs: a list of labels of the expected outputs from the protocol compiler.
 """
+
+def _go_lint_impl(ctx):
+  srcs = ctx.files.deps
+  inputs = []
+  for dep in ctx.attr.deps:
+    for file in dep.go_sources:
+      inputs += [file]
+  ctx.action(
+      inputs = inputs,
+      outputs = [ctx.outputs.out],
+      arguments = [ctx.outputs.out.path],
+      progress_message = "Linting Go giles...",
+      executable = ctx.executable._golint,
+  )
+  return struct(
+      runfiles=ctx.runfiles(files=[ctx.outputs.out]),
+  )
+
+_GOLINT = "//testing:golint"
+
+_go_lint = rule(
+    attrs = {
+      "deps": attr.label_list(),
+      "ignores": attr.string_list(allow_empty = True),
+      "_golint": attr.label(
+          cfg = "host",
+          executable = True,
+          allow_files = True,
+          default = Label(_GOLINT),
+      ),
+    },
+    outputs = {"out": "%{name}.out"},
+    implementation = _go_lint_impl,
+)
+
+def go_lint(deps):
+  target = _go_lint(name="golint_gen_report", deps=deps)
+  native.sh_test(
+      name = "go_lint",
+      srcs = ["lint.sh"],
+      data = [":golint_gen_report"],
+  )

@@ -4,6 +4,17 @@ go_prefix("github.com/sr/operator")
 
 exports_files(["operator.proto"])
 
+filegroup(
+    name = "go_files",
+    srcs = glob(["*.go"], exclude=["*.pb.go"], exclude_directories= 1),
+    visibility = ["//visibility:public"],
+)
+
+package_group(
+    name = "go_packages",
+    packages = ["//..."],
+)
+
 go_library(
     name = "go_default_library",
     srcs = [

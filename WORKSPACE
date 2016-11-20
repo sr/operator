@@ -14,12 +14,24 @@ git_repository(
 
 load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository", "new_go_repository")
 
+new_go_repository(
+	name = "com_github_golang_lint",
+	commit = "206c0f020eba0f7fbcfbc467a5eb808037df2ed6",
+	importpath = "github.com/golang/lint",
+)
+
 go_repositories()
 
 go_repository(
     name = "com_github_bazelbuild_buildifier",
     commit = "31c314a5d60d94f6c67de61e9228d1aeb1f6c8e5",
     importpath = "github.com/bazelbuild/buildifier",
+)
+
+new_go_repository(
+    name = "org_golang_x_tools",
+    commit = "8b84dae17391c154ca50b0162662aa1fc9ff84c2",
+    importpath = "golang.org/x/tools",
 )
 
 new_go_repository(
