@@ -1,4 +1,4 @@
-package operatortesting
+package testing
 
 import (
 	"github.com/sr/operator"

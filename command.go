@@ -10,9 +10,8 @@ import (
 	"os/user"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"github.com/kr/text"
+	"google.golang.org/grpc"
 )
 
 const (

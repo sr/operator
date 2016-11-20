@@ -2,20 +2,17 @@ syntax = "proto3";
 
 package operator;
 
-import "google/protobuf/descriptor.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "operator";
-
 message Request {
-	Source source = 1;
-	Call call = 2;
-    string sender_id = 3;
-    string otp = 4;
+  Source source = 1;
+  Call call = 2;
+  string sender_id = 3;
+  string otp = 4;
 }
 
 message Response {
-    string message = 1;
+  string message = 1;
 }
 
 // Call represents a completed gRPC call. The Error field will be non-nil if
@@ -25,7 +22,7 @@ message Call {
 	string method = 2;
 	map<string, string> args = 3;
 	string error = 4;
-	google.protobuf.Duration duration = 5;
+  google.protobuf.Duration duration = 5;
 }
 
 message Source {
@@ -50,8 +47,4 @@ message User {
 	string login = 2;
 	string real_name = 3;
 	string email = 4;
-}
-
-extend google.protobuf.ServiceOptions {
-	string name = 51234;
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/dvsekhvalnov/jose2go"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
-	"github.com/sr/operator/testing"
+	operatortesting "github.com/sr/operator/testing"
 )
 
 var credentials = &operatorhipchat.ClientCredentials{
