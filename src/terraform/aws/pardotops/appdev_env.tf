@@ -1726,6 +1726,20 @@ resource "aws_instance" "appdev_metrics1" {
   }
 }
 
+resource "aws_ebs_volume" "appdev_metrics1_opt_volume" {
+  count             = "${var.environment_appdev["num_metrics1_hosts"]}"
+  availability_zone = "us-east-1d"
+  type              = "gp2"
+  size              = "512"
+}
+
+resource "aws_volume_attachment" "appdev_metrics1_opt_volume_attachment" {
+  count       = "${var.environment_appdev["num_metrics1_hosts"]}"
+  device_name = "/dev/xvdf"
+  volume_id   = "${element(aws_ebs_volume.appdev_metrics1_opt_volume.*.id, count.index)}"
+  instance_id = "${element(aws_instance.appdev_metrics1.*.id, count.index)}"
+}
+
 resource "aws_route53_record" "appdev_metrics1_arecord" {
   count   = "${var.environment_appdev["num_metrics1_hosts"]}"
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
