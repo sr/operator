@@ -174,7 +174,7 @@ namespace :canoe do
       DeployTarget.find_or_initialize_by(name: "performance_testing").tap { |target|
         target.production = true
         target.enabled = true
-      }
+      }.tap(&:save!)
     end
   end
 
