@@ -104,7 +104,7 @@ resource "aws_eip" "github_enterprise_server_1" {
 }
 
 resource "aws_eip" "github_enterprise_server_2" {
-  vpc = true
+  vpc      = true
   instance = "${aws_instance.github_enterprise_server_2.id}"
 }
 
