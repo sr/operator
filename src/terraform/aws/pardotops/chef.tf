@@ -11,7 +11,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
 
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
 
@@ -22,7 +22,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
 
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
 
@@ -33,7 +33,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
 
     cidr_blocks = [
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
 
