@@ -3,7 +3,7 @@ variable "github_enterprise_ami_us_east_1" {
 }
 
 variable "github_enterprise_instance_type" {
-  default = "r3.xlarge"
+  default = "c4.4xlarge"
 }
 
 variable "github_enterprise_xvdf_size" {
@@ -22,7 +22,10 @@ resource "aws_security_group" "github_enterprise_server_admin_management" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
+      "52.4.132.69/32",               # 1.git.dev.pardot.com
     ]
+
+    self = true
   }
 
   # Administrative web interface
@@ -43,8 +46,8 @@ resource "aws_security_group" "github_enterprise_server_admin_management" {
     protocol  = "udp"
 
     cidr_blocks = [
-      "52.4.132.69/32",
-    ] # 1.git.dev.pardot.com
+      "52.4.132.69/32", # 1.git.dev.pardot.com
+    ]
 
     self = true
   }
@@ -65,8 +68,11 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
     ]
   }
 }
@@ -86,8 +92,11 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
     ]
   }
 
@@ -102,8 +111,11 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
     ]
   }
 }
