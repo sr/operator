@@ -22,7 +22,10 @@ resource "aws_security_group" "github_enterprise_server_admin_management" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
+      "52.4.132.69/32",               # 1.git.dev.pardot.com
     ]
+
+    self = true
   }
 
   # Administrative web interface
@@ -43,8 +46,8 @@ resource "aws_security_group" "github_enterprise_server_admin_management" {
     protocol  = "udp"
 
     cidr_blocks = [
-      "52.4.132.69/32",
-    ] # 1.git.dev.pardot.com
+      "52.4.132.69/32", # 1.git.dev.pardot.com
+    ]
 
     self = true
   }
