@@ -1,0 +1,3156 @@
+{
+  "12factor": {
+    "provider": "heroku",
+    "repository": "heroku/12factor",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "twelve-factor"
+  },
+  "abuse-report-api": {
+    "provider": "heroku",
+    "repository": "heroku/abuse-report-api",
+    "auto_merge": true,
+    "heroku_team_name": "Security",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "abuse-report-api"
+  },
+  "addons": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/addons.heroku.com",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "addons-production",
+    "heroku_staging_name": "addons-staging"
+  },
+  "addons-reports": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/addons-reports",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "addons-reports",
+    "heroku_staging_name": "addons-reports-staging"
+  },
+  "addons-sso-v2": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/addons-sso-v2",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "addons-sso-production",
+    "heroku_staging_name": "addons-sso-staging"
+  },
+  "amino": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/amino",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "amino-production"
+  },
+  "amino-ansible": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/amino-ansible",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "api": {
+    "provider": "kernel",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/api",
+    "auto_merge": false,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "api-admin": {
+    "provider": "unknown",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/api-admin",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "aws-contact-manager": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/aws-contact-manager",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "babelfish": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/babelfish",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "heroku-babelfish-production",
+    "heroku_staging_name": "heroku-babelfish-staging"
+  },
+  "beta": {
+    "provider": "heroku",
+    "repository": "heroku/beta",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "dev",
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_dev_name": "beta-dev",
+    "heroku_production_name": "beta",
+    "heroku_staging_name": "beta-staging"
+  },
+  "blog": {
+    "provider": "heroku",
+    "repository": "heroku/blog",
+    "auto_merge": true,
+    "manually_added": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "dev",
+      "staging",
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_dev_name": "blog-dev",
+    "heroku_staging_name": "blog-stag",
+    "heroku_production_name": "blog"
+  },
+  "bob": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/bob",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "bob-production"
+  },
+  "buildkits": {
+    "provider": "heroku",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/buildkits",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "buildkits",
+    "heroku_staging_name": "buildkits-staging"
+  },
+  "burnward": {
+    "provider": "heroku",
+    "repository": "heroku/burnward",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "burnward",
+    "heroku_staging_name": "burnward-staging"
+  },
+  "busl": {
+    "provider": "kernel",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/busl",
+    "auto_merge": false,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "build-output"
+  },
+  "button-gallery": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/button-gallery",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "button-gallery-production",
+    "heroku_staging_name": "button-gallery-staging"
+  },
+  "buzz": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/buzz",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "aws-limits-production",
+    "heroku_staging_name": "aws-limits-staging"
+  },
+  "caas": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/caas",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "caas-production",
+    "heroku_staging_name": "caas-cf-staging"
+  },
+  "canary-v2": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/canary-v2",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "canary-v2"
+  },
+  "certs-db": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/certs-db",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "changeling": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/changeling",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "changeling-production",
+    "heroku_staging_name": "changeling-staging"
+  },
+  "chronoflux": {
+    "provider": "heroku",
+    "repository": "heroku/chronoflux",
+    "auto_merge": true,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "codon": {
+    "provider": "heroku",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/codon",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "codon-canary-cedar"
+  },
+  "component-inventory-metrics": {
+    "provider": "heroku",
+    "repository": "heroku/component-inventory-metrics",
+    "auto_merge": true,
+    "heroku_team_name": "Quality Working Group",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "cosmos": {
+    "provider": "heroku",
+    "repository": "heroku/cosmos",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "cosmosdash"
+  },
+  "costofservices": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/costofservices",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "costofservices"
+  },
+  "darwin": {
+    "provider": "kernel",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/darwin",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "dashboard": {
+    "provider": "heroku",
+    "repository": "heroku/dashboard-v6",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "dataclips": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/dataclips",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "dataclips"
+  },
+  "data-warehouse": {
+    "provider": "heroku",
+    "repository": "heroku/data-warehouse",
+    "auto_merge": true,
+    "heroku_team_name": "Bizops",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "heroku-data-warehouse"
+  },
+  "deployhooks": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/deployhooks",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "deploy-hooks",
+    "heroku_staging_name": "deployhooks-staging"
+  },
+  "deploymaster": {
+    "provider": "kernel",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/deploymaster",
+    "auto_merge": false,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "dep-tracker": {
+    "provider": "unknown",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/dep-tracker",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "devcenter": {
+    "provider": "heroku",
+    "repository": "heroku/devcenter",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "devcenter",
+    "heroku_staging_name": "devcenter-staging"
+  },
+  "devcenter-reports": {
+    "provider": "heroku",
+    "repository": "heroku/devcenter-reports",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "devcenter-reports"
+  },
+  "devcloud-ci": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/devcloud-ci",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "devcloud-ci-production"
+  },
+  "direwolf": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/direwolf",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "direwolf-production",
+    "heroku_staging_name": "direwolf-staging"
+  },
+  "docker-builder": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/docker-builder",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "docker-builder-production"
+  },
+  "docker-registry": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/docker-registry",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "docker-registry-production"
+  },
+  "dogwood-control": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/dogwood-control",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "dev"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_dev_name": "dapped-dev"
+  },
+  "dogwood-control-agent": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/dogwood-control-agent",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "dogwood-dashboard": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/dogwood-dashboard",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "dogwood-dashboard-cedar"
+  },
+  "dogwood-ops": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/dogwood-ops",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "dogwood-ops-production",
+    "heroku_staging_name": "dogwood-ops-staging"
+  },
+  "dropi": {
+    "provider": "heroku",
+    "repository": "heroku/dropi",
+    "auto_merge": true,
+    "heroku_team_name": "DevEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "dropi"
+  },
+  "dtcpdump": {
+    "provider": "unknown",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/dtcpdump",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "elements": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/elements",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "elements",
+    "heroku_staging_name": "elements-staging"
+  },
+  "elephant": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/elephant",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "heroku-npm"
+  },
+  "emmet": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/emmet",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "endosome": {
+    "provider": "kernel",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/endosome",
+    "auto_merge": false,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "engineering": {
+    "provider": "heroku",
+    "repository": "heroku/engineering",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "engineering",
+    "heroku_staging_name": "engineering-staging"
+  },
+  "etlette": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "heroku/etlette",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "event-manager-api": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/event-manager-api",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "event-manager-api"
+  },
+  "event-stream-archiver": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/event-stream-archiver",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "gemgate": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "dpiddy/gemgate",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "gemgate-heroku-internal-gems"
+  },
+  "golgi": {
+    "provider": "kernel",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/golgi",
+    "auto_merge": false,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "gvaas": {
+    "provider": "heroku",
+    "hipchat_room": "",
+    "repository": "ryanbrainard/gvaas",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "gvaas"
+  },
+  "heimdall": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/heimdall",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "heimdall-production",
+    "heroku_staging_name": "heimdall-staging"
+  },
+  "help": {
+    "provider": "heroku",
+    "repository": "heroku/help",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "help",
+    "heroku_staging_name": "help-staging"
+  },
+  "hermes": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/hermes",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "herokai-videos": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/herokai-videos",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "herokai-videos"
+  },
+  "heroku-buildpack-clojure": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-clojure",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-gradle": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-gradle",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-grails": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-grails",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-java": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-java",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-jvm-common": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-jvm-common",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-nodejs": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-nodejs",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-php": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-php",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-play": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-play",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-python": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-python",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-ruby": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-ruby",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-scala": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-buildpack-scala",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-buildpack-testrunner": {
+    "provider": "unknown",
+    "repository": "ryanbrainard/heroku-buildpack-testrunner",
+    "auto_merge": true,
+    "heroku_team_name": "Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "herokuconnect": {
+    "provider": "unknown",
+    "repository": "heroku/herokuconnect",
+    "auto_merge": true,
+    "heroku_team_name": "Heroku Connect",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "herokuconnect-prod"
+  },
+  "heroku-fleet-sfdc": {
+    "provider": "heroku",
+    "repository": "heroku/heroku-fleet-sfdc",
+    "auto_merge": true,
+    "heroku_team_name": "Security",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "heroku-fleet-sfdc"
+  },
+  "heroku-jenkins-plugin": {
+    "provider": "unknown",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/heroku-jenkins-plugin",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-orgs": {
+    "provider": "unknown",
+    "repository": "heroku/heroku-orgs",
+    "auto_merge": true,
+    "heroku_team_name": "Management Experience",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-pg-extras": {
+    "provider": "unknown",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/heroku-pg-extras",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-pipeline": {
+    "provider": "unknown",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/heroku-pipeline",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-repo": {
+    "provider": "unknown",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/heroku-repo",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-spaces": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/heroku-spaces",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "heroku-sudo": {
+    "provider": "unknown",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/heroku-sudo",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "hk": {
+    "provider": "unknown",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/hk",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "htcat": {
+    "provider": "unknown",
+    "hipchat_room": "dod-ops",
+    "repository": "htcat/htcat",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "hundur": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/hundur",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "Hyperion": {
+    "provider": "kernel",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/hyperion",
+    "auto_merge": false,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "identity": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/identity",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "id-production",
+    "heroku_staging_name": "id-staging"
+  },
+  "influxor": {
+    "provider": "kernel",
+    "repository": "heroku/influxor",
+    "auto_merge": false,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "doms-chronoflux"
+  },
+  "ion": {
+    "provider": "kernel",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "ion-api": {
+    "provider": "unknown",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion-api",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "ion-client": {
+    "provider": "unknown",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion-client",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "izanami": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/izanami",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "izanami-production"
+  },
+  "jambox": {
+    "provider": "heroku",
+    "repository": "heroku/jambox",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "jambox-p"
+  },
+  "json2envdir": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/json2envdir",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "kansa": {
+    "provider": "heroku",
+    "repository": "heroku/kansa",
+    "auto_merge": true,
+    "heroku_team_name": "Security",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "kansa"
+  },
+  "kashi": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/kashi",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "kashi"
+  },
+  "kensa": {
+    "provider": "unknown",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/kensa",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "keyblaster": {
+    "provider": "unknown",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/keyblaster",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "keyblaster-ui": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/keyblaster-ui",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "keyblaster-ui-production"
+  },
+  "kokyaku": {
+    "provider": "heroku",
+    "repository": "heroku/kokyaku",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "kokyaku"
+  },
+  "kolkrabbi": {
+    "provider": "heroku",
+    "repository": "heroku/kolkrabbi",
+    "auto_merge": true,
+    "heroku_team_name": "DevEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "kolkrabbi"
+  },
+  "koseki": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/koseki",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "koseki"
+  },
+  "Kozane": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/kozane",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "laika": {
+    "provider": "heroku",
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/laika",
+    "auto_merge": true,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "landp": {
+    "provider": "heroku",
+    "repository": "heroku/vault-landp",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "landp",
+    "heroku_staging_name": "landp-staging"
+  },
+  "Legacy Routing Analyzer": {
+    "provider": "heroku",
+    "repository": "heroku/legacy-routing-analyzer",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "legacy-routing",
+    "heroku_staging_name": "legacy-routing-staging"
+  },
+  "librato-drains": {
+    "provider": "heroku",
+    "hipchat_room": "telemetry-ops",
+    "repository": "heroku/librato-drains",
+    "auto_merge": true,
+    "heroku_team_name": "Telemetry",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "limerick": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/limerick",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "limerick-production",
+    "heroku_staging_name": "limerick-staging"
+  },
+  "limerick-dashboard": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/limerick-dashboard",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "limerick-dashboard-production",
+    "heroku_staging_name": "limerick-dashboard-staging"
+  },
+  "limerick-test-app": {
+    "provider": "kernel",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/limerick-test-app",
+    "auto_merge": false,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "log-iss": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/log-iss",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "log-iss-reservoir-production"
+  },
+  "logplex": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/logplex",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "logplexc": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "logplex/logplexc",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "logplex-client": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "heroku/logplex-client",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "logplex-redgrid-redis": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/redgrid",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "log-shuttle": {
+    "provider": "unknown",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/log-shuttle",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "longboard": {
+    "provider": "heroku",
+    "repository": "heroku/longboard",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_staging_name": "longboard-staging"
+  },
+  "lumbermill": {
+    "provider": "kernel",
+    "repository": "heroku/lumbermill",
+    "auto_merge": false,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "logplex-metrics-firehose-1"
+  },
+  "maas": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/maas",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "maas-production"
+  },
+  "maas-consumer-nagios": {
+    "provider": "kernel",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/maas-consumer-nagios",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "manifesto": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/manifesto",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "foundation-manifesto"
+  },
+  "megaphone": {
+    "provider": "kernel",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/megaphone",
+    "auto_merge": false,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "metrics-api": {
+    "provider": "heroku",
+    "repository": "heroku/metaas#metrics-api",
+    "auto_merge": true,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "metrics-ingress": {
+    "provider": "heroku",
+    "repository": "heroku/metaas",
+    "auto_merge": true,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "midgard": {
+    "provider": "kernel",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/midgard",
+    "auto_merge": false,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "moshimoshi": {
+    "provider": "heroku",
+    "repository": "heroku/moshimoshi",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "moshimoshi"
+  },
+  "nagios": {
+    "provider": "kernel",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/engineering-docs/tree/master/components/nagios",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "Newspaper": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/newspaper",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "newspaper-production",
+    "heroku_staging_name": "newspaper-staging"
+  },
+  "nile": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/nile",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "nile-production"
+  },
+  "NTP": {
+    "provider": "kernel",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/darwin/blob/master/cookbooks/platform/ntp/recipes/default.rb",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "nyata": {
+    "provider": "heroku",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/nyata",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "nyata"
+  },
+  "observatory": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/observatory",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "observatory"
+  },
+  "off-call": {
+    "provider": "unknown",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/off-call",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "oki": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/oki",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "oki"
+  },
+  "oracle": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/oracle",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "oracle"
+  },
+  "organization-resources-api": {
+    "provider": "heroku",
+    "repository": "heroku/organization-resources-api",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "organization-resources-api",
+    "heroku_staging_name": "organization-resources-staging"
+  },
+  "overwatch": {
+    "provider": "heroku",
+    "repository": "heroku/overwatch",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "overwatch-api": {
+    "provider": "heroku",
+    "repository": "heroku/overwatch-api",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "pallet": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/pallet",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "pg_logfebe": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "heroku/pg_logfebe",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "pg_logplexcollector": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "heroku/pg_logplexcollector",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "Phonics": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/phonics",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "phonics-production"
+  },
+  "physicald": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/physicald",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "physicald-eu-west-1-a"
+  },
+  "pipa": {
+    "provider": "heroku",
+    "repository": "heroku/pipa",
+    "auto_merge": true,
+    "heroku_team_name": "DevEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "pipa"
+  },
+  "pitchfork": {
+    "provider": "heroku",
+    "repository": "heroku/pitchfork",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "postgres.heroku.com": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/postgres",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "postgres"
+  },
+  "premiumrush": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/premiumrush",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "Prism": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/prism",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "heroku-prism-production",
+    "heroku_staging_name": "heroku-prism-staging"
+  },
+  "psmgr": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/psmgr",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "psmgr-db"
+  },
+  "railgun": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/railgun",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "rearview": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/rearview",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "rearview-production",
+    "heroku_staging_name": "rearview-staging"
+  },
+  "redis.heroku.com": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/heroku-redis",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "relish": {
+    "provider": "unknown",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/relish",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "rendezvous": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/rendezvous",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "ringmaster": {
+    "provider": "kernel",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/ringmaster",
+    "auto_merge": false,
+    "heroku_team_name": "API",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "rolodex": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/rolodex",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "rolodex-production",
+    "heroku_staging_name": "rolodex-staging"
+  },
+  "route-53": {
+    "provider": "unknown",
+    "repository": "n/a",
+    "auto_merge": true,
+    "heroku_team_name": "External",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "runtimed": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/runtimed",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "scheduler": {
+    "provider": "heroku",
+    "repository": "heroku/scheduler",
+    "auto_merge": true,
+    "heroku_team_name": "HIT",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "heroku-scheduler"
+  },
+  "shaas": {
+    "provider": "unknown",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/shaas",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "shh": {
+    "provider": "unknown",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/shh",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "shogun": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/shogun",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "shogun"
+  },
+  "signup": {
+    "provider": "heroku",
+    "repository": "heroku/signup",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "signup-production",
+    "heroku_staging_name": "signup-staging"
+  },
+  "simi": {
+    "provider": "heroku",
+    "repository": "heroku/simi",
+    "auto_merge": true,
+    "heroku_team_name": "DevEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "simi-production"
+  },
+  "slash-heroku": {
+    "provider": "unknown",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/slash-heroku",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "slash-heroku-production",
+    "heroku_staging_name": "slash-heroku-staging"
+  },
+  "sleuth-codescan": {
+    "provider": "heroku",
+    "repository": "heroku/sleuth-codescan",
+    "auto_merge": true,
+    "heroku_team_name": "Security",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "sleuth-codescan"
+  },
+  "spacemgr": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/spacemgr",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "spacemgr"
+  },
+  "spike": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/spike",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "logplex-remote-canary-prod"
+  },
+  "splunk-cli": {
+    "provider": "unknown",
+    "hipchat_room": "",
+    "repository": "heroku/splunk-cli",
+    "auto_merge": true,
+    "heroku_team_name": "",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "sputnik": {
+    "provider": "heroku",
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/sputnik",
+    "auto_merge": true,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "sputnik-production"
+  },
+  "ssl-doctor": {
+    "provider": "heroku",
+    "repository": "heroku/ssl-doctor",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "ssl-doctor"
+  },
+  "sso": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/sso",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "sso-production"
+  },
+  "starboard": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/starboard",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "starboard"
+  },
+  "status": {
+    "provider": "kernel",
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/status",
+    "auto_merge": false,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "status-buddy": {
+    "provider": "heroku",
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/status-buddy",
+    "auto_merge": true,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "status-buddy-production"
+  },
+  "Support Agent Interface": {
+    "provider": "heroku",
+    "repository": "heroku/support-agent-interface",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "support-tickets",
+    "heroku_staging_name": "support-agent-staging"
+  },
+  "support-api": {
+    "provider": "heroku",
+    "repository": "heroku/support-api",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "support-api",
+    "heroku_staging_name": "support-api-staging"
+  },
+  "support-incoming": {
+    "provider": "heroku",
+    "repository": "heroku/support-incoming",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "support-incoming",
+    "heroku_staging_name": "support-incoming-staging"
+  },
+  "support-outgoing": {
+    "provider": "heroku",
+    "repository": "heroku/support-outgoing",
+    "auto_merge": true,
+    "heroku_team_name": "Support",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "support-outgoing",
+    "heroku_staging_name": "support-outgoing-staging"
+  },
+  "swfsmx": {
+    "provider": "heroku",
+    "hipchat_room": "dogwood-ops",
+    "repository": "heroku/swfsmx",
+    "auto_merge": true,
+    "heroku_team_name": "Dogwood",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "swfsmx-production",
+    "heroku_staging_name": "swfsmx-staging"
+  },
+  "sylvester": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/sylvester",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "sylvester-production"
+  },
+  "telex": {
+    "provider": "heroku",
+    "hipchat_room": "api-ops",
+    "repository": "heroku/telex",
+    "auto_merge": true,
+    "heroku_team_name": "API",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "telex"
+  },
+  "tempo": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/tempo",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "tempo-hermes"
+  },
+  "tenanto": {
+    "provider": "heroku",
+    "repository": "heroku/tenanto",
+    "auto_merge": true,
+    "heroku_team_name": "Security",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "toolbelt": {
+    "provider": "unknown",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/heroku",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "toolbelt-website": {
+    "provider": "heroku",
+    "repository": "heroku/toolbelt/",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "toolbelt",
+    "heroku_staging_name": "toolbelt-staging"
+  },
+  "transferatu": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/transferatu",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "transferatu"
+  },
+  "tweetie": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/tweetie",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "logplex-canary-emit-production"
+  },
+  "umpire": {
+    "provider": "heroku",
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/umpire",
+    "auto_merge": true,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "umpire-production"
+  },
+  "URInception": {
+    "provider": "heroku",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/urinception",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "urinception"
+  },
+  "vacuole": {
+    "provider": "heroku",
+    "hipchat_room": "Build and Languages Ops",
+    "repository": "heroku/vacuole",
+    "auto_merge": true,
+    "heroku_team_name": "Build and Languages",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "vacuole-production"
+  },
+  "vault": {
+    "provider": "heroku",
+    "repository": "heroku/vault",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "dev",
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_dev_name": "vault-staging-dev",
+    "heroku_production_name": "vault",
+    "heroku_staging_name": "vault-staging"
+  },
+  "vault-analytics": {
+    "provider": "heroku",
+    "repository": "heroku/vault-analytics",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "vault-analytics"
+  },
+  "vault-cashier": {
+    "provider": "heroku",
+    "repository": "heroku/vault-cashier",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "vault-cashier"
+  },
+  "vault-credit-request": {
+    "provider": "heroku",
+    "repository": "heroku/vault-credit-request",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "vault-internal": {
+    "provider": "heroku",
+    "repository": "heroku/vault_internal",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "vault-invoice-builder": {
+    "provider": "heroku",
+    "repository": "heroku/vault-invoice-builder",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "vault-invoice-builder"
+  },
+  "vault-usage": {
+    "provider": "heroku",
+    "repository": "heroku/vault-usage",
+    "auto_merge": true,
+    "heroku_team_name": "Vault",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "vixie": {
+    "provider": "heroku",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/vixie",
+    "auto_merge": true,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "vixie-production"
+  },
+  "WAL-E": {
+    "provider": "unknown",
+    "hipchat_room": "dod-ops",
+    "repository": "wal-e/wal-e",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+
+    ]
+  },
+  "watchtower-tng": {
+    "provider": "kernel",
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/watchtower-tng",
+    "auto_merge": false,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "watchtower-tng-production",
+    "heroku_staging_name": "watchtower-tng-staging"
+  },
+  "whatis": {
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/whatis",
+    "auto_merge": true,
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "whatis",
+    "heroku_staging_name": "whatis-staging"
+  },
+  "wombat": {
+    "provider": "kernel",
+    "hipchat_room": "Cedar Ops",
+    "repository": "heroku/wombat",
+    "auto_merge": false,
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "production",
+      "staging",
+      "eu-west-1-a",
+      "ops",
+      "us-west-2",
+      "yannick"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "www": {
+    "provider": "heroku",
+    "repository": "heroku/www",
+    "auto_merge": true,
+    "heroku_team_name": "Marketing",
+    "environments": [
+      "dev",
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_dev_name": "www-dev",
+    "heroku_production_name": "www",
+    "heroku_staging_name": "www-staging"
+  },
+  "yahtzee": {
+    "provider": "heroku",
+    "repository": "heroku/metaas#yahtzee",
+    "auto_merge": true,
+    "heroku_team_name": "OpEx",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "yobuko": {
+    "provider": "heroku",
+    "hipchat_room": "dod-ops",
+    "repository": "heroku/yobuko",
+    "auto_merge": true,
+    "heroku_team_name": "Department of Data",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "yobuko"
+  },
+  "zerigo-dashboard": {
+    "provider": "heroku",
+    "hipchat_room": "add-ons",
+    "repository": "heroku/zerigo-dashboard",
+    "auto_merge": true,
+    "heroku_team_name": "Addons",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+
+    ],
+    "heroku_production_name": "zerigo-dashboard-production",
+    "heroku_staging_name": "zerigo-dashboard-staging"
+  },
+  "ion-ops": {
+    "provider": "kernel",
+    "manually_added": true,
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "us-west-2"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "ion-production": {
+    "provider": "kernel",
+    "manually_added": true,
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "us-west-2"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "ion-staging": {
+    "provider": "kernel",
+    "manually_added": true,
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "us-west-2"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "ion-us-west-2": {
+    "provider": "kernel",
+    "manually_added": true,
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "ion-eu-west-1-a": {
+    "provider": "heroku",
+    "manually_added": true,
+    "hipchat_room": "foundation-ops",
+    "repository": "heroku/ion",
+    "auto_merge": false,
+    "heroku_team_name": "Foundation",
+    "environments": [
+      "production"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "ion-eu-west-1-a"
+  },
+  "watchtower-tng-staging": {
+    "provider": "heroku",
+    "manually_added": true,
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/watchtower-tng",
+    "auto_merge": false,
+    "heroku_team_name": "SRE",
+    "environments": [
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "watchtower-tng-production",
+    "heroku_staging_name": "watchtower-tng-staging"
+  },
+  "status-staging": {
+    "provider": "kernel",
+    "manually_added": true,
+    "auto_merge": false,
+    "hipchat_room": "SRE Ops",
+    "repository": "heroku/status",
+    "heroku_team_name": "SRE",
+    "environments": [
+      "us-west-2"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "barbary": {
+    "manually_added": true,
+    "provider": "heroku",
+    "hipchat_room": "Tools-ops",
+    "repository": "heroku/barbary",
+    "heroku_team_name": "Tools",
+    "environments": [
+      "production",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ],
+    "heroku_production_name": "barbary-production",
+    "heroku_staging_name": "barbary-staging"
+  },
+  "runtime-px": {
+    "manually_added": true,
+    "auto_merge": false,
+    "provider": "kernel",
+    "hipchat_room": "cedar-ops",
+    "repository": "heroku/railgun",
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "eu-west-1-a",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "runtime": {
+    "manually_added": true,
+    "auto_merge": false,
+    "provider": "kernel",
+    "hipchat_room": "cedar-ops",
+    "repository": "heroku/railgun",
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "eu-west-1-a",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  },
+  "runtime-medium": {
+    "manually_added": true,
+    "auto_merge": false,
+    "provider": "kernel",
+    "hipchat_room": "cedar-ops",
+    "repository": "heroku/railgun",
+    "heroku_team_name": "Cedar",
+    "environments": [
+      "eu-west-1-a",
+      "staging"
+    ],
+    "required_contexts": [
+      "continuous-integration/travis-ci/push"
+    ]
+  }
+}
