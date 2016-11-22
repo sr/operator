@@ -21,7 +21,7 @@ variable "sfdc_proxyout_cidr_blocks" {
   ]
 }
 
-variable "heroku_spaces_cidr_blocks" {
+variable "sfdc_pardot_tools_production_heroku_space_cidr_blocks" {
   type = "list"
 
   default = [
