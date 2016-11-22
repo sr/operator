@@ -3,7 +3,7 @@ variable "github_enterprise_ami_us_east_1" {
 }
 
 variable "github_enterprise_instance_type" {
-  default = "r3.xlarge"
+  default = "c4.4xlarge"
 }
 
 variable "github_enterprise_xvdf_size" {
