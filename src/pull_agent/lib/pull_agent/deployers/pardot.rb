@@ -45,14 +45,10 @@ module PullAgent
 
       def add_graphite_annotation
         host = GRAPHITE_HOST.fetch(ShellHelper.datacenter)
-        graphite_key = case @environment
-          when "production" then "events.deploy.prod"
-          when "performance_testing" then "events.deploy.perftest"
-          else "unknown"
-        end
+
         Timeout.timeout(5) do
           TCPSocket.open(host, GRAPHITE_PORT) do |sock|
-            sock.puts("#{graphite_key} 1 #{Time.parse(@deploy.created_at).to_i}")
+            sock.puts("events.deploy.#{@environment} 1 #{Time.parse(@deploy.created_at).to_i}")
             sock.close_write
           end
         end
