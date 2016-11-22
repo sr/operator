@@ -155,7 +155,7 @@ resource "aws_instance" "github_enterprise_server_2" {
   ami                     = "${var.github_enterprise_ami_us_east_1}"
   instance_type           = "${var.github_enterprise_instance_type}"
   key_name                = "github_enterprise"
-  subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1e_dmz.id}"
+  subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1d_dmz.id}"
   ebs_optimized           = true
   disable_api_termination = true
 
