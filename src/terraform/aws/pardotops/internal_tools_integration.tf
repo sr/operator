@@ -560,8 +560,8 @@ resource "aws_route_table_association" "internal_tools_integration_us_east_1e_dm
   route_table_id = "${aws_route_table.internal_tools_integration_route_dmz.id}"
 }
 
-resource "aws_security_group" "internal_tools_integration_mysql_ingress" {
-  name        = "internal_tools_integration_mysql_ingress"
+resource "aws_security_group" "artifactory_mysql_ingress" {
+  name        = "artifactory_integration_mysql_ingress"
   description = "Allow mysql from artifactory instances only"
   vpc_id      = "${aws_vpc.internal_tools_integration.id}"
 
@@ -589,7 +589,7 @@ resource "aws_security_group" "internal_tools_integration_mysql_ingress" {
 }
 
 resource "aws_db_subnet_group" "internal_tools_integration" {
-  name        = "internal_tools_integration"
+  name        = "artifactory_integration"
   description = "Pardot CI DB Subnet"
 
   subnet_ids = [
