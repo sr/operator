@@ -93,6 +93,8 @@ resource "aws_security_group" "github_enterprise_server" {
     cidr_blocks = [
       "52.4.132.69/32",
     ] # 1.git.dev.pardot.com
+
+    self = true
   }
 }
 
@@ -103,6 +105,7 @@ resource "aws_eip" "github_enterprise_server_1" {
 
 resource "aws_eip" "github_enterprise_server_2" {
   vpc = true
+  instance = "${aws_instance.github_enterprise_server_2.id}"
 }
 
 resource "aws_instance" "github_enterprise_server_1" {
@@ -133,5 +136,36 @@ resource "aws_instance" "github_enterprise_server_1" {
 
   tags {
     Name = "pardot0-github1-1-ue1"
+  }
+}
+
+resource "aws_instance" "github_enterprise_server_2" {
+  ami                     = "${var.github_enterprise_ami_us_east_1}"
+  instance_type           = "${var.github_enterprise_instance_type}"
+  key_name                = "github_enterprise"
+  subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1e_dmz.id}"
+  ebs_optimized           = true
+  disable_api_termination = true
+
+  vpc_security_group_ids = [
+    "${aws_security_group.internal_tools_integration_default.id}",
+    "${aws_security_group.github_enterprise_server.id}",
+  ]
+
+  root_block_device {
+    volume_type           = "gp2"
+    delete_on_termination = false
+  }
+
+  ebs_block_device {
+    device_name           = "/dev/xvdf"
+    volume_type           = "gp2"
+    volume_size           = "${var.github_enterprise_xvdf_size}"
+    delete_on_termination = false
+    encrypted             = true
+  }
+
+  tags {
+    Name = "pardot0-github1-2-ue1"
   }
 }
