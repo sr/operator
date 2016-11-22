@@ -24,12 +24,30 @@ class Repository
     @repo.name_with_owner
   end
 
+  def required_testing_statuses
+    @repo.required_testing_statuses
+  end
+
   def update_github_commit_status?
     @repo.update_github_commit_status?
   end
 
   def participating?
     @repo.participating?
+  end
+
+  def synchronize_commit_status(github_id, commit_status)
+    attributes = {
+      github_repository_id: github_id,
+      sha: commit_status.sha,
+      context: commit_status.context
+    }
+
+    status = RepositoryCommitStatus.find_or_initialize_by(attributes) do |s|
+      s.state = commit_status.state
+    end
+    status.save!
+    status
   end
 
   def team

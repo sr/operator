@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160603084848) do
+ActiveRecord::Schema.define(version: 20161121221222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,6 +77,17 @@ ActiveRecord::Schema.define(version: 20160603084848) do
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
+  end
+
+  create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string   "sha",                  null: false
+    t.string   "context",              null: false
+    t.string   "state"
+    t.string   "commit_status_state"
+    t.integer  "github_repository_id", null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.index ["sha", "context"], name: "index_repository_commit_statuses_on_sha_and_context", unique: true, using: :btree
   end
 
   create_table "users", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

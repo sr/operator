@@ -2,6 +2,8 @@
 module Clients
   # Interact with pull requests and commit statuses via the GitHub API
   class GitHub
+    CommitStatus = Struct.new(:sha, :context, :state)
+
     def initialize(token)
       @client = Octokit::Client.new(
         api_endpoint: Changeling.config.github_api_endpoint,

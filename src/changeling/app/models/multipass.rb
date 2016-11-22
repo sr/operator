@@ -98,6 +98,22 @@ class Multipass < ActiveRecord::Base
     end
   end
 
+  def synchronize_testing_status
+    commit_statuses = RepositoryCommitStatus.where(sha: release_id)
+
+    success = repository.required_testing_statuses.all? do |context|
+      status = commit_statuses.where(context: context).first
+
+      if status
+        status.state == RepositoryCommitStatus::SUCCESS
+      else
+        false
+      end
+    end
+
+    update!(testing: success)
+  end
+
   def hostname
     ENV["HOST"] || "changeling-development.heroku.tools"
   end
