@@ -72,6 +72,7 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.heroku_spaces_cidr_blocks}",
     ]
   }
 }
@@ -95,6 +96,7 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.heroku_spaces_cidr_blocks}",
     ]
   }
 
@@ -113,6 +115,7 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.heroku_spaces_cidr_blocks}",
     ]
   }
 }
