@@ -1,9 +1,0 @@
-<div class="purple-box u-padding-Al row actors">
-  <%= render "multipasses/form/actor", multipass: multipass, field: "peer_reviewer" %>
-  <% if multipass.required_field?("sre_approver") %>
-    <%= render "multipasses/form/actor", multipass: multipass, field: "sre_approver" %>
-  <% end %>
-  <%= render "multipasses/form/actor", multipass: multipass, field: "rejector" %>
-  <%= render "multipasses/form/actor", multipass: multipass, field: "emergency_approver" %>
-</div>
-
