@@ -35,7 +35,7 @@ module PullAgent
       end
 
       def restart
-        add_graphite_annotation if %w(production performance_testing).include?(@environment)
+        add_graphite_annotation if %w[production performance_testing].include?(@environment)
         restart_redis_jobs
         restart_old_style_jobs
         restart_autojobs
@@ -108,9 +108,9 @@ module PullAgent
 
       def symfony_env
         @symfony_env ||=
-          if %w(production performance_testing).include?(@environment) && ShellHelper.datacenter == "dfw"
+          if %w[production performance_testing].include?(@environment) && ShellHelper.datacenter == "dfw"
             "prod-s"
-          elsif %w(production performance_testing).include?(@environment)
+          elsif %w[production performance_testing].include?(@environment)
             "prod"
           elsif @environment == "staging" && ShellHelper.datacenter == "dfw"
             "staging-s"
