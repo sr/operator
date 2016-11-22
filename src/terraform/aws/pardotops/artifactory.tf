@@ -649,12 +649,12 @@ resource "aws_alb_target_group" "public_artifactory_all_hosts_target_group" {
   }
 
   health_check {
-    interval            = "60"
+    interval            = 10
     path                = "/artifactory/api/system/ping"
     port                = 80
     protocol            = "HTTP"
-    healthy_threshold   = 5
-    unhealthy_threshold = 5
+    healthy_threshold   = 4
+    unhealthy_threshold = 2
     matcher             = "200"
   }
 }
@@ -729,12 +729,12 @@ resource "aws_alb_target_group" "private_artifactory_all_hosts_target_group" {
   }
 
   health_check {
-    interval            = "60"
+    interval            = 10
     path                = "/artifactory/api/system/ping"
     port                = 80
     protocol            = "HTTP"
-    healthy_threshold   = 5
-    unhealthy_threshold = 5
+    healthy_threshold   = 4
+    unhealthy_threshold = 2
     matcher             = "200"
   }
 }
@@ -898,8 +898,8 @@ resource "aws_elb" "artifactory_primary_machine_access_elb" {
     healthy_threshold   = 4
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:80/artifactory/webapp/"
-    interval            = 5
+    target              = "HTTP:80/artifactory/api/system/ping"
+    interval            = 10
   }
 
   tags {

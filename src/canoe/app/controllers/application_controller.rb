@@ -11,15 +11,6 @@ class ApplicationController < ActionController::Base
 
   around_action :log_context
 
-  rescue_from Exception do |exception|
-    if !Rails.env.test? && !Rails.env.development?
-      Instrumentation.log_exception(exception)
-      render file: "public/500.html", layout: false, status: 500
-    else
-      raise exception
-    end
-  end
-
   protected
 
   def log_context
