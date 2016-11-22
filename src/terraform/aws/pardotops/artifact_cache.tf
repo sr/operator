@@ -5,7 +5,7 @@ resource "aws_security_group" "artifact_cache_http_lb" {
   # changing it after the fact requires rebuilding all dependencies
   description = "Allow HTTP/HTTPS from SFDC VPN only"
 
-  vpc_id = "${aws_vpc.artifactory_integration.id}"
+  vpc_id = "${aws_vpc.internal_tools_integration.id}"
 
   ingress {
     from_port = 443
@@ -15,7 +15,7 @@ resource "aws_security_group" "artifact_cache_http_lb" {
     cidr_blocks = [
       "${var.pardot_ci_vpc_cidr}",
       "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_vpc.artifactory_integration.cidr_block}",
+      "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
     ]
   }
@@ -38,7 +38,7 @@ resource "aws_lb_cookie_stickiness_policy" "duration-based-elb-cookie-policy-art
 resource "aws_security_group" "external_artifact_cache_http_lb" {
   name        = "external_artifact_cache_http_lb"
   description = "Allow HTTP/HTTPS from SFDC VPN and datacenters only"
-  vpc_id      = "${aws_vpc.artifactory_integration.id}"
+  vpc_id      = "${aws_vpc.internal_tools_integration.id}"
 
   ingress {
     from_port   = 80
@@ -63,7 +63,7 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
       "${aws_eip.internal_apps_nat_gw.public_ip}/32",
       "${aws_eip.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
-      "${aws_eip.artifactory_integration_nat_gw.public_ip}/32",
+      "${aws_eip.internal_tools_integration_nat_gw.public_ip}/32",
       "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
@@ -79,7 +79,7 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
 resource "aws_security_group" "artifact_cache_server" {
   name        = "artifact_cache_server"
   description = "Allow HTTP from Artifact Cache LB"
-  vpc_id      = "${aws_vpc.artifactory_integration.id}"
+  vpc_id      = "${aws_vpc.internal_tools_integration.id}"
 
   # SSH from bastion
   ingress {
@@ -116,10 +116,10 @@ resource "aws_elb" "artifact_cache_lb" {
   security_groups = ["${aws_security_group.artifact_cache_http_lb.id}"]
 
   subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1a.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1c.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1d.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1e.id}",
   ]
 
   cross_zone_load_balancing   = true
@@ -167,10 +167,10 @@ resource "aws_elb" "external_artifact_cache_lb" {
   security_groups = ["${aws_security_group.external_artifact_cache_http_lb.id}"]
 
   subnets = [
-    "${aws_subnet.artifactory_integration_us_east_1a_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1c_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1d_dmz.id}",
-    "${aws_subnet.artifactory_integration_us_east_1e_dmz.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1a_dmz.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1c_dmz.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1d_dmz.id}",
+    "${aws_subnet.internal_tools_integration_us_east_1e_dmz.id}",
   ]
 
   cross_zone_load_balancing   = true
@@ -215,7 +215,7 @@ resource "aws_elb" "external_artifact_cache_lb" {
 resource "aws_instance" "artifact_cache_server_1" {
   ami                    = "${var.centos_6_hvm_ebs_ami}"
   instance_type          = "c4.2xlarge"
-  subnet_id              = "${aws_subnet.artifactory_integration_us_east_1a.id}"
+  subnet_id              = "${aws_subnet.internal_tools_integration_us_east_1a.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name               = "internal_apps"
 
@@ -242,7 +242,7 @@ resource "aws_route53_record" "artifact_cache_server_1_Arecord" {
 resource "aws_instance" "artifact_cache_server_2" {
   ami                    = "${var.centos_6_hvm_ebs_ami}"
   instance_type          = "c4.2xlarge"
-  subnet_id              = "${aws_subnet.artifactory_integration_us_east_1c.id}"
+  subnet_id              = "${aws_subnet.internal_tools_integration_us_east_1c.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name               = "internal_apps"
 
@@ -269,7 +269,7 @@ resource "aws_route53_record" "artifact_cache_server_2_Arecord" {
 resource "aws_instance" "artifact_cache_server_3" {
   ami                    = "${var.centos_6_hvm_ebs_ami}"
   instance_type          = "c4.2xlarge"
-  subnet_id              = "${aws_subnet.artifactory_integration_us_east_1d.id}"
+  subnet_id              = "${aws_subnet.internal_tools_integration_us_east_1d.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name               = "internal_apps"
 
@@ -296,7 +296,7 @@ resource "aws_route53_record" "artifact_cache_server_3_Arecord" {
 resource "aws_instance" "artifact_cache_server_4" {
   ami                    = "${var.centos_6_hvm_ebs_ami}"
   instance_type          = "c4.2xlarge"
-  subnet_id              = "${aws_subnet.artifactory_integration_us_east_1e.id}"
+  subnet_id              = "${aws_subnet.internal_tools_integration_us_east_1e.id}"
   vpc_security_group_ids = ["${aws_security_group.artifact_cache_server.id}"]
   key_name               = "internal_apps"
 
