@@ -3,6 +3,29 @@ resource "aws_route53_zone_association" "internal_tools_integration_to_internal_
   zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
 }
 
+resource "aws_security_group" "internal_tools_integration_default" {
+  name   = "internal_tools_default"
+  vpc_id = "${aws_vpc.internal_tools_integration.id}"
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${aws_instance.internal_apps_bastion.private_ip}/32",
+      "${aws_instance.internal_apps_bastion_2.private_ip}/32",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "artifactory_instance_secgroup" {
   name   = "artifactory_instance_secgroup"
   vpc_id = "${aws_vpc.internal_tools_integration.id}"
