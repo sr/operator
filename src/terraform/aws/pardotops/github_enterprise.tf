@@ -10,8 +10,8 @@ variable "github_enterprise_xvdf_size" {
   default = "250"
 }
 
-resource "aws_security_group" "github_enterprise_server" {
-  name   = "github_enterprise_server"
+resource "aws_security_group" "github_enterprise_server_admin_management" {
+  name   = "github_enterprise_server_admin_management"
   vpc_id = "${aws_vpc.internal_tools_integration.id}"
 
   # Administrative SSH port
@@ -36,6 +36,24 @@ resource "aws_security_group" "github_enterprise_server" {
     ]
   }
 
+  # VPN for secure replication from primary
+  ingress {
+    from_port = 1194
+    to_port   = 1194
+    protocol  = "udp"
+
+    cidr_blocks = [
+      "52.4.132.69/32",
+    ] # 1.git.dev.pardot.com
+
+    self = true
+  }
+}
+
+resource "aws_security_group" "github_enterprise_server_ssh" {
+  name   = "github_enterprise_server_ssh"
+  vpc_id = "${aws_vpc.internal_tools_integration.id}"
+
   ingress {
     from_port = 22
     to_port   = 22
@@ -51,6 +69,11 @@ resource "aws_security_group" "github_enterprise_server" {
       "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
+}
+
+resource "aws_security_group" "github_enterprise_server_http" {
+  name   = "github_enterprise_server_http"
+  vpc_id = "${aws_vpc.internal_tools_integration.id}"
 
   ingress {
     from_port = 80
@@ -83,19 +106,6 @@ resource "aws_security_group" "github_enterprise_server" {
       "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
-
-  # VPN for secure replication from primary
-  ingress {
-    from_port = 1194
-    to_port   = 1194
-    protocol  = "udp"
-
-    cidr_blocks = [
-      "52.4.132.69/32",
-    ] # 1.git.dev.pardot.com
-
-    self = true
-  }
 }
 
 resource "aws_eip" "github_enterprise_server_1" {
@@ -118,7 +128,9 @@ resource "aws_instance" "github_enterprise_server_1" {
 
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
-    "${aws_security_group.github_enterprise_server.id}",
+    "${aws_security_group.github_enterprise_server_admin_management.id}",
+    "${aws_security_group.github_enterprise_server_ssh.id}",
+    "${aws_security_group.github_enterprise_server_http.id}",
   ]
 
   root_block_device {
@@ -143,13 +155,15 @@ resource "aws_instance" "github_enterprise_server_2" {
   ami                     = "${var.github_enterprise_ami_us_east_1}"
   instance_type           = "${var.github_enterprise_instance_type}"
   key_name                = "github_enterprise"
-  subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1e_dmz.id}"
+  subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1d_dmz.id}"
   ebs_optimized           = true
   disable_api_termination = true
 
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
-    "${aws_security_group.github_enterprise_server.id}",
+    "${aws_security_group.github_enterprise_server_admin_management.id}",
+    "${aws_security_group.github_enterprise_server_ssh.id}",
+    "${aws_security_group.github_enterprise_server_http.id}",
   ]
 
   root_block_device {
