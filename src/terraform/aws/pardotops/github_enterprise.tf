@@ -168,6 +168,14 @@ resource "aws_instance" "github_enterprise_server_1" {
   }
 }
 
+resource "aws_route53_record" "github_enterprise_server_1_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-github1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.github_enterprise_server_1.private_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
 resource "aws_instance" "github_enterprise_server_2" {
   ami                     = "${var.github_enterprise_ami_us_east_1}"
   instance_type           = "${var.github_enterprise_instance_type}"
@@ -200,6 +208,14 @@ resource "aws_instance" "github_enterprise_server_2" {
     terraform = "true"
     Name      = "pardot0-github1-2-ue1"
   }
+}
+
+resource "aws_route53_record" "github_enterprise_server_2_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-github1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.github_enterprise_server_2.private_ip}"]
+  type    = "A"
+  ttl     = "900"
 }
 
 resource "aws_security_group" "github_enterprise_server_backups" {
@@ -253,4 +269,12 @@ resource "aws_instance" "github_enterprise_server_backups" {
     terraform = "true"
     Name      = "pardot0-githubbackup1-1-ue1"
   }
+}
+
+resource "aws_route53_record" "github_enterprise_server_backups_Arecord" {
+  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-githubbackup1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.github_enterprise_server_backups.private_ip}"]
+  type    = "A"
+  ttl     = "900"
 }
