@@ -72,11 +72,15 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
+      "${var.bamboo_server_instance_ip}/32",
+      "${var.jira_server_instance_ip}/32",
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
 }
@@ -96,13 +100,22 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
+      "${var.bamboo_server_instance_ip}/32",
+      "${var.jira_server_instance_ip}/32",
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
+}
+
+resource "aws_security_group" "github_enterprise_server_https" {
+  name   = "github_enterprise_server_https"
+  vpc_id = "${aws_vpc.internal_tools_integration.id}"
 
   ingress {
     from_port = 443
@@ -115,11 +128,15 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
+      "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
       "${aws_vpc.internal_apps.cidr_block}",
       "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
+      "${var.bamboo_server_instance_ip}/32",
+      "${var.jira_server_instance_ip}/32",
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
 }
@@ -147,6 +164,7 @@ resource "aws_instance" "github_enterprise_server_1" {
     "${aws_security_group.github_enterprise_server_admin_management.id}",
     "${aws_security_group.github_enterprise_server_ssh.id}",
     "${aws_security_group.github_enterprise_server_http.id}",
+    "${aws_security_group.github_enterprise_server_https.id}",
   ]
 
   root_block_device {
@@ -189,6 +207,7 @@ resource "aws_instance" "github_enterprise_server_2" {
     "${aws_security_group.github_enterprise_server_admin_management.id}",
     "${aws_security_group.github_enterprise_server_ssh.id}",
     "${aws_security_group.github_enterprise_server_http.id}",
+    "${aws_security_group.github_enterprise_server_https.id}",
   ]
 
   root_block_device {
