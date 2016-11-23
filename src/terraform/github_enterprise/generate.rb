@@ -28,56 +28,64 @@ Octokit.configure do |c|
   c.api_endpoint = "https://git.dev.pardot.com/api/v3"
   c.access_token = ENV.fetch("GITHUB_ACCESS_TOKEN")
 end
+Octokit.auto_paginate = true
 
 if options[:repos]
   Octokit.organization_repositories(options[:org]).each do |repo|
-    if repo.fork?
-      fail "fork detected: #{repo.name}"
-    end
+    safe_name = repo.name.gsub(".", "-")
+    puts "Writing repository_#{safe_name}.tf ..."
+    File.open("repository_#{safe_name}.tf", "w") do |fp|
+      if repo.fork?
+        fail "fork detected: #{repo.name}"
+      end
 
-    puts <<-EOS
-resource "github_repository" "#{repo.name}" {
+      fp.puts <<-EOS
+resource "github_repository" "#{safe_name}" {
   name        = "#{repo.name}"
-  description = "#{repo.description.gsub('"', '\"')}"
+  description = "#{repo.description.to_s.gsub('"', '\"')}"
   homepage_url = "#{repo.homepage_url}"
   private = #{repo.private}
   has_issues = #{repo.has_issues}
   has_downloads = #{repo.has_downloads}
   has_wiki = #{repo.has_wiki}
 }
-EOS
-    Octokit.repository_teams(repo.id).each do |team|
-      puts <<-EOS
-resource "github_team_repository" "#{repo.name}_#{team.slug}" {
-  repository = "\${github_repository.#{repo.name}.name}"
+  EOS
+      Octokit.repository_teams(repo.id).each do |team|
+        fp.puts <<-EOS
+resource "github_team_repository" "#{safe_name}_#{team.slug}" {
+  repository = "\${github_repository.#{safe_name}.name}"
   team_id = "\${github_team.#{team.slug}.id}"
   permission = "#{team.permission}"
 }
-EOS
+  EOS
+
+        if options[:import]
+          system("terraform", "import", "-var-file=../terraform.tfvars", "github_team_repository.#{safe_name}_#{team.slug}", "#{team.id}:#{repo.name}", out: :err)
+        end
+      end
 
       if options[:import]
-        system("terraform", "import", "-var-file=../terraform.tfvars", "github_team_repository.#{repo.name}_#{team.slug}", "#{team.id}:#{repo.name}", out: :err)
+        system("terraform", "import", "-var-file=../terraform.tfvars", "github_repository.#{safe_name}", repo.name, out: :err)
       end
-    end
-
-    if options[:import]
-      system("terraform", "import", "-var-file=../terraform.tfvars", "github_repository.#{repo.name}", repo.name, out: :err)
     end
   end
 end
 
 if options[:teams]
   Octokit.organization_teams(options[:org]).each do |team|
-    puts <<-EOS
+    puts "Writing teams.tf ..."
+    File.open("teams.tf", "w") do |fp|
+      fp.puts <<-EOS
 resource "github_team" "#{team.slug}" {
   name = "#{team.name}"
-  description = "#{team.description.gsub('"', '\"')}"
+  description = "#{team.description.to_s.gsub('"', '\"')}"
   privacy = "#{team.privacy}"
 }
-EOS
+  EOS
 
-    if options[:import]
-      system("terraform", "import", "-var-file=../terraform.tfvars", "github_team.#{team.slug}", team.id.to_s, out: :err)
+      if options[:import]
+        system("terraform", "import", "-var-file=../terraform.tfvars", "github_team.#{team.slug}", team.id.to_s, out: :err)
+      end
     end
   end
 end
