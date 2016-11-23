@@ -1,7 +1,7 @@
 resource "github_repository" "bread" {
   name          = "bread"
   description   = "BREAD team repository"
-  homepage_url  = ""
+  homepage_url  = "https://confluence.dev.pardot.com/display/PTechops/BREAD+Ops"
   private       = true
   has_issues    = false
   has_downloads = true
