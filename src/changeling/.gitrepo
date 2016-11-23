@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/sr/changeling
+	branch = pardot-sync
+	commit = 6b5af5da0636725dac7e5c777094a74a64f0ba60
+	parent = ab8ee2b5b807c8fd55e84b1172785cee77378fdb
+	cmdver = 0.3.0
