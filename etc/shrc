@@ -13,6 +13,10 @@ else
   export BREAD GOPATH PATH CDPATH
 fi
 
+# https://github.com/ingydotnet/git-subrepo#readme
+test -f "$BREAD/src/build/git-subrepo/.rc" &&
+. "$BREAD/src/build/git-subrepo/.rc" &&
+
 test -f "$BREAD/etc/secrets" &&
 . "$BREAD/etc/secrets"
 
