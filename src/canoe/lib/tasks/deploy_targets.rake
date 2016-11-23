@@ -90,7 +90,8 @@ namespace :canoe do
       "aws/pardot-ci",
       "aws/pardot-qe",
       "aws/pardotops",
-      "aws/pardotpublic"
+      "aws/pardotpublic",
+      "letsencrypt"
     ].each do |name|
       project = Project.find_or_initialize_by(name: "terraform-#{name}").tap { |p|
         p.icon = "server"
