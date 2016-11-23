@@ -80,7 +80,7 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32"
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
 }
@@ -108,13 +108,13 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32"
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
 }
 
 resource "aws_security_group" "github_enterprise_server_https" {
-  name = "github_enterprise_server_https"
+  name   = "github_enterprise_server_https"
   vpc_id = "${aws_vpc.internal_tools_integration.id}"
 
   ingress {
@@ -136,7 +136,7 @@ resource "aws_security_group" "github_enterprise_server_https" {
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
-      "${var.tools_egress_proxy_ip}/32"
+      "${var.tools_egress_proxy_ip}/32",
     ]
   }
 }
