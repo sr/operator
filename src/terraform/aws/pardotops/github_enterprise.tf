@@ -25,6 +25,10 @@ resource "aws_security_group" "github_enterprise_server_admin_management" {
       "52.4.132.69/32",               # 1.git.dev.pardot.com
     ]
 
+    security_groups = [
+      "${aws_security_group.github_enterprise_server_backups.id}",
+    ]
+
     self = true
   }
 
@@ -159,7 +163,8 @@ resource "aws_instance" "github_enterprise_server_1" {
   }
 
   tags {
-    Name = "pardot0-github1-1-ue1"
+    terraform = "true"
+    Name      = "pardot0-github1-1-ue1"
   }
 }
 
@@ -192,6 +197,60 @@ resource "aws_instance" "github_enterprise_server_2" {
   }
 
   tags {
-    Name = "pardot0-github1-2-ue1"
+    terraform = "true"
+    Name      = "pardot0-github1-2-ue1"
+  }
+}
+
+resource "aws_security_group" "github_enterprise_server_backups" {
+  name   = "github_enterprise_server_backups"
+  vpc_id = "${aws_vpc.internal_apps.id}"
+
+  # SSH from bastion
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.internal_apps_bastion.id}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "github_enterprise_server_backups" {
+  ami                     = "${var.centos_6_hvm_ebs_ami}"
+  instance_type           = "t2.medium"
+  key_name                = "internal_apps"
+  subnet_id               = "${aws_subnet.internal_apps_us_east_1c.id}"
+  disable_api_termination = true
+
+  vpc_security_group_ids = [
+    "${aws_security_group.github_enterprise_server_backups.id}",
+  ]
+
+  root_block_device {
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
+
+  ebs_block_device {
+    device_name           = "/dev/xvdf"
+    volume_type           = "standard"
+    volume_size           = "1024"
+    delete_on_termination = false
+    encrypted             = true
+  }
+
+  tags {
+    terraform = "true"
+    Name      = "pardot0-githubbackup1-1-ue1"
   }
 }
