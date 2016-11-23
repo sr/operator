@@ -27,6 +27,13 @@ message GithubEvent {
 	repeated HTTPRequest forwarded = 4;
 }
 
+message JIRAEvent {
+	int32 id = 1;
+	string type = 2;
+	string issue_key = 3;
+	repeated HTTPRequest forwarded = 4;
+}
+
 message HTTPRequest {
 	string method = 1;
 	string path = 2;
