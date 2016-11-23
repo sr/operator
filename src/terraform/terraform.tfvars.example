@@ -13,4 +13,4 @@ pardotci_secret_access_key = ""
 pardot_access_key_id = ""
 pardot_secret_access_key = ""
 
-github_token = ""
+github_enterprise_token = ""
