@@ -35,7 +35,7 @@ module PullAgent
       end
 
       def restart
-        add_graphite_annotation if @environment == "production"
+        add_graphite_annotation if %w[production performance_testing].include?(@environment)
         restart_redis_jobs
         restart_old_style_jobs
         restart_autojobs
@@ -48,7 +48,7 @@ module PullAgent
 
         Timeout.timeout(5) do
           TCPSocket.open(host, GRAPHITE_PORT) do |sock|
-            sock.puts("events.deploy.prod 1 #{Time.parse(@deploy.created_at).to_i}")
+            sock.puts("events.deploy.#{@environment} 1 #{Time.parse(@deploy.created_at).to_i}")
             sock.close_write
           end
         end
@@ -104,9 +104,9 @@ module PullAgent
 
       def symfony_env
         @symfony_env ||=
-          if @environment == "production" && ShellHelper.datacenter == "dfw"
+          if %w[production performance_testing].include?(@environment) && ShellHelper.datacenter == "dfw"
             "prod-s"
-          elsif @environment == "production"
+          elsif %w[production performance_testing].include?(@environment)
             "prod"
           elsif @environment == "staging" && ShellHelper.datacenter == "dfw"
             "staging-s"
