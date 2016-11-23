@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Clients::Heimdall do
   let(:heimdall) { Clients::Heimdall.new }
-  let(:repo) { Repository.new("fake-owner/fake-repo") }
+  let(:repo) { Repository.find("fake-owner/fake-repo") }
 
   context "#client" do
     it "includes the heimdall api token in the headers" do

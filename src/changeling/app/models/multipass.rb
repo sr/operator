@@ -14,8 +14,6 @@ class Multipass < ActiveRecord::Base
   extend Multipass::PullRequestReview
   include PullRequestMethods
 
-  REPOSITORY_REGEX = %r{https://github\.com/([-_\.0-9a-z]+/[-_\.0-9a-z]+)/pull/(\d+)}
-
   before_save :update_complete
   after_save :log_completed
   after_commit :callback_to_github
@@ -77,7 +75,7 @@ class Multipass < ActiveRecord::Base
   end
 
   def repository
-    Repository.new(repository_name)
+    Repository.find(repository_name)
   end
 
   def for_compliance?
@@ -85,15 +83,19 @@ class Multipass < ActiveRecord::Base
   end
 
   def repository_name
-    match = reference_url.match(REPOSITORY_REGEX)
-    return nil unless match
-    match[1]
+    if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
+      reference_url_path_parts[1, 2].join("/")
+    else
+      nil
+    end
   end
 
   def pull_request_number
-    match = reference_url.match(REPOSITORY_REGEX)
-    return nil unless match
-    match[2]
+    if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
+      reference_url_path_parts[4]
+    else
+      nil
+    end
   end
 
   def hostname
@@ -173,5 +175,15 @@ class Multipass < ActiveRecord::Base
   def log_created
     Metrics.increment("multipasses.created.#{loggable_repository_name}")
     Metrics.increment("multipasses.created")
+  end
+
+  private
+
+  def reference_url_path_parts
+    unless reference_url.present?
+      return []
+    end
+
+    URI(reference_url).path.split("/")
   end
 end

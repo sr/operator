@@ -2,7 +2,7 @@
 module Multipass::GitHubStatuses
   def commit_status_options
     {
-      context: "heroku/compliance",
+      context: Changeling.config.compliance_status_context,
       target_url: permalink,
       description: commit_status_description
     }
@@ -47,7 +47,9 @@ module Multipass::GitHubStatuses
   end
 
   def callback_to_github
-    GitHubCommitStatusWorker.perform_later(id)
+    if repository.update_github_commit_status?
+      GitHubCommitStatusWorker.perform_later(id)
+    end
   end
 
   def approve_github_commit_status!

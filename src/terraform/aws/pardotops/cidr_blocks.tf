@@ -21,6 +21,17 @@ variable "sfdc_proxyout_cidr_blocks" {
   ]
 }
 
+variable "sfdc_pardot_tools_production_heroku_space_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "52.70.38.185/32",
+    "52.3.60.97/32",
+    "54.82.52.167/32",
+    "54.82.76.144/32",
+  ]
+}
+
 variable "pardot_ci_vpc_cidr" {
   default = "172.27.0.0/16"
 }

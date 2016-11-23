@@ -191,7 +191,7 @@ var testAccNetworkingV2Subnet_update = fmt.Sprintf(`
     network_id = "${openstack_networking_network_v2.network_1.id}"
     cidr = "192.168.199.0/24"
     gateway_ip = "192.168.199.1"
-		allocation_pools {
+ 		allocation_pools {
 			start = "192.168.199.100"
 			end = "192.168.199.200"
 		}

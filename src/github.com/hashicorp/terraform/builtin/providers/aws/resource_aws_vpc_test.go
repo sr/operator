@@ -28,6 +28,8 @@ func TestAccAWSVpc_basic(t *testing.T) {
 						"aws_vpc.foo", "cidr_block", "10.1.0.0/16"),
 					resource.TestCheckResourceAttrSet(
 						"aws_vpc.foo", "default_route_table_id"),
+					resource.TestCheckResourceAttr(
+						"aws_vpc.foo", "enable_dns_support", "true"),
 				),
 			},
 		},
@@ -208,6 +210,24 @@ func TestAccAWSVpc_bothDnsOptionsSet(t *testing.T) {
 	})
 }
 
+// https://github.com/hashicorp/terraform/issues/10168
+func TestAccAWSVpc_DisabledDnsSupport(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckVpcDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVpcConfig_DisabledDnsSupport,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"aws_vpc.bar", "enable_dns_support", "false"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccAWSVpc_classiclinkOptionSet(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -275,6 +295,18 @@ resource "aws_vpc" "bar" {
 
 	enable_dns_hostnames = true
 	enable_dns_support = true
+}
+`
+
+const testAccVpcConfig_DisabledDnsSupport = `
+provider "aws" {
+	region = "us-west-2"
+}
+
+resource "aws_vpc" "bar" {
+	cidr_block = "10.2.0.0/16"
+
+	enable_dns_support = false
 }
 `
 

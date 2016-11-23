@@ -29,6 +29,10 @@ func TestAccAWSAPIGatewayApiKey_basic(t *testing.T) {
 						"aws_api_gateway_api_key.test", "name", "foo"),
 					resource.TestCheckResourceAttr(
 						"aws_api_gateway_api_key.test", "description", "Managed by Terraform"),
+					resource.TestCheckResourceAttrSet(
+						"aws_api_gateway_api_key.test", "created_date"),
+					resource.TestCheckResourceAttrSet(
+						"aws_api_gateway_api_key.test", "last_updated_date"),
 				),
 			},
 		},

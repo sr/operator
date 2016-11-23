@@ -1,4 +1,4 @@
-variable "pardot_ci_to_artifactory_integration_vpc_link_id" {
+variable "pardot_ci_to_internal_tools_integration_vpc_link_id" {
   default = "pcx-e95ed480"
 }
 
@@ -107,7 +107,7 @@ resource "aws_route_table" "pardot_ci_route_dmz" {
 
   route {
     cidr_block                = "172.28.0.0/24"
-    vpc_peering_connection_id = "${var.pardot_ci_to_artifactory_integration_vpc_link_id}"
+    vpc_peering_connection_id = "${var.pardot_ci_to_internal_tools_integration_vpc_link_id}"
   }
 }
 
@@ -123,9 +123,9 @@ resource "aws_route" "pardot_ci_to_pardotops_appdev" {
   route_table_id            = "${aws_vpc.pardot_ci.main_route_table_id}"
 }
 
-resource "aws_route" "pardot_ci_to_artifactory_integration" {
+resource "aws_route" "pardot_ci_to_internal_tools_integration" {
   destination_cidr_block    = "172.28.0.0/24"
-  vpc_peering_connection_id = "${var.pardot_ci_to_artifactory_integration_vpc_link_id}"
+  vpc_peering_connection_id = "${var.pardot_ci_to_internal_tools_integration_vpc_link_id}"
   route_table_id            = "${aws_vpc.pardot_ci.main_route_table_id}"
 }
 

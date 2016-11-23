@@ -47,7 +47,7 @@ The following arguments are supported:
 
 * `account_kind` - (Optional) Defines the Kind of account. Valid options are `Storage`
     and `BlobStorage`. Changing this forces a new resource to be created. Defaults
-    to `Storage`.
+    to `Storage`. 
 
 * `account_type` - (Required) Defines the type of storage account to be
     created. Valid options are `Standard_LRS`, `Standard_ZRS`, `Standard_GRS`,

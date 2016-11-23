@@ -318,13 +318,16 @@ func TestDeploy(t *testing.T) {
 }
 
 func TestGithub(t *testing.T) {
-	const secret = "shared secret"
+	const (
+		secret          = "shared secret"
+		failMagicString = `{"fail": true}`
+	)
 	endpoint := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			panic(err)
 		}
-		if string(body) == "{fail: true}" {
+		if string(body) == failMagicString {
 			w.WriteHeader(418)
 		} else {
 			w.WriteHeader(200)
@@ -335,10 +338,11 @@ func TestGithub(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler := bread.NewGithubHandler(protolog.DiscardLogger, &bread.GithubHandlerConfig{
-		RequestTimeout: 10 * time.Millisecond,
-		Endpoints:      []*url.URL{endpointURL},
-		SecretToken:    secret,
+	handler := bread.NewEventHandler(protolog.DiscardLogger, &bread.EventHandlerConfig{
+		RequestTimeout:    10 * time.Millisecond,
+		GithubEndpoints:   []*url.URL{endpointURL},
+		JIRAEndpoints:     []*url.URL{endpointURL},
+		GithubSecretToken: secret,
 	})
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
@@ -353,6 +357,7 @@ func TestGithub(t *testing.T) {
 			"unsupported method: GET",
 			"{}",
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
 				req.Method = "GET"
 				return req
 			},
@@ -362,6 +367,7 @@ func TestGithub(t *testing.T) {
 			"unsupported content-type: application/xml",
 			"{}",
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
 				req.Header.Set("Content-Type", "application/xml")
 				return req
 			},
@@ -371,6 +377,7 @@ func TestGithub(t *testing.T) {
 			"",
 			"{}",
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
 				req.Header.Del("X-Hub-Signature")
 				return req
 			},
@@ -380,6 +387,7 @@ func TestGithub(t *testing.T) {
 			"",
 			"{}",
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
 				req.Header.Set("X-Hub-Signature", "badsig")
 				return req
 			},
@@ -389,6 +397,7 @@ func TestGithub(t *testing.T) {
 			"signature does not match",
 			"{x: true}",
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
 				req.Header.Set("X-Hub-Signature", "sha1=f7b12f2256197f54286357418bff5d6230f821bf")
 				return req
 			},
@@ -396,8 +405,45 @@ func TestGithub(t *testing.T) {
 		{
 			500,
 			"could not proxy to all endpoints",
-			"{fail: true}",
+			failMagicString,
 			func(req *http.Request) *http.Request {
+				req.URL.Path = "/github"
+				return req
+			},
+		},
+		{
+			404,
+			"handler not found: /boomtown",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.URL.Path = "/boomtown"
+				return req
+			},
+		},
+		{
+			200,
+			"",
+			"{}",
+			func(req *http.Request) *http.Request {
+				req.URL.Path = "/jira"
+				return req
+			},
+		},
+		{
+			400,
+			"invalid character",
+			"garbage",
+			func(req *http.Request) *http.Request {
+				req.URL.Path = "/jira"
+				return req
+			},
+		},
+		{
+			500,
+			"could not proxy to all endpoints",
+			failMagicString,
+			func(req *http.Request) *http.Request {
+				req.URL.Path = "/jira"
 				return req
 			},
 		},
@@ -422,7 +468,7 @@ func TestGithub(t *testing.T) {
 		}
 		if b, err := ioutil.ReadAll(resp.Body); err != nil {
 			t.Error(err)
-		} else if strings.TrimSpace(string(b)) != tc.respBody {
+		} else if !strings.Contains(strings.TrimSpace(string(b)), tc.respBody) {
 			t.Errorf("expected response body `%s`, got `%s`", tc.respBody, strings.TrimSpace(string(b)))
 		}
 	}

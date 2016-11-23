@@ -69,7 +69,8 @@ class WebhooksController < ApplicationController
   private
 
   def verify_incoming_webhook_address!
-    source_ips = ["192.30.252.0/22"]
+    source_ips = Changeling.config.github_source_ips
+
     if Rails.env.development?
       source_ips << "127.0.0.1/32"
     end

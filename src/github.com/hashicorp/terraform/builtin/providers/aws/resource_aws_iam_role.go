@@ -82,6 +82,11 @@ func resourceAwsIamRole() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+
+			"create_date": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -172,6 +177,9 @@ func resourceAwsIamRoleReadResult(d *schema.ResourceData, role *iam.Role) error 
 		return err
 	}
 	if err := d.Set("unique_id", role.RoleId); err != nil {
+		return err
+	}
+	if err := d.Set("create_date", role.CreateDate.Format(time.RFC3339)); err != nil {
 		return err
 	}
 	return nil

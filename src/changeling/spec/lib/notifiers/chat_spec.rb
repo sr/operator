@@ -74,8 +74,8 @@ describe Notifiers::Chat, :type => :webmock do
       expect(result).to eql multipass.repository_name
     end
 
-    it "returns 'a multipass' if the reference_url is not github.com" do
-      multipass.reference_url = "https://notgithub.com/fake-owner/fake-repo/pull/42"
+    it "returns 'a multipass' if the reference_url is not a Pull Request URL" do
+      multipass.reference_url = "https://notgithub.com/fake-owner/fake-repo/issue/42"
       result = notifier.override_name(multipass)
       expect(result).to eql "a multipass"
     end

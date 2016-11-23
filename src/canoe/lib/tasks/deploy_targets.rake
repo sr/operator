@@ -90,7 +90,8 @@ namespace :canoe do
       "aws/pardot-ci",
       "aws/pardot-qe",
       "aws/pardotops",
-      "aws/pardotpublic"
+      "aws/pardotpublic",
+      "letsencrypt"
     ].each do |name|
       project = Project.find_or_initialize_by(name: "terraform-#{name}").tap { |p|
         p.icon = "server"
@@ -170,6 +171,10 @@ namespace :canoe do
       DeployTarget.find_or_initialize_by(name: "production_phx").tap { |target|
         target.production = true
         target.enabled = false
+      }.tap(&:save!)
+      DeployTarget.find_or_initialize_by(name: "performance_testing").tap { |target|
+        target.production = true
+        target.enabled = true
       }.tap(&:save!)
     end
   end

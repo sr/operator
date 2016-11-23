@@ -641,7 +641,7 @@ func testAccAWSALBConfig_accessLogs(enabled bool, albName, bucketName string) st
   access_logs {
   	bucket = "${aws_s3_bucket.logs.bucket}"
   	prefix = "${var.bucket_prefix}"
-	enabled = "%t"
+  	enabled = "%t"
   }
 
   tags {

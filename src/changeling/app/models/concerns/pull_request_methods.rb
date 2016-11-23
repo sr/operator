@@ -20,7 +20,7 @@ module PullRequestMethods
     end
 
     def find_or_initialize_by_pull_request(pull_request)
-      repo = Repository.new(pull_request["repository"]["full_name"])
+      repo = Repository.find(pull_request["repository"]["full_name"])
       multipass = find_by(reference_url: pull_request["pull_request"]["html_url"])
 
       unless multipass
