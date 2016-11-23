@@ -32,3 +32,4 @@ The following arguments are supported:
 
 * `autoscaling_group_name` - (Required) Name of ASG to associate with the ELB.
 * `elb` - (Required) The name of the ELB.
+

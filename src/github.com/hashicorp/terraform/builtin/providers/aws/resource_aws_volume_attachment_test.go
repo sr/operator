@@ -121,7 +121,7 @@ resource "aws_volume_attachment" "ebs_att" {
 const testAccVolumeAttachmentConfigSkipDestroy = `
 resource "aws_instance" "web" {
 	ami = "ami-21f78e11"
-	availability_zone = "us-west-2a"
+  	availability_zone = "us-west-2a"
 	instance_type = "t1.micro"
 	tags {
 		Name = "HelloWorld"
@@ -129,7 +129,7 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_ebs_volume" "example" {
-	availability_zone = "us-west-2a"
+  	availability_zone = "us-west-2a"
 	size = 1
 	tags {
 		Name = "TestVolume"
@@ -152,7 +152,7 @@ data "aws_ebs_volume" "ebs_volume" {
 }
 
 resource "aws_volume_attachment" "ebs_att" {
-	device_name = "/dev/sdh"
+  	device_name = "/dev/sdh"
 	volume_id = "${data.aws_ebs_volume.ebs_volume.id}"
 	instance_id = "${aws_instance.web.id}"
 	skip_destroy = true

@@ -58,6 +58,16 @@ func resourceAwsApiGatewayApiKey() *schema.Resource {
 					},
 				},
 			},
+
+			"created_date": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+
+			"last_updated_date": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -101,6 +111,14 @@ func resourceAwsApiGatewayApiKeyRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("description", apiKey.Description)
 	d.Set("enabled", apiKey.Enabled)
 	d.Set("stage_key", flattenApiGatewayStageKeys(apiKey.StageKeys))
+
+	if err := d.Set("created_date", apiKey.CreatedDate.Format(time.RFC3339)); err != nil {
+		log.Printf("[DEBUG] Error setting created_date: %s", err)
+	}
+
+	if err := d.Set("last_updated_date", apiKey.LastUpdatedDate.Format(time.RFC3339)); err != nil {
+		log.Printf("[DEBUG] Error setting last_updated_date: %s", err)
+	}
 
 	return nil
 }
