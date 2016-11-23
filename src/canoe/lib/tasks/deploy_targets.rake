@@ -91,6 +91,7 @@ namespace :canoe do
       "aws/pardot-qe",
       "aws/pardotops",
       "aws/pardotpublic",
+      "github_enterprise",
       "letsencrypt"
     ].each do |name|
       project = Project.find_or_initialize_by(name: "terraform-#{name}").tap { |p|
