@@ -39,6 +39,74 @@ func TestAccAWSLambdaFunction_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSLambdaFunction_envVariables(t *testing.T) {
+	var conf lambda.GetFunctionOutput
+
+	rName := fmt.Sprintf("tf_test_%s", acctest.RandString(5))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckLambdaFunctionDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSLambdaConfigEnvVariables(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsLambdaFunctionExists("aws_lambda_function.lambda_function_test", rName, &conf),
+					testAccCheckAwsLambdaFunctionName(&conf, rName),
+					testAccCheckAwsLambdaFunctionArnHasSuffix(&conf, ":"+rName),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "environment.0.variables.foo", "bar"),
+				),
+			},
+			{
+				Config: testAccAWSLambdaConfigEnvVariablesModified(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsLambdaFunctionExists("aws_lambda_function.lambda_function_test", rName, &conf),
+					testAccCheckAwsLambdaFunctionName(&conf, rName),
+					testAccCheckAwsLambdaFunctionArnHasSuffix(&conf, ":"+rName),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "environment.0.variables.foo", "baz"),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "environment.0.variables.foo1", "bar1"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccAWSLambdaFunction_encryptedEnvVariables(t *testing.T) {
+	var conf lambda.GetFunctionOutput
+
+	rName := fmt.Sprintf("tf_test_%s", acctest.RandString(5))
+	keyRegex := regexp.MustCompile("^arn:aws:kms:")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckLambdaFunctionDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSLambdaConfigEncryptedEnvVariables(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsLambdaFunctionExists("aws_lambda_function.lambda_function_test", rName, &conf),
+					testAccCheckAwsLambdaFunctionName(&conf, rName),
+					testAccCheckAwsLambdaFunctionArnHasSuffix(&conf, ":"+rName),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "environment.0.variables.foo", "bar"),
+					resource.TestMatchResourceAttr("aws_lambda_function.lambda_function_test", "kms_key_arn", keyRegex),
+				),
+			},
+			{
+				Config: testAccAWSLambdaConfigEncryptedEnvVariablesModified(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAwsLambdaFunctionExists("aws_lambda_function.lambda_function_test", rName, &conf),
+					testAccCheckAwsLambdaFunctionName(&conf, rName),
+					testAccCheckAwsLambdaFunctionArnHasSuffix(&conf, ":"+rName),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "environment.0.variables.foo", "bar"),
+					resource.TestCheckResourceAttr("aws_lambda_function.lambda_function_test", "kms_key_arn", ""),
+				),
+			},
+		},
+	})
+}
+
 func TestAccAWSLambdaFunction_versioned(t *testing.T) {
 	var conf lambda.GetFunctionOutput
 
@@ -534,6 +602,93 @@ resource "aws_lambda_function" "lambda_function_test" {
     function_name = "%s"
     role = "${aws_iam_role.iam_for_lambda.arn}"
     handler = "exports.example"
+}
+`, rName)
+}
+
+func testAccAWSLambdaConfigEnvVariables(rName string) string {
+	return fmt.Sprintf(baseAccAWSLambdaConfig+`
+resource "aws_lambda_function" "lambda_function_test" {
+    filename = "test-fixtures/lambdatest.zip"
+    function_name = "%s"
+    role = "${aws_iam_role.iam_for_lambda.arn}"
+    handler = "exports.example"
+    environment {
+        variables = {
+            foo = "bar"
+        }
+    }
+}
+`, rName)
+}
+
+func testAccAWSLambdaConfigEnvVariablesModified(rName string) string {
+	return fmt.Sprintf(baseAccAWSLambdaConfig+`
+resource "aws_lambda_function" "lambda_function_test" {
+    filename = "test-fixtures/lambdatest.zip"
+    function_name = "%s"
+    role = "${aws_iam_role.iam_for_lambda.arn}"
+    handler = "exports.example"
+    environment {
+        variables = {
+            foo = "baz"
+            foo1 = "bar1"
+        }
+    }
+}
+`, rName)
+}
+
+func testAccAWSLambdaConfigEncryptedEnvVariables(rName string) string {
+	return fmt.Sprintf(baseAccAWSLambdaConfig+`
+resource "aws_kms_key" "foo" {
+    description = "Terraform acc test %s"
+    policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "kms-tf-1",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_lambda_function" "lambda_function_test" {
+    filename = "test-fixtures/lambdatest.zip"
+    function_name = "%s"
+    role = "${aws_iam_role.iam_for_lambda.arn}"
+    handler = "exports.example"
+    kms_key_arn = "${aws_kms_key.foo.arn}"
+    environment {
+        variables = {
+            foo = "bar"
+        }
+    }
+}
+`, rName, rName)
+}
+
+func testAccAWSLambdaConfigEncryptedEnvVariablesModified(rName string) string {
+	return fmt.Sprintf(baseAccAWSLambdaConfig+`
+resource "aws_lambda_function" "lambda_function_test" {
+    filename = "test-fixtures/lambdatest.zip"
+    function_name = "%s"
+    role = "${aws_iam_role.iam_for_lambda.arn}"
+    handler = "exports.example"
+    environment {
+        variables = {
+            foo = "bar"
+        }
+    }
 }
 `, rName)
 }

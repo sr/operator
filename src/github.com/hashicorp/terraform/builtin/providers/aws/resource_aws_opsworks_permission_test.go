@@ -53,7 +53,7 @@ resource "aws_iam_user" "user" {
 	name = "%s"
 	path = "/"
 }
-
+	
 %s
 `, rn, testAccAwsOpsworksStackConfigNoVpcCreate(rn))
 }

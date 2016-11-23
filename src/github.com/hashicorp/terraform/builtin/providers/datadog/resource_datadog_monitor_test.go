@@ -297,7 +297,7 @@ resource "datadog_monitor" "foo" {
 
   thresholds {
     warning  = 1
-    critical = 3.0
+    critical = 3.0 
   }
 
   notify_no_data    = false
