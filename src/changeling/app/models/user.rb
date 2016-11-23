@@ -3,7 +3,9 @@ class User < ActiveRecord::Base
   audited :except => :encrypted_github_token
 
   def self.create_with_omniauth(auth)
-    require_herokai! auth["credentials"]["token"]
+    if Changeling.config.require_heroku_organization_membership?
+      require_herokai!(auth["credentials"]["token"])
+    end
 
     user = User.find_or_create_by(github_uid: auth["uid"])
     user.github_login = auth["extra"]["raw_info"]["login"]
@@ -22,8 +24,8 @@ class User < ActiveRecord::Base
 
   def self.ghost
     result = new
-    result.github_login = "changeling-production"
-    result.github_token = ENV["GITHUB_COMMIT_STATUS_TOKEN"]
+    result.github_login = Changeling.config.ghost_user_login
+    result.github_token = Changeling.config.ghost_user_token
     result
   end
 

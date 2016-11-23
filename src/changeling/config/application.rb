@@ -10,6 +10,8 @@ require "action_mailer/railtie"
 require "action_view/railtie"
 require "sprockets/railtie"
 
+require_relative "../lib/changeling_config"
+
 require_relative "../lib/metrics"
 require_relative "../lib/exceptions"
 require_relative "../lib/stream/event"
@@ -23,6 +25,10 @@ require_relative "../lib/multipass_monitor"
 Bundler.require(*Rails.groups)
 
 module Changeling
+  cattr_accessor :config do
+    ChangelingConfig.new
+  end
+
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

@@ -3,7 +3,10 @@ module Clients
   # Interact with pull requests and commit statuses via the GitHub API
   class GitHub
     def initialize(token)
-      @client = Octokit::Client.new(access_token: token)
+      @client = Octokit::Client.new(
+        api_endpoint: Changeling.config.github_api_endpoint,
+        access_token: token
+      )
     end
 
     # Identify whether we're a herokai or not
