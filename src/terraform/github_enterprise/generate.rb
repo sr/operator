@@ -43,7 +43,7 @@ if options[:repos]
 resource "github_repository" "#{safe_name}" {
   name        = "#{repo.name}"
   description = "#{repo.description.to_s.gsub('"', '\"')}"
-  homepage_url = "#{repo.homepage_url}"
+  homepage_url = "#{repo.homepage}"
   private = #{repo.private}
   has_issues = #{repo.has_issues}
   has_downloads = #{repo.has_downloads}

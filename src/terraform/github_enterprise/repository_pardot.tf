@@ -1,7 +1,7 @@
 resource "github_repository" "pardot" {
   name          = "pardot"
   description   = "The best marketing automation app in the multiverse."
-  homepage_url  = ""
+  homepage_url  = "http://www.pardot.com"
   private       = true
   has_issues    = false
   has_downloads = true
