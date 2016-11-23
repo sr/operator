@@ -72,7 +72,7 @@ if options[:teams]
 resource "github_team" "#{team.slug}" {
   name = "#{team.name}"
   description = "#{team.description.gsub('"', '\"')}"
-  privacy = "closed"
+  privacy = "#{team.privacy}"
 }
 EOS
 
