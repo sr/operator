@@ -1,9 +1,3 @@
-resource "github_team" "admin-test" {
-  name        = "Admin Test"
-  description = ""
-  privacy     = "closed"
-}
-
 resource "github_team" "bread" {
   name        = "BREAD"
   description = ""
@@ -43,13 +37,13 @@ resource "github_team" "ops" {
 resource "github_team" "service-accounts-read-only" {
   name        = "Service Accounts read-only"
   description = ""
-  privacy     = "closed"
+  privacy     = "secret"
 }
 
 resource "github_team" "service-accounts-write-only" {
   name        = "Service Accounts write-only"
   description = ""
-  privacy     = "closed"
+  privacy     = "secret"
 }
 
 resource "github_team" "tier-2-support" {
