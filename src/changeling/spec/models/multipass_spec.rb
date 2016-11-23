@@ -75,8 +75,13 @@ RSpec.describe Multipass, :type => :model do
     end
 
     it "returns nil if the reference_url is not a GitHub pull request" do
-      complete_multipass.reference_url = "https://notgithub.com/atmos/hamburgers/pull/42"
+      complete_multipass.reference_url = "https://github.com/atmos/hamburgers/issue/42"
       expect(complete_multipass.repository_name).to be nil
+    end
+
+    it "supports GitHub Enterprise URLs" do
+      complete_multipass.reference_url = "https://git.dev.pardot.com/atmos/hamburgers/pull/42"
+      expect(complete_multipass.repository_name).to eql("atmos/hamburgers")
     end
   end
 
@@ -87,8 +92,13 @@ RSpec.describe Multipass, :type => :model do
     end
 
     it "returns nil if the reference_url is not a GitHub pull request" do
-      complete_multipass.reference_url = "https://notgithub.com/atmos/hamburgers/pull/42"
+      complete_multipass.reference_url = "https://notgithub.com/atmos/hamburgers/issue/42"
       expect(complete_multipass.pull_request_number).to be nil
+    end
+
+    it "supports GitHub Enterprise URLs" do
+      complete_multipass.reference_url = "https://git.dev.pardot.com/atmos/hamburgers/pull/42"
+      expect(complete_multipass.pull_request_number).to eql("42")
     end
   end
 
@@ -216,6 +226,25 @@ RSpec.describe Multipass, :type => :model do
       expect do
         multipass.approve_from_api_comment(user, "I think this is good", "fake-url")
       end.to change { multipass.complete? }.from(false).to(true)
+    end
+  end
+
+  describe "after_commit #callback_to_github" do
+    after(:all) do
+      Changeling.config.pardot = false
+    end
+
+    it "enqueues job to update the commit status on github" do
+      multipass = Fabricate(:multipass)
+      expect(GitHubCommitStatusWorker).to receive(:perform_later)
+      multipass.update!(testing: true)
+    end
+
+    it "does not queue a job when commit status are disabled for the repo" do
+      Changeling.config.pardot = true
+      multipass = Fabricate(:multipass, reference_url: "https://git/Pardot/pardot/pull/1")
+      expect(GitHubCommitStatusWorker).not_to receive(:perform_later)
+      multipass.update!(testing: true)
     end
   end
 end

@@ -97,9 +97,15 @@ class Event < ActiveRecord::Base
     if multipass
       multipass.repository
     elsif repo_name
-      Repository.new(repo_name)
+      Repository.find(repo_name)
     else
-      Repository.new("heroku/unknown-app")
+      Repository.find(default_repo_name)
     end
+  end
+
+  private
+
+  def default_repo_name
+    Changeling.config.default_repo_name
   end
 end

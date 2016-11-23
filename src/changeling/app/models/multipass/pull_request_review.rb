@@ -5,7 +5,9 @@ module Multipass::PullRequestReview
     multipass = find_by(reference_url: pull_request["html_url"])
     return unless multipass && user
 
-    return unless %w{atmos jroes stellacotton ys}.include?(user.github_login)
+    unless Changeling.config.review_approval_enabled_for?(user)
+      return
+    end
 
     case review["state"]
     when "approved"

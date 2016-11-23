@@ -48,7 +48,7 @@ TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
 
-go install github.com/hashicorp/terraform
+go install -v github.com/hashicorp/terraform github.com/paybyphone/terraform-provider-acme
 
 case "$action" in
   apply|unlock|plan)
