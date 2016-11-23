@@ -66,8 +66,6 @@ Run the tests using the `script/test` command.
 
 Confirm everything is working as expected, then merge your branch. Otherwise rollback to master, fix your branch, and repeat the process until you are satisfied with your changes and HAL9000 is in a good state.
 
-**NOTE:** If you do not have a YubiKey, please ask in the Build & Automate room and we will deploy the branch for you. We're working on a better solution.
-
 ## Implementing chat commands as gRPC methods
 
 We also support implementing chat commands as  [gRPC](http://www.grpc.io/) methods. This biggest difference with those implemented as Lita handlers  is the invocation syntax. Since they directly map to RPC (Remote Procedure Call) methods, commands always take the `service method [arg1=value]` form. This constraint may not be appropriate for all use cases.
