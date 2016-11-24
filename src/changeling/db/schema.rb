@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161121221222) do
+ActiveRecord::Schema.define(version: 20161122133607) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -79,16 +79,19 @@ ActiveRecord::Schema.define(version: 20161121221222) do
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
   end
 
-  create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string   "sha",                  null: false
-    t.string   "context",              null: false
-    t.string   "state"
-    t.string   "commit_status_state"
-    t.integer  "github_repository_id", null: false
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-    t.index ["sha", "context"], name: "index_repository_commit_statuses_on_sha_and_context", unique: true, using: :btree
+# Could not dump table "repository_commit_statuses" because of following StandardError
+#   Unknown type 'commit_status_state' for column 'state'
+
+  create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "multipass_id", null: false
+    t.uuid     "ticket_id",    null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["multipass_id", "ticket_id"], name: "index_ticket_references_on_multipass_id_and_ticket_id", unique: true, using: :btree
   end
+
+# Could not dump table "tickets" because of following StandardError
+#   Unknown type 'ticket_management_software_name' for column 'management_software'
 
   create_table "users", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text     "github_uid"
@@ -99,4 +102,6 @@ ActiveRecord::Schema.define(version: 20161121221222) do
     t.string   "team"
   end
 
+  add_foreign_key "ticket_references", "multipasses", primary_key: "uuid"
+  add_foreign_key "ticket_references", "tickets"
 end

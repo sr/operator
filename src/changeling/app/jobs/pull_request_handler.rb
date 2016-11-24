@@ -10,6 +10,11 @@ class PullRequestHandler < ActiveJob::Base
     pull_request = JSON.parse(data)
     case pull_request["action"]
     when "opened", "synchronize"
+      if Changeling.config.pardot?
+        pull = RepositoryPullRequest.new(pull_request)
+        return pull.open
+      end
+
       multipass = Multipass.find_or_initialize_by_pull_request(pull_request)
       multipass.update_for_open_or_synchronize_pull_request(pull_request)
     when "closed"

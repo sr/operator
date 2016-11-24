@@ -9,6 +9,14 @@ class ChangelingConfig
     !pardot?
   end
 
+  def jira_url
+    if pardot?
+      ENV.fetch("CHANGELING_JIRA_URL", "https://jira.dev.pardot.com")
+    else
+      ""
+    end
+  end
+
   def review_approval_enabled_for?(user)
     if pardot?
       return true

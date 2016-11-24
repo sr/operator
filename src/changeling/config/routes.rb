@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get "/auth/:provider/callback", to: "sessions#create"
   post "/signout", to: "sessions#destroy", as: :signout
 
+  post "/events/jira", to: "webhooks#jira"
   post "/events", to: "events#create"
   post "/webhooks", to: "webhooks#create"
 

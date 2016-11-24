@@ -1,8 +1,18 @@
 # Controller that receives GitHub webhooks events
 class WebhooksController < ApplicationController
-  before_action :verify_incoming_webhook_address!, :verify_signature!
-  skip_before_action :verify_authenticity_token, only: [:create]
-  skip_before_action :require_oauth, only: [:create]
+  before_action :verify_incoming_webhook_address!, :verify_signature!, except: [:jira]
+  skip_before_action :verify_authenticity_token, only: [:create, :jira]
+  skip_before_action :require_oauth, only: [:create, :jira]
+
+  def jira
+    payload = JSON.parse(request.body.read.force_encoding("utf-8"))
+    Raven.extra_context(payload: payload)
+
+    event = JIRAIssueEvent.parse(payload)
+    Ticket.synchronize_jira_ticket(event)
+
+    render json: {}, status: :created
+  end
 
   def create
     if valid_events.include? event_type
