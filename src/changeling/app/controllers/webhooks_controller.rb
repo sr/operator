@@ -126,8 +126,4 @@ class WebhooksController < ApplicationController
     Rollbar.error WebhookSignatureValidationError.new("Failed to verify webhook payload signature.")
   end
   class WebhookSignatureValidationError < ArgumentError; end
-
-  def event_params
-    params.permit!
-  end
 end
