@@ -14,7 +14,9 @@ export RACK_ENV=test
 export RAILS_ENV=test
 
 bundle exec rake db:migrate
-bundle exec rubocop
+if [ -z "${DISABLE_RUBOCOP:-}" ]; then
+  bundle exec rubocop
+fi
 bundle exec rake assets:precompile >/dev/null 2>&1
 if [ "$HEROKU_SETUP_STREAM_URL" = "" ]; then
   bundle exec rspec spec
