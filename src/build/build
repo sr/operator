@@ -165,6 +165,15 @@ case "$project" in
             docker_push "$project"
         fi
         ;;
+    changeling)
+        RUBOCOP_CONFIG="etc/rubocop-changeling.yml"
+        export RUBOCOP_CONFIG
+        build-ruby "$project"
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
+        ;;
     devenv)
         mkdir -p "$BREAD/bin/darwin_amd64"
         docker run --rm -w /go \
@@ -310,6 +319,7 @@ case "$project" in
         fi
         ;;
     *)
+        echo "Unknown project: $project" 2>&1
         exit 1
         ;;
 esac
