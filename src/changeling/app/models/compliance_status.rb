@@ -48,6 +48,10 @@ class ComplianceStatus
     rejected? && adapter.user_is_rejector?(user)
   end
 
+  def github_commit_status_description
+    adapter.github_commit_status_description
+  end
+
   def status
     if complete?
       "complete"

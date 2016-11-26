@@ -44,4 +44,20 @@ class HerokuComplianceStatus
   def user_is_rejector?(user)
     @multipass.rejector == user
   end
+
+  def github_commit_status_description
+    if rejected?
+      "Rejected by #{@multipass.rejector}"
+    elsif emergency_approved?
+      "Completed via emergency approval by #{@multipass.emergency_approver}."
+    elsif @multipass.missing_conditional_fields.any?
+      @multipass.human_missing_conditional_fields
+    elsif complete?
+      "All requirements completed. Reviewed by #{@multipass.reviewers}."
+    elsif !@multipass.testing
+      "Waiting for CI to complete."
+    else
+      "Missing fields: #{@multipass.missing_fields.join(', ')}"
+    end
+  end
 end
