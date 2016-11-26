@@ -1,0 +1,21 @@
+//
+// Scaffolding
+// --------------------------------------------------
+
+
+// Links
+
+a {
+  text-decoration: underline;
+}
+
+// Reset link styles for modules
+
+a.btn,
+a.list-group-item,
+.list-group-item-link a,
+.dropdown a, .dropdown-menu a,
+.nav a,
+.navbar a {
+  text-decoration: none;
+}
