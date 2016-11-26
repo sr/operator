@@ -42,6 +42,7 @@ Rails/OutputSafety:
 # Configuration parameters: AutoCorrect.
 Security/JSONLoad:
   Exclude:
+    - 'src/changeling/vendor/purple/purple.gemspec'
     - 'src/changeling/config/initializers/config.rb'
 
 # Offense count: 92
@@ -162,6 +163,7 @@ Style/RedundantSelf:
 # SupportedStyles: slashes, percent_r, mixed
 Style/RegexpLiteral:
   Exclude:
+    - 'src/changeling/vendor/purple/**'
     - 'src/changeling/spec/lib/clients/github_spec.rb'
     - 'src/changeling/spec/models/multipass/git_hub_statuses_spec.rb'
     - 'src/changeling/spec/support/webmock_helpers.rb'
@@ -191,6 +193,7 @@ Style/SpaceInsidePercentLiteralDelimiters:
 # SupportedStyles: single_quotes, double_quotes
 Style/StringLiterals:
   Exclude:
+    - 'src/changeling/vendor/purple/**/*'
     - 'src/changeling/config.ru'
     - 'src/changeling/config/application.rb'
     - 'src/changeling/config/boot.rb'

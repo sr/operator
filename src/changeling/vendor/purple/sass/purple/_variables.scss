@@ -1,0 +1,170 @@
+//
+// Variables
+// --------------------------------------------------
+
+
+// Colors
+//
+$gray-darker:             #202025 !default;
+$gray-dark:               #3F3F44 !default;
+$gray:                    #7D7D8E !default;
+$gray-light:              #CBCBD2 !default;
+$gray-lighter:            #E7E7EC !default;
+
+$brand-primary:           #79589F;
+$brand-success:           #74C080;
+$brand-info:              #56CDFC;
+$brand-warning:           #FA9F47;
+$brand-danger:            #D64242;
+
+$color-dropbox:           #007EE5;
+$color-github:            #3F3F44;
+
+// Scaffolding
+//
+$text-color: $gray-dark;
+$link-color: $brand-primary;
+$link-hover-color: darken($link-color, 10%);
+$abbr-border-color: lighten($brand-primary, 30%);
+
+// Typography
+//
+$font-family-sans-serif: benton-sans, 'Helvetica Neue', helvetica, arial, sans-serif;
+$headings-font-weight: 200;
+$headings-color: $brand-primary;
+$headings-small-color: $gray;
+$blockquote-small-color: $gray;
+$webfont-path: '//www.herokucdn.com/fonts' !default;
+
+// Buttons
+//
+$btn-default-color: $brand-primary;
+$btn-default-border: $brand-primary;
+
+$btn-primary-bg: $brand-primary;
+$btn-primary-bg-alt: #9F5896;
+$btn-primary-border: $brand-primary;
+
+$btn-success-bg: $brand-success;
+$btn-success-bg-alt: #98DAA2;
+$btn-success-border: $brand-success;
+
+$btn-info-bg: $brand-info;
+$btn-info-bg-alt: #C0EDFF;
+$btn-info-border: $brand-info;
+
+$btn-warning-bg: $brand-warning;
+$btn-warning-bg-alt: #F6C58E;
+$btn-warning-border: $brand-warning;
+
+$btn-danger-bg: $brand-danger;
+$btn-danger-bg-alt: #F47878;
+$btn-danger-border: $brand-danger;
+
+$btn-dropbox-bg: $color-dropbox;
+$btn-dropbox-bg-alt: #3297EA;
+
+$btn-github-bg: $color-github;
+$btn-github-bg-alt: #616165;
+
+$btn-link-disabled-color: $gray-lighter;
+
+// Forms
+//
+$input-color: $text-color;
+$input-border: $gray-light;
+$input-border-radius: 4px;
+$input-border-focus: $brand-primary;
+$input-color-placeholder: $gray-light;
+$input-bg-disabled: lighten($gray-lighter, 5%);
+
+// Dropdowns
+//
+$dropdown-border: rgba(#000, .05);
+
+// States
+//
+$state-success-text: $brand-success;
+$state-success-bg: lighten($brand-success, 35%);
+$state-success-border: lighten($brand-success, 25%);
+
+$state-info-text: $brand-info;
+$state-info-bg: lighten($brand-info, 30%);
+$state-info-border: lighten($brand-info, 25%);
+
+$state-warning-text: $brand-warning;
+$state-warning-bg: lighten($brand-warning, 32%);
+$state-warning-border: lighten($brand-warning, 20%);
+
+$state-danger-text: $brand-danger;
+$state-danger-bg: $brand-danger;
+$state-danger-border: $brand-danger;
+
+// Code
+//
+$code-color: $gray-dark;
+$code-bg: lighten($gray-lighter, 5%);
+
+$kbd-color: $gray-lighter;
+$kbd-bg: $gray-dark;
+
+$pre-bg: lighten($gray-lighter, 7.5%);
+$pre-color: $gray-dark;
+$pre-border-color: darken($gray-lighter, 2.5%);
+
+// Tables
+//
+$table-bg-accent: rgba($gray-lighter, 0.2);
+$table-bg-hover: rgba($gray-lighter, 0.2);
+$table-border-color: $gray-lighter;
+
+// List Groups
+//
+$list-group-border: $gray-lighter;
+$list-group-border-radius: none;
+$list-group-hover-bg: lighten($gray-lighter, 6.5%);
+$list-group-active-bg: white;
+$list-group-active-border: $list-group-border;
+$list-group-active-color: $brand-info;
+$list-group-active-text-color: $list-group-active-color;
+$list-group-active-indicator: $list-group-active-color;
+$list-group-link-heading-color: $text-color;
+$list-group-item-padding: 10px;
+
+// Modals
+//
+$modal-backdrop-bg: $gray-dark;
+$modal-backdrop-opacity: 0.8;
+
+// Alerts
+//
+$alert-padding: 10px !default;
+$alert-link-font-weight: normal !default;
+
+$alert-success-bg:            $state-success-bg;
+$alert-success-text:          $state-success-text;
+$alert-success-border:        $state-success-border;
+
+$alert-info-bg:               $state-info-bg;
+$alert-info-text:             $state-info-text;
+$alert-info-border:           $state-info-border;
+
+$alert-warning-bg:            $state-warning-bg;
+$alert-warning-text:          $state-warning-text;
+$alert-warning-border:        $state-warning-border;
+
+$alert-danger-bg:             $state-danger-bg;
+$alert-danger-text:           #FFF;
+$alert-danger-border:         $state-danger-border;
+
+
+// Spacing
+// 
+$space-xxlarge: 40px;
+$space-xlarge: 33px;
+$space-large: 27px;
+$space-xmedium: 22px;
+$space-medium: 20px;
+$space-small: 12px;
+$space-xsmall: 9px;
+$space-xxsmall: 6px;
