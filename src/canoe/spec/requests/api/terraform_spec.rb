@@ -19,7 +19,10 @@ RSpec.describe "Terraform API" do
       url: "https://github.com/builds/1",
       sha: "sha1",
       branch: "master",
-      state: GithubRepository::SUCCESS,
+      state: GithubRepository::FAILURE,
+      compliance: {
+        state: GithubRepository::SUCCESS
+      },
       updated_at: Time.current,
       compare_status: GithubRepository::AHEAD
     }
@@ -89,15 +92,27 @@ RSpec.describe "Terraform API" do
     expect(deploy_response["message"]).to eq("Unknown Terraform project: \"aws/boomtown\"")
   end
 
-  it "returns an error if the commit status is pending" do
-    @github_repo.current_build = build_build(state: GithubRepository::PENDING)
+  it "returns an error if compliance status is pending" do
+    @github_repo.current_build = build_build(
+      compliance: {
+        state: GithubRepository::PENDING,
+        target_url: "https://compliance"
+      },
+      state: GithubRepository::SUCCESS
+    )
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
   end
 
-  it "returns an error if the commit status is failure" do
-    @github_repo.current_build = build_build(state: GithubRepository::FAILURE)
+  it "returns an error if the compliance check is in failure state" do
+    @github_repo.current_build = build_build(
+      compliance: {
+        state: GithubRepository::FAILURE,
+        target_url: "https://compliance"
+      },
+      state: GithubRepository::SUCCESS
+    )
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")

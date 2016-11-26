@@ -5,6 +5,8 @@ class GithubRepository
   MASTER = "master".freeze
   AHEAD = "ahead".freeze
   BEHIND = "behind".freeze
+  # TODO(sr) Figure out some way to avoid hard-coding this, maybe
+  COMPLIANCE_STATUS = "pardot/compliance".freeze
 
   class Build
     def self.none
@@ -18,9 +20,24 @@ class GithubRepository
       @state = attributes.fetch(:state)
       @updated_at = attributes.fetch(:updated_at)
       @compare_status = attributes.fetch(:compare_status, nil)
+      @compliance = attributes.fetch(:compliance, {})
     end
 
-    attr_reader :url, :branch, :sha, :state, :updated_at, :compare_status
+    attr_reader :url, :branch, :sha, :state, :updated_at, :compare_status, :compliance
+
+    def compliance_state
+      if @compliance
+        @compliance.fetch(:state)
+      else
+        PENDING
+      end
+    end
+
+    def compliance_url
+      if @compliance
+        @compliance.fetch(:target_url)
+      end
+    end
   end
 
   class Fake
@@ -43,6 +60,7 @@ class GithubRepository
   def current_build(branch)
     status = @client.combined_status(@name, branch)
     compare = @client.compare(@name, MASTER, branch)
+    compliance = satus[:statuses].detect { |s| s[:context] == COMPLIANCE_STATUS }
 
     Build.new(
       url: status[:statuses].first[:target_url],
@@ -51,6 +69,7 @@ class GithubRepository
       # source of build truth for Chef Delivery.
       branch: "master",
       state: status[:state],
+      compliance: compliance,
       compare_status: compare[:status],
       updated_at: status[:statuses].first[:updated_at]
     )
