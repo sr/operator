@@ -4,6 +4,7 @@ class PardotRepository
   # repository configured here.
   CHANGELING = "heroku/changeling".freeze
 
+  BREAD = "Pardot/bread".freeze
   CHEF = "Pardot/chef".freeze
   PARDOT = "Pardot/pardot".freeze
   TEAM_OPS = "Pardot/ops".freeze
@@ -17,6 +18,8 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
+    when BREAD
+      ["BREAD build"]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
     when CHEF
@@ -42,7 +45,7 @@ class PardotRepository
 
   # Do not create commit statuses for now.
   def update_github_commit_status?
-    false
+    [BREAD].include?(name_with_owner)
   end
 
   def participating?
