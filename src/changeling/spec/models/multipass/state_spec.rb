@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Multipass, "state", type: [:model, :webmock] do
-  before(:all) do
+  before(:each) do
     Changeling.config.pardot = false
   end
 
@@ -131,14 +131,14 @@ RSpec.describe Multipass, "state", type: [:model, :webmock] do
     end
 
     it "returns pending for multipasses that are pending" do
-      allow(complete_multipass).to receive(:complete?).and_return false
-      allow(complete_multipass).to receive(:pending?).and_return true
+      complete_multipass.testing = nil
       expect(complete_multipass.status).to eql "pending"
     end
 
     it "returns incomplete for multipasses that aren't complete or pending" do
-      allow(complete_multipass).to receive(:complete?).and_return false
-      allow(complete_multipass).to receive(:pending?).and_return false
+      complete_multipass.testing = false
+      complete_multipass.merged = true
+      complete_multipass.rejector = nil
       expect(complete_multipass.status).to eql "incomplete"
     end
   end

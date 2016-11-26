@@ -8,7 +8,7 @@ class Multipass < ActiveRecord::Base
   has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
-    Multipass::State, Multipass::Updates, Multipass::GitHubStatuses,
+    Multipass::Updates, Multipass::GitHubStatuses,
     Multipass::Actions
 
   extend Multipass::IssueComments
@@ -194,7 +194,33 @@ class Multipass < ActiveRecord::Base
     Metrics.increment("multipasses.created")
   end
 
+  def changed_risk_assessment?
+    return false if audits.size == 1
+    audits.any? do |audit|
+      audit.audited_changes["impact"] != "low"
+    end
+  end
+
+  delegate \
+    :update_complete,
+    :complete?,
+    :rejected?,
+    :pending?,
+    :peer_reviewed?,
+    :user_is_peer_reviewer?,
+    :sre_approved?,
+    :user_is_sre_approver?,
+    :emergency_approved?,
+    :user_is_emergency_approver?,
+    :user_is_rejector?,
+    :status,
+    to: :compliance_status
+
   private
+
+  def compliance_status
+    @compliance_status ||= ComplianceStatus.new(self)
+  end
 
   def reference_url_path_parts
     unless reference_url.present?
