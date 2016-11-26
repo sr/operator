@@ -1,5 +1,5 @@
 Fabricator(:multipass) do
-  reference_url { "https://github.com/#{Faker::Lorem.word}/#{Faker::Lorem.word}/pull/#{Faker::Number.number(3)}" }
+  reference_url { "https://#{Changeling.config.github_hostname}/#{Faker::Lorem.word}/#{Faker::Lorem.word}/pull/#{Faker::Number.number(3)}" }
   callback_url { "https://#{Faker::Internet.domain_name}" }
   release_id { Faker::Number.hexadecimal(7) }
   requester { Faker::Internet.user_name }
@@ -42,7 +42,7 @@ Fabricator(:unreviewed_multipass, :from => :multipass) do
   change_type        { "minor" }
   peer_reviewer      { nil }
   sre_approver       { nil }
-  reference_url      { "https://github.com/heroku/changeling/pull/32" }
+  reference_url      { "https://#{Changeling.config.github_hostname}/heroku/changeling/pull/32" }
   requester          { Faker::Internet.user_name }
   testing            { true }
 end

@@ -6,8 +6,10 @@ class ChangelingConfig
   attr_writer :pardot
 
   def require_heroku_organization_membership?
-    !pardot?
+    return @require_heroku_organization_membership if defined?(@require_heroku_organization_membership)
+    @require_heroku_organization_membership = !pardot?
   end
+  attr_writer :require_heroku_organization_membership
 
   def jira_url
     if pardot?
@@ -26,8 +28,10 @@ class ChangelingConfig
   end
 
   def approval_via_comment_enabled?
-    !pardot?
+    return @approval_via_comment_enabled if defined?(@approval_via_comment_enabled)
+    @approval_via_comment_enabled = !pardot?
   end
+  attr_writer :approval_via_comment_enabled
 
   def compliance_status_context
     if pardot?

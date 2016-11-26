@@ -3,19 +3,16 @@ require "rails_helper"
 RSpec.describe "Ticket references", type: :request do
   include ActiveJob::TestHelper
 
-  after(:all) do
-    Changeling.config.pardot = false
-  end
-
-  before(:all) do
-    Changeling.config.pardot = true
-  end
-
   before(:each) do
+    Changeling.config.pardot = true
+    reference_url = format("https://%s/%s/pull/32",
+      Changeling.config.github_hostname,
+      PardotRepository::CHANGELING
+    )
     @multipass = Fabricate(:multipass,
-      reference_url: "https://github.com/heroku/changeling/pull/32",
+      reference_url: reference_url,
       release_id: "deadbeef",
-      testing: nil,
+      testing: nil
     )
   end
 
@@ -28,6 +25,7 @@ RSpec.describe "Ticket references", type: :request do
 
   def github_pull_request_event(head_sha:, title:)
     payload = decoded_fixture_data("github/pull_request_opened")
+    payload["pull_request"]["html_url"] = @multipass.reference_url
     payload["pull_request"]["title"] = title
     payload["pull_request"]["head"]["sha"] = head_sha
     # TODO(sr) Go through the controller layer

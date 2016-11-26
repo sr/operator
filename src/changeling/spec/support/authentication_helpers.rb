@@ -9,7 +9,7 @@ module AuthenticationHelpers
 
   def login_with_oauth(username = "joe")
     body = [{ login: "heroku" }].to_json
-    stub_json_request(:get, "https://api.github.com/user/orgs", body)
+    stub_json_request(:get, "#{Changeling.config.github_api_endpoint}/user/orgs", body)
     visit "/auth/github"
     expect(page).to have_content(username)
 

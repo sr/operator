@@ -1,6 +1,10 @@
 require "rails_helper"
 
-RSpec.describe Multipass::State, type: [:model, :webmock] do
+RSpec.describe Multipass, "state", type: [:model, :webmock] do
+  before(:all) do
+    Changeling.config.pardot = false
+  end
+
   let(:user) { Faker::Internet.user_name }
   let(:complete_multipass) { Fabricate.build(:complete_multipass) }
   let(:incomplete_multipass) { Fabricate.build(:incomplete_multipass) }
