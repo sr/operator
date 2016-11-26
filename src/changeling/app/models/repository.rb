@@ -32,6 +32,10 @@ class Repository
     @repo.update_github_commit_status?
   end
 
+  def ticket_reference_required?
+    @repo.ticket_reference_required?
+  end
+
   def participating?
     @repo.participating?
   end

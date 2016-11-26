@@ -37,6 +37,10 @@ class HerokuRepository
     self.class.participating_repositories.include?(name_with_owner)
   end
 
+  def ticket_reference_required?
+    false
+  end
+
   def required_testing_statuses
     raise NotImplementedError, "This behaviour is only enabled for Pardot repositories"
   end

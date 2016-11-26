@@ -203,6 +203,8 @@ class Multipass < ActiveRecord::Base
 
   delegate \
     :update_complete,
+    :status,
+    :github_commit_status_description,
     :complete?,
     :rejected?,
     :pending?,
@@ -213,7 +215,6 @@ class Multipass < ActiveRecord::Base
     :emergency_approved?,
     :user_is_emergency_approver?,
     :user_is_rejector?,
-    :status,
     to: :compliance_status
 
   private

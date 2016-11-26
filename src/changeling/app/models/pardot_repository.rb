@@ -1,4 +1,9 @@
 class PardotRepository
+  # TODO(sr) Move the configuration somewhere to allow setting this up
+  # cleanly in tests without needing to have a magic heroku/changeling
+  # repository configured here.
+  CHANGELING = "heroku/changeling".freeze
+
   CHEF = "Pardot/chef".freeze
   PARDOT = "Pardot/pardot".freeze
   TEAM_OPS = "Pardot/ops".freeze
@@ -12,10 +17,7 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    # TODO(sr) Move the configuration somewhere to allow setting this up
-    # cleanly in tests without needing to have a magic heroku/changeling
-    # repository configured here.
-    when "heroku/changeling"
+    when CHANGELING
       ["ci/bazel", "ci/travis"]
     when CHEF
       ["Test Jobs"]
@@ -32,6 +34,10 @@ class PardotRepository
     else
       TEAM_DEVELOPERS
     end
+  end
+
+  def ticket_reference_required?
+    [CHANGELING].include?(name_with_owner)
   end
 
   # Do not create commit statuses for now.

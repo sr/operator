@@ -67,6 +67,11 @@ class ComplianceStatus
   private
 
   def adapter
-    @adapter ||= HerokuComplianceStatus.new(@multipass)
+    @adapter ||=
+      if Changeling.config.pardot?
+        PardotComplianceStatus.new(@multipass)
+      else
+        HerokuComplianceStatus.new(@multipass)
+      end
   end
 end

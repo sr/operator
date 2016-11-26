@@ -26,7 +26,7 @@ class RepositoryPullRequest
 
   def update_ticket_reference(multipass, ticket)
     if ticket.new_record?
-      raise ArgumentError, "ticket has is a new record"
+      raise ArgumentError, "ticket is a new record"
     end
 
     if !multipass.ticket_reference

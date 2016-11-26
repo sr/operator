@@ -57,7 +57,7 @@ class HerokuComplianceStatus
     elsif !@multipass.testing
       "Waiting for CI to complete."
     else
-      "Missing fields: #{@multipass.missing_fields.join(', ')}"
+      "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end
   end
 end
