@@ -40,7 +40,7 @@ class PardotRepository
   end
 
   def ticket_reference_required?
-    [CHANGELING].include?(name_with_owner)
+    [BREAD, CHANGELING].include?(name_with_owner)
   end
 
   # Do not create commit statuses for now.
