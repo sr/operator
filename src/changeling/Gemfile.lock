@@ -172,6 +172,8 @@ GEM
       activesupport (>= 3.0)
       librato-rack (~> 1.0.1)
       railties (>= 3.0)
+    local_time (1.0.3)
+      coffee-rails
     lograge (0.4.1)
       actionpack (>= 4, < 5.1)
       activesupport (>= 4, < 5.1)
@@ -394,6 +396,7 @@ DEPENDENCIES
   kaminari
   launchy
   librato-rails
+  local_time
   nokogiri
   octokit
   omniauth-github

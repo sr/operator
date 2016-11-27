@@ -8,7 +8,7 @@
     <h5 class='normal-weight'>
       <div class="hidden-sm hidden-xs">
         <%= tooltip "Created #{time_ago_in_words multipass.created_at.to_s(:short)} ago" do %>
-          By <%= multipass.requester %> • Owned by <%= multipass.team %> • At <%= multipass.created_at %>
+          By <%= multipass.requester %> • Owned by <%= multipass.team %> • <%= local_time(multipass.created_at) %>
         <% end %>
       </div>
     </h5>
