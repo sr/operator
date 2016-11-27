@@ -1,4 +1,8 @@
 class ChangelingConfig
+  def heroku?
+    !pardot?
+  end
+
   def pardot?
     return @pardot if defined?(@pardot)
     @pardot = !ENV["PARDOT"].to_s.empty?
@@ -10,6 +14,14 @@ class ChangelingConfig
     @require_heroku_organization_membership = !pardot?
   end
   attr_writer :require_heroku_organization_membership
+
+  def page_title
+    if pardot?
+      "Pardot Compliance"
+    else
+      "Changeling"
+    end
+  end
 
   def jira_url
     if pardot?

@@ -1,3 +1,4 @@
+<%- if Changeling.config.heroku? %>
 <div id="pci-hipaa-info" class="collapse alert alert-warning">
   <button type="button" class="close" role="button" data-toggle="collapse" href="#pci-hipaa-info" aria-expanded="true" aria-controls="pci-hipaa-info">
       <span aria-hidden="true">&times;</span>
@@ -17,6 +18,15 @@
     <%= select_tag 'complete', options_for_select([["Only complete", true], ["Only incomplete", false]], params[:complete]), include_blank: 'No status filter', class: 'form-control', onChange: 'this.form.submit()' %>
   </div>
 <% end %>
+
+<%- else %>
+
+<div id="pci-hipaa-info" class="alert">
+<h1>Changes management at Pardot</h1>
+<p>This the list of proposed changes accross all repositories at Pardot, in the form of pull requests. The status color indicate whether the changes meet compliance requirements and are ready to be released to production. <b>Compliant pull requests must be peer-reviewed, pass all automated tests, and reference a <%= link_to "JIRA", Changeling.config.jira_url %> ticket.</b></p>
+</div>
+<%- end %>
+
 <div class="col-md-2">
   <p id="pci-hipaa-info-show" class="hidden">
   <a href="#"><i class="glyphicon glyphicon-info-sign"></i> More info</a>

@@ -44,7 +44,9 @@
       </button>
       <ul class="dropdown-menu dropdown-menu-right" role="menu">
         <li><%= unique_actor_update_link(multipass, "Peer review", :peer_reviewer) %></li>
+        <%- if Changeling.config.heroku? %>
         <li><%= unique_actor_update_link(multipass, "SRE Approve", :sre_approver) %></li>
+        <%- end %>
       </ul>
     </div>
   </td>

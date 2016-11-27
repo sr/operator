@@ -1,6 +1,11 @@
+<%- if Changeling.config.pardot? %>
+<p>←  <%= link_to "Go back to listing", "/" %></p>
+<%- end %>
 <h1 class="title">
   <%= @multipass.title || "Multipass #{truncate(@multipass.id.to_s, length: 11)}" %> (<%= link_to "PR##{@multipass.pull_request_number}", @multipass.reference_url %>)
+  <%- if Changeling.config.heroku? %>
   <% if @multipass.for_compliance? %><span class="text-success label label-success">participating in compliance</a><% end %>
+  <%- end %>
 </h1>
 <h4 class="requester">by <%= @multipass.requester %> • owned by <%= @multipass.team %>
   <%= link_to sync_multipass_path(@multipass), title: 'sync multipass', method: :post do %>
