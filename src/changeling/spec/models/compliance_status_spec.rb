@@ -6,7 +6,7 @@ describe ComplianceStatus, "pardot" do
     ticket = Ticket.create!(
       external_id: "1",
       summary: "fix everything",
-      management_software: Ticket::TYPE_JIRA
+      tracker: Ticket::TRACKER_JIRA
     )
     reference_url = format("https://%s/%s/pull/90",
       Changeling.config.github_hostname,

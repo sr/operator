@@ -1,5 +1,5 @@
 class Ticket < ApplicationRecord
-  TYPE_JIRA = "jira".freeze
+  TRACKER_JIRA = "jira".freeze
 
   has_one :ticket_reference
   has_one :multipass
@@ -14,7 +14,7 @@ class Ticket < ApplicationRecord
         ticket = Ticket.create!(
           external_id: event.issue_key,
           summary: event.issue_summary,
-          management_software: Ticket::TYPE_JIRA
+          tracker: Ticket::TRACKER_JIRA
         )
       end
 
@@ -23,8 +23,8 @@ class Ticket < ApplicationRecord
   end
 
   def url
-    case management_software
-    when TYPE_JIRA
+    case tracker
+    when TRACKER_JIRA
       "#{Changeling.config.jira_url}/browse/#{external_id}"
     else
       ""

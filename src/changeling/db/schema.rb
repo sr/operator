@@ -90,8 +90,14 @@ ActiveRecord::Schema.define(version: 20161122133607) do
     t.index ["multipass_id", "ticket_id"], name: "index_ticket_references_on_multipass_id_and_ticket_id", unique: true, using: :btree
   end
 
-# Could not dump table "tickets" because of following StandardError
-#   Unknown type 'ticket_management_software_name' for column 'management_software'
+  create_table "tickets", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text     "external_id", null: false
+    t.text     "summary",     null: false
+    t.text     "tracker",     null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["external_id", "tracker"], name: "index_tickets_on_external_id_and_tracker", unique: true, using: :btree
+  end
 
   create_table "users", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text     "github_uid"

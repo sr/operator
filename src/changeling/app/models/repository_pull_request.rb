@@ -41,7 +41,7 @@ class RepositoryPullRequest
   def referenced_ticket
     case @payload["pull_request"]["title"]
     when /\A([A-Z]+\-[0-9]+)/
-      Ticket.where(external_id: Regexp.last_match(1), management_software: Ticket::TYPE_JIRA).first
+      Ticket.where(external_id: Regexp.last_match(1), tracker: Ticket::TRACKER_JIRA).first
     end
   end
 end
