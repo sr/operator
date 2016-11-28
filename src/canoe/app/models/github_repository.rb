@@ -44,13 +44,19 @@ class GithubRepository
     status = @client.combined_status(@name, branch)
     compare = @client.compare(@name, MASTER, branch)
 
+    # TODO: Remove when pardot/compliance is ready to be enforced
+    relevant_statuses = status.statuses.reject { |s| s.context == "pardot/compliance" }
+    combined_state = %w[failure pending success].find("pending") { |state|
+      relevant_statuses.any? { |s| s.state == state }
+    }
+
     Build.new(
       url: status[:statuses].first[:target_url],
       sha: status[:sha],
       # TODO(sr) Remove hard-coded value once we move to Artifactory as our
       # source of build truth for Chef Delivery.
       branch: "master",
-      state: status[:state],
+      state: combined_state,
       compare_status: compare[:status],
       updated_at: status[:statuses].first[:updated_at]
     )
