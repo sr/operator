@@ -60,7 +60,7 @@ module Zabbix
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
       begin
-        payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter), timeout_seconds)
+        payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}", timeout_seconds)
       rescue => e
         log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, "**************"))
         err = "Payload Delivery completely failed and was 'rescued.' Error: #{e.gsub(config.zabbix_password, "**************")}."

@@ -457,11 +457,12 @@ class ZabbixHandler < ApplicationHandler
       datacenter: datacenter,
       log: log)
     log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-    payload_insertion_url = if datacenter.in? config.datacenters_requiring_dot_not_dash
-      config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter).gsub("zabbix-", "zabbix.")
-    else
-      config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter)
-    end
+    payload_insertion_url =
+      if datacenter.in? config.datacenters_requiring_dot_not_dash
+        config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter).gsub("zabbix-", "zabbix.")
+      else
+        config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter)
+      end
     zabbixmon.monitor(payload_insertion_url,
       config.monitor_retries,
       config.monitor_retry_interval_seconds,
