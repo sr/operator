@@ -59,19 +59,31 @@ module Zabbix
 
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
-      payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter),
-          timeout_seconds)
-      if payload_delivery_response.code =~ /20./
-        @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
+      begin
+        payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter), timeout_seconds)
+      rescue => e
+        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, "**************"))
+        err = "Payload Delivery completely failed and was 'rescued.' Error: #{e.gsub(config.zabbix_password, "**************")}."
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{e.gsub(config.zabbix_password, "**************")}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{e.gsub(config.zabbix_password, "**************")} ")
+      end
+
+      if !payload_delivery_response.nil?
+        if payload_delivery_response.code =~ /20./
+          @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
+        else
+          err = "#{payload_delivery_response.code} : #{payload_delivery_response.body}"
+          @hard_failure ||= "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
+          @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
+        end
       else
-        err = "#{payload_delivery_response.code} : #{payload_delivery_response.body}"
-        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
+        @hard_failure ||= "Generic Payload Insertion Failure."
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] #{@hard_failure}")
       end
     end
 
     def retrieve_payload(payload)
-      begin # get zabbix item
+      begin
         success = false
         zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
