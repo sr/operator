@@ -39,12 +39,12 @@ class ZabbixHandler < ApplicationHandler
   config :zabbix_api_url, default: {
       dfw: "https://zabbix-dfw.pardot.com/api_jsonrpc.php",
       phx: "https://zabbix-phx.pardot.com/api_jsonrpc.php",
-      dev: "https://zabbix.dev.pardot.com/api_jsonrpc.php",
+      dev: "https://zabbix.dev.pardot.com/api_jsonrpc.php"
   }
   config :zabbix_monitor_payload_url, default: {
       dfw: "https://zabbix-dfw.pardot.com/cgi-bin/zabbix-status-check.sh?",
       phx: "https://zabbix-phx.pardot.com/cgi-bin/zabbix-status-check.sh?",
-      dev: "https://zabbix.dev.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      dev: "https://zabbix.dev.pardot.com/cgi-bin/zabbix-status-check.sh?"
   }
   config :zabbix_user, default: "Admin"
   config :zabbix_password, required: "changeme"
