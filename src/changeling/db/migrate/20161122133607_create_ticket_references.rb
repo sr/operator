@@ -4,6 +4,7 @@ class CreateTicketReferences < ActiveRecord::Migration[5.0]
       t.text :external_id, null: false
       t.text :summary, null: false
       t.text :tracker, null: false
+      t.text :status, null: false
       t.timestamps null: false
     end
 

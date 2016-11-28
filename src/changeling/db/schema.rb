@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(version: 20161122133607) do
     t.text     "external_id", null: false
     t.text     "summary",     null: false
     t.text     "tracker",     null: false
+    t.text     "status",      null: false
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.index ["external_id", "tracker"], name: "index_tickets_on_external_id_and_tracker", unique: true, using: :btree

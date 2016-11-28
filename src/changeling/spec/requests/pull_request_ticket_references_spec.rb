@@ -16,9 +16,10 @@ RSpec.describe "Ticket references", type: :request do
     )
   end
 
-  def create_jira_ticket(external_id)
+  def create_jira_ticket(external_id, status = nil)
     jira_event = decoded_fixture_data("jira/issue_updated")
     jira_event["issue"]["key"] = external_id
+    jira_event["issue"]["fields"]["status"]["name"] = status || "To Do"
     post "/events/jira", params: jira_event, as: :json
     expect(response.status).to eq(201)
   end
@@ -43,6 +44,7 @@ RSpec.describe "Ticket references", type: :request do
 
     expect(@multipass.reload.ticket_reference).to_not eq(nil)
     reference = @multipass.reload.ticket_reference
+    expect(reference.open?).to eq(true)
     expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/BREAD-1598")
   end
 
@@ -62,7 +64,12 @@ RSpec.describe "Ticket references", type: :request do
 
     reference = @multipass.reload.ticket_reference
     expect(reference).to_not eq(nil)
+    expect(reference.open?).to eq(true)
     expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/PDT-98")
+
+    create_jira_ticket("PDT-98", "Resolved")
+    reference.reload
+    expect(reference.open?).to eq(false)
   end
 
   it "removes existing JIRA ticket reference" do

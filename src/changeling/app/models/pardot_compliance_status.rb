@@ -14,7 +14,8 @@ class PardotComplianceStatus
 
   def complete?
     @multipass.missing_mandatory_fields.empty? &&
-      !ticket_reference_missing?
+      !ticket_reference_missing? &&
+      referenced_ticket_open?
   end
 
   def user_is_peer_reviewer?(user)
@@ -44,6 +45,8 @@ class PardotComplianceStatus
       "Completed via emergency approval by #{@multipass.emergency_approver}."
     elsif ticket_reference_missing?
       "Ticket reference missing"
+    elsif !referenced_ticket_open?
+      "Referenced ticket is not open"
     elsif complete?
       "All requirements completed. Reviewed by #{@multipass.reviewers}."
     elsif @multipass.testing.nil?
@@ -56,6 +59,14 @@ class PardotComplianceStatus
   end
 
   private
+
+  def referenced_ticket_open?
+    if !@multipass.repository.ticket_reference_required?
+      return true
+    end
+
+    @multipass.ticket_reference.open?
+  end
 
   def ticket_reference_missing?
     if !@multipass.repository.ticket_reference_required?

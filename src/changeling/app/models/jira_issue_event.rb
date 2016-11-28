@@ -33,14 +33,25 @@ class JIRAIssueEvent
     @issue.present? &&
       @issue["key"].present? &&
       @issue["fields"].present? &&
-      @issue["fields"]["summary"].present?
+      @issue["fields"]["summary"].present? &&
+      @issue["fields"]["status"].present?
   end
 
   def issue_key
-    @issue["key"]
+    @issue.fetch("key")
+  end
+
+  def issue_status
+    fields.fetch("status").fetch("name")
   end
 
   def issue_summary
-    @issue["fields"]["summary"]
+    fields.fetch("summary")
+  end
+
+  private
+
+  def fields
+    @issue.fetch("fields")
   end
 end

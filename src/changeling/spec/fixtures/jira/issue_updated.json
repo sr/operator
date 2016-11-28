@@ -10,6 +10,9 @@
       "summary": "I feel the need for speed",
       "created": "2009-12-16T23:46:10.612-0600",
       "description": "Make the issue nav load 10x faster",
+      "status": {
+        "name": "To Do"
+      },
       "labels": [
         "UI",
         "dialogue",

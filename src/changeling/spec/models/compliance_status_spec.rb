@@ -6,6 +6,7 @@ describe ComplianceStatus, "pardot" do
     ticket = Ticket.create!(
       external_id: "1",
       summary: "fix everything",
+      status: JIRATicket::OPEN_STATUSES[0],
       tracker: Ticket::TRACKER_JIRA
     )
     reference_url = format("https://%s/%s/pull/90",
@@ -30,6 +31,15 @@ describe ComplianceStatus, "pardot" do
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Ticket reference missing")
+  end
+
+  it "requires a reference to an open ticket to be complete" do
+    expect(@multipass.complete?).to eq(true)
+    @multipass.ticket_reference.ticket.update!(status: "WONTFIX")
+    expect(@multipass.reload.complete?).to eq(false)
+
+    description = @multipass.github_commit_status_description
+    expect(description).to eq("Referenced ticket is not open")
   end
 
   it "requires the builds to be successful" do
