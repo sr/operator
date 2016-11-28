@@ -159,6 +159,10 @@ resource "aws_instance" "github_enterprise_server_1" {
   ebs_optimized           = true
   disable_api_termination = true
 
+  # Internal DNS records use internal IPs, so we want to keep this as static as
+  # possible
+  private_ip = "172.28.0.132"
+
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
     "${aws_security_group.github_enterprise_server_admin_management.id}",
@@ -201,6 +205,10 @@ resource "aws_instance" "github_enterprise_server_2" {
   subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1d_dmz.id}"
   ebs_optimized           = true
   disable_api_termination = true
+
+  # Internal DNS records use internal IPs, so we want to keep this as static as
+  # possible
+  private_ip = "172.28.0.220"
 
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
