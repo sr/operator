@@ -165,6 +165,9 @@ case "$project" in
             docker_push "$project"
         fi
         ;;
+    changeling)
+        true
+        ;;
     devenv)
         mkdir -p "$BREAD/bin/darwin_amd64"
         docker run --rm -w /go \
