@@ -181,12 +181,20 @@ resource "aws_route53_record" "git_dev_pardot_com_CNAMErecord" {
   ttl     = "60"
 }
 
+resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["172.31.57.89"]
+  type    = "A"
+  ttl     = "60"
+}
+
 resource "aws_route53_record" "1_git_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "1.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["52.4.132.69"]
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
 }
 
 resource "aws_route53_record" "2_git_dev_pardot_com_Arecord" {
@@ -194,7 +202,7 @@ resource "aws_route53_record" "2_git_dev_pardot_com_Arecord" {
   name    = "2.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["52.3.83.197"]
   type    = "A"
-  ttl     = "60"
+  ttl     = "30"
 }
 
 resource "aws_route53_record" "backups_git_dev_pardot_com_Arecord" {
@@ -210,14 +218,6 @@ resource "aws_route53_record" "reply_git_dev_pardot_com_MXrecord" {
   name    = "reply.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["10 git.dev.pardot.com."]
   type    = "MX"
-  ttl     = "900"
-}
-
-resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["172.31.57.89"]
-  type    = "A"
   ttl     = "900"
 }
 
