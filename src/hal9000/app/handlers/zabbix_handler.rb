@@ -36,8 +36,16 @@ class ZabbixHandler < ApplicationHandler
   ZABBIX_CHEF_APP_NAME = "app:chef".freeze
 
   # config: zabbix
-  config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
-  config :zabbix_monitor_payload_url, default: "https://zabbix-%datacenter%.pardot.com/cgi-bin/zabbix-status-check.sh?"
+  config :zabbix_api_url, default: {
+      dfw: "https://zabbix-dfw.pardot.com/api_jsonrpc.php",
+      phx: "https://zabbix-phx.pardot.com/api_jsonrpc.php",
+      dev: "https://zabbix.dev.pardot.com/api_jsonrpc.php",
+  }
+  config :zabbix_monitor_payload_url, default: {
+      dfw: "https://zabbix-dfw.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      phx: "https://zabbix-phx.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      dev: "https://zabbix.dev.pardot.com/cgi-bin/zabbix-status-check.sh?",
+  }
   config :zabbix_user, default: "Admin"
   config :zabbix_password, required: "changeme"
 
@@ -457,13 +465,7 @@ class ZabbixHandler < ApplicationHandler
       datacenter: datacenter,
       log: log)
     log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-    payload_insertion_url =
-      if datacenter.in? config.datacenters_requiring_dot_not_dash
-        config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter).gsub("zabbix-", "zabbix.")
-      else
-        config.zabbix_monitor_payload_url.gsub(/%datacenter%/, datacenter)
-      end
-    zabbixmon.monitor(payload_insertion_url,
+    zabbixmon.monitor(config.zabbix_monitor_payload_url[datacenter.to_sym],
       config.monitor_retries,
       config.monitor_retry_interval_seconds,
       config.monitor_http_timeout_seconds)
@@ -481,11 +483,7 @@ class ZabbixHandler < ApplicationHandler
 
   def build_zabbix_client(datacenter:)
     options = {
-      url: if datacenter.in? config.datacenters_requiring_dot_not_dash
-             config.zabbix_api_url.gsub(/%datacenter%/, datacenter).gsub("zabbix-", "zabbix.")
-           else
-             config.zabbix_api_url.gsub(/%datacenter%/, datacenter)
-           end,
+      url: config.zabbix_api_url[datacenter.to_sym],
       user: config.zabbix_user,
       password: config.zabbix_password
     }
