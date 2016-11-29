@@ -60,6 +60,6 @@ resource "github_team" "triton" {
 
 resource "github_team" "read-only-users" {
   name        = "Read-Only Users"
-  description = "Read-Only Access"
-  privacy     = "closed"
+  description = "Read-Only Access for CORE CCE to setup dev env locally and test"
+  privacy     = "secret"
 }
