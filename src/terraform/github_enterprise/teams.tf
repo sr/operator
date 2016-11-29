@@ -57,3 +57,9 @@ resource "github_team" "triton" {
   description = "We manage engagement history, which syncs activities and campaigns to Salesforce"
   privacy     = "closed"
 }
+
+resource "github_team" "read-only-users" {
+  name        = "Read-Only Users"
+  description = "Read-Only Access for CORE CCE to setup dev env locally and test"
+  privacy     = "secret"
+}
