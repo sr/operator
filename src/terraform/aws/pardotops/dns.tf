@@ -128,7 +128,7 @@ resource "aws_route53_record" "confluence_dev_pardot_com_Arecord" {
 resource "aws_route53_record" "quadrant3_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "quadrant3.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${var.quadrant3_test_host_ip}"]
+  records = ["${var.quadrant3_host_ip}"]
   type    = "A"
   ttl     = "900"
 }
