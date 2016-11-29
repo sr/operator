@@ -62,17 +62,18 @@ module Zabbix
       begin
         payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}", timeout_seconds)
       rescue => e
-        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}".gsub(config.zabbix_password, "**************"))
-        err = "Payload Delivery completely failed and was 'rescued.' Error: #{e.gsub(config.zabbix_password, "**************")}."
-        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{e.gsub(config.zabbix_password, "**************")}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{e.gsub(config.zabbix_password, "**************")} ")
+        e = scrub_password(e)
+        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
+        err = "Payload Delivery completely failed and was 'rescued.' Error: #{e}."
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{e}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed: #{e} !")
       end
 
       if !payload_delivery_response.nil?
         if payload_delivery_response.code =~ /20./
           @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
         else
-          err = "#{payload_delivery_response.code} : #{payload_delivery_response.body}"
+          err = scrub_password("#{payload_delivery_response.code} : #{payload_delivery_response.body}")
           @hard_failure ||= "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
           @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
         end
@@ -87,8 +88,9 @@ module Zabbix
         success = false
         zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
+        e = scrub_password(e)
         @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", e))
-        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", e).gsub(@zbx_password, "**************"))
+        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", e))
       end
       if zbx_items
         if !zbx_items.empty? # success case
