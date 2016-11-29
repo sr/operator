@@ -43,3 +43,9 @@ resource "github_team_repository" "pardot_core-production-security" {
   team_id    = "${github_team.core-production-security.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "pardot_read-only-users" {
+  repository = "${github_repository.pardot.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}

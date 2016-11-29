@@ -19,3 +19,9 @@ resource "github_team_repository" "geoip-api-php_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "geoip-api-php_read-only-users" {
+  repository = "${github_repository.geoip-api-php.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}
