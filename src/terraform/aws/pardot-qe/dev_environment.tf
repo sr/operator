@@ -53,6 +53,13 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
 
 resource "aws_security_group" "allow_inbound_http_https_from_sfdc" {
   vpc_id = "${aws_vpc.dev_environment.id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 # https://help.salesforce.com/apex/HTViewSolution?id=000003652
