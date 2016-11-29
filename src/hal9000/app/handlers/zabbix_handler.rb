@@ -51,7 +51,6 @@ class ZabbixHandler < ApplicationHandler
 
   # config: datacenters
   config :datacenters, default: %w[dfw phx dev]
-  config :datacenters_requiring_dot_not_dash, default: %w[dev]
   config :default_datacenter, default: "dfw"
 
   # config: hal9000's "home room"
