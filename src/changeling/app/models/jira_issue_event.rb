@@ -9,11 +9,17 @@ class JIRAIssueEvent
     attr_reader :payload
   end
 
-  PROCESSABLE_EVENT_TYPES = ["jira:issue_updated"].freeze
+  class UnprocessableEvent < StandardError
+    def initialize(event_name)
+      super "unprocessable webhook event: #{event_name.inspect}"
+    end
+  end
+
+  PROCESSABLE_EVENT_TYPES = ["jira:issue_created", "jira:issue_updated"].freeze
 
   def self.parse(payload)
     if !PROCESSABLE_EVENT_TYPES.include?(payload["webhookEvent"])
-      return
+      raise UnprocessableEvent, payload["webhookEvent"]
     end
 
     event = new(payload["issue"])
