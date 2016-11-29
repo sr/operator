@@ -31,3 +31,9 @@ resource "github_team_repository" "protobuf-schemas_service-accounts-read-only" 
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "protobuf-schemas_read-only-users" {
+  repository = "${github_repository.protobuf-schemas.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}

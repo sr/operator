@@ -31,3 +31,9 @@ resource "github_team_repository" "vagrant-dev_tier-2-support" {
   team_id    = "${github_team.tier-2-support.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "vagrant-dev_read-only-users" {
+  repository = "${github_repository.vagrant-dev.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}

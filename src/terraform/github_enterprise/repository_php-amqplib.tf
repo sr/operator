@@ -19,3 +19,9 @@ resource "github_team_repository" "php-amqplib_service-accounts-read-only" {
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "php-amqplib_read-only-users" {
+  repository = "${github_repository.php-amqplib.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}
