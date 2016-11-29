@@ -82,6 +82,7 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
       "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "${var.quadrant3_host_ip}/32",
     ]
   }
 }
@@ -140,6 +141,7 @@ resource "aws_security_group" "github_enterprise_server_https" {
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
       "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "${var.quadrant3_host_ip}/32",
     ]
   }
 }
