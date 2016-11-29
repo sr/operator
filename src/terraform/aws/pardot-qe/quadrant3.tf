@@ -64,6 +64,7 @@ resource "aws_eip" "q3_eip" {
 
 resource "aws_security_group" "q3_app_secgroup" {
   description = "q3_secgroup"
+  vpc_id      = "${aws_vpc.dev_environment.id}"
 
   ingress {
     from_port = 22
