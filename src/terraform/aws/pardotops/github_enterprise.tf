@@ -81,6 +81,7 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
+      "52.4.132.69/32",                                               # 1.git.dev.pardot.com
     ]
   }
 }
@@ -109,6 +110,7 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
+      "52.4.132.69/32",                                               # 1.git.dev.pardot.com
     ]
   }
 }
@@ -137,6 +139,7 @@ resource "aws_security_group" "github_enterprise_server_https" {
       "${var.bamboo_server_instance_ip}/32",
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
+      "52.4.132.69/32",                                               # 1.git.dev.pardot.com
     ]
   }
 }
@@ -158,6 +161,10 @@ resource "aws_instance" "github_enterprise_server_1" {
   subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1a_dmz.id}"
   ebs_optimized           = true
   disable_api_termination = true
+
+  # Internal DNS records use internal IPs, so we want to keep this as static as
+  # possible
+  private_ip = "172.28.0.132"
 
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
@@ -201,6 +208,10 @@ resource "aws_instance" "github_enterprise_server_2" {
   subnet_id               = "${aws_subnet.internal_tools_integration_us_east_1d_dmz.id}"
   ebs_optimized           = true
   disable_api_termination = true
+
+  # Internal DNS records use internal IPs, so we want to keep this as static as
+  # possible
+  private_ip = "172.28.0.220"
 
   vpc_security_group_ids = [
     "${aws_security_group.internal_tools_integration_default.id}",
