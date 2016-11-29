@@ -22,6 +22,7 @@ resource "aws_security_group" "q3_secgroup" {
 
     cidr_blocks = [
       "${var.jump_dot_dev_ip_address}/32",
+      "${var.pardot_ci_egress_ip}/32",
     ]
   }
 
