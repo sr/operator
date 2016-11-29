@@ -51,13 +51,17 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   ]
 }
 
+resource "aws_security_group" "allow_inbound_http_https_from_sfdc" {
+  vpc_id = "${aws_vpc.dev_environment.id}"
+}
+
 # https://help.salesforce.com/apex/HTViewSolution?id=000003652
 resource "aws_security_group_rule" "dev_environment_allow_salesforce_http" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+  security_group_id = "${aws_security_group.allow_inbound_http_https_from_sfdc.id}"
 
   cidr_blocks = [
     "96.43.144.0/20",
@@ -72,7 +76,7 @@ resource "aws_security_group_rule" "dev_environment_allow_salesforce_https" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+  security_group_id = "${aws_security_group.allow_inbound_http_https_from_sfdc.id}"
 
   cidr_blocks = [
     "96.43.144.0/20",

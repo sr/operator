@@ -8,11 +8,11 @@ resource "aws_db_instance" "q3db" {
   parameter_group_name = "default.postgres9.5"
 
   vpc_security_group_ids = [
-    "${aws_security_group.q3_secgroup.id}",
+    "${aws_security_group.q3_db_secgroup.id}",
   ]
 }
 
-resource "aws_security_group" "q3_secgroup" {
+resource "aws_security_group" "q3_db_secgroup" {
   description = "q3_secgroup"
 
   ingress {
@@ -21,9 +21,8 @@ resource "aws_security_group" "q3_secgroup" {
     protocol  = "TCP"
 
     cidr_blocks = [
-      "${var.jump_dot_dev_ip_address}/32",
-      "${var.pardot_ci_egress_ip}/32",
-      "${var.pardot2_proxyout_egress_ip}/32",
+      "${aws_instance.q3_apphost.private_ip}/32",
+      "${aws_eip.q3_eip.public_ip}/32",
     ]
   }
 
@@ -35,7 +34,87 @@ resource "aws_security_group" "q3_secgroup" {
   }
 
   tags {
-    Name      = "q3_secgroup"
+    Name      = "q3_db_secgroup"
+    terraform = "true"
+  }
+}
+
+resource "aws_instance" "q3_apphost" {
+  ami                         = "${var.centos_7_hvm_ebs_ami}"
+  instance_type               = "t2.medium"
+  subnet_id                   = "${aws_subnet.dev_environment_us_east_1c_dmz.id}"
+  associate_public_ip_address = false
+  key_name                    = "quadrant3"
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = "50"
+    delete_on_termination = true
+  }
+
+  vpc_security_group_ids = [
+    "${aws_security_group.q3_app_secgroup.id}",
+  ]
+}
+
+resource "aws_eip" "q3_eip" {
+  instance = "${aws_instance.q3_apphost.id}"
+  vpc      = true
+}
+
+resource "aws_security_group" "q3_app_secgroup" {
+  description = "q3_secgroup"
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "TCP"
+
+    cidr_blocks = [
+      "${var.jump_dot_dev_ip_address}/32",
+      "${var.pardot2_proxyout_egress_ip}/32",
+    ]
+  }
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "204.14.236.0/24",               # aloha-east
+      "204.14.239.0/24",               # aloha-west
+      "62.17.146.140/30",              # aloha-emea
+      "62.17.146.144/28",              # aloha-emea
+      "62.17.146.160/27",              # aloha-emea
+      "${var.pardot_ci_egress_ip}/32",
+    ]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "204.14.236.0/24",               # aloha-east
+      "204.14.239.0/24",               # aloha-west
+      "62.17.146.140/30",              # aloha-emea
+      "62.17.146.144/28",              # aloha-emea
+      "62.17.146.160/27",              # aloha-emea
+      "${var.pardot_ci_egress_ip}/32",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name      = "q3_app_secgroup"
     terraform = "true"
   }
 }
