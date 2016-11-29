@@ -48,6 +48,40 @@ RSpec.describe "Ticket references", type: :request do
     expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/BREAD-1598")
   end
 
+  it "detects most common ticket ID - title separators" do
+    create_jira_ticket("BREAD-1598")
+    expect(@multipass.ticket_reference).to eq(nil)
+    github_pull_request_event(
+      head_sha: @multipass.release_id,
+      title: "BREAD-1598: hello"
+    )
+    expect(@multipass.reload.ticket_reference).to_not eq(nil)
+
+    @multipass.ticket_reference.destroy!
+    expect(@multipass.reload.ticket_reference).to eq(nil)
+    github_pull_request_event(
+      head_sha: @multipass.release_id,
+      title: "BREAD-1598 - hello"
+    )
+    expect(@multipass.reload.ticket_reference).to_not eq(nil)
+
+    @multipass.ticket_reference.destroy!
+    expect(@multipass.reload.ticket_reference).to eq(nil)
+    github_pull_request_event(
+      head_sha: @multipass.release_id,
+      title: "BREAD-1598 - hello"
+    )
+    expect(@multipass.reload.ticket_reference).to_not eq(nil)
+
+    @multipass.ticket_reference.destroy!
+    expect(@multipass.reload.ticket_reference).to eq(nil)
+    github_pull_request_event(
+      head_sha: @multipass.release_id,
+      title: "[BREAD-1598] - hello"
+    )
+    expect(@multipass.reload.ticket_reference).to_not eq(nil)
+  end
+
   it "updates existing JIRA ticket reference" do
     create_jira_ticket("BREAD-1598")
     github_pull_request_event(
