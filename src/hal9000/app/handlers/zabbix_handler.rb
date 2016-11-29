@@ -363,7 +363,7 @@ class ZabbixHandler < ApplicationHandler
                 datacenter: datacenter,
                 problems: problems,
                 hosts_without_data: hosts_without_data
-              )
+              )[0, 999]
             )
           end
         end

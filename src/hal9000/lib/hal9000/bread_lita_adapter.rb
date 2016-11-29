@@ -53,7 +53,7 @@ module Hal9000
 
     # rubocop:disable Style/Send
     def send_messages(source, messages)
-      $stderr.puts "DEBUG: source=#{source.inspect} messages=#{messages.inspect}"
+      $stderr.puts "DEBUG: source=#{source.inspect} messages=#{messages.map(&:size)}"
 
       if source.private_message? && source.user.id.to_s.empty?
         raise Error, "Unable to send private message without a source user: #{source.inspect}"
