@@ -2,13 +2,22 @@ resource "aws_db_instance" "q3db" {
   allocated_storage    = 50
   engine               = "postgres"
   instance_class       = "db.t2.small"
-  name                 = "mydb"
+  name                 = "q3db"
   username             = "pardottandp"
   password             = "thisIsNotThePasswordAnymore" # once changed, this is no longer tracked by TF. See secrets.ops.pardot.com for latest PW
   parameter_group_name = "default.postgres9.5"
 
   vpc_security_group_ids = [
     "${aws_security_group.q3_db_secgroup.id}",
+  ]
+
+  db_subnet_group_name = "${aws_db_subnet_group.q3db_subnet_group.name}"
+}
+
+resource "aws_db_subnet_group" "q3db_subnet_group" {
+  name = "q3_db_subnet_group"
+  subnet_ids = [
+    "${aws_subnet.dev_environment_us_east_1c.id}"
   ]
 }
 
