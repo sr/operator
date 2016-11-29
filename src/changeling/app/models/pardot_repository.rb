@@ -35,7 +35,7 @@ class PardotRepository
     when PARDOT
       ["Initial Jobs", "Test Jobs"]
     else
-      raise ConfigurationMissing, repo
+      raise ConfigurationMissing, @name_with_owner
     end
   end
 
