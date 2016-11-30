@@ -1,5 +1,19 @@
 class JIRATicket
-  OPEN_STATUSES = ["Accepted", "Under Consideration", "To Do"].freeze
+  OPEN_STATUSES = [
+    "Accepted",
+    "Backlog",
+    "Blocked",
+    "In Progress",
+    "Investigation",
+    "To Do",
+    "Under Consideration",
+    "Under Review",
+    "QA",
+    "QA Confirmed",
+    "QA In Progress",
+    "Reopened",
+    "Waiting on Client"
+  ].freeze
 
   def initialize(ticket)
     @ticket = ticket
