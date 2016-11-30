@@ -19,6 +19,7 @@ resource "aws_db_subnet_group" "q3db_subnet_group" {
 
   subnet_ids = [
     "${aws_subnet.dev_environment_us_east_1c.id}",
+    "${aws_subnet.dev_environment_us_east_1d.id}",
   ]
 }
 
