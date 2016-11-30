@@ -137,7 +137,7 @@ module Zabbix
   end
 
   def scrub_password(str)
-    if @zabbix_password.empty?
+    if @zabbix_password.empty? || @zabbix_password.nil?
       str
     else
       str.gsub(@zabbix_password, "****")
