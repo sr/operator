@@ -487,8 +487,7 @@ module.exports = (robot) ->
       'http://i.imgur.com/oeAufrG.gifv',
       'http://i.imgur.com/cNDbs8v.gif',
       'http://i.imgur.com/xy6tM.gif',
-      'http://i.imgur.com/F94emFR.jpg',
-      ''
+      'http://i.imgur.com/F94emFR.jpg'
     ]
     msg.send msg.random pandas
 
