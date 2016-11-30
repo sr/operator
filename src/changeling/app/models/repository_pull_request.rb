@@ -53,10 +53,14 @@ class RepositoryPullRequest
     }
 
     ActiveRecord::Base.transaction do
-      status = RepositoryCommitStatus.find_or_initialize_by(attributes) do |s|
-        s.state = commit_status.state
+      status = RepositoryCommitStatus.where(attributes).first
+
+      if status
+        status.update!(state: commit_status.state)
+      else
+        RepositoryCommitStatus.create!(attributes.merge(state: commit_status.state))
       end
-      status.save!
+
       recalculate_testing_status
     end
   end

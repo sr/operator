@@ -9,6 +9,32 @@ RSpec.describe StatusHandler do
     Changeling.config.pardot = false
   end
 
+  it "updates or creates commit status for the appropriate repository" do
+    payload = decoded_fixture_data("github/status_success_travis")
+    @multipass = Fabricate(:multipass,
+      reference_url: "https://github.com/heroku/changeling/pull/32",
+      release_id: payload["commit"]["sha"],
+      testing: nil,
+    )
+
+    expect(RepositoryCommitStatus.count).to eq(0)
+
+    payload["context"] = "ci/travis"
+    payload["state"] = RepositoryCommitStatus::SUCCESS
+    StatusHandler.perform_now(nil, JSON.dump(payload))
+
+    expect(RepositoryCommitStatus.count).to eq(1)
+    status = RepositoryCommitStatus.first!
+    expect(status.state).to eq(RepositoryCommitStatus::SUCCESS)
+
+    payload["context"] = "ci/travis"
+    payload["state"] = RepositoryCommitStatus::FAILURE
+    StatusHandler.perform_now(nil, JSON.dump(payload))
+    expect(RepositoryCommitStatus.count).to eq(1)
+    status = RepositoryCommitStatus.first!
+    expect(status.state).to eq(RepositoryCommitStatus::FAILURE)
+  end
+
   it "marks the testing status as success if all the required testing status are successful" do
     payload = decoded_fixture_data("github/status_success_travis")
     @multipass = Fabricate(:multipass,
