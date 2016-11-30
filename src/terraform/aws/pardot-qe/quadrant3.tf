@@ -55,7 +55,6 @@ resource "aws_instance" "q3_apphost" {
   ami                         = "${var.centos_7_hvm_ebs_ami}"
   instance_type               = "t2.medium"
   subnet_id                   = "${aws_subnet.dev_environment_us_east_1c_dmz.id}"
-  associate_public_ip_address = false
   key_name                    = "quadrant3"
 
   root_block_device {
