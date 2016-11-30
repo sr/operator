@@ -6,6 +6,28 @@ class RepositoryPullRequest
     @multipass = multipass
   end
 
+  def title
+    @multipass.title
+  end
+
+  def number
+    @multipass.pull_request_number
+  end
+
+  def repository_name
+    @multipass.repository_name.split("/").last
+  end
+
+  def repository_url
+    url = URI(@multipass.reference_url)
+    url.path = url.path.split("/")[0, 3].join("/")
+    url.to_s
+  end
+
+  def github_url
+    @multipass.reference_url
+  end
+
   def open
     recalculate_testing_status
 
@@ -36,6 +58,12 @@ class RepositoryPullRequest
       end
       status.save!
       recalculate_testing_status
+    end
+  end
+
+  def referenced_ticket
+    if referenced_ticket_id
+      Ticket.where(external_id: referenced_ticket_id, tracker: Ticket::TRACKER_JIRA).first
     end
   end
 
@@ -112,12 +140,6 @@ class RepositoryPullRequest
 
     recalculate_testing_status
     @multipass.save!
-  end
-
-  def referenced_ticket
-    if referenced_ticket_id
-      Ticket.where(external_id: referenced_ticket_id, tracker: Ticket::TRACKER_JIRA).first
-    end
   end
 
   def referenced_ticket_id
