@@ -531,10 +531,6 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def scrub_password(str)
-    if config.zabbix_password.empty?
-      str
-    else
-      str.gsub(config.zabbix_password, "****")
-    end
+    str.gsub(config.zabbix_password, "****") unless config.zabbix_password.empty?
   end
 end
