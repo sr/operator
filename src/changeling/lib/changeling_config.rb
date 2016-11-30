@@ -121,4 +121,17 @@ class ChangelingConfig
       ENV["GITHUB_OAUTH_SECRET"]
     end
   end
+
+  def jira_client
+    return @jira_client if defined?(@jira_client)
+    options = {
+      username: ENV.fetch("JIRA_USERNAME"),
+      password: ENV.fetch("JIRA_PASSWORD"),
+      site: jira_url,
+      auth_type: :basic,
+      rest_base_path: "/rest/api/2",
+      context_path: ""
+    }
+    @jira_client = JIRA::Client.new(options)
+  end
 end

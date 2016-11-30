@@ -99,20 +99,15 @@ class Multipass < ActiveRecord::Base
     end
   end
 
-  def synchronize_testing_status
-    commit_statuses = RepositoryCommitStatus.where(sha: release_id)
-
-    success = repository.required_testing_statuses.all? do |context|
-      status = commit_statuses.where(context: context).first
-
-      if status
-        status.state == RepositoryCommitStatus::SUCCESS
-      else
-        false
-      end
+  def synchronize(current_github_login = nil)
+    if Changeling.config.heroku?
+      check_commit_statuses!
+      self.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
+      save!
+    else
+      pull = RepositoryPullRequest.new(self)
+      pull.synchronize
     end
-
-    update!(testing: success)
   end
 
   def hostname

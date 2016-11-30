@@ -40,20 +40,6 @@ class Repository
     @repo.participating?
   end
 
-  def synchronize_commit_status(github_id, commit_status)
-    attributes = {
-      github_repository_id: github_id,
-      sha: commit_status.sha,
-      context: commit_status.context
-    }
-
-    status = RepositoryCommitStatus.find_or_initialize_by(attributes) do |s|
-      s.state = commit_status.state
-    end
-    status.save!
-    status
-  end
-
   def team
     @repo.team
   end

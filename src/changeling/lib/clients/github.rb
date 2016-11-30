@@ -2,7 +2,7 @@
 module Clients
   # Interact with pull requests and commit statuses via the GitHub API
   class GitHub
-    CommitStatus = Struct.new(:sha, :context, :state)
+    CommitStatus = Struct.new(:repository_id, :sha, :context, :state)
 
     def initialize(token)
       @client = Octokit::Client.new(
@@ -45,6 +45,10 @@ module Clients
 
     def commit_statuses(name_with_owner, sha)
       @client.statuses(name_with_owner, sha)
+    end
+
+    def combined_status(name_with_owner, sha)
+      @client.combined_status(name_with_owner, sha)
     end
 
     def pull_request(name_with_owner, number)
