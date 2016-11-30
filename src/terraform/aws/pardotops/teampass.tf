@@ -1,12 +1,12 @@
 resource "aws_elb" "teampass" {
   name            = "teampass"
-  security_groups = ["${aws_security_group.internal_apps_http_lb.id}"]
+  security_groups = ["${aws_security_group.pardot0_ue1_http_lb.id}"]
 
   subnets = [
-    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1e_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1a_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1c_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1d_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1e_dmz.id}",
   ]
 
   cross_zone_load_balancing   = true
@@ -47,7 +47,7 @@ resource "aws_ecs_cluster" "teampass" {
 
 resource "aws_security_group" "teampass_app" {
   name   = "teampass_app"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   # SSH from bastion
   ingress {
@@ -56,7 +56,7 @@ resource "aws_security_group" "teampass_app" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -64,7 +64,7 @@ resource "aws_security_group" "teampass_app" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${aws_vpc.internal_apps.cidr_block}"]
+    cidr_blocks = ["${aws_vpc.pardot0_ue1.cidr_block}"]
   }
 
   egress {
@@ -111,10 +111,10 @@ resource "aws_autoscaling_group" "teampass" {
   launch_configuration = "${aws_launch_configuration.teampass.id}"
 
   vpc_zone_identifier = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 
   lifecycle {
@@ -124,7 +124,7 @@ resource "aws_autoscaling_group" "teampass" {
 
 resource "aws_security_group" "teampass_db" {
   name   = "teampass_db"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port       = 3306
@@ -154,7 +154,7 @@ resource "aws_db_instance" "teampass" {
   maintenance_window      = "Tue:00:00-Tue:04:00"
   multi_az                = true
   publicly_accessible     = false
-  db_subnet_group_name    = "${aws_db_subnet_group.internal_apps.name}"
+  db_subnet_group_name    = "${aws_db_subnet_group.pardot0_ue1.name}"
   vpc_security_group_ids  = ["${aws_security_group.teampass_db.id}"]
   storage_encrypted       = true
   backup_retention_period = 30
