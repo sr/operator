@@ -79,8 +79,15 @@ ActiveRecord::Schema.define(version: 20161122133607) do
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
   end
 
-# Could not dump table "repository_commit_statuses" because of following StandardError
-#   Unknown type 'commit_status_state' for column 'state'
+  create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string   "sha",                  null: false
+    t.string   "context",              null: false
+    t.text     "state",                null: false
+    t.integer  "github_repository_id", null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.index ["sha", "context"], name: "index_repository_commit_statuses_on_sha_and_context", unique: true, using: :btree
+  end
 
   create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid     "multipass_id", null: false
