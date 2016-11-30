@@ -13,7 +13,7 @@ data "template_file" "parbot_production_user_data" {
 
 resource "aws_security_group" "parbot_app_production" {
   name   = "parbot_app_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   # SSH from bastion
   ingress {
@@ -22,7 +22,7 @@ resource "aws_security_group" "parbot_app_production" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -61,10 +61,10 @@ resource "aws_autoscaling_group" "parbot_production" {
   launch_configuration = "${aws_launch_configuration.parbot_production.id}"
 
   vpc_zone_identifier = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 
   lifecycle {
@@ -77,16 +77,16 @@ resource "aws_elasticache_subnet_group" "parbot_production" {
   description = "parbot production"
 
   subnet_ids = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 }
 
 resource "aws_security_group" "parbot_redis_production" {
   name   = "parbot_redis_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port       = 6379
@@ -120,7 +120,7 @@ resource "aws_elasticache_cluster" "parbot_production" {
 
 resource "aws_security_group" "parbot_db_production" {
   name   = "parbot_db_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port       = 3306
@@ -150,7 +150,7 @@ resource "aws_db_instance" "parbot_production" {
   maintenance_window      = "Tue:00:00-Tue:04:00"
   multi_az                = true
   publicly_accessible     = false
-  db_subnet_group_name    = "${aws_db_subnet_group.internal_apps.name}"
+  db_subnet_group_name    = "${aws_db_subnet_group.pardot0_ue1.name}"
   vpc_security_group_ids  = ["${aws_security_group.parbot_db_production.id}"]
   storage_encrypted       = false
   backup_retention_period = 5
