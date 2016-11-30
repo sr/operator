@@ -7,6 +7,7 @@ variable "aloha_vpn_cidr_blocks" {
     "62.17.146.140/30", # aloha-emea
     "62.17.146.144/28", # aloha-emea
     "62.17.146.160/27", # aloha-emea
+    "202.95.77.64/27",  # aloha-apj
   ]
 }
 
@@ -29,6 +30,17 @@ variable "sfdc_pardot_tools_production_heroku_space_cidr_blocks" {
     "52.3.60.97/32",
     "54.82.52.167/32",
     "54.82.76.144/32",
+  ]
+}
+
+variable "sfdc_pardot_tools_netherworld_heroku_space_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "34.192.47.206/32",
+    "34.192.147.59/32",
+    "34.192.142.55/32",
+    "34.192.58.27/32",
   ]
 }
 
