@@ -1,12 +1,4 @@
 class PardotRepository
-  class ConfigurationMissing < StandardError
-    def initialize(repo)
-      Raven.extra_context(repo: repo)
-
-      super "Repository configuration missing"
-    end
-  end
-
   # TODO(sr) Move the configuration somewhere to allow setting this up
   # cleanly in tests without needing to have a magic heroku/changeling
   # repository configured here.
@@ -35,7 +27,8 @@ class PardotRepository
     when PARDOT
       ["Initial Jobs", "Test Jobs"]
     else
-      raise ConfigurationMissing, @name_with_owner
+      Rails.logger.info "configuration-missing repo=#{name_with_owner.inspect}"
+      []
     end
   end
 
