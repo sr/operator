@@ -1,13 +1,16 @@
 package aws
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
 func TestAWSElasticBeanstalkApplication_importBasic(t *testing.T) {
 	resourceName := "aws_elastic_beanstalk_application.tftest"
+	config := fmt.Sprintf("tf-test-name-%d", acctest.RandInt())
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -15,7 +18,7 @@ func TestAWSElasticBeanstalkApplication_importBasic(t *testing.T) {
 		CheckDestroy: testAccCheckBeanstalkAppDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccBeanstalkAppConfig,
+				Config: testAccBeanstalkAppImportConfig(config),
 			},
 
 			{
@@ -25,4 +28,11 @@ func TestAWSElasticBeanstalkApplication_importBasic(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccBeanstalkAppImportConfig(name string) string {
+	return fmt.Sprintf(`resource "aws_elastic_beanstalk_application" "tftest" {
+	  name = "%s"
+	  description = "tf-test-desc"
+	}`, name)
 }
