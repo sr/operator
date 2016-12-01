@@ -67,6 +67,11 @@ resource "aws_instance" "q3_apphost" {
   vpc_security_group_ids = [
     "${aws_security_group.q3_app_secgroup.id}",
   ]
+
+  tags {
+    Name      = "quadrant3"
+    terraform = "true"
+  }
 }
 
 resource "aws_eip" "q3_eip" {
