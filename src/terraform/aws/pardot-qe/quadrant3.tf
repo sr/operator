@@ -25,7 +25,8 @@ resource "aws_db_subnet_group" "q3db_subnet_group" {
 
 resource "aws_security_group" "q3_db_secgroup" {
   vpc_id      = "${aws_vpc.dev_environment.id}"
-  description = "q3_secgroup"
+  name        = "q3_db_secgroup"
+  description = "q3_db_secgroup"
 
   ingress {
     from_port = 5432
@@ -74,7 +75,8 @@ resource "aws_eip" "q3_eip" {
 }
 
 resource "aws_security_group" "q3_app_secgroup" {
-  description = "q3_secgroup"
+  name        = "q3_app_secgroup"
+  description = "q3_app_secgroup"
   vpc_id      = "${aws_vpc.dev_environment.id}"
 
   ingress {
