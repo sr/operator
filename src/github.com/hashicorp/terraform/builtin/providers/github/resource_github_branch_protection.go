@@ -120,13 +120,13 @@ func resourceGithubBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	}
 
 	if restrictions != nil && restrictions.Teams != nil {
-		names := []string{}
+		slugs := []string{}
 		for _, t := range restrictions.Teams {
-			if t.Name != nil {
-				names = append(names, *t.Name)
+			if t.Slug != nil {
+				slugs = append(slugs, *t.Slug)
 			}
 		}
-		d.Set("teams_restriction", names)
+		d.Set("teams_restriction", slugs)
 	} else {
 		d.Set("teams_restriction", nil)
 	}
