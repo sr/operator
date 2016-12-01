@@ -52,6 +52,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
 }
 
 resource "aws_security_group" "allow_inbound_http_https_from_sfdc" {
+  name   = "allow_inbound_http_https_from_sfdc"
   vpc_id = "${aws_vpc.dev_environment.id}"
 
   egress {
