@@ -197,7 +197,7 @@ resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
   ttl     = "60"
 }
 
-resource "aws_route53_record" "1_git_dev_pardot_com_Arecord" {
+resource "aws_route53_record" "one_git_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "1.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_1.public_ip}"]
@@ -205,7 +205,7 @@ resource "aws_route53_record" "1_git_dev_pardot_com_Arecord" {
   ttl     = "900"
 }
 
-resource "aws_route53_record" "2_git_dev_pardot_com_Arecord" {
+resource "aws_route53_record" "two_git_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "2.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_2.public_ip}"]
