@@ -41,3 +41,7 @@ variable "bamboo_server_instance_ip" {
 variable "jira_server_instance_ip" {
   default = "52.0.34.28"
 }
+
+variable "quadrant3_host_ip" {
+  default = "34.193.65.12"
+}

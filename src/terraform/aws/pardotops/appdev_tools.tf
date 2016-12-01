@@ -14,6 +14,16 @@ resource "aws_security_group" "appdev_tools_server" {
     ]
   }
 
+  ingress {
+    from_port = 4440
+    to_port   = 4440
+    protocol  = "tcp"
+
+    security_groups = [
+      "${aws_security_group.appdev_toolsproxy.id}",
+    ]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

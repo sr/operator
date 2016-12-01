@@ -1,6 +1,6 @@
-resource "aws_route53_zone_association" "internal_tools_integration_to_internal_apps_dns_association" {
+resource "aws_route53_zone_association" "internal_tools_integration_to_pardot0_ue1_dns_association" {
   vpc_id  = "${aws_vpc.internal_tools_integration.id}"
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.id}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.id}"
 }
 
 resource "aws_security_group" "internal_tools_integration_default" {
@@ -13,8 +13,8 @@ resource "aws_security_group" "internal_tools_integration_default" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_instance.internal_apps_bastion.private_ip}/32",
-      "${aws_instance.internal_apps_bastion_2.private_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion.private_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion_2.private_ip}/32",
     ]
   }
 
@@ -36,10 +36,10 @@ resource "aws_security_group" "artifactory_instance_secgroup" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_instance.internal_apps_bastion.public_ip}/32",
-      "${aws_instance.internal_apps_bastion_2.public_ip}/32",
-      "${aws_instance.internal_apps_bastion.private_ip}/32",
-      "${aws_instance.internal_apps_bastion_2.private_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion.public_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion_2.public_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion.private_ip}/32",
+      "${aws_instance.pardot0_ue1_bastion_2.private_ip}/32",
     ]
   }
 
@@ -217,7 +217,7 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.internal_tools_integration.cidr_block}",
-      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
       "172.31.0.0/16",                                    # pardot-atlassian: default vpc
       "192.168.128.0/22",                                 # pardot-ci: default vpc
     ]
@@ -231,7 +231,7 @@ resource "aws_security_group" "artifactory_internal_elb_secgroup" {
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}",
       "${aws_vpc.internal_tools_integration.cidr_block}",
-      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
       "172.31.0.0/16",                                    # pardot-atlassian: default vpc
       "192.168.128.0/22",                                 # pardot-ci: default vpc
     ]
@@ -272,8 +272,8 @@ resource "aws_instance" "pardot0-artifactory1-1-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-1-ue1_arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-artifactory1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-artifactory1-1-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.pardot0-artifactory1-1-ue1.private_ip}"]
   type    = "A"
   ttl     = 900
@@ -306,8 +306,8 @@ resource "aws_instance" "pardot0-artifactory1-2-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-2-ue1_arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-artifactory1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-artifactory1-2-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.pardot0-artifactory1-2-ue1.private_ip}"]
   type    = "A"
   ttl     = 900
@@ -340,8 +340,8 @@ resource "aws_instance" "pardot0-artifactory1-3-ue1" {
 }
 
 resource "aws_route53_record" "pardot0-artifactory1-3-ue1_arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-artifactory1-3-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-artifactory1-3-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.pardot0-artifactory1-3-ue1.private_ip}"]
   type    = "A"
   ttl     = 900
@@ -522,7 +522,7 @@ resource "aws_route_table" "internal_tools_integration_route_dmz" {
 
   route {
     cidr_block                = "172.30.0.0/16"
-    vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_internal_tools_integration_vpc_peering.id}"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot0_ue1_and_internal_tools_integration_vpc_peering.id}"
   }
 
   route {
@@ -537,9 +537,9 @@ resource "aws_route" "internal_tools_integration_to_pardot_ci" {
   route_table_id            = "${aws_vpc.internal_tools_integration.main_route_table_id}"
 }
 
-resource "aws_route" "internal_tools_integration_to_internal_apps" {
+resource "aws_route" "internal_tools_integration_to_pardot0_ue1" {
   destination_cidr_block    = "172.30.0.0/16"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.internal_apps_and_internal_tools_integration_vpc_peering.id}"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot0_ue1_and_internal_tools_integration_vpc_peering.id}"
   route_table_id            = "${aws_vpc.internal_tools_integration.main_route_table_id}"
 }
 
@@ -623,9 +623,9 @@ resource "aws_db_subnet_group" "internal_tools_integration" {
   ]
 }
 
-resource "aws_vpc_peering_connection" "internal_apps_and_internal_tools_integration_vpc_peering" {
+resource "aws_vpc_peering_connection" "pardot0_ue1_and_internal_tools_integration_vpc_peering" {
   peer_owner_id = "${var.pardotops_account_number}"
-  peer_vpc_id   = "${aws_vpc.internal_apps.id}"
+  peer_vpc_id   = "${aws_vpc.pardot0_ue1.id}"
   vpc_id        = "${aws_vpc.internal_tools_integration.id}"
 }
 

@@ -71,10 +71,10 @@ resource "aws_eip" "appdev_ldap_host_eip" {
   instance = "${aws_instance.appdev_ldap_host.id}"
 }
 
-resource "aws_route53_record" "appdev_internal_apps_ldap_master_Arecord" {
+resource "aws_route53_record" "appdev_pardot0_ue1_ldap_master_Arecord" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot0-auth1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  records = ["${aws_eip.pardot0_ue1_ldap_master.public_ip}"]
   ttl     = "900"
   type    = "A"
 }

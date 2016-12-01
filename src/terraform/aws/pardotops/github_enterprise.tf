@@ -73,8 +73,8 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
+      "${aws_nat_gateway.pardot0_ue1_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
@@ -82,6 +82,7 @@ resource "aws_security_group" "github_enterprise_server_ssh" {
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
       "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "${var.quadrant3_host_ip}/32",
     ]
   }
 }
@@ -102,8 +103,8 @@ resource "aws_security_group" "github_enterprise_server_http" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
+      "${aws_nat_gateway.pardot0_ue1_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
@@ -131,8 +132,8 @@ resource "aws_security_group" "github_enterprise_server_https" {
       "${aws_vpc.appdev.cidr_block}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_nat_gateway.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
+      "${aws_nat_gateway.pardot0_ue1_nat_gw.public_ip}/32",
       "${var.pardot_ci_vpc_cidr}",
       "${var.pardot_ci_nat_gw_public_ip}/32",
       "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
@@ -140,6 +141,7 @@ resource "aws_security_group" "github_enterprise_server_https" {
       "${var.jira_server_instance_ip}/32",
       "${var.tools_egress_proxy_ip}/32",
       "52.4.132.69/32",                                               # 1.git.dev.pardot.com
+      "${var.quadrant3_host_ip}/32",
     ]
   }
 }
@@ -194,8 +196,8 @@ resource "aws_instance" "github_enterprise_server_1" {
 }
 
 resource "aws_route53_record" "github_enterprise_server_1_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-github1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-github1-1-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.github_enterprise_server_1.private_ip}"]
   type    = "A"
   ttl     = "900"
@@ -241,8 +243,8 @@ resource "aws_instance" "github_enterprise_server_2" {
 }
 
 resource "aws_route53_record" "github_enterprise_server_2_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-github1-2-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-github1-2-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.github_enterprise_server_2.private_ip}"]
   type    = "A"
   ttl     = "900"
@@ -250,7 +252,7 @@ resource "aws_route53_record" "github_enterprise_server_2_Arecord" {
 
 resource "aws_security_group" "github_enterprise_server_backups" {
   name   = "github_enterprise_server_backups"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   # SSH from bastion
   ingress {
@@ -259,7 +261,7 @@ resource "aws_security_group" "github_enterprise_server_backups" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -275,7 +277,7 @@ resource "aws_instance" "github_enterprise_server_backups" {
   ami                     = "${var.centos_6_hvm_ebs_ami}"
   instance_type           = "t2.medium"
   key_name                = "internal_apps"
-  subnet_id               = "${aws_subnet.internal_apps_us_east_1c.id}"
+  subnet_id               = "${aws_subnet.pardot0_ue1_1c.id}"
   disable_api_termination = true
 
   vpc_security_group_ids = [
@@ -302,8 +304,8 @@ resource "aws_instance" "github_enterprise_server_backups" {
 }
 
 resource "aws_route53_record" "github_enterprise_server_backups_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot0-githubbackup1-1-ue1.${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.name}"
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot0-githubbackup1-1-ue1.${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.name}"
   records = ["${aws_instance.github_enterprise_server_backups.private_ip}"]
   type    = "A"
   ttl     = "900"

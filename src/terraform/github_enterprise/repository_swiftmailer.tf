@@ -25,3 +25,9 @@ resource "github_team_repository" "swiftmailer_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "swiftmailer_read-only-users" {
+  repository = "${github_repository.swiftmailer.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}

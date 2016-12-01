@@ -13,7 +13,7 @@ data "template_file" "refocus_production_user_data" {
 
 resource "aws_security_group" "refocus_app_production" {
   name   = "refocus_app_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   # SSH from bastion
   ingress {
@@ -22,7 +22,7 @@ resource "aws_security_group" "refocus_app_production" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -61,10 +61,10 @@ resource "aws_autoscaling_group" "refocus_production" {
   launch_configuration = "${aws_launch_configuration.refocus_production.id}"
 
   vpc_zone_identifier = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 
   lifecycle {
