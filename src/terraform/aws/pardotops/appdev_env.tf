@@ -308,7 +308,6 @@ resource "aws_elb" "appdev_app_elb" {
   name = "${var.environment_appdev["env_name"]}-app-elb"
 
   security_groups = [
-    "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
     "${aws_security_group.appdev_app_lb.id}",
   ]
 
@@ -483,7 +482,6 @@ resource "aws_security_group" "appdev_app1host" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
       "${aws_security_group.appdev_app_lb.id}",
     ]
   }
