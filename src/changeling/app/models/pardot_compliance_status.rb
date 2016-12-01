@@ -15,7 +15,8 @@ class PardotComplianceStatus
   def complete?
     @multipass.missing_mandatory_fields.empty? &&
       !ticket_reference_missing? &&
-      referenced_ticket_open?
+      referenced_ticket_open? &&
+      peer_reviewed?
   end
 
   def user_is_peer_reviewer?(user)
@@ -41,6 +42,8 @@ class PardotComplianceStatus
   def github_commit_status_description
     if rejected?
       "Rejected by #{@multipass.rejector}"
+    elsif !peer_reviewed?
+      "Peer-review missing"
     elsif emergency_approved?
       "Completed via emergency approval by #{@multipass.emergency_approver}."
     elsif ticket_reference_missing?

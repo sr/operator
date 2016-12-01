@@ -59,4 +59,15 @@ describe ComplianceStatus, "pardot" do
     description = @multipass.github_commit_status_description
     expect(description).to eq("Build pending")
   end
+
+  it "requires peer review to be complete" do
+    expect(@multipass.complete?).to eq(true)
+    expect(@multipass.peer_reviewed?).to eq(true)
+    @multipass.update!(peer_reviewer: nil)
+    expect(@multipass.reload.complete?).to eq(false)
+    expect(@multipass.peer_reviewed?).to eq(false)
+
+    description = @multipass.github_commit_status_description
+    expect(description).to eq("Peer-review missing")
+  end
 end
