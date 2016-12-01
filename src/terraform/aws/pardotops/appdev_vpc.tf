@@ -255,9 +255,10 @@ resource "aws_security_group" "appdev_app_lb" {
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
       "${var.salesforce_cidr_blocks}",

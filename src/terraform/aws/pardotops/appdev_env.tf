@@ -309,7 +309,7 @@ resource "aws_elb" "appdev_app_elb" {
 
   security_groups = [
     "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
-    "${aws_security_group.appdev_app_lb.id}"
+    "${aws_security_group.appdev_app_lb.id}",
   ]
 
   subnets = [
@@ -484,7 +484,7 @@ resource "aws_security_group" "appdev_app1host" {
 
     security_groups = [
       "${aws_security_group.appdev_sfdc_vpn_http_https.id}",
-      "${aws_security_group.appdev_app_lb.id}"
+      "${aws_security_group.appdev_app_lb.id}",
     ]
   }
 
