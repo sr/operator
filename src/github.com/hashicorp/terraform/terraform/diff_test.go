@@ -991,6 +991,100 @@ func TestInstanceDiffSame(t *testing.T) {
 			true,
 			"",
 		},
+
+		// Innner computed set should allow outer change in key
+		{
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.~1.outer_val": {
+						Old: "",
+						New: "foo",
+					},
+					"foo.~1.inner.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.~1.inner.~2.value": {
+						Old:         "",
+						New:         "${var.bar}",
+						NewComputed: true,
+					},
+				},
+			},
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.12.outer_val": {
+						Old: "",
+						New: "foo",
+					},
+					"foo.12.inner.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.12.inner.42.value": {
+						Old: "",
+						New: "baz",
+					},
+				},
+			},
+			true,
+			"",
+		},
+
+		// Innner computed list should allow outer change in key
+		{
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.~1.outer_val": {
+						Old: "",
+						New: "foo",
+					},
+					"foo.~1.inner.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.~1.inner.0.value": {
+						Old:         "",
+						New:         "${var.bar}",
+						NewComputed: true,
+					},
+				},
+			},
+			&InstanceDiff{
+				Attributes: map[string]*ResourceAttrDiff{
+					"foo.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.12.outer_val": {
+						Old: "",
+						New: "foo",
+					},
+					"foo.12.inner.#": {
+						Old: "0",
+						New: "1",
+					},
+					"foo.12.inner.0.value": {
+						Old: "",
+						New: "baz",
+					},
+				},
+			},
+			true,
+			"",
+		},
 	}
 
 	for i, tc := range cases {

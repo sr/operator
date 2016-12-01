@@ -31,9 +31,15 @@ func Provider() terraform.ResourceProvider {
 			},
 			"private_key_pem": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: providerPrivateKeyEnvDefault,
+				Deprecated:  "Please use key_material instead",
 				Description: "PEM-formatted private key for client authentication.",
+			},
+			"key_material": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("CHEF_KEY_MATERIAL", ""),
 			},
 			"allow_unverified_ssl": {
 				Type:        schema.TypeBool,
@@ -60,10 +66,17 @@ func Provider() terraform.ResourceProvider {
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := &chefc.Config{
 		Name:    d.Get("client_name").(string),
-		Key:     d.Get("private_key_pem").(string),
 		BaseURL: d.Get("server_url").(string),
 		SkipSSL: d.Get("allow_unverified_ssl").(bool),
 		Timeout: 10 * time.Second,
+	}
+
+	if v, ok := d.GetOk("private_key_pem"); ok {
+		config.Key = v.(string)
+	}
+
+	if v, ok := d.GetOk("key_material"); ok {
+		config.Key = v.(string)
 	}
 
 	return chefc.NewClient(config)
