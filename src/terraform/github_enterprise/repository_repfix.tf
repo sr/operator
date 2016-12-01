@@ -19,3 +19,9 @@ resource "github_team_repository" "repfix_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "repfix_developers" {
+  repository = "${github_repository.repfix.name}"
+  team_id    = "${github_team.developers.id}"
+  permission = "push"
+}

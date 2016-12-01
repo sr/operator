@@ -49,3 +49,12 @@ resource "github_team_repository" "pardot_read-only-users" {
   team_id    = "${github_team.read-only-users.id}"
   permission = "pull"
 }
+
+resource "github_branch_protection" "pardot_master" {
+  repository = "${github_repository.pardot.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Initial Jobs", "Test Jobs"]
+}

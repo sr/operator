@@ -31,3 +31,15 @@ resource "github_team_repository" "chef_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "chef_master" {
+  repository = "${github_repository.chef.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = true
+  contexts       = ["Test Jobs"]
+
+  users_restriction = []
+  teams_restriction = ["ops"]
+}
