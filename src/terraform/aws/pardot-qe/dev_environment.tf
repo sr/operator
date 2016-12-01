@@ -72,6 +72,7 @@ resource "aws_security_group_rule" "dev_environment_allow_salesforce_http" {
   security_group_id = "${aws_security_group.allow_inbound_http_https_from_sfdc.id}"
 
   cidr_blocks = [
+    "13.108.0.0/14",
     "96.43.144.0/20",
     "136.146.0.0/15",
     "204.14.232.0/21",
@@ -87,6 +88,7 @@ resource "aws_security_group_rule" "dev_environment_allow_salesforce_https" {
   security_group_id = "${aws_security_group.allow_inbound_http_https_from_sfdc.id}"
 
   cidr_blocks = [
+    "13.108.0.0/14",
     "96.43.144.0/20",
     "136.146.0.0/15",
     "204.14.232.0/21",
