@@ -31,3 +31,12 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_branch_protection" "engagement-history-topology_master" {
+  repository = "${github_repository.engagement-history-topology.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
+}

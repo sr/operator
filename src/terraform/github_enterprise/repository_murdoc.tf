@@ -29,4 +29,8 @@ resource "github_team_repository" "murdoc_service-accounts-write-only" {
 resource "github_branch_protection" "murdoc_master" {
   repository = "${github_repository.murdoc.name}"
   branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
 }
