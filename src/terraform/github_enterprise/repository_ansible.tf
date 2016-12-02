@@ -8,12 +8,6 @@ resource "github_repository" "ansible" {
   has_wiki      = true
 }
 
-resource "github_team_repository" "ansible_ops" {
-  repository = "${github_repository.ansible.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "ansible_service-accounts-read-only" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
