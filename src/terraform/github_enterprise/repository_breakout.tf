@@ -14,12 +14,6 @@ resource "github_team_repository" "breakout_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "breakout_ops" {
-  repository = "${github_repository.breakout.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "breakout_read-only-users" {
   repository = "${github_repository.breakout.name}"
   team_id    = "${github_team.read-only-users.id}"

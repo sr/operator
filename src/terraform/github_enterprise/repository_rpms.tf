@@ -13,9 +13,3 @@ resource "github_team_repository" "rpms_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
-
-resource "github_team_repository" "rpms_ops" {
-  repository = "${github_repository.rpms.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}

@@ -20,12 +20,6 @@ resource "github_team_repository" "bread_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "bread_ops" {
-  repository = "${github_repository.bread.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "bread_service-accounts-read-only" {
   repository = "${github_repository.bread.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"

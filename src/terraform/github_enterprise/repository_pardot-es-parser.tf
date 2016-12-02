@@ -14,12 +14,6 @@ resource "github_team_repository" "pardot-es-parser_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "pardot-es-parser_ops" {
-  repository = "${github_repository.pardot-es-parser.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "pardot-es-parser_service-accounts-write-only" {
   repository = "${github_repository.pardot-es-parser.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"

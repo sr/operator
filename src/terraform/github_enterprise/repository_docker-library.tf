@@ -14,12 +14,6 @@ resource "github_team_repository" "docker-library_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "docker-library_ops" {
-  repository = "${github_repository.docker-library.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "docker-library_service-accounts-write-only" {
   repository = "${github_repository.docker-library.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
