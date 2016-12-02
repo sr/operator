@@ -25,3 +25,12 @@ resource "github_team_repository" "repfix_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "repfix_master" {
+  repository = "${github_repository.repfix.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
+}

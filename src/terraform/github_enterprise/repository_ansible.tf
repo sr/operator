@@ -25,3 +25,12 @@ resource "github_team_repository" "ansible_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "ansible_master" {
+  repository = "${github_repository.ansible.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
+}
