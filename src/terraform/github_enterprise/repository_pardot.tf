@@ -56,5 +56,5 @@ resource "github_branch_protection" "pardot_master" {
 
   include_admins = true
   strict         = false
-  contexts       = ["Initial Jobs", "Test Jobs"]
+  contexts       = ["Test Jobs"]
 }
