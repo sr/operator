@@ -2,6 +2,7 @@ module Api
   class ProtoDeploysController < ProtoController
     before_action :require_project
     before_action :require_target
+    before_action :require_phone_authentication
 
     def create
       if !current_user.deploy_authorized?(current_project, current_target)
@@ -25,6 +26,10 @@ module Api
     end
 
     private
+
+    def phone_auth_action
+      "Deploy #{current_project.name} to #{current_target.name}"
+    end
 
     def current_project
       Project.where(name: proto_request.project).first

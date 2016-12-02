@@ -5,6 +5,7 @@ RSpec.describe "Deploy creation API" do
     @project = FactoryGirl.create(:project)
     @target = FactoryGirl.create(:deploy_target, name: "test")
     @user = FactoryGirl.create(:auth_user)
+    @user.phone.create_pairing("pairing phrase")
 
     @default_artifact = {
       "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
@@ -16,6 +17,12 @@ RSpec.describe "Deploy creation API" do
         "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"]
       }
     }
+  end
+
+  def stub_artifactory_client(url, artifact)
+    allow(Artifactory.client).to receive(:get)
+      .with(Regexp.new(URI(url).path), properties: nil)
+      .and_return(artifact)
   end
 
   def create_deploy(params)
@@ -52,12 +59,20 @@ RSpec.describe "Deploy creation API" do
     expect(deploy_response.message).to match(/No user with email/)
   end
 
+  it "requires phone authentication" do
+    SalesforceAuthenticatorPairing.delete_all
+    artifact_url = @default_artifact.fetch("download_uri")
+    stub_artifactory_client(artifact_url, @default_artifact)
+
+    create_deploy(project: @project.name, target_name: @target.name)
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to include("Phone authentication required")
+  end
+
   it "returns the new deploy after successfuly creating it" do
     artifact_url = @default_artifact.fetch("download_uri")
     expect_any_instance_of(AuthUser).to receive(:deploy_authorized?).and_return(true)
-    allow(Artifactory.client).to receive(:get)
-      .with(Regexp.new(URI(artifact_url).path), properties: nil)
-      .and_return(@default_artifact)
+    stub_artifactory_client(artifact_url, @default_artifact)
 
     expect(Deploy.count).to eq(0)
 
@@ -76,9 +91,7 @@ RSpec.describe "Deploy creation API" do
   it "returns an error for unauthorized user" do
     artifact_url = @default_artifact.fetch("download_uri")
     expect_any_instance_of(AuthUser).to receive(:deploy_authorized?).and_return(false)
-    allow(Artifactory.client).to receive(:get)
-      .with(Regexp.new(URI(artifact_url).path), properties: nil)
-      .and_return(@default_artifact)
+    stub_artifactory_client(artifact_url, @default_artifact)
 
     create_deploy(
       target_name: @target.name,
