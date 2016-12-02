@@ -38,6 +38,60 @@ func TestContext2Plan_basic(t *testing.T) {
 	}
 }
 
+func TestContext2Plan_createBefore_deposed(t *testing.T) {
+	m := testModule(t, "plan-cbd")
+	p := testProvider("aws")
+	p.DiffFn = testDiffFn
+
+	s := &State{
+		Modules: []*ModuleState{
+			{
+				Path: []string{"root"},
+				Resources: map[string]*ResourceState{
+					"aws_instance.foo": {
+						Type: "aws_instance",
+						Primary: &InstanceState{
+							ID: "baz",
+						},
+						Deposed: []*InstanceState{
+							{ID: "foo"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+		State: s,
+	})
+
+	plan, err := ctx.Plan()
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	actual := strings.TrimSpace(plan.String())
+	expected := strings.TrimSpace(`
+DIFF:
+
+DESTROY: aws_instance.foo (deposed only)
+
+STATE:
+
+aws_instance.foo: (1 deposed)
+  ID = baz
+  Deposed ID 1 = foo
+		`)
+	if actual != expected {
+		t.Fatalf("expected:\n%s, got:\n%s", expected, actual)
+	}
+}
+
 func TestContext2Plan_createBefore_maintainRoot(t *testing.T) {
 	m := testModule(t, "plan-cbd-maintain-root")
 	p := testProvider("aws")
@@ -1306,6 +1360,26 @@ func TestContext2Plan_countComputed(t *testing.T) {
 	_, err := ctx.Plan()
 	if err == nil {
 		t.Fatal("should error")
+	}
+}
+
+func TestContext2Plan_countComputedModule(t *testing.T) {
+	m := testModule(t, "plan-count-computed-module")
+	p := testProvider("aws")
+	p.DiffFn = testDiffFn
+	ctx := testContext2(t, &ContextOpts{
+		Module: m,
+		Providers: map[string]ResourceProviderFactory{
+			"aws": testProviderFuncFixed(p),
+		},
+	})
+
+	_, err := ctx.Plan()
+
+	expectedErr := "aws_instance.bar: value of 'count'"
+	if !strings.Contains(fmt.Sprintf("%s", err), expectedErr) {
+		t.Fatalf("expected err would contain %q\nerr: %s\n",
+			expectedErr, err)
 	}
 }
 

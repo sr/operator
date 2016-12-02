@@ -14,12 +14,6 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   permission = "push"
 }
 
-resource "github_team_repository" "engagement-history-topology_ops" {
-  repository = "${github_repository.engagement-history-topology.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "engagement-history-topology_developers" {
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.developers.id}"

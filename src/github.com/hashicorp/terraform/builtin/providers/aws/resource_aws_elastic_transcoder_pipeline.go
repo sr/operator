@@ -26,8 +26,9 @@ func resourceAwsElasticTranscoderPipeline() *schema.Resource {
 			},
 
 			"aws_kms_key_arn": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateArn,
 			},
 
 			// ContentConfig also requires ThumbnailConfig

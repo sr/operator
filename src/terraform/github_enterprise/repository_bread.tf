@@ -20,14 +20,17 @@ resource "github_team_repository" "bread_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "bread_ops" {
-  repository = "${github_repository.bread.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "bread_service-accounts-read-only" {
   repository = "${github_repository.bread.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
+}
+
+resource "github_branch_protection" "bread_master" {
+  repository = "${github_repository.bread.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = true
+  contexts       = ["BREAD build"]
 }

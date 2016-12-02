@@ -25,3 +25,8 @@ resource "github_team_repository" "murdoc_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "murdoc_master" {
+  repository = "${github_repository.murdoc.name}"
+  branch     = "master"
+}

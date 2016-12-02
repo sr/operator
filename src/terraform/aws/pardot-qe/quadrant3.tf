@@ -25,7 +25,8 @@ resource "aws_db_subnet_group" "q3db_subnet_group" {
 
 resource "aws_security_group" "q3_db_secgroup" {
   vpc_id      = "${aws_vpc.dev_environment.id}"
-  description = "q3_secgroup"
+  name        = "q3_db_secgroup"
+  description = "q3_db_secgroup"
 
   ingress {
     from_port = 5432
@@ -52,11 +53,10 @@ resource "aws_security_group" "q3_db_secgroup" {
 }
 
 resource "aws_instance" "q3_apphost" {
-  ami                         = "${var.centos_7_hvm_ebs_ami}"
-  instance_type               = "t2.medium"
-  subnet_id                   = "${aws_subnet.dev_environment_us_east_1c_dmz.id}"
-  associate_public_ip_address = false
-  key_name                    = "quadrant3"
+  ami           = "${var.centos_7_hvm_ebs_ami}"
+  instance_type = "t2.medium"
+  subnet_id     = "${aws_subnet.dev_environment_us_east_1c_dmz.id}"
+  key_name      = "quadrant3"
 
   root_block_device {
     volume_type           = "gp2"
@@ -67,6 +67,11 @@ resource "aws_instance" "q3_apphost" {
   vpc_security_group_ids = [
     "${aws_security_group.q3_app_secgroup.id}",
   ]
+
+  tags {
+    Name      = "quadrant3"
+    terraform = "true"
+  }
 }
 
 resource "aws_eip" "q3_eip" {
@@ -75,7 +80,8 @@ resource "aws_eip" "q3_eip" {
 }
 
 resource "aws_security_group" "q3_app_secgroup" {
-  description = "q3_secgroup"
+  name        = "q3_app_secgroup"
+  description = "q3_app_secgroup"
   vpc_id      = "${aws_vpc.dev_environment.id}"
 
   ingress {

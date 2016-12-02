@@ -66,8 +66,9 @@ func resourceAwsCloudTrail() *schema.Resource {
 				Default:  false,
 			},
 			"kms_key_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateArn,
 			},
 			"home_region": {
 				Type:     schema.TypeString,
