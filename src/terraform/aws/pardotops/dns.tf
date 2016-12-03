@@ -312,9 +312,9 @@ resource "aws_route53_record" "compliance_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["52.0.35.223"]
+  records = ["${aws_eip.hipchat_server.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "30"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_TXTrecord" {
