@@ -9,8 +9,8 @@ resource "aws_security_group" "hipchat_server_admin_management" {
     to_port   = 22
     protocol  = "tcp"
 
-    security_groups = [
-      "${aws_security_group.github_enterprise_server_backups.id}",
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
     ]
   }
 
