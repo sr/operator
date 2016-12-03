@@ -125,7 +125,7 @@ resource "aws_security_group" "hipchat_server_https" {
 }
 
 resource "aws_instance" "hipchat_server" {
-  ami                     = "ami-TODO"
+  ami                     = "ami-be003aa9"
   instance_type           = "c4.2xlarge"
   key_name                = "hipchat"
   subnet_id               = "${aws_subnet.pardot0_ue1_1e_dmz.id}"
