@@ -143,7 +143,6 @@ resource "aws_instance" "hipchat_server" {
     volume_type           = "gp2"
     volume_size           = "250"
     delete_on_termination = false
-    encrypted             = true
   }
 
   tags {
