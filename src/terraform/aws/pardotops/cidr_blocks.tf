@@ -35,6 +35,17 @@ variable "sfdc_pardot_tools_production_heroku_space_cidr_blocks" {
   ]
 }
 
+variable "sfdc_pardot_tools_netherworld_heroku_space_cidr_blocks" {
+  type = "list"
+
+  default = [
+    "34.192.47.206/32",
+    "34.192.147.59/32",
+    "34.192.142.55/32",
+    "34.192.58.27/32",
+  ]
+}
+
 variable "pardot_ci_vpc_cidr" {
   default = "172.27.0.0/16"
 }
