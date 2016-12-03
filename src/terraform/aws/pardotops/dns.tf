@@ -314,7 +314,7 @@ resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   name    = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_eip.hipchat_server.public_ip}"]
   type    = "A"
-  ttl     = "30"
+  ttl     = "900"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_TXTrecord" {
