@@ -529,6 +529,11 @@ resource "aws_route_table" "internal_tools_integration_route_dmz" {
     cidr_block                = "172.27.0.0/16"
     vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot_ci_and_internal_tools_integration_vpc_peering.id}"
   }
+
+  route {
+    cidr_block                = "172.29.0.0/16"
+    vpc_peering_connection_id = "${aws_vpc_peering_connection.tools_egress_and_internal_tools_integration_vpc_peering.id}"
+  }
 }
 
 resource "aws_route" "internal_tools_integration_to_pardot_ci" {
@@ -540,6 +545,12 @@ resource "aws_route" "internal_tools_integration_to_pardot_ci" {
 resource "aws_route" "internal_tools_integration_to_pardot0_ue1" {
   destination_cidr_block    = "172.30.0.0/16"
   vpc_peering_connection_id = "${aws_vpc_peering_connection.pardot0_ue1_and_internal_tools_integration_vpc_peering.id}"
+  route_table_id            = "${aws_vpc.internal_tools_integration.main_route_table_id}"
+}
+
+resource "aws_route" "internal_tools_integration_to_tools_egress" {
+  destination_cidr_block    = "172.29.0.0/16"
+  vpc_peering_connection_id = "${aws_vpc_peering_connection.tools_egress_and_internal_tools_integration_vpc_peering.id}"
   route_table_id            = "${aws_vpc.internal_tools_integration.main_route_table_id}"
 }
 
@@ -632,6 +643,12 @@ resource "aws_vpc_peering_connection" "pardot0_ue1_and_internal_tools_integratio
 resource "aws_vpc_peering_connection" "pardot_ci_and_internal_tools_integration_vpc_peering" {
   peer_owner_id = "096113534078"
   peer_vpc_id   = "${var.pardot_ci_vpc_id}"
+  vpc_id        = "${aws_vpc.internal_tools_integration.id}"
+}
+
+resource "aws_vpc_peering_connection" "tools_egress_and_internal_tools_integration_vpc_peering" {
+  peer_owner_id = "010094454891"                             # pardot-atlassian
+  peer_vpc_id   = "vpc-b64769d2"                             # tools_egress
   vpc_id        = "${aws_vpc.internal_tools_integration.id}"
 }
 
