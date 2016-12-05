@@ -41,14 +41,14 @@ var (
 				Service: "bread.Ping",
 				Method:  "Ping",
 			},
-			Group: "sysadmin",
+			Group: "developers",
 		},
 		{
 			Call: &operator.Call{
 				Service: "bread.Ping",
 				Method:  "SlowLoris",
 			},
-			Group:             "sysadmin",
+			Group:             "developers",
 			PhoneAuthOptional: true,
 		},
 		{
@@ -56,7 +56,7 @@ var (
 				Service: "bread.Deploy",
 				Method:  "ListTargets",
 			},
-			Group:             "sysadmin",
+			Group:             "developers",
 			PhoneAuthOptional: true,
 		},
 		{
@@ -64,7 +64,7 @@ var (
 				Service: "bread.Deploy",
 				Method:  "ListBuilds",
 			},
-			Group:             "sysadmin",
+			Group:             "developers",
 			PhoneAuthOptional: true,
 		},
 		{
@@ -72,7 +72,7 @@ var (
 				Service: "bread.Deploy",
 				Method:  "Trigger",
 			},
-			Group: "sysadmin",
+			Group: "developers",
 		},
 	}
 
