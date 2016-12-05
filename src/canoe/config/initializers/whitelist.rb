@@ -2,11 +2,14 @@ require "ipaddr"
 
 trusted_networks = [
   "127.0.0.1/32",
-  "204.14.236.0/24",    # aloha-east
-  "204.14.239.0/24",    # aloha-west
-  "62.17.146.140/30",   # aloha-emea
-  "62.17.146.144/28",   # aloha-emea
-  "62.17.146.160/27",   # aloha-emea
+  "204.14.236.0/24",    # amer east
+  "204.14.239.0/24",    # amer west
+  "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
+  "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
+  "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
+  "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
+  "202.95.77.64/27",    # APAC Singapore
+  "221.133.209.128/27", # APAC Sydney
   "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
   "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress

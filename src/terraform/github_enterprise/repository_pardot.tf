@@ -14,12 +14,6 @@ resource "github_team_repository" "pardot_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "pardot_ops" {
-  repository = "${github_repository.pardot.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "pardot_service-accounts-write-only" {
   repository = "${github_repository.pardot.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
@@ -56,5 +50,5 @@ resource "github_branch_protection" "pardot_master" {
 
   include_admins = true
   strict         = false
-  contexts       = ["Initial Jobs", "Test Jobs"]
+  contexts       = ["Test Jobs"]
 }

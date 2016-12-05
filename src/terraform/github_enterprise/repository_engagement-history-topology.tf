@@ -14,12 +14,6 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   permission = "push"
 }
 
-resource "github_team_repository" "engagement-history-topology_ops" {
-  repository = "${github_repository.engagement-history-topology.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "engagement-history-topology_developers" {
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.developers.id}"
@@ -30,4 +24,13 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
+}
+
+resource "github_branch_protection" "engagement-history-topology_master" {
+  repository = "${github_repository.engagement-history-topology.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
 }

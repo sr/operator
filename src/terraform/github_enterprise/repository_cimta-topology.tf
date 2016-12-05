@@ -14,12 +14,6 @@ resource "github_team_repository" "cimta-topology_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "cimta-topology_ops" {
-  repository = "${github_repository.cimta-topology.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "cimta-topology_service-accounts-write-only" {
   repository = "${github_repository.cimta-topology.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"

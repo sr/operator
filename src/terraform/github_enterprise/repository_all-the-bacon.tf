@@ -14,12 +14,6 @@ resource "github_team_repository" "all-the-bacon_service-accounts-read-only" {
   permission = "pull"
 }
 
-resource "github_team_repository" "all-the-bacon_ops" {
-  repository = "${github_repository.all-the-bacon.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "all-the-bacon_developers" {
   repository = "${github_repository.all-the-bacon.name}"
   team_id    = "${github_team.developers.id}"

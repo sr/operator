@@ -13,9 +13,3 @@ resource "github_team_repository" "pd-homebrew_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
-
-resource "github_team_repository" "pd-homebrew_ops" {
-  repository = "${github_repository.pd-homebrew.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}

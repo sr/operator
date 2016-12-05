@@ -50,6 +50,7 @@ variable "environment_appdev" {
     num_cephosd2_hosts        = 3
     num_ns1_hosts             = 1
     num_metrics1_hosts        = 1
+    num_lba1_hosts            = 1
   }
 }
 
@@ -304,58 +305,11 @@ resource "aws_security_group" "appdev_proxyout_host" {
   }
 }
 
-resource "aws_elb" "appdev_app_elb" {
-  name = "${var.environment_appdev["env_name"]}-app-elb"
-
-  security_groups = [
-    "${aws_security_group.appdev_app_lb.id}",
-  ]
-
-  subnets = [
-    "${aws_subnet.appdev_us_east_1a_dmz.id}",
-    "${aws_subnet.appdev_us_east_1c_dmz.id}",
-    "${aws_subnet.appdev_us_east_1d_dmz.id}",
-    "${aws_subnet.appdev_us_east_1e_dmz.id}",
-  ]
-
-  cross_zone_load_balancing   = true
-  connection_draining         = true
-  connection_draining_timeout = 30
-  instances                   = ["${aws_instance.appdev_app1.*.id}"]
-
-  listener {
-    lb_port            = 443
-    lb_protocol        = "https"
-    instance_port      = 80
-    instance_protocol  = "http"
-    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
-  }
-
-  listener {
-    lb_port           = 80
-    lb_protocol       = "http"
-    instance_port     = 80
-    instance_protocol = "http"
-  }
-
-  health_check {
-    healthy_threshold   = 4
-    unhealthy_threshold = 2
-    timeout             = 3
-    target              = "HTTP:80/home/ping"
-    interval            = 5
-  }
-
-  tags {
-    Name = "appdev_public_elb"
-  }
-}
-
-resource "aws_route53_record" "app_dev_pardot_com_CNAMErecord" {
+resource "aws_route53_record" "app_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "app.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${aws_elb.appdev_app_elb.dns_name}"]
-  type    = "CNAME"
+  records = ["${aws_eip.appdev_lba1_eip.public_ip}"]
+  type    = "A"
   ttl     = "900"
 }
 
@@ -1761,6 +1715,45 @@ resource "aws_route53_record" "grafana_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "grafana.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.appdev_toolsproxy1.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
+resource "aws_instance" "appdev_lba1" {
+  key_name      = "internal_apps"
+  count         = "${var.environment_appdev["num_lba1_hosts"]}"
+  ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type = "${var.environment_appdev["app_instance_type"]}"
+  subnet_id     = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = "50"
+    delete_on_termination = true
+  }
+
+  vpc_security_group_ids = [
+    "${aws_security_group.appdev_vpc_default.id}",
+    "${aws_security_group.appdev.id}",
+    "${aws_security_group.appdev_app_lb.id}",
+  ]
+
+  tags {
+    Name      = "${var.environment_appdev["pardot_env_id"]}-lba1-${count.index + 1}-${var.environment_appdev["dc_id"]}"
+    terraform = "true"
+  }
+}
+
+resource "aws_eip" "appdev_lba1_eip" {
+  vpc      = true
+  instance = "${aws_instance.appdev_lba1.id}"
+}
+
+resource "aws_route53_record" "appdev_lba1_arecord" {
+  count   = "${var.environment_appdev["num_lba1_hosts"]}"
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "${var.environment_appdev["pardot_env_id"]}-lba1-${count.index + 1}-${var.environment_appdev["dc_id"]}.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${element(aws_instance.appdev_lba1.*.private_ip, count.index)}"]
   type    = "A"
   ttl     = "900"
 }

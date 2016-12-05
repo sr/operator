@@ -8,12 +8,6 @@ resource "github_repository" "bamboo-plugin-github-webhook" {
   has_wiki      = true
 }
 
-resource "github_team_repository" "bamboo-plugin-github-webhook_ops" {
-  repository = "${github_repository.bamboo-plugin-github-webhook.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "bamboo-plugin-github-webhook_developers" {
   repository = "${github_repository.bamboo-plugin-github-webhook.name}"
   team_id    = "${github_team.developers.id}"

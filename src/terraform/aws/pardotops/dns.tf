@@ -194,7 +194,7 @@ resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
   name    = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_1.private_ip}"]
   type    = "A"
-  ttl     = "60"
+  ttl     = "900"
 }
 
 resource "aws_route53_record" "one_git_dev_pardot_com_Arecord" {
@@ -202,7 +202,7 @@ resource "aws_route53_record" "one_git_dev_pardot_com_Arecord" {
   name    = "1.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_1.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "two_git_dev_pardot_com_Arecord" {
@@ -210,7 +210,7 @@ resource "aws_route53_record" "two_git_dev_pardot_com_Arecord" {
   name    = "2.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_2.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "reply_git_dev_pardot_com_MXrecord" {
@@ -218,6 +218,14 @@ resource "aws_route53_record" "reply_git_dev_pardot_com_MXrecord" {
   name    = "reply.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["10 git.dev.pardot.com."]
   type    = "MX"
+  ttl     = "900"
+}
+
+resource "aws_route53_record" "app_debug_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "app-debug.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["app.dev.pardot.com."]
+  type    = "CNAME"
   ttl     = "900"
 }
 
@@ -312,9 +320,9 @@ resource "aws_route53_record" "compliance_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["52.0.35.223"]
+  records = ["${aws_eip.hipchat_server.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_TXTrecord" {
@@ -437,11 +445,19 @@ resource "aws_route53_record" "preview_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
-resource "aws_route53_record" "push_dev_pardot_com_Arecord" {
+resource "aws_route53_record" "push_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "push.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["174.37.191.4", "174.37.191.5"]
-  type    = "A"
+  records = ["app.dev.pardot.com."]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
+resource "aws_route53_record" "push_next_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "push-next.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["app.dev.pardot.com."]
+  type    = "CNAME"
   ttl     = "900"
 }
 
