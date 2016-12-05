@@ -2,6 +2,10 @@ require "rails_helper"
 
 RSpec.describe "Deploy creation API" do
   before do
+    Canoe.config.phone_authentication_max_tries = 1
+    Canoe.config.phone_authentication_sleep_interval = 0
+    Canoe.salesforce_authenticator.authentication_status = { granted: true }
+
     @project = FactoryGirl.create(:project)
     @target = FactoryGirl.create(:deploy_target, name: "test")
     @user = FactoryGirl.create(:auth_user)
@@ -59,7 +63,7 @@ RSpec.describe "Deploy creation API" do
     expect(deploy_response.message).to match(/No user with email/)
   end
 
-  it "requires phone authentication" do
+  it "returns an error if the user doesn't have a phone pairing setup" do
     SalesforceAuthenticatorPairing.delete_all
     artifact_url = @default_artifact.fetch("download_uri")
     stub_artifactory_client(artifact_url, @default_artifact)
@@ -67,6 +71,22 @@ RSpec.describe "Deploy creation API" do
     create_deploy(project: @project.name, target_name: @target.name)
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("Phone authentication required")
+  end
+
+  it "returns an error if the phone authentication fails" do
+    Canoe.salesforce_authenticator.authentication_status = { granted: false }
+    artifact_url = @default_artifact.fetch("download_uri")
+    stub_artifactory_client(artifact_url, @default_artifact)
+
+    expect(Deploy.count).to eq(0)
+
+    create_deploy(
+      target_name: @target.name,
+      project: @project.name,
+      artifact_url: artifact_url
+    )
+    expect(deploy_response["error"]).to eq(true)
+    expect(deploy_response["message"]).to include("Phone authentication failed")
   end
 
   it "returns the new deploy after successfuly creating it" do

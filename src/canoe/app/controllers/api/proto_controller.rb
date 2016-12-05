@@ -35,7 +35,12 @@ module Api
 
     def require_phone_authentication
       if !current_user || !current_user.authenticate_phone(action: phone_auth_action)
-        render json: { error: true, message: "Phone authentication required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
+        if current_user.phone.paired?
+          render json: { error: true, message: "Phone authentication failed." }
+        else
+          render json: { error: true, message: "Phone authentication required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
+        end
+
         return false
       end
 

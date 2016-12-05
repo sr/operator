@@ -1,7 +1,5 @@
 module Api
   class AuthenticationController < ProtoController
-    cattr_accessor :max_tries, :sleep_interval
-
     def phone
       if !current_user.phone.paired?
         message = "Your Canoe account is not paired with your phone. Please  " \
@@ -11,8 +9,8 @@ module Api
 
       options = {
         action: proto_request.action,
-        max_tries: max_tries,
-        sleep_interval: sleep_interval
+        max_tries: Canoe.config.phone_authentication_max_tries,
+        sleep_interval: Canoe.config.phone_authentication_sleep_interval
       }
 
       if !current_user.authenticate_phone(options)
