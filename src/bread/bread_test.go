@@ -39,6 +39,10 @@ type fakeCanoeClient struct {
 	authResp *canoe.PhoneAuthenticationOK
 }
 
+func (c *fakeCanoeClient) CreateDeploy(*canoe.CreateDeployParams) (*canoe.CreateDeployOK, error) {
+	panic("not implemented")
+}
+
 func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
 	panic("not implemented")
 }

@@ -137,15 +137,21 @@ func run(invoker operator.InvokerFunc) error {
 		auth       operator.Authorizer
 		sender     operator.Sender
 
-		store operatorhipchat.ClientCredentialsStore
-		db    *sql.DB
-		hal   hal9000.RobotClient
+		store    operatorhipchat.ClientCredentialsStore
+		db       *sql.DB
+		hal      hal9000.RobotClient
+		canoeAPI bread.CanoeClient
 
 		err error
 	)
 	httpServer = http.NewServeMux()
 	logger = bread.NewLogger()
 	inst = bread.NewInstrumenter(logger)
+	canoeURL, err := url.Parse(config.canoe.URL)
+	if err != nil {
+		return err
+	}
+	canoeAPI = bread.NewCanoeClient(canoeURL, config.canoe.APIKey)
 	if config.dev {
 		auth = &noopAuthorizer{}
 		if config.devRoomID == 0 {
@@ -194,11 +200,7 @@ func run(invoker operator.InvokerFunc) error {
 		httpServer.Handle("/_ping", bread.NewHandler(logger, bread.NewPingHandler(db)))
 		store = operatorhipchat.NewSQLStore(db, bread.HipchatHost)
 		sender = operatorhipchat.NewSender(store, bread.HipchatHost)
-		canoeURL, err := url.Parse(config.canoe.URL)
-		if err != nil {
-			return err
-		}
-		if auth, err = bread.NewAuthorizer(config.ldap, bread.NewCanoeClient(canoeURL, config.canoe.APIKey), bread.ACL); err != nil {
+		if auth, err = bread.NewAuthorizer(config.ldap, canoeAPI, bread.ACL); err != nil {
 			return err
 		}
 	}
@@ -213,8 +215,8 @@ func run(invoker operator.InvokerFunc) error {
 		sender,
 		bread.NewDeployServer(
 			sender,
-			bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets),
-			bread.NewCanoeDeployer(config.canoe),
+			bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI),
+			bread.NewCanoeDeployer(canoeAPI, config.canoe),
 			tz,
 		),
 	); err != nil {

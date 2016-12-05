@@ -51,23 +51,30 @@ func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error
 		return fmt.Errorf("service `%s %s` requires to be a member of LDAP group `%s`", req.Call.Service, req.Call.Method, entry.Group)
 	}
 	if !entry.PhoneAuthOptional {
-		resp, err := a.canoe.PhoneAuthentication(
-			canoe.NewPhoneAuthenticationParams().
-				WithTimeout(CanoeTimeout).
-				WithBody(&models.CanoePhoneAuthenticationRequest{
-					Action:    "Chat command",
-					UserEmail: email,
-				}),
-		)
-		if err != nil || resp.Payload == nil {
-			return fmt.Errorf("Canoe phone authentication request failed: %s", err)
+		if err := authenticatePhone(a.canoe, email, "Chat command"); err != nil {
+			return err
 		}
-		if resp.Payload.Error {
-			if resp.Payload.Message == "" {
-				return errors.New("Canoe phone authenticated failed for unknown reason")
-			}
-			return errors.New(resp.Payload.Message)
+	}
+	return nil
+}
+
+func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
+	resp, err := canoeAPI.PhoneAuthentication(
+		canoe.NewPhoneAuthenticationParams().
+			WithTimeout(CanoeTimeout).
+			WithBody(&models.CanoePhoneAuthenticationRequest{
+				Action:    action,
+				UserEmail: email,
+			}),
+	)
+	if err != nil || resp.Payload == nil {
+		return fmt.Errorf("Canoe phone authentication request failed: %s", err)
+	}
+	if resp.Payload.Error {
+		if resp.Payload.Message == "" {
+			return errors.New("Canoe phone authenticated failed for unknown reason")
 		}
+		return errors.New(resp.Payload.Message)
 	}
 	return nil
 }

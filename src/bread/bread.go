@@ -72,7 +72,8 @@ var (
 				Service: "bread.Deploy",
 				Method:  "Trigger",
 			},
-			Group: "developers",
+			Group:             "developers",
+			PhoneAuthOptional: true,
 		},
 	}
 
@@ -129,6 +130,7 @@ var (
 )
 
 type CanoeClient interface {
+	CreateDeploy(*canoe.CreateDeployParams) (*canoe.CreateDeployOK, error)
 	UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error)
 	PhoneAuthentication(*canoe.PhoneAuthenticationParams) (*canoe.PhoneAuthenticationOK, error)
 	CreateTerraformDeploy(*canoe.CreateTerraformDeployParams) (*canoe.CreateTerraformDeployOK, error)
@@ -228,7 +230,7 @@ func NewDeployServer(sender operator.Sender, ecs Deployer, canoe Deployer, tz *t
 }
 
 // NewECSDeployer returs a Deployer that deploys to AWS ECS
-func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget) Deployer {
+func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI CanoeClient) Deployer {
 	return &ecsDeployer{
 		ecs.New(
 			session.New(
@@ -240,6 +242,7 @@ func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*Deploy
 		afy,
 		config.Timeout,
 		targets,
+		canoeAPI,
 	}
 }
 
@@ -253,8 +256,8 @@ func NewCanoeClient(url *url.URL, token string) CanoeClient {
 }
 
 // NewCanoeDeployer returns a Deployer that deploys via Canoe
-func NewCanoeDeployer(config *CanoeConfig) Deployer {
-	return &canoeDeployer{&http.Client{}, config}
+func NewCanoeDeployer(canoeAPI CanoeClient, config *CanoeConfig) Deployer {
+	return &canoeDeployer{&http.Client{}, config, canoeAPI}
 }
 
 func NewServer(
