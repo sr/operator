@@ -77,6 +77,8 @@ func (d *canoeDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch 
 	return builds, nil
 }
 
+const canoeProductionTarget = "production"
+
 func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
 	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
@@ -85,6 +87,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 		WithBody(&models.CanoeCreateDeployRequest{
 			UserEmail:   req.UserEmail,
 			Project:     req.Target.Name,
+			TargetName:  canoeProductionTarget,
 			ArtifactURL: req.Build.GetArtifactURL(),
 		}),
 	)
