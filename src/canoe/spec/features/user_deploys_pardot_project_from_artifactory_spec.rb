@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.feature "user deploys pardot project from artifactory artifact" do
+  SYNCMASTER = "joe.syncmaster@salesforce.com"
+
   before do
     @deploy_target = FactoryGirl.create(:deploy_target, name: "test")
     @project = FactoryGirl.create(:project,
@@ -45,7 +47,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
   end
 
   scenario "happy path deployment" do
-    login_as "Joe Syncmaster", "joe.syncmaster@salesforce.com"
+    login_as "Joe Syncmaster", SYNCMASTER
 
     find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
@@ -57,7 +59,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
 
     deploys = Deploy.all
     expect(deploys.length).to eq(1)
-    expect(deploys[0].auth_user.email).to eq("joe.syncmaster@salesforce.com")
+    expect(deploys[0].auth_user.email).to eq(SYNCMASTER)
     expect(deploys[0].project_name).to eq(@project.name)
     expect(deploys[0].branch).to eq("master")
     expect(deploys[0].build_number).to eq(1234)
@@ -68,5 +70,44 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     expect(deploys[0].results.length).to eq(1)
     expect(deploys[0].results[0].server.hostname).to eq(@server.hostname)
     expect(deploys[0].results[0].stage).to eq("initiated")
+  end
+
+  scenario "deployment with 2FA required" do
+    begin
+      old_val = Canoe.config.phone_authentication_required?
+      Canoe.config.phone_authentication_required = true
+      auth_user = FactoryGirl.create(:auth_user, email: SYNCMASTER, uid: SYNCMASTER)
+      auth_user.phone.create_pairing("pairing phrase")
+
+      login_as "Joe Syncmaster", SYNCMASTER
+
+      find(".projects-index-list a", text: @project.titleized_name).click
+      find(".deploy-targets a", text: "master").click
+      click_link "Ship This"
+      find("a[data-target='test']", text: "Ship it Here").click
+      expect(page).to_not have_text("Tags") # We deploy to all servers by default
+      click_button "SHIP IT!"
+      expect(page).to have_text("Watching deploy of #{@project.name.capitalize}")
+    ensure
+      Canoe.config.phone_authentication_required = old_val
+    end
+  end
+
+  scenario "deployment with 2FA required but no phone paired" do
+    begin
+      old_val = Canoe.config.phone_authentication_required?
+      Canoe.config.phone_authentication_required = true
+      login_as "Joe Syncmaster", SYNCMASTER
+
+      find(".projects-index-list a", text: @project.titleized_name).click
+      find(".deploy-targets a", text: "master").click
+      click_link "Ship This"
+      find("a[data-target='test']", text: "Ship it Here").click
+      expect(page).to_not have_text("Tags") # We deploy to all servers by default
+      click_button "SHIP IT!"
+      expect(page).to have_text("Phone authentication failed")
+    ensure
+      Canoe.config.phone_authentication_required = old_val
+    end
   end
 end
