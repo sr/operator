@@ -194,7 +194,7 @@ resource "aws_route53_record" "git-internal_dev_pardot_com_Arecord" {
   name    = "git-internal.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_1.private_ip}"]
   type    = "A"
-  ttl     = "60"
+  ttl     = "900"
 }
 
 resource "aws_route53_record" "one_git_dev_pardot_com_Arecord" {
@@ -202,7 +202,7 @@ resource "aws_route53_record" "one_git_dev_pardot_com_Arecord" {
   name    = "1.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_1.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "two_git_dev_pardot_com_Arecord" {
@@ -210,7 +210,7 @@ resource "aws_route53_record" "two_git_dev_pardot_com_Arecord" {
   name    = "2.git.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_instance.github_enterprise_server_2.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "reply_git_dev_pardot_com_MXrecord" {
@@ -322,7 +322,7 @@ resource "aws_route53_record" "hipchat_dev_pardot_com_Arecord" {
   name    = "hipchat.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_eip.hipchat_server.public_ip}"]
   type    = "A"
-  ttl     = "900"
+  ttl     = "86400"
 }
 
 resource "aws_route53_record" "hipchat_dev_pardot_com_TXTrecord" {
