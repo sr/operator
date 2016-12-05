@@ -3,7 +3,7 @@
 
 Name: pardot-kafka-tools
 Version: %{srcver}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Random Pardot Kafka Tools
 Group: Applications/Internet
 License: Apache License v2.0
@@ -31,12 +31,12 @@ Random collection of Kafka tools pardot has built.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -m 0755 -d $RPM_BUILD_ROOT/opt/kafka/current/lib
-install -m 0644 %{SOURCE0} $RPM_BUILD_ROOT/opt/kafka/current/lib/pardot-kafka-tools-%{srcver}.jar
+install -m 0755 -d $RPM_BUILD_ROOT/opt/kafka/current/libs
+install -m 0644 %{SOURCE0} $RPM_BUILD_ROOT/opt/kafka/current/libs/pardot-kafka-tools-%{srcver}.jar
 
 %files
 %defattr(-,kafka,kafka,-)
-/opt/kafka/current/lib/pardot-kafka-tools-%{srcver}.jar
+/opt/kafka/current/libs/pardot-kafka-tools-%{srcver}.jar
 
 %pre
 # Check if custom group 'kafka' exists. If not, create it.
