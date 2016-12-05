@@ -45,7 +45,7 @@ module Api
         when "create"
           Canoe::CreateDeployRequest.decode_json(request.body.read)
         else
-          raise "Unable to handle RPC call: #{params[:action].inspect}"
+          raise UnhandleableRPCCall, params[:action]
         end
     end
   end

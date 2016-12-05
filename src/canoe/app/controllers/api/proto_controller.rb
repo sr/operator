@@ -1,5 +1,11 @@
 module Api
   class ProtoController < ApplicationController
+    class UnhandleableRPCCall < StandardError
+      def initialize(method)
+        super "Unable to handle RPC call: #{method.inspect}"
+      end
+    end
+
     skip_before_action :verify_authenticity_token
     skip_before_action :require_oauth_authentication
     before_action :require_api_authentication
