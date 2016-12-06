@@ -10,6 +10,9 @@ trusted_networks = [
   "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
   "202.95.77.64/27",    # APAC Singapore
   "221.133.209.128/27", # APAC Sydney
+  "142.176.79.170/29",  # Halifax, Canada
+  "61.120.150.128/27",  # Tokyo, Japan
+  "61.213.161.144/30",  # Tokyo, Japan
   "136.147.104.20/30",  # pardot-proxyout1-{1,2,3,4}-dfw
   "136.147.96.20/30",   # pardot-proxyout1-{1,2,3,4}-phx
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress
