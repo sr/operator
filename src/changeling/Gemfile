@@ -53,7 +53,7 @@ group :test do
   gem "rubocop"
   gem "rspec", "3.5.0"
   gem "rspec-ontap"
-  gem "webmock"
+  gem "webmock", require: nil
   gem "rails-controller-testing"
 end
 
