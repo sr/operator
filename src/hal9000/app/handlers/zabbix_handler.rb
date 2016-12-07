@@ -50,7 +50,7 @@ class ZabbixHandler < ApplicationHandler
   config :zabbix_password, required: "changeme"
 
   # config: datacenters
-  config :datacenters, default: %w[dfw phx dev]
+  config :datacenters, default: %w[dfw phx]
   config :default_datacenter, default: "dfw"
 
   # config: hal9000's "home room"
