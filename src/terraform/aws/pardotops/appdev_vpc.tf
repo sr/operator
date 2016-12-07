@@ -206,6 +206,7 @@ resource "aws_security_group" "appdev_vpc_default" {
       "${aws_eip.appdev_bastion_eip.public_ip}/32",
       "${aws_instance.appdev_bastion.private_ip}/32",
       "${aws_instance.appdev_tools_server.private_ip}/32",
+      "${aws_instance.appdev_tools1-2_server.private_ip}/32",
     ]
   }
 
@@ -249,16 +250,20 @@ resource "aws_security_group" "appdev_vpc_default" {
   }
 }
 
-resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
-  name        = "appdev_sfdc_vpn_http_https"
-  description = "Allow HTTP/HTTPS traffic from SFDC VPN"
+resource "aws_security_group" "appdev_app_lb" {
+  name        = "appdev_app_lb"
+  description = "app.dev Internet-facing load balancer"
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = "${var.aloha_vpn_cidr_blocks}"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${var.salesforce_cidr_blocks}",
+    ]
   }
 
   ingress {
@@ -268,6 +273,7 @@ resource "aws_security_group" "appdev_sfdc_vpn_http_https" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
+      "${var.salesforce_cidr_blocks}",
       "${aws_nat_gateway.appdev_nat_gw.public_ip}/32",
       "${aws_nat_gateway.appdev_nat_gw.private_ip}/32",
     ]
@@ -293,7 +299,7 @@ resource "aws_security_group" "appdev_sfdc_provisioning_https" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${var.sfdc_org62_sandbox_cidr_blocks}",
+      "${var.salesforce_cidr_blocks}",
     ]
   }
 

@@ -12,9 +12,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/hashicorp/errwrap"
 	"github.com/hashicorp/go-getter"
+	"github.com/hashicorp/terraform/config"
 	"github.com/hashicorp/terraform/config/module"
 	"github.com/hashicorp/terraform/helper/experiment"
+	"github.com/hashicorp/terraform/helper/wrappedstreams"
 	"github.com/hashicorp/terraform/state"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/mitchellh/cli"
@@ -69,11 +72,14 @@ type Meta struct {
 	// allowed when walking the graph
 	//
 	// shadow is used to enable/disable the shadow graph
+	//
+	// provider is to specify specific resource providers
 	statePath    string
 	stateOutPath string
 	backupPath   string
 	parallelism  int
 	shadow       bool
+	provider     string
 }
 
 // initStatePaths is used to initialize the default values for
@@ -166,6 +172,17 @@ func (m *Meta) Context(copts contextOpts) (*terraform.Context, bool, error) {
 	var mod *module.Tree
 	if copts.Path != "" {
 		mod, err = module.NewTreeModule("", copts.Path)
+
+		// Check for the error where we have no config files but
+		// allow that. If that happens, clear the error.
+		if errwrap.ContainsType(err, new(config.ErrNoConfigsFound)) &&
+			copts.PathEmptyOk {
+			log.Printf(
+				"[WARN] Empty configuration dir, ignoring: %s", copts.Path)
+			err = nil
+			mod = module.NewEmptyTree()
+		}
+
 		if err != nil {
 			return nil, false, fmt.Errorf("Error loading config: %s", err)
 		}
@@ -297,6 +314,17 @@ func (m *Meta) PersistState(s *terraform.State) error {
 // Input returns true if we should ask for input for context.
 func (m *Meta) Input() bool {
 	return !test && m.input && len(m.variables) == 0
+}
+
+// StdinPiped returns true if the input is piped.
+func (m *Meta) StdinPiped() bool {
+	fi, err := wrappedstreams.Stdin().Stat()
+	if err != nil {
+		// If there is an error, let's just say its not piped
+		return false
+	}
+
+	return fi.Mode()&os.ModeNamedPipe != 0
 }
 
 // contextOpts returns the options to use to initialize a Terraform
@@ -505,7 +533,11 @@ func (m *Meta) outputShadowError(err error, output bool) bool {
 // contextOpts are the options used to load a context from a command.
 type contextOpts struct {
 	// Path to the directory where the root module is.
-	Path string
+	//
+	// PathEmptyOk, when set, will allow paths that have no Terraform
+	// configurations. The result in that case will be an empty module.
+	Path        string
+	PathEmptyOk bool
 
 	// StatePath is the path to the state file. If this is empty, then
 	// no state will be loaded. It is also okay for this to be a path to

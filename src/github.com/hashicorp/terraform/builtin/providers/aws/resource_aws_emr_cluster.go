@@ -48,7 +48,7 @@ func resourceAwsEMRCluster() *schema.Resource {
 			"core_instance_count": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  0,
+				Default:  1,
 			},
 			"cluster_state": {
 				Type:     schema.TypeString,
@@ -275,7 +275,7 @@ func resourceAwsEMRClusterCreate(d *schema.ResourceData, meta interface{}) error
 		Pending:    []string{"STARTING", "BOOTSTRAPPING"},
 		Target:     []string{"WAITING", "RUNNING"},
 		Refresh:    resourceAwsEMRClusterStateRefreshFunc(d, meta),
-		Timeout:    40 * time.Minute,
+		Timeout:    75 * time.Minute,
 		MinTimeout: 10 * time.Second,
 		Delay:      30 * time.Second, // Wait 30 secs before starting
 	}

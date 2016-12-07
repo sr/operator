@@ -25,3 +25,8 @@ resource "github_team_repository" "bamboo-configuration_service-accounts-write-o
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "bamboo-configuration_develop" {
+  repository = "${github_repository.bamboo-configuration.name}"
+  branch     = "develop"
+}

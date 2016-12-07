@@ -25,3 +25,8 @@ resource "github_team_repository" "bamboo-elastic-instance_service-accounts-read
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_branch_protection" "bamboo-elastic-instance_develop" {
+  repository = "${github_repository.bamboo-elastic-instance.name}"
+  branch     = "develop"
+}
