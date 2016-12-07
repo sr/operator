@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/redshift"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"regexp"
 )
 
 func TestValidateRedshiftClusterDbName(t *testing.T) {
@@ -68,6 +69,33 @@ func TestAccAWSRedshiftCluster_basic(t *testing.T) {
 						"aws_redshift_cluster.default", "cluster_type", "single-node"),
 					resource.TestCheckResourceAttr(
 						"aws_redshift_cluster.default", "publicly_accessible", "true"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccAWSRedshiftCluster_kmsKey(t *testing.T) {
+	var v redshift.Cluster
+
+	ri := rand.New(rand.NewSource(time.Now().UnixNano())).Int()
+	config := fmt.Sprintf(testAccAWSRedshiftClusterConfig_kmsKey, ri, ri)
+	keyRegex := regexp.MustCompile("^arn:aws:([a-zA-Z0-9\\-])+:([a-z]{2}-[a-z]+-\\d{1})?:(\\d{12})?:(.*)$")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSRedshiftClusterDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSRedshiftClusterExists("aws_redshift_cluster.default", &v),
+					resource.TestCheckResourceAttr(
+						"aws_redshift_cluster.default", "cluster_type", "single-node"),
+					resource.TestCheckResourceAttr(
+						"aws_redshift_cluster.default", "publicly_accessible", "true"),
+					resource.TestMatchResourceAttr("aws_redshift_cluster.default", "kms_key_id", keyRegex),
 				),
 			},
 		},
@@ -500,6 +528,41 @@ resource "aws_redshift_cluster" "default" {
   node_type = "dc1.large"
   automated_snapshot_retention_period = 0
   allow_version_upgrade = false
+}`
+
+var testAccAWSRedshiftClusterConfig_kmsKey = `
+resource "aws_kms_key" "foo" {
+  description = "Terraform acc test %d"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "kms-tf-1",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_redshift_cluster" "default" {
+  cluster_identifier = "tf-redshift-cluster-%d"
+  availability_zone = "us-west-2a"
+  database_name = "mydb"
+  master_username = "foo_test"
+  master_password = "Mustbe8characters"
+  node_type = "dc1.large"
+  automated_snapshot_retention_period = 0
+  allow_version_upgrade = false
+  kms_key_id = "${aws_kms_key.foo.arn}"
+  encrypted = true
 }`
 
 var testAccAWSRedshiftClusterConfig_enhancedVpcRoutingEnabled = `

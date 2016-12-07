@@ -13,9 +13,3 @@ resource "github_team_repository" "pardot-demo-org-visualforce_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
-
-resource "github_team_repository" "pardot-demo-org-visualforce_ops" {
-  repository = "${github_repository.pardot-demo-org-visualforce.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}

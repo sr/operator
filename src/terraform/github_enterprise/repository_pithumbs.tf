@@ -25,3 +25,12 @@ resource "github_team_repository" "pithumbs_service-accounts-read-only" {
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_branch_protection" "pithumbs_master" {
+  repository = "${github_repository.pithumbs.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
+}

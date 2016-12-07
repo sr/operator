@@ -20,6 +20,7 @@ resource "aws_security_group" "tools_egress_proxy" {
 
     cidr_blocks = [
       "${aws_vpc.tools_egress.cidr_block}",
+      "172.28.0.0/24",                      # internal_tools_integration from pardotops
       "172.30.0.0/16",                      # pardot0_ue1 from pardotops
     ]
   }
@@ -98,6 +99,12 @@ resource "aws_route" "tools_egress_to_internal_tools" {
   vpc_peering_connection_id = "pcx-d026a4b9"                                # pardotops/pardot0_ue1
 }
 
+resource "aws_route" "tools_egress_to_internal_tools_integration" {
+  route_table_id            = "${aws_vpc.tools_egress.main_route_table_id}"
+  destination_cidr_block    = "172.28.0.0/24"
+  vpc_peering_connection_id = "pcx-d830a1b1"                                # pardotops/internal_tools_integration
+}
+
 resource "aws_route_table" "tools_egress_route_dmz" {
   vpc_id = "${aws_vpc.tools_egress.id}"
 
@@ -109,6 +116,11 @@ resource "aws_route_table" "tools_egress_route_dmz" {
   route {
     cidr_block                = "172.30.0.0/16"
     vpc_peering_connection_id = "pcx-d026a4b9"  # pardotops/pardot0_ue1
+  }
+
+  route {
+    cidr_block                = "172.28.0.0/24"
+    vpc_peering_connection_id = "pcx-d830a1b1"  # pardotops/internal_tools_integration
   }
 }
 

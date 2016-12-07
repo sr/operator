@@ -29,6 +29,15 @@ func TestAccAWSRDSClusterInstance_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSClusterInstanceExists("aws_rds_cluster_instance.cluster_instances", &v),
 					testAccCheckAWSDBClusterInstanceAttributes(&v),
+					resource.TestCheckResourceAttr("aws_rds_cluster_instance.cluster_instances", "auto_minor_version_upgrade", "true"),
+				),
+			},
+			{
+				Config: testAccAWSClusterInstanceConfigModified(acctest.RandInt()),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSClusterInstanceExists("aws_rds_cluster_instance.cluster_instances", &v),
+					testAccCheckAWSDBClusterInstanceAttributes(&v),
+					resource.TestCheckResourceAttr("aws_rds_cluster_instance.cluster_instances", "auto_minor_version_upgrade", "false"),
 				),
 			},
 		},
@@ -223,6 +232,42 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   instance_class          = "db.r3.large"
   db_parameter_group_name = "${aws_db_parameter_group.bar.name}"
   promotion_tier          = "3"
+}
+
+resource "aws_db_parameter_group" "bar" {
+  name   = "tfcluster-test-group-%d"
+  family = "aurora5.6"
+
+  parameter {
+    name         = "back_log"
+    value        = "32767"
+    apply_method = "pending-reboot"
+  }
+
+  tags {
+    foo = "bar"
+  }
+}
+`, n, n, n)
+}
+
+func testAccAWSClusterInstanceConfigModified(n int) string {
+	return fmt.Sprintf(`
+resource "aws_rds_cluster" "default" {
+  cluster_identifier = "tf-aurora-cluster-test-%d"
+  availability_zones = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  database_name      = "mydb"
+  master_username    = "foo"
+  master_password    = "mustbeeightcharaters"
+}
+
+resource "aws_rds_cluster_instance" "cluster_instances" {
+  identifier                 = "tf-cluster-instance-%d"
+  cluster_identifier         = "${aws_rds_cluster.default.id}"
+  instance_class             = "db.r3.large"
+  db_parameter_group_name    = "${aws_db_parameter_group.bar.name}"
+  auto_minor_version_upgrade = false
+  promotion_tier             = "3"
 }
 
 resource "aws_db_parameter_group" "bar" {

@@ -35,6 +35,24 @@ func TestAccGithubIssueLabel_basic(t *testing.T) {
 	})
 }
 
+func TestAccGithubIssueLabel_importBasic(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccGithubIssueLabelDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGithubIssueLabelConfig,
+			},
+			{
+				ResourceName:      "github_issue_label.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGithubIssueLabelExists(n string, label *github.Label) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -101,17 +119,17 @@ func testAccGithubIssueLabelDestroy(s *terraform.State) error {
 }
 
 var testAccGithubIssueLabelConfig string = fmt.Sprintf(`
-    resource "github_issue_label" "test" {
-      repository = "%s"
-      name       = "foo"
-      color      = "000000"
-    }
+resource "github_issue_label" "test" {
+  repository = "%s"
+  name       = "foo"
+  color      = "000000"
+}
 `, testRepo)
 
 var testAccGithubIssueLabelUpdateConfig string = fmt.Sprintf(`
-    resource "github_issue_label" "test" {
-      repository = "%s"
-      name       = "bar"
-      color      = "FFFFFF"
-    }
+resource "github_issue_label" "test" {
+  repository = "%s"
+  name       = "bar"
+  color      = "FFFFFF"
+}
 `, testRepo)

@@ -41,26 +41,62 @@ if options[:repos]
 
       fp.puts <<-EOS
 resource "github_repository" "#{safe_name}" {
-  name        = "#{repo.name}"
-  description = "#{repo.description.to_s.gsub('"', '\"')}"
-  homepage_url = "#{repo.homepage}"
-  private = #{repo.private}
-  has_issues = #{repo.has_issues}
+  name          = "#{repo.name}"
+  description   = "#{repo.description.to_s.gsub('"', '\"')}"
+  homepage_url  = "#{repo.homepage}"
+  private       = #{repo.private}
+  has_issues    = #{repo.has_issues}
   has_downloads = #{repo.has_downloads}
-  has_wiki = #{repo.has_wiki}
+  has_wiki      = #{repo.has_wiki}
 }
-  EOS
+
+EOS
+
       Octokit.repository_teams(repo.id).each do |team|
         fp.puts <<-EOS
 resource "github_team_repository" "#{safe_name}_#{team.slug}" {
   repository = "\${github_repository.#{safe_name}.name}"
-  team_id = "\${github_team.#{team.slug}.id}"
+  team_id    = "\${github_team.#{team.slug}.id}"
   permission = "#{team.permission}"
 }
-  EOS
 
+EOS
         if options[:import]
           system("terraform", "import", "-var-file=../terraform.tfvars", "github_team_repository.#{safe_name}_#{team.slug}", "#{team.id}:#{repo.name}", out: :err)
+        end
+      end
+
+      Octokit.branches(repo.full_name, protected: true, accept: "application/vnd.github.loki-preview+json").each do |branch|
+        protection = Octokit.branch_protection(repo.full_name, branch.name, accept: "application/vnd.github.loki-preview+json")
+        fp.puts <<-EOS
+resource "github_branch_protection" "#{safe_name}_#{branch.name}" {
+  repository = "\${github_repository.#{safe_name}.name}"
+  branch     = "#{branch.name}"
+EOS
+
+        if protection.required_status_checks
+          fp.puts <<-EOS
+
+  include_admins = #{protection.required_status_checks.include_admins}
+  strict         = #{protection.required_status_checks.strict}
+  contexts       = #{JSON.dump(protection.required_status_checks.contexts || [])}
+EOS
+        end
+
+        if protection.restrictions
+          fp.puts <<-EOS
+
+  users_restriction = #{JSON.dump(protection.restrictions.users.map(&:login))}
+  teams_restriction = #{JSON.dump(protection.restrictions.teams.map(&:slug))}
+EOS
+        end
+
+        fp.puts <<-EOS
+}
+
+EOS
+        if options[:import]
+          system("terraform", "import", "-var-file=../terraform.tfvars", "github_branch_protection.#{safe_name}_#{branch.name}", "#{repo.name}:#{branch.name}", out: :err)
         end
       end
 
@@ -77,11 +113,12 @@ if options[:teams]
     File.open("teams.tf", "w") do |fp|
       fp.puts <<-EOS
 resource "github_team" "#{team.slug}" {
-  name = "#{team.name}"
+  name        = "#{team.name}"
   description = "#{team.description.to_s.gsub('"', '\"')}"
-  privacy = "#{team.privacy}"
+  privacy     = "#{team.privacy}"
 }
-  EOS
+
+EOS
 
       if options[:import]
         system("terraform", "import", "-var-file=../terraform.tfvars", "github_team.#{team.slug}", team.id.to_s, out: :err)

@@ -10,8 +10,8 @@ resource "aws_security_group" "pardot0_ue1_operator_http_lb" {
     cidr_blocks = [
       "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32",
       "${aws_route53_record.jira_dev_pardot_com_Arecord.records[0]}/32",
-      "${aws_route53_record.1_git_dev_pardot_com_Arecord.records[0]}/32",
-      "${aws_route53_record.2_git_dev_pardot_com_Arecord.records[0]}/32",
+      "${aws_route53_record.one_git_dev_pardot_com_Arecord.records[0]}/32",
+      "${aws_route53_record.two_git_dev_pardot_com_Arecord.records[0]}/32",
     ]
   }
 

@@ -14,12 +14,6 @@ resource "github_team_repository" "poor-mans-asset-pipeline_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "poor-mans-asset-pipeline_ops" {
-  repository = "${github_repository.poor-mans-asset-pipeline.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "poor-mans-asset-pipeline_service-accounts-write-only" {
   repository = "${github_repository.poor-mans-asset-pipeline.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"

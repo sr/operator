@@ -420,6 +420,41 @@ func TestDiffFieldReader(t *testing.T) {
 						New: "baz",
 					},
 
+					"mapInt.%": {
+						Old: "",
+						New: "2",
+					},
+					"mapInt.one": {
+						Old: "",
+						New: "1",
+					},
+					"mapInt.two": {
+						Old: "",
+						New: "2",
+					},
+
+					"mapFloat.%": {
+						Old: "",
+						New: "1",
+					},
+					"mapFloat.oneDotTwo": {
+						Old: "",
+						New: "1.2",
+					},
+
+					"mapBool.%": {
+						Old: "",
+						New: "2",
+					},
+					"mapBool.True": {
+						Old: "",
+						New: "true",
+					},
+					"mapBool.False": {
+						Old: "",
+						New: "false",
+					},
+
 					"set.#": {
 						Old: "0",
 						New: "2",
