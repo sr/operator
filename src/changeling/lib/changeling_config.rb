@@ -87,7 +87,7 @@ class ChangelingConfig
 
   def github_hostname
     if pardot?
-      ENV.fetch("GITHUB_HOSTNAME")
+      ENV.fetch("GITHUB_HOSTNAME", "git.dev.pardot.com")
     else
       "github.com"
     end

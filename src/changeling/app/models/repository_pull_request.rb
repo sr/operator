@@ -97,15 +97,10 @@ class RepositoryPullRequest
       return false
     end
 
-    issue = Changeling.config.jira_client.Issue.find(referenced_ticket_id)
-    event = JIRAIssueEvent.new(issue.attrs)
+    payload = Changeling.config.jira_client.Issue.find(referenced_ticket_id).attrs
+    issue = JIRAIssue.new(payload)
 
-    if !event.valid?
-      Raven.extra_context(jira_issue: issue)
-      raise SyncError, "JIRA issue is invalid"
-    end
-
-    ticket = Ticket.synchronize_jira_ticket(event)
+    ticket = Ticket.synchronize_jira_ticket(issue)
     update_ticket_reference(ticket)
   end
 

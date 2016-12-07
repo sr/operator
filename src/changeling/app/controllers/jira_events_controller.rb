@@ -7,12 +7,15 @@ class JiraEventsController < ApplicationController
   end
 
   def create
-    payload = JSON.parse(request.body.read.force_encoding("utf-8"))
-    Raven.extra_context(payload: payload)
+    # The webhook data cannot be trusted. We use the payload only to get the key
+    # to reach back to the JIRA API to get authoritative data.
+    webhook_payload = JSON.parse(request.body.read.force_encoding("utf-8"))
+    webhook_issue = JIRAIssue.new(webhook_payload)
+    Raven.extra_context(payload: webhook_payload)
 
-    event = JIRAIssueEvent.parse(payload)
-    redis_connection.sadd("jira-statuses", event.issue_status.inspect)
-    Ticket.synchronize_jira_ticket(event)
+    payload = Changeling.config.jira_client.Issue.find(webhook_issue.key).attrs
+    issue = JIRAIssue.new(payload)
+    Ticket.synchronize_jira_ticket(issue)
 
     render json: {}, status: :created
   end

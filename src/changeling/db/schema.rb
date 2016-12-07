@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161122133607) do
+ActiveRecord::Schema.define(version: 20161207210528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,12 +98,14 @@ ActiveRecord::Schema.define(version: 20161122133607) do
   end
 
   create_table "tickets", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.text     "external_id", null: false
-    t.text     "summary",     null: false
-    t.text     "tracker",     null: false
-    t.text     "status",      null: false
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.string   "external_id",                 null: false
+    t.text     "summary",                     null: false
+    t.string   "tracker",                     null: false
+    t.string   "status",                      null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.text     "url",         default: "",    null: false
+    t.boolean  "open",        default: false, null: false
     t.index ["external_id", "tracker"], name: "index_tickets_on_external_id_and_tracker", unique: true, using: :btree
   end
 
