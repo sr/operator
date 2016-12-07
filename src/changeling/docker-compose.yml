@@ -2,6 +2,8 @@ version: "2"
 services:
   postgres:
     image: postgres:9.5.5-alpine
+    environment:
+      POSTGRES_USER: "changeling"
     expose:
       - "5432"
   redis:
@@ -14,11 +16,9 @@ services:
       BIND: "0.0.0.0"
       PORT: "4000"
       REDIS_URL: "redis://redis:6379"
-      DATABASE_HOST: postgres
-      DATABASE_USER: postgres
-      DATABASE_NAME: postgres
-    volumes:
-      - .:/app
+      DATABASE_HOST: "postgres"
+      DATABASE_USER: "changeling"
+      DATABASE_NAME: "changeling"
     ports:
       - "4000:4000"
     depends_on:

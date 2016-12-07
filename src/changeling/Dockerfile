@@ -21,3 +21,5 @@ RUN bundle install --local --binstubs
 
 ADD . /app
 RUN bundle exec rake assets:precompile
+
+CMD ["script/server"]
