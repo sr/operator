@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.."; pwd)"
+
+git push heroku "$(git subtree split --prefix src/changeling HEAD)":master
