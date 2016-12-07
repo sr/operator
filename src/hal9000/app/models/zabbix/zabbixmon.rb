@@ -62,11 +62,11 @@ module Zabbix
       begin
         payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}", timeout_seconds)
       rescue => e
-        e = scrub_password(e)
-        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{e}")
-        err = "Payload Delivery completely failed and was 'rescued.' Error: #{e}."
-        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{e}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed: #{e} !")
+        error = scrub_password(e.to_s)
+        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{error}")
+        err = "Payload Delivery completely failed and was 'rescued.' Error: #{error}."
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{error}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed: #{error} !")
       end
 
       if !payload_delivery_response.nil?
@@ -88,9 +88,9 @@ module Zabbix
         success = false
         zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
-        e = scrub_password(e)
-        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", e))
-        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", e))
+        error = scrub_password(e.to_s)
+        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", error))
+        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", error))
       end
       if zbx_items
         if !zbx_items.empty? # success case
