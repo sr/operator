@@ -61,7 +61,7 @@ module.exports = (robot) ->
         deploys.push(null)
         deploys = deploys[0..number]
 
-        oldestDeploy = deploys[1]
+        oldestDeploy = deploys[0]
         newestDeploy = deploys[number-1]
 
         totalDiffMsg = "The last #{number} releases resulted in a total diff of "
