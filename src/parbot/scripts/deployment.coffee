@@ -71,7 +71,7 @@ module.exports = (robot) ->
 
         msgs.push(totalDiffMsg)
 
-        for [deploy, previousDeploy] in eachCons(deploys[0..number], 2)
+        for [deploy, previousDeploy] in eachCons(deploys[0..deploys.length], 2)
           deployMsg = "<a href=\"mailto:#{deploy.user}\">#{deploy.user}</a> synced "
           if previousDeploy
             deployMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/compare/#{previousDeploy.sha}...#{deploy.sha}\">"
