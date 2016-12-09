@@ -89,14 +89,13 @@ describe ZabbixHandler, lita_handler: true do
   end
 
   describe "!zabbix monitor run dfw" do
-    it "successfully pages PD on a failed manually_run_monitor('dfw')" do
+    it "reports failure on a failed manually_run_monitor('dfw')" do
       stub_api_version
       stub_user_login
       stub_insert_payload
-      stub_page_pagerduty
       stub_item_get(result: [])
       send_command("zabbix monitor run dfw")
-      expect(replies.last).to match(/^.*dead.*[J|j]im*$/)
+      expect(replies.last).to match(/^.*zabbix.*\sis\sdead,\sJim*$/)
     end
   end
 end
