@@ -11,6 +11,8 @@ class ChefDeliveryNotification
   end
 
   def at_lock_age_limit(room_id, server, checkout, build)
+    # Disable messaging for chef1-2 servers until they're provisioned - OPS-5521
+    return if /pardot0-chef1-2-*/.match(server.hostname)
     message = "chef/master #{link_to(build)} could not be deployed to "\
       "#{server.datacenter}/#{server.environment} because branch " \
       "#{link_to(checkout.branch)} is checked out on " \
@@ -20,6 +22,8 @@ class ChefDeliveryNotification
   end
 
   def deploy_completed(room_id, deploy, error_message)
+    # Disable messaging for chef1-2 servers until they're provisioned - OPS-5521
+    return if /pardot0-chef1-2-*/.match(server.hostname)
     if deploy.successful?
       color = GREEN
       message = "chef/master #{link_to(deploy)} successfully deployed to " \
