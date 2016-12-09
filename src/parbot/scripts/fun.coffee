@@ -768,7 +768,12 @@ module.exports = (robot) ->
     msg.send msg.random tbones
 
   robot.respond /dartz/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG"
+    dartzs = [
+      "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG",
+      "https://hipchat.dev.pardot.com/files/1/69/TFrXosSJjg5I4il/ezgif.com-gif-maker.gif"
+    ]
+
+    msg.send msg.random dartzs
 
   robot.respond /megaman$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"
