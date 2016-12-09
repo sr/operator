@@ -62,9 +62,9 @@ module.exports = (robot) ->
         deploys = deploys[0..number]
 
         oldestDeploy = deploys[0]
-        newestDeploy = deploys[number-1]
+        newestDeploy = deploys[deploys.length - 1]
 
-        totalDiffMsg = "The last #{number} releases resulted in a total diff of "
+        totalDiffMsg = "The last #{deploys.length - 1} releases resulted in a total diff of "
         totalDiffMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/compare/#{oldestDeploy.sha}...#{newestDeploy.sha}\">"
         totalDiffMsg += "#{oldestDeploy.branch}/build#{oldestDeploy.build_number}...#{newestDeploy.branch}/build#{newestDeploy.build_number}"
         totalDiffMsg += "</a>"
