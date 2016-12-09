@@ -23,7 +23,7 @@ class ChefDeliveryNotification
 
   def deploy_completed(room_id, deploy, error_message)
     # Disable messaging for chef1-2 servers until they're provisioned - OPS-5521
-    return if /pardot0-chef1-2-*/ =~ server.hostname
+    return if /pardot0-chef1-2-*/ =~ deploy.hostname
     if deploy.successful?
       color = GREEN
       message = "chef/master #{link_to(deploy)} successfully deployed to " \
