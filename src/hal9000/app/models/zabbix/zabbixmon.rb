@@ -135,7 +135,6 @@ module Zabbix
       @log.error("[#{monitor_name}] has hard failed: ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed")
     end
 
-
     def scrub_password(str)
       if @zabbix_password.to_s.empty?
         str
@@ -143,6 +142,5 @@ module Zabbix
         str.gsub(@zabbix_password, "****")
       end
     end
-    
   end
 end
