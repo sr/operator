@@ -50,7 +50,7 @@ module.exports = (robot) ->
     msg.hipchatNotify(html, {color: "gray"})
 
   robot.respond /last(?:releases?|syncs?)(?:\s+(\d+))?$/i, (msg) ->
-    number = _.min([10, parseInt(msg.match[1] || "1")])
+    number = _.min([20, parseInt(msg.match[1] || "1")])
 
     canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME || "production", "pardot", (err, deploys) ->
       if err?
