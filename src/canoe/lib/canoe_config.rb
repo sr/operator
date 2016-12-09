@@ -18,10 +18,10 @@ class CanoeConfig
   attr_writer :phone_authentication_sleep_interval
 
   def salesforce_authenticator_consumer_id
-    ENV.fetch("SALESFORCE_AUTHENTICATOR_CONSUMER_ID")
+    ENV.fetch("SALESFORCE_AUTHENTICATOR_CONSUMER_ID", "")
   end
 
   def salesforce_authenticator_consumer_key
-    ENV.fetch("SALESFORCE_AUTHENTICATOR_CONSUMER_KEY")
+    ENV.fetch("SALESFORCE_AUTHENTICATOR_CONSUMER_KEY", "")
   end
 end
