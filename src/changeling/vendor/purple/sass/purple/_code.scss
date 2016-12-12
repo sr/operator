@@ -1,0 +1,29 @@
+//
+// Code (inline and block)
+// --------------------------------------------------
+
+
+// Inline and block code styles
+
+code,
+kbd {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+label code {
+  box-shadow: none;
+  background: none;
+  border: none;
+  color: $gray;
+  box-shadow: none;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+// Blocks of code
+
+pre {
+  code {
+    box-shadow: none;
+  }
+}
