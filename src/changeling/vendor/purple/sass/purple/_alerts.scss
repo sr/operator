@@ -1,0 +1,20 @@
+//
+// Alerts
+// --------------------------------------------------
+
+
+.alert a {
+  color: inherit;
+}
+
+.alert-success {
+  background-color: $brand-success;
+  border-color: $brand-success;
+  color: white;
+}
+
+.alert-info {
+  background-color: $brand-info;
+  border-color: $brand-info;
+  color: white; 
+}

@@ -1,0 +1,99 @@
+//
+// Fonts
+// --------------------------------------------------
+
+@include font-face('benton-sans', '#{$webfont-path}/bentonsans-book', 200, $file-formats: eot woff ttf);
+@include font-face('benton-sans', '#{$webfont-path}/bentonsans-regular', normal, $file-formats: eot woff ttf);
+@include font-face('benton-sans', '#{$webfont-path}/bentonsans-medium', bold, $file-formats: eot woff ttf);
+
+
+//
+// Typography
+// --------------------------------------------------
+
+// Headings
+// -------------------------
+
+h4,
+.h4 {
+  font-size: 16px;
+  font-weight: 200;
+}
+
+h5, h6,
+.h5, .h6 {
+  color: $gray;
+  font-weight: normal;
+}
+
+h6,
+.h6 {
+  text-transform: uppercase;
+}
+
+
+// Body text
+// -------------------------
+
+.lead {
+  color: $gray;
+}
+
+
+// Lists
+// -------------------------
+
+// Definition  Lists
+
+dl {
+  dt {
+    font-size: 13px;
+    font-weight: normal;
+    color: $gray;
+  }
+  dd {
+    margin-bottom: 12px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  &.dl-horizontal {
+    dt {
+      text-align: left;
+    }
+  }
+}
+
+
+// Misc
+// -------------------------
+
+// Abbreviations and acronyms
+
+abbr {
+  color: $gray;
+}
+
+// Blockquotes
+
+blockquote {
+  border-width: 3px;
+}
+
+
+// Retina
+// -------------------------
+
+@include retina {
+  html, body, input, button {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h5, h6,
+  .h5, .h6 {
+    font-weight: bold;
+  }
+}
