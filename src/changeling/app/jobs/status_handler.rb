@@ -13,6 +13,10 @@ class StatusHandler < ActiveJob::Base
 
     Audited::Audit.as_user(user) do
       if Changeling.config.pardot?
+        # Avoid infinite loop where reporting our own status triggers this job
+        # again and again.
+        return if commit_status.context == GithubRepository::COMPLIANCE_STATUS
+
         Multipass.where(release_id: commit_status.sha).each do |multipass|
           pull = RepositoryPullRequest.new(multipass)
           pull.synchronize
