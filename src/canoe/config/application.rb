@@ -16,6 +16,7 @@ require "pinglish"
 require "instrumentation"
 require "salesforce_authenticator_api"
 
+require "canoe_config"
 require "canoe/deployer"
 require "canoe/ldap_authorizer"
 require "canoe"
@@ -25,6 +26,10 @@ require "canoe"
 Bundler.require(*Rails.groups)
 
 module Canoe
+  cattr_accessor :config do
+    CanoeConfig.new(ENV.to_hash)
+  end
+
   cattr_accessor :salesforce_authenticator do
     SalesforceAuthenticatorAPI.new(
       ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_ID"],

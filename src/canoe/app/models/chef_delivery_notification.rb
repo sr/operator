@@ -10,10 +10,10 @@ class ChefDeliveryNotification
     @repo = repo_name
   end
 
-  def at_lock_age_limit(room_id, server, checkout, build)
+  def at_lock_age_limit(room_id, server, checkout, deploy)
     # Disable messaging for chef1-2 servers until they're provisioned - OPS-5521
     return if /pardot0-chef1-2-*/ =~ server.hostname
-    message = "chef/master #{link_to(build)} could not be deployed to "\
+    message = "chef/master #{link_to(deploy)} could not be deployed to "\
       "#{server.datacenter}/#{server.environment} because branch " \
       "#{link_to(checkout.branch)} is checked out on " \
       "<code>#{server.hostname}</code>"
@@ -53,9 +53,9 @@ class ChefDeliveryNotification
 
   def link_to(object)
     case object
-    when GithubRepository::Build
-      build_id = object.url.split("-").last
-      %(<a href="#{object.url}">##{build_id}</a>)
+    when GithubCommitStatus
+      build_id = object.tests_url.split("-").last
+      %(<a href="#{object.tests_url}">##{build_id}</a>)
     when ChefDeploy
       %(<a href="#{object.build_url}">##{object.build_id}</a>)
     when String

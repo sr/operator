@@ -2,20 +2,14 @@ require "rails_helper"
 
 RSpec.describe ChefDelivery do
   before(:each) do
-    @repo = GithubRepository::Fake.new
-    @config = FakeChefDeliveryConfig.new(@repo)
+    @config = FakeChefDeliveryConfig.new
     @delivery = ChefDelivery.new(@config)
+
+    github.tests_status = GithubRepository::SUCCESS
   end
 
-  def build_build(attributes = {})
-    defaults = {
-      url: "https://github.com/builds/1",
-      sha: "sha1",
-      branch: "master",
-      state: ChefDelivery::SUCCESS,
-      updated_at: Time.current
-    }
-    GithubRepository::Build.new(defaults.merge(attributes))
+  def github
+    Canoe.config.github_client
   end
 
   def create_current_deploy(attributes = {})
@@ -51,7 +45,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = GithubRepository::Build.none
+    github.tests_status = nil
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -60,7 +54,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(state: ChefDelivery::FAILURE)
+    github.tests_status = GithubRepository::FAILURE
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -69,19 +63,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(state: ChefDelivery::PENDING)
-    response = @delivery.checkin(request)
-    assert_equal "noop", response.action
-  end
-
-  it "noops if the build is not for the master branch" do
-    server = ChefDelivery::Server.new("test", "production", "chef1")
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
-    request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(
-      branch: "this-is-fine-dot-jpg",
-      state: ChefDelivery::PENDING
-    )
+    github.tests_status = GithubRepository::PENDING
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -91,14 +73,16 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "mybranch")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(sha: "deadbeef")
+    github.master_head_sha = "deadbeef"
+
     response = @delivery.checkin(request, Time.current)
+
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
-    assert msg.message.include?("could not be deployed")
-    assert msg.message.include?("mybranch")
-    assert msg.message.include?("pardot0-chef1")
+    assert_includes msg.message, "could not be deployed"
+    assert_includes msg.message, "mybranch"
+    assert_includes msg.message, "pardot0-chef1"
 
     response = @delivery.checkin(request, Time.current + 15.minutes)
     assert_equal 0, @config.notifier.messages.size
@@ -113,7 +97,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = GithubRepository::Build.none
+    github.tests_status = nil
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -122,9 +106,10 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build
     create_current_deploy(state: ChefDelivery::PENDING)
+
     response = @delivery.checkin(request)
+
     assert_equal "noop", response.action
   end
 
@@ -132,8 +117,9 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(sha: "sha1")
+    github.master_head_sha = "sha1"
     create_current_deploy(state: ChefDelivery::SUCCESS, sha: "sha1")
+
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -142,7 +128,8 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(sha: "sha2")
+    github.master_head_sha = "sha2"
+
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
   end
@@ -151,14 +138,16 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(sha: "sha1^^")
+    github.master_head_sha = "sha1^^"
+
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
+
     request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
     @delivery.complete_deploy(request)
-
     checkout = ChefCheckinRequest::Checkout.new("sha1~100", "master")
     request = ChefCheckinRequest.new(server, checkout)
+
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
   end
@@ -167,16 +156,19 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1^", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    @repo.current_build = build_build(sha: "sha1")
+    github.master_head_sha = "sha1"
+
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
+
     request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
     @delivery.complete_deploy(request)
-
     server = ChefDelivery::Server.new("test", "production", "pardot2-chef1")
     request = ChefCheckinRequest.new(server, checkout)
+
     response = @delivery.checkin(request)
     assert_equal "deploy", response.action
+
     request = ChefCompleteDeployRequest.new(response.deploy.id, true, nil)
     @delivery.complete_deploy(request)
 
@@ -209,6 +201,7 @@ RSpec.describe ChefDelivery do
     )
     request = ChefCompleteDeployRequest.new(deploy.id, false, "boomtown")
     @delivery.complete_deploy(request)
+
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
     assert_includes msg.message, "failed to deploy"

@@ -8,6 +8,10 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    Canoe.config.github_client = FakeGithubClient.new(
+      compare_status: GithubRepository::EVEN,
+      compliance_status: GithubRepository::SUCCESS
+    )
     Canoe.salesforce_authenticator = SalesforceAuthenticatorAPI::Fake.new
   end
 

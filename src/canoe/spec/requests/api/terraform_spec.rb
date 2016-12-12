@@ -1,32 +1,18 @@
 require "rails_helper"
 
 RSpec.describe "Terraform API" do
-  before do
+  before(:each) do
     @notifier = FakeHipchatNotifier.new
-    @github_repo = GithubRepository::Fake.new(build_build)
-
     TerraformProject.notifier = @notifier
     TerraformProject.required_version = "0.7.4"
-    TerraformProject.github_repository = @github_repo
 
     @project = TerraformProject.create!(name: "aws/pardotops", project: FactoryGirl.create(:project))
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @user.phone.create_pairing("boom town")
   end
 
-  def build_build(attributes = {})
-    defaults = {
-      url: "https://github.com/builds/1",
-      sha: "sha1",
-      branch: "master",
-      state: GithubRepository::FAILURE,
-      compliance: {
-        state: GithubRepository::SUCCESS
-      },
-      updated_at: Time.current,
-      compare_status: GithubRepository::AHEAD
-    }
-    GithubRepository::Build.new(defaults.merge(attributes))
+  def github
+    Canoe.config.github_client
   end
 
   def create_deploy(params)
@@ -93,33 +79,21 @@ RSpec.describe "Terraform API" do
   end
 
   it "returns an error if compliance status is pending" do
-    @github_repo.current_build = build_build(
-      compliance: {
-        state: GithubRepository::PENDING,
-        target_url: "https://compliance"
-      },
-      state: GithubRepository::SUCCESS
-    )
+    github.compliance_status = GithubRepository::PENDING
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
   end
 
   it "returns an error if the compliance check is in failure state" do
-    @github_repo.current_build = build_build(
-      compliance: {
-        state: GithubRepository::FAILURE,
-        target_url: "https://compliance"
-      },
-      state: GithubRepository::SUCCESS
-    )
+    github.compliance_status = GithubRepository::FAILURE
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
   end
 
   it "returns an error if the commit is behind master" do
-    @github_repo.current_build = build_build(compare_status: GithubRepository::BEHIND)
+    github.compare_status = GithubRepository::BEHIND
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("is not up to date")
