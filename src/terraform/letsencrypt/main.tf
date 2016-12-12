@@ -61,10 +61,10 @@ resource "tls_private_key" "e2ec_cert_private_key" {
 resource "tls_cert_request" "e2ec_dev_pardot_com" {
   key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.bread_cert_private_key.private_key_pem}"
-  dns_names       = ["e2ec.dev.pardot.com"]
+  dns_names       = ["e2ecredentials.dev.pardot.com"]
 
   subject {
-    common_name = "e2ec.dev.pardot.com"
+    common_name = "e2ecredentials.dev.pardot.com"
   }
 }
 
