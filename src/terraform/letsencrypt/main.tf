@@ -1,3 +1,7 @@
+variable "pardotops_access_key_id" {}
+
+variable "pardotops_secret_access_key" {}
+
 variable "letsencrypt_api_url" {
   type    = "string"
   default = "https://acme-staging.api.letsencrypt.org/directory"
