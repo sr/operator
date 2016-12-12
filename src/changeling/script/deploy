@@ -3,4 +3,4 @@ set -euo pipefail
 set -x
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.."; pwd)"
 
-git push heroku "$(git subtree split --prefix src/changeling HEAD)":master
+git subrepo push src/changeling --force -r https://git.heroku.com/pardot-changeling-production.git -b master
