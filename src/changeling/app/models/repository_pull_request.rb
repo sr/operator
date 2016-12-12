@@ -32,7 +32,9 @@ class RepositoryPullRequest
     synchronize_github_pull_request
     synchronize_github_statuses
     synchronize_jira_ticket
-    @multipass.tap(&:save!)
+
+    @multipass.save!
+    @multipass
   end
 
   def referenced_ticket
@@ -97,11 +99,12 @@ class RepositoryPullRequest
       return false
     end
 
-    payload = Changeling.config.jira_client.Issue.find(referenced_ticket_id).attrs
-    issue = JIRAIssue.new(payload)
-
-    ticket = Ticket.synchronize_jira_ticket(issue)
-    update_ticket_reference(ticket)
+    ticket = Ticket.synchronize_jira_ticket(referenced_ticket_id)
+    if ticket
+      update_ticket_reference(ticket)
+    else
+      remove_ticket_reference
+    end
   end
 
   def recalculate_testing_status
@@ -136,9 +139,6 @@ class RepositoryPullRequest
     else
       @multipass.ticket_reference.update!(ticket_id: ticket.id)
     end
-
-    recalculate_testing_status
-    @multipass.save!
   end
 
   def referenced_ticket_id

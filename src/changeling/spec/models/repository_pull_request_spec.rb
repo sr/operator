@@ -19,12 +19,17 @@ RSpec.describe RepositoryPullRequest do
     Changeling.config.pardot = false
   end
 
-  def stub_jira_ticket(external_id, resolved: false)
-    issue = decoded_fixture_data("jira/issue")
-    issue["key"] = external_id
-    issue["fields"]["resolution"] = nil unless resolved
-    stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
-      .to_return(body: JSON.dump(issue), headers: { "Content-Type" => "application/json" })
+  def stub_jira_ticket(external_id, exists: true, resolved: false)
+    if exists
+      issue = decoded_fixture_data("jira/issue")
+      issue["key"] = external_id
+      issue["fields"]["resolution"] = nil unless resolved
+      stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
+        .to_return(body: JSON.dump(issue), headers: { "Content-Type" => "application/json" })
+    else
+      stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
+        .to_return(body: JSON.dump({}), status: 404, headers: { "Content-Type" => "application/json" })
+    end
   end
 
   def stub_github_pull_request(title: nil)
@@ -123,6 +128,30 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "Untitled")
       @repository_pull_request.synchronize
       expect(@multipass.reload.ticket_reference).to eq(nil)
+    end
+
+    it "does not create a JIRA ticket reference if the issue does not exist" do
+      stub_jira_ticket("BREAD-1598", exists: false)
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      @repository_pull_request.synchronize
+
+      reference = @multipass.reload.ticket_reference
+      expect(reference).to eq(nil)
+    end
+
+    it "closes the JIRA ticket if it is later deleted" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      @repository_pull_request.synchronize
+
+      reference = @multipass.reload.ticket_reference
+      expect(reference.open?).to eq(true)
+
+      stub_jira_ticket("BREAD-1598", exists: false)
+      @repository_pull_request.synchronize
+      expect(reference.reload.open?).to eq(false)
     end
   end
 

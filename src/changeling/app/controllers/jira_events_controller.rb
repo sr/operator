@@ -21,13 +21,10 @@ class JiraEventsController < ApplicationController
       render json: {}, status: :ok
       return
     end
-
-    webhook_issue = JIRAIssue.new(webhook_payload)
     Raven.extra_context(payload: webhook_payload)
 
-    payload = Changeling.config.jira_client.Issue.find(webhook_issue.key).attrs
-    issue = JIRAIssue.new(payload)
-    Ticket.synchronize_jira_ticket(issue)
+    webhook_issue = JIRAIssue.new(webhook_payload)
+    Ticket.synchronize_jira_ticket(webhook_issue.key)
 
     render json: {}, status: :created
   end
