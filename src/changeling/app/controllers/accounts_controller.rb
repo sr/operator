@@ -1,7 +1,6 @@
 # Controller that handles Your account
 class AccountsController < ApplicationController
-  def show
-  end
+  def show; end
 
   def update
     if current_user.update(user_params)

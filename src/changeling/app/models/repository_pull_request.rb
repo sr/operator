@@ -91,7 +91,6 @@ class RepositoryPullRequest
     end
   end
 
-
   def synchronize_jira_ticket
     if !referenced_ticket_id
       remove_ticket_reference

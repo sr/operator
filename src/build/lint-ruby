@@ -2,7 +2,7 @@
 set -eu
 cd "$(dirname "$0")/../.."
 
-if [ -z "$RUBOCOP_CONFIG" ]; then
+if [ -z "${RUBOCOP_CONFIG-}" ]; then
   RUBOCOP_CONFIG="etc/rubocop.yml"
 fi
 

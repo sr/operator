@@ -18,13 +18,11 @@ class PullRequestHandler < ActiveJob::Base
         multipass = Multipass.find_or_initialize_by_pull_request(pull_request)
         multipass.update_for_open_or_synchronize_pull_request(pull_request)
       when "closed"
-        if pull_request["pull_request"]["merged"]
-          return unless default_branch?(pull_request)
-          multipass = Multipass.find_or_initialize_by_pull_request(pull_request)
+        return unless pull_request["pull_request"]["merged"] && default_branch?(pull_request)
+        multipass = Multipass.find_or_initialize_by_pull_request(pull_request)
 
-          commit_sha = pull_request["pull_request"]["merge_commit_sha"]
-          multipass.flag_merge_commits_as_successful(pull_request, commit_sha)
-        end
+        commit_sha = pull_request["pull_request"]["merge_commit_sha"]
+        multipass.flag_merge_commits_as_successful(pull_request, commit_sha)
       end
     end
   end

@@ -133,7 +133,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1234")
       stub_github_pull_request
       stub_github_commit_status(statuses: [
-        {state: RepositoryCommitStatus::SUCCESS, context: "ci/travis"}
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
       @repository_pull_request.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
@@ -141,7 +141,7 @@ RSpec.describe RepositoryPullRequest do
       expect(status.state).to eq(RepositoryCommitStatus::SUCCESS)
 
       stub_github_commit_status(statuses: [
-        {state: RepositoryCommitStatus::FAILURE, context: "ci/travis"}
+        { state: RepositoryCommitStatus::FAILURE, context: "ci/travis" }
       ])
       @repository_pull_request.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
@@ -156,14 +156,14 @@ RSpec.describe RepositoryPullRequest do
       expect(@multipass.testing?).to eq(false)
 
       stub_github_commit_status(statuses: [
-        {state: RepositoryCommitStatus::SUCCESS, context: "ci/travis"}
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
       @repository_pull_request.synchronize
       expect(@multipass.reload.testing?).to eq(false)
 
       stub_github_commit_status(statuses: [
-        {state: RepositoryCommitStatus::SUCCESS, context: "ci/travis"},
-        {state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel"}
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel" }
       ])
       @repository_pull_request.synchronize
       expect(@multipass.reload.testing?).to eq(true)
