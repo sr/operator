@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap"
+	"github.com/go-openapi/runtime"
 	"github.com/sr/operator"
 	"golang.org/x/net/context"
 
@@ -68,7 +69,10 @@ func authenticatePhone(canoeAPI CanoeClient, email, action string) error {
 			}),
 	)
 	if err != nil || resp.Payload == nil {
-		return fmt.Errorf("Canoe phone authentication request failed: %s", err)
+		if v, ok := err.(*runtime.APIError); ok {
+			return fmt.Errorf("Canoe phone authentication request failed with status %d", v.Code)
+		}
+		return fmt.Errorf("Canoe phone authentication request failed in a weird way")
 	}
 	if resp.Payload.Error {
 		if resp.Payload.Message == "" {
