@@ -63,7 +63,7 @@ class DeploysController < ApplicationController
   def create
     if current_user.phone.paired? || Canoe.config.phone_authentication_required?
       if !current_user.authenticate_phone(action: phone_auth_action)
-        flash[:alert] = "Phone authentication failed. #{helpers.link_to("your phone is paired", "/auth/phone")}."
+        flash[:alert] = "Phone authentication failed. Please make sure #{helpers.link_to("your phone is setup", "/auth/phone")} correctly."
         return redirect_back(fallback_location: projects_url(current_project))
       end
     end

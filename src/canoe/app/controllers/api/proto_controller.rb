@@ -36,9 +36,9 @@ module Api
     def require_phone_authentication
       if !current_user || !current_user.authenticate_phone(action: phone_auth_action)
         if current_user.phone.paired?
-          render json: { error: true, message: "Phone authentication failed." }
+          render json: { error: true, message: "Salesforce Authenticator verification failed" }
         else
-          render json: { error: true, message: "Phone authentication required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
+          render json: { error: true, message: "Salesforce Authenticator verification required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
         end
 
         return false

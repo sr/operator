@@ -2,8 +2,8 @@ module Api
   class AuthenticationController < ProtoController
     def phone
       if !current_user.phone.paired?
-        message = "Your Canoe account is not paired with your phone. Please  " \
-          "go to https://canoe.dev.pardot.com/auth/phone to setup your phone"
+        message = "Your Canoe account is not paired with the Salesforce Authenticator app. Please  " \
+          "go to https://canoe.dev.pardot.com/auth/phone to get setup"
         return render(json: build_response(error: true, message: message))
       end
 
@@ -14,7 +14,7 @@ module Api
       }
 
       if !current_user.authenticate_phone(options)
-        message = "Phone authentication failed for #{current_user.email.inspect}"
+        message = "Salesforce Authenticator verification failed for #{current_user.email.inspect}"
         return render \
           json: build_response(error: true, message: message)
       end
