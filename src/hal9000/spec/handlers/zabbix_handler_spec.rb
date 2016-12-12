@@ -9,12 +9,8 @@ describe ZabbixHandler, lita_handler: true do
   end
 
   before do
-    handler_config.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
-    handler_config.zabbix_monitor_payload_url = "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
     handler_config.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
     handler_config.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
-    handler_config.datacenters = %w[dfw]
-    handler_config.pager = "pagerduty"
     handler_config.zabbix_password = "abc123"
   end
 
