@@ -1,0 +1,1794 @@
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="introduction">Introduction</h1>
+    <p class="lead">Purple is a UI kit for all of Heroku's digital properties. Purple provides guidelines for the aesthetic, function, and form of user interfaces to provide a consistent experience for our customers. This is a living document and is under constant iteration.</p>
+
+    <!-- Desktop menu -->
+
+    <div class="row hidden-xs">
+      <div class="col-sm-4">
+        <img class='img-responsive' src="/images/cube.png"/>
+        <h4>Style kit</h4>
+        <p>Style kit provides Purple styling for your application. Use Style kit if you do not wish to use Ember components or need a great deal of interactivity.</p>
+        <a href="#installation" class="scroll u-margin-Txxs u-margin-Bxxl btn btn-default btn-sm">View Style kit</a>
+      </div>
+      <div class="col-sm-4">
+        <img class='img-responsive' src="/images/pryimid.png"/>
+        <h4>Interaction kit</h4>
+        <p>Interaction kit provides a suite of components that are created to match the look &amp; feel of Style kit and follow the Purple design guidelines &amp; patterns.</p>
+        <a href="#" class="u-margin-Txxs u-margin-Bxxl btn btn-default disabled btn-sm">Coming soon</a>
+      </div>
+      <div class="col-sm-4">
+        <img class='img-responsive' src="/images/globe.png"/>
+        <h4>Guidelines &amp; patterns</h4>
+        <p>General design guidelines for Purple to create a harmonious user experience regardless of the technical stack of your application.</p>
+        <a href="#blankstate" class="scroll u-margin-Txxs u-margin-Bxxl btn btn-default btn-sm">View guidelines &amp; patterns</a>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+
+    <div class="row button-group visible-xs">
+      <div class="col-xs-4">
+        <img class='img-responsive' src="/images/cube.png"/>
+      </div>
+      <div class="col-xs-8">
+        <h4>Style kit</h4>
+        <p>Style kit provides Purple styling for your application. Use Style kit if you do not wish to use Ember components or need a great deal of interactivity.</p>
+        <a href="#installation" class="scroll u-margin-Txxs u-margin-Bs btn btn-default btn-sm">View Style kit</a>
+      </div>
+    </div>
+
+
+    <div class="row button-group visible-xs">
+      <div class="col-xs-4">
+        <img class='img-responsive' src="/images/pryimid.png"/>
+      </div>
+      <div class="col-xs-8">
+        <h4>Interaction kit</h4>
+        <p>Interaction kit provides a suite of components that are created to match the look &amp; feel of Style kit and follow the Purple design guidelines &amp; patterns.</p>
+        <a href="#" class="u-margin-Txxs u-margin-Bs btn btn-default disabled btn-sm">Coming soon</a>
+      </div>
+    </div>
+
+    <div class="row button-group visible-xs">
+      <div class="col-xs-4">
+        <img class='img-responsive' src="/images/globe.png"/>
+      </div>
+      <div class="col-xs-8">
+        <h4>Guidelines &amp; patterns</h4>
+        <p>General design guidelines for Purple to create a harmonious user experience regardless of the technical stack of your application.</p>
+        <a href="#blankstate" class="scroll u-margin-Txxs u-margin-Bs btn btn-default btn-sm">View guidelines &amp; patterns</a>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="installation">Installation</h1>
+    <div class='alert alert-warning'>
+      <ul>
+        <li>
+          Purple is an internal Heroku tool that we hope provides inspiration. It is publicly documented in order to illustrate our design philosophy and process.
+        </li>
+        <li>
+          Purple should <strong>never</strong> be used outside of officially endorsed Heroku products or without explicit permission.
+        </li>
+        <li>
+          For more information about the Heroku trademark, please see our <a href='https://www.heroku.com/policy/trademark'> trademark policy page</a>.
+        </li>
+      </ul>
+    </div>
+    <p>
+      The Purple source code and implementation details are limited to internal Heroku employees.
+    </p>
+    <p>Herokai can find installation instructions in the <a href="https://github.com/heroku/purple">private repo</a>.</p>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="writingcss" class="u-margin-Bl">Writing CSS</h1>
+    <p>For our own components, follow the <b>BEM</b> (Block, Element, Modifier) method for writing &amp; organising CSS. BEM helps keep our CSS logical and predictable. The naming convention follows this pattern:</p>
+    <pre class="u-margin-Bm">
+<code>.block {}
+.block__element {}
+.block__element--modifier {}</code></pre>
+    <ul class="u-margin-Bm">
+      <li><p><code>.block</code> represents the higher level of an abstraction or component.</p></li>
+      <li><p><code>.block__element</code> represents a descendent of <code>.block</code> that helps form <code>.block</code>
+    as a whole.</li>
+      <li><p><code>.block--modifier</code> represents a different state or version of <code>.block</code>.</p></li>
+    </ul>
+    <small>(Source: <a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/">CSSWizardry</a>)</small>
+    <br><br>
+    <p>For more information on BEM, <a href="http://csswizardry.com/2013/01/mindbemding-getting-your-head-round-bem-syntax/">please see this article</a>.</p>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="color">Color</h1>
+    <p class="lead">Shades of purple-hinted greys combined with the Heroku brand color.<br>Pastel primary colors for out of the ordinary aspects and events that require attention.</p>
+
+    <div class="row">
+      <div class="col-sm-3 col-xs-6">
+        <div class="color bg-primary"></div>
+        Brand color<br>
+        <code>#79589F</code><br>
+        <code>$brand-primary</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--hero"></div>
+        Hero color<br>
+        <code>#534A93</code>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div class="row">
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--highlight"></div>
+        Highlight<br>
+        <code>#56CDFC</code><br>
+        <code>$brand-info</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--success"></div>
+        Success<br>
+        <code>#74C080</code><br>
+        <code>$brand-success</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--warning"></div>
+        Warning<br>
+        <code>#FA9F47</code><br>
+        <code>$brand-warning</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--error"></div>
+        Error<br>
+        <code>#D64242</code><br>
+        <code>$brand-danger</code>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div class="row">
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--grayLighter"></div>
+        Gray lighter<br>
+        <code>#E7E7EC</code><br>
+        <code>$gray-lighter</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--grayLight"></div>
+        Gray light<br>
+        <code>#CBCBD2</code><br>
+        <code>$gray-light</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--gray"></div>
+        Gray<br>
+        <code>#7D7D8E</code><br>
+        <code>$gray</code>
+      </div>
+
+      <div class="col-sm-3 col-xs-6">
+        <div class="color color--grayDark"></div>
+        Gray dark<br>
+        <code>#3F3F44</code><br>
+        <code>$gray-dark</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="typography">Typography</h1>
+    <p class="lead">Benton Sans throughout. Consistent weights, purple for major headings, shades of grey and dark grey for everything else.</p>
+
+    <div class="purple-box u-padding-Hxl u-padding-Bl">
+      <h1>h1. Purple heading</h1>
+      <h2>h2. Purple heading</h2>
+      <h3>h3. Purple heading <small>Secondary text</small></h3>
+      <h4>h4. Purple heading <small>Secondary text</small></h4>
+      <h5>h5. Purple heading <small>Secondary text</small></h5>
+      <h6>h6. Purple heading <small>Secondary text</small></h6>
+    </div>
+
+    <pre class="u-margin-Tm html">
+<code>&lt;h1&gt;h1. Purple heading&lt;/h1&gt;
+&lt;h2&gt;h2. Purple heading&lt;/h2&gt;
+&lt;h3&gt;h3. Purple heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h3&gt;
+&lt;h4&gt;h4. Purple heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h4&gt;
+&lt;h5&gt;h5. Purple heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h5&gt;
+&lt;h6&gt;h6. Purple heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h6&gt;</code></pre>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="buttons">Buttons</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Standard</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default">Default</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default"><i class="icon icon-fav"></i> Icon</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;&lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt; Icon&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-primary">Primary</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn disabled">Disabled</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn disabled&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-link">Link</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-link&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Large <small>(lg)</small></h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-lg">Default</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-lg&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-lg"><i class="icon icon-fav"></i> Icon</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-lg&quot;&gt;&lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt; Icon&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-primary btn-lg">Primary</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-lg&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Small <small>(sm)</small></h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-sm">Default</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-sm&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-sm"><i class="icon icon-fav"></i> Icon</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-sm&quot;&gt;&lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt; Icon&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-primary btn-sm">Primary</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-sm&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Extra Small <small>(xs)</small></h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-xs">Default</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-xs&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-xs"><i class="icon icon-fav"></i> Icon</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-xs&quot;&gt;&lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt; Icon&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-primary btn-xs">Primary</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-xs&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Colors</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-danger">Delete app</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-danger">Remove</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-danger&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-success">Approve request</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <button type="button" class="u-margin-Bm btn btn-default btn-success">Approve request</button>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;button type=&quot;button&quot; class=&quot;btn btn-default btn-success&quot;&gt;Default&lt;/button&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Button Groups</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="u-margin-Bm btn btn-default">Left</button>
+          <button type="button" class="u-margin-Bm btn btn-default">Middle</button>
+          <button type="button" class="u-margin-Bm btn btn-default">Right</button>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;Left&lt;/button&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;Middle&lt;/button&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;Right&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Action <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Action &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default">Action</button>
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;Action&lt;/button&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+    &lt;span class=&quot;sr-only&quot;&gt;Toggle Dropdown&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="dropdowns">Dropdowns</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Standard</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Activate dropdown <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else longer here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Activate dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Right-aligned</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Activate dropdown <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else longer here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Activate dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu dropdown-menu-right&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Scrollable</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Activate dropdown <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <div class="dropdown-menu-scroll">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else longer here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else longer here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else longer here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else longer here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Activate dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu&quot; role=&quot;menu&quot;&gt;
+    &lt;div class=&quot;dropdown-menu-scroll&quot;&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+      &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+    &lt;/div&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Dropup</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="dropup">
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+              Activate dropup <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else longer here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;dropup&quot;&gt;
+  &lt;div class=&quot;btn-group&quot;&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+      Activate dropup &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;ul class=&quot;dropdown-menu&quot; role=&quot;menu&quot;&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+      &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">With Point</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Activate dropdown <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu with-point" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else longer here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Activate dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu with-point&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Centered With Point</h3>
+
+    <div class="row button-group">
+      <div class="col-md-4">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Activate dropdown <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-center with-point" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else longer here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <pre class="html"><code>&lt;div class=&quot;btn-group&quot;&gt;
+  &lt;button type=&quot;button&quot; class=&quot;btn btn-default dropdown-toggle&quot; data-toggle=&quot;dropdown&quot;&gt;
+    Activate dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;ul class=&quot;dropdown-menu dropdown-menu-center with-point&quot; role=&quot;menu&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else longer here&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+      <p class="text-warning">Please be sure when using center-point dropdowns that they are an <b>even number of pixels wide</b>. Safari exhibits poor rounding behavior that could lead to undesirable blurring and artifacts otherwise.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12 columns-example">
+    <h1 id="grid">Grid system</h1>
+    <p class="lead">Purple uses the standard Bootstrap grid which is a 12 column responsive layout.</p>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bl">Three equal columns</h3>
+    <div class="row">
+      <div class="col-md-4">.col-md-4</div>
+      <div class="col-md-4">.col-md-4</div>
+      <div class="col-md-4">.col-md-4</div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bl">Three equal columns (down to mobile)</h3>
+    <div class="row">
+      <div class="col-xs-4">.col-xs-4</div>
+      <div class="col-xs-4">.col-xs-4</div>
+      <div class="col-xs-4">.col-xs-4</div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bl">Three unequal columns</h3>
+    <div class="row">
+      <div class="col-md-3">.col-md-3</div>
+      <div class="col-md-6">.col-md-6</div>
+      <div class="col-md-3">.col-md-3</div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bl">Two columns</h3>
+    <div class="row">
+      <div class="col-md-8">.col-md-8</div>
+      <div class="col-md-4">.col-md-4</div>
+    </div>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="forms">Forms</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Basic Example</h3>
+
+
+    <div class="purple-box u-padding-Al">
+      <form role="form">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox"> Check me out
+          </label>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+
+    <pre class="html u-margin-Tm"><code>&lt;div class=&quot;purple-box u-padding-Al&quot;&gt;
+  &lt;form role=&quot;form&quot;&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label for=&quot;exampleInputEmail1&quot;&gt;Email address&lt;/label&gt;
+      &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Enter email&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label for=&quot;exampleInputPassword1&quot;&gt;Password&lt;/label&gt;
+      &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Password&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;checkbox&quot;&gt;
+      &lt;label&gt;
+        &lt;input type=&quot;checkbox&quot;&gt; Check me out
+      &lt;/label&gt;
+    &lt;/div&gt;
+    &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Inline Form</h3>
+
+    <div class="purple-box u-padding-Al">
+      <form class="form-inline" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="exampleInputEmail2">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+          <label class="sr-only" for="exampleInputPassword2">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox"> Remember me
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary u-margin-Lm">Sign in</button>
+      </form>
+    </div>
+
+    <pre class="html u-margin-Tm"><code>&lt;div class=&quot;purple-box u-padding-Al&quot;&gt;
+  &lt;form class=&quot;form-inline&quot; role=&quot;form&quot;&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label class=&quot;sr-only&quot; for=&quot;exampleInputEmail2&quot;&gt;Email address&lt;/label&gt;
+      &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail2&quot; placeholder=&quot;Enter email&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label class=&quot;sr-only&quot; for=&quot;exampleInputPassword2&quot;&gt;Password&lt;/label&gt;
+      &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword2&quot; placeholder=&quot;Password&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;checkbox&quot;&gt;
+      &lt;label&gt;
+        &lt;input type=&quot;checkbox&quot;&gt; Remember me
+      &lt;/label&gt;
+    &lt;/div&gt;
+    &lt;button type=&quot;submit&quot; class=&quot;btn btn-primary u-margin-Lm&quot;&gt;Sign in&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Horizontal Form</h3>
+
+    <div class="purple-box u-padding-Al">
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <label class="ember-view radio-inline">
+              <input type="radio" value="us" name="region" checked="checked">United States
+            </label>
+
+            <label class="radio-inline">
+              <input type="radio" value="eu" name="region">Europe
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox"> Remember me
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">Sign in</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <pre class="html u-margin-Tm"><code>&lt;div class=&quot;purple-box u-padding-Al&quot;&gt;
+  &lt;form class=&quot;form-horizontal&quot; role=&quot;form&quot;&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;col-sm-offset-2 col-sm-10&quot;&gt;
+        &lt;label class=&quot;ember-view radio-inline&quot;&gt;
+          &lt;input type=&quot;radio&quot; value=&quot;us&quot; name=&quot;region&quot; checked=&quot;checked&quot;&gt;United States
+        &lt;/label&gt;
+
+        &lt;label class=&quot;radio-inline&quot;&gt;
+          &lt;input type=&quot;radio&quot; value=&quot;eu&quot; name=&quot;region&quot;&gt;Europe
+        &lt;/label&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label for=&quot;inputEmail3&quot; class=&quot;col-sm-2 control-label&quot;&gt;Email&lt;/label&gt;
+      &lt;div class=&quot;col-sm-10&quot;&gt;
+        &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;inputEmail3&quot; placeholder=&quot;Email&quot;&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;label for=&quot;inputPassword3&quot; class=&quot;col-sm-2 control-label&quot;&gt;Password&lt;/label&gt;
+      &lt;div class=&quot;col-sm-10&quot;&gt;
+        &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;inputPassword3&quot; placeholder=&quot;Password&quot;&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;col-sm-offset-2 col-sm-10&quot;&gt;
+        &lt;div class=&quot;checkbox&quot;&gt;
+          &lt;label&gt;
+            &lt;input type=&quot;checkbox&quot;&gt; Remember me
+          &lt;/label&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;col-sm-offset-2 col-sm-10&quot;&gt;
+        &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Sign in&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Button Addons</h3>
+
+    <div class="purple-box u-padding-Al u-padding-Bm">
+      <div class="form-group">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Enter a deploy message">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button">Deploy...</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Enter a deploy message">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="button">Deploy...</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <pre class="html u-margin-Tm"><code>&lt;div class=&quot;purple-box u-padding-Al u-padding-Bm&quot;&gt;
+  &lt;div class=&quot;form-group&quot;&gt;
+    &lt;div class=&quot;input-group&quot;&gt;
+      &lt;input type=&quot;text&quot; class=&quot;form-control&quot; placeholder=&quot;Enter a deploy message&quot;&gt;
+      &lt;span class=&quot;input-group-btn&quot;&gt;
+        &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Deploy...&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;form-group&quot;&gt;
+    &lt;div class=&quot;input-group&quot;&gt;
+      &lt;input type=&quot;text&quot; class=&quot;form-control&quot; placeholder=&quot;Enter a deploy message&quot;&gt;
+      &lt;span class=&quot;input-group-btn&quot;&gt;
+        &lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot;&gt;Deploy...&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-margin-Bxl">Supported Controls</h3>
+
+    <div class="purple-box u-padding-Al">
+      <form role="form">
+        <div class="form-group">
+          <label>Input</label>
+          <input type="email" class="form-control" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label>Input</label>
+          <input type="email" class="form-control input-lg" placeholder="Email Large">
+        </div>
+        <div class="form-group">
+          <label>Input</label>
+          <input type="email" class="form-control input-sm" placeholder="Email Small">
+        </div>
+        <div class="form-group">
+          <label>Disabled Input</label>
+          <input type="email" class="form-control" placeholder="Email" disabled>
+        </div>
+        <div class="form-group">
+          <label>Textarea</label>
+          <textarea class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Selects</label>
+          <select class="form-control">
+            <option>Option #1</option>
+            <option>Option #2</option>
+            <option>Option #3</option>
+            <option>Option #4</option>
+            <option>Option #5</option>
+          </select>
+          <br />
+          <select class="form-control" disabled>
+            <option>Option #1</option>
+            <option>Option #2</option>
+            <option>Option #3</option>
+            <option>Option #4</option>
+            <option>Option #5</option>
+          </select>
+          <br />
+          <select multiple class="form-control">
+            <option>Option #1</option>
+            <option>Option #2</option>
+            <option>Option #3</option>
+            <option>Option #4</option>
+            <option>Option #5</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Help block</label>
+          <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="validation">Validation</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Input states</h3>
+
+    <div class="row">
+      <div class="col-md-4">
+        <form>
+          <div class="form-group has-success">
+            <input type="text" class="form-control" id="inputSuccess1" value="my-amazing-app">
+            <label class="control-label u-margin-Txxs" for="inputSuccess1">
+              <b>my-amazing-app</b> is available
+            </label>
+          </div>
+        </form>
+        <pre>
+<code>.form-group has-success</code></pre>
+      </div>
+
+      <div class="col-md-4">
+        <form>
+          <div class="form-group has-error">
+            <input type="text" class="form-control" id="inputSuccess1" value="hector@h">
+            <label class="control-label u-margin-Txxs" for="inputSuccess1">
+              <b>hector@h</b> is not a valid email address
+            </label>
+          </div>
+        </form>
+        <pre>
+<code>.form-group has-error</code></pre>
+      </div>
+
+      <div class="col-md-4">
+        <form>
+          <div class="form-group has-warning">
+            <input type="text" class="form-control" id="inputSuccess1" value="blooming-tundra-91">
+            <label class="control-label u-margin-Txxs" for="inputSuccess1">
+              <b>You have an app with an similar name</b>
+            </label>
+          </div>
+        </form>
+        <pre>
+<code>.form-group has-warning</code></pre>
+      </div>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Form states</h3>
+    <p>Forms should show granular errors as well as an alert at the top of the form, to alert the user to errors.</p>
+
+    <div class="purple-box u-padding-Al u-margin-Tl">
+
+      <div class="alert alert-danger">
+        <p>There was <b>one</b> error submitting this form</p>
+      </div>
+
+      <form role="form">
+        <div class="form-group has-error">
+          <label class="control-label" for="exampleInputEmail1">Email address</label>
+          <input type="text" class="form-control" id="inputSuccess1" value="hector@h">
+          <label class="control-label u-margin-Txxs" for="inputSuccess1">
+            <b>hector@h</b> is not a valid email address
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox"> Check me out
+          </label>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="alerts">Alerts</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Standard error</h3>
+
+    <div class="alert alert-danger">
+      <p>Your profile could not be updated</p>
+    </div>
+
+    <pre class="html"><code>&lt;div class=&quot;alert alert-danger&quot;&gt;
+  &lt;p&gt;Your profile could not be updated&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Error with link</h3>
+
+    <div class="alert alert-danger">
+      <p>Your profile could not be updated. <a href="#" class="text-right">Do action</a></p>
+    </div>
+
+<pre class="html"><code>&lt;div class=&quot;alert alert-danger&quot;&gt;
+  &lt;p&gt;Your profile could not be updated. &lt;a href=&quot;#&quot; class=&quot;text-right&quot;&gt;Do action&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Standard success</h3>
+
+    <div class="alert alert-success">
+      <p><b>floating-tundra-81</b> has been created. <a href="#" class="text-right">Edit this app</a></p>
+    </div>
+
+    <pre class="html"><code>&lt;div class=&quot;alert alert-success&quot;&gt;
+  &lt;p&gt;&lt;b&gt;floating-tundra-81&lt;/b&gt; has been created. &lt;a href=&quot;#&quot; class=&quot;text-right&quot;&gt;Edit this app&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Standard info</h3>
+
+    <div class="alert alert-info">
+      <p><b>A new update is available for your app</b></p>
+    </div>
+
+    <pre class="html"><code>&lt;div class=&quot;alert alert-info&quot;&gt;
+  &lt;p&gt;A new update is available for your app&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl u-padding-Bl">Messaging</h3>
+
+    <p class="text-muted">Muted message</p>
+    <p class="text-primary">Primary message</p>
+    <p class="text-success">Success message</p>
+    <p class="text-info">Info message</p>
+    <p class="text-warning">Warning message</p>
+    <p class="text-danger">Danger message</p>
+    <p class="bg-primary">Primary message</p>
+    <p class="bg-success">Success message</p>
+    <p class="bg-info">Info message</p>
+    <p class="bg-warning">Warning message</p>
+    <p class="bg-danger">Danger message</p>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="modal" class="u-margin-Bxxl">Modal</h1>
+
+    <!-- Button trigger modal -->
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+      Launch Modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal Title</h4>
+          </div>
+          <div class="modal-body">
+            Content
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <pre class="html u-margin-Tm"><code>&lt;!-- Button trigger modal --&gt;
+&lt;button class=&quot;btn btn-primary btn-lg&quot; data-toggle=&quot;modal&quot; data-target=&quot;#myModal&quot;&gt;
+  Launch Modal
+&lt;/button&gt;
+
+&lt;!-- Modal --&gt;
+&lt;div class=&quot;modal&quot; id=&quot;myModal&quot; tabindex=&quot;-1&quot; role=&quot;dialog&quot; aria-labelledby=&quot;myModalLabel&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div class=&quot;modal-dialog&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;div class=&quot;modal-header&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;close&quot; data-dismiss=&quot;modal&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;&amp;times;&lt;/span&gt;&lt;span class=&quot;sr-only&quot;&gt;Close&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class=&quot;modal-title&quot; id=&quot;myModalLabel&quot;&gt;Modal Title&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-body&quot;&gt;
+        Content
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-footer&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot; data-dismiss=&quot;modal&quot;&gt;Cancel&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Save Changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+  </div>
+</div>
+
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="subnav" class="u-margin-Bxxl">Sub nav</h1>
+
+    <div class="purple-box u-padding-Al u-padding-Ts u-margin-Bm">
+      <div class="nav nav-tabs sub-nav app-nav">
+        <a href="#" class="active">
+          <i class="icon icon-fav"></i>
+          <span>Resources</span>
+        </a>
+
+        <a href="#">
+          <i class="icon icon-fav--inactive"></i>
+          <span>Deploy</span>
+        </a>
+
+        <a href="#">
+          <i class="icon icon-fav--inactive"></i>
+          <span>Metrics</span>
+        </a>
+
+        <a href="#">
+          <i class="icon icon-fav--inactive"></i>
+          <span>Activity</span>
+        </a>
+
+        <a href="#">
+          <i class="icon icon-fav--inactive"></i>
+          <span>Access</span>
+        </a>
+
+        <a href="#">
+          <i class="icon icon-fav--inactive"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </div>
+
+    <pre class="html"><code>&lt;div class=&quot;nav nav-tabs sub-nav app-nav&quot;&gt;
+  &lt;a href=&quot;#&quot; class=&quot;active&quot;&gt;
+    &lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt;
+    &lt;span&gt;Resources&lt;/span&gt;
+  &lt;/a&gt;
+
+  ...
+
+  &lt;a href=&quot;#&quot;&gt;
+    &lt;i class=&quot;icon icon-fav&quot;&gt;&lt;/i&gt;
+    &lt;span&gt;Settings&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/div&gt;</code></pre>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="lists">Lists</h1>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Unordered List</h3>
+    <ul>
+      <li>Unordered list item</li>
+      <li>Another unordered list item
+        <ul>
+          <li>Nested list item one</li>
+          <li>Another nested list item</li>
+        </ul>
+      </li>
+      <li>Short list item</li>
+    </ul>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Ordered List</h3>
+    <ol>
+      <li>Ordered list item</li>
+      <li>Another ordered list item</li>
+      <li>Short list item</li>
+    </ol>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Definition Lists</h3>
+    <dl>
+      <dt>Euismod</dt>
+      <dd>Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.</dd>
+      <dt>Malesuada porta</dt>
+      <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
+    </dl>
+
+    <dl class="dl-horizontal">
+      <dt>Euismod</dt>
+      <dd>Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.</dd>
+      <dt>Malesuada porta</dt>
+      <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
+    </dl>
+
+    <h3 class="u-margin-Txl u-padding-Tl">List Group</h3>
+    <ul class="list-group">
+      <li class="list-group-item">Dapibus ac facilisis in</li>
+      <li class="list-group-item">Morbi leo risus</li>
+      <li class="list-group-item">Porta ac consectetur ac</li>
+      <li class="list-group-item">Vestibulum at eros</li>
+    </ul>
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="tables">Tables</h1>
+    <h3 class="u-margin-Txl u-padding-Tl">Basic example without a header</h3>
+    <div class="purple-box u-padding-Al u-margin-Bm u-padding-Bs">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="html"><code>&lt;table class="table"&gt;...&lt;table&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Basic example</h3>
+    <div class="purple-box u-padding-Al u-margin-Bm u-padding-Bs">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="html"><code>&lt;table class="table table-hover"&gt;...&lt;table&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Striped rows</h3>
+    <div class="purple-box u-padding-Al u-margin-Bm u-padding-Bs">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="html"><code>&lt;table class="table table-striped"&gt;...&lt;table&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Bordered table</h3>
+    <div class="purple-box u-padding-Al u-margin-Bm u-padding-Bs">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="html"><code>&lt;table class="table table-bordered"&gt;...&lt;table&gt;</code></pre>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Condensed table</h3>
+    <div class="purple-box u-padding-Al u-margin-Bm u-padding-Bs">
+      <table class="table table-condensed table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr class="warning">
+            <td>2</td>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre class="html"><code>&lt;table class="table table-condensed"&gt;...&lt;table&gt;</code></pre>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="spinner">Spinner</h1>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <h3 class="u-margin-Txl u-padding-Tl">Default spinner</h3>
+        <p>For displaying the loading state of a view</p>
+        <div class="purple-box u-text-center u-padding-Axxl">
+          <div class="spinner">
+            <i class="spinner__dot spinner__dot--one"></i>
+            <i class="spinner__dot spinner__dot--two"></i>
+            <i class="spinner__dot spinner__dot--three"></i>
+          </div>
+        </div>
+        <pre class="u-margin-Tm html">
+<code>&lt;div class=&quot;spinner&quot;&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--one&quot;&gt;&lt;/i&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--two&quot;&gt;&lt;/i&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--three&quot;&gt;&lt;/i&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+      <div class="col-lg-6">
+        <h3 class="u-margin-Txl u-padding-Tl">Inverted spinner</h3>
+        <p>For dark and purple backgrounds</p>
+        <div class="purple-box bg-primary u-text-center u-padding-Axxl">
+          <div class="spinner spinner--inverted">
+            <i class="spinner__dot spinner__dot--one"></i>
+            <i class="spinner__dot spinner__dot--two"></i>
+            <i class="spinner__dot spinner__dot--three"></i>
+          </div>
+        </div>
+        <pre class="u-margin-Tm html">
+<code>&lt;div class=&quot;spinner spinner--inverted&quot;&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--one&quot;&gt;&lt;/i&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--two&quot;&gt;&lt;/i&gt;
+  &lt;i class=&quot;spinner__dot spinner__dot--three&quot;&gt;&lt;/i&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+
+
+    <h3 class="u-margin-Txl u-padding-Tl">Button spinner</h3>
+    <p>To show the working state of a button action e.g. saving or updating</p>
+
+    <div class="purple-box u-margin-Bm u-text-center u-padding-Axxl">
+      <a class="btn btn-sm btn-default disabled btn--saving">
+        <span class="spinner">
+          <i class="spinner__dot spinner__dot--one"></i>
+          <i class="spinner__dot spinner__dot--two"></i>
+          <i class="spinner__dot spinner__dot--three"></i>
+        </span>
+        Saving
+      </a>
+    </div>
+
+    <pre class="u-margin-Tm html">
+<code class="html">&lt;a class=&quot;btn btn-sm btn-default disabled btn--saving&quot;&gt;
+  &lt;span class=&quot;spinner&quot;&gt;
+    &lt;i class=&quot;spinner__dot spinner__dot--one&quot;&gt;&lt;/i&gt;
+    &lt;i class=&quot;spinner__dot spinner__dot--two&quot;&gt;&lt;/i&gt;
+    &lt;i class=&quot;spinner__dot spinner__dot--three&quot;&gt;&lt;/i&gt;
+  &lt;/span&gt;
+  Saving
+&lt;/a&gt;</code></pre>
+  </div>
+</div>
+
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="utilities">Utilities</h1>
+    <h3 class="u-margin-Txl u-padding-Tl">Space</h3>
+    <p>Spacing utilities allow you to insert generic spacing to elements and components.<br>The classes take the following form: <code>.u-{{type}}-{{direction}}{{size}}</code></p>
+
+    <h4 class="u-margin-Tm">Types</h3>
+    <ul class="list-group">
+      <li class="list-group-item"><code>margin</code></li>
+      <li class="list-group-item"><code>padding</code></li>
+    </ul>
+
+    <div class="row">
+      <div class="col-xs-6">
+
+        <h4 class="u-margin-Tm">Directions</h3>
+        <ul class="list-group">
+          <li class="list-group-item"><code>A</code> &mdash; all</li>
+          <li class="list-group-item"><code>T</code> &mdash; top</li>
+          <li class="list-group-item"><code>R</code> &mdash; right</li>
+          <li class="list-group-item"><code>B</code> &mdash; bottom</li>
+          <li class="list-group-item"><code>L</code> &mdash; left</li>
+          <li class="list-group-item"><code>H</code> &mdash; horizontal</li>
+          <li class="list-group-item"><code>V</code> &mdash; vertical</li>
+        </ul>
+
+      </div>
+      <div class="col-xs-6">
+        <h4 class="u-margin-Tm">Sizes</h3>
+        <ul class="list-group">
+          <li class="list-group-item"><code>n</code> &mdash; none</li>
+          <li class="list-group-item"><code>xxs</code> &mdash; 6px</li>
+          <li class="list-group-item"><code>xs</code> &mdash; 9px</li>
+          <li class="list-group-item"><code>s</code> &mdash; 12px</li>
+          <li class="list-group-item"><code>m</code> &mdash; 20px</li>
+          <li class="list-group-item"><code>l</code> &mdash; 27px</li>
+          <li class="list-group-item"><code>xl</code> &mdash; 33px</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 class="u-margin-Tl">Examples</h4>
+    <div class="purple-box text-center u-margin-Bl u-padding-Al u-padding-Bm">
+      <code>.u-margin-Bl .u-padding-Al</code>
+      <p>Large bottom margin &amp; large padding</p>
+    </div>
+
+    <div class="purple-box text-center u-padding-An">
+      <code>.u-padding-An</code>
+      <p>No padding</p>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl">State</h3>
+
+    <p>Helpers for the state of objects</p>
+
+    <ul class="list-group">
+      <li class="list-group-item"><code>.u-is-hidden</code> &mdash; display none &amp; remove from flow (screenreaders)</li>
+      <li class="list-group-item"><code>.u-is-visible</code> &mdash; display as block</li>
+      <li class="list-group-item"><code>.u-is-hidden-visually</code> &mdash; hide visually but visible to screenreaders</li>
+      <li class="list-group-item"><code>.u-is-visible</code> &mdash; visible</li>
+      <li class="list-group-item"><code>.u-is-invisible</code> &mdash; invisible</li>
+      <li class="list-group-item u-is-actionable"><code>.u-is-actionable</code> &mdash; adds cursor pointer</li>
+      <li class="list-group-item u-is-draggable"><code>.u-is-draggable</code> &mdash; adds cursor move</li>
+    </ul>
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="blankstate">Blank state</h1>
+    <p></p>
+    <p>The blank state of a view is what users will see before it is populated with data. For the collaborators view, for example, this would be before any collaborators have been added.</p>
+    <p>The blank state should answer the following questions:</p>
+    <ul>
+      <li><p>What will appear in the view?</p></li>
+      <li><p>What is the point of this view?</p></li>
+      <li><p>How do I add things to this view?</p></li>
+      <li><p>How do I learn more about this? <i>(If the concept cannot be fully explained in one or two sentences)</i></p></li>
+    </ul>
+
+    <h4 class="u-margin-Txxl u-margin-Bm">Good</h4>
+    <div class="purple-box u-padding-Al u-padding-Tm u-text-center">
+      <h3><small>Collaborators will appear here</small></h3>
+      <p>People you invite as collaborators have code &amp; deploy access to this app</p>
+      <p><a href="#" class="btn btn-default">Add a collaborator</a></p>
+    </div>
+
+    <h4 class="u-margin-Txxl u-margin-Bm">Bad</h4>
+    <div class="purple-box u-padding-Al u-text-center">
+      You have <b>0</b> collaborators
+    </div>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="crud">CRUD <small>Create, update, destroy patterns</small></h1>
+    <h3 class="u-margin-Txl u-padding-Tl">Adding new data</h3>
+    <p>In Dashboard we have three levels of additive change:</p>
+    <ul>
+      <li><p>Convenience – the form to make the change is always visible (Collaborators)</p></li>
+      <li><p>Disclosed – the form to make changes is hidden until requested (SSH keys)</p></li>
+      <li><p>Complex – changes are made within a modal (2FA, Credit cards)</p></li>
+    </ul>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Convenience</h3>
+    <p>Convenient, always visible forms should be used when the input form is very simple (one or two elements) and where it does not distract from the content of the view.</p>
+
+    <div class="purple-box u-margin-Tl">
+      <img class="img-responsive" src="/images/collaborators-1.png"/>
+    </div>
+    <h4>The form to add a new collaborator is always visible</h4>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Disclosed</h3>
+    <p>Disclosed forms should house more complex inputs (such as multiple text inputs, text areas, radio buttons etc) or can be used where adding data is an uncommon/infrequent function of the view.</p>
+
+    <div class="purple-box u-margin-Tl">
+      <img class="img-responsive" src="/images/ssh-add.gif"/>
+    </div>
+    <h4>The form to add an SSH key is hidden until the user discloses it</h4>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Complex</h3>
+    <p>Complex forms may span multiple pages (wizards) or may contain other content that merits an entirely focused view. These may be shown on a new page or within a modal.</p>
+
+    <div class="bg-modal purple-box u-margin-Tl u-text-center u-padding-Al">
+      <img class="u-margin-Vl" src="/images/creditcard.png" style="max-width: 626px; width: 100%;"/>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Inline editing</h3>
+    <p>For single inputs (like name, email address in our profile), the input can be put in an editable state just by clicking on it.</p>
+
+    <div class="purple-box u-margin-Tl u-text-center u-padding-Am">
+      <img src="/images/profile-edit.gif" style="max-width: 530px; width: 100%;"/>
+    </div>
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="listviews">Listviews</h1>
+    <h3 class="u-margin-Txl u-padding-Tl">Editing rows</h3>
+    <p>If an item in a list view is editable, the pencil icon should be present next to it. Clicking the edit icon opens a modal that allows the user to perform actions on the item. Validation should also happen in this modal.</p>
+
+    <div class="purple-box u-margin-Tl u-text-center u-padding-As">
+      <img src="/images/editing-rows.png" width="100%"/>
+    </div>
+
+    <p class="u-margin-Tl">The modal dialog lists all editable columns vertically and allows the user to update or discard their changes.</p>
+
+    <div class="purple-box u-margin-Tl u-text-center u-padding-An">
+      <img src="/images/editing-rows-modal.png" width="100%"/>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Removing rows</h3>
+    <p>Removing a row happens in the same locus as editing. Clicking the delete icon displays a confirmation modal. The most distinguishable detail of the row (e.g. Name for Collaborator, Add-on name for add-on) should be used in the modal so the user is sure they're deleting the correct item.</p>
+    <p>The modal should use the <a class="scroll" href="#confirmation">confirmation modal pattern</a>.</p>
+
+    <div class="purple-box u-margin-Tl u-text-center u-padding-As">
+      <img src="/images/editing-rows.png" width="100%"/>
+    </div>
+
+    <div class="purple-box u-margin-Tl u-text-center u-padding-An">
+      <img src="/images/editing-rows-remove.png" width="100%"/>
+    </div>
+
+  </div>
+</div>
+
+<div class="row section">
+  <div class="col-md-12">
+    <h1 id="confirmation">Confirmation <small>Destroying data forever</small></h1>
+    <p>If the user is destroying significant data that cannot be restored, they should have to pass a confirmation dialog. This should not be used for any destructive action, as it’s designed to interrupt the user.</p>
+    <h4 class="u-margin-Tl">Examples of appropriate use</h4>
+    <ul>
+      <li>
+        <p>Removing add-ons</p>
+      </li>
+      <li>
+        <p>Transferring an app</p>
+      </li>
+      <li>
+        <p>Deleting an app</p>
+      </li>
+    </ul>
+
+    <h3 class="u-margin-Tl u-padding-Tl">Confirmation with app name input</h3>
+    <p>The user confirms an action by retyping the name of the app they wish to modify.</p>
+
+    <div class="bg-modal purple-box u-margin-Tl u-text-center u-padding-Al u-padding-Txl">
+      <img class="u-margin-Vl" src="/images/modal-2.png" style="max-width: 364px; width: 100%;"/>
+    </div>
+
+    <h3 class="u-margin-Txl u-padding-Tl">Simple confirmation</h3>
+    <p>The user is presented with a modal dialog to confirm or cancel a modification.</p>
+
+    <div class="bg-modal purple-box u-margin-Tl u-text-center u-padding-Al u-padding-Txl">
+      <img class="u-margin-Vl" src="/images/modal-1.png" style="max-width: 364px; width: 100%;"/>
+    </div>
+
+  </div>
+</div>

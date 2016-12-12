@@ -1,0 +1,81 @@
+.nav.sub-nav {
+  border: none;
+  text-align: center;
+  padding-top: 9px;
+  box-shadow: inset 0 -1px 0 #E7E7EC;
+
+  a {
+    display: inline-block;
+    margin-right: 26px;
+    padding: 10px 2px 12px;
+    color: $gray;
+    position: relative;
+
+    &.active, &.active-override {
+      color: $brand-primary;
+    }
+
+    &:last-child { margin-right: 0px; }
+
+    @media (max-width: $screen-sm-min) {
+      margin-right: 10px;
+      i { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      i {
+        display: inline-block;
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+      span { display: none; }
+    }
+
+    &:hover::after {
+      position: absolute;
+      bottom: 0px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      content: '';
+      background: $gray-light;
+    }
+
+    &.active::after {
+      position: absolute;
+      bottom: 0px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      content: '';
+      background: #A996C0;
+    }
+
+    > a {
+      display: inline;
+      color: gray;
+      border: none;
+      vertical-align: middle;
+      padding: 0;
+      &:hover {
+        background: none;
+      }
+    }
+
+    i {
+      position: relative;
+      top: -1px;
+      vertical-align: middle;
+      margin-right: 4px;
+      display: inline-block;
+    }
+
+    &.active {
+      border: none;
+      > a {
+        color: $list-group-active-color;
+        i { @extend .active-app-nav-icon !optional }
+      }
+    }
+  }
+}

@@ -16,6 +16,10 @@
  *= require_self
  */
 
+$brand-primary: #0070d2;
+$brand-success: #0070d2;
+$brand-danger: #c23934;
+
 @import 'purple/rails';
 
 .navbar .active {

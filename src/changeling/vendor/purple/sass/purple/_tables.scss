@@ -1,0 +1,96 @@
+//
+// Tables
+// --------------------------------------------------
+
+
+.table {
+  th {
+    color: $gray;
+    font-weight: normal;
+    font-size: 90%;
+  }
+}
+
+.table {
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th {
+        box-shadow: 0 1px 0 rgba($gray-lighter, .7), 0 3px 0 rgba($gray-lighter, .3);
+        border-bottom: none;
+      }
+      &:first-of-type {
+        > td {
+          border-top: none;
+        }
+      }
+    }
+  }
+}
+
+.table-striped {
+  > tbody > tr:nth-child(odd) {
+    background-color: $table-bg;
+  }
+
+  > tbody > tr:nth-child(even) {
+    background-color: $table-bg-accent;
+  }
+}
+
+.table-bordered {
+  border: none;
+  border-collapse: separate;
+
+  td {
+    border-top: none !important;
+  }
+
+  th:not(:last-of-type),
+  td:not(:last-of-type) {
+    border-right: none !important;
+  }
+
+  > thead:first-child {
+    > tr:first-child {
+      > th {
+        border-top: 1px solid $table-border-color;
+
+        &:first-of-type {
+          border-top-left-radius: $border-radius-base;
+        }
+
+        &:last-of-type {
+          border-top-right-radius: $border-radius-base;
+        }
+      }
+    }
+  }
+
+  > tbody,
+  > tfoot {
+    > tr:last-child {
+      > td {
+        &:first-of-type {
+          border-bottom-left-radius: $border-radius-base;
+        }
+
+        &:last-of-type {
+          border-bottom-right-radius: $border-radius-base;
+        }
+      }
+    }
+  }
+}
+
+.table-responsive,
+.editable-table-component.table-responsive {
+  border: none;
+}
+
+@include purple-table-row-variant('active', lighten($table-bg-active, 7.5%), $gray-dark);
+@include purple-table-row-variant('success', lighten($state-success-bg, 7.5%), darken($state-success-text, 15%));
+@include purple-table-row-variant('info', lighten($state-info-bg, 7.5%), darken($state-info-text, 15%));
+@include purple-table-row-variant('warning', lighten($state-warning-bg, 3%), darken($state-warning-text, 15%));
+@include purple-table-row-variant('danger', lighten($state-danger-bg, 7.5%), darken($state-danger-text, 15%));
