@@ -25,7 +25,7 @@ class PardotRepository
     when CHEF
       ["Test Jobs"]
     when PARDOT
-      ["Initial Jobs", "Test Jobs"]
+      ["Test Jobs"]
     else
       Rails.logger.info "configuration-missing repo=#{name_with_owner.inspect}"
       []
