@@ -1,7 +1,3 @@
-variable "pardotops_access_key_id" {}
-
-variable "pardotops_secret_access_key" {}
-
 variable "letsencrypt_api_url" {
   type    = "string"
   default = "https://acme-staging.api.letsencrypt.org/directory"
@@ -23,7 +19,7 @@ resource "tls_private_key" "bread_cert_private_key" {
 resource "acme_registration" "bread" {
   server_url      = "${var.letsencrypt_api_url}"
   account_key_pem = "${tls_private_key.bread_registration_private_key.private_key_pem}"
-  email_address   = "${letsencrypt_registration_email}"
+  email_address   = "${var.letsencrypt_registration_email}"
 }
 
 resource "tls_cert_request" "compliance_dev_pardot_com" {
