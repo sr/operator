@@ -58,10 +58,11 @@
       <li>The pull request has not been peer reviewed</li>
     <%- end %>
 
-    <%- if pull.referenced_ticket.nil? %>
+    <%- referenced_ticket = pull.referenced_ticket %>
+    <%- if referenced_ticket.nil? %>
       <li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>
-    <%- elsif !pull.referenced_ticket.open? %>
-      <li>Referenced ticket (<%= pull.referenced_ticket.ticket_id %>) is not open</li>
+    <%- elsif !referenced_ticket.open? %>
+      <li>Referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
     <%- end %>
 
     <%- if @multipass.testing.nil? %>
