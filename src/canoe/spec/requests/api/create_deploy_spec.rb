@@ -70,7 +70,7 @@ RSpec.describe "Deploy creation API" do
 
     create_deploy(project: @project.name, target_name: @target.name)
     expect(deploy_response.error).to eq(true)
-    expect(deploy_response.message).to include("Phone authentication required")
+    expect(deploy_response.message).to include("Salesforce Authenticator verification required")
   end
 
   it "returns an error if the phone authentication fails" do
@@ -85,8 +85,8 @@ RSpec.describe "Deploy creation API" do
       project: @project.name,
       artifact_url: artifact_url
     )
-    expect(deploy_response["error"]).to eq(true)
-    expect(deploy_response["message"]).to include("Phone authentication failed")
+    expect(deploy_response.error).to eq(true)
+    expect(deploy_response.message).to include("Salesforce Authenticator verification failed")
   end
 
   it "returns the new deploy after successfuly creating it" do
