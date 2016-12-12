@@ -181,6 +181,13 @@ resource "aws_route53_record" "docker-internal_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "e2ecredentials_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "e2ecredentials.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["pardot-e2e-credentials.herokuapp.com"]
+  type    = "CNAME"
+  ttl     = "900"
+}
 resource "aws_route53_record" "git_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "git.${aws_route53_zone.dev_pardot_com.name}"
