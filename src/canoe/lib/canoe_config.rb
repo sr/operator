@@ -21,7 +21,7 @@ class CanoeConfig
   end
 
   def github_user
-    @env.fetch("GITHUB_USER")
+    @env.fetch("GITHUB_USER", "sa-canoe")
   end
 
   def github_password
