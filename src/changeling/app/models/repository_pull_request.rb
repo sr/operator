@@ -30,8 +30,10 @@ class RepositoryPullRequest
 
   def synchronize
     synchronize_github_pull_request
-    synchronize_github_statuses
-    synchronize_jira_ticket
+    unless @multipass.merged?
+      synchronize_github_statuses
+      synchronize_jira_ticket
+    end
 
     @multipass.save!
     @multipass
@@ -51,8 +53,14 @@ class RepositoryPullRequest
       number
     )
 
-    @multipass.release_id = pull_request[:head][:sha]
+    @multipass.merged = pull_request[:merged]
     @multipass.title = pull_request[:title]
+    @multipass.release_id = \
+      if pull_request[:merged]
+        pull_request[:merge_commit_sha]
+      else
+        pull_request[:head][:sha]
+      end
   end
 
   def synchronize_github_statuses

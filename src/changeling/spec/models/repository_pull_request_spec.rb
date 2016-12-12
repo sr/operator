@@ -32,10 +32,14 @@ RSpec.describe RepositoryPullRequest do
     end
   end
 
-  def stub_github_pull_request(title: nil)
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil)
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
     pull_request["title"] = title if title
+    if merge_commit_sha
+      pull_request["merged"] = true
+      pull_request["merge_commit_sha"] = merge_commit_sha
+    end
     stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}")
       .to_return(body: JSON.dump(pull_request), headers: { "Content-Type" => "application/json" })
   end
@@ -152,6 +156,17 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598", exists: false)
       @repository_pull_request.synchronize
       expect(reference.reload.open?).to eq(false)
+    end
+  end
+
+  describe "synchronizing github pull request" do
+    it "updates the SHA to the merge commit after the PR has been merged" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      stub_github_commit_status
+      @repository_pull_request.synchronize
+
+      expect(@multipass.reload.release_id).to eq("abc123")
     end
   end
 
