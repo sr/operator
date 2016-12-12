@@ -28,41 +28,11 @@ class RepositoryPullRequest
     @multipass.reference_url
   end
 
-  def open
-    recalculate_testing_status
-
-    if referenced_ticket
-      update_ticket_reference(referenced_ticket)
-    else
-      remove_ticket_reference
-    end
-
-    @multipass
-  end
-
   def synchronize
+    synchronize_github_pull_request
     synchronize_github_statuses
     synchronize_jira_ticket
-  end
-
-  def update_commit_status(commit_status)
-    attributes = {
-      github_repository_id: commit_status.repository_id,
-      sha: commit_status.sha,
-      context: commit_status.context
-    }
-
-    ActiveRecord::Base.transaction do
-      status = RepositoryCommitStatus.where(attributes).first
-
-      if status
-        status.update!(state: commit_status.state)
-      else
-        RepositoryCommitStatus.create!(attributes.merge(state: commit_status.state))
-      end
-
-      recalculate_testing_status
-    end
+    @multipass.tap(&:save!)
   end
 
   def referenced_ticket
@@ -72,6 +42,16 @@ class RepositoryPullRequest
   end
 
   private
+
+  def synchronize_github_pull_request
+    pull_request = @multipass.github_client.pull_request(
+      repository.name_with_owner,
+      number
+    )
+
+    @multipass.release_id = pull_request[:head][:sha]
+    @multipass.title = pull_request[:title]
+  end
 
   def synchronize_github_statuses
     combined_status = @multipass.github_client.combined_status(
@@ -89,7 +69,28 @@ class RepositoryPullRequest
 
       update_commit_status(status)
     end
+
+    recalculate_testing_status
   end
+
+  def update_commit_status(commit_status)
+    attributes = {
+      github_repository_id: commit_status.repository_id,
+      sha: commit_status.sha,
+      context: commit_status.context
+    }
+
+    ActiveRecord::Base.transaction do
+      status = RepositoryCommitStatus.find_by(attributes)
+
+      if status
+        status.update!(state: commit_status.state)
+      else
+        RepositoryCommitStatus.create!(attributes.merge(state: commit_status.state))
+      end
+    end
+  end
+
 
   def synchronize_jira_ticket
     if !referenced_ticket_id
@@ -117,7 +118,7 @@ class RepositoryPullRequest
       end
     end
 
-    @multipass.update!(testing: success)
+    @multipass.testing = success
   end
 
   def remove_ticket_reference

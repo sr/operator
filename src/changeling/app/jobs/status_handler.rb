@@ -15,7 +15,7 @@ class StatusHandler < ActiveJob::Base
       if Changeling.config.pardot?
         Multipass.where(release_id: commit_status.sha).each do |multipass|
           pull = RepositoryPullRequest.new(multipass)
-          pull.update_commit_status(commit_status)
+          pull.synchronize
         end
       else
         CommitStatus.new(payload).update_multipass_testing

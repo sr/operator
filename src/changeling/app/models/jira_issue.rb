@@ -22,6 +22,6 @@ class JIRAIssue
   end
 
   def url
-    URI.join(Changeling.config.jira_url, "browse", @payload["key"])
+    URI.join(Changeling.config.jira_url, "browse/", @payload["key"]).to_s
   end
 end

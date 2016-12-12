@@ -52,9 +52,7 @@ module Clients
     end
 
     def pull_request(name_with_owner, number)
-      repository   = @client.repository(name_with_owner)
-      pull_request = @client.pull_request(name_with_owner, number)
-      HashWithIndifferentAccess.new(repository: repository, pull_request: pull_request)
+      @client.pull_request(name_with_owner, number)
     end
   end
 end
