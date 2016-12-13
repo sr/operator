@@ -262,7 +262,7 @@ resource "aws_route53_record" "star_pardot_local" {
 }
 
 resource "aws_db_instance" "oracle_sandbox_db" {
-  allocated_storage       = 50
+  allocated_storage       = 100
   engine                  = "oracle"
   engine_version          = "11.2.0.4.v1"
   instance_class          = "db.t2.small"
