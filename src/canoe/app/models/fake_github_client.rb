@@ -1,4 +1,8 @@
 class FakeGithubClient
+  CombinedStatus = Struct.new(:status, :sha, :statuses)
+  Status = Struct.new(:context, :state, :target_url)
+  Comparison = Struct.new(:status, :ahead_by, :behind_by)
+
   def initialize(compare_status:, compliance_status:, tests_status: nil)
     @compare_status = compare_status || GithubRepository::IDENTICAL
     @compliance_status = compliance_status || GithubRepository::PENDING
@@ -9,46 +13,36 @@ class FakeGithubClient
 
   def combined_status(_repo, _sha)
     statuses = [
-      context: GithubRepository::COMPLIANCE_STATUS,
-      state: @compliance_status,
-      target_url: "https://changeling"
+      Status.new(
+        GithubRepository::COMPLIANCE_STATUS,
+        @compliance_status,
+        "https://changeling"
+      )
     ]
 
     if @tests_status
-      statuses << {
-        context: GithubCommitStatus::TESTS_STATUS,
-        state: @tests_status,
-        target_url: "https://bamboo/1"
-      }
+      statuses << Status.new(
+        GithubCommitStatus::TESTS_STATUS,
+        @tests_status,
+        "https://bamboo/1"
+      )
     end
 
-    {
-      status: @compliance_status,
-      sha: @master_head_sha || "sha1",
-      statuses: statuses
-    }
+    CombinedStatus.new(
+      @compliance_status,
+      @master_head_sha || "sha1",
+      statuses
+    )
   end
 
   def compare(_repo, _branch, _sha)
     case @compare_status
     when GithubRepository::IDENTICAL
-      {
-        ahead_by: 0,
-        behind_by: 0,
-        status: GithubRepository::IDENTICAL
-      }
+      Comparison.new(GithubRepository::IDENTICAL, 0, 0)
     when GithubRepository::BEHIND
-      {
-        ahead_by: 0,
-        behind_by: 9,
-        status: GithubRepository::BEHIND
-      }
+      Comparison.new(GithubRepository::BEHIND, 0, 9)
     when GithubRepository::AHEAD
-      {
-        ahead_by: 4,
-        behind_by: 0,
-        status: GithubRepository::AHEAD
-      }
+      Comparison.new(GithubRepository::AHEAD, 4, 0)
     else
       raise "invalid state: #{@compare_status.inspect}"
     end
