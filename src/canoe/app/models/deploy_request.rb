@@ -47,6 +47,15 @@ class DeployRequest
       end
     end
 
+    def as_proto_json
+      proto = Canoe::CreateDeployResponse.new(
+        error: error?,
+        message: error_message || "",
+        deploy_id: @deploy.id
+      )
+      proto.as_json
+    end
+
     def to_json(_)
       JSON.dump(error: @error, message: error_message, deploy: @deploy.attributes)
     end

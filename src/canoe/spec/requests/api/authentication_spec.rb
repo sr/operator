@@ -4,8 +4,8 @@ RSpec.describe "Authentication API" do
   before do
     @user = FactoryGirl.create(:auth_user, email: "user@salesforce.com")
     Canoe.salesforce_authenticator.authentication_status = { granted: true }
-    Api::AuthenticationController.max_tries = 1
-    Api::AuthenticationController.sleep_interval = 0
+    Canoe.config.phone_authentication_max_tries = 1
+    Canoe.config.phone_authentication_sleep_interval = 0
   end
 
   def authenticate(email)
@@ -39,7 +39,7 @@ RSpec.describe "Authentication API" do
     authenticate @user.email
     expect(auth_response["error"]).to eq(true)
     expect(auth_response["user_email"]).to eq(@user.email)
-    expect(auth_response["message"]).to include("Phone authentication failed")
+    expect(auth_response["message"]).to include("Salesforce Authenticator verification failed")
     expect(auth_response["message"]).to include(@user.email)
   end
 

@@ -50,6 +50,33 @@ func (a *Client) CompleteTerraformDeploy(params *CompleteTerraformDeployParams) 
 }
 
 /*
+CreateDeploy create deploy API
+*/
+func (a *Client) CreateDeploy(params *CreateDeployParams) (*CreateDeployOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewCreateDeployParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "CreateDeploy",
+		Method:             "POST",
+		PathPattern:        "/api/grpc/create_deploy",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &CreateDeployReader{formats: a.formats},
+		Context:            params.Context,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*CreateDeployOK), nil
+
+}
+
+/*
 CreateTerraformDeploy create terraform deploy API
 */
 func (a *Client) CreateTerraformDeploy(params *CreateTerraformDeployParams) (*CreateTerraformDeployOK, error) {
