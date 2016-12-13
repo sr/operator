@@ -334,7 +334,7 @@ resource "aws_iam_policy" "oracle_sandbox_db_access_role_policy" {
    "Version":"2012-10-17",
    "Statement":[
       {
-         "Sid":"AllowOracleSandboxAccess",
+         "Sid":"DenyOracleSandboxDeleteAccess",
          "Effect":"Deny",
          "Action":"rds:Delete*",
          "Resource":"${aws_db_instance.oracle_sandbox_db.arn}"
