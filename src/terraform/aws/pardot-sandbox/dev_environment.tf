@@ -329,6 +329,7 @@ resource "aws_iam_role" "oracle_sandbox_db_access_role" {
 
 resource "aws_iam_policy" "oracle_sandbox_db_access_role_policy" {
   name = "oracle_sandbox_db_access_role"
+
   policy = <<EOF
 {
    "Version":"2012-10-17",
