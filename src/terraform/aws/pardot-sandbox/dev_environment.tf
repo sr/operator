@@ -260,3 +260,64 @@ resource "aws_route53_record" "star_pardot_local" {
   records = ["127.0.0.1"]
   ttl     = "3600"
 }
+
+resource "aws_db_instance" "oracle_sandbox_db" {
+  allocated_storage       = 50
+  engine                  = "oracle"
+  engine_version          = "11.2.0.4.v1"
+  instance_class          = "db.t2.small"
+  name                    = "pardot_sandbox_db"
+  port                    = 1521
+  username                = "pardottandp"
+  password                = "pardottandporaclesandbox" # WARNING: once changed, this is no longer tracked by TF
+  parameter_group_name    = "default.oracle-ee-11.2"
+  option_group_name       = "default:oracle-ee-11-2"
+  character_set_name      = "AL32UTF8"
+  storage_encrypted       = "false"
+  maintenance_window      = "Sun:00:00-Sun:03:00"
+  backup_retention_period = 14
+
+  vpc_security_group_ids = [
+    "${aws_security_group.oracle_sandbox__db_secgroup.id}",
+  ]
+
+  db_subnet_group_name = "${aws_db_subnet_group.oracle_sandbox_db_subnet_group.name}"
+}
+
+resource "aws_db_subnet_group" "oracle_sandbox_db_subnet_group" {
+  name = "oracle_sandbox__db_subnet_group"
+
+  subnet_ids = [
+    "${aws_subnet.dev_environment_us_east_1c.id}",
+    "${aws_subnet.dev_environment_us_east_1d.id}",
+  ]
+}
+
+resource "aws_security_group" "oracle_sandbox__db_secgroup" {
+  vpc_id      = "${aws_vpc.dev_environment.id}"
+  name        = "oracle_sandbox__db_secgroup"
+  description = "oracle_sandbox__db_secgroup"
+
+  ingress {
+    from_port = 1521
+    to_port   = 1521
+    protocol  = "TCP"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_vpc.dev_environment.cidr_block}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name      = "oracle_sandbox__db_secgroup"
+    terraform = "true"
+  }
+}
