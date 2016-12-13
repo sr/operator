@@ -288,8 +288,8 @@ resource "aws_db_subnet_group" "oracle_sandbox_db_subnet_group" {
   name = "oracle_sandbox_db_subnet_group"
 
   subnet_ids = [
-    "${aws_subnet.dev_environment_us_east_1c.id}",
-    "${aws_subnet.dev_environment_us_east_1d.id}",
+    "${aws_subnet.dev_environment_us_east_1c_dmz.id}",
+    "${aws_subnet.dev_environment_us_east_1d_dmz.id}",
   ]
 }
 
