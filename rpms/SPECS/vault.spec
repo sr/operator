@@ -1,4 +1,4 @@
-%define vault_ver 0.6.1
+%define vault_ver 0.6.3
 %define bin_dir /usr/local/bin/
 
 Summary: Tool for securely accessing secrets
