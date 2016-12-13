@@ -3393,8 +3393,8 @@ objectClass: posixGroup
 objectClass: top
 structuralObjectClass: posixGroup
 
-dn: cn=bamboo-admin,ou=Group,dc=pardot,dc=com
-cn: bamboo-admin
+dn: cn=developers,ou=Group,dc=pardot,dc=com
+cn: developers
 createTimestamp: 20150206164907Z
 creatorsName: uid=mike.lockhart,ou=People,dc=pardot,dc=com
 entryCSN: 20160324191758.391796Z#000000#001#000000

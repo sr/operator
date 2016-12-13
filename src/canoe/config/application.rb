@@ -27,13 +27,13 @@ Bundler.require(*Rails.groups)
 
 module Canoe
   cattr_accessor :config do
-    CanoeConfig.new(ENV.to_hash)
+    CanoeConfig.new
   end
 
   cattr_accessor :salesforce_authenticator do
     SalesforceAuthenticatorAPI.new(
-      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_ID"],
-      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_KEY"]
+      Canoe.config.salesforce_authenticator_consumer_id,
+      Canoe.config.salesforce_authenticator_consumer_key
     )
   end
 

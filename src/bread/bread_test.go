@@ -39,6 +39,10 @@ type fakeCanoeClient struct {
 	authResp *canoe.PhoneAuthenticationOK
 }
 
+func (c *fakeCanoeClient) CreateDeploy(*canoe.CreateDeployParams) (*canoe.CreateDeployOK, error) {
+	panic("not implemented")
+}
+
 func (c *fakeCanoeClient) UnlockTerraformProject(*canoe.UnlockTerraformProjectParams) (*canoe.UnlockTerraformProjectOK, error) {
 	panic("not implemented")
 }
@@ -115,7 +119,7 @@ func TestAuthorizer(t *testing.T) {
 		{"", "bread.Ping", "Ping", authOK, nil, errors.New("unable to authorize request without an user email")},
 		{swe, "bread.Ping", "Pong", authOK, nil, errors.New("no ACL entry found for service `bread.Ping Pong`")},
 		{unknown, "bread.Ping", "Ping", authOK, nil, errors.New("no user matching email `boom@gmail.com`")},
-		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed: panic")},
+		{swe, "bread.Ping", "Ping", nil, errors.New("panic"), errors.New("Canoe phone authentication request failed")},
 		{swe, "bread.Ping", "Ping", &canoe.PhoneAuthenticationOK{
 			Payload: &models.CanoePhoneAuthenticationResponse{
 				Error:   true,
@@ -145,8 +149,8 @@ func TestAuthorizer(t *testing.T) {
 			} else {
 				if tc.err == nil {
 					t.Errorf("unexpected error: %s", err)
-				} else if err.Error() != tc.err.Error() {
-					t.Errorf("expected error message %#v, got %#v", tc.err.Error(), err.Error())
+				} else if !strings.Contains(err.Error(), tc.err.Error()) {
+					t.Errorf("expected error message to contain %#v, got %#v", tc.err.Error(), err.Error())
 				}
 			}
 		})

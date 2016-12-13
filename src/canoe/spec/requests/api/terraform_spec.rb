@@ -54,7 +54,7 @@ RSpec.describe "Terraform API" do
 
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
-    expect(deploy_response.message).to include("Phone authentication required")
+    expect(deploy_response.message).to include("Salesforce Authenticator verification required")
   end
 
   it "returns an error for unknown user" do
