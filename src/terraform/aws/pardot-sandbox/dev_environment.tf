@@ -321,3 +321,31 @@ resource "aws_security_group" "oracle_sandbox_db_secgroup" {
     terraform = "true"
   }
 }
+
+resource "aws_iam_role" "oracle_sandbox_db_access_role" {
+  name               = "oracle_sandbox_db_access_role"
+  assume_role_policy = "${aws_iam_policy.oracle_sandbox_db_access_role_policy.id}"
+}
+
+resource "aws_iam_policy" "oracle_sandbox_db_access_role_policy" {
+  name = "oracle_sandbox_db_access_role"
+  policy = <<EOF
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Sid":"AllowOracleSandboxAccess",
+         "Effect":"Deny",
+         "Action":"rds:Delete*",
+         "Resource":"${aws_db_instance.oracle_sandbox_db.arn}"
+      },
+      {
+         "Sid":"AllowOracleSandboxAccess",
+         "Effect":"Allow",
+         "Action":"rds:*",
+         "Resource":"${aws_db_instance.oracle_sandbox_db.arn}"
+      }
+   ]
+}
+EOF
+}
