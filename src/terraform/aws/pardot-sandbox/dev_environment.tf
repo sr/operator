@@ -278,14 +278,14 @@ resource "aws_db_instance" "oracle_sandbox_db" {
   backup_retention_period = 14
 
   vpc_security_group_ids = [
-    "${aws_security_group.oracle_sandbox__db_secgroup.id}",
+    "${aws_security_group.oracle_sandbox_db_secgroup.id}",
   ]
 
   db_subnet_group_name = "${aws_db_subnet_group.oracle_sandbox_db_subnet_group.name}"
 }
 
 resource "aws_db_subnet_group" "oracle_sandbox_db_subnet_group" {
-  name = "oracle_sandbox__db_subnet_group"
+  name = "oracle_sandbox_db_subnet_group"
 
   subnet_ids = [
     "${aws_subnet.dev_environment_us_east_1c.id}",
@@ -293,10 +293,10 @@ resource "aws_db_subnet_group" "oracle_sandbox_db_subnet_group" {
   ]
 }
 
-resource "aws_security_group" "oracle_sandbox__db_secgroup" {
+resource "aws_security_group" "oracle_sandbox_db_secgroup" {
   vpc_id      = "${aws_vpc.dev_environment.id}"
-  name        = "oracle_sandbox__db_secgroup"
-  description = "oracle_sandbox__db_secgroup"
+  name        = "oracle_sandbox_db_secgroup"
+  description = "oracle_sandbox_db_secgroup"
 
   ingress {
     from_port = 1521
@@ -317,7 +317,7 @@ resource "aws_security_group" "oracle_sandbox__db_secgroup" {
   }
 
   tags {
-    Name      = "oracle_sandbox__db_secgroup"
+    Name      = "oracle_sandbox_db_secgroup"
     terraform = "true"
   }
 }
