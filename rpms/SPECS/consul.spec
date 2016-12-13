@@ -1,11 +1,11 @@
-%define consul_ver 0.7.0
+%define consul_ver 0.7.1
 %define data_dir /opt/consul
 %define bin_dir /usr/local/bin/
 
 Summary: Consul is a tool for service discovery and configuration. Consul is distributed, highly available, and extremely scalable.
 Name: consul
 Version: %{consul_ver}
-Release: 2.pardot%{?dist}
+Release: 1.pardot%{?dist}
 Group: System Environment/Daemons
 License: MPLv2.0
 URL: http://www.consul.io
