@@ -1,6 +1,6 @@
 class FakeGithubClient
   def initialize(compare_status:, compliance_status:, tests_status: nil)
-    @compare_status = compare_status || GithubRepository::EVEN
+    @compare_status = compare_status || GithubRepository::IDENTICAL
     @compliance_status = compliance_status || GithubRepository::PENDING
     @tests_status = tests_status
   end
@@ -31,11 +31,11 @@ class FakeGithubClient
 
   def compare(_repo, _branch, _sha)
     case @compare_status
-    when GithubRepository::EVEN
+    when GithubRepository::IDENTICAL
       {
         ahead_by: 0,
         behind_by: 0,
-        status: GithubRepository::EVEN
+        status: GithubRepository::IDENTICAL
       }
     when GithubRepository::BEHIND
       {

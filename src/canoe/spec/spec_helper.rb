@@ -13,7 +13,7 @@ RSpec.configure do |config|
     Canoe.config.phone_authentication_required = false
 
     Canoe.config.github_client = FakeGithubClient.new(
-      compare_status: GithubRepository::EVEN,
+      compare_status: GithubRepository::IDENTICAL,
       compliance_status: GithubRepository::SUCCESS
     )
 
