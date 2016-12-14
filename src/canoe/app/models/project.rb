@@ -1,6 +1,5 @@
 class Project < ApplicationRecord
   ARTIFACTORY_REPO = "pd-canoe".freeze
-  GITHUB_URL = "https://git.dev.pardot.com".freeze
 
   has_many :deploy_notifications
 
@@ -71,24 +70,24 @@ class Project < ApplicationRecord
   # ----- PATHS ----
 
   def tag_url(tag)
-    "#{GITHUB_URL}/#{repository}/releases/tag/#{tag.name}"
+    "#{Canoe.config.github_url}/#{repository}/releases/tag/#{tag.name}"
   end
 
   def branch_url(branch)
-    "#{GITHUB_URL}/#{repository}/tree/#{branch.name}"
+    "#{Canoe.config.github_url}/#{repository}/tree/#{branch.name}"
   end
 
   def commit_url(commit)
-    "#{GITHUB_URL}/#{repository}/commits/#{commit.sha}"
+    "#{Canoe.config.github_url}/#{repository}/commits/#{commit.sha}"
   end
 
   def sha_url(sha)
-    "#{GITHUB_URL}/#{repository}/commits/#{sha}"
+    "#{Canoe.config.github_url}/#{repository}/commits/#{sha}"
   end
 
   def diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
-    "#{GITHUB_URL}/#{repository}/compare/#{deploy1.sha}...#{deploy2.sha}"
+    "#{Canoe.config.github_url}/#{repository}/compare/#{deploy1.sha}...#{deploy2.sha}"
   end
 
   private

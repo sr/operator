@@ -26,10 +26,6 @@ class ChefDeliveryConfig
     true
   end
 
-  def repo_name
-    ENV.fetch("CANOE_CHEF_REPO", "Pardot/chef")
-  end
-
   def master_branch
     "master"
   end
@@ -38,17 +34,10 @@ class ChefDeliveryConfig
     30.minutes
   end
 
-  def github_url
-    Project::GITHUB_URL
-  end
-
   def github_repo
     @github_repo ||= GithubRepository.new(
-      Octokit::Client.new(
-        api_endpoint: "#{github_url}/api/v3",
-        access_token: github_token
-      ),
-      repo_name
+      Canoe.config.github_client,
+      Canoe.config.chef_repository_name
     )
   end
 
@@ -67,11 +56,5 @@ class ChefDeliveryConfig
 
   def notifier
     @notifier ||= HipchatNotifier.new
-  end
-
-  private
-
-  def github_token
-    ENV.fetch("GITHUB_PASSWORD")
   end
 end
