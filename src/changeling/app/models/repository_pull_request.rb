@@ -2,6 +2,16 @@ class RepositoryPullRequest
   class SyncError < StandardError
   end
 
+  def self.synchronize(commit_status)
+    # Avoid infinite loop where reporting our own status triggers this job
+    # again and again.
+    return if commit_status.context == Changeling.config.compliance_status_context
+
+    Multipass.where(release_id: commit_status.sha).each do |multipass|
+      multipass.synchronize
+    end
+  end
+
   def initialize(multipass)
     @multipass = multipass
   end

@@ -13,14 +13,7 @@ class StatusHandler < ActiveJob::Base
 
     Audited::Audit.as_user(user) do
       if Changeling.config.pardot?
-        # Avoid infinite loop where reporting our own status triggers this job
-        # again and again.
-        return if commit_status.context == Changeling.config.compliance_status_context
-
-        Multipass.where(release_id: commit_status.sha).each do |multipass|
-          pull = RepositoryPullRequest.new(multipass)
-          pull.synchronize
-        end
+        RepositoryPullRequest.synchronize(commit_status.sha)
       else
         CommitStatus.new(payload).update_multipass_testing
       end
