@@ -1,5 +1,10 @@
 class FakeGithubClient
-  CombinedStatus = Struct.new(:status, :sha, :statuses)
+  CombinedStatus = Struct.new(:status, :sha, :statuses) do
+    def repository
+      Struct.new(:full_name).new("Pardot/pardot")
+    end
+  end
+
   Status = Struct.new(:context, :state, :target_url)
   Comparison = Struct.new(:status, :ahead_by, :behind_by)
 
