@@ -12,8 +12,7 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
@@ -23,8 +22,7 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
