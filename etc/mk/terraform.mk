@@ -27,7 +27,7 @@ plan: $(TERRAFORM) $(TERRAFORM_DIR) validate remote-state
 	cd $(TERRAFORM_DIR) && \
 		$< plan -out $(TERRAFORM_PLAN) -var-file=$(TERRAFORM_VAR_FILE) $(TERRAFORM_OPTS)
 
-pull: $(TERRAFORM) $(TERRAFORM_DIR)
+pull: $(TERRAFORM) $(TERRAFORM_DIR) remote-state
 	cd $(TERRAFORM_DIR) && \
 		cp .terraform/terraform.tfstate .terraform/terraform.tfstate.$(shell date +%Y%m%d%H%M%S); \
 		$< remote pull $(TERRAFORM_OPTS)
