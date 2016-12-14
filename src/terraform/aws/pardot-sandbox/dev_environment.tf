@@ -14,7 +14,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}"
+    "${var.aloha_vpn_cidr_blocks}",
   ]
 }
 
@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}"
+    "${var.aloha_vpn_cidr_blocks}",
   ]
 }
 
@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}"
+    "${var.aloha_vpn_cidr_blocks}",
   ]
 }
 
