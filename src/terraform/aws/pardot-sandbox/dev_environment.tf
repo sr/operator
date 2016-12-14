@@ -236,7 +236,7 @@ resource "aws_db_instance" "oracle_sandbox_db" {
   engine                  = "oracle-ee"
   engine_version          = "11.2.0.4.v1"
   instance_class          = "db.t2.small"
-  name                    = "pardot_sandbox_db"
+  name                    = "orclsdbx"
   port                    = 1521
   username                = "pardottandp"
   password                = "pardottandporaclesandbox" # WARNING: once changed, this is no longer tracked by TF
