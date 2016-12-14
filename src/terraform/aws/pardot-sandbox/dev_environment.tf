@@ -14,17 +14,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
+    "${var.aloha_vpn_cidr_blocks}"
   ]
 }
 
@@ -36,17 +26,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
+    "${var.aloha_vpn_cidr_blocks}"
   ]
 }
 
@@ -58,17 +38,7 @@ resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
   security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
 
   cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
+    "${var.aloha_vpn_cidr_blocks}"
   ]
 }
 
