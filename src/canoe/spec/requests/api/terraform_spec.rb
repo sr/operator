@@ -10,7 +10,7 @@ RSpec.describe "Terraform API" do
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @user.phone.create_pairing("boom town")
 
-    github.tests_status = GithubRepository::SUCCESS
+    github.tests_state = GithubRepository::SUCCESS
   end
 
   def github
@@ -81,21 +81,21 @@ RSpec.describe "Terraform API" do
   end
 
   it "returns an error if the commit status is pending" do
-    github.tests_status = GithubRepository::PENDING
+    github.tests_state = GithubRepository::PENDING
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
   end
 
   it "returns an error if the commit status is failure" do
-    github.tests_status = GithubRepository::FAILURE
+    github.tests_state = GithubRepository::FAILURE
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
   end
 
   it "returns an error if the commit is behind master" do
-    github.compare_status = GithubRepository::BEHIND
+    github.compare_state = GithubRepository::BEHIND
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("is not up to date")

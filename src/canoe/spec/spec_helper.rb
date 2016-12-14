@@ -13,8 +13,8 @@ RSpec.configure do |config|
     Canoe.config.phone_authentication_required = false
 
     Canoe.config.github_client = FakeGithubClient.new(
-      compare_status: GithubRepository::IDENTICAL,
-      compliance_status: GithubRepository::SUCCESS
+      compare_state: GithubRepository::IDENTICAL,
+      compliance_state: GithubRepository::SUCCESS
     )
 
     Canoe.salesforce_authenticator = SalesforceAuthenticatorAPI::Fake.new

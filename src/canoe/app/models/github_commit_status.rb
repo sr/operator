@@ -21,7 +21,7 @@ class GithubCommitStatus
     GithubRepository::MASTER
   end
 
-  def compare_status
+  def compare_state
     @branch_compare.status
   end
 

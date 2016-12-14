@@ -5,7 +5,7 @@ RSpec.describe ChefDelivery do
     @config = FakeChefDeliveryConfig.new
     @delivery = ChefDelivery.new(@config)
 
-    github.tests_status = GithubRepository::SUCCESS
+    github.tests_state = GithubRepository::SUCCESS
   end
 
   def github
@@ -45,7 +45,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    github.tests_status = nil
+    github.tests_state = nil
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -54,7 +54,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    github.tests_status = GithubRepository::FAILURE
+    github.tests_state = GithubRepository::FAILURE
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -63,7 +63,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    github.tests_status = GithubRepository::PENDING
+    github.tests_state = GithubRepository::PENDING
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -97,7 +97,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
-    github.tests_status = nil
+    github.tests_state = nil
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
