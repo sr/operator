@@ -21,11 +21,8 @@ class JiraEventsController < ApplicationController
       render json: {}, status: :ok
       return
     end
-    Raven.extra_context(payload: webhook_payload)
 
-    webhook_issue = JIRAIssue.new(webhook_payload)
-    Ticket.synchronize_jira_ticket(webhook_issue.key)
-
+    JiraSynchronizationJob.perform_later(webhook_payload)
     render json: {}, status: :created
   end
 end
