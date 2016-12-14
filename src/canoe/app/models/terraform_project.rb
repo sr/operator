@@ -4,15 +4,6 @@ class TerraformProject < ActiveRecord::Base
   belongs_to :project
   has_many :terraform_deploys
 
-  cattr_accessor :github_repository do
-    client = Octokit::Client.new(
-      api_endpoint: "#{Project::GITHUB_URL}/api/v3",
-      access_token: ENV.fetch("GITHUB_PASSWORD")
-    )
-
-    GithubRepository.new(client, BREAD)
-  end
-
   cattr_accessor :required_version do
     Pathname("../../../config/terraform-version")
       .expand_path(__FILE__).read.chomp
@@ -29,17 +20,18 @@ class TerraformProject < ActiveRecord::Base
       return TerraformDeployResponse.new(nil, error)
     end
 
-    github_build = github_repository.current_build(build.commit)
+    commit_status = github_repository.commit_status(build.commit)
 
-    if github_build.compare_status == GithubRepository::BEHIND
+    if commit_status.compare_state == GithubRepository::BEHIND
       message = "Current branch #{build.branch.inspect} is not " \
         "up to date. Please merge master before continuing"
       return TerraformDeployResponse.new(nil, message)
     end
 
-    if github_build.state != GithubRepository::SUCCESS
-      message = "Current build status #{github_build.state.inspect} for " \
-        "#{github_build.branch}@#{github_build.sha[0, 7]} is not successful"
+    if commit_status.tests_state != GithubRepository::SUCCESS
+      message = "Current build status #{commit_status.tests_state.inspect} for " \
+        "#{commit_status.branch}@#{commit_status.sha[0, 7]} is not successful. " \
+        "See #{commit_status.tests_url} for details"
       return TerraformDeployResponse.new(nil, message)
     end
 
@@ -99,6 +91,10 @@ class TerraformProject < ActiveRecord::Base
   end
 
   private
+
+  def github_repository
+    @github_repository ||= GithubRepository.new(Canoe.config.github_client, BREAD)
+  end
 
   def notification
     TerraformNotification.new(notifier, room_ids)

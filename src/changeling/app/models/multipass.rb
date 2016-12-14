@@ -5,9 +5,10 @@ require_relative "./validators/sre_approver_is_in_sre"
 class Multipass < ActiveRecord::Base
   audited
   has_many :events
+  has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
-    Multipass::State, Multipass::Updates, Multipass::GitHubStatuses,
+    Multipass::Updates, Multipass::GitHubStatuses,
     Multipass::Actions
 
   extend Multipass::IssueComments
@@ -98,6 +99,17 @@ class Multipass < ActiveRecord::Base
     end
   end
 
+  def synchronize(current_github_login = nil)
+    if Changeling.config.heroku?
+      check_commit_statuses!
+      self.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
+      save!
+    else
+      pull = RepositoryPullRequest.new(self)
+      pull.synchronize
+    end
+  end
+
   def hostname
     ENV["HOST"] || "changeling-development.heroku.tools"
   end
@@ -177,7 +189,34 @@ class Multipass < ActiveRecord::Base
     Metrics.increment("multipasses.created")
   end
 
+  def changed_risk_assessment?
+    return false if audits.size == 1
+    audits.any? do |audit|
+      audit.audited_changes["impact"] != "low"
+    end
+  end
+
+  delegate \
+    :update_complete,
+    :status,
+    :github_commit_status_description,
+    :complete?,
+    :rejected?,
+    :pending?,
+    :peer_reviewed?,
+    :user_is_peer_reviewer?,
+    :sre_approved?,
+    :user_is_sre_approver?,
+    :emergency_approved?,
+    :user_is_emergency_approver?,
+    :user_is_rejector?,
+    to: :compliance_status
+
   private
+
+  def compliance_status
+    @compliance_status ||= ComplianceStatus.new(self)
+  end
 
   def reference_url_path_parts
     unless reference_url.present?

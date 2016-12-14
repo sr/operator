@@ -15,6 +15,10 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.after(:each) do
+    Changeling.config.pardot = false
+  end
+
   OmniAuth.config.test_mode = true
 
   mock_auth = OmniAuth::AuthHash.new(

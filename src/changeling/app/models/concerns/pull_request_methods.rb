@@ -27,6 +27,7 @@ module PullRequestMethods
         multipass = new_from_pull_request_team(repo.team, pull_request)
       end
       multipass.release_id = pull_request["pull_request"]["head"]["sha"]
+      multipass.title = pull_request["pull_request"]["title"]
       multipass
     end
   end

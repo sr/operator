@@ -1,22 +1,52 @@
 class PardotRepository
+  # TODO(sr) Move the configuration somewhere to allow setting this up
+  # cleanly in tests without needing to have a magic heroku/changeling
+  # repository configured here.
+  CHANGELING = "heroku/changeling".freeze
+
+  BREAD = "Pardot/bread".freeze
+  CHEF = "Pardot/chef".freeze
+  PARDOT = "Pardot/pardot".freeze
+  TEAM_OPS = "Pardot/ops".freeze
+  TEAM_DEVELOPERS = "Pardot/developers".freeze
+
   def initialize(nwo)
-    @nwo = nwo
+    @name_with_owner = nwo
   end
 
-  def name_with_owner
-    @nwo
+  attr_reader :name_with_owner
+
+  def required_testing_statuses
+    case name_with_owner
+    when BREAD
+      ["BREAD build"]
+    when CHANGELING
+      ["ci/bazel", "ci/travis"]
+    when CHEF
+      ["Test Jobs"]
+    when PARDOT
+      ["Test Jobs"]
+    else
+      Rails.logger.info "configuration-missing repo=#{name_with_owner.inspect}"
+      []
+    end
   end
 
   def team
-    if @nwo == "Pardot/chef"
-      return "Pardot/ops"
+    if CHEF
+      TEAM_OPS
+    else
+      TEAM_DEVELOPERS
     end
-
-    "Pardot/developers"
   end
 
+  def ticket_reference_required?
+    [BREAD, CHANGELING].include?(name_with_owner)
+  end
+
+  # Do not create commit statuses for now.
   def update_github_commit_status?
-    false
+    [BREAD].include?(name_with_owner)
   end
 
   def participating?
