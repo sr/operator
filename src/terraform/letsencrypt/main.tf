@@ -4,7 +4,7 @@ variable "pardotops_secret_access_key" {}
 
 variable "letsencrypt_api_url" {
   type    = "string"
-  default = "https://acme-staging.api.letsencrypt.org/directory"
+  default = "https://acme-v01.api.letsencrypt.org/directory"
 }
 
 variable "letsencrypt_registration_email" {
