@@ -1,7 +1,4 @@
 class RepositoryPullRequest
-  class SyncError < StandardError
-  end
-
   def self.synchronize(commit_status)
     # Avoid infinite loop where reporting our own status triggers this job
     # again and again.
