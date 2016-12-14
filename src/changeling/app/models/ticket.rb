@@ -20,17 +20,19 @@ class Ticket < ApplicationRecord
 
     ticket
   rescue JIRA::HTTPError => e
-    if e.code.to_i == 404
-      ticket = Ticket.find_by(
-        external_id: issue_key,
-        tracker: Ticket::TRACKER_JIRA
-      )
+    if e.code.to_i != 404
+      raise
+    end
 
-      if ticket
-        ticket.open = false
-        ticket.save!
-        ticket
-      end
+    ticket = Ticket.find_by(
+      external_id: issue_key,
+      tracker: Ticket::TRACKER_JIRA
+    )
+
+    if ticket
+      ticket.open = false
+      ticket.save!
+      ticket
     end
   end
 end
