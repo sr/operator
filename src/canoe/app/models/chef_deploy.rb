@@ -7,12 +7,12 @@ class ChefDeploy < ApplicationRecord
   ]
 
   def self.find_or_init_current(server, build)
-    if build.state != ChefDelivery::SUCCESS
+    if build.tests_state != ChefDelivery::SUCCESS
       raise ChefDelivery::Error, "build is not successful: #{build.inspect}"
     end
 
     conditions = {
-      build_url: build.url,
+      build_url: build.tests_url,
       datacenter: server.datacenter,
       hostname: server.hostname
     }
@@ -24,7 +24,7 @@ class ChefDeploy < ApplicationRecord
 
     new(
       branch: build.branch,
-      build_url: build.url,
+      build_url: build.tests_url,
       environment: server.environment,
       datacenter: server.datacenter,
       hostname: server.hostname,
@@ -54,7 +54,7 @@ class ChefDeploy < ApplicationRecord
         room_id,
         request.server,
         request.checkout,
-        build
+        self,
       )
       self.last_notified_at = Time.current
     end
@@ -91,16 +91,6 @@ class ChefDeploy < ApplicationRecord
 
   def build_id
     build_url.split("-").last
-  end
-
-  def build
-    GithubRepository::Build.new(
-      url: build_url,
-      branch: branch,
-      sha: sha,
-      state: nil,
-      updated_at: nil
-    )
   end
 
   def server

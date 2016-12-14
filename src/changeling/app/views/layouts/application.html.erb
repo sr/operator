@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Changeling</title>
+  <title><%= Changeling.config.page_title %></title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%- if Changeling.config.heroku? %>
   <link rel="icon" type="image/png" href="<%= image_path("favicon.png") %>" />
+  <%- end %>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
   <div<%= ' id="primary-container"'.html_safe %> class='container'>
     <% if current_user %>
+      <%- if Changeling.config.heroku? %>
       <%= render 'shared/nav' %>
+      <%- end %>
       <%= flash_messages %>
       <%= yield %>
     <% else %>

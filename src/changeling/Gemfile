@@ -13,10 +13,12 @@ gem "font-awesome-rails"
 gem "gemoji"
 gem "github-markdown"
 gem "html-pipeline"
+gem "jira-ruby"
 gem "jquery-rails"
 gem "jbuilder", "~> 2.0"
 gem "kaminari"
 gem "librato-rails"
+gem "local_time"
 gem "nokogiri"
 gem "octokit"
 gem "omniauth-github"
@@ -51,7 +53,7 @@ group :test do
   gem "rubocop"
   gem "rspec", "3.5.0"
   gem "rspec-ontap"
-  gem "webmock"
+  gem "webmock", require: nil
   gem "rails-controller-testing"
 end
 

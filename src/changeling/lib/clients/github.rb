@@ -2,6 +2,8 @@
 module Clients
   # Interact with pull requests and commit statuses via the GitHub API
   class GitHub
+    CommitStatus = Struct.new(:repository_id, :sha, :context, :state)
+
     def initialize(token)
       @client = Octokit::Client.new(
         api_endpoint: Changeling.config.github_api_endpoint,
@@ -45,10 +47,12 @@ module Clients
       @client.statuses(name_with_owner, sha)
     end
 
+    def combined_status(name_with_owner, sha)
+      @client.combined_status(name_with_owner, sha)
+    end
+
     def pull_request(name_with_owner, number)
-      repository   = @client.repository(name_with_owner)
-      pull_request = @client.pull_request(name_with_owner, number)
-      HashWithIndifferentAccess.new(repository: repository, pull_request: pull_request)
+      @client.pull_request(name_with_owner, number)
     end
   end
 end

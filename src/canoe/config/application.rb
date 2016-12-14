@@ -27,7 +27,7 @@ Bundler.require(*Rails.groups)
 
 module Canoe
   cattr_accessor :config do
-    CanoeConfig.new
+    CanoeConfig.new(ENV.to_hash)
   end
 
   cattr_accessor :salesforce_authenticator do
