@@ -3,7 +3,7 @@ class GithubRepository
   PENDING = "pending".freeze
   SUCCESS = "success".freeze
   MASTER = "master".freeze
-  EVEN = "even".freeze
+  IDENTICAL = "identical".freeze
   AHEAD = "ahead".freeze
   BEHIND = "behind".freeze
 

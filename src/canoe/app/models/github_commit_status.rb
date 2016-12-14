@@ -12,7 +12,7 @@ class GithubCommitStatus
   end
 
   def sha
-    @commit_status.fetch(:sha)
+    @commit_status.sha
   end
 
   def branch
@@ -21,13 +21,13 @@ class GithubCommitStatus
     GithubRepository::MASTER
   end
 
-  def compare_status
-    @branch_compare.fetch(:status)
+  def compare_state
+    @branch_compare.status
   end
 
   def tests_state
     if tests_status
-      tests_status.fetch(:state)
+      tests_status.state
     else
       GithubRepository::PENDING
     end
@@ -35,7 +35,7 @@ class GithubCommitStatus
 
   def compliance_state
     if compliance_status
-      compliance_status.fetch(:state)
+      compliance_status.state
     else
       GithubRepository::PENDING
     end
@@ -43,7 +43,7 @@ class GithubCommitStatus
 
   def tests_url
     if tests_status
-      tests_status.fetch(:target_url)
+      tests_status.target_url
     else
       ""
     end
@@ -51,7 +51,7 @@ class GithubCommitStatus
 
   def compliance_url
     if compliance_status
-      compliance_status.fetch(:target_url)
+      compliance_status.target_url
     else
       ""
     end
@@ -60,8 +60,8 @@ class GithubCommitStatus
   private
 
   def compliance_status
-    @commit_status.fetch(:statuses).detect do |s|
-      s.fetch(:context) == GithubRepository::COMPLIANCE_STATUS
+    @commit_status.statuses.detect do |s|
+      s.context == GithubRepository::COMPLIANCE_STATUS
     end
   end
 
@@ -71,8 +71,8 @@ class GithubCommitStatus
   TESTS_STATUS = "Test Jobs".freeze
 
   def tests_status
-    @commit_status.fetch(:statuses).detect do |s|
-      s.fetch(:context) == TESTS_STATUS
+    @commit_status.statuses.detect do |s|
+      s.context == TESTS_STATUS
     end
   end
 end

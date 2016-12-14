@@ -9,6 +9,8 @@ RSpec.describe "Terraform API" do
     @project = TerraformProject.create!(name: "aws/pardotops", project: FactoryGirl.create(:project))
     @user = FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
     @user.phone.create_pairing("boom town")
+
+    github.tests_state = GithubRepository::SUCCESS
   end
 
   def github
@@ -78,22 +80,25 @@ RSpec.describe "Terraform API" do
     expect(deploy_response["message"]).to eq("Unknown Terraform project: \"aws/boomtown\"")
   end
 
-  it "returns an error if compliance status is pending" do
-    github.compliance_status = GithubRepository::PENDING
+  it "returns an error if the commit status is pending" do
+    github.tests_state = GithubRepository::PENDING
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
   end
 
-  it "returns an error if the compliance check is in failure state" do
-    github.compliance_status = GithubRepository::FAILURE
+  it "returns an error if the commit status is failure" do
+    github.tests_state = GithubRepository::FAILURE
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
   end
 
   it "returns an error if the commit is behind master" do
-    github.compare_status = GithubRepository::BEHIND
+    github.compare_state = GithubRepository::BEHIND
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("is not up to date")
