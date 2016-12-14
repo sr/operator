@@ -30,8 +30,8 @@ else
   # own from a `development` environment.
   export RAILS_ENV="test" RACK_ENV="test"
 
-  (bin/rake db:create || true) >/dev/null 2>&1
-  bin/rake db:migrate >/dev/null 2>&1
+  bundle exec rake db:create || true
+  bundle exec rake db:migrate
 fi
 
 echo "===> Running tests..."

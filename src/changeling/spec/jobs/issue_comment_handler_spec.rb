@@ -1,6 +1,10 @@
 require "rails_helper"
 
 describe IssueCommentHandler do
+  before(:all) do
+    Changeling.config.approval_via_comment_enabled = true
+  end
+
   before do
     stub_json_request(:get, "https://x:123@components.heroku.tools/apps.json", fixture_data("heimdall/apps"))
 
@@ -8,7 +12,7 @@ describe IssueCommentHandler do
 
     sha = pull_request_data["pull_request"]["head"]["sha"]
 
-    url = "https://api.github.com/repos/heroku/changeling/statuses/#{sha}"
+    url = "#{Changeling.config.github_api_endpoint}/repos/heroku/changeling/statuses/#{sha}"
     stub_request(:get, url)
       .to_return(body: "[]", headers: { "Content-type" => "application/json" })
     multipass = Multipass.find_or_initialize_by_pull_request(pull_request_data)

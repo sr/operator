@@ -13,4 +13,5 @@
 //= require jquery
 //= require jquery_ujs
 //= require purple/rails
+//= require local_time
 //= require_tree .

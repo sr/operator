@@ -1,4 +1,8 @@
 class ChangelingConfig
+  def heroku?
+    !pardot?
+  end
+
   def pardot?
     return @pardot if defined?(@pardot)
     @pardot = !ENV["PARDOT"].to_s.empty?
@@ -6,7 +10,25 @@ class ChangelingConfig
   attr_writer :pardot
 
   def require_heroku_organization_membership?
-    !pardot?
+    return @require_heroku_organization_membership if defined?(@require_heroku_organization_membership)
+    @require_heroku_organization_membership = !pardot?
+  end
+  attr_writer :require_heroku_organization_membership
+
+  def page_title
+    if pardot?
+      "Pardot Compliance"
+    else
+      "Changeling"
+    end
+  end
+
+  def jira_url
+    if pardot?
+      ENV.fetch("CHANGELING_JIRA_URL", "https://jira.dev.pardot.com")
+    else
+      ""
+    end
   end
 
   def review_approval_enabled_for?(user)
@@ -18,8 +40,10 @@ class ChangelingConfig
   end
 
   def approval_via_comment_enabled?
-    !pardot?
+    return @approval_via_comment_enabled if defined?(@approval_via_comment_enabled)
+    @approval_via_comment_enabled = !pardot?
   end
+  attr_writer :approval_via_comment_enabled
 
   def compliance_status_context
     if pardot?
@@ -63,7 +87,7 @@ class ChangelingConfig
 
   def github_hostname
     if pardot?
-      ENV.fetch("GITHUB_HOSTNAME")
+      ENV.fetch("GITHUB_HOSTNAME", "git.dev.pardot.com")
     else
       "github.com"
     end
@@ -96,5 +120,18 @@ class ChangelingConfig
     else
       ENV["GITHUB_OAUTH_SECRET"]
     end
+  end
+
+  def jira_client
+    return @jira_client if defined?(@jira_client)
+    options = {
+      username: ENV.fetch("JIRA_USERNAME"),
+      password: ENV.fetch("JIRA_PASSWORD"),
+      site: jira_url,
+      auth_type: :basic,
+      rest_base_path: "/rest/api/2",
+      context_path: ""
+    }
+    @jira_client = JIRA::Client.new(options)
   end
 end

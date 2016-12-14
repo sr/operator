@@ -82,6 +82,7 @@ RSpec.describe "Terraform API" do
 
   it "returns an error if the commit status is pending" do
     github.tests_state = GithubRepository::PENDING
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("pending\" for master@sha1 is not successful")
@@ -89,6 +90,7 @@ RSpec.describe "Terraform API" do
 
   it "returns an error if the commit status is failure" do
     github.tests_state = GithubRepository::FAILURE
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("failure\" for master@sha1 is not successful")
@@ -96,6 +98,7 @@ RSpec.describe "Terraform API" do
 
   it "returns an error if the commit is behind master" do
     github.compare_state = GithubRepository::BEHIND
+
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
     expect(deploy_response.message).to include("is not up to date")

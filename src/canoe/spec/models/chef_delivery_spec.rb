@@ -46,6 +46,7 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     github.tests_state = nil
+
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -55,6 +56,7 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     github.tests_state = GithubRepository::FAILURE
+
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -64,6 +66,7 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     github.tests_state = GithubRepository::PENDING
+
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -76,7 +79,6 @@ RSpec.describe ChefDelivery do
     github.master_head_sha = "deadbeef"
 
     response = @delivery.checkin(request, Time.current)
-
     assert_equal "noop", response.action
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
@@ -98,6 +100,7 @@ RSpec.describe ChefDelivery do
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
     github.tests_state = nil
+
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
   end
@@ -109,7 +112,6 @@ RSpec.describe ChefDelivery do
     create_current_deploy(state: ChefDelivery::PENDING)
 
     response = @delivery.checkin(request)
-
     assert_equal "noop", response.action
   end
 

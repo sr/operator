@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -eu
 cd "$(dirname "$0")/../.."
+
+if [ -z "${RUBOCOP_CONFIG-}" ]; then
+  RUBOCOP_CONFIG="etc/rubocop.yml"
+fi
+
 exec rubocop \
-  --config "$(pwd)/etc/rubocop.yml" \
+  --config "$(pwd)/$RUBOCOP_CONFIG" \
   --format "emacs" \
   --fail-level "C" \
   --rails \
