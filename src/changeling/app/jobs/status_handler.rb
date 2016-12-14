@@ -13,7 +13,7 @@ class StatusHandler < ActiveJob::Base
 
     Audited::Audit.as_user(user) do
       if Changeling.config.pardot?
-        RepositoryPullRequest.synchronize(commit_status.sha)
+        RepositoryPullRequest.synchronize(commit_status)
       else
         CommitStatus.new(payload).update_multipass_testing
       end
