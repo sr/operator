@@ -11,9 +11,9 @@ resource "aws_security_group" "dev_environment_secgroup" {
   vpc_id = "${aws_vpc.dev_environment.id}"
 
   ingress {
-    from_port         = 22
-    to_port           = 22
-    protocol          = "tcp"
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
@@ -21,9 +21,9 @@ resource "aws_security_group" "dev_environment_secgroup" {
   }
 
   ingress {
-    from_port         = 80
-    to_port           = 80
-    protocol          = "tcp"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
@@ -31,9 +31,9 @@ resource "aws_security_group" "dev_environment_secgroup" {
   }
 
   ingress {
-    from_port         = 443
-    to_port           = 443
-    protocol          = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
