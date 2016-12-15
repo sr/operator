@@ -46,11 +46,6 @@ class ChangelingConfig
   end
   attr_writer :approval_via_comment_enabled
 
-  def review_approval_enabled_for?(user)
-    return true if pardot?
-    %w{atmos jroes stellacotton ys}.include?(user.github_login)
-  end
-
   def compliance_status_context
     if pardot?
       ENV.fetch("CHANGELING_COMPLIANCE_STATUS_CONTEXT")
