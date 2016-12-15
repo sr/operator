@@ -1,6 +1,5 @@
 Fabricator(:multipass) do
   reference_url { "https://#{Changeling.config.github_hostname}/#{Faker::Lorem.word}/#{Faker::Lorem.word}/pull/#{Faker::Number.number(3)}" }
-  callback_url { "https://#{Faker::Internet.domain_name}" }
   release_id { Faker::Number.hexadecimal(7) }
   requester { Faker::Internet.user_name }
   impact { %w{low medium high}.sample }

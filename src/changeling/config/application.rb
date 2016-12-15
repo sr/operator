@@ -62,4 +62,7 @@ module Changeling
 
     config.active_job.queue_adapter = :sidekiq
   end
+  cattr_accessor :config do
+    ChangelingConfig.new
+  end
 end

@@ -50,11 +50,11 @@
   background-color: $background;
 
   background-image: -webkit-gradient(
-  	linear,
-  	right top,
-  	left bottom,
-  	color-stop(0, rgba($gradient, 0)),
-  	color-stop(1, rgba($gradient, 0.6))
+	linear,
+	right top,
+	left bottom,
+	color-stop(0, rgba($gradient, 0)),
+	color-stop(1, rgba($gradient, 0.6))
   );
   background-image: -o-linear-gradient(left bottom, rgba($gradient, 0) 0%, rgba($gradient, 0.6) 100%);
   background-image: -moz-linear-gradient(left bottom, rgba($gradient, 0) 0%, rgba($gradient, 0.6) 100%);

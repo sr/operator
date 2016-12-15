@@ -4,5 +4,7 @@ class PublishEventJob < ActiveJob::Base
 
   def perform(type, multipass)
     Shuriken.new.publish(type, multipass)
+    return unless type == "emergency_override"
+    EmergencyOverrideMailer.send_multipass(multipass).deliver_later
   end
 end
