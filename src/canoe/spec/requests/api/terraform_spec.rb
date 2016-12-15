@@ -81,7 +81,7 @@ RSpec.describe "Terraform API" do
   end
 
   it "returns an error if the commit status is pending" do
-    github.tests_state = GithubRepository::PENDING
+    github.compliance_state = GithubRepository::PENDING
 
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
@@ -89,7 +89,7 @@ RSpec.describe "Terraform API" do
   end
 
   it "returns an error if the commit status is failure" do
-    github.tests_state = GithubRepository::FAILURE
+    github.compliance_state = GithubRepository::FAILURE
 
     create_deploy project: "aws/pardotops"
     expect(deploy_response.error).to eq(true)
