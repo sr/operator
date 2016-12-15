@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe EmergencyOverrideMailer, type: [:mailer] do
   before do
+    Changeling.config.email_notifications_enabled = true
+
     stub_json_request(:get, "https://x:123@components.heroku.tools/apps.json", fixture_data("heimdall/apps"))
 
     pull_request_data = decoded_fixture_data("github/pull_request_opened")
