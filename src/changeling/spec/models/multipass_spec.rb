@@ -102,53 +102,6 @@ RSpec.describe Multipass, :type => :model do
     end
   end
 
-  describe "#log_created" do
-    before do
-      allow(GitHubCommitStatusWorker).to receive(:perform_later)
-    end
-
-    it "logs when a new multipass is created" do
-      expect(Metrics).to receive(:increment).with(/multipasses\.created\..*/)
-      expect(Metrics).to receive(:increment).with("multipasses.created")
-
-      Fabricate(:unreviewed_multipass)
-    end
-
-    it "does not log when an existing multipass is saved" do
-      multipass = Fabricate(:multipass)
-
-      expect(Metrics).to_not receive(:increment)
-
-      multipass.save
-    end
-  end
-
-  describe "logging completed multipass" do
-    before do
-      allow(GitHubCommitStatusWorker).to receive(:perform_later)
-    end
-
-    let!(:multipass) { Fabricate.create(:incomplete_multipass, requester: "Jonan", reference_url: "https://github.com/heroku/changeling/pull/12") }
-
-    it "only logs when the multipass changes to completed" do
-      multipass.peer_reviewer = "Yannick"
-      multipass.change_type = :minor
-      multipass.testing = true
-      allow(Metrics).to receive(:increment)
-      expect(Metrics).to receive(:increment)
-        .with("multipasses.completed.heroku.changeling", anything)
-      multipass.save!
-    end
-
-    it "doesn't log when the multipass is updated while completed" do
-      complete_multipass.save!
-      expect(Metrics).to_not receive(:increment)
-        .with("multipasses.completed.heroku.changeling", anything)
-      complete_multipass.peer_reviewer = "Yannick"
-      complete_multipass.save!
-    end
-  end
-
   describe "multipass with change type preapproved" do
     let(:multipass) { Fabricate(:multipass, change_type: "minor") }
     let(:select_change_type) do
@@ -166,7 +119,7 @@ RSpec.describe Multipass, :type => :model do
     end
 
     it "does not call any of our callbacks when modifying the change type" do
-      %w{ update_complete callback_to_github log_completed log_created }.each do |callback|
+      %w{ update_complete callback_to_github }.each do |callback|
         expect_any_instance_of(Multipass).to receive(callback).never
       end
 

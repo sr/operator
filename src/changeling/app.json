@@ -85,6 +85,14 @@
       "description": "The session secret used to encrypt and sign session cookies.",
       "generator": "secret"
     },
+    "SENDGRID_PASSWORD": {
+      "description": "The password for sending email through sendgrid",
+      "required": false
+    },
+    "SENDGRID_USERNAME": {
+      "description": "The username for sending email through sendgrid",
+      "required": false
+    },
     "TONITRUS_LOGIN": {
       "description": "Event stream login",
       "value": "unknown"

@@ -1,4 +1,3 @@
-require_relative "./validators/callback_url_is_valid"
 require_relative "./validators/sre_approver_is_in_sre"
 
 # A change request in the system
@@ -16,9 +15,7 @@ class Multipass < ActiveRecord::Base
   include PullRequestMethods
 
   before_save :update_complete
-  after_save :log_completed
   after_commit :callback_to_github
-  after_create :log_created
 
   scope :by_team, lambda { |team|
     return if team.blank?
@@ -34,7 +31,7 @@ class Multipass < ActiveRecord::Base
     where(testing: false).where(["updated_at > ?", 5.minutes.ago])
   }
 
-  validates_with SREApproverIsInSRE, CallbackUrlIsValid
+  validates_with SREApproverIsInSRE
 
   validates :requester, :reference_url, :team, presence: true
   validates_each :sre_approver, :peer_reviewer do |record, attr, value|
@@ -59,11 +56,6 @@ class Multipass < ActiveRecord::Base
     end
 
     self[:change_type]
-  end
-
-  def log_completed
-    return true unless just_completed?
-    ActiveSupport::Notifications.instrument("multipass.completed", multipass: self)
   end
 
   # Return true if the multipass was marked as completed just now.
