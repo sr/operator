@@ -88,6 +88,10 @@ module HAL9000
           config.handlers.zabbix_handler.monitor_http_timeout_seconds = 30
         end
 
+        if config.handlers.respond_to?(:emergency_escalation_handler)
+          config.handlers.emergency_escalation_handler.pagerduty_service_key = ENV.fetch("SRE_PAGERDUTY_SERVICE_KEY", "")
+        end
+
         ## Example: Set options for the Redis connection.
         config.redis[:host] = ENV.fetch("REDIS_HOST", "127.0.0.1")
         config.redis[:port] = ENV.fetch("REDIS_PORT", "6379").to_i
