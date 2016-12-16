@@ -10,6 +10,10 @@ class RepositoryPullRequest
   end
 
   def initialize(multipass)
+    if multipass.nil? || multipass.new_record?
+      raise ArgumentError, "multipass is nil or is a new record"
+    end
+
     @multipass = multipass
   end
 
