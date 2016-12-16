@@ -10,6 +10,7 @@ class PullRequestHandler < ActiveJob::Base
     pull_request = JSON.parse(data)
     if Changeling.config.pardot?
       multipass = Multipass.find_or_initialize_by_pull_request(pull_request)
+      multipass.save!
       multipass.synchronize
     else
       case pull_request["action"]
