@@ -116,7 +116,7 @@ case "$action" in
     fi
 
     cd src/terraform &&
-    make -f ../../etc/mk/terraform.mk "$TERRAFORM_PROJECT" |
+    make -f ../../etc/mk/terraform.mk "$action" |
     grep -vi password
     ;;
   fmt)
