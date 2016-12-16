@@ -3,16 +3,6 @@ class ApplicationController < ActionController::Base
   before_action :require_oauth_authentication
   around_action :log_context
 
-  rescue_from Exception do |exception|
-    Instrumentation.log_exception(exception)
-
-    if !Rails.env.development?
-      render file: "public/500.html", layout: false, status: 500
-    else
-      raise exception
-    end
-  end
-
   def sql_view
     "SQL".freeze
   end
