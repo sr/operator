@@ -1,7 +1,7 @@
 class RepositoryPullRequest
   def self.synchronize(commit_status)
-    # Avoid infinite loop where reporting our own status triggers this job
-    # again and again.
+    # Avoid infinite loop where reporting our own status triggers synchronization
+    # again and again
     return if commit_status.context == Changeling.config.compliance_status_context
 
     Multipass.where(release_id: commit_status.sha).each do |multipass|
