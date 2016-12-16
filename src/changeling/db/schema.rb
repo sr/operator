@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161207210528) do
+ActiveRecord::Schema.define(version: 20161214120258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,7 +68,6 @@ ActiveRecord::Schema.define(version: 20161207210528) do
     t.datetime "updated_at",                             null: false
     t.string   "team",               default: "Unknown"
     t.boolean  "merged",             default: false
-    t.string   "callback_url"
     t.string   "release_id"
     t.string   "emergency_approver"
     t.string   "title"
@@ -86,7 +85,7 @@ ActiveRecord::Schema.define(version: 20161207210528) do
     t.integer  "github_repository_id", null: false
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
-    t.index ["sha", "context"], name: "index_repository_commit_statuses_on_sha_and_context", unique: true, using: :btree
+    t.index ["github_repository_id", "sha", "context"], name: "repository_commit_statuses_unique_idx", unique: true, using: :btree
   end
 
   create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -98,10 +97,10 @@ ActiveRecord::Schema.define(version: 20161207210528) do
   end
 
   create_table "tickets", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string   "external_id",                 null: false
+    t.text     "external_id",                 null: false
     t.text     "summary",                     null: false
-    t.string   "tracker",                     null: false
-    t.string   "status",                      null: false
+    t.text     "tracker",                     null: false
+    t.text     "status",                      null: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.text     "url",         default: "",    null: false

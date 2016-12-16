@@ -1,4 +1,4 @@
-class RepositoryCommitStatus < ActiveRecord::Base
+class RepositoryCommitStatus < ApplicationRecord
   SUCCESS = "success".freeze
   FAILURE = "failure".freeze
 end

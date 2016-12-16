@@ -2,9 +2,14 @@
 
 ## Table of contents
 
+* [User Setup](#user-setup)
 * [Overview](#overview)
 * [As someone requesting a change](#as-someone-requesting-a-change)
 * [As someone reviewing a change](#as-someone-reviewing-a-change)
+
+## User Setup
+
+In order to participate in compliance you need to be added to the [List of Herokai](https://docs.google.com/spreadsheets/d/19R9mq-cGjNePlNQX4d1JldW3-W4c0pw-cGehDLDxmyg/edit#gid=0). This applies to both full time employees and contractors. To add a herokai email vibehelp@heroku.com to get things going. After you've been added to the employees.csv ping someone in the tools room to update the employees.csv inside of changeling.
 
 ## Overview
 
