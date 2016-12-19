@@ -64,7 +64,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
 
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
       reference = @multipass.reload.ticket_reference
@@ -78,25 +78,25 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598: hello")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.ticket_reference).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.ticket_reference).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.ticket_reference).to eq(nil)
       stub_github_pull_request(title: "[BREAD-1598] - hello")
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
     end
 
@@ -104,12 +104,12 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
       stub_jira_ticket("PDT-98")
       stub_github_pull_request(title: "PDT-98 Fix everything")
-      @repository_pull_request.synchronize
+      @multipass.synchronize
 
       reference = @multipass.reload.ticket_reference
       expect(reference).to_not eq(nil)
@@ -117,7 +117,7 @@ RSpec.describe RepositoryPullRequest do
       expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/PDT-98")
 
       stub_jira_ticket("PDT-98", resolved: true)
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       reference.reload
       expect(reference.open?).to eq(false)
     end
@@ -126,11 +126,11 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
       stub_github_pull_request(title: "Untitled")
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to eq(nil)
     end
 
@@ -138,7 +138,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598", exists: false)
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
 
       reference = @multipass.reload.ticket_reference
       expect(reference).to eq(nil)
@@ -148,13 +148,13 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
 
       reference = @multipass.reload.ticket_reference
       expect(reference.open?).to eq(true)
 
       stub_jira_ticket("BREAD-1598", exists: false)
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(reference.reload.open?).to eq(false)
     end
   end
@@ -164,7 +164,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
       stub_github_commit_status
-      @repository_pull_request.synchronize
+      @multipass.synchronize
 
       expect(@multipass.reload.release_id).to eq("abc123")
     end
@@ -179,7 +179,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
       expect(status.state).to eq(RepositoryCommitStatus::SUCCESS)
@@ -187,7 +187,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::FAILURE, context: "ci/travis" }
       ])
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
       expect(status.state).to eq(RepositoryCommitStatus::FAILURE)
@@ -202,14 +202,14 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.testing?).to eq(false)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel" }
       ])
-      @repository_pull_request.synchronize
+      @multipass.synchronize
       expect(@multipass.reload.testing?).to eq(true)
     end
   end

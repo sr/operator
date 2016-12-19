@@ -6,40 +6,46 @@ resource "aws_vpc" "dev_environment" {
   }
 }
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+resource "aws_security_group" "dev_environment_secgroup" {
+  name   = "dev_environment_secgroup"
+  vpc_id = "${aws_vpc.dev_environment.id}"
 
-  cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}",
-  ]
-}
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
 
-  cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}",
-  ]
-}
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
 
-  cidr_blocks = [
-    "${var.aloha_vpn_cidr_blocks}",
-  ]
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group" "allow_inbound_http_https_from_sfdc" {
@@ -236,7 +242,7 @@ resource "aws_db_instance" "oracle_sandbox_db" {
   engine                  = "oracle-ee"
   engine_version          = "11.2.0.4.v1"
   instance_class          = "db.t2.small"
-  name                    = "pardot_sandbox_db"
+  name                    = "ORCLSBX"
   port                    = 1521
   username                = "pardottandp"
   password                = "pardottandporaclesandbox" # WARNING: once changed, this is no longer tracked by TF
@@ -290,33 +296,4 @@ resource "aws_security_group" "oracle_sandbox_db_secgroup" {
     Name      = "oracle_sandbox_db_secgroup"
     terraform = "true"
   }
-}
-
-resource "aws_iam_role" "oracle_sandbox_db_access_role" {
-  name               = "oracle_sandbox_db_access_role"
-  assume_role_policy = "${aws_iam_policy.oracle_sandbox_db_access_role_policy.id}"
-}
-
-resource "aws_iam_policy" "oracle_sandbox_db_access_role_policy" {
-  name = "oracle_sandbox_db_access_role"
-
-  policy = <<EOF
-{
-   "Version":"2012-10-17",
-   "Statement":[
-      {
-         "Sid":"DenyOracleSandboxDeleteAccess",
-         "Effect":"Deny",
-         "Action":"rds:Delete*",
-         "Resource":"${aws_db_instance.oracle_sandbox_db.arn}"
-      },
-      {
-         "Sid":"AllowOracleSandboxAccess",
-         "Effect":"Allow",
-         "Action":"rds:*",
-         "Resource":"${aws_db_instance.oracle_sandbox_db.arn}"
-      }
-   ]
-}
-EOF
 }

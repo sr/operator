@@ -1,3 +1,4 @@
+# Class for enabling feature flags for pardot or heroku's installation
 class ChangelingConfig
   def heroku?
     !pardot?
@@ -14,6 +15,12 @@ class ChangelingConfig
     @require_heroku_organization_membership = !pardot?
   end
   attr_writer :require_heroku_organization_membership
+
+  def email_notifications_enabled?
+    return @email_notifications_enabled if defined?(@email_notifications_enabled)
+    @email_notifications_enabled = heroku?
+  end
+  attr_writer :email_notifications_enabled
 
   def page_title
     if pardot?

@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
 
   def self.create_with_omniauth(auth)
     if Changeling.config.require_heroku_organization_membership?
-      require_herokai!(auth["credentials"]["token"])
+      require_herokai! auth["credentials"]["token"]
     end
 
     user = User.find_or_create_by(github_uid: auth["uid"])

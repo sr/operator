@@ -5,7 +5,6 @@ class JiraEventsController < ApplicationController
   PROCESSABLE_EVENTS = [
     "jira:issue_created",
     "jira:issue_updated",
-    "jira:version_updated",
     "jira:issue_deleted"
   ].freeze
 
