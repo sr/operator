@@ -1,7 +1,7 @@
 class RepositoryPullRequest
   def self.synchronize(commit_status)
-    # Avoid infinite loop where reporting our own status triggers this job
-    # again and again.
+    # Avoid infinite loop where reporting our own status triggers synchronization
+    # again and again
     return if commit_status.context == Changeling.config.compliance_status_context
 
     Multipass.where(release_id: commit_status.sha).each do |multipass|
@@ -10,6 +10,14 @@ class RepositoryPullRequest
   end
 
   def initialize(multipass)
+    if multipass.nil?
+      raise ArgumentError, "multipass is nil"
+    end
+
+    if multipass.new_record?
+      raise ArgumentError, "multipass is a new record"
+    end
+
     @multipass = multipass
   end
 
@@ -78,10 +86,10 @@ class RepositoryPullRequest
 
     combined_status[:statuses].each do |payload|
       status = Clients::GitHub::CommitStatus.new(
-        combined_status[:repository][:id],
-        combined_status[:sha],
-        payload[:context],
-        payload[:state],
+        combined_status.repository.id,
+        combined_status.sha,
+        payload.context,
+        payload.state,
       )
 
       update_commit_status(status)
@@ -106,6 +114,8 @@ class RepositoryPullRequest
         RepositoryCommitStatus.create!(attributes.merge(state: commit_status.state))
       end
     end
+  # rubocop:disable Lint/HandleExceptions
+  rescue ActiveRecord::RecordNotUnique
   end
 
   def synchronize_jira_ticket
