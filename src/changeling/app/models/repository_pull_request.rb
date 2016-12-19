@@ -86,10 +86,10 @@ class RepositoryPullRequest
 
     combined_status[:statuses].each do |payload|
       status = Clients::GitHub::CommitStatus.new(
-        combined_status[:repository][:id],
-        combined_status[:sha],
-        payload[:context],
-        payload[:state],
+        combined_status.repository.id,
+        combined_status.sha,
+        payload.context,
+        payload.state,
       )
 
       update_commit_status(status)
