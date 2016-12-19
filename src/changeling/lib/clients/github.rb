@@ -54,5 +54,43 @@ module Clients
     def pull_request(name_with_owner, number)
       @client.pull_request(name_with_owner, number)
     end
+
+    def pull_request_reviews(name_with_owner, number)
+      # TODO Replace with @client.pull_request_reviews when GitHub Enterprise
+      # API supports <https://developer.github.com/v3/pulls/reviews/>
+      agent = Mechanize.new
+      agent.get("https://#{Changeling.config.github_hostname}/login") do |login_page|
+        login_page.form_with(action: "/session") { |f|
+          f["login"] = Changeling.config.github_service_account_username
+          f["password"] = Changeling.config.github_service_account_password
+        }.click_button
+      end
+
+      pr_page = agent.get("https://#{Changeling.config.github_hostname}/#{name_with_owner}/pull/#{number}")
+      review_action_item = pr_page.css(".mergeability-details .branch-action-item").first
+      return [] if review_action_item.nil?
+
+      review_action_item.css(".merge-status-item").flat_map { |msi|
+        user_avatar = msi.css("img").first
+        next [] if user_avatar.nil?
+
+        user_login = user_avatar["alt"].sub(/\A@/, "")
+        text = msi.css(".text-gray").text
+        state = \
+          case text
+          when /approved these changes/
+            "APPROVED"
+          else
+            "REJECTED"
+          end
+
+        Hashie::Mash.new(
+          user: {
+            login: user_login
+          },
+          state: state
+        )
+      }
+    end
   end
 end

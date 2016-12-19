@@ -100,6 +100,22 @@ class ChangelingConfig
     end
   end
 
+  def github_service_account_username
+    if pardot?
+      ENV.fetch("GITHUB_USERNAME")
+    else
+      ENV["GITHUB_USERNAME"]
+    end
+  end
+
+  def github_service_account_password
+    if pardot?
+      ENV.fetch("GITHUB_PASSWORD")
+    else
+      ENV["GITHUB_PASSWORD"]
+    end
+  end
+
   def github_source_ips
     Array(ENV.fetch("GITHUB_WEBHOOK_SOURCE_IP", "192.30.252.0/22"))
   end

@@ -46,6 +46,7 @@ class RepositoryPullRequest
   def synchronize
     synchronize_github_pull_request
     unless @multipass.merged?
+      synchronize_github_reviewers
       synchronize_github_statuses
       synchronize_jira_ticket
     end
@@ -96,6 +97,20 @@ class RepositoryPullRequest
     end
 
     recalculate_testing_status
+  end
+
+  def synchronize_github_reviewers
+    reviews = @multipass.github_client.pull_request_reviews(
+      repository.name_with_owner,
+      number
+    )
+
+    approval = reviews.detect { |r| r.state.casecmp("approved") == 0 }
+    if approval
+      @multipass.peer_reviewer = approval.user.login
+    else
+      @multipass.peer_reviewer = nil
+    end
   end
 
   def update_commit_status(commit_status)

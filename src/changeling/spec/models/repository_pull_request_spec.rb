@@ -57,6 +57,39 @@ RSpec.describe RepositoryPullRequest do
       .to_return(body: JSON.dump(combined_status), headers: { "Content-Type" => "application/json" })
   end
 
+  def stub_github_pull_request_reviews(reviews = [])
+    login_form = <<-EOS
+      <form method="post" action="/session">
+        <input type="text" name="login">
+        <input type="password" name="password">
+        <input type="submit">
+      </form>
+    EOS
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/login")
+      .to_return(body: login_form, headers: { "Content-Type" => "text/html" })
+    stub_request(:post, "https://#{Changeling.config.github_hostname}/session")
+
+    reviews_html = reviews.map { |r|
+      <<-EOS
+        <div class="merge-status-item">
+          <img alt="@#{r[:github_login]}">
+          <span class="text-gray">#{r[:github_login]} #{r[:approved] ? "approved these changes" : "requested changes"}</span>
+        </div>
+      EOS
+    }
+
+    body = <<-EOS
+    <div class="mergeability-details">
+      <div class="branch-action-item">
+        #{reviews_html.join("\n")}
+      </div>
+    </div>
+    EOS
+
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/#{PardotRepository::CHANGELING}/pull/#{@multipass.pull_request_number}")
+      .to_return(body: body, headers: { "Content-Type" => "text/html" })
+  end
+
   describe "synchronizing ticket references" do
     it "creates a ticket references for JIRA tickets" do
       expect(@multipass.ticket_reference).to eq(nil)
@@ -64,6 +97,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
 
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
@@ -78,6 +112,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598: hello")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
@@ -104,6 +139,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
@@ -126,6 +162,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
       expect(@multipass.reload.ticket_reference).to_not eq(nil)
 
@@ -138,6 +175,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598", exists: false)
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
 
       reference = @multipass.reload.ticket_reference
@@ -148,6 +186,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
 
       reference = @multipass.reload.ticket_reference
@@ -164,6 +203,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
       stub_github_commit_status
+      stub_github_pull_request_reviews
       @multipass.synchronize
 
       expect(@multipass.reload.release_id).to eq("abc123")
@@ -179,6 +219,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
+      stub_github_pull_request_reviews
       @multipass.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
@@ -196,6 +237,7 @@ RSpec.describe RepositoryPullRequest do
     it "marks the testing status as success if all the required testing status are successful" do
       stub_jira_ticket("BREAD-1234")
       stub_github_pull_request
+      stub_github_pull_request_reviews
 
       expect(@multipass.testing?).to eq(false)
 
@@ -211,6 +253,61 @@ RSpec.describe RepositoryPullRequest do
       ])
       @multipass.synchronize
       expect(@multipass.reload.testing?).to eq(true)
+    end
+  end
+
+  describe "synchronizing peer reviewer" do
+    it "does not set peer reviewer if the pull request has not been reviewed" do
+      stub_jira_ticket("BREAD-1234")
+      stub_github_pull_request
+      stub_github_commit_status
+      stub_github_pull_request_reviews([])
+      @repository_pull_request.synchronize
+
+      expect(@multipass.reload.peer_reviewer).to eq(nil)
+    end
+
+    it "sets the peer reviewer to the first reviewer that approved the pull request" do
+      stub_jira_ticket("BREAD-1234")
+      stub_github_pull_request
+      stub_github_commit_status
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: true },
+        { github_login: "sr", approved: true }
+      ])
+      @repository_pull_request.synchronize
+
+      expect(@multipass.reload.peer_reviewer).to eq("alindeman")
+    end
+
+    it "sets the peer reviewer to the first approval even if there are other negative reviews" do
+      stub_jira_ticket("BREAD-1234")
+      stub_github_pull_request
+      stub_github_commit_status
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: false },
+        { github_login: "sr", approved: true }
+      ])
+      @repository_pull_request.synchronize
+
+      expect(@multipass.reload.peer_reviewer).to eq("sr")
+    end
+
+    it "removes the reviewer if they later rescind their review" do
+      stub_jira_ticket("BREAD-1234")
+      stub_github_pull_request
+      stub_github_commit_status
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: true }
+      ])
+      @repository_pull_request.synchronize
+      expect(@multipass.reload.peer_reviewer).to eq("alindeman")
+
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: false }
+      ])
+      @repository_pull_request.synchronize
+      expect(@multipass.reload.peer_reviewer).to eq(nil)
     end
   end
 end
