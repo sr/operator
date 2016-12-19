@@ -114,6 +114,8 @@ class RepositoryPullRequest
         RepositoryCommitStatus.create!(attributes.merge(state: commit_status.state))
       end
     end
+  # rubocop:disable Lint/HandleExceptions
+  rescue ActiveRecord::RecordNotUnique
   end
 
   def synchronize_jira_ticket
