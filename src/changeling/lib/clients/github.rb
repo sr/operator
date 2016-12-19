@@ -56,7 +56,7 @@ module Clients
     end
 
     def pull_request_reviews(name_with_owner, number)
-      # TODO Replace with @client.pull_request_reviews when GitHub Enterprise
+      # TODO: Replace with @client.pull_request_reviews when GitHub Enterprise
       # API supports <https://developer.github.com/v3/pulls/reviews/>
       agent = Mechanize.new
       agent.get("https://#{Changeling.config.github_hostname}/login") do |login_page|
