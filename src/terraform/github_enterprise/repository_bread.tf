@@ -30,7 +30,7 @@ resource "github_branch_protection" "bread_master" {
   repository = "${github_repository.bread.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = true
-  contexts       = ["BREAD build"]
+  contexts       = ["pardot/compliance"]
 }

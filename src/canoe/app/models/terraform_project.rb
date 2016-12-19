@@ -28,10 +28,10 @@ class TerraformProject < ActiveRecord::Base
       return TerraformDeployResponse.new(nil, message)
     end
 
-    if commit_status.tests_state != GithubRepository::SUCCESS
-      message = "Current build status #{commit_status.tests_state.inspect} for " \
+    if commit_status.compliance_state != GithubRepository::SUCCESS
+      message = "Current compliance state #{commit_status.compliance_state.inspect} for " \
         "#{commit_status.branch}@#{commit_status.sha[0, 7]} is not successful. " \
-        "See #{commit_status.tests_url} for details"
+        "See #{commit_status.compliance_url} for details"
       return TerraformDeployResponse.new(nil, message)
     end
 
