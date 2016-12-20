@@ -376,10 +376,8 @@ class ZabbixHandler < ApplicationHandler
           end
         end
       rescue => e
-        robot.send_message(
-          @status_room,
-          "Error while attempting to report Chef problems for #{datacenter}: #{e}"
-        )
+        $stderr.puts "ERROR: #{e.inspect}"
+        $stderr.puts e.backtrace.join("\n")
       end
     end
   end
