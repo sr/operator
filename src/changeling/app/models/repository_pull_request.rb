@@ -105,7 +105,8 @@ class RepositoryPullRequest
       number
     )
 
-    approval = reviews.detect { |r| r.state.casecmp("approved") == 0 }
+    approval = reviews.detect { |r| r.state == Clients::GitHub::REVIEW_APPROVED }
+
     if approval
       @multipass.peer_reviewer = approval.user.login
     else

@@ -2,6 +2,10 @@
 module Clients
   # Interact with pull requests and commit statuses via the GitHub API
   class GitHub
+    # https://developer.github.com/early-access/graphql/enum/pullrequestreviewstate/
+    REVIEW_APPROVED = "APPROVED".freeze
+    REVIEW_CHANGES_REQUESTED = "CHANGES_REQUESTED".freeze
+
     CommitStatus = Struct.new(:repository_id, :sha, :context, :state)
 
     def initialize(token)
@@ -79,9 +83,9 @@ module Clients
         state = \
           case text
           when /approved these changes/
-            "APPROVED"
+            REVIEW_APPROVED
           else
-            "REJECTED"
+            REVIEW_CHANGES_REQUESTED
           end
 
         Hashie::Mash.new(
