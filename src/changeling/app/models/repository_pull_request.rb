@@ -46,6 +46,7 @@ class RepositoryPullRequest
   def synchronize
     synchronize_github_pull_request
     unless @multipass.merged?
+      synchronize_github_reviewers
       synchronize_github_statuses
       synchronize_jira_ticket
     end
@@ -63,7 +64,7 @@ class RepositoryPullRequest
   private
 
   def synchronize_github_pull_request
-    pull_request = @multipass.github_client.pull_request(
+    pull_request = github_client.pull_request(
       repository.name_with_owner,
       number
     )
@@ -79,7 +80,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_github_statuses
-    combined_status = @multipass.github_client.combined_status(
+    combined_status = github_client.combined_status(
       repository.name_with_owner,
       @multipass.release_id
     )
@@ -96,6 +97,21 @@ class RepositoryPullRequest
     end
 
     recalculate_testing_status
+  end
+
+  def synchronize_github_reviewers
+    reviews = github_client.pull_request_reviews(
+      repository.name_with_owner,
+      number
+    )
+
+    approval = reviews.detect { |r| r.state == Clients::GitHub::REVIEW_APPROVED }
+
+    if approval
+      @multipass.peer_reviewer = approval.user.login
+    else
+      @multipass.peer_reviewer = nil
+    end
   end
 
   def update_commit_status(commit_status)
@@ -171,6 +187,10 @@ class RepositoryPullRequest
     when /\A\[?([A-Z]+\-[0-9]+)\]?/
       Regexp.last_match(1)
     end
+  end
+
+  def github_client
+    @github_client ||= Clients::GitHub.new(Changeling.config.github_service_account_token)
   end
 
   def repository

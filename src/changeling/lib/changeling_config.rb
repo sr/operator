@@ -77,19 +77,11 @@ class ChangelingConfig
   end
 
   def ghost_user_login
-    if pardot?
-      ENV.fetch("CHANGELING_GHOST_LOGIN")
-    else
-      "changeling-production"
-    end
+    "changeling-production"
   end
 
   def ghost_user_token
-    if pardot?
-      ENV.fetch("GITHUB_COMMIT_STATUS_TOKEN")
-    else
-      ENV["GITHUB_COMMIT_STATUS_TOKEN"]
-    end
+    ENV["GITHUB_COMMIT_STATUS_TOKEN"]
   end
 
   def github_hostname
@@ -98,6 +90,26 @@ class ChangelingConfig
     else
       "github.com"
     end
+  end
+
+  def github_service_account_username
+    if pardot?
+      ENV.fetch("GITHUB_USERNAME")
+    else
+      ENV["GITHUB_USERNAME"]
+    end
+  end
+
+  def github_service_account_password
+    if pardot?
+      ENV.fetch("GITHUB_PASSWORD")
+    else
+      ENV["GITHUB_PASSWORD"]
+    end
+  end
+
+  def github_service_account_token
+    ENV.fetch("GITHUB_TOKEN")
   end
 
   def github_source_ips

@@ -23,6 +23,10 @@ class User < ActiveRecord::Base
   end
 
   def self.ghost
+    if Changeling.config.pardot?
+      raise "User.ghost is disabled in Pardot mode"
+    end
+
     result = new
     result.github_login = Changeling.config.ghost_user_login
     result.github_token = Changeling.config.ghost_user_token

@@ -14,10 +14,6 @@ module Multipass::GitHubStatuses
   end
 
   def commit_status_creator
-    if Changeling.config.pardot?
-      return User.ghost
-    end
-
     creator = if rejected?
                 User.find_by(github_login: rejector)
               elsif emergency_approver.present?
@@ -31,7 +27,7 @@ module Multipass::GitHubStatuses
   end
 
   def github_client
-    @github_client = Clients::GitHub.new(commit_status_creator.github_token)
+    @github_client = Clients::GitHub.new(github_client_token)
   end
 
   def callback_to_github
@@ -70,6 +66,16 @@ module Multipass::GitHubStatuses
     statuses.detect do |s|
       cs = CommitStatus.new(s)
       cs.testing_success? && cs.valid_context?
+    end
+  end
+
+  private
+
+  def github_client_token
+    if Changeling.config.pardot?
+      Changeling.config.github_service_account_token
+    else
+      commit_status_creator.github_token
     end
   end
 end
