@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/bkeepers/owners
+  revision: e42844aa79c16dc5dedc1526ab9a5a00ecd9a541
+  specs:
+    owners (0.0.1)
+
 PATH
   remote: vendor/purple
   specs:
@@ -412,6 +418,7 @@ DEPENDENCIES
   nokogiri
   octokit
   omniauth-github
+  owners!
   pg
   pry-byebug
   puma (= 2.15.3)
