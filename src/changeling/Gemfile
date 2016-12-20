@@ -2,10 +2,14 @@ ruby "2.3.1"
 
 source "https://rubygems.org"
 
+gem "faraday_middleware", "~> 0.10.0"
+gem "lograge", "~> 0.4"
+gem "sentry-raven",  "~> 2.1.0"
+gem "zipkin-tracer", "~> 0.18"
+
 gem "active_model_serializers"
 gem "audited", "4.3.0"
 gem "bootstrap_form"
-gem "coal_car", "~> 0.2.2"
 gem "coffee-rails", "~> 4.1.0"
 gem "faraday"
 gem "fernet"
