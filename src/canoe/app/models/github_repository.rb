@@ -3,62 +3,22 @@ class GithubRepository
   PENDING = "pending".freeze
   SUCCESS = "success".freeze
   MASTER = "master".freeze
+  IDENTICAL = "identical".freeze
   AHEAD = "ahead".freeze
   BEHIND = "behind".freeze
 
-  class Build
-    def self.none
-      new(url: nil, branch: nil, sha: nil, state: nil, updated_at: nil)
-    end
-
-    def initialize(attributes = {})
-      @url = attributes.fetch(:url)
-      @sha = attributes.fetch(:sha)
-      @branch = attributes.fetch(:branch)
-      @state = attributes.fetch(:state)
-      @updated_at = attributes.fetch(:updated_at)
-      @compare_status = attributes.fetch(:compare_status, nil)
-    end
-
-    attr_reader :url, :branch, :sha, :state, :updated_at, :compare_status
-  end
-
-  class Fake
-    attr_writer :current_build
-
-    def initialize(build = nil)
-      @current_build = build
-    end
-
-    def current_build(_branch)
-      @current_build
-    end
-  end
+  # TODO(sr) Figure out some way to avoid hard-coding this, maybe
+  COMPLIANCE_STATUS = "pardot/compliance".freeze
 
   def initialize(client, name)
     @client = client
     @name = name
   end
 
-  def current_build(branch)
-    status = @client.combined_status(@name, branch)
-    compare = @client.compare(@name, MASTER, branch)
-
-    # TODO: Remove when pardot/compliance is ready to be enforced
-    relevant_statuses = status.statuses.reject { |s| s.context == "pardot/compliance" }
-    combined_state = %w[failure pending success].find("pending") { |state|
-      relevant_statuses.any? { |s| s.state == state }
-    }
-
-    Build.new(
-      url: status[:statuses].first[:target_url],
-      sha: status[:sha],
-      # TODO(sr) Remove hard-coded value once we move to Artifactory as our
-      # source of build truth for Chef Delivery.
-      branch: "master",
-      state: combined_state,
-      compare_status: compare[:status],
-      updated_at: status[:statuses].first[:updated_at]
+  def commit_status(sha)
+    GithubCommitStatus.new(
+      @client.combined_status(@name, sha),
+      @client.compare(@name, MASTER, sha)
     )
   end
 end

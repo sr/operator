@@ -76,9 +76,7 @@ class MultipassesController < ApplicationController
   end
 
   def sync
-    multipass.check_commit_statuses!
-    multipass.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
-    multipass.save!
+    multipass.synchronize(current_github_login)
     redirect_back fallback_location: multipass_path(multipass)
   end
 

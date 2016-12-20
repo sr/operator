@@ -14,12 +14,6 @@ resource "github_team_repository" "protobuf-schemas_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "protobuf-schemas_ops" {
-  repository = "${github_repository.protobuf-schemas.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "protobuf-schemas_service-accounts-write-only" {
   repository = "${github_repository.protobuf-schemas.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
@@ -29,5 +23,11 @@ resource "github_team_repository" "protobuf-schemas_service-accounts-write-only"
 resource "github_team_repository" "protobuf-schemas_service-accounts-read-only" {
   repository = "${github_repository.protobuf-schemas.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
+  permission = "pull"
+}
+
+resource "github_team_repository" "protobuf-schemas_read-only-users" {
+  repository = "${github_repository.protobuf-schemas.name}"
+  team_id    = "${github_team.read-only-users.id}"
   permission = "pull"
 }

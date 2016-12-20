@@ -9,12 +9,8 @@ describe ZabbixHandler, lita_handler: true do
   end
 
   before do
-    handler_config.zabbix_api_url = "https://zabbix-%datacenter%.example/api_jsonrpc.php"
-    handler_config.zabbix_monitor_payload_url = "https://zabbix-%datacenter%.example/cgi-bin/zabbix-status-check.sh?"
     handler_config.active_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
     handler_config.paging_monitors = [::Zabbix::Zabbixmon::MONITOR_NAME]
-    handler_config.datacenters = %w[dfw]
-    handler_config.pager = "pagerduty"
     handler_config.zabbix_password = "abc123"
   end
 
@@ -89,6 +85,17 @@ describe ZabbixHandler, lita_handler: true do
       stub_item_get(result: [{ fake_item_key: "fake item value" }])
       send_command("zabbix monitor run dfw")
       expect(replies.last).to match(/^.*is confirmed alive*$/)
+    end
+  end
+
+  describe "!zabbix monitor run dfw" do
+    it "reports failure on a failed manually_run_monitor('dfw')" do
+      stub_api_version
+      stub_user_login
+      stub_insert_payload
+      stub_item_get(result: [])
+      send_command("zabbix monitor run dfw")
+      expect(replies.last).to match(/^.*zabbix.*\sis\sdead,\sJim*$/)
     end
   end
 end

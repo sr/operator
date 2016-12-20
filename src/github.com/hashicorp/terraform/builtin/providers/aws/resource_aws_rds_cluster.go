@@ -202,10 +202,11 @@ func resourceAwsRDSCluster() *schema.Resource {
 			},
 
 			"kms_key_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ForceNew:     true,
+				ValidateFunc: validateArn,
 			},
 
 			"tags": tagsSchema(),

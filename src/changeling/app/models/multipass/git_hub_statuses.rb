@@ -4,24 +4,8 @@ module Multipass::GitHubStatuses
     {
       context: Changeling.config.compliance_status_context,
       target_url: permalink,
-      description: commit_status_description
+      description: compliance_status.github_commit_status_description
     }
-  end
-
-  def commit_status_description
-    if rejected?
-      "Rejected by #{rejector}"
-    elsif emergency_approver.present?
-      "Completed via emergency approval by #{emergency_approver}."
-    elsif missing_conditional_fields.any?
-      human_missing_conditional_fields
-    elsif complete?
-      "All requirements completed. Reviewed by #{reviewers}."
-    elsif !testing
-      "Waiting for CI to complete."
-    else
-      "Missing fields: #{missing_fields.join(', ')}"
-    end
   end
 
   def github_login_for_requester
@@ -43,7 +27,7 @@ module Multipass::GitHubStatuses
   end
 
   def github_client
-    @github_client = Clients::GitHub.new(commit_status_creator.github_token)
+    @github_client = Clients::GitHub.new(github_client_token)
   end
 
   def callback_to_github
@@ -82,6 +66,16 @@ module Multipass::GitHubStatuses
     statuses.detect do |s|
       cs = CommitStatus.new(s)
       cs.testing_success? && cs.valid_context?
+    end
+  end
+
+  private
+
+  def github_client_token
+    if Changeling.config.pardot?
+      Changeling.config.github_service_account_token
+    else
+      commit_status_creator.github_token
     end
   end
 end

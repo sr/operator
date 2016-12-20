@@ -16,6 +16,19 @@ module MultipassListHelper
   end
 
   def multipass_title(multipass)
+    if Changeling.config.pardot?
+      pull = RepositoryPullRequest.new(multipass)
+      ticket = pull.referenced_ticket
+      repo_link = link_to(pull.repository_name.to_s, pull.repository_url)
+
+      if ticket
+        ticket_link = link_to(ticket.external_id, ticket.url)
+        return raw("#{repo_link}: #{ticket_link} #{ticket.summary}")
+      else
+        return raw("#{repo_link}: #{pull.title}")
+      end
+    end
+
     if multipass.repository_name && multipass.pull_request_number
       link = link_to "PR##{multipass.pull_request_number}", multipass.reference_url
       raw "#{multipass.repository_name.split('/').last} (#{link})"

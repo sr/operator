@@ -475,6 +475,22 @@ module.exports = (robot) ->
     ]
     msg.send msg.random fondant
 
+  robot.respond /panda$/i, (msg) ->
+    pandas = [
+      'https://media1.giphy.com/media/xT8qB1QeVVwk2NmF0Y/giphy.gif',
+      'https://media4.giphy.com/media/12a5jfD4RVTAQw/giphy.gif',
+      'https://media3.giphy.com/media/l3vRiLydJmh7X0Yx2/giphy.gif',
+      'https://giant.gfycat.com/GaseousGorgeousAracari.gif',
+      'http://i.imgur.com/vxKOi.gif',
+      'http://i.imgur.com/X6wWnNp.gif',
+      'http://i.imgur.com/tPQi76p.jpg',
+      'http://i.imgur.com/oeAufrG.gifv',
+      'http://i.imgur.com/cNDbs8v.gif',
+      'http://i.imgur.com/xy6tM.gif',
+      'http://i.imgur.com/F94emFR.jpg'
+    ]
+    msg.send msg.random pandas
+
   robot.respond /mikacat$/i, (msg) ->
     mikacat = [
       'http://i.imgur.com/68Bo5g1.jpg',
@@ -752,7 +768,12 @@ module.exports = (robot) ->
     msg.send msg.random tbones
 
   robot.respond /dartz/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG"
+    dartzs = [
+      "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG",
+      "https://hipchat.dev.pardot.com/files/1/69/TFrXosSJjg5I4il/ezgif.com-gif-maker.gif"
+    ]
+
+    msg.send msg.random dartzs
 
   robot.respond /megaman$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"

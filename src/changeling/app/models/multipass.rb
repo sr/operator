@@ -1,13 +1,13 @@
-require_relative "./validators/callback_url_is_valid"
 require_relative "./validators/sre_approver_is_in_sre"
 
 # A change request in the system
 class Multipass < ActiveRecord::Base
   audited
   has_many :events
+  has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
-    Multipass::State, Multipass::Updates, Multipass::GitHubStatuses,
+    Multipass::Updates, Multipass::GitHubStatuses,
     Multipass::Actions
 
   extend Multipass::IssueComments
@@ -15,9 +15,7 @@ class Multipass < ActiveRecord::Base
   include PullRequestMethods
 
   before_save :update_complete
-  after_save :log_completed
   after_commit :callback_to_github
-  after_create :log_created
 
   scope :by_team, lambda { |team|
     return if team.blank?
@@ -33,7 +31,7 @@ class Multipass < ActiveRecord::Base
     where(testing: false).where(["updated_at > ?", 5.minutes.ago])
   }
 
-  validates_with SREApproverIsInSRE, CallbackUrlIsValid
+  validates_with SREApproverIsInSRE
 
   validates :requester, :reference_url, :team, presence: true
   validates_each :sre_approver, :peer_reviewer do |record, attr, value|
@@ -58,11 +56,6 @@ class Multipass < ActiveRecord::Base
     end
 
     self[:change_type]
-  end
-
-  def log_completed
-    return true unless just_completed?
-    ActiveSupport::Notifications.instrument("multipass.completed", multipass: self)
   end
 
   # Return true if the multipass was marked as completed just now.
@@ -95,6 +88,17 @@ class Multipass < ActiveRecord::Base
       reference_url_path_parts[4]
     else
       nil
+    end
+  end
+
+  def synchronize(current_github_login = nil)
+    if Changeling.config.heroku?
+      check_commit_statuses!
+      self.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
+      save!
+    else
+      pull = RepositoryPullRequest.new(self)
+      pull.synchronize
     end
   end
 
@@ -177,7 +181,34 @@ class Multipass < ActiveRecord::Base
     Metrics.increment("multipasses.created")
   end
 
+  def changed_risk_assessment?
+    return false if audits.size == 1
+    audits.any? do |audit|
+      audit.audited_changes["impact"] != "low"
+    end
+  end
+
+  delegate \
+    :update_complete,
+    :status,
+    :github_commit_status_description,
+    :complete?,
+    :rejected?,
+    :pending?,
+    :peer_reviewed?,
+    :user_is_peer_reviewer?,
+    :sre_approved?,
+    :user_is_sre_approver?,
+    :emergency_approved?,
+    :user_is_emergency_approver?,
+    :user_is_rejector?,
+    to: :compliance_status
+
   private
+
+  def compliance_status
+    @compliance_status ||= ComplianceStatus.new(self)
+  end
 
   def reference_url_path_parts
     unless reference_url.present?

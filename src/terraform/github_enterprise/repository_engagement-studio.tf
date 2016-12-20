@@ -19,3 +19,8 @@ resource "github_team_repository" "engagement-studio_service-accounts-write-only
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_branch_protection" "engagement-studio_master" {
+  repository = "${github_repository.engagement-studio.name}"
+  branch     = "master"
+}

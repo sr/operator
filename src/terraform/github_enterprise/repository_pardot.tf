@@ -14,12 +14,6 @@ resource "github_team_repository" "pardot_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "pardot_ops" {
-  repository = "${github_repository.pardot.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "pardot_service-accounts-write-only" {
   repository = "${github_repository.pardot.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
@@ -42,4 +36,19 @@ resource "github_team_repository" "pardot_core-production-security" {
   repository = "${github_repository.pardot.name}"
   team_id    = "${github_team.core-production-security.id}"
   permission = "pull"
+}
+
+resource "github_team_repository" "pardot_read-only-users" {
+  repository = "${github_repository.pardot.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
+}
+
+resource "github_branch_protection" "pardot_master" {
+  repository = "${github_repository.pardot.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
 }

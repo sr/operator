@@ -1,6 +1,6 @@
-resource "aws_security_group" "internal_apps_operator_http_lb" {
+resource "aws_security_group" "pardot0_ue1_operator_http_lb" {
   name   = "internal_apps_operator_http_lb"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port = 443
@@ -10,8 +10,8 @@ resource "aws_security_group" "internal_apps_operator_http_lb" {
     cidr_blocks = [
       "${aws_route53_record.hipchat_dev_pardot_com_Arecord.records[0]}/32",
       "${aws_route53_record.jira_dev_pardot_com_Arecord.records[0]}/32",
-      "${aws_route53_record.1_git_dev_pardot_com_Arecord.records[0]}/32",
-      "${aws_route53_record.2_git_dev_pardot_com_Arecord.records[0]}/32",
+      "${aws_route53_record.one_git_dev_pardot_com_Arecord.records[0]}/32",
+      "${aws_route53_record.two_git_dev_pardot_com_Arecord.records[0]}/32",
     ]
   }
 
@@ -25,15 +25,15 @@ resource "aws_security_group" "internal_apps_operator_http_lb" {
 
 resource "aws_alb" "operator_production" {
   security_groups = [
-    "${aws_security_group.internal_apps_operator_http_lb.id}",
-    "${aws_security_group.internal_apps_dc_only_http_lb.id}",
+    "${aws_security_group.pardot0_ue1_operator_http_lb.id}",
+    "${aws_security_group.pardot0_ue1_dc_only_http_lb.id}",
   ]
 
   subnets = [
-    "${aws_subnet.internal_apps_us_east_1a_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1c_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1d_dmz.id}",
-    "${aws_subnet.internal_apps_us_east_1e_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1a_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1c_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1d_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1e_dmz.id}",
   ]
 
   enable_deletion_protection = true
@@ -47,7 +47,7 @@ resource "aws_alb_target_group" "operator" {
   name                 = "operator-target-group"
   port                 = 80
   protocol             = "HTTP"
-  vpc_id               = "${aws_vpc.internal_apps.id}"
+  vpc_id               = "${aws_vpc.pardot0_ue1.id}"
   deregistration_delay = 30
 
   health_check {
@@ -123,7 +123,7 @@ resource "aws_ecs_cluster" "operator_production" {
 
 resource "aws_security_group" "operator_app_production" {
   name   = "operator_app_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port = 22
@@ -131,7 +131,7 @@ resource "aws_security_group" "operator_app_production" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -141,7 +141,7 @@ resource "aws_security_group" "operator_app_production" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_operator_http_lb.id}",
+      "${aws_security_group.pardot0_ue1_operator_http_lb.id}",
     ]
   }
 
@@ -155,7 +155,7 @@ resource "aws_security_group" "operator_app_production" {
 
 resource "aws_security_group" "operator_db_production" {
   name   = "operator_db_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port       = 3306
@@ -185,7 +185,7 @@ resource "aws_db_instance" "operator_production" {
   maintenance_window      = "Tue:00:00-Tue:04:00"
   multi_az                = true
   publicly_accessible     = false
-  db_subnet_group_name    = "${aws_db_subnet_group.internal_apps.name}"
+  db_subnet_group_name    = "${aws_db_subnet_group.pardot0_ue1.name}"
   vpc_security_group_ids  = ["${aws_security_group.operator_db_production.id}"]
   storage_encrypted       = false
   backup_retention_period = 5
@@ -296,10 +296,10 @@ resource "aws_autoscaling_group" "operator_production" {
   launch_configuration = "${aws_launch_configuration.operator_production.id}"
 
   vpc_zone_identifier = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 
   lifecycle {
@@ -312,16 +312,16 @@ resource "aws_elasticache_subnet_group" "hal9000_production" {
   description = "hal9000 production"
 
   subnet_ids = [
-    "${aws_subnet.internal_apps_us_east_1a.id}",
-    "${aws_subnet.internal_apps_us_east_1c.id}",
-    "${aws_subnet.internal_apps_us_east_1d.id}",
-    "${aws_subnet.internal_apps_us_east_1e.id}",
+    "${aws_subnet.pardot0_ue1_1a.id}",
+    "${aws_subnet.pardot0_ue1_1c.id}",
+    "${aws_subnet.pardot0_ue1_1d.id}",
+    "${aws_subnet.pardot0_ue1_1e.id}",
   ]
 }
 
 resource "aws_security_group" "hal9000_redis_production" {
   name   = "hal9000_redis_production"
-  vpc_id = "${aws_vpc.internal_apps.id}"
+  vpc_id = "${aws_vpc.pardot0_ue1.id}"
 
   ingress {
     from_port = 6379

@@ -1,7 +1,7 @@
-resource "aws_security_group" "internal_apps_chef_server" {
+resource "aws_security_group" "pardot0_ue1_chef_server" {
   name        = "internal_apps_chef_server"
   description = "Chef Server for the AWS environment"
-  vpc_id      = "${aws_vpc.internal_apps.id}"
+  vpc_id      = "${aws_vpc.pardot0_ue1.id}"
 
   # https://docs.chef.io/server_firewalls_and_ports.html
   ingress {
@@ -10,7 +10,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
       "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
@@ -21,7 +21,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
       "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
@@ -32,7 +32,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
       "${aws_vpc.internal_tools_integration.cidr_block}",
     ]
   }
@@ -44,7 +44,7 @@ resource "aws_security_group" "internal_apps_chef_server" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -56,15 +56,15 @@ resource "aws_security_group" "internal_apps_chef_server" {
   }
 }
 
-resource "aws_instance" "internal_apps_chef_server" {
+resource "aws_instance" "pardot0_ue1_chef_server" {
   ami           = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
   key_name      = "internal_apps"
   private_ip    = "172.30.22.109"
-  subnet_id     = "${aws_subnet.internal_apps_us_east_1a.id}"
+  subnet_id     = "${aws_subnet.pardot0_ue1_1a.id}"
 
   vpc_security_group_ids = [
-    "${aws_security_group.internal_apps_chef_server.id}",
+    "${aws_security_group.pardot0_ue1_chef_server.id}",
   ]
 
   root_block_device {
@@ -79,10 +79,10 @@ resource "aws_instance" "internal_apps_chef_server" {
   }
 }
 
-resource "aws_route53_record" "internal_apps_chef1-1_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+resource "aws_route53_record" "pardot0_ue1_chef1-1_Arecord" {
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot0-chef1-1-ue1.aws.pardot.com"
-  records = ["${aws_instance.internal_apps_chef_server.private_ip}"]
+  records = ["${aws_instance.pardot0_ue1_chef_server.private_ip}"]
   type    = "A"
   ttl     = "900"
 }

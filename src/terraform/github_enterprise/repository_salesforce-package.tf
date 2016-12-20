@@ -23,5 +23,14 @@ resource "github_team_repository" "salesforce-package_service-accounts-read-only
 resource "github_team_repository" "salesforce-package_service-accounts-write-only" {
   repository = "${github_repository.salesforce-package.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
-  permission = "pull"
+  permission = "push"
+}
+
+resource "github_branch_protection" "salesforce-package_master" {
+  repository = "${github_repository.salesforce-package.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["Test and Deploy Jobs"]
 }

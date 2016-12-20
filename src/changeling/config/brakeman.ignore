@@ -1,0 +1,61 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "7c051fd824209596b43578c796b1d7014900c953f89df14644be74ef47db20de",
+      "message": "Unescaped model attribute",
+      "file": "app/views/multipasses/show.html.erb",
+      "line": 26,
+      "link": "http://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "HTML::Pipeline.new([HTML::Pipeline::MarkdownFilter, HTML::Pipeline::EmojiFilter], :gfm => true, :asset_root => \"/images\").call(Multipass.find(params[:id]).backout_plan)[:output].to_s",
+      "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":21,"file":"app/controllers/multipasses_controller.rb"}],
+      "location": {
+        "type": "template",
+        "template": "multipasses/show"
+      },
+      "user_input": "Multipass.find(params[:id]).backout_plan",
+      "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Weak Hash",
+      "warning_code": 90,
+      "fingerprint": "81c7bda9baf975da51e9eac68498d89b85939a0a4f74c8bc0540c7339e829656",
+      "message": "Weak hashing algorithm (SHA1) used",
+      "file": "app/controllers/webhooks_controller.rb",
+      "line": 88,
+      "link": "http://brakemanscanner.org/docs/warning_types/weak_hash/",
+      "code": "OpenSSL::Digest.new(\"sha1\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WebhooksController",
+        "method": "signature_for_payload"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Cross Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "ee7df5bac702e63ef52f960f4d2d620bd05e73f6a45322041b1ec45a6c1103d7",
+      "message": "Unescaped model attribute",
+      "file": "app/views/multipasses/_multipass_form.html.erb",
+      "line": 77,
+      "link": "http://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "HTML::Pipeline.new([HTML::Pipeline::MarkdownFilter, HTML::Pipeline::EmojiFilter], :gfm => true, :asset_root => \"/images\").call(Multipass.find(params[:id]).backout_plan)[:output].to_s",
+      "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":21,"file":"app/controllers/multipasses_controller.rb"},{"type":"template","name":"multipasses/show","line":22,"file":"app/views/multipasses/show.html.erb"}],
+      "location": {
+        "type": "template",
+        "template": "multipasses/_multipass_form"
+      },
+      "user_input": "Multipass.find(params[:id]).backout_plan",
+      "confidence": "Weak",
+      "note": ""
+    }
+  ],
+  "updated": "2016-11-24 19:51:49 +0100",
+  "brakeman_version": "3.3.2"
+}

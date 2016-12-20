@@ -1,7 +1,7 @@
-resource "aws_security_group" "internal_apps_ldap_server" {
+resource "aws_security_group" "pardot0_ue1_ldap_server" {
   name        = "internal_apps_ldap_server"
   description = "Allow LDAP and LDAPS from SFDC datacenters and internal apps"
-  vpc_id      = "${aws_vpc.internal_apps.id}"
+  vpc_id      = "${aws_vpc.pardot0_ue1.id}"
 
   # We run LDAP over port 443 to allow SFDC datacenters to connect to us, since
   # only 80, 443, and 25 are allowed outbound.
@@ -12,8 +12,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
@@ -23,8 +22,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
@@ -34,8 +32,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
+      "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_eip.internal_tools_integration_nat_gw.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
@@ -53,8 +51,8 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_vpc.internal_apps.cidr_block}",
-      "${aws_eip.internal_apps_nat_gw.public_ip}/32",
+      "${aws_vpc.pardot0_ue1.cidr_block}",
+      "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
       "${aws_vpc.internal_tools_integration.cidr_block}",
       "${aws_eip.internal_tools_integration_nat_gw.public_ip}/32",
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
@@ -73,7 +71,7 @@ resource "aws_security_group" "internal_apps_ldap_server" {
     protocol  = "tcp"
 
     security_groups = [
-      "${aws_security_group.internal_apps_bastion.id}",
+      "${aws_security_group.pardot0_ue1_bastion.id}",
     ]
   }
 
@@ -85,19 +83,19 @@ resource "aws_security_group" "internal_apps_ldap_server" {
   }
 }
 
-resource "aws_iam_role" "internal_apps_ldap_master" {
+resource "aws_iam_role" "pardot0_ue1_ldap_master" {
   name               = "internal_apps_ldap_master"
   assume_role_policy = "${file("ec2_instance_trust_relationship.json")}"
 }
 
-resource "aws_iam_instance_profile" "internal_apps_ldap_master" {
+resource "aws_iam_instance_profile" "pardot0_ue1_ldap_master" {
   name  = "internal_apps_ldap_master"
-  roles = ["${aws_iam_role.internal_apps_ldap_master.id}"]
+  roles = ["${aws_iam_role.pardot0_ue1_ldap_master.id}"]
 }
 
-resource "aws_iam_role_policy" "internal_apps_ldap_master_policy" {
+resource "aws_iam_role_policy" "pardot0_ue1_ldap_master_policy" {
   name = "internal_apps_ldap_master_policy"
-  role = "${aws_iam_role.internal_apps_ldap_master.id}"
+  role = "${aws_iam_role.pardot0_ue1_ldap_master.id}"
 
   policy = <<EOF
 {
@@ -115,16 +113,16 @@ resource "aws_iam_role_policy" "internal_apps_ldap_master_policy" {
 EOF
 }
 
-resource "aws_instance" "internal_apps_ldap_master" {
+resource "aws_instance" "pardot0_ue1_ldap_master" {
   ami                  = "${var.centos_6_hvm_ebs_ami}"
   instance_type        = "t2.medium"
-  iam_instance_profile = "${aws_iam_instance_profile.internal_apps_ldap_master.id}"
+  iam_instance_profile = "${aws_iam_instance_profile.pardot0_ue1_ldap_master.id}"
   key_name             = "internal_apps"
   private_ip           = "172.30.132.212"
-  subnet_id            = "${aws_subnet.internal_apps_us_east_1a_dmz.id}"
+  subnet_id            = "${aws_subnet.pardot0_ue1_1a_dmz.id}"
 
   vpc_security_group_ids = [
-    "${aws_security_group.internal_apps_ldap_server.id}",
+    "${aws_security_group.pardot0_ue1_ldap_server.id}",
   ]
 
   root_block_device {
@@ -138,15 +136,15 @@ resource "aws_instance" "internal_apps_ldap_master" {
   }
 }
 
-resource "aws_instance" "internal_apps_ldap_replica" {
+resource "aws_instance" "pardot0_ue1_ldap_replica" {
   ami           = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "t2.medium"
   key_name      = "internal_apps"
   private_ip    = "172.30.213.2"
-  subnet_id     = "${aws_subnet.internal_apps_us_east_1d_dmz.id}"
+  subnet_id     = "${aws_subnet.pardot0_ue1_1d_dmz.id}"
 
   vpc_security_group_ids = [
-    "${aws_security_group.internal_apps_ldap_server.id}",
+    "${aws_security_group.pardot0_ue1_ldap_server.id}",
   ]
 
   root_block_device {
@@ -160,46 +158,46 @@ resource "aws_instance" "internal_apps_ldap_replica" {
   }
 }
 
-resource "aws_eip" "internal_apps_ldap_master" {
+resource "aws_eip" "pardot0_ue1_ldap_master" {
   vpc      = true
-  instance = "${aws_instance.internal_apps_ldap_master.id}"
+  instance = "${aws_instance.pardot0_ue1_ldap_master.id}"
 }
 
-resource "aws_eip" "internal_apps_ldap_replica" {
+resource "aws_eip" "pardot0_ue1_ldap_replica" {
   vpc      = true
-  instance = "${aws_instance.internal_apps_ldap_replica.id}"
+  instance = "${aws_instance.pardot0_ue1_ldap_replica.id}"
 }
 
 // THE FOLLOWING FOUR RECORDS MUST STAY SYNCHRONIZED BETWEEN PRIVATE AND PUBLIC VERSIONS! SEEK BREAD-TEAM FOR ASSISTANCE
 
-resource "aws_route53_record" "internal_apps_auth1-1_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+resource "aws_route53_record" "pardot0_ue1_auth1-1_Arecord" {
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot0-auth1-1-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  records = ["${aws_eip.pardot0_ue1_ldap_master.public_ip}"]
   type    = "A"
   ttl     = "900"
 }
 
-resource "aws_route53_record" "internal_apps_auth1-2_Arecord" {
-  zone_id = "${aws_route53_zone.internal_apps_aws_pardot_com_hosted_zone.zone_id}"
+resource "aws_route53_record" "pardot0_ue1_auth1-2_Arecord" {
+  zone_id = "${aws_route53_zone.pardot0_ue1_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot0-auth1-2-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  records = ["${aws_eip.pardot0_ue1_ldap_replica.public_ip}"]
   type    = "A"
   ttl     = "900"
 }
 
-resource "aws_route53_record" "internal_apps_auth1-1_Arecord_PUBLIC" {
+resource "aws_route53_record" "pardot0_ue1_auth1-1_Arecord_PUBLIC" {
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name    = "pardot0-auth1-1-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_master.public_ip}"]
+  records = ["${aws_eip.pardot0_ue1_ldap_master.public_ip}"]
   type    = "A"
   ttl     = "900"
 }
 
-resource "aws_route53_record" "internal_apps_auth1-2_Arecord_PUBLIC" {
+resource "aws_route53_record" "pardot0_ue1_auth1-2_Arecord_PUBLIC" {
   zone_id = "${aws_route53_zone.aws_pardot_com_restricted_use_public_zone.zone_id}"
   name    = "pardot0-auth1-2-ue1.aws.pardot.com"
-  records = ["${aws_eip.internal_apps_ldap_replica.public_ip}"]
+  records = ["${aws_eip.pardot0_ue1_ldap_replica.public_ip}"]
   type    = "A"
   ttl     = "900"
 }

@@ -1,5 +1,11 @@
 module Api
   class ProtoController < ApplicationController
+    class UnhandleableRPCCall < StandardError
+      def initialize(method)
+        super "Unable to handle RPC call: #{method.inspect}"
+      end
+    end
+
     skip_before_action :verify_authenticity_token
     skip_before_action :require_oauth_authentication
     before_action :require_api_authentication
@@ -29,7 +35,12 @@ module Api
 
     def require_phone_authentication
       if !current_user || !current_user.authenticate_phone(action: phone_auth_action)
-        render json: { error: true, message: "Phone authentication required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
+        if current_user.phone.paired?
+          render json: { error: true, message: "Salesforce Authenticator verification failed" }
+        else
+          render json: { error: true, message: "Salesforce Authenticator verification required. Please go to https://canoe.dev.pardot.com/auth/phone to get setup" }
+        end
+
         return false
       end
 

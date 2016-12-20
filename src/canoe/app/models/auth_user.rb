@@ -1,6 +1,4 @@
 class AuthUser < ApplicationRecord
-  DEFAULT_MAX_AUTH_TRIES = 13
-  DEFAULT_MAX_AUTH_SLEEP_INTERVAL = 2
   DEFAULT_2FA_ACTION = "Pardot T&P 2FA".freeze
 
   has_one :salesforce_authenticator_pairing
@@ -20,8 +18,8 @@ class AuthUser < ApplicationRecord
   end
 
   def authenticate_phone(options = {})
-    max_tries = Integer(options[:max_tries].presence || DEFAULT_MAX_AUTH_TRIES)
-    sleep_interval = Integer(options[:sleep_interval].presence || DEFAULT_MAX_AUTH_SLEEP_INTERVAL)
+    max_tries = Integer(options.fetch(:max_tries, Canoe.config.phone_authentication_max_tries))
+    sleep_interval = Integer(options.fetch(:sleep_interval, Canoe.config.phone_authentication_sleep_interval))
     action = options[:action].presence || DEFAULT_2FA_ACTION
 
     if !phone.paired?

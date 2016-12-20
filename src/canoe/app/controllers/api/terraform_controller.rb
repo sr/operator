@@ -72,7 +72,7 @@ module Api
         when "unlock"
           Canoe::UnlockTerraformProjectRequest.decode_json(request.body.read)
         else
-          raise "Unable to handle RPC call: #{params[:action].inspect}"
+          raise UnhandleableRPCCall, params[:action]
         end
     end
   end

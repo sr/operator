@@ -14,11 +14,15 @@ import (
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"golang.org/x/net/context/ctxhttp"
+
+	"bread/swagger/client/canoe"
+	"bread/swagger/models"
 )
 
 type canoeDeployer struct {
-	http  *http.Client
-	canoe *CanoeConfig
+	http   *http.Client
+	canoe  *CanoeConfig
+	client CanoeClient
 }
 
 type canoeProject struct {
@@ -73,40 +77,27 @@ func (d *canoeDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch 
 	return builds, nil
 }
 
+const canoeProductionTarget = "production"
+
 func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
 	if req.UserEmail == "" {
 		return nil, errors.New("unable to deploy without a user")
 	}
-	params := url.Values{}
-	params.Add("project_name", req.Target.Name)
-	params.Add("artifact_url", req.Build.GetArtifactURL())
-	params.Add("user_email", req.UserEmail)
-	resp, err := d.doCanoe(
-		ctx,
-		"POST",
-		"/api/targets/production/deploys",
-		params.Encode(),
+	resp, err := d.client.CreateDeploy(canoe.NewCreateDeployParamsWithContext(ctx).
+		WithBody(&models.CanoeCreateDeployRequest{
+			UserEmail:   req.UserEmail,
+			Project:     req.Target.Name,
+			TargetName:  canoeProductionTarget,
+			ArtifactURL: req.Build.GetArtifactURL(),
+		}),
 	)
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
-	type canoeDeploy struct {
-		ID int `json:"id"`
+	if resp.Payload.Error {
+		return nil, errors.New(resp.Payload.Message)
 	}
-	type canoeResp struct {
-		Error   bool         `json:"error"`
-		Message string       `json:"message"`
-		Deploy  *canoeDeploy `json:"deploy"`
-	}
-	var data canoeResp
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	if data.Error {
-		return nil, errors.New(data.Message)
-	}
-	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, data.Deploy.ID)
+	deployURL := fmt.Sprintf("%s/projects/%s/deploys/%d?watching=1", d.canoe.URL, req.Target.Name, resp.Payload.DeployID)
 	return &operator.Message{
 		Text: deployURL,
 		HTML: fmt.Sprintf(
@@ -115,7 +106,7 @@ func (d *canoeDeployer) Deploy(ctx context.Context, sender *operator.RequestSend
 			req.Build.GetBranch(),
 			req.Target.Name,
 			deployURL,
-			data.Deploy.ID,
+			resp.Payload.DeployID,
 		),
 		Options: &operatorhipchat.MessageOptions{
 			Color: "green",

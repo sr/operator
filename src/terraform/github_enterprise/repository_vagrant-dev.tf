@@ -14,12 +14,6 @@ resource "github_team_repository" "vagrant-dev_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "vagrant-dev_ops" {
-  repository = "${github_repository.vagrant-dev.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "vagrant-dev_service-accounts-read-only" {
   repository = "${github_repository.vagrant-dev.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
@@ -30,4 +24,10 @@ resource "github_team_repository" "vagrant-dev_tier-2-support" {
   repository = "${github_repository.vagrant-dev.name}"
   team_id    = "${github_team.tier-2-support.id}"
   permission = "push"
+}
+
+resource "github_team_repository" "vagrant-dev_read-only-users" {
+  repository = "${github_repository.vagrant-dev.name}"
+  team_id    = "${github_team.read-only-users.id}"
+  permission = "pull"
 }

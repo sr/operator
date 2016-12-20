@@ -90,8 +90,9 @@ func resourceAwsS3BucketObject() *schema.Resource {
 			},
 
 			"kms_key_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateArn,
 			},
 
 			"etag": {

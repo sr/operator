@@ -1,0 +1,20 @@
+// Horizontal text alignment
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-text-start {
+  text-align: left;
+}
+
+.u-text-end {
+  text-align: right;
+}
+
+// Extra text sizes
+
+.u-text-extra-small {
+  font-size: 12px;
+  color: $gray;
+}

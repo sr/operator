@@ -88,7 +88,7 @@ namespace :canoe do
       "aws/pardot",
       "aws/pardot-atlassian",
       "aws/pardot-ci",
-      "aws/pardot-qe",
+      "aws/pardot-sandbox",
       "aws/pardotops",
       "aws/pardotpublic",
       "github_enterprise",

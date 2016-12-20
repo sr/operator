@@ -36,8 +36,16 @@ class ZabbixHandler < ApplicationHandler
   ZABBIX_CHEF_APP_NAME = "app:chef".freeze
 
   # config: zabbix
-  config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
-  config :zabbix_monitor_payload_url, default: "https://zabbix-%datacenter%.pardot.com/cgi-bin/zabbix-status-check.sh?"
+  config :zabbix_api_url, default: {
+      "dfw" => "https://zabbix-dfw.pardot.com/api_jsonrpc.php",
+      "phx" => "https://zabbix-phx.pardot.com/api_jsonrpc.php",
+      "dev" => "https://zabbix.dev.pardot.com/api_jsonrpc.php"
+  }
+  config :zabbix_monitor_payload_url, default: {
+      "dfw" => "https://zabbix-dfw.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      "phx" => "https://zabbix-phx.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      "dev" => "https://zabbix.dev.pardot.com/cgi-bin/zabbix-status-check.sh?"
+  }
   config :zabbix_user, default: "Admin"
   config :zabbix_password, required: "changeme"
 
@@ -454,7 +462,7 @@ class ZabbixHandler < ApplicationHandler
       datacenter: datacenter,
       log: log)
     log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-    zabbixmon.monitor(config.zabbix_monitor_payload_url,
+    zabbixmon.monitor(config.zabbix_monitor_payload_url[datacenter],
       config.monitor_retries,
       config.monitor_retry_interval_seconds,
       config.monitor_http_timeout_seconds)
@@ -472,7 +480,7 @@ class ZabbixHandler < ApplicationHandler
 
   def build_zabbix_client(datacenter:)
     options = {
-      url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
+      url: config.zabbix_api_url[datacenter],
       user: config.zabbix_user,
       password: config.zabbix_password
     }
@@ -521,7 +529,7 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def scrub_password(str)
-    if config.zabbix_password.empty?
+    if config.zabbix_password.to_s.empty?
       str
     else
       str.gsub(config.zabbix_password, "****")

@@ -8,12 +8,6 @@ resource "github_repository" "ansible" {
   has_wiki      = true
 }
 
-resource "github_team_repository" "ansible_ops" {
-  repository = "${github_repository.ansible.name}"
-  team_id    = "${github_team.ops.id}"
-  permission = "push"
-}
-
 resource "github_team_repository" "ansible_service-accounts-read-only" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.service-accounts-read-only.id}"
@@ -30,4 +24,13 @@ resource "github_team_repository" "ansible_developers" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.developers.id}"
   permission = "push"
+}
+
+resource "github_branch_protection" "ansible_master" {
+  repository = "${github_repository.ansible.name}"
+  branch     = "master"
+
+  include_admins = true
+  strict         = false
+  contexts       = ["Test Jobs"]
 }
