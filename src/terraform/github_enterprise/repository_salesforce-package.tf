@@ -32,5 +32,5 @@ resource "github_branch_protection" "salesforce-package_master" {
 
   include_admins = false
   strict         = false
-  contexts       = ["Test and Deploy Jobs"]
+  contexts       = ["Test Jobs"]
 }
