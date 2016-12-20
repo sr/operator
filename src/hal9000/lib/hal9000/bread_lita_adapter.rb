@@ -74,7 +74,7 @@ module Hal9000
             message = message.gsub("\n", "<br>")
           end
 
-          @hipchat[source.room].send("", message, options)
+          @hipchat[source.room].send("", message[0,9999], options)
         end
       end
     end
