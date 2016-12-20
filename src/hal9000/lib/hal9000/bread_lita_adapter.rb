@@ -53,6 +53,8 @@ module Hal9000
 
     # rubocop:disable Style/Send
     def send_messages(source, messages)
+      $stderr.puts "DEBUG: source=#{source.inspect} messages=#{messages.map(&:size)}"
+
       if source.private_message? && source.user.id.to_s.empty?
         raise Error, "Unable to send private message without a source user: #{source.inspect}"
       end
@@ -72,7 +74,7 @@ module Hal9000
             message = message.gsub("\n", "<br>")
           end
 
-          @hipchat[source.room].send("", message, options)
+          @hipchat[source.room].send("", message[0, 9999], options)
         end
       end
     end
