@@ -14,10 +14,6 @@ module Multipass::GitHubStatuses
   end
 
   def commit_status_creator
-    if Changeling.config.pardot?
-      return User.ghost
-    end
-
     creator = if rejected?
                 User.find_by(github_login: rejector)
               elsif emergency_approver.present?

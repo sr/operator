@@ -64,7 +64,7 @@ class RepositoryPullRequest
   private
 
   def synchronize_github_pull_request
-    pull_request = @multipass.github_client.pull_request(
+    pull_request = github_client.pull_request(
       repository.name_with_owner,
       number
     )
@@ -80,7 +80,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_github_statuses
-    combined_status = @multipass.github_client.combined_status(
+    combined_status = github_client.combined_status(
       repository.name_with_owner,
       @multipass.release_id
     )
@@ -100,7 +100,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_github_reviewers
-    reviews = @multipass.github_client.pull_request_reviews(
+    reviews = github_client.pull_request_reviews(
       repository.name_with_owner,
       number
     )
@@ -186,6 +186,10 @@ class RepositoryPullRequest
     when /\A\[?([A-Z]+\-[0-9]+)\]?/
       Regexp.last_match(1)
     end
+  end
+
+  def github_client
+    @github_client ||= Clients::GitHub.new(Changeling.config.github_service_account_token)
   end
 
   def repository
