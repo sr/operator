@@ -156,13 +156,17 @@ class RepositoryPullRequest
 
     if required_statuses.length < repository.required_testing_statuses.length
       # At least one required status hasn't been reported yet
-      @multipass.testing = nil
-    elsif required_statuses.any? { |r| r.state == RepositoryCommitStatus::PENDING }
-      @multipass.testing = nil
-    elsif required_statuses.all? { |r| r.state == RepositoryCommitStatus::SUCCESS }
-      @multipass.testing = true
-    else
       @multipass.testing = false
+      @multipass.tests_state = RepositoryCommitStatus::PENDING
+    else
+      @multipass.testing = true
+      if required_statuses.any? { |r| r.state == RepositoryCommitStatus::PENDING }
+        @multipass.tests_state = RepositoryCommitStatus::PENDING
+      elsif required_statuses.all? { |r| r.state == RepositoryCommitStatus::SUCCESS }
+        @multipass.tests_state = RepositoryCommitStatus::SUCCESS
+      else
+        @multipass.tests_state = RepositoryCommitStatus::FAILURE
+      end
     end
   end
 

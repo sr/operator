@@ -240,33 +240,33 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_commit_status(statuses: [])
 
-      # `testing` is currently used as a tristate:
-      # * nil/null means no statuses reported yet
-      # * false means tests failed
-      # * true means tests passed
       @multipass.synchronize
-      expect(@multipass.testing).to eq(nil)
+      expect(@multipass.testing).to eq(false)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::PENDING, context: "ci/bazel" }
       ])
       @multipass.synchronize
-      expect(@multipass.reload.testing).to eq(nil)
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::FAILURE, context: "ci/bazel" }
       ])
       @multipass.synchronize
-      expect(@multipass.reload.testing).to eq(false)
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::FAILURE)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel" }
       ])
       @multipass.synchronize
-      expect(@multipass.reload.testing).to eq(true)
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::SUCCESS)
     end
   end
 

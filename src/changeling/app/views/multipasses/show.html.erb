@@ -65,9 +65,9 @@
       <li>Referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
     <%- end %>
 
-    <%- if @multipass.testing.nil? %>
+    <%- if @multipass.tests_state == RepositoryCommitStatus::PENDING %>
       <li>The automated build has not yet completed</li>
-    <%- elsif !@multipass.testing %>
+    <%- elsif @multipass.tests_state != RepositoryCommitStatus::SUCCESS %>
       <li>The automated build has failed</li>
     <%- end %>
   </ul>
