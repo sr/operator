@@ -16,7 +16,8 @@ class PardotComplianceStatus
     @multipass.missing_mandatory_fields.empty? &&
       !ticket_reference_missing? &&
       referenced_ticket_open? &&
-      peer_reviewed?
+      peer_reviewed? &&
+      tests_successful?
   end
 
   def user_is_peer_reviewer?(user)
@@ -41,21 +42,21 @@ class PardotComplianceStatus
 
   def github_commit_status_description
     if rejected?
-      "Rejected by #{@multipass.rejector}"
+      "Changes requested by #{@multipass.rejector}"
     elsif !peer_reviewed?
-      "Peer-review missing"
+      "Peer review is required"
     elsif emergency_approved?
-      "Completed via emergency approval by #{@multipass.emergency_approver}."
+      "Satisfied via emergency approval by #{@multipass.emergency_approver}."
     elsif ticket_reference_missing?
-      "Ticket reference missing"
+      "Ticket reference is missing"
     elsif !referenced_ticket_open?
       "Referenced ticket is not open"
     elsif complete?
-      "All requirements completed. Reviewed by #{@multipass.reviewers}."
-    elsif @multipass.testing.nil?
-      "Build pending"
-    elsif !@multipass.testing
-      "Build failed"
+      "Satisfied. Reviewed by #{@multipass.reviewers}."
+    elsif tests_pending?
+      "Awaiting automated tests results"
+    elsif !tests_successful?
+      "Automated tests failed"
     else
       "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end
@@ -77,5 +78,13 @@ class PardotComplianceStatus
     end
 
     @multipass.ticket_reference.nil?
+  end
+
+  def tests_successful?
+    @multipass.tests_state == RepositoryCommitStatus::SUCCESS
+  end
+
+  def tests_pending?
+    @multipass.tests_state == RepositoryCommitStatus::PENDING
   end
 end
