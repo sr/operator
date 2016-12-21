@@ -52,6 +52,10 @@ class ChangelingConfig
   end
   attr_writer :approval_via_comment_enabled
 
+  def pardot_rollout_phase1_enabled?
+    !ENV["PARDOT_ROLLOUT_PHASE1_ENABLED"].to_s.empty?
+  end
+
   def compliance_status_context
     if pardot?
       ENV.fetch("CHANGELING_COMPLIANCE_STATUS_CONTEXT")
