@@ -261,21 +261,35 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1234")
       stub_github_pull_request
       stub_github_pull_request_reviews
+      stub_github_commit_status(statuses: [])
 
-      expect(@multipass.testing?).to eq(false)
+      @multipass.synchronize
+      expect(@multipass.testing).to eq(false)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
 
       stub_github_commit_status(statuses: [
-        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
+        { state: RepositoryCommitStatus::PENDING, context: "ci/bazel" }
       ])
       @multipass.synchronize
-      expect(@multipass.reload.testing?).to eq(false)
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
+
+      stub_github_commit_status(statuses: [
+        { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
+        { state: RepositoryCommitStatus::FAILURE, context: "ci/bazel" }
+      ])
+      @multipass.synchronize
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::FAILURE)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel" }
       ])
       @multipass.synchronize
-      expect(@multipass.reload.testing?).to eq(true)
+      expect(@multipass.testing).to eq(true)
+      expect(@multipass.tests_state).to eq(RepositoryCommitStatus::SUCCESS)
     end
   end
 
