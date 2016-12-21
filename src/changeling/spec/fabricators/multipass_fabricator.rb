@@ -2,6 +2,7 @@ Fabricator(:multipass) do
   reference_url { "https://#{Changeling.config.github_hostname}/#{Faker::Lorem.word}/#{Faker::Lorem.word}/pull/#{Faker::Number.number(3)}" }
   release_id { Faker::Number.hexadecimal(7) }
   requester { Faker::Internet.user_name }
+  title { Faker::Lorem.word }
   impact { %w{low medium high}.sample }
   impact_probability { %w{low medium high}.sample }
   change_type { %w{minor major}.sample }
