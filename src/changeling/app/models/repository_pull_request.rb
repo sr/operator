@@ -149,19 +149,21 @@ class RepositoryPullRequest
   end
 
   def recalculate_testing_status
-    commit_statuses = RepositoryCommitStatus.where(sha: @multipass.release_id)
+    required_statuses = RepositoryCommitStatus.where(
+      sha: @multipass.release_id,
+      context: repository.required_testing_statuses
+    ).to_a
 
-    success = repository.required_testing_statuses.all? do |context|
-      status = commit_statuses.where(context: context).first
-
-      if status
-        status.state == RepositoryCommitStatus::SUCCESS
-      else
-        false
-      end
+    if required_statuses.length < repository.required_testing_statuses.length
+      # At least one required status hasn't been reported yet
+      @multipass.testing = nil
+    elsif required_statuses.any? { |r| r.state == RepositoryCommitStatus::PENDING }
+      @multipass.testing = nil
+    elsif required_statuses.all? { |r| r.state == RepositoryCommitStatus::SUCCESS }
+      @multipass.testing = true
+    else
+      @multipass.testing = false
     end
-
-    @multipass.testing = success
   end
 
   def remove_ticket_reference
