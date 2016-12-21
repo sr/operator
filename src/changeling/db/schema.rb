@@ -55,24 +55,24 @@ ActiveRecord::Schema.define(version: 20161221164646) do
   end
 
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string   "reference_url"
-    t.string   "requester"
-    t.string   "impact"
-    t.string   "impact_probability"
-    t.string   "change_type"
+    t.string   "reference_url",                          null: false
+    t.string   "requester",                              null: false
+    t.string   "impact",                                 null: false
+    t.string   "impact_probability",                     null: false
+    t.string   "change_type",                            null: false
     t.string   "peer_reviewer"
     t.string   "sre_approver"
+    t.boolean  "testing"
     t.text     "backout_plan"
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
-    t.string   "team",               default: "Unknown"
-    t.boolean  "merged",             default: false
-    t.string   "release_id"
+    t.string   "team",               default: "Unknown", null: false
+    t.boolean  "merged",             default: false,     null: false
+    t.string   "release_id",                             null: false
     t.string   "emergency_approver"
-    t.string   "title"
-    t.boolean  "complete",           default: false
+    t.string   "title",                                  null: false
+    t.boolean  "complete",           default: false,     null: false
     t.string   "rejector"
-    t.boolean  "testing"
     t.string   "tests_state",        default: "pending", null: false
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
