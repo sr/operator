@@ -18,7 +18,7 @@ RSpec.describe Multipass::Updates, :type => :model do
 
     it "updates the impact" do
       new_impact = "test"
-      complete_multipass.update_attributes(impact: nil)
+      complete_multipass.impact = nil
       multipass_attributes["impact"] = new_impact
 
       complete_multipass.update_from_form(multipass_attributes)
@@ -27,7 +27,7 @@ RSpec.describe Multipass::Updates, :type => :model do
 
     it "updates the impact_probability" do
       new_probability = "test"
-      complete_multipass.update_attributes(impact_probability: nil)
+      complete_multipass.impact_probability = nil
       multipass_attributes["impact_probability"] = new_probability
 
       complete_multipass.update_from_form(multipass_attributes)
@@ -36,7 +36,7 @@ RSpec.describe Multipass::Updates, :type => :model do
 
     it "updates the change_type" do
       new_type = "minor"
-      complete_multipass.update_attributes(change_type: nil)
+      complete_multipass.change_type = nil
       multipass_attributes["change_type"] = new_type
 
       complete_multipass.update_from_form(multipass_attributes)
