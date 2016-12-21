@@ -14,7 +14,11 @@ describe ComplianceStatus, "pardot" do
       Changeling.config.github_hostname,
       PardotRepository::CHANGELING
     )
-    @multipass = Fabricate(:multipass, testing: true, reference_url: reference_url)
+    @multipass = Fabricate(:multipass,
+      testing: true,
+      tests_state: RepositoryCommitStatus::SUCCESS,
+      reference_url: reference_url
+    )
     @multipass.create_ticket_reference!(ticket: ticket)
     @user = Fabricate(:user)
   end
@@ -31,7 +35,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.reload.complete?).to eq(false)
 
     description = @multipass.github_commit_status_description
-    expect(description).to eq("Ticket reference missing")
+    expect(description).to eq("Ticket reference is missing")
   end
 
   it "requires a reference to an open ticket to be complete" do
@@ -45,20 +49,20 @@ describe ComplianceStatus, "pardot" do
 
   it "requires the builds to be successful" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.update!(testing: false)
+    @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
     expect(@multipass.reload.complete?).to eq(false)
 
     description = @multipass.github_commit_status_description
-    expect(description).to eq("Build failed")
+    expect(description).to eq("Automated tests failed")
   end
 
   it "requires the build to be complete" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.update!(testing: nil)
+    @multipass.update!(testing: false, tests_state: RepositoryCommitStatus::PENDING)
     expect(@multipass.reload.complete?).to eq(false)
 
     description = @multipass.github_commit_status_description
-    expect(description).to eq("Build pending")
+    expect(description).to eq("Awaiting automated tests results")
   end
 
   it "requires peer review to be complete" do
@@ -69,6 +73,6 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.peer_reviewed?).to eq(false)
 
     description = @multipass.github_commit_status_description
-    expect(description).to eq("Peer-review missing")
+    expect(description).to eq("Peer review is required")
   end
 end
