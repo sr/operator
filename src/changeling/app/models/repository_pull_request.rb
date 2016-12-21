@@ -1,4 +1,6 @@
 class RepositoryPullRequest
+  TICKET_REFERENCE_REGEXP = /\A\[?([A-Z]+\-[0-9]+)\]?/
+
   def self.synchronize(commit_status)
     # Avoid infinite loop where reporting our own status triggers synchronization
     # again and again
@@ -48,7 +50,7 @@ class RepositoryPullRequest
     unless @multipass.merged?
       synchronize_github_reviewers
       synchronize_github_statuses
-      synchronize_jira_ticket
+      synchronize_ticket
     end
 
     @multipass.save!
@@ -134,13 +136,20 @@ class RepositoryPullRequest
   rescue ActiveRecord::RecordNotUnique
   end
 
-  def synchronize_jira_ticket
+  def synchronize_ticket
     if !referenced_ticket_id
       remove_ticket_reference
       return false
     end
 
-    ticket = Ticket.synchronize_jira_ticket(referenced_ticket_id)
+    ticket =
+      if referenced_ticket_id[0].casecmp("W") == 0
+        summary = title.sub(TICKET_REFERENCE_REGEXP, "").lstrip
+        Ticket.synchronize_gus_ticket(referenced_ticket_id, summary)
+      else
+        Ticket.synchronize_jira_ticket(referenced_ticket_id)
+      end
+
     if ticket
       update_ticket_reference(ticket)
     else
@@ -184,7 +193,7 @@ class RepositoryPullRequest
 
   def referenced_ticket_id
     case @multipass.title
-    when /\A\[?([A-Z]+\-[0-9]+)\]?/
+    when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end
   end

@@ -1,8 +1,22 @@
 class Ticket < ApplicationRecord
   TRACKER_JIRA = "jira".freeze
+  TRACKER_GUS = "gus".freeze
 
   has_one :ticket_reference
   has_one :multipass
+
+  def self.synchronize_gus_ticket(issue_key, summary)
+    ticket = Ticket.find_or_initialize_by(
+      external_id: issue_key,
+      tracker: Ticket::TRACKER_GUS
+    )
+    ticket.summary = summary
+    ticket.status = "TODO"
+    ticket.open = true
+    ticket.url = "gus://#{issue_key}"
+    ticket.save!
+    ticket
+  end
 
   def self.synchronize_jira_ticket(issue_key)
     payload = Changeling.config.jira_client.Issue.find(issue_key).attrs

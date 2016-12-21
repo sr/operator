@@ -196,6 +196,29 @@ RSpec.describe RepositoryPullRequest do
       @multipass.synchronize
       expect(reference.reload.open?).to eq(false)
     end
+
+    it "handles GUS Work ticket references" do
+      stub_github_pull_request(title: "W-3343901 Draw the rest of the owl")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      @multipass.synchronize
+
+      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      reference = @multipass.reload.ticket_reference
+      expect(reference.open?).to eq(true)
+      expect(reference.ticket_id).to eq("W-3343901")
+      expect(reference.ticket.summary).to eq("Draw the rest of the owl")
+      expect(reference.ticket.tracker).to eq(Ticket::TRACKER_GUS)
+
+      stub_github_pull_request(title: "W-3343901")
+      @multipass.synchronize
+      reference = @multipass.reload.ticket_reference
+      expect(reference.ticket.summary).to eq("")
+
+      stub_github_pull_request(title: "boomtown")
+      @multipass.synchronize
+      expect(@multipass.reload.ticket_reference).to eq(nil)
+    end
   end
 
   describe "synchronizing github pull request" do
