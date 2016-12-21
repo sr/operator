@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161214120258) do
+ActiveRecord::Schema.define(version: 20161221164646) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,7 +62,6 @@ ActiveRecord::Schema.define(version: 20161214120258) do
     t.string   "change_type"
     t.string   "peer_reviewer"
     t.string   "sre_approver"
-    t.boolean  "testing"
     t.text     "backout_plan"
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
@@ -73,6 +72,8 @@ ActiveRecord::Schema.define(version: 20161214120258) do
     t.string   "title"
     t.boolean  "complete",           default: false
     t.string   "rejector"
+    t.boolean  "testing"
+    t.string   "tests_state",        default: "pending", null: false
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
