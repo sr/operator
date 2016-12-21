@@ -92,7 +92,7 @@ RSpec.describe RepositoryPullRequest do
 
   describe "synchronizing ticket references" do
     it "creates a ticket references for JIRA tickets" do
-      expect(@multipass.ticket_reference).to eq(nil)
+      expect(@multipass.referenced_ticket).to eq(nil)
 
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
@@ -100,39 +100,39 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       @multipass.synchronize
 
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
-      reference = @multipass.reload.ticket_reference
-      expect(reference.open?).to eq(true)
-      expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/BREAD-1598")
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket.open?).to eq(true)
+      expect(ticket.url).to eq("https://jira.dev.pardot.com/browse/BREAD-1598")
     end
 
     it "detects most common ticket ID - title separators" do
-      expect(@multipass.ticket_reference).to eq(nil)
+      expect(@multipass.referenced_ticket).to eq(nil)
 
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598: hello")
       stub_github_commit_status
       stub_github_pull_request_reviews
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
-      expect(@multipass.reload.ticket_reference).to eq(nil)
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
-      expect(@multipass.reload.ticket_reference).to eq(nil)
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
-      expect(@multipass.reload.ticket_reference).to eq(nil)
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "[BREAD-1598] - hello")
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
     end
 
     it "updates existing JIRA ticket reference" do
@@ -141,21 +141,21 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status
       stub_github_pull_request_reviews
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       stub_jira_ticket("PDT-98")
       stub_github_pull_request(title: "PDT-98 Fix everything")
       @multipass.synchronize
 
-      reference = @multipass.reload.ticket_reference
-      expect(reference).to_not eq(nil)
-      expect(reference.open?).to eq(true)
-      expect(reference.ticket_url).to eq("https://jira.dev.pardot.com/browse/PDT-98")
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket).to_not eq(nil)
+      expect(ticket.open?).to eq(true)
+      expect(ticket.url).to eq("https://jira.dev.pardot.com/browse/PDT-98")
 
       stub_jira_ticket("PDT-98", resolved: true)
       @multipass.synchronize
-      reference.reload
-      expect(reference.open?).to eq(false)
+      ticket.reload
+      expect(ticket.open?).to eq(false)
     end
 
     it "removes existing JIRA ticket reference" do
@@ -164,11 +164,11 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status
       stub_github_pull_request_reviews
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       stub_github_pull_request(title: "Untitled")
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to eq(nil)
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
     end
 
     it "does not create a JIRA ticket reference if the issue does not exist" do
@@ -178,8 +178,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       @multipass.synchronize
 
-      reference = @multipass.reload.ticket_reference
-      expect(reference).to eq(nil)
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket).to eq(nil)
     end
 
     it "closes the JIRA ticket if it is later deleted" do
@@ -189,12 +189,12 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       @multipass.synchronize
 
-      reference = @multipass.reload.ticket_reference
-      expect(reference.open?).to eq(true)
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket.open?).to eq(true)
 
       stub_jira_ticket("BREAD-1598", exists: false)
       @multipass.synchronize
-      expect(reference.reload.open?).to eq(false)
+      expect(ticket.reload.open?).to eq(false)
     end
 
     it "handles GUS Work ticket references" do
@@ -203,21 +203,21 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       @multipass.synchronize
 
-      expect(@multipass.reload.ticket_reference).to_not eq(nil)
-      reference = @multipass.reload.ticket_reference
-      expect(reference.open?).to eq(true)
-      expect(reference.ticket_id).to eq("W-3343901")
-      expect(reference.ticket.summary).to eq("Draw the rest of the owl")
-      expect(reference.ticket.tracker).to eq(Ticket::TRACKER_GUS)
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket.open?).to eq(true)
+      expect(ticket.external_id).to eq("W-3343901")
+      expect(ticket.summary).to eq("Draw the rest of the owl")
+      expect(ticket.tracker).to eq(Ticket::TRACKER_GUS)
 
       stub_github_pull_request(title: "W-3343901")
       @multipass.synchronize
-      reference = @multipass.reload.ticket_reference
-      expect(reference.ticket.summary).to eq("")
+      ticket = @multipass.reload.referenced_ticket
+      expect(ticket.summary).to eq("")
 
       stub_github_pull_request(title: "boomtown")
       @multipass.synchronize
-      expect(@multipass.reload.ticket_reference).to eq(nil)
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
     end
   end
 

@@ -16,10 +16,6 @@ class RepositoryPullRequest
       raise ArgumentError, "multipass is nil"
     end
 
-    if multipass.new_record?
-      raise ArgumentError, "multipass is a new record"
-    end
-
     @multipass = multipass
   end
 
@@ -46,6 +42,10 @@ class RepositoryPullRequest
   end
 
   def synchronize
+    if @multipass.new_record?
+      raise ArgumentError, "can not synchronize unsaved multipass record"
+    end
+
     synchronize_github_pull_request
     unless @multipass.merged?
       synchronize_github_reviewers
@@ -58,8 +58,8 @@ class RepositoryPullRequest
   end
 
   def referenced_ticket
-    if referenced_ticket_id
-      Ticket.where(external_id: referenced_ticket_id, tracker: Ticket::TRACKER_JIRA).first
+    if @multipass.ticket_reference
+      @multipass.ticket_reference.ticket
     end
   end
 

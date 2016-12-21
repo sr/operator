@@ -68,7 +68,9 @@ class PardotComplianceStatus
       return true
     end
 
-    @multipass.ticket_reference.open?
+    if @multipass.referenced_ticket
+      @multipass.referenced_ticket.open?
+    end
   end
 
   def ticket_reference_missing?
@@ -76,6 +78,6 @@ class PardotComplianceStatus
       return false
     end
 
-    @multipass.ticket_reference.nil?
+    @multipass.referenced_ticket.nil?
   end
 end

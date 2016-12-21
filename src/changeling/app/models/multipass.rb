@@ -97,9 +97,12 @@ class Multipass < ActiveRecord::Base
       self.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
       save!
     else
-      pull = RepositoryPullRequest.new(self)
-      pull.synchronize
+      repository_pull_request.synchronize
     end
+  end
+
+  def referenced_ticket
+    repository_pull_request.referenced_ticket
   end
 
   def hostname
@@ -205,6 +208,10 @@ class Multipass < ActiveRecord::Base
     to: :compliance_status
 
   private
+
+  def repository_pull_request
+    @repository_pull_request ||= RepositoryPullRequest.new(self)
+  end
 
   def compliance_status
     @compliance_status ||= ComplianceStatus.new(self)
