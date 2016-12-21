@@ -143,7 +143,7 @@ class RepositoryPullRequest
     end
 
     ticket =
-      if referenced_ticket_id[0].casecmp("W") == 0
+      if referenced_ticket_id[0, 2].casecmp("W-") == 0
         summary = title.sub(TICKET_REFERENCE_REGEXP, "").lstrip
         Ticket.synchronize_gus_ticket(referenced_ticket_id, summary)
       else
