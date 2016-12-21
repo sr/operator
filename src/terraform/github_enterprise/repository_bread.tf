@@ -32,5 +32,5 @@ resource "github_branch_protection" "bread_master" {
 
   include_admins = false
   strict         = true
-  contexts       = ["pardot/compliance"]
+  contexts       = ["compliance"]
 }
