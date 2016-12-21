@@ -44,19 +44,19 @@ class PardotComplianceStatus
     if rejected?
       "Changes requested by #{@multipass.rejector}"
     elsif !peer_reviewed?
-      "Peer review missing"
+      "Peer review is required"
     elsif emergency_approved?
       "Satisfied via emergency approval by #{@multipass.emergency_approver}."
     elsif ticket_reference_missing?
-      "Ticket reference missing"
+      "Ticket reference is missing"
     elsif !referenced_ticket_open?
       "Referenced ticket is not open"
     elsif complete?
       "Satisfied. Reviewed by #{@multipass.reviewers}."
     elsif tests_pending?
-      "Build pending"
+      "Awaiting automated tests results"
     elsif !tests_successful?
-      "Build failed"
+      "Automated tests failed"
     else
       "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end

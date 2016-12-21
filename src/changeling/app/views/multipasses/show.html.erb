@@ -62,13 +62,13 @@
     <%- if referenced_ticket.nil? %>
       <li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>
     <%- elsif !referenced_ticket.open? %>
-      <li>Referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
+      <li>The referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
     <%- end %>
 
     <%- if @multipass.tests_state == RepositoryCommitStatus::PENDING %>
-      <li>The automated build has not yet completed</li>
+      <li>The automated tests have not yet completed</li>
     <%- elsif @multipass.tests_state != RepositoryCommitStatus::SUCCESS %>
-      <li>The automated build has failed</li>
+      <li>The automated tests have failed</li>
     <%- end %>
   </ul>
   </p>
