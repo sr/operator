@@ -1,4 +1,7 @@
 class RepositoryPullRequest
+  TICKET_REFERENCE_REGEXP = /\A\[?([A-Z]+\-[0-9]+)\]?/
+  GUS_TICKET_ID_PREFIX = "W-".freeze
+
   def self.synchronize(commit_status)
     # Avoid infinite loop where reporting our own status triggers synchronization
     # again and again
@@ -12,10 +15,6 @@ class RepositoryPullRequest
   def initialize(multipass)
     if multipass.nil?
       raise ArgumentError, "multipass is nil"
-    end
-
-    if multipass.new_record?
-      raise ArgumentError, "multipass is a new record"
     end
 
     @multipass = multipass
@@ -44,11 +43,15 @@ class RepositoryPullRequest
   end
 
   def synchronize
+    if @multipass.new_record?
+      raise ArgumentError, "can not synchronize unsaved multipass record"
+    end
+
     synchronize_github_pull_request
     unless @multipass.merged?
       synchronize_github_reviewers
       synchronize_github_statuses
-      synchronize_jira_ticket
+      synchronize_ticket
     end
 
     @multipass.save!
@@ -56,8 +59,8 @@ class RepositoryPullRequest
   end
 
   def referenced_ticket
-    if referenced_ticket_id
-      Ticket.where(external_id: referenced_ticket_id, tracker: Ticket::TRACKER_JIRA).first
+    if @multipass.ticket_reference
+      @multipass.ticket_reference.ticket
     end
   end
 
@@ -134,13 +137,20 @@ class RepositoryPullRequest
   rescue ActiveRecord::RecordNotUnique
   end
 
-  def synchronize_jira_ticket
+  def synchronize_ticket
     if !referenced_ticket_id
       remove_ticket_reference
       return false
     end
 
-    ticket = Ticket.synchronize_jira_ticket(referenced_ticket_id)
+    ticket =
+      if referenced_ticket_id[0, 2] == GUS_TICKET_ID_PREFIX
+        summary = title.sub(TICKET_REFERENCE_REGEXP, "").lstrip
+        Ticket.synchronize_gus_ticket(referenced_ticket_id, summary)
+      else
+        Ticket.synchronize_jira_ticket(referenced_ticket_id)
+      end
+
     if ticket
       update_ticket_reference(ticket)
     else
@@ -190,7 +200,7 @@ class RepositoryPullRequest
 
   def referenced_ticket_id
     case @multipass.title
-    when /\A\[?([A-Z]+\-[0-9]+)\]?/
+    when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end
   end
