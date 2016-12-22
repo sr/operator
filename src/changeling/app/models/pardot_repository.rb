@@ -41,12 +41,20 @@ class PardotRepository
   end
 
   def ticket_reference_required?
-    [BREAD, CHANGELING].include?(name_with_owner)
+    if Changeling.config.pardot_rollout_phase1_enabled?
+      [BREAD, PARDOT, CHEF].include?(name_with_owner)
+    else
+      [BREAD, CHANGELING].include?(name_with_owner)
+    end
   end
 
   # Do not create commit statuses for now.
   def update_github_commit_status?
-    [BREAD].include?(name_with_owner)
+    if Changeling.config.pardot_rollout_phase1_enabled?
+      [BREAD, PARDOT, CHEF].include?(name_with_owner)
+    else
+      [BREAD].include?(name_with_owner)
+    end
   end
 
   def participating?
