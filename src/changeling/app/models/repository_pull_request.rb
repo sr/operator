@@ -1,5 +1,6 @@
 class RepositoryPullRequest
   TICKET_REFERENCE_REGEXP = /\A\[?([A-Z]+\-[0-9]+)\]?/
+  GUS_TICKET_ID_PREFIX = "W-".freeze
 
   def self.synchronize(commit_status)
     # Avoid infinite loop where reporting our own status triggers synchronization
@@ -143,7 +144,7 @@ class RepositoryPullRequest
     end
 
     ticket =
-      if referenced_ticket_id[0, 2].casecmp("W-") == 0
+      if referenced_ticket_id[0, 2] == GUS_TICKET_ID_PREFIX
         summary = title.sub(TICKET_REFERENCE_REGEXP, "").lstrip
         Ticket.synchronize_gus_ticket(referenced_ticket_id, summary)
       else
