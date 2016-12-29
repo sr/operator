@@ -68,8 +68,12 @@ module Hal9000
         # only plain text private messages open a new conversation tab.
         if source.private_message?
           options = { message_format: "text", color: "yellow", notify: true }
-          response = @hipchat.user(source.user.id).send(message, options.merge(notify: true))
-          $stderr.puts "HipChat API returned:\n HTTP error code #{response.code}\n #{response.body}" if !response.code =~ /2../
+          begin
+            response = @hipchat.user(source.user.id).send(message, options.merge(notify: true))
+            $stderr.puts "HipChat API returned:\n HTTP error code #{response.code}\n #{response.body}" if !response.code =~ /2../
+          rescue
+            $stderr.puts "HipChat API send_message failed:\n message: #{message}\n options: #{options.merge(notify: true)}"
+          end
         else
           if !message.start_with?("<!-- #html -->")
             message = message.gsub("\n", "<br>")
