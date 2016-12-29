@@ -103,15 +103,16 @@ class RepositoryPullRequest
   end
 
   def synchronize_github_reviewers
-    reviews = github_client.pull_request_reviews(
+    github_reviews = github_client.pull_request_reviews(
       repository.name_with_owner,
       number
     )
 
+    reviews = PeerReview.synchronize(@multipass, github_reviews)
     approval = reviews.detect { |r| r.state == Clients::GitHub::REVIEW_APPROVED }
 
     if approval
-      @multipass.peer_reviewer = approval.user.login
+      @multipass.peer_reviewer = approval.reviewer_github_login
     else
       @multipass.peer_reviewer = nil
     end

@@ -4,6 +4,7 @@ require_relative "./validators/sre_approver_is_in_sre"
 class Multipass < ActiveRecord::Base
   audited
   has_many :events
+  has_many :peer_reviews
   has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
