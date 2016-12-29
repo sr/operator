@@ -36,8 +36,8 @@ describe ComplianceStatus, "pardot" do
       }
     ]
 
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{repo}/contents/OWNERS").
-      to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{repo}/contents/OWNERS")
+      .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
   end
 
   it "can never be approved by a SRE" do

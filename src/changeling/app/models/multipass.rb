@@ -112,8 +112,8 @@ class Multipass < ActiveRecord::Base
 
   # Returns an Array of GitHub user logins that approve of this change
   def peer_review_approvers
-    peer_reviews.where(state: Clients::GitHub::REVIEW_APPROVED).
-      load.map(&:reviewer_github_login)
+    peer_reviews.where(state: Clients::GitHub::REVIEW_APPROVED)
+      .load.map(&:reviewer_github_login)
   end
 
   def hostname

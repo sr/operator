@@ -9,6 +9,7 @@ hello world
 @simon-rozet
 @simon-rozet
 EOS
-  expect(owners.users).to eq([OwnersFile::User.new("simon-rozet")])
+
+    expect(owners.users).to eq([OwnersFile::User.new("simon-rozet")])
   end
 end
