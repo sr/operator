@@ -1,5 +1,8 @@
 # A way to find out info about a GitHub Repository
 class Repository
+  class OwnersError < StandardError
+  end
+
   def self.team_for(name_with_owner)
     find(name_with_owner).team
   end
@@ -18,10 +21,19 @@ class Repository
 
   def initialize(repo)
     @repo = repo
+    @github = Clients::GitHub.new(Changeling.config.github_service_account_token)
   end
 
   def name_with_owner
     @repo.name_with_owner
+  end
+
+  Owner = Struct.new(:github_login)
+
+  def owners
+    @github.file_content(@repo.name_with_owner, "OWNERS").each_line.map do |line|
+      Owner.new(line.chomp)
+    end
   end
 
   def required_testing_statuses
