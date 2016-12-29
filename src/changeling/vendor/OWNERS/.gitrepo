@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/bkeepers/OWNERS
+	branch = master
+	commit = e42844aa79c16dc5dedc1526ab9a5a00ecd9a541
+	parent = 69b1540640d079f345bcb606e0dc4bba6a6a54a8
+	cmdver = 0.3.0
