@@ -63,13 +63,11 @@ module Clients
     end
 
     def file_content(name_with_owner, path)
-      contents = @client.contents(name_with_owner, path: path)
+      file = @client.contents(name_with_owner, path: path)
 
-      if contents.size > 1
+      if file.is_a?(Array)
         raise Error, "path #{path.inspect} is not a file"
       end
-
-      file = contents[0]
 
       if file.encoding != "base64"
         raise Error, "unknown file encoding: #{file.encoding.inspect}"

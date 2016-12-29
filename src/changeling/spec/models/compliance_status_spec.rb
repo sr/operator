@@ -28,13 +28,11 @@ describe ComplianceStatus, "pardot" do
   end
 
   def stub_repository_owners(repo, owners)
-    owners = [
-      {
-        type: "file",
-        encoding: "base64",
-        content: Base64.encode64(owners.join("\n"))
-      }
-    ]
+    owners = {
+      type: "file",
+      encoding: "base64",
+      content: Base64.encode64(owners.join("\n"))
+    }
 
     stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{repo}/contents/OWNERS")
       .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
