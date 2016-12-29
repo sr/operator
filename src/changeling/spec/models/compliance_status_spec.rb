@@ -102,7 +102,7 @@ describe ComplianceStatus, "pardot" do
       @multipass.complete?
     end.to raise_error(Repository::OwnersError)
 
-    stub_repository_owners(@multipass.repository_name, ["alindeman"])
+    stub_repository_owners(@multipass.repository_name, ["@alindeman"])
     expect(@multipass.peer_reviewed?).to eq(false)
     expect(@multipass.complete?).to eq(false)
 
@@ -117,7 +117,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
 
-    stub_repository_owners(@multipass.repository_name, ["sr"])
+    stub_repository_owners(@multipass.repository_name, ["@sr"])
     expect(@multipass.peer_reviewed?).to eq(false)
     expect(@multipass.complete?).to eq(false)
 
@@ -125,7 +125,7 @@ describe ComplianceStatus, "pardot" do
       reviewer_github_login: "sr",
       state: Clients::GitHub::REVIEW_CHANGES_REQUESTED
     )
-    stub_repository_owners(@multipass.repository_name, ["alindeman", "sr"])
+    stub_repository_owners(@multipass.repository_name, ["@alindeman", "@sr"])
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
   end

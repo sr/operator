@@ -31,9 +31,9 @@ class Repository
   Owner = Struct.new(:github_login)
 
   def owners
-    @github.file_content(@repo.name_with_owner, "OWNERS").each_line.map do |line|
-      Owner.new(line.chomp)
-    end
+    content = @github.file_content(@repo.name_with_owner, "OWNERS")
+
+    OwnersFile.new(content).users
   end
 
   def required_testing_statuses
