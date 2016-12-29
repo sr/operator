@@ -1,6 +1,5 @@
-GIT
-  remote: https://github.com/bkeepers/owners
-  revision: e42844aa79c16dc5dedc1526ab9a5a00ecd9a541
+PATH
+  remote: vendor/OWNERS
   specs:
     owners (0.0.1)
 

@@ -1,7 +1,7 @@
 require "owners/parser"
 require "owners/version"
 
-class Owners
+module Owners
   def initialize(string)
     @parser = Parser.new
     @tokens = @parser.parse(string)
