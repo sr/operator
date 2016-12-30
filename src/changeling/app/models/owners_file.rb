@@ -1,29 +1,30 @@
 require "owners"
 
 class OwnersFile
-  User = Struct.new(:github_login)
-
   def initialize(string)
-    @tokens = Owners::Parser.new.parse(string)
+    @users, @teams = parse(string)
   end
 
-  def users
-    usernames.map do |username|
-      User.new(username)
-    end
-  end
+  attr_reader :users, :teams
 
   private
 
-  def usernames
-    usernames = []
+  def parse(string)
+    tokens = Owners::Parser.new.parse(string)
+    users = []
+    teams = []
 
-    @tokens.each do |token, value|
-      if token == :USERNAME
-        usernames << value[1, value.length]
+    tokens.each do |token, value|
+      case token
+      when :USERNAME
+        users << value[1, value.length]
+      when :TEAMNAME
+        teams << value[1, value.length]
+      else
+        next
       end
     end
 
-    usernames.uniq
+    [users.uniq, teams.uniq]
   end
 end

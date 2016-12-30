@@ -34,6 +34,21 @@ describe ComplianceStatus, "pardot" do
       content: Base64.encode64(owners.join("\n"))
     }
 
+    organization = repo.split("/")[0]
+
+    bread = { id: 1, slug: "bread" }
+    tools = { id: 2, slug: "tools" }
+    teams = [bread, tools]
+    bread_members = [{ login: "alindeman" }]
+    tools_members = [{ login: "ys" }]
+
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/orgs/#{organization}/teams")
+      .to_return(body: JSON.dump(teams), headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/teams/#{bread[:id]}/members")
+      .to_return(body: JSON.dump(bread_members), headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/teams/#{tools[:id]}/members")
+      .to_return(body: JSON.dump(tools_members), headers: { "Content-Type" => "application/json" })
+
     stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{repo}/contents/OWNERS")
       .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
   end
@@ -93,7 +108,7 @@ describe ComplianceStatus, "pardot" do
 
   it "requires peer review by one of the repository owners to be complete" do
     Changeling.config.repository_owners_review_required = [@multipass.repository_name]
-    @multipass.peer_reviews.destroy
+    @multipass.peer_reviews.destroy_all
 
     stub_repository_owners(@multipass.repository_name, [])
     expect do
@@ -124,6 +139,25 @@ describe ComplianceStatus, "pardot" do
       state: Clients::GitHub::REVIEW_CHANGES_REQUESTED
     )
     stub_repository_owners(@multipass.repository_name, ["@alindeman", "@sr"])
+    expect(@multipass.peer_reviewed?).to eq(true)
+    expect(@multipass.complete?).to eq(true)
+
+    stub_repository_owners(@multipass.repository_name, ["@heroku/bread"])
+    @multipass.peer_reviews.destroy_all
+    expect(@multipass.peer_reviewed?).to eq(false)
+    expect(@multipass.complete?).to eq(false)
+
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "ys",
+      state: Clients::GitHub::REVIEW_APPROVED
+    )
+    expect(@multipass.peer_reviewed?).to eq(false)
+    expect(@multipass.complete?).to eq(false)
+
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "alindeman",
+      state: Clients::GitHub::REVIEW_APPROVED
+    )
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
   end

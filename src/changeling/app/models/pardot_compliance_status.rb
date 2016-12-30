@@ -52,7 +52,7 @@ class PardotComplianceStatus
     end
 
     owners.any? do |owner|
-      reviewers.include?(owner.github_login)
+      reviewers.include?(owner)
     end
   end
 
