@@ -38,6 +38,10 @@ class ChangelingConfig
     end
   end
 
+  def gus_url
+    "https://gus.my.salesforce.com"
+  end
+
   def review_approval_enabled_for?(user)
     if pardot?
       return true
