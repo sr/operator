@@ -34,7 +34,7 @@ module Clients
 
       team_slugs.each do |team|
         @client.team_members(team_ids.fetch(team)).each do |member|
-          if users.has_key?(member.id)
+          if users.key?(member.id)
             next
           end
 
