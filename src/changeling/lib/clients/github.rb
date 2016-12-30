@@ -84,8 +84,12 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
-    def file_content(name_with_owner, path)
-      file = @client.contents(name_with_owner, path: path)
+    def file_content(name_with_owner, path, branch = nil)
+      params = { path: path }
+      if branch
+        params[:ref] = branch
+      end
+      file = @client.contents(name_with_owner, params)
 
       if file.is_a?(Array)
         raise Error, "path #{path.inspect} is not a file"

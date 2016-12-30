@@ -28,6 +28,10 @@ class ChangelingConfig
   end
   attr_writer :repository_owners_review_required
 
+  def repository_owners_file_branch
+    ENV.fetch("REPOSITORY_OWNERS_FILE_BRANCH", nil)
+  end
+
   def page_title
     if pardot?
       "Pardot Compliance"

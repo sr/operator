@@ -37,7 +37,11 @@ class Repository
   # Returns an Array of GitHub users referenced in the OWNERS file of this
   # repository, either by their username or through a team they belong to.
   def owners
-    content = @github.file_content(@repo.name_with_owner, OWNERS_FILENAME)
+    content = @github.file_content(
+      @repo.name_with_owner,
+      OWNERS_FILENAME,
+      Changeling.config.repository_owners_file_branch
+    )
     file = OwnersFile.new(content)
 
     owners = []
