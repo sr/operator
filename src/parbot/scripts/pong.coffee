@@ -22,7 +22,7 @@ getPlayerString = (playerNameArray, teamId) ->
     return "team #{teamId}"
 
 module.exports = (robot) ->
-  robot.respond /pong\s+status$/i, (msg) ->
+  robot.respond /pong\s*(?:status)*$/i, (msg) ->
     url = pongApiUrl + 'rooms/1/status'
     robot.http(url)
       .get() (error, response, body) ->
