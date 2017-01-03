@@ -1,6 +1,7 @@
 class Ticket < ApplicationRecord
   TRACKER_JIRA = "jira".freeze
   TRACKER_GUS = "gus".freeze
+  GUS_URL_TEMPLATE = "https://gus.my.salesforce.com/apex/ADM_WorkLocator?bugorworknumber=%s".freeze
 
   has_one :ticket_reference
   has_one :multipass
@@ -13,7 +14,7 @@ class Ticket < ApplicationRecord
     ticket.summary = summary
     ticket.status = "TODO"
     ticket.open = true
-    ticket.url = "gus://#{issue_key}"
+    ticket.url = format(GUS_URL_TEMPLATE, issue_key)
     ticket.save!
     ticket
   end
