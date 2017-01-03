@@ -64,22 +64,29 @@ module Hal9000
       end
 
       messages.each do |message|
-        # If it's a private message, force format to be text. For some reason
-        # only plain text private messages open a new conversation tab.
-        if source.private_message?
-          options = { message_format: "text", color: "yellow", notify: true }
-          begin
-            response = @hipchat.user(source.user.id).send(message, options.merge(notify: true))
-            $stderr.puts "HipChat API returned:\n HTTP error code #{response.code}\n #{response.body}" if !response.code =~ /2../
-          rescue
-            $stderr.puts "HipChat API send_message failed:\n message: #{message}\n options: #{options.merge(notify: true)}"
-          end
-        else
-          if !message.start_with?("<!-- #html -->")
-            message = message.gsub("\n", "<br>")
-          end
 
-          @hipchat[source.room].send("", message[0, 9999], options)
+        if message.to_s.empty?
+          Lita.logger.warn "got an empty message: #{source.inspect}"
+          next
+        else
+
+          # If it's a private message, force format to be text. For some reason
+          # only plain text private messages open a new conversation tab.
+          if source.private_message?
+            options = { message_format: "text", color: "yellow", notify: true }
+            begin
+              response = @hipchat.user(source.user.id).send(message, options.merge(notify: true))
+              $stderr.puts "HipChat API returned:\n HTTP error code #{response.code}\n #{response.body}" if !response.code =~ /2../
+            rescue
+              $stderr.puts "HipChat API send_message failed:\n message: #{message}\n options: #{options.merge(notify: true)}"
+            end
+          else
+            if !message.start_with?("<!-- #html -->")
+              message = message.gsub("\n", "<br>")
+            end
+
+            @hipchat[source.room].send("", message[0, 9999], options)
+          end
         end
       end
     end
