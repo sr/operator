@@ -8,6 +8,9 @@ module Clients
 
     CommitStatus = Struct.new(:repository_id, :sha, :context, :state)
 
+    class Error < StandardError
+    end
+
     def initialize(token)
       @client = Octokit::Client.new(
         api_endpoint: Changeling.config.github_api_endpoint,
@@ -57,6 +60,22 @@ module Clients
 
     def pull_request(name_with_owner, number)
       @client.pull_request(name_with_owner, number)
+    end
+
+    def file_content(name_with_owner, path)
+      file = @client.contents(name_with_owner, path: path)
+
+      if file.is_a?(Array)
+        raise Error, "path #{path.inspect} is not a file"
+      end
+
+      if file.encoding != "base64"
+        raise Error, "unknown file encoding: #{file.encoding.inspect}"
+      end
+
+      Base64.decode64(file.content)
+    rescue Octokit::NotFound
+      ""
     end
 
     def pull_request_reviews(name_with_owner, number)

@@ -17,6 +17,7 @@ ADD Gemfile /app/Gemfile
 ADD Gemfile.lock /app/Gemfile.lock
 ADD vendor/cache /app/vendor/cache
 ADD vendor/purple /app/vendor/purple
+ADD vendor/OWNERS /app/vendor/OWNERS
 RUN bundle install --local --binstubs
 
 ADD . /app

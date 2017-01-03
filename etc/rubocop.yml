@@ -148,3 +148,4 @@ AllCops:
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
     - "src/**/vendor/gems/**/*"
+    - "src/changeling/vendor/OWNERS/**/*"
