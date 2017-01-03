@@ -53,7 +53,7 @@ module Hal9000
 
     # rubocop:disable Style/Send
     def send_messages(source, messages)
-      $stderr.puts "DEBUG: source=#{source.inspect} messages=#{messages.map(&:size)}"
+      Lita.logger.debug "DEBUG: source=#{source.inspect} messages=#{messages.map(&:size)}"
 
       if source.private_message? && source.user.id.to_s.empty?
         raise Error, "Unable to send private message without a source user: #{source.inspect}"
@@ -67,16 +67,16 @@ module Hal9000
         if message.to_s.empty?
           Lita.logger.warn "got an empty message: #{source.inspect}"
           next
+        end
 
-        elsif source.private_message?
+        if source.private_message?
           # If it's a private message, force format to be text. For some reason
           # only plain text private messages open a new conversation tab.
           options = { message_format: "text", color: "yellow", notify: true }
           begin
-            response = @hipchat.user(source.user.id).send(message, options.merge(notify: true))
-            $stderr.puts "HipChat API returned:\n HTTP error code #{response.code}\n #{response.body}" if !response.code =~ /2../
-          rescue
-            $stderr.puts "HipChat API send_message failed:\n message: #{message}\n options: #{options.merge(notify: true)}"
+            @hipchat.user(source.user.id).send(message, options)
+          rescue HipChat::BadRequest
+            Lita.logger.error "HipChat API send_message failed. message: #{message}"
           end
 
         else
