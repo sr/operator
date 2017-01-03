@@ -30,14 +30,22 @@ class Project < ApplicationRecord
     name
   end
 
-  def builds(branch:, include_untested_builds: false)
-    aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds)
+  def builds(branch:)
+    aql = build_aql_query(branch: branch)
     artifact_hashes = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
 
-    artifact_hashes.map { |hash| Build.from_artifact_hash(hash) }
+    artifact_hashes.map { |hash| Build.from_artifact_hash(self, hash) }
       .compact
       .sort_by { |deploy| -deploy.build_number }
+  end
+
+  def github_repository
+    @github_repository ||= GithubRepository.new(Canoe.config.github_client, repository)
+  end
+
+  def commit_status(sha)
+    github_repository.commit_status(sha)
   end
 
   def tags(count = 30)
@@ -92,7 +100,7 @@ class Project < ApplicationRecord
 
   private
 
-  def build_aql_query(branch:, include_untested_builds:)
+  def build_aql_query(branch:)
     conditions = [
       { "repo"       => { "$eq"    => ARTIFACTORY_REPO } },
       { "@gitRepo"   => { "$match" => "*/#{repository}.git" } },
@@ -109,21 +117,6 @@ class Project < ApplicationRecord
       if bamboo_job.present?
         conditions << { "@bambooJob" => { "$eq" => bamboo_job } }
       end
-    end
-
-    if include_untested_builds
-      # We can't know the difference between a failed build and a build that
-      # hasn't yet completed CI. Since the intention is to be able to deploy
-      # untested (but not failed) builds, our compromise is to display builds
-      # only that have been created in the past hour.
-      conditions << {
-        "$or" => [
-          { "@passedCI" => { "$eq" => "true" } },
-          { "created"   => { "$gt" => 1.hour.ago.iso8601 } },
-        ]
-      }
-    else
-      conditions << { "@passedCI" => { "$eq" => "true" } }
     end
 
     aql = %(items.find(#{JSON.dump("$and" => conditions)}))

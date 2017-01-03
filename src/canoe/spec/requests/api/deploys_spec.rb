@@ -85,6 +85,35 @@ RSpec.describe "/api/targets/:target_name/deploys" do
 
       expect(Deploy.count).to eq(deploys)
     end
+
+    it "disallows a non-compliant build" do
+      Canoe.config.github_client.compliance_state = GithubRepository::FAILURE
+
+      FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
+      expect_any_instance_of(AuthUser).to receive(:deploy_authorized?).and_return(true)
+      allow(Artifactory.client).to receive(:get)
+        .with(/pd-canoe\/PDT\/PPANT\/build1234\.tar\.gz/, properties: nil)
+        .and_return(
+          "uri" => "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
+          "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
+          "properties" => {
+            "gitBranch"      => ["master"],
+            "buildNumber"    => ["1234"],
+            "gitSha"         => ["abc123"],
+            "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"]
+          },
+        )
+
+      api_post "/api/targets/#{@target.name}/deploys",
+        artifact_url: "https://artifactory/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        project_name: @project.name
+
+      expect(json_response["error"]).to eq(true)
+      expect(json_response["message"]).to eq("The build is does not meet compliance requirements: description")
+      expect(json_response["deploy"]).to eq(nil)
+
+      expect(Deploy.count).to eq(0)
+    end
   end
 
   describe "/api/targets/:target_name/deploys/latest" do

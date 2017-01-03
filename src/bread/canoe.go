@@ -37,7 +37,7 @@ type canoeBuild struct {
 	Branch      string    `json:"branch"`
 	BuildNumber int       `json:"build_number"`
 	SHA         string    `json:"sha"`
-	PassedCI    bool      `json:"passed_ci"`
+	Compliant   bool      `json:"compliant"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 

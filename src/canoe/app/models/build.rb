@@ -2,7 +2,7 @@ require "base64"
 require "json"
 
 class Build
-  attr_reader :artifact_url, :branch, :build_number, :sha, :passed_ci, :created_at, :properties
+  attr_reader :artifact_url, :branch, :build_number, :sha, :created_at, :commit_status, :properties
   attr_reader :options_validator, :options
 
   def self.from_artifact_url(project, artifact_url)
@@ -13,11 +13,11 @@ class Build
     from_artifact_url_and_properties(project, artifact_url, properties)
   end
 
-  def self.from_artifact_hash(hash)
+  def self.from_artifact_hash(project, hash)
     artifact_url = Artifactory.client.build_uri(:get, "/" + ["api", "storage", hash["repo"], hash["path"], hash["name"]].join("/")).to_s
     properties = hash["properties"].each_with_object({}) { |p, h| h[p["key"]] = p["value"] }
 
-    from_artifact_url_and_properties(hash["repo"], artifact_url, properties)
+    from_artifact_url_and_properties(project, artifact_url, properties)
   end
 
   def self.from_artifact_url_and_properties(project, artifact_url, properties)
@@ -38,14 +38,16 @@ class Build
         nil
       end
 
+    commit_status = project.commit_status(properties["gitSha"])
+
     new(
       project: project,
       artifact_url: artifact_url,
       branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
-      passed_ci: !!(properties["passedCI"] && properties["passedCI"] == "true"),
       created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
+      commit_status: commit_status,
       options_validator: options_validator,
       options: {},
       properties: properties
@@ -53,25 +55,18 @@ class Build
   end
 
   def self.from_previous_deploy(project, deploy)
-    new(
-      project: project,
-      artifact_url: deploy.artifact_url,
-      branch: deploy.branch,
-      build_number: deploy.build_number,
-      sha: deploy.sha,
-      passed_ci: deploy.passed_ci,
-      options_validator: deploy.options_validator,
-      options: deploy.options
-    )
+    build = from_artifact_url(project, deploy.artifact_url)
+    build.options = deploy.options
+    build
   end
 
-  def initialize(project:, artifact_url:, branch:, build_number:, sha:, passed_ci:, created_at: nil, options_validator: nil, options: {}, properties: {})
+  def initialize(project:, artifact_url:, branch:, build_number:, sha:, commit_status:, created_at: nil, options_validator: nil, options: {}, properties: {})
     @project = project
     @artifact_url = artifact_url
     @branch = branch
     @build_number = build_number
     @sha = sha
-    @passed_ci = passed_ci
+    @commit_status = commit_status
     @created_at = created_at
     @options_validator = options_validator
     @options = options
@@ -102,8 +97,12 @@ class Build
     @sha.present?
   end
 
-  def passed_ci?
-    @passed_ci
+  def compliant?
+    @commit_status.compliance_state == GithubRepository::SUCCESS
+  end
+
+  def compliance_description
+    @commit_status.compliance_description
   end
 
   def test_state(test)

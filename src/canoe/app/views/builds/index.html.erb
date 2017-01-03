@@ -15,12 +15,6 @@
     </div>
   <% end %>
   <div class="row">
-    <div class="well well-sm col-md-3" style="margin-left: 15px; margin-right: -15px;">
-      <%= form_tag request.path, method: "get", class: "form form-inline", id: "include-untested-build-form" do |f| %>
-        <%= check_box_tag :include_untested_builds, "1", @include_untested_builds %>
-        <%= label_tag :include_untested_builds, "Include Fully Untested Builds?" %>
-      <%- end %>
-    </div>
     <% current_project.test_list.values.each_with_index do |test_name, i| %>
       <div class="col-md-1<%= " col-md-offset-1" if i == 0 %>"><label><%= test_name %></label></div>
     <% end %>
@@ -40,9 +34,6 @@
                 <%= link_to "Ship This", select_target_project_deploys_path(current_project, artifact_url: build.artifact_url), class: "btn btn-primary btn-xs btn-success deploy-button" %>
                 &nbsp;
                 <%= deploy_type_icon("build") %> build<%= build.build_number %>
-                <%- if !build.passed_ci? %>
-                  <span class="label label-danger">Untested</span>
-                <%- end %>
               </h4>
               <small class="muted">
                 commit:

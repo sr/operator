@@ -5,7 +5,7 @@ class FakeGithubClient
     end
   end
 
-  Status = Struct.new(:context, :state, :target_url)
+  Status = Struct.new(:context, :state, :target_url, :description)
   Comparison = Struct.new(:status, :ahead_by, :behind_by)
 
   def initialize(compare_state:, compliance_state:, tests_state: nil)
@@ -21,7 +21,8 @@ class FakeGithubClient
       Status.new(
         GithubRepository::COMPLIANCE_STATUS,
         @compliance_state,
-        "https://changeling"
+        "https://changeling",
+        "description"
       )
     ]
 
@@ -29,7 +30,8 @@ class FakeGithubClient
       statuses << Status.new(
         GithubCommitStatus::TESTS_STATUS,
         @tests_state,
-        "https://bamboo/1"
+        "https://bamboo/1",
+        "description"
       )
     end
 

@@ -41,6 +41,14 @@ class GithubCommitStatus
     end
   end
 
+  def compliance_description
+    if compliance_status
+      compliance_status.description
+    else
+      ""
+    end
+  end
+
   def tests_url
     if tests_status
       tests_status.target_url

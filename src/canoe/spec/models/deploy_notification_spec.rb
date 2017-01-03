@@ -35,13 +35,4 @@ RSpec.describe DeployNotification do
       expect(notifier.messages[0].message).to match(/CANCELLED syncing/)
     end
   end
-
-  describe "#notify_untested_deploy" do
-    it "notifies a HipChat room" do
-      notification.notify_untested_deploy(deploy)
-      expect(notifier.messages.size).to eq(1)
-      expect(notifier.messages[0].room_id).to eq(notification.hipchat_room_id)
-      expect(notifier.messages[0].message).to match(/UNTESTED deploy/)
-    end
-  end
 end

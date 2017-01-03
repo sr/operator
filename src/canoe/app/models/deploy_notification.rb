@@ -58,17 +58,6 @@ class DeployNotification < ApplicationRecord
     )
   end
 
-  def notify_untested_deploy(deploy)
-    msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " \
-      "an UNTESTED deploy of #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
-
-    notifier.notify_room(
-      hipchat_room_id,
-      msg,
-      color: UNTESTED_COLOR
-    )
-  end
-
   def notifier
     @notifier ||= HipchatNotifier.new
   end
