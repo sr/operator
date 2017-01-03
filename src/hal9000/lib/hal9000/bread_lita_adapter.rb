@@ -69,9 +69,9 @@ module Hal9000
           next
         end
 
+        # If it's a private message, force format to be text. For some reason
+        # only plain text private messages open a new conversation tab.
         if source.private_message?
-          # If it's a private message, force format to be text. For some reason
-          # only plain text private messages open a new conversation tab.
           options = { message_format: "text", color: "yellow", notify: true }
           begin
             @hipchat.user(source.user.id).send(message, options)
