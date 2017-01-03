@@ -78,14 +78,13 @@ module Hal9000
           rescue
             $stderr.puts "HipChat API send_message failed:\n message: #{message}\n options: #{options.merge(notify: true)}"
           end
-          
+
         else
           if !message.start_with?("<!-- #html -->")
             message = message.gsub("\n", "<br>")
           end
 
           @hipchat[source.room].send("", message[0, 9999], options)
-        end
         end
       end
     end
