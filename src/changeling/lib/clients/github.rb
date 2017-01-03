@@ -23,6 +23,28 @@ module Clients
       @client.orgs.map { |o| o[:login] }.include? "heroku"
     end
 
+    # Returns an Array of users that are members of the given organization's teams
+    def team_members(organization, team_slugs)
+      team_ids = {}
+      users = {}
+
+      @client.organization_teams(organization).each do |team|
+        team_ids[team.slug] = team.id
+      end
+
+      team_slugs.each do |team|
+        @client.team_members(team_ids.fetch(team)).each do |member|
+          if users.key?(member.id)
+            next
+          end
+
+          users[member.id] = member
+        end
+      end
+
+      users.values
+    end
+
     def compliance_status(name_with_owner, sha)
       statuses = @client.statuses(name_with_owner, sha)
       statuses.detect { |status| status["context"] == "heroku/compliance" }
@@ -62,8 +84,12 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
-    def file_content(name_with_owner, path)
-      file = @client.contents(name_with_owner, path: path)
+    def file_content(name_with_owner, path, branch = nil)
+      params = { path: path }
+      if branch
+        params[:ref] = branch
+      end
+      file = @client.contents(name_with_owner, params)
 
       if file.is_a?(Array)
         raise Error, "path #{path.inspect} is not a file"

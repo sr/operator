@@ -1,5 +1,7 @@
 # A way to find out info about a GitHub Repository
 class Repository
+  OWNERS_FILENAME = "OWNERS".freeze
+
   class OwnersError < StandardError
   end
 
@@ -28,12 +30,43 @@ class Repository
     @repo.name_with_owner
   end
 
-  Owner = Struct.new(:github_login)
+  def organization
+    @repo.name_with_owner.split("/")[0]
+  end
 
+  # Returns an Array of GitHub users referenced in the OWNERS file of this
+  # repository, either by their username or through a team they belong to.
   def owners
-    content = @github.file_content(@repo.name_with_owner, "OWNERS")
+    content = @github.file_content(
+      @repo.name_with_owner,
+      OWNERS_FILENAME,
+      Changeling.config.repository_owners_file_branch
+    )
+    file = OwnersFile.new(content)
 
-    OwnersFile.new(content).users
+    owners = []
+    team_slugs = []
+
+    file.teams.each do |team|
+      parts = team.split("/")
+
+      # Ignore teams that don't belong to this repository's organization
+      if parts[0] != organization
+        next
+      end
+
+      team_slugs << parts[1]
+    end
+
+    @github.team_members(organization, team_slugs).each do |user|
+      owners << user.login
+    end
+
+    file.users.each do |user|
+      owners << user
+    end
+
+    owners.uniq
   end
 
   def required_testing_statuses
