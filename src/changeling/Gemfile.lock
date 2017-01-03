@@ -1,4 +1,9 @@
 PATH
+  remote: vendor/OWNERS
+  specs:
+    owners (0.0.1)
+
+PATH
   remote: vendor/purple
   specs:
     purple (1.1.2.pre.10634f)
@@ -412,6 +417,7 @@ DEPENDENCIES
   nokogiri
   octokit
   omniauth-github
+  owners!
   pg
   pry-byebug
   puma (= 2.15.3)

@@ -347,4 +347,36 @@ RSpec.describe RepositoryPullRequest do
       expect(@multipass.reload.peer_reviewer).to eq(nil)
     end
   end
+
+  it "synchronizes peer reviewers" do
+    stub_jira_ticket("BREAD-1234")
+    stub_github_pull_request
+    stub_github_commit_status
+    stub_github_pull_request_reviews([])
+    expect(@multipass.reload.peer_reviews).to eq([])
+
+    stub_github_pull_request_reviews([
+      { github_login: "alindeman", approved: true },
+      { github_login: "sr", approved: false }
+    ])
+    @repository_pull_request.synchronize
+
+    expect(@multipass.reload.peer_reviews.size).to eq(2)
+
+    review_1 = @multipass.peer_reviews[0]
+    expect(review_1.reviewer_github_login).to eq("alindeman")
+    expect(review_1.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+
+    review_2 = @multipass.peer_reviews[1]
+    expect(review_2.reviewer_github_login).to eq("sr")
+    expect(review_2.state).to eq(Clients::GitHub::REVIEW_CHANGES_REQUESTED)
+
+    stub_github_pull_request_reviews([
+      { github_login: "alindeman", approved: true },
+      { github_login: "sr", approved: true }
+    ])
+    @repository_pull_request.synchronize
+    review = @multipass.reload.peer_reviews.where(reviewer_github_login: "sr").first!
+    expect(review.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+  end
 end

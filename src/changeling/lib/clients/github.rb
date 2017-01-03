@@ -8,6 +8,9 @@ module Clients
 
     CommitStatus = Struct.new(:repository_id, :sha, :context, :state)
 
+    class Error < StandardError
+    end
+
     def initialize(token)
       @client = Octokit::Client.new(
         api_endpoint: Changeling.config.github_api_endpoint,
@@ -18,6 +21,28 @@ module Clients
     # Identify whether we're a herokai or not
     def heroku_org_member?
       @client.orgs.map { |o| o[:login] }.include? "heroku"
+    end
+
+    # Returns an Array of users that are members of the given organization's teams
+    def team_members(organization, team_slugs)
+      team_ids = {}
+      users = {}
+
+      @client.organization_teams(organization).each do |team|
+        team_ids[team.slug] = team.id
+      end
+
+      team_slugs.each do |team|
+        @client.team_members(team_ids.fetch(team)).each do |member|
+          if users.key?(member.id)
+            next
+          end
+
+          users[member.id] = member
+        end
+      end
+
+      users.values
     end
 
     def compliance_status(name_with_owner, sha)
@@ -57,6 +82,26 @@ module Clients
 
     def pull_request(name_with_owner, number)
       @client.pull_request(name_with_owner, number)
+    end
+
+    def file_content(name_with_owner, path, branch = nil)
+      params = { path: path }
+      if branch
+        params[:ref] = branch
+      end
+      file = @client.contents(name_with_owner, params)
+
+      if file.is_a?(Array)
+        raise Error, "path #{path.inspect} is not a file"
+      end
+
+      if file.encoding != "base64"
+        raise Error, "unknown file encoding: #{file.encoding.inspect}"
+      end
+
+      Base64.decode64(file.content)
+    rescue Octokit::NotFound
+      ""
     end
 
     def pull_request_reviews(name_with_owner, number)

@@ -8,7 +8,6 @@ class PardotComplianceStatus
     :complete?,
     :rejected?,
     :pending?,
-    :peer_reviewed?,
     :emergency_approved?,
     to: :@default
 
@@ -38,6 +37,23 @@ class PardotComplianceStatus
 
   def user_is_rejector?(user)
     @default.user_is_rejector?(user)
+  end
+
+  def peer_reviewed?
+    if !Changeling.config.repository_owners_review_required.include?(@multipass.repository_name)
+      return @multipass.peer_reviewer.present?
+    end
+
+    reviewers = @multipass.peer_review_approvers
+    owners = @multipass.repository_owners
+
+    if owners.empty?
+      raise Repository::OwnersError, "repository #{@multipass.repository_name.inspect} does not have any owner"
+    end
+
+    owners.any? do |owner|
+      reviewers.include?(owner)
+    end
   end
 
   def github_commit_status_description

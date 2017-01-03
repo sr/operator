@@ -4,6 +4,7 @@ require_relative "./validators/sre_approver_is_in_sre"
 class Multipass < ActiveRecord::Base
   audited
   has_many :events
+  has_many :peer_reviews
   has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
@@ -83,6 +84,10 @@ class Multipass < ActiveRecord::Base
     end
   end
 
+  def repository_owners
+    repository.owners
+  end
+
   def pull_request_number
     if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
       reference_url_path_parts[4]
@@ -103,6 +108,12 @@ class Multipass < ActiveRecord::Base
 
   def referenced_ticket
     repository_pull_request.referenced_ticket
+  end
+
+  # Returns an Array of GitHub user logins that approve of this change
+  def peer_review_approvers
+    peer_reviews.where(state: Clients::GitHub::REVIEW_APPROVED)
+      .load.map(&:reviewer_github_login)
   end
 
   def hostname
