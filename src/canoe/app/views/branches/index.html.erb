@@ -12,7 +12,7 @@
     <% @branches.each do |branch| %>
       <li>
         <h4>
-          <%= link_to "This branch", project_branch_builds_path(current_project, branch.name), class: "btn btn-primary btn-xs deploy-button" %>
+          <%= link_to "This Branch", project_branch_builds_path(current_project, branch.name), class: "btn btn-primary btn-xs deploy-button" %>
 
           &nbsp;
           <%= deploy_type_icon("branch") %> <%= branch.name %>
