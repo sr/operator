@@ -29,6 +29,9 @@
       </td>
       <td>
         <%= print_deploy_what(deploy) %>
+        <%- if deploy.tests_state != GithubRepository::SUCCESS %>
+          <span class="label label-danger">Untested</span>
+        <%- end %>
       </td>
       <td><%= sha_span(deploy.sha) unless deploy.sha.blank? %></td>
       <td><%= print_email deploy.auth_user.email %></td>

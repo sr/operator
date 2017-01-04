@@ -11,6 +11,7 @@ class Project < ApplicationRecord
     case name
     when "pardot"
       {
+        GithubRepository::COMPLIANCE_STATUS  => "Compliance",
         "Test Jobs"                          => "PHP Tests",
         "WebDriver - Test Jobs"              => "WebDriver",
         "Salesforce Integration - Test Jobs" => "Salesforce Integration",
@@ -40,7 +41,7 @@ class Project < ApplicationRecord
 
     artifact_hashes.map { |hash| Build.from_artifact_hash(self, hash) }
       .compact
-      .sort_by { |deploy| -deploy.build_number }
+      .sort_by { |build| -build.build_number }
   end
 
   def github_repository

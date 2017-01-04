@@ -57,7 +57,7 @@ class GithubCommitStatus
     if status
       status.state
     else
-      GithubRepository::PENDING
+      GithubRepository::UNREPORTED
     end
   end
 

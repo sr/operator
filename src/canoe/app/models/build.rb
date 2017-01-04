@@ -2,7 +2,7 @@ require "base64"
 require "json"
 
 class Build
-  attr_reader :artifact_url, :branch, :build_number, :sha, :created_at, :commit_status, :properties
+  attr_reader :artifact_url, :branch, :build_number, :sha, :created_at, :properties
   attr_reader :options_validator, :options
 
   def self.from_artifact_url(project, artifact_url)
@@ -38,8 +38,6 @@ class Build
         nil
       end
 
-    commit_status = project.commit_status(properties["gitSha"])
-
     new(
       project: project,
       artifact_url: artifact_url,
@@ -47,7 +45,6 @@ class Build
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
       created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
-      commit_status: commit_status,
       options_validator: options_validator,
       options: {},
       properties: properties
@@ -60,13 +57,12 @@ class Build
     build
   end
 
-  def initialize(project:, artifact_url:, branch:, build_number:, sha:, commit_status:, created_at: nil, options_validator: nil, options: {}, properties: {})
+  def initialize(project:, artifact_url:, branch:, build_number:, sha:, created_at: nil, options_validator: nil, options: {}, properties: {})
     @project = project
     @artifact_url = artifact_url
     @branch = branch
     @build_number = build_number
     @sha = sha
-    @commit_status = commit_status
     @created_at = created_at
     @options_validator = options_validator
     @options = options
@@ -97,16 +93,31 @@ class Build
     @sha.present?
   end
 
+  def commit_status
+    @commit_status ||= @project.commit_status(@sha)
+  end
+
   def compliant?
     compliance_state == GithubRepository::SUCCESS
   end
 
+  def compliance_allows_deploy?
+    # Allows deploys from default branch in emergencies. Something could not
+    # have gotten into the default branch unless it passed compliance earlier or
+    # an emergency override was used.
+    if !@project.compliant_builds_required? || @project.default_branch == branch
+      true
+    else
+      compliant?
+    end
+  end
+
   def compliance_state
-    @commit_status.compliance_state
+    commit_status.compliance_state
   end
 
   def compliance_description
-    @commit_status.compliance_description
+    commit_status.compliance_description
   end
 
   def passed_tests?
@@ -114,14 +125,14 @@ class Build
   end
 
   def tests_state
-    @commit_status.tests_state
+    commit_status.tests_state
   end
 
   def state_for_context(context)
-    @commit_status.state_for_context(context)
+    commit_status.state_for_context(context)
   end
 
   def url_for_context(context)
-    @commit_status.url_for_context(context)
+    commit_status.url_for_context(context)
   end
 end
