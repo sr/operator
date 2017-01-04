@@ -1,4 +1,9 @@
 class GithubCommitStatus
+  # TODO(sr) Remove this and update callers to use the #compliance_url method
+  # instead once we're ready to switch both Chef and Terraform to using the
+  # pardot/compliance check
+  TESTS_STATUS = "Test Jobs".freeze
+
   def self.none
     new(nil, nil)
   end
@@ -64,20 +69,7 @@ class GithubCommitStatus
 
   def tests_status
     @commit_status.statuses.detect do |s|
-      s.context == test_status_context
-    end
-  end
-
-  # TODO(sr) Remove this and update callers to use the #compliance_url method
-  # instead once we're ready to switch both Chef and Terraform to using the
-  # pardot/compliance check
-  TESTS_STATUS = "Test Jobs".freeze
-
-  def test_status_context
-    if @commit_status.repository.full_name == "Pardot/bread"
-      "BREAD build"
-    else
-      TESTS_STATUS
+      s.context == TESTS_STATUS
     end
   end
 end
