@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161031203534) do
+ActiveRecord::Schema.define(version: 20170104161808) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -121,14 +121,16 @@ ActiveRecord::Schema.define(version: 20161031203534) do
   end
 
   create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string  "name",                                                                                  null: false
-    t.string  "icon",                                                                                  null: false
+    t.string  "name",                                                                                     null: false
+    t.string  "icon",                                                                                     null: false
     t.string  "bamboo_project"
     t.string  "bamboo_plan"
-    t.string  "repository",                                                                            null: false
+    t.string  "repository",                                                                               null: false
     t.string  "bamboo_job"
-    t.boolean "all_servers_default",                                                   default: true,  null: false
-    t.decimal "maximum_unavailable_percentage_per_datacenter", precision: 5, scale: 2, default: "1.0", null: false
+    t.boolean "all_servers_default",                                                   default: true,     null: false
+    t.decimal "maximum_unavailable_percentage_per_datacenter", precision: 5, scale: 2, default: "1.0",    null: false
+    t.boolean "compliant_builds_required",                                             default: true,     null: false
+    t.string  "default_branch",                                                        default: "master", null: false
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 

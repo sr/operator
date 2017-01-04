@@ -69,7 +69,7 @@ class DeployRequest
       return Response.error("Build is not valid")
     end
 
-    if !build.compliant?
+    if !compliance_allows_deploy?
       return Response.error("The build is does not meet compliance requirements: #{build.compliance_description}")
     end
 
@@ -111,5 +111,16 @@ class DeployRequest
 
   def build
     @build ||= Build.from_artifact_url(@project, @artifact_url)
+  end
+
+  def compliance_allows_deploy?
+    # Allows deploys from default branch in emergencies. Something could not
+    # have gotten into the default branch unless it passed compliance earlier or
+    # an emergency override was used.
+    if !@project.compliant_builds_required? || @project.default_branch == build.branch
+      true
+    else
+      build.compliant?
+    end
   end
 end

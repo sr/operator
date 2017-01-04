@@ -18,6 +18,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "EHT"
       project.repository = "Pardot/engagement-history-topology"
+      project.compliant_builds_required = false
       project.save!
     }.tap(&:save!)
     eht.deploy_notifications.find_or_initialize_by(hipchat_room_id: TRITON_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -28,6 +29,7 @@ namespace :canoe do
       project.bamboo_plan = "BREAD"
       project.bamboo_job = "EX"
       project.repository = "Pardot/bread"
+      project.compliant_builds_required = false
       project.save!
     }.tap(&:save!)
     explorer.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -37,6 +39,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PPANT"
       project.repository = "Pardot/pardot"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
     pardot.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -46,6 +49,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "PTHMBS"
       project.repository = "Pardot/pithumbs"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
     pithumbs.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -55,6 +59,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "RTF"
       project.repository = "Pardot/realtime-frontend"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: ENGR_HIPCHAT_ROOM_ID).tap(&:save!)
     rtf.deploy_notifications.find_or_initialize_by(hipchat_room_id: SUPPORT_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -64,6 +69,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "WFST"
       project.repository = "Pardot/workflow-stats"
+      project.compliant_builds_required = false
       project.maximum_unavailable_percentage_per_datacenter = "0.5"
     }.tap(&:save!)
     wfst.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -73,6 +79,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "MDOC"
       project.repository = "Pardot/murdoc"
+      project.compliant_builds_required = false
       project.all_servers_default = false
     }.tap(&:save!)
     murdoc.deploy_notifications.find_or_initialize_by(hipchat_room_id: ES_ONCALL_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -82,6 +89,7 @@ namespace :canoe do
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "CHEF"
       project.repository = "Pardot/chef"
+      project.compliant_builds_required = false
     }.tap(&:save!)
 
     [
@@ -100,6 +108,7 @@ namespace :canoe do
         p.bamboo_plan = "BREAD"
         p.bamboo_job = "TER"
         p.repository = "Pardot/bread"
+        p.compliant_builds_required = false
       }
       project.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
       project.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -111,6 +120,7 @@ namespace :canoe do
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "REPFIX"
       project.repository = "Pardot/repfix"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     repfix.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
 
@@ -119,6 +129,7 @@ namespace :canoe do
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "INTAPI"
       project.repository = "Pardot/internal-api"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: BREAD_HIPCHAT_ROOM_ID).tap(&:save!)
     intapi.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
@@ -128,6 +139,7 @@ namespace :canoe do
       project.bamboo_project = "PDT"
       project.bamboo_plan = "BLUMSH"
       project.repository = "Pardot/blue-mesh"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     blue_mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
@@ -136,6 +148,7 @@ namespace :canoe do
       project.bamboo_project = "BREAD"
       project.bamboo_plan = "MESH"
       project.repository = "Pardot/mesh"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     mesh.deploy_notifications.find_or_initialize_by(hipchat_room_id: TEAM_CAERUS_HIPCHAT_ROOM_ID).tap(&:save!)
 
@@ -144,6 +157,7 @@ namespace :canoe do
       project.bamboo_project = "SRE"
       project.bamboo_plan = "ANSBL"
       project.repository = "Pardot/ansible"
+      project.compliant_builds_required = false
     }.tap(&:save!)
     ansible.deploy_notifications.find_or_initialize_by(hipchat_room_id: OPS_HIPCHAT_ROOM_ID).tap(&:save!)
   end
