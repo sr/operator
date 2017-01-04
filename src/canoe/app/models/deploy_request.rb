@@ -16,7 +16,7 @@ class DeployRequest
     attr_reader :error, :deploy
 
     def error?
-      !!@error
+      !@error.nil?
     end
 
     def as_proto_json

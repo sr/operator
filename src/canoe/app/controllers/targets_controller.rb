@@ -1,6 +1,5 @@
 class TargetsController < ApplicationController
   before_action :require_target
 
-  def show
-  end
+  def show; end
 end
