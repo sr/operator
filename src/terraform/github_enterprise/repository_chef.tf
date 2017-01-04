@@ -38,8 +38,5 @@ resource "github_branch_protection" "chef_master" {
 
   include_admins = true
   strict         = true
-  contexts       = ["Test Jobs"]
-
-  users_restriction = []
-  teams_restriction = ["ops"]
+  contexts       = ["compliance"]
 }
