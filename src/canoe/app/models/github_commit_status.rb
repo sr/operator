@@ -1,7 +1,4 @@
 class GithubCommitStatus
-  # TODO(sr) Figure out some way to avoid hard-coding this, maybe
-  COMPLIANCE_STATUS = "pardot/compliance".freeze
-
   def self.none
     new(nil, nil)
   end
