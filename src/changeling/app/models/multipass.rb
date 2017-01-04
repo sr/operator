@@ -88,6 +88,21 @@ class Multipass < ActiveRecord::Base
     repository.owners
   end
 
+  def repository_owners_file_url
+    [
+      Changeling.config.github_url,
+      repository_name,
+      "blob",
+      Changeling.config.repository_owners_file_branch || "master",
+      Repository::OWNERS_FILENAME
+    ].join("/")
+  end
+
+  def repository_owners_enabled?
+    Changeling.config.repository_owners_review_required
+      .include?(repository_name)
+  end
+
   def pull_request_number
     if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
       reference_url_path_parts[4]

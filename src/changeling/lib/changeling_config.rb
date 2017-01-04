@@ -110,6 +110,10 @@ class ChangelingConfig
     end
   end
 
+  def github_url
+    @github_url ||= URI("https://#{github_hostname}")
+  end
+
   def github_service_account_username
     if pardot?
       ENV.fetch("GITHUB_USERNAME")
