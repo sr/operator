@@ -98,11 +98,23 @@ class Build
   end
 
   def compliant?
-    @commit_status.compliance_state == GithubRepository::SUCCESS
+    compliance_state == GithubRepository::SUCCESS
+  end
+
+  def compliance_state
+    @commit_status.compliance_state
   end
 
   def compliance_description
     @commit_status.compliance_description
+  end
+
+  def passed_tests?
+    tests_state == GithubRepository::SUCCESS
+  end
+
+  def tests_state
+    @commit_status.tests_state
   end
 
   def test_state(test)
