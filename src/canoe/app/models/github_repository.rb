@@ -8,7 +8,7 @@ class GithubRepository
   BEHIND = "behind".freeze
 
   # TODO(sr) Figure out some way to avoid hard-coding this, maybe
-  COMPLIANCE_STATUS = "pardot/compliance".freeze
+  COMPLIANCE_STATUS = "compliance".freeze
 
   def initialize(client, name)
     @client = client
