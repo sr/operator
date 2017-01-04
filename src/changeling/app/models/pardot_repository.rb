@@ -9,6 +9,7 @@ class PardotRepository
   PARDOT = "Pardot/pardot".freeze
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
+  TEST_STATUS = "Test Jobs".freeze
 
   def initialize(nwo)
     @name_with_owner = nwo
@@ -18,14 +19,10 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when BREAD
-      ["BREAD build"]
+    when BREAD, CHEF, PARDOT
+      [TEST_STATUS]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
-    when CHEF
-      ["Test Jobs"]
-    when PARDOT
-      ["Test Jobs"]
     else
       Rails.logger.info "configuration-missing repo=#{name_with_owner.inspect}"
       []
