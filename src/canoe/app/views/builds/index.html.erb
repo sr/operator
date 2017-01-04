@@ -7,15 +7,16 @@
 
 <div>
   <%= render partial: "application/deploy_what_tabs" %>
-  <% unless current_project.test_list.empty? %>
+  <% unless current_project.status_contexts.empty? %>
     <div class="row">
+      <div class="col-md-3"></div>
       <div class="col-md-2 col-md-offset-6" style="font-size: 1.5em;">
-        Test Plans
+        Status Checks
       </div>
     </div>
   <% end %>
   <div class="row">
-    <% current_project.test_list.values.each_with_index do |test_name, i| %>
+    <% current_project.status_contexts.values.each_with_index do |test_name, i| %>
       <div class="col-md-1<%= " col-md-offset-1" if i == 0 %>"><label><%= test_name %></label></div>
     <% end %>
   </div>
@@ -42,9 +43,9 @@
                 <%- end %>
               </small>
             </div>
-            <% current_project.test_list.keys.each_with_index do |test, i| %>
+            <% current_project.status_contexts.keys.each_with_index do |test, i| %>
               <div class="col-md-1<%= " col-md-offset-1" if i == 0 %>">
-                <%= render partial: "streetlight", locals: { state: build.test_state(test), build_url: build.build_url(test) } %>
+                <%= render partial: "streetlight", locals: { state: build.state_for_context(test), build_url: build.url_for_context(test) } %>
               </div>
             <% end %>
           </div>

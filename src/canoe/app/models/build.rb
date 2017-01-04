@@ -117,21 +117,11 @@ class Build
     @commit_status.tests_state
   end
 
-  def test_state(test)
-    key = test == :PPANT ? "passedCI" : "ciJob[#{test}]"
-    state = properties[key]
-    build_time = DateTime.parse(properties["buildTimeStamp"]).iso8601
-
-    # Since Bamboo doesn't have a run code on failure option we don't know if
-    # the build plan is still processing
-    # TODO: Interface with the Bamboo API to verify build status
-    if state == "false" && build_time > 30.minutes.ago
-      state = "pending"
-    end
-    state
+  def state_for_context(context)
+    @commit_status.state_for_context(context)
   end
 
-  def build_url(test)
-    properties["ciJobUrl[#{test}]"]
+  def url_for_context(context)
+    @commit_status.url_for_context(context)
   end
 end

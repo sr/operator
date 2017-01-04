@@ -7,18 +7,21 @@ class Project < ApplicationRecord
     where.not(name: [ChefDelivery::PROJECT], id: TerraformProject.select(:project_id).all)
   end
 
-  def test_list
+  def status_contexts
     case name
     when "pardot"
       {
-        PPANT: "PPANT",
-        WT: "WebDriver",
-        TSIT: "Salesforce Integration",
-        PPANTCLONE666: "AB Combinatorial",
-        PPANTCLONE6666: "List Combinatorial"
+        "Test Jobs"                          => "PHP Tests",
+        "WebDriver - Test Jobs"              => "WebDriver",
+        "Salesforce Integration - Test Jobs" => "Salesforce Integration",
+        "AB Combinatorial - Test Jobs"       => "AB Combinatorial",
+        "List Combinatorial - Test Jobs"     => "List Combinatorial"
       }
     else
-      {}
+      {
+        GithubRepository::COMPLIANCE_STATUS      => "Compliance",
+        GithubCommitStatus::DEFAULT_TEST_CONTEXT => "Primary Build"
+      }
     end
   end
 

@@ -28,7 +28,7 @@ class FakeGithubClient
 
     if @tests_state
       statuses << Status.new(
-        GithubCommitStatus::TESTS_STATUS,
+        GithubCommitStatus::DEFAULT_TEST_CONTEXT,
         @tests_state,
         "https://bamboo/1",
         "description"
