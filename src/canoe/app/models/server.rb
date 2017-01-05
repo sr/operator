@@ -1,7 +1,12 @@
 # Server represents a server where code is deployed for a given target.
 class Server < ApplicationRecord
-  validates :hostname, presence: true, uniqueness: true
+  # A hostname must be in a format where we can extract a datacenter from it
+  HOSTNAME_REGEX = /\A[0-9a-z-]+-(?<datacenter>[0-9a-z]+)(?:\.dev)?\z/i
+
+  validates :hostname, presence: true, uniqueness: true, format: HOSTNAME_REGEX
   attr_readonly :hostname
+
+  before_save :calculate_datacenter
 
   scope :enabled, -> { where(enabled: true) }
   scope :active, -> { where(archived: false) }
@@ -28,11 +33,14 @@ class Server < ApplicationRecord
     server_tags.map(&:name)
   end
 
-  def datacenter
-    case hostname
-    when /-dfw$/ then :dfw
-    when /-phx$/ then :phx
-    else :sl
+  def calculate_datacenter
+    HOSTNAME_REGEX =~ hostname
+    datacenter = Regexp.last_match(:datacenter)
+
+    if datacenter =~ /\A[sd][0-9]+\z/ # legacy app-s1, app-d1
+      self.datacenter = "softlayer"
+    else
+      self.datacenter = datacenter
     end
   end
 end

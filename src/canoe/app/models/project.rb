@@ -11,7 +11,7 @@ class Project < ApplicationRecord
     case name
     when "pardot"
       {
-        "WebDriver - Test Jobs"              => "WebDriver",
+        "Webdriver - Test Jobs"              => "Webdriver",
         "Salesforce Integration - Test Jobs" => "Salesforce Integration",
         "AB Combinatorial - Test Jobs"       => "AB Combinatorial",
         "List Combinatorial - Test Jobs"     => "List Combinatorial"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104170156) do
+ActiveRecord::Schema.define(version: 20170105155407) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -166,6 +166,7 @@ ActiveRecord::Schema.define(version: 20170104170156) do
     t.datetime "created_at", default: '2016-01-21 14:59:58', null: false
     t.datetime "updated_at", default: '2016-01-21 14:59:58', null: false
     t.boolean  "archived",   default: false,                 null: false
+    t.string   "datacenter",                                 null: false
     t.index ["archived"], name: "index_servers_on_archived", using: :btree
     t.index ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
   end

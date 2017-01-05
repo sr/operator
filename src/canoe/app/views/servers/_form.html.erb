@@ -1,5 +1,5 @@
 <%= simple_nested_form_for @server, html: {class: 'form-horizontal'}, wrapper: :horizontal_form do |f| %>
-  <%= f.input :hostname, label: 'Hostname', placeholder: 'app-s1', disabled: @server.persisted? %>
+  <%= f.input :hostname, label: 'Hostname', placeholder: 'pardot0-app1-1-dfw', disabled: @server.persisted? %>
   <%= f.input :enabled, label: 'Enabled?', wrapper: :horizontal_radio_and_checkboxes %>
 
   <%= f.input :server_tag_names, label: 'Tags' do %>
