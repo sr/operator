@@ -15,5 +15,15 @@ RSpec.describe Server do
       expect(server.valid?).to be_falsey
       expect(server.errors).to have_key(:hostname)
     end
+
+    it "calculates datacenter for legacy SoftLayer servers" do
+      server = FactoryGirl.build(:server, hostname: "app-s1")
+      server.save!
+      expect(server.datacenter).to eq("softlayer")
+
+      server = FactoryGirl.build(:server, hostname: "app-s1.dev")
+      server.save!
+      expect(server.datacenter).to eq("softlayer")
+    end
   end
 end
