@@ -1,7 +1,7 @@
 class DeployNotification < ApplicationRecord
   PRODUCTION_COLOR = "purple".freeze
   NON_PRODUCTION_COLOR = "gray".freeze
-  FAILED_BUILD_COLOR = "red".freeze
+  PENDING_BUILD_COLOR = "red".freeze
 
   belongs_to :project
 
@@ -21,8 +21,8 @@ class DeployNotification < ApplicationRecord
       "just began syncing #{deploy.project_name.capitalize} to " \
       "#{build_link(deploy)} [#{server_msg}]"
 
-    if deploy.tests_state != GithubRepository::SUCCESS
-      msg += " [FAILED BUILD]"
+    if !deploy.passed_ci?
+      msg += " [PENDING BUILD]"
     end
 
     previous_deploy = deploy.deploy_target.previous_deploy(deploy)
@@ -34,8 +34,8 @@ class DeployNotification < ApplicationRecord
     end
 
     color = \
-      if deploy.tests_state != GithubRepository::SUCCESS
-        FAILED_BUILD_COLOR
+      if !deploy.passed_ci?
+        PENDING_BUILD_COLOR
       elsif deploy.deploy_target.production?
         PRODUCTION_COLOR
       else

@@ -105,10 +105,10 @@ ActiveRecord::Schema.define(version: 20170104170156) do
     t.text     "sha",               limit: 65535
     t.integer  "build_number"
     t.string   "artifact_url"
+    t.boolean  "passed_ci",                       default: true,      null: false
     t.text     "options_validator", limit: 65535
     t.text     "options",           limit: 65535
     t.string   "compliance_state",                default: "pending", null: false
-    t.string   "tests_state",                     default: "pending", null: false
     t.index ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
   end
 

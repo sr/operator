@@ -21,12 +21,12 @@
 #= require_tree .
 
 $ ->
-  $("#allow-failed-builds-form input").on "change", (e) ->
+  $("#allow-pending-builds-form input").on "change", (e) ->
     checkbox = $(this)
     form = $(this).closest("form")
 
     if checkbox.prop("checked")
-      if confirm("Failed builds should only be deployed in emergency situations. Are you sure?")
+      if confirm("Pending builds should only be deployed in emergency situations. Are you sure?")
         form.submit()
         form.find("input").prop("disabled", true)
       else

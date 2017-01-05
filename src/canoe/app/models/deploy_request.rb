@@ -89,7 +89,7 @@ class DeployRequest
         completed: false,
         sha: @build.sha,
         compliance_state: @build.compliance_state,
-        tests_state: @build.tests_state,
+        passed_ci: @build.passed_ci?,
         build_number: @build.build_number,
         artifact_url: @build.artifact_url,
         options_validator: @build.options_validator,

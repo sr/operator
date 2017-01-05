@@ -2,9 +2,12 @@ class BuildsController < ApplicationController
   before_action :require_project
 
   def index
-    @allow_failed_builds = (params[:allow_failed_builds] == "1")
+    @allow_pending_builds = (params[:allow_pending_builds] == "1")
 
-    @builds = current_project.builds(branch: params[:branch_name])
+    @builds = current_project.builds(
+      branch: params[:branch_name],
+      include_pending_builds: @allow_pending_builds
+    )
     @total_builds = @builds.length
 
     @builds = @builds.slice(

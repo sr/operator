@@ -29,7 +29,7 @@
       </td>
       <td>
         <%= print_deploy_what(deploy) %>
-        <%- if deploy.tests_state != GithubRepository::SUCCESS %>
+        <%- if !deploy.passed_ci? %>
           <span class="label label-danger">Untested</span>
         <%- end %>
       </td>

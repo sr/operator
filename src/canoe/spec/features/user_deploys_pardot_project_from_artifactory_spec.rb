@@ -52,7 +52,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
-    find("a[data-target='test']", text: "Ship it Here").click
+    find("a[data-target='test']", text: "Ship It Here").click
     expect(page).to_not have_text("Tags") # We deploy to all servers by default
     click_button "SHIP IT!"
     expect(page).to have_text("Watching deploy of #{@project.name.capitalize}")
@@ -83,7 +83,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
-    find("a[data-target='test']", text: "Ship it Here").click
+    find("a[data-target='test']", text: "Ship It Here").click
     expect(page).to_not have_text("Tags") # We deploy to all servers by default
     click_button "SHIP IT!"
     expect(page).to have_text("Watching deploy of #{@project.name.capitalize}")
@@ -101,7 +101,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
-    find("a[data-target='test']", text: "Ship it Here").click
+    find("a[data-target='test']", text: "Ship It Here").click
     expect(page).to_not have_text("Tags") # We deploy to all servers by default
     click_button "SHIP IT!"
     expect(page).to have_text("Phone authentication failed")
@@ -116,7 +116,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
     find(".projects-index-list a", text: @project.titleized_name).click
     find(".deploy-targets a", text: "master").click
     click_link "Ship This"
-    find("a[data-target='test']", text: "Ship it Here").click
+    find("a[data-target='test']", text: "Ship It Here").click
     expect(page).to_not have_text("Tags") # We deploy to all servers by default
     click_button "SHIP IT!"
     expect(page).to have_text("Phone authentication failed")

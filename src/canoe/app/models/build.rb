@@ -120,12 +120,25 @@ class Build
     commit_status.compliance_description
   end
 
-  def passed_tests?
-    tests_state == GithubRepository::SUCCESS
+  # The build artifact--not the commit status--remains the source of truth for
+  # whether a build has passed CI because it is very possible for multiple
+  # builds to reference the same SHA yet have differing results.
+
+  # For instance, a build that is a child build of another build on which it
+  # depends might pull in a different version of the dependency each time it
+  # builds, even though the underlying SHA is the same. This could produce
+  # dramatically different deployment results, even if the SHA for the build is
+  # the same. For this reason we cannot use the test status associated with
+  # `commit_status` to determine if a given _artifact_ has passed CI.
+  def passed_ci?
+    # TODO(alindeman) passedCI should be a tristate: pending, success, failed
+    @properties["passedCI"] == "true"
   end
 
-  def tests_state
-    commit_status.tests_state
+  def primary_build_url
+    # TODO(alindeman) Modify builds to report a key linking to the primary
+    # build. The property name should be consistent across projects
+    "#"
   end
 
   def state_for_context(context)

@@ -7,22 +7,17 @@ class Project < ApplicationRecord
     where.not(name: [ChefDelivery::PROJECT], id: TerraformProject.select(:project_id).all)
   end
 
-  def status_contexts
+  def extra_status_contexts
     case name
     when "pardot"
       {
-        GithubRepository::COMPLIANCE_STATUS  => "Compliance",
-        "Test Jobs"                          => "PHP Tests",
         "WebDriver - Test Jobs"              => "WebDriver",
         "Salesforce Integration - Test Jobs" => "Salesforce Integration",
         "AB Combinatorial - Test Jobs"       => "AB Combinatorial",
         "List Combinatorial - Test Jobs"     => "List Combinatorial"
       }
     else
-      {
-        GithubRepository::COMPLIANCE_STATUS      => "Compliance",
-        GithubCommitStatus::DEFAULT_TEST_CONTEXT => "Primary Build"
-      }
+      {}
     end
   end
 
@@ -34,8 +29,8 @@ class Project < ApplicationRecord
     name
   end
 
-  def builds(branch:)
-    aql = build_aql_query(branch: branch)
+  def builds(branch:, include_pending_builds: false)
+    aql = build_aql_query(branch: branch, include_pending_builds: include_pending_builds)
     artifact_hashes = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
 
@@ -104,7 +99,7 @@ class Project < ApplicationRecord
 
   private
 
-  def build_aql_query(branch:)
+  def build_aql_query(branch:, include_pending_builds:)
     conditions = [
       { "repo"       => { "$eq"    => ARTIFACTORY_REPO } },
       { "@gitRepo"   => { "$match" => "*/#{repository}.git" } },
@@ -121,6 +116,21 @@ class Project < ApplicationRecord
       if bamboo_job.present?
         conditions << { "@bambooJob" => { "$eq" => bamboo_job } }
       end
+    end
+
+    if include_pending_builds
+      # We can't know the difference between a failed build and a build that
+      # hasn't yet completed CI. Since the intention is to be able to deploy
+      # untested (but not failed) builds, our compromise is to display builds
+      # only that have been created in the past hour.
+      conditions << {
+        "$or" => [
+          { "@passedCI" => { "$eq" => "true" } },
+          { "created"   => { "$gt" => 1.hour.ago.iso8601 } },
+        ]
+      }
+    else
+      conditions << { "@passedCI" => { "$eq" => "true" } }
     end
 
     aql = %(items.find(#{JSON.dump("$and" => conditions)}))
