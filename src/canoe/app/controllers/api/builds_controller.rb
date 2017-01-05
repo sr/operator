@@ -9,5 +9,11 @@ module Api
           pagination_page_size
         )
     end
+
+    private
+
+    def pagination_page_size
+      5
+    end
   end
 end

@@ -18,6 +18,10 @@ class BuildsController < ApplicationController
 
   private
 
+  def pagination_page_size
+    5
+  end
+
   def current_branch
     @current_branch ||= current_project.branch(params[:branch_name])
   end
