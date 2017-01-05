@@ -60,9 +60,7 @@ class Build
   def self.load_commit_statuses(builds)
     threads = \
       builds.map { |b|
-        Thread.new(b) do |build|
-          build.load_commit_status
-        end
+        Thread.new(b, &:load_commit_status)
       }
     threads.each(&:join)
   end
