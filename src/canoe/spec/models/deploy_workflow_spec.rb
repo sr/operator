@@ -40,16 +40,23 @@ RSpec.describe DeployWorkflow do
 
     context "with maximum available percentage less than 100%" do
       it "allows a server in the 'start' stage to proceed to 'initiated'" do
-        servers = FactoryGirl.create_list(:server, 3)
+        dfw_servers = FactoryGirl.create_list(:server, 2)
+        dfw_servers.each_with_index { |s, i| s.update(hostname: "#{i}-dfw") }
+        phx_servers = FactoryGirl.create_list(:server, 2)
+        phx_servers.each_with_index { |s, i| s.update(hostname: "#{i}-phx") }
+        servers = dfw_servers + phx_servers
+
         workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers, maximum_unavailable_percentage_per_datacenter: 0.5)
 
-        server = servers.first
-        workflow.notify_action_successful(server: server, action: "deploy")
-
+        expect(deploy.results.for_server(dfw_servers[1]).stage).to eq("start")
+        workflow.notify_action_successful(server: dfw_servers[0], action: "deploy")
         deploy.reload
-        expect(deploy.results.for_server(server).stage).to eq("deployed")
-        expect(deploy.results.for_server(servers[1]).stage).to eq("initiated")
-        expect(deploy.results.for_server(servers[2]).stage).to eq("start")
+        expect(deploy.results.for_server(dfw_servers[1]).stage).to eq("initiated")
+
+        expect(deploy.results.for_server(phx_servers[1]).stage).to eq("start")
+        workflow.notify_action_successful(server: phx_servers[0], action: "deploy")
+        deploy.reload
+        expect(deploy.results.for_server(phx_servers[1]).stage).to eq("initiated")
       end
     end
   end
