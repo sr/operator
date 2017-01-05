@@ -7,12 +7,12 @@ class ChefDeploy < ApplicationRecord
   ]
 
   def self.find_or_init_current(server, build)
-    if build.tests_state != ChefDelivery::SUCCESS
+    if build.compliance_state != ChefDelivery::SUCCESS
       raise ChefDelivery::Error, "build is not successful: #{build.inspect}"
     end
 
     conditions = {
-      build_url: build.tests_url,
+      build_url: build.compliance_url,
       datacenter: server.datacenter,
       hostname: server.hostname
     }
@@ -24,7 +24,7 @@ class ChefDeploy < ApplicationRecord
 
     new(
       branch: build.branch,
-      build_url: build.tests_url,
+      build_url: build.compliance_url,
       environment: server.environment,
       datacenter: server.datacenter,
       hostname: server.hostname,
