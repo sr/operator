@@ -1,7 +1,7 @@
 default: &default
   adapter: mysql2
   encoding: utf8
-  pool: 5
+  pool: <%= ENV.fetch("MAX_THREADS", 5) %>
   host: <%= ENV.fetch("CANOE_DATABASE_HOST", ENV.fetch("DATABASE_HOST", "localhost")) %>
   port: <%= ENV.fetch("DATABASE_PORT", 3306) %>
   username: root
@@ -16,4 +16,5 @@ test:
   database: canoe_test
 
 production: &production
+  pool: <%= ENV.fetch("MAX_THREADS", 5) %>
   url: <%= ENV['DATABASE_URL'] %>

@@ -10,7 +10,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
       bamboo_project: "PDT",
       bamboo_plan: "PPANT"
     )
-    @server = FactoryGirl.create(:server, hostname: "app-s1.example")
+    @server = FactoryGirl.create(:server)
     @server.deploy_scenarios.create!(deploy_target: @deploy_target, project: @project)
 
     allow(Octokit).to receive(:branch)

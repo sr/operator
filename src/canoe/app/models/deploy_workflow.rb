@@ -98,7 +98,11 @@ class DeployWorkflow
     # Handle case where maximum_available_percentage_per_datacenter is less than
     # 1.0: if this server deployed successfully, we can allow another server in
     # the 'start' stage to proceed
-    @deploy.results.where(stage: "start").limit(1).update_all(stage: "initiated")
+    @deploy.results
+      .joins(:server)
+      .where(stage: "start", servers: { datacenter: result.server.datacenter })
+      .limit(1)
+      .update_all(stage: "initiated")
 
     @deploy.check_completed_status!
   end
