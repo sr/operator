@@ -14,9 +14,14 @@ class BuildsController < ApplicationController
       (current_page - 1) * pagination_page_size,
       pagination_page_size
     )
+    Build.load_commit_statuses(@builds)
   end
 
   private
+
+  def pagination_page_size
+    5
+  end
 
   def current_branch
     @current_branch ||= current_project.branch(params[:branch_name])
