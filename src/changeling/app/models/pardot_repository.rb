@@ -10,6 +10,7 @@ class PardotRepository
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
   TEST_STATUS = "Test Jobs".freeze
+  FINAL_STATUS = "Final Jobs".freeze
 
   def initialize(nwo)
     @name_with_owner = nwo
@@ -19,8 +20,10 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when BREAD, CHEF, PARDOT
+    when BREAD, PARDOT
       [TEST_STATUS]
+    when CHEF
+      [TEST_STATUS, FINAL_STATUS]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
     else
