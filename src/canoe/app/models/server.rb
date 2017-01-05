@@ -1,7 +1,7 @@
 # Server represents a server where code is deployed for a given target.
 class Server < ApplicationRecord
   # A hostname must be in a format where we can extract a datacenter from it
-  HOSTNAME_REGEX = /-(?<datacenter>[0-9a-z]+)\z/i
+  HOSTNAME_REGEX = /\A\S+-(?<datacenter>[0-9a-z]+)\z/i
 
   validates :hostname, presence: true, uniqueness: true, format: HOSTNAME_REGEX
   attr_readonly :hostname

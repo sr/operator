@@ -41,11 +41,16 @@ RSpec.describe DeployWorkflow do
     context "with maximum available percentage less than 100%" do
       it "allows a server in the 'start' stage to proceed to 'initiated'" do
         dfw_servers = FactoryGirl.create_list(:server, 2)
-        dfw_servers.each_with_index { |s, i| s.update(hostname: "#{i}-dfw") }
-        phx_servers = FactoryGirl.create_list(:server, 2)
-        phx_servers.each_with_index { |s, i| s.update(hostname: "#{i}-phx") }
-        servers = dfw_servers + phx_servers
+        dfw_servers.each_with_index do |s, i|
+          s.update(hostname: "#{i}-dfw")
+        end
 
+        phx_servers = FactoryGirl.create_list(:server, 2)
+        phx_servers.each_with_index do |s, i|
+          s.update(hostname: "#{i}-phx")
+        end
+
+        servers = dfw_servers + phx_servers
         workflow = DeployWorkflow.initiate(deploy: deploy, servers: servers, maximum_unavailable_percentage_per_datacenter: 0.5)
 
         expect(deploy.results.for_server(dfw_servers[1]).stage).to eq("start")
