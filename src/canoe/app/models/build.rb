@@ -135,12 +135,6 @@ class Build
     @properties["passedCI"] == "true"
   end
 
-  def primary_build_url
-    # TODO(alindeman) Modify builds to report a key linking to the primary
-    # build. The property name should be consistent across projects
-    "#"
-  end
-
   def state_for_context(context)
     commit_status.state_for_context(context)
   end

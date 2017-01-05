@@ -56,7 +56,7 @@
               <%= render partial: "streetlight", locals: { state: build.state_for_context(GithubRepository::COMPLIANCE_STATUS), build_url: build.url_for_context(GithubRepository::COMPLIANCE_STATUS) } %>
             </div>
             <div class="col-md-1">
-              <%= render partial: "streetlight", locals: { state: build.passed_ci? ? GithubRepository::SUCCESS : GithubRepository::FAILURE, build_url: build.primary_build_url } %>
+              <%= render partial: "streetlight", locals: { state: build.passed_ci? ? GithubRepository::SUCCESS : GithubRepository::FAILURE, build_url: build.url } %>
             </div>
             <% current_project.extra_status_contexts.keys.each_with_index do |test, i| %>
               <div class="col-md-1">
