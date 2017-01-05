@@ -16,7 +16,6 @@ class Deploy < ApplicationRecord
     next unless deploy.project.present?
     deploy.project.deploy_notifications.each do |notification|
       notification.notify_deploy_start(deploy)
-      notification.notify_untested_deploy(deploy) if deploy.deploy_target.production? && !deploy.passed_ci
     end
   end
 

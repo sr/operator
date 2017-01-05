@@ -4,8 +4,7 @@ module Api
 
     def index
       @builds = current_project.builds(
-        branch: params[:branch_name],
-        include_untested_builds: false,
+        branch: params[:branch_name]
       )
     end
   end

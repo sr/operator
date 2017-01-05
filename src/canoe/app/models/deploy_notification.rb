@@ -1,7 +1,7 @@
 class DeployNotification < ApplicationRecord
   PRODUCTION_COLOR = "purple".freeze
   NON_PRODUCTION_COLOR = "gray".freeze
-  UNTESTED_COLOR = "red".freeze
+  PENDING_BUILD_COLOR = "red".freeze
 
   belongs_to :project
 
@@ -21,6 +21,10 @@ class DeployNotification < ApplicationRecord
       "just began syncing #{deploy.project_name.capitalize} to " \
       "#{build_link(deploy)} [#{server_msg}]"
 
+    if !deploy.passed_ci?
+      msg += " [PENDING BUILD]"
+    end
+
     previous_deploy = deploy.deploy_target.previous_deploy(deploy)
 
     if previous_deploy
@@ -29,10 +33,19 @@ class DeployNotification < ApplicationRecord
         "</a>"
     end
 
+    color = \
+      if !deploy.passed_ci?
+        PENDING_BUILD_COLOR
+      elsif deploy.deploy_target.production?
+        PRODUCTION_COLOR
+      else
+        NON_PRODUCTION_COLOR
+      end
+
     notifier.notify_room(
       hipchat_room_id,
       msg,
-      color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
+      color: color
     )
   end
 
@@ -55,17 +68,6 @@ class DeployNotification < ApplicationRecord
       hipchat_room_id,
       msg,
       color: deploy.deploy_target.production? ? PRODUCTION_COLOR : NON_PRODUCTION_COLOR
-    )
-  end
-
-  def notify_untested_deploy(deploy)
-    msg = "#{deploy.deploy_target.name.capitalize}: #{deploy.auth_user.email} just started " \
-      "an UNTESTED deploy of #{deploy.project_name.capitalize} to #{build_link(deploy, false)}"
-
-    notifier.notify_room(
-      hipchat_room_id,
-      msg,
-      color: UNTESTED_COLOR
     )
   end
 

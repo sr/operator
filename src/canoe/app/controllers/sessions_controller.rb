@@ -4,8 +4,7 @@ class SessionsController < ApplicationController
   # OmniAuth doesn't send us a CSRF token
   skip_before_action :verify_authenticity_token, only: [:create]
 
-  def new
-  end
+  def new; end
 
   def create
     session.destroy
@@ -31,8 +30,7 @@ class SessionsController < ApplicationController
     @failure_message = params[:message]
   end
 
-  def phone_pairing
-  end
+  def phone_pairing; end
 
   def create_phone_pairing
     response = current_user.phone.create_pairing(params[:pairing_phrase])

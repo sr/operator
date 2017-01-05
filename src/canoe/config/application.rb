@@ -17,7 +17,6 @@ require "instrumentation"
 require "salesforce_authenticator_api"
 
 require "canoe_config"
-require "canoe/deployer"
 require "canoe/ldap_authorizer"
 require "canoe"
 

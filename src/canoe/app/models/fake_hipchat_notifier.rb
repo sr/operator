@@ -1,5 +1,5 @@
 class FakeHipchatNotifier
-  Message = Struct.new(:room_id, :message)
+  Message = Struct.new(:room_id, :message, :color)
 
   attr_reader :messages
 
@@ -7,7 +7,7 @@ class FakeHipchatNotifier
     @messages = []
   end
 
-  def notify_room(room_id, message, _opts = {})
-    @messages << Message.new(room_id, message)
+  def notify_room(room_id, message, opts = {})
+    @messages << Message.new(room_id, message, opts[:color])
   end
 end
