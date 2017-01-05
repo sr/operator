@@ -40,7 +40,6 @@ Lint/CircularArgumentReference:
 Metrics/ParameterLists:
   Exclude:
     - 'src/canoe/app/models/build.rb'
-    - 'src/canoe/lib/canoe/deployer.rb'
     - 'src/hal9000/app/handlers/zabbix_handler.rb'
     - 'src/hal9000/app/models/zabbix/zabbixmon.rb'
 

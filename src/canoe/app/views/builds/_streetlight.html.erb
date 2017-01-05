@@ -1,16 +1,10 @@
 <h3>
-  <% if state %>
-    <%= link_to build_url, class: "streetlight" do %>
-      <% case state %>
-      <% when "true" #green %>
-        <i class="icon-check-sign"></i>
-      <% when "false" #red %>
-        <i class="icon-circle"></i>
-      <% when "pending" #blue %>
-        <i class="icon-refresh"></i>
-      <% end %>
+  <%= link_to build_url.presence || "#", class: "streetlight" do %>
+    <% case state %>
+    <% when GithubRepository::SUCCESS %>
+      <%= content_tag :i, "", class: "icon-check-sign", title: state.titleize %>
+    <% else %>
+      <%= content_tag :i, "", class: "icon-circle", title: state.titleize, data: { state: state } %>
     <% end %>
-  <% else #gray %>
-    <i class="icon-circle gray" title="No run"></i>
   <% end %>
 </h3>

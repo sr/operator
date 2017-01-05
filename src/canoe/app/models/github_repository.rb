@@ -1,4 +1,5 @@
 class GithubRepository
+  UNREPORTED = "unreported".freeze
   FAILURE = "failure".freeze
   PENDING = "pending".freeze
   SUCCESS = "success".freeze
@@ -16,9 +17,11 @@ class GithubRepository
   end
 
   def commit_status(sha)
-    GithubCommitStatus.new(
-      @client.combined_status(@name, sha),
-      @client.compare(@name, MASTER, sha)
-    )
+    Instrumentation.log(fn: "commit_status", sha: sha) do
+      GithubCommitStatus.new(
+        @client.combined_status(@name, sha),
+        @client.compare(@name, MASTER, sha)
+      )
+    end
   end
 end

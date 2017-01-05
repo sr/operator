@@ -62,7 +62,7 @@
     <%- end %>
 
     <div class="checkbox">
-      <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
+      <%= content_tag :button, "SHIP IT!", type: "submit", class: "btn btn-lg btn-default #{shipit_btn_class(@prov_deploy)}", disabled: shipit_btn_disabled(@prov_deploy, true), title: shipit_btn_title(@prov_deploy, true) %>
       <label>
         <input type="checkbox" name="lock"> Lock
       </label>
