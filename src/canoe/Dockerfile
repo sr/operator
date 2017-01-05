@@ -17,7 +17,7 @@ ADD vendor/cache /app/vendor/cache
 RUN bundle install --local
 
 ENV RUBYLIB "/usr/local/bundle/extensions/x86_64-linux/2.3.0-static/grpc-1.0.0/grpc:$RUBYLIB"
-#RUN echo 'require "grpc_c"' > /usr/local/bundle/gems/grpc-1.0.0-x86_64-linux/src/ruby/lib/grpc/grpc.rb
+RUN echo 'require "grpc_c"' > /usr/local/bundle/gems/grpc-1.0.0/src/ruby/lib/grpc/grpc.rb
 
 ADD . /app
 RUN bundle exec rake assets:precompile
