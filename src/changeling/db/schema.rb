@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161222140718) do
+ActiveRecord::Schema.define(version: 20170105184929) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -96,6 +96,15 @@ ActiveRecord::Schema.define(version: 20161222140718) do
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
     t.index ["github_repository_id", "sha", "context"], name: "repository_commit_statuses_unique_idx", unique: true, using: :btree
+  end
+
+  create_table "repository_owners_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text     "repository_name", null: false
+    t.text     "path_name",       null: false
+    t.text     "content",         null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["repository_name", "path_name"], name: "index_repository_owners_files_on_repository_name_and_path_name", unique: true, using: :btree
   end
 
   create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
