@@ -5,7 +5,7 @@ RSpec.describe ChefDelivery do
     @config = FakeChefDeliveryConfig.new
     @delivery = ChefDelivery.new(@config)
 
-    github.tests_state = GithubRepository::SUCCESS
+    github.compliance_state = GithubRepository::SUCCESS
   end
 
   def github

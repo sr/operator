@@ -55,7 +55,11 @@
   <p>
   <ul>
     <%- if !@multipass.peer_reviewed? %>
-      <li>The pull request has not been peer reviewed</li>
+      <%- if @multipass.repository_owners_enabled? %>
+        <li>The pull request has not been peer reviewed by one of the repository owner. See the <%= link_to "OWNERS file", @multipass.repository_owners_file_url %> for a list of teams and individuals that can review this change</li>
+      <%- else %>
+        <li>The pull request has not been peer reviewed</li>
+      <%- end %>
     <%- end %>
 
     <%- referenced_ticket = pull.referenced_ticket %>

@@ -60,7 +60,11 @@ class PardotComplianceStatus
     if rejected?
       "Changes requested by #{@multipass.rejector}"
     elsif !peer_reviewed?
-      "Peer review is required"
+      if @multipass.repository_owners_enabled?
+        "Peer review by a repository owner is missing"
+      else
+        "Peer review is required"
+      end
     elsif emergency_approved?
       "Satisfied via emergency approval by #{@multipass.emergency_approver}."
     elsif ticket_reference_missing?

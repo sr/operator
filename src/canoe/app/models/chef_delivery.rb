@@ -30,7 +30,7 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if current_build.tests_state != SUCCESS
+    if current_build.compliance_state != SUCCESS
       return ChefCheckinResponse.noop
     end
 

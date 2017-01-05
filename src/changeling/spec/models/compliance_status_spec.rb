@@ -103,7 +103,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.peer_reviewed?).to eq(false)
 
     description = @multipass.github_commit_status_description
-    expect(description).to eq("Peer review is required")
+    expect(description).to include("Peer review")
   end
 
   it "requires peer review by one of the repository owners to be complete" do
