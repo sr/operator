@@ -54,11 +54,11 @@ class DeployRequest
     end
 
     if !@target.user_can_deploy?(@project, @user)
-      return Response.error("User #{@user} is not authorized to deploy #{@project.name}")
+      return Response.error("User #{@user.email} is not authorized to deploy #{@project.name}")
     end
 
     if !@target.active_deploy(@project).nil?
-      return Response.error("There is already an active deploy for #{project.name}")
+      return Response.error("There is already an active deploy for #{@project.name}")
     end
 
     if !build
@@ -70,7 +70,7 @@ class DeployRequest
     end
 
     if !build.compliance_allows_deploy?
-      return Response.error("The build is does not meet compliance requirements: #{build.compliance_description}")
+      return Response.error("The build does not meet compliance requirements: #{build.compliance_description}")
     end
 
     deploy = @target.transaction do

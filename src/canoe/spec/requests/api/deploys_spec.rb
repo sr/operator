@@ -109,7 +109,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
         project_name: @project.name
 
       expect(json_response["error"]).to eq(true)
-      expect(json_response["message"]).to eq("The build is does not meet compliance requirements: description")
+      expect(json_response["message"]).to eq("The build does not meet compliance requirements: description")
       expect(json_response["deploy"]).to eq(nil)
 
       expect(Deploy.count).to eq(0)
