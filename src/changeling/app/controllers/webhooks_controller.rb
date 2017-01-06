@@ -19,6 +19,8 @@ class WebhooksController < ApplicationController
       handle_issue_comment
     when "pull_request"
       handle_pull_request
+    when "push_event"
+      handle_push_event
     when "status"
       handle_status
     when "pull_request_review"
@@ -50,6 +52,18 @@ class WebhooksController < ApplicationController
     )
   end
 
+  def handle_push_event
+    request.body.rewind
+    payload = JSON.load(request.body.read.force_encoding("utf-8"))
+    repo_name = payload.fetch("repository").fetch("name")
+
+    if payload.fetch("ref", "") != "refs/heads/master"
+      render :json => {}, :status => :unprocessable_entity
+    end
+
+    RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
+  end
+
   def handle_status
     request.body.rewind
     StatusHandler.perform_later(
@@ -63,7 +77,7 @@ class WebhooksController < ApplicationController
   end
 
   def valid_events
-    %w{issue_comment ping pull_request status pull_request_review}
+    %w{issue_comment ping pull_request status pull_request_review push_event}
   end
 
   private
