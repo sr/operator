@@ -54,7 +54,7 @@ class WebhooksController < ApplicationController
 
   def handle_push_event
     request.body.rewind
-    payload = JSON.load(request.body.read.force_encoding("utf-8"))
+    payload = JSON.parse(request.body.read.force_encoding("utf-8"))
     repo_name = payload.fetch("repository").fetch("name")
 
     if payload.fetch("ref", "") != "refs/heads/master"
