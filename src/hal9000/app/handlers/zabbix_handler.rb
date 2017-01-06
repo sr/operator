@@ -388,24 +388,18 @@ class ZabbixHandler < ApplicationHandler
       begin
         problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
         hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
-        if !problems.empty? || !hosts_without_data.empty?
-          replies << render_template(
-            "chef_problem_report",
-            datacenter: datacenter,
-            problems: problems,
-            hosts_without_data: hosts_without_data
-          )
-        end
+        replies << render_template(
+          "chef_problem_report",
+          datacenter: datacenter,
+          problems: problems,
+          hosts_without_data: hosts_without_data
+        )
       rescue => e
         replies << "Something went wrong checking for Chef problems in #{datacenter}: #{e}"
       end
     end
 
-    if replies.empty?
-      response.reply_with_mention("Everything seems in order! All hosts are running Chef successfully.")
-    else
-      response.reply(*replies)
-    end
+    response.reply(*replies)
   end
 
   def run_monitors
