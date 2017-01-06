@@ -19,12 +19,3 @@ resource "github_team_repository" "salesforce-actions-topologies_service-account
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
-
-resource "github_branch_protection" "salesforce-actions-topologies_master" {
-  repository = "${github_repository.salesforce-actions-topologies.name}"
-  branch     = "master"
-
-  include_admins = true
-  strict         = false
-  contexts       = ["Test Jobs"]
-}
