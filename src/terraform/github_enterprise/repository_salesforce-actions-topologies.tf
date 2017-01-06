@@ -1,6 +1,6 @@
 resource "github_repository" "salesforce-actions-topologies" {
   name          = "salesforce-actions-topologies"
-  description   = "Blue Mesh: Codebase for pushing Blue-Steel metrics into NA5"
+  description   = "salesforce-actions-topologies: Codebase for 3rd Party Actions Storm Topology"
   homepage_url  = ""
   private       = false
   has_issues    = false
