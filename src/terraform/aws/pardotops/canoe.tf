@@ -187,8 +187,8 @@ resource "aws_launch_configuration" "canoe_production" {
 }
 
 resource "aws_autoscaling_group" "canoe_production" {
-  max_size             = 2
-  min_size             = 2
+  max_size             = 3
+  min_size             = 3
   launch_configuration = "${aws_launch_configuration.canoe_production.id}"
 
   vpc_zone_identifier = [

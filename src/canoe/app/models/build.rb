@@ -57,6 +57,14 @@ class Build
     build
   end
 
+  def self.load_commit_statuses(builds)
+    threads = \
+      builds.map { |b|
+        Thread.new(b, &:load_commit_status)
+      }
+    threads.each(&:join)
+  end
+
   def initialize(project:, artifact_url:, branch:, build_number:, sha:, created_at: nil, options_validator: nil, options: {}, properties: {})
     @project = project
     @artifact_url = artifact_url
@@ -95,6 +103,11 @@ class Build
 
   def commit_status
     @commit_status ||= @project.commit_status(@sha)
+  end
+
+  def load_commit_status
+    commit_status
+    true
   end
 
   def compliant?
