@@ -1,7 +1,6 @@
 module ReplicationFixing
   class ReplicationErrorSanitizer
-    def initialize
-    end
+    def initialize; end
 
     def sanitize(error)
       error.gsub(/Query: '(.+)'/) do
