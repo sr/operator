@@ -63,3 +63,15 @@ resource "github_team" "read-only-users" {
   description = "Read-Only Access for CORE CCE to setup dev env locally and test"
   privacy     = "secret"
 }
+
+resource "github_team" "sre" {
+  name        = "SRE Team"
+  description = "Site Reliability Engineering Team"
+  privacy     = "closed"
+}
+
+resource "github_team" "dev-manager" {
+  name        = "Dev Managers"
+  description = "Pardot T&P Managers"
+  privacy     = "closed"
+}
