@@ -51,7 +51,7 @@ class Repository
         next
       end
 
-      owners_files << RepositoryOwnersFile.find_or_initialize_by(
+      owners_files << RepositoryOwnersFile.new(
         repository_name: @repo.name_with_owner,
         path_name: item.path,
         content: content
@@ -59,6 +59,7 @@ class Repository
     end
 
     RepositoryOwnersFile.transaction do
+      RepositoryOwnersFile.where(repository_name: @repo.name_with_owner).delete_all
       owners_files.map(&:save!)
     end
   end

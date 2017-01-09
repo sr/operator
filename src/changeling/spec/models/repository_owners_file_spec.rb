@@ -35,5 +35,10 @@ RSpec.describe RepositoryOwnersFile do
     expect(owners_file.repository_name).to eq(repo_name)
     expect(owners_file.path_name).to eq("OWNERS")
     expect(owners_file.content).to eq("@Pardot/bread\n")
+
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/search/code?q=in:path%20filename:OWNERS%20repo:#{repo_name}")
+      .to_return(body: JSON.dump(items: []), headers: { "Content-Type" => "application/json" })
+    RepositoryOwnersFile.synchronize(repo_name)
+    expect(RepositoryOwnersFile.count).to eq(0)
   end
 end
