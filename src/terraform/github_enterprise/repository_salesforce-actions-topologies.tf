@@ -1,11 +1,11 @@
 resource "github_repository" "salesforce-actions-topologies" {
-  name          = "salesforce-actions-topologies"
-  description   = "salesforce-actions-topologies: Codebase for 3rd Party Actions Storm Topology"
+  name          = "${github_repository.salesforce-actions-topologies.name}"
+  description   = "$3rd Party Actions Storm Topology"
   homepage_url  = ""
   private       = false
   has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "salesforce-actions-topologies_developers" {
