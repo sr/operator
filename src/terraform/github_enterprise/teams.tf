@@ -64,14 +64,14 @@ resource "github_team" "read-only-users" {
   privacy     = "secret"
 }
 
-resource "github_team" "sre" {
-  name        = "SRE Team"
+resource "github_team" "site-reliability-engineer" {
+  name        = "Site Reliability Engineer"
   description = "Site Reliability Engineering Team"
   privacy     = "closed"
 }
 
-resource "github_team" "dev-manager" {
-  name        = "Dev Managers"
+resource "github_team" "engineering-manager" {
+  name        = "Engineering Manager"
   description = "Pardot T&P Managers"
   privacy     = "closed"
 }
