@@ -58,11 +58,7 @@ class Build
   end
 
   def self.load_commit_statuses(builds)
-    threads = \
-      builds.map { |b|
-        Thread.new(b, &:load_commit_status)
-      }
-    threads.each(&:join)
+    builds.map(&:load_commit_status)
   end
 
   def initialize(project:, artifact_url:, branch:, build_number:, sha:, created_at: nil, options_validator: nil, options: {}, properties: {})
