@@ -28,12 +28,6 @@ describe ComplianceStatus, "pardot" do
   end
 
   def stub_repository_owners(repo, owners)
-    owners = {
-      type: "file",
-      encoding: "base64",
-      content: Base64.encode64(owners.join("\n"))
-    }
-
     organization = repo.split("/")[0]
 
     bread = { id: 1, slug: "bread" }
@@ -42,15 +36,18 @@ describe ComplianceStatus, "pardot" do
     bread_members = [{ login: "alindeman" }]
     tools_members = [{ login: "ys" }]
 
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/orgs/#{organization}/teams")
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/orgs/#{organization}/teams")
       .to_return(body: JSON.dump(teams), headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/teams/#{bread[:id]}/members")
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{bread[:id]}/members")
       .to_return(body: JSON.dump(bread_members), headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/teams/#{tools[:id]}/members")
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{tools[:id]}/members")
       .to_return(body: JSON.dump(tools_members), headers: { "Content-Type" => "application/json" })
 
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{repo}/contents/OWNERS")
-      .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
+    owners_file = RepositoryOwnersFile.find_or_initialize_by(
+      repository_name: repo,
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+    )
+    owners_file.update!(content: owners.join("\n"))
   end
 
   it "can never be approved by a SRE" do
