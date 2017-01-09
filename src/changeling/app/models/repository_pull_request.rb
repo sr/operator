@@ -200,7 +200,7 @@ class RepositoryPullRequest
   end
 
   def referenced_ticket_id
-    case @multipass.title
+    case @multipass.title.lstrip
     when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end

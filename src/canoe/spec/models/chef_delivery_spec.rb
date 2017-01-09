@@ -183,6 +183,7 @@ RSpec.describe ChefDelivery do
 
   it "notifies of successful deployment" do
     deploy = create_current_deploy(
+      sha: "deadbeefcake",
       state: ChefDelivery::PENDING,
       build_url: "https://BREAD-9000",
       hostname: "pardot0-chef1"
@@ -192,7 +193,7 @@ RSpec.describe ChefDelivery do
     assert_equal 1, @config.notifier.messages.size
     msg = @config.notifier.messages.pop
     assert_includes msg.message, "successfully deployed"
-    assert_includes msg.message, "#9000"
+    assert_includes msg.message, "deadbee"
     assert_includes msg.message, "pardot0-chef1"
   end
 
