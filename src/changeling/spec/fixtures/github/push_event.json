@@ -65,8 +65,8 @@
   },
   "repository": {
     "id": 35129377,
-    "name": "public-repo",
-    "full_name": "baxterthehacker/public-repo",
+    "name": "chef",
+    "full_name": "Pardot/chef",
     "owner": {
       "name": "baxterthehacker",
       "email": "baxterthehacker@users.noreply.github.com"
