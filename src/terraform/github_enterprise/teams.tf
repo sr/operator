@@ -72,6 +72,6 @@ resource "github_team" "site-reliability-engineers" {
 
 resource "github_team" "engineering-managers" {
   name        = "Engineering Managers"
-  description = "Engineering Managers under Zach Bailey"
+  description = "Engineering Managers under Pardot Tech & Product"
   privacy     = "closed"
 }
