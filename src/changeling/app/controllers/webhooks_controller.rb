@@ -57,7 +57,7 @@ class WebhooksController < ApplicationController
   def handle_push_event
     request.body.rewind
     payload = JSON.parse(request.body.read.force_encoding("utf-8"))
-    repo_name = payload.fetch("repository").fetch("name")
+    repo_name = payload.fetch("repository").fetch("full_name")
 
     if payload.fetch("ref", "") == MASTER_REF
       RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
