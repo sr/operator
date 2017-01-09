@@ -118,6 +118,12 @@ RSpec.describe RepositoryPullRequest do
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
+      stub_github_pull_request(title: "    BREAD-1598: hello")
+      @multipass.synchronize
+      expect(@multipass.reload.referenced_ticket).to_not eq(nil)
+
+      @multipass.ticket_reference.destroy!
+      expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
       @multipass.synchronize
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
