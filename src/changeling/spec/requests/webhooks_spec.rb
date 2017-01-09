@@ -323,7 +323,7 @@ describe "Receiving GitHub hooks", :type => :request do
       assert_enqueued_jobs 0, only: RepositoryOwnersFileSynchronizationJob
 
       post "/webhooks", params: fixture_data("github/push_event"),
-        headers: request_headers("push_event")
+        headers: request_headers("push")
       expect(response).to be_successful
       expect(response.status).to eql(201)
 
