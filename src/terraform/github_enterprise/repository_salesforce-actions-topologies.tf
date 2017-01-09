@@ -1,5 +1,5 @@
 resource "github_repository" "salesforce-actions-topologies" {
-  name          = "${github_repository.salesforce-actions-topologies.name}"
+  name          = "salesforce-actions-topologies"
   description   = "3rd Party Actions Storm Topology"
   homepage_url  = ""
   private       = false
