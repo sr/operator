@@ -64,14 +64,14 @@ resource "github_team" "read-only-users" {
   privacy     = "secret"
 }
 
-resource "github_team" "site-reliability-engineer" {
-  name        = "Site Reliability Engineer"
+resource "github_team" "site-reliability-engineers" {
+  name        = "Site Reliability Engineers"
   description = "Site Reliability Engineering Team"
   privacy     = "closed"
 }
 
-resource "github_team" "engineering-manager" {
-  name        = "Engineering Manager"
-  description = "Pardot T&P Managers"
+resource "github_team" "engineering-managers" {
+  name        = "Engineering Managers"
+  description = "Engineering Managers under Zach Bailey"
   privacy     = "closed"
 }
