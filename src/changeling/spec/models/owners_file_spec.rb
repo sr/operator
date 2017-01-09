@@ -10,10 +10,8 @@ hello world
 garbage
 srozet@salesforce.com
 @simon-rozet
-@simon-rozet
 EOS
 
-    expect(owners.users).to eq(["simon-rozet"])
     expect(owners.teams).to eq(["Pardot/bread"])
   end
 end
