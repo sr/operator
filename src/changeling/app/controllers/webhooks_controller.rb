@@ -1,5 +1,7 @@
 # Controller that receives GitHub webhooks events
 class WebhooksController < ApplicationController
+  MASTER_REF = "refs/heads/master".freeze
+
   before_action :verify_incoming_webhook_address!, :verify_signature!
   skip_before_action :verify_authenticity_token, only: [:create]
   skip_before_action :require_oauth, only: [:create]
@@ -19,6 +21,8 @@ class WebhooksController < ApplicationController
       handle_issue_comment
     when "pull_request"
       handle_pull_request
+    when "push_event"
+      handle_push_event
     when "status"
       handle_status
     when "pull_request_review"
@@ -50,6 +54,16 @@ class WebhooksController < ApplicationController
     )
   end
 
+  def handle_push_event
+    request.body.rewind
+    payload = JSON.parse(request.body.read.force_encoding("utf-8"))
+    repo_name = payload.fetch("repository").fetch("name")
+
+    if payload.fetch("ref", "") == MASTER_REF
+      RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
+    end
+  end
+
   def handle_status
     request.body.rewind
     StatusHandler.perform_later(
@@ -63,7 +77,7 @@ class WebhooksController < ApplicationController
   end
 
   def valid_events
-    %w{issue_comment ping pull_request status pull_request_review}
+    %w{issue_comment ping pull_request status pull_request_review push_event}
   end
 
   private
