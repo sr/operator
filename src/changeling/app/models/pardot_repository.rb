@@ -9,6 +9,7 @@ class PardotRepository
   PARDOT = "Pardot/pardot".freeze
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
+  INITIAL_STATUS = "Initial Jobs".freeze
   TEST_STATUS = "Test Jobs".freeze
   FINAL_STATUS = "Final Jobs".freeze
 
@@ -20,8 +21,10 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when BREAD, PARDOT
+    when BREAD
       [TEST_STATUS]
+    when PARDOT
+      [INITIAL_STATUS, TEST_STATUS, FINAL_JOBS]
     when CHEF
       [TEST_STATUS, FINAL_STATUS]
     when CHANGELING
