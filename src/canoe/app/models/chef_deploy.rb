@@ -89,8 +89,8 @@ class ChefDeploy < ApplicationRecord
     state == ChefDelivery::SUCCESS
   end
 
-  def build_id
-    build_url.split("-").last
+  def short_sha
+    sha[0, 7]
   end
 
   def server
