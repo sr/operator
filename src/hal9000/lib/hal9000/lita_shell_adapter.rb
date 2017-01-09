@@ -5,8 +5,7 @@ require "lita/adapters/shell"
 module Lita
   module Adapters
     class Shell < Adapter
-      def join(*)
-      end
+      def join(*); end
     end
   end
 end

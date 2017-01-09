@@ -1,41 +1,45 @@
 <!-- #html -->
-<strong><%= @datacenter %>: Hosts without a recent successful Chef run</strong><br>
-<table>
-  <tr>
-    <th>
-      Host
-    </th>
-    <th>
-      Problem
-    </th>
-  </tr>
-  <% @problems.each do |problem| %>
-    <% host = problem.fetch("hosts", []).first %>
+<% if @problems.empty? && @hosts_without_data.empty? %>
+  <strong><%= @datacenter %>: No problems (!party)
+<% else %>
+  <strong><%= @datacenter %>: Hosts without a recent successful Chef run</strong><br>
+  <table>
     <tr>
-      <td>
-        <code>
-          <% if host %>
+      <th>
+        Host
+      </th>
+      <th>
+        Problem
+      </th>
+    </tr>
+    <% @problems.each do |problem| %>
+      <% host = problem.fetch("hosts", []).first %>
+      <tr>
+        <td>
+          <code>
+            <% if host %>
+              <%= host["host"] %>
+            <% else %>
+              <i>unknown host</i>
+            <% end %>
+          </code>
+        </td>
+        <td>
+          <%= problem["description"] %>
+        </td>
+      </tr>
+    <% end %>
+    <% @hosts_without_data.each do |host| %>
+      <tr>
+        <td>
+          <code>
             <%= host["host"] %>
-          <% else %>
-            <i>unknown host</i>
-          <% end %>
-        </code>
-      </td>
-      <td>
-        <%= problem["description"] %>
-      </td>
-    </tr>
-  <% end %>
-  <% @hosts_without_data.each do |host| %>
-    <tr>
-      <td>
-        <code>
-          <%= host["host"] %>
-        </code>
-      </td>
-      <td>
-        No data about the latest Chef run. Chef may not be running at all or the t_linux template may not be applied to the host.
-      </td>
-    </tr>
-  <% end %>
-</table>
+          </code>
+        </td>
+        <td>
+          No data about the latest Chef run. Chef may not be running at all or the t_linux template may not be applied to the host.
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
