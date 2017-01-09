@@ -1,5 +1,7 @@
 # Controller that receives GitHub webhooks events
 class WebhooksController < ApplicationController
+  MASTER_REF = "refs/heads/master".freeze
+
   before_action :verify_incoming_webhook_address!, :verify_signature!
   skip_before_action :verify_authenticity_token, only: [:create]
   skip_before_action :require_oauth, only: [:create]
@@ -57,11 +59,9 @@ class WebhooksController < ApplicationController
     payload = JSON.parse(request.body.read.force_encoding("utf-8"))
     repo_name = payload.fetch("repository").fetch("name")
 
-    if payload.fetch("ref", "") != "refs/heads/master"
-      render :json => {}, :status => :unprocessable_entity
+    if payload.fetch("ref", "") == MASTER_REF
+      RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
     end
-
-    RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
   end
 
   def handle_status
