@@ -315,4 +315,19 @@ describe "Receiving GitHub hooks", :type => :request do
       end
     end
   end
+
+  describe "PushEvent" do
+    include ActiveJob::TestHelper
+
+    it "enqueues a job to synchronize OWNERS files on PushEvent for the master branch" do
+      assert_enqueued_jobs 0, only: RepositoryOwnersFileSynchronizationJob
+
+      post "/webhooks", params: fixture_data("github/push_event"),
+        headers: request_headers("push_event")
+      expect(response).to be_successful
+      expect(response.status).to eql(201)
+
+      assert_enqueued_jobs 1, only: RepositoryOwnersFileSynchronizationJob
+    end
+  end
 end

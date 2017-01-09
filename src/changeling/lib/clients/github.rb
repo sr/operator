@@ -84,6 +84,10 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
+    def search_code(query)
+      @client.search_code(query)
+    end
+
     def file_content(name_with_owner, path, branch = nil)
       params = { path: path }
       if branch

@@ -34,14 +34,45 @@ class Repository
     @repo.name_with_owner.split("/")[0]
   end
 
+  def synchronize_owners_files
+    owners_files = []
+
+    query = "in:path filename:#{OWNERS_FILENAME} repo:#{@repo.name_with_owner}"
+    results = @github.search_code(query)
+
+    results.items.each do |item|
+      if item.name != OWNERS_FILENAME
+        next
+      end
+
+      content = @github.file_content(@repo.name_with_owner, item.path, nil)
+
+      if content.empty?
+        next
+      end
+
+      owners_files << RepositoryOwnersFile.new(
+        repository_name: @repo.name_with_owner,
+        path_name: item.path,
+        content: content
+      )
+    end
+
+    RepositoryOwnersFile.transaction do
+      RepositoryOwnersFile.where(repository_name: @repo.name_with_owner).delete_all
+      owners_files.map(&:save!)
+    end
+  end
+
   # Returns an Array of GitHub users referenced in the OWNERS file of this
   # repository, either by their username or through a team they belong to.
   def owners
-    content = @github.file_content(
-      @repo.name_with_owner,
-      OWNERS_FILENAME,
-      Changeling.config.repository_owners_file_branch
+    owners_files = RepositoryOwnersFile.where(
+      repository_name: @repo.name_with_owner,
+      path_name: "/#{OWNERS_FILENAME}"
     )
+
+    content = owners_files.first!.content
     file = OwnersFile.new(content)
 
     owners = []
