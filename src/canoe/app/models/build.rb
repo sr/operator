@@ -60,11 +60,18 @@ class Build
   end
 
   def self.load_commit_statuses(builds)
-    threads = \
+    if Rails.env.development?
+      # The development environment is not thread-safe
+      builds.map(&:load_commit_status)
+    else
+      # In production, this makes the page load faster because requests to
+      # GitHub are done in parallel
       builds.map { |b|
         Thread.new(b, &:load_commit_status)
-      }
-    threads.each(&:join)
+      }.each(&:join)
+    end
+
+    true
   end
 
   def initialize(project:, artifact_url:, branch:, build_number:, sha:, created_at: nil, options_validator: nil, options: {}, properties: {})
