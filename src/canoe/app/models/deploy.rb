@@ -123,4 +123,8 @@ class Deploy < ApplicationRecord
       end
     end
   end
+
+  def instance_of_build?(build)
+    build.artifact_url == artifact_url
+  end
 end

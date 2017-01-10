@@ -76,7 +76,11 @@ class DeployRequest
     end
 
     if (Time.now - build.created_at) > MAXIMUM_BUILD_AGE
-      return Response.error("Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE.inspect} ago")
+      # Allow redeploys of the latest build in all circumstances
+      last_successful_deploy = @target.last_successful_deploy_for(@project.name)
+      if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(build)
+        return Response.error("Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE.inspect} ago")
+      end
     end
 
     deploy = @target.transaction do

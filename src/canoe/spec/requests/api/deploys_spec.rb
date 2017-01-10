@@ -143,6 +143,42 @@ RSpec.describe "/api/targets/:target_name/deploys" do
       expect(Deploy.count).to eq(0)
     end
 
+    it "allows a redeploy of the current build in all circumstances" do
+      existing_deploy = FactoryGirl.create(:deploy,
+        project_name: @project.name,
+        deploy_target: @production,
+        artifact_url: "https://artifactory.example/api/storage/pd-canoe/PDT/PPANT/build1234.tar.gz",
+        completed: true,
+        canceled: false
+      )
+
+      FactoryGirl.create(:auth_user, email: "sveader@salesforce.com")
+      expect_any_instance_of(AuthUser).to receive(:deploy_authorized?).and_return(true)
+      allow(Artifactory.client).to receive(:get)
+        .with(/pd-canoe\/PDT\/PPANT\/build1234\.tar\.gz/, properties: nil)
+        .and_return(
+          "uri" => existing_deploy.artifact_url,
+          "download_uri" => "https://artifactory.example/pd-canoe/PDT/PPANT/build1234.tar.gz",
+          "properties" => {
+            "gitBranch"      => ["feature-branch"],
+            "buildNumber"    => ["1234"],
+            "gitSha"         => ["abc123"],
+            "buildTimeStamp" => [(Time.now - DeployRequest::MAXIMUM_BUILD_AGE - 1.hour).iso8601]
+          },
+        )
+
+      api_post "/api/targets/#{@production.name}/deploys",
+        artifact_url: existing_deploy.artifact_url,
+        project_name: @project.name
+
+      expect(json_response["error"]).to eq(false)
+      expect(json_response["message"]).to match(nil)
+      expect(json_response["deploy"]).to_not be(nil)
+      expect(json_response["deploy"]["artifact_url"]).to eq(existing_deploy.artifact_url)
+
+      expect(Deploy.count).to eq(2)
+    end
+
     it "allows a non-compliant build if the project is configured to allow it" do
       @project.update!(compliant_builds_required: false)
       Canoe.config.github_client.compliance_state = GithubRepository::FAILURE
