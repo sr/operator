@@ -20,8 +20,10 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when BREAD, PARDOT
+    when BREAD
       [TEST_STATUS]
+    when PARDOT
+      [TEST_STATUS, FINAL_STATUS]
     when CHEF
       [TEST_STATUS, FINAL_STATUS]
     when CHANGELING
