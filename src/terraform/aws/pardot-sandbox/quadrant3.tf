@@ -109,7 +109,7 @@ resource "aws_security_group" "q3_app_secgroup" {
       "62.17.146.176/28",              # EMEA 62.17.146.176 - 62.17.146.191
       "202.95.77.64/27",               # APAC Singapore
       "221.133.209.128/27",            # APAC Sydney
-      "142.176.79.170/29",             # Halifax, Canada
+      "142.176.79.168/29",             # Halifax, Canada
       "61.120.150.128/27",             # Tokyo, Japan
       "61.213.161.144/30",             # Tokyo, Japan
       "${var.pardot_ci_egress_ip}/32",
@@ -130,7 +130,7 @@ resource "aws_security_group" "q3_app_secgroup" {
       "62.17.146.176/28",              # EMEA 62.17.146.176 - 62.17.146.191
       "202.95.77.64/27",               # APAC Singapore
       "221.133.209.128/27",            # APAC Sydney
-      "142.176.79.170/29",             # Halifax, Canada
+      "142.176.79.168/29",             # Halifax, Canada
       "61.120.150.128/27",             # Tokyo, Japan
       "61.213.161.144/30",             # Tokyo, Japan
       "${var.pardot_ci_egress_ip}/32",
