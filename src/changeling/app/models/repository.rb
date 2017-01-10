@@ -72,6 +72,10 @@ class Repository
       path_name: "/#{OWNERS_FILENAME}"
     )
 
+    if owners_files.count.zero?
+      return []
+    end
+
     content = owners_files.first!.content
     file = OwnersFile.new(content)
 
@@ -91,10 +95,6 @@ class Repository
 
     @github.team_members(organization, team_slugs).each do |user|
       owners << user.login
-    end
-
-    file.users.each do |user|
-      owners << user
     end
 
     owners.uniq

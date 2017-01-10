@@ -2,22 +2,19 @@ require "owners"
 
 class OwnersFile
   def initialize(string)
-    @users, @teams = parse(string)
+    @teams = parse(string)
   end
 
-  attr_reader :users, :teams
+  attr_reader :teams
 
   private
 
   def parse(string)
     tokens = Owners::Parser.new.parse(string)
-    users = []
     teams = []
 
     tokens.each do |token, value|
       case token
-      when :USERNAME
-        users << value[1, value.length]
       when :TEAMNAME
         teams << value[1, value.length]
       else
@@ -25,6 +22,6 @@ class OwnersFile
       end
     end
 
-    [users.uniq, teams.uniq]
+    teams.uniq
   end
 end
