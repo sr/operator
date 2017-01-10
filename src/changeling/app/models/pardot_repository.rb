@@ -23,7 +23,7 @@ class PardotRepository
     when BREAD
       [TEST_STATUS]
     when PARDOT
-      [TEST_STATUS, FINAL_JOBS]
+      [TEST_STATUS, FINAL_STATUS]
     when CHEF
       [TEST_STATUS, FINAL_STATUS]
     when CHANGELING
