@@ -57,7 +57,7 @@ class ChefDeliveryNotification
       build_id = object.tests_url.split("-").last
       %(<a href="#{object.tests_url}">##{build_id}</a>)
     when ChefDeploy
-      %(<a href="#{object.build_url}">##{object.build_id}</a>)
+      %(<a href="#{object.build_url}">#{object.short_sha}</a>)
     when String
       %(<a href="#{@github_url}/#{@repo}/compare/#{object}">#{object}</a>)
     else

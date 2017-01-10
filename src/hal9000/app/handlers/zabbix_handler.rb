@@ -51,7 +51,7 @@ class ZabbixHandler < ApplicationHandler
 
   # config: datacenters
   config :datacenters, default: %w[dfw phx]
-  config :default_datacenter, default: "dfw"
+  config :default_datacenter, default: "phx"
 
   # config: hal9000's "home room"
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
