@@ -65,7 +65,10 @@ class DeployRequest
       return Response.error("No build specified")
     end
 
-    deployability = build.deployability(target: @target)
+    deployability = build.deployability(
+      target: @target,
+      allow_pending_builds: true
+    )
     if !deployability.permitted?
       return Response.error(deployability.reason)
     end
