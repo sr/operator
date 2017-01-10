@@ -44,7 +44,7 @@ class Build
       branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
-      created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
+      created_at: Time.parse(properties["buildTimeStamp"]),
       options_validator: options_validator,
       options: {},
       properties: properties

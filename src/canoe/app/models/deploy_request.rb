@@ -1,4 +1,6 @@
 class DeployRequest
+  MAXIMUM_BUILD_AGE = 12.hours
+
   class Response
     def self.error(message)
       new(nil, message)
@@ -70,7 +72,11 @@ class DeployRequest
     end
 
     if !build.compliance_allows_deploy?
-      return Response.error("The build does not meet compliance requirements: #{build.compliance_description}")
+      return Response.error("Build does not meet compliance requirements: #{build.compliance_description}")
+    end
+
+    if (Time.now - build.created_at) > MAXIMUM_BUILD_AGE
+      return Response.error("Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE.inspect} ago")
     end
 
     deploy = @target.transaction do
