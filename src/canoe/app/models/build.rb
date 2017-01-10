@@ -46,7 +46,7 @@ class Build
       branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
-      created_at: Time.parse(properties["buildTimeStamp"]),
+      created_at: Time.parse(properties["buildTimeStamp"]).utc,
       options_validator: options_validator,
       options: {},
       properties: properties
@@ -123,7 +123,7 @@ class Build
         )
       end
 
-      if (Time.now - created_at) > MAXIMUM_BUILD_AGE_FOR_DEPLOY
+      if (Time.now.utc - created_at) > MAXIMUM_BUILD_AGE_FOR_DEPLOY
         # Allow redeploys of the latest build in all circumstances
         last_successful_deploy = target.last_successful_deploy_for(@project.name)
         if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(self)

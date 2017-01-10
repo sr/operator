@@ -28,7 +28,7 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
             { "key" => "buildNumber", "value" => "1234" },
             { "key" => "gitSha", "value" => "abc123" },
             { "key" => "buildTimeStamp", "value" => Time.now.iso8601 },
-            { "key" => "passedCI", "value" => "true"}
+            { "key" => "passedCI", "value" => "true" }
           ]
         }
       ])
