@@ -44,7 +44,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["master"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -72,7 +73,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["master"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -101,7 +103,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -128,7 +131,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [(Time.now - DeployRequest::MAXIMUM_BUILD_AGE - 1.hour).iso8601]
+            "buildTimeStamp" => [(Time.now - Build::MAXIMUM_BUILD_AGE_FOR_DEPLOY - 1.hour).iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -163,7 +167,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [(Time.now - DeployRequest::MAXIMUM_BUILD_AGE - 1.hour).iso8601]
+            "buildTimeStamp" => [(Time.now - Build::MAXIMUM_BUILD_AGE_FOR_DEPLOY - 1.hour).iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -194,7 +199,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -223,7 +229,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["master"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 
@@ -252,7 +259,8 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["my-feature"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [Time.now.iso8601]
+            "buildTimeStamp" => [Time.now.iso8601],
+            "passedCI"       => ["true"]
           },
         )
 

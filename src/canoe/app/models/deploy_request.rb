@@ -1,6 +1,4 @@
 class DeployRequest
-  MAXIMUM_BUILD_AGE = 12.hours
-
   class Response
     def self.error(message)
       new(nil, message)
@@ -67,20 +65,9 @@ class DeployRequest
       return Response.error("No build specified")
     end
 
-    if !build.valid?
-      return Response.error("Build is not valid")
-    end
-
-    if @target.production? && !build.compliance_allows_deploy?
-      return Response.error("Build does not meet compliance requirements: #{build.compliance_description}")
-    end
-
-    if (Time.now - build.created_at) > MAXIMUM_BUILD_AGE
-      # Allow redeploys of the latest build in all circumstances
-      last_successful_deploy = @target.last_successful_deploy_for(@project.name)
-      if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(build)
-        return Response.error("Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE.inspect} ago")
-      end
+    deployability = build.deployability(target: @target)
+    if !deployability.permitted?
+      return Response.error(deployability.reason)
     end
 
     deploy = @target.transaction do

@@ -18,7 +18,8 @@ RSpec.describe "Deploy creation API" do
         "gitBranch"      => ["master"],
         "buildNumber"    => ["1234"],
         "gitSha"         => ["abc123"],
-        "buildTimeStamp" => [Time.now.iso8601]
+        "buildTimeStamp" => [Time.now.iso8601],
+        "passedCI"       => ["true"]
       }
     }
   end

@@ -2,6 +2,8 @@ require "base64"
 require "json"
 
 class Build
+  MAXIMUM_BUILD_AGE_FOR_DEPLOY = 12.hours
+
   attr_reader :artifact_url, :branch, :build_number, :sha, :created_at, :properties
   attr_reader :options_validator, :options
 
@@ -97,8 +99,36 @@ class Build
     !@project.all_servers_default
   end
 
-  def valid?
-    @sha.present?
+  def deployability(target: nil, allow_pending_builds: false)
+    if !@sha.present?
+      return Deployability.new(false, "SHA is missing")
+    end
+
+    if !allow_pending_builds && !passed_ci?
+      return Deployability.new(false, "The primary build is pending or has failed")
+    end
+
+    if target.present?
+      if target.production? && !compliance_allows_deploy?
+        return Deployability.new(
+          false,
+          "Build does not meet compliance requirements: #{compliance_description}"
+        )
+      end
+
+      if (Time.now - created_at) > MAXIMUM_BUILD_AGE_FOR_DEPLOY
+        # Allow redeploys of the latest build in all circumstances
+        last_successful_deploy = target.last_successful_deploy_for(@project.name)
+        if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(self)
+          return Deployability.new(
+            false,
+            "Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE_FOR_DEPLOY.inspect} ago"
+          )
+        end
+      end
+    end
+
+    Deployability.new(true, "Build is deployable")
   end
 
   def commit_status
