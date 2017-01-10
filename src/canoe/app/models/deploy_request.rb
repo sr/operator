@@ -71,7 +71,7 @@ class DeployRequest
       return Response.error("Build is not valid")
     end
 
-    if !build.compliance_allows_deploy?
+    if @target.production? && !build.compliance_allows_deploy?
       return Response.error("Build does not meet compliance requirements: #{build.compliance_description}")
     end
 
