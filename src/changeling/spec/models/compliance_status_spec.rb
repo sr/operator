@@ -24,30 +24,24 @@ describe ComplianceStatus, "pardot" do
     @multipass.create_ticket_reference!(ticket: ticket)
     @user = Fabricate(:user)
 
-    stub_repository_owners(PardotRepository::CHANGELING, [])
+    stub_organization_teams("heroku", {})
   end
 
-  def stub_repository_owners(repo, owners)
-    organization = repo.split("/")[0]
-
-    bread = { id: 1, slug: "bread" }
-    tools = { id: 2, slug: "tools" }
-    teams = [bread, tools]
-    bread_members = [{ login: "alindeman" }]
-    tools_members = [{ login: "ys" }]
+  def stub_organization_teams(organization, teams)
+    teams_data = []
+    teams.keys.each_with_index do |slug, index|
+      teams_data << { id: index, slug: slug }
+    end
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/orgs/#{organization}/teams")
-      .to_return(body: JSON.dump(teams), headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{bread[:id]}/members")
-      .to_return(body: JSON.dump(bread_members), headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{tools[:id]}/members")
-      .to_return(body: JSON.dump(tools_members), headers: { "Content-Type" => "application/json" })
+      .to_return(body: JSON.dump(teams_data), headers: { "Content-Type" => "application/json" })
 
-    owners_file = RepositoryOwnersFile.find_or_initialize_by(
-      repository_name: repo,
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-    )
-    owners_file.update!(content: owners.join("\n"))
+    teams.each_with_index do |(_, members), index|
+      data = members.map { |member| { login: member } }
+
+      stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{index}/members")
+        .to_return(body: JSON.dump(data), headers: { "Content-Type" => "application/json" })
+    end
   end
 
   it "can never be approved by a SRE" do
@@ -106,54 +100,51 @@ describe ComplianceStatus, "pardot" do
   it "requires peer review by one of the repository owners to be complete" do
     Changeling.config.repository_owners_review_required = [@multipass.repository_name]
     @multipass.peer_reviews.destroy_all
+    RepositoryOwnersFile.delete_all
 
-    stub_repository_owners(@multipass.repository_name, [])
+    stub_organization_teams("heroku", {})
+
     expect do
       @multipass.complete?
     end.to raise_error(Repository::OwnersError)
 
-    stub_repository_owners(@multipass.repository_name, ["@alindeman"])
+    RepositoryOwnersFile.create!(
+      repository_name: @multipass.repository_name,
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/bread\n@heroku/tools\n",
+    )
+
+    stub_organization_teams("heroku", "bread": ["alindeman"])
     expect(@multipass.peer_reviewed?).to eq(false)
     expect(@multipass.complete?).to eq(false)
 
-    review = @multipass.peer_reviews.create!(
+    review_1 = @multipass.peer_reviews.create!(
       reviewer_github_login: "alindeman",
-      state: Clients::GitHub::REVIEW_CHANGES_REQUESTED
+      state: Clients::GitHub::REVIEW_APPROVED,
     )
-    expect(@multipass.peer_reviewed?).to eq(false)
-    expect(@multipass.complete?).to eq(false)
-
-    review.update!(state: Clients::GitHub::REVIEW_APPROVED)
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
 
-    stub_repository_owners(@multipass.repository_name, ["@sr"])
+    review_1.update!(state: Clients::GitHub::REVIEW_CHANGES_REQUESTED)
     expect(@multipass.peer_reviewed?).to eq(false)
     expect(@multipass.complete?).to eq(false)
 
-    @multipass.peer_reviews.create!(
+    stub_organization_teams("heroku", "bread": ["alindeman", "sr"])
+    review_2 = @multipass.peer_reviews.create!(
       reviewer_github_login: "sr",
-      state: Clients::GitHub::REVIEW_CHANGES_REQUESTED
+      state: Clients::GitHub::REVIEW_APPROVED,
     )
-    stub_repository_owners(@multipass.repository_name, ["@alindeman", "@sr"])
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
 
-    stub_repository_owners(@multipass.repository_name, ["@heroku/bread"])
-    @multipass.peer_reviews.destroy_all
+    review_2.update!(state: Clients::GitHub::REVIEW_CHANGES_REQUESTED)
     expect(@multipass.peer_reviewed?).to eq(false)
     expect(@multipass.complete?).to eq(false)
 
+    stub_organization_teams("heroku", "bread": ["alindeman", "sr"], "tools": ["ys"])
     @multipass.peer_reviews.create!(
       reviewer_github_login: "ys",
-      state: Clients::GitHub::REVIEW_APPROVED
-    )
-    expect(@multipass.peer_reviewed?).to eq(false)
-    expect(@multipass.complete?).to eq(false)
-
-    @multipass.peer_reviews.create!(
-      reviewer_github_login: "alindeman",
-      state: Clients::GitHub::REVIEW_APPROVED
+      state: Clients::GitHub::REVIEW_APPROVED,
     )
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
