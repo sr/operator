@@ -12,11 +12,16 @@ module Clients
     end
 
     def initialize(token)
-      @client = Octokit::Client.new(
+      options = {
         api_endpoint: Changeling.config.github_api_endpoint,
-        access_token: token,
-        auto_paginate: true,
-      )
+        access_token: token
+      }
+
+      if !Rails.env.test?
+        options[:auto_paginate] = true
+      end
+
+      @client = Octokit::Client.new(options)
     end
 
     # Identify whether we're a herokai or not
