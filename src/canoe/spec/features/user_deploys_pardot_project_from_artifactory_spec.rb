@@ -27,7 +27,8 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
             { "key" => "gitBranch", "value" => "master" },
             { "key" => "buildNumber", "value" => "1234" },
             { "key" => "gitSha", "value" => "abc123" },
-            { "key" => "buildTimeStamp", "value" => "2015-09-11T18:51:37.047-04:00" }
+            { "key" => "buildTimeStamp", "value" => Time.now.iso8601 },
+            { "key" => "passedCI", "value" => "true" }
           ]
         }
       ])
@@ -41,7 +42,8 @@ RSpec.feature "user deploys pardot project from artifactory artifact" do
           "gitBranch"      => ["master"],
           "buildNumber"    => ["1234"],
           "gitSha"         => ["abc123"],
-          "buildTimeStamp" => ["2015-09-11T18:51:37.047-04:00"]
+          "buildTimeStamp" => [Time.now.iso8601],
+          "passedCI"       => ["true"]
         },
       )
   end

@@ -44,7 +44,7 @@ class Build
       branch: properties["gitBranch"],
       build_number: properties["buildNumber"].to_i,
       sha: properties["gitSha"],
-      created_at: Time.parse(properties["buildTimeStamp"]).iso8601,
+      created_at: Time.parse(properties["buildTimeStamp"]).utc,
       options_validator: options_validator,
       options: {},
       properties: properties
@@ -58,11 +58,18 @@ class Build
   end
 
   def self.load_commit_statuses(builds)
-    threads = \
+    if Rails.env.development?
+      # The development environment is not thread-safe
+      builds.map(&:load_commit_status)
+    else
+      # In production, this makes the page load faster because requests to
+      # GitHub are done in parallel
       builds.map { |b|
         Thread.new(b, &:load_commit_status)
-      }
-    threads.each(&:join)
+      }.each(&:join)
+    end
+
+    true
   end
 
   def initialize(project:, artifact_url:, branch:, build_number:, sha:, created_at: nil, options_validator: nil, options: {}, properties: {})
@@ -97,8 +104,36 @@ class Build
     !@project.all_servers_default
   end
 
-  def valid?
-    @sha.present?
+  def deployability(target: nil, allow_pending_builds: false)
+    if !@sha.present?
+      return Deployability.new(false, "SHA is missing")
+    end
+
+    if !allow_pending_builds && !passed_ci?
+      return Deployability.new(false, "The automated tests are pending or have failed")
+    end
+
+    if target.present?
+      if target.production? && !compliance_allows_deploy?
+        return Deployability.new(
+          false,
+          "Build does not meet compliance requirements: #{compliance_description}"
+        )
+      end
+
+      if (Time.now.utc - created_at) > Canoe.config.maximum_build_age_for_deploy
+        # Allow redeploys of the latest build in all circumstances
+        last_successful_deploy = target.last_successful_deploy_for(@project.name)
+        if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(self)
+          return Deployability.new(
+            false,
+            "Build cannot be deployed because it was created more than #{Canoe.config.maximum_build_age_for_deploy.inspect} ago. To deploy, restart the build or merge/commit to master."
+          )
+        end
+      end
+    end
+
+    Deployability.new(true, "Build is deployable")
   end
 
   def commit_status
