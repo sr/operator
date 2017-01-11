@@ -2,8 +2,6 @@ require "base64"
 require "json"
 
 class Build
-  MAXIMUM_BUILD_AGE_FOR_DEPLOY = 12.hours
-
   attr_reader :artifact_url, :branch, :build_number, :sha, :created_at, :properties
   attr_reader :options_validator, :options
 
@@ -112,7 +110,7 @@ class Build
     end
 
     if !allow_pending_builds && !passed_ci?
-      return Deployability.new(false, "The primary build is pending or has failed")
+      return Deployability.new(false, "The automated tests are pending or have failed")
     end
 
     if target.present?
@@ -123,13 +121,13 @@ class Build
         )
       end
 
-      if (Time.now.utc - created_at) > MAXIMUM_BUILD_AGE_FOR_DEPLOY
+      if (Time.now.utc - created_at) > Canoe.config.maximum_build_age_for_deploy
         # Allow redeploys of the latest build in all circumstances
         last_successful_deploy = target.last_successful_deploy_for(@project.name)
         if last_successful_deploy.nil? || !last_successful_deploy.instance_of_build?(self)
           return Deployability.new(
             false,
-            "Build cannot be deployed because it was created more than #{MAXIMUM_BUILD_AGE_FOR_DEPLOY.inspect} ago"
+            "Build cannot be deployed because it was created more than #{Canoe.config.maximum_build_age_for_deploy.inspect} ago. To deploy, restart the build or merge/commit to master."
           )
         end
       end

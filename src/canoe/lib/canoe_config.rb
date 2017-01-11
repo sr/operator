@@ -57,4 +57,12 @@ class CanoeConfig
   def salesforce_authenticator_consumer_key
     @env.fetch("SALESFORCE_AUTHENTICATOR_CONSUMER_KEY", "")
   end
+
+  def maximum_build_age_for_deploy
+    return @maximum_build_age_for_deploy if defined?(@maximum_build_age_for_deploy)
+
+    # https://en.wikipedia.org/wiki/ISO_8601#Durations
+    @maximum_build_age_for_deploy = \
+      ActiveSupport::Duration.parse(@env.fetch("MAXIMUM_BUILD_AGE_FOR_DEPLOY", "PT12H"))
+  end
 end

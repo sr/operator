@@ -131,7 +131,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [(Time.now.utc - Build::MAXIMUM_BUILD_AGE_FOR_DEPLOY - 1.hour).iso8601],
+            "buildTimeStamp" => [(Time.now.utc - Canoe.config.maximum_build_age_for_deploy - 1.hour).iso8601],
             "passedCI"       => ["true"]
           },
         )
@@ -167,7 +167,7 @@ RSpec.describe "/api/targets/:target_name/deploys" do
             "gitBranch"      => ["feature-branch"],
             "buildNumber"    => ["1234"],
             "gitSha"         => ["abc123"],
-            "buildTimeStamp" => [(Time.now.utc - Build::MAXIMUM_BUILD_AGE_FOR_DEPLOY - 1.hour).iso8601],
+            "buildTimeStamp" => [(Time.now.utc - Canoe.config.maximum_build_age_for_deploy - 1.hour).iso8601],
             "passedCI"       => ["true"]
           },
         )
