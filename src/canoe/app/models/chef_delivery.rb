@@ -98,6 +98,10 @@ class ChefDelivery
       return
     end
 
+    if request.command[0] == "status"
+      return
+    end
+
     if request.command[0, 2] == %w[node show]
       return
     end
