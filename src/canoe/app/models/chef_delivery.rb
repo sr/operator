@@ -22,7 +22,9 @@ class ChefDelivery
       at: "chef",
       branch: request.checkout_branch,
       sha: request.checkout_sha,
-      current_build: current_build.to_json,
+      current_build_sha: current_build.sha,
+      current_build_compare_state: current_build.compare_state,
+      current_build_compliance_state: current_build.compliance_state,
       server: request.server.to_json,
     )
 
