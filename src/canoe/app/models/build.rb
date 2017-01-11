@@ -57,18 +57,8 @@ class Build
     build
   end
 
-  def self.load_commit_statuses(builds)
-    if Rails.env.development?
-      # The development environment is not thread-safe
-      builds.map(&:load_commit_status)
-    else
-      # In production, this makes the page load faster because requests to
-      # GitHub are done in parallel
-      builds.map { |b|
-        Thread.new(b, &:load_commit_status)
-      }.each(&:join)
-    end
-
+  def self.preload_commit_statuses(builds)
+    builds.map(&:preload_commit_status)
     true
   end
 
@@ -140,7 +130,7 @@ class Build
     @commit_status ||= @project.commit_status(@sha)
   end
 
-  def load_commit_status
+  def preload_commit_status
     commit_status
     true
   end
