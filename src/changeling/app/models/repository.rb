@@ -64,20 +64,24 @@ class Repository
     end
   end
 
+  # Returns all OWNERS files included in this repository
+  def owners_files
+    RepositoryOwnersFile.where(repository_name: @repo.name_with_owner)
+  end
+
   # Returns an Array of GitHub users referenced in the OWNERS file of this
   # repository, either by their username or through a team they belong to.
   def owners
-    owners_files = RepositoryOwnersFile.where(
+    owners_file = RepositoryOwnersFile.find_by(
       repository_name: @repo.name_with_owner,
       path_name: "/#{OWNERS_FILENAME}"
     )
 
-    if owners_files.count.zero?
+    if owners_file.nil?
       return []
     end
 
-    content = owners_files.first!.content
-    file = OwnersFile.new(content)
+    file = OwnersFile.new(owners_file.content)
 
     owners = []
     team_slugs = []

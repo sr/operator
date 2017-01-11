@@ -28,6 +28,14 @@ class RepositoryPullRequest
     @multipass.pull_request_number
   end
 
+  def repository_full_name
+    @multipass.repository_name
+  end
+
+  def repository_organization
+    @multipass.repository_name.split("/").first
+  end
+
   def repository_name
     @multipass.repository_name.split("/").last
   end
@@ -36,6 +44,85 @@ class RepositoryPullRequest
     url = URI(@multipass.reference_url)
     url.path = url.path.split("/")[0, 3].join("/")
     url.to_s
+  end
+
+  # Returns an Array of all the OWNERS files covering files being changed in
+  # this pull request
+  def owners_files
+    files = Set.new([])
+    directories = {}
+
+    repository.owners_files.each do |file|
+      directories[File.dirname(file.path_name)] = file
+    end
+
+    if directories.empty?
+      return []
+    end
+
+    # If the pull request doesn't have any change, return the root OWNERS file,
+    # or an empty Array if there is none
+    if @multipass.changed_files.empty?
+      return Array(directories["/"])
+    end
+
+    @multipass.changed_files.each do |file|
+      file.ascend do |path|
+        dirname = path.dirname.to_s
+
+        if directories.key?(dirname)
+          files.add(directories.fetch(dirname))
+        end
+      end
+    end
+
+    files.to_a
+  end
+
+  # Return the Array of team members, one per OWNERS file that is relevant to
+  # the files changed in this pull request
+  def owners
+    # Cache of all GitHub teams and their members referenced across OWNERS files
+    github_team_ids = {}
+    github_teams = {}
+
+    # Fetch all teams for this repository's organization
+    github_client.organization_teams(repository_organization).each do |team|
+      github_team_ids["#{repository_organization}/#{team.slug}"] = team.id
+    end
+
+    # Parse all OWNERS files and for load the referenced teams and their members,
+    # returning the resulting nested Array.
+    owners_files.map do |file|
+      file = OwnersFile.new(file.content)
+      users = Set.new([])
+
+      # Load the referenced teams and their members
+      file.teams.each do |team|
+        # Ignore teams that don't belong to this repository's organization
+        if !github_team_ids.key?(team)
+          next
+        end
+
+        # Avoid fetching members of the same team twice
+        if github_teams.key?(team)
+          users.merge(github_teams.fetch(team))
+
+          next
+        end
+
+        members = Set.new([])
+
+        github_client.team_members2(github_team_ids.fetch(team)).each do |user|
+          members.add(user.login)
+        end
+
+        github_teams[team] = members
+        users.merge(members)
+      end
+
+      users.to_a
+    end
   end
 
   def github_url
