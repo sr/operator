@@ -8,7 +8,7 @@ module Api
           (current_page - 1) * pagination_page_size,
           pagination_page_size
         )
-      Build.load_commit_statuses(@builds)
+      Build.preload_commit_statuses(@builds)
     end
 
     private
