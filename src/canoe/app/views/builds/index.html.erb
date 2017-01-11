@@ -41,7 +41,8 @@
           <div class="row">
             <div class="col-md-3">
               <h4>
-                <%= link_to "Ship This", select_target_project_deploys_path(current_project, artifact_url: build.artifact_url), class: "btn #{shipit_btn_class(build)} btn-xs deploy-button", disabled: shipit_btn_disabled(build, @allow_pending_builds), title: shipit_btn_title(build, @allow_pending_builds) %>
+                <%- deployability = build.deployability(allow_pending_builds: @allow_pending_builds) %>
+                <%= link_to "Ship This", select_target_project_deploys_path(current_project, artifact_url: build.artifact_url), class: "btn #{shipit_btn_class(build)} btn-xs deploy-button", disabled: !deployability.permitted?, title: deployability.reason %>
                 &nbsp;
                 <%= deploy_type_icon("build") %> build<%= build.build_number %>
               </h4>

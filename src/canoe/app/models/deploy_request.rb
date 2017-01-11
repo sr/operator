@@ -65,12 +65,12 @@ class DeployRequest
       return Response.error("No build specified")
     end
 
-    if !build.valid?
-      return Response.error("Build is not valid")
-    end
-
-    if !build.compliance_allows_deploy?
-      return Response.error("The build does not meet compliance requirements: #{build.compliance_description}")
+    deployability = build.deployability(
+      target: @target,
+      allow_pending_builds: true
+    )
+    if !deployability.permitted?
+      return Response.error(deployability.reason)
     end
 
     deploy = @target.transaction do
