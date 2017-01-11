@@ -66,7 +66,12 @@ module Canoe
     config.middleware.use Rack::Attack
     config.middleware.use Pinglish do |ping|
       ping.check :db do
-        !!Project.count
+        begin
+          Integer(Project.count)
+        rescue => e
+          Instrumentation.log_exception(e)
+          raise
+        end
       end
     end
   end
