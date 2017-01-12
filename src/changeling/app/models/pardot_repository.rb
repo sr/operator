@@ -28,7 +28,7 @@ class PardotRepository
     when CHEF
       [TEST_STATUS, FINAL_STATUS]
     when ANSIBLE
-      [TEST_STATUS, FINAL_STATUS]
+      [TEST_STATUS]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
     else
@@ -47,9 +47,9 @@ class PardotRepository
 
   def ticket_reference_required?
     if Changeling.config.pardot_rollout_phase1_enabled?
-      [BREAD, PARDOT, CHEF].include?(name_with_owner)
+      [ANSIBLE, BREAD, PARDOT, CHEF].include?(name_with_owner)
     else
-      [ANSIBLE, BREAD, CHANGELING].include?(name_with_owner)
+      [BREAD, CHANGELING].include?(name_with_owner)
     end
   end
 
