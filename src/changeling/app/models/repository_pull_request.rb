@@ -72,6 +72,11 @@ class RepositoryPullRequest
       number
     )
 
+    files = github_client.pull_request_files(
+      repository.name_with_owner,
+      number
+    )
+
     @multipass.merged = pull_request[:merged]
     @multipass.title = pull_request[:title]
     @multipass.release_id = \
@@ -80,6 +85,19 @@ class RepositoryPullRequest
       else
         pull_request[:head][:sha]
       end
+
+    PullRequestFile.transaction do
+      PullRequestFile.where(multipass_id: @multipass.id).delete_all
+
+      files.each do |file|
+        PullRequestFile.create!(
+          multipass_id: @multipass.id,
+          filename: "/" + file.filename,
+          state: file.status,
+          patch: file.patch
+        )
+      end
+    end
   end
 
   def synchronize_github_statuses

@@ -5,6 +5,7 @@ class Multipass < ActiveRecord::Base
   audited
   has_many :events
   has_many :peer_reviews
+  has_many :pull_request_files
   has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
@@ -123,6 +124,11 @@ class Multipass < ActiveRecord::Base
 
   def referenced_ticket
     repository_pull_request.referenced_ticket
+  end
+
+  # Returns an Array of filenames that were changed in this pull request
+  def changed_files
+    pull_request_files.pluck(:filename).map { |f| Pathname(f) }
   end
 
   # Returns an Array of GitHub user logins that approve of this change

@@ -32,7 +32,7 @@ RSpec.describe RepositoryPullRequest do
     end
   end
 
-  def stub_github_pull_request(title: nil, merge_commit_sha: nil)
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [])
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
     pull_request["title"] = title if title
@@ -40,8 +40,11 @@ RSpec.describe RepositoryPullRequest do
       pull_request["merged"] = true
       pull_request["merge_commit_sha"] = merge_commit_sha
     end
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}")
+
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}")
       .to_return(body: JSON.dump(pull_request), headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}/files")
+      .to_return(body: JSON.dump(files), headers: { "Content-Type" => "application/json" })
   end
 
   def stub_github_commit_status(statuses: [])
@@ -236,6 +239,34 @@ RSpec.describe RepositoryPullRequest do
       @multipass.synchronize
 
       expect(@multipass.reload.release_id).to eq("abc123")
+    end
+
+    it "synchronizes changed files" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(
+        title: "BREAD-1598",
+        merge_commit_sha: "abc123",
+        files: [
+          { status: "added", filename: "boomtown", patch: "+ hi" }
+        ]
+      )
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+
+      expect(@multipass.changed_files).to eq([])
+      @multipass.synchronize
+      expect(@multipass.changed_files).to eq([Pathname("/boomtown")])
+
+      stub_github_pull_request(
+        title: "BREAD-1598",
+        merge_commit_sha: "abc123",
+        files: [
+          { status: "added", filename: "README", patch: "+ rtfm" },
+          { status: "removed", filename: "config", patch: "" }
+        ]
+      )
+      @multipass.synchronize
+      expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
   end
 
