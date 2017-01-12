@@ -7,6 +7,7 @@ class PardotRepository
   BREAD = "Pardot/bread".freeze
   CHEF = "Pardot/chef".freeze
   PARDOT = "Pardot/pardot".freeze
+  ANSIBLE = "Pardot/ansible".freeze
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
   TEST_STATUS = "Test Jobs".freeze
@@ -26,6 +27,8 @@ class PardotRepository
       [TEST_STATUS, FINAL_STATUS]
     when CHEF
       [TEST_STATUS, FINAL_STATUS]
+    when ANSIBLE
+      [TEST_STATUS]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
     else
@@ -44,7 +47,7 @@ class PardotRepository
 
   def ticket_reference_required?
     if Changeling.config.pardot_rollout_phase1_enabled?
-      [BREAD, PARDOT, CHEF].include?(name_with_owner)
+      [ANSIBLE, BREAD, PARDOT, CHEF].include?(name_with_owner)
     else
       [BREAD, CHANGELING].include?(name_with_owner)
     end
@@ -53,7 +56,7 @@ class PardotRepository
   # Do not create commit statuses for now.
   def update_github_commit_status?
     if Changeling.config.pardot_rollout_phase1_enabled?
-      [BREAD, PARDOT, CHEF].include?(name_with_owner)
+      [ANSIBLE, BREAD, PARDOT, CHEF].include?(name_with_owner)
     else
       [BREAD].include?(name_with_owner)
     end
