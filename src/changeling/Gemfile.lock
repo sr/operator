@@ -131,6 +131,7 @@ GEM
     github-markdown (0.6.9)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
+    google-protobuf (3.1.0)
     hashdiff (0.3.0)
     hashie (3.4.3)
     hetchy (1.0.0)
@@ -404,6 +405,7 @@ DEPENDENCIES
   font-awesome-rails
   gemoji
   github-markdown
+  google-protobuf (~> 3.0)
   html-pipeline
   jbuilder (~> 2.0)
   jira-ruby
