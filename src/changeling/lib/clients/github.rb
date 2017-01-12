@@ -90,6 +90,10 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
+    def pull_request_files(name_with_owner, number)
+      @client.pull_request_files(name_with_owner, number)
+    end
+
     def search_code(query)
       @client.search_code(query)
     end

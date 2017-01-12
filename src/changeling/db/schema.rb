@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170105184929) do
+ActiveRecord::Schema.define(version: 20170106072952) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,6 +86,16 @@ ActiveRecord::Schema.define(version: 20170105184929) do
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.index ["multipass_id", "reviewer_github_login"], name: "index_peer_reviews_on_multipass_id_and_reviewer_github_login", unique: true, using: :btree
+  end
+
+  create_table "pull_request_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "multipass_id", null: false
+    t.text     "filename",     null: false
+    t.text     "state",        null: false
+    t.text     "patch",        null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["multipass_id", "filename"], name: "index_pull_request_files_on_multipass_id_and_filename", unique: true, using: :btree
   end
 
   create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
