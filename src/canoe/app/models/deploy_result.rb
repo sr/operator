@@ -1,8 +1,14 @@
 class DeployResult < ApplicationRecord
+  START = "start".freeze
+  INITIATED = "initiated".freeze
+  DEPLOYED = "deployed".freeze
+  COMPLETED = "completed".freeze
+  FAILED = "failed".freeze
+  STAGES = [START, INITIATED, DEPLOYED, COMPLETED, FAILED].freeze
+
   belongs_to :deploy
   belongs_to :server
 
-  STAGES = %w[start initiated deployed completed failed].freeze
   validates :stage,
     presence: true,
     inclusion: { in: STAGES }
