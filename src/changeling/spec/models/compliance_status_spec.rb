@@ -4,6 +4,7 @@ describe ComplianceStatus, "pardot" do
   before(:each) do
     Changeling.config.pardot = true
     Changeling.config.repository_owners_review_required = []
+    Changeling.config.component_owners_review_enabled = []
 
     ticket = Ticket.create!(
       external_id: "1",
@@ -97,9 +98,10 @@ describe ComplianceStatus, "pardot" do
     expect(description).to include("Peer review")
   end
 
-  it "requires peer review by one of the repository owners to be complete" do
+  it "requires peer review by repository owners to be complete" do
     Changeling.config.repository_owners_review_required = [@multipass.repository_name]
     @multipass.peer_reviews.destroy_all
+    @multipass.pull_request_files.destroy_all
     RepositoryOwnersFile.delete_all
 
     stub_organization_teams("heroku", {})
@@ -148,5 +150,77 @@ describe ComplianceStatus, "pardot" do
     )
     expect(@multipass.peer_reviewed?).to eq(true)
     expect(@multipass.complete?).to eq(true)
+  end
+
+  it "requires peer review and approval by the component(s) owners" do
+    Changeling.config.repository_owners_review_required = [@multipass.repository_name]
+    Changeling.config.component_owners_review_enabled = [@multipass.repository_name]
+    @multipass.peer_reviews.destroy_all
+    @multipass.pull_request_files.destroy_all
+    RepositoryOwnersFile.delete_all
+
+    stub_organization_teams(
+      "heroku",
+      "ops": %w[alindeman sr glenn],
+      "bread": %w[alindeman sr],
+      "dba": %w[glenn]
+    )
+
+    @multipass.pull_request_files.create!(
+      filename: "README",
+      state: "added",
+      patch: "+ Hello World"
+    )
+    @multipass.pull_request_files.create!(
+      filename: "/cookbooks/pardot_mysql/README",
+      state: "added",
+      patch: "+ test"
+    )
+    @multipass.pull_request_files.create!(
+      filename: "/scripts/build",
+      state: "modified",
+      patch: "+ exit 1"
+    )
+
+    expect do
+      @multipass.peer_reviewed?
+    end.to raise_error(Repository::OwnersError)
+
+    RepositoryOwnersFile.create!(
+      repository_name: @multipass.repository_name,
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/ops"
+    )
+    RepositoryOwnersFile.create!(
+      repository_name: @multipass.repository_name,
+      path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/dba"
+    )
+    RepositoryOwnersFile.create!(
+      repository_name: @multipass.repository_name,
+      path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/bread"
+    )
+
+    expect(@multipass.peer_reviewed?).to eq(false)
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "sr",
+      state: Clients::GitHub::REVIEW_APPROVED,
+    )
+    expect(@multipass.peer_reviewed?).to eq(false)
+
+    expect(@multipass.peer_reviewed?).to eq(false)
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "glenn",
+      state: Clients::GitHub::REVIEW_APPROVED,
+    )
+    expect(@multipass.peer_reviewed?).to eq(true)
+
+    # One positive review per component is sufficient
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "alindeman",
+      state: Clients::GitHub::REVIEW_CHANGES_REQUESTED,
+    )
+    expect(@multipass.peer_reviewed?).to eq(true)
   end
 end

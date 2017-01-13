@@ -15,10 +15,6 @@ RSpec.describe RepositoryPullRequest do
     @repository_pull_request = RepositoryPullRequest.new(@multipass)
   end
 
-  after(:each) do
-    Changeling.config.pardot = false
-  end
-
   def stub_jira_ticket(external_id, exists: true, resolved: false)
     if exists
       issue = decoded_fixture_data("jira/issue")

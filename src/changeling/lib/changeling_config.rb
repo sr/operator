@@ -28,6 +28,12 @@ class ChangelingConfig
   end
   attr_writer :repository_owners_review_required
 
+  def component_owners_review_enabled
+    return @component_owners_review_enabled if defined?(@component_owners_review_enabled)
+    @component_owners_review_enabled = Array(ENV.fetch("COMPONENT_OWNERS_REVIEW_ENABLED", "").split(","))
+  end
+  attr_writer :component_owners_review_enabled
+
   def repository_owners_file_branch
     ENV.fetch("REPOSITORY_OWNERS_FILE_BRANCH", nil)
   end
