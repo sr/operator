@@ -51,9 +51,16 @@ class Repository
         next
       end
 
+      path_name =
+        if item.path[0] == "/"
+          item.path
+        else
+          "/#{item.path}"
+        end
+
       owners_files << RepositoryOwnersFile.new(
         repository_name: @repo.name_with_owner,
-        path_name: item.path,
+        path_name: path_name,
         content: content
       )
     end

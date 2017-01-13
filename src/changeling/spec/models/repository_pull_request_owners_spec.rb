@@ -100,6 +100,11 @@ RSpec.describe RepositoryPullRequest do
       state: "removed",
       patch: ""
     )
+    @multipass.pull_request_files.create!(
+      filename: "/cookbooks/pardot_mysql/attributes/pardot.rb",
+      state: "removed",
+      patch: ""
+    )
     expect(@pull_request.owners_files).to eq([root, scripts, mysql])
   end
 
