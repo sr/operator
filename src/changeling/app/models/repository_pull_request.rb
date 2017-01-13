@@ -135,7 +135,8 @@ class RepositoryPullRequest
     end
 
     synchronize_github_pull_request
-    unless @multipass.merged?
+
+    if !@multipass.merged?
       synchronize_github_reviewers
       synchronize_github_statuses
       synchronize_ticket
@@ -177,12 +178,13 @@ class RepositoryPullRequest
       PullRequestFile.where(multipass_id: @multipass.id).delete_all
 
       files.each do |file|
-        PullRequestFile.create!(
+        pull_request_file = PullRequestFile.find_or_initialize_by(
           multipass_id: @multipass.id,
           filename: "/" + file.filename,
           state: file.status,
-          patch: file.patch
+          patch: file.patch || ""
         )
+        pull_request_file.save
       end
     end
   end
