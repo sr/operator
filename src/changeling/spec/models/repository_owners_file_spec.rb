@@ -13,7 +13,11 @@ RSpec.describe RepositoryOwnersFile do
     items = [
       {
         name: "OWNERS",
-        path: "OWNERS"
+        path: "/OWNERS"
+      },
+      {
+        name: "OWNERS",
+        path: "cookbooks/pardot_mysql/OWNERS"
       },
       {
         name: "owners_file_spec.rb",
@@ -23,18 +27,23 @@ RSpec.describe RepositoryOwnersFile do
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{repo_name}/contents/OWNERS")
       .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{repo_name}/contents/cookbooks/pardot_mysql/OWNERS")
+      .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/search/code?q=in:path%20filename:OWNERS%20repo:#{repo_name}")
       .to_return(body: JSON.dump(items: items), headers: { "Content-Type" => "application/json" })
 
     expect(RepositoryOwnersFile.count).to eq(0)
     RepositoryOwnersFile.synchronize(repo_name)
-    expect(RepositoryOwnersFile.count).to eq(1)
+    expect(RepositoryOwnersFile.count).to eq(2)
 
-    owners_file = RepositoryOwnersFile.first!
+    owners_files = RepositoryOwnersFile.all.order("LENGTH(path_name) ASC")
+    owners_file = owners_files.first!
     expect(owners_file.repository_name).to eq(repo_name)
-    expect(owners_file.path_name).to eq("OWNERS")
+    expect(owners_file.path_name).to eq("/OWNERS")
     expect(owners_file.content).to eq("@Pardot/bread\n")
+
+    expect(owners_files.pluck(:path_name)).to eq(["/OWNERS", "/cookbooks/pardot_mysql/OWNERS"])
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/search/code?q=in:path%20filename:OWNERS%20repo:#{repo_name}")
       .to_return(body: JSON.dump(items: []), headers: { "Content-Type" => "application/json" })

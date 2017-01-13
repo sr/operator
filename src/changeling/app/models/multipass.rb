@@ -89,6 +89,16 @@ class Multipass < ActiveRecord::Base
     repository.owners
   end
 
+  # Returns a nested Array with one element per directory affected by this pull
+  # request, and the GitHub team(s) that owns them.
+  def owners
+    repository_pull_request.owners
+  end
+
+  def teams
+    repository_pull_request.teams
+  end
+
   def repository_owners_file_url
     [
       Changeling.config.github_url,
@@ -97,6 +107,11 @@ class Multipass < ActiveRecord::Base
       Changeling.config.repository_owners_file_branch || "master",
       Repository::OWNERS_FILENAME
     ].join("/")
+  end
+
+  def components_owners_enabled?
+    Changeling.config.component_owners_review_enabled
+      .include?(repository_name)
   end
 
   def repository_owners_enabled?

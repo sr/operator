@@ -28,6 +28,14 @@ class RepositoryPullRequest
     @multipass.pull_request_number
   end
 
+  def repository_full_name
+    @multipass.repository_name
+  end
+
+  def repository_organization
+    @multipass.repository_name.split("/").first
+  end
+
   def repository_name
     @multipass.repository_name.split("/").last
   end
@@ -36,6 +44,55 @@ class RepositoryPullRequest
     url = URI(@multipass.reference_url)
     url.path = url.path.split("/")[0, 3].join("/")
     url.to_s
+  end
+
+  def reload
+    owners_collection.load
+    self
+  end
+
+  # Returns an Array of all the OWNERS files covering files being changed in
+  # this pull request
+  def owners_files
+    files = Set.new([])
+    directories = {}
+
+    repository.owners_files.each do |file|
+      directories[File.dirname(file.path_name)] = file
+    end
+
+    if directories.empty?
+      return []
+    end
+
+    # If the pull request doesn't have any change, return the root OWNERS file,
+    # or an empty Array if there is none
+    if @multipass.changed_files.empty?
+      return Array(directories["/"])
+    end
+
+    @multipass.changed_files.each do |file|
+      file.ascend do |path|
+        dirname = path.dirname.to_s
+
+        if directories.key?(dirname)
+          files.add(directories.fetch(dirname))
+        end
+      end
+    end
+
+    files.to_a
+  end
+
+  # Returns an Array of teams that own components affected by this pull request
+  def teams
+    owners_collection.teams
+  end
+
+  # Return the Array of team members, one per OWNERS file that is relevant to
+  # the files changed in this pull request
+  def owners
+    owners_collection.users
   end
 
   def github_url
@@ -48,7 +105,8 @@ class RepositoryPullRequest
     end
 
     synchronize_github_pull_request
-    unless @multipass.merged?
+
+    if !@multipass.merged?
       synchronize_github_reviewers
       synchronize_github_statuses
       synchronize_ticket
@@ -65,6 +123,10 @@ class RepositoryPullRequest
   end
 
   private
+
+  def owners_collection
+    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
+  end
 
   def synchronize_github_pull_request
     pull_request = github_client.pull_request(
@@ -90,12 +152,13 @@ class RepositoryPullRequest
       PullRequestFile.where(multipass_id: @multipass.id).delete_all
 
       files.each do |file|
-        PullRequestFile.create!(
+        pull_request_file = PullRequestFile.find_or_initialize_by(
           multipass_id: @multipass.id,
           filename: "/" + file.filename,
           state: file.status,
-          patch: file.patch
+          patch: file.patch || ""
         )
+        pull_request_file.save
       end
     end
   end

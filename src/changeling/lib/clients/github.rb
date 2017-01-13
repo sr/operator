@@ -29,6 +29,14 @@ module Clients
       @client.orgs.map { |o| o[:login] }.include? "heroku"
     end
 
+    def organization_teams(organization)
+      @client.organization_teams(organization)
+    end
+
+    def team_members2(team_id)
+      @client.team_members(team_id)
+    end
+
     # Returns an Array of users that are members of the given organization's teams
     def team_members(organization, team_slugs)
       team_ids = {}
