@@ -84,7 +84,7 @@ class PardotComplianceStatus
     elsif !peer_reviewed?
       if @multipass.repository_owners_enabled?
         if @multipass.components_owners_enabled?
-          "Review by affected components owners is incomplete"
+          "Review by one or more component(s) owner(s) is missing"
         else
           "Peer review by a repository owner is missing"
         end
