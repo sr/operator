@@ -46,6 +46,11 @@ class RepositoryPullRequest
     url.to_s
   end
 
+  def reload
+    owners_collection.load
+    self
+  end
+
   # Returns an Array of all the OWNERS files covering files being changed in
   # this pull request
   def owners_files
@@ -79,50 +84,15 @@ class RepositoryPullRequest
     files.to_a
   end
 
+  # Returns an Array of teams that own components affected by this pull request
+  def teams
+    owners_collection.teams
+  end
+
   # Return the Array of team members, one per OWNERS file that is relevant to
   # the files changed in this pull request
   def owners
-    # Cache of all GitHub teams and their members referenced across OWNERS files
-    github_team_ids = {}
-    github_teams = {}
-
-    # Fetch all teams for this repository's organization
-    github_client.organization_teams(repository_organization).each do |team|
-      github_team_ids["#{repository_organization}/#{team.slug}"] = team.id
-    end
-
-    # Parse all OWNERS files and for load the referenced teams and their members,
-    # returning the resulting nested Array.
-    owners_files.map do |file|
-      file = OwnersFile.new(file.content)
-      users = Set.new([])
-
-      # Load the referenced teams and their members
-      file.teams.each do |team|
-        # Ignore teams that don't belong to this repository's organization
-        if !github_team_ids.key?(team)
-          next
-        end
-
-        # Avoid fetching members of the same team twice
-        if github_teams.key?(team)
-          users.merge(github_teams.fetch(team))
-
-          next
-        end
-
-        members = Set.new([])
-
-        github_client.team_members2(github_team_ids.fetch(team)).each do |user|
-          members.add(user.login)
-        end
-
-        github_teams[team] = members
-        users.merge(members)
-      end
-
-      users.to_a
-    end
+    owners_collection.users
   end
 
   def github_url
@@ -153,6 +123,10 @@ class RepositoryPullRequest
   end
 
   private
+
+  def owners_collection
+    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
+  end
 
   def synchronize_github_pull_request
     pull_request = github_client.pull_request(

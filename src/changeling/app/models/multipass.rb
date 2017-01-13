@@ -95,6 +95,10 @@ class Multipass < ActiveRecord::Base
     repository_pull_request.owners
   end
 
+  def teams
+    repository_pull_request.teams
+  end
+
   def repository_owners_file_url
     [
       Changeling.config.github_url,

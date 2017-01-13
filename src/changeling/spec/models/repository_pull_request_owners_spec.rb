@@ -48,7 +48,23 @@ RSpec.describe RepositoryPullRequest do
     )
     stub_organization_teams("heroku", "bread": %w[alindeman sr], "tools": %w[ys])
 
-    expect(@pull_request.owners).to eq([%w[alindeman sr ys]])
+    expect(@pull_request.reload.owners).to eq([%w[alindeman sr ys]])
+  end
+
+  it "returns the list of teams that owns components changed by this pull request" do
+    expect(@pull_request.teams).to eq([])
+
+    RepositoryOwnersFile.create!(
+      repository_name: @multipass.repository_name,
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/ops"
+    )
+    stub_organization_teams("heroku", "ops": %w[alindeman sr])
+
+    expect(@pull_request.reload.teams.size).to eq(1)
+    team_1 = @pull_request.teams[0]
+    expect(team_1.slug).to eq("heroku/ops")
+    expect(team_1.url).to eq("#{Changeling.config.github_url}/orgs/heroku/teams/ops")
   end
 
   it "returns the OWNERS files relevant for the pull request" do
@@ -141,27 +157,27 @@ RSpec.describe RepositoryPullRequest do
       patch: "+ exit 1"
     )
 
-    expect(@pull_request.owners).to eq([])
+    expect(@pull_request.reload.owners).to eq([])
 
     RepositoryOwnersFile.create!(
       repository_name: @multipass.repository_name,
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
-    expect(@pull_request.owners).to eq([team_ops])
+    expect(@pull_request.reload.owners).to eq([team_ops])
 
     RepositoryOwnersFile.create!(
       repository_name: @multipass.repository_name,
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/dba"
     )
-    expect(@pull_request.owners).to eq([team_ops, team_dba])
+    expect(@pull_request.reload.owners).to eq([team_ops, team_dba])
 
     RepositoryOwnersFile.create!(
       repository_name: @multipass.repository_name,
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
     )
-    expect(@pull_request.owners).to eq([team_ops, team_dba, team_bread])
+    expect(@pull_request.reload.owners).to eq([team_ops, team_dba, team_bread])
   end
 end

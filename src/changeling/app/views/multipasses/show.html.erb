@@ -57,11 +57,11 @@
     <%- if !@multipass.peer_reviewed? %>
       <%- if @multipass.repository_owners_enabled? %>
         <%- if @multipass.components_owners_enabled? %>
-          <%- teams = @multipass.required_review_teams %>
+          <%- teams = @multipass.teams %>
           <%- if teams.size == 1 %>
             <li>Review by a member of the <%= link_to "@#{teams[0].slug}", teams[0].url %> team is required</li>
           <%- else %>
-            <li>Review by a member of the fellowing teams is needed: <%= @multipass.required_review_teams.map { |t| link_to "@#{t.slug}", t.url }.join(",") %></li>
+            <li>Review by a member of the fellowing teams is needed: <% @multipass.teams.map { |t| %><%= link_to "@#{t.slug}", t.url %> <% } %></li>
           <%- end %>
         <% else %>
           <li>The pull request has not been reviewed by one of the repository owner. See the <%= link_to "OWNERS file", @multipass.repository_owners_file_url %> for a list of teams that can review this change</li>
