@@ -3,9 +3,9 @@ resource "github_repository" "ansible" {
   description   = "Basic Ansible Plays to complement other Ops tools."
   homepage_url  = ""
   private       = true
-  has_issues    = true
+  has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "ansible_service-accounts-read-only" {
@@ -32,5 +32,5 @@ resource "github_branch_protection" "ansible_master" {
 
   include_admins = true
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }
