@@ -24,7 +24,7 @@ resource "github_branch_protection" "blue-mesh_master" {
   repository = "${github_repository.blue-mesh.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = false
   contexts       = ["compliance"]
 }
