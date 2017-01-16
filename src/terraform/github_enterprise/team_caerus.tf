@@ -28,7 +28,6 @@ resource "github_team_membership" "caerus_mei-mccullar" {
   role     = "maintainer"
 }
 
-
 resource "github_team_membership" "caerus_arnaud-thabot" {
   team_id  = "${github_team.caerus.id}"
   username = "arnaud-thabot"
