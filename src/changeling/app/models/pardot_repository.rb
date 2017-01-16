@@ -4,14 +4,17 @@ class PardotRepository
   # repository configured here.
   CHANGELING = "heroku/changeling".freeze
 
+  ANSIBLE = "Pardot/ansible".freeze
+  BLUE_MESH = "Pardot/blue-mesh".freeze
   BREAD = "Pardot/bread".freeze
   CHEF = "Pardot/chef".freeze
   PARDOT = "Pardot/pardot".freeze
-  ANSIBLE = "Pardot/ansible".freeze
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
   TEST_STATUS = "Test Jobs".freeze
   FINAL_STATUS = "Final Jobs".freeze
+
+  COMPLIANT_REPOSITORIES = [ANSIBLE, BLUE_MESH, BREAD, CHEF, PARDOT].freeze
 
   def initialize(nwo)
     @name_with_owner = nwo
@@ -21,14 +24,10 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when BREAD
+    when ANSIBLE, BLUE_MESH, BREAD
       [TEST_STATUS]
-    when PARDOT
+    when CHEF, PARDOT
       [TEST_STATUS, FINAL_STATUS]
-    when CHEF
-      [TEST_STATUS, FINAL_STATUS]
-    when ANSIBLE
-      [TEST_STATUS]
     when CHANGELING
       ["ci/bazel", "ci/travis"]
     else
@@ -46,20 +45,12 @@ class PardotRepository
   end
 
   def ticket_reference_required?
-    if Changeling.config.pardot_rollout_phase1_enabled?
-      [ANSIBLE, BREAD, PARDOT, CHEF].include?(name_with_owner)
-    else
-      [BREAD, CHANGELING].include?(name_with_owner)
-    end
+    true
   end
 
   # Do not create commit statuses for now.
   def update_github_commit_status?
-    if Changeling.config.pardot_rollout_phase1_enabled?
-      [ANSIBLE, BREAD, PARDOT, CHEF].include?(name_with_owner)
-    else
-      [BREAD].include?(name_with_owner)
-    end
+    COMPLIANT_REPOSITORIES.include?(name_with_owner)
   end
 
   def participating?

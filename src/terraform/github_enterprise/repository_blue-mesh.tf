@@ -5,7 +5,7 @@ resource "github_repository" "blue-mesh" {
   private       = false
   has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "blue-mesh_developers" {
@@ -24,7 +24,7 @@ resource "github_branch_protection" "blue-mesh_master" {
   repository = "${github_repository.blue-mesh.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }

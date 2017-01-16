@@ -195,7 +195,7 @@ RSpec.describe Multipass, :type => :model do
 
     it "does not queue a job when commit status are disabled for the repo" do
       Changeling.config.pardot = true
-      multipass = Fabricate(:multipass, reference_url: "https://git/Pardot/pardot/pull/1")
+      multipass = Fabricate(:multipass, reference_url: "https://git/Pardot/changeling/pull/1")
       expect(GitHubCommitStatusWorker).not_to receive(:perform_later)
       multipass.update!(testing: true)
     end
