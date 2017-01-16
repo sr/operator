@@ -4,8 +4,8 @@ resource "github_team" "caerus" {
   privacy     = "closed"
 }
 
-resource "github_team_membership" "caerus_andy-fischer" {
+resource "github_team_membership" "caerus_nathan-maphet" {
   team_id  = "${github_team.caerus.id}"
-  username = "andy-fischer"
-  role     = "member"
+  username = "nathan-maphet"
+  role     = "maintainer"
 }
