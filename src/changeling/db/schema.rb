@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170112234620) do
+ActiveRecord::Schema.define(version: 20170117143955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20170112234620) do
     t.text     "hostname",   null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["hostname"], name: "index_github_installations_on_hostname", unique: true, using: :btree
   end
 
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
