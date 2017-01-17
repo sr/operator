@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170106072952) do
+ActiveRecord::Schema.define(version: 20170112234620) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,6 +52,12 @@ ActiveRecord::Schema.define(version: 20170106072952) do
     t.index ["app_name"], name: "index_events_on_app_name", using: :btree
     t.index ["created_at"], name: "index_events_on_created_at", using: :btree
     t.index ["user_id"], name: "index_events_on_user_id", using: :btree
+  end
+
+  create_table "github_installations", force: :cascade do |t|
+    t.text     "hostname",   null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -96,6 +102,19 @@ ActiveRecord::Schema.define(version: 20170106072952) do
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
     t.index ["multipass_id", "filename"], name: "index_pull_request_files_on_multipass_id_and_filename", unique: true, using: :btree
+  end
+
+  create_table "repositories", force: :cascade do |t|
+    t.integer  "github_installation_id", null: false
+    t.integer  "github_id",              null: false
+    t.integer  "github_owner_id",        null: false
+    t.text     "owner",                  null: false
+    t.text     "name",                   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.datetime "deleted_at"
+    t.index ["github_installation_id", "github_owner_id", "github_id"], name: "repositories_github_ids_unique_idx", unique: true, using: :btree
+    t.index ["github_installation_id", "owner", "name"], name: "repositories_github_names_unique_idx", unique: true, using: :btree
   end
 
   create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -147,6 +166,7 @@ ActiveRecord::Schema.define(version: 20170106072952) do
   end
 
   add_foreign_key "peer_reviews", "multipasses", primary_key: "uuid"
+  add_foreign_key "repositories", "github_installations"
   add_foreign_key "ticket_references", "multipasses", primary_key: "uuid"
   add_foreign_key "ticket_references", "tickets"
 end
