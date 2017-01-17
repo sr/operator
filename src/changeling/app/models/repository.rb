@@ -74,30 +74,26 @@ class Repository
 
       owners_files << RepositoryOwnersFile.new(
         repository_id: repository.id,
-        repository_name: @repo.name_with_owner,
         path_name: path_name,
         content: content
       )
     end
 
     RepositoryOwnersFile.transaction do
-      RepositoryOwnersFile.where(repository_name: @repo.name_with_owner).delete_all
+      RepositoryOwnersFile.where(repository_id: github_repository.id).delete_all
       owners_files.map(&:save!)
     end
   end
 
   # Returns all OWNERS files included in this repository
   def owners_files
-    RepositoryOwnersFile.where(repository_name: @repo.name_with_owner)
+    github_repository.repository_owners_files
   end
 
   # Returns an Array of GitHub users referenced in the OWNERS file of this
   # repository, either by their username or through a team they belong to.
   def owners
-    owners_file = RepositoryOwnersFile.find_by(
-      repository_name: @repo.name_with_owner,
-      path_name: "/#{OWNERS_FILENAME}"
-    )
+    owners_file = owners_files.find_by(path_name: "/#{OWNERS_FILENAME}")
 
     if owners_file.nil?
       return []
@@ -144,5 +140,11 @@ class Repository
 
   def team
     @repo.team
+  end
+
+  private
+
+  def github_repository
+    GithubRepository.find_by!(owner: organization, name: name)
   end
 end

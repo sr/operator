@@ -23,6 +23,13 @@ describe ComplianceStatus, "pardot" do
       reference_url: reference_url
     )
     @multipass.create_ticket_reference!(ticket: ticket)
+    github_install = GithubInstallation.create!(hostname: Changeling.config.github_hostname)
+    @repository = github_install.repositories.create!(
+      github_id: 1,
+      github_owner_id: 1,
+      owner: "heroku",
+      name: "changeling",
+    )
     @user = Fabricate(:user)
 
     stub_organization_teams("heroku", {})
@@ -102,7 +109,7 @@ describe ComplianceStatus, "pardot" do
     Changeling.config.repository_owners_review_required = [@multipass.repository_name]
     @multipass.peer_reviews.destroy_all
     @multipass.pull_request_files.destroy_all
-    RepositoryOwnersFile.delete_all
+    @repository.repository_owners_files.delete_all
 
     stub_organization_teams("heroku", {})
 
@@ -110,8 +117,7 @@ describe ComplianceStatus, "pardot" do
       @multipass.complete?
     end.to raise_error(Repository::OwnersError)
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread\n@heroku/tools\n",
     )
@@ -157,7 +163,7 @@ describe ComplianceStatus, "pardot" do
     Changeling.config.component_owners_review_enabled = [@multipass.repository_name]
     @multipass.peer_reviews.destroy_all
     @multipass.pull_request_files.destroy_all
-    RepositoryOwnersFile.delete_all
+    @repository.repository_owners_files.delete_all
 
     stub_organization_teams(
       "heroku",
@@ -186,18 +192,15 @@ describe ComplianceStatus, "pardot" do
       @multipass.peer_reviewed?
     end.to raise_error(Repository::OwnersError)
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/dba"
     )
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
     )

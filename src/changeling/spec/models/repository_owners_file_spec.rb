@@ -11,7 +11,7 @@ RSpec.describe RepositoryOwnersFile do
     repo_name = PardotRepository::CHEF
     org_name = repo_name.split("/")[0]
 
-    @github_install.repositories.create!(
+    repo = @github_install.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: org_name,
@@ -56,7 +56,7 @@ RSpec.describe RepositoryOwnersFile do
 
     owners_files = RepositoryOwnersFile.all.order("LENGTH(path_name) ASC")
     owners_file = owners_files.first!
-    expect(owners_file.repository_name).to eq(repo_name)
+    expect(owners_file.repository_id).to eq(repo.id)
     expect(owners_file.path_name).to eq("/OWNERS")
     expect(owners_file.content).to eq("@Pardot/bread\n")
 

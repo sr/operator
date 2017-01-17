@@ -13,6 +13,13 @@ RSpec.describe RepositoryPullRequest do
       tests_state: RepositoryCommitStatus::SUCCESS,
       reference_url: reference_url
     )
+    github_install = GithubInstallation.create!(hostname: Changeling.config.github_hostname)
+    @repository = github_install.repositories.create!(
+      github_id: 1,
+      github_owner_id: 1,
+      owner: "heroku",
+      name: "changeling"
+    )
     @pull_request = RepositoryPullRequest.new(@multipass)
 
     Changeling.config.repository_owners_review_required = [@pull_request.repository_full_name]
@@ -41,8 +48,7 @@ RSpec.describe RepositoryPullRequest do
   it "returns the repository owners if the pull request has no changes" do
     expect(@pull_request.owners).to eq([])
 
-    RepositoryOwnersFile.create!(
-      repository_name: @pull_request.repository_full_name,
+    @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@pardot/boomtown\n@heroku/bread\n@heroku/tools\n",
     )
@@ -54,8 +60,7 @@ RSpec.describe RepositoryPullRequest do
   it "returns the list of teams that owns components changed by this pull request" do
     expect(@pull_request.teams).to eq([])
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
@@ -70,20 +75,17 @@ RSpec.describe RepositoryPullRequest do
   it "returns the OWNERS files relevant for the pull request" do
     expect(@pull_request.owners_files).to eq([])
 
-    mysql = RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    mysql = @repository.repository_owners_files.create!(
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: ""
     )
     expect(@pull_request.owners_files).to eq([])
 
-    root = RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    root = @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: ""
     )
-    scripts = RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    scripts = @repository.repository_owners_files.create!(
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: ""
     )
@@ -159,22 +161,19 @@ RSpec.describe RepositoryPullRequest do
 
     expect(@pull_request.reload.owners).to eq([])
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
     expect(@pull_request.reload.owners).to eq([team_ops])
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/dba"
     )
     expect(@pull_request.reload.owners).to eq([team_ops, team_dba])
 
-    RepositoryOwnersFile.create!(
-      repository_name: @multipass.repository_name,
+    @repository.repository_owners_files.create!(
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
     )
