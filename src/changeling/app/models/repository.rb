@@ -35,6 +35,14 @@ class Repository
   end
 
   def synchronize_owners_files
+    # The GitHub search API returns empty results when the search backend is
+    # unavailable. To avoid syncing bad data, we first perform a query that is
+    # known to always return results and abort the synchronization process if it
+    # looks like the API is having availability issues.
+    if @github.search_code("user:#{organization} changeling").total_count == 0
+      return
+    end
+
     owners_files = []
 
     query = "in:path filename:#{OWNERS_FILENAME} repo:#{@repo.name_with_owner}"

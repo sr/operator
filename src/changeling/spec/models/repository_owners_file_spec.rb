@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe RepositoryOwnersFile do
   it "synchronizes OWNERS files using the GitHub API" do
     repo_name = PardotRepository::CHEF
+    org_name = repo_name.split("/")[0]
 
     owners = {
       type: "file",
@@ -24,6 +25,9 @@ RSpec.describe RepositoryOwnersFile do
         path: "src/changeling/spec/owners_file_spec.rb"
       }
     ]
+
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/search/code?q=user:#{org_name}%20changeling")
+      .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{repo_name}/contents/OWNERS")
       .to_return(body: JSON.dump(owners), headers: { "Content-Type" => "application/json" })
