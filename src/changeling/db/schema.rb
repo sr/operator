@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170117143955) do
+ActiveRecord::Schema.define(version: 20170117144231) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -134,6 +134,8 @@ ActiveRecord::Schema.define(version: 20170117143955) do
     t.text     "content",         null: false
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+    t.integer  "repository_id"
+    t.index ["repository_id", "path_name"], name: "index_repository_owners_files_on_repository_id_and_path_name", unique: true, using: :btree
     t.index ["repository_name", "path_name"], name: "index_repository_owners_files_on_repository_name_and_path_name", unique: true, using: :btree
   end
 
@@ -168,6 +170,7 @@ ActiveRecord::Schema.define(version: 20170117143955) do
 
   add_foreign_key "peer_reviews", "multipasses", primary_key: "uuid"
   add_foreign_key "repositories", "github_installations"
+  add_foreign_key "repository_owners_files", "repositories"
   add_foreign_key "ticket_references", "multipasses", primary_key: "uuid"
   add_foreign_key "ticket_references", "tickets"
 end

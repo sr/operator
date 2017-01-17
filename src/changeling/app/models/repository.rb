@@ -30,6 +30,10 @@ class Repository
     @repo.name_with_owner
   end
 
+  def name
+    @repo.name_with_owner.split("/")[1]
+  end
+
   def organization
     @repo.name_with_owner.split("/")[0]
   end
@@ -42,6 +46,8 @@ class Repository
     if @github.search_code("user:#{organization} changeling").total_count == 0
       return
     end
+
+    repository = GithubRepository.find_by!(owner: organization, name: name)
 
     owners_files = []
 
@@ -67,6 +73,7 @@ class Repository
         end
 
       owners_files << RepositoryOwnersFile.new(
+        repository_id: repository.id,
         repository_name: @repo.name_with_owner,
         path_name: path_name,
         content: content

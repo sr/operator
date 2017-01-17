@@ -1,9 +1,22 @@
 require "rails_helper"
 
 RSpec.describe RepositoryOwnersFile do
+  before(:each) do
+    @github_install = GithubInstallation.create!(
+      hostname: Changeling.config.github_hostname
+    )
+  end
+
   it "synchronizes OWNERS files using the GitHub API" do
     repo_name = PardotRepository::CHEF
     org_name = repo_name.split("/")[0]
+
+    @github_install.repositories.create!(
+      github_id: 1,
+      github_owner_id: 1,
+      owner: org_name,
+      name: repo_name.split("/")[1]
+    )
 
     owners = {
       type: "file",
