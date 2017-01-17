@@ -202,6 +202,7 @@ class RepositoryPullRequest
   def update_commit_status(commit_status)
     attributes = {
       github_repository_id: commit_status.repository_id,
+      repository_id: github_repository.id,
       sha: commit_status.sha,
       context: commit_status.context
     }
@@ -289,6 +290,13 @@ class RepositoryPullRequest
 
   def github_client
     @github_client ||= Clients::GitHub.new(Changeling.config.github_service_account_token)
+  end
+
+  def github_repository
+    GithubRepository.find_by!(
+      owner: repository_organization,
+      name: repository_name
+    )
   end
 
   def repository

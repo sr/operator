@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170117151241) do
+ActiveRecord::Schema.define(version: 20170117161924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,7 +125,9 @@ ActiveRecord::Schema.define(version: 20170117151241) do
     t.integer  "github_repository_id", null: false
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+    t.integer  "repository_id"
     t.index ["github_repository_id", "sha", "context"], name: "repository_commit_statuses_unique_idx", unique: true, using: :btree
+    t.index ["repository_id", "sha", "context"], name: "repository_commit_statuses_unique_idx2", unique: true, using: :btree
   end
 
   create_table "repository_owners_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -168,6 +170,7 @@ ActiveRecord::Schema.define(version: 20170117151241) do
 
   add_foreign_key "peer_reviews", "multipasses", primary_key: "uuid"
   add_foreign_key "repositories", "github_installations"
+  add_foreign_key "repository_commit_statuses", "repositories"
   add_foreign_key "repository_owners_files", "repositories"
   add_foreign_key "ticket_references", "multipasses", primary_key: "uuid"
   add_foreign_key "ticket_references", "tickets"

@@ -12,6 +12,13 @@ RSpec.describe RepositoryPullRequest do
       release_id: "deadbeef",
       testing: nil
     )
+    github_install = GithubInstallation.create!(hostname: Changeling.config.github_hostname)
+    @repository = github_install.repositories.create!(
+      github_id: 1,
+      github_owner_id: 1,
+      owner: "heroku",
+      name: "changeling"
+    )
     @repository_pull_request = RepositoryPullRequest.new(@multipass)
   end
 
@@ -280,6 +287,7 @@ RSpec.describe RepositoryPullRequest do
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
       expect(status.state).to eq(RepositoryCommitStatus::SUCCESS)
+      expect(status.repository_id).to eq(@repository.id)
 
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::FAILURE, context: "ci/travis" }
