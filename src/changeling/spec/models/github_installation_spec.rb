@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe GithubInstallation do
   before(:each) do
-    GithubInstallation.create!(hostname: Changeling.config.github_hostname)
     @github_install = GithubInstallation.current
   end
 
