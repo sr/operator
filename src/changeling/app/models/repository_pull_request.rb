@@ -201,7 +201,6 @@ class RepositoryPullRequest
 
   def update_commit_status(commit_status)
     attributes = {
-      github_repository_id: commit_status.repository_id,
       repository_id: github_repository.id,
       sha: commit_status.sha,
       context: commit_status.context
@@ -242,10 +241,10 @@ class RepositoryPullRequest
   end
 
   def recalculate_testing_status
-    required_statuses = RepositoryCommitStatus.where(
+    required_statuses = github_repository.repository_commit_statuses.where(
       sha: @multipass.release_id,
       context: repository.required_testing_statuses
-    ).to_a
+    ).all.to_a
 
     if required_statuses.length < repository.required_testing_statuses.length
       # At least one required status hasn't been reported yet
