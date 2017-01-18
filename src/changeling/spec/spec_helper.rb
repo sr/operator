@@ -15,6 +15,11 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before(:all) do
+    GithubInstallation.find_or_create_by!(hostname: "git.dev.pardot.com")
+    GithubInstallation.find_or_create_by!(hostname: "github.com")
+  end
+
   config.after(:each) do
     Changeling.config.pardot = false
   end
