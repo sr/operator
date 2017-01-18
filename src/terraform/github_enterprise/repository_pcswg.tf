@@ -13,3 +13,15 @@ resource "github_team_repository" "pcswg_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "pcswg_site-reliability-engineers" {
+  repository = "${github_repository.pcswg.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "pcswg_engineering-managers" {
+  repository = "${github_repository.pcswg.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

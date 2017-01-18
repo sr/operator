@@ -32,11 +32,23 @@ resource "github_team_repository" "chef_developers" {
   permission = "push"
 }
 
+resource "github_team_repository" "chef_site-reliability-engineers" {
+  repository = "${github_repository.chef.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "chef_engineering-managers" {
+  repository = "${github_repository.chef.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "chef_master" {
   repository = "${github_repository.chef.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = true
   contexts       = ["compliance"]
 }

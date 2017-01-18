@@ -19,3 +19,15 @@ resource "github_team_repository" "Discovery-Agent_service-accounts-read-only" {
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "Discovery-Agent_site-reliability-engineers" {
+  repository = "${github_repository.Discovery-Agent.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "Discovery-Agent_engineering-managers" {
+  repository = "${github_repository.Discovery-Agent.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

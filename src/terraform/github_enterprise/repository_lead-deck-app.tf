@@ -25,3 +25,15 @@ resource "github_team_repository" "lead-deck-app_service-accounts-read-only" {
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "lead-deck-app_site-reliability-engineers" {
+  repository = "${github_repository.lead-deck-app.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "lead-deck-app_engineering-managers" {
+  repository = "${github_repository.lead-deck-app.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
