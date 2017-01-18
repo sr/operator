@@ -25,3 +25,9 @@ resource "github_team_repository" "all-the-bacon_core-production-security" {
   team_id    = "${github_team.core-production-security.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "all-the-bacon_service-accounts-write-only" {
+  repository = "${github_repository.all-the-bacon.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

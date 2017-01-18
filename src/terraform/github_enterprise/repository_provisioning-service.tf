@@ -19,3 +19,9 @@ resource "github_team_repository" "provisioning-service_service-accounts-read-on
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "provisioning-service_service-accounts-write-only" {
+  repository = "${github_repository.provisioning-service.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

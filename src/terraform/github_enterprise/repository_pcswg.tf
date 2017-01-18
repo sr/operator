@@ -13,3 +13,9 @@ resource "github_team_repository" "pcswg_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "pcswg_service-accounts-write-only" {
+  repository = "${github_repository.pcswg.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

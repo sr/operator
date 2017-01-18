@@ -13,3 +13,9 @@ resource "github_team_repository" "insert_ignore_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "insert_ignore_service-accounts-write-only" {
+  repository = "${github_repository.insert_ignore.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

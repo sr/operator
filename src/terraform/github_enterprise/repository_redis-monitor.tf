@@ -13,3 +13,9 @@ resource "github_team_repository" "redis-monitor_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "redis-monitor_service-accounts-write-only" {
+  repository = "${github_repository.redis-monitor.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

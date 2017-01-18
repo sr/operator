@@ -52,7 +52,13 @@ resource "github_repository" "#{safe_name}" {
 
 EOS
 
-      Octokit.repository_teams(repo.id).each do |team|
+      teams = Octokit.repository_teams(repo.id)
+
+      if !teams.detect { |t| t.slug == "service-accounts-write-only" }
+        teams << Struct.new(:slug, :permission).new("service-accounts-write-only", "push")
+      end
+
+      teams.each do |team|
         fp.puts <<-EOS
 resource "github_team_repository" "#{safe_name}_#{team.slug}" {
   repository = "\${github_repository.#{safe_name}.name}"

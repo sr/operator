@@ -25,3 +25,9 @@ resource "github_team_repository" "csrf-php_read-only-users" {
   team_id    = "${github_team.read-only-users.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "csrf-php_service-accounts-write-only" {
+  repository = "${github_repository.csrf-php.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

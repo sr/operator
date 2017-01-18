@@ -19,3 +19,9 @@ resource "github_team_repository" "kendo_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "kendo_service-accounts-write-only" {
+  repository = "${github_repository.kendo.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}
