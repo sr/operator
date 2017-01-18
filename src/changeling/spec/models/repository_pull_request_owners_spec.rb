@@ -13,8 +13,7 @@ RSpec.describe RepositoryPullRequest do
       tests_state: RepositoryCommitStatus::SUCCESS,
       reference_url: reference_url
     )
-    github_install = GithubInstallation.create!(hostname: Changeling.config.github_hostname)
-    @repository = github_install.repositories.create!(
+    @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: "heroku",

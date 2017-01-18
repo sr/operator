@@ -12,8 +12,7 @@ RSpec.describe RepositoryPullRequest do
       release_id: "deadbeef",
       testing: nil
     )
-    github_install = GithubInstallation.create!(hostname: Changeling.config.github_hostname)
-    @repository = github_install.repositories.create!(
+    @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: "heroku",

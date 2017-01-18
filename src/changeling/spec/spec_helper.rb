@@ -16,7 +16,8 @@ RSpec.configure do |config|
   end
 
   config.before(:all) do
-    GithubInstallation.find_or_create_by!(hostname: Changeling.config.github_hostname)
+    GithubInstallation.find_or_create_by!(hostname: "git.dev.pardot.com")
+    GithubInstallation.find_or_create_by!(hostname: "github.com")
   end
 
   config.after(:each) do
