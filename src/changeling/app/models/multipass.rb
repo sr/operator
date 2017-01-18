@@ -3,6 +3,9 @@ require_relative "./validators/sre_approver_is_in_sre"
 # A change request in the system
 class Multipass < ActiveRecord::Base
   audited
+
+  belongs_to :github_repository, foreign_key: "repository_id"
+
   has_many :events
   has_many :peer_reviews
   has_many :pull_request_files

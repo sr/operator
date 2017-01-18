@@ -29,15 +29,15 @@ class RepositoryPullRequest
   end
 
   def repository_full_name
-    @multipass.repository_name
+    "#{github_repository.owner}/#{github_repository.name}"
   end
 
   def repository_organization
-    @multipass.repository_name.split("/").first
+    github_repository.owner
   end
 
   def repository_name
-    @multipass.repository_name.split("/").last
+    github_repository.name
   end
 
   def repository_url
@@ -292,10 +292,14 @@ class RepositoryPullRequest
   end
 
   def github_repository
-    GithubRepository.find_by!(
-      owner: repository_organization,
-      name: repository_name
-    )
+    return @github_repository if defined?(@github_repository)
+
+    if !@multipass.github_repository
+      Raven.extra_context multipass_id: @multipass.id
+      raise ActiveRecord::RecordNotFound, "multipass does not have an associated repository"
+    end
+
+    @github_repository = @multipass.github_repository
   end
 
   def repository

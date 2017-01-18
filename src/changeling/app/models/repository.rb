@@ -47,8 +47,6 @@ class Repository
       return
     end
 
-    repository = GithubRepository.find_by!(owner: organization, name: name)
-
     owners_files = []
 
     query = "in:path filename:#{OWNERS_FILENAME} repo:#{@repo.name_with_owner}"
@@ -73,7 +71,7 @@ class Repository
         end
 
       owners_files << RepositoryOwnersFile.new(
-        repository_id: repository.id,
+        repository_id: github_repository.id,
         path_name: path_name,
         content: content
       )
@@ -145,6 +143,6 @@ class Repository
   private
 
   def github_repository
-    GithubRepository.find_by!(owner: organization, name: name)
+    @github_repository ||= GithubRepository.find_by!(owner: organization, name: name)
   end
 end

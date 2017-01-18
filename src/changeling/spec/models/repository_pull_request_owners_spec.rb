@@ -8,16 +8,17 @@ RSpec.describe RepositoryPullRequest do
       Changeling.config.github_hostname,
       PardotRepository::CHANGELING
     )
-    @multipass = Fabricate(:multipass,
-      testing: true,
-      tests_state: RepositoryCommitStatus::SUCCESS,
-      reference_url: reference_url
-    )
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: "heroku",
       name: "changeling"
+    )
+    @multipass = Fabricate(:multipass,
+      testing: true,
+      tests_state: RepositoryCommitStatus::SUCCESS,
+      reference_url: reference_url,
+      repository_id: @repository.id
     )
     @pull_request = RepositoryPullRequest.new(@multipass)
 
