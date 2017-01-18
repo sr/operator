@@ -26,14 +26,14 @@ resource "github_team_repository" "pardot-storm_service-accounts-write-only" {
   permission = "push"
 }
 
-resource "github_team_repository" "pardot-storm_site-reliability-engineers" {
-  repository = "${github_repository.pardot-storm.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "pardot-storm_engineering-managers" {
   repository = "${github_repository.pardot-storm.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "pardot-storm_site-reliability-engineers" {
+  repository = "${github_repository.pardot-storm.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }

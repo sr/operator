@@ -32,14 +32,14 @@ resource "github_team_repository" "protobuf-schemas_read-only-users" {
   permission = "pull"
 }
 
-resource "github_team_repository" "protobuf-schemas_site-reliability-engineers" {
-  repository = "${github_repository.protobuf-schemas.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "protobuf-schemas_engineering-managers" {
   repository = "${github_repository.protobuf-schemas.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "protobuf-schemas_site-reliability-engineers" {
+  repository = "${github_repository.protobuf-schemas.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }

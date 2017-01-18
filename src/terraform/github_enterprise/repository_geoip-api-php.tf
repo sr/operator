@@ -26,14 +26,14 @@ resource "github_team_repository" "geoip-api-php_read-only-users" {
   permission = "pull"
 }
 
-resource "github_team_repository" "geoip-api-php_site-reliability-engineers" {
-  repository = "${github_repository.geoip-api-php.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "geoip-api-php_engineering-managers" {
   repository = "${github_repository.geoip-api-php.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "geoip-api-php_site-reliability-engineers" {
+  repository = "${github_repository.geoip-api-php.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }

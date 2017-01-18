@@ -26,14 +26,14 @@ resource "github_team_repository" "engagement-history-package_service-accounts-w
   permission = "push"
 }
 
-resource "github_team_repository" "engagement-history-package_site-reliability-engineers" {
-  repository = "${github_repository.engagement-history-package.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "engagement-history-package_engineering-managers" {
   repository = "${github_repository.engagement-history-package.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "engagement-history-package_site-reliability-engineers" {
+  repository = "${github_repository.engagement-history-package.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
