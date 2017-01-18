@@ -37,6 +37,10 @@ module PullRequestMethods
       end
       multipass.release_id = pull_request["pull_request"]["head"]["sha"]
       multipass.title = pull_request["pull_request"]["title"]
+      if Changeling.config.pardot?
+        multipass.merge_commit_sha = pull_request["pull_request"]["merge_commit_sha"] if pull_request["pull_request"]["merged"]
+      end
+
       multipass
     end
   end

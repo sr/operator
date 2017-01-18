@@ -38,17 +38,29 @@ module Multipass::GitHubStatuses
 
   def approve_github_commit_status!
     return unless repository && repository.participating?
-    github_client.create_success_commit_status(repository.name_with_owner, release_id, commit_status_options)
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_success_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def pending_github_commit_status!
     return unless repository && repository.participating?
-    github_client.create_pending_commit_status(repository.name_with_owner, release_id, commit_status_options)
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_pending_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def failure_github_commit_status!
     return unless repository && repository.participating?
-    github_client.create_failure_commit_status(repository.name_with_owner, release_id, commit_status_options)
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_failure_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def check_commit_statuses!

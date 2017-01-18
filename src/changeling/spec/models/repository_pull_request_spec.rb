@@ -234,14 +234,18 @@ RSpec.describe RepositoryPullRequest do
   end
 
   describe "synchronizing github pull request" do
-    it "updates the SHA to the merge commit after the PR has been merged" do
+    it "sets the merge commit SHA if present" do
       stub_jira_ticket("BREAD-1598")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
-      @multipass.synchronize
 
-      expect(@multipass.reload.release_id).to eq("abc123")
+      original_release_id = @multipass.release_id
+      @multipass.synchronize
+      @multipass.reload
+
+      expect(@multipass.release_id).to eq(original_release_id)
+      expect(@multipass.merge_commit_sha).to eq("abc123")
     end
 
     it "synchronizes changed files" do

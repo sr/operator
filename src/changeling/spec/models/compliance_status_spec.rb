@@ -76,6 +76,13 @@ describe ComplianceStatus, "pardot" do
     expect(description).to eq("Referenced ticket is not open")
   end
 
+  it "does not require a ticket to be open if the pull request has been merged" do
+    expect(@multipass.complete?).to eq(true)
+    @multipass.update!(merged: true)
+    @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
+    expect(@multipass.reload.complete?).to eq(true)
+  end
+
   it "requires the builds to be successful" do
     expect(@multipass.complete?).to eq(true)
     @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
