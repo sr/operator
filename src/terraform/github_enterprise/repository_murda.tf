@@ -19,3 +19,15 @@ resource "github_team_repository" "murda_service-accounts-read-only" {
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "murda_site-reliability-engineers" {
+  repository = "${github_repository.murda.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "murda_engineering-managers" {
+  repository = "${github_repository.murda.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

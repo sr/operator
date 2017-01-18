@@ -13,3 +13,15 @@ resource "github_team_repository" "babysitd_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "babysitd_site-reliability-engineers" {
+  repository = "${github_repository.babysitd.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "babysitd_engineering-managers" {
+  repository = "${github_repository.babysitd.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

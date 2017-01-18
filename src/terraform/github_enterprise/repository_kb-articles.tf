@@ -32,6 +32,18 @@ resource "github_team_repository" "kb-articles_service-accounts-write-only" {
   permission = "push"
 }
 
+resource "github_team_repository" "kb-articles_site-reliability-engineers" {
+  repository = "${github_repository.kb-articles.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "kb-articles_engineering-managers" {
+  repository = "${github_repository.kb-articles.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "kb-articles_master" {
   repository = "${github_repository.kb-articles.name}"
   branch     = "master"

@@ -26,6 +26,18 @@ resource "github_team_repository" "bamboo-elastic-instance_service-accounts-read
   permission = "pull"
 }
 
+resource "github_team_repository" "bamboo-elastic-instance_site-reliability-engineers" {
+  repository = "${github_repository.bamboo-elastic-instance.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "bamboo-elastic-instance_engineering-managers" {
+  repository = "${github_repository.bamboo-elastic-instance.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "bamboo-elastic-instance_develop" {
   repository = "${github_repository.bamboo-elastic-instance.name}"
   branch     = "develop"
