@@ -27,4 +27,3 @@ resource "github_team_membership" "engagement-studio_stephen-powis" {
   username = "stephen-powis"
   role     = "maintainer"
 }
-
