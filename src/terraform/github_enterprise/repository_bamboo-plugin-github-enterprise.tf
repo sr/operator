@@ -13,3 +13,15 @@ resource "github_team_repository" "bamboo-plugin-github-enterprise_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "bamboo-plugin-github-enterprise_site-reliability-engineers" {
+  repository = "${github_repository.bamboo-plugin-github-enterprise.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "bamboo-plugin-github-enterprise_engineering-managers" {
+  repository = "${github_repository.bamboo-plugin-github-enterprise.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

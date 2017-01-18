@@ -25,3 +25,15 @@ resource "github_team_repository" "swiftmailer_read-only-users" {
   team_id    = "${github_team.read-only-users.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "swiftmailer_site-reliability-engineers" {
+  repository = "${github_repository.swiftmailer.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "swiftmailer_engineering-managers" {
+  repository = "${github_repository.swiftmailer.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

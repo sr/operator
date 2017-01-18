@@ -19,3 +19,15 @@ resource "github_team_repository" "provisioning-service_service-accounts-read-on
   team_id    = "${github_team.service-accounts-read-only.id}"
   permission = "pull"
 }
+
+resource "github_team_repository" "provisioning-service_site-reliability-engineers" {
+  repository = "${github_repository.provisioning-service.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "provisioning-service_engineering-managers" {
+  repository = "${github_repository.provisioning-service.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}

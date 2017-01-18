@@ -52,7 +52,16 @@ resource "github_repository" "#{safe_name}" {
 
 EOS
 
-      Octokit.repository_teams(repo.id).each do |team|
+      teams = Octokit.repository_teams(repo.id)
+
+      admins = %w[site-reliability-engineers engineering-managers]
+      admins.each do |team|
+        if !teams.detect { |t| t.slug == team }
+          teams << Struct.new(:slug, :permission).new(team, "admin")
+        end
+      end
+
+      teams.each do |team|
         fp.puts <<-EOS
 resource "github_team_repository" "#{safe_name}_#{team.slug}" {
   repository = "\${github_repository.#{safe_name}.name}"
@@ -77,7 +86,7 @@ EOS
         if protection.required_status_checks
           fp.puts <<-EOS
 
-  include_admins = #{protection.required_status_checks.include_admins}
+  include_admins = false
   strict         = #{protection.required_status_checks.strict}
   contexts       = #{JSON.dump(protection.required_status_checks.contexts || [])}
 EOS

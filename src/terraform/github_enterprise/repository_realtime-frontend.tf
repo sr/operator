@@ -26,11 +26,23 @@ resource "github_team_repository" "realtime-frontend_service-accounts-read-only"
   permission = "pull"
 }
 
+resource "github_team_repository" "realtime-frontend_site-reliability-engineers" {
+  repository = "${github_repository.realtime-frontend.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "realtime-frontend_engineering-managers" {
+  repository = "${github_repository.realtime-frontend.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "realtime-frontend_master" {
   repository = "${github_repository.realtime-frontend.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = false
   contexts       = ["Test Jobs"]
 }
