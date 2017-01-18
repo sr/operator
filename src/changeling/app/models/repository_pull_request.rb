@@ -140,13 +140,9 @@ class RepositoryPullRequest
     )
 
     @multipass.merged = pull_request[:merged]
+    @multipass.merge_commit_sha = pull_request[:merge_commit_sha] if pull_request[:merged]
     @multipass.title = pull_request[:title]
-    @multipass.release_id = \
-      if pull_request[:merged]
-        pull_request[:merge_commit_sha]
-      else
-        pull_request[:head][:sha]
-      end
+    @multipass.release_id = pull_request[:head][:sha]
 
     PullRequestFile.transaction do
       PullRequestFile.where(multipass_id: @multipass.id).delete_all

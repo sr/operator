@@ -12,11 +12,15 @@ class PardotComplianceStatus
     to: :@default
 
   def complete?
-    @multipass.missing_mandatory_fields.empty? &&
-      !ticket_reference_missing? &&
-      referenced_ticket_open? &&
-      peer_reviewed? &&
-      tests_successful?
+    success = @multipass.missing_mandatory_fields.empty? && \
+              peer_reviewed? && \
+              tests_successful?
+
+    unless @multipass.merged?
+      success &= !ticket_reference_missing? && referenced_ticket_open?
+    end
+
+    success
   end
 
   def user_is_peer_reviewer?(user)
@@ -93,12 +97,12 @@ class PardotComplianceStatus
       end
     elsif emergency_approved?
       "Satisfied via emergency approval by #{@multipass.emergency_approver}."
+    elsif complete?
+      "Satisfied. Reviewed by #{@multipass.reviewers}."
     elsif ticket_reference_missing?
       "Ticket reference is missing"
     elsif !referenced_ticket_open?
       "Referenced ticket is not open"
-    elsif complete?
-      "Satisfied. Reviewed by #{@multipass.reviewers}."
     elsif tests_pending?
       "Awaiting automated tests results"
     elsif !tests_successful?
