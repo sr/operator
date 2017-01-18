@@ -12,15 +12,12 @@ class PardotComplianceStatus
     to: :@default
 
   def complete?
-    success = @multipass.missing_mandatory_fields.empty? && \
-              peer_reviewed? && \
-              tests_successful?
+    return false unless @multipass.missing_mandatory_fields.empty?
 
-    unless @multipass.merged?
-      success &= !ticket_reference_missing? && referenced_ticket_open?
-    end
+    # Unless merged, an open ticket reference is required
+    return false if !@multipass.merged? && (ticket_reference_missing? || !referenced_ticket_open?)
 
-    success
+    peer_reviewed? && tests_successful?
   end
 
   def user_is_peer_reviewer?(user)
