@@ -26,6 +26,18 @@ resource "github_team_repository" "bamboo-configuration_service-accounts-write-o
   permission = "push"
 }
 
+resource "github_team_repository" "bamboo-configuration_site-reliability-engineers" {
+  repository = "${github_repository.bamboo-configuration.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "bamboo-configuration_engineering-managers" {
+  repository = "${github_repository.bamboo-configuration.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "bamboo-configuration_develop" {
   repository = "${github_repository.bamboo-configuration.name}"
   branch     = "develop"

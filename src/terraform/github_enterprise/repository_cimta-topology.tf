@@ -19,3 +19,15 @@ resource "github_team_repository" "cimta-topology_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "cimta-topology_site-reliability-engineers" {
+  repository = "${github_repository.cimta-topology.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "cimta-topology_engineering-managers" {
+  repository = "${github_repository.cimta-topology.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
