@@ -90,6 +90,13 @@ describe "Receiving GitHub hooks", :type => :request do
       end
 
       it "creates multipasses for pull request opened events", :type => :webmock do
+        pull_data = decoded_fixture_data("github/pull_request_opened")
+        repo = GithubInstallation.current.repositories.create!(
+          github_id: pull_data["repository"]["id"],
+          github_owner_id: pull_data.fetch("repository").fetch("owner").fetch("id"),
+          name: pull_data["repository"]["name"],
+          owner: pull_data["repository"]["owner"]["login"],
+        )
         stub_request(:get, "https://api.github.com/repos/heroku/changeling/statuses/ffa01fcbf02757d6cae5d928c2315adbaa2ec582")
           .to_return(body: "[]", headers: { "Content-Type" => "application/json" })
         stub_request(:post, "https://api.github.com/repos/heroku/changeling/statuses/ffa01fcbf02757d6cae5d928c2315adbaa2ec582")
@@ -112,6 +119,7 @@ describe "Receiving GitHub hooks", :type => :request do
         expect(multipass.impact_probability).to eql("medium")
         expect(multipass.reference_url).to eql("https://github.com/heroku/changeling/pull/32")
         expect(multipass.audits.size).to eql(1)
+        expect(multipass.repository_id).to eq(repo.id)
         expect(multipass.audits[0].comment)
           .to eql("API: Created from webhook https://github.com/heroku/changeling/pull/32")
       end
@@ -320,7 +328,14 @@ describe "Receiving GitHub hooks", :type => :request do
     include ActiveJob::TestHelper
 
     it "enqueues a job to synchronize OWNERS files on PushEvent for the master branch" do
-      assert_enqueued_with(job: RepositoryOwnersFileSynchronizationJob, args: ["Pardot/chef"]) do
+      data = decoded_fixture_data("github/push_event")
+      repo = GithubInstallation.current.repositories.create!(
+        github_id: data.fetch("repository").fetch("id"),
+        owner: data.fetch("repository").fetch("owner").fetch("name"),
+        github_owner_id: 1,
+        name: "bread"
+      )
+      assert_enqueued_with(job: RepositorySynchronizationJob, args: [repo.id]) do
         post "/webhooks", params: fixture_data("github/push_event"),
           headers: request_headers("push")
         expect(response).to be_successful

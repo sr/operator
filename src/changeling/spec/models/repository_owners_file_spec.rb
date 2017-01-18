@@ -5,6 +5,13 @@ RSpec.describe RepositoryOwnersFile do
     repo_name = PardotRepository::CHEF
     org_name = repo_name.split("/")[0]
 
+    @repository = GithubInstallation.current.repositories.create!(
+      github_id: 1,
+      github_owner_id: 1,
+      owner: org_name,
+      name: repo_name.split("/")[1]
+    )
+
     owners = {
       type: "file",
       encoding: "base64",
@@ -38,12 +45,12 @@ RSpec.describe RepositoryOwnersFile do
       .to_return(body: JSON.dump(items: items), headers: { "Content-Type" => "application/json" })
 
     expect(RepositoryOwnersFile.count).to eq(0)
-    RepositoryOwnersFile.synchronize(repo_name)
+    @repository.synchronize
     expect(RepositoryOwnersFile.count).to eq(2)
 
     owners_files = RepositoryOwnersFile.all.order("LENGTH(path_name) ASC")
     owners_file = owners_files.first!
-    expect(owners_file.repository_name).to eq(repo_name)
+    expect(owners_file.repository_id).to eq(@repository.id)
     expect(owners_file.path_name).to eq("/OWNERS")
     expect(owners_file.content).to eq("@Pardot/bread\n")
 
@@ -51,7 +58,7 @@ RSpec.describe RepositoryOwnersFile do
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/search/code?q=in:path%20filename:OWNERS%20repo:#{repo_name}")
       .to_return(body: JSON.dump(items: []), headers: { "Content-Type" => "application/json" })
-    RepositoryOwnersFile.synchronize(repo_name)
+    @repository.synchronize
     expect(RepositoryOwnersFile.count).to eq(0)
   end
 end

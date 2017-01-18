@@ -22,9 +22,18 @@ module PullRequestMethods
     def find_or_initialize_by_pull_request(pull_request)
       repo = Repository.find(pull_request["repository"]["full_name"])
       multipass = find_by(reference_url: pull_request["pull_request"]["html_url"])
+      github_install = GithubInstallation.current
 
       unless multipass
         multipass = new_from_pull_request_team(repo.team, pull_request)
+      end
+
+      github_repo = github_install.repositories.find_by(
+        github_owner_id: pull_request.fetch("repository").fetch("owner").fetch("id"),
+        github_id: pull_request.fetch("repository").fetch("id")
+      )
+      if github_repo
+        multipass.repository_id = github_repo.id
       end
       multipass.release_id = pull_request["pull_request"]["head"]["sha"]
       multipass.title = pull_request["pull_request"]["title"]
