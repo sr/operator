@@ -10,13 +10,14 @@ class PardotRepository
   CHEF = "Pardot/chef".freeze
   INTERNAL_API = "Pardot/internal-api".freeze
   MESH = "Pardot/mesh".freeze
+  MURDOC = "Pardot/murdoc".freeze
   PARDOT = "Pardot/pardot".freeze
   TEAM_OPS = "Pardot/ops".freeze
   TEAM_DEVELOPERS = "Pardot/developers".freeze
   TEST_STATUS = "Test Jobs".freeze
   FINAL_STATUS = "Final Jobs".freeze
 
-  COMPLIANT_REPOSITORIES = [ANSIBLE, BLUE_MESH, BREAD, CHEF, INTERNAL_API, MESH, PARDOT].freeze
+  COMPLIANT_REPOSITORIES = [ANSIBLE, BLUE_MESH, BREAD, CHEF, INTERNAL_API, MESH, MURDOC, PARDOT].freeze
 
   def initialize(nwo)
     @name_with_owner = nwo
@@ -26,7 +27,7 @@ class PardotRepository
 
   def required_testing_statuses
     case name_with_owner
-    when ANSIBLE, BLUE_MESH, BREAD, INTERNAL_API, MESH
+    when ANSIBLE, BLUE_MESH, BREAD, INTERNAL_API, MESH, MURDOC
       [TEST_STATUS]
     when CHEF, PARDOT
       [TEST_STATUS, FINAL_STATUS]
