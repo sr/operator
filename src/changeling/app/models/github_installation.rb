@@ -7,14 +7,20 @@ class GithubInstallation < ApplicationRecord
 
   def synchronize
     github_client.organizations.each do |organization|
-      synchronize_organization(organization)
+      synchronize_organization(organization.login)
     end
   end
 
-  def synchronize_organization(organization)
+  def github_client
+    @github_client ||= Clients::GitHub.new(github_token)
+  end
+
+  private
+
+  def synchronize_organization(organization_name)
     repo_ids = Set.new([])
 
-    github_client.organization_repositories(organization.login).each do |org_repo|
+    github_client.organization_repositories(organization_name).each do |org_repo|
       repo_ids.add(org_repo.id)
 
       repo = repositories.find_or_initialize_by(
@@ -28,12 +34,6 @@ class GithubInstallation < ApplicationRecord
       repo.update!(deleted_at: Time.current)
     end
   end
-
-  def github_client
-    @github_client ||= Clients::GitHub.new(github_token)
-  end
-
-  private
 
   def github_token
     Changeling.config.github_service_account_token

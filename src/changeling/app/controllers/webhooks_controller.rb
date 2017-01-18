@@ -57,10 +57,16 @@ class WebhooksController < ApplicationController
   def handle_push_event
     request.body.rewind
     payload = JSON.parse(request.body.read.force_encoding("utf-8"))
-    repo_name = payload.fetch("repository").fetch("full_name")
+    owner = payload.fetch("repository").fetch("owner").fetch("name")
+    repo_id = payload.fetch("repository").fetch("id")
 
     if payload.fetch("ref", "") == MASTER_REF
-      RepositoryOwnersFileSynchronizationJob.perform_later(repo_name)
+      repo = GithubInstallation.current.repositories.find_by!(
+        owner: owner,
+        github_id: repo_id
+      )
+
+      RepositorySynchronizationJob.perform_later(repo.id)
     end
   end
 

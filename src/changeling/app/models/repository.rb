@@ -38,51 +38,6 @@ class Repository
     @repo.name_with_owner.split("/")[0]
   end
 
-  def synchronize_owners_files
-    # The GitHub search API returns empty results when the search backend is
-    # unavailable. To avoid syncing bad data, we first perform a query that is
-    # known to always return results and abort the synchronization process if it
-    # looks like the API is having availability issues.
-    if @github.search_code("user:#{organization} changeling").total_count == 0
-      return
-    end
-
-    owners_files = []
-
-    query = "in:path filename:#{OWNERS_FILENAME} repo:#{@repo.name_with_owner}"
-    results = @github.search_code(query)
-
-    results.items.each do |item|
-      if item.name != OWNERS_FILENAME
-        next
-      end
-
-      content = @github.file_content(@repo.name_with_owner, item.path, nil)
-
-      if content.empty?
-        next
-      end
-
-      path_name =
-        if item.path[0] == "/"
-          item.path
-        else
-          "/#{item.path}"
-        end
-
-      owners_files << RepositoryOwnersFile.new(
-        repository_id: github_repository.id,
-        path_name: path_name,
-        content: content
-      )
-    end
-
-    RepositoryOwnersFile.transaction do
-      RepositoryOwnersFile.where(repository_id: github_repository.id).delete_all
-      owners_files.map(&:save!)
-    end
-  end
-
   # Returns all OWNERS files included in this repository
   def owners_files
     github_repository.repository_owners_files

@@ -328,7 +328,14 @@ describe "Receiving GitHub hooks", :type => :request do
     include ActiveJob::TestHelper
 
     it "enqueues a job to synchronize OWNERS files on PushEvent for the master branch" do
-      assert_enqueued_with(job: RepositoryOwnersFileSynchronizationJob, args: ["Pardot/chef"]) do
+      data = decoded_fixture_data("github/push_event")
+      repo = GithubInstallation.current.repositories.create!(
+        github_id: data.fetch("repository").fetch("id"),
+        owner: data.fetch("repository").fetch("owner").fetch("name"),
+        github_owner_id: 1,
+        name: "bread"
+      )
+      assert_enqueued_with(job: RepositorySynchronizationJob, args: [repo.id]) do
         post "/webhooks", params: fixture_data("github/push_event"),
           headers: request_headers("push")
         expect(response).to be_successful
