@@ -1,5 +1,5 @@
 resource "github_team" "engagement-studio" {
-  name        = "engagement-studio"
+  name        = "Engagement Studio"
   description = "We increase customer success and satisfaction by enhancing our existing suite of tools that encompass our marketing execution engine. (Multi-Project)"
   privacy     = "closed"
 }
