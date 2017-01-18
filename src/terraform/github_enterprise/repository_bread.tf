@@ -43,6 +43,6 @@ resource "github_branch_protection" "bread_master" {
   branch     = "master"
 
   include_admins = false
-  strict         = true
+  strict         = false
   contexts       = ["compliance"]
 }
