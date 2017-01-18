@@ -20,14 +20,14 @@ resource "github_team_repository" "salesforce-actions-topologies_service-account
   permission = "push"
 }
 
-resource "github_team_repository" "salesforce-actions-topologies_site-reliability-engineers" {
-  repository = "${github_repository.salesforce-actions-topologies.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "salesforce-actions-topologies_engineering-managers" {
   repository = "${github_repository.salesforce-actions-topologies.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "salesforce-actions-topologies_site-reliability-engineers" {
+  repository = "${github_repository.salesforce-actions-topologies.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }

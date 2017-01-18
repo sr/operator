@@ -25,3 +25,9 @@ resource "github_team_repository" "bamboo-plugin-github-webhook_engineering-mana
   team_id    = "${github_team.engineering-managers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "bamboo-plugin-github-webhook_service-accounts-write-only" {
+  repository = "${github_repository.bamboo-plugin-github-webhook.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

@@ -26,15 +26,15 @@ resource "github_team_repository" "ansible_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "ansible_site-reliability-engineers" {
-  repository = "${github_repository.ansible.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "ansible_engineering-managers" {
   repository = "${github_repository.ansible.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "ansible_site-reliability-engineers" {
+  repository = "${github_repository.ansible.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
 
