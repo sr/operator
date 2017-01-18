@@ -14,6 +14,18 @@ resource "github_team_repository" "php-amqplib2_developers" {
   permission = "push"
 }
 
+resource "github_team_repository" "php-amqplib2_engineering-managers" {
+  repository = "${github_repository.php-amqplib2.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "php-amqplib2_site-reliability-engineers" {
+  repository = "${github_repository.php-amqplib2.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
 resource "github_team_repository" "php-amqplib2_service-accounts-write-only" {
   repository = "${github_repository.php-amqplib2.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"

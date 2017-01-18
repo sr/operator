@@ -14,6 +14,18 @@ resource "github_team_repository" "symfony_service-accounts-read-only" {
   permission = "pull"
 }
 
+resource "github_team_repository" "symfony_site-reliability-engineers" {
+  repository = "${github_repository.symfony.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "symfony_engineering-managers" {
+  repository = "${github_repository.symfony.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
 resource "github_team_repository" "symfony_service-accounts-write-only" {
   repository = "${github_repository.symfony.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
