@@ -24,6 +24,14 @@ module Clients
       @client = Octokit::Client.new(options)
     end
 
+    def organizations
+      @client.organizations
+    end
+
+    def organization_repositories(name)
+      @client.organization_repositories(name)
+    end
+
     # Identify whether we're a herokai or not
     def heroku_org_member?
       @client.orgs.map { |o| o[:login] }.include? "heroku"

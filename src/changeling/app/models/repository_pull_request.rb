@@ -29,15 +29,15 @@ class RepositoryPullRequest
   end
 
   def repository_full_name
-    @multipass.repository_name
+    "#{github_repository.owner}/#{github_repository.name}"
   end
 
   def repository_organization
-    @multipass.repository_name.split("/").first
+    github_repository.owner
   end
 
   def repository_name
-    @multipass.repository_name.split("/").last
+    github_repository.name
   end
 
   def repository_url
@@ -201,7 +201,7 @@ class RepositoryPullRequest
 
   def update_commit_status(commit_status)
     attributes = {
-      github_repository_id: commit_status.repository_id,
+      repository_id: github_repository.id,
       sha: commit_status.sha,
       context: commit_status.context
     }
@@ -241,10 +241,10 @@ class RepositoryPullRequest
   end
 
   def recalculate_testing_status
-    required_statuses = RepositoryCommitStatus.where(
+    required_statuses = github_repository.repository_commit_statuses.where(
       sha: @multipass.release_id,
       context: repository.required_testing_statuses
-    ).to_a
+    ).all.to_a
 
     if required_statuses.length < repository.required_testing_statuses.length
       # At least one required status hasn't been reported yet
@@ -289,6 +289,17 @@ class RepositoryPullRequest
 
   def github_client
     @github_client ||= Clients::GitHub.new(Changeling.config.github_service_account_token)
+  end
+
+  def github_repository
+    return @github_repository if defined?(@github_repository)
+
+    if !@multipass.github_repository
+      Raven.extra_context multipass_id: @multipass.id
+      raise ActiveRecord::RecordNotFound, "multipass does not have an associated repository"
+    end
+
+    @github_repository = @multipass.github_repository
   end
 
   def repository
