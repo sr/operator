@@ -26,15 +26,15 @@ resource "github_team_repository" "engagement-history-topology_service-accounts-
   permission = "pull"
 }
 
-resource "github_team_repository" "engagement-history-topology_site-reliability-engineers" {
-  repository = "${github_repository.engagement-history-topology.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "engagement-history-topology_engineering-managers" {
   repository = "${github_repository.engagement-history-topology.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "engagement-history-topology_site-reliability-engineers" {
+  repository = "${github_repository.engagement-history-topology.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
 

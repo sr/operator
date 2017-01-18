@@ -25,3 +25,9 @@ resource "github_team_repository" "kafka-tools_engineering-managers" {
   team_id    = "${github_team.engineering-managers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "kafka-tools_service-accounts-write-only" {
+  repository = "${github_repository.kafka-tools.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

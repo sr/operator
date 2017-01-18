@@ -20,14 +20,14 @@ resource "github_team_repository" "docker-library_service-accounts-write-only" {
   permission = "push"
 }
 
-resource "github_team_repository" "docker-library_site-reliability-engineers" {
-  repository = "${github_repository.docker-library.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "docker-library_engineering-managers" {
   repository = "${github_repository.docker-library.name}"
   team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "docker-library_site-reliability-engineers" {
+  repository = "${github_repository.docker-library.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }

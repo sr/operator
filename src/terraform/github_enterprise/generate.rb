@@ -54,6 +54,10 @@ EOS
 
       teams = Octokit.repository_teams(repo.id)
 
+      if !teams.detect { |t| t.slug == "service-accounts-write-only" }
+        teams << Struct.new(:slug, :permission).new("service-accounts-write-only", "push")
+      end
+
       admins = %w[site-reliability-engineers engineering-managers]
       admins.each do |team|
         if !teams.detect { |t| t.slug == team }
