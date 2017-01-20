@@ -12,16 +12,17 @@ class ComplianceEnabledRepositoriesFeatureFlag < ActiveRecord::Migration[5.0]
   def change
     add_column :repositories, :compliance_enabled, :boolean, null: false, default: false
 
+    query = "UPDATE repositories SET compliance_enabled = true WHERE owner = %s AND name = %s"
+
     COMPLIANT_REPOSITORIES.each do |full_name|
       owner = full_name.split("/")[0]
       name = full_name.split("/")[1]
 
-      repo = GithubRepository.find_by(owner: owner, name: name)
-      if !repo
-        next
-      end
-
-      repo.update!(compliance_enabled: true)
+      execute format(
+        query,
+        ActiveRecord::Base.connection.quote(owner),
+        ActiveRecord::Base.connection.quote(name)
+      )
     end
   end
 end
