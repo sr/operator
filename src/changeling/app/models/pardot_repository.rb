@@ -1,9 +1,4 @@
 class PardotRepository
-  # TODO(sr) Move the configuration somewhere to allow setting this up
-  # cleanly in tests without needing to have a magic heroku/changeling
-  # repository configured here.
-  CHANGELING = "heroku/changeling".freeze
-
   ANSIBLE = "Pardot/ansible".freeze
   BLUE_MESH = "Pardot/blue-mesh".freeze
   BREAD = "Pardot/bread".freeze
@@ -22,20 +17,6 @@ class PardotRepository
   end
 
   attr_reader :name_with_owner
-
-  def required_testing_statuses
-    case name_with_owner
-    when ANSIBLE, BLUE_MESH, BREAD, INTERNAL_API, MESH, MURDOC
-      [TEST_STATUS]
-    when CHEF, PARDOT
-      [TEST_STATUS, FINAL_STATUS]
-    when CHANGELING
-      ["ci/bazel", "ci/travis"]
-    else
-      Rails.logger.info "configuration-missing repo=#{name_with_owner.inspect}"
-      []
-    end
-  end
 
   def team
     if CHEF

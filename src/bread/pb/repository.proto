@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package bread;
+
+message RepositoryConfig {
+	// List of automated test statuses that are required to pass for this
+	// repository's build to be considered successful
+	repeated string required_testing_statuses = 1;
+
+	// Changing the files matching the globs definition in this watchlist
+	// triggers additional review by the @Pardot/security team.
+	RepositoryWatchlist high_risk_files = 2;
+
+	// Watchlists attached to this repository
+	repeated RepositoryWatchlist watchlists = 3;
+}
+
+message RepositoryWatchlist {
+	// Slug of the team that should be notified when a file matching one of the
+	// globs listed bellow matches. Example: Pardot/build-and-automate
+	string team = 1;
+
+	// List of file glob patterns
+	repeated string globs = 2;
+}

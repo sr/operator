@@ -239,10 +239,10 @@ class RepositoryPullRequest
   def recalculate_testing_status
     required_statuses = github_repository.repository_commit_statuses.where(
       sha: @multipass.release_id,
-      context: repository.required_testing_statuses
+      context: github_repository.config.required_testing_statuses
     ).all.to_a
 
-    if required_statuses.length < repository.required_testing_statuses.length
+    if required_statuses.length < github_repository.config.required_testing_statuses.length
       # At least one required status hasn't been reported yet
       @multipass.testing = false
       @multipass.tests_state = RepositoryCommitStatus::PENDING

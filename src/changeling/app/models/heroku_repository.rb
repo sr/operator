@@ -37,10 +37,6 @@ class HerokuRepository
     false
   end
 
-  def required_testing_statuses
-    raise NotImplementedError, "This behaviour is only enabled for Pardot repositories"
-  end
-
   def team
     self.class.data.find do |_name, info|
       if info["repository"] == name_with_owner

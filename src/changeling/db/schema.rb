@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 20170120141733) do
     t.string   "change_type",                            null: false
     t.string   "peer_reviewer"
     t.string   "sre_approver"
+    t.boolean  "testing"
     t.text     "backout_plan"
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
@@ -79,7 +80,6 @@ ActiveRecord::Schema.define(version: 20170120141733) do
     t.string   "title",                                  null: false
     t.boolean  "complete",           default: false,     null: false
     t.string   "rejector"
-    t.boolean  "testing"
     t.string   "tests_state",        default: "pending", null: false
     t.integer  "repository_id"
     t.string   "merge_commit_sha"
@@ -116,6 +116,7 @@ ActiveRecord::Schema.define(version: 20170120141733) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.datetime "deleted_at"
+    t.text     "config_file_content"
     t.boolean  "compliance_enabled",     default: false, null: false
     t.index ["github_installation_id", "github_owner_id", "github_id"], name: "repositories_github_ids_unique_idx", unique: true, using: :btree
     t.index ["github_installation_id", "owner", "name"], name: "repositories_github_names_unique_idx", unique: true, using: :btree

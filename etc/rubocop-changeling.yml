@@ -207,6 +207,7 @@ Style/StringLiterals:
     - 'src/changeling/db/migrate/20151111012558_change_users_and_multipasses_identifiers_to_uuid.rb'
     - 'src/changeling/db/migrate/20160309010658_install_audited.rb'
     - 'src/changeling/db/migrate/20160309050619_fixup_audits_table_entirely.rb'
+    - 'src/changeling/lib/repository.rb'
 
 # Offense count: 16
 # Cop supports --auto-correct.
