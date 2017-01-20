@@ -12,8 +12,6 @@ class PardotRepository
   TEST_STATUS = "Test Jobs".freeze
   FINAL_STATUS = "Final Jobs".freeze
 
-  COMPLIANT_REPOSITORIES = [ANSIBLE, BLUE_MESH, BREAD, CHEF, INTERNAL_API, MESH, MURDOC, PARDOT].freeze
-
   def initialize(nwo)
     @name_with_owner = nwo
   end
@@ -29,15 +27,6 @@ class PardotRepository
   end
 
   def ticket_reference_required?
-    true
-  end
-
-  # Do not create commit statuses for now.
-  def update_github_commit_status?
-    COMPLIANT_REPOSITORIES.include?(name_with_owner)
-  end
-
-  def participating?
     true
   end
 end
