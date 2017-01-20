@@ -8,7 +8,7 @@ module MultipassHelpers
 
     multipass = Multipass.find_or_initialize_by_pull_request(pull_request_data)
     multipass.testing = false
-    multipass.change_type = "minor"
+    multipass.change_type = ChangeCategorization::STANDARD
     multipass.created_at = 10.minutes.ago
     multipass.peer_reviewer = "ys"
     multipass.save

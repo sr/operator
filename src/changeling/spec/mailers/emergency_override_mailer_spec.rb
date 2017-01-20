@@ -15,7 +15,7 @@ RSpec.describe EmergencyOverrideMailer, type: [:mailer] do
       .to_return(body: "[]", headers: { "Content-type" => "application/json" })
     @multipass = Multipass.find_or_initialize_by_pull_request(pull_request_data)
     @multipass.testing = true
-    @multipass.change_type = "minor"
+    @multipass.change_type = ChangeCategorization::STANDARD
     @multipass.emergency_approver = Faker::Internet.user_name
     @multipass.save
 

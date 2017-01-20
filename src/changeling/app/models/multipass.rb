@@ -57,7 +57,7 @@ class Multipass < ActiveRecord::Base
 
   def change_type
     if self[:change_type] == "preapproved"
-      update_column(:change_type, "minor")
+      update_column(:change_type, ChangeCategorization::STANDARD)
     end
 
     self[:change_type]

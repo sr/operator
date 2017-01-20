@@ -114,9 +114,9 @@ describe "Receiving GitHub hooks", :type => :request do
         expect(multipass.requester).to eql("corey@heroku.com")
         expect(multipass.team).to eql("Tools")
         expect(multipass.impact).to eql("low")
-        expect(multipass.change_type).to eql("minor")
+        expect(multipass.change_type).to eql(ChangeCategorization::STANDARD)
         expect(multipass.backout_plan).to eql("We revert the pull request.")
-        expect(multipass.impact_probability).to eql("medium")
+        expect(multipass.impact_probability).to eql(ChangeCategorization::LIKELIHOOD_MEDIUM)
         expect(multipass.reference_url).to eql("https://github.com/heroku/changeling/pull/32")
         expect(multipass.audits.size).to eql(1)
         expect(multipass.repository_id).to eq(repo.id)
@@ -199,7 +199,7 @@ describe "Receiving GitHub hooks", :type => :request do
         ci_success = decoded_fixture_data("github/status_success_travis")
         # I want an incomplete multipass to avoid the callback
         Fabricate(:multipass, release_id:   ci_success["commit"]["sha"],
-                              change_type:  "major",
+                              change_type:  ChangeCategorization::MAJOR,
                               sre_approver: nil,
                               testing:      false)
         expect do
@@ -218,7 +218,7 @@ describe "Receiving GitHub hooks", :type => :request do
           ci_msg = decoded_fixture_data("github/status_#{status}_travis")
           # I want an incomplete multipass to avoid the callback
           Fabricate(:multipass, release_id:   ci_msg["commit"]["sha"],
-                                change_type:  "major",
+                                change_type:  ChangeCategorization::MAJOR,
                                 sre_approver: nil,
                                 testing:      false)
           expect do
@@ -237,7 +237,7 @@ describe "Receiving GitHub hooks", :type => :request do
         ci_msg = decoded_fixture_data("github/status_pending_unknown")
         # I want an incomplete multipass to avoid the callback
         Fabricate(:multipass, release_id:   ci_msg["commit"]["sha"],
-                              change_type:  "major",
+                              change_type:  ChangeCategorization::MAJOR,
                               sre_approver: nil,
                               testing:      false)
         expect do
@@ -261,7 +261,7 @@ describe "Receiving GitHub hooks", :type => :request do
         pull_request_data = decoded_fixture_data("github/pull_request_opened")
         multipass = Multipass.find_or_initialize_by_pull_request(pull_request_data)
         multipass.testing = true
-        multipass.change_type = "minor"
+        multipass.change_type = ChangeCategorization::STANDARD
         multipass.save
       end
 
@@ -299,7 +299,7 @@ describe "Receiving GitHub hooks", :type => :request do
                   reference_url: "https://github.com/heroku/changeling-pr-tests/pull/85",
                   impact: "low",
                   impact_probability: "low",
-                  change_type: "minor",
+                  change_type: ChangeCategorization::STANDARD,
                   testing: true,
                   requester: "atmos")
 

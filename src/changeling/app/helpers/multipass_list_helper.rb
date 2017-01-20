@@ -4,9 +4,9 @@ module MultipassListHelper
 
   def change_type_label(change_type)
     classes = case change_type
-              when "major"
+              when ChangeCategorization::MAJOR
                 "label label-primary"
-              when "minor"
+              when ChangeCategorization::STANDARD
                 "label label-success"
               else
                 "label label-default"
