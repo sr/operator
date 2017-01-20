@@ -113,6 +113,9 @@ class RepositoryPullRequest
     end
 
     @multipass.save!
+
+    detect_emergency_merge
+
     @multipass
   end
 
@@ -123,6 +126,12 @@ class RepositoryPullRequest
   end
 
   private
+
+  def detect_emergency_merge
+    if @multipass.merged? && !@multipass.complete?
+      @multipass.update!(change_type: ChangeCategorization::EMERGENCY)
+    end
+  end
 
   def owners_collection
     @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
