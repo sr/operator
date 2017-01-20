@@ -75,10 +75,6 @@ class Repository
     owners.uniq
   end
 
-  def required_testing_statuses
-    @repo.required_testing_statuses
-  end
-
   def update_github_commit_status?
     @repo.update_github_commit_status?
   end

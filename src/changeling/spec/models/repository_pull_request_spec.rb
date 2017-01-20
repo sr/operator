@@ -3,15 +3,15 @@ require "rails_helper"
 RSpec.describe RepositoryPullRequest do
   before(:each) do
     Changeling.config.pardot = true
-    reference_url = format("https://%s/%s/pull/32",
-      Changeling.config.github_hostname,
-      PardotRepository::CHANGELING
-    )
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: "heroku",
       name: "changeling"
+    )
+    reference_url = format("https://%s/%s/pull/32",
+      Changeling.config.github_hostname,
+      @repository.full_name
     )
     @multipass = Fabricate(:multipass,
       reference_url: reference_url,
@@ -44,9 +44,9 @@ RSpec.describe RepositoryPullRequest do
       pull_request["merge_commit_sha"] = merge_commit_sha
     end
 
-    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}")
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/pulls/#{@multipass.pull_request_number}")
       .to_return(body: JSON.dump(pull_request), headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{PardotRepository::CHANGELING}/pulls/#{@multipass.pull_request_number}/files")
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/pulls/#{@multipass.pull_request_number}/files")
       .to_return(body: JSON.dump(files), headers: { "Content-Type" => "application/json" })
   end
 
@@ -59,7 +59,7 @@ RSpec.describe RepositoryPullRequest do
       statuses: statuses
     }
 
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{PardotRepository::CHANGELING}/commits/#{@multipass.release_id}/status")
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/commits/#{@multipass.release_id}/status")
       .to_return(body: JSON.dump(combined_status), headers: { "Content-Type" => "application/json" })
   end
 
@@ -92,7 +92,7 @@ RSpec.describe RepositoryPullRequest do
     </div>
     EOS
 
-    stub_request(:get, "https://#{Changeling.config.github_hostname}/#{PardotRepository::CHANGELING}/pull/#{@multipass.pull_request_number}")
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/#{@repository.full_name}/pull/#{@multipass.pull_request_number}")
       .to_return(body: body, headers: { "Content-Type" => "text/html" })
   end
 
@@ -307,6 +307,11 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request
       stub_github_pull_request_reviews
       stub_github_commit_status(statuses: [])
+
+      config = Bread::RepositoryConfig.new(
+        required_testing_statuses: ["ci/travis", "ci/bazel"]
+      )
+      @repository.update!(config_file_content: config.to_json)
 
       @multipass.synchronize
       expect(@multipass.testing).to eq(false)
