@@ -14,7 +14,7 @@ RSpec.describe Multipass, "state", type: [:model, :webmock] do
       before do
         @multipass = Fabricate.build(:multipass)
         @multipass.testing = true
-        complete_multipass.change_type = :major
+        complete_multipass.change_type = ChangeCategorization::MAJOR
       end
 
       it "returns false without sre approval" do
@@ -34,7 +34,7 @@ RSpec.describe Multipass, "state", type: [:model, :webmock] do
 
     context "when a minor change" do
       before do
-        complete_multipass.change_type = :minor
+        complete_multipass.change_type = ChangeCategorization::STANDARD
         complete_multipass.sre_approver = ""
       end
 

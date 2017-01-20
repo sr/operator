@@ -26,7 +26,7 @@ RSpec.describe Multipass::Updates, :type => :model do
     end
 
     it "updates the impact_probability" do
-      new_probability = "test"
+      new_probability = ChangeCategorization::LIKELIHOOD_LOW
       complete_multipass.impact_probability = nil
       multipass_attributes["impact_probability"] = new_probability
 
@@ -35,7 +35,7 @@ RSpec.describe Multipass::Updates, :type => :model do
     end
 
     it "updates the change_type" do
-      new_type = "minor"
+      new_type = ChangeCategorization::STANDARD
       complete_multipass.change_type = nil
       multipass_attributes["change_type"] = new_type
 

@@ -11,9 +11,9 @@ module Multipass::RequiredFields
   ].freeze
 
   CONDITIONAL_REQUIRED_FIELDS = {
-    major: [:sre_approver, :peer_reviewer],
-    minor: [:peer_reviewer],
-    emergency: []
+    ChangeCategorization::STANDARD => [:peer_reviewer],
+    ChangeCategorization::MAJOR => [:sre_approver, :peer_reviewer],
+    ChangeCategorization::EMERGENCY => []
   }.freeze
 
   def missing_fields
@@ -34,11 +34,11 @@ module Multipass::RequiredFields
   end
 
   def conditional_fields
-    CONDITIONAL_REQUIRED_FIELDS[change_type.to_sym]
+    CONDITIONAL_REQUIRED_FIELDS.fetch(change_type)
   end
 
   def required_field?(actor)
-    CONDITIONAL_REQUIRED_FIELDS[change_type.to_sym].include? actor.to_sym
+    CONDITIONAL_REQUIRED_FIELDS.fetch(change_type).include?(actor.to_sym)
   end
 
   def enabled_actor?(actor, version = 1)

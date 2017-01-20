@@ -10,8 +10,8 @@ module PullRequestMethods
     def new_from_pull_request_team(name, pull_request)
       new team: name,
           impact: "low",
-          change_type: "minor",
-          impact_probability: "medium",
+          change_type: ChangeCategorization::STANDARD,
+          impact_probability: ChangeCategorization::LIKELIHOOD_MEDIUM,
           backout_plan: "We revert the pull request.", # https://i.imgur.com/27P3xPe.gif
           requester: User.for_github_login(pull_request["pull_request"]["user"]["login"]),
           reference_url: pull_request["pull_request"]["html_url"],

@@ -14,7 +14,7 @@ RSpec.describe Multipass::PullRequestReview do
                            reference_url: hook["pull_request"]["html_url"],
                            impact: "low",
                            impact_probability: "low",
-                           change_type: "minor",
+                           change_type: ChangeCategorization::STANDARD,
                            testing: true,
                            requester: "atmos")
     expect do
@@ -28,7 +28,7 @@ RSpec.describe Multipass::PullRequestReview do
                            reference_url: hook["pull_request"]["html_url"],
                            impact: "low",
                            impact_probability: "low",
-                           change_type: "minor",
+                           change_type: ChangeCategorization::STANDARD,
                            testing: true,
                            complete: true,
                            peer_reviewer: "atmos",

@@ -55,13 +55,13 @@ RSpec.describe Multipass, :type => :model do
       end
 
       it "works if the user is in the sre team" do
-        complete_multipass.change_type = "major"
+        complete_multipass.change_type = ChangeCategorization::MAJOR
         complete_multipass.sre_approver = "jmervine"
         expect(complete_multipass).to be_valid
       end
 
       it "works if case is wrong" do
-        complete_multipass.change_type = "major"
+        complete_multipass.change_type = ChangeCategorization::MAJOR
         complete_multipass.sre_approver = "jMerViNe"
         expect(complete_multipass).to be_valid
       end
@@ -99,46 +99,6 @@ RSpec.describe Multipass, :type => :model do
     it "supports GitHub Enterprise URLs" do
       complete_multipass.reference_url = "https://git.dev.pardot.com/atmos/hamburgers/pull/42"
       expect(complete_multipass.pull_request_number).to eql("42")
-    end
-  end
-
-  describe "multipass with change type preapproved" do
-    let(:multipass) { Fabricate(:multipass, change_type: "minor") }
-    let(:select_change_type) do
-      Proc.new do
-        ActiveRecord::Base.connection.execute(
-          "SELECT change_type FROM multipasses WHERE uuid = '#{multipass.id}';"
-        ).first["change_type"]
-      end
-    end
-
-    before do
-      expect do
-        multipass.update_column(:change_type, "preapproved")
-      end.to change { select_change_type.call }.from("minor").to("preapproved")
-    end
-
-    it "does not call any of our callbacks when modifying the change type" do
-      %w{ update_complete callback_to_github }.each do |callback|
-        expect_any_instance_of(Multipass).to receive(callback).never
-      end
-
-      expect(select_change_type.call).to eql "preapproved"
-      expect(multipass.change_type).to eql "minor"
-    end
-
-    it "does not update columns that don't have change_type preapproved" do
-      %w{ minor major }.each do |change_type|
-        multipass.update_column(:change_type, change_type)
-
-        expect_any_instance_of(Multipass).to receive(:update_column).with(:change_type, change_type).never
-        expect { multipass.change_type }.not_to change { select_change_type.call }
-      end
-    end
-
-    it "is updated to have change_type minor when checking it's change_type" do
-      expect(select_change_type.call).to eql "preapproved"
-      expect { multipass.change_type }.to change { select_change_type.call }.from("preapproved").to("minor")
     end
   end
 
