@@ -29,10 +29,6 @@ class HerokuRepository
 
   attr_reader :name_with_owner
 
-  def update_github_commit_status?
-    true
-  end
-
   def participating?
     self.class.participating_repositories.include?(name_with_owner)
   end

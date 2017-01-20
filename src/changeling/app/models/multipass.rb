@@ -118,7 +118,7 @@ class Multipass < ActiveRecord::Base
   end
 
   def repository_owners_enabled?
-    PardotRepository::COMPLIANT_REPOSITORIES.include?(repository_name) ||
+    compliance_enabled? ||
       Changeling.config.repository_owners_review_required
         .include?(repository_name)
   end
