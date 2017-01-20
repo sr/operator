@@ -16,6 +16,10 @@ class ChangelingConfig
   end
   attr_writer :require_heroku_organization_membership
 
+  def default_required_testing_statuses
+    return [PardotRepository::TEST_STATUS]
+  end
+
   def email_notifications_enabled?
     return @email_notifications_enabled if defined?(@email_notifications_enabled)
     @email_notifications_enabled = heroku?

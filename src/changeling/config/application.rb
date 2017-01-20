@@ -20,6 +20,7 @@ require_relative "../lib/clients/heimdall"
 require_relative "../lib/clients/github"
 require_relative "../lib/notifiers/chat"
 require_relative "../lib/multipass_monitor"
+require_relative "../lib/repository"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)

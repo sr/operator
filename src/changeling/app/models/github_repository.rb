@@ -1,4 +1,6 @@
 class GithubRepository < ApplicationRecord
+  CONFIG_FILENAME = "REPOSITORY.json".freeze
+
   self.table_name = "repositories"
 
   belongs_to :github_installation
@@ -13,6 +15,35 @@ class GithubRepository < ApplicationRecord
   end
 
   def synchronize
+    synchronize_config_file
+    synchronize_owners_files
+  end
+
+  def config
+    if config_file_content.to_s.empty?
+      return RepositoryConfigFile.blank
+    end
+
+    RepositoryConfigFile.parse(config_file_content)
+  end
+
+  private
+
+  def synchronize_config_file
+    content = github_client.file_content(full_name, CONFIG_FILENAME, nil)
+
+    if content.empty?
+      return
+    end
+
+    parsed = RepositoryConfigFile.parse(content)
+
+    if parsed
+      update!(config_file_content: parsed.to_json)
+    end
+  end
+
+  def synchronize_owners_files
     # The GitHub search API returns empty results when the search backend is
     # unavailable. To avoid syncing bad data, we first perform a query that is
     # known to always return results and abort the synchronization process if it
