@@ -31,13 +31,11 @@ module Multipass::GitHubStatuses
   end
 
   def callback_to_github
-    if repository.update_github_commit_status?
-      GitHubCommitStatusWorker.perform_later(id)
-    end
+    GitHubCommitStatusWorker.perform_later(id)
   end
 
   def approve_github_commit_status!
-    return unless repository && repository.participating?
+    return unless compliance_enabled?
 
     opts = commit_status_options
     [release_id, merge_commit_sha].compact.each do |sha|
@@ -46,7 +44,7 @@ module Multipass::GitHubStatuses
   end
 
   def pending_github_commit_status!
-    return unless repository && repository.participating?
+    return unless compliance_enabled?
 
     opts = commit_status_options
     [release_id, merge_commit_sha].compact.each do |sha|
@@ -55,7 +53,7 @@ module Multipass::GitHubStatuses
   end
 
   def failure_github_commit_status!
-    return unless repository && repository.participating?
+    return unless compliance_enabled?
 
     opts = commit_status_options
     [release_id, merge_commit_sha].compact.each do |sha|
@@ -64,7 +62,7 @@ module Multipass::GitHubStatuses
   end
 
   def check_commit_statuses!
-    return unless repository && repository.participating?
+    return unless compliance_enabled?
 
     status = find_testing_status
 
@@ -88,6 +86,14 @@ module Multipass::GitHubStatuses
       Changeling.config.github_service_account_token
     else
       commit_status_creator.github_token
+    end
+  end
+
+  def compliance_enabled?
+    if github_repository.nil?
+      repository.participating?
+    else
+      github_repository.compliance_enabled?
     end
   end
 end

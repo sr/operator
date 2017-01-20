@@ -79,10 +79,6 @@ class Repository
     @repo.required_testing_statuses
   end
 
-  def update_github_commit_status?
-    @repo.update_github_commit_status?
-  end
-
   def ticket_reference_required?
     @repo.ticket_reference_required?
   end

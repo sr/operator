@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170118174802) do
+ActiveRecord::Schema.define(version: 20170120141733) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,14 +108,15 @@ ActiveRecord::Schema.define(version: 20170118174802) do
   end
 
   create_table "repositories", force: :cascade do |t|
-    t.integer  "github_installation_id", null: false
-    t.integer  "github_id",              null: false
-    t.integer  "github_owner_id",        null: false
-    t.text     "owner",                  null: false
-    t.text     "name",                   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.integer  "github_installation_id",                 null: false
+    t.integer  "github_id",                              null: false
+    t.integer  "github_owner_id",                        null: false
+    t.text     "owner",                                  null: false
+    t.text     "name",                                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
     t.datetime "deleted_at"
+    t.boolean  "compliance_enabled",     default: false, null: false
     t.index ["github_installation_id", "github_owner_id", "github_id"], name: "repositories_github_ids_unique_idx", unique: true, using: :btree
     t.index ["github_installation_id", "owner", "name"], name: "repositories_github_names_unique_idx", unique: true, using: :btree
   end
