@@ -65,6 +65,7 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
       "${aws_eip.internal_tools_integration_nat_gw.public_ip}/32",
       "${var.pardot_ci_nat_gw_public_ip}/32",
+      "${var.quadrant3_host_ip}/32",
     ]
   }
 
