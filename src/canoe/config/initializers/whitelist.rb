@@ -13,7 +13,7 @@ trusted_networks = [
   "142.176.79.170/29",  # Halifax, Canada
   "61.120.150.128/27",  # Tokyo, Japan
   "61.213.161.144/30",  # Tokyo, Japan
-  "136.147.104.42/32",  # pardot1-proxyout1-{1,2,3,4}-dfw
+  "136.147.104.42/32",  # pardot1-proxyout1-1-dfw (OUTBOUND NAT)
   "136.147.104.20/30",  # pardot0-proxyout1-{1,2,3,4}-dfw
   "136.147.96.20/30",   # pardot0-proxyout1-{1,2,3,4}-phx
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress
