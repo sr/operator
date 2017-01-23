@@ -58,6 +58,16 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.user_is_sre_approver?(@user)).to eq(false)
   end
 
+  it "requires nothing if the change is an emergency" do
+    @multipass.ticket_reference.destroy!
+    @multipass.update!(peer_reviewer: nil)
+    @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
+    expect(@multipass.reload.complete?).to eq(false)
+
+    @multipass.update(change_type: ChangeCategorization::EMERGENCY)
+    expect(@multipass.reload.complete?).to eq(true)
+  end
+
   it "requires a ticket reference to be complete" do
     expect(@multipass.complete?).to eq(true)
     @multipass.ticket_reference.destroy!

@@ -8,14 +8,19 @@ class PardotComplianceStatus
     :complete?,
     :rejected?,
     :pending?,
-    :emergency_approved?,
     to: :@default
 
   def complete?
-    return false unless @multipass.missing_mandatory_fields.empty?
+    return true if emergency_approved?
+
+    if !@multipass.missing_mandatory_fields.empty?
+      return false
+    end
 
     # Unless merged, an open ticket reference is required
-    return false if !@multipass.merged? && (ticket_reference_missing? || !referenced_ticket_open?)
+    if !@multipass.merged? && (ticket_reference_missing? || !referenced_ticket_open?)
+      return false
+    end
 
     peer_reviewed? && tests_successful?
   end
@@ -30,6 +35,10 @@ class PardotComplianceStatus
 
   def user_is_sre_approver?(_user)
     raise NotImplementedError
+  end
+
+  def emergency_approved?
+    @multipass.change_type == ChangeCategorization::EMERGENCY
   end
 
   def user_is_emergency_approver?(user)
@@ -93,7 +102,7 @@ class PardotComplianceStatus
         "Peer review is required"
       end
     elsif emergency_approved?
-      "Satisfied via emergency approval by #{@multipass.emergency_approver}."
+      "Satisfied via emergency approval."
     elsif complete?
       "Satisfied. Reviewed by #{@multipass.reviewers}."
     elsif ticket_reference_missing?
