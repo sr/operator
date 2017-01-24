@@ -104,6 +104,8 @@ resource "aws_security_group" "pardot0_ue1_canoe_http_lb" {
       "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
       "${aws_eip.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
+      "${var.sfdc_pardot_tools_netherworld_heroku_space_cidr_blocks}",
+      "${var.sfdc_pardot_tools_production_heroku_space_cidr_blocks}",
     ]
 
     security_groups = [

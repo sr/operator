@@ -19,7 +19,17 @@ trusted_networks = [
   # https://confluence.dev.pardot.com/pages/viewpage.action?pageId=16001087#AWS/EC2InternalAppsEnvironment-Egress
   "52.72.6.14/32",
   # Ditto, but for App.dev
-  "54.82.15.10/32"
+  "54.82.15.10/32",
+  # Heroku: Netherworld
+  "34.192.47.206/32",
+  "34.192.147.59/32",
+  "34.192.142.55/32",
+  "34.192.58.27/32",
+  # Heroku: Production
+  "52.70.38.185/32",
+  "52.3.60.97/32",
+  "54.82.52.167/32",
+  "54.82.76.144/32"
 ]
 
 if Rails.env.development?
