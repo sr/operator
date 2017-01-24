@@ -17,5 +17,9 @@ describe BathroomHandler, lita_handler: true do
       send_command("bathroom status")
       expect(replies.last).to eq("Bathroom Status:\n34 Mens: 0 stalls free\n34 Womens: 2 stalls free")
     end
+    it "returns the status of the bathrooms" do
+      send_command("bathroom")
+      expect(replies.last).to eq("Bathroom Status:\n34 Mens: 0 stalls free\n34 Womens: 2 stalls free")
+    end
   end
 end

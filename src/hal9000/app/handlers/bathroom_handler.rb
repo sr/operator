@@ -3,8 +3,8 @@ require "uri"
 require "json"
 
 class BathroomHandler < ApplicationHandler
-  route(/^poo$/i, :poo, command: false, help: { "poo" => "returns a parsed version of the current bathroom statuses" })
-  route(/^bathroom status$/i, :poo, command: false, help: { "poo" => "returns a parsed version of the current bathroom statuses" })
+  route(/^poo$/i, :poo, command: true, help: { "poo" => "returns a parsed version of the current bathroom statuses" })
+  route(/^bathroom(?: status)?$/i, :poo, command: true, help: { "bathroom( status)" => "returns a parsed version of the current bathroom statuses" })
 
   def poo(request)
     response = Net::HTTP.get(URI("https://pardot-pingpong.herokuapp.com/bathrooms.json"))
