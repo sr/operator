@@ -3,7 +3,7 @@ require "spec_helper"
 describe BathroomHandler, lita_handler: true do
   before do
     expect(Net::HTTP).to receive(:get)
-      .with(URI('https://pardot-pingpong.herokuapp.com/bathrooms.json'))
+      .with(URI("https://pardot-pingpong.herokuapp.com/bathrooms.json"))
       .and_return('[{"id":1,"name":"34 Mens","stalls":[{"number":0,"state":true},{"number":1,"state":true}]}, {"id":2,"name":"34 Womens","stalls":[{"number":0,"state":true},{"number":1,"state":false},{"number":2,"state":true},{"number":3,"state":false}]}]')
   end
   describe "!poo" do
