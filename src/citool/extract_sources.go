@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"flag"
 	"fmt"
@@ -45,13 +46,13 @@ Extracts sources from a Docker container into a tarball. The Docker container mu
 Examples:
 
   # Extracts /app from Docker image foo:BUILD-1234 to the root path of a tarball
-  citool extract-sources --image=foo:BUILD-1234 --source=/app:/ --file=app.tar
+  citool extract-sources --image=foo:BUILD-1234 --source=/app:/ --file=app.tar.gz
 `
 }
 
 func (c *extractSourcesCommand) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&c.image, "image", "", "Docker image name and tag.")
-	fs.StringVar(&c.file, "file", "/dev/stdout", "Output file.")
+	fs.StringVar(&c.file, "file", "/dev/stdout", "Output file (.tar.gz format).")
 	fs.Var(&c.sources, "source", "List of sources to extract in the form SRC:DST. Can be specified multiple times.")
 }
 
@@ -83,7 +84,14 @@ func (c *extractSourcesCommand) Run() error {
 }
 
 func (c *extractSourcesCommand) extractFiles(client *docker.Client, container *docker.Container) error {
-	// TODO: Could probably be parallelized if benchmarks show it would help
+	outFile, err := os.Create(c.file)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = outFile.Close() }()
+
+	gzipWriter := gzip.NewWriter(outFile)
+	tarWriter := tar.NewWriter(gzipWriter)
 	for _, source := range c.sources {
 		parts := strings.Split(source, ":")
 		if len(parts) != 2 {
@@ -101,14 +109,7 @@ func (c *extractSourcesCommand) extractFiles(client *docker.Client, container *d
 			return err
 		}
 
-		outFile, err := os.Create(c.file)
-		if err != nil {
-			return err
-		}
-		defer func() { _ = outFile.Close() }()
-
 		tarReader := tar.NewReader(downloadStream)
-		tarWriter := tar.NewWriter(outFile)
 		buf := make([]byte, 16384)
 		for {
 			header, err := tarReader.Next()
@@ -143,10 +144,13 @@ func (c *extractSourcesCommand) extractFiles(client *docker.Client, container *d
 				}
 			}
 		}
+	}
 
-		if err := tarWriter.Close(); err != nil {
-			return err
-		}
+	if err := tarWriter.Close(); err != nil {
+		return err
+	}
+	if err := gzipWriter.Close(); err != nil {
+		return err
 	}
 
 	return nil

@@ -19,6 +19,7 @@ type command interface {
 func main() {
 	commands := []command{
 		&extractSourcesCommand{},
+		&createHerokuBuildCommand{},
 	}
 
 	overallUsage := func() {
