@@ -5,7 +5,7 @@ resource "github_repository" "engagement-history-topology" {
   private       = true
   has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "engagement-history-topology_service-accounts-write-only" {
@@ -44,5 +44,5 @@ resource "github_branch_protection" "engagement-history-topology_master" {
 
   include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }
