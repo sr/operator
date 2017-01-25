@@ -196,8 +196,8 @@ describe ComplianceStatus, "pardot" do
     )
     @multipass.pull_request_files.create!(
       filename: "/cookbooks/pardot_mysql/README",
-      state: "added",
-      patch: "+ test"
+      state: "changed",
+      patch: ""
     )
     @multipass.pull_request_files.create!(
       filename: "/scripts/build",

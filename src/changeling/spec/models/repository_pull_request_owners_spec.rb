@@ -89,6 +89,10 @@ RSpec.describe RepositoryPullRequest do
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: ""
     )
+    lib = @repository.repository_owners_files.create!(
+      path_name: "/lib/#{Repository::OWNERS_FILENAME}",
+      content: ""
+    )
 
     expect(@pull_request.owners_files).to eq([root])
 
@@ -114,6 +118,13 @@ RSpec.describe RepositoryPullRequest do
     expect(@pull_request.owners_files).to eq([root, scripts])
 
     @multipass.pull_request_files.create!(
+      filename: "/lib/foo.rb",
+      state: "changed",
+      patch: ""
+    )
+    expect(@pull_request.owners_files).to eq([root, scripts, lib])
+
+    @multipass.pull_request_files.create!(
       filename: "/cookbooks/pardot_mysql/files/default/mysqld.conf",
       state: "removed",
       patch: ""
@@ -123,7 +134,7 @@ RSpec.describe RepositoryPullRequest do
       state: "removed",
       patch: ""
     )
-    expect(@pull_request.owners_files).to eq([root, scripts, mysql])
+    expect(@pull_request.owners_files).to eq([root, scripts, lib, mysql])
   end
 
   it "returns the owners of every component being changed" do
