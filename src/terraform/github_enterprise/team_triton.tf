@@ -1,5 +1,5 @@
 resource "github_team" "triton" {
-  name        = "Caerus"
+  name        = "Triton"
   description = "https://confluence.dev.pardot.com/display/PE/Team+Triton"
   privacy     = "closed"
 }
