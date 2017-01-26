@@ -192,7 +192,7 @@ resource "aws_route53_record" "e2ecredentials_dev_pardot_com_CNAMErecord" {
 resource "aws_route53_record" "canoehipchat_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "canoehipchat.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["cryptic-inlet-8743.quiet-river-4563.herokuspace.com"]
+  records = ["secure-hollows-9230.quiet-river-4563.herokuspace.com"]
   type    = "CNAME"
   ttl     = "900"
 }
