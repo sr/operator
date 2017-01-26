@@ -76,12 +76,6 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	// body, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return err
-	// }
-	// fmt.Printf("%s\n", body)
-
 	return json.NewDecoder(resp.Body).Decode(v)
 }
 

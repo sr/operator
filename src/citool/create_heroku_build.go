@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -75,11 +74,6 @@ func (c *createHerokuBuildCommand) Run() error {
 	if err != nil {
 		return err
 	} else if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s\n", body)
 		return fmt.Errorf("HTTP %d when uploading the source file", resp.StatusCode)
 	}
 
