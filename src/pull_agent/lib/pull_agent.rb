@@ -6,6 +6,8 @@ require "securerandom"
 require "socket"
 require "tmpdir"
 require "yaml"
+require "fileutils"
+require "pathname"
 
 require "instrumentation"
 require "redis"
