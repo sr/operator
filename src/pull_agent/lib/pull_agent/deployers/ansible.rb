@@ -22,7 +22,7 @@ module PullAgent
               @deploy.to_build_version.save_to_directory(release_directory.standby_directory)
 
               FileUtils.chown_R("root", "sysadmin", release_directory.standby_directory.to_s)
-              FileUtils.chmod(0750, release_directory.standby_directory.to_s)
+              FileUtils.chmod(0o750, release_directory.standby_directory.to_s)
 
               release_directory.make_standby_directory_live
             end
