@@ -120,6 +120,14 @@ docker_push() {
     true
 }
 
+heroku_version() {
+    jq -ncM \
+       --arg "branch" "$CI_BRANCH" \
+       --arg "build" "${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}" \
+       --arg "sha" "$(git rev-parse HEAD)" \
+       '{"branch":$branch,"build":$build,"sha":$sha}'
+}
+
 create_heroku_build() {
     local project="$1"
     local app="$2"
@@ -148,7 +156,7 @@ create_heroku_build() {
     citool create-heroku-build \
         -file="$tarball" \
         -app="$app" \
-        -version="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
+        -version="$(heroku_version)"
     rm -f "$tarball"
 }
 
