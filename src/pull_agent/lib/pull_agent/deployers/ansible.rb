@@ -25,6 +25,8 @@ module PullAgent
           end
         end
 
+        FileUtils.chown_R("root", "sysadmin", release_directory.standby_directory)
+
         AtomicSymlink.create!(
           File.join(release_directory.current_symlink, "production_#{ShellHelper.datacenter}.ini"),
           File.join(release_directory.current_symlink, "hosts"),
@@ -42,7 +44,6 @@ module PullAgent
             ENV.fetch("RELEASE_DIRECTORY", "/etc/ansible-releases"),
             current_symlink: "../ansible",
           )
-        FileUtils.chown_R "sysadmin", "sysadmin", "/etc/ansible-releases"
       end
     end
   end
