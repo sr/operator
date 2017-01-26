@@ -1,4 +1,5 @@
 *.sync.tmp
+/.cache/
 /etc/secrets
 /src/**/log/*.log
 /src/**/tmp
