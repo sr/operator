@@ -52,12 +52,6 @@ resource "github_team" "tier-2-support" {
   privacy     = "closed"
 }
 
-resource "github_team" "triton" {
-  name        = "Triton"
-  description = "We manage engagement history, which syncs activities and campaigns to Salesforce"
-  privacy     = "closed"
-}
-
 resource "github_team" "read-only-users" {
   name        = "Read-Only Users"
   description = "Read-Only Access for CORE CCE to setup dev env locally and test"
