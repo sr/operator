@@ -42,7 +42,7 @@ module PullAgent
             ENV.fetch("RELEASE_DIRECTORY", "/etc/ansible-releases"),
             current_symlink: "../ansible",
           )
-        FileUtils.chown_R "sysadmins", "sysadmins", "/etc/ansible-releases"
+        FileUtils.chown_R "sysadmin", "sysadmin", "/etc/ansible-releases"
       end
     end
   end
