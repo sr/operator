@@ -31,13 +31,15 @@ Requires HEROKU_API_TOKEN to be set.
 
 func (c *createHerokuBuildCommand) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&c.app, "app", "", "Heroku application name.")
-	fs.StringVar(&c.file, "file", "/dev/stdin", "Source file (.tar.gz format).")
+	fs.StringVar(&c.file, "file", "", "Source file (.tar.gz format).")
 	fs.StringVar(&c.version, "version", "", "Heroku build version (e.g., build ID).")
 }
 
 func (c *createHerokuBuildCommand) Run() error {
 	if c.app == "" {
 		return errors.New("-app is required")
+	} else if c.file == "" {
+		return errors.New("-file is required")
 	}
 
 	apiToken := os.Getenv("HEROKU_API_TOKEN")

@@ -84,7 +84,7 @@ func (c *extractSourcesCommand) Run() error {
 }
 
 func (c *extractSourcesCommand) extractFiles(client *docker.Client, container *docker.Container) error {
-	outFile, err := os.Create(c.file)
+	outFile, err := os.OpenFile(c.file, os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
