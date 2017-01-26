@@ -13,7 +13,7 @@ class BathroomHandler < ApplicationHandler
   end
 
   def serious_poo(request)
-    request.reply bathroom_status_string()
+    request.reply bathroom_status_string
   rescue => e
     request.reply "Something went wrong :( #{e}"
   end
