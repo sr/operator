@@ -208,6 +208,10 @@ case "$project" in
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
           tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+
+          export CI_JOB="CITOOL"
+          tarball="$(tarball-build "citool")"
+          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
           popd
         fi
         ;;
