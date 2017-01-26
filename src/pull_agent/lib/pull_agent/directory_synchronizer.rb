@@ -1,5 +1,3 @@
-require "fileutils"
-
 module PullAgent
   class DirectorySynchronizer
     SynchronizationFailedError = Class.new(StandardError)
