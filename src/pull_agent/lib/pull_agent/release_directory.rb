@@ -1,6 +1,3 @@
-require "pathname"
-require "fileutils"
-
 module PullAgent
   # ReleaseDirectory provides functionality around deploying to and atomically switching to a new release via symlinks.
   #
