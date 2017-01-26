@@ -63,8 +63,8 @@ fi
 docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
 build_rubygem() {
-    gemname="$1"
-    gemspec="$2"
+    local gemname="$1"
+    local gemspec="$2"
     docker run --rm \
         -v "$BREAD:/data" \
         -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
@@ -86,10 +86,10 @@ docker_image() {
 }
 
 docker_push() {
-    project="$1"
-    sha1="$(git rev-parse HEAD)"
-    tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
-    repo="$(docker_image "$project")"
+    local project="$1"
+    local sha1="$(git rev-parse HEAD)"
+    local tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
+    local repo="$(docker_image "$project")"
 
     echo "Pushing container image to ${repo}..." 2>&1
     docker tag "${project}_app" "$repo"
@@ -97,7 +97,7 @@ docker_push() {
 
     echo "Setting standard properties on container image manifest.json file..." 2>&1
 
-    props="bambooProject=${CI_PROJECT}|"
+    local props="bambooProject=${CI_PROJECT}|"
     props+="bambooPlan=${CI_PLAN}|"
     props+="bambooJob=${CI_JOB}|"
     props+="buildID=${CI_PROJECT}-${CI_PLAN}-${CI_JOB}-${CI_BUILD_NUMBER}|"
@@ -110,8 +110,8 @@ docker_push() {
     props+="passedCI=true"
     props+="dockerImageRepository=${DOCKER_REPO_BREAD}/${project}/app"
 
-    manifest="pd-docker/build/bread/${project}/app/${tag}/manifest.json"
-    apipath="api/storage/$manifest?properties=$props"
+    local manifest="pd-docker/build/bread/${project}/app/${tag}/manifest.json"
+    local apipath="api/storage/$manifest?properties=$props"
     set +x
     curl -f -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" -X PUT \
       "${ARTIFACTORY_URL}/${apipath}"
@@ -153,9 +153,9 @@ create_heroku_build() {
 }
 
 tarball_upload() {
-    gitsha1="$1"
-    tarball="$2"
-    green="$3"
+    local gitsha1="$1"
+    local tarball="$2"
+    local green="$3"
 
     docker run --rm \
         -v "$BREAD:/data" \
