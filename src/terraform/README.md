@@ -16,6 +16,8 @@ export GOPATH="<base bread repo checkout path>"
 export PATH=$GOPATH/bin:$PATH
 ```
 
+Grab the "Salesforce Authenticator" app on your company phone. Browse to https://canoe.dev.pardot.com and authenticate. Then browse to https://canoe.dev.pardot.com/auth/phone and when it asks for a code, go to your phone/salesforce-authenticator app, and hit " + New Account ", and supply the two word code to Canoe.
+
 ## Authentication
 
 ### Artifactory
