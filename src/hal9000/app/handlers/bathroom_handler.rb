@@ -24,7 +24,7 @@ class BathroomHandler < ApplicationHandler
 
     available = use_emojis ? "🚽 " : ""
     occupied = use_emojis ? "💩 " : ""
-    response_string = "Bathroom Status:"
+    response_string = "<a href=\"https://pardot-pingpong.herokuapp.com/bathrooms\">Bathroom Status</a>:"
 
     json.each do |bathroom|
       name = bathroom["name"]

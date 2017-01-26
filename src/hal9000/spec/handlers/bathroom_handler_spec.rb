@@ -7,8 +7,8 @@ describe BathroomHandler, lita_handler: true do
       .and_return('[{"id":1,"name":"Mens","stalls":[{"number":0,"state":true},{"number":1,"state":true}]}, {"id":2,"name":"Womens","stalls":[{"number":0,"state":true},{"number":1,"state":false},{"number":2,"state":true},{"number":3,"state":false}]}]')
     @poop_emoji = "\u{1F4A9}"
     @toilet_emoji = "\u{1F6BD}"
-    @emoji_string = "Bathroom Status:\nMens: #{@poop_emoji} #{@poop_emoji} 0 stalls free\nWomens: #{@poop_emoji} #{@toilet_emoji} #{@poop_emoji} #{@toilet_emoji} 2 stalls free"
-    @no_emoji_string = "Bathroom Status:\nMens: 0 stalls free\nWomens: 2 stalls free"
+    @emoji_string = "<a href=\"https://pardot-pingpong.herokuapp.com/bathrooms\">Bathroom Status</a>:\nMens: #{@poop_emoji} #{@poop_emoji} 0 stalls free\nWomens: #{@poop_emoji} #{@toilet_emoji} #{@poop_emoji} #{@toilet_emoji} 2 stalls free"
+    @no_emoji_string = "<a href=\"https://pardot-pingpong.herokuapp.com/bathrooms\">Bathroom Status</a>:\nMens: 0 stalls free\nWomens: 2 stalls free"
   end
 
   describe "!poo" do
