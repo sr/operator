@@ -62,6 +62,12 @@ if [ -z "$NOPULL" ]; then
 fi
 docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
+# Build citool
+docker run --rm -w /go \
+   -v "$BREAD:/go" \
+   build/build \
+   make -f etc/mk/golang.mk install-citool
+
 build_rubygem() {
     local gemname="$1"
     local gemspec="$2"
@@ -120,50 +126,27 @@ docker_push() {
     true
 }
 
-heroku_version() {
-    jq -ncM \
-       --arg "branch" "$CI_BRANCH" \
-       --arg "build" "${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}" \
-       --arg "sha" "$(git rev-parse HEAD)" \
-       '{"branch":$branch,"build":$build,"sha":$sha}'
-}
-
-create_heroku_build() {
+extract_tarball() {
     local project="$1"
-    local app="$2"
-    local source="$3"
-    local image="$(docker_image "$project")"
+    local tarball="$2"
+    shift 2
 
-    if [ -n "$CI" ]; then
-        set +x
-        source "/etc/env/heroku.sh"
-        test -n "$DEBUG" && set -x
-    fi
+    local sourceopts=()
+    while [ "$#" -gt 0 ]; do
+        sourceopts+=("-source=$1")
+        shift
+    done
 
-    docker run --rm -w /go \
-        -v "$BREAD:/go" \
-        -v "$BREAD/etc/mk:/go/etc/mk" \
-        build/build \
-        make -f etc/mk/golang.mk install-citool
-
-    echo "Extracting source from '${image}' and pushing to Heroku ('${app}') ..." 2>&1
-
-    local tarball="$(mktemp)"
     citool extract-sources \
-        -image="$image" \
-        -source="$source" \
-        -file="$tarball"
-    citool create-heroku-build \
+        -image="$(docker_image "$project")" \
         -file="$tarball" \
-        -app="$app" \
-        -version="$(heroku_version)"
-    rm -f "$tarball"
+        "${sourceopts[@]}"
 }
 
 tarball_upload() {
-    local gitsha1="$1"
-    local tarball="$2"
-    local green="$3"
+    local tarball="$1"
+    local green="$2"
+    local sha1="$(git rev-parse HEAD)"
 
     docker run --rm \
         -v "$BREAD:/data" \
@@ -185,7 +168,7 @@ tarball_upload() {
         -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
         -e "CI_BRANCH=$CI_BRANCH" \
         build/build \
-        tarball-upload "$gitsha1" "$green" /data/tarball.tar
+        tarball-upload "$sha1" "$green" /data/tarball.tar
 }
 
 echo "===> Building ${project}..." 2>&1
@@ -209,8 +192,13 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
-            create_heroku_build "$project" "pardot-canoe-production" "/app:/"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "$project" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
+
         ;;
     changeling)
         RUBOCOP_CONFIG="etc/rubocop-changeling.yml"
@@ -219,7 +207,11 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
-            create_heroku_build "$project" "pardot-changeling-production" "/app:/"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "$project" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     devenv)
@@ -238,10 +230,10 @@ case "$project" in
         if [ -n "$CI" ]; then
             # Build a tarball from the app container built above
             tarball="$(tarball-build-ruby "explorer_app")"
-            trap 'rm -f $tarball' EXIT
+            trap 'rm -f "$tarball"' EXIT
 
             # Update the tarball to Artifactory
-            tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     golang)
@@ -251,15 +243,15 @@ case "$project" in
         if [ -n "$CI" ]; then
           pushd "bin"
           tarball="$(tarball-build "jiracleaner")"
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
 
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
 
           export CI_JOB="CITOOL"
           tarball="$(tarball-build "citool")"
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
           popd
         fi
         ;;
@@ -306,7 +298,11 @@ case "$project" in
         # Push the container to Artifactory (CI-only)
         if [ -n "$CI" ]; then
             docker_push "${project}d"
-            create_heroku_build "${project}d" "pardot-operator-production" "/app:/"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "${project}d" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     parbot)
@@ -315,6 +311,11 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "${project}" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     pd-sync-chef)
@@ -368,7 +369,7 @@ case "$project" in
           git archive "$(git rev-parse HEAD)" src/terraform > "$tarball"
 
         if [ -n "$CI" ]; then
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
         fi
         ;;
     *)
