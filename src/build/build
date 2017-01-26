@@ -211,6 +211,7 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
+            create_heroku_build "$project" "pardot-changeling-production" "/app:/"
         fi
         ;;
     devenv)
