@@ -20,12 +20,12 @@ module PullAgent
               DirectorySynchronizer.new(temp_dir, release_directory.standby_directory).synchronize
 
               @deploy.to_build_version.save_to_directory(release_directory.standby_directory)
+              FileUtils.chown_R("root", "sysadmin", release_directory.standby_directory.to_s)
+
               release_directory.make_standby_directory_live
             end
           end
         end
-
-        FileUtils.chown_R("root", "sysadmin", release_directory.standby_directory)
 
         AtomicSymlink.create!(
           File.join(release_directory.current_symlink, "production_#{ShellHelper.datacenter}.ini"),
