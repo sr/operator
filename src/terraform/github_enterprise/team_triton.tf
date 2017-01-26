@@ -5,7 +5,7 @@ resource "github_team" "triton" {
 }
 
 resource "github_team_membership" "triton_stan-lemon" {
-  team_id  = "${github_team.caerus.id}"
+  team_id  = "${github_team.triton.id}"
   username = "stan-lemon"
   role     = "maintainer"
 }
