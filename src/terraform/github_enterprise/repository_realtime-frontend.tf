@@ -3,9 +3,9 @@ resource "github_repository" "realtime-frontend" {
   description   = "Realtime frontend server"
   homepage_url  = ""
   private       = true
-  has_issues    = true
+  has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "realtime-frontend_developers" {
@@ -44,5 +44,5 @@ resource "github_branch_protection" "realtime-frontend_master" {
 
   include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }
