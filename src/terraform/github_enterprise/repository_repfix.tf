@@ -3,9 +3,9 @@ resource "github_repository" "repfix" {
   description   = "Replication fixer scripts"
   homepage_url  = ""
   private       = true
-  has_issues    = true
+  has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "repfix_service-accounts-read-only" {
@@ -44,5 +44,5 @@ resource "github_branch_protection" "repfix_master" {
 
   include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }
