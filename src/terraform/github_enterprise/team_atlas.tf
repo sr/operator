@@ -1,5 +1,5 @@
 resource "github_team" "atlas" {
-  name        = "atlas"
+  name        = "Atlas"
   description = "Owners of the Salesforce-Package repository"
   privacy     = "closed"
 }
