@@ -14,7 +14,7 @@ resource "aws_security_group" "appdev_resty_server" {
     ]
 
     security_groups = [
-      "${aws_security_group.resty_http_lb.id}"
+      "${aws_security_group.resty_http_lb.id}",
     ]
   }
 
@@ -90,14 +90,16 @@ resource "aws_security_group" "resty_http_lb" {
   vpc_id      = "${aws_vpc.appdev.id}"
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
       "${aws_vpc.appdev.cidr_block}",
     ]
-    self        = "true"
+
+    self = "true"
   }
 
   ingress {
