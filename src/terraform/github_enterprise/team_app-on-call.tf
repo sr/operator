@@ -5,7 +5,7 @@ resource "github_team" "app-on-call" {
 }
 
 resource "github_team_membership" "app-on-call" {
-  team_id  = "${github_team.athena.id}"
+  team_id  = "${github_team.app-on-call.id}"
   username = "nathan-maphet"
   role     = "maintainer"
 }
