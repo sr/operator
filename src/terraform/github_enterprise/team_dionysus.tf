@@ -1,5 +1,5 @@
 resource "github_team" "dionysus" {
-  name        = "dionysus"
+  name        = "Dionysus"
   description = "https://confluence.dev.pardot.com/display/PE/Integration+Program"
   privacy     = "closed"
 }

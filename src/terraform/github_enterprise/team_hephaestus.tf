@@ -1,5 +1,5 @@
 resource "github_team" "hephaestus" {
-  name        = "hephaestus"
+  name        = "Hephaestus"
   description = "https://confluence.dev.pardot.com/display/PE/Team+Hephaestus"
   privacy     = "closed"
 }
