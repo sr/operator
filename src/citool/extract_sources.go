@@ -41,7 +41,7 @@ func (c *extractSourcesCommand) Description() string {
 
 func (c *extractSourcesCommand) LongHelp() string {
 	return `
-Extracts sources from a Docker container into a tarball. The Docker container must be a running or (preferably) stopped container. Multiple paths can be extracted to multiple destination paths.
+Extracts sources from a Docker image into a tarball. Multiple paths can be extracted to multiple destination paths.
 
 Examples:
 

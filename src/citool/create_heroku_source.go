@@ -9,33 +9,37 @@ import (
 	"os"
 )
 
-type createHerokuBuildCommand struct {
+type createHerokuSourceCommand struct {
 	app     string
 	file    string
 	version string
 }
 
-func (c *createHerokuBuildCommand) Name() string {
-	return "create-heroku-build"
+func (c *createHerokuSourceCommand) Name() string {
+	return "create-heroku-source"
 }
 
-func (c *createHerokuBuildCommand) Description() string {
-	return "Creates a Heroku build from a tarball"
+func (c *createHerokuSourceCommand) Description() string {
+	return "Creates a Heroku source from a tarball"
 }
 
-func (c *createHerokuBuildCommand) LongHelp() string {
+func (c *createHerokuSourceCommand) LongHelp() string {
 	return `
-Requires HEROKU_API_TOKEN to be set.
+Creates a Heroku source blob from a tarball. Requires HEROKU_API_TOKEN to be set.
+
+Examples:
+
+  citool create-heroku-source --app=pardot-foo --file=source.tar.gz --version=sha123
 `
 }
 
-func (c *createHerokuBuildCommand) RegisterFlags(fs *flag.FlagSet) {
+func (c *createHerokuSourceCommand) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&c.app, "app", "", "Heroku application name.")
 	fs.StringVar(&c.file, "file", "", "Source file (.tar.gz format).")
 	fs.StringVar(&c.version, "version", "", "Heroku build version (e.g., build ID).")
 }
 
-func (c *createHerokuBuildCommand) Run() error {
+func (c *createHerokuSourceCommand) Run() error {
 	if c.app == "" {
 		return errors.New("-app is required")
 	} else if c.file == "" {
@@ -79,17 +83,6 @@ func (c *createHerokuBuildCommand) Run() error {
 		return fmt.Errorf("HTTP %d when uploading the source file", resp.StatusCode)
 	}
 
-	build := &heroku.Build{
-		SourceBlob: &heroku.BuildSourceBlob{
-			URL:     source.SourceBlob.GetURL,
-			Version: c.version,
-		},
-	}
-	build, err = client.CreateBuild(c.app, build)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Created build '%s'\n", build.ID)
+	fmt.Printf("%s\n", source.SourceBlob.GetURL)
 	return nil
 }
