@@ -2,7 +2,7 @@ require "net/http"
 
 module PullAgent
   class PlayDeadController
-    def initialize(admin_port = 8090)
+    def initialize(admin_port = 8095)
       @admin_port = admin_port
     end
 
