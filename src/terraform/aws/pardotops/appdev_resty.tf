@@ -11,6 +11,7 @@ resource "aws_security_group" "appdev_resty_server" {
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}",
       "${var.pardot_ci_vpc_cidr}",
+      "${var.aloha_vpn_cidr_blocks}",
     ]
   }
 
@@ -22,6 +23,7 @@ resource "aws_security_group" "appdev_resty_server" {
     cidr_blocks = [
       "${aws_vpc.appdev.cidr_block}",
       "${var.pardot_ci_vpc_cidr}",
+      "${var.aloha_vpn_cidr_blocks}",
     ]
   }
 
