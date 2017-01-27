@@ -47,7 +47,7 @@ resource "aws_security_group" "appdev_resty_server" {
 }
 
 resource "aws_instance" "appdev_resty_server" {
-  ami           = "${var.centos_6_hvm_ebs_ami}"
+  ami           = "${var.centos_6_hvm_50gb_chefdev_ami}"
   instance_type = "t2.medium"
   key_name      = "internal_apps"
   private_ip    = "172.26.64.100"
