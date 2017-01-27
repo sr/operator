@@ -4,8 +4,8 @@ resource "github_repository" "engagement-history-package" {
   homepage_url  = ""
   private       = false
   has_issues    = true
-  has_downloads = false
-  has_wiki      = true
+  has_wiki      = false
+  has_downloads = true
 }
 
 resource "github_team_repository" "engagement-history-package_developers" {
