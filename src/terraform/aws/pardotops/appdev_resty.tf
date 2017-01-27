@@ -159,6 +159,6 @@ resource "aws_elb" "resty_public_elb" {
   }
 
   tags {
-    Name = "resty_primary_host_only"
+    Name = "resty_elb"
   }
 }
