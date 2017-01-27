@@ -83,17 +83,6 @@ func (c *createHerokuSourceCommand) Run() error {
 		return fmt.Errorf("HTTP %d when uploading the source file", resp.StatusCode)
 	}
 
-	build := &heroku.Build{
-		SourceBlob: &heroku.BuildSourceBlob{
-			URL:     source.SourceBlob.GetURL,
-			Version: c.version,
-		},
-	}
-	build, err = client.CreateBuild(c.app, build)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Created build '%s'\n", build.ID)
+	fmt.Printf("%s\n", source.SourceBlob.GetURL)
 	return nil
 }
