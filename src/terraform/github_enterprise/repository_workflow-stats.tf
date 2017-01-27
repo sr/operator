@@ -1,5 +1,5 @@
 resource "github_repository" "workflow-stats" {
-  name          = "Workflow Stats"
+  name          = "workflow-stats"
   description   = "https://git.dev.pardot.com/Pardot/workflow-stats/blob/master/README.md"
   homepage_url  = "https://git.dev.pardot.com/Pardot/workflow-stats"
   private       = true
