@@ -76,9 +76,9 @@ resource "aws_instance" "appdev_resty_server" {
   }
 }
 
-resource "aws_route53_record" "appdev_resty_CNAME_record" {
-  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
-  name    = "pardot2-resty1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+resource "aws_route53_record" "resty_dev_pardot_com_CNAME_record" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "resty.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_elb.resty_public_elb.dns_name}"]
   type    = "CNAME"
   ttl     = "900"
