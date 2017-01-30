@@ -1,33 +1,0 @@
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 54.89.37.88...
-* TCP_NODELAY set
-  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0* Connected to e2ecredentials.dev.pardot.com (54.89.37.88) port 443 (#0)
-* TLS 1.2 connection using TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-* Server certificate: e2ecredentials.dev.pardot.com
-* Server certificate: Let's Encrypt Authority X3
-* Server certificate: DST Root CA X3
-> GET /credentials/unlock?email=ete.ee.test.15@salesforce.com HTTP/1.1
-> Host: e2ecredentials.dev.pardot.com
-> User-Agent: curl/7.51.0
-> Accept: */*
-> 
-< HTTP/1.1 405 Method Not Allowed
-< Allow: POST
-< Cache-Control: no-cache
-< Content-Type: text/html; charset=UTF-8
-< Date: Mon, 30 Jan 2017 20:24:30 GMT
-< Server: Apache
-< Via: 1.1 spaces-router (4785ea88b207)
-< Transfer-Encoding: chunked
-< 
-{ [946 bytes data]
-* Curl_http_done: called premature == 0
-100  4519    0  4519    0     0   2535      0 --:--:--  0:00:01 --:--:--  2534
-* Connection #0 to host e2ecredentials.dev.pardot.com left intact
-* Rebuilt URL to: 2/
-*   Trying 0.0.0.2...
-* TCP_NODELAY set
-* Immediate connect fail for 0.0.0.2: No route to host
-* Closing connection 1
-curl: (7) Couldn't connect to server
