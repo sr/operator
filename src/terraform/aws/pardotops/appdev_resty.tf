@@ -27,10 +27,6 @@ resource "aws_security_group" "appdev_resty_server" {
       "${aws_vpc.appdev.cidr_block}",
       "${var.aloha_vpn_cidr_blocks}",
     ]
-
-    security_groups = [
-      "${aws_security_group.resty_http_lb.id}",
-    ]
   }
 
   # SSH from bastion
@@ -84,6 +80,14 @@ resource "aws_route53_record" "resty_dev_pardot_com_CNAME_record" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "resty_aws_pardot_com_A_record" {
+  zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
+  name    = "pardot2-resty1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
+  records = ["${aws_instance.appdev_resty_server.private_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
 resource "aws_security_group" "resty_http_lb" {
   name        = "resty_http_lb"
   description = "Allow HTTP/HTTPS from SFDC VPN and AppDev"
@@ -127,10 +131,10 @@ resource "aws_elb" "resty_public_elb" {
   ]
 
   subnets = [
-    "${aws_subnet.appdev_us_east_1d.id}",
-    "${aws_subnet.appdev_us_east_1a.id}",
-    "${aws_subnet.appdev_us_east_1c.id}",
-    "${aws_subnet.appdev_us_east_1e.id}",
+    "${aws_subnet.appdev_us_east_1d_dmz.id}",
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.appdev_us_east_1c_dmz.id}",
+    "${aws_subnet.appdev_us_east_1e_dmz.id}",
   ]
 
   connection_draining         = true
