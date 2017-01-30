@@ -131,10 +131,10 @@ resource "aws_elb" "resty_public_elb" {
   ]
 
   subnets = [
-    "${aws_subnet.appdev_us_east_1d.id}",
-    "${aws_subnet.appdev_us_east_1a.id}",
-    "${aws_subnet.appdev_us_east_1c.id}",
-    "${aws_subnet.appdev_us_east_1e.id}",
+    "${aws_subnet.appdev_us_east_1d_dmz.id}",
+    "${aws_subnet.appdev_us_east_1a_dmz.id}",
+    "${aws_subnet.appdev_us_east_1c_dmz.id}",
+    "${aws_subnet.appdev_us_east_1e_dmz.id}",
   ]
 
   connection_draining         = true
