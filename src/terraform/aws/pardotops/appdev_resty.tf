@@ -83,7 +83,7 @@ resource "aws_route53_record" "resty_dev_pardot_com_CNAME_record" {
 resource "aws_route53_record" "resty_aws_pardot_com_A_record" {
   zone_id = "${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.zone_id}"
   name    = "pardot2-resty1-1-ue1.${aws_route53_zone.appdev_aws_pardot_com_hosted_zone.name}"
-  records = ["${aws_instance.appdev_resty_server.private_ip}}"]
+  records = ["${aws_instance.appdev_resty_server.private_ip}"]
   type    = "A"
   ttl     = "900"
 }
