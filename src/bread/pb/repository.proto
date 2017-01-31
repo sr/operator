@@ -7,9 +7,10 @@ message RepositoryConfig {
 	// repository's build to be considered successful
 	repeated string required_testing_statuses = 1;
 
-	// Changing the files matching the globs definition in this watchlist
-	// triggers additional review by the @Pardot/security team.
-	RepositoryWatchlist high_risk_files = 2;
+	// Changing files matching glob patterns configured in this watchlist
+	// requires additional peer review and approval from a member of the
+	// @Pardot/security team
+	RepositoryWatchlist security_watchlist = 2;
 
 	// Watchlists attached to this repository
 	repeated RepositoryWatchlist watchlists = 3;

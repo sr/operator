@@ -13,8 +13,8 @@ class RepositoryConfigFile
     @config = config
   end
 
-  def high_risk_files
-    Array(@config.high_risk_files)
+  def security_watchlist
+    @config.security_watchlist
   end
 
   def required_testing_statuses
