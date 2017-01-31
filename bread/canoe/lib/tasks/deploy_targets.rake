@@ -8,10 +8,21 @@ namespace :canoe do
     BREAD_HIPCHAT_ROOM_ID = 42
     ENGR_HIPCHAT_ROOM_ID = 2
     ES_ONCALL_HIPCHAT_ROOM_ID = 901
+    MONGOOSES_HIPCHAT_ROOM_ID = 376
     OPS_HIPCHAT_ROOM_ID = 6
     SUPPORT_HIPCHAT_ROOM_ID = 28
     TEAM_CAERUS_HIPCHAT_ROOM_ID = 437
     TRITON_HIPCHAT_ROOM_ID = 872
+
+    cimta = Project.find_or_initialize_by(name: "cimta-topology").tap { |project|
+      project.icon = "hand-right"
+      project.bamboo_project = "PDT"
+      project.bamboo_plan = "CIM"
+      project.repository = "Pardot/cimta-topology"
+      project.compliant_builds_required = false
+      project.save!
+    }.tap(&:save!)
+    cimta.deploy_notifications.find_or_initialize_by(hipchat_room_id: MONGOOSES_HIPCHAT_ROOM_ID).tap(&:save!)
 
     eht = Project.find_or_initialize_by(name: "engagement-history-topology").tap { |project|
       project.icon = "book"
