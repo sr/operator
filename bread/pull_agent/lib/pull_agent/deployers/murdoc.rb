@@ -1,9 +1,21 @@
 module PullAgent
   module Deployers
-    class Murdoc < TopologyDeploy
+    class Murdoc
       DeployerRegistry["murdoc"] = self
 
-      protected
+      def initialize(environment, deploy)
+        @environment = environment
+        @deploy = deploy
+      end
+
+      def deploy
+        TopologyDeploy.new(@deploy, release_directory)
+      end
+
+      def restart
+      end
+
+      private
 
       def release_directory
         @release_directory ||=
