@@ -46,7 +46,8 @@ BUILDS = {
   "mesh/app"                        => Build.new("mesh/app"),
   "repfix/app"                      => Build.new("repfix/app"),
   "bread/bread"                     => Build.new("bread/bread", common: true),
-  "bread/teampass:2.1.25.2"         => Build.new("bread/teampass"),
+  "teampass:2.1.25.2"               => Build.new("teampass/2.1.25"),
+  "teampass:2.1.26"                 => Build.new("teampass/2.1.26"),
   "pwm:1.7.1"                       => Build.new("pwm/1.7.1"),
 }
 
