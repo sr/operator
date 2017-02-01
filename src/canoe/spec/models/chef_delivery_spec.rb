@@ -6,6 +6,8 @@ RSpec.describe ChefDelivery do
     @delivery = ChefDelivery.new(@config)
 
     github.compliance_state = GithubRepository::SUCCESS
+    github.tests_state = GithubRepository::SUCCESS
+    github.master_head_sha = "sha2"
   end
 
   def github
@@ -23,6 +25,15 @@ RSpec.describe ChefDelivery do
       state: ChefDelivery::SUCCESS
     }
     ChefDeploy.create!(defaults.merge(attributes))
+  end
+
+  it "deploys if the checkout differs from the current build and all prereqs are satisfied" do
+    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
+    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
+    request = ChefCheckinRequest.new(server, checkout)
+
+    response = @delivery.checkin(request)
+    assert_equal "deploy", response.action
   end
 
   it "noops if chef delivery is disabled in current environment" do
@@ -109,6 +120,7 @@ RSpec.describe ChefDelivery do
     server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
     checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
     request = ChefCheckinRequest.new(server, checkout)
+    github.master_head_sha = "sha1"
     create_current_deploy(state: ChefDelivery::PENDING)
 
     response = @delivery.checkin(request)
@@ -124,16 +136,6 @@ RSpec.describe ChefDelivery do
 
     response = @delivery.checkin(request)
     assert_equal "noop", response.action
-  end
-
-  it "deploys if the checkout differs from the current build" do
-    server = ChefDelivery::Server.new("test", "production", "pardot0-chef1")
-    checkout = ChefCheckinRequest::Checkout.new("sha1", "master")
-    request = ChefCheckinRequest.new(server, checkout)
-    github.master_head_sha = "sha2"
-
-    response = @delivery.checkin(request)
-    assert_equal "deploy", response.action
   end
 
   it "deploys the same build twice" do
