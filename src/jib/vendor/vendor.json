@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "I0CBo8Exz2mQLtjYF3FNAKMn4Fk=",
+			"path": "github.com/google/go-github/github",
+			"revision": "b61d23c014d35fb451bbefefaa468153e67753da",
+			"revisionTime": "2017-01-30T03:11:43Z"
+		},
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"revisionTime": "2017-01-11T10:11:55Z"
+		}
+	],
+	"rootPath": "jib"
+}
