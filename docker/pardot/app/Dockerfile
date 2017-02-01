@@ -4,7 +4,7 @@ ARG dist=el6
 ARG percona_major_version=55
 ARG nodejs_version=4.4.2
 ARG npm_version=3
-ARG yarn_version=0.16.1
+ARG yarn_version=0.19.1
 ARG bower_version=1.7.2
 ARG phantomjs_version=2.1.1-1
 ARG artifactory_host
