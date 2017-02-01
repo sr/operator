@@ -13,7 +13,7 @@ RSpec.describe GithubRepository do
   it "synchronizes repository configuration file" do
     config = Bread::RepositoryConfig.new(
       required_testing_statuses: ["Initial Job", "Test Jobs"],
-      high_risk_files: Bread::RepositoryWatchlist.new(
+      security_watchlist: Bread::RepositoryWatchlist.new(
         team: "security",
         globs: ["/templates/default/etc/sudoers.erb"]
       )
@@ -32,13 +32,13 @@ RSpec.describe GithubRepository do
 
     expect(repository.config.required_testing_statuses).to eq(["Test Jobs"])
     expect(repository.config.watchlists).to eq([])
-    expect(repository.config.high_risk_files).to eq([])
+    expect(repository.config.security_watchlist).to eq(nil)
 
     repository.synchronize
 
     expect(repository.config.required_testing_statuses).to eq(["Initial Job", "Test Jobs"])
-    expect(repository.config.high_risk_files[0].team).to eq("security")
-    expect(repository.config.high_risk_files[0].globs.to_a).to eq(["/templates/default/etc/sudoers.erb"])
+    expect(repository.config.security_watchlist.team).to eq("security")
+    expect(repository.config.security_watchlist.globs.to_a).to eq(["/templates/default/etc/sudoers.erb"])
     expect(repository.config.watchlists).to eq([])
 
     config_file[:content] = Base64.encode64(JSON.dump(garbage: true))

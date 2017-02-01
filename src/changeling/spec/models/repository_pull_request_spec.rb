@@ -275,6 +275,22 @@ RSpec.describe RepositoryPullRequest do
       @multipass.synchronize
       expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
+
+    it "detects emergency merges" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+
+      expect(@multipass.change_type).to_not eq(ChangeCategorization::EMERGENCY)
+      expect(@multipass.complete?).to eq(false)
+
+      stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      @multipass.synchronize
+      @multipass.reload
+
+      expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
+    end
   end
 
   describe "synchronizing github statuses" do
