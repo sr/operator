@@ -25,6 +25,17 @@ type IssueComment struct {
 	Body string
 }
 
+// IssueReplyComment represents the bot's reply to a given command or other
+// event. It is meant to be idempotent and updatable
+type IssueReplyComment struct {
+	// Replies with the same Context will be updated instead of posted anew.
+	//
+	// Context must be serializable to JSON.
+	Context interface{}
+
+	Body string
+}
+
 type User struct {
 	Login string
 }
@@ -38,4 +49,8 @@ var (
 
 func Bool(b bool) *bool {
 	return &b
+}
+
+func String(s string) *string {
+	return &s
 }

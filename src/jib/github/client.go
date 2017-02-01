@@ -1,9 +1,12 @@
 package github
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	gogithub "github.com/google/go-github/github"
 )
@@ -20,11 +23,13 @@ type Client interface {
 	GetIssueComments(owner, repo string, number int) ([]*IssueComment, error)
 	GetUserPermissionLevel(owner, repo, login string) (PermissionLevel, error)
 	MergePullRequest(owner, repo string, number int, commitMessage string) error
+	PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error
 }
 
 // client is the real implementation of Client.
 type client struct {
-	gh *gogithub.Client
+	username string
+	gh       *gogithub.Client
 }
 
 func NewClient(baseURL *url.URL, username string, apiToken string) Client {
@@ -38,7 +43,8 @@ func NewClient(baseURL *url.URL, username string, apiToken string) Client {
 	gh.BaseURL = baseURL
 
 	return &client{
-		gh: gh,
+		username: username,
+		gh:       gh,
 	}
 }
 
@@ -188,4 +194,55 @@ func (c *client) MergePullRequest(org, repo string, number int, commitMessage st
 	opt := &gogithub.PullRequestOptions{}
 	_, _, err := c.gh.PullRequests.Merge(org, repo, number, commitMessage, opt)
 	return err
+}
+
+func (c *client) PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error {
+	if comment.Context == nil {
+		return errors.New("comment context was nil")
+	}
+
+	contextStr, err := buildHiddenContextString(comment.Context)
+	if err != nil {
+		return err
+	}
+
+	comments, err := c.GetIssueComments(owner, repo, number)
+	if err != nil {
+		return err
+	}
+
+	ghComment := &gogithub.IssueComment{
+		Body: String(fmt.Sprintf("%s\n%s", contextStr, comment.Body)),
+	}
+
+	// Attempt to find an existing comment by our user that matches the context
+	for _, comment := range comments {
+		if comment.User.Login != c.username {
+			// Comment is not written by us
+			continue
+		}
+
+		if comment.Body == *ghComment.Body {
+			// Comments are already identical (including context),
+			// nothing to do
+			return nil
+		} else if strings.HasPrefix(comment.Body, contextStr) {
+			// Matches context, but body differs. Edit.
+			_, _, err := c.gh.Issues.EditComment(owner, repo, number, ghComment)
+			return err
+		}
+	}
+
+	// No existing comment found or no context provided. Create a new one.
+	_, _, err = c.gh.Issues.CreateComment(owner, repo, number, ghComment)
+	return err
+}
+
+func buildHiddenContextString(context interface{}) (string, error) {
+	contextJSON, err := json.Marshal(context)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("<!-- %s -->", contextJSON), nil
 }
