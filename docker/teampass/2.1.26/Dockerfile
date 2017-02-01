@@ -29,7 +29,7 @@ RUN perl -p -i -e "s#Directory /var/www#Directory /teampass/www#g" /etc/httpd/co
 COPY custom.sh /
 RUN /custom.sh
 
-RUN cp /teampass/www/apache-default.conf /etc/httpd/conf.d/teampass.conf
+COPY apache-default.conf /etc/httpd/conf.d/teampass.conf
 COPY supervisord.conf /etc/supervisord.conf
 
 EXPOSE 80
