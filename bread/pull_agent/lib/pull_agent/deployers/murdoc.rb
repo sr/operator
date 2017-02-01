@@ -9,7 +9,7 @@ module PullAgent
       end
 
       def deploy
-        TopologyDeploy.new(@deploy, release_directory)
+        TopologyDeploy.new(@deploy, release_directory).deploy
       end
 
       def restart
