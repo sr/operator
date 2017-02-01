@@ -48,7 +48,6 @@ BUILDS = {
   "bread/bread"                     => Build.new("bread/bread", common: true),
   "teampass:2.1.25.2"               => Build.new("teampass/2.1.25"),
   "teampass:2.1.26"                 => Build.new("teampass/2.1.26"),
-  "teampass:2.1.26-unmodified"                 => Build.new("teampass/2.1.26-unmodified"),
   "pwm:1.7.1"                       => Build.new("pwm/1.7.1"),
 }
 
