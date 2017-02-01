@@ -49,6 +49,6 @@ resource "github_branch_protection" "chef_master" {
   branch     = "master"
 
   include_admins = false
-  strict         = true
+  strict         = false
   contexts       = ["compliance"]
 }
