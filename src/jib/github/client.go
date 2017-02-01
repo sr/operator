@@ -19,6 +19,7 @@ const (
 // github.com/google/go-github, focusing on higher-level, safe or otherwise
 // idempotent operations
 type Client interface {
+	Username() string
 	GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
 	GetIssueComments(owner, repo string, number int) ([]*IssueComment, error)
 	GetUserPermissionLevel(owner, repo, login string) (PermissionLevel, error)
@@ -46,6 +47,10 @@ func NewClient(baseURL *url.URL, username string, apiToken string) Client {
 		username: username,
 		gh:       gh,
 	}
+}
+
+func (c *client) Username() string {
+	return c.username
 }
 
 func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error) {
@@ -100,6 +105,8 @@ func (c *client) wrapPullRequest(owner, repo string, pullRequest *gogithub.PullR
 		return nil, fmt.Errorf("pull request state was nil: %+v", pullRequest)
 	} else if pullRequest.Title == nil {
 		return nil, fmt.Errorf("pull request title was nil: %+v", pullRequest)
+	} else if pullRequest.UpdatedAt == nil {
+		return nil, fmt.Errorf("pull request updated at was nil: %+v", pullRequest)
 	}
 
 	wrapped := &PullRequest{
@@ -108,6 +115,7 @@ func (c *client) wrapPullRequest(owner, repo string, pullRequest *gogithub.PullR
 		Number:     *pullRequest.Number,
 		State:      *pullRequest.State,
 		Title:      *pullRequest.Title,
+		UpdatedAt:  *pullRequest.UpdatedAt,
 		Mergeable:  pullRequest.Mergeable,
 	}
 	return wrapped, nil
@@ -115,8 +123,6 @@ func (c *client) wrapPullRequest(owner, repo string, pullRequest *gogithub.PullR
 
 func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComment, error) {
 	opt := &gogithub.IssueListCommentsOptions{
-		Sort:      "created",
-		Direction: "asc",
 		ListOptions: gogithub.ListOptions{
 			PerPage: githubMaxPerPage,
 		},
@@ -150,9 +156,13 @@ func (c *client) wrapIssueComment(comment *gogithub.IssueComment) (*IssueComment
 	if comment.ID == nil {
 		return nil, fmt.Errorf("comment ID was nil: %+v", comment)
 	} else if comment.User == nil {
-		return nil, fmt.Errorf("comment User was nil: %+v", comment)
+		return nil, fmt.Errorf("comment user was nil: %+v", comment)
 	} else if comment.Body == nil {
-		return nil, fmt.Errorf("comment Body was nil: %+v", comment)
+		return nil, fmt.Errorf("comment body was nil: %+v", comment)
+	} else if comment.CreatedAt == nil {
+		return nil, fmt.Errorf("comment created at was nil: %+v", comment)
+	} else if comment.UpdatedAt == nil {
+		return nil, fmt.Errorf("comment updated at was nil: %+v", comment)
 	}
 
 	wrappedUser, err := c.wrapUser(comment.User)
@@ -161,9 +171,11 @@ func (c *client) wrapIssueComment(comment *gogithub.IssueComment) (*IssueComment
 	}
 
 	wrapped := &IssueComment{
-		ID:   *comment.ID,
-		User: wrappedUser,
-		Body: *comment.Body,
+		ID:        *comment.ID,
+		User:      wrappedUser,
+		Body:      *comment.Body,
+		CreatedAt: *comment.CreatedAt,
+		UpdatedAt: *comment.UpdatedAt,
 	}
 	return wrapped, nil
 }

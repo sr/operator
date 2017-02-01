@@ -18,15 +18,28 @@ type Command struct {
 	Comment *github.IssueComment
 }
 
-func ExtractCommands(comments []*github.IssueComment) []*Command {
+// ExtractCommands extracts commands from the list of comments.
+//
+// It ignores any comments from ignoredUsernames, so that bots don't end up talking to themselves.
+func ExtractCommands(comments []*github.IssueComment, ignoredUsernames []string) []*Command {
 	commands := []*Command{}
 	for _, comment := range comments {
-		matches := cmdRe.FindAllStringSubmatch(comment.Body, -1)
-		for _, matches := range matches {
-			commands = append(commands, &Command{
-				Name:    matches[1],
-				Comment: comment,
-			})
+		ignored := false
+		for _, ignoredUsername := range ignoredUsernames {
+			if ignoredUsername == comment.User.Login {
+				ignored = true
+				break
+			}
+		}
+
+		if !ignored {
+			matches := cmdRe.FindAllStringSubmatch(comment.Body, -1)
+			for _, matches := range matches {
+				commands = append(commands, &Command{
+					Name:    matches[1],
+					Comment: comment,
+				})
+			}
 		}
 	}
 	return commands

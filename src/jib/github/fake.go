@@ -3,6 +3,7 @@ package github
 import "fmt"
 
 type FakeClient struct {
+	ProvidedUsername   string
 	OpenPullRequests   []*PullRequest
 	IssueComments      map[int][]*IssueComment
 	PermissionLevels   map[string]PermissionLevel
@@ -12,6 +13,10 @@ type FakeClient struct {
 
 // Ensure FakeClient conforms to the GithubClient interface
 var _ Client = &FakeClient{}
+
+func (c *FakeClient) Username() string {
+	return c.ProvidedUsername
+}
 
 func (c *FakeClient) GetOpenPullRequests(org, repo string) ([]*PullRequest, error) {
 	return c.OpenPullRequests, nil

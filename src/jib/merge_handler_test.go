@@ -4,6 +4,7 @@ import (
 	"jib/github"
 	"regexp"
 	"testing"
+	"time"
 )
 
 func TestMergeCommandHandler(t *testing.T) {
@@ -63,25 +64,33 @@ func TestMergeCommandHandler(t *testing.T) {
 			},
 			expectedToMerge: false,
 		},
-		// Mergeability undetermined, command issued
-		// Bot will just wait until mergeability is determined
+		// Mergable PR, but updated after /merge command issued
 		{
 			pullRequest: &github.PullRequest{
 				Owner:      "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",
-				Mergeable:  nil,
+				Mergeable:  github.Bool(true),
+				UpdatedAt:  time.Now().Add(-1 * time.Minute),
 			},
 			comments: []*github.IssueComment{
 				{
-					ID:   123,
-					User: authorizedUser,
-					Body: "/merge",
+					ID:        123,
+					User:      authorizedUser,
+					Body:      "/merge",
+					CreatedAt: time.Now().Add(-2 * time.Minute),
 				},
 			},
-			expectedReplyComment: nil,
-			expectedToMerge:      false,
+			expectedReplyComment: &issueReplyCommentMatcher{
+				Context: &mergeReplyCommentContext{
+					InReplyToID: 123,
+				},
+				BodyRegexps: []*regexp.Regexp{
+					regexp.MustCompile(`@authorized-user I didn't merge this PR because it was updated after the /merge command was issued`),
+				},
+			},
+			expectedToMerge: false,
 		},
 	}
 

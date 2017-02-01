@@ -1,6 +1,9 @@
 package github
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type PullRequest struct {
 	Owner      string
@@ -9,6 +12,8 @@ type PullRequest struct {
 
 	State string
 	Title string
+
+	UpdatedAt time.Time
 
 	// Mergeable is either true (mergeable), false (not mergeable), or null (not computed yet)
 	Mergeable *bool
@@ -23,6 +28,9 @@ type IssueComment struct {
 	ID   int
 	User *User
 	Body string
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // IssueReplyComment represents the bot's reply to a given command or other
