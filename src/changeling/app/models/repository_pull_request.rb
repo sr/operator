@@ -115,6 +115,7 @@ class RepositoryPullRequest
     @multipass.save!
 
     detect_emergency_merge
+    create_github_commit_status
 
     @multipass
   end
@@ -282,6 +283,16 @@ class RepositoryPullRequest
       TicketReference.create!(multipass_id: @multipass.id, ticket_id: ticket.id)
     else
       @multipass.ticket_reference.update!(ticket_id: ticket.id)
+    end
+  end
+
+  def create_github_commit_status
+    if @multipass.rejected?
+      @multipass.failure_github_commit_status!
+    elsif @multipass.complete?
+      @multipass.approve_github_commit_status!
+    else
+      @multipass.pending_github_commit_status!
     end
   end
 

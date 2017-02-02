@@ -36,6 +36,10 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
+    if current_build.tests_state != SUCCESS
+      return ChefCheckinResponse.noop
+    end
+
     if current_build.branch != @config.master_branch
       return ChefCheckinResponse.noop
     end
