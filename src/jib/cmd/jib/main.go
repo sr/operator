@@ -7,6 +7,7 @@ import (
 	"jib"
 	"jib/github"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -98,6 +99,13 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
+	// TODO(alindeman): Implement a real webhook server
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", config.port),
+		Handler: http.NotFoundHandler(),
+	}
+	go func() { panic(server.ListenAndServe()) }()
 
 	for {
 		for _, pr := range openPRs {
