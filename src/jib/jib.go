@@ -9,9 +9,9 @@ const (
 	complianceStatusContext = "compliance"
 )
 
-type PullRequestHandler func(gh github.Client, pr *github.PullRequest) error
+type PullRequestHandler func(log *log.Logger, gh github.Client, pr *github.PullRequest) error
 
-func InfoHandler(gh github.Client, pr *github.PullRequest) error {
+func InfoHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) error {
 	log.Printf("processing %s/%s#%d titled '%s'\n", pr.Org, pr.Repository, pr.Number, pr.Title)
 	return nil
 }

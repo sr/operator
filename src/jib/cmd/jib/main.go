@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"jib"
 	"jib/github"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -87,6 +88,7 @@ func run() error {
 		jib.InfoHandler,
 		jib.MergeCommandHandler,
 	}
+	log := log.New(os.Stdout, "", log.LstdFlags)
 
 	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
 	openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
@@ -96,7 +98,7 @@ func run() error {
 
 	for _, pr := range openPRs {
 		for _, handler := range handlers {
-			err := handler(gh, pr)
+			err := handler(log, gh, pr)
 			if err != nil {
 				// An error in a handler is worrisome, but not fatal
 				// TODO(alindeman): report to sentry

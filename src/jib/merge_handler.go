@@ -32,7 +32,7 @@ If you still want to merge, re-issue the /merge command and I'll get right to it
 `)))
 )
 
-func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
+func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) error {
 	if pr.Mergeable == nil {
 		log.Printf("pull request '%s' has undetermined mergeability, skipping for now", pr)
 		return nil
