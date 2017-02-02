@@ -26,20 +26,8 @@ class ChangelingConfig
   end
   attr_writer :email_notifications_enabled
 
-  def repository_owners_review_required
-    return @repository_owners_review_required if defined?(@repository_owners_review_required)
-    @repository_owners_review_required = Array(ENV.fetch("REPOSITORY_OWNERS_REVIEW_REQUIRED", "").split(","))
-  end
-  attr_writer :repository_owners_review_required
-
-  def component_owners_review_enabled
-    return @component_owners_review_enabled if defined?(@component_owners_review_enabled)
-    @component_owners_review_enabled = Array(ENV.fetch("COMPONENT_OWNERS_REVIEW_ENABLED", "").split(","))
-  end
-  attr_writer :component_owners_review_enabled
-
-  def repository_owners_file_branch
-    ENV.fetch("REPOSITORY_OWNERS_FILE_BRANCH", nil)
+  def owners_files_enabled?
+    pardot?
   end
 
   def page_title

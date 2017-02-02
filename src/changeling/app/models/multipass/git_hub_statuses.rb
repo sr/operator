@@ -31,6 +31,10 @@ module Multipass::GitHubStatuses
   end
 
   def callback_to_github
+    if Changeling.config.pardot?
+      return
+    end
+
     GitHubCommitStatusWorker.perform_later(id)
   end
 
