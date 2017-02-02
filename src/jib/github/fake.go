@@ -3,10 +3,12 @@ package github
 import "fmt"
 
 type FakeClient struct {
-	ProvidedUsername   string
-	OpenPullRequests   []*PullRequest
-	IssueComments      map[int][]*IssueComment
-	PermissionLevels   map[string]PermissionLevel
+	ProvidedUsername string
+	OpenPullRequests []*PullRequest
+	IssueComments    map[int][]*IssueComment
+	PermissionLevels map[string]PermissionLevel
+	CommitStatuses   map[string][]*CommitStatus
+
 	MergedPullRequests map[int]string
 	PostedComments     []*IssueReplyComment
 }
@@ -45,6 +47,14 @@ func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessag
 	c.MergedPullRequests[number] = commitMessage
 
 	return nil
+}
+
+func (c *FakeClient) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error) {
+	if statuses, ok := c.CommitStatuses[ref]; ok {
+		return statuses, nil
+	} else {
+		return nil, fmt.Errorf("no commit statuses for %s", ref)
+	}
 }
 
 func (c *FakeClient) PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error {

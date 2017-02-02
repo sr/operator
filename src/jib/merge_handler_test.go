@@ -15,6 +15,7 @@ func TestMergeCommandHandler(t *testing.T) {
 	cases := []struct {
 		pullRequest          *github.PullRequest
 		comments             []*github.IssueComment
+		commitStatuses       map[string][]*github.CommitStatus
 		expectedReplyComment *issueReplyCommentMatcher
 		expectedToMerge      bool
 	}{
@@ -26,12 +27,21 @@ func TestMergeCommandHandler(t *testing.T) {
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
+				HeadSHA:    "abc123",
 			},
 			comments: []*github.IssueComment{
 				{
 					ID:   123,
 					User: authorizedUser,
 					Body: "/merge",
+				},
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": []*github.CommitStatus{
+					{
+						Context: complianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
 				},
 			},
 			expectedReplyComment: nil,
@@ -45,6 +55,15 @@ func TestMergeCommandHandler(t *testing.T) {
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(false),
+				HeadSHA:    "abc123",
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": []*github.CommitStatus{
+					{
+						Context: complianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
+				},
 			},
 			comments: []*github.IssueComment{
 				{
@@ -58,7 +77,71 @@ func TestMergeCommandHandler(t *testing.T) {
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
-					regexp.MustCompile(`@authorized-user I can't merge.*because a required status failed`),
+					regexp.MustCompile(`@authorized-user I can't merge.*because the pull request is not in a mergeable state.`),
+					regexp.MustCompile(`Please fix.*and re-issue the /merge command`),
+				},
+			},
+			expectedToMerge: false,
+		},
+		// Mergeability undetermined, command issued
+		{
+			pullRequest: &github.PullRequest{
+				Owner:      "pardot",
+				Repository: "bread",
+				Number:     1,
+				State:      "open",
+				Mergeable:  nil,
+				HeadSHA:    "abc123",
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": []*github.CommitStatus{
+					{
+						Context: complianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
+				},
+			},
+			comments: []*github.IssueComment{
+				{
+					ID:   123,
+					User: authorizedUser,
+					Body: "/merge",
+				},
+			},
+			expectedReplyComment: nil,
+			expectedToMerge:      false,
+		},
+		// Mergeable PR, but tests failed
+		{
+			pullRequest: &github.PullRequest{
+				Owner:      "pardot",
+				Repository: "bread",
+				Number:     1,
+				State:      "open",
+				Mergeable:  github.Bool(true),
+				HeadSHA:    "abc123",
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": []*github.CommitStatus{
+					{
+						Context: complianceStatusContext,
+						State:   github.CommitStatusFailure,
+					},
+				},
+			},
+			comments: []*github.IssueComment{
+				{
+					ID:   123,
+					User: authorizedUser,
+					Body: "/merge",
+				},
+			},
+			expectedReplyComment: &issueReplyCommentMatcher{
+				Context: &mergeReplyCommentContext{
+					InReplyToID: 123,
+				},
+				BodyRegexps: []*regexp.Regexp{
+					regexp.MustCompile(`@authorized-user I can't merge.*because the compliance status check failed.`),
 					regexp.MustCompile(`Please fix.*and re-issue the /merge command`),
 				},
 			},
@@ -72,7 +155,16 @@ func TestMergeCommandHandler(t *testing.T) {
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
+				HeadSHA:    "abc123",
 				UpdatedAt:  time.Now().Add(-1 * time.Minute),
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": []*github.CommitStatus{
+					{
+						Context: complianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
+				},
 			},
 			comments: []*github.IssueComment{
 				{
@@ -100,6 +192,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			IssueComments: map[int][]*github.IssueComment{
 				tc.pullRequest.Number: tc.comments,
 			},
+			CommitStatuses: tc.commitStatuses,
 		}
 
 		err := MergeCommandHandler(client, tc.pullRequest)

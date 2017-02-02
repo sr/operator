@@ -14,7 +14,13 @@ type mergeReplyCommentContext struct {
 
 var (
 	unmergablePrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} I can't merge this PR right now because a required status failed.
+@{{.User.Login}} I can't merge this PR right now because the pull request is not in a mergeable state.
+
+Please fix the issue and re-issue the /merge command and I'll get right to it.
+`)))
+
+	complianceStatusFailedPrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
+@{{.User.Login}} I can't merge this PR right now because the compliance status check failed.
 
 Please fix the issue and re-issue the /merge command and I'll get right to it.
 `)))
@@ -64,38 +70,18 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 		}
 	}
 
-	if latestMergeCommand != nil {
-		comment := latestMergeCommand.Comment
-		if *pr.Mergeable {
-			// If the PR was updated after the /merge
-			// command was created, we must get the user to
-			// verify their intent again.
-			if pr.UpdatedAt.After(comment.CreatedAt) {
-				body, err := renderTemplate(prUpdatedAfterMergeCommandReply, comment)
-				if err != nil {
-					return err
-				}
+	if latestMergeCommand == nil {
+		// Nothing to do
+		return nil
+	}
 
-				reply := &github.IssueReplyComment{
-					Context: &mergeReplyCommentContext{
-						InReplyToID: comment.ID,
-					},
-					Body: body,
-				}
-
-				err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
-				if err != nil {
-					return err
-				}
-			} else {
-				message := fmt.Sprintf("Automated merge, requested by @%s", comment.User.Login)
-				err = gh.MergePullRequest(pr.Owner, pr.Repository, pr.Number, message)
-				if err != nil {
-					return err
-				}
-			}
-		} else {
-			body, err := renderTemplate(unmergablePrReply, comment)
+	comment := latestMergeCommand.Comment
+	if *pr.Mergeable {
+		// If the PR was updated after the /merge
+		// command was created, we must get the user to
+		// verify their intent again.
+		if pr.UpdatedAt.After(comment.CreatedAt) {
+			body, err := renderTemplate(prUpdatedAfterMergeCommandReply, comment)
 			if err != nil {
 				return err
 			}
@@ -111,6 +97,60 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			statuses, err := gh.GetCommitStatuses(pr.Owner, pr.Repository, pr.HeadSHA)
+			if err != nil {
+				return err
+			}
+
+			complianceStatus := findComplianceStatus(statuses)
+			if complianceStatus == nil || complianceStatus.State == github.CommitStatusPending {
+				// Compliance check is unreported or pending;
+				// nothing to do until it has a firm result
+				return nil
+			}
+
+			if complianceStatus.State == github.CommitStatusSuccess {
+				message := fmt.Sprintf("Automated merge, requested by @%s", comment.User.Login)
+				err = gh.MergePullRequest(pr.Owner, pr.Repository, pr.Number, message)
+				if err != nil {
+					return err
+				}
+			} else if complianceStatus.State == github.CommitStatusFailure {
+				body, err := renderTemplate(complianceStatusFailedPrReply, comment)
+				if err != nil {
+					return err
+				}
+
+				reply := &github.IssueReplyComment{
+					Context: &mergeReplyCommentContext{
+						InReplyToID: comment.ID,
+					},
+					Body: body,
+				}
+
+				err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	} else {
+		body, err := renderTemplate(unmergablePrReply, comment)
+		if err != nil {
+			return err
+		}
+
+		reply := &github.IssueReplyComment{
+			Context: &mergeReplyCommentContext{
+				InReplyToID: comment.ID,
+			},
+			Body: body,
+		}
+
+		err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
+		if err != nil {
+			return err
 		}
 	}
 

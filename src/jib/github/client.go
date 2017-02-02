@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	gogithub "github.com/google/go-github/github"
 )
@@ -14,6 +15,79 @@ import (
 const (
 	githubMaxPerPage = 100
 )
+
+type PullRequest struct {
+	Owner      string
+	Repository string
+	Number     int
+
+	State string
+	Title string
+
+	UpdatedAt time.Time
+
+	HeadSHA string
+
+	// Mergeable is either true (mergeable), false (not mergeable), or null (not computed yet)
+	Mergeable *bool
+}
+
+func (p *PullRequest) String() string {
+	return fmt.Sprintf("%s/%s#%d \"%s\"", p.Owner, p.Repository, p.Number, p.Title)
+
+}
+
+type IssueComment struct {
+	ID   int
+	User *User
+	Body string
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// IssueReplyComment represents the bot's reply to a given command or other
+// event. It is meant to be idempotent and updatable
+type IssueReplyComment struct {
+	// Replies with the same Context will be updated instead of posted anew.
+	//
+	// Context must be serializable to JSON.
+	Context interface{}
+
+	Body string
+}
+
+type User struct {
+	Login string
+}
+
+type PermissionLevel string
+
+var (
+	PermissionLevelAdmin PermissionLevel = "admin"
+	PermissionLevelWrite PermissionLevel = "write"
+)
+
+type CommitStatusState string
+
+type CommitStatus struct {
+	Context string
+	State   CommitStatusState
+}
+
+var (
+	CommitStatusFailure CommitStatusState = "failure"
+	CommitStatusPending CommitStatusState = "pending"
+	CommitStatusSuccess CommitStatusState = "success"
+)
+
+func Bool(b bool) *bool {
+	return &b
+}
+
+func String(s string) *string {
+	return &s
+}
 
 // Client is a pared-down version of the GitHub client from
 // github.com/google/go-github, focusing on higher-level, safe or otherwise
@@ -25,6 +99,7 @@ type Client interface {
 	GetUserPermissionLevel(owner, repo, login string) (PermissionLevel, error)
 	MergePullRequest(owner, repo string, number int, commitMessage string) error
 	PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error
+	GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error)
 }
 
 // client is the real implementation of Client.
@@ -82,7 +157,7 @@ func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
 				return nil, err
 			}
 
-			wrapped, err := c.wrapPullRequest(owner, repo, fullPullRequest)
+			wrapped, err := wrapPullRequest(owner, repo, fullPullRequest)
 			if err != nil {
 				return nil, err
 			}
@@ -96,29 +171,6 @@ func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
 	}
 
 	return allPullRequests, nil
-}
-
-func (c *client) wrapPullRequest(owner, repo string, pullRequest *gogithub.PullRequest) (*PullRequest, error) {
-	if pullRequest.Number == nil {
-		return nil, fmt.Errorf("pull request number was nil: %+v", pullRequest)
-	} else if pullRequest.State == nil {
-		return nil, fmt.Errorf("pull request state was nil: %+v", pullRequest)
-	} else if pullRequest.Title == nil {
-		return nil, fmt.Errorf("pull request title was nil: %+v", pullRequest)
-	} else if pullRequest.UpdatedAt == nil {
-		return nil, fmt.Errorf("pull request updated at was nil: %+v", pullRequest)
-	}
-
-	wrapped := &PullRequest{
-		Owner:      owner,
-		Repository: repo,
-		Number:     *pullRequest.Number,
-		State:      *pullRequest.State,
-		Title:      *pullRequest.Title,
-		UpdatedAt:  *pullRequest.UpdatedAt,
-		Mergeable:  pullRequest.Mergeable,
-	}
-	return wrapped, nil
 }
 
 func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComment, error) {
@@ -136,7 +188,7 @@ func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComme
 		}
 
 		for _, comment := range comments {
-			wrapped, err := c.wrapIssueComment(comment)
+			wrapped, err := wrapIssueComment(comment)
 			if err != nil {
 				return nil, err
 			}
@@ -150,45 +202,6 @@ func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComme
 	}
 
 	return allComments, nil
-}
-
-func (c *client) wrapIssueComment(comment *gogithub.IssueComment) (*IssueComment, error) {
-	if comment.ID == nil {
-		return nil, fmt.Errorf("comment ID was nil: %+v", comment)
-	} else if comment.User == nil {
-		return nil, fmt.Errorf("comment user was nil: %+v", comment)
-	} else if comment.Body == nil {
-		return nil, fmt.Errorf("comment body was nil: %+v", comment)
-	} else if comment.CreatedAt == nil {
-		return nil, fmt.Errorf("comment created at was nil: %+v", comment)
-	} else if comment.UpdatedAt == nil {
-		return nil, fmt.Errorf("comment updated at was nil: %+v", comment)
-	}
-
-	wrappedUser, err := c.wrapUser(comment.User)
-	if err != nil {
-		return nil, err
-	}
-
-	wrapped := &IssueComment{
-		ID:        *comment.ID,
-		User:      wrappedUser,
-		Body:      *comment.Body,
-		CreatedAt: *comment.CreatedAt,
-		UpdatedAt: *comment.UpdatedAt,
-	}
-	return wrapped, nil
-}
-
-func (c *client) wrapUser(user *gogithub.User) (*User, error) {
-	if user.Login == nil {
-		return nil, fmt.Errorf("user Login was nil: %+v", user)
-	}
-
-	wrapped := &User{
-		Login: *user.Login,
-	}
-	return wrapped, nil
 }
 
 func (c *client) GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error) {
@@ -248,6 +261,110 @@ func (c *client) PostIssueComment(owner, repo string, number int, comment *Issue
 	// No existing comment found or no context provided. Create a new one.
 	_, _, err = c.gh.Issues.CreateComment(owner, repo, number, ghComment)
 	return err
+}
+
+func (c *client) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error) {
+	opt := &gogithub.ListOptions{
+		PerPage: githubMaxPerPage,
+	}
+
+	cs, _, err := c.gh.Repositories.GetCombinedStatus(owner, repo, ref, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	statuses := []*CommitStatus{}
+	for _, ghStatus := range cs.Statuses {
+		status, err := wrapCommitStatus(&ghStatus)
+		if err != nil {
+			return nil, err
+		}
+
+		statuses = append(statuses, status)
+	}
+
+	return statuses, nil
+}
+
+func wrapCommitStatus(status *gogithub.RepoStatus) (*CommitStatus, error) {
+	if status.State == nil {
+		return nil, fmt.Errorf("status state was nil: %+v", status)
+	} else if status.Context == nil {
+		return nil, fmt.Errorf("status context was nil: %+v", status)
+	}
+
+	wrapped := &CommitStatus{
+		Context: *status.Context,
+		State:   CommitStatusState(*status.State),
+	}
+	return wrapped, nil
+}
+
+func wrapPullRequest(owner, repo string, pullRequest *gogithub.PullRequest) (*PullRequest, error) {
+	if pullRequest.Number == nil {
+		return nil, fmt.Errorf("pull request number was nil: %+v", pullRequest)
+	} else if pullRequest.State == nil {
+		return nil, fmt.Errorf("pull request state was nil: %+v", pullRequest)
+	} else if pullRequest.Title == nil {
+		return nil, fmt.Errorf("pull request title was nil: %+v", pullRequest)
+	} else if pullRequest.UpdatedAt == nil {
+		return nil, fmt.Errorf("pull request updated at was nil: %+v", pullRequest)
+	} else if pullRequest.Head == nil {
+		return nil, fmt.Errorf("pull request head was nil: %+v", pullRequest)
+	} else if pullRequest.Head.SHA == nil {
+		return nil, fmt.Errorf("pull request head SHA was nil: %+v", pullRequest)
+	}
+
+	wrapped := &PullRequest{
+		Owner:      owner,
+		Repository: repo,
+		Number:     *pullRequest.Number,
+		State:      *pullRequest.State,
+		Title:      *pullRequest.Title,
+		UpdatedAt:  *pullRequest.UpdatedAt,
+		HeadSHA:    *pullRequest.Head.SHA,
+		Mergeable:  pullRequest.Mergeable,
+	}
+	return wrapped, nil
+}
+
+func wrapIssueComment(comment *gogithub.IssueComment) (*IssueComment, error) {
+	if comment.ID == nil {
+		return nil, fmt.Errorf("comment ID was nil: %+v", comment)
+	} else if comment.User == nil {
+		return nil, fmt.Errorf("comment user was nil: %+v", comment)
+	} else if comment.Body == nil {
+		return nil, fmt.Errorf("comment body was nil: %+v", comment)
+	} else if comment.CreatedAt == nil {
+		return nil, fmt.Errorf("comment created at was nil: %+v", comment)
+	} else if comment.UpdatedAt == nil {
+		return nil, fmt.Errorf("comment updated at was nil: %+v", comment)
+	}
+
+	wrappedUser, err := wrapUser(comment.User)
+	if err != nil {
+		return nil, err
+	}
+
+	wrapped := &IssueComment{
+		ID:        *comment.ID,
+		User:      wrappedUser,
+		Body:      *comment.Body,
+		CreatedAt: *comment.CreatedAt,
+		UpdatedAt: *comment.UpdatedAt,
+	}
+	return wrapped, nil
+}
+
+func wrapUser(user *gogithub.User) (*User, error) {
+	if user.Login == nil {
+		return nil, fmt.Errorf("user Login was nil: %+v", user)
+	}
+
+	wrapped := &User{
+		Login: *user.Login,
+	}
+	return wrapped, nil
 }
 
 func buildHiddenContextString(context interface{}) (string, error) {
