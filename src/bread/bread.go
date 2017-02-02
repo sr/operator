@@ -124,7 +124,7 @@ var (
 			ECSCluster:    "teampass",
 			ECSService:    "teampass",
 			ContainerName: "teampass",
-			Image:         "build/bread/teampass/app",
+			Image:         "base/teampass/2.1.26",
 		},
 	}
 )
