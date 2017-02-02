@@ -40,7 +40,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": []*github.CommitStatus{
+				"abc123": {
 					{
 						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
@@ -61,7 +61,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				HeadSHA:    "abc123",
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": []*github.CommitStatus{
+				"abc123": {
 					{
 						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
@@ -97,7 +97,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				HeadSHA:    "abc123",
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": []*github.CommitStatus{
+				"abc123": {
 					{
 						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
@@ -125,7 +125,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				HeadSHA:    "abc123",
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": []*github.CommitStatus{
+				"abc123": {
 					{
 						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusFailure,
@@ -162,7 +162,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				UpdatedAt:  time.Now().Add(-1 * time.Minute),
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": []*github.CommitStatus{
+				"abc123": {
 					{
 						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
