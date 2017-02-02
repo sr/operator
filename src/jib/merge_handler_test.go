@@ -210,7 +210,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				t.Fatalf("expected 1 comment to be posted, but were %d\n", len(client.PostedComments))
 			}
 
-			err = tc.expectedReplyComment.AssertMatches(client.PostedComments[0])
+			err = assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0])
 			if err != nil {
 				t.Fatal(err)
 			}

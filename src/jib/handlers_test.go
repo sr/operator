@@ -13,7 +13,7 @@ type issueReplyCommentMatcher struct {
 	BodyRegexps []*regexp.Regexp
 }
 
-func (m *issueReplyCommentMatcher) AssertMatches(comment *github.IssueReplyComment) error {
+func assertIssueReplyMatches(m *issueReplyCommentMatcher, comment *github.IssueReplyComment) error {
 	if m.Context != nil && !reflect.DeepEqual(comment.Context, m.Context) {
 		return fmt.Errorf("expected context to be %+v, but was %+v", m.Context, comment.Context)
 	}
