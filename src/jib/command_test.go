@@ -1,6 +1,7 @@
-package jib
+package jib_test
 
 import (
+	"jib"
 	"jib/github"
 	"reflect"
 	"testing"
@@ -71,7 +72,7 @@ func TestExtractCommands(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		commands := ExtractCommands(tc.comments, []string{tc.ignoredUsername})
+		commands := jib.ExtractCommands(tc.comments, []string{tc.ignoredUsername})
 		commandNames := []string{}
 		for _, command := range commands {
 			commandNames = append(commandNames, command.Name)

@@ -1,4 +1,4 @@
-package jib
+package jib_test
 
 import (
 	"fmt"

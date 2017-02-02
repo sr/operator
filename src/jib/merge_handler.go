@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type mergeReplyCommentContext struct {
+type MergeReplyCommentContext struct {
 	InReplyToID int
 }
 
@@ -87,7 +87,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 			}
 
 			reply := &github.IssueReplyComment{
-				Context: &mergeReplyCommentContext{
+				Context: &MergeReplyCommentContext{
 					InReplyToID: comment.ID,
 				},
 				Body: body,
@@ -123,7 +123,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 				}
 
 				reply := &github.IssueReplyComment{
-					Context: &mergeReplyCommentContext{
+					Context: &MergeReplyCommentContext{
 						InReplyToID: comment.ID,
 					},
 					Body: body,
@@ -142,7 +142,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 		}
 
 		reply := &github.IssueReplyComment{
-			Context: &mergeReplyCommentContext{
+			Context: &MergeReplyCommentContext{
 				InReplyToID: comment.ID,
 			},
 			Body: body,

@@ -1,7 +1,10 @@
-package jib
+package jib_test
 
 import (
+	"io/ioutil"
+	"jib"
 	"jib/github"
+	"log"
 	"regexp"
 	"testing"
 	"time"
@@ -39,7 +42,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": []*github.CommitStatus{
 					{
-						Context: complianceStatusContext,
+						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -60,7 +63,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": []*github.CommitStatus{
 					{
-						Context: complianceStatusContext,
+						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -73,7 +76,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
-				Context: &mergeReplyCommentContext{
+				Context: &jib.MergeReplyCommentContext{
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
@@ -96,7 +99,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": []*github.CommitStatus{
 					{
-						Context: complianceStatusContext,
+						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -124,7 +127,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": []*github.CommitStatus{
 					{
-						Context: complianceStatusContext,
+						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusFailure,
 					},
 				},
@@ -137,7 +140,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
-				Context: &mergeReplyCommentContext{
+				Context: &jib.MergeReplyCommentContext{
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
@@ -161,7 +164,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": []*github.CommitStatus{
 					{
-						Context: complianceStatusContext,
+						Context: jib.ComplianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -175,7 +178,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
-				Context: &mergeReplyCommentContext{
+				Context: &jib.MergeReplyCommentContext{
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
@@ -194,8 +197,9 @@ func TestMergeCommandHandler(t *testing.T) {
 			},
 			CommitStatuses: tc.commitStatuses,
 		}
+		log := log.New(ioutil.Discard, "", 0)
 
-		err := MergeCommandHandler(client, tc.pullRequest)
+		err := jib.MergeCommandHandler(log, client, tc.pullRequest)
 		if err != nil {
 			t.Fatal(err)
 		}

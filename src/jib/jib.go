@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	complianceStatusContext = "compliance"
+	ComplianceStatusContext = "compliance"
 )
 
 type PullRequestHandler func(log *log.Logger, gh github.Client, pr *github.PullRequest) error
@@ -20,7 +20,7 @@ func InfoHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) erro
 
 func findComplianceStatus(statuses []*github.CommitStatus) *github.CommitStatus {
 	for _, status := range statuses {
-		if status.Context == complianceStatusContext {
+		if status.Context == ComplianceStatusContext {
 			return status
 		}
 	}
