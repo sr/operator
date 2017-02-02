@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 type urlFlag struct {
@@ -38,6 +39,7 @@ type config struct {
 	githubUser     string
 	githubAPIToken string
 	githubOrg      string
+	pollDuration   time.Duration
 }
 
 func main() {
@@ -61,6 +63,7 @@ func run() error {
 	flags.StringVar(&config.githubUser, "github-user", "", "GitHub username")
 	flags.StringVar(&config.githubAPIToken, "github-api-token", "", "GitHub API token")
 	flags.StringVar(&config.githubOrg, "github-org", "", "GitHub organization name")
+	flags.DurationVar(&config.pollDuration, "poll-duration", 1*time.Minute, "Duration between polls of open pull requests")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -96,16 +99,17 @@ func run() error {
 		return err
 	}
 
-	for _, pr := range openPRs {
-		for _, handler := range handlers {
-			err := handler(log, gh, pr)
-			if err != nil {
-				// An error in a handler is worrisome, but not fatal
-				// TODO(alindeman): report to sentry
-				fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+	for {
+		for _, pr := range openPRs {
+			for _, handler := range handlers {
+				err := handler(log, gh, pr)
+				if err != nil {
+					// An error in a handler is worrisome, but not fatal
+					// TODO(alindeman): report to sentry
+					fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+				}
 			}
 		}
+		<-time.After(config.pollDuration)
 	}
-
-	return nil
 }
