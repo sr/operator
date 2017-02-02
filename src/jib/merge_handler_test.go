@@ -22,7 +22,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		// Mergeable PR, command issued
 		{
 			pullRequest: &github.PullRequest{
-				Owner:      "pardot",
+				Org:        "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",
@@ -50,7 +50,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		// Unmergeable PR, command issued
 		{
 			pullRequest: &github.PullRequest{
-				Owner:      "pardot",
+				Org:        "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",
@@ -86,7 +86,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		// Mergeability undetermined, command issued
 		{
 			pullRequest: &github.PullRequest{
-				Owner:      "pardot",
+				Org:        "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",
@@ -114,7 +114,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		// Mergeable PR, but tests failed
 		{
 			pullRequest: &github.PullRequest{
-				Owner:      "pardot",
+				Org:        "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",
@@ -150,7 +150,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		// Mergable PR, but updated after /merge command issued
 		{
 			pullRequest: &github.PullRequest{
-				Owner:      "pardot",
+				Org:        "pardot",
 				Repository: "bread",
 				Number:     1,
 				State:      "open",

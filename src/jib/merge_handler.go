@@ -38,7 +38,7 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 		return nil
 	}
 
-	comments, err := gh.GetIssueComments(pr.Owner, pr.Repository, pr.Number)
+	comments, err := gh.GetIssueComments(pr.Org, pr.Repository, pr.Number)
 	if err != nil {
 		return err
 	}
@@ -56,12 +56,12 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 			// For now, it's acceptable to fall back to the fact
 			// that only fully compliant PRs can be merged in any case.
 			//
-			// permissionLevel, err := gh.GetUserPermissionLevel(pr.Owner, pr.Repository, comment.User.Login)
+			// permissionLevel, err := gh.GetUserPermissionLevel(pr.Org, pr.Repository, comment.User.Login)
 			// if err != nil {
-			// 	log.Printf("error retrieving permission level for %s/%s, user %s: %v", pr.Owner, pr.Repository, comment.User.Login, err)
+			// 	log.Printf("error retrieving permission level for %s/%s, user %s: %v", pr.Org, pr.Repository, comment.User.Login, err)
 			// 	continue
 			// } else if permissionLevel != github.PermissionLevelAdmin && permissionLevel != github.PermissionLevelWrite {
-			// 	log.Printf("user %s does not have write access to %s/%s, ignoring merge command", comment.User.Login, pr.Owner, pr.Repository)
+			// 	log.Printf("user %s does not have write access to %s/%s, ignoring merge command", comment.User.Login, pr.Org, pr.Repository)
 			// 	continue
 			// }
 
@@ -93,12 +93,12 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 				Body: body,
 			}
 
-			err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
+			err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 			if err != nil {
 				return err
 			}
 		} else {
-			statuses, err := gh.GetCommitStatuses(pr.Owner, pr.Repository, pr.HeadSHA)
+			statuses, err := gh.GetCommitStatuses(pr.Org, pr.Repository, pr.HeadSHA)
 			if err != nil {
 				return err
 			}
@@ -112,7 +112,7 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 
 			if complianceStatus.State == github.CommitStatusSuccess {
 				message := fmt.Sprintf("Automated merge, requested by @%s", comment.User.Login)
-				err = gh.MergePullRequest(pr.Owner, pr.Repository, pr.Number, message)
+				err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 				if err != nil {
 					return err
 				}
@@ -129,7 +129,7 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 					Body: body,
 				}
 
-				err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
+				err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 				if err != nil {
 					return err
 				}
@@ -148,7 +148,7 @@ func MergeCommandHandler(gh github.Client, pr *github.PullRequest) error {
 			Body: body,
 		}
 
-		err = gh.PostIssueComment(pr.Owner, pr.Repository, pr.Number, reply)
+		err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 		if err != nil {
 			return err
 		}

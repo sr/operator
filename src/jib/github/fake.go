@@ -20,7 +20,7 @@ func (c *FakeClient) Username() string {
 	return c.ProvidedUsername
 }
 
-func (c *FakeClient) GetOpenPullRequests(org, repo string) ([]*PullRequest, error) {
+func (c *FakeClient) GetOpenPullRequests(org string) ([]*PullRequest, error) {
 	return c.OpenPullRequests, nil
 }
 
@@ -49,7 +49,7 @@ func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessag
 	return nil
 }
 
-func (c *FakeClient) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error) {
+func (c *FakeClient) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error) {
 	if statuses, ok := c.CommitStatuses[ref]; ok {
 		return statuses, nil
 	} else {
@@ -57,7 +57,7 @@ func (c *FakeClient) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus
 	}
 }
 
-func (c *FakeClient) PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error {
+func (c *FakeClient) PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error {
 	c.PostedComments = append(c.PostedComments, comment)
 	return nil
 }

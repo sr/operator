@@ -16,8 +16,13 @@ const (
 	githubMaxPerPage = 100
 )
 
+type Repository struct {
+	Org  string
+	Name string
+}
+
 type PullRequest struct {
-	Owner      string
+	Org        string
 	Repository string
 	Number     int
 
@@ -33,7 +38,7 @@ type PullRequest struct {
 }
 
 func (p *PullRequest) String() string {
-	return fmt.Sprintf("%s/%s#%d \"%s\"", p.Owner, p.Repository, p.Number, p.Title)
+	return fmt.Sprintf("%s/%s#%d \"%s\"", p.Org, p.Repository, p.Number, p.Title)
 
 }
 
@@ -94,12 +99,12 @@ func String(s string) *string {
 // idempotent operations
 type Client interface {
 	Username() string
-	GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
-	GetIssueComments(owner, repo string, number int) ([]*IssueComment, error)
-	GetUserPermissionLevel(owner, repo, login string) (PermissionLevel, error)
-	MergePullRequest(owner, repo string, number int, commitMessage string) error
-	PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error
-	GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error)
+	GetOpenPullRequests(org string) ([]*PullRequest, error)
+	GetIssueComments(org, repo string, number int) ([]*IssueComment, error)
+	GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error)
+	MergePullRequest(org, repo string, number int, commitMessage string) error
+	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
+	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
 }
 
 // client is the real implementation of Client.
@@ -128,8 +133,9 @@ func (c *client) Username() string {
 	return c.username
 }
 
-func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error) {
-	opt := &gogithub.PullRequestListOptions{
+func (c *client) GetOpenPullRequests(org string) ([]*PullRequest, error) {
+	opt := &gogithub.IssueListOptions{
+		Filter:    "all",
 		State:     "open",
 		Sort:      "created",
 		Direction: "desc",
@@ -140,24 +146,29 @@ func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
 
 	allPullRequests := []*PullRequest{}
 	for {
-		pullRequests, resp, err := c.gh.PullRequests.List(owner, repo, opt)
+		issues, resp, err := c.gh.Issues.ListByOrg(org, opt)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, pullRequest := range pullRequests {
-			if pullRequest.Number == nil {
+		for _, issue := range issues {
+			if issue.PullRequestLinks == nil {
+				// Issue is not a pull request, just a generic issue
+				continue
+			} else if issue.Number == nil {
+				continue
+			} else if issue.Repository == nil {
 				continue
 			}
 
 			// Refetching the pull request from the individual route
 			// is required to get mergeability
-			fullPullRequest, _, err := c.gh.PullRequests.Get(owner, repo, *pullRequest.Number)
+			fullPullRequest, _, err := c.gh.PullRequests.Get(org, *issue.Repository.Name, *issue.Number)
 			if err != nil {
 				return nil, err
 			}
 
-			wrapped, err := wrapPullRequest(owner, repo, fullPullRequest)
+			wrapped, err := wrapPullRequest(org, *issue.Repository.Name, fullPullRequest)
 			if err != nil {
 				return nil, err
 			}
@@ -173,7 +184,7 @@ func (c *client) GetOpenPullRequests(owner, repo string) ([]*PullRequest, error)
 	return allPullRequests, nil
 }
 
-func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComment, error) {
+func (c *client) GetIssueComments(org, repo string, number int) ([]*IssueComment, error) {
 	opt := &gogithub.IssueListCommentsOptions{
 		ListOptions: gogithub.ListOptions{
 			PerPage: githubMaxPerPage,
@@ -182,7 +193,7 @@ func (c *client) GetIssueComments(owner, repo string, number int) ([]*IssueComme
 
 	allComments := []*IssueComment{}
 	for {
-		comments, resp, err := c.gh.Issues.ListComments(owner, repo, number, opt)
+		comments, resp, err := c.gh.Issues.ListComments(org, repo, number, opt)
 		if err != nil {
 			return nil, err
 		}
@@ -221,7 +232,7 @@ func (c *client) MergePullRequest(org, repo string, number int, commitMessage st
 	return err
 }
 
-func (c *client) PostIssueComment(owner, repo string, number int, comment *IssueReplyComment) error {
+func (c *client) PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error {
 	if comment.Context == nil {
 		return errors.New("comment context was nil")
 	}
@@ -231,7 +242,7 @@ func (c *client) PostIssueComment(owner, repo string, number int, comment *Issue
 		return err
 	}
 
-	comments, err := c.GetIssueComments(owner, repo, number)
+	comments, err := c.GetIssueComments(org, repo, number)
 	if err != nil {
 		return err
 	}
@@ -253,22 +264,22 @@ func (c *client) PostIssueComment(owner, repo string, number int, comment *Issue
 			return nil
 		} else if strings.HasPrefix(comment.Body, contextStr) {
 			// Matches context, but body differs. Edit.
-			_, _, err := c.gh.Issues.EditComment(owner, repo, number, ghComment)
+			_, _, err := c.gh.Issues.EditComment(org, repo, number, ghComment)
 			return err
 		}
 	}
 
 	// No existing comment found or no context provided. Create a new one.
-	_, _, err = c.gh.Issues.CreateComment(owner, repo, number, ghComment)
+	_, _, err = c.gh.Issues.CreateComment(org, repo, number, ghComment)
 	return err
 }
 
-func (c *client) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, error) {
+func (c *client) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error) {
 	opt := &gogithub.ListOptions{
 		PerPage: githubMaxPerPage,
 	}
 
-	cs, _, err := c.gh.Repositories.GetCombinedStatus(owner, repo, ref, opt)
+	cs, _, err := c.gh.Repositories.GetCombinedStatus(org, repo, ref, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -286,6 +297,18 @@ func (c *client) GetCommitStatuses(owner, repo, ref string) ([]*CommitStatus, er
 	return statuses, nil
 }
 
+func wrapRepository(org string, repository *gogithub.Repository) (*Repository, error) {
+	if repository.Name == nil {
+		return nil, fmt.Errorf("repository name was nil: %+v", repository)
+	}
+
+	wrapped := &Repository{
+		Org:  org,
+		Name: *repository.Name,
+	}
+	return wrapped, nil
+}
+
 func wrapCommitStatus(status *gogithub.RepoStatus) (*CommitStatus, error) {
 	if status.State == nil {
 		return nil, fmt.Errorf("status state was nil: %+v", status)
@@ -300,7 +323,7 @@ func wrapCommitStatus(status *gogithub.RepoStatus) (*CommitStatus, error) {
 	return wrapped, nil
 }
 
-func wrapPullRequest(owner, repo string, pullRequest *gogithub.PullRequest) (*PullRequest, error) {
+func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*PullRequest, error) {
 	if pullRequest.Number == nil {
 		return nil, fmt.Errorf("pull request number was nil: %+v", pullRequest)
 	} else if pullRequest.State == nil {
@@ -316,7 +339,7 @@ func wrapPullRequest(owner, repo string, pullRequest *gogithub.PullRequest) (*Pu
 	}
 
 	wrapped := &PullRequest{
-		Owner:      owner,
+		Org:        org,
 		Repository: repo,
 		Number:     *pullRequest.Number,
 		State:      *pullRequest.State,

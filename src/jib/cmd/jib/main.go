@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"jib"
 	"jib/github"
@@ -9,6 +10,34 @@ import (
 	"os"
 	"strings"
 )
+
+type urlFlag struct {
+	URL *url.URL
+}
+
+func (f *urlFlag) Set(s string) error {
+	url, err := url.Parse(s)
+	if err != nil {
+		return err
+	}
+
+	*f.URL = *url
+	return nil
+}
+func (f *urlFlag) String() string {
+	if f.URL == nil {
+		return ""
+	}
+	return f.URL.String()
+}
+
+type config struct {
+	port           int
+	githubBaseURL  *url.URL
+	githubUser     string
+	githubAPIToken string
+	githubOrg      string
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -18,66 +47,60 @@ func main() {
 }
 
 func run() error {
-	port := os.Getenv("PORT")
-	if port == "" {
-		return errors.New("PORT environment variable is required")
+	config := &config{
+		githubBaseURL: &url.URL{
+			Scheme: "https",
+			Host:   "git.dev.pardot.com",
+			Path:   "/api/v3/",
+		},
 	}
+	flags := flag.CommandLine
+	flags.IntVar(&config.port, "port", 8080, "Listen port for the web service")
+	flags.Var(&urlFlag{URL: config.githubBaseURL}, "github-base-url", "Base URL for the GitHub API")
+	flags.StringVar(&config.githubUser, "github-user", "", "GitHub username")
+	flags.StringVar(&config.githubAPIToken, "github-api-token", "", "GitHub API token")
+	flags.StringVar(&config.githubOrg, "github-org", "", "GitHub organization name")
+	// Allow setting flags via environment variables
+	flags.VisitAll(func(f *flag.Flag) {
+		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
+		if v := os.Getenv(k); v != "" {
+			if err := f.Value.Set(v); err != nil {
+				panic(err)
+			}
+		}
+	})
 
-	baseURLStr := os.Getenv("GITHUB_URL")
-	if baseURLStr == "" {
-		baseURLStr = "https://git.dev.pardot.com/api/v3/"
+	if err := flags.Parse(os.Args[1:]); err != nil {
+		return err
 	}
-
-	baseURL, err := url.Parse(baseURLStr)
-	if err != nil {
-		return fmt.Errorf("unable to parse GitHub URL '%s': %v", baseURLStr, err)
+	if config.githubUser == "" {
+		return errors.New("required flag missing: github-user")
+	} else if config.githubAPIToken == "" {
+		return errors.New("required flag missing: github-api-token")
+	} else if config.githubOrg == "" {
+		return errors.New("required flag missing: github-org")
+	} else if config.githubBaseURL == nil {
+		return errors.New("required flag missing: github-base-url")
 	}
-
-	githubUser := os.Getenv("GITHUB_USER")
-	if githubUser == "" {
-		return errors.New("GITHUB_USER environment variable is required")
-	}
-
-	githubAPIToken := os.Getenv("GITHUB_API_TOKEN")
-	if githubAPIToken == "" {
-		return errors.New("GITHUB_API_TOKEN environment variable is required")
-	}
-
-	githubRepositoriesStr := os.Getenv("GITHUB_REPOSITORIES")
-	if githubRepositoriesStr == "" {
-		return errors.New("GITHUB_REPOSITORIES environment variable is required in the form 'org1/repo1,org2/repo2,...'")
-	}
-
-	repositories := strings.Split(githubRepositoriesStr, ",")
-	gh := github.NewClient(baseURL, githubUser, githubAPIToken)
 
 	handlers := []jib.PullRequestHandler{
 		jib.InfoHandler,
 		jib.MergeCommandHandler,
 	}
 
-	for _, repository := range repositories {
-		parts := strings.SplitN(repository, "/", 2)
-		if len(parts) != 2 {
-			return fmt.Errorf("expected repository name '%s' to be in the form 'org/name', but was not", repository)
-		}
+	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
+	openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
+	if err != nil {
+		return err
+	}
 
-		org := parts[0]
-		repo := parts[1]
-
-		openPRs, err := gh.GetOpenPullRequests(org, repo)
-		if err != nil {
-			return err
-		}
-
-		for _, pr := range openPRs {
-			for _, handler := range handlers {
-				err := handler(gh, pr)
-				if err != nil {
-					// An error in a handler is worrisome, but not fatal
-					// TODO(alindeman): report to sentry
-					fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
-				}
+	for _, pr := range openPRs {
+		for _, handler := range handlers {
+			err := handler(gh, pr)
+			if err != nil {
+				// An error in a handler is worrisome, but not fatal
+				// TODO(alindeman): report to sentry
+				fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
 			}
 		}
 	}
