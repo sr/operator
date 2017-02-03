@@ -94,12 +94,7 @@ func run() error {
 		jib.MergeCommandHandler,
 	}
 	log := log.New(os.Stdout, "", log.LstdFlags)
-
 	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
-	openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
-	if err != nil {
-		return err
-	}
 
 	// TODO(alindeman): Implement a real webhook server
 	server := &http.Server{
@@ -109,6 +104,11 @@ func run() error {
 	go func() { panic(server.ListenAndServe()) }()
 
 	for {
+		openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
+		if err != nil {
+			return err
+		}
+
 		for _, pr := range openPRs {
 			for _, handler := range handlers {
 				err := handler(log, gh, pr)
