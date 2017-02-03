@@ -381,8 +381,7 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
     abort_incomplete_multipart_upload_days = 5
 
     expiration {
-      days                         = 60
-      expired_object_delete_marker = true
+      days = 60
     }
   }
 
