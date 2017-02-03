@@ -375,13 +375,13 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
   acceleration_status = "Enabled"
 
   lifecycle_rule {
-    id = "auto-delete-after-60-days"
-    prefix = "backups/"
-    enabled = true
+    id                                     = "auto-delete-after-60-days"
+    prefix                                 = "backups/"
+    enabled                                = true
     abort_incomplete_multipart_upload_days = 5
 
     expiration {
-      days = 60
+      days                         = 60
       expired_object_delete_marker = true
     }
   }
