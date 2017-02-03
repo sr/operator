@@ -382,7 +382,6 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
 
     expiration {
       days                         = 60
-      expired_object_delete_marker = true
     }
   }
 
