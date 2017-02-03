@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.."; pwd)"
+
+git subrepo push src/jib --force -r https://git.heroku.com/pardot-jib-production.git -b master
