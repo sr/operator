@@ -113,7 +113,6 @@ resource "aws_security_group" "artifactory_http_lb" {
 
     cidr_blocks = [
       "${var.aloha_vpn_cidr_blocks}",
-      "${var.legacy_artifactory_instance_ip}/32", # TODO: deleteme post switchover
       "${var.pardot_ci_nat_gw_public_ip}/32",
     ]
   }
@@ -374,6 +373,18 @@ resource "aws_s3_bucket" "artifactory-s3-filestore" {
   bucket              = "artifactory-s3-filestore"
   acl                 = "private"
   acceleration_status = "Enabled"
+
+  lifecycle_rule {
+    id = "auto-delete-after-60-days"
+    prefix = "backups/"
+    enabled = true
+    abort_incomplete_multipart_upload_days = 5
+
+    expiration {
+      days = 60
+      expired_object_delete_marker = true
+    }
+  }
 
   # for more info on the Elastic Load Balancing Account Number:
   # http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
@@ -879,15 +890,6 @@ resource "aws_efs_mount_target" "efs_mount_target_us_east_1e" {
   subnet_id      = "${aws_subnet.internal_tools_integration_us_east_1e.id}"
 }
 
-#TODO: DELETE LEGACY AFTER SWITCHOVER IS FINAL
-resource "aws_route53_record" "artifactory-legacy_dev_pardot_com_Arecord" {
-  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
-  name    = "artifactory-legacy.${aws_route53_zone.dev_pardot_com.name}"
-  records = ["${var.legacy_artifactory_instance_ip}"]
-  type    = "A"
-  ttl     = "900"
-}
-
 resource "aws_route53_record" "artifactory-internal_dev_pardot_com_CNAMErecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "artifactory-internal.${aws_route53_zone.dev_pardot_com.name}"
@@ -959,7 +961,7 @@ resource "aws_ebs_volume" "artifactory_primary_host_backup_drive" {
   snapshot_id       = "${var.blank_6tb_ext4_ebs_volume_snapshot_id}"
   availability_zone = "us-east-1a"
   type              = "gp2"
-  size              = "6144"
+  size              = "10000"
 }
 
 resource "aws_volume_attachment" "artifactory_primary_host_backup_drive_attachment" {
