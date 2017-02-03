@@ -106,19 +106,21 @@ func run() error {
 	for {
 		openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
 		if err != nil {
-			return err
-		}
-
-		for _, pr := range openPRs {
-			for _, handler := range handlers {
-				err := handler(log, gh, pr)
-				if err != nil {
-					// An error in a handler is worrisome, but not fatal
-					// TODO(alindeman): report to sentry
-					fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+			// TODO(alindeman): report to sentry
+			fmt.Fprintf(os.Stderr, "error fetching open PRs, will retry: %v\n", err)
+		} else {
+			for _, pr := range openPRs {
+				for _, handler := range handlers {
+					err := handler(log, gh, pr)
+					if err != nil {
+						// An error in a handler is worrisome, but not fatal
+						// TODO(alindeman): report to sentry
+						fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+					}
 				}
 			}
 		}
+
 		<-time.After(config.pollDuration)
 	}
 }
