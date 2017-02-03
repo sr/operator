@@ -39,9 +39,9 @@ type PullRequest struct {
 	Mergeable *bool
 }
 
-var (
-	StateOpen   string = "open"
-	StateClosed string = "closed"
+const (
+	IssueStateOpen   string = "open"
+	IssueStateClosed string = "closed"
 )
 
 func (p *PullRequest) String() string {

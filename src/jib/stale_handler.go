@@ -23,7 +23,7 @@ Please feel free to reopen this pull request if it is still relevant.
 )
 
 func StaleHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) error {
-	if pr.State != github.StateOpen {
+	if pr.State != github.IssueStateOpen {
 		// PR is not open; nothing to do
 		return nil
 	} else if time.Now().Sub(pr.UpdatedAt) < staleDuration {
