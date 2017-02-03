@@ -211,7 +211,7 @@ func TestMergeCommandHandler(t *testing.T) {
 
 		if tc.expectedReplyComment != nil {
 			if len(client.PostedComments) != 1 {
-				t.Fatalf("expected 1 comment to be posted, but were %d\n", len(client.PostedComments))
+				t.Fatalf("expected 1 comment to be posted, but %d were posted", len(client.PostedComments))
 			}
 
 			err = assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0])
@@ -219,7 +219,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				t.Fatal(err)
 			}
 		} else if len(client.PostedComments) != 0 {
-			t.Fatalf("expected 0 comments to be posted, but were %d\n", len(client.PostedComments))
+			t.Fatalf("expected 0 comments to be posted, but %d were posted", len(client.PostedComments))
 		}
 	}
 }

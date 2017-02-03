@@ -90,15 +90,11 @@ func run() error {
 
 	handlers := []jib.PullRequestHandler{
 		jib.InfoHandler,
+		jib.StaleHandler,
 		jib.MergeCommandHandler,
 	}
 	log := log.New(os.Stdout, "", log.LstdFlags)
-
 	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
-	openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
-	if err != nil {
-		return err
-	}
 
 	// TODO(alindeman): Implement a real webhook server
 	server := &http.Server{
@@ -108,16 +104,23 @@ func run() error {
 	go func() { panic(server.ListenAndServe()) }()
 
 	for {
-		for _, pr := range openPRs {
-			for _, handler := range handlers {
-				err := handler(log, gh, pr)
-				if err != nil {
-					// An error in a handler is worrisome, but not fatal
-					// TODO(alindeman): report to sentry
-					fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+		openPRs, err := gh.GetOpenPullRequests(config.githubOrg)
+		if err != nil {
+			// TODO(alindeman): report to sentry
+			fmt.Fprintf(os.Stderr, "error fetching open PRs, will retry: %v\n", err)
+		} else {
+			for _, pr := range openPRs {
+				for _, handler := range handlers {
+					err := handler(log, gh, pr)
+					if err != nil {
+						// An error in a handler is worrisome, but not fatal
+						// TODO(alindeman): report to sentry
+						fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)
+					}
 				}
 			}
 		}
+
 		<-time.After(config.pollDuration)
 	}
 }

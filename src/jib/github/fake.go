@@ -11,6 +11,7 @@ type FakeClient struct {
 
 	MergedPullRequests map[int]string
 	PostedComments     []*IssueReplyComment
+	ClosedIssues       []int
 }
 
 // Ensure FakeClient conforms to the GithubClient interface
@@ -59,5 +60,10 @@ func (c *FakeClient) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, 
 
 func (c *FakeClient) PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error {
 	c.PostedComments = append(c.PostedComments, comment)
+	return nil
+}
+
+func (c *FakeClient) CloseIssue(org, repo string, number int) error {
+	c.ClosedIssues = append(c.ClosedIssues, number)
 	return nil
 }
