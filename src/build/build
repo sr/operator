@@ -351,6 +351,14 @@ case "$project" in
         docker run --rm -v "$BREAD:/data" \
             -e "PATH=/data/src/build:$PATH" build/shellcheck lint-shell
         ;;
+    teampass)
+        docker build $pullopts \
+            -f src/teampass/Dockerfile -t teampass_app src/teampass
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+        fi
+        ;;
     terraform)
         docker run -e "GOPATH=/data" --rm -v "$BREAD:/data" build/build \
             terra validate
