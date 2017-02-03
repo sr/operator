@@ -26,6 +26,8 @@ type PullRequest struct {
 	Repository string
 	Number     int
 
+	User *User
+
 	State string
 	Title string
 
@@ -36,6 +38,11 @@ type PullRequest struct {
 	// Mergeable is either true (mergeable), false (not mergeable), or null (not computed yet)
 	Mergeable *bool
 }
+
+var (
+	StateOpen   string = "open"
+	StateClosed string = "closed"
+)
 
 func (p *PullRequest) String() string {
 	return fmt.Sprintf("%s/%s#%d \"%s\"", p.Org, p.Repository, p.Number, p.Title)
@@ -105,6 +112,7 @@ type Client interface {
 	MergePullRequest(org, repo string, number int, commitMessage string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
 	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
+	CloseIssue(org, repo string, number int) error
 }
 
 // client is the real implementation of Client.
@@ -297,6 +305,15 @@ func (c *client) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, erro
 	return statuses, nil
 }
 
+func (c *client) CloseIssue(org, repo string, number int) error {
+	req := &gogithub.IssueRequest{
+		State: gogithub.String("closed"),
+	}
+
+	_, _, err := c.gh.Issues.Edit(org, repo, number, req)
+	return err
+}
+
 func wrapRepository(org string, repository *gogithub.Repository) (*Repository, error) {
 	if repository.Name == nil {
 		return nil, fmt.Errorf("repository name was nil: %+v", repository)
@@ -336,12 +353,20 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		return nil, fmt.Errorf("pull request head was nil: %+v", pullRequest)
 	} else if pullRequest.Head.SHA == nil {
 		return nil, fmt.Errorf("pull request head SHA was nil: %+v", pullRequest)
+	} else if pullRequest.User == nil {
+		return nil, fmt.Errorf("pull request user was nil: %+v", pullRequest)
+	}
+
+	wrappedUser, err := wrapUser(pullRequest.User)
+	if err != nil {
+		return nil, err
 	}
 
 	wrapped := &PullRequest{
 		Org:        org,
 		Repository: repo,
 		Number:     *pullRequest.Number,
+		User:       wrappedUser,
 		State:      *pullRequest.State,
 		Title:      *pullRequest.Title,
 		UpdatedAt:  *pullRequest.UpdatedAt,
