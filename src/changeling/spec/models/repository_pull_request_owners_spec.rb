@@ -22,9 +22,6 @@ RSpec.describe RepositoryPullRequest do
     )
     @pull_request = RepositoryPullRequest.new(@multipass)
 
-    Changeling.config.repository_owners_review_required = [@pull_request.repository_full_name]
-    Changeling.config.component_owners_review_enabled = [@pull_request.repository_full_name]
-
     stub_organization_teams("heroku", {})
   end
 

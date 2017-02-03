@@ -3,8 +3,6 @@ require "rails_helper"
 describe ComplianceStatus, "pardot" do
   before(:each) do
     Changeling.config.pardot = true
-    Changeling.config.repository_owners_review_required = []
-    Changeling.config.component_owners_review_enabled = []
 
     ticket = Ticket.create!(
       external_id: "1",
@@ -13,12 +11,18 @@ describe ComplianceStatus, "pardot" do
       open: true,
       tracker: Ticket::TRACKER_JIRA
     )
+
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
       owner: "heroku",
       name: "changeling",
     )
+    @repository.repository_owners_files.create!(
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/bread"
+    )
+
     reference_url = format("https://%s/%s/pull/90",
       Changeling.config.github_hostname,
       @repository.full_name
@@ -30,9 +34,13 @@ describe ComplianceStatus, "pardot" do
       repository_id: @repository.id
     )
     @multipass.create_ticket_reference!(ticket: ticket)
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "sr",
+      state: Clients::GitHub::REVIEW_APPROVED,
+    )
     @user = Fabricate(:user)
 
-    stub_organization_teams("heroku", {})
+    stub_organization_teams("heroku", bread: %w[sr])
   end
 
   def stub_organization_teams(organization, teams)
@@ -111,73 +119,7 @@ describe ComplianceStatus, "pardot" do
     expect(description).to eq("Awaiting automated tests results")
   end
 
-  it "requires peer review to be complete" do
-    expect(@multipass.complete?).to eq(true)
-    expect(@multipass.peer_reviewed?).to eq(true)
-    @multipass.update!(peer_reviewer: nil)
-    expect(@multipass.reload.complete?).to eq(false)
-    expect(@multipass.peer_reviewed?).to eq(false)
-
-    description = @multipass.github_commit_status_description
-    expect(description).to include("Peer review")
-  end
-
-  it "requires peer review by repository owners to be complete" do
-    Changeling.config.repository_owners_review_required = [@multipass.repository_name]
-    @multipass.peer_reviews.destroy_all
-    @multipass.pull_request_files.destroy_all
-    @repository.repository_owners_files.delete_all
-
-    stub_organization_teams("heroku", {})
-
-    expect do
-      @multipass.complete?
-    end.to raise_error(Repository::OwnersError)
-
-    @repository.repository_owners_files.create!(
-      path_name: "/#{Repository::OWNERS_FILENAME}",
-      content: "@heroku/bread\n@heroku/tools\n",
-    )
-
-    stub_organization_teams("heroku", "bread": ["alindeman"])
-    expect(@multipass.peer_reviewed?).to eq(false)
-    expect(@multipass.complete?).to eq(false)
-
-    review_1 = @multipass.peer_reviews.create!(
-      reviewer_github_login: "alindeman",
-      state: Clients::GitHub::REVIEW_APPROVED,
-    )
-    expect(@multipass.peer_reviewed?).to eq(true)
-    expect(@multipass.complete?).to eq(true)
-
-    review_1.update!(state: Clients::GitHub::REVIEW_CHANGES_REQUESTED)
-    expect(@multipass.peer_reviewed?).to eq(false)
-    expect(@multipass.complete?).to eq(false)
-
-    stub_organization_teams("heroku", "bread": ["alindeman", "sr"])
-    review_2 = @multipass.peer_reviews.create!(
-      reviewer_github_login: "sr",
-      state: Clients::GitHub::REVIEW_APPROVED,
-    )
-    expect(@multipass.peer_reviewed?).to eq(true)
-    expect(@multipass.complete?).to eq(true)
-
-    review_2.update!(state: Clients::GitHub::REVIEW_CHANGES_REQUESTED)
-    expect(@multipass.peer_reviewed?).to eq(false)
-    expect(@multipass.complete?).to eq(false)
-
-    stub_organization_teams("heroku", "bread": ["alindeman", "sr"], "tools": ["ys"])
-    @multipass.peer_reviews.create!(
-      reviewer_github_login: "ys",
-      state: Clients::GitHub::REVIEW_APPROVED,
-    )
-    expect(@multipass.peer_reviewed?).to eq(true)
-    expect(@multipass.complete?).to eq(true)
-  end
-
   it "requires peer review and approval by the component(s) owners" do
-    Changeling.config.repository_owners_review_required = [@multipass.repository_name]
-    Changeling.config.component_owners_review_enabled = [@multipass.repository_name]
     @multipass.peer_reviews.destroy_all
     @multipass.pull_request_files.destroy_all
     @repository.repository_owners_files.delete_all
@@ -221,6 +163,9 @@ describe ComplianceStatus, "pardot" do
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
     )
+
+    # TODO(sr) Memoization is the worst
+    @multipass.instance_variable_set(:@repository_pull_request, nil)
 
     expect(@multipass.peer_reviewed?).to eq(false)
     @multipass.peer_reviews.create!(
