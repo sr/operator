@@ -90,6 +90,7 @@ func run() error {
 
 	handlers := []jib.PullRequestHandler{
 		jib.InfoHandler,
+		jib.StaleHandler,
 		jib.MergeCommandHandler,
 	}
 	log := log.New(os.Stdout, "", log.LstdFlags)
