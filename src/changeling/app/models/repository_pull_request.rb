@@ -120,6 +120,43 @@ class RepositoryPullRequest
     @multipass
   end
 
+  MAGIC_HTML_COMMENT = "<!-- compliance -->"
+
+  def update_github_comment
+    if !Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
+      return
+    end
+
+    comments = github_client.issue_comments(
+      repository.name_with_owner,
+      number
+    )
+
+    compliance_comment = comments.detect do |comment|
+      if comment.user.login != Changeling.config.github_service_account_username
+        next
+      end
+
+      comment.body.include?(MAGIC_HTML_COMMENT)
+    end
+
+    if !compliance_comment
+      return github_client.add_comment(
+        repository.name_with_owner,
+        number,
+        compliance_comment_body_html
+      )
+    end
+
+    if compliance_comment.body != compliance_comment_body_html
+      return github_client.update_comment(
+        repository.name_with_owner,
+        compliance_comment.id,
+        compliance_comment_body_html
+      )
+    end
+  end
+
   def referenced_ticket
     if @multipass.ticket_reference
       @multipass.ticket_reference.ticket
@@ -127,6 +164,64 @@ class RepositoryPullRequest
   end
 
   private
+
+  GLYPH_DONE = "✓"
+  GLYPH_TODO = "✗"
+
+  def compliance_comment_body_html
+    if teams.size <= 0
+      raise Repository::OwnersError, "could not determine any owner for this change"
+    end
+
+    body = "#{MAGIC_HTML_COMMENT}\n"
+
+    if referenced_ticket
+      case referenced_ticket.tracker
+      when Ticket::TRACKER_JIRA
+        label = "#{referenced_ticket.external_id} #{referenced_ticket.summary}"
+      when Ticket::TRACKER_GUS
+        label = referenced_ticket.external_id
+      else
+        raise RuntimeError, "unhandleable ticket: #{referenced_ticket.inspect}"
+      end
+
+      body << "<a href=\"#{referenced_ticket.url}\">#{label}</a>"
+    end
+
+    body << "<p>This pull request requires peer review and approval from a member of the fellowing team(s):</p>"
+    body << "<ul>"
+
+    teams.each do |team|
+      approver = nil # TODO(sr) ownership.approver_for_team(team)
+
+      if approver
+        body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver}</li>"
+      else
+        body << "<li>#{GLYPH_TODO} @#{team.slug}</li>"
+      end
+    end
+
+    body << "</ul>"
+
+    body << "<details>"
+    body << "<summary>Peer review and compliance details</summary>"
+    body << "<p>Reviewers were automatically determined based on the fellowing <code>OWNERS</code> files:</p>"
+    body << "<ul>"
+
+    owners_files.each do |owner_file|
+      body << "<li><a href=\"#{owner_file.url}\"><code>#{owner_file.path_name}</code></a></li>"
+    end
+
+    body << "</ul>"
+
+    if @multipass.complete?
+      body << "<p>#{GLYPH_DONE} This pull request meets all compliance requirements and is ready to be merged into the main branch</p>"
+    else
+      body << "<p>#{GLYPH_TODO} This pull request does not yet meet all compliance requirements</p>"
+    end
+
+    body << @multipass.status_description_html
+  end
 
   def detect_emergency_merge
     if @multipass.merged? && !@multipass.complete?

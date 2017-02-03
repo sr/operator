@@ -24,6 +24,10 @@ module Clients
       @client = Octokit::Client.new(options)
     end
 
+    attr_reader :client
+
+    delegate :issue_comments, :add_comment, :update_comment, to: :client
+
     def organizations
       @client.organizations
     end

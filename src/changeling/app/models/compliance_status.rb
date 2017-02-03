@@ -52,6 +52,51 @@ class ComplianceStatus
     adapter.github_commit_status_description
   end
 
+  def description_html
+    body = "<ul>"
+
+    teams = @multipass.teams.map do |team|
+      "<a href=\"#{html_escape(team.url)}\">@#{html_escape(team.slug)}</a>"
+    end
+
+    if peer_reviewed?
+      approvers = @multipass.peer_review_approvers.map do |approver|
+        "<a href=\"#{html_escape(Changeling.config.github_url + "/" + approver)}\">@#{html_escape(approver)}</a>"
+      end
+
+      body << "<li>Changes reviewed and approved by the fellowing people: #{approvers.join(" ")}</li>"
+    else
+      if teams.size == 1
+        body << "<li>Review by a member of the #{teams[0]} team is required</li>"
+      else
+        body << "<li>Review by a member of the fellowing teams is required: #{teams.join(" ")}</li>"
+      end
+    end
+
+    case @multipass.tests_state
+    when RepositoryCommitStatus::SUCCESS
+      body << "<li>The automated tests have succeeded</li>"
+    when RepositoryCommitStatus::PENDING
+      body << "<li>The automated tests have not yet completed</li>"
+    when RepositoryCommitStatus::FAILURE
+      body << "<li>The automated tests have failed</li>"
+    else
+      body << "<li>The status of automated tests is unknown</li>"
+    end
+
+    ticket = @multipass.referenced_ticket
+
+    if ticket
+      if ticket.open?
+        body << "<li>Ticket reference found: <a href=\"#{html_escape(ticket.url)}\">#{html_escape(ticket.external_id)}</a></li>"
+      else
+        body << "<li>The referenced ticket (<a href=\"#{html_escape(ticket.url)}\">#{html_escape(ticket.external_id)}</a>) is not open</li>"
+      end
+    else
+      body << "<li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>"
+    end
+  end
+
   def status
     if complete?
       "complete"
@@ -65,6 +110,10 @@ class ComplianceStatus
   end
 
   private
+
+  def html_escape(s)
+    ERB::Util.html_escape(s)
+  end
 
   def adapter
     @adapter ||=
