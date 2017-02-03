@@ -5,10 +5,17 @@ import (
 	"html/template"
 	"jib/github"
 	"log"
+	"regexp"
 )
 
 const (
 	ComplianceStatusContext = "compliance"
+
+	CIUserLogin = "sa-bamboo"
+)
+
+var (
+	CIAutomatedMergeMessageMatcher = regexp.MustCompile(`\A\[ci\] Automated branch merge`)
 )
 
 type PullRequestHandler func(log *log.Logger, gh github.Client, pr *github.PullRequest) error
@@ -36,4 +43,14 @@ func renderTemplate(t *template.Template, context interface{}) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func filterCIAutomatedMerges(commits []*github.Commit) []*github.Commit {
+	filtered := []*github.Commit{}
+	for _, commit := range commits {
+		if commit.Author == nil || commit.Author.Login != CIUserLogin || !CIAutomatedMergeMessageMatcher.MatchString(commit.Message) {
+			filtered = append(filtered, commit)
+		}
+	}
+	return filtered
 }

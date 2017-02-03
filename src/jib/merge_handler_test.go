@@ -14,11 +14,15 @@ func TestMergeCommandHandler(t *testing.T) {
 	authorizedUser := &github.User{
 		Login: "authorized-user",
 	}
+	ciUser := &github.User{
+		Login: jib.CIUserLogin,
+	}
 
 	cases := []struct {
 		pullRequest          *github.PullRequest
 		comments             []*github.IssueComment
 		commitStatuses       map[string][]*github.CommitStatus
+		commitsSince         map[string][]*github.Commit
 		expectedReplyComment *issueReplyCommentMatcher
 		expectedToMerge      bool
 	}{
@@ -47,6 +51,9 @@ func TestMergeCommandHandler(t *testing.T) {
 					},
 				},
 			},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {},
+			},
 			expectedReplyComment: nil,
 			expectedToMerge:      true,
 		},
@@ -60,6 +67,13 @@ func TestMergeCommandHandler(t *testing.T) {
 				Mergeable:  github.Bool(false),
 				HeadSHA:    "abc123",
 			},
+			comments: []*github.IssueComment{
+				{
+					ID:   123,
+					User: authorizedUser,
+					Body: "/merge",
+				},
+			},
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
@@ -68,12 +82,8 @@ func TestMergeCommandHandler(t *testing.T) {
 					},
 				},
 			},
-			comments: []*github.IssueComment{
-				{
-					ID:   123,
-					User: authorizedUser,
-					Body: "/merge",
-				},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
 				Context: &jib.MergeReplyCommentContext{
@@ -96,6 +106,13 @@ func TestMergeCommandHandler(t *testing.T) {
 				Mergeable:  nil,
 				HeadSHA:    "abc123",
 			},
+			comments: []*github.IssueComment{
+				{
+					ID:   123,
+					User: authorizedUser,
+					Body: "/merge",
+				},
+			},
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
@@ -104,12 +121,8 @@ func TestMergeCommandHandler(t *testing.T) {
 					},
 				},
 			},
-			comments: []*github.IssueComment{
-				{
-					ID:   123,
-					User: authorizedUser,
-					Body: "/merge",
-				},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {},
 			},
 			expectedReplyComment: nil,
 			expectedToMerge:      false,
@@ -124,6 +137,13 @@ func TestMergeCommandHandler(t *testing.T) {
 				Mergeable:  github.Bool(true),
 				HeadSHA:    "abc123",
 			},
+			comments: []*github.IssueComment{
+				{
+					ID:   123,
+					User: authorizedUser,
+					Body: "/merge",
+				},
+			},
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
@@ -132,12 +152,8 @@ func TestMergeCommandHandler(t *testing.T) {
 					},
 				},
 			},
-			comments: []*github.IssueComment{
-				{
-					ID:   123,
-					User: authorizedUser,
-					Body: "/merge",
-				},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
 				Context: &jib.MergeReplyCommentContext{
@@ -150,7 +166,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			},
 			expectedToMerge: false,
 		},
-		// Mergable PR, but updated after /merge command issued
+		// Mergable PR, but new commits after the /merge command issued
 		{
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
@@ -159,15 +175,6 @@ func TestMergeCommandHandler(t *testing.T) {
 				State:      "open",
 				Mergeable:  github.Bool(true),
 				HeadSHA:    "abc123",
-				UpdatedAt:  time.Now().Add(-1 * time.Minute),
-			},
-			commitStatuses: map[string][]*github.CommitStatus{
-				"abc123": {
-					{
-						Context: jib.ComplianceStatusContext,
-						State:   github.CommitStatusSuccess,
-					},
-				},
 			},
 			comments: []*github.IssueComment{
 				{
@@ -177,15 +184,71 @@ func TestMergeCommandHandler(t *testing.T) {
 					CreatedAt: time.Now().Add(-2 * time.Minute),
 				},
 			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": {
+					{
+						Context: jib.ComplianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
+				},
+			},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {
+					{
+						SHA:       "bcd345",
+						Author:    authorizedUser,
+						Committer: authorizedUser,
+						Message:   "Fixes the thing",
+					},
+				},
+			},
 			expectedReplyComment: &issueReplyCommentMatcher{
 				Context: &jib.MergeReplyCommentContext{
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
-					regexp.MustCompile(`@authorized-user I didn't merge this PR because it was updated after the /merge command was issued`),
+					regexp.MustCompile(`@authorized-user I didn't merge this PR because there was a commit created since the /merge command was issued`),
 				},
 			},
 			expectedToMerge: false,
+		},
+		// Mergable PR, only CI commits after the merge was issued
+		{
+			pullRequest: &github.PullRequest{
+				Org:        "pardot",
+				Repository: "bread",
+				Number:     1,
+				State:      "open",
+				Mergeable:  github.Bool(true),
+				HeadSHA:    "abc123",
+			},
+			comments: []*github.IssueComment{
+				{
+					ID:        123,
+					User:      authorizedUser,
+					Body:      "/merge",
+					CreatedAt: time.Now().Add(-2 * time.Minute),
+				},
+			},
+			commitStatuses: map[string][]*github.CommitStatus{
+				"abc123": {
+					{
+						Context: jib.ComplianceStatusContext,
+						State:   github.CommitStatusSuccess,
+					},
+				},
+			},
+			commitsSince: map[string][]*github.Commit{
+				"abc123": {
+					{
+						SHA:       "bcd345",
+						Author:    ciUser,
+						Committer: ciUser,
+						Message:   "[ci] Automated branch merge (from master:ccc123)",
+					},
+				},
+			},
+			expectedToMerge: true,
 		},
 	}
 
@@ -196,6 +259,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				tc.pullRequest.Number: tc.comments,
 			},
 			CommitStatuses: tc.commitStatuses,
+			CommitsSince:   tc.commitsSince,
 		}
 		log := log.New(ioutil.Discard, "", 0)
 

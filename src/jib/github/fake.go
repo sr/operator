@@ -1,6 +1,9 @@
 package github
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type FakeClient struct {
 	ProvidedUsername string
@@ -8,6 +11,7 @@ type FakeClient struct {
 	IssueComments    map[int][]*IssueComment
 	PermissionLevels map[string]PermissionLevel
 	CommitStatuses   map[string][]*CommitStatus
+	CommitsSince     map[string][]*Commit
 
 	MergedPullRequests map[int]string
 	PostedComments     []*IssueReplyComment
@@ -55,6 +59,14 @@ func (c *FakeClient) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, 
 		return statuses, nil
 	} else {
 		return nil, fmt.Errorf("no commit statuses for %s", ref)
+	}
+}
+
+func (c *FakeClient) GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error) {
+	if commits, ok := c.CommitsSince[sha]; ok {
+		return commits, nil
+	} else {
+		return nil, fmt.Errorf("no commits since for %s", sha)
 	}
 }
 
