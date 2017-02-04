@@ -18,7 +18,8 @@ RUN mkdir /teampass && \
   curl -O https://${artifactory_host}/artifactory/pd-tarball/teampass/teampass-${teampass_version}.zip && \
   unzip teampass-${teampass_version}.zip && \
   rm teampass-${teampass_version}.zip && \
-  mv TeamPass-${teampass_version} www
+  mv TeamPass-${teampass_version} www && \
+  chown -Rf apache.apache www
 
 #RUN chown -Rf www-data.www-data /teampass/www
 #RUN php5enmod ldap

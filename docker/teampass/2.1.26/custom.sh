@@ -15,13 +15,14 @@ global \$server, \$user, \$pass, \$database, \$pre, \$db, \$port, \$encoding;
 \$user = getenv('MYSQL_USER');
 \$pass = getenv('MYSQL_PASSWORD');
 \$database = getenv('MYSQL_DATABASE');
-\$pre = 'teampass_';
+\$pre = \"teampass_\";
 \$port = 3306;
-\$encoding = 'utf8';
+\$encoding = \"utf8\";
 
 @date_default_timezone_set(\$_SESSION['settings']['timezone']);
 @define('SECUREPATH', '/teampass/www/includes');
-require_once '/teampass/www/includes/sk.php';
+require_once \"/teampass/www/includes/sk.php\";
+@define('COST', '13'); // Don't change this.
 ?>" > $ROOTTP/includes/config/settings.php
 
 echo "<?php
