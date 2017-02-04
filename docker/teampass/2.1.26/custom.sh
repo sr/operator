@@ -69,4 +69,4 @@ return array(
 );' > $ROOTTP/includes/libraries/csrfp/libs/csrfp.config.php
 
 # Temporarily disable TLS cert checking until we have a valid *.aws.pardot.com cert in place
-echo "TLS_REQCERT never\n" >> /etc/openldap/ldap.conf
+printf "TLS_REQCERT never\n" >> /etc/openldap/ldap.conf
