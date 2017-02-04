@@ -67,3 +67,6 @@ return array(
     See details of your web browser for how to enable JavaScript.",
     "verifyGetFor" => array("*page=items&type=duo_check*", "*upload.attachments.php*")
 );' > $ROOTTP/includes/libraries/csrfp/libs/csrfp.config.php
+
+# Temporarily disable TLS cert checking until we have a valid *.aws.pardot.com cert in place
+echo "TLS_REQCERT never\n" >> /etc/openldap/ldap.conf
