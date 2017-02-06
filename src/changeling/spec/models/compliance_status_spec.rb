@@ -105,6 +105,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.complete?).to eq(true)
     @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
     expect(@multipass.reload.complete?).to eq(false)
+    expect(@multipass.reload.pending?).to eq(false)
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Automated tests failed")
@@ -114,6 +115,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.complete?).to eq(true)
     @multipass.update!(testing: false, tests_state: RepositoryCommitStatus::PENDING)
     expect(@multipass.reload.complete?).to eq(false)
+    expect(@multipass.reload.pending?).to eq(true)
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Awaiting automated tests results")

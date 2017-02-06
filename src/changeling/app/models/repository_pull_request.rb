@@ -287,12 +287,12 @@ class RepositoryPullRequest
   end
 
   def create_github_commit_status
-    if @multipass.rejected?
-      @multipass.failure_github_commit_status!
-    elsif @multipass.complete?
+    if @multipass.complete?
       @multipass.approve_github_commit_status!
-    else
+    elsif @multipass.pending?
       @multipass.pending_github_commit_status!
+    else
+      @multipass.failure_github_commit_status!
     end
   end
 

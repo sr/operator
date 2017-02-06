@@ -4,12 +4,6 @@ class PardotComplianceStatus
     @default = HerokuComplianceStatus.new(multipass)
   end
 
-  delegate \
-    :complete?,
-    :rejected?,
-    :pending?,
-    to: :@default
-
   def complete?
     return true if emergency_approved?
 
@@ -23,6 +17,16 @@ class PardotComplianceStatus
     end
 
     peer_reviewed? && tests_successful?
+  end
+
+  def rejected?
+    return false if emergency_approved?
+
+    @default.rejected?
+  end
+
+  def pending?
+    !complete? && !tests_failed?
   end
 
   def user_is_peer_reviewer?(user)
@@ -121,5 +125,9 @@ class PardotComplianceStatus
 
   def tests_pending?
     @multipass.tests_state == RepositoryCommitStatus::PENDING
+  end
+
+  def tests_failed?
+    !tests_pending? && !tests_successful?
   end
 end
