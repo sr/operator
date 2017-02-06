@@ -71,6 +71,7 @@ type IssueReplyComment struct {
 
 type User struct {
 	Login string
+	Email string
 }
 
 type PermissionLevel string
@@ -452,8 +453,16 @@ func wrapUser(user *gogithub.User) (*User, error) {
 		return nil, fmt.Errorf("user Login was nil: %+v", user)
 	}
 
+	// It is valid for user.Email to be nil if the user has not set their
+	// email to 'public'
+	var email string
+	if user.Email != nil {
+		email = *user.Email
+	}
+
 	wrapped := &User{
 		Login: *user.Login,
+		Email: email,
 	}
 	return wrapped, nil
 }
