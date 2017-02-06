@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Worker for handling incoming issue_comment events
 class IssueCommentHandler < ActiveJob::Base
   ACCEPTED_PEER_REVIEW_COMMENTS = [
@@ -12,12 +13,16 @@ class IssueCommentHandler < ActiveJob::Base
 
   def perform(_, data)
     issue_comment = JSON.parse(data)
-
-    if valid_issue_comment?(issue_comment["comment"]["body"])
-      Multipass.update_from_issue_comment(issue_comment["issue"]["pull_request"],
-                                          issue_comment["comment"], ":+1:")
+    if Changeling.config.pardot?
+      multipass = Multipass.find_or_initialize_by_pull_request(issue_comment["issue"]["pull_request"])
+      multipass.synchronize
     else
-      Rails.logger.info "Ignoring issue comment: #{issue_comment['comment']['body']}"
+      if valid_issue_comment?(issue_comment["comment"]["body"])
+        Multipass.update_from_issue_comment(issue_comment["issue"]["pull_request"],
+                                            issue_comment["comment"], ":+1:")
+      else
+        Rails.logger.info "Ignoring issue comment: #{issue_comment['comment']['body']}"
+      end
     end
   end
 end

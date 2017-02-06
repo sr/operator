@@ -106,6 +106,10 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
+    def issue_comments(name_with_owner, number)
+      @client.issue_comments(name_with_owner, number)
+    end
+
     def labels_for_issue(name_with_owner, number)
       @client.labels_for_issue(name_with_owner, number)
     end

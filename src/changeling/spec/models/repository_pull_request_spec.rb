@@ -35,9 +35,10 @@ RSpec.describe RepositoryPullRequest do
     end
   end
 
-  def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [])
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [], body: "")
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
+    pull_request["body"] = body
     pull_request["title"] = title if title
     if merge_commit_sha
       pull_request["merged"] = true
@@ -61,6 +62,19 @@ RSpec.describe RepositoryPullRequest do
 
     stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/commits/#{@multipass.release_id}/status")
       .to_return(body: JSON.dump(combined_status), headers: { "Content-Type" => "application/json" })
+  end
+
+  def stub_github_pull_request_comments(comments = [])
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/issues/#{@multipass.pull_request_number}/comments")
+      .to_return(body: JSON.dump(comments), headers: { "Content-Type" => "application/json" })
+  end
+
+  def stub_github_pull_request_labels(labels = [])
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/issues/#{@multipass.pull_request_number}/labels")
+      .to_return(body: JSON.dump(labels), headers: { "Content-Type" => "application/json" })
+
+    stub_request(:post, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/issues/#{@multipass.pull_request_number}/labels")
+      .to_return(status: 201)
   end
 
   def stub_github_pull_request_reviews(reviews = [])
@@ -104,6 +118,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
@@ -119,6 +135,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598: hello")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -152,6 +170,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598 Enforce traceability of PR back to ticket")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -175,6 +195,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
@@ -188,6 +210,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
 
       ticket = @multipass.reload.referenced_ticket
@@ -199,6 +223,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
 
       ticket = @multipass.reload.referenced_ticket
@@ -213,6 +239,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "W-3343901 Draw the rest of the owl")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
@@ -239,6 +267,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
 
       original_release_id = @multipass.release_id
       @multipass.synchronize
@@ -259,6 +289,8 @@ RSpec.describe RepositoryPullRequest do
       )
       stub_github_commit_status
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
 
       expect(@multipass.changed_files).to eq([])
       @multipass.synchronize
@@ -275,22 +307,6 @@ RSpec.describe RepositoryPullRequest do
       @multipass.synchronize
       expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
-
-    it "detects emergency merges" do
-      stub_jira_ticket("BREAD-1598")
-      stub_github_pull_request(title: "BREAD-1598")
-      stub_github_commit_status
-      stub_github_pull_request_reviews
-
-      expect(@multipass.change_type).to_not eq(ChangeCategorization::EMERGENCY)
-      expect(@multipass.complete?).to eq(false)
-
-      stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
-      @multipass.synchronize
-      @multipass.reload
-
-      expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
-    end
   end
 
   describe "synchronizing github statuses" do
@@ -303,6 +319,8 @@ RSpec.describe RepositoryPullRequest do
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" }
       ])
       stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @multipass.synchronize
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
@@ -323,6 +341,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request
       stub_github_pull_request_reviews
       stub_github_commit_status(statuses: [])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
 
       config = Bread::RepositoryConfig.new(
         required_testing_statuses: ["ci/travis", "ci/bazel"]
@@ -365,6 +385,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request
       stub_github_commit_status
       stub_github_pull_request_reviews([])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @repository_pull_request.synchronize
 
       expect(@multipass.reload.peer_reviewer).to eq(nil)
@@ -378,6 +400,8 @@ RSpec.describe RepositoryPullRequest do
         { github_login: "alindeman", approved: true },
         { github_login: "sr", approved: true }
       ])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @repository_pull_request.synchronize
 
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
@@ -391,6 +415,8 @@ RSpec.describe RepositoryPullRequest do
         { github_login: "alindeman", approved: false },
         { github_login: "sr", approved: true }
       ])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @repository_pull_request.synchronize
 
       expect(@multipass.reload.peer_reviewer).to eq("sr")
@@ -403,6 +429,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews([
         { github_login: "alindeman", approved: true }
       ])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
       @repository_pull_request.synchronize
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
 
@@ -412,37 +440,102 @@ RSpec.describe RepositoryPullRequest do
       @repository_pull_request.synchronize
       expect(@multipass.reload.peer_reviewer).to eq(nil)
     end
+
+    it "synchronizes peer reviewers" do
+      stub_jira_ticket("BREAD-1234")
+      stub_github_pull_request
+      stub_github_commit_status
+      stub_github_pull_request_reviews([])
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
+      expect(@multipass.reload.peer_reviews).to eq([])
+
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: true },
+        { github_login: "sr", approved: false }
+      ])
+      @repository_pull_request.synchronize
+
+      expect(@multipass.reload.peer_reviews.size).to eq(2)
+
+      review_1 = @multipass.peer_reviews[0]
+      expect(review_1.reviewer_github_login).to eq("alindeman")
+      expect(review_1.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+
+      review_2 = @multipass.peer_reviews[1]
+      expect(review_2.reviewer_github_login).to eq("sr")
+      expect(review_2.state).to eq(Clients::GitHub::REVIEW_CHANGES_REQUESTED)
+
+      stub_github_pull_request_reviews([
+        { github_login: "alindeman", approved: true },
+        { github_login: "sr", approved: true }
+      ])
+      @repository_pull_request.synchronize
+      review = @multipass.reload.peer_reviews.where(reviewer_github_login: "sr").first!
+      expect(review.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+    end
   end
 
-  it "synchronizes peer reviewers" do
-    stub_jira_ticket("BREAD-1234")
-    stub_github_pull_request
-    stub_github_commit_status
-    stub_github_pull_request_reviews([])
-    expect(@multipass.reload.peer_reviews).to eq([])
+  describe "setting change type" do
+    it "sets the change type to standard by default" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
 
-    stub_github_pull_request_reviews([
-      { github_login: "alindeman", approved: true },
-      { github_login: "sr", approved: false }
-    ])
-    @repository_pull_request.synchronize
+      @multipass.synchronize
+      @multipass.reload
+      expect(@multipass.change_type).to eq(ChangeCategorization::STANDARD)
+    end
 
-    expect(@multipass.reload.peer_reviews.size).to eq(2)
+    it "sets the change type to major if the pull request body specifies #major" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598", body: "Dangerzone! #major")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
 
-    review_1 = @multipass.peer_reviews[0]
-    expect(review_1.reviewer_github_login).to eq("alindeman")
-    expect(review_1.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+      @multipass.synchronize
+      @multipass.reload
+      expect(@multipass.change_type).to eq(ChangeCategorization::MAJOR)
+    end
 
-    review_2 = @multipass.peer_reviews[1]
-    expect(review_2.reviewer_github_login).to eq("sr")
-    expect(review_2.state).to eq(Clients::GitHub::REVIEW_CHANGES_REQUESTED)
+    it "sets the change type to major if a pull request comment specifies #major" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      stub_github_pull_request_comments([
+        {body: "I think we need extra review on this one #major"}
+      ])
+      stub_github_pull_request_labels
 
-    stub_github_pull_request_reviews([
-      { github_login: "alindeman", approved: true },
-      { github_login: "sr", approved: true }
-    ])
-    @repository_pull_request.synchronize
-    review = @multipass.reload.peer_reviews.where(reviewer_github_login: "sr").first!
-    expect(review.state).to eq(Clients::GitHub::REVIEW_APPROVED)
+      @multipass.synchronize
+      @multipass.reload
+      expect(@multipass.change_type).to eq(ChangeCategorization::MAJOR)
+    end
+
+    it "detects emergency merges" do
+      stub_jira_ticket("BREAD-1598")
+      stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
+
+      @multipass.synchronize
+      @multipass.reload
+      expect(@multipass.change_type).to_not eq(ChangeCategorization::EMERGENCY)
+      expect(@multipass.complete?).to eq(false)
+
+      stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      @multipass.synchronize
+      @multipass.reload
+
+      expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
+    end
   end
 end
