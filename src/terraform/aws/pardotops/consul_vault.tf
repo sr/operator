@@ -33,6 +33,10 @@ resource "aws_security_group" "pardot0_ue1_consul_vault" {
       "${aws_vpc.pardot0_ue1.cidr_block}",
       "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
     ]
+
+    security_groups = [
+      "${aws_security_group.vault_http_lb.id}",
+    ]
   }
 
   # allow app.dev hosts access to consul server port
