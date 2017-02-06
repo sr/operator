@@ -71,6 +71,7 @@ type IssueReplyComment struct {
 
 type User struct {
 	Login string
+	Email string
 }
 
 type PermissionLevel string
@@ -93,6 +94,13 @@ var (
 	CommitStatusSuccess CommitStatusState = "success"
 )
 
+type Commit struct {
+	SHA       string
+	Message   string
+	Author    *User
+	Committer *User
+}
+
 func Bool(b bool) *bool {
 	return &b
 }
@@ -109,9 +117,11 @@ type Client interface {
 	GetOpenPullRequests(org string) ([]*PullRequest, error)
 	GetIssueComments(org, repo string, number int) ([]*IssueComment, error)
 	GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error)
+	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
+	GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error)
+
 	MergePullRequest(org, repo string, number int, commitMessage string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
-	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
 	CloseIssue(org, repo string, number int) error
 }
 
@@ -232,6 +242,40 @@ func (c *client) GetUserPermissionLevel(org, repo, login string) (PermissionLeve
 	}
 
 	return PermissionLevel(*rpl.Permission), nil
+}
+
+func (c *client) GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error) {
+	opt := &gogithub.CommitsListOptions{
+		SHA:   sha,
+		Since: since,
+		ListOptions: gogithub.ListOptions{
+			PerPage: githubMaxPerPage,
+		},
+	}
+
+	allCommits := []*Commit{}
+	for {
+		commits, resp, err := c.gh.Repositories.ListCommits(org, repo, opt)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, commit := range commits {
+			wrapped, err := wrapCommit(commit)
+			if err != nil {
+				return nil, err
+			}
+
+			allCommits = append(allCommits, wrapped)
+		}
+
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.ListOptions.Page = resp.NextPage
+	}
+
+	return allCommits, nil
 }
 
 func (c *client) MergePullRequest(org, repo string, number int, commitMessage string) error {
@@ -409,8 +453,54 @@ func wrapUser(user *gogithub.User) (*User, error) {
 		return nil, fmt.Errorf("user Login was nil: %+v", user)
 	}
 
+	// It is valid for user.Email to be nil if the user has not set their
+	// email to 'public'
+	var email string
+	if user.Email != nil {
+		email = *user.Email
+	}
+
 	wrapped := &User{
 		Login: *user.Login,
+		Email: email,
+	}
+	return wrapped, nil
+}
+
+func wrapCommit(commit *gogithub.RepositoryCommit) (*Commit, error) {
+	if commit.SHA == nil {
+		return nil, fmt.Errorf("commit sha was nil: %+v", commit)
+	} else if commit.Commit == nil {
+		return nil, fmt.Errorf("commit commit was nil: %+v", commit)
+	} else if commit.Commit.Message == nil {
+		return nil, fmt.Errorf("commit message was nil: %+v", commit.Commit)
+	}
+
+	// It is valid for author or committer to be nil, if they don't match
+	// any known GitHub users
+	var author, committer *User
+
+	if commit.Author != nil {
+		var err error
+		author, err = wrapUser(commit.Author)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if commit.Committer != nil {
+		var err error
+		committer, err = wrapUser(commit.Committer)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	wrapped := &Commit{
+		SHA:       *commit.SHA,
+		Message:   *commit.Commit.Message,
+		Author:    author,
+		Committer: committer,
 	}
 	return wrapped, nil
 }

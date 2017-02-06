@@ -25,8 +25,8 @@ Please fix the issue and re-issue the /merge command and I'll get right to it.
 Please fix the issue and re-issue the /merge command and I'll get right to it.
 `)))
 
-	prUpdatedAfterMergeCommandReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} I didn't merge this PR because it was updated after the /merge command was issued.
+	prCommitAfterMergeCommandReply = template.Must(template.New("").Parse(strings.TrimSpace(`
+@{{.User.Login}} I didn't merge this PR because there was a commit created since the /merge command was issued.
 
 If you still want to merge, re-issue the /merge command and I'll get right to it.
 `)))
@@ -77,11 +77,17 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 
 	comment := latestMergeCommand.Comment
 	if *pr.Mergeable {
+		commitsSinceCommand, err := gh.GetCommitsSince(pr.Org, pr.Repository, pr.HeadSHA, comment.CreatedAt)
+		if err != nil {
+			return err
+		}
+		commitsSinceCommand = filterCIAutomatedMerges(commitsSinceCommand)
+
 		// If the PR was updated after the /merge
 		// command was created, we must get the user to
 		// verify their intent again.
-		if pr.UpdatedAt.After(comment.CreatedAt) {
-			body, err := renderTemplate(prUpdatedAfterMergeCommandReply, comment)
+		if len(commitsSinceCommand) > 0 {
+			body, err := renderTemplate(prCommitAfterMergeCommandReply, comment)
 			if err != nil {
 				return err
 			}
@@ -111,7 +117,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 			}
 
 			if complianceStatus.State == github.CommitStatusSuccess {
-				message := fmt.Sprintf("Automated merge, requested by @%s", comment.User.Login)
+				message := fmt.Sprintf("Merge-requested-by: @%s <%s>", comment.User.Login, comment.User.Email)
 				err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 				if err != nil {
 					return err
