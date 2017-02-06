@@ -20,7 +20,7 @@ RSpec.configure do |config|
     GithubInstallation.find_or_create_by!(hostname: "github.com")
   end
 
-  config.after(:each) do
+  config.before(:each) do
     Changeling.config.pardot = false
   end
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require "rails_helper"
 
 RSpec.describe Clients::GitHub do
@@ -165,6 +166,49 @@ RSpec.describe Clients::GitHub do
       stub_json_request(:get, "https://api.github.com/repos/heroku/changeling/statuses/#{sha}", body)
       statuses = client.commit_statuses(repo, sha)
       expect(statuses.size).to eql(1)
+    end
+  end
+
+  describe "#labels_for_issue" do
+    let(:number) { 4 }
+    let(:repo) { "heroku/changeling" }
+
+    it "returns the list of labels for an issue (or pull request)" do
+      body = [{ id: 1234, name: "standard-impact" }].to_json
+      stub_json_request(:get, "https://api.github.com/repos/heroku/changeling/issues/#{number}/labels", body)
+
+      labels = client.labels_for_issue(repo, number)
+      expect(labels.size).to eql(1)
+    end
+  end
+
+  describe "#add_labels_to_an_issue" do
+    let(:number) { 4 }
+    let(:repo) { "heroku/changeling" }
+    let(:labels) { ["label1", "label2"] }
+
+    it "returns the list of labels for an issue (or pull request)" do
+      body = labels.to_json
+      req = stub_request(:post, "https://api.github.com/repos/heroku/changeling/issues/#{number}/labels")
+        .with(body: body)
+        .to_return(status: 201)
+
+      client.add_labels_to_an_issue(repo, number, labels)
+      expect(req).to have_been_made
+    end
+  end
+
+  describe "#remove_label" do
+    let(:number) { 4 }
+    let(:repo) { "heroku/changeling" }
+    let(:label) { "label1" }
+
+    it "returns the list of labels for an issue (or pull request)" do
+      req = stub_request(:delete, "https://api.github.com/repos/heroku/changeling/issues/#{number}/labels/#{label}")
+        .to_return(status: 204)
+
+      client.remove_label(repo, number, label)
+      expect(req).to have_been_made
     end
   end
 end

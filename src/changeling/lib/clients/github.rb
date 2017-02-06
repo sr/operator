@@ -106,6 +106,18 @@ module Clients
       @client.pull_request(name_with_owner, number)
     end
 
+    def labels_for_issue(name_with_owner, number)
+      @client.labels_for_issue(name_with_owner, number)
+    end
+
+    def add_labels_to_an_issue(name_with_owner, number, labels = [])
+      @client.add_labels_to_an_issue(name_with_owner, number, labels)
+    end
+
+    def remove_label(name_with_owner, number, label)
+      @client.remove_label(name_with_owner, number, label)
+    end
+
     def pull_request_files(name_with_owner, number)
       @client.pull_request_files(name_with_owner, number)
     end
