@@ -296,7 +296,7 @@ class RepositoryPullRequest
     end
 
     if !@multipass.ticket_reference
-      TicketReference.create!(multipass_id: @multipass.id, ticket_id: ticket.id)
+      @multipass.ticket_reference.create!(ticket_id: ticket.id)
     else
       @multipass.ticket_reference.update!(ticket_id: ticket.id)
     end
