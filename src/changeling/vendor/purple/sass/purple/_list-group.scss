@@ -1,0 +1,82 @@
+//
+// List groups
+// --------------------------------------------------
+
+
+.list-group-item {
+  border-left: none;
+  border-right: none;
+  padding-bottom: $list-group-item-padding;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: $list-group-item-padding;
+
+  &:first-of-type {
+    border-top: none;
+  }
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+// Clone a.list-group-item default styles
+// @extend would be great here but not possible with nested selector
+// https://github.com/sass/libsass/issues/146
+
+.list-group-item-link {
+  color: $list-group-link-color;
+
+  .list-group-item-heading {
+    color: $list-group-link-heading-color;
+  }
+
+  // Hover state
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: $list-group-link-hover-color;
+    background-color: $list-group-hover-bg;
+  }
+}
+
+a.list-group-item,
+.list-group-item-link {
+  &:hover,
+  &:focus {
+    @include background-image(linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, #fff 100%));
+
+    &:first-of-type {
+      @include background-image(
+        linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, #fff 100%),
+        linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0))
+      );
+    }
+
+    &:last-of-type {
+      @include background-image(
+        linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, #fff 100%),
+        linear-gradient(to top, #fff, rgba(255, 255, 255, 0))
+      );
+    }
+  }
+
+  &.active:before {
+    background: $list-group-active-indicator;
+    content: '';
+    display: block;
+    height: 100%;
+    left: -15px;
+    position: absolute;
+    top: 0;
+    width: 3px;
+  }
+}
+
+.list-group-lg {
+  > .list-group-item {
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+}

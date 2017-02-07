@@ -13,3 +13,21 @@ resource "github_team_repository" "pd-homebrew-php_developers" {
   team_id    = "${github_team.developers.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "pd-homebrew-php_engineering-managers" {
+  repository = "${github_repository.pd-homebrew-php.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "pd-homebrew-php_site-reliability-engineers" {
+  repository = "${github_repository.pd-homebrew-php.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "pd-homebrew-php_service-accounts-write-only" {
+  repository = "${github_repository.pd-homebrew-php.name}"
+  team_id    = "${github_team.service-accounts-write-only.id}"
+  permission = "push"
+}

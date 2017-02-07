@@ -1,0 +1,606 @@
+// Used to adjust the default spacing between components
+// Use with great care!
+//
+// u-<type>-<location><size>
+//
+//
+//
+// Types:
+//
+// margin
+// padding
+//
+//
+// Directions:
+//
+// A = all
+// T = top
+// R = right
+// B = bottom
+// L = left
+// H = horizontal
+// V = vertical
+//
+//
+// Sizes:
+//
+// n = none
+// s = small
+// m = medium
+// l = large
+
+
+//////////////
+// All padding
+
+.u-padding-Axxl {
+  padding: $space-xxlarge;
+}
+
+.u-padding-Axl {
+  padding: $space-xlarge;
+}
+
+.u-padding-Al {
+  padding: $space-large;
+}
+
+.u-padding-Axm {
+  padding: $space-xmedium;
+}
+
+.u-padding-Am {
+  padding: $space-medium;
+}
+
+.u-padding-As {
+  padding: $space-small;
+}
+
+.u-padding-Axs {
+  padding: $space-xsmall;
+}
+
+.u-padding-Axxs {
+  padding: $space-xxsmall;
+}
+
+.u-padding-An {
+  padding: 0;
+}
+
+// All margin
+
+.u-margin-Axxl {
+  margin: $space-xxlarge;
+}
+
+.u-margin-Axl {
+  margin: $space-xlarge;
+}
+
+.u-margin-Al {
+  margin: $space-large;
+}
+
+.u-margin-Axm {
+  margin: $space-xmedium;
+}
+
+.u-margin-Am {
+  margin: $space-medium;
+}
+
+.u-margin-As {
+  margin: $space-small;
+}
+
+.u-margin-Axs {
+  margin: $space-xsmall;
+}
+
+.u-margin-Axxs {
+  margin: $space-xxsmall;
+}
+
+.u-margin-An {
+  margin: 0;
+}
+
+//////////////////
+// Vertical margin
+
+.u-margin-Vxxl {
+  margin-top: $space-xxlarge;
+  margin-bottom: $space-xxlarge;
+}
+
+.u-margin-Vxl {
+  margin-top: $space-xlarge;
+  margin-bottom: $space-xlarge;
+}
+
+.u-margin-Vl {
+  margin-top: $space-large;
+  margin-bottom: $space-large;
+}
+
+.u-margin-Vxm {
+  margin-top: $space-xmedium;
+  margin-bottom: $space-xmedium;
+}
+
+.u-margin-Vm {
+  margin-top: $space-medium;
+  margin-bottom: $space-medium;
+}
+
+.u-margin-Vs {
+  margin-top: $space-small;
+  margin-bottom: $space-small;
+}
+
+.u-margin-Vxs {
+  margin-top: $space-xsmall;
+  margin-bottom: $space-xsmall;
+}
+
+.u-margin-Vxxs {
+  margin-top: $space-xxsmall;
+  margin-bottom: $space-xxsmall;
+}
+
+.u-margin-Vn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+// Vertical padding
+
+.u-padding-Vxxl {
+  padding-top: $space-xxlarge;
+  padding-bottom: $space-xxlarge;
+}
+
+.u-padding-Vxl {
+  padding-top: $space-xlarge;
+  padding-bottom: $space-xlarge;
+}
+
+.u-padding-Vl {
+  padding-top: $space-large;
+  padding-bottom: $space-large;
+}
+
+.u-padding-Vxm {
+  padding-top: $space-xmedium;
+  padding-bottom: $space-xmedium;
+}
+
+.u-padding-Vm {
+  padding-top: $space-medium;
+  padding-bottom: $space-medium;
+}
+
+.u-padding-Vs {
+  padding-top: $space-small;
+  padding-bottom: $space-small;
+}
+
+.u-padding-Vxs {
+  padding-top: $space-xsmall;
+  padding-bottom: $space-xsmall;
+}
+
+.u-padding-Vxxs {
+  padding-top: $space-xxsmall;
+  padding-bottom: $space-xxsmall;
+}
+
+.u-padding-Vn {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+////////////////////
+// Horizontal margin
+
+.u-margin-Hxxl {
+  margin-left: $space-xxlarge;
+  margin-right: $space-xxlarge;
+}
+
+.u-margin-Hxl {
+  margin-left: $space-xlarge;
+  margin-right: $space-xlarge;
+}
+
+.u-margin-Hl {
+  margin-left: $space-large;
+  margin-right: $space-large;
+}
+
+.u-margin-Hxm {
+  margin-left: $space-xmedium;
+  margin-right: $space-xmedium;
+}
+
+.u-margin-Hm {
+  margin-left: $space-medium;
+  margin-right: $space-medium;
+}
+
+.u-margin-Hs {
+  margin-left: $space-small;
+  margin-right: $space-small;
+}
+
+.u-margin-Hxs {
+  margin-left: $space-xsmall;
+  margin-right: $space-xsmall;
+}
+
+.u-margin-Hxxs {
+  margin-left: $space-xxsmall;
+  margin-right: $space-xxsmall;
+}
+
+.u-margin-Hn {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+// Horizontal padding
+
+.u-padding-Hxxl {
+  padding-left: $space-xxlarge;
+  padding-right: $space-xxlarge;
+}
+
+.u-padding-Hxl {
+  padding-left: $space-xlarge;
+  padding-right: $space-xlarge;
+}
+
+.u-padding-Hl {
+  padding-left: $space-large;
+  padding-right: $space-large;
+}
+
+.u-padding-Hxm {
+  padding-left: $space-xmedium;
+  padding-right: $space-xmedium;
+}
+
+.u-padding-Hm {
+  padding-left: $space-medium;
+  padding-right: $space-medium;
+}
+
+.u-padding-Hs {
+  padding-left: $space-small;
+  padding-right: $space-small;
+}
+
+.u-padding-Hxs {
+  padding-left: $space-xsmall;
+  padding-right: $space-xsmall;
+}
+
+.u-padding-Hxxs {
+  padding-left: $space-xxsmall;
+  padding-right: $space-xxsmall;
+}
+
+.u-padding-Hn {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/////////////
+// Top margin
+
+.u-margin-Txxl {
+  margin-top: $space-xxlarge;
+}
+
+.u-margin-Txl {
+  margin-top: $space-xlarge;
+}
+
+.u-margin-Tl {
+  margin-top: $space-large;
+}
+
+.u-margin-Txm {
+  margin-top: $space-xmedium;
+}
+
+.u-margin-Tm {
+  margin-top: $space-medium;
+}
+
+.u-margin-Ts {
+  margin-top: $space-small;
+}
+
+.u-margin-Txs {
+  margin-top: $space-xsmall;
+}
+
+.u-margin-Txxs {
+  margin-top: $space-xxsmall;
+}
+
+.u-margin-Tn {
+  margin-top: 0;
+}
+
+// Top padding
+
+.u-padding-Txxl {
+  padding-top: $space-xxlarge;
+}
+
+.u-padding-Txl {
+  padding-top: $space-xlarge;
+}
+
+.u-padding-Tl {
+  padding-top: $space-large;
+}
+
+.u-padding-Txm {
+  padding-top: $space-xmedium;
+}
+
+.u-padding-Tm {
+  padding-top: $space-medium;
+}
+
+.u-padding-Ts {
+  padding-top: $space-small;
+}
+
+.u-padding-Txs {
+  padding-top: $space-xsmall;
+}
+
+.u-padding-Txxs {
+  padding-top: $space-xxsmall;
+}
+
+.u-padding-Tn {
+  padding-top: 0;
+}
+
+////////////////
+// Bottom margin
+
+.u-margin-Bxxl {
+  margin-bottom: $space-xxlarge;
+}
+
+.u-margin-Bxl {
+  margin-bottom: $space-xlarge;
+}
+
+.u-margin-Bl {
+  margin-bottom: $space-large;
+}
+
+.u-margin-Bxm {
+  margin-bottom: $space-xmedium;
+}
+
+.u-margin-Bm {
+  margin-bottom: $space-medium;
+}
+
+.u-margin-Bs {
+  margin-bottom: $space-small;
+}
+
+.u-margin-Bxs {
+  margin-bottom: $space-xsmall;
+}
+
+.u-margin-Bxxs {
+  margin-bottom: $space-xxsmall;
+}
+
+.u-margin-Bn {
+  margin-bottom: 0;
+}
+
+// Bottom padding
+
+.u-padding-Bxxl {
+  padding-bottom: $space-xxlarge;
+}
+
+.u-padding-Bxl {
+  padding-bottom: $space-xlarge;
+}
+
+.u-padding-Bl {
+  padding-bottom: $space-large;
+}
+
+.u-padding-Bxm {
+  padding-bottom: $space-xmedium;
+}
+
+.u-padding-Bm {
+  padding-bottom: $space-medium;
+}
+
+.u-padding-Bs {
+  padding-bottom: $space-small;
+}
+
+.u-padding-Bxs {
+  padding-bottom: $space-xsmall;
+}
+
+.u-padding-Bxxs {
+  padding-bottom: $space-xxsmall;
+}
+
+.u-padding-Bn {
+  padding-bottom: 0;
+}
+
+///////////////
+// Right margin
+
+.u-margin-Rxxl {
+  margin-right: $space-xxlarge;
+}
+
+.u-margin-Rxl {
+  margin-right: $space-xlarge;
+}
+
+.u-margin-Rl {
+  margin-right: $space-large;
+}
+
+.u-margin-Rxm {
+  margin-right: $space-xmedium;
+}
+
+.u-margin-Rm {
+  margin-right: $space-medium;
+}
+
+.u-margin-Rs {
+  margin-right: $space-small;
+}
+
+.u-margin-Rxs {
+  margin-right: $space-xsmall;
+}
+
+.u-margin-Rxxs {
+  margin-right: $space-xxsmall;
+}
+
+.u-margin-Rn {
+  margin-right: 0;
+}
+
+// Right padding
+
+.u-padding-Rxxl {
+  padding-right: $space-xxlarge;
+}
+
+.u-padding-Rxl {
+  padding-right: $space-xlarge;
+}
+
+.u-padding-Rl {
+  padding-right: $space-large;
+}
+
+.u-padding-Rxm {
+  padding-right: $space-xmedium;
+}
+
+.u-padding-Rm {
+  padding-right: $space-medium;
+}
+
+.u-padding-Rs {
+  padding-right: $space-small;
+}
+
+.u-padding-Rxs {
+  padding-right: $space-xsmall;
+}
+
+.u-padding-Rxxs {
+  padding-right: $space-xxsmall;
+}
+
+.u-padding-Rn {
+  padding-right: 0;
+}
+
+//////////////
+// Left margin
+
+.u-margin-Lxxl {
+  margin-left: $space-xxlarge;
+}
+
+.u-margin-Lxl {
+  margin-left: $space-xlarge;
+}
+
+.u-margin-Ll {
+  margin-left: $space-large;
+}
+
+.u-margin-Lxm {
+  margin-left: $space-xmedium;
+}
+
+.u-margin-Lm {
+  margin-left: $space-medium;
+}
+
+.u-margin-Ls {
+  margin-left: $space-small;
+}
+
+.u-margin-Lxs {
+  margin-left: $space-xsmall;
+}
+
+.u-margin-Lxxs {
+  margin-left: $space-xxsmall;
+}
+
+.u-margin-Ln {
+  margin-left: 0;
+}
+
+// Left padding
+
+.u-padding-Lxxl {
+  padding-left: $space-xxlarge;
+}
+
+.u-padding-Lxl {
+  padding-left: $space-xlarge;
+}
+
+.u-padding-Ll {
+  padding-left: $space-large;
+}
+
+.u-padding-Lxm {
+  padding-left: $space-xmedium;
+}
+
+.u-padding-Lm {
+  padding-left: $space-medium;
+}
+
+.u-padding-Ls {
+  padding-left: $space-small;
+}
+
+.u-padding-Lxs {
+  padding-left: $space-xsmall;
+}
+
+.u-padding-Lxxs {
+  padding-left: $space-xxsmall;
+}
+
+.u-padding-Ln {
+  padding-left: 0;
+}

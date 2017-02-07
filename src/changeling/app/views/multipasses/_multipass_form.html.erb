@@ -9,14 +9,14 @@
             <br>
 
             <div class="btn-group col-xs-12 col-sm-6 col-md-4 radio-buttons buttons-3" data-toggle="buttons">
-              <%= f.button :impact, "low", label: "Low", inline: true %>
-              <%= f.button :impact, "medium", label: "Medium", inline: true %>
-              <%= f.button :impact, "high", label: "High", inline: true %>
+              <%= f.button :impact, ChangeCategorization::LIKELIHOOD_LOW, label: "Low", inline: true %>
+              <%= f.button :impact, ChangeCategorization::LIKELIHOOD_MEDIUM, label: "Medium", inline: true %>
+              <%= f.button :impact, ChangeCategorization::LIKELIHOOD_HIGH, label: "High", inline: true %>
             </div>
 
-            <%= render "multipasses/form/helptext", button: "low", text: "This change could create no more than a minor distruption." %>
-            <%= render "multipasses/form/helptext", button: "medium", text: "This change could create a moderate disruption." %>
-            <%= render "multipasses/form/helptext", button: "high", text: "This change could create a severe disruption." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_LOW, text: "This change could create no more than a minor distruption." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_MEDIUM, text: "This change could create a moderate disruption." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_HIGH, text: "This change could create a severe disruption." %>
           </div>
         <% end %>
 
@@ -26,14 +26,14 @@
             <br>
 
             <div class="btn-group col-xs-12 col-sm-6 col-md-4 radio-buttons buttons-3" data-toggle="buttons">
-              <%= f.button :impact_probability, "low", label: "Low", inline: true %>
-              <%= f.button :impact_probability, "medium", label: "Medium", title: "", inline: true %>
-              <%= f.button :impact_probability, "high", label: "High", inline: true %>
+              <%= f.button :impact_probability, ChangeCategorization::LIKELIHOOD_LOW, label: "Low", inline: true %>
+              <%= f.button :impact_probability, ChangeCategorization::LIKELIHOOD_MEDIUM, label: "Medium", title: "", inline: true %>
+              <%= f.button :impact_probability, ChangeCategorization::LIKELIHOOD_HIGH, label: "High", inline: true %>
             </div>
 
-            <%= render "multipasses/form/helptext", button: "low", text: "This is a well-defined, frequently performed or automated change (0-2% chance of failure)." %>
-            <%= render "multipasses/form/helptext", button: "medium", text: "This is a well-defined, somewhat automated change (2-10% chance of failure)." %>
-            <%= render "multipasses/form/helptext", button: "high", text: "This is a rarely performed, manual change (more than a 10% chance of failure)." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_LOW, text: "This is a well-defined, frequently performed or automated change (0-2% chance of failure)." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_MEDIUM, text: "This is a well-defined, somewhat automated change (2-10% chance of failure)." %>
+            <%= render "multipasses/form/helptext", button: ChangeCategorization::LIKELIHOOD_HIGH, text: "This is a rarely performed, manual change (more than a 10% chance of failure)." %>
           </div>
         <% end %>
       </div>

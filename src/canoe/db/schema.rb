@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161031203534) do
+ActiveRecord::Schema.define(version: 20170105155407) do
 
   create_table "auth_users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "email"
@@ -105,9 +105,10 @@ ActiveRecord::Schema.define(version: 20161031203534) do
     t.text     "sha",               limit: 65535
     t.integer  "build_number"
     t.string   "artifact_url"
-    t.boolean  "passed_ci",                       default: true,  null: false
+    t.boolean  "passed_ci",                       default: true,      null: false
     t.text     "options_validator", limit: 65535
     t.text     "options",           limit: 65535
+    t.string   "compliance_state",                default: "pending", null: false
     t.index ["deploy_target_id"], name: "index_deploys_on_deploy_target_id", using: :btree
   end
 
@@ -121,14 +122,16 @@ ActiveRecord::Schema.define(version: 20161031203534) do
   end
 
   create_table "projects", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string  "name",                                                                                  null: false
-    t.string  "icon",                                                                                  null: false
+    t.string  "name",                                                                                     null: false
+    t.string  "icon",                                                                                     null: false
     t.string  "bamboo_project"
     t.string  "bamboo_plan"
-    t.string  "repository",                                                                            null: false
+    t.string  "repository",                                                                               null: false
     t.string  "bamboo_job"
-    t.boolean "all_servers_default",                                                   default: true,  null: false
-    t.decimal "maximum_unavailable_percentage_per_datacenter", precision: 5, scale: 2, default: "1.0", null: false
+    t.boolean "all_servers_default",                                                   default: true,     null: false
+    t.decimal "maximum_unavailable_percentage_per_datacenter", precision: 5, scale: 2, default: "1.0",    null: false
+    t.boolean "compliant_builds_required",                                             default: true,     null: false
+    t.string  "default_branch",                                                        default: "master", null: false
     t.index ["name"], name: "index_projects_on_name", unique: true, using: :btree
   end
 
@@ -163,6 +166,7 @@ ActiveRecord::Schema.define(version: 20161031203534) do
     t.datetime "created_at", default: '2016-01-21 14:59:58', null: false
     t.datetime "updated_at", default: '2016-01-21 14:59:58', null: false
     t.boolean  "archived",   default: false,                 null: false
+    t.string   "datacenter",                                 null: false
     t.index ["archived"], name: "index_servers_on_archived", using: :btree
     t.index ["hostname"], name: "index_servers_on_hostname", unique: true, using: :btree
   end

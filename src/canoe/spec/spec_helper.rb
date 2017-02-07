@@ -8,7 +8,17 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    Canoe.config.phone_authentication_max_tries = 1
+    Canoe.config.phone_authentication_sleep_interval = 0
+    Canoe.config.phone_authentication_required = false
+
+    Canoe.config.github_client = FakeGithubClient.new(
+      compare_state: GithubRepository::IDENTICAL,
+      compliance_state: GithubRepository::SUCCESS
+    )
+
     Canoe.salesforce_authenticator = SalesforceAuthenticatorAPI::Fake.new
+    Canoe.salesforce_authenticator.authentication_status = { granted: true }
   end
 
   config.mock_with :rspec do |mocks|

@@ -1,11 +1,11 @@
 resource "github_repository" "workflow-stats" {
   name          = "workflow-stats"
-  description   = ""
-  homepage_url  = ""
+  description   = "https://git.dev.pardot.com/Pardot/workflow-stats/blob/master/README.md"
+  homepage_url  = "https://git.dev.pardot.com/Pardot/workflow-stats"
   private       = true
-  has_issues    = true
+  has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "workflow-stats_developers" {
@@ -26,11 +26,23 @@ resource "github_team_repository" "workflow-stats_service-accounts-write-only" {
   permission = "push"
 }
 
+resource "github_team_repository" "workflow-stats_engineering-managers" {
+  repository = "${github_repository.workflow-stats.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "workflow-stats_site-reliability-engineers" {
+  repository = "${github_repository.workflow-stats.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "workflow-stats_master" {
   repository = "${github_repository.workflow-stats.name}"
   branch     = "master"
 
-  include_admins = true
+  include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }

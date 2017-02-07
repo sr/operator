@@ -33,6 +33,7 @@ group :development, :test do
   gem "byebug", "~> 9.0"
   gem "capybara", "~> 2.4", ">= 2.4.4"
   gem "factory_girl_rails", "~> 4.5"
+  gem "rb-readline"
   gem "rspec-rails", "~> 3.3", ">= 3.3.3"
   gem "spring"
   gem "webmock", "~> 1.21", ">= 1.21.0", require: false

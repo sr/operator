@@ -90,6 +90,13 @@ describe "Receiving GitHub hooks", :type => :request do
       end
 
       it "creates multipasses for pull request opened events", :type => :webmock do
+        pull_data = decoded_fixture_data("github/pull_request_opened")
+        repo = GithubInstallation.current.repositories.create!(
+          github_id: pull_data["repository"]["id"],
+          github_owner_id: pull_data.fetch("repository").fetch("owner").fetch("id"),
+          name: pull_data["repository"]["name"],
+          owner: pull_data["repository"]["owner"]["login"],
+        )
         stub_request(:get, "https://api.github.com/repos/heroku/changeling/statuses/ffa01fcbf02757d6cae5d928c2315adbaa2ec582")
           .to_return(body: "[]", headers: { "Content-Type" => "application/json" })
         stub_request(:post, "https://api.github.com/repos/heroku/changeling/statuses/ffa01fcbf02757d6cae5d928c2315adbaa2ec582")
@@ -107,11 +114,12 @@ describe "Receiving GitHub hooks", :type => :request do
         expect(multipass.requester).to eql("corey@heroku.com")
         expect(multipass.team).to eql("Tools")
         expect(multipass.impact).to eql("low")
-        expect(multipass.change_type).to eql("minor")
+        expect(multipass.change_type).to eql(ChangeCategorization::STANDARD)
         expect(multipass.backout_plan).to eql("We revert the pull request.")
-        expect(multipass.impact_probability).to eql("medium")
+        expect(multipass.impact_probability).to eql(ChangeCategorization::LIKELIHOOD_MEDIUM)
         expect(multipass.reference_url).to eql("https://github.com/heroku/changeling/pull/32")
         expect(multipass.audits.size).to eql(1)
+        expect(multipass.repository_id).to eq(repo.id)
         expect(multipass.audits[0].comment)
           .to eql("API: Created from webhook https://github.com/heroku/changeling/pull/32")
       end
@@ -191,7 +199,7 @@ describe "Receiving GitHub hooks", :type => :request do
         ci_success = decoded_fixture_data("github/status_success_travis")
         # I want an incomplete multipass to avoid the callback
         Fabricate(:multipass, release_id:   ci_success["commit"]["sha"],
-                              change_type:  "major",
+                              change_type:  ChangeCategorization::MAJOR,
                               sre_approver: nil,
                               testing:      false)
         expect do
@@ -210,7 +218,7 @@ describe "Receiving GitHub hooks", :type => :request do
           ci_msg = decoded_fixture_data("github/status_#{status}_travis")
           # I want an incomplete multipass to avoid the callback
           Fabricate(:multipass, release_id:   ci_msg["commit"]["sha"],
-                                change_type:  "major",
+                                change_type:  ChangeCategorization::MAJOR,
                                 sre_approver: nil,
                                 testing:      false)
           expect do
@@ -229,7 +237,7 @@ describe "Receiving GitHub hooks", :type => :request do
         ci_msg = decoded_fixture_data("github/status_pending_unknown")
         # I want an incomplete multipass to avoid the callback
         Fabricate(:multipass, release_id:   ci_msg["commit"]["sha"],
-                              change_type:  "major",
+                              change_type:  ChangeCategorization::MAJOR,
                               sre_approver: nil,
                               testing:      false)
         expect do
@@ -253,7 +261,7 @@ describe "Receiving GitHub hooks", :type => :request do
         pull_request_data = decoded_fixture_data("github/pull_request_opened")
         multipass = Multipass.find_or_initialize_by_pull_request(pull_request_data)
         multipass.testing = true
-        multipass.change_type = "minor"
+        multipass.change_type = ChangeCategorization::STANDARD
         multipass.save
       end
 
@@ -291,7 +299,7 @@ describe "Receiving GitHub hooks", :type => :request do
                   reference_url: "https://github.com/heroku/changeling-pr-tests/pull/85",
                   impact: "low",
                   impact_probability: "low",
-                  change_type: "minor",
+                  change_type: ChangeCategorization::STANDARD,
                   testing: true,
                   requester: "atmos")
 
@@ -312,6 +320,26 @@ describe "Receiving GitHub hooks", :type => :request do
         expect(multipass.audits.size).to eql(2)
         expect(multipass.audits[1].comment)
           .to eql("API: Updated from PullRequest Review webhook '' - https://github.com/heroku/changeling-pr-tests/pull/85#pullrequestreview-3917889")
+      end
+    end
+  end
+
+  describe "PushEvent" do
+    include ActiveJob::TestHelper
+
+    it "enqueues a job to synchronize OWNERS files on PushEvent for the master branch" do
+      data = decoded_fixture_data("github/push_event")
+      repo = GithubInstallation.current.repositories.create!(
+        github_id: data.fetch("repository").fetch("id"),
+        owner: data.fetch("repository").fetch("owner").fetch("name"),
+        github_owner_id: 1,
+        name: "bread"
+      )
+      assert_enqueued_with(job: RepositorySynchronizationJob, args: [repo.id]) do
+        post "/webhooks", params: fixture_data("github/push_event"),
+          headers: request_headers("push")
+        expect(response).to be_successful
+        expect(response.status).to eql(201)
       end
     end
   end

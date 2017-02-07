@@ -7,7 +7,7 @@ RSpec.describe "Multipass#changed_risk_assessment?", type: [:model, :webmock] do
   describe "#changed_risk_assessment?" do
     it "returns true if change_type is not default" do
       complete_multipass.save
-      complete_multipass.update(impact: "medium")
+      complete_multipass.update(impact: ChangeCategorization::LIKELIHOOD_MEDIUM)
       expect(complete_multipass).to be_changed_risk_assessment
     end
 

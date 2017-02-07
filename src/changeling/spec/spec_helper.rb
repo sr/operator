@@ -15,6 +15,15 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before(:all) do
+    GithubInstallation.find_or_create_by!(hostname: "git.dev.pardot.com")
+    GithubInstallation.find_or_create_by!(hostname: "github.com")
+  end
+
+  config.after(:each) do
+    Changeling.config.pardot = false
+  end
+
   OmniAuth.config.test_mode = true
 
   mock_auth = OmniAuth::AuthHash.new(
@@ -37,4 +46,8 @@ RSpec.configure do |config|
     code_climate_config.logger.level = Logger::WARN
   end
   CodeClimate::TestReporter.start
+
+  config.before(:each) do
+    stub_request(:post, "https://zipkin-staging.heroku.tools/api/v1/spans")
+  end
 end

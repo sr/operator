@@ -4,24 +4,8 @@ module Multipass::GitHubStatuses
     {
       context: Changeling.config.compliance_status_context,
       target_url: permalink,
-      description: commit_status_description
+      description: compliance_status.github_commit_status_description
     }
-  end
-
-  def commit_status_description
-    if rejected?
-      "Rejected by #{rejector}"
-    elsif emergency_approver.present?
-      "Completed via emergency approval by #{emergency_approver}."
-    elsif missing_conditional_fields.any?
-      human_missing_conditional_fields
-    elsif complete?
-      "All requirements completed. Reviewed by #{reviewers}."
-    elsif !testing
-      "Waiting for CI to complete."
-    else
-      "Missing fields: #{missing_fields.join(', ')}"
-    end
   end
 
   def github_login_for_requester
@@ -43,32 +27,46 @@ module Multipass::GitHubStatuses
   end
 
   def github_client
-    @github_client = Clients::GitHub.new(commit_status_creator.github_token)
+    @github_client = Clients::GitHub.new(github_client_token)
   end
 
   def callback_to_github
-    if repository.update_github_commit_status?
-      GitHubCommitStatusWorker.perform_later(id)
+    if Changeling.config.pardot?
+      return
     end
+
+    GitHubCommitStatusWorker.perform_later(id)
   end
 
   def approve_github_commit_status!
-    return unless repository && repository.participating?
-    github_client.create_success_commit_status(repository.name_with_owner, release_id, commit_status_options)
+    return unless compliance_enabled?
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_success_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def pending_github_commit_status!
-    return unless repository && repository.participating?
-    github_client.create_pending_commit_status(repository.name_with_owner, release_id, commit_status_options)
+    return unless compliance_enabled?
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_pending_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def failure_github_commit_status!
-    return unless repository && repository.participating?
-    github_client.create_failure_commit_status(repository.name_with_owner, release_id, commit_status_options)
+    return unless compliance_enabled?
+
+    opts = commit_status_options
+    [release_id, merge_commit_sha].compact.each do |sha|
+      github_client.create_failure_commit_status(repository.name_with_owner, sha, opts)
+    end
   end
 
   def check_commit_statuses!
-    return unless repository && repository.participating?
+    return unless compliance_enabled?
 
     status = find_testing_status
 
@@ -82,6 +80,24 @@ module Multipass::GitHubStatuses
     statuses.detect do |s|
       cs = CommitStatus.new(s)
       cs.testing_success? && cs.valid_context?
+    end
+  end
+
+  private
+
+  def github_client_token
+    if Changeling.config.pardot?
+      Changeling.config.github_service_account_token
+    else
+      commit_status_creator.github_token
+    end
+  end
+
+  def compliance_enabled?
+    if github_repository.nil?
+      repository.participating?
+    else
+      github_repository.compliance_enabled?
     end
   end
 end

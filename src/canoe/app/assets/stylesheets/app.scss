@@ -188,8 +188,10 @@ ul.nav {
   text-decoration: none;
 }
 .streetlight {
-  i.icon-check-sign { color: #5cb85c; }
-  i.icon-circle { color: #d9534f; }
-  i.icon-refresh { color: #009ddc; }
+  i.icon-check-sign { color: #55a532; }
+  i.icon-circle {
+    &[data-state="failure"] { color: #bd2c00; }
+    &[data-state="pending"] { color: #cea61b; }
+    &[data-state="unreported"] { color: #cccccc; }
+  }
 }
-i.gray { color: #ddd; }

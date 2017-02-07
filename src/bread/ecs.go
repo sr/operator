@@ -36,6 +36,7 @@ type ecsDeployer struct {
 	afy     *ArtifactoryConfig
 	timeout time.Duration
 	targets []*DeployTarget
+	canoe   CanoeClient
 }
 
 type afyItem struct {
@@ -81,6 +82,9 @@ func (d *ecsDeployer) ListBuilds(ctx context.Context, t *DeployTarget, branch st
 }
 
 func (d *ecsDeployer) Deploy(ctx context.Context, sender *operator.RequestSender, req *DeployRequest) (*operator.Message, error) {
+	if err := authenticatePhone(d.canoe, req.UserEmail, fmt.Sprintf("Deploy %s", req.Target.Name)); err != nil {
+		return nil, err
+	}
 	svc, err := d.ecs.DescribeServices(
 		&ecs.DescribeServicesInput{
 			Services: []*string{aws.String(req.Target.ECSService)},

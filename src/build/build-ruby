@@ -39,7 +39,9 @@ config="$dir/docker-compose.yml"
 
 # Lint the code with RuboCop
 if $lint; then
-    docker run --rm -v "$(pwd):/data" -w "/data/$dir" build/build \
+    docker run --rm -v "$(pwd):/data" -w "/data/$dir" \
+        -e "RUBOCOP_CONFIG=${RUBOCOP_CONFIG:-""}" \
+        build/build \
         lint-ruby "/data/$dir"
 fi
 
@@ -58,7 +60,15 @@ if [ -f "$config" ]; then
     docker-compose -p "$project" -f "$config" build --pull
     # TODO(sr) Remove the sleep test...
     docker-compose -p "$project" -f "$config" run app sleep 30
-    docker-compose -p "$project" -f "$config" run -e CI=1 app script/test
+    if [ -f "${dir}/script/test" ]; then
+      docker-compose -p "$project" -f "$config" run -e CI=1 app script/test
+    elif [ -f "${dir}/bin/cibuild" ]; then
+      docker-compose -p "$project" -f "$config" run -e CI=1 -e DISABLE_RUBOCOP=1 app bin/cibuild
+      docker-compose -p "$project" -f "$config" run -e CI=1 -e DISABLE_RUBOCOP=1 -e PARDOT=1 app bin/cibuild
+    else
+      echo "Unable to build project. Neither script/test file or spec/ directory present" 2>&1
+      exit 1
+    fi
 else
     # Otherwise just build it as a normal Ruby library
     docker run --rm -v "$(pwd):/data" build/build \

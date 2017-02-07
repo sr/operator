@@ -81,14 +81,13 @@ module Zabbix
         }
       ).map { |a| a["applicationid"] }
 
-      @client.query(
+      results = @client.query(
         method: "trigger.get",
         params: {
           output: "extend",
           selectHosts: "extend",
           expandDescription: true,
           active: true,
-          monitored: true,
           applicationids: app_ids,
           sortfield: "hostname",
           filter: {
@@ -96,6 +95,12 @@ module Zabbix
           }
         }
       )
+
+      # Filter out hosts that are in maintenance
+      results.map { |r|
+        r["hosts"] = r["hosts"].select { |h| h["maintenance_status"] == "0" } # not in maintenance
+        r unless r["hosts"].empty?
+      }.compact
     end
 
     # Fetches hosts without data for given application name. This is necessary

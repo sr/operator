@@ -12,8 +12,7 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
@@ -23,8 +22,7 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "136.147.104.20/30", # pardot-proxyout1-{1,2,3,4}-dfw
-      "136.147.96.20/30",  # pardot-proxyout1-{1,2,3,4}-phx
+      "${var.sfdc_proxyout_cidr_blocks}",
     ]
   }
 
@@ -41,7 +39,6 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "${aws_eip.github_enterprise_server_1.public_ip}/32",
       "${aws_eip.github_enterprise_server_2.public_ip}/32",
-      "${var.legacy_artifactory_instance_ip}/32",                  # artifactory.dev.pardot.com
       "52.4.132.69/32",                                            # 1.git.dev.pardot.com
       "52.3.83.197/32",                                            # 2.git.dev.pardot.com
     ]
@@ -60,7 +57,6 @@ resource "aws_security_group" "pardot0_ue1_ldap_server" {
       "${aws_eip.appdev_ldap_host_eip.public_ip}/32",
       "${aws_eip.github_enterprise_server_1.public_ip}/32",
       "${aws_eip.github_enterprise_server_2.public_ip}/32",
-      "${var.legacy_artifactory_instance_ip}/32",                  # artifactory.dev.pardot.com
       "52.4.132.69/32",                                            # 1.git.dev.pardot.com
       "52.3.83.197/32",                                            # 2.git.dev.pardot.com
     ]

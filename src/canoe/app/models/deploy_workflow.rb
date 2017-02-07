@@ -13,7 +13,7 @@ class DeployWorkflow
       ].max
 
       dc_servers.each_with_index do |server, index|
-        stage = index < max_unavailable_servers ? "initiated" : "start"
+        stage = index < max_unavailable_servers ? DeployResult::INITIATED : DeployResult::START
         deploy.results.create!(server: server, stage: stage)
       end
     end
@@ -61,8 +61,8 @@ class DeployWorkflow
       # This could be refactored to use the restart_servers :through association directly,
       # but I can't figure out how to set the datacenter column through ActiveRecord in the relational table
       @deploy.deploy_restart_servers[i].update_attribute(:server_id, restart_server.id)
-      @deploy.results.for_server(restart_server).update_attribute(:stage, "deployed")
-      old_restart_result.update_attribute(:stage, "completed")
+      @deploy.results.for_server(restart_server).update_attribute(:stage, DeployResult::DEPLOYED)
+      old_restart_result.update_attribute(:stage, DeployResult::COMPLETED)
     end
   end
 
@@ -86,25 +86,45 @@ class DeployWorkflow
   end
 
   def notify_action_deploy_successful(result:)
-    # This update_all line is atomic. It can't race with another restart server
-    # being assigned. As far as I know, this is the only way to achieve this
-    # kind of thing in Rails :/
-    if DeployRestartServer.where(deploy_id: @deploy.id, datacenter: result.server.datacenter, server_id: nil).update_all(server_id: result.server_id) > 0
-      result.update(stage: "deployed")
+    # Assign restart server for the datacenter if it is not already assigned.
+    # where + update_all is atomic and won't race against another process.
+    updated_rows = DeployRestartServer.where(
+      deploy_id: @deploy.id,
+      datacenter: result.server.datacenter,
+      server_id: nil
+    ).update_all(server_id: result.server_id)
+    if updated_rows > 0
+      result.update(stage: DeployResult::DEPLOYED)
     else
-      result.update(stage: "completed")
+      result.update(stage: DeployResult::COMPLETED)
     end
 
     # Handle case where maximum_available_percentage_per_datacenter is less than
     # 1.0: if this server deployed successfully, we can allow another server in
     # the 'start' stage to proceed
-    @deploy.results.where(stage: "start").limit(1).update_all(stage: "initiated")
+    loop do
+      start_server_result = @deploy.results
+        .joins(:server)
+        .where(
+          stage: DeployResult::START,
+          servers: { datacenter: result.server.datacenter }
+        ).first
+      break if start_server_result.nil?
+
+      # where + update_all is atomic to avoid race conditions with other
+      # processes
+      updated_rows = DeployResult.where(
+        id: start_server_result.id,
+        stage: DeployResult::START
+      ).update_all(stage: DeployResult::INITIATED)
+      break if updated_rows > 0
+    end
 
     @deploy.check_completed_status!
   end
 
   def notify_action_restart_successful(result:)
-    result.update(stage: "completed")
+    result.update(stage: DeployResult::COMPLETED)
     @deploy.check_completed_status!
   end
 end

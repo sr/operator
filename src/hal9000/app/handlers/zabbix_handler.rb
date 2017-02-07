@@ -36,14 +36,22 @@ class ZabbixHandler < ApplicationHandler
   ZABBIX_CHEF_APP_NAME = "app:chef".freeze
 
   # config: zabbix
-  config :zabbix_api_url, default: "https://zabbix-%datacenter%.pardot.com/api_jsonrpc.php"
-  config :zabbix_monitor_payload_url, default: "https://zabbix-%datacenter%.pardot.com/cgi-bin/zabbix-status-check.sh?"
+  config :zabbix_api_url, default: {
+      "dfw" => "https://zabbix-dfw.pardot.com/api_jsonrpc.php",
+      "phx" => "https://zabbix-phx.pardot.com/api_jsonrpc.php",
+      "dev" => "https://zabbix.dev.pardot.com/api_jsonrpc.php"
+  }
+  config :zabbix_monitor_payload_url, default: {
+      "dfw" => "https://zabbix-dfw.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      "phx" => "https://zabbix-phx.pardot.com/cgi-bin/zabbix-status-check.sh?",
+      "dev" => "https://zabbix.dev.pardot.com/cgi-bin/zabbix-status-check.sh?"
+  }
   config :zabbix_user, default: "Admin"
   config :zabbix_password, required: "changeme"
 
   # config: datacenters
   config :datacenters, default: %w[dfw phx]
-  config :default_datacenter, default: "dfw"
+  config :default_datacenter, default: "phx"
 
   # config: hal9000's "home room"
   config :status_room, default: "1_ops@conf.btf.hipchat.com"
@@ -368,10 +376,8 @@ class ZabbixHandler < ApplicationHandler
           end
         end
       rescue => e
-        robot.send_message(
-          @status_room,
-          "Error while attempting to report Chef problems for #{datacenter}: #{e}"
-        )
+        $stderr.puts "ERROR: #{e.inspect}"
+        $stderr.puts e.backtrace.join("\n")
       end
     end
   end
@@ -382,24 +388,18 @@ class ZabbixHandler < ApplicationHandler
       begin
         problems = client.get_problem_triggers_by_app_name(ZABBIX_CHEF_APP_NAME)
         hosts_without_data = client.get_hosts_without_item_data_by_app_name(ZABBIX_CHEF_APP_NAME)
-        if !problems.empty? || !hosts_without_data.empty?
-          replies << render_template(
-            "chef_problem_report",
-            datacenter: datacenter,
-            problems: problems,
-            hosts_without_data: hosts_without_data
-          )
-        end
+        replies << render_template(
+          "chef_problem_report",
+          datacenter: datacenter,
+          problems: problems,
+          hosts_without_data: hosts_without_data
+        )
       rescue => e
         replies << "Something went wrong checking for Chef problems in #{datacenter}: #{e}"
       end
     end
 
-    if replies.empty?
-      response.reply_with_mention("Everything seems in order! All hosts are running Chef successfully.")
-    else
-      response.reply(*replies)
-    end
+    response.reply(*replies)
   end
 
   def run_monitors
@@ -456,7 +456,7 @@ class ZabbixHandler < ApplicationHandler
       datacenter: datacenter,
       log: log)
     log.debug("starting [#{::Zabbix::Zabbixmon::MONITOR_NAME}] Datacenter: #{datacenter}")
-    zabbixmon.monitor(config.zabbix_monitor_payload_url,
+    zabbixmon.monitor(config.zabbix_monitor_payload_url[datacenter],
       config.monitor_retries,
       config.monitor_retry_interval_seconds,
       config.monitor_http_timeout_seconds)
@@ -474,7 +474,7 @@ class ZabbixHandler < ApplicationHandler
 
   def build_zabbix_client(datacenter:)
     options = {
-      url: config.zabbix_api_url.gsub(/%datacenter%/, datacenter),
+      url: config.zabbix_api_url[datacenter],
       user: config.zabbix_user,
       password: config.zabbix_password
     }
@@ -523,7 +523,7 @@ class ZabbixHandler < ApplicationHandler
   end
 
   def scrub_password(str)
-    if config.zabbix_password.empty?
+    if config.zabbix_password.to_s.empty?
       str
     else
       str.gsub(config.zabbix_password, "****")

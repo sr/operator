@@ -81,6 +81,7 @@ class DeployTarget < ApplicationRecord
 
   def servers(project:)
     Server
+      .enabled
       .active
       .joins(:deploy_scenarios)
       .where(deploy_scenarios: { deploy_target_id: id, project_id: project.id })

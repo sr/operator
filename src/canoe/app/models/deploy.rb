@@ -16,7 +16,6 @@ class Deploy < ApplicationRecord
     next unless deploy.project.present?
     deploy.project.deploy_notifications.each do |notification|
       notification.notify_deploy_start(deploy)
-      notification.notify_untested_deploy(deploy) if deploy.deploy_target.production? && !deploy.passed_ci
     end
   end
 
@@ -123,5 +122,9 @@ class Deploy < ApplicationRecord
         self.errors.add("options", error.to_s)
       end
     end
+  end
+
+  def instance_of_build?(build)
+    build.artifact_url == artifact_url
   end
 end

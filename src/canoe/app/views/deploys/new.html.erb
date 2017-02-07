@@ -62,7 +62,8 @@
     <%- end %>
 
     <div class="checkbox">
-      <button type="submit" class="btn btn-lg btn-default btn-warning">SHIP IT!</button>
+      <%- deployability = @prov_deploy.deployability(target: current_target, allow_pending_builds: true) %>
+      <%= content_tag :button, "SHIP IT!", type: "submit", class: "btn btn-lg btn-default #{shipit_btn_class(@prov_deploy)}", disabled: !deployability.permitted?, title: deployability.reason %>
       <label>
         <input type="checkbox" name="lock"> Lock
       </label>

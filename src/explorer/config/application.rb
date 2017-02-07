@@ -22,7 +22,12 @@ module Explorer
 
     config.middleware.use Pinglish do |ping|
       ping.check :db do
-        Integer(User.count)
+        begin
+          Integer(User.count)
+        rescue => e
+          Instrumentation.log_exception(e)
+          raise
+        end
       end
     end
 

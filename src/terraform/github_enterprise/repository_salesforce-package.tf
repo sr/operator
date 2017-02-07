@@ -3,9 +3,9 @@ resource "github_repository" "salesforce-package" {
   description   = ""
   homepage_url  = ""
   private       = true
-  has_issues    = true
+  has_issues    = false
   has_downloads = true
-  has_wiki      = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "salesforce-package_developers" {
@@ -26,11 +26,23 @@ resource "github_team_repository" "salesforce-package_service-accounts-write-onl
   permission = "push"
 }
 
+resource "github_team_repository" "salesforce-package_engineering-managers" {
+  repository = "${github_repository.salesforce-package.name}"
+  team_id    = "${github_team.engineering-managers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "salesforce-package_site-reliability-engineers" {
+  repository = "${github_repository.salesforce-package.name}"
+  team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "salesforce-package_master" {
   repository = "${github_repository.salesforce-package.name}"
   branch     = "master"
 
   include_admins = false
   strict         = false
-  contexts       = ["Test and Deploy Jobs"]
+  contexts       = ["compliance"]
 }

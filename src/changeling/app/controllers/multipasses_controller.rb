@@ -4,10 +4,13 @@ class MultipassesController < ApplicationController
 
   def index
     @by_team = params[:by_team] || current_user.team
-    @multipasses = Multipass.by_team(@by_team)
-                            .complete(complete)
-                            .order("created_at desc")
-                            .page(params[:page])
+    @multipasses = Multipass
+      .includes(:github_repository)
+      .includes(ticket_reference: :ticket)
+      .by_team(@by_team)
+      .complete(complete)
+      .order("created_at desc")
+      .page(params[:page])
   end
 
   def show
@@ -76,9 +79,7 @@ class MultipassesController < ApplicationController
   end
 
   def sync
-    multipass.check_commit_statuses!
-    multipass.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
-    multipass.save!
+    multipass.synchronize(current_github_login)
     redirect_back fallback_location: multipass_path(multipass)
   end
 

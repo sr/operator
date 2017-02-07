@@ -16,7 +16,7 @@ require "pinglish"
 require "instrumentation"
 require "salesforce_authenticator_api"
 
-require "canoe/deployer"
+require "canoe_config"
 require "canoe/ldap_authorizer"
 require "canoe"
 
@@ -25,10 +25,14 @@ require "canoe"
 Bundler.require(*Rails.groups)
 
 module Canoe
+  cattr_accessor :config do
+    CanoeConfig.new(ENV.to_hash)
+  end
+
   cattr_accessor :salesforce_authenticator do
     SalesforceAuthenticatorAPI.new(
-      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_ID"],
-      ENV["SALESFORCE_AUTHENTICATOR_CONSUMER_KEY"]
+      Canoe.config.salesforce_authenticator_consumer_id,
+      Canoe.config.salesforce_authenticator_consumer_key
     )
   end
 
@@ -62,7 +66,12 @@ module Canoe
     config.middleware.use Rack::Attack
     config.middleware.use Pinglish do |ping|
       ping.check :db do
-        !!Project.count
+        begin
+          Integer(Project.count)
+        rescue => e
+          Instrumentation.log_exception(e)
+          raise
+        end
       end
     end
   end

@@ -85,7 +85,7 @@ RSpec.describe Multipass::GitHubStatuses, :type => :model do
 
     context "when major change" do
       before do
-        multipass.change_type = :major
+        multipass.change_type = ChangeCategorization::MAJOR
       end
 
       it "knows when missing fields" do
@@ -116,7 +116,7 @@ RSpec.describe Multipass::GitHubStatuses, :type => :model do
 
     context "when minor change" do
       before do
-        multipass.change_type = :minor
+        multipass.change_type = ChangeCategorization::STANDARD
       end
 
       it "knows when missing fields" do
@@ -148,7 +148,7 @@ RSpec.describe Multipass::GitHubStatuses, :type => :model do
 
     context "when untested but has needed reviews" do
       it "says it's waiting for CI" do
-        multipass.change_type = :minor
+        multipass.change_type = ChangeCategorization::STANDARD
         multipass.peer_reviewer = "Yannick"
         multipass.testing = false
         expect(multipass.commit_status_options[:description]).to eql "Waiting for CI to complete."
@@ -157,7 +157,7 @@ RSpec.describe Multipass::GitHubStatuses, :type => :model do
 
     context "when missing fields other than testing and has needed reviews" do
       it "says it's waiting for CI" do
-        multipass.change_type = :minor
+        multipass.change_type = ChangeCategorization::STANDARD
         multipass.peer_reviewer = "Yannick"
         multipass.impact = nil
         expect(multipass.commit_status_options[:description]).to eql "Missing fields: impact"

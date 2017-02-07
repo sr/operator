@@ -59,24 +59,38 @@ module Zabbix
 
     def insert_payload(payload, url, timeout_seconds)
       @log.debug("[#{monitor_name}] value generated: #{payload}")
-      payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}".gsub(/%datacenter%/, @datacenter),
-          timeout_seconds)
-      if payload_delivery_response.code =~ /20./
-        @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
+      begin
+        payload_delivery_response = deliver_zabbixmon_payload("#{url}#{payload}", timeout_seconds)
+      rescue => e
+        error = scrub_password(e.to_s)
+        log.error("Error creating Zabbix maintenance supervisor for #{datacenter}: #{error}")
+        err = "Payload Delivery completely failed and was 'rescued.' Error: #{error}."
+        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{error}"
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed: #{error} !")
+      end
+
+      if !payload_delivery_response.nil?
+        if payload_delivery_response.code =~ /20./
+          @log.debug("[#{monitor_name}] Monitor Payload Delivered Successfully")
+        else
+          err = scrub_password("#{payload_delivery_response.code} : #{payload_delivery_response.body}")
+          @hard_failure ||= "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
+          @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
+        end
       else
-        err = "#{payload_delivery_response.code} : #{payload_delivery_response.body}"
-        @hard_failure = "ZabbixMon[#{@datacenter}] payload insertion failed! #{ERR_NON_200_HTTP_CODE}\n#{err}"
-        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] payload insertion failed! #{err} ")
+        @hard_failure ||= "Generic Payload Insertion Failure."
+        @log.error("[#{monitor_name}] ZabbixMon[#{@datacenter}] #{@hard_failure}")
       end
     end
 
     def retrieve_payload(payload)
-      begin # get zabbix item
+      begin
         success = false
         zbx_items = @client.get_item_by_name_and_lastvalue(ZBXMON_KEY, payload)
       rescue => e
-        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", e))
-        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", e).gsub(@zbx_password, "**************"))
+        error = scrub_password(e.to_s)
+        @log.error("[#{monitor_name}] #{ERR_ZBX_CLIENT_EXCEPTION}".gsub("%exception%", error))
+        @soft_failures.add(ERR_ZBX_CLIENT_EXCEPTION.to_s.gsub("%exception%", error))
       end
       if zbx_items
         if !zbx_items.empty? # success case
@@ -119,6 +133,14 @@ module Zabbix
       @log.error("[#{monitor_name}] HTTP TIMEOUT while attempting to insert payload")
     rescue ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed
       @log.error("[#{monitor_name}] has hard failed: ::Lita::Handlers::Zabbix::MonitorDataInsertionFailed")
+    end
+
+    def scrub_password(str)
+      if @zabbix_password.to_s.empty?
+        str
+      else
+        str.gsub(@zabbix_password, "****")
+      end
     end
   end
 end

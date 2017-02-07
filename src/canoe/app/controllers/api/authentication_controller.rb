@@ -1,22 +1,20 @@
 module Api
   class AuthenticationController < ProtoController
-    cattr_accessor :max_tries, :sleep_interval
-
     def phone
       if !current_user.phone.paired?
-        message = "Your Canoe account is not paired with your phone. Please  " \
-          "go to https://canoe.dev.pardot.com/auth/phone to setup your phone"
+        message = "Your Canoe account is not paired with the Salesforce Authenticator app. Please  " \
+          "go to https://canoe.dev.pardot.com/auth/phone to get setup"
         return render(json: build_response(error: true, message: message))
       end
 
       options = {
         action: proto_request.action,
-        max_tries: max_tries,
-        sleep_interval: sleep_interval
+        max_tries: Canoe.config.phone_authentication_max_tries,
+        sleep_interval: Canoe.config.phone_authentication_sleep_interval
       }
 
       if !current_user.authenticate_phone(options)
-        message = "Phone authentication failed for #{current_user.email.inspect}"
+        message = "Salesforce Authenticator verification failed for #{current_user.email.inspect}"
         return render \
           json: build_response(error: true, message: message)
       end

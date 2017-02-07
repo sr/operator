@@ -53,6 +53,7 @@
 #   hubot situation - Belinda Wong Situation
 #   hubot engage - . M A K E . I T . S O .
 #   hubot picard - for when you're feeling frisky!
+#   hubot lonekorean - Will cares this much
 #   hubot visualstudio - you_irl (if you were a M$ dev)
 #   hubot nope - Got nope?
 #   hubot tldr - Totally didn't read it
@@ -119,6 +120,9 @@ module.exports = (robot) ->
       "https://hipchat.dev.pardot.com/files/1/65/WnyJW4Q1KyCzZIq/Blake%20road%20work.jpg",
       "https://hipchat.dev.pardot.com/files/1/282/9CAPIYlpbUGdD4H/0e8e6bd1-ae04-4dcb-bbd8-b1d2b0c9aab1.png",
     ]
+
+  robot.respond /lonekorean$/i, (msg) ->
+    msg.reply "https://hipchat.dev.pardot.com/files/1/271/1ek5aTrpcJdIpWD/fucks-given-none.png"
 
   robot.respond /cookiecake$/i, (msg) ->
     msg.reply "Great! (cupcake) Submit your request here: https://sfdc.co/cookie-cake"
@@ -768,7 +772,12 @@ module.exports = (robot) ->
     msg.send msg.random tbones
 
   robot.respond /dartz/i, (msg) ->
-    msg.send "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG"
+    dartzs = [
+      "https://hipchat.dev.pardot.com/files/1/287/EbSCbGnuhIxlbJq/IMG_2698%20%281%29.JPG",
+      "https://hipchat.dev.pardot.com/files/1/69/TFrXosSJjg5I4il/ezgif.com-gif-maker.gif"
+    ]
+
+    msg.send msg.random dartzs
 
   robot.respond /megaman$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/287/tvREs1l3wGBhQIR/Screen%20Shot%202016-02-22%20at%2010.51.36%20AM.png"

@@ -1,13 +1,18 @@
-require_relative "./validators/callback_url_is_valid"
 require_relative "./validators/sre_approver_is_in_sre"
 
 # A change request in the system
 class Multipass < ActiveRecord::Base
   audited
+
+  belongs_to :github_repository, foreign_key: "repository_id"
+
   has_many :events
+  has_many :peer_reviews
+  has_many :pull_request_files
+  has_one :ticket_reference
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
-    Multipass::State, Multipass::Updates, Multipass::GitHubStatuses,
+    Multipass::Updates, Multipass::GitHubStatuses,
     Multipass::Actions
 
   extend Multipass::IssueComments
@@ -15,9 +20,7 @@ class Multipass < ActiveRecord::Base
   include PullRequestMethods
 
   before_save :update_complete
-  after_save :log_completed
   after_commit :callback_to_github
-  after_create :log_created
 
   scope :by_team, lambda { |team|
     return if team.blank?
@@ -33,7 +36,7 @@ class Multipass < ActiveRecord::Base
     where(testing: false).where(["updated_at > ?", 5.minutes.ago])
   }
 
-  validates_with SREApproverIsInSRE, CallbackUrlIsValid
+  validates_with SREApproverIsInSRE
 
   validates :requester, :reference_url, :team, presence: true
   validates_each :sre_approver, :peer_reviewer do |record, attr, value|
@@ -54,15 +57,10 @@ class Multipass < ActiveRecord::Base
 
   def change_type
     if self[:change_type] == "preapproved"
-      update_column(:change_type, "minor")
+      update_column(:change_type, ChangeCategorization::STANDARD)
     end
 
     self[:change_type]
-  end
-
-  def log_completed
-    return true unless just_completed?
-    ActiveSupport::Notifications.instrument("multipass.completed", multipass: self)
   end
 
   # Return true if the multipass was marked as completed just now.
@@ -90,12 +88,57 @@ class Multipass < ActiveRecord::Base
     end
   end
 
+  # Returns a nested Array with one element per directory affected by this pull
+  # request, and the GitHub team(s) that owns them.
+  def owners
+    repository_pull_request.owners
+  end
+
+  def teams
+    repository_pull_request.teams
+  end
+
+  def repository_owners_file_url
+    [
+      Changeling.config.github_url,
+      repository_name,
+      "blob",
+      "master",
+      Repository::OWNERS_FILENAME
+    ].join("/")
+  end
+
   def pull_request_number
     if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
       reference_url_path_parts[4]
     else
       nil
     end
+  end
+
+  def synchronize(current_github_login = nil)
+    if Changeling.config.heroku?
+      check_commit_statuses!
+      self.audit_comment = "Browser: Sync commit statuses by #{current_github_login}"
+      save!
+    else
+      repository_pull_request.synchronize
+    end
+  end
+
+  def referenced_ticket
+    repository_pull_request.referenced_ticket
+  end
+
+  # Returns an Array of filenames that were changed in this pull request
+  def changed_files
+    pull_request_files.pluck(:filename).map { |f| Pathname(f) }
+  end
+
+  # Returns an Array of GitHub user logins that approve of this change
+  def peer_review_approvers
+    peer_reviews.where(state: Clients::GitHub::REVIEW_APPROVED)
+      .load.map(&:reviewer_github_login)
   end
 
   def hostname
@@ -177,7 +220,38 @@ class Multipass < ActiveRecord::Base
     Metrics.increment("multipasses.created")
   end
 
+  def changed_risk_assessment?
+    return false if audits.size == 1
+    audits.any? do |audit|
+      audit.audited_changes["impact"] != "low"
+    end
+  end
+
+  delegate \
+    :update_complete,
+    :status,
+    :github_commit_status_description,
+    :complete?,
+    :rejected?,
+    :pending?,
+    :peer_reviewed?,
+    :user_is_peer_reviewer?,
+    :sre_approved?,
+    :user_is_sre_approver?,
+    :emergency_approved?,
+    :user_is_emergency_approver?,
+    :user_is_rejector?,
+    to: :compliance_status
+
   private
+
+  def repository_pull_request
+    @repository_pull_request ||= RepositoryPullRequest.new(self)
+  end
+
+  def compliance_status
+    @compliance_status ||= ComplianceStatus.new(self)
+  end
 
   def reference_url_path_parts
     unless reference_url.present?

@@ -1,4 +1,8 @@
+<%- if Changeling.config.pardot? %>
+<p>←  <%= link_to "Go back to listing", "/" %></p>
+<%- end %>
 <h1 class="title">
+<%- if Changeling.config.heroku? %>
   <%= @multipass.title || "Multipass #{truncate(@multipass.id.to_s, length: 11)}" %> (<%= link_to "PR##{@multipass.pull_request_number}", @multipass.reference_url %>)
   <% if @multipass.for_compliance? %><span class="text-success label label-success">participating in compliance</a><% end %>
 </h1>
@@ -7,16 +11,83 @@
     <i class="glyphicon glyphicon-refresh"></i>
   <% end %>
 </h4>
+<%- else %>
+  <%- pull = RepositoryPullRequest.new(@multipass) %>
+  <%= multipass_title(@multipass) %>
+<h4 class="requester"><%= link_to("PR ##{pull.number}", pull.github_url) %> by <%= @multipass.requester %>
+  <%= link_to sync_multipass_path(@multipass), title: 'sync multipass', method: :post do %>
+    <i class="glyphicon glyphicon-refresh"></i>
+  <% end %>
+</h4>
+<%- end %>
 
 <% locals = { multipass: @multipass, backout_plan: @backout_plan } %>
 
+<%- if Changeling.config.heroku? %>
 <% unless @bypass_form || User.for_heroku_email(@multipass.requester) == current_user %>
   <div class="row description purple-box u-padding-Al">
     This <strong><%= @multipass.change_type %></strong> change has a <strong><%= @multipass.impact %></strong> impact with a <strong><%= @multipass.impact_probability %></strong> probability. It is <strong><% unless @multipass.testing %>un<% end %>tested</strong>.
   </div>
 <% end %>
 
+<%- else %>
+
+<div class="row description purple-box u-padding-Al">
+<%
+  status = ComplianceStatus.new(@multipass)
+  pull = RepositoryPullRequest.new(@multipass)
+%>
+
+<% if status.complete? %>
+
+  <%= tooltip "Complete" do %>
+  <i class='complete glyphicon glyphicon-ok'></i>
+  This pull request is fully compliant and can be merged into the main branch. It is estimated to be a <%= @multipass.change_type %> change.
+  <%- end %>
+
+<% else %>
+
+  <%= tooltip "Pending" do %>
+    <i class='incomplete glyphicon glyphicon-circle'></i>
+    This pull request does not meet all compliance requirements:
+  <% end %>
+
+  <p>
+  <ul>
+    <%- if !@multipass.peer_reviewed? %>
+      <%- if Changeling.config.owners_files_enabled? %>
+        <%- teams = @multipass.teams %>
+        <%- if teams.size == 1 %>
+          <li>Review by a member of the <%= link_to "@#{teams[0].slug}", teams[0].url %> team is required</li>
+        <%- else %>
+          <li>Review by a member of the fellowing teams is needed: <% @multipass.teams.map { |t| %><%= link_to "@#{t.slug}", t.url %> <% } %></li>
+        <%- end %>
+      <%- else %>
+        <li>The pull request has not been peer reviewed</li>
+      <%- end %>
+    <%- end %>
+
+    <%- referenced_ticket = pull.referenced_ticket %>
+    <%- if referenced_ticket.nil? %>
+      <li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>
+    <%- elsif !referenced_ticket.open? %>
+      <li>The referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
+    <%- end %>
+
+    <%- if @multipass.tests_state == RepositoryCommitStatus::PENDING %>
+      <li>The automated tests have not yet completed</li>
+    <%- elsif @multipass.tests_state != RepositoryCommitStatus::SUCCESS %>
+      <li>The automated tests have failed</li>
+    <%- end %>
+  </ul>
+  </p>
+
+<% end %>
+<% end %>
+
+<%- if Changeling.config.heroku? -%>
 <%= render partial: "actor_buttons", locals: locals %>
+<%- end %>
 
 <% if @bypass_form || User.for_heroku_email(@multipass.requester) == current_user %>
   <%= render(partial: "multipass_form", locals: locals) %>

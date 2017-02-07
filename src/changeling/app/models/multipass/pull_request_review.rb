@@ -5,9 +5,7 @@ module Multipass::PullRequestReview
     multipass = find_by(reference_url: pull_request["html_url"])
     return unless multipass && user
 
-    unless Changeling.config.review_approval_enabled_for?(user)
-      return
-    end
+    return unless Changeling.config.review_approval_enabled_for?(user)
 
     case review["state"]
     when "approved"

@@ -1,0 +1,20 @@
+//
+// Modals
+// --------------------------------------------------
+
+
+.modal-content {
+  border-radius: $border-radius-base;
+  border: none;
+  box-shadow: none;
+}
+
+.modal-title {
+  text-align: center;
+}
+
+@media (min-width: $screen-sm-min) {
+  .modal-dialog {
+    margin: 40px auto;
+  }
+}

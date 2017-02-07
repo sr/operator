@@ -22,7 +22,9 @@ class ChefDelivery
       at: "chef",
       branch: request.checkout_branch,
       sha: request.checkout_sha,
-      current_build: current_build.to_json,
+      current_build_sha: current_build.sha,
+      current_build_compare_state: current_build.compare_state,
+      current_build_compliance_state: current_build.compliance_state,
       server: request.server.to_json,
     )
 
@@ -30,7 +32,11 @@ class ChefDelivery
       return ChefCheckinResponse.noop
     end
 
-    if current_build.state != SUCCESS
+    if current_build.compliance_state != SUCCESS
+      return ChefCheckinResponse.noop
+    end
+
+    if current_build.tests_state != SUCCESS
       return ChefCheckinResponse.noop
     end
 
@@ -98,6 +104,10 @@ class ChefDelivery
       return
     end
 
+    if request.command[0] == "status"
+      return
+    end
+
     if request.command[0, 2] == %w[node show]
       return
     end
@@ -126,16 +136,12 @@ class ChefDelivery
   def notification
     @notification ||= ChefDeliveryNotification.new(
       @config.notifier,
-      @config.github_url,
-      @config.repo_name
+      Canoe.config.github_url,
+      Canoe.config.chef_repository_name
     )
   end
 
-  def repo
-    @repo ||= @config.github_repo
-  end
-
   def current_build
-    @current_build ||= repo.current_build(@config.master_branch)
+    @current_build ||= @config.github_repo.commit_status(@config.master_branch)
   end
 end

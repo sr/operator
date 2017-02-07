@@ -62,9 +62,15 @@ if [ -z "$NOPULL" ]; then
 fi
 docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
+# Build citool
+docker run --rm -w /go \
+   -v "$BREAD:/go" \
+   build/build \
+   make -f etc/mk/golang.mk install-citool
+
 build_rubygem() {
-    gemname="$1"
-    gemspec="$2"
+    local gemname="$1"
+    local gemspec="$2"
     docker run --rm \
         -v "$BREAD:/data" \
         -v /etc/env/artifactoryenv:/etc/env/artifactoryenv \
@@ -79,19 +85,25 @@ build_rubygem() {
         "$gemspec"
 }
 
+docker_image() {
+    local project="$1"
+    local tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
+    echo "${DOCKER_REPO_BREAD}/${project}/app:${tag}"
+}
+
 docker_push() {
-    app="$1"
-    sha1="$(git rev-parse HEAD)"
-    tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
-    repo="${DOCKER_REPO_BREAD}/${app}/app:${tag}"
+    local project="$1"
+    local sha1="$(git rev-parse HEAD)"
+    local tag="${CI_PROJECT}-${CI_PLAN}-${CI_BUILD_NUMBER}"
+    local repo="$(docker_image "$project")"
 
     echo "Pushing container image to ${repo}..." 2>&1
-    docker tag "${app}_app" "$repo"
+    docker tag "${project}_app" "$repo"
     docker push "$repo"
 
     echo "Setting standard properties on container image manifest.json file..." 2>&1
 
-    props="bambooProject=${CI_PROJECT}|"
+    local props="bambooProject=${CI_PROJECT}|"
     props+="bambooPlan=${CI_PLAN}|"
     props+="bambooJob=${CI_JOB}|"
     props+="buildID=${CI_PROJECT}-${CI_PLAN}-${CI_JOB}-${CI_BUILD_NUMBER}|"
@@ -102,10 +114,10 @@ docker_push() {
     props+="buildTimeStamp=${BAMBOO_BUILD_TIMESTAMP}|"
     props+="buildResults=${BAMBOO_BUILD_RESULTS_URL}|"
     props+="passedCI=true"
-    props+="dockerImageRepository=${DOCKER_REPO_BREAD}/${app}/app"
+    props+="dockerImageRepository=${DOCKER_REPO_BREAD}/${project}/app"
 
-    manifest="pd-docker/build/bread/${app}/app/${tag}/manifest.json"
-    apipath="api/storage/$manifest?properties=$props"
+    local manifest="pd-docker/build/bread/${project}/app/${tag}/manifest.json"
+    local apipath="api/storage/$manifest?properties=$props"
     set +x
     curl -f -u "${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD}" -X PUT \
       "${ARTIFACTORY_URL}/${apipath}"
@@ -114,10 +126,27 @@ docker_push() {
     true
 }
 
+extract_tarball() {
+    local project="$1"
+    local tarball="$2"
+    shift 2
+
+    local sourceopts=()
+    while [ "$#" -gt 0 ]; do
+        sourceopts+=("-source=$1")
+        shift
+    done
+
+    citool extract-sources \
+        -image="$(docker_image "$project")" \
+        -file="$tarball" \
+        "${sourceopts[@]}"
+}
+
 tarball_upload() {
-    gitsha1="$1"
-    tarball="$2"
-    green="$3"
+    local tarball="$1"
+    local green="$2"
+    local sha1="$(git rev-parse HEAD)"
 
     docker run --rm \
         -v "$BREAD:/data" \
@@ -139,7 +168,7 @@ tarball_upload() {
         -e "CI_BUILD_NUMBER=$CI_BUILD_NUMBER" \
         -e "CI_BRANCH=$CI_BRANCH" \
         build/build \
-        tarball-upload "$gitsha1" "$green" /data/tarball.tar
+        tarball-upload "$sha1" "$green" /data/tarball.tar
 }
 
 echo "===> Building ${project}..." 2>&1
@@ -163,10 +192,27 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "$project" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
+
         ;;
     changeling)
-        true
+        RUBOCOP_CONFIG="etc/rubocop-changeling.yml"
+        export RUBOCOP_CONFIG
+        build-ruby "$project"
+
+        if [ -n "$CI" ]; then
+            docker_push "$project"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "$project" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
+        fi
         ;;
     devenv)
         mkdir -p "$BREAD/bin/darwin_amd64"
@@ -184,10 +230,10 @@ case "$project" in
         if [ -n "$CI" ]; then
             # Build a tarball from the app container built above
             tarball="$(tarball-build-ruby "explorer_app")"
-            trap 'rm -f $tarball' EXIT
+            trap 'rm -f "$tarball"' EXIT
 
             # Update the tarball to Artifactory
-            tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     golang)
@@ -197,11 +243,15 @@ case "$project" in
         if [ -n "$CI" ]; then
           pushd "bin"
           tarball="$(tarball-build "jiracleaner")"
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
 
           export CI_JOB="PRIV"
           tarball="$(tarball-build "privet")"
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
+
+          export CI_JOB="CITOOL"
+          tarball="$(tarball-build "citool")"
+          tarball_upload "$tarball" "true"
           popd
         fi
         ;;
@@ -248,6 +298,11 @@ case "$project" in
         # Push the container to Artifactory (CI-only)
         if [ -n "$CI" ]; then
             docker_push "${project}d"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "${project}d" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     parbot)
@@ -256,6 +311,11 @@ case "$project" in
 
         if [ -n "$CI" ]; then
             docker_push "$project"
+
+            tarball="$(mktemp)"
+            trap 'rm -f "$tarball"' EXIT
+            extract_tarball "${project}" "$tarball" "/app:/"
+            tarball_upload "$tarball" "true"
         fi
         ;;
     pd-sync-chef)
@@ -309,10 +369,11 @@ case "$project" in
           git archive "$(git rev-parse HEAD)" src/terraform > "$tarball"
 
         if [ -n "$CI" ]; then
-          tarball_upload "$(git rev-parse HEAD)" "$tarball" "true"
+          tarball_upload "$tarball" "true"
         fi
         ;;
     *)
+        echo "Unknown project: $project" 2>&1
         exit 1
         ;;
 esac

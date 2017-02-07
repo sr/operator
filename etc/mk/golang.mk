@@ -7,7 +7,7 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES ?= $(shell $(GO) list bread/... privet/... devenv/... github.com/sr/operator/... | grep -Ev '^bread/vendor/|devenv/vendor')
+PACKAGES ?= $(shell $(GO) list bread/... privet/... citool/... devenv/... github.com/sr/operator/... | grep -Ev '^(bread|devenv|citool)/vendor')
 TOOLS = $(shell $(GO) list golang.org/x/tools/cmd/...)
 
 all: install test fmt lint vet errcheck interfacer unused deadleaves
@@ -27,8 +27,11 @@ install-tools:
 install-devenv:
 	$(GO) install -v $$($(GO) list devenv/...)
 
+install-citool:
+	$(GO) install -v $$($(GO) list citool/...)
+
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -Ev '(github.com/go-swagger/go-swagger|github.com/hashicorp/terraform|^github.com/paybyphone/terraform-provider-acme|^bread/swagger|^bread/vendor/|^devenv/vendor|^github.com/sr/operator/testing$')')"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/go-swagger/go-swagger|github.com/hashicorp/terraform|^github.com/paybyphone/terraform-provider-acme|^bread/swagger|^(bread|devenv|citool)/vendor|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \

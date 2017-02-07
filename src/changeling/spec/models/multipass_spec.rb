@@ -55,13 +55,13 @@ RSpec.describe Multipass, :type => :model do
       end
 
       it "works if the user is in the sre team" do
-        complete_multipass.change_type = "major"
+        complete_multipass.change_type = ChangeCategorization::MAJOR
         complete_multipass.sre_approver = "jmervine"
         expect(complete_multipass).to be_valid
       end
 
       it "works if case is wrong" do
-        complete_multipass.change_type = "major"
+        complete_multipass.change_type = ChangeCategorization::MAJOR
         complete_multipass.sre_approver = "jMerViNe"
         expect(complete_multipass).to be_valid
       end
@@ -99,93 +99,6 @@ RSpec.describe Multipass, :type => :model do
     it "supports GitHub Enterprise URLs" do
       complete_multipass.reference_url = "https://git.dev.pardot.com/atmos/hamburgers/pull/42"
       expect(complete_multipass.pull_request_number).to eql("42")
-    end
-  end
-
-  describe "#log_created" do
-    before do
-      allow(GitHubCommitStatusWorker).to receive(:perform_later)
-    end
-
-    it "logs when a new multipass is created" do
-      expect(Metrics).to receive(:increment).with(/multipasses\.created\..*/)
-      expect(Metrics).to receive(:increment).with("multipasses.created")
-
-      Fabricate(:unreviewed_multipass)
-    end
-
-    it "does not log when an existing multipass is saved" do
-      multipass = Fabricate(:multipass)
-
-      expect(Metrics).to_not receive(:increment)
-
-      multipass.save
-    end
-  end
-
-  describe "logging completed multipass" do
-    before do
-      allow(GitHubCommitStatusWorker).to receive(:perform_later)
-    end
-
-    let!(:multipass) { Fabricate.create(:incomplete_multipass, requester: "Jonan", reference_url: "https://github.com/heroku/changeling/pull/12") }
-
-    it "only logs when the multipass changes to completed" do
-      multipass.peer_reviewer = "Yannick"
-      multipass.change_type = :minor
-      multipass.testing = true
-      allow(Metrics).to receive(:increment)
-      expect(Metrics).to receive(:increment)
-        .with("multipasses.completed.heroku.changeling", anything)
-      multipass.save!
-    end
-
-    it "doesn't log when the multipass is updated while completed" do
-      complete_multipass.save!
-      expect(Metrics).to_not receive(:increment)
-        .with("multipasses.completed.heroku.changeling", anything)
-      complete_multipass.peer_reviewer = "Yannick"
-      complete_multipass.save!
-    end
-  end
-
-  describe "multipass with change type preapproved" do
-    let(:multipass) { Fabricate(:multipass, change_type: "minor") }
-    let(:select_change_type) do
-      Proc.new do
-        ActiveRecord::Base.connection.execute(
-          "SELECT change_type FROM multipasses WHERE uuid = '#{multipass.id}';"
-        ).first["change_type"]
-      end
-    end
-
-    before do
-      expect do
-        multipass.update_column(:change_type, "preapproved")
-      end.to change { select_change_type.call }.from("minor").to("preapproved")
-    end
-
-    it "does not call any of our callbacks when modifying the change type" do
-      %w{ update_complete callback_to_github log_completed log_created }.each do |callback|
-        expect_any_instance_of(Multipass).to receive(callback).never
-      end
-
-      expect(select_change_type.call).to eql "preapproved"
-      expect(multipass.change_type).to eql "minor"
-    end
-
-    it "does not update columns that don't have change_type preapproved" do
-      %w{ minor major }.each do |change_type|
-        multipass.update_column(:change_type, change_type)
-
-        expect_any_instance_of(Multipass).to receive(:update_column).with(:change_type, change_type).never
-        expect { multipass.change_type }.not_to change { select_change_type.call }
-      end
-    end
-
-    it "is updated to have change_type minor when checking it's change_type" do
-      expect(select_change_type.call).to eql "preapproved"
-      expect { multipass.change_type }.to change { select_change_type.call }.from("preapproved").to("minor")
     end
   end
 
@@ -237,13 +150,6 @@ RSpec.describe Multipass, :type => :model do
     it "enqueues job to update the commit status on github" do
       multipass = Fabricate(:multipass)
       expect(GitHubCommitStatusWorker).to receive(:perform_later)
-      multipass.update!(testing: true)
-    end
-
-    it "does not queue a job when commit status are disabled for the repo" do
-      Changeling.config.pardot = true
-      multipass = Fabricate(:multipass, reference_url: "https://git/Pardot/pardot/pull/1")
-      expect(GitHubCommitStatusWorker).not_to receive(:perform_later)
       multipass.update!(testing: true)
     end
   end

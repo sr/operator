@@ -9,7 +9,7 @@ then echo "BREAD point to a directory that does not exists: $BREAD" 2>&1
 else
   GOPATH="$BREAD"
   PATH="$GOPATH/bin:$PATH"
-  CDPATH="$GOPATH/src"
+  CDPATH=".:$GOPATH/src"
   export BREAD GOPATH PATH CDPATH
 fi
 

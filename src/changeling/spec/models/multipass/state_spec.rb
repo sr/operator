@@ -1,6 +1,10 @@
 require "rails_helper"
 
-RSpec.describe Multipass::State, type: [:model, :webmock] do
+RSpec.describe Multipass, "state", type: [:model, :webmock] do
+  before(:each) do
+    Changeling.config.pardot = false
+  end
+
   let(:user) { Faker::Internet.user_name }
   let(:complete_multipass) { Fabricate.build(:complete_multipass) }
   let(:incomplete_multipass) { Fabricate.build(:incomplete_multipass) }
@@ -10,7 +14,7 @@ RSpec.describe Multipass::State, type: [:model, :webmock] do
       before do
         @multipass = Fabricate.build(:multipass)
         @multipass.testing = true
-        complete_multipass.change_type = :major
+        complete_multipass.change_type = ChangeCategorization::MAJOR
       end
 
       it "returns false without sre approval" do
@@ -30,7 +34,7 @@ RSpec.describe Multipass::State, type: [:model, :webmock] do
 
     context "when a minor change" do
       before do
-        complete_multipass.change_type = :minor
+        complete_multipass.change_type = ChangeCategorization::STANDARD
         complete_multipass.sre_approver = ""
       end
 
@@ -127,14 +131,14 @@ RSpec.describe Multipass::State, type: [:model, :webmock] do
     end
 
     it "returns pending for multipasses that are pending" do
-      allow(complete_multipass).to receive(:complete?).and_return false
-      allow(complete_multipass).to receive(:pending?).and_return true
+      complete_multipass.testing = nil
       expect(complete_multipass.status).to eql "pending"
     end
 
     it "returns incomplete for multipasses that aren't complete or pending" do
-      allow(complete_multipass).to receive(:complete?).and_return false
-      allow(complete_multipass).to receive(:pending?).and_return false
+      complete_multipass.testing = false
+      complete_multipass.merged = true
+      complete_multipass.rejector = nil
       expect(complete_multipass.status).to eql "incomplete"
     end
   end

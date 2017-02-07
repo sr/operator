@@ -1,0 +1,53 @@
+// States utilities
+
+// Global states.
+// JavaScript may add/remove/toggle these classes.
+// All other states are component-scoped and use the `is-` prefix.
+
+// Completely remove from the flow and screen readers.
+
+.u-is-hidden {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.u-is-visible {
+  display: block !important;
+  visibility: visible !important;
+}
+
+// Completely remove from the flow but leave available to screen readers.
+
+.u-is-hidden-visually {
+  position: absolute !important;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+// Control visibility without affecting flow.
+
+.u-is-visible {
+  visibility: visible;
+}
+
+.u-is-invisible {
+  visibility: hidden;
+}
+
+// Indicate that interaction will result in an (in)action.
+
+.u-is-actionable {
+  cursor: pointer;
+}
+
+.u-is-draggable {
+  cursor: move;
+}
+
+.u-is-disabled {
+  cursor: default;
+}

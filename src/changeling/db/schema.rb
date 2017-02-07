@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160603084848) do
+ActiveRecord::Schema.define(version: 20170125170358) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,29 +54,111 @@ ActiveRecord::Schema.define(version: 20160603084848) do
     t.index ["user_id"], name: "index_events_on_user_id", using: :btree
   end
 
+  create_table "github_installations", force: :cascade do |t|
+    t.text     "hostname",   null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hostname"], name: "index_github_installations_on_hostname", unique: true, using: :btree
+  end
+
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string   "reference_url"
-    t.string   "requester"
-    t.string   "impact"
-    t.string   "impact_probability"
-    t.string   "change_type"
+    t.string   "reference_url",                          null: false
+    t.string   "requester",                              null: false
+    t.string   "impact",                                 null: false
+    t.string   "impact_probability",                     null: false
+    t.string   "change_type",                            null: false
     t.string   "peer_reviewer"
     t.string   "sre_approver"
     t.boolean  "testing"
     t.text     "backout_plan"
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
-    t.string   "team",               default: "Unknown"
-    t.boolean  "merged",             default: false
-    t.string   "callback_url"
-    t.string   "release_id"
+    t.string   "team",               default: "Unknown", null: false
+    t.boolean  "merged",             default: false,     null: false
+    t.string   "release_id",                             null: false
     t.string   "emergency_approver"
-    t.string   "title"
-    t.boolean  "complete",           default: false
+    t.string   "title",                                  null: false
+    t.boolean  "complete",           default: false,     null: false
     t.string   "rejector"
+    t.string   "tests_state",        default: "pending", null: false
+    t.integer  "repository_id"
+    t.string   "merge_commit_sha"
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
+  end
+
+  create_table "peer_reviews", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "multipass_id",          null: false
+    t.text     "reviewer_github_login", null: false
+    t.text     "state",                 null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+    t.index ["multipass_id", "reviewer_github_login"], name: "index_peer_reviews_on_multipass_id_and_reviewer_github_login", unique: true, using: :btree
+  end
+
+  create_table "pull_request_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "multipass_id", null: false
+    t.text     "filename",     null: false
+    t.text     "state",        null: false
+    t.text     "patch",        null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["multipass_id", "filename"], name: "index_pull_request_files_on_multipass_id_and_filename", unique: true, using: :btree
+  end
+
+  create_table "repositories", force: :cascade do |t|
+    t.integer  "github_installation_id",                 null: false
+    t.integer  "github_id",                              null: false
+    t.integer  "github_owner_id",                        null: false
+    t.text     "owner",                                  null: false
+    t.text     "name",                                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.datetime "deleted_at"
+    t.text     "config_file_content"
+    t.boolean  "compliance_enabled",     default: false, null: false
+    t.index ["github_installation_id", "github_owner_id", "github_id"], name: "repositories_github_ids_unique_idx", unique: true, using: :btree
+    t.index ["github_installation_id", "owner", "name"], name: "repositories_github_names_unique_idx", unique: true, using: :btree
+  end
+
+  create_table "repository_commit_statuses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string   "sha",           null: false
+    t.string   "context",       null: false
+    t.text     "state",         null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "repository_id", null: false
+    t.index ["repository_id", "sha", "context"], name: "repository_commit_statuses_unique_idx2", unique: true, using: :btree
+  end
+
+  create_table "repository_owners_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text     "path_name",     null: false
+    t.text     "content",       null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "repository_id", null: false
+    t.index ["repository_id", "path_name"], name: "index_repository_owners_files_on_repository_id_and_path_name", unique: true, using: :btree
+  end
+
+  create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "multipass_id", null: false
+    t.uuid     "ticket_id",    null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.index ["multipass_id", "ticket_id"], name: "index_ticket_references_on_multipass_id_and_ticket_id", unique: true, using: :btree
+  end
+
+  create_table "tickets", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text     "external_id",                 null: false
+    t.text     "summary",                     null: false
+    t.text     "tracker",                     null: false
+    t.text     "status",                      null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.text     "url",         default: "",    null: false
+    t.boolean  "open",        default: false, null: false
+    t.index ["external_id", "tracker"], name: "index_tickets_on_external_id_and_tracker", unique: true, using: :btree
   end
 
   create_table "users", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -88,4 +170,11 @@ ActiveRecord::Schema.define(version: 20160603084848) do
     t.string   "team"
   end
 
+  add_foreign_key "multipasses", "repositories"
+  add_foreign_key "peer_reviews", "multipasses", primary_key: "uuid"
+  add_foreign_key "repositories", "github_installations"
+  add_foreign_key "repository_commit_statuses", "repositories"
+  add_foreign_key "repository_owners_files", "repositories"
+  add_foreign_key "ticket_references", "multipasses", primary_key: "uuid"
+  add_foreign_key "ticket_references", "tickets"
 end

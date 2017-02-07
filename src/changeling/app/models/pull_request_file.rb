@@ -1,0 +1,2 @@
+class PullRequestFile < ApplicationRecord
+end

@@ -1,6 +1,5 @@
 class Project < ApplicationRecord
   ARTIFACTORY_REPO = "pd-canoe".freeze
-  GITHUB_URL = "https://git.dev.pardot.com".freeze
 
   has_many :deploy_notifications
 
@@ -8,15 +7,14 @@ class Project < ApplicationRecord
     where.not(name: [ChefDelivery::PROJECT], id: TerraformProject.select(:project_id).all)
   end
 
-  def test_list
+  def extra_status_contexts
     case name
     when "pardot"
       {
-        PPANT: "PPANT",
-        WT: "WebDriver",
-        TSIT: "Salesforce Integration",
-        PPANTCLONE666: "AB Combinatorial",
-        PPANTCLONE6666: "List Combinatorial"
+        "Webdriver - Test Jobs"              => "Webdriver",
+        "Salesforce Integration - Test Jobs" => "Salesforce Integration",
+        "AB Combinatorial - Test Jobs"       => "AB Combinatorial",
+        "List Combinatorial - Test Jobs"     => "List Combinatorial"
       }
     else
       {}
@@ -31,14 +29,22 @@ class Project < ApplicationRecord
     name
   end
 
-  def builds(branch:, include_untested_builds: false)
-    aql = build_aql_query(branch: branch, include_untested_builds: include_untested_builds)
+  def builds(branch:, include_pending_builds: false)
+    aql = build_aql_query(branch: branch, include_pending_builds: include_pending_builds)
     artifact_hashes = Artifactory.client.post("/api/search/aql", aql, "Content-Type" => "text/plain")
       .fetch("results")
 
-    artifact_hashes.map { |hash| Build.from_artifact_hash(hash) }
+    artifact_hashes.map { |hash| Build.from_artifact_hash(self, hash) }
       .compact
-      .sort_by { |deploy| -deploy.build_number }
+      .sort_by { |build| -build.build_number }
+  end
+
+  def github_repository
+    @github_repository ||= GithubRepository.new(Canoe.config.github_client, repository)
+  end
+
+  def commit_status(sha)
+    github_repository.commit_status(sha)
   end
 
   def tags(count = 30)
@@ -71,29 +77,29 @@ class Project < ApplicationRecord
   # ----- PATHS ----
 
   def tag_url(tag)
-    "#{GITHUB_URL}/#{repository}/releases/tag/#{tag.name}"
+    "#{Canoe.config.github_url}/#{repository}/releases/tag/#{tag.name}"
   end
 
   def branch_url(branch)
-    "#{GITHUB_URL}/#{repository}/tree/#{branch.name}"
+    "#{Canoe.config.github_url}/#{repository}/tree/#{branch.name}"
   end
 
   def commit_url(commit)
-    "#{GITHUB_URL}/#{repository}/commits/#{commit.sha}"
+    "#{Canoe.config.github_url}/#{repository}/commits/#{commit.sha}"
   end
 
   def sha_url(sha)
-    "#{GITHUB_URL}/#{repository}/commits/#{sha}"
+    "#{Canoe.config.github_url}/#{repository}/commits/#{sha}"
   end
 
   def diff_url(deploy1, deploy2)
     return "#" unless deploy1 && deploy2
-    "#{GITHUB_URL}/#{repository}/compare/#{deploy1.sha}...#{deploy2.sha}"
+    "#{Canoe.config.github_url}/#{repository}/compare/#{deploy1.sha}...#{deploy2.sha}"
   end
 
   private
 
-  def build_aql_query(branch:, include_untested_builds:)
+  def build_aql_query(branch:, include_pending_builds:)
     conditions = [
       { "repo"       => { "$eq"    => ARTIFACTORY_REPO } },
       { "@gitRepo"   => { "$match" => "*/#{repository}.git" } },
@@ -112,7 +118,7 @@ class Project < ApplicationRecord
       end
     end
 
-    if include_untested_builds
+    if include_pending_builds
       # We can't know the difference between a failed build and a build that
       # hasn't yet completed CI. Since the intention is to be able to deploy
       # untested (but not failed) builds, our compromise is to display builds

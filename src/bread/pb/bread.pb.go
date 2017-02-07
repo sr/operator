@@ -9,6 +9,7 @@ It is generated from these files:
 	pb/bread.proto
 	pb/deploy.proto
 	pb/ping.proto
+	pb/repository.proto
 
 It has these top-level messages:
 	OperatorRequest
@@ -23,6 +24,8 @@ It has these top-level messages:
 	TriggerRequest
 	PingRequest
 	SlowLorisRequest
+	RepositoryConfig
+	RepositoryWatchlist
 */
 package breadpb
 

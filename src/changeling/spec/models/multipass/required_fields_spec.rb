@@ -16,13 +16,13 @@ RSpec.describe Multipass::RequiredFields, :type => :model do
 
     context "conditional fields" do
       it "returns missing fields for major changes" do
-        incomplete_multipass.change_type = :major
+        incomplete_multipass.change_type = ChangeCategorization::MAJOR
         expect(incomplete_multipass.missing_fields).to include(:peer_reviewer)
         expect(incomplete_multipass.missing_fields).to include(:sre_approver)
       end
 
       it "returns missing fields for minor changes" do
-        incomplete_multipass.change_type = :minor
+        incomplete_multipass.change_type = ChangeCategorization::STANDARD
         expect(incomplete_multipass.missing_fields).to include(:peer_reviewer)
       end
     end
@@ -31,7 +31,7 @@ RSpec.describe Multipass::RequiredFields, :type => :model do
   describe "#required_field?" do
     context "with a major change" do
       before do
-        incomplete_multipass.update_attributes(change_type: "major")
+        incomplete_multipass.update_attributes(change_type: ChangeCategorization::MAJOR)
       end
 
       it "returns true for sre_approver" do
@@ -45,7 +45,7 @@ RSpec.describe Multipass::RequiredFields, :type => :model do
 
     context "with a minor change" do
       before do
-        incomplete_multipass.update_attributes(change_type: "minor")
+        incomplete_multipass.update_attributes(change_type: ChangeCategorization::STANDARD)
       end
 
       it "returns false for sre_approver" do
@@ -59,7 +59,7 @@ RSpec.describe Multipass::RequiredFields, :type => :model do
 
     context "with an emergency change" do
       before do
-        incomplete_multipass.update_attributes(change_type: "emergency")
+        incomplete_multipass.update_attributes(change_type: ChangeCategorization::EMERGENCY)
       end
 
       it "returns false for sre_approver" do

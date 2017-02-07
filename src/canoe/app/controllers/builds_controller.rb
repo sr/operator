@@ -2,15 +2,26 @@ class BuildsController < ApplicationController
   before_action :require_project
 
   def index
-    @include_untested_builds = (params[:include_untested_builds] == "1")
+    @allow_pending_builds = (params[:allow_pending_builds] == "1")
 
     @builds = current_project.builds(
       branch: params[:branch_name],
-      include_untested_builds: @include_untested_builds,
+      include_pending_builds: @allow_pending_builds
     )
+    @total_builds = @builds.length
+
+    @builds = @builds.slice(
+      (current_page - 1) * pagination_page_size,
+      pagination_page_size
+    )
+    Build.preload_commit_statuses(@builds)
   end
 
   private
+
+  def pagination_page_size
+    5
+  end
 
   def current_branch
     @current_branch ||= current_project.branch(params[:branch_name])

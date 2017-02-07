@@ -61,6 +61,13 @@ class DeploysController < ApplicationController
   end
 
   def create
+    if current_user.phone.paired? || Canoe.config.phone_authentication_required?
+      if !current_user.authenticate_phone(action: phone_auth_action)
+        flash[:alert] = "Phone authentication failed. Please make sure #{helpers.link_to("your phone is setup", "/auth/phone")} correctly."
+        return redirect_back(fallback_location: projects_url(current_project))
+      end
+    end
+
     servers =
       if params[:servers] == "on"
         params.fetch(:server_hostnames, [])
@@ -81,7 +88,7 @@ class DeploysController < ApplicationController
     deploy_response = deploy_request.handle
 
     if deploy_response.error?
-      flash[:notice] = deploy_response.error_message
+      flash[:notice] = deploy_response.error
       redirect_to :back
       return
     end
@@ -111,6 +118,10 @@ class DeploysController < ApplicationController
   end
 
   private
+
+  def phone_auth_action
+    "Deploy #{current_project.name} to #{current_target.name}"
+  end
 
   def require_no_active_deploy
     unless current_target.active_deploy(current_project).nil?

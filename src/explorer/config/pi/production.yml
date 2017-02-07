@@ -828,7 +828,7 @@ shards:
   13:
     softlayer:
       dallas:
-        host: pardot0-dbshard2-13-dfw
+        host: pardot0-dbshard2-161-dfw
         role: master
         database: pi
         username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
@@ -837,7 +837,7 @@ shards:
           username: $1:+qSlnbnlgO1wugB+JvhEsttR+AcM4rPknNESdQZXqgw=:gazhwwzpTtK6xcaH5orEdSGNBJuOoMQlO9vS4iUOjtA=
           password: $1:1xyx3H8H1TdJ3JXVY/MU5jQorD0WtKg167dVzZBHGHk=:oD7Mm9IsmH5m0GQr9+CwkzB9UJ5hoYa2s3kgBXQgW/M=
       seattle:
-        host: pardot0-dbshard1-13-dfw
+        host: pardot0-dbshard1-161-dfw
         role: master
         database: pi
         username: $1:UHuQqrWM8CO/jEjrp8xMpWddrZK2fZIgOH1sstJHCDk=:GVzz8ZnERGSZ13ITg6UMk67Dq1WkeUo5ULDhjvVnRSA=
@@ -853,7 +853,7 @@ shards:
           password: $1:PeTbjWH1f2eCcOeZPwLWZCthkxZipn+6mtNni7tChCA=:BORlqQc1AKhio/zLXSTMZ0R1y/NpfP+3EVBySxdepnQ=
     dfw:
       1:
-        host: pardot0-dbshard1-13-dfw
+        host: pardot0-dbshard1-161-dfw
         role: master
         database: pi
         username: $1:UHuQqrWM8CO/jEjrp8xMpWddrZK2fZIgOH1sstJHCDk=:GVzz8ZnERGSZ13ITg6UMk67Dq1WkeUo5ULDhjvVnRSA=
@@ -862,7 +862,7 @@ shards:
           username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
           password: $1:1xyx3H8H1TdJ3JXVY/MU5jQorD0WtKg167dVzZBHGHk=:oD7Mm9IsmH5m0GQr9+CwkzB9UJ5hoYa2s3kgBXQgW/M=
       2:
-        host: pardot0-dbshard2-13-dfw
+        host: pardot0-dbshard2-161-dfw
         role: master
         database: pi
         username: $1:UHuQqrWM8CO/jEjrp8xMpWddrZK2fZIgOH1sstJHCDk=:GVzz8ZnERGSZ13ITg6UMk67Dq1WkeUo5ULDhjvVnRSA=
@@ -872,7 +872,7 @@ shards:
           password: $1:1xyx3H8H1TdJ3JXVY/MU5jQorD0WtKg167dVzZBHGHk=:oD7Mm9IsmH5m0GQr9+CwkzB9UJ5hoYa2s3kgBXQgW/M=
     phx:
       1:
-        host: pardot0-dbshard1-13-phx
+        host: pardot0-dbshard1-161-phx
         role: master
         database: pi
         username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
@@ -881,7 +881,7 @@ shards:
           username: $1:+qSlnbnlgO1wugB+JvhEsttR+AcM4rPknNESdQZXqgw=:gazhwwzpTtK6xcaH5orEdSGNBJuOoMQlO9vS4iUOjtA=
           password: $1:1xyx3H8H1TdJ3JXVY/MU5jQorD0WtKg167dVzZBHGHk=:oD7Mm9IsmH5m0GQr9+CwkzB9UJ5hoYa2s3kgBXQgW/M=
       2:
-        host: pardot0-dbshard2-13-phx
+        host: pardot0-dbshard2-161-phx
         role: master
         database: pi
         username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
@@ -7133,64 +7133,6 @@ shards:
         replication:
           username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
           password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-  113:
-    softlayer:
-      dallas:
-        host: pardot0-dbshard2-113-dfw
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
-        replication:
-          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-      seattle:
-        host: pardot0-dbshard1-113-dfw
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
-        replication:
-          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-    dfw:
-      1:
-        host: pardot0-dbshard1-113-dfw
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
-        replication:
-          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-      2:
-        host: pardot0-dbshard2-113-dfw
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
-        replication:
-          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-    phx:
-      1:
-        host: pardot0-dbshard1-113-phx
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
-        replication:
-          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
-      2:
-        host: pardot0-dbshard2-113-phx
-        role: master
-        database: pi
-        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
-        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
-        replication:
-          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
-          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
   114:
     softlayer:
       dallas:
@@ -8634,6 +8576,1282 @@ shards:
           password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
       2:
         host: pardot0-dbshard2-138-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  139:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-139-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-139-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-139-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-139-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-139-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-139-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  140:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-140-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-140-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-140-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-140-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-140-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-140-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  141:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-141-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-141-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-141-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-141-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-141-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-141-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  143:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-143-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-143-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-143-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-143-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-143-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-143-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  144:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-144-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-144-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-144-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-144-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-144-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-144-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  145:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-145-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-145-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-145-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-145-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-145-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-145-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  147:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-147-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-147-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-147-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-147-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-147-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-147-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  149:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-149-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-149-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-149-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-149-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-149-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-149-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  150:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-150-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-150-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-150-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-150-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-150-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-150-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  151:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-151-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-151-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-151-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-151-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-151-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-151-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  152:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-152-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-152-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-152-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-152-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-152-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-152-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  153:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-153-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-153-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-153-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-153-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-153-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-153-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  154:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-154-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-154-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-154-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-154-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-154-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-154-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  155:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-155-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-155-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-155-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-155-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-155-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-155-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  156:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-156-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-156-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-156-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-156-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-156-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-156-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  157:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-157-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-157-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-157-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-157-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-157-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-157-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  158:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-158-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-158-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-158-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-158-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-158-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-158-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  159:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-159-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-159-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-159-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-159-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-159-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-159-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  162:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-162-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-162-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-162-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-162-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-162-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-162-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  163:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-163-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-163-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-163-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-163-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-163-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-163-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  164:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-164-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-164-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-164-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-164-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-164-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-164-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+  165:
+    softlayer:
+      dallas:
+        host: pardot0-dbshard2-165-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      seattle:
+        host: pardot0-dbshard1-165-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    dfw:
+      1:
+        host: pardot0-dbshard1-165-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-165-dfw
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:q7N9zwtADAbXypt56W4YPg7fp5uLMcV8AXOAQyXoK4s=:/hMve9Xwb2pSCYFlYPyDoWxT0k8i1x6hC2qXWmFeKXY=
+        replication:
+          username: $1:nWXoqg3vjI4lo7QYS8Uz2/XylfUJw5/E8zmIBizWHWY=:Kd8z9DVf9FQrWjQx5rSxqJXbw3A8gYz0sC9o2NGt9vw=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+    phx:
+      1:
+        host: pardot0-dbshard1-165-phx
+        role: master
+        database: pi
+        username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=
+        password: $1:t9zPPM/2zYFbyOssSoI7ZXUBE0PYzab1AejY7quZPtk=:1bfnB7a3eJIio1UJdOxk6ZOhtrLHS+yq8u2BWQAWHXU=
+        replication:
+          username: $1:/djgJucm+k6hzv9OYAVC4JTsy2xrdL6O0c+o2xX22rY=:yd93ikdGDrH1Xi/pNcOovX8/OjWcKPvpiFfEDF08GVk=
+          password: $1:C0RkdWl6jq7Peiw0/gXZC7e7lP6RL5T8cx9k34PoZVw=:njzIDAFMORJZyfFmrt37YT8epm0DlWQdGJk2g/UruPQ=
+      2:
+        host: pardot0-dbshard2-165-phx
         role: master
         database: pi
         username: $1:HPUgf4NyEj2kzrUcys9LBCV2S8ZjXf15Hv/a1ZP2N2U=:jrNvItnb0Tlxnv5pkpU3vkbeda6f7ULt6Sr4zKT1//8=

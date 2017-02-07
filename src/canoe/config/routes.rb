@@ -61,6 +61,7 @@ Rails.application.routes.draw do
   post "/api/targets/:target_name/deploys", to: "api/deploys#create"
   get "/api/projects", to: "api/projects#index"
 
+  post "/api/grpc/create_deploy", to: "api/proto_deploys#create"
   post "/api/grpc/create_terraform_deploy", to: "api/terraform#create"
   post "/api/grpc/complete_terraform_deploy", to: "api/terraform#complete"
   post "/api/grpc/unlock_terraform_project", to: "api/terraform#unlock"

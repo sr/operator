@@ -44,6 +44,11 @@ generate: $(PROTOC) $(GRPC_RUBY_PLUGIN) $(PROTOC_GEN_GO) $(PROTOC_GEN_OPERATORCT
 		$(GOPATH)/src/bread/hal9000/*.proto
 	echo "0a\n# rubocop:disable all\n.\nw" | ed src/hal9000/lib/hal9000/hal9000_services.rb >/dev/null
 	echo "0a\n# rubocop:disable all\n.\nw" | ed src/hal9000/lib/hal9000/hal9000.rb >/dev/null
+	$< \
+		-I$(GOPATH)/src/bread/pb \
+		--ruby_out=src/changeling/lib \
+		--plugin=protoc-gen-grpc=$(GRPC_RUBY_PLUGIN) \
+		$(GOPATH)/src/bread/pb/repository.proto
 
 ldap-dev: docker-build-ldap
 	$(DOCKER) stop -t 3 operator_ldap >/dev/null || true

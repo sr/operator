@@ -6,70 +6,46 @@ resource "aws_vpc" "dev_environment" {
   }
 }
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_ssh" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+resource "aws_security_group" "dev_environment_secgroup" {
+  name   = "dev_environment_secgroup"
+  vpc_id = "${aws_vpc.dev_environment.id}"
 
-  cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
-  ]
-}
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_http" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
 
-  cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
-  ]
-}
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
 
-resource "aws_security_group_rule" "dev_environment_allow_vpn_https" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  security_group_id = "${aws_vpc.dev_environment.default_security_group_id}"
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
 
-  cidr_blocks = [
-    "204.14.236.0/24",    # amer east
-    "204.14.239.0/24",    # amer west
-    "62.17.146.140/30",   # EMEA 62.17.146.140 - 62.17.146.143
-    "62.17.146.144/28",   # EMEA 62.17.146.144 - 62.17.146.159
-    "62.17.146.160/28",   # EMEA 62.17.146.160 - 62.17.146.175
-    "62.17.146.176/28",   # EMEA 62.17.146.176 - 62.17.146.191
-    "202.95.77.64/27",    # APAC Singapore
-    "221.133.209.128/27", # APAC Sydney
-    "142.176.79.170/29",  # Halifax, Canada
-    "61.120.150.128/27",  # Tokyo, Japan
-    "61.213.161.144/30",  # Tokyo, Japan
-  ]
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group" "allow_inbound_http_https_from_sfdc" {
@@ -185,13 +161,6 @@ resource "aws_nat_gateway" "dev_environment_nat_gw" {
   subnet_id     = "${aws_subnet.dev_environment_us_east_1b_dmz.id}"
 }
 
-# All Artifactory requests get NATed so the source IP is constant
-resource "aws_route" "dev_environment_artifactory_route" {
-  route_table_id         = "${aws_vpc.dev_environment.main_route_table_id}"
-  destination_cidr_block = "${var.legacy_artifactory_instance_ip}/32"       # artifactory.dev.pardot.com
-  nat_gateway_id         = "${aws_nat_gateway.dev_environment_nat_gw.id}"
-}
-
 resource "aws_route" "dev_environment_internet_route" {
   route_table_id         = "${aws_vpc.dev_environment.main_route_table_id}"
   destination_cidr_block = "0.0.0.0/0"
@@ -259,4 +228,65 @@ resource "aws_route53_record" "star_pardot_local" {
   type    = "A"
   records = ["127.0.0.1"]
   ttl     = "3600"
+}
+
+resource "aws_db_instance" "oracle_sandbox_db" {
+  allocated_storage       = 100
+  engine                  = "oracle-ee"
+  engine_version          = "11.2.0.4.v1"
+  instance_class          = "db.t2.small"
+  name                    = "ORCLSBX"
+  port                    = 1521
+  username                = "pardottandp"
+  password                = "pardottandporaclesandbox" # WARNING: once changed, this is no longer tracked by TF
+  parameter_group_name    = "default.oracle-ee-11.2"
+  option_group_name       = "default:oracle-ee-11-2"
+  character_set_name      = "AL32UTF8"
+  storage_encrypted       = "false"
+  maintenance_window      = "Sun:00:00-Sun:03:00"
+  backup_retention_period = 14
+
+  vpc_security_group_ids = [
+    "${aws_security_group.oracle_sandbox_db_secgroup.id}",
+  ]
+
+  db_subnet_group_name = "${aws_db_subnet_group.oracle_sandbox_db_subnet_group.name}"
+}
+
+resource "aws_db_subnet_group" "oracle_sandbox_db_subnet_group" {
+  name = "oracle_sandbox_db_subnet_group"
+
+  subnet_ids = [
+    "${aws_subnet.dev_environment_us_east_1c_dmz.id}",
+    "${aws_subnet.dev_environment_us_east_1d_dmz.id}",
+  ]
+}
+
+resource "aws_security_group" "oracle_sandbox_db_secgroup" {
+  vpc_id      = "${aws_vpc.dev_environment.id}"
+  name        = "oracle_sandbox_db_secgroup"
+  description = "oracle_sandbox_db_secgroup"
+
+  ingress {
+    from_port = 1521
+    to_port   = 1521
+    protocol  = "TCP"
+
+    cidr_blocks = [
+      "${var.aloha_vpn_cidr_blocks}",
+      "${aws_vpc.dev_environment.cidr_block}",
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name      = "oracle_sandbox_db_secgroup"
+    terraform = "true"
+  }
 }

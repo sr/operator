@@ -4,8 +4,19 @@ class StatusHandler < ActiveJob::Base
     payload = JSON.parse(data)
 
     user = User.find_by(github_login: payload["sender"]["login"])
+    commit_status = Clients::GitHub::CommitStatus.new(
+      payload.fetch("repository").fetch("id"),
+      payload.fetch("commit").fetch("sha"),
+      payload.fetch("context"),
+      payload.fetch("state"),
+    )
+
     Audited::Audit.as_user(user) do
-      CommitStatus.new(payload).update_multipass_testing
+      if Changeling.config.pardot?
+        RepositoryPullRequest.synchronize(commit_status)
+      else
+        CommitStatus.new(payload).update_multipass_testing
+      end
     end
   end
 end
