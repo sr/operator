@@ -170,6 +170,7 @@ class RepositoryPullRequest
     else
       comment_bodies = [@multipass.body]
       comment_bodies += github_client.issue_comments(repository.name_with_owner, number)
+        .reject { |c| bot_comment?(c) }
         .map { |c| c[:body] }
 
       # Changes by default are standard, but can be moved to major by adding a
@@ -348,5 +349,10 @@ class RepositoryPullRequest
 
   def repository
     @multipass.repository
+  end
+
+  def bot_comment?(comment)
+    # sa- is Pardot convention for 'service account'
+    comment[:user][:login] =~ /\Asa-/
   end
 end
