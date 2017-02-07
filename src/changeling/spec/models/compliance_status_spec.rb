@@ -80,6 +80,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.complete?).to eq(true)
     @multipass.ticket_reference.destroy!
     expect(@multipass.reload.complete?).to eq(false)
+    expect(@multipass.reload.pending?).to eq(false)
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Ticket reference is missing")
@@ -89,6 +90,7 @@ describe ComplianceStatus, "pardot" do
     expect(@multipass.complete?).to eq(true)
     @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
     expect(@multipass.reload.complete?).to eq(false)
+    expect(@multipass.reload.pending?).to eq(false)
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Referenced ticket is not open")
