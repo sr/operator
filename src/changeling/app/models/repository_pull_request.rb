@@ -99,7 +99,7 @@ class RepositoryPullRequest
     @multipass.reference_url
   end
 
-  def synchronize
+  def synchronize(create_github_status: true)
     if @multipass.new_record?
       raise ArgumentError, "can not synchronize unsaved multipass record"
     end
@@ -115,7 +115,7 @@ class RepositoryPullRequest
     @multipass.save!
 
     detect_emergency_merge
-    create_github_commit_status
+    create_github_commit_status if create_github_status
 
     @multipass
   end
