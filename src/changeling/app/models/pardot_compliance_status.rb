@@ -4,12 +4,6 @@ class PardotComplianceStatus
     @default = HerokuComplianceStatus.new(multipass)
   end
 
-  delegate \
-    :complete?,
-    :rejected?,
-    :pending?,
-    to: :@default
-
   def complete?
     return true if emergency_approved?
 
@@ -23,6 +17,22 @@ class PardotComplianceStatus
     end
 
     peer_reviewed? && tests_successful?
+  end
+
+  def rejected?
+    return false if emergency_approved?
+
+    @default.rejected?
+  end
+
+  def pending?
+    return false if complete?
+
+    if tests_failed?
+      return false
+    end
+
+    tests_pending? || !peer_reviewed?
   end
 
   def user_is_peer_reviewer?(user)
@@ -76,8 +86,6 @@ class PardotComplianceStatus
   def github_commit_status_description
     if rejected?
       "Changes requested by #{@multipass.rejector}"
-    elsif !peer_reviewed?
-      "Review by one or more component(s) owner(s) is missing"
     elsif emergency_approved?
       "Satisfied via emergency approval."
     elsif complete?
@@ -90,6 +98,8 @@ class PardotComplianceStatus
       "Awaiting automated tests results"
     elsif !tests_successful?
       "Automated tests failed"
+    elsif !peer_reviewed?
+      "Review by one or more component(s) owner(s) is missing"
     else
       "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end
@@ -121,5 +131,9 @@ class PardotComplianceStatus
 
   def tests_pending?
     @multipass.tests_state == RepositoryCommitStatus::PENDING
+  end
+
+  def tests_failed?
+    !tests_pending? && !tests_successful?
   end
 end

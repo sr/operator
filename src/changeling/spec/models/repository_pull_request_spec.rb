@@ -120,7 +120,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
       ticket = @multipass.reload.referenced_ticket
@@ -137,31 +137,31 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "    BREAD-1598: hello")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       @multipass.ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "[BREAD-1598] - hello")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
     end
 
@@ -172,12 +172,12 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       stub_jira_ticket("PDT-98")
       stub_github_pull_request(title: "PDT-98 Fix everything")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       ticket = @multipass.reload.referenced_ticket
       expect(ticket).to_not eq(nil)
@@ -185,7 +185,7 @@ RSpec.describe RepositoryPullRequest do
       expect(ticket.url).to eq("https://jira.dev.pardot.com/browse/PDT-98")
 
       stub_jira_ticket("PDT-98", resolved: true)
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       ticket.reload
       expect(ticket.open?).to eq(false)
     end
@@ -197,11 +197,11 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
       stub_github_pull_request(title: "Untitled")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to eq(nil)
     end
 
@@ -212,7 +212,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       ticket = @multipass.reload.referenced_ticket
       expect(ticket).to eq(nil)
@@ -225,13 +225,13 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       ticket = @multipass.reload.referenced_ticket
       expect(ticket.open?).to eq(true)
 
       stub_jira_ticket("BREAD-1598", exists: false)
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(ticket.reload.open?).to eq(false)
     end
 
@@ -241,7 +241,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
       ticket = @multipass.reload.referenced_ticket
@@ -251,12 +251,12 @@ RSpec.describe RepositoryPullRequest do
       expect(ticket.tracker).to eq(Ticket::TRACKER_GUS)
 
       stub_github_pull_request(title: "W-3343901")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       ticket = @multipass.reload.referenced_ticket
       expect(ticket.summary).to eq("")
 
       stub_github_pull_request(title: "boomtown")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to eq(nil)
     end
   end
@@ -271,7 +271,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_labels
 
       original_release_id = @multipass.release_id
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
 
       expect(@multipass.release_id).to eq(original_release_id)
@@ -293,7 +293,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_labels
 
       expect(@multipass.changed_files).to eq([])
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.changed_files).to eq([Pathname("/boomtown")])
 
       stub_github_pull_request(
@@ -304,7 +304,7 @@ RSpec.describe RepositoryPullRequest do
           { status: "removed", filename: "config", patch: "" }
         ]
       )
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
   end
@@ -321,7 +321,8 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
+
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
       expect(status.state).to eq(RepositoryCommitStatus::SUCCESS)
@@ -330,7 +331,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status(statuses: [
         { state: RepositoryCommitStatus::FAILURE, context: "ci/travis" }
       ])
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(RepositoryCommitStatus.count).to eq(1)
       status = RepositoryCommitStatus.first!
       expect(status.state).to eq(RepositoryCommitStatus::FAILURE)
@@ -349,7 +350,7 @@ RSpec.describe RepositoryPullRequest do
       )
       @repository.update!(config_file_content: config.to_json)
 
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.testing).to eq(false)
       expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
 
@@ -357,7 +358,7 @@ RSpec.describe RepositoryPullRequest do
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::PENDING, context: "ci/bazel" }
       ])
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.testing).to eq(true)
       expect(@multipass.tests_state).to eq(RepositoryCommitStatus::PENDING)
 
@@ -365,7 +366,7 @@ RSpec.describe RepositoryPullRequest do
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::FAILURE, context: "ci/bazel" }
       ])
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.testing).to eq(true)
       expect(@multipass.tests_state).to eq(RepositoryCommitStatus::FAILURE)
 
@@ -373,7 +374,7 @@ RSpec.describe RepositoryPullRequest do
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/travis" },
         { state: RepositoryCommitStatus::SUCCESS, context: "ci/bazel" }
       ])
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.testing).to eq(true)
       expect(@multipass.tests_state).to eq(RepositoryCommitStatus::SUCCESS)
     end
@@ -387,7 +388,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews([])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq(nil)
     end
@@ -402,7 +403,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
     end
@@ -417,7 +418,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
 
       expect(@multipass.reload.peer_reviewer).to eq("sr")
     end
@@ -431,13 +432,13 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_comments
       stub_github_pull_request_labels
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.peer_reviewer).to eq("alindeman")
 
       stub_github_pull_request_reviews([
         { github_login: "alindeman", approved: false }
       ])
-      @repository_pull_request.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.peer_reviewer).to eq(nil)
     end
 
@@ -485,7 +486,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
 
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
       expect(@multipass.change_type).to eq(ChangeCategorization::STANDARD)
     end
@@ -498,7 +499,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
 
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
       expect(@multipass.change_type).to eq(ChangeCategorization::MAJOR)
     end
@@ -513,7 +514,7 @@ RSpec.describe RepositoryPullRequest do
       ])
       stub_github_pull_request_labels
 
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
       expect(@multipass.change_type).to eq(ChangeCategorization::MAJOR)
     end
@@ -526,13 +527,13 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
 
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
       expect(@multipass.change_type).to_not eq(ChangeCategorization::EMERGENCY)
       expect(@multipass.complete?).to eq(false)
 
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
-      @multipass.synchronize
+      @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
 
       expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)

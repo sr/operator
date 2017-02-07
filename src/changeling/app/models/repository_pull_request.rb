@@ -99,7 +99,7 @@ class RepositoryPullRequest
     @multipass.reference_url
   end
 
-  def synchronize
+  def synchronize(create_github_status: true)
     if @multipass.new_record?
       raise ArgumentError, "can not synchronize unsaved multipass record"
     end
@@ -114,7 +114,7 @@ class RepositoryPullRequest
     end
 
     @multipass.save!
-    create_github_commit_status
+    create_github_commit_status if create_github_status
     set_github_labels
 
     @multipass
@@ -302,12 +302,12 @@ class RepositoryPullRequest
   end
 
   def create_github_commit_status
-    if @multipass.rejected?
-      @multipass.failure_github_commit_status!
-    elsif @multipass.complete?
+    if @multipass.complete?
       @multipass.approve_github_commit_status!
-    else
+    elsif @multipass.pending?
       @multipass.pending_github_commit_status!
+    else
+      @multipass.failure_github_commit_status!
     end
   end
 

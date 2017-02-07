@@ -33,6 +33,10 @@ resource "aws_security_group" "pardot0_ue1_consul_vault" {
       "${aws_vpc.pardot0_ue1.cidr_block}",
       "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
     ]
+
+    security_groups = [
+      "${aws_security_group.vault_http_lb.id}",
+    ]
   }
 
   # allow app.dev hosts access to consul server port
@@ -70,7 +74,7 @@ resource "aws_instance" "pardot0_ue1_consul1" {
   ami           = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_consul_vault["consul_instance_type"]}"
   key_name      = "internal_apps"
-  subnet_id     = "${aws_subnet.pardot0_ue1_1a_dmz.id}"
+  subnet_id     = "${aws_subnet.pardot0_ue1_1a.id}"
 
   vpc_security_group_ids = [
     "${aws_security_group.pardot0_ue1_consul_vault.id}",
@@ -102,7 +106,7 @@ resource "aws_instance" "pardot0_ue1_vault1" {
   ami           = "${var.centos_6_hvm_ebs_ami}"
   instance_type = "${var.environment_consul_vault["vault_instance_type"]}"
   key_name      = "internal_apps"
-  subnet_id     = "${aws_subnet.pardot0_ue1_1a_dmz.id}"
+  subnet_id     = "${aws_subnet.pardot0_ue1_1a.id}"
 
   vpc_security_group_ids = [
     "${aws_security_group.pardot0_ue1_consul_vault.id}",
@@ -127,4 +131,74 @@ resource "aws_route53_record" "pardot0_ue1_vault1_Arecord" {
   records = ["${element(aws_instance.pardot0_ue1_vault1.*.private_ip, count.index)}"]
   type    = "A"
   ttl     = "900"
+}
+
+resource "aws_route53_record" "vault_dev_pardot_com_CNAME_record" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "vault.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_elb.vault_public_elb.dns_name}"]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
+resource "aws_security_group" "vault_http_lb" {
+  name        = "vault_http_lb"
+  description = "Allow HTTP/HTTPS from SFDC VPN and CI"
+  vpc_id      = "${aws_vpc.pardot0_ue1.id}"
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${var.pardot_ci_nat_gw_public_ip}/32",
+    ]
+
+    self = "true"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_elb" "vault_public_elb" {
+  security_groups = [
+    "${aws_security_group.vault_http_lb.id}",
+  ]
+
+  subnets = [
+    "${aws_subnet.pardot0_ue1_1a_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1c_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1d_dmz.id}",
+    "${aws_subnet.pardot0_ue1_1e_dmz.id}",
+  ]
+
+  connection_draining         = true
+  connection_draining_timeout = 30
+  instances                   = ["${aws_instance.pardot0_ue1_vault1.*.id}"]
+
+  listener {
+    lb_port            = 443
+    lb_protocol        = "https"
+    instance_port      = 8200
+    instance_protocol  = "https"
+    ssl_certificate_id = "arn:aws:iam::${var.pardotops_account_number}:server-certificate/dev.pardot.com-2016-with-intermediate"
+  }
+
+  health_check {
+    healthy_threshold   = 4
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTPS:8200/v1/sys/health"
+    interval            = 10
+  }
+
+  tags {
+    Name = "vault_elb"
+  }
 }
