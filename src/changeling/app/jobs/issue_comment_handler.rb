@@ -16,13 +16,11 @@ class IssueCommentHandler < ActiveJob::Base
     if Changeling.config.pardot?
       multipass = Multipass.find_or_initialize_by_pull_request(issue_comment["issue"]["pull_request"])
       multipass.synchronize
+    elsif valid_issue_comment?(issue_comment["comment"]["body"])
+      Multipass.update_from_issue_comment(issue_comment["issue"]["pull_request"],
+        issue_comment["comment"], ":+1:")
     else
-      if valid_issue_comment?(issue_comment["comment"]["body"])
-        Multipass.update_from_issue_comment(issue_comment["issue"]["pull_request"],
-                                            issue_comment["comment"], ":+1:")
-      else
-        Rails.logger.info "Ignoring issue comment: #{issue_comment['comment']['body']}"
-      end
+      Rails.logger.info "Ignoring issue comment: #{issue_comment['comment']['body']}"
     end
   end
 end

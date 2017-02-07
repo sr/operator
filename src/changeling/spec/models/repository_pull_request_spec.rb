@@ -510,7 +510,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments([
-        {body: "I think we need extra review on this one #major"}
+        { body: "I think we need extra review on this one #major" }
       ])
       stub_github_pull_request_labels
 
