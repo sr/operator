@@ -26,7 +26,13 @@ class PardotComplianceStatus
   end
 
   def pending?
-    !complete? && (tests_pending? || !peer_reviewed?)
+    return false if complete?
+
+    if tests_failed?
+      return false
+    end
+
+    tests_pending? || !peer_reviewed?
   end
 
   def user_is_peer_reviewer?(user)
