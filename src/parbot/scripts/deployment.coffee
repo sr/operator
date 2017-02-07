@@ -61,7 +61,13 @@ module.exports = (robot) ->
         deploys.push(null)
         deploys = deploys[0..number]
 
-        oldestDeploy = deploys[deploys.length - 1]
+        # If we request the maximum number of deploys, to enable eachCons, the last thing will be a null instead of a 
+        # deploy. Check for this condition, and use the second to last deploy if necessary.
+        if (deploys[deploys.length - 1]?)
+          oldestDeploy = deploys[deploys.length - 1]
+        else
+          oldestDeploy = deploys[deploys.length - 2]
+
         newestDeploy = deploys[0]
 
         totalDiffMsg = "The last #{deploys.length - 1} releases resulted in a total diff of "
