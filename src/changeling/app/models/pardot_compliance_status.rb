@@ -86,8 +86,6 @@ class PardotComplianceStatus
   def github_commit_status_description
     if rejected?
       "Changes requested by #{@multipass.rejector}"
-    elsif !peer_reviewed?
-      "Review by one or more component(s) owner(s) is missing"
     elsif emergency_approved?
       "Satisfied via emergency approval."
     elsif complete?
@@ -100,6 +98,8 @@ class PardotComplianceStatus
       "Awaiting automated tests results"
     elsif !tests_successful?
       "Automated tests failed"
+    elsif !peer_reviewed?
+      "Review by one or more component(s) owner(s) is missing"
     else
       "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end
