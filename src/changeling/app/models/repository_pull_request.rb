@@ -353,6 +353,6 @@ class RepositoryPullRequest
 
   def bot_comment?(comment)
     # sa- is Pardot convention for 'service account'
-    comment[:user][:login] =~ /\Asa-/
+    comment[:user][:login].start_with?("sa-")
   end
 end
