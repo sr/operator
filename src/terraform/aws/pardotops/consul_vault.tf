@@ -31,7 +31,7 @@ resource "aws_security_group" "pardot0_ue1_consul_vault" {
 
     cidr_blocks = [
       "${aws_vpc.pardot0_ue1.cidr_block}",
-      "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
+      "${aws_eip.dc_access_00.public_ip}/32",
     ]
 
     security_groups = [
