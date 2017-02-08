@@ -319,7 +319,7 @@ class RepositoryPullRequest
     ChangeCategorization.change_types.each do |change_type|
       if label_names.include?(change_type) && @multipass.change_type != change_type
         github_client.remove_label(repository_full_name, number, change_type)
-      elsif !label_names.include?(change_type) && @multipass.change_type == change_type
+      elsif change_type != ChangeCategorization::STANDARD && !label_names.include?(change_type) && @multipass.change_type == change_type
         github_client.add_labels_to_an_issue(repository_full_name, number, [change_type])
       end
     end
