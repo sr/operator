@@ -44,5 +44,5 @@ resource "github_branch_protection" "murdoc_master" {
 
   include_admins = false
   strict         = false
-  contexts       = ["Test Jobs"]
+  contexts       = ["compliance"]
 }
