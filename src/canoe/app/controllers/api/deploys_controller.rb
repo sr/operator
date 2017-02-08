@@ -9,7 +9,7 @@ module Api
       @deploys = current_target.deploys
         .where(project_name: current_project.name)
         .order(id: :desc)
-        .limit(10)
+        .limit(20)
     end
 
     def create

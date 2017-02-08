@@ -99,12 +99,13 @@ class RepositoryPullRequest
     @multipass.reference_url
   end
 
-  def synchronize
+  def synchronize(create_github_status: true)
     if @multipass.new_record?
       raise ArgumentError, "can not synchronize unsaved multipass record"
     end
 
     synchronize_github_pull_request
+    synchronize_change_categorization
 
     if !@multipass.merged?
       synchronize_github_reviewers
@@ -113,9 +114,8 @@ class RepositoryPullRequest
     end
 
     @multipass.save!
-
-    detect_emergency_merge
-    create_github_commit_status
+    create_github_commit_status if create_github_status
+    set_github_labels
 
     @multipass
   end
@@ -223,16 +223,6 @@ class RepositoryPullRequest
     body << @multipass.status_description_html
   end
 
-  def detect_emergency_merge
-    if @multipass.merged? && !@multipass.complete?
-      @multipass.update!(change_type: ChangeCategorization::EMERGENCY)
-    end
-  end
-
-  def owners_collection
-    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
-  end
-
   def synchronize_github_pull_request
     pull_request = github_client.pull_request(
       repository.name_with_owner,
@@ -247,6 +237,7 @@ class RepositoryPullRequest
     @multipass.merged = pull_request[:merged]
     @multipass.merge_commit_sha = pull_request[:merge_commit_sha] if pull_request[:merged]
     @multipass.title = pull_request[:title]
+    @multipass.body = pull_request[:body]
     @multipass.release_id = pull_request[:head][:sha]
 
     PullRequestFile.transaction do
@@ -262,6 +253,27 @@ class RepositoryPullRequest
         pull_request_file.save
       end
     end
+  end
+
+  def synchronize_change_categorization
+    if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.merged? && !@multipass.complete?)
+      change_type = ChangeCategorization::EMERGENCY
+    else
+      comment_bodies = [@multipass.body]
+      comment_bodies += github_client.issue_comments(repository.name_with_owner, number)
+        .reject { |c| bot_comment?(c) }
+        .map { |c| c[:body] }
+
+      # Changes by default are standard, but can be moved to major by adding a
+      # hashtag to a pull request comment
+      if comment_bodies.any? { |body| ChangeCategorization::MAJOR_COMMENT_MATCHER =~ body }
+        change_type = ChangeCategorization::MAJOR
+      else
+        change_type = ChangeCategorization::STANDARD
+      end
+    end
+
+    @multipass.change_type = change_type
   end
 
   def synchronize_github_statuses
@@ -375,19 +387,32 @@ class RepositoryPullRequest
     end
 
     if !@multipass.ticket_reference
-      TicketReference.create!(multipass_id: @multipass.id, ticket_id: ticket.id)
+      @multipass.create_ticket_reference!(ticket_id: ticket.id)
     else
       @multipass.ticket_reference.update!(ticket_id: ticket.id)
     end
   end
 
   def create_github_commit_status
-    if @multipass.rejected?
-      @multipass.failure_github_commit_status!
-    elsif @multipass.complete?
+    if @multipass.complete?
       @multipass.approve_github_commit_status!
-    else
+    elsif @multipass.pending?
       @multipass.pending_github_commit_status!
+    else
+      @multipass.failure_github_commit_status!
+    end
+  end
+
+  def set_github_labels
+    label_names = github_client.labels_for_issue(repository_full_name, number)
+      .map { |l| l[:name] }
+
+    ChangeCategorization.change_types.each do |change_type|
+      if label_names.include?(change_type) && @multipass.change_type != change_type
+        github_client.remove_label(repository_full_name, number, change_type)
+      elsif change_type != ChangeCategorization::STANDARD && !label_names.include?(change_type) && @multipass.change_type == change_type
+        github_client.add_labels_to_an_issue(repository_full_name, number, [change_type])
+      end
     end
   end
 
@@ -396,6 +421,10 @@ class RepositoryPullRequest
     when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end
+  end
+
+  def owners_collection
+    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
   end
 
   def github_client
@@ -415,5 +444,10 @@ class RepositoryPullRequest
 
   def repository
     @multipass.repository
+  end
+
+  def bot_comment?(comment)
+    # sa- is Pardot convention for 'service account'
+    comment[:user][:login].start_with?("sa-")
   end
 end

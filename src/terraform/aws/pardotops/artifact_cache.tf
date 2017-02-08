@@ -60,7 +60,7 @@ resource "aws_security_group" "external_artifact_cache_http_lb" {
     protocol  = "tcp"
 
     cidr_blocks = [
-      "${aws_eip.pardot0_ue1_nat_gw.public_ip}/32",
+      "${aws_eip.dc_access_00.public_ip}/32",
       "${aws_eip.appdev_nat_gw.public_ip}/32",
       "${aws_eip.appdev_proxyout1_eip.public_ip}/32",
       "${aws_eip.internal_tools_integration_nat_gw.public_ip}/32",

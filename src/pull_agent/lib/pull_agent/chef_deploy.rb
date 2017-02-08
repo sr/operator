@@ -6,6 +6,7 @@ module PullAgent
       "dfw" => "environments/dfw/production.rb",
       "phx" => "environments/phx/production.rb",
       "ue1" => "environments/aws/production.rb",
+      "performance_testing" => "environments/dev.rb",
       "local" => "none"
     }.freeze
 
@@ -13,6 +14,7 @@ module PullAgent
       "dfw" => "nodes/dfw",
       "phx" => "nodes/phx",
       "ue1" => "nodes/aws",
+      "perf" => "nodes/dfw/dev/pardot1",
       "local" => "none"
     }.freeze
 

@@ -16,6 +16,7 @@ module PullRequestMethods
           requester: User.for_github_login(pull_request["pull_request"]["user"]["login"]),
           reference_url: pull_request["pull_request"]["html_url"],
           title: pull_request["pull_request"]["title"],
+          body: pull_request["pull_request"]["body"],
           release_id: pull_request["pull_request"]["head"]["sha"]
     end
 
@@ -37,6 +38,7 @@ module PullRequestMethods
       end
       multipass.release_id = pull_request["pull_request"]["head"]["sha"]
       multipass.title = pull_request["pull_request"]["title"]
+      multipass.body = pull_request["pull_request"]["body"]
       if Changeling.config.pardot?
         multipass.merge_commit_sha = pull_request["pull_request"]["merge_commit_sha"] if pull_request["pull_request"]["merged"]
       end

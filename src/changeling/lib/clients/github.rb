@@ -72,8 +72,13 @@ module Clients
     end
 
     def compliance_status(name_with_owner, sha)
-      statuses = @client.statuses(name_with_owner, sha)
-      statuses.detect { |status| status["context"] == "heroku/compliance" }
+      if Changeling.config.pardot?
+        statuses = @client.combined_status(name_with_owner, sha)[:statuses] || []
+        statuses.detect { |status| status[:context] == Changeling.config.compliance_status_context }
+      else
+        statuses = @client.statuses(name_with_owner, sha)
+        statuses.detect { |status| status["context"] == "heroku/compliance" }
+      end
     end
 
     def compliance_status_exists?(name_with_owner, sha, description, destination_state)
@@ -108,6 +113,22 @@ module Clients
 
     def pull_request(name_with_owner, number)
       @client.pull_request(name_with_owner, number)
+    end
+
+    def issue_comments(name_with_owner, number)
+      @client.issue_comments(name_with_owner, number)
+    end
+
+    def labels_for_issue(name_with_owner, number)
+      @client.labels_for_issue(name_with_owner, number)
+    end
+
+    def add_labels_to_an_issue(name_with_owner, number, labels = [])
+      @client.add_labels_to_an_issue(name_with_owner, number, labels)
+    end
+
+    def remove_label(name_with_owner, number, label)
+      @client.remove_label(name_with_owner, number, label)
     end
 
     def pull_request_files(name_with_owner, number)

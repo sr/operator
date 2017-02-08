@@ -50,7 +50,7 @@ module.exports = (robot) ->
     msg.hipchatNotify(html, {color: "gray"})
 
   robot.respond /last(?:releases?|syncs?)(?:\s+(\d+))?$/i, (msg) ->
-    number = _.min([10, parseInt(msg.match[1] || "1")])
+    number = _.min([20, parseInt(msg.match[1] || "1")])
 
     canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME || "production", "pardot", (err, deploys) ->
       if err?
@@ -61,7 +61,23 @@ module.exports = (robot) ->
         deploys.push(null)
         deploys = deploys[0..number]
 
-        for [deploy, previousDeploy] in eachCons(deploys[0..number], 2)
+        # If we request the maximum number of deploys, to enable eachCons, the last thing will be a null instead of a
+        # deploy. Check for this condition, and use the second to last deploy if necessary.
+        if deploys[deploys.length - 1]?
+          oldestDeploy = deploys[deploys.length - 1]
+        else
+          oldestDeploy = deploys[deploys.length - 2]
+
+        newestDeploy = deploys[0]
+
+        totalDiffMsg = "The last #{deploys.length - 1} releases resulted in a total diff of "
+        totalDiffMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/compare/#{oldestDeploy.sha}...#{newestDeploy.sha}\">"
+        totalDiffMsg += "#{oldestDeploy.branch}/build#{oldestDeploy.build_number}...#{newestDeploy.branch}/build#{newestDeploy.build_number}"
+        totalDiffMsg += "</a>"
+
+        msgs.push(totalDiffMsg)
+
+        for [deploy, previousDeploy] in eachCons(deploys[0..deploys.length], 2)
           deployMsg = "<a href=\"mailto:#{deploy.user}\">#{deploy.user}</a> synced "
           if previousDeploy
             deployMsg += "<a href=\"https://git.dev.pardot.com/pardot/pardot/compare/#{previousDeploy.sha}...#{deploy.sha}\">"

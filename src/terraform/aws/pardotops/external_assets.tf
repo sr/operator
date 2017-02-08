@@ -26,10 +26,6 @@ variable "pardot_ci_vpc_id" {
   default = "vpc-6d80c40a"
 }
 
-variable "legacy_artifactory_instance_ip" {
-  default = "52.21.58.50"
-}
-
 variable "tools_egress_proxy_ip" {
   default = "52.3.71.92"
 }
