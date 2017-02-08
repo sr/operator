@@ -3,6 +3,7 @@ Fabricator(:multipass) do
   release_id { Faker::Number.hexadecimal(7) }
   requester { Faker::Internet.user_name }
   title { Faker::Lorem.word }
+  body { Faker::Lorem.paragraph }
   impact { %w{low medium high}.sample }
   impact_probability { %w{low medium high}.sample }
   change_type { [ChangeCategorization::STANDARD, ChangeCategorization::MAJOR].sample }
