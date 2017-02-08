@@ -35,6 +35,38 @@ RSpec.describe Clients::GitHub do
       status = client.compliance_status("heroku/changeling", sha)
       expect(status).to eq(nil)
     end
+
+    context "pardot" do
+      it "returns a status when it exists" do
+        Changeling.config.pardot = true
+        sha = "036e7c5b7388b3738e1f0288dfa4e4b1a76d76e6"
+
+        body = {
+          statuses: [
+            { context: Changeling.config.compliance_status_context, state: "pending" }
+          ]
+        }.to_json
+        stub_json_request(:get, "https://github.com/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
+
+        status = client.compliance_status("heroku/changeling", sha)
+        expect(status.state).to eq("pending")
+      end
+
+      it "returns nil when it does not exist" do
+        Changeling.config.pardot = true
+        sha = "deadbeef"
+
+        body = {
+          statuses: [
+            { context: "unrelated", state: "pending" }
+          ]
+        }.to_json
+        stub_json_request(:get, "https://github.com/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
+
+        status = client.compliance_status("heroku/changeling", sha)
+        expect(status).to eq(nil)
+      end
+    end
   end
 
   describe "#compliance_status_exists?" do

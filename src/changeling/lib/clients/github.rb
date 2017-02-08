@@ -68,8 +68,13 @@ module Clients
     end
 
     def compliance_status(name_with_owner, sha)
-      statuses = @client.statuses(name_with_owner, sha)
-      statuses.detect { |status| status["context"] == "heroku/compliance" }
+      if Changeling.config.pardot?
+        statuses = @client.combined_status(name_with_owner, sha)[:statuses] || []
+        statuses.detect { |status| status[:context] == Changeling.config.compliance_status_context }
+      else
+        statuses = @client.statuses(name_with_owner, sha)
+        statuses.detect { |status| status["context"] == "heroku/compliance" }
+      end
     end
 
     def compliance_status_exists?(name_with_owner, sha, description, destination_state)
