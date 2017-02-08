@@ -117,7 +117,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 			}
 
 			if complianceStatus.State == github.CommitStatusSuccess {
-				message := fmt.Sprintf("Merge-requested-by: @%s <%s>", comment.User.Login, comment.User.Email)
+				message := fmt.Sprintf("Merge-requested-by: @%s", comment.User.Login)
 				err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 				if err != nil {
 					return err
