@@ -63,7 +63,7 @@ module.exports = (robot) ->
 
         # If we request the maximum number of deploys, to enable eachCons, the last thing will be a null instead of a
         # deploy. Check for this condition, and use the second to last deploy if necessary.
-        if (deploys[deploys.length - 1]?)
+        if deploys[deploys.length - 1]?
           oldestDeploy = deploys[deploys.length - 1]
         else
           oldestDeploy = deploys[deploys.length - 2]
