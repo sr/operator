@@ -28,6 +28,7 @@ class BathroomHandler < ApplicationHandler
 
     json.each do |bathroom|
       name = bathroom["name"]
+      offline = bathroom["offline"]
       stalls_string = ""
       stalls_in_use = 0
       stall_count = bathroom["stalls"].count
@@ -40,7 +41,7 @@ class BathroomHandler < ApplicationHandler
         end
       end
       available_stall_count = stall_count - stalls_in_use
-      response_string += "\n#{name}: #{stalls_string}#{available_stall_count} stalls free"
+      response_string += "\n#{name}: #{offline ? "OFFLINE - Please check sensor " : ""}#{stalls_string}#{available_stall_count} stalls free"
     end
     response_string
   end
