@@ -74,12 +74,13 @@ resource "aws_internet_gateway" "pardot0_ue1_internet_gw" {
   vpc_id = "${aws_vpc.pardot0_ue1.id}"
 }
 
+//TODO: CLEANUP AFTER A GOOD CHECK THAT THIS IP ISN'T WHITELISTED ELSEWHERE
 resource "aws_eip" "pardot0_ue1_nat_gw" {
   vpc = true
 }
 
 resource "aws_nat_gateway" "pardot0_ue1_nat_gw" {
-  allocation_id = "${aws_eip.pardot0_ue1_nat_gw.id}"
+  allocation_id = "${aws_eip.dc_access_00.id}"
   subnet_id     = "${aws_subnet.pardot0_ue1_1a_dmz.id}"
 }
 

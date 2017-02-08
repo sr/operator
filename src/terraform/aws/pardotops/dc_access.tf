@@ -1,6 +1,6 @@
 resource "aws_eip" "dc_access_00" {
   vpc = true
-}
+} # CLAIMED: nat gateway for pardot0-ue1
 
 resource "aws_eip" "dc_access_01" {
   vpc = true
