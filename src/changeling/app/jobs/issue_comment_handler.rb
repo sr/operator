@@ -14,9 +14,10 @@ class IssueCommentHandler < ActiveJob::Base
   def perform(_, data)
     issue_comment = JSON.parse(data)
     if Changeling.config.pardot?
-      multipass = Multipass.find_or_initialize_by_pull_request(issue_comment["issue"]["pull_request"])
-      multipass.save!
-      multipass.synchronize
+      return unless issue_comment["issue"] && issue_comment["issue"]["pull_request"]
+
+      multipass = Multipass.find_by(reference_url: issue_comment["issue"]["pull_request"]["html_url"])
+      multipass.synchronize if multipass
     elsif valid_issue_comment?(issue_comment["comment"]["body"])
       Multipass.update_from_issue_comment(issue_comment["issue"]["pull_request"],
         issue_comment["comment"], ":+1:")
