@@ -46,7 +46,7 @@ RSpec.describe Clients::GitHub do
             { context: Changeling.config.compliance_status_context, state: "pending" }
           ]
         }.to_json
-        stub_json_request(:get, "https://github.com/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
+        stub_json_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
 
         status = client.compliance_status("heroku/changeling", sha)
         expect(status.state).to eq("pending")
@@ -61,7 +61,7 @@ RSpec.describe Clients::GitHub do
             { context: "unrelated", state: "pending" }
           ]
         }.to_json
-        stub_json_request(:get, "https://github.com/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
+        stub_json_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/heroku/changeling/commits/#{sha}/status", body)
 
         status = client.compliance_status("heroku/changeling", sha)
         expect(status).to eq(nil)
