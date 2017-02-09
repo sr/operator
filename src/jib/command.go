@@ -1,6 +1,7 @@
 package jib
 
 import (
+	"fmt"
 	"jib/github"
 	"regexp"
 )
@@ -16,6 +17,10 @@ var (
 type Command struct {
 	Name    string
 	Comment *github.IssueComment
+}
+
+func (c *Command) String() string {
+	return fmt.Sprintf("/%s", c.Name)
 }
 
 // ExtractCommands extracts commands from the list of comments.
