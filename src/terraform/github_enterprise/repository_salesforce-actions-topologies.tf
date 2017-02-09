@@ -31,3 +31,9 @@ resource "github_team_repository" "salesforce-actions-topologies_site-reliabilit
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "salesforce-actions-topologies_service-accounts-admins" {
+  repository = "${github_repository.salesforce-actions-topologies.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

@@ -38,6 +38,12 @@ resource "github_team_repository" "engagement-history-topology_site-reliability-
   permission = "admin"
 }
 
+resource "github_team_repository" "engagement-history-topology_service-accounts-admins" {
+  repository = "${github_repository.engagement-history-topology.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "engagement-history-topology_master" {
   repository = "${github_repository.engagement-history-topology.name}"
   branch     = "master"

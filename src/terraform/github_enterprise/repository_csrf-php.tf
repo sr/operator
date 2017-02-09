@@ -43,3 +43,9 @@ resource "github_team_repository" "csrf-php_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "csrf-php_service-accounts-admins" {
+  repository = "${github_repository.csrf-php.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

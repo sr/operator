@@ -56,6 +56,12 @@ resource "github_team_repository" "pardot_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "pardot_service-accounts-admins" {
+  repository = "${github_repository.pardot.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "pardot_master" {
   repository = "${github_repository.pardot.name}"
   branch     = "master"

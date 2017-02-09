@@ -46,6 +46,12 @@ resource "github_team" "service-accounts-write-only" {
   privacy     = "secret"
 }
 
+resource "github_team" "service-accounts-admins" {
+  name        = "Service Accounts administrators"
+  description = ""
+  privacy     = "secret"
+}
+
 resource "github_team" "tier-2-support" {
   name        = "Tier 2 Support"
   description = "Tier 2 Support"

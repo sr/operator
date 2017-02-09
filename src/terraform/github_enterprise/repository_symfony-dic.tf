@@ -37,3 +37,9 @@ resource "github_team_repository" "symfony-dic_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "symfony-dic_service-accounts-admins" {
+  repository = "${github_repository.symfony-dic.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

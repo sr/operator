@@ -37,3 +37,9 @@ resource "github_team_repository" "java-snippets_service-accounts-write-only" {
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "java-snippets_service-accounts-admins" {
+  repository = "${github_repository.java-snippets.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

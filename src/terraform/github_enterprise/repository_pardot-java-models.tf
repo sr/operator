@@ -37,3 +37,9 @@ resource "github_team_repository" "pardot-java-models_engineering-managers" {
   team_id    = "${github_team.engineering-managers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "pardot-java-models_service-accounts-admins" {
+  repository = "${github_repository.pardot-java-models.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

@@ -38,6 +38,12 @@ resource "github_team_repository" "realtime-frontend_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "realtime-frontend_service-accounts-admins" {
+  repository = "${github_repository.realtime-frontend.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "realtime-frontend_master" {
   repository = "${github_repository.realtime-frontend.name}"
   branch     = "master"

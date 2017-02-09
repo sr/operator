@@ -1,6 +1,6 @@
 resource "github_repository" "engage-campaign-reports" {
   name          = "engage-campaign-reports"
-  description   = "Engage Campaign Reports"
+  description   = ""
   homepage_url  = ""
   private       = false
   has_issues    = false
@@ -14,26 +14,23 @@ resource "github_team_repository" "engage-campaign-reports_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "engage-campaign-reports_read-only-users" {
-  repository = "${github_repository.engage-campaign-reports.name}"
-  team_id    = "${github_team.read-only-users.id}"
-  permission = "pull"
-}
-
-resource "github_team_repository" "engage-campaign-reports_engineering-managers" {
-  repository = "${github_repository.engage-campaign-reports.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "engage-campaign-reports_site-reliability-engineers" {
-  repository = "${github_repository.engage-campaign-reports.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "engage-campaign-reports_service-accounts-write-only" {
   repository = "${github_repository.engage-campaign-reports.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
+}
+
+resource "github_team_repository" "engage-campaign-reports_service-accounts-admins" {
+  repository = "${github_repository.engage-campaign-reports.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
+resource "github_branch_protection" "engage-campaign-reports_master" {
+  repository = "${github_repository.engage-campaign-reports.name}"
+  branch     = "master"
+
+  include_admins = false
+  strict         = false
+  contexts       = ["compliance"]
 }
