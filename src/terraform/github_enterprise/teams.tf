@@ -46,7 +46,7 @@ resource "github_team" "service-accounts-write-only" {
   privacy     = "secret"
 }
 
-resource "github_team" "service-accounts-admins" {
+resource "github_team" "service-accounts-administrators" {
   name        = "Service Accounts administrators"
   description = ""
   privacy     = "secret"

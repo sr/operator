@@ -26,21 +26,9 @@ resource "github_team_repository" "bread_service-accounts-read-only" {
   permission = "pull"
 }
 
-resource "github_team_repository" "bread_site-reliability-engineers" {
+resource "github_team_repository" "bread_service-accounts-administrators" {
   repository = "${github_repository.bread.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "bread_engineering-managers" {
-  repository = "${github_repository.bread.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "bread_service-accounts-admins" {
-  repository = "${github_repository.bread.name}"
-  team_id    = "${github_team.service-accounts-admins.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 
