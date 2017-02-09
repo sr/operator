@@ -120,7 +120,7 @@ class RepositoryPullRequest
     @multipass
   end
 
-  MAGIC_HTML_COMMENT = "<!-- compliance -->"
+  MAGIC_HTML_COMMENT = "<!-- compliance -->".freeze
 
   def update_github_comment
     if !Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
@@ -165,8 +165,8 @@ class RepositoryPullRequest
 
   private
 
-  GLYPH_DONE = "✓"
-  GLYPH_TODO = "✗"
+  GLYPH_DONE = "✓".freeze
+  GLYPH_TODO = "✗".freeze
 
   def compliance_comment_body_html
     if teams.size <= 0
@@ -182,7 +182,7 @@ class RepositoryPullRequest
       when Ticket::TRACKER_GUS
         label = referenced_ticket.external_id
       else
-        raise RuntimeError, "unhandleable ticket: #{referenced_ticket.inspect}"
+        raise "unhandleable ticket: #{referenced_ticket.inspect}"
       end
 
       body << "<a href=\"#{referenced_ticket.url}\">#{label}</a>"

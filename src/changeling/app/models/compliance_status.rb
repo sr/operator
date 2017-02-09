@@ -65,12 +65,10 @@ class ComplianceStatus
       end
 
       body << "<li>Changes reviewed and approved by the fellowing people: #{approvers.join(" ")}</li>"
+    elsif teams.size == 1
+      body << "<li>Review by a member of the #{teams[0]} team is required</li>"
     else
-      if teams.size == 1
-        body << "<li>Review by a member of the #{teams[0]} team is required</li>"
-      else
-        body << "<li>Review by a member of the fellowing teams is required: #{teams.join(" ")}</li>"
-      end
+      body << "<li>Review by a member of the fellowing teams is required: #{teams.join(" ")}</li>"
     end
 
     case @multipass.tests_state
