@@ -26,7 +26,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		comments             []*github.IssueComment
 		commitStatuses       map[string][]*github.CommitStatus
 		commitsSince         map[string][]*github.Commit
-		userTeams            map[string][]*github.Team
+		teamMembers          map[string][]string
 		expectedReplyComment *issueReplyCommentMatcher
 		expectedToMerge      bool
 	}{
@@ -283,12 +283,8 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitsSince: map[string][]*github.Commit{
 				"abc123": {},
 			},
-			userTeams: map[string][]*github.Team{
-				sreUser.Login: {
-					{
-						Slug: "site-reliability-engineers",
-					},
-				},
+			teamMembers: map[string][]string{
+				"site-reliability-engineers": []string{sreUser.Login},
 			},
 			expectedToMerge: true,
 		},
@@ -321,12 +317,8 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitsSince: map[string][]*github.Commit{
 				"abc123": {},
 			},
-			userTeams: map[string][]*github.Team{
-				developerUser.Login: {
-					{
-						Slug: "developers",
-					},
-				},
+			teamMembers: map[string][]string{
+				"developers": []string{developerUser.Login},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
 				Context: &jib.MergeReplyCommentContext{
@@ -348,7 +340,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			},
 			CommitStatuses: tc.commitStatuses,
 			CommitsSince:   tc.commitsSince,
-			UserTeams:      tc.userTeams,
+			TeamMembers:    tc.teamMembers,
 		}
 		log := log.New(ioutil.Discard, "", 0)
 

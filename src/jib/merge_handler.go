@@ -209,32 +209,27 @@ func performStandardMerge(log *log.Logger, gh github.Client, context *mergeComma
 func performEmergencyMerge(log *log.Logger, gh github.Client, context *mergeCommandContext) error {
 	pr := context.PullRequest
 
-	teams, err := gh.GetUserTeams(pr.Org, context.Command.Comment.User.Login)
+	isMember, err := gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, emergencyMergeAuthorizedTeamSlugs)
 	if err != nil {
 		return err
 	}
 
-	for _, team := range teams {
-		for _, authorizedTeamSlug := range emergencyMergeAuthorizedTeamSlugs {
-			if team.Slug == authorizedTeamSlug {
-				// User is allowed to authorize an emergency merge
-				message, err := renderTemplate(mergeCommandCommitMessage, context)
-				if err != nil {
-					return err
-				}
-
-				err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
-				if err != nil {
-					return err
-				}
-
-				return nil
-			}
+	if isMember {
+		// User is allowed to authorize an emergency merge
+		message, err := renderTemplate(mergeCommandCommitMessage, context)
+		if err != nil {
+			return err
 		}
+
+		err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	// We've looped through all the authorized teams. User must not be
-	// authorized
+	// User is not authorized
 	body, err := renderTemplate(notAuthorizedToEmergencyMergeReply, context)
 	if err != nil {
 		return nil

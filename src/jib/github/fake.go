@@ -12,7 +12,7 @@ type FakeClient struct {
 	PermissionLevels map[string]PermissionLevel
 	CommitStatuses   map[string][]*CommitStatus
 	CommitsSince     map[string][]*Commit
-	UserTeams        map[string][]*Team
+	TeamMembers      map[string][]string
 
 	MergedPullRequests map[int]string
 	PostedComments     []*IssueReplyComment
@@ -71,12 +71,18 @@ func (c *FakeClient) GetCommitsSince(org, repo, sha string, since time.Time) ([]
 	}
 }
 
-func (c *FakeClient) GetUserTeams(org, login string) ([]*Team, error) {
-	if teams, ok := c.UserTeams[login]; ok {
-		return teams, nil
-	} else {
-		return nil, fmt.Errorf("no teams for user %s", login)
+func (c *FakeClient) IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error) {
+	for _, teamSlug := range teamSlugs {
+		if members, ok := c.TeamMembers[teamSlug]; ok {
+			for _, teamMember := range members {
+				if teamMember == login {
+					return true, nil
+				}
+			}
+		}
 	}
+
+	return false, nil
 }
 
 func (c *FakeClient) PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error {
