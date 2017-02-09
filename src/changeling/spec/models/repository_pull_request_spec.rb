@@ -110,6 +110,23 @@ RSpec.describe RepositoryPullRequest do
       .to_return(body: body, headers: { "Content-Type" => "text/html" })
   end
 
+  def stub_organization_teams(organization, teams)
+    teams_data = []
+    teams.keys.each_with_index do |slug, index|
+      teams_data << { id: index, slug: slug }
+    end
+
+    stub_request(:get, "#{Changeling.config.github_api_endpoint}/orgs/#{organization}/teams")
+      .to_return(body: JSON.dump(teams_data), headers: { "Content-Type" => "application/json" })
+
+    teams.each_with_index do |(_, members), index|
+      data = members.map { |member| { login: member } }
+
+      stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{index}/members")
+        .to_return(body: JSON.dump(data), headers: { "Content-Type" => "application/json" })
+    end
+  end
+
   describe "synchronizing ticket references" do
     it "creates a ticket references for JIRA tickets" do
       expect(@multipass.referenced_ticket).to eq(nil)
@@ -541,5 +558,20 @@ RSpec.describe RepositoryPullRequest do
 
       expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
     end
+  end
+
+  it "updates the github comment describing the status of the PR" do
+    Changeling.config.compliance_comment_enabled_repositories = [@repository.full_name]
+    @repository.repository_owners_files.create!(
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/ops"
+    )
+    stub_organization_teams("heroku", "ops": %w[alindeman sr])
+    stub_github_pull_request_comments([])
+    request = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+
+    @multipass.update_github_comment
+
+    expect(request).to have_been_made.once
   end
 end
