@@ -192,10 +192,14 @@ class RepositoryPullRequest
     body << "<ul>"
 
     teams.each do |team|
-      approver = nil # TODO(sr) ownership.approver_for_team(team)
+      approver = owners_collection.team_members(team.slug).detect do |user_login|
+        @multipass.peer_review_approvers.include?(user_login)
+      end
+
+      approver_link = "<a href=\"#{html_escape(Changeling.config.github_url)}/#{html_escape(approver)}\">@#{html_escape(approver)}</a>"
 
       if approver
-        body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver}</li>"
+        body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver_link}"
       else
         body << "<li>#{GLYPH_TODO} @#{team.slug}</li>"
       end
@@ -221,6 +225,10 @@ class RepositoryPullRequest
     end
 
     body << @multipass.status_description_html
+  end
+
+  def html_escape(s)
+    ERB::Util.html_escape(s)
   end
 
   def synchronize_github_pull_request

@@ -38,6 +38,10 @@ class PullRequestOwnersCollection
     end
   end
 
+  def team_members(team_name)
+    @github_teams.fetch(team_name)
+  end
+
   def load
     @users.clear
 
