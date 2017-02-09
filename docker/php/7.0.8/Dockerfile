@@ -5,7 +5,7 @@ ARG dist=el6
 ARG libzookeeper_version=3.4.6-1.pardot
 ARG git_version=2.6.4-1
 ARG php_version=7.0.8-1
-ARG php_packages="php-json php-common php-cli php-devel php php-mcrypt php-mbstring php-pdo php-xml php-xmlrpc php-imap php-gd php-tidy php-bcmath php-intl php-opcache php-mysqlnd php-process"
+ARG php_packages="php-json php-common php-cli php-devel php php-mcrypt php-mbstring php-pdo php-xml php-xmlrpc php-imap php-gd php-tidy php-bcmath php-intl php-opcache php-mysqlnd php-process php-ldap"
 ARG artifactory_host
 
 # PHP
