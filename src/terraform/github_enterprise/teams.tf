@@ -75,3 +75,9 @@ resource "github_team" "engineering-managers" {
   description = "Engineering Managers under Pardot Tech & Product"
   privacy     = "closed"
 }
+
+resource "github_team" "customer-centric-engineering" {
+  name        = "Customer Centric Engineering"
+  description = "Pardot Customer Centric Engineering (CCE)"
+  privacy     = "closed"
+}
