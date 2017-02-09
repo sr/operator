@@ -284,7 +284,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				"abc123": {},
 			},
 			teamMembers: map[string][]string{
-				"site-reliability-engineers": []string{sreUser.Login},
+				"site-reliability-engineers": {sreUser.Login},
 			},
 			expectedToMerge: true,
 		},
@@ -318,7 +318,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				"abc123": {},
 			},
 			teamMembers: map[string][]string{
-				"developers": []string{developerUser.Login},
+				"developers": {developerUser.Login},
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
 				Context: &jib.MergeReplyCommentContext{
