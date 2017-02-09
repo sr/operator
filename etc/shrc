@@ -2,16 +2,28 @@
 #/ Usage: . etc/shrc
 #/ Setup the shell environment for working with the BREAD repo.
 
-if [ -z "$BREAD" ]
-then echo "BREAD environment variable not set." 2>&1
-elif [ ! -d "$BREAD" ]
-then echo "BREAD point to a directory that does not exists: $BREAD" 2>&1
-else
-  GOPATH="$BREAD"
-  PATH="$GOPATH/bin:$PATH"
-  CDPATH=".:$GOPATH/src"
-  export BREAD GOPATH PATH CDPATH
+# Use the default (as of Go 1.8) GOPATH unless it is already set
+if [ -z "${GOPATH:-""}" ]; then
+    GOPATH="${HOME}/go"
+    PATH="${GOPATH}/bin:${PATH}"
+    export GOPATH PATH
 fi
+
+: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
+export BREAD
+
+# Add utilities to the PATH
+PATH="${BREAD}/bin:$PATH"
+export PATH
+
+# Quickly cd into any subtree within the BREAD repository:
+#
+#   $ pwd
+#   /Users/srozet
+#   $ cd jib
+#   /Users/srozet/go/src/git.dev.pardot.com/Pardot/bread/jib
+CDPATH=".:${BREAD}"
+export CDPATH
 
 # https://github.com/ingydotnet/git-subrepo#readme
 test -f "$BREAD/src/build/git-subrepo/.rc" &&

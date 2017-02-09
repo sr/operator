@@ -1,0 +1,13 @@
+{
+  "comment": "",
+  "ignore": "test",
+  "heroku": {
+    "install": [
+      "./cmd/..."
+    ],
+    "goVersion": "go1.7",
+    "sync": false
+  },
+  "package": [],
+  "rootPath": "git.dev.pardot.com/Pardot/bread"
+}

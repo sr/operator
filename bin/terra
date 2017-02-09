@@ -18,6 +18,8 @@ cd "$(dirname "$0")/.."
 : "${PROGRAM:="$(basename "$0")"}"
 : "${HIPCHAT_TOKEN:=""}"
 : "${USER:="$(whoami)"}"
+: "${BREAD:="$(pwd)"}"
+export BREAD
 
 # Prevent Terraform from making a remote API call to HashiCorp's servers.
 # See https://github.com/hashicorp/go-checkpoint for details.
@@ -48,11 +50,31 @@ TERRAFORM_PLAN="${TERRAFORM_DIR}/plan.out"
 TERRAFORM_VAR_FILE="${TERRAFORM_BASEDIR}/terraform.tfvars"
 export TERRAFORM_DIR TERRAFORM_PLAN TERRAFORM_PROJECT TERRAFORM_VAR_FILE
 
-go install -v github.com/hashicorp/terraform
+GOPATH="$BREAD" GOBIN="${BREAD}/bin" go install -v github.com/hashicorp/terraform
+
+if test -z "${GOPATH:-""}" || test "$BREAD" != "${GOPATH}/src/git.dev.pardot.com/Pardot/bread"; then
+    echo "Deploying Terraform changes requires a working Go environment:"
+    echo
+    echo "- Go must be installed. On macOS, 'brew install go' should just work"
+    echo "- The GOPATH environment variable must set. Example: export GOPATH=\$HOME"
+    echo "- This repository must be checked out at the correct location under the \$GOPATH directory"
+    echo
+    echo "To install Go and move the checkout to the correct location run the following commands:"
+    echo
+    echo "  brew install go"
+    echo "  export GOPATH=\$HOME BREAD=$(pwd)"
+    echo "  mkdir -p \$GOPATH/src/git.dev.pardot.com/Pardot"
+    echo "  cd .. && mv \$BREAD \$GOPATH/src/git.dev.pardot.com/Pardot/bread"
+    echo "  cd \$GOPATH/src/git.dev.pardot.com/Pardot/bread"
+    echo
+    echo "If you need assistance getting setup, please ask your question in the Build & Automate room on HipChat and feel free to mention @sr."
+    echo
+    exit 1
+fi
 
 case "$action" in
   apply|unlock|plan)
-    go install bread/cmd/terra2
+    go install -v ./cmd/terra2
 
     artifactoryenv="src/terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
@@ -70,12 +92,12 @@ case "$action" in
       -terraform-command "$action" \
       -terraform-dir "$TERRAFORM_BASEDIR" \
       -terraform-project "$TERRAFORM_PROJECT" \
-      -terraform-exec "$GOPATH/bin/terraform" \
+      -terraform-exec "${BREAD}/bin/terraform" \
       -terraform-plan "$TERRAFORM_PLAN" \
       -terraform-var-file "$TERRAFORM_VAR_FILE"
     ;;
   pull|push)
-    go install bread/cmd/breadsignal
+    go install -v ./cmd/breadsignal
 
     artifactoryenv="src/terraform/artifactory.env"
     if ! test -f "$artifactoryenv"; then
@@ -124,9 +146,9 @@ case "$action" in
     exit "$?"
     ;;
   validate)
-    cd src/terraform && make -s -f ../../etc/mk/terraform.mk validate
+    cd src/terraform && GOBIN="${BREAD}/bin" make -s -f ../../etc/mk/terraform.mk validate
     cd ../..
-    out="$(terraform fmt -write=false -list=true src/terraform)"
+    out="$("${BREAD}/bin/terraform" fmt -write=false -list=true src/terraform)"
     if [ -z "$out" ]; then
       exit 0
     else

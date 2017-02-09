@@ -17,6 +17,18 @@ export PATH
 : "${DEBUG:=""}"
 test -n "$DEBUG" && set -x
 
+if [ -z "${GOBIN:-""}" ]; then
+    GOBIN="$(mktemp -d)"
+    export GOBIN
+    trap 'rm -rf "$GOBIN"' EXIT
+
+    PATH="${GOBIN}:$PATH"
+    export PATH
+fi
+
+: "${GO_PREFIX:="git.dev.pardot.com/Pardot/bread"}"
+export GO_PREFIX
+
 project=""
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -62,11 +74,12 @@ if [ -z "$NOPULL" ]; then
 fi
 docker build $pullopts -f etc/docker/Dockerfile.build -t build/build .
 
-# Build citool
+# Build citool utility program
 docker run --rm -w /go \
-   -v "$BREAD:/go" \
+   -v "$GOBIN:/go/bin" \
+   -v "$BREAD:/go/src/${GO_PREFIX}" \
    build/build \
-   make -f etc/mk/golang.mk install-citool
+   go install -v "${GO_PREFIX}/cmd/citool"
 
 build_rubygem() {
     local gemname="$1"
@@ -215,14 +228,15 @@ case "$project" in
         fi
         ;;
     devenv)
-        mkdir -p "$BREAD/bin/darwin_amd64"
+        mkdir -p "${BREAD}/bin/darwin_amd64"
         docker run --rm -w /go \
-            -v "$BREAD/src:/go/src" \
-            -v "$BREAD/etc/mk:/go/etc/mk" \
-            -v "$BREAD/bin/darwin_amd64:/go/bin/darwin_amd64" \
-            -e "GOOS=darwin" -e "GOARCH=amd64" \
+            -v "${GOBIN}:/go/bin" \
+            -v "${BREAD}:/go/src/${GO_PREFIX}" \
+            -v "${BREAD}/bin/darwin_amd64:/go/bin/darwin_amd64" \
+            -e "GOOS=darwin" \
+            -e "GOARCH=amd64" \
             build/build \
-            make -f etc/mk/golang.mk install-devenv
+            go install -v "${GO_PREFIX}/cmd/devenv"
         ;;
     explorer)
         build-ruby "$project"
@@ -243,12 +257,15 @@ case "$project" in
         trap 'docker stop -t3 $ldapcontainer >/dev/null 2>&1' EXIT
 
         # Lint (first-party only) then build all Go code
-        docker run --rm -w /go -v "$BREAD:/go" --link "$ldapcontainer:ldap" \
+        docker run --rm -w /go \
+            -v "${GOBIN}:/go/bin" \
+            -v "$BREAD:/go/src/${GO_PREFIX}" \
+            --link "$ldapcontainer:ldap" \
             build/build \
-            make -f etc/mk/golang.mk
+            make -f "/go/src/${GO_PREFIX}/etc/mk/golang.mk"
 
         if [ -n "$CI" ]; then
-          pushd "bin"
+          pushd "$GOBIN"
           tarball="$(tarball-build "jiracleaner")"
           tarball_upload "$tarball" "true"
 
@@ -264,11 +281,10 @@ case "$project" in
           # Build static operatord binary for Linux
           docker run --rm -w /go \
               -v "/tmp:/tmp" \
-              -v "$BREAD/src:/go/src" \
-              -v "$BREAD/etc/mk:/go/etc/mk" \
-              -e TMPDIR=/tmp \
+              -v "$BREAD:/go/src/${GO_PREFIX}" \
+              -e "TMPDIR=/tmp" \
               build/build \
-              make -f etc/mk/operator.mk build-operatord
+              make -f "/go/src/${GO_PREFIX}/etc/mk/operator.mk" build-operatord
 
           # Build operatord container for deployment
           trap 'rm -f $BREAD/operatord' EXIT
@@ -349,8 +365,12 @@ case "$project" in
         fi
         ;;
     terraform)
-        docker run -e "GOPATH=/data" --rm -v "$BREAD:/data" build/build \
-            terra validate
+        docker run --rm -w /go \
+            -v "${GOBIN}:/go/bin" \
+            -v "$BREAD:/go/src/${GO_PREFIX}" \
+            -e "GOBIN=/go/bin" \
+            build/build \
+            "/go/src/${GO_PREFIX}/bin/terra" validate
 
         tarball="$(mktemp -t "bread-terraformXXXXX").tar"
         trap 'rm $tarball' EXIT

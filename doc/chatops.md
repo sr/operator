@@ -27,7 +27,7 @@ https://git.dev.pardot.com/Pardot/bread/tree/master/src/hal9000/spec/handlers
 
 ### Running HAL9000 locally
 
-HAL9000 requires [devenv](https://git.dev.pardot.com/Pardot/bread/tree/master/src/devenv). After installing devenv, move into the hal9000 root directory:
+HAL9000 requires [devenv](https://git.dev.pardot.com/Pardot/bread/tree/master). After installing devenv, move into the hal9000 root directory:
 
 `$ cd src/hal9000`
 
@@ -72,16 +72,16 @@ We also support implementing chat commands as  [gRPC](http://www.grpc.io/) metho
 
 Additionally, access to commands implemented this way is authorized based on LDAP group membership and allows to require 2FA (Two-factor Authentication) where needed. The ACL (Access Control List) is defined as code here:
 
-<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/bread.go#L35>
+<https://git.dev.pardot.com/Pardot/bread/blob/master/bread.go#L35>
 
 Note that commands implemented this way must be written in [Go](https://golang.org/), a statically compiled language. We may add support for other languages such as Java in the future.
 
 Documentation is rather sparse at this time, and reading the code is the best we have. The implementation of the `!deploy` command is a good starting point:
 
-<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/pb/deploy.proto>
-<https://git.dev.pardot.com/Pardot/bread/blob/master/src/bread/deploy.go>
+<https://git.dev.pardot.com/Pardot/bread/blob/master/pb/deploy.proto>
+<https://git.dev.pardot.com/Pardot/bread/blob/master/deploy.go>
 
-We also recommend reading `godoc bread`.
+We also recommend reading `godoc ./`.
 
 ### Running the chatops server locally
 
@@ -89,7 +89,7 @@ The gRPC server that exposes chatops commands is part of the `operatord` command
 
 To build the client and server, run:
 
-`$ go install -v bread/cmd/...`
+`$ go install -v ./cmd/...`
 
 If everything worked you should be able to run a development server like so:
 
@@ -110,7 +110,7 @@ Rich HTML-formatted messages are sent to the [BREAD Testing](hipchat://hipchat.d
 
 Use the normal Go tooling to run the tests:
 
-`$ go test -v bread/...`
+`$ go test -v ./...`
 
 To run the entire battery of tests, including various lint checks and whatnot, run:
 
