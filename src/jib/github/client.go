@@ -124,7 +124,7 @@ type Client interface {
 	GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error)
 	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
 	GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error)
-	GetUserTeams(org, login string) ([]*Team, error)
+	IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error)
 
 	MergePullRequest(org, repo string, number int, commitMessage string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
@@ -284,14 +284,38 @@ func (c *client) GetCommitsSince(org, repo, sha string, since time.Time) ([]*Com
 	return allCommits, nil
 }
 
-func (c *client) GetUserTeams(org, login string) ([]*Team, error) {
+func (c *client) IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error) {
+	teams, err := c.getTeams(org)
+	if err != nil {
+		return false, err
+	}
+
+	for _, team := range teams {
+		for _, teamSlug := range teamSlugs {
+			if team.Slug == teamSlug {
+				isMember, _, err := c.gh.Organizations.IsTeamMember(team.ID, login)
+				if err != nil {
+					return false, err
+				} else if isMember {
+					return true, nil
+				}
+
+				continue
+			}
+		}
+	}
+
+	return false, nil
+}
+
+func (c *client) getTeams(org string) ([]*Team, error) {
 	opt := &gogithub.ListOptions{
 		PerPage: githubMaxPerPage,
 	}
 
 	allTeams := []*Team{}
 	for {
-		teams, resp, err := c.gh.Organizations.ListUserTeams(opt)
+		teams, resp, err := c.gh.Organizations.ListTeams(org, opt)
 		if err != nil {
 			return nil, err
 		}
