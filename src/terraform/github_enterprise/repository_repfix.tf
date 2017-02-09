@@ -26,21 +26,9 @@ resource "github_team_repository" "repfix_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "repfix_engineering-managers" {
+resource "github_team_repository" "repfix_service-accounts-administrators" {
   repository = "${github_repository.repfix.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "repfix_site-reliability-engineers" {
-  repository = "${github_repository.repfix.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "repfix_service-accounts-admins" {
-  repository = "${github_repository.repfix.name}"
-  team_id    = "${github_team.service-accounts-admins.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 

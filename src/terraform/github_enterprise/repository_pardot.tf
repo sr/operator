@@ -44,21 +44,9 @@ resource "github_team_repository" "pardot_read-only-users" {
   permission = "pull"
 }
 
-resource "github_team_repository" "pardot_site-reliability-engineers" {
+resource "github_team_repository" "pardot_service-accounts-administrators" {
   repository = "${github_repository.pardot.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "pardot_engineering-managers" {
-  repository = "${github_repository.pardot.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "pardot_service-accounts-admins" {
-  repository = "${github_repository.pardot.name}"
-  team_id    = "${github_team.service-accounts-admins.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 

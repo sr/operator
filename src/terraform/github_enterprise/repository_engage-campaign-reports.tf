@@ -20,9 +20,9 @@ resource "github_team_repository" "engage-campaign-reports_service-accounts-writ
   permission = "push"
 }
 
-resource "github_team_repository" "engage-campaign-reports_service-accounts-admins" {
+resource "github_team_repository" "engage-campaign-reports_service-accounts-administrators" {
   repository = "${github_repository.engage-campaign-reports.name}"
-  team_id    = "${github_team.service-accounts-admins.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 
