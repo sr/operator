@@ -38,6 +38,12 @@ resource "github_team_repository" "repfix_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "repfix_service-accounts-admins" {
+  repository = "${github_repository.repfix.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "repfix_master" {
   repository = "${github_repository.repfix.name}"
   branch     = "master"

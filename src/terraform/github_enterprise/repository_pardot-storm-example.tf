@@ -31,3 +31,9 @@ resource "github_team_repository" "pardot-storm-example_service-accounts-write-o
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "pardot-storm-example_service-accounts-admins" {
+  repository = "${github_repository.pardot-storm-example.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

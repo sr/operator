@@ -38,6 +38,12 @@ resource "github_team_repository" "murdoc_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "murdoc_service-accounts-admins" {
+  repository = "${github_repository.murdoc.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "murdoc_master" {
   repository = "${github_repository.murdoc.name}"
   branch     = "master"

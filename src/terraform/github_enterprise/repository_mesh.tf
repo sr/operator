@@ -38,6 +38,12 @@ resource "github_team_repository" "mesh_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "mesh_service-accounts-admins" {
+  repository = "${github_repository.mesh.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "mesh_master" {
   repository = "${github_repository.mesh.name}"
   branch     = "master"

@@ -38,6 +38,12 @@ resource "github_team_repository" "internal-api_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "internal-api_service-accounts-admins" {
+  repository = "${github_repository.internal-api.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "internal-api_master" {
   repository = "${github_repository.internal-api.name}"
   branch     = "master"

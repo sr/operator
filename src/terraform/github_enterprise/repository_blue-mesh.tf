@@ -32,6 +32,12 @@ resource "github_team_repository" "blue-mesh_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "blue-mesh_service-accounts-admins" {
+  repository = "${github_repository.blue-mesh.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "blue-mesh_master" {
   repository = "${github_repository.blue-mesh.name}"
   branch     = "master"

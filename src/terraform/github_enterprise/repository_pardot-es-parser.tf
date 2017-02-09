@@ -31,3 +31,9 @@ resource "github_team_repository" "pardot-es-parser_site-reliability-engineers" 
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "pardot-es-parser_service-accounts-admins" {
+  repository = "${github_repository.pardot-es-parser.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

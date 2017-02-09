@@ -31,3 +31,9 @@ resource "github_team_repository" "cimta-topology_site-reliability-engineers" {
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "cimta-topology_service-accounts-admins" {
+  repository = "${github_repository.cimta-topology.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

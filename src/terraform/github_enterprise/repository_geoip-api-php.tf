@@ -37,3 +37,9 @@ resource "github_team_repository" "geoip-api-php_site-reliability-engineers" {
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "geoip-api-php_service-accounts-admins" {
+  repository = "${github_repository.geoip-api-php.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

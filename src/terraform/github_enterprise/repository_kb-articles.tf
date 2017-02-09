@@ -44,6 +44,12 @@ resource "github_team_repository" "kb-articles_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "kb-articles_service-accounts-admins" {
+  repository = "${github_repository.kb-articles.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "kb-articles_master" {
   repository = "${github_repository.kb-articles.name}"
   branch     = "master"

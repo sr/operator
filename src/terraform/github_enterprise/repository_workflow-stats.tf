@@ -38,6 +38,12 @@ resource "github_team_repository" "workflow-stats_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "workflow-stats_service-accounts-admins" {
+  repository = "${github_repository.workflow-stats.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "workflow-stats_master" {
   repository = "${github_repository.workflow-stats.name}"
   branch     = "master"

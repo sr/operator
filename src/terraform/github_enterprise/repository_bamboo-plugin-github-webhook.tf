@@ -31,3 +31,9 @@ resource "github_team_repository" "bamboo-plugin-github-webhook_service-accounts
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "bamboo-plugin-github-webhook_service-accounts-admins" {
+  repository = "${github_repository.bamboo-plugin-github-webhook.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

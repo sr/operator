@@ -64,7 +64,7 @@ func run() error {
 	flags.StringVar(&config.githubUser, "github-user", "", "GitHub username")
 	flags.StringVar(&config.githubAPIToken, "github-api-token", "", "GitHub API token")
 	flags.StringVar(&config.githubOrg, "github-org", "", "GitHub organization name")
-	flags.DurationVar(&config.pollDuration, "poll-duration", 1*time.Minute, "Duration between polls of open pull requests")
+	flags.DurationVar(&config.pollDuration, "poll-duration", 30*time.Second, "Duration between polls of open pull requests")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))

@@ -44,6 +44,12 @@ resource "github_team_repository" "chef_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "chef_service-accounts-admins" {
+  repository = "${github_repository.chef.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "chef_master" {
   repository = "${github_repository.chef.name}"
   branch     = "master"

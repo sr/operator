@@ -32,6 +32,12 @@ resource "github_team_repository" "docker-library_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "docker-library_service-accounts-admins" {
+  repository = "${github_repository.docker-library.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "docker-library_master" {
   repository = "${github_repository.docker-library.name}"
   branch     = "master"

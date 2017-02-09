@@ -37,3 +37,9 @@ resource "github_team_repository" "pardot-storm_site-reliability-engineers" {
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "pardot-storm_service-accounts-admins" {
+  repository = "${github_repository.pardot-storm.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

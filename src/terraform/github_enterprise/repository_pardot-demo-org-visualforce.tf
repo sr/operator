@@ -31,3 +31,9 @@ resource "github_team_repository" "pardot-demo-org-visualforce_service-accounts-
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "pardot-demo-org-visualforce_service-accounts-admins" {
+  repository = "${github_repository.pardot-demo-org-visualforce.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

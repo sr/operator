@@ -37,3 +37,9 @@ resource "github_team_repository" "provisioning-service_service-accounts-write-o
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
 }
+
+resource "github_team_repository" "provisioning-service_service-accounts-admins" {
+  repository = "${github_repository.provisioning-service.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

@@ -31,3 +31,9 @@ resource "github_team_repository" "poor-mans-asset-pipeline_engineering-managers
   team_id    = "${github_team.engineering-managers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "poor-mans-asset-pipeline_service-accounts-admins" {
+  repository = "${github_repository.poor-mans-asset-pipeline.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

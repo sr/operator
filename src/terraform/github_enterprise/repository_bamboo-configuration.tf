@@ -38,6 +38,12 @@ resource "github_team_repository" "bamboo-configuration_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "bamboo-configuration_service-accounts-admins" {
+  repository = "${github_repository.bamboo-configuration.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "bamboo-configuration_develop" {
   repository = "${github_repository.bamboo-configuration.name}"
   branch     = "develop"

@@ -31,3 +31,9 @@ resource "github_team_repository" "pardot-refocus_site-reliability-engineers" {
   team_id    = "${github_team.site-reliability-engineers.id}"
   permission = "admin"
 }
+
+resource "github_team_repository" "pardot-refocus_service-accounts-admins" {
+  repository = "${github_repository.pardot-refocus.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}

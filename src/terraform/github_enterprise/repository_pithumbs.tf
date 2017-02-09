@@ -38,6 +38,12 @@ resource "github_team_repository" "pithumbs_site-reliability-engineers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "pithumbs_service-accounts-admins" {
+  repository = "${github_repository.pithumbs.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "pithumbs_master" {
   repository = "${github_repository.pithumbs.name}"
   branch     = "master"

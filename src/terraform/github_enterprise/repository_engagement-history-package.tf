@@ -4,8 +4,8 @@ resource "github_repository" "engagement-history-package" {
   homepage_url  = ""
   private       = false
   has_issues    = true
-  has_wiki      = false
   has_downloads = true
+  has_wiki      = false
 }
 
 resource "github_team_repository" "engagement-history-package_developers" {
@@ -35,6 +35,12 @@ resource "github_team_repository" "engagement-history-package_engineering-manage
 resource "github_team_repository" "engagement-history-package_site-reliability-engineers" {
   repository = "${github_repository.engagement-history-package.name}"
   team_id    = "${github_team.site-reliability-engineers.id}"
+  permission = "admin"
+}
+
+resource "github_team_repository" "engagement-history-package_service-accounts-admins" {
+  repository = "${github_repository.engagement-history-package.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
   permission = "admin"
 }
 

@@ -32,6 +32,12 @@ resource "github_team_repository" "engagement-studio_engineering-managers" {
   permission = "admin"
 }
 
+resource "github_team_repository" "engagement-studio_service-accounts-admins" {
+  repository = "${github_repository.engagement-studio.name}"
+  team_id    = "${github_team.service-accounts-admins.id}"
+  permission = "admin"
+}
+
 resource "github_branch_protection" "engagement-studio_master" {
   repository = "${github_repository.engagement-studio.name}"
   branch     = "master"
