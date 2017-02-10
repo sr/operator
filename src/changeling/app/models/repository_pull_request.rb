@@ -190,7 +190,7 @@ class RepositoryPullRequest
       body << "<a href=\"#{referenced_ticket.url}\">#{label}</a>"
     end
 
-    body << "<p>This pull request requires peer review and approval from a member of the fellowing team(s):</p>"
+    body << "<p>This pull request requires peer review and approval from a member of the following team(s):</p>"
     body << "<ul>"
 
     teams.each do |team|
@@ -211,7 +211,7 @@ class RepositoryPullRequest
 
     body << "<details>"
     body << "<summary>Peer review and compliance details</summary>"
-    body << "<p>Reviewers were automatically determined based on the fellowing <code>OWNERS</code> files:</p>"
+    body << "<p>Reviewers were automatically determined based on the following <code>OWNERS</code> files:</p>"
     body << "<ul>"
 
     owners_files.each do |owner_file|

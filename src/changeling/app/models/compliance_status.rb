@@ -64,11 +64,11 @@ class ComplianceStatus
         "<a href=\"#{html_escape(Changeling.config.github_url + "/" + approver)}\">@#{html_escape(approver)}</a>"
       end
 
-      body << "<li>Changes reviewed and approved by the fellowing people: #{approvers.join(" ")}</li>"
+      body << "<li>Changes reviewed and approved by the following people: #{approvers.join(" ")}</li>"
     elsif teams.size == 1
       body << "<li>Review by a member of the #{teams[0]} team is required</li>"
     else
-      body << "<li>Review by a member of the fellowing teams is required: #{teams.join(" ")}</li>"
+      body << "<li>Review by a member of the following teams is required: #{teams.join(" ")}</li>"
     end
 
     case @multipass.tests_state
