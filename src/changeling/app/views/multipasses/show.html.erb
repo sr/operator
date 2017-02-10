@@ -1,6 +1,7 @@
 <%- if Changeling.config.pardot? %>
 <p>←  <%= link_to "Go back to listing", "/" %></p>
 <%- end %>
+
 <h1 class="title">
 <%- if Changeling.config.heroku? %>
   <%= @multipass.title || "Multipass #{truncate(@multipass.id.to_s, length: 11)}" %> (<%= link_to "PR##{@multipass.pull_request_number}", @multipass.reference_url %>)
@@ -29,16 +30,10 @@
     This <strong><%= @multipass.change_type %></strong> change has a <strong><%= @multipass.impact %></strong> impact with a <strong><%= @multipass.impact_probability %></strong> probability. It is <strong><% unless @multipass.testing %>un<% end %>tested</strong>.
   </div>
 <% end %>
-
-<%- else %>
+<% end %>
 
 <div class="row description purple-box u-padding-Al">
-<%
-  status = ComplianceStatus.new(@multipass)
-  pull = RepositoryPullRequest.new(@multipass)
-%>
-
-<% if status.complete? %>
+<% if @multipass.complete? %>
 
   <%= tooltip "Complete" do %>
   <i class='complete glyphicon glyphicon-ok'></i>
@@ -49,40 +44,11 @@
 
   <%= tooltip "Pending" do %>
     <i class='incomplete glyphicon glyphicon-circle'></i>
-    This pull request does not meet all compliance requirements:
+    This pull request does not yet meet all compliance requirements:
   <% end %>
 
-  <p>
-  <ul>
-    <%- if !@multipass.peer_reviewed? %>
-      <%- if Changeling.config.owners_files_enabled? %>
-        <%- teams = @multipass.teams %>
-        <%- if teams.size == 1 %>
-          <li>Review by a member of the <%= link_to "@#{teams[0].slug}", teams[0].url %> team is required</li>
-        <%- else %>
-          <li>Review by a member of the fellowing teams is needed: <% @multipass.teams.map { |t| %><%= link_to "@#{t.slug}", t.url %> <% } %></li>
-        <%- end %>
-      <%- else %>
-        <li>The pull request has not been peer reviewed</li>
-      <%- end %>
-    <%- end %>
+  <%=raw @multipass.status_description_html %>
 
-    <%- referenced_ticket = pull.referenced_ticket %>
-    <%- if referenced_ticket.nil? %>
-      <li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>
-    <%- elsif !referenced_ticket.open? %>
-      <li>The referenced ticket (<%= referenced_ticket.external_id %>) is not open</li>
-    <%- end %>
-
-    <%- if @multipass.tests_state == RepositoryCommitStatus::PENDING %>
-      <li>The automated tests have not yet completed</li>
-    <%- elsif @multipass.tests_state != RepositoryCommitStatus::SUCCESS %>
-      <li>The automated tests have failed</li>
-    <%- end %>
-  </ul>
-  </p>
-
-<% end %>
 <% end %>
 
 <%- if Changeling.config.heroku? -%>

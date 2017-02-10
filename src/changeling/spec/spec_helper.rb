@@ -22,6 +22,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Changeling.config.pardot = false
+    Changeling.config.compliance_comment_enabled_repositories = []
   end
 
   OmniAuth.config.test_mode = true
