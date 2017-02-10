@@ -30,6 +30,12 @@ class ChangelingConfig
     pardot?
   end
 
+  def compliance_comment_enabled_repositories
+    return @compliance_comment_enabled_repositories if defined?(@compliance_comment_enabled_repositories)
+    @compliance_comment_enabled_repositories = Array(ENV["CHANGELING_COMPLIANCE_COMMENT_ENABLED_REPOSITORIES"].split(","))
+  end
+  attr_writer :compliance_comment_enabled_repositories
+
   def page_title
     if pardot?
       "Pardot Compliance"
