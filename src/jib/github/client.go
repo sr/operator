@@ -418,18 +418,6 @@ func (c *client) CloseIssue(org, repo string, number int) error {
 	return err
 }
 
-func wrapRepository(org string, repository *gogithub.Repository) (*Repository, error) {
-	if repository.Name == nil {
-		return nil, fmt.Errorf("repository name was nil: %+v", repository)
-	}
-
-	wrapped := &Repository{
-		Org:  org,
-		Name: *repository.Name,
-	}
-	return wrapped, nil
-}
-
 func wrapCommitStatus(status *gogithub.RepoStatus) (*CommitStatus, error) {
 	if status.State == nil {
 		return nil, fmt.Errorf("status state was nil: %+v", status)

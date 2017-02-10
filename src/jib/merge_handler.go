@@ -2,9 +2,10 @@ package jib
 
 import (
 	"html/template"
-	"jib/github"
 	"log"
 	"strings"
+
+	"jib/github"
 )
 
 type MergeReplyCommentContext struct {
@@ -133,9 +134,8 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 		} else {
 			if context.Command.Name == "emergency-merge" {
 				return performEmergencyMerge(log, gh, context)
-			} else {
-				return performStandardMerge(log, gh, context)
 			}
+			return performStandardMerge(log, gh, context)
 		}
 	} else {
 		body, err := renderTemplate(unmergablePrReply, context)
