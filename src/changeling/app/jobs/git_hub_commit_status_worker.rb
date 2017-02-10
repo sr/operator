@@ -11,11 +11,6 @@ class GitHubCommitStatusWorker < ActiveJob::Base
       multipass.pending_github_commit_status!
     end
 
-    begin
-      multipass.update_github_comment
-    # rubocop:disable Lint/RescueException
-    rescue Exception
-      Raven.capture_exception($!)
-    end
+    multipass.update_github_comment
   end
 end
