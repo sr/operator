@@ -25,7 +25,7 @@
       "fingerprint": "7c051fd824209596b43578c796b1d7014900c953f89df14644be74ef47db20de",
       "message": "Unescaped model attribute",
       "file": "app/views/multipasses/show.html.erb",
-      "line": 101,
+      "line": 63,
       "link": "http://brakemanscanner.org/docs/warning_types/cross_site_scripting",
       "code": "HTML::Pipeline.new([HTML::Pipeline::MarkdownFilter, HTML::Pipeline::EmojiFilter], :gfm => true, :asset_root => \"/images\").call(Multipass.find(params[:id]).backout_plan)[:output].to_s",
       "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":24,"file":"app/controllers/multipasses_controller.rb"}],
@@ -97,13 +97,31 @@
     {
       "warning_type": "Cross Site Scripting",
       "warning_code": 2,
+      "fingerprint": "e1e91308706be8b288aff52089114ba37eca67cc92d99f242996cc1f41d00525",
+      "message": "Unescaped model attribute",
+      "file": "app/views/multipasses/show.html.erb",
+      "line": 50,
+      "link": "http://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Multipass.find(params[:id]).status_description_html",
+      "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":24,"file":"app/controllers/multipasses_controller.rb"}],
+      "location": {
+        "type": "template",
+        "template": "multipasses/show"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "Cross Site Scripting",
+      "warning_code": 2,
       "fingerprint": "ee7df5bac702e63ef52f960f4d2d620bd05e73f6a45322041b1ec45a6c1103d7",
       "message": "Unescaped model attribute",
       "file": "app/views/multipasses/_multipass_form.html.erb",
       "line": 77,
       "link": "http://brakemanscanner.org/docs/warning_types/cross_site_scripting",
       "code": "HTML::Pipeline.new([HTML::Pipeline::MarkdownFilter, HTML::Pipeline::EmojiFilter], :gfm => true, :asset_root => \"/images\").call(Multipass.find(params[:id]).backout_plan)[:output].to_s",
-      "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":24,"file":"app/controllers/multipasses_controller.rb"},{"type":"template","name":"multipasses/show","line":97,"file":"app/views/multipasses/show.html.erb"}],
+      "render_path": [{"type":"controller","class":"MultipassesController","method":"show","line":24,"file":"app/controllers/multipasses_controller.rb"},{"type":"template","name":"multipasses/show","line":59,"file":"app/views/multipasses/show.html.erb"}],
       "location": {
         "type": "template",
         "template": "multipasses/_multipass_form"
@@ -113,6 +131,6 @@
       "note": ""
     }
   ],
-  "updated": "2017-01-18 11:09:25 +0100",
+  "updated": "2017-02-10 10:13:08 +0100",
   "brakeman_version": "3.4.1"
 }
