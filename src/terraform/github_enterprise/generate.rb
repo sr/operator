@@ -58,11 +58,8 @@ EOS
         teams << Struct.new(:slug, :permission).new("service-accounts-write-only", "push")
       end
 
-      admins = %w[site-reliability-engineers engineering-managers]
-      admins.each do |team|
-        if !teams.detect { |t| t.slug == team }
-          teams << Struct.new(:slug, :permission).new(team, "admin")
-        end
+      if !teams.detect { |t| t.slug == "service-accounts-administrators" }
+        teams << Struct.new(:slug, :permission).new("service-accounts-administrators", "admin")
       end
 
       teams.each do |team|

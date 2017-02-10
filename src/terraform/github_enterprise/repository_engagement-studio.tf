@@ -20,15 +20,9 @@ resource "github_team_repository" "engagement-studio_service-accounts-write-only
   permission = "push"
 }
 
-resource "github_team_repository" "engagement-studio_site-reliability-engineers" {
+resource "github_team_repository" "engagement-studio_service-accounts-administrators" {
   repository = "${github_repository.engagement-studio.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "engagement-studio_engineering-managers" {
-  repository = "${github_repository.engagement-studio.name}"
-  team_id    = "${github_team.engineering-managers.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 

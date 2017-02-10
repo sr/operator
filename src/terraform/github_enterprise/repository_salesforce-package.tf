@@ -26,15 +26,9 @@ resource "github_team_repository" "salesforce-package_service-accounts-write-onl
   permission = "push"
 }
 
-resource "github_team_repository" "salesforce-package_engineering-managers" {
+resource "github_team_repository" "salesforce-package_service-accounts-administrators" {
   repository = "${github_repository.salesforce-package.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "salesforce-package_site-reliability-engineers" {
-  repository = "${github_repository.salesforce-package.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }
 

@@ -20,14 +20,8 @@ resource "github_team_repository" "mesh-sync-package_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "mesh-sync-package_site-reliability-engineers" {
+resource "github_team_repository" "mesh-sync-package_service-accounts-administrators" {
   repository = "${github_repository.mesh-sync-package.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "mesh-sync-package_engineering-managers" {
-  repository = "${github_repository.mesh-sync-package.name}"
-  team_id    = "${github_team.engineering-managers.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }

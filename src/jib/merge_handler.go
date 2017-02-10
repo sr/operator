@@ -1,7 +1,6 @@
 package jib
 
 import (
-	"fmt"
 	"html/template"
 	"jib/github"
 	"log"
@@ -12,24 +11,49 @@ type MergeReplyCommentContext struct {
 	InReplyToID int
 }
 
-var (
-	unmergablePrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} I can't merge this PR right now because the pull request is not in a mergeable state.
+type mergeCommandContext struct {
+	Command     *Command
+	PullRequest *github.PullRequest
+}
 
-Please fix the issue and re-issue the /merge command and I'll get right to it.
+var (
+	mergeCommandCommitMessage = template.Must(template.New("").Parse(strings.TrimSpace(`
+Merge-requested-by: @{{.Command.Comment.User.Login}}
+`)))
+
+	unmergablePrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
+@{{.Command.Comment.User.Login}} I can't merge this PR right now because the pull request is not in a mergeable state.
+
+Please fix the issue and re-issue the {{.Command}} command and I'll get right to it.
 `)))
 
 	complianceStatusFailedPrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} I can't merge this PR right now because the compliance status check failed.
+@{{.Command.Comment.User.Login}} I can't merge this PR right now because the compliance status check failed.
 
-Please fix the issue and re-issue the /merge command and I'll get right to it.
+Please fix the issue and re-issue the {{.Command}} command and I'll get right to it.
 `)))
 
 	prCommitAfterMergeCommandReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.User.Login}} I didn't merge this PR because there was a commit created since the /merge command was issued.
+@{{.Command.Comment.User.Login}} I didn't merge this PR because there was a commit created since the /merge command was issued.
 
-If you still want to merge, re-issue the /merge command and I'll get right to it.
+If you still want to merge, re-issue the {{.Command}} command and I'll get right to it.
 `)))
+
+	notAuthorizedToEmergencyMergeReply = template.Must(template.New("").Parse(strings.TrimSpace(`
+@{{.Command.Comment.User.Login}} I didn't perform an emergency merge for this PR because you are not a member of one of the teams allowed to authorize emergency merges.
+
+If this pull request requires an emergency merge, please find someone on the app-on-call, engineering-managers, customer-centric-engineering, or site-reliability-engineers teams to issue the {{.Command}} command and I'll get right to it.
+`)))
+)
+
+var (
+	// Team slugs that are allowed to approve emergency changes
+	emergencyMergeAuthorizedTeamSlugs = []string{
+		"app-on-call",
+		"customer-centric-engineering",
+		"engineering-managers",
+		"site-reliability-engineers",
+	}
 )
 
 func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) error {
@@ -51,7 +75,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 	// Iterate from latest comment to earliest
 	for i := len(commands) - 1; i >= 0; i-- {
 		command := commands[i]
-		if command.Name == "merge" {
+		if command.Name == "merge" || command.Name == "emergency-merge" {
 			// TODO(alindeman): Enable when GitHub Enterprise supports this route.
 			// For now, it's acceptable to fall back to the fact
 			// that only fully compliant PRs can be merged in any case.
@@ -75,26 +99,29 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 		return nil
 	}
 
-	comment := latestMergeCommand.Comment
+	context := &mergeCommandContext{
+		Command:     latestMergeCommand,
+		PullRequest: pr,
+	}
+
 	if *pr.Mergeable {
-		commitsSinceCommand, err := gh.GetCommitsSince(pr.Org, pr.Repository, pr.HeadSHA, comment.CreatedAt)
+		commitsSinceCommand, err := gh.GetCommitsSince(pr.Org, pr.Repository, pr.HeadSHA, context.Command.Comment.CreatedAt)
 		if err != nil {
 			return err
 		}
 		commitsSinceCommand = filterCIAutomatedMerges(commitsSinceCommand)
 
-		// If the PR was updated after the /merge
-		// command was created, we must get the user to
-		// verify their intent again.
+		// If the PR was updated after the merge command was created, we
+		// must get the user to verify their intent again.
 		if len(commitsSinceCommand) > 0 {
-			body, err := renderTemplate(prCommitAfterMergeCommandReply, comment)
+			body, err := renderTemplate(prCommitAfterMergeCommandReply, context)
 			if err != nil {
 				return err
 			}
 
 			reply := &github.IssueReplyComment{
 				Context: &MergeReplyCommentContext{
-					InReplyToID: comment.ID,
+					InReplyToID: context.Command.Comment.ID,
 				},
 				Body: body,
 			}
@@ -104,52 +131,21 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 				return err
 			}
 		} else {
-			statuses, err := gh.GetCommitStatuses(pr.Org, pr.Repository, pr.HeadSHA)
-			if err != nil {
-				return err
-			}
-
-			complianceStatus := findComplianceStatus(statuses)
-			if complianceStatus == nil || complianceStatus.State == github.CommitStatusPending {
-				// Compliance check is unreported or pending;
-				// nothing to do until it has a firm result
-				return nil
-			}
-
-			if complianceStatus.State == github.CommitStatusSuccess {
-				message := fmt.Sprintf("Merge-requested-by: @%s", comment.User.Login)
-				err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
-				if err != nil {
-					return err
-				}
-			} else if complianceStatus.State == github.CommitStatusFailure {
-				body, err := renderTemplate(complianceStatusFailedPrReply, comment)
-				if err != nil {
-					return err
-				}
-
-				reply := &github.IssueReplyComment{
-					Context: &MergeReplyCommentContext{
-						InReplyToID: comment.ID,
-					},
-					Body: body,
-				}
-
-				err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
-				if err != nil {
-					return err
-				}
+			if context.Command.Name == "emergency-merge" {
+				return performEmergencyMerge(log, gh, context)
+			} else {
+				return performStandardMerge(log, gh, context)
 			}
 		}
 	} else {
-		body, err := renderTemplate(unmergablePrReply, comment)
+		body, err := renderTemplate(unmergablePrReply, context)
 		if err != nil {
 			return err
 		}
 
 		reply := &github.IssueReplyComment{
 			Context: &MergeReplyCommentContext{
-				InReplyToID: comment.ID,
+				InReplyToID: context.Command.Comment.ID,
 			},
 			Body: body,
 		}
@@ -158,6 +154,97 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func performStandardMerge(log *log.Logger, gh github.Client, context *mergeCommandContext) error {
+	pr := context.PullRequest
+
+	statuses, err := gh.GetCommitStatuses(pr.Org, pr.Repository, pr.HeadSHA)
+	if err != nil {
+		return err
+	}
+
+	complianceStatus := findComplianceStatus(statuses)
+	if complianceStatus == nil || complianceStatus.State == github.CommitStatusPending {
+		// Compliance check is unreported or pending;
+		// nothing to do until it has a firm result
+		return nil
+	}
+
+	if complianceStatus.State == github.CommitStatusSuccess {
+		message, err := renderTemplate(mergeCommandCommitMessage, context)
+		if err != nil {
+			return err
+		}
+
+		err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
+		if err != nil {
+			return err
+		}
+	} else if complianceStatus.State == github.CommitStatusFailure {
+		body, err := renderTemplate(complianceStatusFailedPrReply, context)
+		if err != nil {
+			return err
+		}
+
+		reply := &github.IssueReplyComment{
+			Context: &MergeReplyCommentContext{
+				InReplyToID: context.Command.Comment.ID,
+			},
+			Body: body,
+		}
+
+		err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func performEmergencyMerge(log *log.Logger, gh github.Client, context *mergeCommandContext) error {
+	pr := context.PullRequest
+
+	isMember, err := gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, emergencyMergeAuthorizedTeamSlugs)
+	if err != nil {
+		return err
+	}
+
+	if isMember {
+		// User is allowed to authorize an emergency merge
+		message, err := renderTemplate(mergeCommandCommitMessage, context)
+		if err != nil {
+			return err
+		}
+
+		err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	// User is not authorized
+	body, err := renderTemplate(notAuthorizedToEmergencyMergeReply, context)
+	if err != nil {
+		return nil
+	}
+
+	reply := &github.IssueReplyComment{
+		Context: &MergeReplyCommentContext{
+			InReplyToID: context.Command.Comment.ID,
+		},
+		Body: body,
+	}
+
+	err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+	if err != nil {
+		return err
 	}
 
 	return nil

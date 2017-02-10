@@ -26,20 +26,14 @@ resource "github_team_repository" "csrf-php_read-only-users" {
   permission = "pull"
 }
 
-resource "github_team_repository" "csrf-php_engineering-managers" {
-  repository = "${github_repository.csrf-php.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "csrf-php_site-reliability-engineers" {
-  repository = "${github_repository.csrf-php.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "csrf-php_service-accounts-write-only" {
   repository = "${github_repository.csrf-php.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
+}
+
+resource "github_team_repository" "csrf-php_service-accounts-administrators" {
+  repository = "${github_repository.csrf-php.name}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
+  permission = "admin"
 }

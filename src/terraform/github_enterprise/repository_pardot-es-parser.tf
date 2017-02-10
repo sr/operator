@@ -20,14 +20,8 @@ resource "github_team_repository" "pardot-es-parser_service-accounts-write-only"
   permission = "push"
 }
 
-resource "github_team_repository" "pardot-es-parser_engineering-managers" {
+resource "github_team_repository" "pardot-es-parser_service-accounts-administrators" {
   repository = "${github_repository.pardot-es-parser.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "pardot-es-parser_site-reliability-engineers" {
-  repository = "${github_repository.pardot-es-parser.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }

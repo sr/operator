@@ -14,20 +14,14 @@ resource "github_team_repository" "SFdeploy_developers" {
   permission = "push"
 }
 
-resource "github_team_repository" "SFdeploy_site-reliability-engineers" {
-  repository = "${github_repository.SFdeploy.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "SFdeploy_engineering-managers" {
-  repository = "${github_repository.SFdeploy.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "SFdeploy_service-accounts-write-only" {
   repository = "${github_repository.SFdeploy.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
+}
+
+resource "github_team_repository" "SFdeploy_service-accounts-administrators" {
+  repository = "${github_repository.SFdeploy.name}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
+  permission = "admin"
 }

@@ -100,6 +100,12 @@ type Commit struct {
 	Committer *User
 }
 
+type Team struct {
+	ID   int
+	Name string
+	Slug string
+}
+
 func Bool(b bool) *bool {
 	return &b
 }
@@ -118,6 +124,7 @@ type Client interface {
 	GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error)
 	GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error)
 	GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error)
+	IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error)
 
 	MergePullRequest(org, repo string, number int, commitMessage string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
@@ -275,6 +282,60 @@ func (c *client) GetCommitsSince(org, repo, sha string, since time.Time) ([]*Com
 	}
 
 	return allCommits, nil
+}
+
+func (c *client) IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error) {
+	teams, err := c.getTeams(org)
+	if err != nil {
+		return false, err
+	}
+
+	for _, team := range teams {
+		for _, teamSlug := range teamSlugs {
+			if team.Slug == teamSlug {
+				isMember, _, err := c.gh.Organizations.IsTeamMember(team.ID, login)
+				if err != nil {
+					return false, err
+				} else if isMember {
+					return true, nil
+				}
+
+				continue
+			}
+		}
+	}
+
+	return false, nil
+}
+
+func (c *client) getTeams(org string) ([]*Team, error) {
+	opt := &gogithub.ListOptions{
+		PerPage: githubMaxPerPage,
+	}
+
+	allTeams := []*Team{}
+	for {
+		teams, resp, err := c.gh.Organizations.ListTeams(org, opt)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, team := range teams {
+			wrapped, err := wrapTeam(team)
+			if err != nil {
+				return nil, err
+			}
+
+			allTeams = append(allTeams, wrapped)
+		}
+
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.Page = resp.NextPage
+	}
+
+	return allTeams, nil
 }
 
 func (c *client) MergePullRequest(org, repo string, number int, commitMessage string) error {
@@ -492,6 +553,23 @@ func wrapCommit(commit *gogithub.RepositoryCommit) (*Commit, error) {
 		Message:   *commit.Commit.Message,
 		Author:    author,
 		Committer: committer,
+	}
+	return wrapped, nil
+}
+
+func wrapTeam(team *gogithub.Team) (*Team, error) {
+	if team.ID == nil {
+		return nil, fmt.Errorf("team.ID was nil: %+v", team)
+	} else if team.Name == nil {
+		return nil, fmt.Errorf("team.Name was nil: %+v", team)
+	} else if team.Slug == nil {
+		return nil, fmt.Errorf("team.Slug was nil: %+v", team)
+	}
+
+	wrapped := &Team{
+		ID:   *team.ID,
+		Name: *team.Name,
+		Slug: *team.Slug,
 	}
 	return wrapped, nil
 }

@@ -8,20 +8,14 @@ resource "github_repository" "wax" {
   has_wiki      = false
 }
 
-resource "github_team_repository" "wax_engineering-managers" {
-  repository = "${github_repository.wax.name}"
-  team_id    = "${github_team.engineering-managers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "wax_site-reliability-engineers" {
-  repository = "${github_repository.wax.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
 resource "github_team_repository" "wax_service-accounts-write-only" {
   repository = "${github_repository.wax.name}"
   team_id    = "${github_team.service-accounts-write-only.id}"
   permission = "push"
+}
+
+resource "github_team_repository" "wax_service-accounts-administrators" {
+  repository = "${github_repository.wax.name}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
+  permission = "admin"
 }

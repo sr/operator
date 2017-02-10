@@ -26,14 +26,8 @@ resource "github_team_repository" "pardot-java-models_service-accounts-write-onl
   permission = "push"
 }
 
-resource "github_team_repository" "pardot-java-models_site-reliability-engineers" {
+resource "github_team_repository" "pardot-java-models_service-accounts-administrators" {
   repository = "${github_repository.pardot-java-models.name}"
-  team_id    = "${github_team.site-reliability-engineers.id}"
-  permission = "admin"
-}
-
-resource "github_team_repository" "pardot-java-models_engineering-managers" {
-  repository = "${github_repository.pardot-java-models.name}"
-  team_id    = "${github_team.engineering-managers.id}"
+  team_id    = "${github_team.service-accounts-administrators.id}"
   permission = "admin"
 }

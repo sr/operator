@@ -46,6 +46,12 @@ resource "github_team" "service-accounts-write-only" {
   privacy     = "secret"
 }
 
+resource "github_team" "service-accounts-administrators" {
+  name        = "Service Accounts administrators"
+  description = ""
+  privacy     = "secret"
+}
+
 resource "github_team" "tier-2-support" {
   name        = "Tier 2 Support"
   description = "Tier 2 Support"
@@ -67,5 +73,11 @@ resource "github_team" "site-reliability-engineers" {
 resource "github_team" "engineering-managers" {
   name        = "Engineering Managers"
   description = "Engineering Managers under Pardot Tech & Product"
+  privacy     = "closed"
+}
+
+resource "github_team" "customer-centric-engineering" {
+  name        = "Customer Centric Engineering"
+  description = "Pardot Customer Centric Engineering (CCE)"
   privacy     = "closed"
 }
