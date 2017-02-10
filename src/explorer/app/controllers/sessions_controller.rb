@@ -4,8 +4,7 @@ class SessionsController < ApplicationController
   # OmniAuth doesn't send us a CSRF token
   skip_before_action :verify_authenticity_token, only: [:create]
 
-  def new
-  end
+  def new; end
 
   def create
     target_url = session[:target_url]
@@ -26,8 +25,7 @@ class SessionsController < ApplicationController
     redirect_to root_url
   end
 
-  def unauthorized
-  end
+  def unauthorized; end
 
   def failure
     session.destroy
