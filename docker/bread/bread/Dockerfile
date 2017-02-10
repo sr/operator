@@ -16,7 +16,9 @@ VOLUME ["/data", "/go"]
 WORKDIR "/data"
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 00777 "$GOPATH"
 RUN \
-  curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
+  yum install -y openldap-servers && yum clean all \
+  && \
+    curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
   && \
     echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
   && \
