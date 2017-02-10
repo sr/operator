@@ -115,18 +115,27 @@ class RepositoryPullRequest
 
     @multipass.save!
     create_github_commit_status if create_github_status
+
+    if Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
+      update_github_comment
+    end
+
     set_github_labels
 
     @multipass
   end
 
+  def referenced_ticket
+    if @multipass.ticket_reference
+      @multipass.ticket_reference.ticket
+    end
+  end
+
+  private
+
   MAGIC_HTML_COMMENT = "<!-- compliance -->".freeze
 
   def update_github_comment
-    if !Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
-      return
-    end
-
     comments = github_client.issue_comments(
       repository.name_with_owner,
       number
@@ -157,13 +166,6 @@ class RepositoryPullRequest
     end
   end
 
-  def referenced_ticket
-    if @multipass.ticket_reference
-      @multipass.ticket_reference.ticket
-    end
-  end
-
-  private
 
   GLYPH_DONE = "✓".freeze
   GLYPH_TODO = "✗".freeze

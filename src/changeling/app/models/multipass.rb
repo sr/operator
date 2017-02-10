@@ -247,8 +247,6 @@ class Multipass < ActiveRecord::Base
     compliance_status.description_html
   end
 
-  delegate :update_github_comment, to: :repository_pull_request
-
   private
 
   def repository_pull_request

@@ -2,6 +2,7 @@
 class GitHubCommitStatusWorker < ActiveJob::Base
   def perform(id)
     multipass = Multipass.find(id)
+    return unless multipass
 
     if multipass.rejected?
       multipass.failure_github_commit_status!
@@ -10,7 +11,5 @@ class GitHubCommitStatusWorker < ActiveJob::Base
     else
       multipass.pending_github_commit_status!
     end
-
-    multipass.update_github_comment
   end
 end

@@ -567,10 +567,15 @@ RSpec.describe RepositoryPullRequest do
       content: "@heroku/ops"
     )
     stub_organization_teams("heroku", "ops": %w[alindeman sr])
-    stub_github_pull_request_comments([])
+    stub_jira_ticket("BREAD-1598")
+    stub_github_pull_request(title: "BREAD-1598")
+    stub_github_commit_status
+    stub_github_pull_request_reviews
+    stub_github_pull_request_comments
+    stub_github_pull_request_labels
     request = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
 
-    @multipass.update_github_comment
+    @multipass.synchronize
 
     expect(request).to have_been_made.once
   end
