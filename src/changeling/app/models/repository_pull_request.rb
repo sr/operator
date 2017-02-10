@@ -166,7 +166,6 @@ class RepositoryPullRequest
     end
   end
 
-
   GLYPH_DONE = "✓".freeze
   GLYPH_TODO = "✗".freeze
 
