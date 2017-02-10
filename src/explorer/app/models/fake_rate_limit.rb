@@ -3,8 +3,7 @@ class FakeRateLimit
     true
   end
 
-  def record_transaction
-  end
+  def record_transaction; end
 
   def resets_in
     3.minutes
