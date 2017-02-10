@@ -33,17 +33,15 @@ func (c *FakeClient) GetOpenPullRequests(org string) ([]*PullRequest, error) {
 func (c *FakeClient) GetIssueComments(org, repo string, number int) ([]*IssueComment, error) {
 	if comments, ok := c.IssueComments[number]; ok {
 		return comments, nil
-	} else {
-		return nil, fmt.Errorf("no pull request comments defined for %s/%s#%d", org, repo, number)
 	}
+	return nil, fmt.Errorf("no pull request comments defined for %s/%s#%d", org, repo, number)
 }
 
 func (c *FakeClient) GetUserPermissionLevel(org, repo, login string) (PermissionLevel, error) {
 	if permissionLevel, ok := c.PermissionLevels[login]; ok {
 		return permissionLevel, nil
-	} else {
-		return "", fmt.Errorf("no permission level defined for %s", login)
 	}
+	return "", fmt.Errorf("no permission level defined for %s", login)
 }
 
 func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessage string) error {
@@ -58,17 +56,15 @@ func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessag
 func (c *FakeClient) GetCommitStatuses(org, repo, ref string) ([]*CommitStatus, error) {
 	if statuses, ok := c.CommitStatuses[ref]; ok {
 		return statuses, nil
-	} else {
-		return nil, fmt.Errorf("no commit statuses for %s", ref)
 	}
+	return nil, fmt.Errorf("no commit statuses for %s", ref)
 }
 
 func (c *FakeClient) GetCommitsSince(org, repo, sha string, since time.Time) ([]*Commit, error) {
 	if commits, ok := c.CommitsSince[sha]; ok {
 		return commits, nil
-	} else {
-		return nil, fmt.Errorf("no commits since for %s", sha)
 	}
+	return nil, fmt.Errorf("no commits since for %s", sha)
 }
 
 func (c *FakeClient) IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error) {
