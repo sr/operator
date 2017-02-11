@@ -237,7 +237,14 @@ case "$project" in
         fi
         ;;
     golang)
-        docker run --rm -w /go -v "$BREAD:/go" build/build \
+        # Start a test LDAP server. This is used by test suite of the "bread" package
+        docker build $pullopts -f etc/docker/Dockerfile.ldap -t bread/ldap "$BREAD"
+        ldapcontainer="$(docker run -d -v "${BREAD}/etc/ldap.ldif:/data/ldap.ldif" bread/ldap)"
+        trap 'docker stop -t3 $ldapcontainer >/dev/null 2>&1' EXIT
+
+        # Lint (first-party only) then build all Go code
+        docker run --rm -w /go -v "$BREAD:/go" --link "$ldapcontainer:ldap" \
+            build/build \
             make -f etc/mk/golang.mk
 
         if [ -n "$CI" ]; then
@@ -253,6 +260,28 @@ case "$project" in
           tarball="$(tarball-build "citool")"
           tarball_upload "$tarball" "true"
           popd
+
+          # Build static operatord binary for Linux
+          docker run --rm -w /go \
+              -v "/tmp:/tmp" \
+              -v "$BREAD/src:/go/src" \
+              -v "$BREAD/etc/mk:/go/etc/mk" \
+              -e TMPDIR=/tmp \
+              build/build \
+              make -f etc/mk/operator.mk build-operatord
+
+          # Build operatord container for deployment
+          trap 'rm -f $BREAD/operatord' EXIT
+          cp /tmp/operatord_linux "$BREAD/operatord"
+          make -f etc/mk/operator.mk docker-build-operatord
+
+          # Push operatord Docker container and tarball to Artifactory
+          export CI_JOB="OP"
+          docker_push "operatord"
+          tarball="$(mktemp)"
+          trap 'rm -f "$tarball"' EXIT
+          extract_tarball "operatord" "$tarball" "/app:/"
+          tarball_upload "$tarball" "true"
         fi
         ;;
     hal9000)
@@ -263,47 +292,7 @@ case "$project" in
         fi
         ;;
     operator)
-        # Start the test LDAP server
-        make -f etc/mk/operator.mk docker-build-ldap
-        ldapc="operator_ldap_$$"
-        trap 'docker stop -t3 $ldapc >/dev/null 2>&1' EXIT
-        docker run --name "$ldapc" -d -v "$BREAD/etc/ldap.ldif:/data/ldap.ldif" bread/ldap >/dev/null
-
-        # Run the normal set of Go checks against the operatord command
-        docker run --rm -w /go \
-            -v "$BREAD/src:/go/src" \
-            -v "$BREAD/etc/mk:/go/etc/mk" \
-            -e PACKAGES=bread/cmd/operatord \
-            build/build \
-            make -f etc/mk/golang.mk
-
-        # Run the LDAP Authorizer tests
-        docker run --rm -w /go -v "$BREAD/src:/go/src" --link "$ldapc:ldap" \
-            build/build go test -v bread
-
-        # Build static operatord binary for Linux
-        docker run --rm -w /go \
-            -v "/tmp:/tmp" \
-            -v "$BREAD/src:/go/src" \
-            -v "$BREAD/etc/mk:/go/etc/mk" \
-            -e TMPDIR=/tmp \
-            build/build \
-            make -f etc/mk/operator.mk build-operatord
-
-        # Build operatord container for deployment
-        trap 'rm -f $BREAD/operatord' EXIT
-        cp /tmp/operatord_linux "$BREAD/operatord"
-        make -f etc/mk/operator.mk docker-build-operatord
-
-        # Push the container to Artifactory (CI-only)
-        if [ -n "$CI" ]; then
-            docker_push "${project}d"
-
-            tarball="$(mktemp)"
-            trap 'rm -f "$tarball"' EXIT
-            extract_tarball "${project}d" "$tarball" "/app:/"
-            tarball_upload "$tarball" "true"
-        fi
+        true
         ;;
     parbot)
         docker build $pullopts -f "$BREAD/src/parbot/Dockerfile" -t parbot_app "$BREAD/src/parbot"
