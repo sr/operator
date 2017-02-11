@@ -31,7 +31,7 @@ install-citool:
 	$(GO) install -v $$($(GO) list citool/...)
 
 deadleaves: $(DEADLEAVES)
-	@ out="$$($< 2>&1 | grep -Ev '(github.com/go-swagger/go-swagger|github.com/hashicorp/terraform|^github.com/paybyphone/terraform-provider-acme|^bread/swagger|^(bread|devenv|citool)/vendor|^github.com/sr/operator/testing$')')"; \
+	@ out="$$($< 2>&1 | grep -Ev '(github.com/go-swagger/go-swagger|github.com/hashicorp/terraform|^bread/swagger|^(bread|devenv|citool)/vendor|^github.com/sr/operator/testing$')')"; \
 		if [ -n "$$out" ]; then \
 			echo "$$out"; \
 			exit 1; \
