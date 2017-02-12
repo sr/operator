@@ -57,13 +57,13 @@ var (
 	}
 )
 
-func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullRequest) error {
+func (s *Server) Merge(pr *github.PullRequest) error {
 	if pr.Mergeable == nil {
 		log.Printf("pull request '%s' has undetermined mergeability, skipping for now", pr)
 		return nil
 	}
 
-	comments, err := gh.GetIssueComments(pr.Org, pr.Repository, pr.Number)
+	comments, err := s.gh.GetIssueComments(pr.Org, pr.Repository, pr.Number)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 	// Only react to the latest authorized merge command, if there is one.
 	// Anything else would be very confusing to the user, as we might post
 	// multiple comments.
-	commands := ExtractCommands(comments, []string{gh.Username()})
+	commands := ExtractCommands(comments, []string{s.gh.Username()})
 	var latestMergeCommand *Command
 	// Iterate from latest comment to earliest
 	for i := len(commands) - 1; i >= 0; i-- {
@@ -81,7 +81,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 			// For now, it's acceptable to fall back to the fact
 			// that only fully compliant PRs can be merged in any case.
 			//
-			// permissionLevel, err := gh.GetUserPermissionLevel(pr.Org, pr.Repository, comment.User.Login)
+			// permissionLevel, err := s.gh.GetUserPermissionLevel(pr.Org, pr.Repository, comment.User.Login)
 			// if err != nil {
 			// 	log.Printf("error retrieving permission level for %s/%s, user %s: %v", pr.Org, pr.Repository, comment.User.Login, err)
 			// 	continue
@@ -106,7 +106,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 	}
 
 	if *pr.Mergeable {
-		commitsSinceCommand, err := gh.GetCommitsSince(pr.Org, pr.Repository, pr.HeadSHA, context.Command.Comment.CreatedAt)
+		commitsSinceCommand, err := s.gh.GetCommitsSince(pr.Org, pr.Repository, pr.HeadSHA, context.Command.Comment.CreatedAt)
 		if err != nil {
 			return err
 		}
@@ -127,15 +127,15 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 				Body: body,
 			}
 
-			err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+			err = s.gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 			if err != nil {
 				return err
 			}
 		} else {
 			if context.Command.Name == "emergency-merge" {
-				return performEmergencyMerge(log, gh, context)
+				return s.performEmergencyMerge(context)
 			}
-			return performStandardMerge(log, gh, context)
+			return s.performStandardMerge(context)
 		}
 	} else {
 		body, err := renderTemplate(unmergablePrReply, context)
@@ -150,7 +150,7 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 			Body: body,
 		}
 
-		err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+		err = s.gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 		if err != nil {
 			return err
 		}
@@ -159,10 +159,10 @@ func MergeCommandHandler(log *log.Logger, gh github.Client, pr *github.PullReque
 	return nil
 }
 
-func performStandardMerge(log *log.Logger, gh github.Client, context *mergeCommandContext) error {
+func (s *Server) performStandardMerge(context *mergeCommandContext) error {
 	pr := context.PullRequest
 
-	statuses, err := gh.GetCommitStatuses(pr.Org, pr.Repository, pr.HeadSHA)
+	statuses, err := s.gh.GetCommitStatuses(pr.Org, pr.Repository, pr.HeadSHA)
 	if err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func performStandardMerge(log *log.Logger, gh github.Client, context *mergeComma
 			return err
 		}
 
-		err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
+		err = s.gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 		if err != nil {
 			return err
 		}
@@ -197,7 +197,7 @@ func performStandardMerge(log *log.Logger, gh github.Client, context *mergeComma
 			Body: body,
 		}
 
-		err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+		err = s.gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 		if err != nil {
 			return err
 		}
@@ -206,10 +206,10 @@ func performStandardMerge(log *log.Logger, gh github.Client, context *mergeComma
 	return nil
 }
 
-func performEmergencyMerge(log *log.Logger, gh github.Client, context *mergeCommandContext) error {
+func (s *Server) performEmergencyMerge(context *mergeCommandContext) error {
 	pr := context.PullRequest
 
-	isMember, err := gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, emergencyMergeAuthorizedTeamSlugs)
+	isMember, err := s.gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, emergencyMergeAuthorizedTeamSlugs)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func performEmergencyMerge(log *log.Logger, gh github.Client, context *mergeComm
 			return err
 		}
 
-		err = gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
+		err = s.gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 		if err != nil {
 			return err
 		}
@@ -242,7 +242,7 @@ func performEmergencyMerge(log *log.Logger, gh github.Client, context *mergeComm
 		Body: body,
 	}
 
-	err = gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
+	err = s.gh.PostIssueComment(pr.Org, pr.Repository, pr.Number, reply)
 	if err != nil {
 		return err
 	}

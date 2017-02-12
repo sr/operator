@@ -11,9 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"git.dev.pardot.com/Pardot/bread/jib/github"
-
 	"git.dev.pardot.com/Pardot/bread/jib"
+	"git.dev.pardot.com/Pardot/bread/jib/github"
 )
 
 type urlFlag struct {
@@ -90,13 +89,13 @@ func run() error {
 		return errors.New("required flag missing: github-base-url")
 	}
 
-	handlers := []jib.PullRequestHandler{
-		jib.InfoHandler,
-		jib.StaleHandler,
-		jib.MergeCommandHandler,
-	}
-	log := log.New(os.Stdout, "", log.LstdFlags)
 	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
+	jibServer := jib.New(log.New(os.Stdout, "", log.LstdFlags), gh)
+	handlers := []jib.PullRequestHandler{
+		jibServer.Info,
+		jibServer.Stale,
+		jibServer.Merge,
+	}
 
 	// TODO(alindeman): Implement a real webhook server
 	server := &http.Server{
@@ -113,8 +112,7 @@ func run() error {
 		} else {
 			for _, pr := range openPRs {
 				for _, handler := range handlers {
-					err := handler(log, gh, pr)
-					if err != nil {
+					if err := handler(pr); err != nil {
 						// An error in a handler is worrisome, but not fatal
 						// TODO(alindeman): report to sentry
 						fmt.Fprintf(os.Stderr, "error in %v handler: %v\n", handler, err)

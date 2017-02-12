@@ -345,9 +345,9 @@ func TestMergeCommandHandler(t *testing.T) {
 			TeamMembers:    tc.teamMembers,
 		}
 		log := log.New(ioutil.Discard, "", 0)
+		jiber := jib.New(log, client)
 
-		err := jib.MergeCommandHandler(log, client, tc.pullRequest)
-		if err != nil {
+		if err := jiber.Merge(tc.pullRequest); err != nil {
 			t.Fatal(err)
 		}
 
@@ -361,8 +361,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				t.Fatalf("expected 1 comment to be posted, but %d were posted", len(client.PostedComments))
 			}
 
-			err = assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0])
-			if err != nil {
+			if err := assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0]); err != nil {
 				t.Fatal(err)
 			}
 		} else if len(client.PostedComments) != 0 {
