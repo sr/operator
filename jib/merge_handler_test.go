@@ -7,9 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"git.dev.pardot.com/Pardot/bread/jib/github"
-
 	"git.dev.pardot.com/Pardot/bread/jib"
+	"git.dev.pardot.com/Pardot/bread/jib/github"
+)
+
+const (
+	complianceStatusContext = "compliance"
+	ciUserLogin             = "sa-bamboo"
 )
 
 func TestMergeCommandHandler(t *testing.T) {
@@ -20,7 +24,7 @@ func TestMergeCommandHandler(t *testing.T) {
 		Login: "site-reliability-engineer",
 	}
 	ciUser := &github.User{
-		Login: jib.CIUserLogin,
+		Login: ciUserLogin,
 	}
 
 	cases := []struct {
@@ -52,7 +56,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -83,7 +87,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -122,7 +126,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -153,7 +157,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusFailure,
 					},
 				},
@@ -193,7 +197,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -239,7 +243,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusSuccess,
 					},
 				},
@@ -277,7 +281,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusPending,
 					},
 				},
@@ -311,7 +315,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			commitStatuses: map[string][]*github.CommitStatus{
 				"abc123": {
 					{
-						Context: jib.ComplianceStatusContext,
+						Context: complianceStatusContext,
 						State:   github.CommitStatusPending,
 					},
 				},
@@ -345,7 +349,14 @@ func TestMergeCommandHandler(t *testing.T) {
 			TeamMembers:    tc.teamMembers,
 		}
 		log := log.New(ioutil.Discard, "", 0)
-		jiber := jib.New(log, client)
+		jiber := jib.New(log, client, &jib.Config{
+			ComplianceStatusContext:        "compliance",
+			CIUserLogin:                    "sa-bamboo",
+			CIAutomatedMergeMessageMatcher: regexp.MustCompile(`\A\[ci\] Automated branch merge`),
+			EmergencyMergeAuthorizedTeams: []string{
+				"site-reliability-engineers",
+			},
+		})
 
 		if err := jiber.Merge(tc.pullRequest); err != nil {
 			t.Fatal(err)

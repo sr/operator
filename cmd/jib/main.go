@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -28,6 +29,7 @@ func (f *urlFlag) Set(s string) error {
 	*f.URL = *url
 	return nil
 }
+
 func (f *urlFlag) String() string {
 	if f.URL == nil {
 		return ""
@@ -42,6 +44,7 @@ type config struct {
 	githubAPIToken string
 	githubOrg      string
 	pollDuration   time.Duration
+	jib            *jib.Config
 }
 
 func main() {
@@ -58,6 +61,18 @@ func run() error {
 			Host:   "git.dev.pardot.com",
 			Path:   "/api/v3/",
 		},
+		jib: &jib.Config{
+			ComplianceStatusContext:        "compliance",
+			CIUserLogin:                    "sa-bamboo",
+			CIAutomatedMergeMessageMatcher: regexp.MustCompile(`\A\[ci\] Automated branch merge`),
+			StaleMaxAge:                    24 * 60 * time.Hour,
+			EmergencyMergeAuthorizedTeams: []string{
+				"app-on-call",
+				"customer-centric-engineering",
+				"engineering-managers",
+				"site-reliability-engineers",
+			},
+		},
 	}
 	flags := flag.CommandLine
 	flags.IntVar(&config.port, "port", 8080, "Listen port for the web service")
@@ -66,6 +81,7 @@ func run() error {
 	flags.StringVar(&config.githubAPIToken, "github-api-token", "", "GitHub API token")
 	flags.StringVar(&config.githubOrg, "github-org", "", "GitHub organization name")
 	flags.DurationVar(&config.pollDuration, "poll-duration", 30*time.Second, "Duration between polls of open pull requests")
+	flags.DurationVar(&config.jib.StaleMaxAge, "stale-max-age", config.jib.StaleMaxAge, "Duration without an update after which pull requests are considered stale")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
 		k := strings.ToUpper(strings.Replace(f.Name, "-", "_", -1))
@@ -90,7 +106,7 @@ func run() error {
 	}
 
 	gh := github.NewClient(config.githubBaseURL, config.githubUser, config.githubAPIToken)
-	jibServer := jib.New(log.New(os.Stdout, "", log.LstdFlags), gh)
+	jibServer := jib.New(log.New(os.Stdout, "", log.LstdFlags), gh, config.jib)
 	handlers := []jib.PullRequestHandler{
 		jibServer.Info,
 		jibServer.Stale,

@@ -9,9 +9,6 @@ import (
 )
 
 var (
-	// Without an update in this duration, pull requests are considered stale
-	staleDuration = 24 * 60 * time.Hour
-
 	stalePrReply = template.Must(template.New("").Parse(strings.TrimSpace(`
 @{{.User.Login}} In an effort to keep our list of open pull requests reasonable, I have started automatically closing stale pull requests.
 
@@ -23,7 +20,7 @@ func (s *Server) Stale(pr *github.PullRequest) error {
 	if pr.State != github.IssueStateOpen {
 		// PR is not open; nothing to do
 		return nil
-	} else if time.Now().Sub(pr.UpdatedAt) < staleDuration {
+	} else if time.Now().Sub(pr.UpdatedAt) < s.config.StaleMaxAge {
 		// PR is not stale; nothing to do
 		return nil
 	}

@@ -5,28 +5,32 @@ import (
 	"html/template"
 	"log"
 	"regexp"
+	"time"
 
 	"git.dev.pardot.com/Pardot/bread/jib/github"
 )
 
-const (
-	ComplianceStatusContext = "compliance"
-	CIUserLogin             = "sa-bamboo"
-)
+type Server struct {
+	log    *log.Logger
+	gh     github.Client
+	config *Config
+}
 
-var (
-	CIAutomatedMergeMessageMatcher = regexp.MustCompile(`\A\[ci\] Automated branch merge`)
-)
+type Config struct {
+	ComplianceStatusContext        string
+	CIUserLogin                    string
+	CIAutomatedMergeMessageMatcher *regexp.Regexp
+	StaleMaxAge                    time.Duration
+	EmergencyMergeAuthorizedTeams  []string
+}
 
 type PullRequestHandler func(pr *github.PullRequest) error
 
-type Server struct {
-	log *log.Logger
-	gh  github.Client
-}
-
-func New(log *log.Logger, gh github.Client) *Server {
-	return &Server{log, gh}
+func New(log *log.Logger, gh github.Client, config *Config) *Server {
+	if config == nil {
+		config = &Config{}
+	}
+	return &Server{log, gh, config}
 }
 
 func (s *Server) Info(pr *github.PullRequest) error {
@@ -34,9 +38,9 @@ func (s *Server) Info(pr *github.PullRequest) error {
 	return nil
 }
 
-func findComplianceStatus(statuses []*github.CommitStatus) *github.CommitStatus {
+func (s *Server) findComplianceStatus(statuses []*github.CommitStatus) *github.CommitStatus {
 	for _, status := range statuses {
-		if status.Context == ComplianceStatusContext {
+		if status.Context == s.config.ComplianceStatusContext {
 			return status
 		}
 	}
@@ -54,10 +58,13 @@ func renderTemplate(t *template.Template, context interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-func filterCIAutomatedMerges(commits []*github.Commit) []*github.Commit {
+func (s *Server) filterCIAutomatedMerges(commits []*github.Commit) []*github.Commit {
+	if s.config.CIAutomatedMergeMessageMatcher == nil {
+		return commits
+	}
 	filtered := []*github.Commit{}
 	for _, commit := range commits {
-		if commit.Author == nil || commit.Author.Login != CIUserLogin || !CIAutomatedMergeMessageMatcher.MatchString(commit.Message) {
+		if commit.Author == nil || commit.Author.Login != s.config.CIUserLogin || !s.config.CIAutomatedMergeMessageMatcher.MatchString(commit.Message) {
 			filtered = append(filtered, commit)
 		}
 	}

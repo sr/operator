@@ -47,16 +47,6 @@ If this pull request requires an emergency merge, please find someone on the app
 `)))
 )
 
-var (
-	// Team slugs that are allowed to approve emergency changes
-	emergencyMergeAuthorizedTeamSlugs = []string{
-		"app-on-call",
-		"customer-centric-engineering",
-		"engineering-managers",
-		"site-reliability-engineers",
-	}
-)
-
 func (s *Server) Merge(pr *github.PullRequest) error {
 	if pr.Mergeable == nil {
 		log.Printf("pull request '%s' has undetermined mergeability, skipping for now", pr)
@@ -110,7 +100,7 @@ func (s *Server) Merge(pr *github.PullRequest) error {
 		if err != nil {
 			return err
 		}
-		commitsSinceCommand = filterCIAutomatedMerges(commitsSinceCommand)
+		commitsSinceCommand = s.filterCIAutomatedMerges(commitsSinceCommand)
 
 		// If the PR was updated after the merge command was created, we
 		// must get the user to verify their intent again.
@@ -167,7 +157,7 @@ func (s *Server) performStandardMerge(context *mergeCommandContext) error {
 		return err
 	}
 
-	complianceStatus := findComplianceStatus(statuses)
+	complianceStatus := s.findComplianceStatus(statuses)
 	if complianceStatus == nil || complianceStatus.State == github.CommitStatusPending {
 		// Compliance check is unreported or pending;
 		// nothing to do until it has a firm result
@@ -209,7 +199,7 @@ func (s *Server) performStandardMerge(context *mergeCommandContext) error {
 func (s *Server) performEmergencyMerge(context *mergeCommandContext) error {
 	pr := context.PullRequest
 
-	isMember, err := s.gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, emergencyMergeAuthorizedTeamSlugs)
+	isMember, err := s.gh.IsMemberOfAnyTeam(pr.Org, context.Command.Comment.User.Login, s.config.EmergencyMergeAuthorizedTeams)
 	if err != nil {
 		return err
 	}

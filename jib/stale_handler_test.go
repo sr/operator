@@ -60,7 +60,9 @@ func TestStaleHandler(t *testing.T) {
 			OpenPullRequests: []*github.PullRequest{tc.pullRequest},
 		}
 		log := log.New(ioutil.Discard, "", 0)
-		jiber := jib.New(log, client)
+		jiber := jib.New(log, client, &jib.Config{
+			StaleMaxAge: 24 * 60 * time.Hour,
+		})
 
 		if err := jiber.Stale(tc.pullRequest); err != nil {
 			t.Fatal(err)
