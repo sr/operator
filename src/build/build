@@ -190,7 +190,7 @@ case "$project" in
     canoe)
         build-ruby "$project"
 
-        file="${BREAD}/src/github.com/hashicorp/terraform/terraform/version.go"
+        file="${BREAD}/src/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
         vendored="$(
           grep "const Version " "$file" |
           sed -e 's/^.*"\(.*\)".*$/\1/'
