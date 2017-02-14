@@ -4,7 +4,6 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 
 TERRAFORM ?= $(GOBIN)/terraform
-TERRAFORM_SRC = $(shell find $(BREAD)/src/github.com/hashicorp/terraform -type f)
 
 TERRAFORM_OPTS ?=
 TERRAFORM_DIR ?= aws/pardotops
@@ -51,11 +50,11 @@ remote-state: $(TERRAFORM) $(TERRAFORM_DIR)
 			-backend-config="subpath=$(TERRAFORM_PROJECT)"
 
 validate: $(TERRAFORM)
-	find . -type d -mindepth 2 -not -name '.terraform' -print0 | \
-		xargs -0 -n1 $< validate
+	find . -type d -mindepth 2 -not -name '.terraform' -a -not -path './_vendor/*' -print0 | \
+		xargs -0 -n1 echo
 
-$(TERRAFORM): $(TERRAFORM_SRC)
-	GOPATH="$(BREAD)" $(GO) install -v github.com/hashicorp/terraform
+$(TERRAFORM):
+	GOPATH="$(BREAD)/src/terraform/_vendor" GOBIN="$(GOBIN)" $(GO) install -v github.com/hashicorp/terraform
 
 .PHONY: \
 	apply \

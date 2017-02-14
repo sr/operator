@@ -7,12 +7,12 @@ ERRCHECK = $(GOBIN)/errcheck
 INTERFACER = $(GOBIN)/interfacer
 UNUSED = $(GOBIN)/unused
 
-PACKAGES ?= $(shell $(GO) list ./... | grep -v vendor | grep -v github.com/hashicorp/terraform)
+PACKAGES ?= $(shell $(GO) list ./... | grep -v vendor)
 
 all: install test fmt lint vet errcheck interfacer unused
 
 install:
-	$(GO) install -v $$($(GO) list ./... | grep -v github.com/hashicorp/terraform)
+	$(GO) install -v $$($(GO) list ./...)
 
 test:
 	$(GO) test -race $(PACKAGES)
@@ -50,7 +50,7 @@ vet:
 
 errcheck: $(ERRCHECK)
 	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'bread/swagger|main-gen\.go|_test\.go')"; \
+			out="$$($< $$pkg | grep -v -E 'swagger|main-gen\.go|_test\.go')"; \
 			if [ -n "$$out" ]; then \
 				echo "$$out"; \
 				fail=true; \
