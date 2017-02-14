@@ -1,25 +1,13 @@
 class ChefDeliveryConfig
-  PRODUCTION = "production".freeze
-  DEV = "dev".freeze
-
   AWS = "ue1".freeze
   DFW = "dfw".freeze
   PHX = "phx".freeze
 
-  ENABLED = [AWS, PHX, DFW].freeze
-
   BREAD_ROOM = 42
   OPS_ROOM = 6
 
-  def enabled?(server)
-    case server.environment
-    when DEV
-      true
-    when PRODUCTION
-      ENABLED.include?(server.datacenter)
-    else
-      false
-    end
+  def enabled?(_server)
+    true
   end
 
   def knife_notifications_enabled?(_server)
