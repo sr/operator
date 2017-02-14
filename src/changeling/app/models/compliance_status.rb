@@ -1,6 +1,7 @@
 class ComplianceStatus
   def initialize(multipass)
     @multipass = multipass
+    @pull_request = RepositoryPullRequest.new(@multipass)
   end
 
   def update_complete
@@ -55,7 +56,7 @@ class ComplianceStatus
   def description_html
     body = "<ul>"
 
-    teams = @multipass.teams.map do |team|
+    teams = @pull_request.ownership_teams.map do |team|
       "<a href=\"#{html_escape(team.url)}\">@#{html_escape(team.slug)}</a>"
     end
 
@@ -116,7 +117,7 @@ class ComplianceStatus
   def adapter
     @adapter ||=
       if Changeling.config.pardot?
-        PardotComplianceStatus.new(@multipass)
+        PardotComplianceStatus.new(@multipass, @pull_request)
       else
         HerokuComplianceStatus.new(@multipass)
       end

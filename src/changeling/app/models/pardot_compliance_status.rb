@@ -1,6 +1,7 @@
 class PardotComplianceStatus
-  def initialize(multipass)
+  def initialize(multipass, pull_request)
     @multipass = multipass
+    @pull_request = pull_request
     @default = HerokuComplianceStatus.new(multipass)
   end
 
@@ -65,7 +66,7 @@ class PardotComplianceStatus
     end
 
     reviewers = @multipass.peer_review_approvers
-    owners = @multipass.owners
+    owners = @pull_request.ownership_users
 
     # Pardot repositories must have at last one OWNERS file at their roots
     # listing the teams that own them. This will eventually be enforced via

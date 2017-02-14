@@ -36,6 +36,10 @@ class RepositoryPullRequest
     github_repository.owner
   end
 
+  def repository_owners_files
+    github_repository.repository_owners_files
+  end
+
   def repository_name
     github_repository.name
   end
@@ -46,54 +50,7 @@ class RepositoryPullRequest
     url.to_s
   end
 
-  def reload
-    owners_collection.load
-    self
-  end
-
-  # Returns an Array of all the OWNERS files covering files being changed in
-  # this pull request
-  def owners_files
-    files = Set.new([])
-    directories = {}
-
-    repository.owners_files.each do |file|
-      directories[File.dirname(file.path_name)] = file
-    end
-
-    if directories.empty?
-      return []
-    end
-
-    # If the pull request doesn't have any change, return the root OWNERS file,
-    # or an empty Array if there is none
-    if @multipass.changed_files.empty?
-      return Array(directories["/"])
-    end
-
-    @multipass.changed_files.each do |file|
-      file.ascend do |path|
-        dirname = path.dirname.to_s
-
-        if directories.key?(dirname)
-          files.add(directories.fetch(dirname))
-        end
-      end
-    end
-
-    files.to_a
-  end
-
-  # Returns an Array of teams that own components affected by this pull request
-  def teams
-    owners_collection.teams
-  end
-
-  # Return the Array of team members, one per OWNERS file that is relevant to
-  # the files changed in this pull request
-  def owners
-    owners_collection.users
-  end
+  delegate :users, :teams, :owners_files, to: :ownership, prefix: true
 
   def github_url
     @multipass.reference_url
@@ -133,6 +90,10 @@ class RepositoryPullRequest
 
   private
 
+  def ownership
+    PullRequestOwnership.new(@multipass, self, github_client)
+  end
+
   MAGIC_HTML_COMMENT = "<!-- compliance -->".freeze
 
   def update_github_comment
@@ -170,7 +131,7 @@ class RepositoryPullRequest
   GLYPH_TODO = "✗".freeze
 
   def compliance_comment_body_html
-    if teams.size <= 0
+    if ownership_teams.size <= 0
       raise Repository::OwnersError, "could not determine any owner for this change"
     end
 
@@ -192,14 +153,11 @@ class RepositoryPullRequest
     body << "<p>This pull request requires peer review and approval from a member of the following team(s):</p>"
     body << "<ul>"
 
-    teams.each do |team|
-      approver = owners_collection.team_members(team.slug).detect do |user_login|
-        @multipass.peer_review_approvers.include?(user_login)
-      end
-
-      approver_link = "<a href=\"#{html_escape(Changeling.config.github_url)}/#{html_escape(approver)}\">@#{html_escape(approver)}</a>"
+    ownership_teams.each do |team|
+      approver = ownership.approver(team)
 
       if approver
+        approver_link = "<a href=\"#{html_escape(approver.url)}\">@#{html_escape(approver.login)}</a>"
         body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver_link}"
       else
         body << "<li>#{GLYPH_TODO} @#{team.slug}</li>"
@@ -213,7 +171,7 @@ class RepositoryPullRequest
     body << "<p>Reviewers were automatically determined based on the following <code>OWNERS</code> files:</p>"
     body << "<ul>"
 
-    owners_files.each do |owner_file|
+    ownership_owners_files.each do |owner_file|
       body << "<li><a href=\"#{owner_file.url}\"><code>#{owner_file.path_name}</code></a></li>"
     end
 
@@ -430,10 +388,6 @@ class RepositoryPullRequest
     when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end
-  end
-
-  def owners_collection
-    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
   end
 
   def github_client
