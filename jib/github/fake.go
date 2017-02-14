@@ -15,6 +15,7 @@ type FakeClient struct {
 	TeamMembers      map[string][]string
 
 	MergedPullRequests map[int]string
+	DeletedBranches    []string
 	PostedComments     []*IssueReplyComment
 	ClosedIssues       []int
 }
@@ -50,6 +51,11 @@ func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessag
 	}
 	c.MergedPullRequests[number] = commitMessage
 
+	return nil
+}
+
+func (c *FakeClient) EnsureBranchDeleted(org, repo, branch string) error {
+	c.DeletedBranches = append(c.DeletedBranches, branch)
 	return nil
 }
 
