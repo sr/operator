@@ -1,0 +1,29 @@
+common:
+  api_name: trace
+  api_version: v1
+  organization_name: google-cloud
+  proto_deps:
+    - google-common-protos
+  import_proto_path:
+    - ${REPOROOT}/googleapis
+  src_proto_path:
+    - ${REPOROOT}/googleapis/google/devtools/cloudtrace/v1
+  service_yaml:
+    - ${REPOROOT}/googleapis/google/devtools/cloudtrace/trace.yaml
+  gapic_api_yaml:
+    - ${REPOROOT}/googleapis/google/devtools/cloudtrace/v1/trace_gapic.yaml
+  output_dir: ${REPOROOT}/artman/output
+java:
+  final_repo_dir: ${REPOROOT}/google-cloud-java/google-cloud-trace
+  enable_batch_generation: True
+python:
+  final_repo_dir: ${REPOROOT}/artman/output/gcloud-python-trace
+ruby:
+  final_repo_dir: ${REPOROOT}/google-cloud-ruby/google-cloud-trace
+nodejs:
+  final_repo_dir: ${REPOROOT}/google-cloud-node/packages/trace
+php:
+  final_repo_dir: ${REPOROOT}/artman/output/gcloud-php-trace
+  enable_batch_generation: True
+go:
+  final_repo_dir: ${REPOROOT}/gapi-trace-go
