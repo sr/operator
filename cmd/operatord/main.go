@@ -259,7 +259,7 @@ func run(invoker operator.InvokerFunc) error {
 		if err != nil {
 			return err
 		}
-		const pkg = "git.dev.pardot.com/Pardot/bread"
+		const pkg = "bread"
 		if webhookHandler, err = bread.NewHipchatHandler(
 			context.Background(),
 			inst,
