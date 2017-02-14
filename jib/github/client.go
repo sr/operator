@@ -34,6 +34,7 @@ type PullRequest struct {
 	UpdatedAt time.Time
 
 	HeadSHA string
+	HeadRef string
 
 	// Mergeable is either true (mergeable), false (not mergeable), or null (not computed yet)
 	Mergeable *bool
@@ -127,6 +128,7 @@ type Client interface {
 	IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error)
 
 	MergePullRequest(org, repo string, number int, commitMessage string) error
+	DeleteBranch(org, repo, branch string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
 	CloseIssue(org, repo string, number int) error
 }
@@ -344,6 +346,21 @@ func (c *client) MergePullRequest(org, repo string, number int, commitMessage st
 	return err
 }
 
+func (c *client) DeleteBranch(org, repo, branch string) error {
+	resp, err := c.gh.Git.DeleteRef(org, repo, fmt.Sprintf("heads/%s", branch))
+	if err != nil {
+		if resp.StatusCode == 422 {
+			// "Reference does not exist"
+			// Already deleted, for idempotency, ignore error
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
+}
+
 func (c *client) PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error {
 	if comment.Context == nil {
 		return errors.New("comment context was nil")
@@ -445,6 +462,8 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		return nil, fmt.Errorf("pull request head was nil: %+v", pullRequest)
 	} else if pullRequest.Head.SHA == nil {
 		return nil, fmt.Errorf("pull request head SHA was nil: %+v", pullRequest)
+	} else if pullRequest.Head.Ref == nil {
+		return nil, fmt.Errorf("pull request head ref was nil: %+v", pullRequest)
 	} else if pullRequest.User == nil {
 		return nil, fmt.Errorf("pull request user was nil: %+v", pullRequest)
 	}
@@ -463,6 +482,7 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		Title:      *pullRequest.Title,
 		UpdatedAt:  *pullRequest.UpdatedAt,
 		HeadSHA:    *pullRequest.Head.SHA,
+		HeadRef:    *pullRequest.Head.Ref,
 		Mergeable:  pullRequest.Mergeable,
 	}
 	return wrapped, nil

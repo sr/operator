@@ -174,6 +174,11 @@ func (s *Server) performStandardMerge(context *mergeCommandContext) error {
 		if err != nil {
 			return err
 		}
+
+		err = s.gh.DeleteBranch(pr.Org, pr.Repository, pr.HeadRef)
+		if err != nil {
+			log.Printf("unable to delete branch '%s': %v", pr.HeadRef, err)
+		}
 	} else if complianceStatus.State == github.CommitStatusFailure {
 		body, err := renderTemplate(complianceStatusFailedPrReply, context)
 		if err != nil {
@@ -214,6 +219,11 @@ func (s *Server) performEmergencyMerge(context *mergeCommandContext) error {
 		err = s.gh.MergePullRequest(pr.Org, pr.Repository, pr.Number, message)
 		if err != nil {
 			return err
+		}
+
+		err = s.gh.DeleteBranch(pr.Org, pr.Repository, pr.HeadRef)
+		if err != nil {
+			log.Printf("unable to delete branch '%s': %v", pr.HeadRef, err)
 		}
 
 		return nil

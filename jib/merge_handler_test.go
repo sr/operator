@@ -367,6 +367,12 @@ func TestMergeCommandHandler(t *testing.T) {
 			t.Fatalf("expected merged = %v, but was %v", tc.expectedToMerge, merged)
 		}
 
+		if tc.expectedToMerge && len(client.DeletedBranches) != 1 {
+			t.Fatalf("expected 1 branch to be deleted, but %d were deleted", len(client.DeletedBranches))
+		} else if !tc.expectedToMerge && len(client.DeletedBranches) != 0 {
+			t.Fatalf("expected 0 branches to be deleted, but %d were deleted", len(client.DeletedBranches))
+		}
+
 		if tc.expectedReplyComment != nil {
 			if len(client.PostedComments) != 1 {
 				t.Fatalf("expected 1 comment to be posted, but %d were posted", len(client.PostedComments))
