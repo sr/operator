@@ -14,15 +14,8 @@
 /src/hal9000/.env
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
-/bin/*
-/pkg/
 .DS_Store
 *.tfstate.backup
 coverage
-!/bin/cibuild
-!/bin/dailyjob
-!/bin/deploy
-!/bin/godoc
-!/bin/terra
 .idea
 **/.idea

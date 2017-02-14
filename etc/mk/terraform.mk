@@ -4,7 +4,7 @@ GO ?= go
 GOBIN ?= $(GOPATH)/bin
 
 TERRAFORM ?= $(GOBIN)/terraform
-TERRAFORM_SRC = $(shell find $(GOPATH)/src/github.com/hashicorp/terraform -type f)
+TERRAFORM_SRC = $(shell find $(BREAD)/src/github.com/hashicorp/terraform -type f)
 
 TERRAFORM_OPTS ?=
 TERRAFORM_DIR ?= aws/pardotops
@@ -55,7 +55,7 @@ validate: $(TERRAFORM)
 		xargs -0 -n1 $< validate
 
 $(TERRAFORM): $(TERRAFORM_SRC)
-	$(GO) install github.com/hashicorp/terraform
+	GOPATH="$(BREAD)" $(GO) install -v github.com/hashicorp/terraform
 
 .PHONY: \
 	apply \

@@ -243,6 +243,10 @@ class Multipass < ActiveRecord::Base
     :user_is_rejector?,
     to: :compliance_status
 
+  def status_description_html
+    compliance_status.description_html
+  end
+
   private
 
   def repository_pull_request

@@ -115,6 +115,11 @@ class RepositoryPullRequest
 
     @multipass.save!
     create_github_commit_status if create_github_status
+
+    if Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
+      update_github_comment
+    end
+
     set_github_labels
 
     @multipass
@@ -128,8 +133,103 @@ class RepositoryPullRequest
 
   private
 
-  def owners_collection
-    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
+  MAGIC_HTML_COMMENT = "<!-- compliance -->".freeze
+
+  def update_github_comment
+    comments = github_client.issue_comments(
+      repository.name_with_owner,
+      number
+    )
+
+    compliance_comment = comments.detect do |comment|
+      if comment.user.login != Changeling.config.github_service_account_username
+        next
+      end
+
+      comment.body.include?(MAGIC_HTML_COMMENT)
+    end
+
+    if !compliance_comment
+      return github_client.add_comment(
+        repository.name_with_owner,
+        number,
+        compliance_comment_body_html
+      )
+    end
+
+    if compliance_comment.body != compliance_comment_body_html
+      return github_client.update_comment(
+        repository.name_with_owner,
+        compliance_comment.id,
+        compliance_comment_body_html
+      )
+    end
+  end
+
+  GLYPH_DONE = "✓".freeze
+  GLYPH_TODO = "✗".freeze
+
+  def compliance_comment_body_html
+    if teams.size <= 0
+      raise Repository::OwnersError, "could not determine any owner for this change"
+    end
+
+    body = "#{MAGIC_HTML_COMMENT}\n"
+
+    if referenced_ticket
+      case referenced_ticket.tracker
+      when Ticket::TRACKER_JIRA
+        label = "#{referenced_ticket.external_id} #{referenced_ticket.summary}"
+      when Ticket::TRACKER_GUS
+        label = referenced_ticket.external_id
+      else
+        raise "unhandleable ticket: #{referenced_ticket.inspect}"
+      end
+
+      body << "<a href=\"#{referenced_ticket.url}\">#{label}</a>"
+    end
+
+    body << "<p>This pull request requires peer review and approval from a member of the following team(s):</p>"
+    body << "<ul>"
+
+    teams.each do |team|
+      approver = owners_collection.team_members(team.slug).detect do |user_login|
+        @multipass.peer_review_approvers.include?(user_login)
+      end
+
+      approver_link = "<a href=\"#{html_escape(Changeling.config.github_url)}/#{html_escape(approver)}\">@#{html_escape(approver)}</a>"
+
+      if approver
+        body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver_link}"
+      else
+        body << "<li>#{GLYPH_TODO} @#{team.slug}</li>"
+      end
+    end
+
+    body << "</ul>"
+
+    body << "<details>"
+    body << "<summary>Peer review and compliance details</summary>"
+    body << "<p>Reviewers were automatically determined based on the following <code>OWNERS</code> files:</p>"
+    body << "<ul>"
+
+    owners_files.each do |owner_file|
+      body << "<li><a href=\"#{owner_file.url}\"><code>#{owner_file.path_name}</code></a></li>"
+    end
+
+    body << "</ul>"
+
+    if @multipass.complete?
+      body << "<p>#{GLYPH_DONE} This pull request meets all compliance requirements and is ready to be merged into the main branch</p>"
+    else
+      body << "<p>#{GLYPH_TODO} This pull request does not yet meet all compliance requirements</p>"
+    end
+
+    body << @multipass.status_description_html
+  end
+
+  def html_escape(s)
+    ERB::Util.html_escape(s)
   end
 
   def synchronize_github_pull_request
@@ -330,6 +430,10 @@ class RepositoryPullRequest
     when TICKET_REFERENCE_REGEXP
       Regexp.last_match(1)
     end
+  end
+
+  def owners_collection
+    @owners_collection ||= PullRequestOwnersCollection.new(self, github_client).load
   end
 
   def github_client

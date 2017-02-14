@@ -1,5 +1,4 @@
-FROM docker.dev.pardot.com/base/centos:6
-RUN yum install -y openldap-servers
+FROM docker.dev.pardot.com/base/bread/bread
 RUN rm -rf /etc/openldap/slapd.d
 EXPOSE 389
 VOLUME /data

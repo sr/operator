@@ -4,8 +4,8 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = https://github.com/sr/changeling
-	branch = pardot
+	remote = https://git.heroku.com/pardot-changeling-production.git
+	branch = master
 	commit = 65fa3477f2584e09d9b04e46d262fa59c18fff3c
 	parent = e43a53d3c5bbcfd0e77fc659a28a21b3cd34d645
 	cmdver = 0.3.0
