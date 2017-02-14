@@ -45,7 +45,7 @@ func TestStaleHandler(t *testing.T) {
 				UpdatedAt:  time.Now().Add(-61 * 24 * time.Hour),
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
-				Context: &jib.StaleReplyCommentContext{},
+				Context: nil,
 				BodyRegexps: []*regexp.Regexp{
 					regexp.MustCompile(`@user.*I have started automatically closing`),
 					regexp.MustCompile(`Please feel free to reopen`),
@@ -60,9 +60,11 @@ func TestStaleHandler(t *testing.T) {
 			OpenPullRequests: []*github.PullRequest{tc.pullRequest},
 		}
 		log := log.New(ioutil.Discard, "", 0)
+		jiber := jib.New(log, client, &jib.Config{
+			StaleMaxAge: 24 * 60 * time.Hour,
+		})
 
-		err := jib.StaleHandler(log, client, tc.pullRequest)
-		if err != nil {
+		if err := jiber.Stale(tc.pullRequest); err != nil {
 			t.Fatal(err)
 		}
 
@@ -83,8 +85,7 @@ func TestStaleHandler(t *testing.T) {
 				t.Fatalf("expected 1 comment to be posted, but %d were posted", len(client.PostedComments))
 			}
 
-			err = assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0])
-			if err != nil {
+			if err := assertIssueReplyMatches(tc.expectedReplyComment, client.PostedComments[0]); err != nil {
 				t.Fatal(err)
 			}
 		} else if len(client.PostedComments) != 0 {
