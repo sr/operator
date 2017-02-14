@@ -88,26 +88,6 @@ class Multipass < ActiveRecord::Base
     end
   end
 
-  # Returns a nested Array with one element per directory affected by this pull
-  # request, and the GitHub team(s) that owns them.
-  def owners
-    repository_pull_request.owners
-  end
-
-  def teams
-    repository_pull_request.teams
-  end
-
-  def repository_owners_file_url
-    [
-      Changeling.config.github_url,
-      repository_name,
-      "blob",
-      "master",
-      Repository::OWNERS_FILENAME
-    ].join("/")
-  end
-
   def pull_request_number
     if reference_url_path_parts.size == 5 && reference_url_path_parts[3] == "pull"
       reference_url_path_parts[4]

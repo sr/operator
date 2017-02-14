@@ -26,7 +26,14 @@ module Clients
 
     attr_reader :client
 
-    delegate :issue_comments, :add_comment, :update_comment, to: :client
+    delegate \
+      :issue_comments,
+      :add_comment,
+      :update_comment,
+      :issue_comments,
+      :team_members,
+
+      to: :client
 
     def organizations
       @client.organizations
@@ -43,32 +50,6 @@ module Clients
 
     def organization_teams(organization)
       @client.organization_teams(organization)
-    end
-
-    def team_members2(team_id)
-      @client.team_members(team_id)
-    end
-
-    # Returns an Array of users that are members of the given organization's teams
-    def team_members(organization, team_slugs)
-      team_ids = {}
-      users = Set.new([])
-
-      @client.organization_teams(organization).each do |team|
-        team_ids[team.slug] = team.id
-      end
-
-      team_slugs.each do |team|
-        if !team_ids.key?(team)
-          next
-        end
-
-        @client.team_members(team_ids.fetch(team)).each do |member|
-          users.add(member)
-        end
-      end
-
-      users.to_a
     end
 
     def compliance_status(name_with_owner, sha)

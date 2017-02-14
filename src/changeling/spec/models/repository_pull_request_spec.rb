@@ -13,6 +13,7 @@ RSpec.describe RepositoryPullRequest do
       Changeling.config.github_hostname,
       @repository.full_name
     )
+    stub_organization_teams("heroku", {})
     @multipass = Fabricate(:multipass,
       reference_url: reference_url,
       release_id: "deadbeef",
