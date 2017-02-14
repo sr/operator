@@ -353,9 +353,9 @@ func (c *client) EnsureBranchDeleted(org, repo, branch string) error {
 			// "Reference does not exist"
 			// Already deleted, for idempotency, ignore error
 			return nil
-		} else {
-			return err
 		}
+
+		return err
 	}
 
 	return nil
