@@ -54,7 +54,7 @@ func (c *FakeClient) MergePullRequest(org, repo string, number int, commitMessag
 	return nil
 }
 
-func (c *FakeClient) EnsureBranchDeleted(org, repo, branch string) error {
+func (c *FakeClient) DeleteBranch(org, repo, branch string) error {
 	c.DeletedBranches = append(c.DeletedBranches, branch)
 	return nil
 }

@@ -128,7 +128,7 @@ type Client interface {
 	IsMemberOfAnyTeam(org, login string, teamSlugs []string) (bool, error)
 
 	MergePullRequest(org, repo string, number int, commitMessage string) error
-	EnsureBranchDeleted(org, repo, branch string) error
+	DeleteBranch(org, repo, branch string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
 	CloseIssue(org, repo string, number int) error
 }
@@ -346,7 +346,7 @@ func (c *client) MergePullRequest(org, repo string, number int, commitMessage st
 	return err
 }
 
-func (c *client) EnsureBranchDeleted(org, repo, branch string) error {
+func (c *client) DeleteBranch(org, repo, branch string) error {
 	resp, err := c.gh.Git.DeleteRef(org, repo, fmt.Sprintf("heads/%s", branch))
 	if err != nil {
 		if resp.StatusCode == 422 {

@@ -175,7 +175,7 @@ func (s *Server) performStandardMerge(context *mergeCommandContext) error {
 			return err
 		}
 
-		err = s.gh.EnsureBranchDeleted(pr.Org, pr.Repository, pr.HeadRef)
+		err = s.gh.DeleteBranch(pr.Org, pr.Repository, pr.HeadRef)
 		if err != nil {
 			log.Printf("unable to delete branch '%s': %v", pr.HeadRef, err)
 		}
@@ -221,7 +221,7 @@ func (s *Server) performEmergencyMerge(context *mergeCommandContext) error {
 			return err
 		}
 
-		err = s.gh.EnsureBranchDeleted(pr.Org, pr.Repository, pr.HeadRef)
+		err = s.gh.DeleteBranch(pr.Org, pr.Repository, pr.HeadRef)
 		if err != nil {
 			log.Printf("unable to delete branch '%s': %v", pr.HeadRef, err)
 		}
