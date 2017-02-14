@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/sr/operator/protolog"
 
 	"git.dev.pardot.com/Pardot/bread/pb"
@@ -48,13 +49,14 @@ func NewEventHandler(logger protolog.Logger, config *EventHandlerConfig) http.Ha
 	if config.RequestTimeout != time.Duration(0) {
 		client.Timeout = config.RequestTimeout
 	}
-	return &eventHandler{logger, config, client}
+	return &eventHandler{logger, config, client, &jsonpb.Marshaler{}}
 }
 
 type eventHandler struct {
-	logger protolog.Logger
-	config *EventHandlerConfig
-	client *http.Client
+	logger  protolog.Logger
+	config  *EventHandlerConfig
+	client  *http.Client
+	jsonpbm *jsonpb.Marshaler
 }
 
 func (h *eventHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -201,12 +203,18 @@ func (h *eventHandler) handleGithub(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	ev.Payload = nil
-	h.logger.Info(ev)
+	var failure bool
 	for _, r := range ev.Forwarded {
 		if !(r.StatusCode >= 200 && r.StatusCode < 300) {
-			http.Error(w, "could not proxy to all endpoints", http.StatusInternalServerError)
-			return
+			failure = true
 		}
 	}
-	w.WriteHeader(http.StatusOK)
+	if failure {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	if err := h.jsonpbm.Marshal(w, ev); err != nil {
+		_, _ = fmt.Fprintf(w, "unable to encode proxy status response: %s", err)
+	}
 }

@@ -408,7 +408,7 @@ func TestGithub(t *testing.T) {
 		},
 		{
 			500,
-			"could not proxy to all endpoints",
+			`"statusCode":418}]`,
 			failMagicString,
 			func(req *http.Request) *http.Request {
 				req.URL.Path = "/github"
