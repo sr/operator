@@ -204,7 +204,9 @@ resource "aws_security_group" "appdev_vpc_default" {
 
     cidr_blocks = [
       "${aws_eip.appdev_bastion_eip.public_ip}/32",
+      "${aws_eip.appdev_bastion_2_eip.public_ip}/32",
       "${aws_instance.appdev_bastion.private_ip}/32",
+      "${aws_instance.appdev_bastion_2.private_ip}/32",
       "${aws_instance.appdev_tools_server.private_ip}/32",
       "${aws_instance.appdev_tools1-2_server.private_ip}/32",
     ]
@@ -352,15 +354,49 @@ resource "aws_instance" "appdev_bastion" {
   }
 }
 
+resource "aws_instance" "appdev_bastion_2" {
+  ami                         = "${var.centos_6_hvm_50gb_chefdev_ami}"
+  instance_type               = "t2.small"
+  key_name                    = "internal_apps"
+  subnet_id                   = "${aws_subnet.appdev_us_east_1d_dmz.id}"
+  vpc_security_group_ids      = ["${aws_security_group.appdev_sfdc_vpn_ssh.id}"]
+  private_ip                  = "172.26.220.44"
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = "50"
+    delete_on_termination = true
+  }
+
+  tags {
+    terraform = "true"
+    Name      = "pardot2-bastion1-2-ue1"
+  }
+}
+
 resource "aws_eip" "appdev_bastion_eip" {
   vpc      = true
   instance = "${aws_instance.appdev_bastion.id}"
+}
+
+resource "aws_eip" "appdev_bastion_2_eip" {
+  vpc      = true
+  instance = "${aws_instance.appdev_bastion_2.id}"
 }
 
 resource "aws_route53_record" "appdev_bastion_Arecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "pardot2-bastion1-1-ue1.${aws_route53_zone.dev_pardot_com.name}"
   records = ["${aws_eip.appdev_bastion_eip.public_ip}"]
+  type    = "A"
+  ttl     = "900"
+}
+
+resource "aws_route53_record" "appdev_bastion_2_Arecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "pardot2-bastion1-2-ue1.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["${aws_eip.appdev_bastion_2_eip.public_ip}"]
   type    = "A"
   ttl     = "900"
 }
