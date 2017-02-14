@@ -71,7 +71,10 @@ class RepositoryPullRequest
     end
 
     @multipass.save!
-    create_github_commit_status if create_github_status
+
+    if github_repository.compliance_enabled?
+      create_github_commit_status if create_github_status
+    end
 
     if Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
       update_github_comment
