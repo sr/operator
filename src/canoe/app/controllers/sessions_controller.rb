@@ -43,10 +43,23 @@ class SessionsController < ApplicationController
   end
 
   def destroy_phone_pairing
+    if current_user.phone.paired?
+      if !current_user.authenticate_phone(action: phone_auth_action)
+        flash[:alert] = "Phone authentication failed. Please make sure #{helpers.link_to("your phone is setup", "/auth/phone")} correctly."
+        return redirect_back(fallback_location: "/auth/phone")
+      end
+    end
+
     if !current_user.phone.new_record?
       current_user.phone.destroy!
     end
 
     redirect_to "/auth/phone"
+  end
+
+  private
+
+  def phone_auth_action
+    "Deploy #{current_project.name} to #{current_target.name}"
   end
 end
