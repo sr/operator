@@ -151,9 +151,7 @@ describe ComplianceStatus, "pardot" do
       patch: "+ exit 1"
     )
 
-    expect do
-      @multipass.peer_reviewed?
-    end.to raise_error(Repository::OwnersError)
+    expect(@multipass.peer_reviewed?).to eq(false)
 
     @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",

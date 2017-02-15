@@ -5,6 +5,10 @@ class ComplianceStatus
   end
 
   def update_complete
+    if Changeling.config.pardot?
+      return true
+    end
+
     @multipass.complete = complete?
     true
   end

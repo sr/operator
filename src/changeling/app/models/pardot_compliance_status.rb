@@ -68,13 +68,8 @@ class PardotComplianceStatus
     reviewers = @multipass.peer_review_approvers
     owners = @pull_request.ownership_users
 
-    # Pardot repositories must have at last one OWNERS file at their roots
-    # listing the teams that own them. This will eventually be enforced via
-    # a continuous linting process:
-    #
-    # https://jira.dev.pardot.com/browse/BREAD-1785
     if owners.empty?
-      raise Repository::OwnersError, "could not determine any owner for this change"
+      return false
     end
 
     # Returns true if at least one of the owners for each of the affected
