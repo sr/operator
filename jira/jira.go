@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"golang.org/x/net/context/ctxhttp"
@@ -21,12 +22,32 @@ type Issue struct {
 	Fields *Fields `json:"fields,omitempty"`
 }
 
+func (i *Issue) HTMLURL() string {
+	if i.Self == "" {
+		return ""
+	}
+	parsed, err := url.Parse(i.Self)
+	if err != nil {
+		return ""
+	}
+	parsed.Path = fmt.Sprintf("/browse/%s", i.Key)
+	return parsed.String()
+}
+
+func (i *Issue) StatusName() string {
+	if i == nil || i.Fields == nil || i.Fields.Status == nil {
+		return ""
+	}
+	return i.Fields.Status.Name
+}
+
 type Fields struct {
-	Project     *Project   `json:"project,omitempty"`
-	IssueType   *IssueType `json:"issue_type,omitempty"`
-	Updated     string     `json:"updated,omitempty"`
-	Summary     string     `json:"summary,omitempty"`
-	Description string     `json:"description,omitempty"`
+	Project     *Project     `json:"project,omitempty"`
+	IssueType   *IssueType   `json:"issue_type,omitempty"`
+	Updated     string       `json:"updated,omitempty"`
+	Summary     string       `json:"summary,omitempty"`
+	Description string       `json:"description,omitempty"`
+	Status      *IssueStatus `json:"status,omitempty"`
 }
 
 type Project struct {
@@ -34,6 +55,10 @@ type Project struct {
 }
 
 type IssueType struct {
+	Name string `json:"name,omitempty"`
+}
+
+type IssueStatus struct {
 	Name string `json:"name,omitempty"`
 }
 

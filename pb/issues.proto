@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package bread;
+
+import "github.com/sr/operator/operator.proto";
+
+option go_package = "breadpb";
+
+// Interact with the JIRA issues management software.
+service Issues {
+	// List in-progress issues assigned to the the current user
+	rpc Mine(MyIssuesRequest) returns (operator.Response);
+}
+
+message MyIssuesRequest {
+	operator.Request request = 1;
+}

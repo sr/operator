@@ -136,6 +136,39 @@ var cmd = operator.NewCommand(
 		},
 
 		{
+			Name:     "issues",
+			Synopsis: `Interact with the JIRA issues management software.`,
+			Methods: []operator.MethodCommand{
+				{
+					Name:     "mine",
+					Synopsis: `List in-progress issues assigned to the the current user`,
+					Flags:    []*flag.Flag{},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewIssuesClient(conn)
+						resp, err := client.Mine(
+							context.Background(),
+							&breadpb.MyIssuesRequest{
+								Request: ctx.Request,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+			},
+		},
+
+		{
 			Name:     "ping",
 			Synopsis: `Undocumented`,
 			Methods: []operator.MethodCommand{

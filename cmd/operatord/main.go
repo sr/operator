@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"git.dev.pardot.com/Pardot/bread"
+	"git.dev.pardot.com/Pardot/bread/jira"
 	"git.dev.pardot.com/Pardot/bread/pb"
 	"git.dev.pardot.com/Pardot/bread/pb/hal9000"
 
@@ -25,7 +26,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const grpcTimeout = 10 * time.Second
+const (
+	grpcTimeout        = 10 * time.Second
+	defaultJIRAProject = "BREAD"
+	defaultJIRAURL     = "https://jira.dev.pardot.com"
+)
 
 func mustParseURL(s string) *url.URL {
 	u, err := url.Parse(s)
@@ -36,9 +41,13 @@ func mustParseURL(s string) *url.URL {
 }
 
 type config struct {
-	afy   *bread.ArtifactoryConfig
-	canoe *bread.CanoeConfig
-	ecs   *bread.ECSConfig
+	afy          *bread.ArtifactoryConfig
+	canoe        *bread.CanoeConfig
+	ecs          *bread.ECSConfig
+	jiraURL      string
+	jiraUsername string
+	jiraPassword string
+	jiraProject  string
 
 	dev             bool
 	devRoomID       int
@@ -104,6 +113,10 @@ func run(invoker operator.InvokerFunc) error {
 	flags.StringVar(&config.canoe.URL, "canoe-url", "https://canoe.dev.pardot.com", "")
 	flags.StringVar(&config.canoe.APIKey, "canoe-api-key", "", "Canoe API key")
 	flags.StringVar(&config.ecs.AWSRegion, "ecs-aws-region", "us-east-1", "AWS Region")
+	flag.StringVar(&config.jiraURL, "jira-url", defaultJIRAURL, "URL of the JIRA installation.")
+	flag.StringVar(&config.jiraProject, "jira-project", defaultJIRAProject, "Key of the project to manage")
+	flag.StringVar(&config.jiraUsername, "jira-username", "", "JIRA username")
+	flag.StringVar(&config.jiraPassword, "jira-password", "", "JIRA password")
 	flags.DurationVar(&config.ecs.Timeout, "ecs-deploy-timeout", 5*time.Minute, "Time to wait for new ECS task definitions to come up")
 	// Allow setting flags via environment variables
 	flags.VisitAll(func(f *flag.Flag) {
@@ -222,6 +235,13 @@ func run(invoker operator.InvokerFunc) error {
 	); err != nil {
 		return err
 	}
+
+	jiraClient := jira.NewClient(config.jiraURL, config.jiraUsername, config.jiraPassword)
+	issuesServer, err := bread.NewIssuesServer(sender, jiraClient, config.jiraProject)
+	if err != nil {
+		return err
+	}
+	breadpb.RegisterIssuesServer(grpcServer, issuesServer)
 	msg := &breadpb.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 	for svc := range grpcServer.GetServiceInfo() {
 		msg.Services = append(msg.Services, svc)
