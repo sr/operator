@@ -60,6 +60,6 @@ class SessionsController < ApplicationController
   private
 
   def phone_auth_action
-    "Deploy #{current_project.name} to #{current_target.name}"
+    "Remove phone authentication pairing?"
   end
 end
