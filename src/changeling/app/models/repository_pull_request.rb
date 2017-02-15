@@ -179,9 +179,9 @@ class RepositoryPullRequest
     body << "<summary>Peer review and compliance details</summary>"
 
     if @multipass.complete?
-      body << "<p>#{GLYPH_COMPLETE} This pull request meets all compliance requirements and is ready to be merged into the main branch</p>"
+      body << "<p>#{GLYPH_COMPLETE} This pull request meets all compliance requirements and is ready to be merged into the main branch:</p>"
     else
-      body << "<p>#{@multipass.pending? ? GLYPH_PENDING : GLYPH_FAILED} This pull request does not yet meet all compliance requirements</p>"
+      body << "<p>#{@multipass.pending? ? GLYPH_PENDING : GLYPH_FAILED} This pull request does not yet meet all compliance requirements:</p>"
     end
     body << @multipass.status_description_html
 
