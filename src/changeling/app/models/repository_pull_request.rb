@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class RepositoryPullRequest
   TICKET_REFERENCE_REGEXP = /\A\[?([A-Z]+\-[0-9]+)\]?/
   GUS_TICKET_ID_PREFIX = "W-".freeze
@@ -132,13 +131,8 @@ class RepositoryPullRequest
     end
   end
 
-
-  GLYPH_TICKET = "\u{1F4DC}".freeze # Scroll
-  GLYPH_APPROVED = "\u{1F44D}".freeze # Thumbs up
-  GLYPH_NOT_APPROVED = "\u{2753}".freeze # Question mark ornament
-  GLYPH_COMPLETE = "\u{2705}".freeze # White heavy check mark
-  GLYPH_PENDING = "\u{23F2}".freeze # Timer clock
-  GLYPH_FAILED = "\u{1F6AB}".freeze # No entry sign
+  GLYPH_DONE = "✓".freeze
+  GLYPH_TODO = "✗".freeze
 
   def compliance_comment_body_html
     if ownership_teams.size <= 0
@@ -150,9 +144,9 @@ class RepositoryPullRequest
     if referenced_ticket
       case referenced_ticket.tracker
       when Ticket::TRACKER_JIRA
-        label = "#{GLYPH_TICKET} #{referenced_ticket.external_id} #{referenced_ticket.summary}"
+        label = "#{referenced_ticket.external_id} #{referenced_ticket.summary}"
       when Ticket::TRACKER_GUS
-        label = "#{GLYPH_TICKET} #{referenced_ticket.external_id}"
+        label = referenced_ticket.external_id
       else
         raise "unhandleable ticket: #{referenced_ticket.inspect}"
       end
@@ -168,9 +162,9 @@ class RepositoryPullRequest
 
       if approver
         approver_link = "<a href=\"#{html_escape(approver.url)}\">@#{html_escape(approver.login)}</a>"
-        body << "<li>#{GLYPH_APPROVED} <code>@#{team.slug}</code>. Approved by #{approver_link}"
+        body << "<li>#{GLYPH_DONE} @#{team.slug}. Approved by #{approver_link}"
       else
-        body << "<li>#{GLYPH_NOT_APPROVED} <code>@#{team.slug}</code></li>"
+        body << "<li>#{GLYPH_TODO} @#{team.slug}</li>"
       end
     end
 
@@ -178,14 +172,6 @@ class RepositoryPullRequest
 
     body << "<details>"
     body << "<summary>Peer review and compliance details</summary>"
-
-    if @multipass.complete?
-      body << "<p>#{GLYPH_COMPLETE} This pull request meets all compliance requirements and is ready to be merged into the main branch</p>"
-    else
-      body << "<p>#{@multipass.pending? ? GLYPH_PENDING : GLYPH_FAILED} This pull request does not yet meet all compliance requirements</p>"
-    end
-    body << @multipass.status_description_html
-
     body << "<p>Reviewers were automatically determined based on the following <code>OWNERS</code> files:</p>"
     body << "<ul>"
 
@@ -194,6 +180,14 @@ class RepositoryPullRequest
     end
 
     body << "</ul>"
+
+    if @multipass.complete?
+      body << "<p>#{GLYPH_DONE} This pull request meets all compliance requirements and is ready to be merged into the main branch</p>"
+    else
+      body << "<p>#{GLYPH_TODO} This pull request does not yet meet all compliance requirements</p>"
+    end
+
+    body << @multipass.status_description_html
   end
 
   def html_escape(s)
