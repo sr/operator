@@ -98,6 +98,8 @@ class ComplianceStatus
     else
       body << "<li>No ticket reference found. Include the ticket ID at the beginning of the pull request title</li>"
     end
+
+    body << "</ul>"
   end
 
   def status
