@@ -1,6 +1,6 @@
 FROM docker.dev.pardot.com/base/centos:7
 
-ARG redis_version=2.6.17
+ARG redis_version=4.0-rc2
 ARG artifactory_host
 
 RUN yum install -y epel-release && \
@@ -9,7 +9,7 @@ RUN yum install -y epel-release && \
 
 RUN yum install -y make gcc && \
   cd /tmp && \
-  curl http://download.redis.io/releases/redis-${redis_version}.tar.gz | tar -xvz && \
+  curl -L https://github.com/antirez/redis/archive/${redis_version}.tar.gz | tar -xvz && \
   cd redis-${redis_version} && \
   make && \
   make install && \
