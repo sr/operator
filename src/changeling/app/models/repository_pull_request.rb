@@ -70,6 +70,7 @@ class RepositoryPullRequest
       synchronize_ticket
     end
 
+    @multipass.complete = @multipass.complete?
     @multipass.save!
 
     if github_repository.compliance_enabled?
