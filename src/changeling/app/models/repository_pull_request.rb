@@ -132,12 +132,12 @@ class RepositoryPullRequest
     end
   end
 
-  GLYPH_TICKET = "\u{1F4DC}".freeze # Scroll
-  GLYPH_APPROVED = "\u{1F44D}".freeze # Thumbs up
-  GLYPH_NOT_APPROVED = "\u{2753}".freeze # Question mark ornament
-  GLYPH_COMPLETE = "\u{2705}".freeze # White heavy check mark
-  GLYPH_PENDING = "\u{23F2}".freeze # Timer clock
-  GLYPH_FAILED = "\u{1F6AB}".freeze # No entry sign
+  GLYPH_SCROLL = "📜".freeze
+  GLYPH_APPROVED = "👍".freeze
+  GLYPH_NOT_APPROVED = "❓".freeze
+  GLYPH_COMPLETE = "✅".freeze
+  GLYPH_PENDING = "⏲".freeze
+  GLYPH_FAILED = "🚫".freeze
 
   def compliance_comment_body_html
     if ownership_teams.size <= 0
@@ -149,9 +149,9 @@ class RepositoryPullRequest
     if referenced_ticket
       case referenced_ticket.tracker
       when Ticket::TRACKER_JIRA
-        label = "#{GLYPH_TICKET} #{referenced_ticket.external_id} #{referenced_ticket.summary}"
+        label = "#{GLYPH_SCROLL} #{referenced_ticket.external_id} #{referenced_ticket.summary}"
       when Ticket::TRACKER_GUS
-        label = "#{GLYPH_TICKET} #{referenced_ticket.external_id}"
+        label = "#{GLYPH_SCROLL} #{referenced_ticket.external_id}"
       else
         raise "unhandleable ticket: #{referenced_ticket.inspect}"
       end
