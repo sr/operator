@@ -6,7 +6,7 @@ class MultipassesController < ApplicationController
     @by_team = params[:by_team] || current_user.team
     @multipasses = Multipass
       .includes(:github_repository)
-      .includes(ticket_reference: :ticket)
+      .includes(story_ticket_reference: :ticket)
       .by_team(@by_team)
       .complete(complete)
       .order("created_at desc")

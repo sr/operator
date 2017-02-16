@@ -98,8 +98,8 @@ class RepositoryPullRequest
   end
 
   def referenced_ticket
-    if @multipass.ticket_reference
-      @multipass.ticket_reference.ticket
+    if @multipass.story_ticket_reference
+      @multipass.story_ticket_reference.ticket
     end
   end
 
@@ -363,8 +363,8 @@ class RepositoryPullRequest
   end
 
   def remove_ticket_reference
-    if @multipass.ticket_reference
-      @multipass.ticket_reference.destroy!
+    if @multipass.story_ticket_reference
+      @multipass.story_ticket_reference.destroy!
     end
   end
 
@@ -373,10 +373,10 @@ class RepositoryPullRequest
       raise ArgumentError, "ticket is a new record"
     end
 
-    if !@multipass.ticket_reference
-      @multipass.create_ticket_reference!(ticket_id: ticket.id)
+    if !@multipass.story_ticket_reference
+      @multipass.create_story_ticket_reference!(ticket_id: ticket.id)
     else
-      @multipass.ticket_reference.update!(ticket_id: ticket.id)
+      @multipass.story_ticket_reference.update!(ticket_id: ticket.id)
     end
   end
 
