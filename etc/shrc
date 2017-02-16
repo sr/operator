@@ -9,6 +9,12 @@ if [ -z "${GOPATH:-""}" ]; then
     export GOPATH PATH
 fi
 
+# Default to 'sfdc-aloha' Heroku organization unless it is already set
+if [ -z "${HEROKU_ORGANIZATION:-""}" ]; then
+    HEROKU_ORGANIZATION="sfdc-aloha"
+    export HEROKU_ORGANIZATION
+fi
+
 : "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
 export BREAD
 
