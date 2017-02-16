@@ -6,7 +6,7 @@ class Bamboo
 
   _buildHttpClient: () ->
     httpClient.create(@host)
-      .timeout(15 * 1000)
+      .timeout(30 * 1000)
       .auth(@username, @password)
       .header("accept", "application/json")
 
