@@ -75,6 +75,15 @@ var (
 			Group:             "developers",
 			PhoneAuthOptional: true,
 		},
+
+		{
+			Call: &operator.Call{
+				Service: "bread.Issues",
+				Method:  "Mine",
+			},
+			Group:             "developers",
+			PhoneAuthOptional: true,
+		},
 	}
 
 	ECSDeployTargets = []*DeployTarget{
