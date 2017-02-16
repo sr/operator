@@ -39,7 +39,7 @@ describe ComplianceStatus, "pardot" do
       reference_url: reference_url,
       repository_id: @repository.id
     )
-    @multipass.create_ticket_reference!(ticket: ticket)
+    @multipass.create_story_ticket_reference!(ticket: ticket)
     @multipass.peer_reviews.create!(
       reviewer_github_login: "sr",
       state: Clients::GitHub::REVIEW_APPROVED,
@@ -73,7 +73,7 @@ describe ComplianceStatus, "pardot" do
   end
 
   it "requires nothing if the change is an emergency" do
-    @multipass.ticket_reference.destroy!
+    @multipass.story_ticket_reference.destroy!
     @multipass.update!(peer_reviewer: nil)
     @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
     expect(@multipass.reload.complete?).to eq(false)
@@ -84,7 +84,7 @@ describe ComplianceStatus, "pardot" do
 
   it "requires a ticket reference to be complete" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.ticket_reference.destroy!
+    @multipass.story_ticket_reference.destroy!
     expect(@multipass.reload.complete?).to eq(false)
     expect(@multipass.reload.pending?).to eq(false)
 
@@ -94,7 +94,7 @@ describe ComplianceStatus, "pardot" do
 
   it "requires a reference to an open ticket to be complete" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
+    @multipass.story_ticket_reference.ticket.update!(open: false, status: "Won't Fix")
     expect(@multipass.reload.complete?).to eq(false)
     expect(@multipass.reload.pending?).to eq(false)
 
@@ -105,7 +105,7 @@ describe ComplianceStatus, "pardot" do
   it "does not require a ticket to be open if the pull request has been merged" do
     expect(@multipass.complete?).to eq(true)
     @multipass.update!(merged: true)
-    @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
+    @multipass.story_ticket_reference.ticket.update!(open: false, status: "Won't Fix")
     expect(@multipass.reload.complete?).to eq(true)
   end
 
