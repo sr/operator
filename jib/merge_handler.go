@@ -66,7 +66,7 @@ func (s *Server) Merge(pr *github.PullRequest) error {
 	// Iterate from latest comment to earliest
 	for i := len(commands) - 1; i >= 0; i-- {
 		command := commands[i]
-		if command.Name == "automerge" || command.Name == "auto-merge" || command.Name == "emergency-merge" {
+		if command.Name == "automerge" || command.Name == "auto-merge" || command.Name == "merge" || command.Name == "emergency-merge" {
 			// TODO(alindeman): Enable when GitHub Enterprise supports this route.
 			// For now, it's acceptable to fall back to the fact
 			// that only fully compliant PRs can be merged in any case.

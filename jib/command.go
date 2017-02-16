@@ -3,6 +3,7 @@ package jib
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"git.dev.pardot.com/Pardot/bread/jib/github"
@@ -71,7 +72,7 @@ func ExtractCommands(pr *github.PullRequest, comments []*github.IssueComment, ig
 			matches := cmdRe.FindAllStringSubmatch(comment.Body, -1)
 			for _, matches := range matches {
 				commands = append(commands, &Command{
-					Name:    matches[1],
+					Name:    strings.ToLower(matches[1]),
 					Comment: comment,
 				})
 			}

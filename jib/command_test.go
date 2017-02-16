@@ -62,6 +62,23 @@ func TestExtractCommands(t *testing.T) {
 					User: &github.User{
 						Login: "user",
 					},
+					Body: "/autoMerge",
+				},
+			},
+			expectedCommandNames: []string{"automerge"},
+		},
+		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
+			comments: []*github.IssueComment{
+				{
+					User: &github.User{
+						Login: "user",
+					},
 					Body: "Sounds good /automerge",
 				},
 			},
