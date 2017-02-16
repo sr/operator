@@ -36,6 +36,12 @@ class ChangelingConfig
   end
   attr_writer :compliance_comment_enabled_repositories
 
+  def emergency_merge_ticket_enabled_repositories
+    return @emergency_merge_ticket_enabled_repositories if defined?(@emergency_merge_ticket_enabled_repositories)
+    @emergency_merge_ticket_enabled_repositories = Array(ENV["CHANGELING_EMERGENCY_MERGE_TICKET_ENABLED_REPOSITORIES"].split(","))
+  end
+  attr_writer :emergency_merge_ticket_enabled_repositories
+
   def page_title
     if pardot?
       "Pardot Compliance"
@@ -171,11 +177,23 @@ class ChangelingConfig
     end
   end
 
+  def emergency_ticket_jira_project_key
+    ENV.fetch("CHANGELING_EMERGENCY_TICKET_JIRA_PROJECT_KEY", "BREAD")
+  end
+
+  def jira_username
+    ENV.fetch("JIRA_USERNAME")
+  end
+
+  def jira_password
+    ENV.fetch("JIRA_PASSWORD")
+  end
+
   def jira_client
     return @jira_client if defined?(@jira_client)
     options = {
-      username: ENV.fetch("JIRA_USERNAME"),
-      password: ENV.fetch("JIRA_PASSWORD"),
+      username: jira_username,
+      password: jira_password,
       site: jira_url,
       auth_type: :basic,
       rest_base_path: "/rest/api/2",

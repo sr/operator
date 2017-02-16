@@ -74,6 +74,7 @@ class RepositoryPullRequest
 
     synchronize_github_pull_request
     synchronize_change_categorization
+    synchronize_emergency_ticket
 
     if !@multipass.merged?
       synchronize_github_reviewers
@@ -263,6 +264,40 @@ class RepositoryPullRequest
     end
 
     @multipass.change_type = change_type
+  end
+
+  def synchronize_emergency_ticket
+    if !Changeling.config.emergency_merge_ticket_enabled_repositories.include?(repository.name_with_owner)
+      return
+    end
+
+    if @multipass.change_type != ChangeCategorization::EMERGENCY
+      return
+    end
+
+    attributes = {
+      "fields": {
+        "summary": "TODO",
+        "description": "TODO",
+        "project": {
+          "key": Changeling.config.emergency_ticket_jira_project_key
+        },
+        "issuetype": {
+          "name": "Task"
+        }
+      }
+    }
+
+    if @multipass.emergency_ticket_reference
+      issue = Changeling.config.jira_client.Issue.find(@multipass.emergency_ticket_reference.ticket.external_id)
+      issue.save!(attributes)
+      Ticket.synchronize_jira_ticket(issue.key)
+    else
+      issue = Changeling.config.jira_client.Issue.build
+      issue.save!(attributes)
+      ticket = Ticket.synchronize_jira_ticket(issue.key)
+      @multipass.create_emergency_ticket_reference!(ticket: ticket)
+    end
   end
 
   def synchronize_github_statuses

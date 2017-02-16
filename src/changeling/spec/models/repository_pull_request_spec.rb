@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe RepositoryPullRequest do
   before(:each) do
     Changeling.config.pardot = true
+    Changeling.config.emergency_merge_ticket_enabled_repositories = ["heroku/changeling"]
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
@@ -28,12 +29,28 @@ RSpec.describe RepositoryPullRequest do
       issue = decoded_fixture_data("jira/issue")
       issue["key"] = external_id
       issue["fields"]["resolution"] = nil unless resolved
+      issue["self"] = "rest/api/2/issue/#{external_id}"
       stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
         .to_return(body: JSON.dump(issue), headers: { "Content-Type" => "application/json" })
     else
       stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
         .to_return(body: JSON.dump({}), status: 404, headers: { "Content-Type" => "application/json" })
     end
+  end
+
+  def stub_jira_ticket_creation(external_id)
+    issue = decoded_fixture_data("jira/issue")
+    issue["key"] = external_id
+    issue["fields"]["resolution"] = nil
+    issue["self"] = "/rest/iss"
+
+    stub_request(:post, "https://#{Changeling.config.jira_username}:#{Changeling.config.jira_password}@#{URI(Changeling.config.jira_url).host}/rest/api/2/issue")
+      .to_return(status: 200, body: JSON.dump(issue))
+
+    stub_jira_ticket(external_id)
+
+    stub_request(:put, "https://#{Changeling.config.jira_username}:#{Changeling.config.jira_password}@#{URI(Changeling.config.jira_url).host}/rest/api/2/issue/#{external_id}")
+      .to_return(status: 200, body: JSON.dump(issue))
   end
 
   def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [], body: "")
@@ -282,6 +299,7 @@ RSpec.describe RepositoryPullRequest do
   describe "synchronizing github pull request" do
     it "sets the merge commit SHA if present" do
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
@@ -298,6 +316,7 @@ RSpec.describe RepositoryPullRequest do
 
     it "synchronizes changed files" do
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(
         title: "BREAD-1598",
         merge_commit_sha: "abc123",
@@ -322,6 +341,7 @@ RSpec.describe RepositoryPullRequest do
           { status: "removed", filename: "config", patch: "" }
         ]
       )
+      @multipass.emergency_ticket_reference.destroy!
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
@@ -542,6 +562,7 @@ RSpec.describe RepositoryPullRequest do
 
     it "detects emergency merges" do
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598")
       stub_github_commit_status
       stub_github_pull_request_reviews
@@ -554,10 +575,19 @@ RSpec.describe RepositoryPullRequest do
       expect(@multipass.complete?).to eq(false)
 
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      expect(@multipass.emergency_ticket_reference).to eq(nil)
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
+      expect(@multipass.emergency_ticket_reference).to_not eq(nil)
+      expect(@multipass.emergency_ticket_reference.ticket_type).to eq(TicketReference::TICKET_TYPE_EMERGENCY)
+      expect(@multipass.emergency_ticket_reference.ticket.external_id).to eq("BREAD-emergency")
+      expect(@multipass.emergency_ticket_reference.ticket.open?).to eq(true)
 
       expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
+
+      stub_jira_ticket("BREAD-emergency", resolved: true)
+      @repository_pull_request.reload.synchronize(create_github_status: false)
+      expect(@multipass.emergency_ticket_reference.ticket.reload.open?).to eq(false)
     end
   end
 
