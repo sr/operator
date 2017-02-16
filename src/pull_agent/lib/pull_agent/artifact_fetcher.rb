@@ -26,6 +26,7 @@ module PullAgent
     # Fetches a deployment artifact and uncompresses it into a directory
     # (which must already exist).
     def fetch_into(directory)
+      Logger.log(:debug, "Fetching #{@artifact_url} to #{directory}")
       object = with_http_client do |http|
         request = Net::HTTP::Get.new(@artifact_url.path)
         request.basic_auth(artifactory_user, artifactory_token)
