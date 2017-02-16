@@ -78,7 +78,7 @@ var (
 
 		{
 			Call: &operator.Call{
-				Service: "bread.Issues",
+				Service: "bread.Tickets",
 				Method:  "Mine",
 			},
 			Group:             "developers",
