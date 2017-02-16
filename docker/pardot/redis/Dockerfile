@@ -31,4 +31,6 @@ ADD 6380.conf /etc/redis/6380.conf
 
 ADD supervisord.conf /etc/supervisord.conf
 
+EXPOSE 6379 6380
+
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
