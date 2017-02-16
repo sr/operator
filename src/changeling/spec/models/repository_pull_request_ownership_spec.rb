@@ -41,15 +41,28 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     end
   end
 
+  def create_team_memberships(teams)
+    teams.each_with_index do |(team_name, members), team_id|
+      members.each_with_index do |user_login, user_id|
+        GithubInstallation.current.team_memberships.create!(
+          github_team_id: team_id,
+          github_user_id: user_id,
+          team_slug: "heroku/#{team_name}",
+          user_login: user_login
+        )
+      end
+    end
+  end
+
   it "returns the repository owners if the pull request has no changes" do
-    stub_organization_teams("heroku", {})
+    create_team_memberships(bread: %w[alindeman sr], tools: %w[ys])
     expect(@pull_request.ownership_users).to eq([])
 
     @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@pardot/boomtown\n@heroku/bread\n@heroku/tools\n",
     )
-    stub_organization_teams("heroku", "bread": %w[alindeman sr], "tools": %w[ys])
+    @pull_request.reload
 
     expect(@pull_request.ownership_users).to eq([%w[alindeman sr ys]])
   end
@@ -61,7 +74,9 @@ RSpec.describe RepositoryPullRequest, "ownership" do
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
-    stub_organization_teams("heroku", "ops": %w[alindeman sr])
+    create_team_memberships(ops: %w[alindeman sr])
+
+    @pull_request.reload
 
     expect(@pull_request.ownership_teams.size).to eq(1)
     team_1 = @pull_request.ownership_teams[0]
@@ -76,7 +91,7 @@ RSpec.describe RepositoryPullRequest, "ownership" do
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: ""
     )
-    expect(@pull_request.ownership_owners_files).to eq([])
+    expect(@pull_request.reload.ownership_owners_files).to eq([])
 
     root = @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
@@ -91,35 +106,35 @@ RSpec.describe RepositoryPullRequest, "ownership" do
       content: ""
     )
 
-    expect(@pull_request.ownership_owners_files).to eq([root])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
     @multipass.pull_request_files.create!(
       filename: "/README",
       state: "added",
       patch: "+ Hello World"
     )
-    expect(@pull_request.ownership_owners_files).to eq([root])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
     @multipass.pull_request_files.create!(
       filename: "/nodes/dfw/pardot0-app1.json",
       state: "added",
       patch: "+ {}"
     )
-    expect(@pull_request.ownership_owners_files).to eq([root])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root])
 
     @multipass.pull_request_files.create!(
       filename: "/scripts/build",
       state: "modified",
       patch: "+ exit 1"
     )
-    expect(@pull_request.ownership_owners_files).to eq([root, scripts])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts])
 
     @multipass.pull_request_files.create!(
       filename: "/lib/foo.rb",
       state: "changed",
       patch: ""
     )
-    expect(@pull_request.ownership_owners_files).to eq([root, scripts, lib])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts, lib])
 
     @multipass.pull_request_files.create!(
       filename: "/cookbooks/pardot_mysql/files/default/mysqld.conf",
@@ -131,16 +146,15 @@ RSpec.describe RepositoryPullRequest, "ownership" do
       state: "removed",
       patch: ""
     )
-    expect(@pull_request.ownership_owners_files).to eq([root, scripts, lib, mysql])
+    expect(@pull_request.reload.ownership_owners_files).to eq([root, scripts, lib, mysql])
   end
 
   it "returns the owners of every component being changed" do
     team_bread = %w[alindeman sr]
     team_dba = %w[glen]
-    team_ops = %w[alindeman sr glen]
+    team_ops = %w[alindeman glen sr]
 
-    stub_organization_teams(
-      "heroku",
+    create_team_memberships(
       "bread": team_bread,
       "dba": team_dba,
       "ops": team_ops
@@ -173,18 +187,18 @@ RSpec.describe RepositoryPullRequest, "ownership" do
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
     )
-    expect(@pull_request.ownership_users).to eq([team_ops])
+    expect(@pull_request.reload.ownership_users).to eq([team_ops])
 
     @repository.repository_owners_files.create!(
       path_name: "/cookbooks/pardot_mysql/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/dba"
     )
-    expect(@pull_request.ownership_users).to eq([team_ops, team_dba])
+    expect(@pull_request.reload.ownership_users).to eq([team_ops, team_dba])
 
     @repository.repository_owners_files.create!(
       path_name: "/scripts/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
     )
-    expect(@pull_request.ownership_users).to eq([team_ops, team_dba, team_bread])
+    expect(@pull_request.reload.ownership_users).to eq([team_ops, team_dba, team_bread])
   end
 end

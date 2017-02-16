@@ -12,7 +12,7 @@ class PullRequestOwnership
   end
 
   # Team represents a GitHub team.
-  class Team
+  class GithubTeam
     def initialize(organization, team)
       @organization = organization
       @slug = team
@@ -35,21 +35,19 @@ class PullRequestOwnership
     @multipass = multipass
     @pull_request = pull_request
     @github_client = github_client
-
-    # Cache of all GitHub teams and their members referenced across OWNERS files
-    @github_team_ids = {}
-    @github_teams = {}
-
-    # Nested Array of GitHub teams members
-    @users = []
-
-    load
   end
 
-  # Returns the list of teams that need to approve the pull request
+  # Returns the list of GitHub team slugs (e.g. @Pardot/bread) mentioned across
+  # the OWNERS files relevant to this pull request.
   def teams
-    @github_teams.keys.map do |team|
-      Team.new(@pull_request.repository_organization, team)
+    slugs = Set.new([])
+
+    parsed_owners_files.each do |file|
+      slugs.merge(file.teams)
+    end
+
+    slugs.map do |slug|
+      GithubTeam.new(@pull_request.repository_organization, slug)
     end
   end
 
@@ -58,13 +56,21 @@ class PullRequestOwnership
   # Example:
   #
   # [["sr", "alindeman"], ["lstoll"]]
-  attr_reader :users
+  def users
+    users = []
+
+    parsed_owners_files.each do |owners_file|
+      users << GithubInstallation.current.team_members(owners_file.teams)
+    end
+
+    users
+  end
 
   # Returns the reviewer that has approved this pull request on the behalf of
   # a given team. If it no one from the given team has given an approvel yet,
   # this returns nil.
   def approver(team)
-    login = @github_teams.fetch(team.slug).detect do |user_login|
+    login = GithubInstallation.current.team_members(team).detect do |user_login|
       @multipass.peer_review_approvers.include?(user_login)
     end
 
@@ -79,7 +85,7 @@ class PullRequestOwnership
     files = Set.new([])
     directories = {}
 
-    @pull_request.repository_owners_files.reload.each do |file|
+    @pull_request.repository_owners_files.each do |file|
       directories[File.dirname(file.path_name)] = file
     end
 
@@ -108,46 +114,9 @@ class PullRequestOwnership
 
   private
 
-  def load
-    @users.clear
-
-    # Fetch all teams for this repository's organization
-    @github_client.organization_teams(@pull_request.repository_organization).each do |team|
-      @github_team_ids["#{@pull_request.repository_organization}/#{team.slug}"] = team.id
+  def parsed_owners_files
+    owners_files.map do |file|
+      OwnersFile.new(file.content)
     end
-
-    # Parse all OWNERS files and load the referenced teams and their members
-    owners_files.each do |file|
-      file = OwnersFile.new(file.content)
-      component_users = Set.new([])
-
-      # Load the referenced teams and their members
-      file.teams.each do |team|
-        # Ignore teams that don't belong to this repository's organization
-        if !@github_team_ids.key?(team)
-          next
-        end
-
-        # Avoid fetching members of the same team twice
-        if @github_teams.key?(team)
-          component_users.merge(@github_teams.fetch(team))
-
-          next
-        end
-
-        members = Set.new([])
-
-        @github_client.team_members(@github_team_ids.fetch(team)).each do |user|
-          members.add(user.login)
-        end
-
-        @github_teams[team] = members
-        component_users.merge(members)
-      end
-
-      @users << component_users.to_a
-    end
-
-    self
   end
 end

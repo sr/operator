@@ -10,8 +10,8 @@ class GithubInstallation < ApplicationRecord
     team_memberships.select(:team_slug).distinct.map(&:team_slug)
   end
 
-  def team_members(team_slug)
-    team_memberships.where(team_slug: team_slug).pluck(:user_login)
+  def team_members(team_slugs)
+    team_memberships.where(team_slug: team_slugs).pluck(:user_login)
   end
 
   def synchronize
@@ -53,7 +53,7 @@ class GithubInstallation < ApplicationRecord
         team_memberships.create!(
           github_team_id: org_team.id,
           github_user_id: user.id,
-          team_slug: org_team.slug,
+          team_slug: "#{organization_name}/#{org_team.slug}",
           user_login: user.login
         )
       end
