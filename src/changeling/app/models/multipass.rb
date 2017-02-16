@@ -227,6 +227,12 @@ class Multipass < ActiveRecord::Base
     compliance_status.description_html
   end
 
+  def reload
+    @compliance_status = nil
+    @repository_pull_request = nil
+    super
+  end
+
   private
 
   def repository_pull_request

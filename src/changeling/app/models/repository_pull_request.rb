@@ -25,6 +25,16 @@ class RepositoryPullRequest
     @multipass.title
   end
 
+  def reload
+    @multipass.reload
+
+    if @github_repository.respond_to?(:reload)
+      @github_repository.reload
+    end
+
+    self
+  end
+
   def number
     @multipass.pull_request_number
   end
@@ -164,7 +174,7 @@ class RepositoryPullRequest
 
     ownership_teams.each do |team|
       team_link = "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
-      approver = ownership.approver(team)
+      approver = ownership.approver(team.slug)
 
       if approver
         approver_link = "<a href=\"#{html_escape(approver.url)}\"><code>@#{html_escape(approver.login)}</code></a>"
