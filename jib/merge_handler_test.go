@@ -41,6 +41,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
@@ -50,7 +51,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:   123,
 					User: developerUser,
-					Body: "/merge",
+					Body: "/automerge",
 				},
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
@@ -72,6 +73,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(false),
@@ -81,7 +83,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:   123,
 					User: developerUser,
-					Body: "/merge",
+					Body: "/automerge",
 				},
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
@@ -101,7 +103,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 				BodyRegexps: []*regexp.Regexp{
 					regexp.MustCompile(`@pardot-developer I can't merge.*because the pull request is not in a mergeable state.`),
-					regexp.MustCompile(`Please fix.*and re-issue the /merge command`),
+					regexp.MustCompile(`Please fix.*and re-issue the /automerge command`),
 				},
 			},
 			expectedToMerge: false,
@@ -111,6 +113,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  nil,
@@ -120,7 +123,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:   123,
 					User: developerUser,
-					Body: "/merge",
+					Body: "/automerge",
 				},
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
@@ -142,6 +145,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
@@ -151,7 +155,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:   123,
 					User: developerUser,
-					Body: "/merge",
+					Body: "/automerge",
 				},
 			},
 			commitStatuses: map[string][]*github.CommitStatus{
@@ -171,16 +175,17 @@ func TestMergeCommandHandler(t *testing.T) {
 				},
 				BodyRegexps: []*regexp.Regexp{
 					regexp.MustCompile(`@pardot-developer I can't merge.*because the compliance status check failed.`),
-					regexp.MustCompile(`Please fix.*and re-issue the /merge command`),
+					regexp.MustCompile(`Please fix.*and re-issue the /automerge command`),
 				},
 			},
 			expectedToMerge: false,
 		},
-		// Mergable PR, but new commits after the /merge command issued
+		// Mergable PR, but new commits after the /automerge command issued
 		{
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
@@ -190,7 +195,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:        123,
 					User:      developerUser,
-					Body:      "/merge",
+					Body:      "/automerge",
 					CreatedAt: time.Now().Add(-2 * time.Minute),
 				},
 			},
@@ -217,7 +222,7 @@ func TestMergeCommandHandler(t *testing.T) {
 					InReplyToID: 123,
 				},
 				BodyRegexps: []*regexp.Regexp{
-					regexp.MustCompile(`@pardot-developer I didn't merge this PR because there was a commit created since the /merge command was issued`),
+					regexp.MustCompile(`@pardot-developer I didn't merge this PR because there was a commit created since the /automerge command was issued`),
 				},
 			},
 			expectedToMerge: false,
@@ -227,6 +232,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
@@ -236,7 +242,7 @@ func TestMergeCommandHandler(t *testing.T) {
 				{
 					ID:        123,
 					User:      developerUser,
-					Body:      "/merge",
+					Body:      "/automerge",
 					CreatedAt: time.Now().Add(-2 * time.Minute),
 				},
 			},
@@ -265,6 +271,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
@@ -299,6 +306,7 @@ func TestMergeCommandHandler(t *testing.T) {
 			pullRequest: &github.PullRequest{
 				Org:        "pardot",
 				Repository: "bread",
+				User:       developerUser,
 				Number:     1,
 				State:      "open",
 				Mergeable:  github.Bool(true),
