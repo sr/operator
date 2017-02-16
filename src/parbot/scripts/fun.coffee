@@ -199,6 +199,12 @@ module.exports = (robot) ->
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
 
+  robot.respond /toiletsliders$/i, (msg) ->
+    msg.send "http://i.giphy.com/l3q2BZNYrffENFsPK.gif"
+
+  robot.respond /toiletwigglers$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBsMMQKWp6OiXJu.gif"
+
   robot.respond /master(\s)?is(\s)?open$/i, (msg) ->
     opens = [
       "https://hipchat.dev.pardot.com/files/1/5/lNYLdAaKwuoNK8I/master_open_4.jpg",
