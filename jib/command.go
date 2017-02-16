@@ -3,21 +3,29 @@ package jib
 import (
 	"fmt"
 	"regexp"
+	"time"
 
 	"git.dev.pardot.com/Pardot/bread/jib/github"
 )
 
 var (
-	cmdRe = regexp.MustCompile(`(?:\s|\A)/(\S+)(?:\s|\z)`)
+	cmdRe = regexp.MustCompile(`(?m)^\s*/(\S+)\s*$`)
 )
 
 // Command is a representation of a slash command in a GitHub pull request.
 //
-// For example, &Command{Name: "merge"} represents someone issuing the "/merge"
-// command in a pull-request comment
+// For example, &Command{Name: "automerge"} represents someone issuing the
+// "/automerge" command in a pull-request comment
 type Command struct {
 	Name    string
-	Comment *github.IssueComment
+	Comment *CommandComment
+}
+
+type CommandComment struct {
+	ID        int
+	User      *github.User
+	Body      string
+	CreatedAt time.Time
 }
 
 func (c *Command) String() string {
@@ -27,9 +35,30 @@ func (c *Command) String() string {
 // ExtractCommands extracts commands from the list of comments.
 //
 // It ignores any comments from ignoredUsernames, so that bots don't end up talking to themselves.
-func ExtractCommands(comments []*github.IssueComment, ignoredUsernames []string) []*Command {
+func ExtractCommands(pr *github.PullRequest, comments []*github.IssueComment, ignoredUsernames []string) []*Command {
 	commands := []*Command{}
+
+	allComments := []*CommandComment{
+		{
+			ID:        0,
+			User:      pr.User,
+			Body:      pr.Body,
+			CreatedAt: pr.CreatedAt,
+		},
+	}
+
+	// Combine PR body with all comments
 	for _, comment := range comments {
+		allComments = append(allComments, &CommandComment{
+
+			ID:        comment.ID,
+			User:      comment.User,
+			Body:      comment.Body,
+			CreatedAt: comment.CreatedAt,
+		})
+	}
+
+	for _, comment := range allComments {
 		ignored := false
 		for _, ignoredUsername := range ignoredUsernames {
 			if ignoredUsername == comment.User.Login {

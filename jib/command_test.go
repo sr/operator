@@ -11,11 +11,18 @@ import (
 
 func TestExtractCommands(t *testing.T) {
 	cases := []struct {
+		pr                   *github.PullRequest
 		comments             []*github.IssueComment
 		ignoredUsername      string
 		expectedCommandNames []string
 	}{
 		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
 			comments: []*github.IssueComment{
 				{
 					User: &github.User{
@@ -27,61 +34,107 @@ func TestExtractCommands(t *testing.T) {
 			expectedCommandNames: []string{},
 		},
 		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
 			comments: []*github.IssueComment{
 				{
 					User: &github.User{
 						Login: "user",
 					},
-					Body: "/merge",
+					Body: "/automerge",
 				},
 			},
-			expectedCommandNames: []string{"merge"},
+			expectedCommandNames: []string{"automerge"},
 		},
 		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
 			comments: []*github.IssueComment{
 				{
 					User: &github.User{
 						Login: "user",
 					},
-					Body: "Sounds good /merge",
+					Body: "Sounds good /automerge",
 				},
 			},
-			expectedCommandNames: []string{"merge"},
+			expectedCommandNames: []string{},
 		},
 		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
 			comments: []*github.IssueComment{
 				{
 					User: &github.User{
 						Login: "user",
 					},
-					Body: "Sounds good\n/merge",
+					Body: "Sounds good\n/automerge",
 				},
 			},
-			expectedCommandNames: []string{"merge"},
+			expectedCommandNames: []string{"automerge"},
 		},
 		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "",
+			},
 			comments: []*github.IssueComment{
 				{
 					User: &github.User{
 						Login: "bot",
 					},
-					Body: "Please reissue your /merge command",
+					Body: "/automerge",
 				},
 			},
+			ignoredUsername:      "bot",
+			expectedCommandNames: []string{},
+		},
+		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "user",
+				},
+				Body: "/automerge",
+			},
+			comments:             []*github.IssueComment{},
+			ignoredUsername:      "bot",
+			expectedCommandNames: []string{"automerge"},
+		},
+		{
+			pr: &github.PullRequest{
+				User: &github.User{
+					Login: "bot",
+				},
+				Body: "/automerge",
+			},
+			comments:             []*github.IssueComment{},
 			ignoredUsername:      "bot",
 			expectedCommandNames: []string{},
 		},
 	}
 
 	for _, tc := range cases {
-		commands := jib.ExtractCommands(tc.comments, []string{tc.ignoredUsername})
+		commands := jib.ExtractCommands(tc.pr, tc.comments, []string{tc.ignoredUsername})
 		commandNames := []string{}
 		for _, command := range commands {
 			commandNames = append(commandNames, command.Name)
 		}
 
 		if !reflect.DeepEqual(commandNames, tc.expectedCommandNames) {
-			t.Errorf("expected %v, got %v", tc.expectedCommandNames, commandNames)
+			t.Errorf("expected %v, got %v for %#v", tc.expectedCommandNames, commandNames, tc)
 		}
 	}
 }

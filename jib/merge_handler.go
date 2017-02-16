@@ -35,7 +35,7 @@ Please fix the issue and re-issue the {{.Command}} command and I'll get right to
 `)))
 
 	prCommitAfterMergeCommandReply = template.Must(template.New("").Parse(strings.TrimSpace(`
-@{{.Command.Comment.User.Login}} I didn't merge this PR because there was a commit created since the /merge command was issued.
+@{{.Command.Comment.User.Login}} I didn't merge this PR because there was a commit created since the {{.Command}} command was issued.
 
 If you still want to merge, re-issue the {{.Command}} command and I'll get right to it.
 `)))
@@ -61,12 +61,12 @@ func (s *Server) Merge(pr *github.PullRequest) error {
 	// Only react to the latest authorized merge command, if there is one.
 	// Anything else would be very confusing to the user, as we might post
 	// multiple comments.
-	commands := ExtractCommands(comments, []string{s.gh.Username()})
+	commands := ExtractCommands(pr, comments, []string{s.gh.Username()})
 	var latestMergeCommand *Command
 	// Iterate from latest comment to earliest
 	for i := len(commands) - 1; i >= 0; i-- {
 		command := commands[i]
-		if command.Name == "merge" || command.Name == "emergency-merge" {
+		if command.Name == "automerge" || command.Name == "auto-merge" || command.Name == "emergency-merge" {
 			// TODO(alindeman): Enable when GitHub Enterprise supports this route.
 			// For now, it's acceptable to fall back to the fact
 			// that only fully compliant PRs can be merged in any case.

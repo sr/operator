@@ -25,12 +25,14 @@ type PullRequest struct {
 	Org        string
 	Repository string
 	Number     int
+	Body       string
 
 	User *User
 
 	State string
 	Title string
 
+	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	HeadSHA string
@@ -456,6 +458,8 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		return nil, fmt.Errorf("pull request state was nil: %+v", pullRequest)
 	} else if pullRequest.Title == nil {
 		return nil, fmt.Errorf("pull request title was nil: %+v", pullRequest)
+	} else if pullRequest.CreatedAt == nil {
+		return nil, fmt.Errorf("pull request created at was nil: %+v", pullRequest)
 	} else if pullRequest.UpdatedAt == nil {
 		return nil, fmt.Errorf("pull request updated at was nil: %+v", pullRequest)
 	} else if pullRequest.Head == nil {
@@ -468,6 +472,11 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		return nil, fmt.Errorf("pull request user was nil: %+v", pullRequest)
 	}
 
+	var body string
+	if pullRequest.Body != nil {
+		body = *pullRequest.Body
+	}
+
 	wrappedUser, err := wrapUser(pullRequest.User)
 	if err != nil {
 		return nil, err
@@ -477,9 +486,11 @@ func wrapPullRequest(org, repo string, pullRequest *gogithub.PullRequest) (*Pull
 		Org:        org,
 		Repository: repo,
 		Number:     *pullRequest.Number,
+		Body:       body,
 		User:       wrappedUser,
 		State:      *pullRequest.State,
 		Title:      *pullRequest.Title,
+		CreatedAt:  *pullRequest.CreatedAt,
 		UpdatedAt:  *pullRequest.UpdatedAt,
 		HeadSHA:    *pullRequest.Head.SHA,
 		HeadRef:    *pullRequest.Head.Ref,
