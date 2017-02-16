@@ -173,13 +173,14 @@ class RepositoryPullRequest
     body << "<ul>"
 
     ownership_teams.each do |team|
+      team_link = "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
       approver = ownership.approver(team.slug)
 
       if approver
-        approver_link = "<a href=\"#{html_escape(approver.url)}\">@#{html_escape(approver.login)}</a>"
-        body << "<li>#{GLYPH_APPROVED} <code>@#{team.slug}</code>. Approved by #{approver_link}"
+        approver_link = "<a href=\"#{html_escape(approver.url)}\"><code>@#{html_escape(approver.login)}</code></a>"
+        body << "<li>#{GLYPH_APPROVED} #{team_link}: approved by #{approver_link}"
       else
-        body << "<li>#{GLYPH_NOT_APPROVED} <code>@#{team.slug}</code></li>"
+        body << "<li>#{GLYPH_NOT_APPROVED} #{team_link}</li>"
       end
     end
 

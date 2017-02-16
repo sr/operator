@@ -35,6 +35,7 @@ module PullAgent
     end
 
     def make_standby_directory_live
+      Logger.log(:debug, "Making standby, #{standby_directory}, live")
       AtomicSymlink.create!(standby_directory, current_symlink)
     end
 

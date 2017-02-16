@@ -117,22 +117,27 @@ module.exports = (robot) ->
       latestDeploy: (cb) ->
         canoe.deploys process.env.HUBOT_CANOE_TARGET_NAME || "production", "pardot", (err, deploys) ->
           if err?
-            cb(err, null)
+            cb("error fetching latest deploy: #{err}", null)
           else
             cb(null, deploys[0])
       latestBuild: (cb) ->
         canoe.builds "pardot", "master", 10, (err, builds) ->
           if err?
-            cb(err, null)
+            cb("error fetching latest build: #{err}", null)
           else
             cb(null, builds[0])
       inProgressBuilds: (cb) ->
         bamboo.inProgressBuilds 'PDT-PPANT', (err, builds) ->
           if err?
-            cb(err, null)
+            cb("error fetching in-progress builds: #{err}", null)
           else
             async.map builds,
-              (b, cb) -> bamboo.buildStatus(b.key, cb),
+              (b, cb) -> bamboo.buildStatus(b.key, (err, status) ->
+                if err?
+                  cb("error fetching build status for #{b.key}: #{err}", null)
+                else
+                  cb(null, status)
+              ),
               cb
     , (err, result) ->
       prettifiedInProgressBuilds = _.chain(result.inProgressBuilds)

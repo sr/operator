@@ -61,12 +61,12 @@ class ComplianceStatus
     body = "<ul>"
 
     teams = @pull_request.ownership_teams.map do |team|
-      "<a href=\"#{html_escape(team.url)}\">@#{html_escape(team.slug)}</a>"
+      "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
     end
 
     if peer_reviewed?
       approvers = @multipass.peer_review_approvers.map do |approver|
-        "<a href=\"#{html_escape(Changeling.config.github_url + "/" + approver)}\">@#{html_escape(approver)}</a>"
+        "<a href=\"#{html_escape(Changeling.config.github_url + "/" + approver)}\"><code>@#{html_escape(approver)}</code></a>"
       end
 
       body << "<li>Changes reviewed and approved by the following people: #{approvers.join(" ")}</li>"
