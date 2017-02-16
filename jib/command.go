@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	cmdRe = regexp.MustCompile(`(?m)^\s*/(\S+)\s*$`)
+	cmdRe = regexp.MustCompile(`(?m)(?:^|\s)/(\S+)(?:\s+([^/]\S*))*`)
 )
 
 // Command is a representation of a slash command in a GitHub pull request.
