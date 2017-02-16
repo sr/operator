@@ -12,40 +12,40 @@ import (
 	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
-type issuesServer struct {
+type ticketsServer struct {
 	operator.Sender
 	jira    jira.Client
 	project string
 }
 
-func NewIssuesServer(sender operator.Sender, jira jira.Client, project string) (breadpb.IssuesServer, error) {
+func NewTicketsServer(sender operator.Sender, jira jira.Client, project string) (breadpb.TicketsServer, error) {
 	if jira == nil {
 		return nil, errors.New("requirement argument 'jira' is nil")
 	}
 	if project == "" {
 		return nil, errors.New("requirement argument 'project' is nil")
 	}
-	return &issuesServer{sender, jira, project}, nil
+	return &ticketsServer{sender, jira, project}, nil
 }
 
-func (s *issuesServer) Mine(ctx context.Context, req *breadpb.MyIssuesRequest) (*operator.Response, error) {
+func (s *ticketsServer) Mine(ctx context.Context, req *breadpb.MyIssuesRequest) (*operator.Response, error) {
 	email := operator.GetUserEmail(req)
 	if email == "" {
-		return nil, errors.New("unable to retrieve list of assigned issues without and email address")
+		return nil, errors.New("unable to retrieve list of assigned tickets without and email address")
 	}
 
-	issues, err := s.jira.Search(
+	tickets, err := s.jira.Search(
 		ctx,
 		fmt.Sprintf("project = '%s' AND Resolution IS NULL AND assignee = '%s'", s.project, email),
 		[]string{"key", "summary", "status"},
 		100,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve issues: %s", err)
+		return nil, fmt.Errorf("unable to retrieve tickets: %s", err)
 	}
 	var txt, html bytes.Buffer
 	_, _ = html.WriteString("<table><tr><th>Issue ID</th><th>Status</th><th>Summary</th></tr>")
-	for _, issue := range issues {
+	for _, issue := range tickets {
 		if issue.Fields == nil {
 			continue
 		}

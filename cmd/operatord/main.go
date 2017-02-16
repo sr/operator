@@ -237,11 +237,11 @@ func run(invoker operator.InvokerFunc) error {
 	}
 
 	jiraClient := jira.NewClient(config.jiraURL, config.jiraUsername, config.jiraPassword)
-	issuesServer, err := bread.NewIssuesServer(sender, jiraClient, config.jiraProject)
+	ticketsServer, err := bread.NewTicketsServer(sender, jiraClient, config.jiraProject)
 	if err != nil {
 		return err
 	}
-	breadpb.RegisterIssuesServer(grpcServer, issuesServer)
+	breadpb.RegisterTicketsServer(grpcServer, ticketsServer)
 	msg := &breadpb.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
 	for svc := range grpcServer.GetServiceInfo() {
 		msg.Services = append(msg.Services, svc)

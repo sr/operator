@@ -28,7 +28,7 @@ type RepositoryConfig struct {
 func (m *RepositoryConfig) Reset()                    { *m = RepositoryConfig{} }
 func (m *RepositoryConfig) String() string            { return proto.CompactTextString(m) }
 func (*RepositoryConfig) ProtoMessage()               {}
-func (*RepositoryConfig) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (*RepositoryConfig) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
 func (m *RepositoryConfig) GetRequiredTestingStatuses() []string {
 	if m != nil {
@@ -62,7 +62,7 @@ type RepositoryWatchlist struct {
 func (m *RepositoryWatchlist) Reset()                    { *m = RepositoryWatchlist{} }
 func (m *RepositoryWatchlist) String() string            { return proto.CompactTextString(m) }
 func (*RepositoryWatchlist) ProtoMessage()               {}
-func (*RepositoryWatchlist) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{1} }
+func (*RepositoryWatchlist) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
 
 func (m *RepositoryWatchlist) GetTeam() string {
 	if m != nil {
@@ -83,9 +83,9 @@ func init() {
 	proto.RegisterType((*RepositoryWatchlist)(nil), "bread.RepositoryWatchlist")
 }
 
-func init() { proto.RegisterFile("repository.proto", fileDescriptor4) }
+func init() { proto.RegisterFile("repository.proto", fileDescriptor3) }
 
-var fileDescriptor4 = []byte{
+var fileDescriptor3 = []byte{
 	// 212 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x12, 0x28, 0x4a, 0x2d, 0xc8,
 	0x2f, 0xce, 0x2c, 0xc9, 0x2f, 0xaa, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a,

@@ -6,9 +6,9 @@ import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
-// Interact with the JIRA issues management software.
-service Issues {
-	// List in-progress issues assigned to the the current user
+// Interact with the JIRA ticket management software.
+service Tickets {
+	// List in-progress issues assigned to the current user
 	rpc Mine(MyIssuesRequest) returns (operator.Response);
 }
 

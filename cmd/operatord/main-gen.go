@@ -49,18 +49,6 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return err
 		}
 	}
-	if req.Call.Service == fmt.Sprintf("%s.Issues", pkg) {
-		if req.Call.Method == "Mine" {
-			client := breadpb.NewIssuesClient(conn)
-			_, err := client.Mine(
-				ctx,
-				&breadpb.MyIssuesRequest{
-					Request: req,
-				},
-			)
-			return err
-		}
-	}
 	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
 		if req.Call.Method == "Ping" {
 			client := breadpb.NewPingClient(conn)
@@ -79,6 +67,18 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 				&breadpb.SlowLorisRequest{
 					Request: req,
 					Wait:    req.Call.Args["wait"],
+				},
+			)
+			return err
+		}
+	}
+	if req.Call.Service == fmt.Sprintf("%s.Tickets", pkg) {
+		if req.Call.Method == "Mine" {
+			client := breadpb.NewTicketsClient(conn)
+			_, err := client.Mine(
+				ctx,
+				&breadpb.MyIssuesRequest{
+					Request: req,
 				},
 			)
 			return err
