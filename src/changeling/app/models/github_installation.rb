@@ -46,17 +46,23 @@ class GithubInstallation < ApplicationRecord
   end
 
   def synchronize_organization_teams(organization_name)
-    team_memberships.delete_all
+    memberships = []
 
     github_client.organization_teams(organization_name).each do |org_team|
       github_client.team_members(org_team.id).each do |user|
-        team_memberships.create!(
+        memberships << GithubTeamMembership.new(
+          github_installation_id: id,
           github_team_id: org_team.id,
           github_user_id: user.id,
           team_slug: "#{organization_name}/#{org_team.slug}",
           user_login: user.login
         )
       end
+    end
+
+    ActiveRecord::Base.transaction do
+      team_memberships.delete_all
+      memberships.map(&:save!)
     end
   end
 
