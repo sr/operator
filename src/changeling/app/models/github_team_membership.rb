@@ -1,0 +1,2 @@
+class GithubTeamMembership < ApplicationRecord
+end
