@@ -67,6 +67,8 @@ Style/Documentation:
   Enabled: false
 Style/DoubleNegation:
   Enabled: true
+Style/EmptyMethod:
+  Enabled: false
 Style/FileName:
   Enabled: true
 Style/FormatString:
