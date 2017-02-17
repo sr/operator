@@ -32,24 +32,14 @@ module Clients
       :update_comment,
       :issue_comments,
       :team_members,
-
+      :organizations,
+      :organization_teams,
+      :organization_repositories,
       to: :client
-
-    def organizations
-      @client.organizations
-    end
-
-    def organization_repositories(name)
-      @client.organization_repositories(name)
-    end
 
     # Identify whether we're a herokai or not
     def heroku_org_member?
       @client.orgs.map { |o| o[:login] }.include? "heroku"
-    end
-
-    def organization_teams(organization)
-      @client.organization_teams(organization)
     end
 
     def compliance_status(name_with_owner, sha)

@@ -3,29 +3,34 @@ require 'test/unit'
 
 class TestStatement < Test::Unit::TestCase
   def test_direct_select
-    assert_sql 'SELECT * FROM `users` ORDER BY `name`', SQLParser::Statement::DirectSelect.new(select(all, tblx(from(tbl('users')))), SQLParser::Statement::OrderBy.new(col('name')))
+    assert_sql 'SELECT * FROM `users` ORDER BY `name`', SQLParser::Statement::DirectSelect.new(select(nil, all, tblx(from(tbl('users')))), SQLParser::Statement::OrderBy.new(col('name')), nil)
   end
 
   def test_order_by
     assert_sql 'ORDER BY `name`', SQLParser::Statement::OrderBy.new(col('name'))
   end
 
+  def test_limit
+    assert_sql 'LIMIT 1', SQLParser::Statement::Limit.new(1)
+    assert_sql 'LIMIT 1 OFFSET 2', SQLParser::Statement::Limit.new(1, 2)
+  end
+
   def test_subquery
-    assert_sql '(SELECT 1)', SQLParser::Statement::Subquery.new(select(int(1)))
+    assert_sql '(SELECT 1)', SQLParser::Statement::Subquery.new(select(nil, int(1)))
   end
 
   def test_select
-    assert_sql 'SELECT 1', select(int(1))
-    assert_sql 'SELECT * FROM `users`', select(all, tblx(from(tbl('users'))))
+    assert_sql 'SELECT 1', select(nil, int(1))
+    assert_sql 'SELECT * FROM `users`', select(nil, all, tblx(from(tbl('users'))))
+  end
+
+  def test_select_distinct
+    assert_sql 'SELECT DISTINCT `user`', select(distinct, slist([col('user')]))
   end
 
   def test_select_list
     assert_sql '`id`', slist(col('id'))
     assert_sql '`id`, `name`', slist([col('id'), col('name')])
-  end
-
-  def test_distinct
-    assert_sql 'DISTINCT(`username`)', distinct(col('username'))
   end
 
   def test_all
@@ -259,6 +264,11 @@ class TestStatement < Test::Unit::TestCase
     assert_sql '1', int(1)
   end
 
+  def test_bool
+    assert_sql 'false', bool('false')
+    assert_sql 'true', bool('true')
+  end
+
   private
 
   def assert_sql(expected, ast)
@@ -285,6 +295,10 @@ class TestStatement < Test::Unit::TestCase
     SQLParser::Statement::Integer.new(value)
   end
 
+  def bool(value)
+    SQLParser::Statement::Bool.new(value)
+  end
+
   def col(name)
     SQLParser::Statement::Column.new(name)
   end
@@ -293,16 +307,16 @@ class TestStatement < Test::Unit::TestCase
     SQLParser::Statement::Table.new(name)
   end
 
-  def distinct(col)
-    SQLParser::Statement::Distinct.new(col)
+  def distinct
+    SQLParser::Statement::Distinct.new
   end
 
   def slist(ary)
     SQLParser::Statement::SelectList.new(ary)
   end
 
-  def select(list, table_expression = nil)
-    SQLParser::Statement::Select.new(list, table_expression)
+  def select(modifier, list, table_expression = nil)
+    SQLParser::Statement::Select.new(modifier, list, table_expression)
   end
 
   def tblx(from_clause, where_clause = nil, group_by_clause = nil, having_clause = nil)

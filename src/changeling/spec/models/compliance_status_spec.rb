@@ -18,6 +18,12 @@ describe ComplianceStatus, "pardot" do
       owner: "heroku",
       name: "changeling",
     )
+    GithubInstallation.current.team_memberships.create!(
+      github_team_id: 1,
+      github_user_id: 1,
+      team_slug: "heroku/bread",
+      user_login: "sr"
+    )
     @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/bread"
@@ -33,7 +39,7 @@ describe ComplianceStatus, "pardot" do
       reference_url: reference_url,
       repository_id: @repository.id
     )
-    @multipass.create_ticket_reference!(ticket: ticket)
+    @multipass.create_story_ticket_reference!(ticket: ticket)
     @multipass.peer_reviews.create!(
       reviewer_github_login: "sr",
       state: Clients::GitHub::REVIEW_APPROVED,
@@ -67,7 +73,7 @@ describe ComplianceStatus, "pardot" do
   end
 
   it "requires nothing if the change is an emergency" do
-    @multipass.ticket_reference.destroy!
+    @multipass.story_ticket_reference.destroy!
     @multipass.update!(peer_reviewer: nil)
     @multipass.update!(testing: true, tests_state: RepositoryCommitStatus::FAILURE)
     expect(@multipass.reload.complete?).to eq(false)
@@ -78,7 +84,7 @@ describe ComplianceStatus, "pardot" do
 
   it "requires a ticket reference to be complete" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.ticket_reference.destroy!
+    @multipass.story_ticket_reference.destroy!
     expect(@multipass.reload.complete?).to eq(false)
     expect(@multipass.reload.pending?).to eq(false)
 
@@ -88,7 +94,7 @@ describe ComplianceStatus, "pardot" do
 
   it "requires a reference to an open ticket to be complete" do
     expect(@multipass.complete?).to eq(true)
-    @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
+    @multipass.story_ticket_reference.ticket.update!(open: false, status: "Won't Fix")
     expect(@multipass.reload.complete?).to eq(false)
     expect(@multipass.reload.pending?).to eq(false)
 
@@ -99,7 +105,7 @@ describe ComplianceStatus, "pardot" do
   it "does not require a ticket to be open if the pull request has been merged" do
     expect(@multipass.complete?).to eq(true)
     @multipass.update!(merged: true)
-    @multipass.ticket_reference.ticket.update!(open: false, status: "Won't Fix")
+    @multipass.story_ticket_reference.ticket.update!(open: false, status: "Won't Fix")
     expect(@multipass.reload.complete?).to eq(true)
   end
 
@@ -123,13 +129,26 @@ describe ComplianceStatus, "pardot" do
     expect(description).to eq("Awaiting automated tests results")
   end
 
+  def create_team_memberships(teams)
+    teams.each_with_index do |(team_name, members), team_id|
+      members.each_with_index do |user_login, user_id|
+        GithubInstallation.current.team_memberships.create!(
+          github_team_id: team_id,
+          github_user_id: user_id,
+          team_slug: "heroku/#{team_name}",
+          user_login: user_login
+        )
+      end
+    end
+  end
+
   it "requires peer review and approval by the component(s) owners" do
     @multipass.peer_reviews.destroy_all
     @multipass.pull_request_files.destroy_all
     @repository.repository_owners_files.delete_all
+    GithubInstallation.current.team_memberships.delete_all
 
-    stub_organization_teams(
-      "heroku",
+    create_team_memberships(
       "ops": %w[alindeman sr glenn],
       "bread": %w[alindeman sr],
       "dba": %w[glenn]
@@ -166,9 +185,6 @@ describe ComplianceStatus, "pardot" do
       content: "@heroku/bread"
     )
 
-    # TODO(sr) Memoization is the worst
-    @multipass.instance_variable_set(:@repository_pull_request, nil)
-
     expect(@multipass.peer_reviewed?).to eq(false)
     @multipass.peer_reviews.create!(
       reviewer_github_login: "sr",
@@ -181,13 +197,13 @@ describe ComplianceStatus, "pardot" do
       reviewer_github_login: "glenn",
       state: Clients::GitHub::REVIEW_APPROVED,
     )
-    expect(@multipass.peer_reviewed?).to eq(true)
+    expect(@multipass.reload.peer_reviewed?).to eq(true)
 
     # One positive review per component is sufficient
     @multipass.peer_reviews.create!(
       reviewer_github_login: "alindeman",
       state: Clients::GitHub::REVIEW_CHANGES_REQUESTED,
     )
-    expect(@multipass.peer_reviewed?).to eq(true)
+    expect(@multipass.reload.peer_reviewed?).to eq(true)
   end
 end

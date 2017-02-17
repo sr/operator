@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170210151424) do
+ActiveRecord::Schema.define(version: 20170216190550) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,6 +59,18 @@ ActiveRecord::Schema.define(version: 20170210151424) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hostname"], name: "index_github_installations_on_hostname", unique: true, using: :btree
+  end
+
+  create_table "github_team_memberships", force: :cascade do |t|
+    t.integer  "github_installation_id", null: false
+    t.integer  "github_team_id",         null: false
+    t.integer  "github_user_id",         null: false
+    t.text     "team_slug",              null: false
+    t.text     "user_login",             null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.index ["github_installation_id", "github_team_id", "github_user_id"], name: "github_team_memberships_github_ids_unique_idx", unique: true, using: :btree
+    t.index ["github_installation_id", "team_slug", "user_login"], name: "github_team_memberships_github_names_unique_idx", unique: true, using: :btree
   end
 
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -143,11 +155,13 @@ ActiveRecord::Schema.define(version: 20170210151424) do
   end
 
   create_table "ticket_references", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid     "multipass_id", null: false
-    t.uuid     "ticket_id",    null: false
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
-    t.index ["multipass_id", "ticket_id"], name: "index_ticket_references_on_multipass_id_and_ticket_id", unique: true, using: :btree
+    t.uuid     "multipass_id",                   null: false
+    t.uuid     "ticket_id",                      null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.text     "ticket_type",  default: "story", null: false
+    t.index ["multipass_id", "ticket_type"], name: "ticket_references_emergency_idx", unique: true, where: "(ticket_type = 'emergency'::text)", using: :btree
+    t.index ["multipass_id", "ticket_type"], name: "ticket_references_story_idx", unique: true, where: "(ticket_type = 'story'::text)", using: :btree
   end
 
   create_table "tickets", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -171,6 +185,7 @@ ActiveRecord::Schema.define(version: 20170210151424) do
     t.string   "team"
   end
 
+  add_foreign_key "github_team_memberships", "github_installations"
   add_foreign_key "multipasses", "repositories"
   add_foreign_key "peer_reviews", "multipasses", primary_key: "uuid"
   add_foreign_key "repositories", "github_installations"

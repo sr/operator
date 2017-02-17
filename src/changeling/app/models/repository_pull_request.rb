@@ -25,6 +25,16 @@ class RepositoryPullRequest
     @multipass.title
   end
 
+  def reload
+    @multipass.reload
+
+    if @github_repository.respond_to?(:reload)
+      @github_repository.reload
+    end
+
+    self
+  end
+
   def number
     @multipass.pull_request_number
   end
@@ -88,8 +98,8 @@ class RepositoryPullRequest
   end
 
   def referenced_ticket
-    if @multipass.ticket_reference
-      @multipass.ticket_reference.ticket
+    if @multipass.story_ticket_reference
+      @multipass.story_ticket_reference.ticket
     end
   end
 
@@ -164,7 +174,7 @@ class RepositoryPullRequest
 
     ownership_teams.each do |team|
       team_link = "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
-      approver = ownership.approver(team)
+      approver = ownership.approver(team.slug)
 
       if approver
         approver_link = "<a href=\"#{html_escape(approver.url)}\"><code>@#{html_escape(approver.login)}</code></a>"
@@ -353,8 +363,8 @@ class RepositoryPullRequest
   end
 
   def remove_ticket_reference
-    if @multipass.ticket_reference
-      @multipass.ticket_reference.destroy!
+    if @multipass.story_ticket_reference
+      @multipass.story_ticket_reference.destroy!
     end
   end
 
@@ -363,10 +373,10 @@ class RepositoryPullRequest
       raise ArgumentError, "ticket is a new record"
     end
 
-    if !@multipass.ticket_reference
-      @multipass.create_ticket_reference!(ticket_id: ticket.id)
+    if !@multipass.story_ticket_reference
+      @multipass.create_story_ticket_reference!(ticket_id: ticket.id)
     else
-      @multipass.ticket_reference.update!(ticket_id: ticket.id)
+      @multipass.story_ticket_reference.update!(ticket_id: ticket.id)
     end
   end
 

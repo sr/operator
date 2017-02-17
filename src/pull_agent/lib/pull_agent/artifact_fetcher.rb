@@ -47,12 +47,18 @@ module PullAgent
           response.value # raise error if non-successful
 
           output = IO.popen(["tar", "-xzf", "-", "-C", directory], "r+", err: [:child, :out]) { |io|
-            response.read_body do |chunk|
-              io.write(chunk)
+            write_thread = Thread.new do
+              response.read_body do |chunk|
+                io.write(chunk)
+              end
+              io.close_write
             end
-            io.close_write
-            io.read
+
+            output = io.read
+            write_thread.join
+            output
           }
+
           raise DecompressionError, "Unable to uncompress artifact: #{output}" unless $?.success?
         end
       end

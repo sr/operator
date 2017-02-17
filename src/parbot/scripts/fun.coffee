@@ -193,11 +193,29 @@ module.exports = (robot) ->
   robot.respond /elmo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/YTCOYslSLDAuTGx/ElmoStop.jpg"
 
+  robot.respond /reversedogs$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xByhjKhEPMjjMoo.gif"
+
   robot.respond /reversenuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/4y1DzwdJcnAfC.gif"
 
+  robot.respond /reversesliders$/i, (msg) ->
+    msg.send "http://i.giphy.com/d3mmCa9caVlp8FH2.gif"
+
+  robot.respond /reversewigglers$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBw6Ep4PPmWH5tu.gif"
+
+  robot.respond /toiletdogs$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBASJKItkJuIX2U.gif"
+
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
+
+  robot.respond /toiletsliders$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBAxOmClqU4FAHe.gif"
+
+  robot.respond /toiletwigglers$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBsMMQKWp6OiXJu.gif"
 
   robot.respond /master(\s)?is(\s)?open$/i, (msg) ->
     opens = [

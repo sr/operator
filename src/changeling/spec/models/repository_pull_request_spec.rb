@@ -158,25 +158,25 @@ RSpec.describe RepositoryPullRequest do
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
-      @multipass.ticket_reference.destroy!
+      @multipass.story_ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "    BREAD-1598: hello")
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
-      @multipass.ticket_reference.destroy!
+      @multipass.story_ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
-      @multipass.ticket_reference.destroy!
+      @multipass.story_ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "BREAD-1598 - hello")
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.reload.referenced_ticket).to_not eq(nil)
 
-      @multipass.ticket_reference.destroy!
+      @multipass.story_ticket_reference.destroy!
       expect(@multipass.reload.referenced_ticket).to eq(nil)
       stub_github_pull_request(title: "[BREAD-1598] - hello")
       @repository_pull_request.synchronize(create_github_status: false)
