@@ -193,6 +193,9 @@ module.exports = (robot) ->
   robot.respond /elmo$/i, (msg) ->
     msg.send "https://hipchat.dev.pardot.com/files/1/162/YTCOYslSLDAuTGx/ElmoStop.jpg"
 
+  robot.respond /reversedogs$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xByhjKhEPMjjMoo.gif"
+
   robot.respond /reversenuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/4y1DzwdJcnAfC.gif"
 
@@ -201,6 +204,9 @@ module.exports = (robot) ->
 
   robot.respond /reversewigglers$/i, (msg) ->
     msg.send "http://i.giphy.com/26xBw6Ep4PPmWH5tu.gif"
+
+  robot.respond /toiletdogs$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBASJKItkJuIX2U.gif"
 
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
