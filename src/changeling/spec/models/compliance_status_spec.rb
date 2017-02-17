@@ -3,6 +3,7 @@ require "rails_helper"
 describe ComplianceStatus, "pardot" do
   before(:each) do
     Changeling.config.pardot = true
+    Changeling.config.sre_team_slug = "heroku/sre"
 
     ticket = Ticket.create!(
       external_id: "1",
@@ -34,6 +35,7 @@ describe ComplianceStatus, "pardot" do
       @repository.full_name
     )
     @multipass = Fabricate(:multipass,
+      change_type: ChangeCategorization::STANDARD,
       testing: true,
       tests_state: RepositoryCommitStatus::SUCCESS,
       reference_url: reference_url,
@@ -64,12 +66,6 @@ describe ComplianceStatus, "pardot" do
       stub_request(:get, "#{Changeling.config.github_api_endpoint}/teams/#{index}/members")
         .to_return(body: JSON.dump(data), headers: { "Content-Type" => "application/json" })
     end
-  end
-
-  it "can never be approved by a SRE" do
-    @multipass.sre_approver = @user
-    expect(@multipass.sre_approved?).to eq(false)
-    expect(@multipass.user_is_sre_approver?(@user)).to eq(false)
   end
 
   it "requires nothing if the change is an emergency" do
@@ -205,5 +201,32 @@ describe ComplianceStatus, "pardot" do
       state: Clients::GitHub::REVIEW_CHANGES_REQUESTED,
     )
     expect(@multipass.reload.peer_reviewed?).to eq(true)
+  end
+
+  it "requires peer review by an SRE for #major changes" do
+    @multipass.peer_reviews.destroy_all
+    @multipass.pull_request_files.destroy_all
+    @repository.repository_owners_files.delete_all
+    GithubInstallation.current.team_memberships.delete_all
+
+    create_team_memberships(
+      "sre": %w[joel]
+    )
+
+    @multipass.change_type = ChangeCategorization::STANDARD
+    @multipass.save!
+    expect(@multipass.sre_approval_required?).to eq(false)
+    expect(@multipass.sre_approved?).to eq(false)
+
+    @multipass.change_type = ChangeCategorization::MAJOR
+    @multipass.save!
+    expect(@multipass.sre_approval_required?).to eq(true)
+    expect(@multipass.sre_approved?).to eq(false)
+
+    @multipass.peer_reviews.create!(
+      reviewer_github_login: "joel",
+      state: Clients::GitHub::REVIEW_APPROVED
+    )
+    expect(@multipass.sre_approved?).to eq(true)
   end
 end

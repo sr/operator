@@ -11,7 +11,10 @@ class GithubInstallation < ApplicationRecord
   end
 
   def team_members(team_slugs)
-    team_memberships.where(team_slug: team_slugs).pluck(:user_login)
+    team_memberships
+      .where(team_slug: team_slugs)
+      .pluck(:user_login)
+      .map { |login| GithubUser.new(login) }
   end
 
   def synchronize

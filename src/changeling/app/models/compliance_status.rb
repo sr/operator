@@ -37,6 +37,10 @@ class ComplianceStatus
     adapter.sre_approved?
   end
 
+  def sre_approval_required?
+    adapter.sre_approval_required?
+  end
+
   def user_is_sre_approver?(user)
     sre_approved? && adapter.user_is_sre_approver?(user)
   end
@@ -60,20 +64,24 @@ class ComplianceStatus
   def description_html
     body = "<ul>"
 
-    teams = @pull_request.ownership_teams.map do |team|
-      "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
-    end
+    teams = @pull_request.ownership_teams.map(&:html_link)
 
     if peer_reviewed?
-      approvers = @multipass.peer_review_approvers.map do |approver|
-        "<a href=\"#{html_escape(Changeling.config.github_url + "/" + approver)}\"><code>@#{html_escape(approver)}</code></a>"
-      end
-
-      body << "<li>Changes reviewed and approved by the following people: #{approvers.join(" ")}</li>"
+      approvers = @multipass.peer_review_approvers.map { |approver| user_link(approver) }
+      body << "<li>Changes reviewed and approved by the following people: #{approvers.join(", ")}</li>"
     elsif teams.size == 1
       body << "<li>Review by a member of the #{teams[0]} team is required</li>"
     else
-      body << "<li>Review by a member of the following teams is required: #{teams.join(" ")}</li>"
+      body << "<li>Review by a member of the following teams is required: #{teams.join(", ")}</li>"
+    end
+
+    if sre_approval_required?
+      sre_team = GithubTeam.new(Changeling.config.sre_team_slug)
+      if sre_approved?
+        body << "<li>Changes reviewed and approved by a member of the #{team_link(sre_team)} team</li>"
+      else
+        body << "<li>Review by a member of the #{team_link(sre_team)} team is required because this is a major change</li>"
+      end
     end
 
     case @multipass.tests_state

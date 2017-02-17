@@ -1,36 +1,4 @@
 class PullRequestOwnership
-  class GithubUser
-    def initialize(login)
-      @login = login
-    end
-
-    attr_reader :login
-
-    def url
-      "#{Changeling.config.github_url}/#{@login}"
-    end
-  end
-
-  # Team represents a GitHub team.
-  class GithubTeam
-    def initialize(organization, team)
-      @organization = organization
-      @slug = team
-    end
-
-    attr_reader :slug
-
-    def url
-      "#{Changeling.config.github_url}/orgs/#{@organization}/teams/#{name}"
-    end
-
-    private
-
-    def name
-      @slug.split("/").last
-    end
-  end
-
   def initialize(multipass, pull_request, github_client)
     @multipass = multipass
     @pull_request = pull_request
@@ -47,7 +15,7 @@ class PullRequestOwnership
     end
 
     slugs.map do |slug|
-      GithubTeam.new(@pull_request.repository_organization, slug)
+      GithubTeam.new(slug)
     end
   end
 
@@ -70,12 +38,9 @@ class PullRequestOwnership
   # a given team. If it no one from the given team has given an approvel yet,
   # this returns nil.
   def approver(team)
-    login = GithubInstallation.current.team_members(team).detect do |user_login|
-      @multipass.peer_review_approvers.include?(user_login)
-    end
-
-    if login
-      GithubUser.new(login)
+    approvers = @multipass.peer_review_approvers
+    GithubInstallation.current.team_members(team).detect do |user|
+      approvers.include?(user)
     end
   end
 

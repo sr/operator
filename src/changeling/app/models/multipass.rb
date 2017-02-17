@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require_relative "./validators/sre_approver_is_in_sre"
 
 # A change request in the system
@@ -116,10 +117,10 @@ class Multipass < ActiveRecord::Base
     pull_request_files.pluck(:filename).map { |f| Pathname(f) }
   end
 
-  # Returns an Array of GitHub user logins that approve of this change
+  # Returns an Array of GitHub users that approve of this change
   def peer_review_approvers
     peer_reviews.where(state: Clients::GitHub::REVIEW_APPROVED)
-      .load.map(&:reviewer_github_login)
+      .load.map { |review| GithubUser.new(review.reviewer_github_login) }
   end
 
   def hostname
@@ -218,6 +219,7 @@ class Multipass < ActiveRecord::Base
     :peer_reviewed?,
     :user_is_peer_reviewer?,
     :sre_approved?,
+    :sre_approval_required?,
     :user_is_sre_approver?,
     :emergency_approved?,
     :user_is_emergency_approver?,
