@@ -36,9 +36,8 @@ module PullAgent
       end
 
       def restart
-        add_graphite_annotation if %w[production performance_testing].include?(@environment)
+        add_graphite_annotation if %w[production].include?(@environment)
         restart_redis_jobs
-        restart_old_style_jobs
         restart_autojobs
       end
 
@@ -75,12 +74,6 @@ module PullAgent
         end
       end
 
-      def restart_old_style_jobs
-        cmd = ["#{release_directory.current_symlink}/symfony-#{symfony_env}", "restart-old-jobs"]
-        output = ShellHelper.execute(cmd)
-        Logger.log(:info, "Restarted old style jobs (#{cmd}): #{output}")
-      end
-
       def restart_autojobs(disco = DiscoveryClient.new, redis = ::PullAgent::Redis)
         Logger.log(:info, "Querying the disco service to find redis rule cache masters")
 
@@ -101,21 +94,6 @@ module PullAgent
       def release_directory
         @release_directory ||=
           ReleaseDirectory.new(ENV.fetch("RELEASE_DIRECTORY", "/var/www/pardot"))
-      end
-
-      def symfony_env
-        @symfony_env ||=
-          if %w[production performance_testing].include?(@environment) && ShellHelper.datacenter == "dfw"
-            "prod-s"
-          elsif %w[production performance_testing].include?(@environment)
-            "prod"
-          elsif @environment == "staging" && ShellHelper.datacenter == "dfw"
-            "staging-s"
-          elsif @environment == "staging"
-            "staging"
-          else
-            @environment
-          end
       end
     end
   end
