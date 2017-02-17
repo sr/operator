@@ -196,11 +196,17 @@ module.exports = (robot) ->
   robot.respond /reversenuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/4y1DzwdJcnAfC.gif"
 
+  robot.respond /reversesliders$/i, (msg) ->
+    msg.send "http://i.giphy.com/d3mmCa9caVlp8FH2.gif"
+
+  robot.respond /reversewigglers$/i, (msg) ->
+    msg.send "http://i.giphy.com/26xBw6Ep4PPmWH5tu.gif"
+
   robot.respond /toiletnuggets$/i, (msg) ->
     msg.send "http://i.giphy.com/NnkNYfMcPcGTS.gif"
 
   robot.respond /toiletsliders$/i, (msg) ->
-    msg.send "http://i.giphy.com/l3q2BZNYrffENFsPK.gif"
+    msg.send "http://i.giphy.com/26xBAxOmClqU4FAHe.gif"
 
   robot.respond /toiletwigglers$/i, (msg) ->
     msg.send "http://i.giphy.com/26xBsMMQKWp6OiXJu.gif"
