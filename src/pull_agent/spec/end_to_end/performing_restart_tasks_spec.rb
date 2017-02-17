@@ -34,10 +34,6 @@ describe "performing restart tasks" do
     stub_request(:get, /http:\/\/127.0.0.1:8383\/v1\/service\/redis-job-[2-9]/)
       .to_return(body: %([]))
 
-    # Restarting old style jobs
-    expect(PullAgent::ShellHelper).to receive(:execute)
-      .with(["#{tempdir}/current/symfony-test", "restart-old-jobs"])
-
     # Restarting autojobs
     stub_request(:get, "http://127.0.0.1:8383/v1/service/redis-rules-cache-1")
       .to_return(body: %([{"payload":{"role":"master"},"address":"redis.example","port":1234}]))
