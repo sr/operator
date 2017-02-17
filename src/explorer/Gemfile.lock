@@ -1,6 +1,7 @@
 GIT
-  remote: https://github.com/janSF/sql-parser
-  revision: cc75a88c273dab6884f0e9edd77416cedb8b5898
+  remote: https://github.com/alindeman/sql-parser
+  revision: e114829eb7f1cfaf7406129bdfb05ccbcd4c6f1f
+  branch: refactor
   specs:
     sql-parser (0.0.3)
       racc (~> 1.4)
