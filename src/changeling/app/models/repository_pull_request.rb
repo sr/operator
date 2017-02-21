@@ -277,6 +277,7 @@ class RepositoryPullRequest
 
     ticket = EmergencyMergeTicket.new(
       Changeling.config.jira_client,
+      github_repository.github_client,
       Changeling.config.emergency_ticket_jira_project_key,
       @multipass
     )

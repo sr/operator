@@ -69,6 +69,19 @@ RSpec.describe RepositoryPullRequest do
       .to_return(body: JSON.dump(files), headers: { "Content-Type" => "application/json" })
   end
 
+  def stub_github_commit(sha:, email: "user@example.com")
+    commit = {
+      commit: {
+        author: {
+          email: email,
+          date: Time.current
+        }
+      }
+    }
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/commits/#{sha}")
+      .to_return(body: JSON.dump(commit), headers: { "Content-Type" => "application/json" })
+  end
+
   def stub_github_commit_status(statuses: [])
     combined_status = {
       repository: {
@@ -301,6 +314,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
@@ -324,6 +338,7 @@ RSpec.describe RepositoryPullRequest do
           { status: "added", filename: "boomtown", patch: "+ hi" }
         ]
       )
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
@@ -553,6 +568,7 @@ RSpec.describe RepositoryPullRequest do
           user: { login: "alindeman" }
         }
       ])
+      stub_github_commit(sha: "abc123")
       stub_github_pull_request_labels
 
       @repository_pull_request.synchronize(create_github_status: false)
@@ -564,6 +580,7 @@ RSpec.describe RepositoryPullRequest do
       stub_jira_ticket("BREAD-1598")
       stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
