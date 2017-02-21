@@ -54,6 +54,10 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     end
   end
 
+  def user(login)
+    GithubUser.new(login)
+  end
+
   it "returns the repository owners if the pull request has no changes" do
     create_team_memberships(bread: %w[alindeman sr], tools: %w[ys])
     expect(@pull_request.ownership_users).to eq([])
@@ -64,7 +68,11 @@ RSpec.describe RepositoryPullRequest, "ownership" do
     )
     @pull_request.reload
 
-    expect(@pull_request.ownership_users).to eq([%w[alindeman sr ys]])
+    expect(@pull_request.ownership_users).to eq([[
+      user("alindeman"),
+      user("sr"),
+      user("ys")
+    ]])
   end
 
   it "returns the list of teams that owns components changed by this pull request" do
@@ -150,14 +158,14 @@ RSpec.describe RepositoryPullRequest, "ownership" do
   end
 
   it "returns the owners of every component being changed" do
-    team_bread = %w[alindeman sr]
-    team_dba = %w[glen]
-    team_ops = %w[alindeman glen sr]
+    team_bread = %w[alindeman sr].map { |u| user(u) }
+    team_dba = %w[glen].map { |u| user(u) }
+    team_ops = %w[alindeman glen sr].map { |u| user(u) }
 
     create_team_memberships(
-      "bread": team_bread,
-      "dba": team_dba,
-      "ops": team_ops
+      "bread": team_bread.map(&:login),
+      "dba": team_dba.map(&:login),
+      "ops": team_ops.map(&:login)
     )
 
     @multipass.pull_request_files.create!(

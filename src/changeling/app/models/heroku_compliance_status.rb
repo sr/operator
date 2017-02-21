@@ -29,6 +29,10 @@ class HerokuComplianceStatus
     @multipass.sre_approver.present?
   end
 
+  def sre_approval_required?
+    false
+  end
+
   def user_is_sre_approver?(user)
     @multipass.sre_approver == user
   end

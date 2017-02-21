@@ -78,6 +78,14 @@ class ChangelingConfig
     end
   end
 
+  def sre_team_slug
+    return @sre_team_slug if defined?(@sre_team_slug)
+
+    @sre_team_slug = \
+      ENV.fetch("CHANGELING_SRE_TEAM_SLUG", "Pardot/site-reliability-engineers")
+  end
+  attr_writer :sre_team_slug
+
   def default_repo_name
     if pardot?
       "Pardot/unknown"

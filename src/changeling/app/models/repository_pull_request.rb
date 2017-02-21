@@ -173,18 +173,24 @@ class RepositoryPullRequest
     body << "<ul>"
 
     ownership_teams.each do |team|
-      team_link = "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
       approver = ownership.approver(team.slug)
-
       if approver
-        approver_link = "<a href=\"#{html_escape(approver.url)}\"><code>@#{html_escape(approver.login)}</code></a>"
-        body << "<li>#{GLYPH_APPROVED} #{team_link}: approved by #{approver_link}"
+        body << "<li>#{GLYPH_APPROVED} #{team.html_link}: approved by #{approver.html_link}"
       else
-        body << "<li>#{GLYPH_NOT_APPROVED} #{team_link}</li>"
+        body << "<li>#{GLYPH_NOT_APPROVED} #{team.html_link}</li>"
       end
     end
 
+    if @multipass.sre_approval_required?
+      sre_team = GithubTeam.new(Changeling.config.sre_team_slug)
+      body << "<li>#{@multipass.sre_approved? ? GLYPH_APPROVED : GLYPH_NOT_APPROVED} #{sre_team.html_link} (required because this is a #major change)</li>"
+    end
+
     body << "</ul>"
+
+    if !@multipass.sre_approval_required?
+      body << "<p>If this is a major change that requires SRE involvement, please tag it as `#major` in an issue comment.</p>"
+    end
 
     body << "<details>"
     body << "<summary>Peer review and compliance details</summary>"
@@ -204,10 +210,6 @@ class RepositoryPullRequest
     end
 
     body << "</ul>"
-  end
-
-  def html_escape(s)
-    ERB::Util.html_escape(s)
   end
 
   def synchronize_github_pull_request

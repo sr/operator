@@ -17,6 +17,10 @@ class PardotComplianceStatus
       return false
     end
 
+    if sre_approval_required? && !sre_approved?
+      return false
+    end
+
     peer_reviewed? && tests_successful?
   end
 
@@ -41,7 +45,13 @@ class PardotComplianceStatus
   end
 
   def sre_approved?
-    false
+    sres = GithubInstallation.current.team_members(Changeling.config.sre_team_slug)
+    reviewers = @multipass.peer_review_approvers
+    !(sres & reviewers).empty?
+  end
+
+  def sre_approval_required?
+    @multipass.change_type == ChangeCategorization::MAJOR
   end
 
   def user_is_sre_approver?(_user)
@@ -96,6 +106,8 @@ class PardotComplianceStatus
       "Automated tests failed"
     elsif !peer_reviewed?
       "Review by one or more component(s) owner(s) is missing"
+    elsif sre_approval_required? && !sre_approved?
+      "Review by the SRE team is required and is missing"
     else
       "Missing fields: #{@multipass.missing_fields.join(", ")}"
     end
