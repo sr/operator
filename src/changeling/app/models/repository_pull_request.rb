@@ -275,29 +275,12 @@ class RepositoryPullRequest
       return
     end
 
-    attributes = {
-      "fields": {
-        "summary": "TODO",
-        "description": "TODO",
-        "project": {
-          "key": Changeling.config.emergency_ticket_jira_project_key
-        },
-        "issuetype": {
-          "name": "Task"
-        }
-      }
-    }
-
-    if @multipass.emergency_ticket_reference
-      issue = Changeling.config.jira_client.Issue.find(@multipass.emergency_ticket_reference.ticket.external_id)
-      issue.save!(attributes)
-      Ticket.synchronize_jira_ticket(issue.key)
-    else
-      issue = Changeling.config.jira_client.Issue.build
-      issue.save!(attributes)
-      ticket = Ticket.synchronize_jira_ticket(issue.key)
-      @multipass.create_emergency_ticket_reference!(ticket: ticket)
-    end
+    ticket = EmergencyMergeTicket.new(
+      Changeling.config.jira_client,
+      Changeling.config.emergency_ticket_jira_project_key,
+      @multipass
+    )
+    ticket.synchronize
   end
 
   def synchronize_github_statuses
