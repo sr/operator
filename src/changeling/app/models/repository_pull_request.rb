@@ -74,6 +74,7 @@ class RepositoryPullRequest
 
     synchronize_github_pull_request
     synchronize_change_categorization
+    synchronize_emergency_ticket
 
     if !@multipass.merged?
       synchronize_github_reviewers
@@ -263,6 +264,24 @@ class RepositoryPullRequest
     end
 
     @multipass.change_type = change_type
+  end
+
+  def synchronize_emergency_ticket
+    if !Changeling.config.emergency_merge_ticket_enabled_repositories.include?(repository.name_with_owner)
+      return
+    end
+
+    if @multipass.change_type != ChangeCategorization::EMERGENCY
+      return
+    end
+
+    ticket = EmergencyMergeTicket.new(
+      Changeling.config.jira_client,
+      github_repository.github_client,
+      Changeling.config.emergency_ticket_jira_project_key,
+      @multipass
+    )
+    ticket.synchronize
   end
 
   def synchronize_github_statuses

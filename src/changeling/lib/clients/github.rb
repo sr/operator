@@ -35,6 +35,7 @@ module Clients
       :organizations,
       :organization_teams,
       :organization_repositories,
+      :commit,
       to: :client
 
     # Identify whether we're a herokai or not

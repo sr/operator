@@ -12,6 +12,7 @@ class Multipass < ActiveRecord::Base
   has_many :pull_request_files
 
   has_one :story_ticket_reference, -> { where(ticket_type: TicketReference::TICKET_TYPE_STORY) }, class_name: "TicketReference"
+  has_one :emergency_ticket_reference, -> { where(ticket_type: TicketReference::TICKET_TYPE_EMERGENCY) }, class_name: "TicketReference"
 
   include Multipass::ActorVerification, Multipass::RequiredFields,
     Multipass::Updates, Multipass::GitHubStatuses,
