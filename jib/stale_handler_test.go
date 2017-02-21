@@ -45,7 +45,7 @@ func TestStaleHandler(t *testing.T) {
 				UpdatedAt:  time.Now().Add(-61 * 24 * time.Hour),
 			},
 			expectedReplyComment: &issueReplyCommentMatcher{
-				Context: nil,
+				Context: struct{}{},
 				BodyRegexps: []*regexp.Regexp{
 					regexp.MustCompile(`@user.*I have started automatically closing`),
 					regexp.MustCompile(`Please feel free to reopen`),

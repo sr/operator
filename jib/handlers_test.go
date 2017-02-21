@@ -15,7 +15,7 @@ type issueReplyCommentMatcher struct {
 }
 
 func assertIssueReplyMatches(m *issueReplyCommentMatcher, comment *github.IssueReplyComment) error {
-	if m.Context != nil && !reflect.DeepEqual(comment.Context, m.Context) {
+	if !reflect.DeepEqual(comment.Context, m.Context) {
 		return fmt.Errorf("expected context to be %+v, but was %+v", m.Context, comment.Context)
 	}
 
