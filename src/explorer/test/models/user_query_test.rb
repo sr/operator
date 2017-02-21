@@ -6,7 +6,7 @@ class UserQueryTest < ActiveSupport::TestCase
   end
 
   test "execute" do
-    query = @user.account_query("SELECT * FROM object_audit", 1)
+    query = @user.account_query("SELECT * FROM object_audit oa", 1)
     results = query.execute(@user)
     row = results.first
     assert_equal "1", row[:id]
