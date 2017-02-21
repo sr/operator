@@ -86,6 +86,9 @@ describe ComplianceStatus, "pardot" do
 
     description = @multipass.github_commit_status_description
     expect(description).to eq("Ticket reference is missing")
+
+    html_description = @multipass.status_description_html
+    expect(html_description).to include("<li>No ticket reference found")
   end
 
   it "requires a reference to an open ticket to be complete" do
@@ -217,16 +220,19 @@ describe ComplianceStatus, "pardot" do
     @multipass.save!
     expect(@multipass.sre_approval_required?).to eq(false)
     expect(@multipass.sre_approved?).to eq(false)
+    expect(@multipass.status_description_html).not_to match(/Review by a member of the.*sre.*team is required/)
 
     @multipass.change_type = ChangeCategorization::MAJOR
     @multipass.save!
     expect(@multipass.sre_approval_required?).to eq(true)
     expect(@multipass.sre_approved?).to eq(false)
+    expect(@multipass.status_description_html).to match(/Review by a member of the.*sre.*team is required/)
 
     @multipass.peer_reviews.create!(
       reviewer_github_login: "joel",
       state: Clients::GitHub::REVIEW_APPROVED
     )
     expect(@multipass.sre_approved?).to eq(true)
+    expect(@multipass.status_description_html).to match(/approved by a member of the.*sre.*team/)
   end
 end

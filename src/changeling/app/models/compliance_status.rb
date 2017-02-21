@@ -67,7 +67,7 @@ class ComplianceStatus
     teams = @pull_request.ownership_teams.map(&:html_link)
 
     if peer_reviewed?
-      approvers = @multipass.peer_review_approvers.map { |approver| user_link(approver) }
+      approvers = @multipass.peer_review_approvers.map(&:html_link)
       body << "<li>Changes reviewed and approved by the following people: #{approvers.join(", ")}</li>"
     elsif teams.size == 1
       body << "<li>Review by a member of the #{teams[0]} team is required</li>"
@@ -78,9 +78,9 @@ class ComplianceStatus
     if sre_approval_required?
       sre_team = GithubTeam.new(Changeling.config.sre_team_slug)
       if sre_approved?
-        body << "<li>Changes reviewed and approved by a member of the #{team_link(sre_team)} team</li>"
+        body << "<li>Changes reviewed and approved by a member of the #{sre_team.html_link} team</li>"
       else
-        body << "<li>Review by a member of the #{team_link(sre_team)} team is required because this is a major change</li>"
+        body << "<li>Review by a member of the #{sre_team.html_link} team is required because this is a major change</li>"
       end
     end
 
