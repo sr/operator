@@ -1,6 +1,6 @@
 class SQLQuery
   ACCOUNT_TABLE = "account".freeze
-  NamedTable = Struct.new(:name, :is_account?)
+  NamedTable = Struct.new(:name, :alias, :is_account?)
 
   def initialize(query)
     @ast = SQLParser::Parser.new.scan_str(query.sub(/;$/, ""))
@@ -40,9 +40,9 @@ class SQLQuery
 
   def table_name(ast)
     if ast.respond_to?(:name)
-      NamedTable.new(ast.name, ast.name == ACCOUNT_TABLE)
-    elsif ast.respond_to?(:column) # Named tables
-      NamedTable.new(ast.column.name, ast.value.name == ACCOUNT_TABLE)
+      NamedTable.new(ast.name, ast.name, ast.name == ACCOUNT_TABLE)
+    elsif ast.respond_to?(:value) && ast.respond_to?(:column) # Named tables
+      NamedTable.new(ast.value.name, ast.column.name, ast.value.name == ACCOUNT_TABLE)
     elsif ast.is_a?(SQLParser::Statement::QualifiedJoin)
       [table_name(ast.left), table_name(ast.right)]
     end

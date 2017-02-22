@@ -60,7 +60,7 @@ class ScopedSQLQuery < SQLQuery
     end
 
     SQLParser::Statement::QualifiedColumn.new(
-      SQLParser::Statement::Table.new(table.name),
+      SQLParser::Statement::Table.new(table.alias),
       SQLParser::Statement::Column.new(column_name)
     )
   end
