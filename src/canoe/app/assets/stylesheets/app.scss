@@ -195,3 +195,7 @@ ul.nav {
     &[data-state="unreported"] { color: #cccccc; }
   }
 }
+.deployability {
+  display: inline-block;
+  margin: 10px;
+}
