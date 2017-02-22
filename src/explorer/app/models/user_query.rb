@@ -72,12 +72,14 @@ class UserQuery < ApplicationRecord
   def parse(show_all_rows)
     sql_query = SQLQuery.new(raw_sql)
 
-    unless show_all_rows
-      sql_query = sql_query.limit(DEFAULT_LIMIT)
-    end
+    if !sql_query.explain?
+      if !show_all_rows
+        sql_query = sql_query.limit(DEFAULT_LIMIT)
+      end
 
-    if for_account?
-      sql_query = sql_query.scope_to(self, account_id)
+      if for_account?
+        sql_query = sql_query.scope_to(self, account_id)
+      end
     end
 
     @parsed = sql_query

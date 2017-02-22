@@ -40,6 +40,7 @@ rule
             {BLANK}       # no action
 
 # keywords
+            {WB}EXPLAIN{WB}       { [:EXPLAIN, text] }
             {WB}SELECT{WB}        { [:SELECT, text] }
             {WB}DISTINCT{WB}      { [:DISTINCT, text] }
             {WB}DATE{WB}          { [:DATE, text] }

@@ -17,9 +17,14 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
     <tr>
     <% results.fields.each_with_index do |field, i| %>
       <th>
-        <%= link_to field, "#", class: 'select_column' %>
+        <%- if query.parsed.explain? %>
+          <%= field %>
+        <%- else %>
+          <%= link_to field, "#", class: 'select_column' %>
+        <%- end %>
+
         <%# TODO Bring this functionality back %>
-        <% if !query.parsed.select_all? && (i == results.fields.length-1) %>
+        <% if !query.parsed.explain? && !query.parsed.select_all? && (i == results.fields.length-1) %>
           <%= select_tag(:add_column, options_for_select(query.database_columns.unshift("Add column", "Show all"))) %>
         <% end %>
       </th>
@@ -38,4 +43,4 @@ the last <%= distance_of_time_in_words(rate_limit.period) %>. Please wait
   </table>
 </div>
 <%# Only enabling this for shards right now. Will see what the query usage is on global before enabling %>
-<%= link_to("Show All Rows", query_path(all_rows: 1)) if query.for_account? && !@show_all_rows %>
+<%= link_to("Show All Rows", query_path(all_rows: 1)) if !query.parsed.explain? && query.for_account? && !@show_all_rows %>
