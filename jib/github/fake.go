@@ -6,18 +6,19 @@ import (
 )
 
 type FakeClient struct {
-	ProvidedUsername string
-	OpenPullRequests []*PullRequest
-	IssueComments    map[int][]*IssueComment
-	PermissionLevels map[string]PermissionLevel
-	CommitStatuses   map[string][]*CommitStatus
-	CommitsSince     map[string][]*Commit
-	TeamMembers      map[string][]string
-
+	ProvidedUsername   string
+	OpenPullRequests   []*PullRequest
+	IssueComments      map[int][]*IssueComment
+	PermissionLevels   map[string]PermissionLevel
+	CommitStatuses     map[string][]*CommitStatus
+	CommitsSince       map[string][]*Commit
+	TeamMembers        map[string][]string
 	MergedPullRequests map[int]string
 	DeletedBranches    []string
 	PostedComments     []*IssueReplyComment
 	ClosedIssues       []int
+	PullRequestFiles   []string
+	RepositoryFile     *File
 }
 
 // Ensure FakeClient conforms to the GithubClient interface
@@ -95,4 +96,12 @@ func (c *FakeClient) PostIssueComment(org, repo string, number int, comment *Iss
 func (c *FakeClient) CloseIssue(org, repo string, number int) error {
 	c.ClosedIssues = append(c.ClosedIssues, number)
 	return nil
+}
+
+func (c *FakeClient) GetPullRequestFiles(org, repo string, number int) ([]string, error) {
+	return c.PullRequestFiles, nil
+}
+
+func (c *FakeClient) GetRepositoryFile(org, repo, file, ref string) (*File, error) {
+	return c.RepositoryFile, nil
 }
