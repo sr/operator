@@ -609,7 +609,7 @@ RSpec.describe RepositoryPullRequest do
   end
 
   it "updates the github comment describing the status of the PR" do
-    Changeling.config.compliance_comment_enabled_repositories = [@repository.full_name]
+    @repository.update!(compliance_enabled: true)
     @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
@@ -621,6 +621,9 @@ RSpec.describe RepositoryPullRequest do
     stub_github_pull_request_reviews
     stub_github_pull_request_comments
     stub_github_pull_request_labels
+
+    stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/statuses/deadbeef")
+
     request = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
 
     @multipass.synchronize

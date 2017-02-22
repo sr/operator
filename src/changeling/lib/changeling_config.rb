@@ -30,12 +30,6 @@ class ChangelingConfig
     pardot?
   end
 
-  def compliance_comment_enabled_repositories
-    return @compliance_comment_enabled_repositories if defined?(@compliance_comment_enabled_repositories)
-    @compliance_comment_enabled_repositories = Array(ENV["CHANGELING_COMPLIANCE_COMMENT_ENABLED_REPOSITORIES"].to_s.split(","))
-  end
-  attr_writer :compliance_comment_enabled_repositories
-
   def emergency_merge_ticket_enabled_repositories
     return @emergency_merge_ticket_enabled_repositories if defined?(@emergency_merge_ticket_enabled_repositories)
     @emergency_merge_ticket_enabled_repositories = Array(ENV["CHANGELING_EMERGENCY_MERGE_TICKET_ENABLED_REPOSITORIES"].to_s.split(","))
