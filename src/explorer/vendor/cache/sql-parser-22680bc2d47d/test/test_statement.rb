@@ -6,6 +6,10 @@ class TestStatement < Test::Unit::TestCase
     assert_sql 'SELECT * FROM `users` ORDER BY `name`', SQLParser::Statement::DirectSelect.new(select(nil, all, tblx(from(tbl('users')))), SQLParser::Statement::OrderBy.new(col('name')), nil)
   end
 
+  def test_explain
+    assert_sql 'EXPLAIN SELECT * FROM `users`', explain(SQLParser::Statement::DirectSelect.new(select(nil, all, tblx(from(tbl('users')))), nil, nil))
+  end
+
   def test_order_by
     assert_sql 'ORDER BY `name`', SQLParser::Statement::OrderBy.new(col('name'))
   end
@@ -317,6 +321,10 @@ class TestStatement < Test::Unit::TestCase
 
   def select(modifier, list, table_expression = nil)
     SQLParser::Statement::Select.new(modifier, list, table_expression)
+  end
+
+  def explain(direct_select)
+    SQLParser::Statement::Explain.new(direct_select)
   end
 
   def tblx(from_clause, where_clause = nil, group_by_clause = nil, having_clause = nil)

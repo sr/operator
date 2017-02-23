@@ -25,6 +25,10 @@ module SQLParser
       ].compact.collect { |e| visit(e) }.join(' ')
     end
 
+    def visit_Explain(o)
+      "EXPLAIN #{visit(o.direct_select)}"
+    end
+
     def visit_Limit(o)
       offset = o.offset > 0 ? " OFFSET #{o.offset}" : ""
       "LIMIT #{o.row_count}#{offset}"

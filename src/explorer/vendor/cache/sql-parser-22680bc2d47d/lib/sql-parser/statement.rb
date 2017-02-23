@@ -56,6 +56,16 @@ module SQLParser
       
     end
 
+    class Explain < Node
+
+      def initialize(direct_select)
+        @direct_select = direct_select
+      end
+
+      attr_accessor :direct_select
+
+    end
+
     class Limit < Node
 
       def initialize(row_count, offset = 0)
