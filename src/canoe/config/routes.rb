@@ -67,6 +67,7 @@ Rails.application.routes.draw do
   post "/api/grpc/unlock_terraform_project", to: "api/terraform#unlock"
   post "/api/grpc/phone_authentication", to: "api/authentication#phone"
 
-  get "/_boomtown", to: "projects#boomtown"
+  get "/_boomtown", to: "health#boomtown"
+  get "/_slowloris", to: "health#slowloris"
   root to: "projects#index"
 end
