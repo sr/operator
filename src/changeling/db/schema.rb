@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170216190550) do
+ActiveRecord::Schema.define(version: 20170223174827) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -74,28 +74,29 @@ ActiveRecord::Schema.define(version: 20170216190550) do
   end
 
   create_table "multipasses", primary_key: "uuid", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string   "reference_url",                          null: false
-    t.string   "requester",                              null: false
-    t.string   "impact",                                 null: false
-    t.string   "impact_probability",                     null: false
-    t.string   "change_type",                            null: false
+    t.string   "reference_url",                              null: false
+    t.string   "requester",                                  null: false
+    t.string   "impact",                                     null: false
+    t.string   "impact_probability",                         null: false
+    t.string   "change_type",                                null: false
     t.string   "peer_reviewer"
     t.string   "sre_approver"
     t.boolean  "testing"
     t.text     "backout_plan"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.string   "team",               default: "Unknown", null: false
-    t.boolean  "merged",             default: false,     null: false
-    t.string   "release_id",                             null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.string   "team",                   default: "Unknown", null: false
+    t.boolean  "merged",                 default: false,     null: false
+    t.string   "release_id",                                 null: false
     t.string   "emergency_approver"
-    t.string   "title",                                  null: false
-    t.boolean  "complete",           default: false,     null: false
+    t.string   "title",                                      null: false
+    t.boolean  "complete",               default: false,     null: false
     t.string   "rejector"
-    t.string   "tests_state",        default: "pending", null: false
+    t.string   "tests_state",            default: "pending", null: false
     t.integer  "repository_id"
     t.string   "merge_commit_sha"
-    t.text     "body",               default: "",        null: false
+    t.text     "body",                   default: "",        null: false
+    t.boolean  "affects_default_branch", default: true,      null: false
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
