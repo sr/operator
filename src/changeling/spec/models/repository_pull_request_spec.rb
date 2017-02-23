@@ -53,9 +53,10 @@ RSpec.describe RepositoryPullRequest do
       .to_return(status: 200, body: JSON.dump(issue))
   end
 
-  def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [], body: "")
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil, base_ref: "master", files: [], body: "")
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
+    pull_request["base"]["ref"] = base_ref
     pull_request["body"] = body
     pull_request["title"] = title if title
     if merge_commit_sha
@@ -629,5 +630,29 @@ RSpec.describe RepositoryPullRequest do
     @multipass.synchronize
 
     expect(request).to have_been_made.once
+  end
+
+  it "does not create a github comment if the PR does not affect the default branch" do
+    @repository.update!(compliance_enabled: true)
+    @repository.repository_owners_files.create!(
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/ops"
+    )
+    stub_organization_teams("heroku", "ops": %w[alindeman sr])
+    stub_jira_ticket("BREAD-1598")
+    stub_github_pull_request(title: "BREAD-1598", base_ref: "feature-branch")
+    stub_github_commit_status
+    stub_github_pull_request_reviews
+    stub_github_pull_request_comments
+    stub_github_pull_request_labels
+
+    status_req = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/statuses/deadbeef")
+
+    comment_req = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+
+    @multipass.synchronize
+
+    expect(status_req).not_to have_been_made
+    expect(comment_req).not_to have_been_made
   end
 end

@@ -39,6 +39,7 @@ module PullRequestMethods
       multipass.release_id = pull_request["pull_request"]["head"]["sha"]
       multipass.title = pull_request["pull_request"]["title"]
       multipass.body = pull_request["pull_request"]["body"].to_s
+      multipass.affects_default_branch = (pull_request["pull_request"]["base"]["ref"] == pull_request["repository"]["default_branch"])
       if Changeling.config.pardot?
         multipass.merge_commit_sha = pull_request["pull_request"]["merge_commit_sha"] if pull_request["pull_request"]["merged"]
       end

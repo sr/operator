@@ -85,7 +85,7 @@ class RepositoryPullRequest
     @multipass.complete = @multipass.complete?
     @multipass.save!
 
-    if github_repository.compliance_enabled?
+    if @multipass.affects_default_branch? && github_repository.compliance_enabled?
       if create_github_status
         create_github_commit_status
       end
@@ -228,6 +228,7 @@ class RepositoryPullRequest
     @multipass.merge_commit_sha = pull_request[:merge_commit_sha] if pull_request[:merged]
     @multipass.title = pull_request[:title]
     @multipass.body = pull_request[:body].to_s
+    @multipass.affects_default_branch = (pull_request[:base][:ref] == pull_request[:base][:repo][:default_branch])
     @multipass.release_id = pull_request[:head][:sha]
 
     PullRequestFile.transaction do
@@ -246,7 +247,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_change_categorization
-    if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.merged? && !@multipass.complete?)
+    if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.affects_default_branch? && @multipass.merged? && !@multipass.complete?)
       change_type = ChangeCategorization::EMERGENCY
     else
       comment_bodies = [@multipass.body]
