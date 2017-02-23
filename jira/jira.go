@@ -34,6 +34,13 @@ func (i *Issue) HTMLURL() string {
 	return parsed.String()
 }
 
+func (i *Issue) GetAssigneeKey() string {
+	if i == nil || i.Fields == nil || i.Fields.Assignee == nil {
+		return ""
+	}
+	return i.Fields.Assignee.Key
+}
+
 func (i *Issue) StatusName() string {
 	if i == nil || i.Fields == nil || i.Fields.Status == nil {
 		return ""
@@ -48,6 +55,13 @@ type Fields struct {
 	Summary     string       `json:"summary,omitempty"`
 	Description string       `json:"description,omitempty"`
 	Status      *IssueStatus `json:"status,omitempty"`
+	Assignee    *User        `json:"assignee,omitempty"`
+}
+
+type User struct {
+	Key         string `json:"key,omitempty"`
+	Name        string `json:"name,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
 }
 
 type Project struct {

@@ -27,7 +27,7 @@ It has these top-level messages:
 	SlowLorisRequest
 	RepositoryConfig
 	RepositoryWatchlist
-	MyIssuesRequest
+	TicketRequest
 */
 package breadpb
 

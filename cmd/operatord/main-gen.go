@@ -77,8 +77,20 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			client := breadpb.NewTicketsClient(conn)
 			_, err := client.Mine(
 				ctx,
-				&breadpb.MyIssuesRequest{
-					Request: req,
+				&breadpb.TicketRequest{
+					Request:         req,
+					IncludeResolved: req.Call.Args["include_resolved"],
+				},
+			)
+			return err
+		}
+		if req.Call.Method == "SprintStatus" {
+			client := breadpb.NewTicketsClient(conn)
+			_, err := client.SprintStatus(
+				ctx,
+				&breadpb.TicketRequest{
+					Request:         req,
+					IncludeResolved: req.Call.Args["include_resolved"],
 				},
 			)
 			return err

@@ -19,24 +19,32 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type MyIssuesRequest struct {
-	Request *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+type TicketRequest struct {
+	Request         *operator.Request `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+	IncludeResolved string            `protobuf:"bytes,2,opt,name=include_resolved,json=includeResolved" json:"include_resolved,omitempty"`
 }
 
-func (m *MyIssuesRequest) Reset()                    { *m = MyIssuesRequest{} }
-func (m *MyIssuesRequest) String() string            { return proto.CompactTextString(m) }
-func (*MyIssuesRequest) ProtoMessage()               {}
-func (*MyIssuesRequest) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
+func (m *TicketRequest) Reset()                    { *m = TicketRequest{} }
+func (m *TicketRequest) String() string            { return proto.CompactTextString(m) }
+func (*TicketRequest) ProtoMessage()               {}
+func (*TicketRequest) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{0} }
 
-func (m *MyIssuesRequest) GetRequest() *operator.Request {
+func (m *TicketRequest) GetRequest() *operator.Request {
 	if m != nil {
 		return m.Request
 	}
 	return nil
 }
 
+func (m *TicketRequest) GetIncludeResolved() string {
+	if m != nil {
+		return m.IncludeResolved
+	}
+	return ""
+}
+
 func init() {
-	proto.RegisterType((*MyIssuesRequest)(nil), "bread.MyIssuesRequest")
+	proto.RegisterType((*TicketRequest)(nil), "bread.TicketRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -51,7 +59,9 @@ const _ = grpc.SupportPackageIsVersion4
 
 type TicketsClient interface {
 	// List in-progress issues assigned to the current user
-	Mine(ctx context.Context, in *MyIssuesRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	Mine(ctx context.Context, in *TicketRequest, opts ...grpc.CallOption) (*operator.Response, error)
+	// Show the state of all tickets in the current sprint
+	SprintStatus(ctx context.Context, in *TicketRequest, opts ...grpc.CallOption) (*operator.Response, error)
 }
 
 type ticketsClient struct {
@@ -62,9 +72,18 @@ func NewTicketsClient(cc *grpc.ClientConn) TicketsClient {
 	return &ticketsClient{cc}
 }
 
-func (c *ticketsClient) Mine(ctx context.Context, in *MyIssuesRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+func (c *ticketsClient) Mine(ctx context.Context, in *TicketRequest, opts ...grpc.CallOption) (*operator.Response, error) {
 	out := new(operator.Response)
 	err := grpc.Invoke(ctx, "/bread.Tickets/Mine", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ticketsClient) SprintStatus(ctx context.Context, in *TicketRequest, opts ...grpc.CallOption) (*operator.Response, error) {
+	out := new(operator.Response)
+	err := grpc.Invoke(ctx, "/bread.Tickets/SprintStatus", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +94,9 @@ func (c *ticketsClient) Mine(ctx context.Context, in *MyIssuesRequest, opts ...g
 
 type TicketsServer interface {
 	// List in-progress issues assigned to the current user
-	Mine(context.Context, *MyIssuesRequest) (*operator.Response, error)
+	Mine(context.Context, *TicketRequest) (*operator.Response, error)
+	// Show the state of all tickets in the current sprint
+	SprintStatus(context.Context, *TicketRequest) (*operator.Response, error)
 }
 
 func RegisterTicketsServer(s *grpc.Server, srv TicketsServer) {
@@ -83,7 +104,7 @@ func RegisterTicketsServer(s *grpc.Server, srv TicketsServer) {
 }
 
 func _Tickets_Mine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MyIssuesRequest)
+	in := new(TicketRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -95,7 +116,25 @@ func _Tickets_Mine_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/bread.Tickets/Mine",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TicketsServer).Mine(ctx, req.(*MyIssuesRequest))
+		return srv.(TicketsServer).Mine(ctx, req.(*TicketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Tickets_SprintStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TicketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TicketsServer).SprintStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/bread.Tickets/SprintStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TicketsServer).SprintStatus(ctx, req.(*TicketRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -108,6 +147,10 @@ var _Tickets_serviceDesc = grpc.ServiceDesc{
 			MethodName: "Mine",
 			Handler:    _Tickets_Mine_Handler,
 		},
+		{
+			MethodName: "SprintStatus",
+			Handler:    _Tickets_SprintStatus_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "tickets.proto",
@@ -116,16 +159,18 @@ var _Tickets_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("tickets.proto", fileDescriptor4) }
 
 var fileDescriptor4 = []byte{
-	// 162 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2d, 0xc9, 0x4c, 0xce,
-	0x4e, 0x2d, 0x29, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a, 0x4d, 0x4c,
-	0x91, 0x52, 0x4d, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0x2e, 0xd2,
-	0xcf, 0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x47, 0x30, 0x20, 0xaa, 0x95, 0xec, 0xb8, 0xf8, 0x7d,
-	0x2b, 0x3d, 0x8b, 0x8b, 0x4b, 0x53, 0x8b, 0x83, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xb4,
-	0xb9, 0xd8, 0x8b, 0x20, 0x4c, 0x09, 0x46, 0x05, 0x46, 0x0d, 0x6e, 0x23, 0x41, 0x3d, 0xb8, 0x26,
-	0xa8, 0x9a, 0x20, 0x98, 0x0a, 0x23, 0x5b, 0x2e, 0xf6, 0x10, 0x88, 0xf5, 0x42, 0x46, 0x5c, 0x2c,
-	0xbe, 0x99, 0x79, 0xa9, 0x42, 0x62, 0x7a, 0x60, 0x17, 0xe8, 0xa1, 0x99, 0x2b, 0x25, 0x84, 0x6c,
-	0x4c, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x13, 0x67, 0x14, 0x3b, 0x58, 0x71, 0x41, 0x52, 0x12,
-	0x1b, 0xd8, 0x41, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xed, 0x43, 0x31, 0x36, 0xcf, 0x00,
-	0x00, 0x00,
+	// 206 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x8c, 0x8f, 0xbf, 0x4b, 0xc6, 0x30,
+	0x10, 0x86, 0xa9, 0xa8, 0xa5, 0xd1, 0xa2, 0x06, 0x87, 0xd2, 0xa9, 0x08, 0x42, 0x45, 0x48, 0xa5,
+	0x2e, 0xce, 0xee, 0x2e, 0xa9, 0x93, 0x8b, 0x34, 0xed, 0x51, 0x83, 0x35, 0x89, 0xb9, 0x8b, 0x7f,
+	0xbf, 0x90, 0xf6, 0xfb, 0xb5, 0x7d, 0xdb, 0xf1, 0xf2, 0x3c, 0xbc, 0xef, 0xb1, 0x9c, 0xf4, 0xf0,
+	0x0d, 0x84, 0xc2, 0x79, 0x4b, 0x96, 0x9f, 0x29, 0x0f, 0xfd, 0x58, 0xde, 0x4f, 0x9a, 0xbe, 0x82,
+	0x12, 0x83, 0xfd, 0x69, 0xd0, 0x37, 0xd6, 0x81, 0xef, 0xc9, 0xee, 0x8e, 0x85, 0xbe, 0x9b, 0x58,
+	0xfe, 0x1e, 0x75, 0x09, 0xbf, 0x01, 0x90, 0xf8, 0x23, 0x4b, 0xfd, 0x72, 0x16, 0x49, 0x95, 0xd4,
+	0x17, 0xed, 0x8d, 0xd8, 0x2a, 0x2b, 0x23, 0x37, 0x04, 0x7f, 0x60, 0xd7, 0xda, 0x0c, 0x73, 0x18,
+	0xe1, 0xd3, 0x03, 0xda, 0xf9, 0x0f, 0xc6, 0xe2, 0xa4, 0x4a, 0xea, 0x4c, 0x5e, 0xad, 0xb9, 0x5c,
+	0xe3, 0x36, 0xb0, 0x74, 0x29, 0x42, 0xfe, 0xc4, 0x4e, 0xdf, 0xb4, 0x01, 0x7e, 0x2b, 0xe2, 0x54,
+	0x71, 0x30, 0xa0, 0xe4, 0xfb, 0x7d, 0xe8, 0xac, 0x41, 0xe0, 0x2f, 0xec, 0xb2, 0x73, 0x5e, 0x1b,
+	0xea, 0xa8, 0xa7, 0x80, 0xc7, 0x9b, 0xaf, 0xd9, 0x47, 0x1a, 0x51, 0xa7, 0xd4, 0x79, 0xfc, 0xf8,
+	0xf9, 0x3f, 0x00, 0x00, 0xff, 0xff, 0x9c, 0xdc, 0x5e, 0xf6, 0x30, 0x01, 0x00, 0x00,
 }

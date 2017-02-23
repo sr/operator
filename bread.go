@@ -75,11 +75,18 @@ var (
 			Group:             "developers",
 			PhoneAuthOptional: true,
 		},
-
 		{
 			Call: &operator.Call{
 				Service: "bread.Tickets",
 				Method:  "Mine",
+			},
+			Group:             "developers",
+			PhoneAuthOptional: true,
+		},
+		{
+			Call: &operator.Call{
+				Service: "bread.Tickets",
+				Method:  "SprintStatus",
 			},
 			Group:             "developers",
 			PhoneAuthOptional: true,
