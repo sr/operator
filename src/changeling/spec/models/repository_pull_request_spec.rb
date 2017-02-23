@@ -3,7 +3,6 @@ require "rails_helper"
 RSpec.describe RepositoryPullRequest do
   before(:each) do
     Changeling.config.pardot = true
-    Changeling.config.emergency_merge_ticket_enabled_repositories = ["heroku/changeling"]
     @repository = GithubInstallation.current.repositories.create!(
       github_id: 1,
       github_owner_id: 1,
@@ -357,7 +356,6 @@ RSpec.describe RepositoryPullRequest do
           { status: "removed", filename: "config", patch: "" }
         ]
       )
-      @multipass.emergency_ticket_reference.destroy!
       @repository_pull_request.synchronize(create_github_status: false)
       expect(@multipass.changed_files).to eq([Pathname("/README"), Pathname("/config")])
     end
@@ -578,6 +576,12 @@ RSpec.describe RepositoryPullRequest do
     end
 
     it "detects emergency merges" do
+      @repository.update!(compliance_enabled: true)
+      @repository.repository_owners_files.create!(
+        path_name: "/#{Repository::OWNERS_FILENAME}",
+        content: "@heroku/bread"
+      )
+      stub_organization_teams("heroku", "bread": %w[ys])
       stub_jira_ticket("BREAD-1598")
       stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598")
@@ -586,6 +590,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload

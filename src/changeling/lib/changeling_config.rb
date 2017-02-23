@@ -30,12 +30,6 @@ class ChangelingConfig
     pardot?
   end
 
-  def emergency_merge_ticket_enabled_repositories
-    return @emergency_merge_ticket_enabled_repositories if defined?(@emergency_merge_ticket_enabled_repositories)
-    @emergency_merge_ticket_enabled_repositories = Array(ENV["CHANGELING_EMERGENCY_MERGE_TICKET_ENABLED_REPOSITORIES"].to_s.split(","))
-  end
-  attr_writer :emergency_merge_ticket_enabled_repositories
-
   def page_title
     if pardot?
       "Pardot Compliance"
