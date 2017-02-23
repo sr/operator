@@ -7,7 +7,8 @@ rule
     : direct_sql_data_statement
 
   direct_sql_data_statement
-    : direct_select_statement_multiple_rows
+    : EXPLAIN direct_select_statement_multiple_rows { result = SQLParser::Statement::Explain.new(val[1]) }
+    | direct_select_statement_multiple_rows
     | insert_specification
 
   direct_select_statement_multiple_rows
