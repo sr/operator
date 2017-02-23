@@ -16,8 +16,12 @@ class SQLQuery
     @ast.to_sql.starts_with?("SELECT *")
   end
 
+  def explain?
+    @ast.is_a?(SQLParser::Statement::Explain)
+  end
+
   def tables
-    tables = @ast.query_expression.table_expression.from_clause.tables
+    tables = query_expression.table_expression.from_clause.tables
     tables.map { |table_ast|
       table_name(table_ast)
     }.flatten
@@ -37,6 +41,10 @@ class SQLQuery
   end
 
   private
+
+  def query_expression
+    explain? ? @ast.direct_select.query_expression : @ast.query_expression
+  end
 
   def table_name(ast)
     if ast.respond_to?(:name)
