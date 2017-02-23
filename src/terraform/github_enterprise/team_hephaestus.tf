@@ -4,6 +4,12 @@ resource "github_team" "hephaestus" {
   privacy     = "closed"
 }
 
+resource "github_team_membership" "hephaestus_nathan-maphet" {
+  team_id  = "${github_team.hephaestus.id}"
+  username = "nathan-maphet"
+  role     = "maintainer"
+}
+
 resource "github_team_membership" "hephaestus_oliver-albrecht" {
   team_id  = "${github_team.hephaestus.id}"
   username = "oliver-albrecht"
