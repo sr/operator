@@ -267,7 +267,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_emergency_ticket
-    if !Changeling.config.emergency_merge_ticket_enabled_repositories.include?(repository.name_with_owner)
+    if !github_repository.compliance_enabled?
       return
     end
 
