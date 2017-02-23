@@ -19,8 +19,9 @@ class GithubRepository
   def commit_status(sha)
     Instrumentation.log(fn: "commit_status", sha: sha) do
       GithubCommitStatus.new(
-        @client.combined_status(@name, sha),
-        @client.compare(@name, MASTER, sha)
+        @client,
+        @name,
+        @client.combined_status(@name, sha)
       )
     end
   end

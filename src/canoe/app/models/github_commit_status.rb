@@ -8,9 +8,10 @@ class GithubCommitStatus
     new(nil, nil)
   end
 
-  def initialize(commit_status, branch_compare)
+  def initialize(github_client, repository_name, commit_status)
+    @github_client = github_client
+    @repository_name = repository_name
     @commit_status = commit_status
-    @branch_compare = branch_compare
   end
 
   def sha
@@ -24,7 +25,7 @@ class GithubCommitStatus
   end
 
   def compare_state
-    @branch_compare.status
+    branch_compare.status
   end
 
   def tests_state
@@ -71,6 +72,11 @@ class GithubCommitStatus
   end
 
   private
+
+  def branch_compare
+    return @branch_compare if defined?(@branch_compare)
+    @branch_compare = @github_client.compare(@repository_name, branch, sha)
+  end
 
   def status_for_context(context)
     @commit_status.statuses.detect do |s|
