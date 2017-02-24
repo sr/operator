@@ -82,6 +82,20 @@ func (m *Request) GetCall() *Call {
 	return nil
 }
 
+func (m *Request) GetSenderId() string {
+	if m != nil {
+		return m.SenderId
+	}
+	return ""
+}
+
+func (m *Request) GetOtp() string {
+	if m != nil {
+		return m.Otp
+	}
+	return ""
+}
+
 type Response struct {
 	Message string `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
 }
@@ -90,6 +104,13 @@ func (m *Response) Reset()                    { *m = Response{} }
 func (m *Response) String() string            { return proto.CompactTextString(m) }
 func (*Response) ProtoMessage()               {}
 func (*Response) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *Response) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
 
 // Call represents a completed gRPC call. The Error field will be non-nil if
 // it resulted in an error.
@@ -106,11 +127,32 @@ func (m *Call) String() string            { return proto.CompactTextString(m) }
 func (*Call) ProtoMessage()               {}
 func (*Call) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
+func (m *Call) GetService() string {
+	if m != nil {
+		return m.Service
+	}
+	return ""
+}
+
+func (m *Call) GetMethod() string {
+	if m != nil {
+		return m.Method
+	}
+	return ""
+}
+
 func (m *Call) GetArgs() map[string]string {
 	if m != nil {
 		return m.Args
 	}
 	return nil
+}
+
+func (m *Call) GetError() string {
+	if m != nil {
+		return m.Error
+	}
+	return ""
 }
 
 func (m *Call) GetDuration() *google_protobuf1.Duration {
@@ -132,6 +174,13 @@ func (m *Source) String() string            { return proto.CompactTextString(m) 
 func (*Source) ProtoMessage()               {}
 func (*Source) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
+func (m *Source) GetType() SourceType {
+	if m != nil {
+		return m.Type
+	}
+	return SourceType_HUBOT
+}
+
 func (m *Source) GetUser() *User {
 	if m != nil {
 		return m.User
@@ -146,6 +195,13 @@ func (m *Source) GetRoom() *Room {
 	return nil
 }
 
+func (m *Source) GetHostname() string {
+	if m != nil {
+		return m.Hostname
+	}
+	return ""
+}
+
 type Room struct {
 	Id   int64  `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Name string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
@@ -155,6 +211,20 @@ func (m *Room) Reset()                    { *m = Room{} }
 func (m *Room) String() string            { return proto.CompactTextString(m) }
 func (*Room) ProtoMessage()               {}
 func (*Room) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *Room) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *Room) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
 
 type User struct {
 	Id       string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
@@ -168,12 +238,41 @@ func (m *User) String() string            { return proto.CompactTextString(m) }
 func (*User) ProtoMessage()               {}
 func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
+func (m *User) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *User) GetLogin() string {
+	if m != nil {
+		return m.Login
+	}
+	return ""
+}
+
+func (m *User) GetRealName() string {
+	if m != nil {
+		return m.RealName
+	}
+	return ""
+}
+
+func (m *User) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
 var E_Name = &proto.ExtensionDesc{
 	ExtendedType:  (*google_protobuf.ServiceOptions)(nil),
 	ExtensionType: (*string)(nil),
 	Field:         51234,
 	Name:          "operator.name",
 	Tag:           "bytes,51234,opt,name=name",
+	Filename:      "operator.proto",
 }
 
 func init() {
