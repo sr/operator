@@ -311,7 +311,7 @@ case "$project" in
         true
         ;;
     parbot)
-        docker build $pullopts -f "$BREAD/src/parbot/Dockerfile" -t parbot_app "$BREAD/src/parbot"
+        docker build $pullopts -f "$BREAD/parbot/Dockerfile" -t parbot_app "$BREAD/parbot"
         docker run parbot_app script/lint
 
         if [ -n "$CI" ]; then
