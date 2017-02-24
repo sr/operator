@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -19,7 +20,6 @@ import (
 
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
-	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -145,7 +145,7 @@ func run(invoker operator.InvokerFunc) error {
 	}
 	var (
 		httpServer *http.ServeMux
-		logger     protolog.Logger
+		logger     bread.Logger
 		inst       operator.Instrumenter
 		auth       operator.Authorizer
 		sender     operator.Sender
@@ -158,7 +158,7 @@ func run(invoker operator.InvokerFunc) error {
 		err error
 	)
 	httpServer = http.NewServeMux()
-	logger = bread.NewLogger()
+	logger = log.New(os.Stdout, "", log.LstdFlags)
 	inst = bread.NewInstrumenter(logger)
 	canoeURL, err := url.Parse(config.canoe.URL)
 	if err != nil {
@@ -242,10 +242,6 @@ func run(invoker operator.InvokerFunc) error {
 		return err
 	}
 	breadpb.RegisterTicketsServer(grpcServer, ticketsServer)
-	msg := &breadpb.ServerStartupNotice{Protocol: "grpc", Address: config.grpcAddr}
-	for svc := range grpcServer.GetServiceInfo() {
-		msg.Services = append(msg.Services, svc)
-	}
 	errC := make(chan error)
 	grpcList, err := net.Listen("tcp", config.grpcAddr)
 	if err != nil {
@@ -254,7 +250,11 @@ func run(invoker operator.InvokerFunc) error {
 	go func() {
 		errC <- grpcServer.Serve(grpcList)
 	}()
-	logger.Info(msg)
+	var services []string
+	for s := range grpcServer.GetServiceInfo() {
+		services = append(services, s)
+	}
+	logger.Printf("grpc server listening on %s. registered services: %s", config.grpcAddr, strings.Join(services, " "))
 	if config.halAddr != "" {
 		if cc, err := grpc.Dial(
 			config.halAddr,
@@ -328,11 +328,7 @@ func run(invoker operator.InvokerFunc) error {
 		)
 	}
 	if config.httpAddr != "" {
-		logger.Info(&breadpb.ServerStartupNotice{
-			Protocol: "http",
-			Address:  config.httpAddr,
-			Hal9000:  config.halAddr,
-		})
+		logger.Printf("http server listening on %s", config.httpAddr)
 		go func() {
 			errC <- http.ListenAndServe(config.httpAddr, httpServer)
 		}()

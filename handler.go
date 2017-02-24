@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"git.dev.pardot.com/Pardot/bread/pb"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/sr/operator/protolog"
 )
 
 type wrapperHandler struct {
-	logger  protolog.Logger
+	logger  Logger
+	jsonpbm *jsonpb.Marshaler
 	handler http.Handler
 }
 
@@ -50,7 +51,11 @@ func (h *wrapperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			log.Error = fmt.Sprintf("panic: %v\n%s", r, string(stack))
 		}
 		log.Duration = ptypes.DurationProto(time.Since(start))
-		h.logger.Info(log)
+		jsonlog, err := h.jsonpbm.MarshalToString(log)
+		if err != nil {
+			h.logger.Printf("error marshaling log line: %s", err)
+		}
+		h.logger.Println(jsonlog)
 	}()
 	h.handler.ServeHTTP(wrappedW, req)
 }
