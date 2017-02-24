@@ -13,10 +13,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/sr/operator"
 )
 
 const undocumentedPlaceholder = "Undocumented"
@@ -28,6 +28,7 @@ type Descriptor struct {
 
 type Service struct {
 	Name        string
+	Enabled     bool
 	Description string
 	Package     string
 	Methods     []*Method
@@ -114,21 +115,8 @@ func NewTemplate(name string, content string) *template.Template {
 	return template.Must(template.New(name).Funcs(funcMap).Parse(content))
 }
 
-func Camelize(s string, sep string) string {
-	var result string
-	words := strings.Split(s, sep)
-	for _, word := range words {
-		if len(word) > 0 {
-			w := []rune(word)
-			w[0] = unicode.ToUpper(w[0])
-			result += string(w)
-		}
-	}
-	return result
-}
-
 var funcMap = template.FuncMap{
-	"inputField":  func(s string) string { return Camelize(s, "_") },
+	"inputField":  func(s string) string { return operator.Camelize(s, "_") },
 	"serviceName": humanize,
 	"methodName":  humanize,
 	"argName":     humanize,

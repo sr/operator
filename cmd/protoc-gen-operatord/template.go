@@ -20,6 +20,7 @@ import (
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
 {{- range .Services}}
+{{if .Enabled }}
 	{{- $pkg := .Package }}
 	{{- $svc := .Name }}
 	if req.Call.Service == fmt.Sprintf("%s.{{.Name}}", pkg) {
@@ -39,6 +40,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 		}
 	{{- end }}
 	}
+{{- end }}
 {{- end }}
 	return fmt.Errorf("no such service: `+"`"+"%s %s"+"`"+`", req.Call.Service, req.Call.Method)
 }
