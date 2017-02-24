@@ -2,7 +2,7 @@ require "owners"
 
 class OwnersFile
   def initialize(string)
-    @teams = parse(string)
+    @teams, @globs = parse(string)
   end
 
   attr_reader :teams
@@ -12,16 +12,27 @@ class OwnersFile
   def parse(string)
     tokens = Owners::Parser.new.parse(string)
     teams = []
+    globs = {}
+    names = []
+    name  = nil
 
     tokens.each do |token, value|
       case token
+      when :NEWLINE
+        teams.concat(names)
+        names = []
+        name = nil
+      when :GLOB
+        name ||= names.pop
+        globs[value] ||= []
+        globs[value] << name
       when :TEAMNAME
-        teams << value[1, value.length]
-      else
-        next
+        names << value[1, value.length]
+      when :END
+        teams.concat(names)
       end
     end
 
-    teams.uniq
+    [teams.uniq, globs]
   end
 end
