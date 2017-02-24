@@ -151,3 +151,5 @@ AllCops:
     - "src/**/vendor/cache/**/*"
     - "src/**/vendor/gems/**/*"
     - "src/changeling/vendor/OWNERS/**/*"
+    - "src/hal9000/lib/hal9000/*.rb"
+    - "src/canoe/lib/canoe.rb"

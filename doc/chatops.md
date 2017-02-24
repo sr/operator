@@ -126,7 +126,7 @@ All RPC services and their methods are defined in the protobuf files located in 
 
 The implementation for the various services lives under the `bread` Go package. After changing the protobuf files be sure to update the generated code (including `operatorctl`) by running the fellowing command:
 
-`$ make -f etc/mk/operator.mk generate`
+`$ tools/protogen`
 
 ## Par Bot
 

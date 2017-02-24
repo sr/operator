@@ -150,105 +150,90 @@
     "canoeCompleteTerraformDeployRequest": {
       "type": "object",
       "properties": {
+        "user_email": {
+          "type": "string"
+        },
         "deploy_id": {
           "type": "string",
           "format": "int64"
-        },
-        "project": {
-          "type": "string",
-          "format": "string"
-        },
-        "request_id": {
-          "type": "string",
-          "format": "string"
         },
         "successful": {
           "type": "boolean",
           "format": "boolean"
         },
-        "user_email": {
-          "type": "string",
-          "format": "string"
+        "request_id": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
         }
       }
     },
     "canoeCreateDeployRequest": {
       "type": "object",
       "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "target_name": {
+          "type": "string"
+        },
         "artifact_url": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "lock": {
           "type": "boolean",
           "format": "boolean"
-        },
-        "project": {
-          "type": "string",
-          "format": "string"
-        },
-        "target_name": {
-          "type": "string",
-          "format": "string"
-        },
-        "user_email": {
-          "type": "string",
-          "format": "string"
         }
       }
     },
     "canoeCreateDeployResponse": {
       "type": "object",
       "properties": {
-        "deploy_id": {
-          "type": "string",
-          "format": "int64"
-        },
         "error": {
           "type": "boolean",
           "format": "boolean"
         },
         "message": {
+          "type": "string"
+        },
+        "deploy_id": {
           "type": "string",
-          "format": "string"
+          "format": "int64"
         }
       }
     },
     "canoeCreateTerraformDeployRequest": {
       "type": "object",
       "properties": {
+        "user_email": {
+          "type": "string"
+        },
         "branch": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "commit": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "project": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "terraform_version": {
-          "type": "string",
-          "format": "string"
-        },
-        "user_email": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         }
       }
     },
     "canoePhoneAuthenticationRequest": {
       "type": "object",
       "properties": {
-        "action": {
-          "type": "string",
-          "format": "string"
-        },
         "user_email": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
         }
       }
     },
@@ -260,50 +245,43 @@
           "format": "boolean"
         },
         "message": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
         "user_email": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         }
       }
     },
     "canoeTerraformDeployResponse": {
       "type": "object",
       "properties": {
-        "deploy_id": {
-          "type": "string",
-          "format": "int64"
-        },
         "error": {
           "type": "boolean",
           "format": "boolean"
         },
         "message": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
         },
-        "project": {
+        "deploy_id": {
           "type": "string",
-          "format": "string"
+          "format": "int64"
         },
         "request_id": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
         }
       }
     },
     "canoeUnlockTerraformProjectRequest": {
       "type": "object",
       "properties": {
-        "project": {
-          "type": "string",
-          "format": "string"
-        },
         "user_email": {
-          "type": "string",
-          "format": "string"
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
         }
       }
     }
