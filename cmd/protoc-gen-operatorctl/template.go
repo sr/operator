@@ -26,6 +26,7 @@ var cmd = operator.NewCommand(
 	program,
 	[]operator.ServiceCommand{
 {{- range .Services}}
+{{- if .Enabled }}
 		{
 {{- $pkg := .Package }}
 {{- $svc := .Name }}
@@ -75,6 +76,7 @@ var cmd = operator.NewCommand(
 	{{- end }}
 			},
 		},
+{{- end}}
 {{end}}
 	},
 )

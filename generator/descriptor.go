@@ -8,8 +8,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/sr/operator"
 )
 
 const (
@@ -71,6 +73,15 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				Package:     pkg,
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
+			}
+			// Check the status of the "operator.enabled" boolan option for the service
+			if service.Options != nil {
+				opt, err := proto.GetExtension(service.Options, operator.E_Enabled)
+				if err == nil {
+					if v, ok := opt.(*bool); ok {
+						services[j].Enabled = *v
+					}
+				}
 			}
 			if m, ok := messagesByName[service.GetName()+"Config"]; ok {
 				services[j].Config = make([]Setting, len(m.Field))

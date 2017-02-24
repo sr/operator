@@ -54,4 +54,5 @@ message User {
 
 extend google.protobuf.ServiceOptions {
 	string name = 51234;
+	bool enabled = 51235;
 }
