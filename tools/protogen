@@ -2,7 +2,7 @@
 set -euo pipefail
 
 : "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
-: "${BREAD_PROTO_DIR:="${BREAD}/pb"}"
+: "${BREAD_PROTO_DIR:="${BREAD}/proto"}"
 : "${BREAD_PROTO_VENDOR_DIR:="${BREAD}/vendor/proto"}"
 : "${BREAD_HAL9000_DIR:="${BREAD}/src/hal9000"}"
 : "${BREAD_CANOE_DIR:="${BREAD}/src/canoe"}"
