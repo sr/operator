@@ -8,37 +8,32 @@ INTERFACER = $(GOBIN)/interfacer
 PROTOC ?= $(shell which protoc)
 PROTOC_GEN_GO ?= $(GOBIN)/protoc-gen-go
 UNUSED = $(GOBIN)/unused
-
-PACKAGES ?= $(shell $(GO) list ./...)
+PROTO_INCLUDE ?= $(shell brew --prefix protobuf)/include
 
 all: deps fmt lint vet errcheck test install interfacer unused
 
 ci: clean all
 
 install:
-	$(GO) install -v $(PACKAGES)
+	$(GO) install -v ./...
 
 test:
-	$(GO) test -race $(PACKAGES)
+	$(GO) test -race ./...
 
 clean:
 	$(GO) clean -i ./...
 
 proto: $(PROTOC) $(PROTOC_GEN_GO)
-	$< -I. --go_out=Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:. operator.proto
-	$< -I. --go_out=Moperator.proto=github.com/sr/operator,plugins=grpc,import_path=testing:. testing/*.proto
+	$< -I. -I$(PROTO_INCLUDE) --go_out=Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:. operator.proto
+	$< -I. -I$(PROTO_INCLUDE) --go_out=Moperator.proto=github.com/sr/operator,plugins=grpc,import_path=testing:. testing/*.proto
 
 deps:
 	$(GO) get \
-		github.com/acsellers/inflections \
 		github.com/dvsekhvalnov/jose2go \
 		github.com/golang/protobuf/proto \
 		github.com/golang/protobuf/ptypes/duration \
 		github.com/golang/protobuf/ptypes/timestamp \
 		github.com/kr/text \
-		github.com/matttproud/golang_protobuf_extensions/pbutil \
-		github.com/satori/go.uuid \
-		github.com/serenize/snaker \
 		google.golang.org/grpc \
 		golang.org/x/oauth2/clientcredentials \
 		golang.org/x/net/context
@@ -57,35 +52,25 @@ fmt: $(GOFMT)
 	  done
 
 lint: $(GOLINT)
-		@	for pkg in $(PACKAGES); do \
-				out="$$($< $$pkg | grep -v -E 'should have comment|\.pb\.go|\-gen\.go')"; \
-				if [ -n "$$out" ]; then \
-					echo "lint: $$out"; \
-					exit 1; \
-				fi; \
-			done
+	@	for pkg in $$($(GO) list ./...); do \
+			out="$$($< $$pkg | grep -v -E 'should have comment|\.pb\.go|\-gen\.go')"; \
+			if [ -n "$$out" ]; then \
+				echo "lint: $$out"; \
+				exit 1; \
+			fi; \
+		done
 
 unused: $(UNUSED)
-	$< $(PACKAGES)
+	$< ./...
 
 vet:
-	$(GO) vet $(PACKAGES)
+	$(GO) vet ./...
 
 errcheck: $(ERRCHECK)
-	@ for pkg in $(PACKAGES); do \
-			out="$$($< $$pkg | grep -v -E 'main-gen\.go|_test\.go')"; \
-			if [ -n "$$out" ]; then \
-				echo "$$out"; \
-				fail=true; \
-			fi; \
-	  done; \
-	  test $$fail && exit 1; true
+	@ $< ./..
 
 interfacer: $(INTERFACER)
-	$< $(PACKAGES)
-
-$(DEADLEAVES):
-	$(GO) get -v github.com/nf/deadleaves
+	$< ./...
 
 $(ERRCHECK):
 	$(GO) get -v github.com/kisielk/errcheck

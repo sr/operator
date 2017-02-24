@@ -855,6 +855,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/sr/operator",
+			"repository": "https://github.com/sr/operator",
+			"vcs": "git",
+			"revision": "36fe5e03ae5e95dfd5ed7f2d77d7dc6606ddfa06",
+			"branch": "master",
+			"notests": true,
+			"allfiles": true
+		},
+		{
 			"importpath": "github.com/stretchr/testify/assert",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",

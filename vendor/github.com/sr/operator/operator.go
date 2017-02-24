@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/net/context"
@@ -232,4 +233,17 @@ func (req *Request) GetUserEmail() string {
 		return ""
 	}
 	return src.User.Email
+}
+
+func Camelize(s string, sep string) string {
+	var result string
+	words := strings.Split(s, sep)
+	for _, word := range words {
+		if len(word) > 0 {
+			w := []rune(word)
+			w[0] = unicode.ToUpper(w[0])
+			result += string(w)
+		}
+	}
+	return result
 }
