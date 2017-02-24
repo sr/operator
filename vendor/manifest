@@ -149,6 +149,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/dghubble/sling",
+			"repository": "https://github.com/dghubble/sling",
+			"vcs": "git",
+			"revision": "91b015f8c5e231605ed75a74130ca0fa48b28cb1",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/docker/distribution/digest",
 			"repository": "https://github.com/docker/distribution",
 			"vcs": "git",
@@ -703,12 +711,12 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api",
 			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
 			"vcs": "git",
-			"revision": "686368427ddb9a51628d63db6c74fbc96a206e1f",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
 			"branch": "master",
-			"path": "/third_party/googleapis",
+			"path": "third_party/googleapis/google/api",
 			"notests": true
 		},
 		{
@@ -828,6 +836,14 @@
 			"revision": "8a055cad4b24c9987be2f10ab2d98923e5ae9b1b",
 			"branch": "HEAD",
 			"path": "/libcontainer/user",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rogpeppe/fastuuid",
+			"repository": "https://github.com/rogpeppe/fastuuid",
+			"vcs": "git",
+			"revision": "6724a57986aff9bff1a1770e9347036def7c89f6",
+			"branch": "master",
 			"notests": true
 		},
 		{
