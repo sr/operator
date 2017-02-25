@@ -1192,6 +1192,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "google.golang.org/genproto/googleapis/api/annotations",
+			"repository": "https://github.com/google/go-genproto",
+			"vcs": "git",
+			"revision": "dee11a626cb8e7ff045ac9413dcd8a92e72f5863",
+			"branch": "master",
+			"path": "/googleapis/api/annotations",
+			"notests": true
+		},
+		{
 			"importpath": "google.golang.org/genproto/protobuf",
 			"repository": "https://github.com/google/go-genproto",
 			"vcs": "git",
