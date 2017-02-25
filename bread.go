@@ -270,20 +270,6 @@ func NewCanoeDeployer(canoeAPI CanoeClient, config *CanoeConfig) Deployer {
 	return &canoeDeployer{&http.Client{}, config, canoeAPI}
 }
 
-func NewServer(
-	auth operator.Authorizer,
-	inst operator.Instrumenter,
-	sender operator.Sender,
-	deploy breadpb.DeployServer,
-) (*grpc.Server, error) {
-	server := grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
-	breadpb.RegisterPingServer(server, &pingAPIServer{sender})
-	if deploy != nil {
-		breadpb.RegisterDeployServer(server, deploy)
-	}
-	return server, nil
-}
-
 // NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
 // for authentication and LDAP group membership for authorization.
 func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {

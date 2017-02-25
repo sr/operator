@@ -222,19 +222,15 @@ func run(invoker operator.InvokerFunc) error {
 		return err
 	}
 	var grpcServer *grpc.Server
-	if grpcServer, err = bread.NewServer(
-		auth,
-		inst,
+	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
+	breadpb.RegisterPingServer(grpcServer, bread.NewPingServer(sender))
+	breadpb.RegisterDeployServer(grpcServer, bread.NewDeployServer(
 		sender,
-		bread.NewDeployServer(
-			sender,
-			bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI),
-			bread.NewCanoeDeployer(canoeAPI, config.canoe),
-			tz,
-		),
-	); err != nil {
-		return err
-	}
+		bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI),
+		bread.NewCanoeDeployer(canoeAPI, config.canoe),
+		tz,
+	),
+	)
 
 	jiraClient := jira.NewClient(config.jiraURL, config.jiraUsername, config.jiraPassword)
 	ticketsServer, err := bread.NewTicketsServer(sender, jiraClient, config.jiraProject)

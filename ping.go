@@ -5,18 +5,23 @@ import (
 	"strconv"
 	"time"
 
+	"git.dev.pardot.com/Pardot/bread/pb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
-
-	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
-type pingAPIServer struct {
+type pingServer struct {
 	operator.Sender
 }
 
-func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+// NewPingServer returns a gRPC server that implements the breadpb.PingServer
+// interface.
+func NewPingServer(sender operator.Sender) breadpb.PingServer {
+	return &pingServer{sender}
+}
+
+func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	email := operator.GetUserEmail(req)
 	if email == "" {
 		email = "unknown"
@@ -31,7 +36,7 @@ func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*op
 	})
 }
 
-func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
+func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
 	var dur time.Duration
 	if req.Wait == "" {
 		dur = 10 * time.Second
