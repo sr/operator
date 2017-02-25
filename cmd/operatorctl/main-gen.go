@@ -18,6 +18,7 @@ const program = "operatorctl"
 var cmd = operator.NewCommand(
 	program,
 	[]operator.ServiceCommand{
+
 		{
 			Name:     "deploy",
 			Synopsis: `Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS`,

@@ -26,18 +26,18 @@ RSpec.describe "Terraform API" do
       terraform_version: TerraformProject.required_version
     }
 
-    request = Canoe::CreateTerraformDeployRequest.new(default_params.merge(params))
+    request = Bread::CreateTerraformDeployRequest.new(default_params.merge(params))
     post "/api/grpc/create_terraform_deploy", params: request.as_json, as: :json
   end
 
   def unlock_project(params)
     default_params = { user_email: @user.email }
-    request = Canoe::UnlockTerraformProjectRequest.new(default_params.merge(params))
+    request = Bread::UnlockTerraformProjectRequest.new(default_params.merge(params))
     post "/api/grpc/unlock_terraform_project", params: request.as_json, as: :json
   end
 
   def complete_deploy(project, request_id, successful)
-    request = Canoe::CompleteTerraformDeployRequest.new(
+    request = Bread::CompleteTerraformDeployRequest.new(
       user_email: @user.email,
       request_id: request_id,
       project: project,
@@ -48,7 +48,7 @@ RSpec.describe "Terraform API" do
   end
 
   def deploy_response
-    Canoe::TerraformDeployResponse.decode_json(response.body)
+    Bread::TerraformDeployResponse.decode_json(response.body)
   end
 
   it "requires phone authentication" do

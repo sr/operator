@@ -26,7 +26,7 @@ type PingRequest struct {
 func (m *PingRequest) Reset()                    { *m = PingRequest{} }
 func (m *PingRequest) String() string            { return proto.CompactTextString(m) }
 func (*PingRequest) ProtoMessage()               {}
-func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
+func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
 func (m *PingRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -43,7 +43,7 @@ type SlowLorisRequest struct {
 func (m *SlowLorisRequest) Reset()                    { *m = SlowLorisRequest{} }
 func (m *SlowLorisRequest) String() string            { return proto.CompactTextString(m) }
 func (*SlowLorisRequest) ProtoMessage()               {}
-func (*SlowLorisRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
+func (*SlowLorisRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
 
 func (m *SlowLorisRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -173,11 +173,11 @@ var _Ping_serviceDesc = grpc.ServiceDesc{
 	Metadata: "ping.proto",
 }
 
-func init() { proto.RegisterFile("ping.proto", fileDescriptor2) }
+func init() { proto.RegisterFile("ping.proto", fileDescriptor3) }
 
-var fileDescriptor2 = []byte{
+var fileDescriptor3 = []byte{
 	// 202 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0xc8, 0xcc, 0x4b,
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0xc8, 0xcc, 0x4b,
 	0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a, 0x4d, 0x4c, 0x91, 0x52, 0x4d,
 	0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0x2e, 0xd2, 0xcf, 0x2f, 0x48,
 	0x2d, 0x4a, 0x2c, 0xc9, 0x47, 0x30, 0x20, 0xaa, 0x95, 0xac, 0xb8, 0xb8, 0x03, 0x32, 0xf3, 0xd2,

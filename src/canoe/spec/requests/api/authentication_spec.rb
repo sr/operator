@@ -9,7 +9,7 @@ RSpec.describe "Authentication API" do
   end
 
   def authenticate(email)
-    request = Canoe::PhoneAuthenticationRequest.new(user_email: email)
+    request = Bread::PhoneAuthenticationRequest.new(user_email: email)
     post "/api/grpc/phone_authentication",
       headers: { "HTTP_X_API_TOKEN" => ENV["API_AUTH_TOKEN"] },
       params: request.as_json,
@@ -17,7 +17,7 @@ RSpec.describe "Authentication API" do
   end
 
   def auth_response
-    Canoe::PhoneAuthenticationResponse.decode_json(response.body)
+    Bread::PhoneAuthenticationResponse.decode_json(response.body)
   end
 
   it "returns error if the user does not have an account" do

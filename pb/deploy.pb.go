@@ -26,7 +26,7 @@ type ListTargetsRequest struct {
 func (m *ListTargetsRequest) Reset()                    { *m = ListTargetsRequest{} }
 func (m *ListTargetsRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListTargetsRequest) ProtoMessage()               {}
-func (*ListTargetsRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (*ListTargetsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
 
 func (m *ListTargetsRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -44,7 +44,7 @@ type ListBuildsRequest struct {
 func (m *ListBuildsRequest) Reset()                    { *m = ListBuildsRequest{} }
 func (m *ListBuildsRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListBuildsRequest) ProtoMessage()               {}
-func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
+func (*ListBuildsRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
 
 func (m *ListBuildsRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -77,7 +77,7 @@ type TriggerRequest struct {
 func (m *TriggerRequest) Reset()                    { *m = TriggerRequest{} }
 func (m *TriggerRequest) String() string            { return proto.CompactTextString(m) }
 func (*TriggerRequest) ProtoMessage()               {}
-func (*TriggerRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
+func (*TriggerRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
 
 func (m *TriggerRequest) GetRequest() *operator.Request {
 	if m != nil {
@@ -257,11 +257,11 @@ var _Deploy_serviceDesc = grpc.ServiceDesc{
 	Metadata: "deploy.proto",
 }
 
-func init() { proto.RegisterFile("deploy.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("deploy.proto", fileDescriptor2) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor2 = []byte{
 	// 273 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0x49, 0x2d, 0xc8,
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0x49, 0x2d, 0xc8,
 	0xc9, 0xaf, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4d, 0x2a, 0x4a, 0x4d, 0x4c, 0x91,
 	0x52, 0x4d, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0x2e, 0xd2, 0xcf,
 	0x2f, 0x48, 0x2d, 0x4a, 0x2c, 0xc9, 0x47, 0x30, 0x20, 0xaa, 0x95, 0x1c, 0xb9, 0x84, 0x7c, 0x32,

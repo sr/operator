@@ -39,7 +39,7 @@ RSpec.describe "Deploy creation API" do
       lock: false
     }
 
-    request = Canoe::CreateDeployRequest.new(default_params.merge(params))
+    request = Bread::CreateDeployRequest.new(default_params.merge(params))
     post "/api/grpc/create_deploy",
       headers: { "X-Api-Token" => ENV["API_AUTH_TOKEN"] },
       params: request.as_json,
@@ -47,7 +47,7 @@ RSpec.describe "Deploy creation API" do
   end
 
   def deploy_response
-    Canoe::CreateDeployResponse.decode_json(response.body)
+    Bread::CreateDeployResponse.decode_json(response.body)
   end
 
   it "returns an error when given no user" do

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "config/canoe.proto",
+    "title": "canoe.proto",
     "version": "version not set"
   },
   "schemes": [
@@ -22,7 +22,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeTerraformDeployResponse"
+              "$ref": "#/definitions/breadTerraformDeployResponse"
             }
           }
         },
@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/canoeCompleteTerraformDeployRequest"
+              "$ref": "#/definitions/breadCompleteTerraformDeployRequest"
             }
           }
         ],
@@ -48,7 +48,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeCreateDeployResponse"
+              "$ref": "#/definitions/breadCreateDeployResponse"
             }
           }
         },
@@ -58,7 +58,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/canoeCreateDeployRequest"
+              "$ref": "#/definitions/breadCreateDeployRequest"
             }
           }
         ],
@@ -74,7 +74,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeTerraformDeployResponse"
+              "$ref": "#/definitions/breadTerraformDeployResponse"
             }
           }
         },
@@ -84,7 +84,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/canoeCreateTerraformDeployRequest"
+              "$ref": "#/definitions/breadCreateTerraformDeployRequest"
             }
           }
         ],
@@ -100,7 +100,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoePhoneAuthenticationResponse"
+              "$ref": "#/definitions/breadPhoneAuthenticationResponse"
             }
           }
         },
@@ -110,7 +110,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/canoePhoneAuthenticationRequest"
+              "$ref": "#/definitions/breadPhoneAuthenticationRequest"
             }
           }
         ],
@@ -126,7 +126,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/canoeTerraformDeployResponse"
+              "$ref": "#/definitions/breadTerraformDeployResponse"
             }
           }
         },
@@ -136,7 +136,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/canoeUnlockTerraformProjectRequest"
+              "$ref": "#/definitions/breadUnlockTerraformProjectRequest"
             }
           }
         ],
@@ -147,7 +147,7 @@
     }
   },
   "definitions": {
-    "canoeCompleteTerraformDeployRequest": {
+    "breadCompleteTerraformDeployRequest": {
       "type": "object",
       "properties": {
         "user_email": {
@@ -169,7 +169,7 @@
         }
       }
     },
-    "canoeCreateDeployRequest": {
+    "breadCreateDeployRequest": {
       "type": "object",
       "properties": {
         "user_email": {
@@ -190,7 +190,7 @@
         }
       }
     },
-    "canoeCreateDeployResponse": {
+    "breadCreateDeployResponse": {
       "type": "object",
       "properties": {
         "error": {
@@ -206,7 +206,7 @@
         }
       }
     },
-    "canoeCreateTerraformDeployRequest": {
+    "breadCreateTerraformDeployRequest": {
       "type": "object",
       "properties": {
         "user_email": {
@@ -226,7 +226,7 @@
         }
       }
     },
-    "canoePhoneAuthenticationRequest": {
+    "breadPhoneAuthenticationRequest": {
       "type": "object",
       "properties": {
         "user_email": {
@@ -237,7 +237,7 @@
         }
       }
     },
-    "canoePhoneAuthenticationResponse": {
+    "breadPhoneAuthenticationResponse": {
       "type": "object",
       "properties": {
         "error": {
@@ -252,7 +252,7 @@
         }
       }
     },
-    "canoeTerraformDeployResponse": {
+    "breadTerraformDeployResponse": {
       "type": "object",
       "properties": {
         "error": {
@@ -274,7 +274,7 @@
         }
       }
     },
-    "canoeUnlockTerraformProjectRequest": {
+    "breadUnlockTerraformProjectRequest": {
       "type": "object",
       "properties": {
         "user_email": {

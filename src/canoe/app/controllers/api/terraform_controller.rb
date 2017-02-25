@@ -66,11 +66,11 @@ module Api
       @proto_request ||=
         case params[:action]
         when "create"
-          Canoe::CreateTerraformDeployRequest.decode_json(request.body.read)
+          Bread::CreateTerraformDeployRequest.decode_json(request.body.read)
         when "complete"
-          Canoe::CompleteTerraformDeployRequest.decode_json(request.body.read)
+          Bread::CompleteTerraformDeployRequest.decode_json(request.body.read)
         when "unlock"
-          Canoe::UnlockTerraformProjectRequest.decode_json(request.body.read)
+          Bread::UnlockTerraformProjectRequest.decode_json(request.body.read)
         else
           raise UnhandleableRPCCall, params[:action]
         end

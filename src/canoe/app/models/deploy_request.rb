@@ -20,7 +20,7 @@ class DeployRequest
     end
 
     def as_proto_json
-      proto = Canoe::CreateDeployResponse.new(
+      proto = Bread::CreateDeployResponse.new(
         error: error?,
         message: error || "",
         deploy_id: @deploy&.id || 0
