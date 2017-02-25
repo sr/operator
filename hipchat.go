@@ -19,7 +19,7 @@ import (
 
 type hipchat struct {
 	ctx     context.Context
-	inst    operator.Instrumenter
+	logger  Logger
 	decoder operator.Decoder
 	sender  operator.Sender
 	invoker operator.InvokerFunc
@@ -34,8 +34,7 @@ type hipchat struct {
 func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	msg, senderID, err := h.decoder.Decode(h.ctx, r)
 	if err != nil || msg.Text == "" {
-		h.inst.Instrument(&operator.Event{Key: "handler_decode_error", Error: err})
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("error decoding the request: %s", err), http.StatusBadRequest)
 		return
 	}
 	var breadMatch, halMatch bool
@@ -65,8 +64,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("WARN: both HAL9000 and Operator match. HAL9000 will be ignored")
 	}
 	if !breadMatch && !halMatch {
-		h.inst.Instrument(&operator.Event{Key: "handler_unmatched_message", Message: msg})
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, fmt.Sprintf("message did not match any service: %s", err), http.StatusNotFound)
 		return
 	}
 	go func(bread bool, hal bool, req *operator.Request, msg *operator.Message, halMsg *hal9000.Message) {
@@ -78,11 +76,7 @@ func (h *hipchat) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				errC <- h.invoker(ctx, h.conn, req, h.pkg)
 			} else if hal {
 				_, err := h.hal9000.Dispatch(ctx, halMsg)
-				h.inst.Instrument(&operator.Event{
-					Key:     "hal9000",
-					Message: msg,
-					Error:   err,
-				})
+				h.logger.Printf("hal9000 request message=%s err=%s", msg.Text, err)
 				errC <- err
 			} else {
 				errC <- errors.New("unhandled request")

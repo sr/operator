@@ -18,6 +18,7 @@ import (
 	"git.dev.pardot.com/Pardot/bread/pb"
 	"git.dev.pardot.com/Pardot/bread/pb/hal9000"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
@@ -146,7 +147,6 @@ func run(invoker operator.InvokerFunc) error {
 	var (
 		httpServer *http.ServeMux
 		logger     bread.Logger
-		inst       operator.Instrumenter
 		auth       operator.Authorizer
 		sender     operator.Sender
 
@@ -159,7 +159,6 @@ func run(invoker operator.InvokerFunc) error {
 	)
 	httpServer = http.NewServeMux()
 	logger = log.New(os.Stdout, "", log.LstdFlags)
-	inst = bread.NewInstrumenter(logger)
 	canoeURL, err := url.Parse(config.canoe.URL)
 	if err != nil {
 		return err
@@ -222,7 +221,7 @@ func run(invoker operator.InvokerFunc) error {
 		return err
 	}
 	var grpcServer *grpc.Server
-	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(operator.NewUnaryServerInterceptor(auth, inst)))
+	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(bread.NewUnaryServerInterceptor(logger, &jsonpb.Marshaler{}, auth)))
 	breadpb.RegisterPingServer(grpcServer, bread.NewPingServer(sender))
 	breadpb.RegisterDeployServer(grpcServer, bread.NewDeployServer(
 		sender,
@@ -278,7 +277,7 @@ func run(invoker operator.InvokerFunc) error {
 		const pkg = "bread"
 		if webhookHandler, err = bread.NewHipchatHandler(
 			context.Background(),
-			inst,
+			logger,
 			operatorhipchat.NewRequestDecoder(store),
 			sender,
 			invoker,

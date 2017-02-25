@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,6 +15,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
@@ -196,7 +198,7 @@ func NewRepfixHandler(hal hal9000.RobotClient) http.Handler {
 // webhook requests.
 func NewHipchatHandler(
 	ctx context.Context,
-	inst operator.Instrumenter,
+	logger Logger,
 	decoder operator.Decoder,
 	sender operator.Sender,
 	invoker operator.InvokerFunc,
@@ -213,7 +215,7 @@ func NewHipchatHandler(
 	}
 	return &hipchat{
 		ctx,
-		inst,
+		logger,
 		decoder,
 		sender,
 		invoker,
@@ -288,4 +290,65 @@ func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operat
 // Hipchat API V2. See: https://www.hipchat.com/docs/apiv2
 func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
 	return operatorhipchat.NewClient(context.Background(), config)
+}
+
+// NewUnaryServerInterceptor returns a gRPC server interceptor that logs requests as and authorizes requests.
+func NewUnaryServerInterceptor(logger Logger, jsonpbm *jsonpb.Marshaler, authorizer operator.Authorizer) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		in interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		requester, ok := in.(interface {
+			GetRequest() *operator.Request
+		})
+		req := requester.GetRequest()
+		if !ok || req == nil {
+			return nil, operator.ErrInvalidRequest
+		}
+		if req.GetSource() == nil {
+			return nil, operator.ErrInvalidRequest
+		}
+		s := strings.Split(info.FullMethod, "/")
+		if len(s) != 3 || s[0] != "" || s[1] == "" || s[2] == "" {
+			return nil, operator.ErrInvalidRequest
+		}
+		req.Call = &operator.Call{Service: s[1], Method: s[2]}
+
+		// Authorize the request and log any error.
+		if err := authorizer.Authorize(ctx, req); err != nil {
+			req.Call.Error = err.Error()
+			logRequest(logger, jsonpbm, req.Call)
+			return nil, err
+		}
+
+		// Run the actual handler and record the duration and eventual error.
+		start := time.Now()
+		resp, err := handler(ctx, in)
+		req.Call.Duration = ptypes.DurationProto(time.Since(start))
+		if err != nil {
+			req.Call.Error = err.Error()
+		}
+
+		// Log the request and return the original response.
+		logRequest(logger, jsonpbm, req.Call)
+		return resp, err
+	}
+}
+
+// logRequest logs a RPC request as a protobuf/JSON encoded event if possible
+// or falls back to logging an unstructured string log message otherwise.
+func logRequest(logger Logger, jsonpbm *jsonpb.Marshaler, call *operator.Call) {
+	if jsonpbm != nil {
+		if s, err := jsonpbm.MarshalToString(&breadpb.RPCEvent{Call: call}); err == nil {
+			logger.Println(s)
+			return
+		}
+	}
+	if call.Error == "" {
+		logger.Printf(`request service="%s" method="%s" duration="%s"`, call.Service, call.Method, call.Duration)
+	} else {
+		logger.Printf(`request service="%s" method="%s" duration="%s" err="%s"`, call.Service, call.Method, call.Duration, call.Error)
+	}
 }
