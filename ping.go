@@ -1,7 +1,9 @@
 package bread
 
 import (
+	"database/sql"
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -16,9 +18,30 @@ type pingServer struct {
 }
 
 // NewPingServer returns a gRPC server that implements the breadpb.PingServer
-// interface.
+// interface which can be used a simple "health check" endpoint.
 func NewPingServer(sender operator.Sender) breadpb.PingServer {
 	return &pingServer{sender}
+}
+
+// NewPingHandler returns an http.HandlerFunc that implements a simple health
+// check endpoint for use with ELB and the likes. If the given db connection
+// is not nil, this also checks the availability of the database.
+func NewPingHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// This is helpful to test the behaviour of the server when it panics.
+		if req.URL.Query().Get("boomtown") != "" {
+			panic("boomtown")
+		}
+		payload := `{"now": %d, "status": "ok"}`
+		if db != nil {
+			if err := db.Ping(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				payload = `{"now": %d, "status": "failures"}`
+			}
+		}
+		_, _ = w.Write([]byte(fmt.Sprintf(payload+"\n", time.Now().Unix())))
+	}
 }
 
 func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {

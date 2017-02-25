@@ -23,6 +23,12 @@ type chatCommand struct {
 	Request    *operator.Request
 }
 
+// NewHipchatClient returns a client that implements a subset of the Hipchat API V2.
+// See Also: https://www.hipchat.com/docs/apiv2
+func NewHipchatClient(config *operatorhipchat.ClientConfig) (operatorhipchat.Client, error) {
+	return operatorhipchat.NewClient(context.Background(), config)
+}
+
 // NewHipchatHandler returns an http.HandlerFunc that receives chat messages via
 // webhook requests from HipChat, and dispatches them to either HAL9000 or any
 // other gRPC service registered on the server.

@@ -17,10 +17,31 @@ import (
 
 const ldapTimeout = 3 * time.Second
 
+type LDAPConfig struct {
+	Addr string
+	Base string
+}
+
 type authorizer struct {
 	ldap  *LDAPConfig
 	canoe CanoeClient
 	acl   []*ACLEntry
+}
+
+// NewAuthorizer returns an operator.Authorizer that enforces ACLs using LDAP
+// for authentication and LDAP group membership for authorization. Additionally,
+// this uses the Canoe API to enforce 2FA via Salesforce Authenticator for some
+// requests.
+func NewAuthorizer(ldap *LDAPConfig, canoe CanoeClient, acl []*ACLEntry) (operator.Authorizer, error) {
+	if ldap.Base == "" {
+		ldap.Base = LDAPBase
+	}
+	for _, e := range acl {
+		if e.Call == nil || e.Call.Service == "" || e.Call.Method == "" || e.Group == "" {
+			return nil, fmt.Errorf("invalid ACL entry: %#v", e)
+		}
+	}
+	return &authorizer{ldap, canoe, acl}, nil
 }
 
 func (a *authorizer) Authorize(ctx context.Context, req *operator.Request) error {

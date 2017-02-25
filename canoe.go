@@ -42,6 +42,17 @@ type canoeBuild struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+// NewCanoeDeployer returns a Deployer that deploys to Canoe.
+func NewCanoeDeployer(canoeAPI CanoeClient, config *CanoeConfig) (Deployer, error) {
+	if canoeAPI == nil {
+		return nil, errors.New("required argument is nil: canoeAPI")
+	}
+	if config == nil {
+		return nil, errors.New("required argument is nil: config")
+	}
+	return &canoeDeployer{&http.Client{}, config, canoeAPI}, nil
+}
+
 func (d *canoeDeployer) ListTargets(ctx context.Context) (targets []*DeployTarget, err error) {
 	var resp *http.Response
 	if resp, err = d.doCanoe(ctx, "GET", "/api/projects", ""); err == nil {
