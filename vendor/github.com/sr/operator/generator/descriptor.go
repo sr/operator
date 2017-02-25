@@ -96,8 +96,17 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				services[j].Config = make([]Setting, 0)
 			}
 			for k, method := range service.Method {
+				services[j].Methods[k] = &Method{
+					Name:        method.GetName(),
+					Description: undocumentedPlaceholder,
+				}
+				if !services[j].Enabled {
+					continue
+				}
 				inputName := strings.Split(method.GetInputType(), ".")[2]
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
+				services[j].Methods[k].Input = inputName
+				services[j].Methods[k].Output = outputName
 				input, ok := messagesByName[inputName]
 				if !ok {
 					return nil, fmt.Errorf("No definition for input message %s", inputName)
@@ -105,6 +114,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				if err := validateMessageHasField(input, sourceField); err != nil {
 					return nil, err
 				}
+				services[j].Methods[k].Arguments = make([]*Argument, len(input.Field)-1)
 				if method.GetOutputType() != ".operator.Response" {
 					output, ok := messagesByName[outputName]
 					if !ok {
@@ -127,13 +137,6 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 					if field.GetType() != descriptor.FieldDescriptorProto_TYPE_STRING {
 						return nil, fmt.Errorf("field %s.message must be a string", output.GetName())
 					}
-				}
-				services[j].Methods[k] = &Method{
-					Name:        method.GetName(),
-					Description: undocumentedPlaceholder,
-					Input:       inputName,
-					Output:      outputName,
-					Arguments:   make([]*Argument, len(input.Field)-1),
 				}
 				for l, field := range input.Field {
 					if field.GetName() == sourceField {
