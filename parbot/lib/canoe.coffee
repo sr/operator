@@ -5,7 +5,7 @@ class Canoe
 
   _buildClient: () ->
     httpClient.create(@host)
-      .timeout(15 * 1000)
+      .timeout(30 * 1000)
       .query("api_token", @api_token)
       .header("accept", "application/json")
 
