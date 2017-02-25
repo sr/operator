@@ -276,12 +276,11 @@ func run(invoker operator.InvokerFunc) error {
 		}
 		const pkg = "bread"
 		if webhookHandler, err = bread.NewHipchatHandler(
-			context.Background(),
 			logger,
 			operatorhipchat.NewRequestDecoder(store),
 			sender,
-			invoker,
 			conn,
+			invoker,
 			grpcServer.GetServiceInfo(),
 			hal,
 			config.timeout,

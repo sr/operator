@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 	"time"
 
@@ -192,40 +191,6 @@ func NewHandler(logger Logger, handler http.Handler) http.Handler {
 
 func NewRepfixHandler(hal hal9000.RobotClient) http.Handler {
 	return &repfixHandler{hal}
-}
-
-// NewHipchatHandler returns an http.Handler that handles incoming HipChat
-// webhook requests.
-func NewHipchatHandler(
-	ctx context.Context,
-	logger Logger,
-	decoder operator.Decoder,
-	sender operator.Sender,
-	invoker operator.InvokerFunc,
-	conn *grpc.ClientConn,
-	svcInfo map[string]grpc.ServiceInfo,
-	hal9000 hal9000.RobotClient,
-	timeout time.Duration,
-	prefix string,
-	pkg string,
-) (http.Handler, error) {
-	re, err := regexp.Compile(fmt.Sprintf(operator.ReCommandMessage, regexp.QuoteMeta(prefix)))
-	if err != nil {
-		return nil, err
-	}
-	return &hipchat{
-		ctx,
-		logger,
-		decoder,
-		sender,
-		invoker,
-		conn,
-		svcInfo,
-		hal9000,
-		timeout,
-		re,
-		pkg,
-	}, nil
 }
 
 // NewPingHandler returns an http.Handler that implements a simple health
