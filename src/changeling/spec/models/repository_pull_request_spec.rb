@@ -28,6 +28,7 @@ RSpec.describe RepositoryPullRequest do
       issue = decoded_fixture_data("jira/issue")
       issue["key"] = external_id
       issue["fields"]["resolution"] = nil unless resolved
+      issue["self"] = "rest/api/2/issue/#{external_id}"
       stub_request(:get, "https://sa_changeling:fakefakefake@jira.dev.pardot.com/rest/api/2/issue/#{external_id}")
         .to_return(body: JSON.dump(issue), headers: { "Content-Type" => "application/json" })
     else
@@ -36,9 +37,25 @@ RSpec.describe RepositoryPullRequest do
     end
   end
 
-  def stub_github_pull_request(title: nil, merge_commit_sha: nil, files: [], body: "")
+  def stub_jira_ticket_creation(external_id)
+    issue = decoded_fixture_data("jira/issue")
+    issue["key"] = external_id
+    issue["fields"]["resolution"] = nil
+    issue["self"] = "/rest/iss"
+
+    stub_request(:post, "https://#{Changeling.config.jira_username}:#{Changeling.config.jira_password}@#{URI(Changeling.config.jira_url).host}/rest/api/2/issue")
+      .to_return(status: 200, body: JSON.dump(issue))
+
+    stub_jira_ticket(external_id)
+
+    stub_request(:put, "https://#{Changeling.config.jira_username}:#{Changeling.config.jira_password}@#{URI(Changeling.config.jira_url).host}/rest/api/2/issue/#{external_id}")
+      .to_return(status: 200, body: JSON.dump(issue))
+  end
+
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil, base_ref: "master", files: [], body: "")
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
+    pull_request["base"]["ref"] = base_ref
     pull_request["body"] = body
     pull_request["title"] = title if title
     if merge_commit_sha
@@ -50,6 +67,19 @@ RSpec.describe RepositoryPullRequest do
       .to_return(body: JSON.dump(pull_request), headers: { "Content-Type" => "application/json" })
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/pulls/#{@multipass.pull_request_number}/files")
       .to_return(body: JSON.dump(files), headers: { "Content-Type" => "application/json" })
+  end
+
+  def stub_github_commit(sha:, email: "user@example.com")
+    commit = {
+      commit: {
+        author: {
+          email: email,
+          date: Time.current
+        }
+      }
+    }
+    stub_request(:get, "https://#{Changeling.config.github_hostname}/api/v3/repos/#{@repository.full_name}/commits/#{sha}")
+      .to_return(body: JSON.dump(commit), headers: { "Content-Type" => "application/json" })
   end
 
   def stub_github_commit_status(statuses: [])
@@ -282,7 +312,9 @@ RSpec.describe RepositoryPullRequest do
   describe "synchronizing github pull request" do
     it "sets the merge commit SHA if present" do
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
@@ -298,6 +330,7 @@ RSpec.describe RepositoryPullRequest do
 
     it "synchronizes changed files" do
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(
         title: "BREAD-1598",
         merge_commit_sha: "abc123",
@@ -305,6 +338,7 @@ RSpec.describe RepositoryPullRequest do
           { status: "added", filename: "boomtown", patch: "+ hi" }
         ]
       )
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
@@ -533,6 +567,7 @@ RSpec.describe RepositoryPullRequest do
           user: { login: "alindeman" }
         }
       ])
+      stub_github_commit(sha: "abc123")
       stub_github_pull_request_labels
 
       @repository_pull_request.synchronize(create_github_status: false)
@@ -541,12 +576,21 @@ RSpec.describe RepositoryPullRequest do
     end
 
     it "detects emergency merges" do
+      @repository.update!(compliance_enabled: true)
+      @repository.repository_owners_files.create!(
+        path_name: "/#{Repository::OWNERS_FILENAME}",
+        content: "@heroku/bread"
+      )
+      stub_organization_teams("heroku", "bread": %w[ys])
       stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
       stub_github_pull_request(title: "BREAD-1598")
+      stub_github_commit(sha: "abc123")
       stub_github_commit_status
       stub_github_pull_request_reviews
       stub_github_pull_request_comments
       stub_github_pull_request_labels
+      stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -554,15 +598,24 @@ RSpec.describe RepositoryPullRequest do
       expect(@multipass.complete?).to eq(false)
 
       stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123")
+      expect(@multipass.emergency_ticket_reference).to eq(nil)
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
+      expect(@multipass.emergency_ticket_reference).to_not eq(nil)
+      expect(@multipass.emergency_ticket_reference.ticket_type).to eq(TicketReference::TICKET_TYPE_EMERGENCY)
+      expect(@multipass.emergency_ticket_reference.ticket.external_id).to eq("BREAD-emergency")
+      expect(@multipass.emergency_ticket_reference.ticket.open?).to eq(true)
 
       expect(@multipass.change_type).to eq(ChangeCategorization::EMERGENCY)
+
+      stub_jira_ticket("BREAD-emergency", resolved: true)
+      @repository_pull_request.reload.synchronize(create_github_status: false)
+      expect(@multipass.emergency_ticket_reference.ticket.reload.open?).to eq(false)
     end
   end
 
   it "updates the github comment describing the status of the PR" do
-    Changeling.config.compliance_comment_enabled_repositories = [@repository.full_name]
+    @repository.update!(compliance_enabled: true)
     @repository.repository_owners_files.create!(
       path_name: "/#{Repository::OWNERS_FILENAME}",
       content: "@heroku/ops"
@@ -574,10 +627,37 @@ RSpec.describe RepositoryPullRequest do
     stub_github_pull_request_reviews
     stub_github_pull_request_comments
     stub_github_pull_request_labels
+
+    stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/statuses/deadbeef")
+
     request = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
 
     @multipass.synchronize
 
     expect(request).to have_been_made.once
+  end
+
+  it "does not create a github comment if the PR does not affect the default branch" do
+    @repository.update!(compliance_enabled: true)
+    @repository.repository_owners_files.create!(
+      path_name: "/#{Repository::OWNERS_FILENAME}",
+      content: "@heroku/ops"
+    )
+    stub_organization_teams("heroku", "ops": %w[alindeman sr])
+    stub_jira_ticket("BREAD-1598")
+    stub_github_pull_request(title: "BREAD-1598", base_ref: "feature-branch")
+    stub_github_commit_status
+    stub_github_pull_request_reviews
+    stub_github_pull_request_comments
+    stub_github_pull_request_labels
+
+    status_req = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/statuses/deadbeef")
+
+    comment_req = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+
+    @multipass.synchronize
+
+    expect(status_req).not_to have_been_made
+    expect(comment_req).not_to have_been_made
   end
 end

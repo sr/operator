@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${BREAD:="${GOPATH}/src/git.dev.pardot.com/Pardot/bread"}"
+: "${BREAD_PROTO_DIR:="${BREAD}/proto"}"
+: "${BREAD_PROTO_VENDOR_DIR:="${BREAD}/vendor/proto"}"
+: "${BREAD_HAL9000_DIR:="${BREAD}/src/hal9000"}"
+: "${BREAD_CANOE_DIR:="${BREAD}/src/canoe"}"
+: "${BREAD_CHANGELING_DIR:="${BREAD}/src/changeling"}"
+
+: "${BREAD_GO_PROTO_DIR:="${BREAD}/pb"}"
+: "${BREAD_GO_VENDOR_DIR:="${BREAD}/vendor"}"
+: "${BREAD_GO_SWAGGER_DIR:="${BREAD}/swagger"}"
+
+: "${BREAD_GO_IMPORT_PATH:="git.dev.pardot.com/Pardot/bread"}"
+: "${BREAD_GO_PROTO_IMPORT_PATH:="${BREAD_GO_IMPORT_PATH}/pb"}"
+: "${BREAD_GO_VENDOR_PATH:="${BREAD_GO_IMPORT_PATH}/vendor"}"
+
+if ! command -v protoc >/dev/null; then
+    echo "protogen: protoc command not available in the PATH" 2>&1
+    echo
+    echo "On macOS install protoc and other gRPC dependencies using Homebrew:"
+    echo "https://github.com/grpc/homebrew-grpc#grpc-homebrew"
+    exit 1
+fi
+
+if ! command -v grpc_ruby_plugin >/dev/null; then
+    echo "protogen: grpc_ruby_plugin command not available in the PATH" 2>&1
+    echo
+    echo "On macOS install grpc_ruby_plugin and other gRPC dependencies using Homebrew:"
+    echo "https://github.com/grpc/homebrew-grpc#grpc-homebrew"
+    exit 1
+fi
+
+if ! test -d "${BREAD_GO_PROTO_DIR}"; then
+    mkdir "${BREAD_GO_PROTO_DIR}"
+fi
+
+# Install vendored protobuf generators
+go install -v \
+    "${BREAD_GO_VENDOR_PATH}/github.com/golang/protobuf/protoc-gen-go" \
+    "${BREAD_GO_VENDOR_PATH}/github.com/sr/operator/cmd/protoc-gen-operatorctl" \
+    "${BREAD_GO_VENDOR_PATH}/github.com/sr/operator/cmd/protoc-gen-operatord" \
+    "${BREAD_GO_VENDOR_PATH}/github.com/go-swagger/go-swagger/cmd/swagger" \
+    "${BREAD_GO_VENDOR_PATH}/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger" \
+    "${BREAD_GO_IMPORT_PATH}/cmd/protoc-gen-operatorlitahelp"
+
+# Generate normal Go protobuf code, utility code for the chat gRPC server for use
+# in the operatord program, and the operatorctl command-line code. Also updates
+# the help text used by HAL9000 to list commands exposed via the chat server.
+protoc \
+    -I"${BREAD_GO_VENDOR_DIR}" \
+    -I"${BREAD_PROTO_DIR}" \
+    -I"${BREAD_PROTO_VENDOR_DIR}/googleapis" \
+    --operatorctl_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/cmd/operatorctl" \
+    --operatord_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/cmd/operatord" \
+    --operatorlitahelp_out="import_path=${BREAD_GO_PROTO_IMPORT_PATH}:${BREAD}/src/hal9000/config" \
+    --go_out="plugins=grpc,import_path=${BREAD_GO_PROTO_IMPORT_PATH},Moperator.proto=github.com/sr/operator,Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:${BREAD_GO_PROTO_DIR}" \
+    "${BREAD_PROTO_DIR}/"*.proto
+
+# Generate Go and Ruby code for HAL9000 service
+protoc \
+    -I"${BREAD_GO_VENDOR_DIR}" \
+    -I"${BREAD_PROTO_DIR}" \
+    -I"${BREAD}" \
+    --ruby_out="${BREAD_HAL9000_DIR}/lib" \
+    --grpc_out="${BREAD_HAL9000_DIR}/lib" \
+    --plugin=protoc-gen-grpc="$(which grpc_ruby_plugin)" \
+    --go_out="plugins=grpc,import_path=${BREAD_GO_PROTO_IMPORT_PATH},Moperator.proto=github.com/sr/operator,Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor,Mgoogle/protobuf/duration.proto=github.com/golang/protobuf/ptypes/duration:${BREAD_GO_PROTO_DIR}" \
+    "${BREAD_PROTO_DIR}/hal9000/"*.proto
+
+# Generate Ruby protobuf code for Changeling
+protoc \
+    -I"${BREAD_PROTO_DIR}" \
+    --ruby_out="${BREAD_CHANGELING_DIR}/lib" \
+    --plugin=protoc-gen-grpc="$(which grpc_ruby_plugin)" \
+    "${BREAD_PROTO_DIR}/repository.proto"
+
+# Generate Ruby protobuf code for Canoe
+protoc \
+    -I"${BREAD_PROTO_DIR}" \
+    -I"${BREAD_CANOE_DIR}/config" \
+    -I"${BREAD_PROTO_VENDOR_DIR}/googleapis" \
+    --ruby_out="${BREAD_CANOE_DIR}/lib" \
+    "${BREAD_PROTO_DIR}/canoe.proto"
+sed -i '' '/google\/api\/annotations/d' "${BREAD_CANOE_DIR}/lib/canoe.rb"
+
+# Generate swagger spec from for the Canoe protobuf code
+protoc \
+    -I"${BREAD_PROTO_DIR}" \
+    -I"${BREAD_PROTO_VENDOR_DIR}/googleapis" \
+    --swagger_out=logtostderr=true:"${BREAD_CANOE_DIR}" \
+    "${BREAD_PROTO_DIR}/canoe.proto"
+
+# Generate Go swagger client code for talking to the Canoe API
+swagger generate client \
+    -f "${BREAD_CANOE_DIR}/config/canoe.swagger.json" \
+    -t "${BREAD_GO_SWAGGER_DIR}" >/dev/null 2>&1

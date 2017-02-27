@@ -96,7 +96,8 @@ class SQLQueryTest < ActiveSupport::TestCase
 
   test "Parse table from join" do
     input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va left join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
-    assert_equal %w[va p e], parse(input).tables.map(&:name)
+    assert_equal %w[visitor_activity prospect email], parse(input).tables.map(&:name)
+    assert_equal %w[va p e], parse(input).tables.map(&:alias)
   end
 
   test "Parse table from join without name" do
@@ -106,6 +107,7 @@ class SQLQueryTest < ActiveSupport::TestCase
 
   test "Parse table from inner join" do
     input = 'select va.email_id,e.list_email_id,e.name,va.prospect_id,p.email,va.type,va.created_at from visitor_activity va INNER join prospect p on p.id=va.prospect_id left join email e on e.id=va.email_id where va.type=12 and va.created_at<"2014-07-23" and va.created_at>"2014-07-22"'
-    assert_equal %w[va p e], parse(input).tables.map(&:name)
+    assert_equal %w[visitor_activity prospect email], parse(input).tables.map(&:name)
+    assert_equal %w[va p e], parse(input).tables.map(&:alias)
   end
 end

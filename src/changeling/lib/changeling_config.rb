@@ -30,12 +30,6 @@ class ChangelingConfig
     pardot?
   end
 
-  def compliance_comment_enabled_repositories
-    return @compliance_comment_enabled_repositories if defined?(@compliance_comment_enabled_repositories)
-    @compliance_comment_enabled_repositories = Array(ENV["CHANGELING_COMPLIANCE_COMMENT_ENABLED_REPOSITORIES"].split(","))
-  end
-  attr_writer :compliance_comment_enabled_repositories
-
   def page_title
     if pardot?
       "Pardot Compliance"
@@ -77,6 +71,14 @@ class ChangelingConfig
       "heroku/compliance"
     end
   end
+
+  def sre_team_slug
+    return @sre_team_slug if defined?(@sre_team_slug)
+
+    @sre_team_slug = \
+      ENV.fetch("CHANGELING_SRE_TEAM_SLUG", "Pardot/site-reliability-engineers")
+  end
+  attr_writer :sre_team_slug
 
   def default_repo_name
     if pardot?
@@ -163,11 +165,23 @@ class ChangelingConfig
     end
   end
 
+  def emergency_ticket_jira_project_key
+    ENV.fetch("CHANGELING_EMERGENCY_TICKET_JIRA_PROJECT_KEY", "BREAD")
+  end
+
+  def jira_username
+    ENV.fetch("JIRA_USERNAME")
+  end
+
+  def jira_password
+    ENV.fetch("JIRA_PASSWORD")
+  end
+
   def jira_client
     return @jira_client if defined?(@jira_client)
     options = {
-      username: ENV.fetch("JIRA_USERNAME"),
-      password: ENV.fetch("JIRA_PASSWORD"),
+      username: jira_username,
+      password: jira_password,
       site: jira_url,
       auth_type: :basic,
       rest_base_path: "/rest/api/2",

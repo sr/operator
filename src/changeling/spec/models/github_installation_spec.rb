@@ -79,11 +79,14 @@ RSpec.describe GithubInstallation do
 
     @github_install.synchronize
     expect(@github_install.reload.team_slugs).to eq(%w[heroku/tools heroku/bread])
-    expect(@github_install.reload.team_members("heroku/bread")).to eq(%w[alindeman sr])
+    expect(@github_install.reload.team_members("heroku/bread")).to eq([
+      GithubUser.new("alindeman"),
+      GithubUser.new("sr")
+    ])
 
     stub_organizations({ heroku: ["changeling", "bread"] }, { bread: %w[alindeman] })
     @github_install.synchronize
     expect(@github_install.reload.team_slugs).to eq(%w[heroku/bread])
-    expect(@github_install.reload.team_members("heroku/bread")).to eq(%w[alindeman])
+    expect(@github_install.reload.team_members("heroku/bread")).to eq([GithubUser.new("alindeman")])
   end
 end

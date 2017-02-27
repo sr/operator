@@ -74,6 +74,7 @@ class RepositoryPullRequest
 
     synchronize_github_pull_request
     synchronize_change_categorization
+    synchronize_emergency_ticket
 
     if !@multipass.merged?
       synchronize_github_reviewers
@@ -84,11 +85,11 @@ class RepositoryPullRequest
     @multipass.complete = @multipass.complete?
     @multipass.save!
 
-    if github_repository.compliance_enabled?
-      create_github_commit_status if create_github_status
-    end
+    if @multipass.affects_default_branch? && github_repository.compliance_enabled?
+      if create_github_status
+        create_github_commit_status
+      end
 
-    if Changeling.config.compliance_comment_enabled_repositories.include?(github_repository.full_name)
       update_github_comment
     end
 
@@ -173,18 +174,24 @@ class RepositoryPullRequest
     body << "<ul>"
 
     ownership_teams.each do |team|
-      team_link = "<a href=\"#{html_escape(team.url)}\"><code>@#{html_escape(team.slug)}</code></a>"
       approver = ownership.approver(team.slug)
-
       if approver
-        approver_link = "<a href=\"#{html_escape(approver.url)}\"><code>@#{html_escape(approver.login)}</code></a>"
-        body << "<li>#{GLYPH_APPROVED} #{team_link}: approved by #{approver_link}"
+        body << "<li>#{GLYPH_APPROVED} #{team.html_link}: approved by #{approver.html_link}"
       else
-        body << "<li>#{GLYPH_NOT_APPROVED} #{team_link}</li>"
+        body << "<li>#{GLYPH_NOT_APPROVED} #{team.html_link}</li>"
       end
     end
 
+    if @multipass.sre_approval_required?
+      sre_team = GithubTeam.new(Changeling.config.sre_team_slug)
+      body << "<li>#{@multipass.sre_approved? ? GLYPH_APPROVED : GLYPH_NOT_APPROVED} #{sre_team.html_link} (required because this is a #major change)</li>"
+    end
+
     body << "</ul>"
+
+    if !@multipass.sre_approval_required?
+      body << "<p>If this is a major change that requires SRE involvement, please tag it as `#major` in an issue comment.</p>"
+    end
 
     body << "<details>"
     body << "<summary>Peer review and compliance details</summary>"
@@ -206,10 +213,6 @@ class RepositoryPullRequest
     body << "</ul>"
   end
 
-  def html_escape(s)
-    ERB::Util.html_escape(s)
-  end
-
   def synchronize_github_pull_request
     pull_request = github_client.pull_request(
       repository.name_with_owner,
@@ -225,6 +228,7 @@ class RepositoryPullRequest
     @multipass.merge_commit_sha = pull_request[:merge_commit_sha] if pull_request[:merged]
     @multipass.title = pull_request[:title]
     @multipass.body = pull_request[:body].to_s
+    @multipass.affects_default_branch = (pull_request[:base][:ref] == pull_request[:base][:repo][:default_branch])
     @multipass.release_id = pull_request[:head][:sha]
 
     PullRequestFile.transaction do
@@ -243,7 +247,7 @@ class RepositoryPullRequest
   end
 
   def synchronize_change_categorization
-    if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.merged? && !@multipass.complete?)
+    if @multipass.change_type == ChangeCategorization::EMERGENCY || (@multipass.affects_default_branch? && @multipass.merged? && !@multipass.complete?)
       change_type = ChangeCategorization::EMERGENCY
     else
       comment_bodies = [@multipass.body]
@@ -261,6 +265,24 @@ class RepositoryPullRequest
     end
 
     @multipass.change_type = change_type
+  end
+
+  def synchronize_emergency_ticket
+    if !github_repository.compliance_enabled?
+      return
+    end
+
+    if @multipass.change_type != ChangeCategorization::EMERGENCY
+      return
+    end
+
+    ticket = EmergencyMergeTicket.new(
+      Changeling.config.jira_client,
+      github_repository.github_client,
+      Changeling.config.emergency_ticket_jira_project_key,
+      @multipass
+    )
+    ticket.synchronize
   end
 
   def synchronize_github_statuses

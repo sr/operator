@@ -43,7 +43,7 @@ module Api
       @proto_request ||=
         case params[:action]
         when "create"
-          Canoe::CreateDeployRequest.decode_json(request.body.read)
+          Bread::CreateDeployRequest.decode_json(request.body.read)
         else
           raise UnhandleableRPCCall, params[:action]
         end

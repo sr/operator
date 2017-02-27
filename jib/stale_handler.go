@@ -33,7 +33,7 @@ func (s *Server) Stale(pr *github.PullRequest) error {
 	}
 
 	comment := &github.IssueReplyComment{
-		Context: nil,
+		Context: struct{}{},
 		Body:    body,
 	}
 

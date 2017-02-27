@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/go-ldap/ldap"
 	"github.com/sr/operator"
-	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 
 	"git.dev.pardot.com/Pardot/bread"
@@ -342,7 +342,7 @@ func TestGithub(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler := bread.NewEventHandler(protolog.DiscardLogger, &bread.EventHandlerConfig{
+	handler := bread.NewEventHandler(log.New(ioutil.Discard, "", log.LstdFlags), &bread.EventHandlerConfig{
 		RequestTimeout:    10 * time.Millisecond,
 		GithubEndpoints:   []*url.URL{endpointURL},
 		JIRAEndpoints:     []*url.URL{endpointURL},

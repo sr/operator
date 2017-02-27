@@ -1,0 +1,289 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "canoe.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/grpc/complete_terraform_deploy": {
+      "post": {
+        "operationId": "CompleteTerraformDeploy",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/breadTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/breadCompleteTerraformDeployRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/create_deploy": {
+      "post": {
+        "operationId": "CreateDeploy",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/breadCreateDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/breadCreateDeployRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/create_terraform_deploy": {
+      "post": {
+        "operationId": "CreateTerraformDeploy",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/breadTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/breadCreateTerraformDeployRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/phone_authentication": {
+      "post": {
+        "operationId": "PhoneAuthentication",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/breadPhoneAuthenticationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/breadPhoneAuthenticationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    },
+    "/api/grpc/unlock_terraform_project": {
+      "post": {
+        "operationId": "UnlockTerraformProject",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/breadTerraformDeployResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/breadUnlockTerraformProjectRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Canoe"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "breadCompleteTerraformDeployRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "deploy_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "successful": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      }
+    },
+    "breadCreateDeployRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "target_name": {
+          "type": "string"
+        },
+        "artifact_url": {
+          "type": "string"
+        },
+        "lock": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "breadCreateDeployResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "deploy_id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "breadCreateTerraformDeployRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "terraform_version": {
+          "type": "string"
+        }
+      }
+    },
+    "breadPhoneAuthenticationRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        }
+      }
+    },
+    "breadPhoneAuthenticationResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "user_email": {
+          "type": "string"
+        }
+      }
+    },
+    "breadTerraformDeployResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "deploy_id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      }
+    },
+    "breadUnlockTerraformProjectRequest": {
+      "type": "object",
+      "properties": {
+        "user_email": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

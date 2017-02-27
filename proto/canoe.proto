@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package bread;
+
+import "google/api/annotations.proto";
+
+option go_package = "breadpb";
+
+service Canoe {
+	rpc CreateDeploy(CreateDeployRequest) returns (CreateDeployResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/create_deploy"
+			body: "*"
+		};
+	}
+	rpc CreateTerraformDeploy(CreateTerraformDeployRequest) returns (TerraformDeployResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/create_terraform_deploy"
+			body: "*"
+		};
+	}
+	rpc CompleteTerraformDeploy(CompleteTerraformDeployRequest) returns (TerraformDeployResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/complete_terraform_deploy"
+			body: "*"
+		};
+	}
+	rpc UnlockTerraformProject(UnlockTerraformProjectRequest) returns (TerraformDeployResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/unlock_terraform_project"
+			body: "*"
+		};
+	}
+	rpc PhoneAuthentication(PhoneAuthenticationRequest) returns (PhoneAuthenticationResponse) {
+		option (google.api.http) = {
+			post: "/api/grpc/phone_authentication"
+			body: "*"
+		};
+	}
+}
+
+message CreateDeployRequest {
+	string user_email = 1;
+	string project = 2;
+	string target_name = 3;
+	string artifact_url = 4;
+	bool lock = 5;
+}
+
+message CreateDeployResponse {
+	bool error = 1;
+	string message = 2;
+	int64 deploy_id = 3;
+}
+
+message CreateTerraformDeployRequest {
+	string user_email = 1;
+	string branch = 2;
+	string commit = 3;
+	string project = 4;
+	string terraform_version = 5;
+}
+
+message CompleteTerraformDeployRequest {
+	string user_email = 1;
+	int64 deploy_id = 2;
+	bool successful = 3;
+	string request_id = 4;
+	string project = 5;
+}
+
+message UnlockTerraformProjectRequest {
+	string user_email = 1;
+	string project = 2;
+}
+
+message TerraformDeployResponse {
+	bool error = 1;
+	string message = 2;
+	int64 deploy_id = 3;
+	string request_id = 4;
+	string project = 5;
+}
+
+message PhoneAuthenticationRequest {
+	string user_email = 1;
+	string action = 2;
+}
+
+message PhoneAuthenticationResponse {
+	bool error = 1;
+	string message = 2;
+	string user_email = 3;
+}

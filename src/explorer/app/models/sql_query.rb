@@ -1,6 +1,6 @@
 class SQLQuery
   ACCOUNT_TABLE = "account".freeze
-  NamedTable = Struct.new(:name, :is_account?)
+  NamedTable = Struct.new(:name, :alias, :is_account?)
 
   def initialize(query)
     @ast = SQLParser::Parser.new.scan_str(query.sub(/;$/, ""))
@@ -16,8 +16,12 @@ class SQLQuery
     @ast.to_sql.starts_with?("SELECT *")
   end
 
+  def explain?
+    @ast.is_a?(SQLParser::Statement::Explain)
+  end
+
   def tables
-    tables = @ast.query_expression.table_expression.from_clause.tables
+    tables = query_expression.table_expression.from_clause.tables
     tables.map { |table_ast|
       table_name(table_ast)
     }.flatten
@@ -38,11 +42,15 @@ class SQLQuery
 
   private
 
+  def query_expression
+    explain? ? @ast.direct_select.query_expression : @ast.query_expression
+  end
+
   def table_name(ast)
     if ast.respond_to?(:name)
-      NamedTable.new(ast.name, ast.name == ACCOUNT_TABLE)
-    elsif ast.respond_to?(:column) # Named tables
-      NamedTable.new(ast.column.name, ast.value.name == ACCOUNT_TABLE)
+      NamedTable.new(ast.name, ast.name, ast.name == ACCOUNT_TABLE)
+    elsif ast.respond_to?(:value) && ast.respond_to?(:column) # Named tables
+      NamedTable.new(ast.value.name, ast.column.name, ast.value.name == ACCOUNT_TABLE)
     elsif ast.is_a?(SQLParser::Statement::QualifiedJoin)
       [table_name(ast.left), table_name(ast.right)]
     end

@@ -149,6 +149,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/dghubble/sling",
+			"repository": "https://github.com/dghubble/sling",
+			"vcs": "git",
+			"revision": "91b015f8c5e231605ed75a74130ca0fa48b28cb1",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/docker/distribution/digest",
 			"repository": "https://github.com/docker/distribution",
 			"vcs": "git",
@@ -625,21 +633,12 @@
 			"path": "/proto"
 		},
 		{
-			"importpath": "github.com/golang/protobuf/protoc-gen-go/descriptor",
+			"importpath": "github.com/golang/protobuf/protoc-gen-go",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
+			"revision": "69b215d01a5606c843240eab4937eab3acee6530",
 			"branch": "master",
-			"path": "/protoc-gen-go/descriptor",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/golang/protobuf/protoc-gen-go/plugin",
-			"repository": "https://github.com/golang/protobuf",
-			"vcs": "git",
-			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
-			"branch": "master",
-			"path": "/protoc-gen-go/plugin",
+			"path": "/protoc-gen-go",
 			"notests": true
 		},
 		{
@@ -676,12 +675,57 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis",
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/descriptor",
 			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
 			"vcs": "git",
-			"revision": "686368427ddb9a51628d63db6c74fbc96a206e1f",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
 			"branch": "master",
-			"path": "/third_party/googleapis",
+			"path": "protoc-gen-grpc-gateway/descriptor",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/generator",
+			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
+			"vcs": "git",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
+			"branch": "master",
+			"path": "protoc-gen-grpc-gateway/generator",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/httprule",
+			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
+			"vcs": "git",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
+			"branch": "master",
+			"path": "protoc-gen-grpc-gateway/httprule",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
+			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
+			"vcs": "git",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
+			"branch": "master",
+			"path": "/protoc-gen-swagger",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api",
+			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
+			"vcs": "git",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
+			"branch": "master",
+			"path": "third_party/googleapis/google/api",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/grpc-ecosystem/grpc-gateway/utilities",
+			"repository": "https://github.com/grpc-ecosystem/grpc-gateway",
+			"vcs": "git",
+			"revision": "b855144721c1eeda1c8c78215662d14da4cf1700",
+			"branch": "master",
+			"path": "utilities",
 			"notests": true
 		},
 		{
@@ -795,12 +839,29 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/rogpeppe/fastuuid",
+			"repository": "https://github.com/rogpeppe/fastuuid",
+			"vcs": "git",
+			"revision": "6724a57986aff9bff1a1770e9347036def7c89f6",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/satori/go.uuid",
 			"repository": "https://github.com/satori/go.uuid",
 			"vcs": "git",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
 			"branch": "master",
 			"notests": true
+		},
+		{
+			"importpath": "github.com/sr/operator",
+			"repository": "https://github.com/sr/operator",
+			"vcs": "git",
+			"revision": "36fe5e03ae5e95dfd5ed7f2d77d7dc6606ddfa06",
+			"branch": "master",
+			"notests": true,
+			"allfiles": true
 		},
 		{
 			"importpath": "github.com/stretchr/testify/assert",
@@ -1128,6 +1189,15 @@
 			"vcs": "git",
 			"revision": "2e4a801b39fc199db615bfca7d0b9f8cd9580599",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "google.golang.org/genproto/googleapis/api/annotations",
+			"repository": "https://github.com/google/go-genproto",
+			"vcs": "git",
+			"revision": "dee11a626cb8e7ff045ac9413dcd8a92e72f5863",
+			"branch": "master",
+			"path": "/googleapis/api/annotations",
 			"notests": true
 		},
 		{

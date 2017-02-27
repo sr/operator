@@ -8,8 +8,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+	"github.com/sr/operator"
 )
 
 const (
@@ -51,8 +53,10 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 		file := filesByName[fileName]
 		services := make([]*Service, len(file.Service))
 		messagesByName := make(map[string]*descriptor.DescriptorProto)
-		for _, message := range file.MessageType {
+		messagesIdxByName := make(map[string]int)
+		for i, message := range file.MessageType {
 			messagesByName[message.GetName()] = message
+			messagesIdxByName[message.GetName()] = i
 		}
 		for j, service := range file.Service {
 			pkg := file.GetPackage()
@@ -70,6 +74,15 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				Description: undocumentedPlaceholder,
 				Methods:     make([]*Method, len(service.Method)),
 			}
+			// Check the status of the "operator.enabled" boolan option for the service
+			if service.Options != nil {
+				opt, err := proto.GetExtension(service.Options, operator.E_Enabled)
+				if err == nil {
+					if v, ok := opt.(*bool); ok {
+						services[j].Enabled = *v
+					}
+				}
+			}
 			if m, ok := messagesByName[service.GetName()+"Config"]; ok {
 				services[j].Config = make([]Setting, len(m.Field))
 				for i, f := range m.Field {
@@ -83,8 +96,17 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				services[j].Config = make([]Setting, 0)
 			}
 			for k, method := range service.Method {
+				services[j].Methods[k] = &Method{
+					Name:        method.GetName(),
+					Description: undocumentedPlaceholder,
+				}
+				if !services[j].Enabled {
+					continue
+				}
 				inputName := strings.Split(method.GetInputType(), ".")[2]
 				outputName := strings.Split(method.GetOutputType(), ".")[2]
+				services[j].Methods[k].Input = inputName
+				services[j].Methods[k].Output = outputName
 				input, ok := messagesByName[inputName]
 				if !ok {
 					return nil, fmt.Errorf("No definition for input message %s", inputName)
@@ -92,6 +114,7 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				if err := validateMessageHasField(input, sourceField); err != nil {
 					return nil, err
 				}
+				services[j].Methods[k].Arguments = make([]*Argument, len(input.Field)-1)
 				if method.GetOutputType() != ".operator.Response" {
 					output, ok := messagesByName[outputName]
 					if !ok {
@@ -115,20 +138,16 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 						return nil, fmt.Errorf("field %s.message must be a string", output.GetName())
 					}
 				}
-				services[j].Methods[k] = &Method{
-					Name:        method.GetName(),
-					Description: undocumentedPlaceholder,
-					Input:       inputName,
-					Output:      outputName,
-					Arguments:   make([]*Argument, len(input.Field)-1),
-				}
 				for l, field := range input.Field {
 					if field.GetName() == sourceField {
 						continue
 					}
 					services[j].Methods[k].Arguments[l-1] = &Argument{
 						Name:        field.GetName(),
+						Type:        field.GetType(),
 						Description: undocumentedPlaceholder,
+						fieldNum:    *field.Number,
+						messageIdx:  messagesIdxByName[input.GetName()],
 					}
 				}
 			}
@@ -139,11 +158,25 @@ func describe(request *plugin.CodeGeneratorRequest) (*Descriptor, error) {
 				continue
 			}
 			if len(loc.Path) == 2 && loc.Path[0] == 6 {
+				// message_type && service
 				services[loc.Path[1]].Description = clean(*loc.LeadingComments)
 			} else if len(loc.Path) == 4 && loc.Path[0] == 6 && loc.Path[2] == 2 {
+				// field declaration && service && field
 				s := services[loc.Path[1]]
 				m := s.Methods[loc.Path[3]]
 				m.Description = clean(*loc.LeadingComments)
+			} else if len(loc.Path) == 4 && loc.Path[0] == 4 && loc.Path[2] == 2 {
+				// field declaration && message_type && field
+				for _, s := range services {
+					for _, m := range s.Methods {
+						for _, a := range m.Arguments {
+							// need the number of the field (loc[3]) and it's enclosing message?
+							if a.messageIdx == int(loc.Path[1]) && a.fieldNum-1 == loc.Path[3] {
+								a.Description = clean(*loc.LeadingComments)
+							}
+						}
+					}
+				}
 			}
 		}
 		desc.Services = append(desc.Services, services...)

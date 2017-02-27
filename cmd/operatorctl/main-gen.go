@@ -18,6 +18,7 @@ const program = "operatorctl"
 var cmd = operator.NewCommand(
 	program,
 	[]operator.ServiceCommand{
+
 		{
 			Name:     "deploy",
 			Synopsis: `Deploy any of the projects listed on Canoe and internal apps hosted AWS/ECS`,
@@ -208,8 +209,14 @@ var cmd = operator.NewCommand(
 				{
 					Name:     "mine",
 					Synopsis: `List in-progress issues assigned to the current user`,
-					Flags:    []*flag.Flag{},
+					Flags: []*flag.Flag{
+						{
+							Name:  "include-resolved",
+							Usage: "Undocumented",
+						},
+					},
 					Run: func(ctx *operator.CommandContext) (string, error) {
+						include_resolved := ctx.Flags.String("include-resolved", "", "")
 						if err := ctx.Flags.Parse(ctx.Args); err != nil {
 							return "", err
 						}
@@ -221,8 +228,42 @@ var cmd = operator.NewCommand(
 						client := breadpb.NewTicketsClient(conn)
 						resp, err := client.Mine(
 							context.Background(),
-							&breadpb.MyIssuesRequest{
-								Request: ctx.Request,
+							&breadpb.TicketRequest{
+								Request:         ctx.Request,
+								IncludeResolved: *include_resolved,
+							},
+						)
+						if err != nil {
+							return "", err
+						}
+						return resp.Message, nil
+					},
+				},
+				{
+					Name:     "sprint-status",
+					Synopsis: `Show the state of all tickets in the current sprint`,
+					Flags: []*flag.Flag{
+						{
+							Name:  "include-resolved",
+							Usage: "Undocumented",
+						},
+					},
+					Run: func(ctx *operator.CommandContext) (string, error) {
+						include_resolved := ctx.Flags.String("include-resolved", "", "")
+						if err := ctx.Flags.Parse(ctx.Args); err != nil {
+							return "", err
+						}
+						conn, err := ctx.GetConn()
+						if err != nil {
+							return "", err
+						}
+						defer conn.Close()
+						client := breadpb.NewTicketsClient(conn)
+						resp, err := client.SprintStatus(
+							context.Background(),
+							&breadpb.TicketRequest{
+								Request:         ctx.Request,
+								IncludeResolved: *include_resolved,
 							},
 						)
 						if err != nil {

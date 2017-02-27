@@ -19,6 +19,29 @@ class UserQueryTest < ActiveSupport::TestCase
     assert_equal "1", row[:id]
   end
 
+  test "execute with aliases" do
+    query = @user.account_query("SELECT * FROM object_audit oa", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal "1", row[:id]
+    assert_equal "1", row[:account_id]
+    assert_equal "Account", row[:object_type]
+  end
+
+  test "explain" do
+    query = @user.global_query("EXPLAIN SELECT * FROM global_account WHERE id = 1234")
+    results = query.execute(@user)
+    row = results.first
+    assert_equal "1", row[:id]
+    assert_equal "SIMPLE", row[:select_type]
+
+    query = @user.account_query("EXPLAIN SELECT * FROM account WHERE id = 1234", 1)
+    results = query.execute(@user)
+    row = results.first
+    assert_equal "1", row[:id]
+    assert_equal "SIMPLE", row[:select_type]
+  end
+
   test "global query audit log" do
     query = @user.global_query("SELECT 1 FROM global_account")
     reset_logger
