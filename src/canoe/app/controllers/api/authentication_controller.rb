@@ -25,11 +25,11 @@ module Api
     private
 
     def proto_request
-      @proto_request ||= Canoe::PhoneAuthenticationRequest.decode_json(request.body.read)
+      @proto_request ||= Bread::PhoneAuthenticationRequest.decode_json(request.body.read)
     end
 
     def build_response(params)
-      Canoe::PhoneAuthenticationResponse.new(params.merge(user_email: current_user.email)).as_json
+      Bread::PhoneAuthenticationResponse.new(params.merge(user_email: current_user.email)).as_json
     end
   end
 end

@@ -7,6 +7,8 @@ import "github.com/sr/operator/operator.proto";
 option go_package = "breadpb";
 
 service Ping {
+	option (operator.enabled) = true;
+
 	// Reply with the email of the authenticated user. Requires 2FA
 	rpc Ping(PingRequest) returns (operator.Response);
 	// Trigger a slow request, for testing timeout handling

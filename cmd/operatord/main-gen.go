@@ -12,6 +12,7 @@ import (
 )
 
 func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, pkg string) error {
+
 	if req.Call.Service == fmt.Sprintf("%s.Deploy", pkg) {
 		if req.Call.Method == "ListTargets" {
 			client := breadpb.NewDeployClient(conn)
@@ -49,6 +50,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return err
 		}
 	}
+
 	if req.Call.Service == fmt.Sprintf("%s.Ping", pkg) {
 		if req.Call.Method == "Ping" {
 			client := breadpb.NewPingClient(conn)
@@ -72,6 +74,7 @@ func invoker(ctx context.Context, conn *grpc.ClientConn, req *operator.Request, 
 			return err
 		}
 	}
+
 	if req.Call.Service == fmt.Sprintf("%s.Tickets", pkg) {
 		if req.Call.Method == "Mine" {
 			client := breadpb.NewTicketsClient(conn)

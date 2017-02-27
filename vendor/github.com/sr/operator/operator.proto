@@ -10,11 +10,12 @@ option go_package = "operator";
 message Request {
 	Source source = 1;
 	Call call = 2;
-    string sender_id = 3;
+	string sender_id = 3;
+	string otp = 4;
 }
 
 message Response {
-    string message = 1;
+	string message = 1;
 }
 
 // Call represents a completed gRPC call. The Error field will be non-nil if
@@ -40,8 +41,8 @@ enum SourceType {
 }
 
 message Room {
-    int64 id = 1;
-    string name = 2;
+	int64 id = 1;
+	string name = 2;
 }
 
 message User {
@@ -53,4 +54,5 @@ message User {
 
 extend google.protobuf.ServiceOptions {
 	string name = 51234;
+	bool enabled = 51235;
 }

@@ -29,7 +29,7 @@ class TerraformDeployResponse
   private
 
   def proto_response
-    Canoe::TerraformDeployResponse.new(
+    Bread::TerraformDeployResponse.new(
       error: !@error_message.to_s.empty?,
       message: @error_message,
       project: @project,

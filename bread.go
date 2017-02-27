@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
 	"time"
 
@@ -14,9 +13,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecs"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
-	"github.com/sr/operator/protolog"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -153,6 +152,12 @@ type CanoeClient interface {
 	CompleteTerraformDeploy(*canoe.CompleteTerraformDeployParams) (*canoe.CompleteTerraformDeployOK, error)
 }
 
+// Logger is a minimal logger interface that's compatible with log.Logger from the standard library
+type Logger interface {
+	Printf(format string, v ...interface{})
+	Println(v ...interface{})
+}
+
 type ACLEntry struct {
 	Call              *operator.Call
 	Group             string
@@ -178,20 +183,9 @@ type LDAPConfig struct {
 	Base string
 }
 
-// NewLogger returns a logger that writes protobuf messages marshalled as JSON
-// objects to stderr.
-func NewLogger() protolog.Logger {
-	return protolog.NewLogger(protolog.NewTextWritePusher(os.Stderr))
-}
-
-// NewInstrumenter returns an operator.Instrumenter that logs all requests.
-func NewInstrumenter(logger protolog.Logger) operator.Instrumenter {
-	return newInstrumenter(logger)
-}
-
 // NewHandler returns an http.Handler that logs all requests.
-func NewHandler(logger protolog.Logger, handler http.Handler) http.Handler {
-	return &wrapperHandler{logger, handler}
+func NewHandler(logger Logger, handler http.Handler) http.Handler {
+	return &wrapperHandler{logger, &jsonpb.Marshaler{}, handler}
 }
 
 func NewRepfixHandler(hal hal9000.RobotClient) http.Handler {

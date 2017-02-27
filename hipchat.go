@@ -10,7 +10,6 @@ import (
 	"unicode"
 
 	"github.com/sr/operator"
-	"github.com/sr/operator/generator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -138,8 +137,8 @@ func (h *hipchat) getRequest(msg *operator.Message, senderID string) *operator.R
 	return &operator.Request{
 		Call: &operator.Call{
 			// TODO(sr) multi package support
-			Service: fmt.Sprintf("%s.%s", h.pkg, generator.Camelize(matches[1], "-")),
-			Method:  generator.Camelize(matches[2], "-"),
+			Service: fmt.Sprintf("%s.%s", h.pkg, operator.Camelize(matches[1], "-")),
+			Method:  operator.Camelize(matches[2], "-"),
 			Args:    args,
 		},
 		SenderId: senderID,

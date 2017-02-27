@@ -13,10 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/sr/operator/protolog"
-
 	"git.dev.pardot.com/Pardot/bread/pb"
+	"github.com/golang/protobuf/jsonpb"
 )
 
 const (
@@ -41,7 +39,7 @@ type EventHandlerConfig struct {
 // NewEventHandler returns an http.Handler that receives JIRA and GitHub events
 // webhooks requests and forwards them to other HTTP endpoints after it has
 // verified their integrity if possible.
-func NewEventHandler(logger protolog.Logger, config *EventHandlerConfig) http.Handler {
+func NewEventHandler(logger Logger, config *EventHandlerConfig) http.Handler {
 	if config.GithubSecretToken == "" {
 		panic("required config struct field missing: GithubSecretToken")
 	}
@@ -53,7 +51,7 @@ func NewEventHandler(logger protolog.Logger, config *EventHandlerConfig) http.Ha
 }
 
 type eventHandler struct {
-	logger  protolog.Logger
+	logger  Logger
 	config  *EventHandlerConfig
 	client  *http.Client
 	jsonpbm *jsonpb.Marshaler
@@ -132,7 +130,7 @@ func (h *eventHandler) handleJIRA(w http.ResponseWriter, req *http.Request) {
 			retries++
 		}
 	}
-	h.logger.Info(ev)
+	h.logger.Println(ev)
 	for _, r := range ev.Forwarded {
 		if !(r.StatusCode >= 200 && r.StatusCode < 300) {
 			http.Error(w, "could not proxy to all endpoints", http.StatusInternalServerError)

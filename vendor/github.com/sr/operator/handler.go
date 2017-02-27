@@ -7,8 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/sr/operator/generator"
-
 	"golang.org/x/net/context"
 )
 
@@ -50,6 +48,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return unicode.IsSpace(c)
 		}
 	})
+	var otp string
+	if len(words) != 0 && !strings.Contains(words[len(words)-1], "=") {
+		otp, words = words[len(words)-1], words[:len(words)-1]
+	}
 	for _, arg := range words {
 		parts := strings.Split(arg, "=")
 		if len(parts) != 2 {
@@ -65,10 +67,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		&Request{
 			Call: &Call{
 				// TODO(sr) multi package support
-				Service: fmt.Sprintf("%s.%s", h.pkg, generator.Camelize(matches[1], "-")),
-				Method:  generator.Camelize(matches[2], "-"),
+				Service: fmt.Sprintf("%s.%s", h.pkg, Camelize(matches[1], "-")),
+				Method:  Camelize(matches[2], "-"),
 				Args:    args,
 			},
+			Otp:      otp,
 			SenderId: senderID,
 			Source:   msg.Source,
 		},

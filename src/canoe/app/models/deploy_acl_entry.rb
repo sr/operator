@@ -37,6 +37,6 @@ class DeployACLEntry < ApplicationRecord
   end
 
   def ldap_authorizer
-    @ldap_authorized ||= Canoe::LDAPAuthorizer.new
+    @ldap_authorized ||= Bread::LDAPAuthorizer.new
   end
 end
