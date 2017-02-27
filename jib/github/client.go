@@ -395,7 +395,7 @@ func (c *client) PostIssueComment(org, repo string, number int, comment *IssueRe
 			return nil
 		} else if strings.HasPrefix(comment.Body, contextStr) {
 			// Matches context, but body differs. Edit.
-			_, _, err := c.gh.Issues.EditComment(org, repo, number, ghComment)
+			_, _, err := c.gh.Issues.EditComment(org, repo, comment.ID, ghComment)
 			return err
 		}
 	}
