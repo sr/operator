@@ -78,7 +78,7 @@ Note that commands implemented this way must be written in [Go](https://golang.o
 
 Documentation is rather sparse at this time, and reading the code is the best we have. The implementation of the `!deploy` command is a good starting point:
 
-<https://git.dev.pardot.com/Pardot/bread/blob/master/pb/deploy.proto>
+<https://git.dev.pardot.com/Pardot/bread/blob/master/proto/deploy.proto>
 <https://git.dev.pardot.com/Pardot/bread/blob/master/deploy.go>
 
 We also recommend reading `godoc ./`.
@@ -120,13 +120,13 @@ This is what gets run on CI.
 
 ### Adding new RPC methods
 
-All RPC services and their methods are defined in the protobuf files located in the `src/bread/pb` directory:
+All RPC services and their methods are defined in the protobuf files located in the `/proto` directory:
 
-<https://git.dev.pardot.com/Pardot/bread/tree/master/src/bread/pb>
+<https://git.dev.pardot.com/Pardot/bread/tree/master/src/proto>
 
-The implementation for the various services lives under the `bread` Go package. After changing the protobuf files be sure to update the generated code (including `operatorctl`) by running the fellowing command:
+The implementation for the various services lives under the `git.dev.pardot.com/Pardot/bread` Go package. After changing the protobuf files be sure to update the generated code (including `operatorctl`) by running the fellowing command:
 
-`$ make -f etc/mk/operator.mk generate`
+`$ tools/protogen`
 
 ## Par Bot
 
