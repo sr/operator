@@ -56,7 +56,6 @@ func run() error {
 			authSock, err := forwarder.DockerSSHAuthSock()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: Unable to setup SSH auth socket. This might mean the ssh-forwarder service didn't start properly. The error was: %v\n", err)
-				return err
 			}
 			if err := os.Setenv("DOCKER_SSH_AUTH_SOCK", authSock); err != nil {
 				return err
