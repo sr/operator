@@ -41,6 +41,6 @@
   <% else %>
     <%- deployability = @prov_deploy.deployability(target: target, allow_pending_builds: true) %>
     <%= link_to "Ship It Here", new_project_deploy_path(current_project.name, target_name: target.name, artifact_url: @prov_deploy.artifact_url, branch: @prov_deploy.branch), class: "btn #{shipit_btn_class(@prov_deploy)} deploy-button", disabled: !deployability.permitted?, title: deployability.reason, data: {"target" => target.name} %>
+    <div class="deployability muted"><%= deployability.reason %></div>
   <% end %>
-  <div class="deployability muted"><%= deployability.reason %></div>
 <%- end %>
