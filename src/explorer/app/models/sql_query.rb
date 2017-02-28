@@ -21,7 +21,9 @@ class SQLQuery
   end
 
   def tables
-    tables = query_expression.table_expression.from_clause.tables
+    return [] if explain?
+
+    tables = @ast.query_expression.table_expression.from_clause.tables
     tables.map { |table_ast| table_name(table_ast) }.compact.flatten
   end
 
@@ -39,10 +41,6 @@ class SQLQuery
   end
 
   private
-
-  def query_expression
-    explain? ? @ast.direct_select.query_expression : @ast.query_expression
-  end
 
   def table_name(ast)
     if ast.respond_to?(:name)

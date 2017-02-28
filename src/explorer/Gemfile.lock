@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/alindeman/sql-parser
-  revision: 22680bc2d47d6364999b82e60fdb64899ac54b9b
+  revision: 6ba74ecb183daf037612af0b305c68fbbfa76732
   branch: refactor
   specs:
     sql-parser (0.0.3)
@@ -198,4 +198,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   1.13.6
+   1.14.4

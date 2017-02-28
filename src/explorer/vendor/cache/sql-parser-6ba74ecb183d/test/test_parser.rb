@@ -24,6 +24,10 @@ class TestParser < Test::Unit::TestCase
 
   def test_explain
     assert_understands 'EXPLAIN SELECT * FROM `users` WHERE `id` = 1'
+    assert_understands 'EXPLAIN `users`'
+
+    assert_sql 'EXPLAIN `users`', 'DESCRIBE users'
+    assert_sql 'EXPLAIN `users`', 'DESC users'
   end
 
   def test_case_insensitivity
@@ -246,6 +250,7 @@ class TestParser < Test::Unit::TestCase
     assert_understands 'SELECT `id` FROM `users`'
     assert_understands 'SELECT `users`.`id` FROM `users`'
     assert_understands 'SELECT * FROM `users`'
+    assert_understands 'SELECT `users`.* FROM `users`'
   end
 
   def test_select_list
@@ -270,6 +275,9 @@ class TestParser < Test::Unit::TestCase
 
     assert_understands 'SELECT * FROM `users` AS `u`'
     assert_sql 'SELECT * FROM `users` AS `u`', 'SELECT * FROM users u'
+
+    assert_understands 'SELECT `u`.* FROM `users` AS `u`'
+    assert_sql 'SELECT `u`.* FROM `users` AS `u`', 'SELECT `u`.* FROM users u'
   end
 
   def test_parentheses

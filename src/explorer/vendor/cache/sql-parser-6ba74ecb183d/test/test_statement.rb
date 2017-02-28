@@ -8,6 +8,7 @@ class TestStatement < Test::Unit::TestCase
 
   def test_explain
     assert_sql 'EXPLAIN SELECT * FROM `users`', explain(SQLParser::Statement::DirectSelect.new(select(nil, all, tblx(from(tbl('users')))), nil, nil))
+    assert_sql 'EXPLAIN `users`', explain(tblx(tbl('users')))
   end
 
   def test_order_by

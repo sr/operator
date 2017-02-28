@@ -7,9 +7,16 @@ rule
     : direct_sql_data_statement
 
   direct_sql_data_statement
-    : EXPLAIN direct_select_statement_multiple_rows { result = SQLParser::Statement::Explain.new(val[1]) }
+    : explain direct_select_statement_multiple_rows { result = SQLParser::Statement::Explain.new(val[1]) }
+    | explain table_reference { result = SQLParser::Statement::Explain.new(val[1]) }
     | direct_select_statement_multiple_rows
     | insert_specification
+
+# explain and describe are synonymous
+  explain
+    : EXPLAIN
+    | DESCRIBE
+    | DESC
 
   direct_select_statement_multiple_rows
     : query_expression order_by_clause limit_clause { result = SQLParser::Statement::DirectSelect.new(val[0], val[1], val[2]) }
@@ -275,6 +282,7 @@ rule
 
   column_reference
     : qualifier period column_name { result = SQLParser::Statement::QualifiedColumn.new(val[0], val[2]) }
+    | qualifier period asterisk { result = SQLParser::Statement::QualifiedColumn.new(val[0], SQLParser::Statement::All.new) }
     | column_name
 
   qualifier
