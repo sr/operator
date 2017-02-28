@@ -21,10 +21,10 @@ class SQLQuery
   end
 
   def tables
-    tables = query_expression.table_expression.from_clause.tables
-    tables.map { |table_ast|
-      table_name(table_ast)
-    }.flatten
+    return [] if explain?
+
+    tables = @ast.query_expression.table_expression.from_clause.tables
+    tables.map { |table_ast| table_name(table_ast) }.compact.flatten
   end
 
   def limit(count)
@@ -42,16 +42,12 @@ class SQLQuery
 
   private
 
-  def query_expression
-    explain? ? @ast.direct_select.query_expression : @ast.query_expression
-  end
-
   def table_name(ast)
     if ast.respond_to?(:name)
       NamedTable.new(ast.name, ast.name, ast.name == ACCOUNT_TABLE)
     elsif ast.respond_to?(:value) && ast.respond_to?(:column) # Named tables
       NamedTable.new(ast.value.name, ast.column.name, ast.value.name == ACCOUNT_TABLE)
-    elsif ast.is_a?(SQLParser::Statement::QualifiedJoin)
+    elsif ast.respond_to?(:left) && ast.respond_to?(:right)
       [table_name(ast.left), table_name(ast.right)]
     end
   end

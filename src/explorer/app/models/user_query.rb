@@ -10,7 +10,7 @@ class UserQuery < ApplicationRecord
   end
 
   BlankResultSet = Struct.new(:fields).new([])
-  BlankSQLQuery = Struct.new(:to_sql, :select_all?).new("", false)
+  BlankSQLQuery = Struct.new(:to_sql, :explain?, :select_all?).new("", false, false)
 
   # Returns an empty result set.
   def blank
@@ -52,6 +52,8 @@ class UserQuery < ApplicationRecord
   end
 
   def database_columns(tables = parsed)
+    return [] if tables == BlankSQLQuery
+
     if tables.is_a? SQLQuery
       tables = tables.tables
     else

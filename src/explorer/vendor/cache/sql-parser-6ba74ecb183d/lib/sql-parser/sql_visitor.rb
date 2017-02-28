@@ -26,7 +26,7 @@ module SQLParser
     end
 
     def visit_Explain(o)
-      "EXPLAIN #{visit(o.direct_select)}"
+      "EXPLAIN #{visit(o.expression)}"
     end
 
     def visit_Limit(o)

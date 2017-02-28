@@ -81,6 +81,12 @@ class SQLParser::Parser < Racc::Parser
       when (text = @ss.scan(/\bEXPLAIN\b/i))
          action { [:EXPLAIN, text] }
 
+      when (text = @ss.scan(/\bDESCRIBE\b/i))
+         action { [:DESCRIBE, text] }
+
+      when (text = @ss.scan(/\bDESC\b/i))
+         action { [:DESC, text] }
+
       when (text = @ss.scan(/\bSELECT\b/i))
          action { [:SELECT, text] }
 

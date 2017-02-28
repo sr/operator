@@ -58,11 +58,11 @@ module SQLParser
 
     class Explain < Node
 
-      def initialize(direct_select)
-        @direct_select = direct_select
+      def initialize(expression)
+        @expression = expression
       end
 
-      attr_accessor :direct_select
+      attr_accessor :expression
 
     end
 

@@ -41,6 +41,8 @@ rule
 
 # keywords
             {WB}EXPLAIN{WB}       { [:EXPLAIN, text] }
+            {WB}DESCRIBE{WB}      { [:DESCRIBE, text] }
+            {WB}DESC{WB}          { [:DESC, text] }
             {WB}SELECT{WB}        { [:SELECT, text] }
             {WB}DISTINCT{WB}      { [:DISTINCT, text] }
             {WB}DATE{WB}          { [:DATE, text] }
