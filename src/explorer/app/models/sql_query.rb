@@ -22,9 +22,7 @@ class SQLQuery
 
   def tables
     tables = query_expression.table_expression.from_clause.tables
-    tables.map { |table_ast|
-      table_name(table_ast)
-    }.flatten
+    tables.map { |table_ast| table_name(table_ast) }.compact.flatten
   end
 
   def limit(count)
@@ -51,7 +49,7 @@ class SQLQuery
       NamedTable.new(ast.name, ast.name, ast.name == ACCOUNT_TABLE)
     elsif ast.respond_to?(:value) && ast.respond_to?(:column) # Named tables
       NamedTable.new(ast.value.name, ast.column.name, ast.value.name == ACCOUNT_TABLE)
-    elsif ast.is_a?(SQLParser::Statement::QualifiedJoin)
+    elsif ast.respond_to?(:left) && ast.respond_to?(:right)
       [table_name(ast.left), table_name(ast.right)]
     end
   end

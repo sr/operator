@@ -110,4 +110,9 @@ class SQLQueryTest < ActiveSupport::TestCase
     assert_equal %w[visitor_activity prospect email], parse(input).tables.map(&:name)
     assert_equal %w[va p e], parse(input).tables.map(&:alias)
   end
+
+  test "Parse table from cross join" do
+    input = 'SELECT global_user.email, global_account.company FROM global_user, global_account'
+    assert_equal %w[global_user global_account], parse(input).tables.map(&:name)
+  end
 end
