@@ -14,8 +14,10 @@
 /src/hal9000/.env
 /src/rubylib/Gemfile.lock
 /src/terraform/*.tfvars
+/bambooplugin/target
 .DS_Store
 *.tfstate.backup
 coverage
 .idea
 **/.idea
+**/*.iml

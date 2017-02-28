@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="pardot-bamboo-plugin"/>
+  <!-- add our web resources -->
+  <web-resource key="pardot-bamboo-plugin-resources" name="pardot-bamboo-plugin Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="pardot-bamboo-plugin.css" location="/css/pardot-bamboo-plugin.css"/>
+    <resource type="download" name="pardot-bamboo-plugin.js" location="/js/pardot-bamboo-plugin.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>pardot-bamboo-plugin</context>
+  </web-resource>
+  <triggerType key="github-webhook-trigger" name="GitHub webhook" class="com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerActivator">
+    <description>GitHub webhook notifies Bamboo of changes</description>
+    <configurator class="com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator"/>
+    <applicability class="com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerApplicability"/>
+    <resource type="freemarker" name="edit" location="trigger/editWebhookTrigger.ftl"/>
+  </triggerType>
+  <rest name="Pardot Bamboo REST API" i18n-name-key="pardot-bamboo-rest.name" key="pardot-bamboo-rest" path="/pardot" version="1.0">
+    <description key="pardot-bamboo-rest.description">The Pardot Bamboo REST API</description>
+  </rest>
+</atlassian-plugin>
