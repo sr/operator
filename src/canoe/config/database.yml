@@ -18,3 +18,7 @@ test:
 production: &production
   pool: <%= ENV.fetch("MAX_THREADS", 5) %>
   url: <%= ENV['DATABASE_URL'] %>
+  connect_timeout: 2
+  read_timeout: 2
+  write_timeout: 2
+  checkout_timeout: 2
