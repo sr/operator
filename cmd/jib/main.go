@@ -111,6 +111,7 @@ func run() error {
 		jibServer.Info,
 		jibServer.Stale,
 		jibServer.Merge,
+		jibServer.Notify,
 	}
 
 	// TODO(alindeman): Implement a real webhook server
