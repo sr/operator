@@ -98,8 +98,10 @@ ActiveRecord::Schema.define(version: 20170306142724) do
     t.text     "body",                   default: "",        null: false
     t.boolean  "affects_default_branch", default: true,      null: false
     t.datetime "merged_at"
+    t.integer  "github_comment_id"
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
+    t.index ["github_comment_id"], name: "index_multipasses_on_github_comment_id", unique: true, using: :btree
     t.index ["reference_url"], name: "index_multipasses_on_reference_url", unique: true, using: :btree
     t.index ["team"], name: "index_multipasses_on_team", using: :btree
   end
