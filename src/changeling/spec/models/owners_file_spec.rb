@@ -10,6 +10,7 @@ hello world
 garbage
 srozet@salesforce.com
 @simon-rozet
+@pardot/app-sec *.php
 EOS
 
     expect(owners.teams).to eq(["Pardot/bread"])
