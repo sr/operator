@@ -360,7 +360,7 @@ module SQLParser
     end
 
     def visit_all(nodes)
-      nodes.collect { |e| visit(e) }
+      Array(nodes).collect { |e| visit(e) }
     end
 
     def arrayize(arr)
