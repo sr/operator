@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/alindeman/sql-parser
-  revision: 6ba74ecb183daf037612af0b305c68fbbfa76732
+  revision: da91b083d3b5f1551597249189463fafd95feca5
   branch: refactor
   specs:
     sql-parser (0.0.3)
