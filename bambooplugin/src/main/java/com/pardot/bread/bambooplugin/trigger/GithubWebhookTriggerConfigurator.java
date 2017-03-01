@@ -4,7 +4,6 @@ import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.trigger.TriggerConfigurator;
 import com.atlassian.bamboo.trigger.TriggerDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-@ExportAsService
 public class GithubWebhookTriggerConfigurator implements TriggerConfigurator {
     private static final Logger log = Logger.getLogger(GithubWebhookTriggerConfigurator.class);
 

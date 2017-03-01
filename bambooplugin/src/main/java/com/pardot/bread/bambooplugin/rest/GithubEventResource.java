@@ -15,14 +15,12 @@ import com.atlassian.bamboo.util.CacheAwareness;
 import com.atlassian.bamboo.utils.BambooRunnables;
 import com.atlassian.bamboo.v2.events.ChangeDetectionRequiredEvent;
 import com.atlassian.event.api.EventPublisher;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.*;
 import com.pardot.bread.bambooplugin.GithubTriggeredPlan;
 import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.InvalidParameterException;
@@ -39,19 +37,24 @@ import java.util.Map;
 public class GithubEventResource {
     private static final Logger log = Logger.getLogger(GithubEventResource.class);
 
-    private final CachedPlanManager cachedPlanManager;
-    private final PlanManager planManager;
-    private final EventPublisher eventPublisher;
-    private final BranchDetectionService branchDetectionService;
+    private CachedPlanManager cachedPlanManager;
+    private PlanManager planManager;
+    private EventPublisher eventPublisher;
+    private BranchDetectionService branchDetectionService;
 
-    @Autowired
-    public GithubEventResource(@ComponentImport final CachedPlanManager cachedPlanManager,
-                               @ComponentImport final PlanManager planManager,
-                               @ComponentImport final EventPublisher eventPublisher,
-                               @ComponentImport final BranchDetectionService branchDetectionService) {
+    public void setCachedPlanManager(final CachedPlanManager cachedPlanManager) {
         this.cachedPlanManager = cachedPlanManager;
+    }
+
+    public void setPlanManager(final PlanManager planManager) {
         this.planManager = planManager;
+    }
+
+    public void setEventPublisher(final EventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
+    }
+
+    public void setBranchDetectionService(final BranchDetectionService branchDetectionService) {
         this.branchDetectionService = branchDetectionService;
     }
 
