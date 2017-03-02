@@ -1,4 +1,13 @@
 #!/bin/sh
 set -eu
 : "${GOROOT:="$(go env GOROOT)"}"
-"$GOROOT/bin/godoc" "$@" | $PAGER
+: "${PAGER:="less"}"
+
+case "${1:-""}" in
+    -http*)
+        "${GOROOT}/bin/godoc" "$@"
+        ;;
+    *)
+        "${GOROOT}/bin/godoc" "$@" | $PAGER
+        ;;
+esac
