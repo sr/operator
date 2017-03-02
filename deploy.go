@@ -22,12 +22,78 @@ const (
 	maxBuildAge = 36 * time.Hour
 )
 
+// ECSDeployTargets is the list of projects that are deployed to Amazon ECS.
+var ECSDeployTargets = []*DeployTarget{
+	{
+		Name:          "canoe",
+		Canoe:         false,
+		ECSCluster:    "canoe_production",
+		ECSService:    "canoe",
+		ContainerName: "canoe",
+		Image:         "build/bread/canoe/app",
+	},
+	{
+		Name:          "hal9000",
+		Canoe:         false,
+		ECSCluster:    "operator_production",
+		ECSService:    "operator",
+		ContainerName: "hal9000",
+		Image:         "build/bread/hal9000/app",
+	},
+	{
+		Name:          "operator",
+		Canoe:         false,
+		ECSCluster:    "operator_production",
+		ECSService:    "operator",
+		ContainerName: "operatord",
+		Image:         "build/bread/operatord/app",
+	},
+	{
+		Name:          "parbot",
+		Canoe:         false,
+		ECSCluster:    "parbot_production",
+		ECSService:    "parbot",
+		ContainerName: "parbot",
+		Image:         "build/bread/parbot/app",
+	},
+	{
+		Name:          "refocus",
+		Canoe:         false,
+		ECSCluster:    "refocus_production",
+		ECSService:    "refocus",
+		ContainerName: "refocus",
+		Image:         "build/pardot-refocus/app",
+	},
+	{
+		Name:          "teampass",
+		Canoe:         false,
+		ECSCluster:    "teampass",
+		ECSService:    "teampass",
+		ContainerName: "teampass",
+		Image:         "build/bread/teampass/app",
+	},
+}
+
+// A Deployer deploys builds to deployment targets.
 type Deployer interface {
 	ListTargets(context.Context) ([]*DeployTarget, error)
 	ListBuilds(context.Context, *DeployTarget, string) ([]Build, error)
 	Deploy(context.Context, *operator.RequestSender, *DeployRequest) (*operator.Message, error)
 }
 
+// A DeployTarget is a running service that can be deployed.
+type DeployTarget struct {
+	Name          string
+	Canoe         bool
+	ECSCluster    string
+	ECSService    string
+	ContainerName string
+	Image         string
+}
+
+// A Build is a code repository checked out at a certain SHA1 that has been built
+// into a deployable blob (such as a tarball or Docker image) and uploaded to
+// an artifact store, such as Artifactory.
 type Build interface {
 	GetID() string
 	GetURL() string
@@ -39,10 +105,17 @@ type Build interface {
 	GetCreated() time.Time
 }
 
+// A DeployRequest is user (as identified by the UserEmail field) request to
+// deploy a build to a deployment target.
 type DeployRequest struct {
 	Target    *DeployTarget
 	Build     Build
 	UserEmail string
+}
+
+type CanoeConfig struct {
+	URL    string
+	APIKey string
 }
 
 type deployAPIServer struct {
@@ -50,6 +123,25 @@ type deployAPIServer struct {
 	ecs   Deployer
 	canoe Deployer
 	tz    *time.Location
+}
+
+// NewDeployServer returns a gRPC server that implements the bread.Deploy protobuf
+// server interface and supports deploying to both Amazon EC2 Container Service (ECS)
+// and Canoe.
+func NewDeployServer(sender operator.Sender, ecs Deployer, canoe Deployer, tz *time.Location) (breadpb.DeployServer, error) {
+	if sender == nil {
+		return nil, errors.New("required argument is nil: sender")
+	}
+	if ecs == nil {
+		return nil, errors.New("required argument is nil: ecs")
+	}
+	if canoe == nil {
+		return nil, errors.New("required argument is nil: canoe")
+	}
+	if tz == nil {
+		tz = time.UTC
+	}
+	return &deployAPIServer{sender, ecs, canoe, tz}, nil
 }
 
 func (s *deployAPIServer) ListTargets(ctx context.Context, req *breadpb.ListTargetsRequest) (*operator.Response, error) {

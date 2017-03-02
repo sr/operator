@@ -19,7 +19,7 @@ ldap-dev: docker-build-ldap
 test: etc/ldap.ldif ldap-dev
 	export LDAP_PORT_389_TCP_PORT="$$(docker inspect -f '{{(index (index .NetworkSettings.Ports "389/tcp") 0).HostPort }}' operator_ldap)"; \
 	export LDAP_PORT_389_TCP_ADDR="localhost"; \
-	$(GO) test $$($(GO) list bread/... | grep -v bread/vendor) -ldap github.com/sr/operator/...
+	$(GO) test $(BREAD_IMPORT_PATH) -ldap github.com/sr/operator/...
 
 build-operatord: $(TMPDIR)
 	env CGO_ENABLED=0 GOOS=linux $(GO) build -a -tags netgo -ldflags "-w" \

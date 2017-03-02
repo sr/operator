@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
@@ -49,6 +50,35 @@ type afyItem struct {
 type property struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+}
+
+// NewECSDeployer returns a Deployer that deploys to Amazon EC2 Container Service.
+func NewECSDeployer(config *ECSConfig, afy *ArtifactoryConfig, targets []*DeployTarget, canoeAPI CanoeClient) (Deployer, error) {
+	if config == nil {
+		return nil, errors.New("required argument is nil: config")
+	}
+	if afy == nil {
+		return nil, errors.New("required argument is nil: afy")
+	}
+	if len(targets) == 0 {
+		return nil, errors.New("required argument is nil or empty: targets")
+	}
+	if canoeAPI == nil {
+		return nil, errors.New("required argument is nil: canoeAPI")
+	}
+	return &ecsDeployer{
+		ecs.New(
+			session.New(
+				&aws.Config{
+					Region: aws.String(config.AWSRegion),
+				},
+			),
+		),
+		afy,
+		config.Timeout,
+		targets,
+		canoeAPI,
+	}, nil
 }
 
 func (d *ecsDeployer) ListTargets(ctx context.Context) ([]*DeployTarget, error) {

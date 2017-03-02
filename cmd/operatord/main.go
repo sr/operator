@@ -18,6 +18,7 @@ import (
 	"git.dev.pardot.com/Pardot/bread/pb"
 	"git.dev.pardot.com/Pardot/bread/pb/hal9000"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
@@ -146,7 +147,6 @@ func run(invoker operator.InvokerFunc) error {
 	var (
 		httpServer *http.ServeMux
 		logger     bread.Logger
-		inst       operator.Instrumenter
 		auth       operator.Authorizer
 		sender     operator.Sender
 
@@ -159,7 +159,6 @@ func run(invoker operator.InvokerFunc) error {
 	)
 	httpServer = http.NewServeMux()
 	logger = log.New(os.Stdout, "", log.LstdFlags)
-	inst = bread.NewInstrumenter(logger)
 	canoeURL, err := url.Parse(config.canoe.URL)
 	if err != nil {
 		return err
@@ -221,27 +220,31 @@ func run(invoker operator.InvokerFunc) error {
 	if err != nil {
 		return err
 	}
+
 	var grpcServer *grpc.Server
-	if grpcServer, err = bread.NewServer(
-		auth,
-		inst,
-		sender,
-		bread.NewDeployServer(
-			sender,
-			bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI),
-			bread.NewCanoeDeployer(canoeAPI, config.canoe),
-			tz,
-		),
-	); err != nil {
-		return err
+	grpcServer = grpc.NewServer(grpc.UnaryInterceptor(bread.NewUnaryServerInterceptor(logger, &jsonpb.Marshaler{}, auth)))
+	ecsDeployer, err := bread.NewECSDeployer(config.ecs, config.afy, bread.ECSDeployTargets, canoeAPI)
+	if err != nil {
+		return fmt.Errorf("bread.NewECSDeployer: %s", err)
 	}
+	canoeDeployer, err := bread.NewCanoeDeployer(canoeAPI, config.canoe)
+	if err != nil {
+		return fmt.Errorf("bread.NewCanoeDeployer: %s", err)
+	}
+	deployServer, err := bread.NewDeployServer(sender, ecsDeployer, canoeDeployer, tz)
+	if err != nil {
+		return fmt.Errorf("bread.NewDeployServer: %s", err)
+	}
+	breadpb.RegisterPingServer(grpcServer, bread.NewPingServer(sender))
+	breadpb.RegisterDeployServer(grpcServer, deployServer)
 
 	jiraClient := jira.NewClient(config.jiraURL, config.jiraUsername, config.jiraPassword)
 	ticketsServer, err := bread.NewTicketsServer(sender, jiraClient, config.jiraProject)
 	if err != nil {
-		return err
+		return fmt.Errorf("bread.NewTicketsServer: %s", err)
 	}
 	breadpb.RegisterTicketsServer(grpcServer, ticketsServer)
+
 	errC := make(chan error)
 	grpcList, err := net.Listen("tcp", config.grpcAddr)
 	if err != nil {
@@ -266,7 +269,7 @@ func run(invoker operator.InvokerFunc) error {
 		} else {
 			return err
 		}
-		httpServer.Handle("/replication/", bread.NewHandler(logger, bread.NewRepfixHandler(hal)))
+		httpServer.Handle("/replication/", bread.NewHandler(logger, newRepfixHandler(hal)))
 	}
 	if !config.dev {
 		var webhookHandler http.Handler
@@ -281,12 +284,11 @@ func run(invoker operator.InvokerFunc) error {
 		}
 		const pkg = "bread"
 		if webhookHandler, err = bread.NewHipchatHandler(
-			context.Background(),
-			inst,
+			logger,
 			operatorhipchat.NewRequestDecoder(store),
 			sender,
-			invoker,
 			conn,
+			invoker,
 			grpcServer.GetServiceInfo(),
 			hal,
 			config.timeout,
