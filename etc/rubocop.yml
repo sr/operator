@@ -57,6 +57,7 @@ Style/BlockDelimiters:
   Exclude:
     # Ignore FactoryGirl's DSL
     - "src/**/spec/factories/**/*.rb"
+    - "**/spec/factories/**/*.rb"
 Style/ClassAndModuleChildren:
   Enabled: true
 Style/ClosingParenthesisIndentation:
@@ -150,6 +151,10 @@ AllCops:
     - "src/**/db/schema.rb"
     - "src/**/vendor/cache/**/*"
     - "src/**/vendor/gems/**/*"
-    - "src/changeling/vendor/OWNERS/**/*"
-    - "src/hal9000/lib/hal9000/*.rb"
-    - "src/canoe/lib/canoe.rb"
+    - "**/bin/*"
+    - "**/db/schema.rb"
+    - "**/vendor/cache/**/*"
+    - "**/vendor/gems/**/*"
+    - "changeling/vendor/OWNERS/**/*"
+    - "hal9000/lib/hal9000/*.rb"
+    - "canoe/lib/canoe.rb"
