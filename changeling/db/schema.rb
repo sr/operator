@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170228151430) do
+ActiveRecord::Schema.define(version: 20170306142724) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,6 +97,7 @@ ActiveRecord::Schema.define(version: 20170228151430) do
     t.string   "merge_commit_sha"
     t.text     "body",                   default: "",        null: false
     t.boolean  "affects_default_branch", default: true,      null: false
+    t.datetime "merged_at"
     t.index "release_id text_pattern_ops", name: "index_multipasses_on_release_id", using: :btree
     t.index ["complete"], name: "index_multipasses_on_complete", using: :btree
     t.index ["reference_url"], name: "index_multipasses_on_reference_url", unique: true, using: :btree

@@ -55,7 +55,8 @@ RSpec.describe RepositoryPullRequest do
       .to_return(status: 200, body: JSON.dump(issue))
   end
 
-  def stub_github_pull_request(title: nil, merge_commit_sha: nil, base_ref: "master", files: [], body: "")
+  # rubocop:disable Metrics/ParameterLists
+  def stub_github_pull_request(title: nil, merge_commit_sha: nil, merged_at: nil, base_ref: "master", files: [], body: "")
     pull_request = decoded_fixture_data("github/pull_request")
     pull_request["head"]["sha"] = @multipass.release_id
     pull_request["base"]["ref"] = base_ref
@@ -64,6 +65,9 @@ RSpec.describe RepositoryPullRequest do
     if merge_commit_sha
       pull_request["merged"] = true
       pull_request["merge_commit_sha"] = merge_commit_sha
+      if merged_at
+        pull_request["merged_at"] = merged_at
+      end
     end
 
     stub_request(:get, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/pulls/#{@multipass.pull_request_number}")
@@ -329,6 +333,24 @@ RSpec.describe RepositoryPullRequest do
 
       expect(@multipass.release_id).to eq(original_release_id)
       expect(@multipass.merge_commit_sha).to eq("abc123")
+    end
+
+    it "sets the merge datetime if present" do
+      stub_jira_ticket("BREAD-1598")
+      stub_jira_ticket_creation("BREAD-emergency")
+      stub_github_pull_request(title: "BREAD-1598", merge_commit_sha: "abc123", merged_at: "2011-01-26T19:01:12Z")
+      stub_github_commit(sha: "abc123")
+      stub_github_commit_status
+      stub_github_pull_request_reviews
+      stub_github_pull_request_comments
+      stub_github_pull_request_labels
+
+      original_release_id = @multipass.release_id
+      @repository_pull_request.synchronize(create_github_status: false)
+      @multipass.reload
+
+      expect(@multipass.release_id).to eq(original_release_id)
+      expect(@multipass.merged_at).to eq("2011-01-26T19:01:12Z")
     end
 
     it "synchronizes changed files" do
