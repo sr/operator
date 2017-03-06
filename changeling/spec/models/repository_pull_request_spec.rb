@@ -15,6 +15,9 @@ RSpec.describe RepositoryPullRequest do
     )
     stub_organization_teams("heroku", {})
     @multipass = Fabricate(:multipass,
+      change_type: ChangeCategorization::STANDARD,
+      requester: "user",
+      peer_reviewer: "reviewer",
       reference_url: reference_url,
       release_id: "deadbeef",
       testing: nil,
