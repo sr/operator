@@ -541,6 +541,14 @@ resource "aws_route53_record" "zabbix-phx_dev_pardot_com_CNAMErecord" {
   ttl     = "900"
 }
 
+resource "aws_route53_record" "embedded_dev_pardot_com_CNAMErecord" {
+  zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
+  name    = "embedded.${aws_route53_zone.dev_pardot_com.name}"
+  records = ["app.dev.pardot.com."]
+  type    = "CNAME"
+  ttl     = "900"
+}
+
 resource "aws_route53_record" "dev_pardot_com_TXTrecord" {
   zone_id = "${aws_route53_zone.dev_pardot_com.zone_id}"
   name    = "dev.pardot.com"

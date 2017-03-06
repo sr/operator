@@ -7,17 +7,8 @@ import "github.com/sr/operator/operator.proto";
 
 option go_package = "breadpb";
 
-message OperatorRequest {
-	string event = 1;
-	operator.Request request = 2;
-	OperatorMessage message = 3;
-	string error = 4;
-}
-
-message OperatorMessage {
-	operator.Source source = 1;
-	string text = 2;
-	string html = 3;
+message RPCEvent {
+	operator.Call call = 1;
 }
 
 message GithubEvent {

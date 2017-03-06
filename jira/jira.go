@@ -158,9 +158,6 @@ func (c *client) do(ctx context.Context, req *http.Request, expectedStatus int) 
 		return resp, err
 	}
 	if resp.StatusCode != expectedStatus {
-		if body, err := ioutil.ReadAll(resp.Body); err == nil {
-			return resp, fmt.Errorf("expected status 204, got %d: %s", resp.StatusCode, body)
-		}
 		return resp, fmt.Errorf("expected status 204, got %d", resp.StatusCode)
 	}
 	return resp, err

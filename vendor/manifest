@@ -28,6 +28,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/FiloSottile/gvt",
+			"repository": "https://github.com/FiloSottile/gvt",
+			"vcs": "git",
+			"revision": "50d83ea21cb0405e81efd284951e111b3a68d701",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Microsoft/go-winio",
 			"repository": "https://github.com/Microsoft/go-winio",
 			"vcs": "git",

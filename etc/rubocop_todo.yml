@@ -19,44 +19,44 @@ Metrics/PerceivedComplexity:
 # Configuration parameters: AllowSafeAssignment.
 Lint/AssignmentInCondition:
   Exclude:
-    - 'src/canoe/app/controllers/application_controller.rb'
-    - 'src/canoe/app/models/deploy_target.rb'
-    - 'src/hal9000/app/models/replication_fixing/message_throttler.rb'
-    - 'src/hal9000/app/models/zabbix/maintenance_supervisor.rb'
-    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
+    - 'canoe/app/controllers/application_controller.rb'
+    - 'canoe/app/models/deploy_target.rb'
+    - 'hal9000/app/models/replication_fixing/message_throttler.rb'
+    - 'hal9000/app/models/zabbix/maintenance_supervisor.rb'
+    - 'hal9000/app/models/zabbix/monitor_supervisor.rb'
 
 # Offense count: 18
 Lint/AmbiguousRegexpLiteral:
   Exclude:
-    - 'src/hal9000/app/handlers/*_handler.rb'
+    - 'hal9000/app/handlers/*_handler.rb'
 
 # Offense count: 1
 Lint/CircularArgumentReference:
   Exclude:
-    - 'src/canoe/app/models/deploy_workflow.rb'
+    - 'canoe/app/models/deploy_workflow.rb'
 
 # Offense count: 2
 # Configuration parameters: CountKeywordArgs.
 Metrics/ParameterLists:
   Exclude:
-    - 'src/canoe/app/models/build.rb'
-    - 'src/hal9000/app/handlers/zabbix_handler.rb'
-    - 'src/hal9000/app/models/zabbix/zabbixmon.rb'
+    - 'canoe/app/models/build.rb'
+    - 'hal9000/app/handlers/zabbix_handler.rb'
+    - 'hal9000/app/models/zabbix/zabbixmon.rb'
 
 # Offense count: 3
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: strict, flexible
 Rails/TimeZone:
   Exclude:
-    - 'src/canoe/app/controllers/application_controller.rb'
-    - 'src/canoe/app/helpers/canoe_helper.rb'
-    - 'src/hal9000/app/handlers/replication_fixing_handler.rb'
-    - 'src/hal9000/app/models/replication_fixing/alerting_manager.rb'
-    - 'src/hal9000/app/models/replication_fixing/fixing_status_client.rb'
-    - 'src/hal9000/spec/models/replication_fixing/alerting_manager_spec.rb'
-    - 'src/hal9000/app/handlers/zabbix_handler.rb'
-    - 'src/hal9000/app/models/zabbix/maintenance_supervisor.rb'
-    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
+    - 'canoe/app/controllers/application_controller.rb'
+    - 'canoe/app/helpers/canoe_helper.rb'
+    - 'hal9000/app/handlers/replication_fixing_handler.rb'
+    - 'hal9000/app/models/replication_fixing/alerting_manager.rb'
+    - 'hal9000/app/models/replication_fixing/fixing_status_client.rb'
+    - 'hal9000/spec/models/replication_fixing/alerting_manager_spec.rb'
+    - 'hal9000/app/handlers/zabbix_handler.rb'
+    - 'hal9000/app/models/zabbix/maintenance_supervisor.rb'
+    - 'hal9000/app/models/zabbix/monitor_supervisor.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -64,26 +64,26 @@ Rails/TimeZone:
 # SupportedStyles: assign_to_condition, assign_inside_condition
 Style/ConditionalAssignment:
   Exclude:
-    - 'src/canoe/app/models/project.rb'
+    - 'canoe/app/models/project.rb'
 
 # Offense count: 3
 Style/DoubleNegation:
   Exclude:
-    - 'src/canoe/app/models/build.rb'
-    - 'src/canoe/config/application.rb'
-    - 'src/canoe/lib/canoe/ldap_authorizer.rb'
+    - 'canoe/app/models/build.rb'
+    - 'canoe/config/application.rb'
+    - 'canoe/lib/canoe/ldap_authorizer.rb'
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: format, sprintf, percent
 Style/FormatString:
   Exclude:
-    - 'src/canoe/app/helpers/canoe_helper.rb'
+    - 'canoe/app/helpers/canoe_helper.rb'
 
 # Offense count: 2
 Style/IdenticalConditionalBranches:
   Exclude:
-    - 'src/canoe/app/helpers/pagination_helper.rb'
+    - 'canoe/app/helpers/pagination_helper.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -91,8 +91,8 @@ Style/IdenticalConditionalBranches:
 # SupportedStyles: slashes, percent_r, mixed
 Style/RegexpLiteral:
   Exclude:
-    - 'src/canoe/spec/features/user_deploys_pardot_project_from_artifactory_spec.rb'
-    - 'src/canoe/spec/support/test_helpers.rb'
+    - 'canoe/spec/features/user_deploys_pardot_project_from_artifactory_spec.rb'
+    - 'canoe/spec/support/test_helpers.rb'
 
 # Offense count: 36
 # Cop supports --auto-correct.
@@ -107,28 +107,28 @@ Style/SpaceInsideHashLiteralBraces:
 # SupportedStyles: comma, consistent_comma, no_comma
 Style/TrailingCommaInLiteral:
   Exclude:
-    - 'src/canoe/app/models/project.rb'
+    - 'canoe/app/models/project.rb'
 
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
 Lint/UnusedMethodArgument:
   Exclude:
-    - 'src/hal9000/app/models/replication_fixing/test_pager.rb'
-    - 'src/hal9000/app/models/zabbix/monitor_supervisor.rb'
-    - 'src/hal9000/app/models/zabbix/test_pager.rb'
-    - 'src/hal9000/spec/helpers/zabbix_spec_helpers.rb'
-    - 'src/hal9000/app/handlers/zabbix_handler.rb'
+    - 'hal9000/app/models/replication_fixing/test_pager.rb'
+    - 'hal9000/app/models/zabbix/monitor_supervisor.rb'
+    - 'hal9000/app/models/zabbix/test_pager.rb'
+    - 'hal9000/spec/helpers/zabbix_spec_helpers.rb'
+    - 'hal9000/app/handlers/zabbix_handler.rb'
 
 # Offense count: 5
 Lint/UselessAssignment:
   Exclude:
-    - 'src/hal9000/app/models/replication_fixing/message_throttler.rb'
-    - 'src/hal9000/spec/handlers/replication_fixing_handler_spec.rb'
-    - 'src/hal9000/spec/models/replication_fixing/monitor_supervisor_spec.rb'
-    - 'src/hal9000/app/models/zabbix/zabbixmon.rb'
+    - 'hal9000/app/models/replication_fixing/message_throttler.rb'
+    - 'hal9000/spec/handlers/replication_fixing_handler_spec.rb'
+    - 'hal9000/spec/models/replication_fixing/monitor_supervisor_spec.rb'
+    - 'hal9000/app/models/zabbix/zabbixmon.rb'
 
 # Offense count: 1
 Lint/UselessAccessModifier:
   Exclude:
-    - 'src/hal9000/app/models/replication_fixing/monitor_supervisor.rb'
+    - 'hal9000/app/models/replication_fixing/monitor_supervisor.rb'

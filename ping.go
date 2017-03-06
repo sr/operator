@@ -1,22 +1,50 @@
 package bread
 
 import (
+	"database/sql"
 	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
+	"git.dev.pardot.com/Pardot/bread/pb"
 	"github.com/sr/operator"
 	"github.com/sr/operator/hipchat"
 	"golang.org/x/net/context"
-
-	"git.dev.pardot.com/Pardot/bread/pb"
 )
 
-type pingAPIServer struct {
+type pingServer struct {
 	operator.Sender
 }
 
-func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
+// NewPingServer returns a gRPC server that implements the breadpb.PingServer
+// interface which can be used a simple "health check" endpoint.
+func NewPingServer(sender operator.Sender) breadpb.PingServer {
+	return &pingServer{sender}
+}
+
+// NewPingHandler returns an http.HandlerFunc that implements a simple health
+// check endpoint for use with ELB and the likes. If the given db connection
+// is not nil, this also checks the availability of the database.
+func NewPingHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		// This is helpful to test the behaviour of the server when it panics.
+		if req.URL.Query().Get("boomtown") != "" {
+			panic("boomtown")
+		}
+		payload := `{"now": %d, "status": "ok"}`
+		if db != nil {
+			if err := db.Ping(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				payload = `{"now": %d, "status": "failures"}`
+			}
+		}
+		_, _ = w.Write([]byte(fmt.Sprintf(payload+"\n", time.Now().Unix())))
+	}
+}
+
+func (s *pingServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*operator.Response, error) {
 	email := operator.GetUserEmail(req)
 	if email == "" {
 		email = "unknown"
@@ -31,7 +59,7 @@ func (s *pingAPIServer) Ping(ctx context.Context, req *breadpb.PingRequest) (*op
 	})
 }
 
-func (s *pingAPIServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
+func (s *pingServer) SlowLoris(ctx context.Context, req *breadpb.SlowLorisRequest) (*operator.Response, error) {
 	var dur time.Duration
 	if req.Wait == "" {
 		dur = 10 * time.Second

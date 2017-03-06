@@ -1,0 +1,6 @@
+/.byebug_history
+/config/pi/*.php
+/log/*.log
+/.bundle/
+/vendor/gems/
+/tmp/
