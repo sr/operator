@@ -28,3 +28,4 @@
 
 # Docker
 /.devenv.sync.tmp
+/vendor/gems

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#/ Usage: build-ruby [--no-lint] my-great-project
+#/ Usage: build-ruby [--no-lint] my-great-project path/to/project
 #/ Build a BREAD Ruby project. It must be located under the src/ tree and have
 #/ a valid docker-compose.yml configuration file at its root.
 set -euo pipefail
@@ -11,6 +11,7 @@ print_help() {
 
 lint=true
 project=""
+dir=""
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -25,6 +26,8 @@ do
         *)
             project="$1"
             shift
+            dir="${1:-""}"
+            shift
             ;;
     esac
 done
@@ -34,7 +37,11 @@ if [ -z "$project" ]; then
     exit 2
 fi
 
-dir="src/$project"
+if [ -z "$dir" ]; then
+    print_help
+    exit 2
+fi
+
 config="$dir/docker-compose.yml"
 
 # Lint the code with RuboCop

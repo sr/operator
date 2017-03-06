@@ -188,14 +188,14 @@ echo "===> Building ${project}..." 2>&1
 
 case "$project" in
     canoe)
-        build-ruby "$project"
+        build-ruby "$project" "canoe"
 
         file="${BREAD}/src/terraform/_vendor/src/github.com/hashicorp/terraform/terraform/version.go"
         vendored="$(
           grep "const Version " "$file" |
           sed -e 's/^.*"\(.*\)".*$/\1/'
         )"
-        canoe="$(cat src/canoe/config/terraform-version)"
+        canoe="$(cat canoe/config/terraform-version)"
 
         if [ "$vendored" != "$canoe" ]; then
           printf "Vendored Terraform version (%s) does not match version required by Canoe: %s\n" \
@@ -216,7 +216,7 @@ case "$project" in
     changeling)
         RUBOCOP_CONFIG="etc/rubocop-changeling.yml"
         export RUBOCOP_CONFIG
-        build-ruby "$project"
+        build-ruby "$project" "changeling"
 
         if [ -n "$CI" ]; then
             docker_push "$project"
@@ -239,7 +239,7 @@ case "$project" in
             go install -v "${GO_PREFIX}/cmd/devenv"
         ;;
     explorer)
-        build-ruby "$project"
+        build-ruby "$project" "explorer"
 
         if [ -n "$CI" ]; then
             # Build a tarball from the app container built above
@@ -301,7 +301,7 @@ case "$project" in
         fi
         ;;
     hal9000)
-        build-ruby "$project"
+        build-ruby "$project" "hal9000"
 
         if [ -n "$CI" ]; then
             docker_push "$project"
@@ -327,7 +327,7 @@ case "$project" in
         # This is a fork of <https://github.com/PagerDuty/pd-sync-chef> which
         # does not follow the strict formatting and styles rules we normally
         # enforce for Ruby code within this repository so we skip the lint check
-        build-ruby --no-lint "$project"
+        build-ruby --no-lint "$project" "src/pd-sync-chef"
 
         if [ -n "$CI" ]; then
             build_rubygem "pardot_chef-sync" \
@@ -335,15 +335,15 @@ case "$project" in
         fi
         ;;
     pull_agent)
-        build-ruby "$project"
+        build-ruby "$project" "pull_agent"
 
         if [ -n "$CI" ]; then
             build_rubygem "pardot_pull-agent" \
-                "src/pull_agent/pardot_pull-agent.gemspec"
+                "pull_agent/pardot_pull-agent.gemspec"
         fi
         ;;
     rubylib)
-        build-ruby "rubylib"
+        build-ruby "rubylib" "src/rubylib"
         ;;
     shell)
         # Build a container image with the shellcheck package installed.
