@@ -5,37 +5,38 @@ class PullRequestOwnership
     @github_client = github_client
   end
 
-  # Returns the list of GitHub team slugs (e.g. @Pardot/bread) mentioned across
-  # the OWNERS files relevant to this pull request.
+  # Returns the list of GitHub team slugs (e.g. @Pardot/bread) that must
+  # review and approve the pull request, based on ownership data.
   def teams
-    slugs = Set.new([])
-
-    parsed_owners_files.each do |file|
-      slugs.merge(file.teams)
-    end
+    _files, slugs = load_ownership_data
 
     slugs.map do |slug|
       GithubTeam.new(slug)
     end
   end
 
-  # For each OWNERS file, returns the list of GitHub users that can approve this
+  # For every team that must review this pull request, returns the list of
+  # GitHub users that are allowed to approve the PR on behalf of the team.
   #
   # Example:
   #
   # [["sr", "alindeman"], ["lstoll"]]
   def users
-    users = []
+    teams_members = []
 
-    parsed_owners_files.each do |owners_file|
-      users << GithubInstallation.current.team_members(owners_file.teams)
+    teams.each do |team|
+      members = GithubInstallation.current.team_members(team.slug)
+
+      if members.any?
+        teams_members << members
+      end
     end
 
-    users
+    teams_members
   end
 
   # Returns the reviewer that has approved this pull request on the behalf of
-  # a given team. If it no one from the given team has given an approvel yet,
+  # a given team. If no one from the team has given approval yet,
   # this returns nil.
   def approver(team)
     approvers = @multipass.peer_review_approvers
@@ -44,44 +45,66 @@ class PullRequestOwnership
     end
   end
 
-  # Returns the list of OWNERS files that cover files being changed in this
-  # pull request.
+  # Returns the list of OWNERS files that cover files and directories being
+  # changed in this pull request.
   def owners_files
-    files = Set.new([])
-    directories = {}
-
-    @pull_request.repository_owners_files.each do |file|
-      directories[File.dirname(file.path_name)] = file
-    end
-
-    if directories.empty?
-      return []
-    end
-
-    # If the pull request doesn't have any change, return the root OWNERS file,
-    # or an empty Array if there is none
-    if @multipass.changed_files.empty?
-      return Array(directories["/"])
-    end
-
-    @multipass.changed_files.each do |file|
-      file.ascend do |path|
-        dirname = path.dirname.to_s
-
-        if directories.key?(dirname)
-          files.add(directories.fetch(dirname))
-        end
-      end
-    end
-
+    files, _slugs = load_ownership_data
     files.to_a
   end
 
   private
 
-  def parsed_owners_files
-    owners_files.map do |file|
-      OwnersFile.new(file.content)
+  def load_ownership_data
+    files = Set.new([])
+    slugs = Set.new([])
+
+    by_directory = {}
+    @pull_request.repository_owners_files.each do |file|
+      by_directory[File.dirname(file.path_name)] = file
     end
+
+    # If the repository doesn't have any OWNERS file, returns an empty list
+    # of files and teams. This means the pull request can never be approved
+    # and will be blocked until a valid OWNERS file is added at the root of
+    # the repository.
+    if by_directory.empty?
+      return [], []
+    end
+
+    # Similarly, if the pull request doesn't have any change, pretend that the
+    # the root /OWNERS file is being changed, effectively causing it to take
+    # effect.
+    changed_files =
+      if @multipass.changed_files.empty?
+        [Pathname("/OWNERS")]
+      else
+        @multipass.changed_files
+      end
+
+    changed_files.each do |file|
+      file.ascend do |path|
+        dirname = path.dirname.to_s
+
+        if by_directory.key?(dirname)
+          owners_file = by_directory.fetch(dirname)
+          owners_file.parse
+
+          files.add(owners_file)
+
+          # Add naked team mentions, such as "@Pardot/bread"
+          slugs.merge(owners_file.parsed.teams)
+
+          # Add team mentions that have a glob modifier attached to them,
+          # such as "@Pardot/bread build-*".
+          owners_file.parsed.globs.each do |glob, team|
+            if File.fnmatch?(glob, file.basename)
+              slugs.add(team)
+            end
+          end
+        end
+      end
+    end
+
+    [files, slugs]
   end
 end
