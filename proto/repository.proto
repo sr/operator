@@ -2,25 +2,24 @@ syntax = "proto3";
 
 package bread;
 
+option go_package = "breadpb";
+
 message RepositoryConfig {
 	// List of automated test statuses that are required to pass for this
 	// repository's build to be considered successful
 	repeated string required_testing_statuses = 1;
 
-	// Changing files matching glob patterns configured in this watchlist
-	// requires additional peer review and approval from a member of the
-	// @Pardot/security team
-	RepositoryWatchlist security_watchlist = 2;
-
 	// Watchlists attached to this repository
-	repeated RepositoryWatchlist watchlists = 3;
+	repeated RepositoryWatchlist watchlists = 2;
 }
 
 message RepositoryWatchlist {
-	// Slug of the team that should be notified when a file matching one of the
-	// globs listed bellow matches. Example: Pardot/build-and-automate
-	string team = 1;
+    // Watchlist label
+    string name = 1;
+    
+    // List of Github user/team names of watchers
+    repeated string watchers = 2;
 
-	// List of file glob patterns
-	repeated string globs = 2;
+    // List of watched file globs
+    repeated string files = 3;
 }

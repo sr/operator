@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,6 +16,11 @@ import (
 const (
 	githubMaxPerPage = 100
 )
+
+type File struct {
+	Path    string
+	Content []byte
+}
 
 type Repository struct {
 	Org  string
@@ -133,6 +139,9 @@ type Client interface {
 	DeleteBranch(org, repo, branch string) error
 	PostIssueComment(org, repo string, number int, comment *IssueReplyComment) error
 	CloseIssue(org, repo string, number int) error
+
+	GetPullRequestFiles(org, repo string, number int) ([]string, error)
+	GetRepositoryFile(org, repo, file, ref string) (*File, error)
 }
 
 // client is the real implementation of Client.
@@ -435,6 +444,37 @@ func (c *client) CloseIssue(org, repo string, number int) error {
 
 	_, _, err := c.gh.Issues.Edit(org, repo, number, req)
 	return err
+}
+
+func (c *client) GetPullRequestFiles(org, repo string, number int) ([]string, error) {
+	files, _, err := c.gh.PullRequests.ListFiles(org, repo, number, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var filenames = make([]string, len(files))
+	for i, file := range files {
+		filenames[i] = *file.Filename
+	}
+	return filenames, nil
+}
+
+func (c *client) GetRepositoryFile(org, repo, file, ref string) (*File, error) {
+	contents, err := c.gh.Repositories.DownloadContents(org, repo, file, &gogithub.RepositoryContentGetOptions{Ref: ref})
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = contents.Close() }()
+
+	bytes, err := ioutil.ReadAll(contents)
+	if err != nil {
+		return nil, err
+	}
+
+	return &File{
+		Path:    file,
+		Content: bytes,
+	}, nil
 }
 
 func wrapCommitStatus(status *gogithub.RepoStatus) (*CommitStatus, error) {
