@@ -225,6 +225,7 @@ class RepositoryPullRequest
     )
 
     @multipass.merged = pull_request[:merged]
+    @multipass.merged_at = pull_request[:merged_at]
     @multipass.merge_commit_sha = pull_request[:merge_commit_sha] if pull_request[:merged]
     @multipass.title = pull_request[:title]
     @multipass.body = pull_request[:body].to_s
