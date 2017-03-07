@@ -354,7 +354,7 @@ case "$project" in
 
         # Lint all shell scripts
         docker run --rm -v "$BREAD:/data" \
-            -e "PATH=/data/src/build:$PATH" build/shellcheck lint-shell
+            -e "PATH=/data/tools/build:$PATH" build/shellcheck lint-shell
         ;;
     teampass)
         docker build $pullopts \
