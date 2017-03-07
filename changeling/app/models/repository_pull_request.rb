@@ -192,7 +192,7 @@ class RepositoryPullRequest
     body << "</ul>"
 
     if !@multipass.sre_approval_required?
-      body << "<p>If this is a major change that requires SRE involvement, please tag it as `#major` in an issue comment.</p>"
+      body << "<p>If this is a major change where SRE assistance would be beneficial, please tag it as `#major` in an issue comment.</p>"
     end
 
     body << "<details>"
