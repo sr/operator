@@ -616,6 +616,7 @@ RSpec.describe RepositoryPullRequest do
       stub_github_pull_request_comments
       stub_github_pull_request_labels
       stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+        .to_return(status: 201, headers: { "Content-Type": "application/json" }, body: JSON.dump(id: 1))
 
       @repository_pull_request.synchronize(create_github_status: false)
       @multipass.reload
@@ -656,6 +657,7 @@ RSpec.describe RepositoryPullRequest do
     stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/statuses/deadbeef")
 
     request = stub_request(:post, "#{Changeling.config.github_api_endpoint}/repos/#{@repository.full_name}/issues/#{@repository_pull_request.number}/comments")
+      .to_return(status: 201, body: JSON.dump(id: 1), headers: { "Content-Type": "application/json" })
 
     @multipass.synchronize
 

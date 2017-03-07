@@ -127,11 +127,13 @@ class RepositoryPullRequest
     end
 
     if !compliance_comment
-      return github_client.add_comment(
+      new_comment = github_client.add_comment(
         repository.name_with_owner,
         number,
         compliance_comment_body_html
       )
+
+      return @multipass.update!(github_comment_id: new_comment.id)
     end
 
     if compliance_comment.body != compliance_comment_body_html
