@@ -1,6 +1,5 @@
 package com.pardot.bread.bambooplugin.rest;
 
-import aQute.bnd.annotation.component.Component;
 import com.atlassian.bamboo.build.BuildDefinition;
 import com.atlassian.bamboo.build.BuildDefinitionManager;
 import com.atlassian.bamboo.build.PlanCreationDeniedException;
@@ -33,6 +32,7 @@ import com.pardot.bread.bambooplugin.trigger.GithubWebhookTriggerConfigurator;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
